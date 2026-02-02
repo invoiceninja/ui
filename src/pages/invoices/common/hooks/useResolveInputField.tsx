@@ -293,10 +293,10 @@ export function useResolveInputField(props: Props) {
           <Inline>
             <TaxRateSelector
               key={`${property}${lineItem[property]}`}
-              // onChange={(value) =>
-              //   value.resource &&
-              //   handleTaxRateChange(property, index, value.resource)
-              // }
+              onChange={(value) =>
+                value.resource &&
+                handleTaxRateChange(property, index, value.resource)
+              }
               onTaxCreated={(taxRate) =>
                 handleTaxRateChange(property, index, taxRate)
               }
@@ -329,9 +329,9 @@ export function useResolveInputField(props: Props) {
           <Inline>
             <TaxCategorySelector
               value={lineItem.tax_id}
-              // onChange={(taxCategory) =>
-              //   onChange('tax_id', taxCategory.value, index)
-              // }
+              onChange={(taxCategory) =>
+                onChange('tax_id', taxCategory.value, index)
+              }
             />
           </Inline>
         );
@@ -349,10 +349,10 @@ export function useResolveInputField(props: Props) {
       <div className="flex flex-col items-center gap-y-2">
         <TaxRateSelector
           key={`${property}${resource?.line_items[index][property]}`}
-          // onChange={(value) =>
-          //   value.resource &&
-          //   handleTaxRateChange(property, index, value.resource)
-          // }
+          onChange={(value) =>
+            value.resource &&
+            handleTaxRateChange(property, index, value.resource)
+          }
           onTaxCreated={(taxRate) =>
             handleTaxRateChange(property, index, taxRate)
           }
@@ -403,9 +403,11 @@ export function useResolveInputField(props: Props) {
       return (
         <ProductSelector
           key={`${property}${resource?.line_items[index][property]}`}
-          onChange={(value) =>
-            onProductChange(index, value.label, value.resource)
-          }
+          onChange={(value) => {
+            if (value.value !== resource?.line_items[index][property]) {
+              onProductChange(index, value.label, value.resource);
+            }
+          }}
           className="w-auto"
           defaultValue={resource?.line_items[index][property]}
           onProductCreated={(product) =>
@@ -426,9 +428,11 @@ export function useResolveInputField(props: Props) {
           key={`${property}${index}`}
           element="textarea"
           value={resource?.line_items[index][property]}
-          // onChange={(event: ChangeEvent<HTMLInputElement>) =>
-          //   onChange(property, event.target.value, index)
-          // }
+          onValueChange={(value) => {
+            if (resource?.line_items[index][property] !== value) {
+              onChange(property, value, index);
+            }
+          }}
           style={{ marginTop: '4px' }}
           textareaRows={preferences.auto_expand_product_table_notes ? 1 : 3}
         />
@@ -451,13 +455,13 @@ export function useResolveInputField(props: Props) {
             id={property}
             value={resource?.line_items[index][property] || ''}
             className="auto"
-            // onValueChange={(value: string) => {
-            //   onChange(
-            //     property,
-            //     isNaN(parseFloat(value)) ? 0 : parseFloat(value),
-            //     index
-            //   );
-            // }}
+            onValueChange={(value: string) => {
+              onChange(
+                property,
+                isNaN(parseFloat(value)) ? 0 : parseFloat(value),
+                index
+              );
+            }}
           />
         )
       );
