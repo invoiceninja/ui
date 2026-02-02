@@ -31,6 +31,7 @@ import {
 import { useHandleTaxRateChange } from './useHandleTaxRateChange';
 import { Product } from '$app/common/interfaces/product';
 import { useAtom } from 'jotai';
+
 import collect from 'collect.js';
 import {
   TaxCategorySelector,
@@ -183,7 +184,9 @@ export function useResolveInputField(props: Props) {
     value: string | number | boolean,
     index: number
   ) => {
-    setIsDeleteActionTriggered(false);
+    if (isDeleteActionTriggered) {
+      setIsDeleteActionTriggered(false);
+    }
 
     await props.onLineItemPropertyChange(key, value, index);
   };
@@ -285,21 +288,20 @@ export function useResolveInputField(props: Props) {
     if (company.calculate_taxes) {
       const lineItem = resource?.line_items[index];
 
-      // If the value is set to override taxes (7), show the regular element
       if (lineItem.tax_id === '7' || lineItem.tax_id === '') {
         return (
           <Inline>
             <TaxRateSelector
-              key={`${property}${resource?.line_items[index][property]}`}
-              onChange={(value) =>
-                value.resource &&
-                handleTaxRateChange(property, index, value.resource)
-              }
+              key={`${property}${lineItem[property]}`}
+              // onChange={(value) =>
+              //   value.resource &&
+              //   handleTaxRateChange(property, index, value.resource)
+              // }
               onTaxCreated={(taxRate) =>
                 handleTaxRateChange(property, index, taxRate)
               }
               defaultValue={getTaxRateComboValue(
-                resource?.line_items[index],
+                lineItem,
                 property.replace('rate', 'name') as TaxNamePropertyType
               )}
               onClearButtonClick={() => handleTaxRateChange(property, index)}
@@ -327,9 +329,9 @@ export function useResolveInputField(props: Props) {
           <Inline>
             <TaxCategorySelector
               value={lineItem.tax_id}
-              onChange={(taxCategory) =>
-                onChange('tax_id', taxCategory.value, index)
-              }
+              // onChange={(taxCategory) =>
+              //   onChange('tax_id', taxCategory.value, index)
+              // }
             />
           </Inline>
         );
@@ -347,10 +349,10 @@ export function useResolveInputField(props: Props) {
       <div className="flex flex-col items-center gap-y-2">
         <TaxRateSelector
           key={`${property}${resource?.line_items[index][property]}`}
-          onChange={(value) =>
-            value.resource &&
-            handleTaxRateChange(property, index, value.resource)
-          }
+          // onChange={(value) =>
+          //   value.resource &&
+          //   handleTaxRateChange(property, index, value.resource)
+          // }
           onTaxCreated={(taxRate) =>
             handleTaxRateChange(property, index, taxRate)
           }
@@ -394,7 +396,7 @@ export function useResolveInputField(props: Props) {
     );
   };
 
-  return (key: string, index: number) => {
+  return (key: string, index: number, lineItem: InvoiceItem) => {
     const property = resolveProperty(key);
 
     if (property === 'product_key') {
@@ -410,7 +412,7 @@ export function useResolveInputField(props: Props) {
             product && onProductChange(index, product.product_key, product)
           }
           clearButton
-          onInputValueChange={(value) => onChange('product_key', value, index)}
+          //onInputValueChange={(value) => onChange('product_key', value, index)}
           onClearButtonClick={() => handleProductChange(index, '', null)}
           displayStockQuantity={location.pathname.startsWith('/invoices')}
         />
@@ -424,9 +426,9 @@ export function useResolveInputField(props: Props) {
           key={`${property}${index}`}
           element="textarea"
           value={resource?.line_items[index][property]}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            onChange(property, event.target.value, index)
-          }
+          // onChange={(event: ChangeEvent<HTMLInputElement>) =>
+          //   onChange(property, event.target.value, index)
+          // }
           style={{ marginTop: '4px' }}
           textareaRows={preferences.auto_expand_product_table_notes ? 1 : 3}
         />
@@ -449,13 +451,13 @@ export function useResolveInputField(props: Props) {
             id={property}
             value={resource?.line_items[index][property] || ''}
             className="auto"
-            onValueChange={(value: string) => {
-              onChange(
-                property,
-                isNaN(parseFloat(value)) ? 0 : parseFloat(value),
-                index
-              );
-            }}
+            // onValueChange={(value: string) => {
+            //   onChange(
+            //     property,
+            //     isNaN(parseFloat(value)) ? 0 : parseFloat(value),
+            //     index
+            //   );
+            // }}
           />
         )
       );

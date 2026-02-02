@@ -13,7 +13,7 @@ import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
 import { useAtom } from 'jotai';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   useNavigate,
@@ -62,6 +62,13 @@ export interface Context {
   client: Client | undefined;
 }
 
+const PRODUCT_TYPE_IDS = [
+  InvoiceItemType.Product,
+  InvoiceItemType.UnpaidFee,
+  InvoiceItemType.PaidFee,
+  InvoiceItemType.LateFee,
+];
+
 export default function Edit() {
   const [t] = useTranslation();
 
@@ -98,6 +105,22 @@ export default function Edit() {
 
   const { changeTemplateVisible, setChangeTemplateVisible } =
     useChangeTemplate();
+
+  const productLineItems = useMemo(
+    () =>
+      invoice?.line_items.filter((item) =>
+        PRODUCT_TYPE_IDS.includes(item.type_id)
+      ) ?? [],
+    [invoice?.line_items]
+  );
+
+  const taskLineItems = useMemo(
+    () =>
+      invoice?.line_items.filter(
+        (item) => item.type_id === InvoiceItemType.Task
+      ) ?? [],
+    [invoice?.line_items]
+  );
 
   return (
     <>
@@ -206,14 +229,7 @@ export default function Edit() {
                   shouldCreateInitialLineItem={
                     searchParams.get('table') !== 'tasks'
                   }
-                  items={invoice.line_items.filter((item) =>
-                    [
-                      InvoiceItemType.Product,
-                      InvoiceItemType.UnpaidFee,
-                      InvoiceItemType.PaidFee,
-                      InvoiceItemType.LateFee,
-                    ].includes(item.type_id)
-                  )}
+                  items={productLineItems}
                   columns={productColumns}
                   relationType="client_id"
                   onLineItemChange={handleLineItemChange}
@@ -237,9 +253,7 @@ export default function Edit() {
                   shouldCreateInitialLineItem={
                     searchParams.get('table') === 'tasks'
                   }
-                  items={invoice.line_items.filter(
-                    (item) => item.type_id === InvoiceItemType.Task
-                  )}
+                  items={taskLineItems}
                   columns={taskColumns}
                   relationType="client_id"
                   onLineItemChange={handleLineItemChange}
