@@ -74,7 +74,11 @@ export default function Projects() {
         hideEditableOptions={!hasPermission('edit_project')}
         enableSavingFilterPreference
         dateRangeColumns={[
-          { column: 'due_date', queryParameterKey: 'date_range' },
+          {
+            column: 'due_date',
+            queryParameterKey: 'date_range',
+            includeColumnNameInQuery: true,
+          },
           { column: 'created_at', queryParameterKey: 'created_between' },
         ]}
       />
