@@ -63,11 +63,19 @@ import { useColorScheme } from '$app/common/colors';
 import { useDebounce } from 'react-use';
 import { cloneDeep, isEqual } from 'lodash';
 import { FilterColumn } from './FilterColumn';
+import { buildDateRangeQueryParameter } from '$app/common/helpers/data-table';
 
 export interface DateRangeColumn {
   column: string;
   queryParameterKey: string;
   includeColumnNameInQuery?: boolean;
+}
+
+export interface DateRangeEntry {
+  column: string;
+  startDate: string;
+  endDate: string;
+  current: boolean;
 }
 
 export type DataTableColumns<T = any> = {
@@ -190,7 +198,7 @@ export type ResourceAction<T> = (resource: T) => ReactElement;
 
 export type PerPage = '10' | '50' | '100';
 
-export const dateRangeAtom = atom<string>('');
+export const dateRangeAtom = atom<DateRangeEntry[]>([]);
 export const dataTableSelectedAtom = atom<Record<string, string[]>>({});
 export const filterColumnsValuesAtom = atom<Record<string, string[]>>({});
 
@@ -285,7 +293,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<string[]>(['active']);
-  const [dateRange, setDateRange] = useAtom(dateRangeAtom);
+  const [dateRangeEntries, setDateRangeEntries] = useAtom(dateRangeAtom);
   const [dateRangeQueryParameter, setDateRangeQueryParameter] =
     useState<string>('');
   const [selected, setSelected] = useState<string[]>([]);
@@ -334,6 +342,18 @@ export function DataTable<T extends object>(props: Props<T>) {
   });
 
   useEffect(() => {
+    const queryParam = buildDateRangeQueryParameter(dateRangeEntries);
+
+    setDateRangeQueryParameter((prev) => {
+      if (prev !== queryParam) {
+        return queryParam;
+      }
+
+      return prev;
+    });
+  }, [dateRangeEntries]);
+
+  useEffect(() => {
     if (!isInitialConfiguration) {
       clearTimeout(companyUpdateTimeOut.current);
 
@@ -368,32 +388,34 @@ export function DataTable<T extends object>(props: Props<T>) {
 
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
-    if (
-      dateRangeColumns.length &&
-      dateRangeQueryParameter &&
-      dateRange?.split(',').every((date) => date.length > 1)
-    ) {
-      const dateRangeColumn = dateRangeColumns.find(
-        (dateRangeColumn) =>
-          dateRangeColumn.queryParameterKey === dateRangeQueryParameter
-      );
+    dateRangeColumns.forEach((dateRangeColumn) => {
+      apiEndpoint.searchParams.delete(dateRangeColumn.queryParameterKey);
+    });
 
-      if (dateRangeColumn?.includeColumnNameInQuery) {
-        apiEndpoint.searchParams.set(
-          dateRangeQueryParameter,
-          `${dateRangeColumn.column},${dateRange}`
-        );
-      } else {
-        apiEndpoint.searchParams.set(dateRangeQueryParameter, dateRange);
-      }
-    }
+    if (dateRangeColumns.length) {
+      dateRangeEntries
+        .filter(
+          (entry) => entry.startDate.length > 0 && entry.endDate.length > 0
+        )
+        .forEach((entry) => {
+          const currentDateRangeColumn = dateRangeColumns.find(
+            (column) => column.column === entry.column
+          );
 
-    if (
-      dateRangeColumns.length &&
-      dateRangeQueryParameter &&
-      !dateRange?.split(',').every((date) => date.length > 1)
-    ) {
-      apiEndpoint.searchParams.set(dateRangeQueryParameter, '');
+          if (currentDateRangeColumn) {
+            if (currentDateRangeColumn.includeColumnNameInQuery) {
+              apiEndpoint.searchParams.set(
+                currentDateRangeColumn.queryParameterKey,
+                `${entry.column},${entry.startDate},${entry.endDate}`
+              );
+            } else {
+              apiEndpoint.searchParams.set(
+                currentDateRangeColumn.queryParameterKey,
+                `${entry.startDate},${entry.endDate}`
+              );
+            }
+          }
+        });
     }
 
     if (Object.keys(filterColumnsValues).length) {
@@ -421,7 +443,6 @@ export function DataTable<T extends object>(props: Props<T>) {
     sort,
     status,
     customFilter,
-    dateRange,
     dateRangeQueryParameter,
     filterColumns,
     filterColumnsValues,
@@ -451,6 +472,8 @@ export function DataTable<T extends object>(props: Props<T>) {
   useEffect(() => {
     return () => {
       setSelected([]);
+      setDateRangeEntries([]);
+      setDateRangeQueryParameter('');
       setGlobalSelected((current) => ({
         ...current,
         [props.resource]: [],
@@ -469,13 +492,7 @@ export function DataTable<T extends object>(props: Props<T>) {
       sort,
       status,
       customFilter,
-      ...(dateRange?.split(',').every((date) => date.length > 1)
-        ? [dateRange]
-        : []),
-      ...(dateRange?.split(',').every((date) => date.length > 1) &&
-      dateRangeQueryParameter
-        ? [dateRangeQueryParameter]
-        : []),
+      ...(dateRangeQueryParameter.length > 0 ? [dateRangeQueryParameter] : []),
       filterColumnsValues,
     ],
     () => request(methodType, apiEndpoint.href),
@@ -563,21 +580,52 @@ export function DataTable<T extends object>(props: Props<T>) {
   };
 
   const handleDateRangeColumnClick = (columnId: string) => {
-    const columnOfCurrentQueryParameter = dateRangeColumns.find(
-      (dateRangeColumn) =>
-        dateRangeQueryParameter === dateRangeColumn.queryParameterKey
-    )?.column;
+    setDateRangeEntries((current) => {
+      const currentColumnIndex = current.findIndex(
+        (entry) => entry.column === columnId
+      );
 
-    const queryParameterOfCurrentColumn = dateRangeColumns.find(
-      (dateRangeColumn) => columnId === dateRangeColumn.column
-    )?.queryParameterKey;
+      if (currentColumnIndex !== -1) {
+        return current.map((entry, index) => ({
+          ...entry,
+          current: index === currentColumnIndex,
+        }));
+      }
 
-    if (
-      columnOfCurrentQueryParameter !== columnId &&
-      queryParameterOfCurrentColumn
-    ) {
-      setDateRangeQueryParameter(queryParameterOfCurrentColumn);
-    }
+      return [
+        ...current.map((entry) => ({ ...entry, current: false })),
+        {
+          column: columnId,
+          startDate: '',
+          endDate: '',
+          current: true,
+        },
+      ];
+    });
+  };
+
+  const handleDateRangeChange = (startDate: string, endDate: string) => {
+    setDateRangeEntries((current) => {
+      const currentEntry = current.find((entry) => entry.current);
+
+      if (!currentEntry) {
+        return current;
+      }
+
+      if (startDate.length === 0 && endDate.length === 0) {
+        return current.filter((entry) => !entry.current);
+      }
+
+      return current.map((entry) =>
+        entry.current ? { ...entry, startDate, endDate } : entry
+      );
+    });
+  };
+
+  const getDateRangeEntryForColumn = (
+    columnId: string
+  ): DateRangeEntry | undefined => {
+    return dateRangeEntries.find((entry) => entry.column === columnId);
   };
 
   const getFooterColumn = (columnId: string) => {
@@ -646,14 +694,18 @@ export function DataTable<T extends object>(props: Props<T>) {
     sort,
     status,
     customFilter,
-    dateRange,
+    dateRangeQueryParameter,
   ]);
 
   useEffect(() => {
-    if (!dateRange?.split(',').every((date) => date.length > 1)) {
+    const hasAnyCompleteDateRange = dateRangeEntries.some(
+      (entry) => entry.startDate.length > 0 && entry.endDate.length > 0
+    );
+
+    if (!hasAnyCompleteDateRange) {
       setAreRowsRendered(true);
     }
-  }, [dateRange]);
+  }, [dateRangeEntries]);
 
   useEffect(() => {
     if (isFetching || isLoading) {
@@ -908,7 +960,14 @@ export function DataTable<T extends object>(props: Props<T>) {
                           column.id === dateRangeColumn.column
                       ) && (
                         <DateRangePicker
-                          setDateRange={setDateRange}
+                          startDate={
+                            getDateRangeEntryForColumn(column.id)?.startDate ??
+                            ''
+                          }
+                          endDate={
+                            getDateRangeEntryForColumn(column.id)?.endDate ?? ''
+                          }
+                          onDateRangeChange={handleDateRangeChange}
                           onClick={() => handleDateRangeColumnClick(column.id)}
                         />
                       )}
