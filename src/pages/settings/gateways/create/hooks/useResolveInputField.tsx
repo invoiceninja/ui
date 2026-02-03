@@ -66,9 +66,13 @@ export function useResolveInputField(
       return (
         <InputField
           element="textarea"
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            handleChange(property as keyof Field, event.target.value)
-          }
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+            if (resolveConfigValue(property) === event.target.value) {
+              return;
+            }
+
+            handleChange(property as keyof Field, event.target.value);
+          }}
           value={resolveConfigValue(property)}
           errorMessage={errors?.errors.appleDomainVerification}
         />
@@ -85,9 +89,13 @@ export function useResolveInputField(
       return (
         <InputField
           type={isSecureField ? 'password' : 'text'}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            handleChange(property as keyof Field, event.target.value)
-          }
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+            if (resolveConfigValue(property) === event.target.value) {
+              return;
+            }
+
+            handleChange(property as keyof Field, event.target.value);
+          }}
           value={resolveConfigValue(property)}
           errorMessage={errors?.errors[property]}
         />

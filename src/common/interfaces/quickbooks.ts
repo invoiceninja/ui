@@ -29,8 +29,11 @@ export interface QuickbooksSettings {
     product: QuickbooksSync;
     payment: QuickbooksSync;
     expense: QuickbooksSync;
-    default_income_account: string;
-    default_expense_account: string;
+    expense_category: QuickbooksSync;
+    income_account_map: IncomeAccountMapEntry[];
+    qb_income_account_id: string | null;
+    tax_rate_map: TaxRateMapEntry[];
+    automatic_taxes: boolean;
 }
 
 export enum QuickbooksSyncDirection {
@@ -44,3 +47,5 @@ export interface QuickbooksSync {
     direction: QuickbooksSyncDirection;
 }
 
+export type IncomeAccountMapEntry = [id: string, name: string, fully_qualified_name: string];
+export type TaxRateMapEntry = [id: string, name: string, rate: string];
