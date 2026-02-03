@@ -31,8 +31,9 @@ import { atom, useSetAtom } from 'jotai';
 import classNames from 'classnames';
 import { useColorScheme } from '$app/common/colors';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import React, { memo, useCallback, useRef } from 'react';
-import { isEqual, omit } from 'lodash';
+import { Spinner } from '$app/components/Spinner';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { isEqual } from 'lodash';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
 export type RelationType = 'client_id' | 'vendor_id';
@@ -160,6 +161,16 @@ function ProductsTableInner(props: Props) {
 
   const { resource, columns, relationType } = props;
 
+  const [isInitialRender, setIsInitialRender] = useState(true);
+
+  useEffect(() => {
+    const timer = requestAnimationFrame(() => {
+      setIsInitialRender(false);
+    });
+
+    return () => cancelAnimationFrame(timer);
+  }, []);
+
   const resolveTranslation = useResolveTranslation({ type: props.type });
 
   const handleDragEnd = useCallback(
@@ -210,6 +221,10 @@ function ProductsTableInner(props: Props) {
   const isAnyLineItemEmpty = props.items.some((lineItem) =>
     isLineItemEmpty(lineItem)
   );
+
+  if (isInitialRender) {
+    return <Spinner />;
+  }
 
   return (
     <Table>
@@ -272,10 +287,7 @@ export const ProductsTable = memo(
   (prevProps, nextProps) => {
     if (!isEqual(prevProps.columns, nextProps.columns)) return false;
 
-    const prevResource = omit(prevProps.resource, ['updated_at']);
-    const nextResource = omit(nextProps.resource, ['updated_at']);
-
-    if (!isEqual(prevResource, nextResource)) return false;
+    if (!isEqual(prevProps, nextProps)) return false;
 
     return true;
   }
