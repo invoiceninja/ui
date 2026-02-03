@@ -31,11 +31,8 @@ import { atom, useSetAtom } from 'jotai';
 import classNames from 'classnames';
 import { useColorScheme } from '$app/common/colors';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import React, { memo, useCallback, useRef, useState } from 'react';
-import { blankLineItem } from '$app/common/constants/blank-line-item';
-import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
-import { v4 } from 'uuid';
-import { isEqual } from 'lodash';
+import React, { memo, useCallback, useRef } from 'react';
+import { isEqual, omit } from 'lodash';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
 export type RelationType = 'client_id' | 'vendor_id';
@@ -163,94 +160,7 @@ function ProductsTableInner(props: Props) {
 
   const { resource, columns, relationType } = props;
 
-  const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
-
   const resolveTranslation = useResolveTranslation({ type: props.type });
-
-  const [lineItems, setLineItems] = useState<InvoiceItem[]>(props.items);
-
-  const getResourceIndex = useCallback(
-    (lineItem: InvoiceItem): number => {
-      return resource.line_items.findIndex((li) => li._id === lineItem._id);
-    },
-    [resource.line_items]
-  );
-
-  const onLineItemPropertyChangeRef = useRef(props.onLineItemPropertyChange);
-  onLineItemPropertyChangeRef.current = props.onLineItemPropertyChange;
-
-  const onLineItemChangeRef = useRef(props.onLineItemChange);
-  onLineItemChangeRef.current = props.onLineItemChange;
-
-  const onDeleteRowClickRef = useRef(props.onDeleteRowClick);
-  onDeleteRowClickRef.current = props.onDeleteRowClick;
-
-  const onCreateItemClickRef = useRef(props.onCreateItemClick);
-  onCreateItemClickRef.current = props.onCreateItemClick;
-
-  const onSortRef = useRef(props.onSort);
-  onSortRef.current = props.onSort;
-
-  const handleLineItemPropertyChange = useCallback(
-    (key: keyof InvoiceItem, value: unknown, resourceIndex: number) => {
-      setLineItems((prev) =>
-        prev.map((item) =>
-          getResourceIndex(item) === resourceIndex
-            ? { ...item, [key]: value }
-            : item
-        )
-      );
-
-      onLineItemPropertyChangeRef.current(key, value, resourceIndex);
-    },
-    [getResourceIndex]
-  );
-
-  const handleLineItemChange = useCallback(
-    (resourceIndex: number, lineItem: InvoiceItem) => {
-      setLineItems((prev) =>
-        prev.map((item) =>
-          getResourceIndex(item) === resourceIndex ? lineItem : item
-        )
-      );
-
-      onLineItemChangeRef.current(resourceIndex, lineItem);
-    },
-    [getResourceIndex]
-  );
-
-  const handleDeleteRowClick = useCallback(
-    (resourceIndex: number) => {
-      setLineItems((prev) =>
-        prev.filter((item) => getResourceIndex(item) !== resourceIndex)
-      );
-
-      setIsDeleteActionTriggered(true);
-
-      onDeleteRowClickRef.current(resourceIndex);
-    },
-    [getResourceIndex, setIsDeleteActionTriggered]
-  );
-
-  const handleCreateItemClick = useCallback(() => {
-    const typeId =
-      props.type === 'task' ? InvoiceItemType.Task : InvoiceItemType.Product;
-
-    const newItem: InvoiceItem = {
-      ...blankLineItem(),
-      type_id: typeId,
-      quantity: 1,
-      _id: v4(),
-    };
-
-    setLineItems((prev) => [...prev, newItem]);
-
-    onCreateItemClickRef.current();
-  }, [props.type]);
-
-  const isAnyLineItemEmpty = useCallback(() => {
-    return lineItems.some((lineItem) => isLineItemEmpty(lineItem));
-  }, [lineItems]);
 
   const handleDragEnd = useCallback(
     (result: DropResult) => {
@@ -261,41 +171,23 @@ function ProductsTableInner(props: Props) {
 
       if (sourceIndex === destinationIndex) return;
 
-      setLineItems((prev) => {
-        const reordered = [...prev];
-        const [moved] = reordered.splice(sourceIndex, 1);
-        reordered.splice(destinationIndex, 0, moved);
+      const reordered = [...resource.line_items];
+      const [moved] = reordered.splice(sourceIndex, 1);
+      reordered.splice(destinationIndex, 0, moved);
 
-        // Build the full reordered line_items for the parent
-        // by replacing the items of our type in resource.line_items
-        const typeId =
-          props.type === 'task'
-            ? InvoiceItemType.Task
-            : InvoiceItemType.Product;
-
-        const otherItems = resource.line_items.filter(
-          (li) => li.type_id !== typeId
-        );
-
-        const newLineItems = [...reordered, ...otherItems];
-
-        // Notify parent asynchronously so we don't set state during render
-        setTimeout(() => onSortRef.current(newLineItems), 0);
-
-        return reordered;
-      });
+      props.onSort(reordered);
     },
-    [props.type, resource.line_items]
+    [resource.line_items, props.onSort]
   );
 
   const resolveInputFieldFn = useResolveInputField({
     type: props.type,
     resource: props.resource,
-    onLineItemChange: handleLineItemChange,
-    onLineItemPropertyChange: handleLineItemPropertyChange,
+    onLineItemChange: props.onLineItemChange,
+    onLineItemPropertyChange: props.onLineItemPropertyChange,
     relationType,
-    createItem: handleCreateItemClick,
-    deleteLineItem: handleDeleteRowClick,
+    createItem: props.onCreateItemClick,
+    deleteLineItem: props.onDeleteRowClick,
   });
 
   const resolveInputFieldRef = useRef(resolveInputFieldFn);
@@ -306,6 +198,17 @@ function ProductsTableInner(props: Props) {
       return resolveInputFieldRef.current(key, index, lineItem);
     },
     []
+  );
+
+  const stableOnDeleteRowClick = useCallback(
+    (index: number) => {
+      props.onDeleteRowClick(index);
+    },
+    [props.onDeleteRowClick]
+  );
+
+  const isAnyLineItemEmpty = props.items.some((lineItem) =>
+    isLineItemEmpty(lineItem)
   );
 
   return (
@@ -321,17 +224,23 @@ function ProductsTableInner(props: Props) {
         <Droppable droppableId="product-table">
           {(provided) => (
             <Tbody {...provided.droppableProps} innerRef={provided.innerRef}>
-              {lineItems.map((lineItem, index) => (
-                <ProductRow
-                  key={lineItem._id}
-                  lineItem={lineItem}
-                  resourceIndex={getResourceIndex(lineItem)}
-                  tabIndex={index + 1}
-                  columns={columns}
-                  resolveInputField={stableResolveInputField}
-                  onDeleteRowClick={handleDeleteRowClick}
-                />
-              ))}
+              {props.items.map((lineItem, index) => {
+                const resourceIndex = resource.line_items.findIndex(
+                  (li) => li._id === lineItem._id
+                );
+
+                return (
+                  <ProductRow
+                    key={lineItem._id}
+                    lineItem={{ ...resource.line_items[resourceIndex] }}
+                    resourceIndex={resourceIndex}
+                    tabIndex={index + 1}
+                    columns={columns}
+                    resolveInputField={stableResolveInputField}
+                    onDeleteRowClick={stableOnDeleteRowClick}
+                  />
+                );
+              })}
 
               {provided.placeholder}
 
@@ -339,7 +248,7 @@ function ProductsTableInner(props: Props) {
                 <Td colSpan={100}>
                   <button
                     onClick={() =>
-                      !isAnyLineItemEmpty() && handleCreateItemClick()
+                      !isAnyLineItemEmpty && props.onCreateItemClick()
                     }
                     className="w-full py-2 inline-flex justify-center items-center space-x-2"
                   >
@@ -362,6 +271,11 @@ export const ProductsTable = memo(
   ProductsTableInner,
   (prevProps, nextProps) => {
     if (!isEqual(prevProps.columns, nextProps.columns)) return false;
+
+    const prevResource = omit(prevProps.resource, ['updated_at']);
+    const nextResource = omit(nextProps.resource, ['updated_at']);
+
+    if (!isEqual(prevResource, nextResource)) return false;
 
     return true;
   }
