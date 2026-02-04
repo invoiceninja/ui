@@ -50,6 +50,7 @@ export default function Index() {
 
   return (
     <div className="max-w-[90rem] mx-auto">
+      {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
       {/* @ts-ignore - SignContext.Provider type conflict with external types */}
       <SignContext.Provider
         value={{
