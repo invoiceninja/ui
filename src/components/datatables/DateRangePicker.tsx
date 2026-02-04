@@ -23,13 +23,19 @@ import { useColorScheme } from '$app/common/colors';
 import { emitter } from '$app';
 
 interface Props {
+  columnId: string;
   startDate: string;
   endDate: string;
-  onDateRangeChange: (startDate: string, endDate: string) => void;
+  onDateRangeChange: (
+    columnId: string,
+    startDate: string,
+    endDate: string
+  ) => void;
   onClick: () => void;
 }
 
 export function DateRangePicker({
+  columnId,
   startDate,
   endDate,
   onDateRangeChange,
@@ -42,12 +48,18 @@ export function DateRangePicker({
   const colors = useColorScheme();
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [internalEndDate, setInternalEndDate] = useState<string>(endDate);
-  const [internalStartDate, setInternalStartDate] = useState<string>(startDate);
   const [isCalendarVisible, setIsCalendarVisible] = useState<boolean>(false);
+
+  const [internalStartDate, setInternalStartDate] = useState<string>(startDate);
+  const [internalEndDate, setInternalEndDate] = useState<string>(endDate);
 
   const antdLocale = useAtomValue(antdLocaleAtom);
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  useEffect(() => {
+    setInternalStartDate(startDate);
+    setInternalEndDate(endDate);
+  }, [startDate, endDate]);
 
   useClickAway(divRef, () => {
     isVisible && !isCalendarVisible && setIsVisible(false);
@@ -78,7 +90,7 @@ export function DateRangePicker({
     setInternalEndDate(end);
 
     if ((start.length && end.length) || (!start.length && !end.length)) {
-      onDateRangeChange(start, end);
+      onDateRangeChange(columnId, start, end);
     }
   };
 
@@ -89,16 +101,16 @@ export function DateRangePicker({
   };
 
   useEffect(() => {
-    setInternalStartDate(startDate);
-    setInternalEndDate(endDate);
-  }, [startDate, endDate]);
-
-  useEffect(() => {
-    emitter.on('date_range_picker.clear', () => {
+    const handleClear = () => {
       setInternalStartDate('');
       setInternalEndDate('');
-      onDateRangeChange('', '');
-    });
+    };
+
+    emitter.on('date_range_picker.clear', handleClear);
+
+    return () => {
+      emitter.off('date_range_picker.clear', handleClear);
+    };
   }, []);
 
   return (

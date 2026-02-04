@@ -604,24 +604,36 @@ export function DataTable<T extends object>(props: Props<T>) {
     });
   };
 
-  const handleDateRangeChange = (startDate: string, endDate: string) => {
-    setDateRangeEntries((current) => {
-      const currentEntry = current.find((entry) => entry.current);
+  const handleDateRangeChange = useCallback(
+    (columnId: string, startDate: string, endDate: string) => {
+      setDateRangeEntries((current) => {
+        if (startDate.length === 0 && endDate.length === 0) {
+          return current.filter((entry) => entry.column !== columnId);
+        }
 
-      if (!currentEntry) {
-        return current;
-      }
+        const existingIndex = current.findIndex(
+          (entry) => entry.column === columnId
+        );
 
-      if (startDate.length === 0 && endDate.length === 0) {
-        return current.filter((entry) => !entry.current);
-      }
+        if (existingIndex !== -1) {
+          return current.map((entry) =>
+            entry.column === columnId ? { ...entry, startDate, endDate } : entry
+          );
+        }
 
-      return current.map((entry) =>
-        entry.current ? { ...entry, startDate, endDate } : entry
-      );
-    });
-  };
-
+        return [
+          ...current,
+          {
+            column: columnId,
+            startDate,
+            endDate,
+            current: true,
+          },
+        ];
+      });
+    },
+    [setDateRangeEntries]
+  );
   const getDateRangeEntryForColumn = (
     columnId: string
   ): DateRangeEntry | undefined => {
@@ -960,6 +972,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                           column.id === dateRangeColumn.column
                       ) && (
                         <DateRangePicker
+                          columnId={column.id}
                           startDate={
                             getDateRangeEntryForColumn(column.id)?.startDate ??
                             ''
