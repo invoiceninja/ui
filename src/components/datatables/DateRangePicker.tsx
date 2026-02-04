@@ -101,16 +101,10 @@ export function DateRangePicker({
   };
 
   useEffect(() => {
-    const handleClear = () => {
+    emitter.on('date_range_picker.clear', () => {
       setInternalStartDate('');
       setInternalEndDate('');
-    };
-
-    emitter.on('date_range_picker.clear', handleClear);
-
-    return () => {
-      emitter.off('date_range_picker.clear', handleClear);
-    };
+    });
   }, []);
 
   return (
