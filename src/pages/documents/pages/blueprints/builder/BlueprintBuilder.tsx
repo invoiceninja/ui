@@ -391,7 +391,7 @@ function BlueprintBuilder() {
         style={{ borderColor: colors.$24 }}
         withoutBodyPadding
       >
-        {/* @ts-expect-error - TODO: fix this */}
+        {/* @ts-ignore - BuilderContext.Provider type conflict with external types */}
         <BuilderContext.Provider
           value={{
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
@@ -524,9 +524,15 @@ function BlueprintBuilder() {
               select_needs_two_options: t('select_needs_two_options') as string,
               default_select_label: t('default_select_label') as string,
               radio_needs_two_options: t('radio_needs_two_options') as string,
-              default_radio_group_label: t('default_radio_group_label') as string,
-              multiselect_needs_two_options: t('multiselect_needs_two_options') as string,
-              default_multiselect_label: t('default_multiselect_label') as string,
+              default_radio_group_label: t(
+                'default_radio_group_label'
+              ) as string,
+              multiselect_needs_two_options: t(
+                'multiselect_needs_two_options'
+              ) as string,
+              default_multiselect_label: t(
+                'default_multiselect_label'
+              ) as string,
             },
           }}
         >

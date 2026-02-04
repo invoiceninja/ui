@@ -50,7 +50,7 @@ export default function Index() {
 
   return (
     <div className="max-w-[90rem] mx-auto">
-      {/* @ts-expect-error - TODO: fix this */}
+      {/* @ts-ignore - SignContext.Provider type conflict with external types */}
       <SignContext.Provider
         value={{
           endpoint: import.meta.env.VITE_DOCUNINJA_API_URL,
