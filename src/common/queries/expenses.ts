@@ -25,7 +25,7 @@ interface BlankQueryParams {
   enabled?: boolean;
 }
 
-export function useBlankExpenseQuery(params: BlankQueryParams) {
+export function useBlankExpenseQuery(params: BlankQueryParams = {}) {
   const hasPermission = useHasPermission();
 
   return useQuery<Expense>(
