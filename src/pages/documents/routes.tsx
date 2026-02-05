@@ -67,7 +67,7 @@ const UserSelection = lazy(
 const Sign = lazy(() => import('$app/pages/documents/sign/index/Sign'));
 const Pdf = lazy(() => import('$app/pages/documents/pdf/Pdf'));
 
-export const documentsRoutes = (
+const routes = (
   <Route
     path="docuninja/*"
     element={
@@ -242,3 +242,5 @@ export const documentsRoutes = (
     }
   />
 );
+
+export const documentsRoutes = import.meta.env.VITE_ENABLE_DOCUNINJA === 'true' ? routes : null;
