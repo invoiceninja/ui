@@ -17,6 +17,7 @@ interface ImportMetaEnv extends Readonly<Record<string, string>> {
   readonly VITE_ENABLE_PEPPOL_STANDARD: string;
   readonly VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT: string;
   readonly VITE_ENABLE_APPLE_LOGIN: string;
+  readonly VITE_ENABLE_DOCUNINJA: string;
 }
 
 interface ImportMeta {
