@@ -67,180 +67,186 @@ const UserSelection = lazy(
 const Sign = lazy(() => import('$app/pages/documents/sign/index/Sign'));
 const Pdf = lazy(() => import('$app/pages/documents/pdf/Pdf'));
 
+const Beta = lazy(() => import('$app/pages/documents/beta/Beta'));
+
 const routes = (
-  <Route
-    path="docuninja/*"
-    element={
-      <DocuNinjaProvider>
-        <Routes>
-          <Route
-            path=""
-            element={<DocuNinjaGuard guards={[]} component={<Documents />} />}
-          />
+  <>
+    <Route path="/docuninja/beta" element={<Beta />} />
 
-          <Route
-            path=":id"
-            element={<DocuNinjaGuard guards={[]} component={<Document />} />}
-          />
-
-          <Route
-            path=":id/pdf"
-            element={<DocuNinjaGuard guards={[]} component={<Pdf />} />}
-          />
-
-          <Route
-            path="create"
-            element={
-              <DocuNinjaGuard
-                guards={[
-                  docuNinjaPermission({ model: 'documents', action: 'create' }),
-                ]}
-                component={<Create />}
-              />
-            }
-          />
-
-          <Route
-            path="settings"
-            element={
-              <DocuNinjaGuard
-                guards={[docuNinjaAdmin()]}
-                component={<Settings />}
-              />
-            }
-          >
-            <Route index element={<Navigate to="email_templates" replace />} />
+    <Route
+      path="docuninja/*"
+      element={
+        <DocuNinjaProvider>
+          <Routes>
             <Route
-              path="email_templates"
+              path=""
+              element={<DocuNinjaGuard guards={[]} component={<Documents />} />}
+            />
+
+            <Route
+              path=":id"
+              element={<DocuNinjaGuard guards={[]} component={<Document />} />}
+            />
+
+            <Route
+              path=":id/pdf"
+              element={<DocuNinjaGuard guards={[]} component={<Pdf />} />}
+            />
+
+            <Route
+              path="create"
+              element={
+                <DocuNinjaGuard
+                  guards={[
+                    docuNinjaPermission({ model: 'documents', action: 'create' }),
+                  ]}
+                  component={<Create />}
+                />
+              }
+            />
+
+            <Route
+              path="settings"
               element={
                 <DocuNinjaGuard
                   guards={[docuNinjaAdmin()]}
-                  type="subPage"
-                  component={<EmailSettings />}
+                  component={<Settings />}
                 />
               }
-            />
+            >
+              <Route index element={<Navigate to="email_templates" replace />} />
+              <Route
+                path="email_templates"
+                element={
+                  <DocuNinjaGuard
+                    guards={[docuNinjaAdmin()]}
+                    type="subPage"
+                    component={<EmailSettings />}
+                  />
+                }
+              />
+              <Route
+                path="notifications"
+                element={
+                  <Guard
+                    guards={[]}
+                    type="subPage"
+                    component={<Notifications />}
+                  />
+                }
+              />
+            </Route>
+
             <Route
-              path="notifications"
+              path=":id/builder"
+              element={<Guard guards={[]} component={<Builder />} />}
+            />
+
+            <Route
+              path="templates"
               element={
-                <Guard
-                  guards={[]}
-                  type="subPage"
-                  component={<Notifications />}
+                <DocuNinjaGuard
+                  guards={[
+                    docuNinjaPermission({ model: 'blueprints', action: 'view' }),
+                  ]}
+                  component={<Blueprints />}
                 />
               }
             />
-          </Route>
 
-          <Route
-            path=":id/builder"
-            element={<Guard guards={[]} component={<Builder />} />}
-          />
+            <Route
+              path="templates/create"
+              element={
+                <DocuNinjaGuard
+                  guards={[
+                    docuNinjaPermission({
+                      model: 'blueprints',
+                      action: 'create',
+                    }),
+                  ]}
+                  component={<CreateBlueprint />}
+                />
+              }
+            />
 
-          <Route
-            path="templates"
-            element={
-              <DocuNinjaGuard
-                guards={[
-                  docuNinjaPermission({ model: 'blueprints', action: 'view' }),
-                ]}
-                component={<Blueprints />}
-              />
-            }
-          />
+            <Route
+              path="templates/:id/editor"
+              element={
+                <DocuNinjaGuard
+                  guards={[
+                    docuNinjaPermission({
+                      model: 'blueprints',
+                      action: 'create',
+                    }),
+                  ]}
+                  component={<BlueprintEditor />}
+                />
+              }
+            />
 
-          <Route
-            path="templates/create"
-            element={
-              <DocuNinjaGuard
-                guards={[
-                  docuNinjaPermission({
-                    model: 'blueprints',
-                    action: 'create',
-                  }),
-                ]}
-                component={<CreateBlueprint />}
-              />
-            }
-          />
+            <Route
+              path="templates/:id/edit"
+              element={
+                <DocuNinjaGuard
+                  guards={[
+                    docuNinjaPermission({
+                      model: 'blueprints',
+                      action: 'create',
+                    }),
+                  ]}
+                  component={<BlueprintBuilder />}
+                />
+              }
+            />
 
-          <Route
-            path="templates/:id/editor"
-            element={
-              <DocuNinjaGuard
-                guards={[
-                  docuNinjaPermission({
-                    model: 'blueprints',
-                    action: 'create',
-                  }),
-                ]}
-                component={<BlueprintEditor />}
-              />
-            }
-          />
+            <Route
+              path="templates/:id/map-signatories"
+              element={
+                <DocuNinjaGuard
+                  guards={[
+                    docuNinjaPermission({ model: 'blueprints', action: 'view' }),
+                  ]}
+                  component={<SignatoryMapping />}
+                />
+              }
+            />
 
-          <Route
-            path="templates/:id/edit"
-            element={
-              <DocuNinjaGuard
-                guards={[
-                  docuNinjaPermission({
-                    model: 'blueprints',
-                    action: 'create',
-                  }),
-                ]}
-                component={<BlueprintBuilder />}
-              />
-            }
-          />
+            <Route
+              path="users"
+              element={
+                <DocuNinjaGuard
+                  guards={[docuNinjaAdmin()]}
+                  component={<Users />}
+                />
+              }
+            />
 
-          <Route
-            path="templates/:id/map-signatories"
-            element={
-              <DocuNinjaGuard
-                guards={[
-                  docuNinjaPermission({ model: 'blueprints', action: 'view' }),
-                ]}
-                component={<SignatoryMapping />}
-              />
-            }
-          />
+            <Route
+              path="users/:id/edit"
+              element={
+                <DocuNinjaGuard
+                  guards={[docuNinjaAdmin()]}
+                  component={<EditUser />}
+                />
+              }
+            />
 
-          <Route
-            path="users"
-            element={
-              <DocuNinjaGuard
-                guards={[docuNinjaAdmin()]}
-                component={<Users />}
-              />
-            }
-          />
+            <Route
+              path="users/selection"
+              element={
+                <DocuNinjaGuard guards={[]} component={<UserSelection />} />
+              }
+            />
 
-          <Route
-            path="users/:id/edit"
-            element={
-              <DocuNinjaGuard
-                guards={[docuNinjaAdmin()]}
-                component={<EditUser />}
-              />
-            }
-          />
-
-          <Route
-            path="users/selection"
-            element={
-              <DocuNinjaGuard guards={[]} component={<UserSelection />} />
-            }
-          />
-
-          <Route
-            path="sign/:document/:invitation"
-            element={<Guard guards={[]} component={<Sign />} />}
-          />
-        </Routes>
-      </DocuNinjaProvider>
-    }
-  />
+            <Route
+              path="sign/:document/:invitation"
+              element={<Guard guards={[]} component={<Sign />} />}
+            />
+          </Routes>
+        </DocuNinjaProvider>
+      }
+    />
+  </>
 );
 
 export const documentsRoutes = import.meta.env.VITE_ENABLE_DOCUNINJA === 'true' ? routes : null;
