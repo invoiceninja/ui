@@ -25,20 +25,22 @@ import { useEffect, useState } from 'react';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useAtom } from 'jotai';
-import { 
-  docuNinjaAtom
-} from '$app/common/atoms/docuninja';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 import { isPaidDocuninjaUserAtom } from '../atoms';
-import { 
-  LoadingState, 
-  UpgradePlan, 
-  SplashPage, 
-  AccountCreation, 
-  CompanySetup 
+import {
+  LoadingState,
+  UpgradePlan,
+  SplashPage,
+  AccountCreation,
+  CompanySetup,
 } from '../components/DocumentStates';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useDocuNinjaAdmin, useDocuNinjaPaidUser, useDocuNinjaPermission } from '$app/common/guards/guards/docuninja/permission';
+import {
+  useDocuNinjaAdmin,
+  useDocuNinjaPaidUser,
+  useDocuNinjaPermission,
+} from '$app/common/guards/guards/docuninja/permission';
 import { useActions } from '../common/hooks/useActions';
 import { DocumentSettingsModal } from '../show/components/DocumentSettingsModal';
 import { useDriverTour } from '$app/common/hooks/useDriverTour';
@@ -58,16 +60,21 @@ export default function Documents() {
   });
   const setIsPaidDocuninjaUser = useSetAtom(isPaidDocuninjaUserAtom);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(
+    null
+  );
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const [docuData] = useAtom(docuNinjaAtom);
-  
+
   // Use hooks that use useAtom like everything else
   const isAdmin = useDocuNinjaAdmin();
   const isPaidUser = useDocuNinjaPaidUser();
-  const canCreateDocumentPermission = useDocuNinjaPermission('documents', 'create');
-  
+  const canCreateDocumentPermission = useDocuNinjaPermission(
+    'documents',
+    'create'
+  );
+
   const { createAccount, getToken } = useDocuNinjaActions();
 
   const hasAccount = !!docuData;
@@ -76,25 +83,27 @@ export default function Documents() {
   const docuCompany = docuData?.companies?.find(
     (c) => c.ninja_company_key === company?.company_key
   );
-  
+
   const needsCompanySetup = hasAccount && !docuCompany;
-  
+
   const needsAccountCreation = !hasAccount && !isAdmin;
 
-  const needsPlanUpgrade = (hasAccount && docuData?.account.plan !== 'pro' && isAdmin);
+  const needsPlanUpgrade =
+    hasAccount && docuData?.account.plan !== 'pro' && isAdmin;
 
   function handleCreateAccount() {
     setIsCreatingAccount(true);
 
     createAccount()
       .catch((error: any) => {
-        toast.error(error.response?.data?.error ?? 'Failed to create Docuninja account');
+        toast.error(
+          error.response?.data?.error ?? 'Failed to create Docuninja account'
+        );
       })
       .finally(() => {
         setIsCreatingAccount(false);
       });
-
-  };
+  }
 
   useEffect(() => {
     setIsPaidDocuninjaUser(isPaidUser);
@@ -120,7 +129,13 @@ export default function Documents() {
   ];
 
   useDriverTour({
-    show: !preferences.document_upload_tour_shown,
+    show:
+      !preferences.document_upload_tour_shown &&
+      docuData &&
+      !needsCompanySetup &&
+      !needsPlanUpgrade &&
+      !needsAccountCreation &&
+      hasAccount,
     steps: [
       {
         element: '.document-creation-dropzone',
@@ -142,9 +157,13 @@ export default function Documents() {
     },
   });
 
-
   // Show loading state only if we don't have any specific state to show
-  if (!docuData && !needsCompanySetup && !needsPlanUpgrade && !needsAccountCreation) {
+  if (
+    !docuData &&
+    !needsCompanySetup &&
+    !needsPlanUpgrade &&
+    !needsAccountCreation
+  ) {
     return <LoadingState pages={pages} />;
   }
 
@@ -163,13 +182,12 @@ export default function Documents() {
     return <SplashPage pages={pages} />;
   }
 
-
   // Show account creation UI
   if (needsAccountCreation) {
     return (
-      <AccountCreation 
-        pages={pages} 
-        onCreateAccount={handleCreateAccount} 
+      <AccountCreation
+        pages={pages}
+        onCreateAccount={handleCreateAccount}
         isLoading={isCreatingAccount}
       />
     );
@@ -178,9 +196,9 @@ export default function Documents() {
   // Show company setup UI
   if (needsCompanySetup) {
     return (
-      <CompanySetup 
-        pages={pages} 
-        onCreateAccount={handleCreateAccount} 
+      <CompanySetup
+        pages={pages}
+        onCreateAccount={handleCreateAccount}
         isLoading={isCreatingAccount}
       />
     );
@@ -189,7 +207,6 @@ export default function Documents() {
   return (
     <Default title={t('docuninja')} breadcrumbs={pages}>
       <div className="flex flex-col gap-y-4">
-
         {canCreateDocumentPermission && (
           <div className="document-creation-dropzone">
             <DocumentCreationDropZone />
@@ -215,21 +232,23 @@ export default function Documents() {
           useDeleteMethod
           deleteBulkRoute="/api/documents/bulk"
           customActions={actions}
-          rightSide={isAdmin && (
-            <Button
-              behavior="button"
-              type="secondary"
-              onClick={() => navigate('/docuninja/settings')}
-            >
-              <div className="flex items-center space-x-2">
-                <div>
-                  <Gear />
-                </div>
+          rightSide={
+            isAdmin && (
+              <Button
+                behavior="button"
+                type="secondary"
+                onClick={() => navigate('/docuninja/settings')}
+              >
+                <div className="flex items-center space-x-2">
+                  <div>
+                    <Gear />
+                  </div>
 
-                <span>{t('settings')}</span>
-              </div>
-            </Button>
-          )}
+                  <span>{t('settings')}</span>
+                </div>
+              </Button>
+            )
+          }
           showEdit={() => true}
           // showEdit={(document: DocumentType) =>
           //   document?.status_id !== DocumentStatus.Completed &&
