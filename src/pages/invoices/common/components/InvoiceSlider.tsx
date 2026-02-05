@@ -632,7 +632,7 @@ export function InvoiceSlider() {
                   .filter(({ history }) => history?.id)
                   .map((activity) => (
                     <HistoryBox
-                      className="flex items-center justify-between p-4 space-x-3 rounded-md cursor-pointer hover:bg-opacity-75"
+                      className="flex items-center justify-between p-4 rounded-md cursor-pointer"
                       key={activity.id}
                       onClick={() =>
                         navigate(
@@ -643,6 +643,7 @@ export function InvoiceSlider() {
                       }
                       theme={{
                         backgroundColor: colors.$4,
+                        hoverBackgroundColor: colors.$15,
                       }}
                     >
                       <div className="flex items-center justify-start space-x-3">
