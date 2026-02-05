@@ -100,7 +100,7 @@ export default function History() {
         )}
 
         {Boolean(resource?.activities?.length) && (
-          <div className="flex flex-col w-full">
+          <div className="flex flex-col w-full gap-3">
             {resource?.activities &&
               resource.activities.map((activity) => (
                 <HistoryBox

@@ -103,7 +103,7 @@ export default function History() {
               0 && <div className="px-3 pt-3 text-sm">{t('api_404')}</div>}
 
           {Boolean(resource?.activities?.length) && (
-            <div className="flex flex-col w-full">
+            <div className="flex flex-col w-full gap-3">
               {resource?.activities &&
                 resource.activities.map((activity) => (
                   <Box

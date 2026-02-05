@@ -400,7 +400,7 @@ export const RecurringInvoiceSlider = () => {
           )}
 
           {Boolean(resource?.activities?.length) && (
-            <div className="flex flex-col px-3">
+            <div className="flex flex-col px-3 gap-3">
               {resource?.activities &&
                 resource.activities.map((activity) => (
                   <Box
