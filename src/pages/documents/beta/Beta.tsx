@@ -8,7 +8,6 @@ import {
   MessageCircle,
   Send,
   CheckCircle,
-  Award,
 } from 'react-feather';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { toast } from '$app/common/helpers/toast/toast';
