@@ -22,6 +22,7 @@ import { Tooltip } from '$app/components/Tooltip';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import {
+  MdAddCircleOutline,
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
@@ -311,12 +312,10 @@ export function useProjectColumns() {
 
 export function useActions() {
   const [t] = useTranslation();
-  const navigate = useNavigate();
-
-  const hasPermission = useHasPermission();
 
   const bulk = useBulkAction();
-
+  const navigate = useNavigate();
+  const hasPermission = useHasPermission();
   const invoiceProject = useInvoiceProject();
 
   const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
@@ -335,6 +334,10 @@ export function useActions() {
     navigate('/projects/create?action=clone');
   };
 
+  const handleAddExpense = (projectId: string) => {
+    navigate(route('/expenses/create?project=:projectId', { projectId }));
+  };
+
   const {
     setChangeTemplateResources,
     setChangeTemplateVisible,
@@ -349,6 +352,15 @@ export function useActions() {
           icon={<Icon element={MdTextSnippet} />}
         >
           {t('invoice_project')}
+        </DropdownElement>
+      ),
+    (project: Project) =>
+      hasPermission('create_expense') && (
+        <DropdownElement
+          onClick={() => handleAddExpense(project.id)}
+          icon={<Icon element={MdAddCircleOutline} />}
+        >
+          {t('create_expense')}
         </DropdownElement>
       ),
     (project: Project) =>
