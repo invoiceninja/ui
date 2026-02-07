@@ -1,6 +1,6 @@
 import { Default } from '$app/components/layouts/Default';
 import { Card } from '$app/components/cards';
-import { Button, Link } from '$app/components/forms';
+import { Button, InputField, Link } from '$app/components/forms';
 import {
   Zap,
   Star,
@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
+import { routeWithOrigin } from '$app/common/helpers/route';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 
 const BETA_BENEFITS = [
@@ -140,6 +141,7 @@ function Join() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEligible, setIsEligible] = useState(true);
+  const [code, setCode] = useState('');
 
   const navigate = useNavigate();
   const account = useCurrentAccount();
@@ -151,17 +153,20 @@ function Join() {
 
     request(
       'POST',
-      endpoint('/api/client/account_management/v2/docuninja/beta')
+      endpoint('/api/client/account_management/v2/docuninja/beta'),
+      { code }
     )
       .then((res) => {
         setIsSubmitting(false);
         setIsModalOpen(false);
 
         toast.success(
-          `You’ve joined the beta. We appreciate your partnership in refining this experience.`
+          `You've joined the beta. We appreciate your partnership in refining this experience. Redirecting...`
         );
 
-        navigate('/docuninja');
+        setTimeout(() => {
+         window.location.href = routeWithOrigin('/docuninja');
+        }, 3000);
       })
       .catch((error: AxiosError) => {
         if (error.response?.status === 401) {
@@ -226,29 +231,39 @@ function Join() {
             </p>
           </div>
 
-          {isEligible ? (
-            <div className="flex justify-end">
-              <Button
-                type="primary"
-                behavior="button"
-                onClick={join}
-                disabled={isSubmitting}
-                disableWithoutIcon
-              >
-                {isSubmitting ? 'Joining, please wait...' : 'Continue'}
-              </Button>
-            </div>
-          ) : (
-            <p className="text-center text-red-500">
-              Your account doesn’t meet the criteria for this beta yet. Think
-              you should be in? Reach out at{' '}
-              <a href="mailto:contact@invoiceninja.com" className="underline">
-                contact@invoiceninja.com
-              </a>
-              .
-            </p>
-          )}
+          <InputField
+            label="Beta code"
+            placeholder="Enter beta invite code"
+            onValueChange={setCode}
+          />
+
+          <p className="text-sm opacity-70">
+            If you don't have a beta invite code, please contact us at{' '}
+            <a href="mailto:contact@docuninja.com" className="underline">
+              contact@docuninja.com
+            </a>{' '}
+            for more information.
+          </p>
+
+          <div className="flex justify-end">
+            <Button
+              type="primary"
+              behavior="button"
+              onClick={join}
+              disabled={isSubmitting}
+              disableWithoutIcon
+            >
+              {isSubmitting ? 'Joining, please wait...' : 'Continue'}
+            </Button>
+          </div>
         </div>
+
+        {!isEligible ? (
+          <p className="text-red-500">
+            Your account doesn’t meet the criteria for this beta yet or you
+            provided wrong invite code.
+          </p>
+        ) : null}
       </Modal>
     </>
   );
