@@ -53,8 +53,6 @@ export function Gateways(props: Props) {
 
   const getSetting = useGetSetting();
 
-  console.log(getSetting(client, 'company_gateway_ids'));
-
   const { data: companyGatewaysResponse } = useCompanyGatewaysQuery();
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
