@@ -283,9 +283,9 @@ export function useNavigation() {
         icon: Plus,
         to: '/docuninja/create',
         label: t('new_document'),
-        visible: true,
+        visible: import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
       },
-      visible: true,
+      visible: import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
       subOptions: [
         {
           name: t('templates'),
