@@ -341,7 +341,7 @@ export function useActions(params?: Params) {
       ),
     (invoice: Invoice) =>
       isInvoiceAutoBillable(invoice) &&
-      shouldDisplayClientGatewaysAndAutoBill(invoice.client) && (
+      shouldDisplayClientGatewaysAndAutoBill(invoice?.client) && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'auto_bill',
