@@ -634,11 +634,13 @@ export function DataTable<T extends object>(props: Props<T>) {
     },
     [setDateRangeEntries]
   );
-  const getDateRangeEntryForColumn = (
-    columnId: string
-  ): DateRangeEntry | undefined => {
-    return dateRangeEntries.find((entry) => entry.column === columnId);
-  };
+
+  const getDateRangeEntryForColumn = useCallback(
+    (columnId: string): DateRangeEntry | undefined => {
+      return dateRangeEntries.find((entry) => entry.column === columnId);
+    },
+    [dateRangeEntries]
+  );
 
   const getFooterColumn = (columnId: string) => {
     return footerColumns.find((footerColumn) => footerColumn.id === columnId);
