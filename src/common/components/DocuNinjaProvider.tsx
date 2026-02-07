@@ -8,15 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { useSetAtom } from 'jotai';
+import { useNavigate } from 'react-router-dom';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { DocuNinjaData } from '$app/common/interfaces/docuninja/api';
 import collect from 'collect.js';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { Spinner } from '$app/components/Spinner';
+import { Default } from '$app/components/layouts/Default';
 
 interface DocuNinjaProviderProps {
   children: ReactNode;
@@ -24,11 +27,12 @@ interface DocuNinjaProviderProps {
 
 export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
   const company = useCurrentCompany();
-  
+  const navigate = useNavigate();
+
   const setData = useSetAtom(docuNinjaAtom);
 
   // SINGLE QUERY - Only runs once, never refetches unless invalidated
-  useQuery(
+  const { isLoading, error } = useQuery(
     ['/api/docuninja/login'], // Fixed query key - no company dependency
     async () => {
       if (!company?.company_key) {
@@ -44,7 +48,7 @@ export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
         );
 
         const docuData = response.data.data as DocuNinjaData;
-        
+
         // Find the matching company by ninja_company_key
         const companies = docuData.companies || [];
         const matchingCompany = collect(companies)
@@ -60,7 +64,6 @@ export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
         // Update atom with the data
         setData(docuData);
         return docuData;
-
       } catch (error: any) {
         // Handle 401 errors gracefully (no account exists)
         if (error?.response?.status === 401) {
@@ -68,7 +71,7 @@ export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
         } else {
           setData(undefined);
         }
-        
+
         throw error;
       }
     },
@@ -86,6 +89,20 @@ export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
       },
     }
   );
-  
+
+  useEffect(() => {
+    if (error) {
+      navigate('/docuninja/beta');
+    }
+  }, [error, navigate]);
+
+  if (isLoading) {
+    return (
+      <Default breadcrumbs={[]}>
+        <Spinner />
+      </Default>
+    );
+  }
+
   return <>{children}</>;
 }
