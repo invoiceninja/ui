@@ -8,7 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint, getEntityState, isProduction } from '$app/common/helpers';
+import {
+  docuNinjaEndpoint,
+  endpoint,
+  getEntityState,
+  isProduction,
+} from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import React, {
   CSSProperties,
@@ -61,7 +66,7 @@ import { TFooter } from './tables/TFooter';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useColorScheme } from '$app/common/colors';
 import { useDebounce } from 'react-use';
-import { cloneDeep, isEqual } from 'lodash';
+import { cloneDeep, get, isEqual } from 'lodash';
 import { FilterColumn } from './FilterColumn';
 
 export interface DateRangeColumn {
@@ -183,6 +188,17 @@ interface Props<T> extends CommonProps {
   beforeFilterInput?: ReactNode;
   withoutBottomRounding?: boolean;
   withoutBottomPadding?: boolean;
+  useDocuNinjaApi?: boolean;
+  endpointHeaders?: Record<string, string>;
+  totalPagesPropPath?: string;
+  totalRecordsPropPath?: string;
+  withoutActionBulkPayloadPropertyForDeleteAction?: boolean;
+  withoutIdsBulkPayloadPropertyForDeleteAction?: boolean;
+  useDeleteMethod?: boolean;
+  deleteBulkRoute?: string;
+  useRestoreForDeletedResources?: boolean;
+  disabledCreateButton?: boolean;
+  filterParameterKey?: 'filter' | 'search';
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -237,7 +253,11 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
 
   const [apiEndpoint, setApiEndpoint] = useState(
-    new URL(endpoint(props.endpoint))
+    new URL(
+      props.useDocuNinjaApi
+        ? docuNinjaEndpoint(props.endpoint)
+        : endpoint(props.endpoint)
+    )
   );
 
   const setInvalidationQueryAtom = useSetAtom(invalidationQueryAtom);
@@ -258,6 +278,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutSortQueryParameter = false,
     showRestoreBulk,
     enableSavingFilterPreference = false,
+    totalPagesPropPath,
+    totalRecordsPropPath,
     onDeleteBulkAction,
     withoutPageAsPreference = false,
     filterColumns,
@@ -267,6 +289,13 @@ export function DataTable<T extends object>(props: Props<T>) {
     beforeFilterInput,
     withoutBottomRounding = false,
     withoutBottomPadding = false,
+    withoutActionBulkPayloadPropertyForDeleteAction = false,
+    withoutIdsBulkPayloadPropertyForDeleteAction = false,
+    useDeleteMethod = false,
+    deleteBulkRoute,
+    useRestoreForDeletedResources = false,
+    disabledCreateButton = false,
+    filterParameterKey = 'filter',
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -354,7 +383,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
     apiEndpoint.searchParams.set('per_page', perPage);
     apiEndpoint.searchParams.set('page', currentPage.toString());
-    apiEndpoint.searchParams.set('filter', filter);
+    apiEndpoint.searchParams.set(filterParameterKey, filter);
 
     handleChangingCustomFilters();
 
@@ -465,7 +494,13 @@ export function DataTable<T extends object>(props: Props<T>) {
         : []),
       filterColumnsValues,
     ],
-    () => request(methodType, apiEndpoint.href),
+    () =>
+      request(
+        methodType,
+        apiEndpoint.href,
+        {},
+        { headers: props.endpointHeaders }
+      ),
     {
       staleTime: props.staleTime ?? Infinity,
       enabled: !disableQuery && arePreferencesApplied,
@@ -504,10 +539,26 @@ export function DataTable<T extends object>(props: Props<T>) {
   const bulk = (action: 'archive' | 'restore' | 'delete', id?: string) => {
     toast.processing();
 
-    request('POST', endpoint(props.bulkRoute ?? `${props.endpoint}/bulk`), {
-      action,
-      ids: id ? [id] : Array.from(selected),
-    })
+    const method = 'POST';
+
+    const route =
+      useDeleteMethod && action === 'delete'
+        ? deleteBulkRoute
+        : props.bulkRoute ?? `${props.endpoint}/bulk`;
+
+    const updatedIds = { ids: id ? [id] : Array.from(selected) };
+
+    request(
+      method,
+      props.useDocuNinjaApi
+        ? docuNinjaEndpoint(route as string, { id })
+        : endpoint(route as string),
+      {
+        action: action,
+        ...updatedIds,
+      },
+      { headers: props.endpointHeaders }
+    )
       .then((response: GenericSingleResourceResponse<T[]>) => {
         toast.success(`${action}d_${props.resource}`);
 
@@ -516,7 +567,9 @@ export function DataTable<T extends object>(props: Props<T>) {
         window.dispatchEvent(
           new CustomEvent('invalidate.combobox.queries', {
             detail: {
-              url: endpoint(props.endpoint),
+              url: props.useDocuNinjaApi
+                ? docuNinjaEndpoint(props.endpoint)
+                : endpoint(props.endpoint),
             },
           })
         );
@@ -733,7 +786,12 @@ export function DataTable<T extends object>(props: Props<T>) {
                   type="component"
                   guards={props.linkToCreateGuards || []}
                   component={
-                    <Button to={props.linkToCreate} className="shadow-sm">
+                    <Button
+                      to={props.linkToCreate}
+                      className="shadow-sm"
+                      disabled={disabledCreateButton}
+                      disableWithoutIcon
+                    >
                       {t(`new_${props.resource}`)}
                     </Button>
                   }
@@ -922,7 +980,6 @@ export function DataTable<T extends object>(props: Props<T>) {
 
             {props.withResourcefulActions && !hideEditableOptions && <Th></Th>}
           </Thead>
-
           <Tbody
             style={{
               ...styleOptions?.tBodyStyle,
@@ -933,6 +990,19 @@ export function DataTable<T extends object>(props: Props<T>) {
                 areRowsRendered || !currentData.length ? 'default' : 'progress',
             }}
           >
+            {(isLoading || !isEqual(currentData, data?.data?.data)) &&
+              !isError && (
+                <MemoizedTr
+                  className="border-b"
+                  style={{
+                    borderColor: colors.$20,
+                  }}
+                >
+                  <Td colSpan={100}>
+                    <Spinner />
+                  </Td>
+                </MemoizedTr>
+              )}
             {(isLoading || !isEqual(currentData, data?.data?.data)) && (
               <MemoizedTr
                 className="border-b"
@@ -1160,8 +1230,16 @@ export function DataTable<T extends object>(props: Props<T>) {
           currentPage={currentPage}
           onPageChange={setCurrentPage}
           onRowsChange={setPerPage}
-          totalPages={data.data.meta.pagination.total_pages}
-          totalRecords={data.data.meta.pagination.total}
+          totalPages={
+            totalPagesPropPath
+              ? get(data, totalPagesPropPath)
+              : data.data.meta.pagination.total_pages
+          }
+          totalRecords={
+            totalRecordsPropPath
+              ? get(data, totalRecordsPropPath)
+              : data.data.meta.pagination.total
+          }
         />
       )}
     </div>

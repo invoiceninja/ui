@@ -31,6 +31,8 @@ import { useEnterpriseUtils } from '../common/hooks/useEnterpriseUtils';
 import { Downgrade } from './plan/Downgrade';
 import { StartTrial } from './plan/StartTrial';
 import { NewCreditCard } from './plan/NewCreditCard';
+import { DocuNinja } from './plan/DocuNinja';
+import { useIsPaid } from '$app/common/hooks/usePaidOrSelfhost';
 import { Divider } from '$app/components/cards/Divider';
 
 export function Plan2() {
@@ -61,7 +63,8 @@ export function Plan2() {
   const { data: plans } = usePlansQuery();
   const { calculatePrice } = useEnterpriseUtils();
   const { t } = useTranslation();
-
+  const isPaid = useIsPaid();
+  
   if (!account || !plans) {
     return null;
   }
@@ -185,6 +188,8 @@ export function Plan2() {
           </div>
         </div>
       </div>
+
+    {isPaid && <DocuNinja />}
 
       <div className="px-7 pt-3">
         <Divider

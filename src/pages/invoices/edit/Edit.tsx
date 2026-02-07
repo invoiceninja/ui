@@ -44,12 +44,15 @@ import { route } from '$app/common/helpers/route';
 import { Project } from '$app/common/interfaces/project';
 import { Icon } from '$app/components/icons/Icon';
 import { ExternalLink } from 'react-feather';
-import { InputLabel } from '$app/components/forms';
+import { InputLabel, Link } from '$app/components/forms';
+import { Link as RouterLink } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { TasksTabLabel } from '../common/components/TasksTabLabel';
 import { TaxDataBadge } from './components/TaxDataBadge';
 import { TaxExemptBadge } from '$app/pages/clients/show/components/TaxExemptBadge';
 import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
+import { Badge } from '$app/components/Badge';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -90,6 +93,7 @@ export default function Edit() {
   const {
     handleChange,
     handleInvitationChange,
+    handleContactCanSignChange,
     handleLineItemChange,
     handleLineItemPropertyChange,
     handleCreateLineItem,
@@ -98,6 +102,8 @@ export default function Edit() {
 
   const { changeTemplateVisible, setChangeTemplateVisible } =
     useChangeTemplate();
+
+    const statusThemeColors = useStatusThemeColorScheme();
 
   return (
     <>
@@ -117,14 +123,39 @@ export default function Edit() {
                     {t('status')}
                   </span>
 
-                  <div>
-                    <InvoiceStatusBadge entity={invoice} />
-                  </div>
+                <div className="flex items-center space-x-2">
+                  <InvoiceStatusBadge entity={invoice} />
+
+                  {invoice && invoice.sync?.dn_completed && invoice.sync?.invitations[0]?.dn_id && (
+                    <Badge variant="green" style={{ backgroundColor: statusThemeColors.$3 }}>
+                      <RouterLink
+                        className="font-medium"
+                        to={`/docuninja/${invoice.sync?.invitations[0]?.dn_id}`}
+                      >
+                        {t('signed_document')}
+                      </RouterLink>
+                    </Badge>
+                  )}
                 </div>
 
                 <TaxExemptBadge
                   isTaxExempt={Boolean(invoice.client?.is_tax_exempt)}
                 />
+              </div>
+            )}
+
+            {invoice && invoice.sync?.dn_completed && invoice.sync?.invitations[0]?.dn_id && (
+              <div className="flex items-center space-x-9">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('signed_document')}
+                </span>
+
+                <Link to={`/docuninja/${invoice.sync?.invitations[0]?.dn_id}`}>
+                  {t('link')}
+                </Link>
               </div>
             )}
 
@@ -170,6 +201,7 @@ export default function Edit() {
                 handleChange('location_id', locationId)
               }
               onContactCheckboxChange={handleInvitationChange}
+              onContactCanSignCheckboxChange={handleContactCanSignChange}
               errorMessage={errors?.errors.client_id}
               textOnly
               readonly

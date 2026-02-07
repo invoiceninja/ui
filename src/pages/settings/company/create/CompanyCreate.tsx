@@ -27,6 +27,7 @@ import { useDispatch } from 'react-redux';
 import { useColorScheme } from '$app/common/colors';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
+import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 
 interface Props {
   isModalOpen: boolean;
@@ -45,6 +46,7 @@ export function CompanyCreate(props: Props) {
   const queryClient = useQueryClient();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const { flushData } = useDocuNinjaActions();
 
   const switchCompany = (
     index: number,
@@ -62,6 +64,9 @@ export function CompanyCreate(props: Props) {
     localStorage.setItem('X-CURRENT-INDEX', index.toString());
 
     queryClient.invalidateQueries();
+    
+    // Clear DocuNinja data and cache when switching companies
+    flushData();
 
     if (id) {
       const basePage =
