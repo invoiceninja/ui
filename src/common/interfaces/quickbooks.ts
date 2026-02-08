@@ -9,43 +9,48 @@
  */
 
 export interface Quickbooks {
-    accessTokenKey: string;
-    refresh_token: string;
-    realmID: string;
-    accessTokenExpiresAt: number;
-    refreshTokenExpiresAt: number;
-    baseURL: string;
-    companyName: string;
-    settings: QuickbooksSettings;
+  accessTokenKey: string;
+  refresh_token: string;
+  realmID: string;
+  accessTokenExpiresAt: number;
+  refreshTokenExpiresAt: number;
+  baseURL: string;
+  companyName: string;
+  settings: QuickbooksSettings;
 }
 
 export interface QuickbooksSettings {
-    client: QuickbooksSync;
-    invoice: QuickbooksSync;
-    vendor: QuickbooksSync;
-    sales: QuickbooksSync;
-    quote: QuickbooksSync;
-    purchase_order: QuickbooksSync;
-    product: QuickbooksSync;
-    payment: QuickbooksSync;
-    expense: QuickbooksSync;
-    expense_category: QuickbooksSync;
-    income_account_map: IncomeAccountMapEntry[];
-    qb_income_account_id: string | null;
-    tax_rate_map: TaxRateMapEntry[];
-    automatic_taxes: boolean;
+  client: QuickbooksSync;
+  invoice: QuickbooksSync;
+  vendor: QuickbooksSync;
+  sales: QuickbooksSync;
+  quote: QuickbooksSync;
+  purchase_order: QuickbooksSync;
+  product: QuickbooksSync;
+  payment: QuickbooksSync;
+  expense: QuickbooksSync;
+  expense_category: QuickbooksSync;
+  income_account_map: IncomeAccountMapEntry[];
+  qb_income_account_id: string | null;
+  tax_rate_map: TaxRateMapEntry[];
+  automatic_taxes: boolean;
+  default_income_account: string | null;
 }
 
 export enum QuickbooksSyncDirection {
-    None = 'none',
-    Push = 'push',
-    Pull = 'pull',
-    Bidirectional = 'bidirectional',
+  None = 'none',
+  Push = 'push',
+  Pull = 'pull',
+  Bidirectional = 'bidirectional',
 }
 
 export interface QuickbooksSync {
-    direction: QuickbooksSyncDirection;
+  direction: QuickbooksSyncDirection;
 }
 
-export type IncomeAccountMapEntry = [id: string, name: string, fully_qualified_name: string];
+export type IncomeAccountMapEntry = [
+  id: string,
+  name: string,
+  fully_qualified_name: string
+];
 export type TaxRateMapEntry = [id: string, name: string, rate: string];

@@ -23,8 +23,15 @@ import { ArrowsOppositeDirection } from '$app/components/icons/ArrowsOppositeDir
 import { BookOpen } from '$app/components/icons/BookOpen';
 import { ConnectedDots } from '$app/components/icons/ConnectedDots';
 import { ChartLine } from '$app/components/icons/ChartLine';
+import { useQuickbooksConnection } from '../common/hooks/useQuickbooksConnection';
+import { Quickbooks } from './Quickbooks';
 
-const Box = styled.div`
+interface BoxTheme {
+  backgroundColor: string;
+  hoverBackgroundColor: string;
+}
+
+const Box = styled.div<{ theme: BoxTheme }>`
   background-color: ${({ theme }) => theme.backgroundColor};
 
   &:hover {
@@ -40,6 +47,10 @@ export function Integrations() {
   const colors = useColorScheme();
 
   const { isAdmin } = useAdmin();
+
+  const { isConnected } = useQuickbooksConnection();
+
+  const isPaidHostedUser = (proPlan() || enterprisePlan()) && isHosted();
 
   return (
     <div className="flex flex-col space-y-4 px-4 sm:px-6 pt-2 pb-4">
@@ -172,6 +183,20 @@ export function Integrations() {
           <ArrowRight color={colors.$3} size="1.4rem" strokeWidth="1.5" />
         </div>
       </Box>
+
+      {isPaidHostedUser && isAdmin && (
+        <>
+          <div className="py-4">
+            <Divider
+              className="border-dashed"
+              withoutPadding
+              style={{ borderColor: colors.$20 }}
+            />
+          </div>
+
+          <Quickbooks />
+        </>
+      )}
     </div>
   );
 }
