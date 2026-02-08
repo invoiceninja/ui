@@ -76,6 +76,9 @@ export default function Products() {
         linkToCreateGuards={[permission('create_product')]}
         hideEditableOptions={!hasPermission('edit_product')}
         enableSavingFilterPreference
+        dateRangeColumns={[
+          { column: 'created_at', queryParameterKey: 'created_between' },
+        ]}
       />
     </Default>
   );
