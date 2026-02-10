@@ -1003,18 +1003,6 @@ export function DataTable<T extends object>(props: Props<T>) {
                   </Td>
                 </MemoizedTr>
               )}
-            {(isLoading || !isEqual(currentData, data?.data?.data)) && (
-              <MemoizedTr
-                className="border-b"
-                style={{
-                  borderColor: colors.$20,
-                }}
-              >
-                <Td colSpan={100}>
-                  <Spinner />
-                </Td>
-              </MemoizedTr>
-            )}
 
             {isError && !isLoading && (
               <MemoizedTr
