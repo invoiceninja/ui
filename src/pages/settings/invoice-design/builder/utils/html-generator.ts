@@ -13,8 +13,8 @@ import { GRID_CONFIG } from './grid-converter';
 import { InvoiceData, replaceVariables, resolveVariable } from './variable-replacer';
 
 /**
- * Generate complete HTML document from blocks using flow-based layout
- * This ensures content can grow and push other elements down naturally
+ * Generate complete HTML document from blocks using absolute positioning
+ * This ensures WYSIWYG consistency between preview and PDF output
  */
 export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string {
   // Sort blocks by Y position, then by X position for same row
@@ -25,9 +25,39 @@ export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string 
     return a.gridPosition.x - b.gridPosition.x;
   });
 
-  // Group blocks into rows based on Y position
-  const rows = groupBlocksIntoRows(sortedBlocks);
-  const rowsHTML = rows.map(row => renderRow(row, data)).join('\n');
+  // Render blocks with absolute positioning based on grid coordinates
+  const blocksHTML = sortedBlocks.map(block => renderBlock(block, data)).join('\n');
+  
+  // Extract containerPadding at function level to avoid scope issues
+  const { rowHeight, margin, containerPadding } = GRID_CONFIG;
+  
+  // Calculate container height based on block positions
+  let maxBottom = 0;
+  if (blocks.length > 0) {
+    blocks.forEach(block => {
+      const { y, h } = block.gridPosition;
+      const top = containerPadding[1] + (y * (rowHeight + margin[1]));
+      const height = (h * rowHeight) + ((h - 1) * margin[1]);
+      const bottom = top + height;
+      if (bottom > maxBottom) {
+        maxBottom = bottom;
+      }
+    });
+    // Add bottom padding
+    maxBottom += containerPadding[1];
+  }
+  // Ensure minimum A4 height
+  const containerHeight = Math.max(maxBottom || 1122, 1122);
+  
+  // Extract values for template string to avoid scope issues
+  // Defensive check to ensure GRID_CONFIG is properly defined
+  if (!GRID_CONFIG || !GRID_CONFIG.containerPadding) {
+    throw new Error('GRID_CONFIG.containerPadding is not defined. Please check grid-converter.ts');
+  }
+  
+  const canvasWidth = GRID_CONFIG.canvasWidth;
+  const containerPaddingVertical = GRID_CONFIG.containerPadding[1];
+  const containerPaddingHorizontal = GRID_CONFIG.containerPadding[0];
 
   return `
 <!DOCTYPE html>
@@ -48,57 +78,32 @@ export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string 
       box-sizing: border-box;
     }
 
-    body {
+    html, body {
       margin: 0;
       padding: 0;
+      width: ${canvasWidth}px;
+      height: ${containerHeight}px;
+      overflow: hidden; /* Prevent scrollbars */
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
 
     .invoice-container {
-      width: ${GRID_CONFIG.canvasWidth}px;
+      width: ${canvasWidth}px;
+      height: ${containerHeight}px;
       background: white;
-      margin: 0 auto;
-      padding: ${GRID_CONFIG.containerPadding[1]}px ${GRID_CONFIG.containerPadding[0]}px;
-    }
-
-    .row {
-      display: block; /* Use block layout for natural flow */
-      margin-bottom: ${GRID_CONFIG.margin[1]}px;
-      width: 100%;
-      clear: both;
-    }
-
-    .row::after {
-      content: "";
-      display: table;
-      clear: both;
-    }
-
-    .row.flex-row {
-      display: flex;
-      flex-wrap: nowrap;
-      align-items: flex-start; /* Align items to top */
+      margin: 0;
+      padding: ${containerPaddingVertical}px ${containerPaddingHorizontal}px;
+      position: relative;
+      overflow: hidden; /* Prevent any visual artifacts from extending beyond container */
+      box-sizing: border-box; /* Include padding in width calculation */
     }
 
     .block {
+      position: absolute;
       box-sizing: border-box;
-      overflow: visible; /* Content can overflow and push elements */
-    }
-
-    /* Full-width blocks - natural block flow */
-    .block.full-width {
-      width: 100% !important;
-      display: block;
-      float: none;
-      clear: both;
-    }
-
-    /* Partial-width blocks in flex rows */
-    .row.flex-row .block {
-      flex-shrink: 0;
-      flex-grow: 0;
+      overflow: visible;
     }
 
     /* Tables should expand to fit content */
@@ -137,113 +142,63 @@ export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string 
 </head>
 <body>
   <div class="invoice-container">
-    ${rowsHTML}
+    ${blocksHTML}
   </div>
 </body>
 </html>
   `.trim();
 }
 
-/**
- * Group blocks into rows based on similar Y positions
- */
-function groupBlocksIntoRows(blocks: Block[]): Block[][] {
-  const rows: Block[][] = [];
-  let currentRow: Block[] = [];
-  let currentY = -1;
-
-  for (const block of blocks) {
-    // If this block is on a new row (different Y position with some tolerance)
-    if (currentY === -1 || Math.abs(block.gridPosition.y - currentY) >= 1) {
-      if (currentRow.length > 0) {
-        rows.push(currentRow);
-      }
-      currentRow = [block];
-      currentY = block.gridPosition.y;
-    } else {
-      // Same row
-      currentRow.push(block);
-    }
-  }
-
-  // Don't forget the last row
-  if (currentRow.length > 0) {
-    rows.push(currentRow);
-  }
-
-  return rows;
-}
 
 /**
- * Render a row of blocks
- */
-function renderRow(blocks: Block[], data: InvoiceData): string {
-  const blocksHTML = blocks.map(block => renderBlock(block, data)).join('\n');
-  
-  // Determine row alignment based on block positions
-  let rowClass = 'row';
-  let rowStyle = '';
-  
-  if (blocks.length > 1) {
-    // Multiple blocks - use flex with gap
-    rowClass = 'row flex-row';
-    rowStyle = `gap: ${GRID_CONFIG.margin[0]}px;`;
-  } else if (blocks.length === 1) {
-    // Single block - check if it needs alignment
-    const block = blocks[0];
-    const xPos = block.gridPosition.x;
-    const width = block.gridPosition.w;
-    
-    if (xPos > 0) {
-      // Block is not at left edge - use flex for positioning
-      rowClass = 'row flex-row';
-      
-      // Determine alignment based on position
-      if (xPos + width >= GRID_CONFIG.cols) {
-        // Block is at right edge
-        rowStyle = 'justify-content: flex-end;';
-      } else if (xPos >= (GRID_CONFIG.cols - width) / 2 - 1 && xPos <= (GRID_CONFIG.cols - width) / 2 + 1) {
-        // Block is roughly centered
-        rowStyle = 'justify-content: center;';
-      } else {
-        // Block has specific left offset - use margin
-        const leftPercent = (xPos / GRID_CONFIG.cols) * 100;
-        rowStyle = `padding-left: ${leftPercent}%;`;
-      }
-    }
-  }
-  
-  return `<div class="${rowClass}" style="${rowStyle}">${blocksHTML}</div>`;
-}
-
-/**
- * Render a single block to HTML with flow-based layout
+ * Render a single block to HTML with absolute positioning based on grid coordinates
+ * This ensures WYSIWYG consistency - blocks appear exactly where they are in the preview
  */
 function renderBlock(block: Block, data: InvoiceData): string {
   const content = renderBlockContent(block, data);
   
-  // Calculate width as percentage of available space (12 columns)
-  const widthPercent = (block.gridPosition.w / GRID_CONFIG.cols) * 100;
-  const isFullWidth = block.gridPosition.w === GRID_CONFIG.cols;
+  // Calculate absolute pixel positions based on grid coordinates
+  // This matches exactly how react-grid-layout positions items
+  const { x, y, w, h } = block.gridPosition;
+  const { cols, rowHeight, canvasWidth, margin, containerPadding } = GRID_CONFIG;
   
-  // Full-width blocks (like tables) should NOT have min-height constraints
-  // This allows them to expand naturally based on content
+  // Calculate column width
+  const availableWidth = canvasWidth - (containerPadding[0] * 2);
+  const colWidth = availableWidth / cols;
+  
+  // Calculate absolute positions
+  // For x position: padding + (column index * column width) + (gaps between columns)
+  // Column width already accounts for the space, so we just need: padding + (x * (colWidth + margin))
+  const left = containerPadding[0] + (x * (colWidth + margin[0]));
+  const top = containerPadding[1] + (y * (rowHeight + margin[1]));
+  
+  // Calculate dimensions
+  // Width: (number of columns * column width) + (gaps between columns within the block)
+  const width = (w * colWidth) + ((w - 1) * margin[0]);
+  const height = (h * rowHeight) + ((h - 1) * margin[1]);
+  
+  // Ensure blocks never exceed container bounds
+  const maxLeft = containerPadding[0];
+  const maxRight = canvasWidth - containerPadding[0];
+  const constrainedLeft = Math.max(maxLeft, Math.min(left, maxRight - width));
+  const constrainedWidth = Math.min(width, maxRight - constrainedLeft);
+  
+  // For expandable blocks (tables, totals), allow content to grow
   const isExpandableBlock = block.type === 'table' || block.type === 'total';
+  const heightStyle = isExpandableBlock 
+    ? `min-height: ${height}px;` 
+    : `height: ${height}px;`;
   
-  // Only set min-height for non-expandable blocks
-  const minHeight = isExpandableBlock ? 0 : block.gridPosition.h * GRID_CONFIG.rowHeight;
-  
-  // Full-width blocks don't need width specification
-  const widthStyle = isFullWidth 
-    ? '' 
-    : `width: ${widthPercent}%;`;
-  
-  const heightStyle = minHeight > 0 ? `min-height: ${minHeight}px;` : '';
-  
-  const className = isFullWidth ? 'block full-width' : 'block';
-  const styles = `${widthStyle} ${heightStyle}`.trim();
+  const styles = `
+    position: absolute;
+    left: ${constrainedLeft}px;
+    top: ${top}px;
+    width: ${constrainedWidth}px;
+    ${heightStyle}
+    box-sizing: border-box;
+  `.trim().replace(/\s+/g, ' ');
 
-  return `<div class="${className}"${styles ? ` style="${styles}"` : ''}>${content}</div>`;
+  return `<div class="block" style="${styles}">${content}</div>`;
 }
 
 /**
@@ -309,8 +264,11 @@ function renderImageBlock(block: Block, data: InvoiceData): string {
     </div>`;
   }
 
+  // Map text alignment to flexbox justify-content
+  const justifyContent = align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center';
+  
   return `
-    <div style="text-align: ${align}; height: 100%; display: flex; align-items: center; justify-content: ${align};">
+    <div style="text-align: ${align}; height: 100%; display: flex; align-items: center; justify-content: ${justifyContent};">
       <img src="${escapeHtml(resolvedSource)}" style="max-width: ${maxWidth}; max-height: 100%; object-fit: ${objectFit};" alt="${block.type}" />
     </div>
   `;
@@ -398,7 +356,7 @@ function renderTableBlock(block: Block, data: InvoiceData): string {
 
   // Generate header
   let headerHTML = '<thead><tr style="background: ' + headerBg + '; color: ' + headerColor + '; font-weight: ' + headerFontWeight + ';">';
-  columns.forEach((col: any) => {
+  columns.forEach((col: { id: string; header: string; align: string; width: string; field: string }) => {
     headerHTML += `
       <th style="
         padding: ${padding};
@@ -418,7 +376,7 @@ function renderTableBlock(block: Block, data: InvoiceData): string {
     const rowBackground = alternateRows && index % 2 === 1 ? alternateRowBg : rowBg;
     rowsHTML += `<tr style="background: ${rowBackground};">`;
 
-    columns.forEach((col: any) => {
+    columns.forEach((col: { id: string; align: string; field: string }) => {
       const value = resolveVariable(col.field, item, data);
       rowsHTML += `
         <td style="
@@ -473,8 +431,14 @@ function renderTotalBlock(block: Block, data: InvoiceData): string {
   html += '<tbody>';
 
   items
-    .filter((item: any) => item.show)
-    .forEach((item: any) => {
+    .filter((item: { show: boolean }) => item.show)
+    .forEach((item: { 
+      show: boolean; 
+      isTotal?: boolean; 
+      isBalance?: boolean; 
+      field: string; 
+      label: string 
+    }) => {
       const isTotal = item.isTotal;
       const isBalance = item.isBalance;
       const value = replaceVariables(item.field, data);

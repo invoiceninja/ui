@@ -83,14 +83,11 @@ interface BlockCardProps {
 
 function BlockCard({ definition, onClick, onDragStart: onDragStartProp }: BlockCardProps) {
   const handleDragStart = (e: React.DragEvent) => {
-    console.log('🚀 Drag started for:', definition.type);
     // CRITICAL for Firefox compatibility
     e.dataTransfer.setData('text/plain', '');
     e.dataTransfer.effectAllowed = 'copy';
     e.dataTransfer.setData('application/json', JSON.stringify(definition));
-    console.log('📋 Set data:', JSON.stringify(definition));
     onDragStartProp?.(definition);
-    console.log('✅ Called onDragStart prop');
   };
 
   return (

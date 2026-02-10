@@ -8,14 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import GridLayout from 'react-grid-layout';
 import type { Layout } from 'react-grid-layout';
 import { Undo2, Redo2, Eye, Save, ArrowLeft, Download, FileJson, Clipboard, GripVertical } from 'lucide-react';
 import { Button } from '$app/components/forms';
-import { Block, BuilderState } from './types';
+import { InputField } from '$app/components/forms/InputField';
+import { Modal } from '$app/components/Modal';
+import { Block, BuilderState, BlockDefinition } from './types';
 import { getTemplateById } from './templates/templates';
 import { ComponentLibrary } from './components/ComponentLibrary';
 import { PropertyPanel } from './components/PropertyPanel';
@@ -55,9 +57,12 @@ function extractBlocksFromDesign(design: Design): Block[] | null {
     
     const jsonString = includes.slice(jsonStart, jsonEnd);
     const parsed = JSON.parse(jsonString);
-    return Array.isArray(parsed) ? parsed : null;
-  } catch (e) {
-    console.error('Failed to parse blocks from design:', e);
+    if (!Array.isArray(parsed)) {
+      throw new Error('Parsed data is not an array');
+    }
+    return parsed;
+  } catch (error) {
+    // Error will be handled by the calling component
     return null;
   }
 }
@@ -98,34 +103,67 @@ export function InvoiceBuilder() {
 
   // Drag and drop state
   const [droppingItem, setDroppingItem] = useState<{ i: string; w: number; h: number } | undefined>();
-  const [currentDragDefinition, setCurrentDragDefinition] = useState<any>(null);
+  const [currentDragDefinition, setCurrentDragDefinition] = useState<BlockDefinition | null>(null);
   const [justDropped, setJustDropped] = useState(false);
+  
+  // Refs for cleanup
+  const timeoutRefs = useRef<Set<NodeJS.Timeout>>(new Set());
+  // Ref to track if we're manually setting layout (to prevent useEffect from overwriting)
+  const isManuallySettingLayout = useRef(false);
   
   // Load existing design when editing
   useEffect(() => {
     if (existingDesign && designId) {
-      const blocks = extractBlocksFromDesign(existingDesign);
-      if (blocks && blocks.length > 0) {
-        setState(prev => ({
-          ...prev,
-          blocks,
-        }));
-        setDesignName(existingDesign.name);
-        setIsEditMode(true);
-      } else {
-        // Design exists but wasn't created with visual builder
-        toast.error('This design was not created with the visual builder');
+      try {
+        const blocks = extractBlocksFromDesign(existingDesign);
+        if (blocks && blocks.length > 0) {
+          // Update state with blocks
+          setState(prev => ({
+            ...prev,
+            blocks,
+          }));
+          // Immediately convert blocks to layout format to ensure proper positioning
+          isManuallySettingLayout.current = true;
+          const initialLayout = blocks.map((block) => ({
+            i: block.id,
+            x: block.gridPosition.x,
+            y: block.gridPosition.y,
+            w: block.gridPosition.w,
+            h: block.gridPosition.h,
+            minW: Math.min(block.gridPosition.w, 2),
+            minH: Math.min(block.gridPosition.h, 1),
+            maxW: block.gridPosition.w >= 12 ? 12 : undefined,
+          }));
+          setLayout(initialLayout);
+          // Reset flag after a brief delay to allow layout to be set
+          setTimeout(() => {
+            isManuallySettingLayout.current = false;
+          }, 0);
+          setDesignName(existingDesign.name);
+          setIsEditMode(true);
+        } else {
+          // Design exists but wasn't created with visual builder
+          toast.error(String(t('design_not_created_with_visual_builder')));
+          navigate(route('/settings/invoice_design/custom_designs'));
+        }
+      } catch (error) {
+        toast.error(String(t('error_loading_design')));
         navigate(route('/settings/invoice_design/custom_designs'));
       }
     }
-  }, [existingDesign, designId, navigate]);
+  }, [existingDesign, designId, navigate, t]);
 
   // Add to history when blocks change
   const addToHistory = useCallback((blocks: Block[], action: string) => {
     setState((prev) => {
       const newHistory = prev.history.slice(0, prev.historyIndex + 1);
+      // Use structuredClone for better performance and type safety
+      const clonedBlocks = typeof structuredClone !== 'undefined' 
+        ? structuredClone(blocks)
+        : JSON.parse(JSON.stringify(blocks));
+      
       newHistory.push({
-        blocks: JSON.parse(JSON.stringify(blocks)), // Deep copy
+        blocks: clonedBlocks,
         timestamp: Date.now(),
         action,
       });
@@ -148,33 +186,52 @@ export function InvoiceBuilder() {
     if (templateId) {
       const template = getTemplateById(templateId);
       if (template) {
+        // Update state with template blocks
         setState((prev) => ({
           ...prev,
           blocks: template.blocks,
           templateId: template.id,
         }));
+        // Immediately convert blocks to layout format to ensure proper positioning
+        isManuallySettingLayout.current = true;
+        const initialLayout = template.blocks.map((block) => ({
+          i: block.id,
+          x: block.gridPosition.x,
+          y: block.gridPosition.y,
+          w: block.gridPosition.w,
+          h: block.gridPosition.h,
+          minW: Math.min(block.gridPosition.w, 2),
+          minH: Math.min(block.gridPosition.h, 1),
+          maxW: block.gridPosition.w >= 12 ? 12 : undefined,
+        }));
+        setLayout(initialLayout);
+        // Reset flag after a brief delay to allow layout to be set
+        setTimeout(() => {
+          isManuallySettingLayout.current = false;
+        }, 0);
       }
     }
   }, [templateId]);
 
   // Convert blocks to react-grid-layout format
   useEffect(() => {
-    console.log('🔄 useEffect: Converting blocks to layout format');
-    console.log('  Current state.blocks:', state.blocks.length);
-    const newLayout = state.blocks.map((block) => {
-      const layoutItem = {
-        i: block.id,
-        x: block.gridPosition.x,
-        y: block.gridPosition.y,
-        w: block.gridPosition.w,
-        h: block.gridPosition.h,
-        minW: 2,
-        minH: 1,
-      };
-      console.log(`  Block ${block.id} (${block.type}): x=${layoutItem.x} y=${layoutItem.y} w=${layoutItem.w} h=${layoutItem.h}`);
-      return layoutItem;
-    });
-    console.log('  Setting layout with', newLayout.length, 'items');
+    // Skip if we're manually setting layout (e.g., when loading a design)
+    if (isManuallySettingLayout.current) {
+      return;
+    }
+    
+    const newLayout = state.blocks.map((block) => ({
+      i: block.id,
+      x: block.gridPosition.x,
+      y: block.gridPosition.y,
+      w: block.gridPosition.w,
+      h: block.gridPosition.h,
+      // minW must be <= w, otherwise react-grid-layout will warn
+      minW: Math.min(block.gridPosition.w, 2),
+      minH: Math.min(block.gridPosition.h, 1),
+      // Ensure blocks can't be resized smaller than their current size
+      maxW: block.gridPosition.w >= 12 ? 12 : undefined,
+    }));
     setLayout(newLayout);
   }, [state.blocks]);
 
@@ -210,9 +267,12 @@ export function InvoiceBuilder() {
     setState((prev) => {
       if (prev.historyIndex > 0) {
         const newIndex = prev.historyIndex - 1;
+        const clonedBlocks = typeof structuredClone !== 'undefined'
+          ? structuredClone(prev.history[newIndex].blocks)
+          : JSON.parse(JSON.stringify(prev.history[newIndex].blocks));
         return {
           ...prev,
-          blocks: JSON.parse(JSON.stringify(prev.history[newIndex].blocks)),
+          blocks: clonedBlocks,
           historyIndex: newIndex,
         };
       }
@@ -224,9 +284,12 @@ export function InvoiceBuilder() {
     setState((prev) => {
       if (prev.historyIndex < prev.history.length - 1) {
         const newIndex = prev.historyIndex + 1;
+        const clonedBlocks = typeof structuredClone !== 'undefined'
+          ? structuredClone(prev.history[newIndex].blocks)
+          : JSON.parse(JSON.stringify(prev.history[newIndex].blocks));
         return {
           ...prev,
-          blocks: JSON.parse(JSON.stringify(prev.history[newIndex].blocks)),
+          blocks: clonedBlocks,
           historyIndex: newIndex,
         };
       }
@@ -251,8 +314,9 @@ export function InvoiceBuilder() {
 
       const newBlocks = [...prev.blocks, newBlock];
 
-      // Add to history
-      setTimeout(() => addToHistory(newBlocks, `Add ${block.type}`), 0);
+      // Add to history with cleanup tracking
+      const timeoutId = setTimeout(() => addToHistory(newBlocks, `Add ${block.type}`), 0);
+      timeoutRefs.current.add(timeoutId);
 
       return {
         ...prev,
@@ -316,34 +380,34 @@ export function InvoiceBuilder() {
         w: currentDragDefinition.defaultSize.w,
         h: currentDragDefinition.defaultSize.h,
       };
-      console.log('📌 Setting droppingItem:', item);
       setDroppingItem(item);
     } else {
       // Clear when not dragging
-      console.log('📌 Clearing droppingItem');
       setDroppingItem(undefined);
     }
   }, [currentDragDefinition]);
 
   const handleDrop = useCallback((layout: Layout[], layoutItem: Layout, event: Event) => {
-    console.log('🎯 DROP EVENT FIRED!');
-    console.log('  layoutItem passed to onDrop:', JSON.stringify(layoutItem, null, 2));
-    console.log('  layout array length:', layout.length);
-    console.log('  currentDragDefinition:', currentDragDefinition);
-
-    const nativeEvent = event as any;
-    const data = nativeEvent.dataTransfer?.getData('application/json');
+    const nativeEvent = event as DragEvent;
+    let data: BlockDefinition | null = null;
+    
+    try {
+      const dataString = nativeEvent.dataTransfer?.getData('application/json');
+      if (dataString) {
+        data = JSON.parse(dataString) as BlockDefinition;
+      }
+    } catch (error) {
+      // If parsing fails, use currentDragDefinition
+    }
 
     // Use currentDragDefinition as the source since dataTransfer might be empty
-    const definition = data ? JSON.parse(data) : currentDragDefinition;
+    const definition = data || currentDragDefinition;
 
     if (!definition) {
-      console.error('❌ No definition available');
+      toast.error(String(t('error_dropping_block')));
       setCurrentDragDefinition(null);
       return;
     }
-
-    console.log('✅ Using definition with defaultSize:', definition.defaultSize);
 
     // CRITICAL FIX: Use definition.defaultSize for w/h, layoutItem for x/y position
     // layoutItem.w/h might be incorrect or the droppingItem placeholder size
@@ -361,13 +425,14 @@ export function InvoiceBuilder() {
       properties: { ...definition.defaultProperties },
     };
 
-    console.log('✅ Creating block with grid position:', newBlock.gridPosition);
-
     // Update state with the new block
     // The layout will be synced via useEffect when state.blocks changes
     setState((prev) => {
       const newBlocks = [...prev.blocks, newBlock];
-      setTimeout(() => addToHistory(newBlocks, `Add ${definition.type}`), 0);
+      
+      // Add to history with cleanup tracking
+      const timeoutId = setTimeout(() => addToHistory(newBlocks, `Add ${definition.type}`), 0);
+      timeoutRefs.current.add(timeoutId);
 
       return {
         ...prev,
@@ -379,17 +444,15 @@ export function InvoiceBuilder() {
 
     // Set flag to prevent handleLayoutChange from overwriting the drop position
     setJustDropped(true);
-    setTimeout(() => setJustDropped(false), 100);
+    const timeoutId = setTimeout(() => setJustDropped(false), 100);
+    timeoutRefs.current.add(timeoutId);
 
     // Clear the drag state
     setCurrentDragDefinition(null);
-
-    console.log('✅ Drop complete, block added to state');
-  }, [addToHistory, currentDragDefinition]);
+  }, [addToHistory, currentDragDefinition, t]);
 
   // Called by react-grid-layout during drag over
   const handleDropDragOver = useCallback(() => {
-    console.log('🔄 DropDragOver called', { droppingItem });
     // Return the dimensions for the placeholder
     // This tells react-grid-layout how big the dropping item should be
     if (droppingItem) {
@@ -444,6 +507,15 @@ export function InvoiceBuilder() {
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showNameModal, setShowNameModal] = useState(false);
+  const [designNameInput, setDesignNameInput] = useState<string>('');
+  
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      timeoutRefs.current.forEach(timeoutId => clearTimeout(timeoutId));
+      timeoutRefs.current.clear();
+    };
+  }, []);
 
   const handleSave = async () => {
     if (!state.blocks.length) {
@@ -451,13 +523,18 @@ export function InvoiceBuilder() {
       return;
     }
 
-    // For new designs, prompt for name
+    // For new designs, show modal for name
     if (!isEditMode && !designName) {
-      const name = prompt(String(t('enter_design_name')), 'Visual Design ' + new Date().toLocaleDateString());
-      if (!name) return;
-      setDesignName(name);
+      const defaultName = 'Visual Design ' + new Date().toLocaleDateString();
+      setDesignNameInput(defaultName);
+      setShowNameModal(true);
+      return;
     }
 
+    await performSave();
+  };
+  
+  const performSave = async () => {
     const nameToUse = designName || 'Visual Design ' + new Date().toLocaleDateString();
 
     setSaving(true);
@@ -496,13 +573,26 @@ export function InvoiceBuilder() {
         // Navigate to edit mode for the new design
         navigate(route('/settings/invoice_design/builder/:id', { id: response.data.data.id }));
         setIsEditMode(true);
+        setDesignName(nameToUse);
       }
-    } catch (error: any) {
-      console.error('Save error:', error);
-      toast.error(error?.response?.data?.message || String(t('error_saving_design')));
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error(errorMessage || String(t('error_saving_design')));
     } finally {
       setSaving(false);
     }
+  };
+  
+  const handleNameModalConfirm = () => {
+    if (!designNameInput.trim()) {
+      toast.error(String(t('design_name_required')));
+      return;
+    }
+    setDesignName(designNameInput.trim());
+    setShowNameModal(false);
+    performSave();
   };
 
   const handlePreview = () => {
@@ -680,7 +770,7 @@ export function InvoiceBuilder() {
                 cols={12}
                 rowHeight={60}
                 width={794} // 210mm in pixels at 96dpi
-                margin={[10, 10]}
+                margin={[10, 16]} // [horizontal, vertical] - vertical is 1rem (16px)
                 containerPadding={[30, 30]}
                 draggableHandle=".drag-handle"
                 isDraggable
@@ -824,6 +914,51 @@ export function InvoiceBuilder() {
           onClose={() => setShowPreview(false)}
         />
       )}
+      
+      {/* Design Name Modal */}
+      <Modal
+        visible={showNameModal}
+        onClose={(status) => {
+          setShowNameModal(false);
+          if (!status && !designName) {
+            // User cancelled, don't save
+            return;
+          }
+        }}
+        title={t('enter_design_name')}
+        size="small"
+      >
+        <div className="space-y-4">
+          <InputField
+            id="design-name"
+            value={designNameInput}
+            onValueChange={(value) => setDesignNameInput(value)}
+            placeholder={t('design_name')}
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleNameModalConfirm();
+              }
+            }}
+          />
+          <div className="flex justify-end gap-2">
+            <Button
+              type="secondary"
+              behavior="button"
+              onClick={() => setShowNameModal(false)}
+            >
+              {t('cancel')}
+            </Button>
+            <Button
+              type="primary"
+              behavior="button"
+              onClick={handleNameModalConfirm}
+            >
+              {t('save')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

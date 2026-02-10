@@ -11,7 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { Trash2, Clipboard } from 'lucide-react';
 import { Button } from '$app/components/forms';
-import { PropertyPanelProps } from '../types';
+import { PropertyPanelProps, Block } from '../types';
 import { getBlockLabel, getBlockDescription } from '../block-library';
 import { TextBlockProperties } from './properties/TextBlockProperties';
 import { ImageBlockProperties } from './properties/ImageBlockProperties';
@@ -104,7 +104,12 @@ export function PropertyPanel({
 }
 
 // Simple property editors for basic block types
-function DividerProperties({ block, onChange }: any) {
+interface DividerPropertiesProps {
+  block: Block;
+  onChange: (block: Block) => void;
+}
+
+function DividerProperties({ block, onChange }: DividerPropertiesProps) {
   const [t] = useTranslation();
 
   return (
@@ -166,7 +171,12 @@ function DividerProperties({ block, onChange }: any) {
   );
 }
 
-function SpacerProperties({ block, onChange }: any) {
+interface SpacerPropertiesProps {
+  block: Block;
+  onChange: (block: Block) => void;
+}
+
+function SpacerProperties({ block, onChange }: SpacerPropertiesProps) {
   const [t] = useTranslation();
 
   return (

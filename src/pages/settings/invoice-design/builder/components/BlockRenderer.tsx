@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { memo } from 'react';
 import { Block } from '../types';
 import { getBlockLabel } from '../block-library';
 import { SAMPLE_INVOICE_DATA, replaceVariables } from '../utils/variable-replacer';
@@ -17,7 +18,7 @@ interface BlockRendererProps {
   block: Block;
 }
 
-export function BlockRenderer({ block }: BlockRendererProps) {
+export const BlockRenderer = memo(function BlockRenderer({ block }: BlockRendererProps) {
   const companyLogo = useLogo();
   
   switch (block.type) {
@@ -62,7 +63,7 @@ export function BlockRenderer({ block }: BlockRendererProps) {
         </div>
       );
   }
-}
+});
 
 // Individual block renderers
 function TextBlockRenderer({ block }: BlockRendererProps) {
@@ -102,8 +103,17 @@ function ImageBlockRenderer({ block, companyLogo }: ImageBlockRendererProps) {
     resolvedSource = replaceVariables(source, SAMPLE_INVOICE_DATA);
   }
 
+  // Map text alignment to flexbox justify-content
+  const justifyContent = align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center';
+  
   return (
-    <div style={{ textAlign: align, height: '100%', display: 'flex', alignItems: 'center', justifyContent: align }}>
+    <div style={{ 
+      textAlign: align, 
+      height: '100%', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent 
+    }}>
       {resolvedSource ? (
         <img
           src={resolvedSource}
@@ -206,7 +216,7 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
     alternateRows,
   } = block.properties;
 
-  const resolveItemValue = (field: string, item: any): string => {
+  const resolveItemValue = (field: string, item: Record<string, unknown>): string => {
     // Extract field from item.field format (e.g., "item.product_key" -> "product_key")
     const fieldKey = field.startsWith('item.') ? field.replace('item.', '') : field;
     const value = item[fieldKey];
@@ -231,12 +241,12 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
               fontWeight: headerFontWeight,
             }}
           >
-            {columns.map((col: any) => (
+            {columns.map((col: { id: string; header: string; align: string; width: string; field: string }) => (
               <th
                 key={col.id}
                 style={{
                   padding,
-                  textAlign: col.align,
+                  textAlign: col.align as 'left' | 'center' | 'right',
                   width: col.width,
                   border: showBorders ? `1px solid ${borderColor}` : 'none',
                 }}
@@ -254,7 +264,7 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
                 backgroundColor: alternateRows && index % 2 === 1 ? alternateRowBg : rowBg,
               }}
             >
-              {columns.map((col: any) => (
+              {columns.map((col: { id: string; align: string; field: string }) => (
                 <td
                   key={col.id}
                   style={{
@@ -306,7 +316,7 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
       <tbody>
         {items
           .filter((item: any) => item.show)
-          .map((item: any, index: number) => {
+          .map((item: { show: boolean; isTotal?: boolean; isBalance?: boolean; field: string; label: string }, index: number) => {
             const isTotal = item.isTotal;
             const isBalance = item.isBalance;
             const displayValue = replaceVariables(item.field, SAMPLE_INVOICE_DATA);
