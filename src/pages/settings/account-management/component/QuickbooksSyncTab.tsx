@@ -33,7 +33,7 @@ const SYNC_ENTITIES: SyncEntityConfig[] = [
   { key: 'product', translationKey: 'products' },
 ];
 
-interface QuickbooksSyncTabProps {
+interface QuickBooksSyncTabProps {
   quickbooksSettings: QuickbooksSettings;
   onSyncDirectionChange: (
     entity: string,
@@ -41,10 +41,10 @@ interface QuickbooksSyncTabProps {
   ) => void;
 }
 
-export function QuickbooksSyncTab({
+export function QuickBooksSyncTab({
   quickbooksSettings,
   onSyncDirectionChange,
-}: QuickbooksSyncTabProps) {
+}: QuickBooksSyncTabProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
@@ -59,8 +59,8 @@ export function QuickbooksSyncTab({
   ];
 
   return (
-    <div className="space-y-4 px-4 sm:px-6 py-4">
-      <div className="space-y-3">
+    <>
+      <div className="space-y-3 pb-4">
         <p className="text-sm" style={{ color: colors.$3 }}>
           These settings control the direction of data sync between QuickBooks
           and Invoice Ninja.
@@ -98,7 +98,7 @@ export function QuickbooksSyncTab({
             : QuickbooksSyncDirection.None;
 
         return (
-          <Element key={key} leftSide={t(translationKey)}>
+          <Element key={key} leftSide={t(translationKey)} noExternalPadding>
             <SelectField
               value={direction}
               onValueChange={(value) =>
@@ -116,6 +116,6 @@ export function QuickbooksSyncTab({
           </Element>
         );
       })}
-    </div>
+    </>
   );
 }

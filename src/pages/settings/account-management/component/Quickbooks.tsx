@@ -8,8 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
-import { Card } from '$app/components/cards';
+import { useMemo, useState } from 'react';
 import { Modal } from '$app/components/Modal';
 import { TabGroup } from '$app/components/TabGroup';
 import { Button } from '$app/components/forms';
@@ -25,9 +24,9 @@ import { useQuickbooksConnection } from '../common/hooks/useQuickbooksConnection
 import { useQuickbooksConnect } from '../common/hooks/useQuickbooksConnect';
 import { useQuickbooksDisconnect } from '../common/hooks/useQuickbooksDisconnect';
 import { useQuickbooksSync } from '../common/hooks/useQuickbooksSync';
-import { QuickbooksConnectTab } from './QuickbooksConnectTab';
-import { QuickbooksImportTab } from './QuickbooksImportTab';
-import { QuickbooksSyncTab } from './QuickbooksSyncTab';
+import { QuickBooksConnectTab } from './QuickBooksConnectTab';
+import { QuickBooksImportTab } from './QuickBooksImportTab';
+import { QuickBooksSyncTab } from './QuickBooksSyncTab';
 import { ConnectedDots } from '$app/components/icons/ConnectedDots';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
 import styled from 'styled-components';
@@ -40,7 +39,7 @@ const Box = styled.div`
   }
 `;
 
-export function Quickbooks() {
+export function QuickBooks() {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
@@ -84,49 +83,52 @@ export function Quickbooks() {
     handleChange('quickbooks.settings.default_income_account', value || null);
   };
 
+  const TABS = useMemo(() => {
+    return quickbooksSettings
+      ? [t('connect'), t('import'), t('sync')]
+      : [t('connect'), t('import')];
+  }, [quickbooksSettings]);
+
   return (
     <>
       {isConnected && quickbooks ? (
-        <Card
-          title="QuickBooks"
-          className="shadow-sm"
-          style={{ borderColor: colors.$24 }}
-          headerStyle={{ borderColor: colors.$20 }}
-          withoutBodyPadding
-        >
-          <TabGroup
-            tabs={[t('connect'), t('import'), t('sync') || 'Sync']}
-            withHorizontalPadding
-            fullRightPadding
-            horizontalPaddingWidth="1.5rem"
-          >
-            <QuickbooksConnectTab
-              quickbooks={quickbooks}
-              quickbooksSettings={quickbooksSettings}
-              onDisconnectClick={() => setIsDisconnectModalVisible(true)}
-              onIncomeAccountIdChange={handleIncomeAccountIdChange}
-              isFormBusy={isFormBusy}
-              errors={errors}
-            />
+        <div className="flex flex-col space-y-4">
+          <h3 className="leading-6 font-medium text-lg">QuickBooks</h3>
 
-            <QuickbooksImportTab
-              syncSelections={syncSelections}
-              onSyncSelectionChange={setSyncSelection}
-              onSync={handleInitialSync}
-              isSyncBusy={isSyncBusy}
-              hasSyncSelection={hasSyncSelection}
-            />
+          <TabGroup tabs={TABS} fullRightPadding>
+            <div>
+              <QuickBooksConnectTab
+                quickbooks={quickbooks}
+                quickbooksSettings={quickbooksSettings}
+                onDisconnectClick={() => setIsDisconnectModalVisible(true)}
+                onIncomeAccountIdChange={handleIncomeAccountIdChange}
+                isFormBusy={isFormBusy}
+                errors={errors}
+              />
+            </div>
+
+            <div>
+              <QuickBooksImportTab
+                syncSelections={syncSelections}
+                onSyncSelectionChange={setSyncSelection}
+                onSync={handleInitialSync}
+                isSyncBusy={isSyncBusy}
+                hasSyncSelection={hasSyncSelection}
+              />
+            </div>
 
             {quickbooksSettings ? (
-              <QuickbooksSyncTab
-                quickbooksSettings={quickbooksSettings}
-                onSyncDirectionChange={handleSyncDirectionChange}
-              />
+              <div>
+                <QuickBooksSyncTab
+                  quickbooksSettings={quickbooksSettings}
+                  onSyncDirectionChange={handleSyncDirectionChange}
+                />
+              </div>
             ) : (
               <div />
             )}
           </TabGroup>
-        </Card>
+        </div>
       ) : (
         <Box
           className="flex justify-between items-center p-4 border shadow-sm w-full rounded-md cursor-pointer"
@@ -141,7 +143,7 @@ export function Quickbooks() {
             <ConnectedDots color={colors.$3} size="1.4rem" />
 
             <span className="text-sm" style={{ color: colors.$3 }}>
-              Quickbooks
+              QuickBooks
             </span>
 
             {isConnected && (

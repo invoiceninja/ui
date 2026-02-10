@@ -19,7 +19,7 @@ import {
 } from '$app/common/interfaces/quickbooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
-interface QuickbooksConnectTabProps {
+interface QuickBooksConnectTabProps {
   quickbooks: Quickbooks;
   quickbooksSettings: QuickbooksSettings | undefined;
   onDisconnectClick: () => void;
@@ -28,24 +28,22 @@ interface QuickbooksConnectTabProps {
   errors: ValidationBag | undefined;
 }
 
-export function QuickbooksConnectTab({
+export function QuickBooksConnectTab({
   quickbooks,
   quickbooksSettings,
   onDisconnectClick,
   onIncomeAccountIdChange,
   isFormBusy,
   errors,
-}: QuickbooksConnectTabProps) {
+}: QuickBooksConnectTabProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
   return (
-    <div className="space-y-4 px-4 sm:px-6 py-4">
-      <Element leftSide={t('status')}>
+    <>
+      <Element leftSide={t('status')} noExternalPadding>
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-sm font-medium" style={{ color: colors.$3 }}>
-            {t('connected')}
-          </span>
+          <span className="text-sm font-medium">{t('connected')}</span>
 
           <Button
             type="primary"
@@ -60,30 +58,37 @@ export function QuickbooksConnectTab({
       </Element>
 
       {quickbooks.companyName && (
-        <Element leftSide={t('company_name')}>
-          <span className="text-sm" style={{ color: colors.$3 }}>
-            {quickbooks.companyName}
-          </span>
+        <Element leftSide={t('company_name')} noExternalPadding>
+          <span className="text-sm">{quickbooks.companyName}</span>
+        </Element>
+      )}
+
+      {quickbooks.realmID && (
+        <Element leftSide={t('realm_id')} noExternalPadding>
+          <span className="text-sm">{quickbooks.realmID}</span>
         </Element>
       )}
 
       {quickbooksSettings && (
-        <>
-          <Element leftSide="Default Income Account">
-            <SelectField
-              value={quickbooksSettings.default_income_account || ''}
-              onValueChange={onIncomeAccountIdChange}
-              errorMessage={
-                errors?.errors?.['quickbooks.settings.default_income_account']
-              }
-              customSelector
-              withBlank
-            >
-              {/* Options populated from settings if income_account_map exists */}
-            </SelectField>
-          </Element>
-        </>
+        <Element leftSide={t('default_income_account')} noExternalPadding>
+          <SelectField
+            value={quickbooksSettings.default_income_account || ''}
+            onValueChange={onIncomeAccountIdChange}
+            errorMessage={
+              errors?.errors?.['quickbooks.settings.default_income_account']
+            }
+            customSelector
+            withBlank
+          >
+            {quickbooksSettings.income_account_map &&
+              quickbooksSettings.income_account_map.map((entry) => (
+                <option key={entry.id} value={entry.id}>
+                  {entry.name}
+                </option>
+              ))}
+          </SelectField>
+        </Element>
       )}
-    </div>
+    </>
   );
 }

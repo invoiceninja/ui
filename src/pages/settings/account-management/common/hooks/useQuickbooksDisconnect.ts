@@ -15,6 +15,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { AxiosError } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useQuickbooksDisconnect() {
   const refresh = useRefreshCompanyUsers();
@@ -32,6 +33,7 @@ export function useQuickbooksDisconnect() {
     request('POST', endpoint('/api/v1/quickbooks/disconnect'), {})
       .then(() => {
         toast.success('disconnected');
+        $refetch(['company_users']);
         refresh();
       })
       .catch((error: AxiosError<ValidationBag>) => {

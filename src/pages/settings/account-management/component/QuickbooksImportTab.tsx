@@ -20,7 +20,7 @@ interface SyncSelections {
   invoice: boolean;
 }
 
-interface QuickbooksImportTabProps {
+interface QuickBooksImportTabProps {
   syncSelections: SyncSelections;
   onSyncSelectionChange: (key: keyof SyncSelections, value: boolean) => void;
   onSync: () => void;
@@ -28,55 +28,53 @@ interface QuickbooksImportTabProps {
   hasSyncSelection: boolean;
 }
 
-export function QuickbooksImportTab(props: QuickbooksImportTabProps) {
-  const {
-    syncSelections,
-    onSyncSelectionChange,
-    onSync,
-    isSyncBusy,
-    hasSyncSelection,
-  } = props;
-
+export function QuickBooksImportTab({
+  syncSelections,
+  onSyncSelectionChange,
+  onSync,
+  isSyncBusy,
+  hasSyncSelection,
+}: QuickBooksImportTabProps) {
   const [t] = useTranslation();
+
   const colors = useColorScheme();
 
   return (
-    <div className="space-y-4 px-4 sm:px-6 py-4">
-      <p className="text-sm mb-4" style={{ color: colors.$3 }}>
-        {t('sync_data_from_quickbooks_to_invoice_ninja')}
-      </p>
+    <>
+      <h3 className="leading-6 font-medium mb-4">{t('sync_data')}</h3>
 
-      <Element leftSide={t('products')}>
+      <Element leftSide={t('products')} noExternalPadding>
         <Toggle
           checked={syncSelections.product}
           onChange={(value: boolean) => onSyncSelectionChange('product', value)}
         />
       </Element>
 
-      <Element leftSide={t('clients')}>
+      <Element leftSide={t('clients')} noExternalPadding>
         <Toggle
           checked={syncSelections.client}
           onChange={(value: boolean) => onSyncSelectionChange('client', value)}
         />
       </Element>
 
-      <Element leftSide={t('invoices')}>
+      <Element leftSide={t('invoices')} noExternalPadding>
         <Toggle
           checked={syncSelections.invoice}
           onChange={(value: boolean) => onSyncSelectionChange('invoice', value)}
         />
       </Element>
 
-      <Element leftSide="">
+      <Element leftSide="" noExternalPadding>
         <Button
           type="primary"
           behavior="button"
           onClick={onSync}
           disabled={isSyncBusy || !hasSyncSelection}
+          disableWithoutIcon
         >
           {t('sync')}
         </Button>
       </Element>
-    </div>
+    </>
   );
 }

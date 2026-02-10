@@ -48,9 +48,9 @@ export interface QuickbooksSync {
   direction: QuickbooksSyncDirection;
 }
 
-export type IncomeAccountMapEntry = [
-  id: string,
-  name: string,
-  fully_qualified_name: string
-];
+export type IncomeAccountMapEntry = {
+  id: string;
+  name: string;
+  fully_qualified_name: string;
+};
 export type TaxRateMapEntry = [id: string, name: string, rate: string];
