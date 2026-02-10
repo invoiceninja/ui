@@ -32,6 +32,7 @@ import { ChevronDown } from '$app/components/icons/ChevronDown';
 import { InfoCard } from '$app/components/InfoCard';
 import { Modal } from '$app/components/Modal';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 interface Props {
   client: Client;
@@ -50,8 +51,9 @@ export function Gateways(props: Props) {
 
   const { isAdmin } = useAdmin();
   const colors = useColorScheme();
+  const currentCompany = useCurrentCompany();
 
-  const getSetting = useGetSetting();
+  const getSetting = useGetSetting({ withoutCompanySettingsFallback: true });
 
   const { data: companyGatewaysResponse } = useCompanyGatewaysQuery();
 
@@ -106,6 +108,10 @@ export function Gateways(props: Props) {
   };
 
   const currentCompanyGatewayIds = useMemo(() => {
+    if (!Object.keys(currentCompany?.settings || {}).length) {
+      return null;
+    }
+
     const currentStoredCompanyGatewayIds = getSetting(
       client,
       'company_gateway_ids'
@@ -116,7 +122,7 @@ export function Gateways(props: Props) {
     }
 
     return currentStoredCompanyGatewayIds.split(',') as string[];
-  }, [client]);
+  }, [client, currentCompany, getSetting]);
 
   useEffect(() => {
     if (companyGatewaysResponse) {

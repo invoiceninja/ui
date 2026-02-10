@@ -14,6 +14,7 @@ import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { cloneDeep } from 'lodash';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { MultiValue, SingleValue } from 'react-select';
 
@@ -74,10 +75,13 @@ export function useGatewayUtilities(params: Params) {
     if (availableGateways) {
       setCurrentGateways(availableGateways);
 
-      handleChange(
-        'settings.company_gateway_ids',
-        availableGateways.map(({ id }) => id).join(',')
-      );
+      const updatedSettings = cloneDeep(companyChanges?.settings);
+
+      if (updatedSettings?.company_gateway_ids !== undefined) {
+        delete updatedSettings.company_gateway_ids;
+      }
+
+      handleChange('settings', updatedSettings);
     }
   };
 
