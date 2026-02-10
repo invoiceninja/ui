@@ -19,13 +19,7 @@ import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { routeWithOrigin } from '$app/common/helpers/route';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-
-const BETA_BENEFITS = [
-  'Early access to all new features',
-  'Direct communication with our team',
-  'Free during beta testing period',
-  'Shape the product roadmap with your feedback',
-];
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 export default function Beta() {
   return (
@@ -142,6 +136,7 @@ function Join() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEligible, setIsEligible] = useState(true);
   const [code, setCode] = useState('');
+  const [errors, setErrors] = useState<ValidationBag | null>(null);
 
   const navigate = useNavigate();
   const account = useCurrentAccount();
@@ -165,18 +160,27 @@ function Join() {
         );
 
         setTimeout(() => {
-         window.location.href = routeWithOrigin('/docuninja');
+          window.location.href = routeWithOrigin('/docuninja');
         }, 3000);
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 401) {
           setIsSubmitting(false);
           setIsEligible(false);
-        } else {
+
+          return;
+        }
+
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
           setIsSubmitting(false);
 
-          toast.error();
+          return;
         }
+
+        setIsSubmitting(false);
+
+        toast.error();
       });
   };
 
