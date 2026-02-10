@@ -78,18 +78,18 @@ export function ImageBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       {/* Image Source */}
       <TextInput
-        label={block.type === 'logo' ? t('logo_source') : t('image_source')}
+        label={block.type === 'logo' ? String(t('logo_source')) : String(t('image_source'))}
         value={block.properties.source}
         onChange={(value) => updateProperty('source', value)}
         placeholder={block.type === 'logo' ? '$company.logo' : 'https://...'}
-        hint={block.type === 'logo' ? t('use_variable_or_url') : t('enter_image_url')}
+        hint={block.type === 'logo' ? String(t('use_variable_or_url')) : String(t('enter_image_url'))}
       />
 
-      <SectionDivider label={t('dimensions')} />
+      <SectionDivider label={String(t('dimensions'))} />
 
       {/* Max Width */}
       <TextInput
-        label={t('max_width')}
+        label={String(t('max_width'))}
         value={block.properties.maxWidth}
         onChange={(value) => updateProperty('maxWidth', value)}
         placeholder="150px"
@@ -97,43 +97,43 @@ export function ImageBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       {/* Max Height */}
       <TextInput
-        label={t('max_height')}
+        label={String(t('max_height'))}
         value={block.properties.maxHeight}
         onChange={(value) => updateProperty('maxHeight', value)}
         placeholder="auto"
       />
 
-      <SectionDivider label={t('layout')} />
+      <SectionDivider label={String(t('layout'))} />
 
       {/* Alignment */}
       <AlignmentInput
-        label={t('alignment')}
+        label={String(t('alignment'))}
         value={block.properties.align}
         onChange={(value) => updateProperty('align', value)}
       />
 
       {/* Object Fit */}
       <SelectInput
-        label={t('object_fit')}
+        label={String(t('object_fit'))}
         value={block.properties.objectFit || 'contain'}
         onChange={(value) => updateProperty('objectFit', value)}
         options={[
-          { value: 'contain', label: t('contain') },
-          { value: 'cover', label: t('cover') },
-          { value: 'fill', label: t('fill') },
-          { value: 'none', label: t('none') },
+          { value: 'contain', label: String(t('contain')) },
+          { value: 'cover', label: String(t('cover')) },
+          { value: 'fill', label: String(t('fill')) },
+          { value: 'none', label: String(t('none')) },
         ]}
       />
 
-      <SectionDivider label={t('spacing')} />
+      <SectionDivider label={String(t('spacing'))} />
 
       {/* Padding */}
       <TextInput
-        label={t('padding')}
+        label={String(t('padding'))}
         value={block.properties.padding}
         onChange={(value) => updateProperty('padding', value)}
         placeholder="0px"
-        hint={t('css_padding_format')}
+        hint={String(t('css_padding_format'))}
       />
     </div>
   );

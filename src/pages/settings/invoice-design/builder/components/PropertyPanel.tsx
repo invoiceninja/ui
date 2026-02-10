@@ -42,7 +42,7 @@ export function PropertyPanel({
         <button
           onClick={onDuplicate}
           className="flex-shrink-0 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-          title={t('duplicate')}
+          title={String(t('duplicate'))}
         >
           <Clipboard className="w-4 h-4" />
         </button>

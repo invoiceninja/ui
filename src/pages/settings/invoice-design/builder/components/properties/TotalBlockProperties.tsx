@@ -65,7 +65,7 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                   onClick={() => moveItemUp(index)}
                   disabled={index === 0}
                   className={`p-0.5 rounded ${index === 0 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-100'}`}
-                  title={t('move_up')}
+                  title={String(t('move_up'))}
                 >
                   <ChevronUp className="w-4 h-4" />
                 </button>
@@ -73,7 +73,7 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                   onClick={() => moveItemDown(index)}
                   disabled={index >= block.properties.items.length - 1}
                   className={`p-0.5 rounded ${index >= block.properties.items.length - 1 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-100'}`}
-                  title={t('move_down')}
+                  title={String(t('move_down'))}
                 >
                   <ChevronDown className="w-4 h-4" />
                 </button>
@@ -94,20 +94,20 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
         </div>
       </div>
 
-      <SectionDivider label={t('alignment')} />
+      <SectionDivider label={String(t('alignment'))} />
 
       {/* Alignment */}
       <AlignmentInput
-        label={t('alignment')}
+        label={String(t('alignment'))}
         value={block.properties.align}
         onChange={(value) => updateProperty('align', value)}
       />
 
-      <SectionDivider label={t('typography')} />
+      <SectionDivider label={String(t('typography'))} />
 
       {/* Font Size */}
       <TextInput
-        label={t('font_size')}
+        label={String(t('font_size'))}
         value={block.properties.fontSize}
         onChange={(value) => updateProperty('fontSize', value)}
         placeholder="13px"
@@ -115,17 +115,17 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       {/* Total Font Size */}
       <TextInput
-        label={t('total_font_size')}
+        label={String(t('total_font_size'))}
         value={block.properties.totalFontSize}
         onChange={(value) => updateProperty('totalFontSize', value)}
         placeholder="18px"
       />
 
-      <SectionDivider label={t('colors')} />
+      <SectionDivider label={String(t('colors'))} />
 
       {/* Label Color */}
       <ColorInput
-        label={t('label_color')}
+        label={String(t('label_color'))}
         value={block.properties.labelColor}
         onChange={(value) => updateProperty('labelColor', value)}
         defaultValue="#6B7280"
@@ -133,7 +133,7 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       {/* Amount Color */}
       <ColorInput
-        label={t('amount_color')}
+        label={String(t('amount_color'))}
         value={block.properties.amountColor}
         onChange={(value) => updateProperty('amountColor', value)}
         defaultValue="#111827"
@@ -141,7 +141,7 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       {/* Total Color */}
       <ColorInput
-        label={t('total_color')}
+        label={String(t('total_color'))}
         value={block.properties.totalColor}
         onChange={(value) => updateProperty('totalColor', value)}
         defaultValue="#111827"
@@ -149,17 +149,17 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       {/* Balance Color */}
       <ColorInput
-        label={t('balance_color')}
+        label={String(t('balance_color'))}
         value={block.properties.balanceColor}
         onChange={(value) => updateProperty('balanceColor', value)}
         defaultValue="#DC2626"
       />
 
-      <SectionDivider label={t('spacing')} />
+      <SectionDivider label={String(t('spacing'))} />
 
       {/* Row Spacing */}
       <TextInput
-        label={t('row_spacing')}
+        label={String(t('row_spacing'))}
         value={block.properties.spacing}
         onChange={(value) => updateProperty('spacing', value)}
         placeholder="8px"
@@ -167,25 +167,25 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       {/* Label Padding */}
       <TextInput
-        label={t('label_padding')}
+        label={String(t('label_padding'))}
         value={block.properties.labelPadding}
         onChange={(value) => updateProperty('labelPadding', value)}
         placeholder="0px"
-        hint={t('css_padding_format')}
+        hint={String(t('css_padding_format'))}
       />
 
       {/* Value Padding */}
       <TextInput
-        label={t('value_padding')}
+        label={String(t('value_padding'))}
         value={block.properties.valuePadding}
         onChange={(value) => updateProperty('valuePadding', value)}
         placeholder="0px"
-        hint={t('css_padding_format')}
+        hint={String(t('css_padding_format'))}
       />
 
       {/* Gap Between Label and Value */}
       <TextInput
-        label={t('label_value_gap')}
+        label={String(t('label_value_gap'))}
         value={block.properties.labelValueGap}
         onChange={(value) => updateProperty('labelValueGap', value)}
         placeholder="20px"
@@ -193,11 +193,11 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       {/* Value Column Min Width */}
       <TextInput
-        label={t('value_min_width')}
+        label={String(t('value_min_width'))}
         value={block.properties.valueMinWidth}
         onChange={(value) => updateProperty('valueMinWidth', value)}
-        placeholder={t('auto')}
-        hint={t('leave_empty_for_auto')}
+        placeholder={String(t('auto'))}
+        hint={String(t('leave_empty_for_auto'))}
       />
     </div>
   );

@@ -88,7 +88,7 @@ export default function CustomDesigns() {
                   <Button
                     type="minimal"
                     behavior="button"
-                    onClick={(e) => {
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                       e.stopPropagation();
                       navigate(route('/settings/invoice_design/builder/:id', { id: resource.id }));
                     }}

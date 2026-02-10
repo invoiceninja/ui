@@ -72,7 +72,7 @@ export function TextBlockProperties({ block, onChange }: PropertyEditorProps) {
         />
       )}
 
-      <SectionDivider label={t('typography')} />
+      <SectionDivider label={String(t('typography'))} />
 
       {/* Font Size */}
       <FontSizeInput
@@ -113,15 +113,15 @@ export function TextBlockProperties({ block, onChange }: PropertyEditorProps) {
         onChange={(value) => updateProperty('lineHeight', value)}
       />
 
-      <SectionDivider label={t('spacing')} />
+      <SectionDivider label={String(t('spacing'))} />
 
       {/* Padding */}
       <TextInput
-        label={t('padding')}
+        label={String(t('padding'))}
         value={block.properties.padding}
         onChange={(value) => updateProperty('padding', value)}
         placeholder="0px"
-        hint={t('css_padding_format')}
+        hint={String(t('css_padding_format'))}
       />
     </div>
   );

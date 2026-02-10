@@ -925,7 +925,7 @@ export function InvoiceBuilder() {
             return;
           }
         }}
-        title={t('enter_design_name')}
+        title={String(t('enter_design_name'))}
         size="small"
       >
         <div className="space-y-4">
@@ -933,9 +933,9 @@ export function InvoiceBuilder() {
             id="design-name"
             value={designNameInput}
             onValueChange={(value) => setDesignNameInput(value)}
-            placeholder={t('design_name')}
+            placeholder={String(t('design_name'))}
             autoFocus
-            onKeyDown={(e) => {
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
               if (e.key === 'Enter') {
                 handleNameModalConfirm();
               }

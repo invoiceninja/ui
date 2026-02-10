@@ -180,7 +180,7 @@ export function AlignmentInput({
                   : 'border-gray-300 hover:border-gray-400'
                 }
               `}
-              title={t(align)}
+              title={String(t(align))}
             >
               <Icon className="w-4 h-4" />
             </button>
@@ -406,7 +406,7 @@ export function PaddingInput({
         value={value}
         onChange={onChange}
         placeholder="8px"
-        hint={t('padding_hint')}
+        hint={String(t('padding_hint'))}
       />
     );
   }
@@ -441,28 +441,28 @@ export function PaddingInput({
           value={top}
           onChange={(e) => updatePadding('top', e.target.value)}
           className="px-2 py-1 border border-gray-300 rounded text-xs text-center"
-          placeholder={t('top')}
+          placeholder={String(t('top'))}
         />
         <input
           type="text"
           value={right}
           onChange={(e) => updatePadding('right', e.target.value)}
           className="px-2 py-1 border border-gray-300 rounded text-xs text-center"
-          placeholder={t('right')}
+          placeholder={String(t('right'))}
         />
         <input
           type="text"
           value={bottom}
           onChange={(e) => updatePadding('bottom', e.target.value)}
           className="px-2 py-1 border border-gray-300 rounded text-xs text-center"
-          placeholder={t('bottom')}
+          placeholder={String(t('bottom'))}
         />
         <input
           type="text"
           value={left}
           onChange={(e) => updatePadding('left', e.target.value)}
           className="px-2 py-1 border border-gray-300 rounded text-xs text-center"
-          placeholder={t('left')}
+          placeholder={String(t('left'))}
         />
       </div>
     </div>

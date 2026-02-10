@@ -58,41 +58,41 @@ export function CompanyInfoBlockProperties({ block, onChange }: PropertyEditorPr
     });
   };
 
-  const rebuildContent = (fields: typeof AVAILABLE_FIELDS) => {
-    updateProperty('content', fields.map(f => f.variable).join('\n'));
+  const rebuildContent = (fields: Array<{ id: string; label: string; variable?: string }>) => {
+    updateProperty('content', fields.map(f => f.variable || '').filter(Boolean).join('\n'));
   };
 
   return (
     <div className="space-y-4">
       {/* Active Fields - Reorderable */}
       <ReorderableFieldList
-        label={t('field_order')}
+        label={String(t('field_order'))}
         fields={enabledFieldsOrdered}
         availableFields={availableToAdd}
         onReorder={rebuildContent}
-        addFieldLabel={t('add_field')}
-        emptyLabel={t('no_fields_selected')}
+        addFieldLabel={String(t('add_field'))}
+        emptyLabel={String(t('no_fields_selected'))}
       />
 
-      <SectionDivider label={t('typography')} />
+      <SectionDivider label={String(t('typography'))} />
 
       {/* Font Size */}
       <FontSizeInput
-        label={t('font_size')}
+        label={String(t('font_size'))}
         value={block.properties.fontSize}
         onChange={(value) => updateProperty('fontSize', value)}
       />
 
       {/* Alignment */}
       <AlignmentInput
-        label={t('alignment')}
+        label={String(t('alignment'))}
         value={block.properties.align}
         onChange={(value) => updateProperty('align', value)}
       />
 
       {/* Text Color */}
       <ColorInput
-        label={t('text_color')}
+        label={String(t('text_color'))}
         value={block.properties.color}
         onChange={(value) => updateProperty('color', value)}
         defaultValue="#374151"
@@ -100,20 +100,20 @@ export function CompanyInfoBlockProperties({ block, onChange }: PropertyEditorPr
 
       {/* Line Height */}
       <LineHeightInput
-        label={t('line_height')}
+        label={String(t('line_height'))}
         value={block.properties.lineHeight}
         onChange={(value) => updateProperty('lineHeight', value)}
       />
 
-      <SectionDivider label={t('spacing')} />
+      <SectionDivider label={String(t('spacing'))} />
 
       {/* Padding */}
       <TextInput
-        label={t('padding')}
+        label={String(t('padding'))}
         value={block.properties.padding}
         onChange={(value) => updateProperty('padding', value)}
         placeholder="0px"
-        hint={t('css_padding_format')}
+        hint={String(t('css_padding_format'))}
       />
     </div>
   );

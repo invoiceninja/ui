@@ -98,7 +98,7 @@ export function InvoiceDetailsBlockProperties({ block, onChange }: PropertyEdito
       {/* Show Labels */}
       <CheckboxInput
         id="showLabels"
-        label={t('show_labels')}
+        label={String(t('show_labels'))}
         value={showLabels}
         onChange={(value) => {
           updateProperty('showLabels', value);
@@ -127,7 +127,7 @@ export function InvoiceDetailsBlockProperties({ block, onChange }: PropertyEdito
                       ? 'text-gray-300 cursor-not-allowed'
                       : 'text-gray-500 hover:bg-gray-100'
                   }`}
-                  title={t('move_up')}
+                  title={String(t('move_up'))}
                 >
                   <ChevronUp className="w-4 h-4" />
                 </button>
@@ -139,7 +139,7 @@ export function InvoiceDetailsBlockProperties({ block, onChange }: PropertyEdito
                       ? 'text-gray-300 cursor-not-allowed'
                       : 'text-gray-500 hover:bg-gray-100'
                   }`}
-                  title={t('move_down')}
+                  title={String(t('move_down'))}
                 >
                   <ChevronDown className="w-4 h-4" />
                 </button>
@@ -150,7 +150,7 @@ export function InvoiceDetailsBlockProperties({ block, onChange }: PropertyEdito
               <button
                 onClick={() => removeField(index)}
                 className="p-1 rounded hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors"
-                title={t('remove')}
+                title={String(t('remove'))}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -185,25 +185,25 @@ export function InvoiceDetailsBlockProperties({ block, onChange }: PropertyEdito
         )}
       </div>
 
-      <SectionDivider label={t('typography')} />
+      <SectionDivider label={String(t('typography'))} />
 
       {/* Font Size */}
       <FontSizeInput
-        label={t('font_size')}
+        label={String(t('font_size'))}
         value={block.properties.fontSize}
         onChange={(value) => updateProperty('fontSize', value)}
       />
 
       {/* Alignment */}
       <AlignmentInput
-        label={t('alignment')}
+        label={String(t('alignment'))}
         value={block.properties.align}
         onChange={(value) => updateProperty('align', value)}
       />
 
       {/* Text Color */}
       <ColorInput
-        label={t('text_color')}
+        label={String(t('text_color'))}
         value={block.properties.color}
         onChange={(value) => updateProperty('color', value)}
         defaultValue="#374151"
@@ -211,7 +211,7 @@ export function InvoiceDetailsBlockProperties({ block, onChange }: PropertyEdito
 
       {/* Label Color */}
       <ColorInput
-        label={t('label_color')}
+        label={String(t('label_color'))}
         value={block.properties.labelColor}
         onChange={(value) => updateProperty('labelColor', value)}
         defaultValue="#6B7280"
@@ -219,20 +219,20 @@ export function InvoiceDetailsBlockProperties({ block, onChange }: PropertyEdito
 
       {/* Line Height */}
       <LineHeightInput
-        label={t('line_height')}
+        label={String(t('line_height'))}
         value={block.properties.lineHeight}
         onChange={(value) => updateProperty('lineHeight', value)}
       />
 
-      <SectionDivider label={t('spacing')} />
+      <SectionDivider label={String(t('spacing'))} />
 
       {/* Padding */}
       <TextInput
-        label={t('padding')}
+        label={String(t('padding'))}
         value={block.properties.padding}
         onChange={(value) => updateProperty('padding', value)}
         placeholder="0px"
-        hint={t('css_padding_format')}
+        hint={String(t('css_padding_format'))}
       />
     </div>
   );

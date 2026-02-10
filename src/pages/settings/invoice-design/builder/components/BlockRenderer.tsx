@@ -269,7 +269,7 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
                   key={col.id}
                   style={{
                     padding,
-                    textAlign: col.align,
+                    textAlign: col.align as 'left' | 'center' | 'right',
                     border: showBorders ? `1px solid ${borderColor}` : 'none',
                   }}
                 >

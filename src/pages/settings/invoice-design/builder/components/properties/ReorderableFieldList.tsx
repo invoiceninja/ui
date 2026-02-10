@@ -87,7 +87,7 @@ export function ReorderableFieldList({
                     ? 'text-gray-300 cursor-not-allowed'
                     : 'text-gray-500 hover:bg-gray-100'
                 }`}
-                title={t('move_up')}
+                title={String(t('move_up'))}
               >
                 <ChevronUp className="w-4 h-4" />
               </button>
@@ -99,7 +99,7 @@ export function ReorderableFieldList({
                     ? 'text-gray-300 cursor-not-allowed'
                     : 'text-gray-500 hover:bg-gray-100'
                 }`}
-                title={t('move_down')}
+                title={String(t('move_down'))}
               >
                 <ChevronDown className="w-4 h-4" />
               </button>
@@ -111,7 +111,7 @@ export function ReorderableFieldList({
               <button
                 onClick={() => removeField(index)}
                 className="p-1 rounded hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors"
-                title={t('remove')}
+                title={String(t('remove'))}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
