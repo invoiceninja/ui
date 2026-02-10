@@ -13,8 +13,160 @@ import { GRID_CONFIG } from './grid-converter';
 import { InvoiceData, replaceVariables, resolveVariable } from './variable-replacer';
 
 /**
- * Generate complete HTML document from blocks using absolute positioning
- * This ensures WYSIWYG consistency between preview and PDF output
+ * Group blocks by their Y position (row)
+ */
+function groupBlocksByRow(blocks: Block[]): Map<number, Block[]> {
+  const rows = new Map<number, Block[]>();
+  blocks.forEach(block => {
+    const y = block.gridPosition.y;
+    if (!rows.has(y)) {
+      rows.set(y, []);
+    }
+    rows.get(y)!.push(block);
+  });
+  return rows;
+}
+
+/**
+ * Estimate content height for a block based on its type and properties
+ */
+function estimateContentHeight(block: Block, data: InvoiceData): number {
+  const { rowHeight } = GRID_CONFIG;
+  const minHeight = rowHeight; // Minimum height for any block
+
+  switch (block.type) {
+    case 'text': {
+      const { content, fontSize, lineHeight } = block.properties;
+      const replacedContent = replaceVariables(content, data);
+      const fontSizeNum = parseFloat(fontSize) || 16;
+      const lineHeightNum = parseFloat(lineHeight) || 1.5;
+      const lines = replacedContent.split('\n').length || 1;
+      const estimatedHeight = lines * fontSizeNum * lineHeightNum;
+      return Math.max(estimatedHeight, minHeight);
+    }
+
+    case 'logo':
+    case 'image': {
+      const { maxWidth, maxHeight } = block.properties;
+      // Use maxHeight if specified, otherwise use a reasonable default
+      if (maxHeight && typeof maxHeight === 'string') {
+        const heightNum = parseFloat(maxHeight);
+        if (!isNaN(heightNum)) {
+          return Math.max(heightNum, minHeight);
+        }
+      }
+      // Default image height
+      return Math.max(100, minHeight);
+    }
+
+    case 'company-info':
+    case 'client-info':
+    case 'invoice-details': {
+      const { content, fontSize, lineHeight } = block.properties;
+      const replacedContent = replaceVariables(content, data);
+      const fontSizeNum = parseFloat(fontSize) || 14;
+      const lineHeightNum = parseFloat(lineHeight) || 1.5;
+      const lines = replacedContent.split('\n').filter(line => line.trim()).length || 1;
+      const estimatedHeight = lines * fontSizeNum * lineHeightNum + 20; // Add padding
+      return Math.max(estimatedHeight, minHeight);
+    }
+
+    case 'table': {
+      const { columns } = block.properties;
+      const headerHeight = 40; // Header row
+      const rowHeight = 30; // Data row height
+      const rowCount = data.line_items.length || 1;
+      const estimatedHeight = headerHeight + (rowCount * rowHeight) + 10; // Add padding
+      return Math.max(estimatedHeight, minHeight);
+    }
+
+    case 'total': {
+      const { items } = block.properties;
+      const itemCount = Array.isArray(items) ? items.filter((item: { show: boolean }) => item.show).length : 5;
+      const itemHeight = 25;
+      const estimatedHeight = itemCount * itemHeight + 20; // Add padding
+      return Math.max(estimatedHeight, minHeight);
+    }
+
+    case 'divider': {
+      const { thickness, marginTop, marginBottom } = block.properties;
+      const thicknessNum = parseFloat(thickness) || 1;
+      const marginTopNum = parseFloat(marginTop) || 0;
+      const marginBottomNum = parseFloat(marginBottom) || 0;
+      return thicknessNum + marginTopNum + marginBottomNum;
+    }
+
+    case 'spacer': {
+      const { height } = block.properties;
+      if (height && typeof height === 'string') {
+        const heightNum = parseFloat(height);
+        if (!isNaN(heightNum)) {
+          return heightNum;
+        }
+      }
+      return minHeight;
+    }
+
+    case 'qrcode':
+    case 'signature': {
+      // Default sizes for QR code and signature
+      return Math.max(100, minHeight);
+    }
+
+    default:
+      return minHeight;
+  }
+}
+
+/**
+ * Calculate row heights based on the tallest content in each row
+ */
+function calculateRowHeights(rows: Map<number, Block[]>, data: InvoiceData): Map<number, number> {
+  const rowHeights = new Map<number, number>();
+  const { margin } = GRID_CONFIG;
+
+  rows.forEach((blocks, y) => {
+    // Find the maximum content height among all blocks in this row
+    const maxContentHeight = Math.max(
+      ...blocks.map(block => estimateContentHeight(block, data))
+    );
+    
+    // Store the row height (content height + vertical margin if not first row)
+    rowHeights.set(y, maxContentHeight);
+  });
+
+  return rowHeights;
+}
+
+/**
+ * Calculate cumulative top positions for each row
+ */
+function calculateRowPositions(rowHeights: Map<number, number>): Map<number, number> {
+  const rowPositions = new Map<number, number>();
+  const { containerPadding, margin } = GRID_CONFIG;
+  
+  let currentTop = containerPadding[1];
+  const sortedRows = Array.from(rowHeights.keys()).sort((a, b) => a - b);
+
+  sortedRows.forEach((y, index) => {
+    rowPositions.set(y, currentTop);
+    
+    // Move to next row: current row height + margin
+    const rowHeight = rowHeights.get(y) || GRID_CONFIG.rowHeight;
+    if (index < sortedRows.length - 1) {
+      // Add margin between rows (except after last row)
+      currentTop += rowHeight + margin[1];
+    } else {
+      currentTop += rowHeight;
+    }
+  });
+
+  return rowPositions;
+}
+
+/**
+ * Generate complete HTML document from blocks using row-based height calculation
+ * This ensures content-driven heights and eliminates wasted vertical space
  */
 export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string {
   // Sort blocks by Y position, then by X position for same row
@@ -25,27 +177,32 @@ export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string 
     return a.gridPosition.x - b.gridPosition.x;
   });
 
-  // Render blocks with absolute positioning based on grid coordinates
-  const blocksHTML = sortedBlocks.map(block => renderBlock(block, data)).join('\n');
+  // Group blocks by row and calculate row-based heights
+  const rows = groupBlocksByRow(blocks);
+  const rowHeights = calculateRowHeights(rows, data);
+  const rowPositions = calculateRowPositions(rowHeights);
+  
+  // Render blocks with row-based positioning
+  const blocksHTML = sortedBlocks.map(block => renderBlockWithRowHeight(block, data, rowHeights, rowPositions)).join('\n');
   
   // Extract containerPadding at function level to avoid scope issues
-  const { rowHeight, margin, containerPadding } = GRID_CONFIG;
+  const { margin, containerPadding } = GRID_CONFIG;
   
-  // Calculate container height based on block positions
+  // Calculate container height based on row positions
   let maxBottom = 0;
-  if (blocks.length > 0) {
-    blocks.forEach(block => {
-      const { y, h } = block.gridPosition;
-      const top = containerPadding[1] + (y * (rowHeight + margin[1]));
-      const height = (h * rowHeight) + ((h - 1) * margin[1]);
-      const bottom = top + height;
-      if (bottom > maxBottom) {
-        maxBottom = bottom;
-      }
-    });
-    // Add bottom padding
-    maxBottom += containerPadding[1];
+  if (rowPositions.size > 0) {
+    const sortedYPositions = Array.from(rowPositions.keys()).sort((a, b) => b - a);
+    const lastRowY = sortedYPositions[0];
+    const lastRowTop = rowPositions.get(lastRowY) || containerPadding[1];
+    const lastRowHeight = rowHeights.get(lastRowY) || GRID_CONFIG.rowHeight;
+    maxBottom = lastRowTop + lastRowHeight;
+  } else {
+    maxBottom = containerPadding[1];
   }
+  
+  // Add bottom padding
+  maxBottom += containerPadding[1];
+  
   // Ensure minimum A4 height
   const containerHeight = Math.max(maxBottom || 1122, 1122);
   
@@ -151,31 +308,34 @@ export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string 
 
 
 /**
- * Render a single block to HTML with absolute positioning based on grid coordinates
- * This ensures WYSIWYG consistency - blocks appear exactly where they are in the preview
+ * Render a single block to HTML with row-based height calculation
+ * This ensures content-driven heights and proper row alignment
  */
-function renderBlock(block: Block, data: InvoiceData): string {
+function renderBlockWithRowHeight(
+  block: Block, 
+  data: InvoiceData, 
+  rowHeights: Map<number, number>,
+  rowPositions: Map<number, number>
+): string {
   const content = renderBlockContent(block, data);
   
   // Calculate absolute pixel positions based on grid coordinates
-  // This matches exactly how react-grid-layout positions items
-  const { x, y, w, h } = block.gridPosition;
-  const { cols, rowHeight, canvasWidth, margin, containerPadding } = GRID_CONFIG;
+  const { x, y, w } = block.gridPosition;
+  const { cols, canvasWidth, margin, containerPadding } = GRID_CONFIG;
   
   // Calculate column width
   const availableWidth = canvasWidth - (containerPadding[0] * 2);
   const colWidth = availableWidth / cols;
   
-  // Calculate absolute positions
-  // For x position: padding + (column index * column width) + (gaps between columns)
-  // Column width already accounts for the space, so we just need: padding + (x * (colWidth + margin))
+  // Calculate horizontal position
   const left = containerPadding[0] + (x * (colWidth + margin[0]));
-  const top = containerPadding[1] + (y * (rowHeight + margin[1]));
   
-  // Calculate dimensions
-  // Width: (number of columns * column width) + (gaps between columns within the block)
+  // Calculate width
   const width = (w * colWidth) + ((w - 1) * margin[0]);
-  const height = (h * rowHeight) + ((h - 1) * margin[1]);
+  
+  // Get row-based position and height
+  const top = rowPositions.get(y) || containerPadding[1];
+  const rowHeight = rowHeights.get(y) || GRID_CONFIG.rowHeight;
   
   // Ensure blocks never exceed container bounds
   const maxLeft = containerPadding[0];
@@ -183,11 +343,11 @@ function renderBlock(block: Block, data: InvoiceData): string {
   const constrainedLeft = Math.max(maxLeft, Math.min(left, maxRight - width));
   const constrainedWidth = Math.min(width, maxRight - constrainedLeft);
   
-  // For expandable blocks (tables, totals), allow content to grow
+  // For expandable blocks (tables, totals), allow content to grow beyond row height
   const isExpandableBlock = block.type === 'table' || block.type === 'total';
   const heightStyle = isExpandableBlock 
-    ? `min-height: ${height}px;` 
-    : `height: ${height}px;`;
+    ? `min-height: ${rowHeight}px;` 
+    : `height: ${rowHeight}px;`;
   
   const styles = `
     position: absolute;
