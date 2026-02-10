@@ -47,7 +47,7 @@ function estimateContentHeight(block: Block, data: InvoiceData): number {
 
     case 'logo':
     case 'image': {
-      const { maxWidth, maxHeight } = block.properties;
+      const { maxHeight } = block.properties;
       // Use maxHeight if specified, otherwise use a reasonable default
       if (maxHeight && typeof maxHeight === 'string') {
         const heightNum = parseFloat(maxHeight);
@@ -72,7 +72,6 @@ function estimateContentHeight(block: Block, data: InvoiceData): number {
     }
 
     case 'table': {
-      const { columns } = block.properties;
       const headerHeight = 40; // Header row
       const rowHeight = 30; // Data row height
       const rowCount = data.line_items.length || 1;
