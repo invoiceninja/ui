@@ -332,7 +332,6 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
                 <td
                   style={{
                     color: labelColor,
-                    paddingRight: gap,
                     paddingBottom: spacing,
                     padding: labelPadding || undefined,
                     paddingRight: gap, // Override right padding with gap

@@ -710,9 +710,8 @@ export function InvoiceBuilder() {
               <Save className="w-4 h-4" />
               {saving ? t('saving') : t('save_design')}
             </Button>
-            <Button
-              type="secondary"
-              behavior="button"
+            <button
+              type="button"
               onClick={() => {
                 const json = JSON.stringify({
                   blocks: state.blocks,
@@ -730,12 +729,11 @@ export function InvoiceBuilder() {
                 toast.success('JSON downloaded');
               }}
               disabled={state.blocks.length === 0}
-              disableWithoutIcon
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               title="Download JSON"
             >
               <FileJson className="w-4 h-4" />
-            </Button>
+            </button>
           </div>
         </div>
 
@@ -929,18 +927,19 @@ export function InvoiceBuilder() {
         size="small"
       >
         <div className="space-y-4">
-          <InputField
-            id="design-name"
-            value={designNameInput}
-            onValueChange={(value) => setDesignNameInput(value)}
-            placeholder={String(t('design_name'))}
-            autoFocus
-            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === 'Enter') {
-                handleNameModalConfirm();
-              }
-            }}
-          />
+          <div onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.key === 'Enter') {
+              handleNameModalConfirm();
+            }
+          }}>
+            <InputField
+              id="design-name"
+              value={designNameInput}
+              onValueChange={(value) => setDesignNameInput(value)}
+              placeholder={String(t('design_name'))}
+              autoFocus
+            />
+          </div>
           <div className="flex justify-end gap-2">
             <Button
               type="secondary"
