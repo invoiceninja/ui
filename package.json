@@ -175,8 +175,8 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.26.1",
-    "vite": "^6.2.1",
-    "vite-tsconfig-paths": "^5.1.4",
+    "vite": "^7.3.1",
+    "vite-tsconfig-paths": "^6.1.0",
     "vitest": "^4.0.18"
   },
   "engines": {
