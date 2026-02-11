@@ -30,6 +30,7 @@ import { LanguageSelector } from '$app/components/LanguageSelector';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { GroupSettingsSelector } from '$app/components/GroupSettingsSelector';
 
 interface Props {
   isModalOpen: boolean;
@@ -336,6 +337,15 @@ export function ClientCreate({
             </div>
 
             <div className="flex flex-col space-y-3 px-4 sm:px-6">
+              <GroupSettingsSelector
+                label={t('group')}
+                value={client?.group_settings_id || ''}
+                onValueChange={(value) =>
+                  handleChange('group_settings_id', value)
+                }
+                errorMessage={errors?.errors.group_settings_id}
+              />
+
               <CurrencySelector
                 label={t('currency')}
                 value={client?.settings?.currency_id || ''}
