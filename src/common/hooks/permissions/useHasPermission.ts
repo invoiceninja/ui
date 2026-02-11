@@ -40,6 +40,11 @@ type PurchaseOrderPermissions =
 type ReportPermissions = 'view_reports';
 type DashboardPermissions = 'view_dashboard';
 type EmailPermissions = 'disable_emails';
+type DocumentPermissions =
+  | 'create_documents'
+  | 'view_documents'
+  | 'edit_documents'
+  | 'requires_approval';
 
 export type Permissions =
   | AllPermissions
@@ -59,7 +64,8 @@ export type Permissions =
   | PurchaseOrderPermissions
   | ReportPermissions
   | DashboardPermissions
-  | EmailPermissions;
+  | EmailPermissions
+  | DocumentPermissions;
 
 export function useHasPermission() {
   const user = useCurrentCompanyUser();

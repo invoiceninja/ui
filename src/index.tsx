@@ -65,8 +65,8 @@ const queryClient = new QueryClient({
   },
 });
 
-self.MonacoEnvironment = {
-  getWorker(_, label) {
+(self as any).MonacoEnvironment = {
+  getWorker(_: any, label: string) {
     if (label === 'json') {
       return new jsonWorker();
     }

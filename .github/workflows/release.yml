@@ -9,29 +9,30 @@ jobs:
     name: Upload Release Asset
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: main
-          
+
       - name: Copy .env file
         run: |
           cp .env.example .env
-             
+
       - name: Prepare React Application
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           npm i
           npm run build
 
-      - name: Cleanup 
+      - name: Cleanup
         run: |
           sudo rm -rf .env
 
       - name: Build project
         run: |
           zip -r ./invoiceninja-react.zip dist/
-      
+
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')

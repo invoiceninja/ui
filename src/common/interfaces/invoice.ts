@@ -90,6 +90,20 @@ export interface Invoice {
   schedule?: ScheduleItem[];
   project?: Project;
   modified_invoice_id?: string;
+  sync?: Sync;
+}
+
+export interface Sync {
+  qb_id: string;
+  dn_completed: boolean;
+  invitations: SyncInvitation[];
+}
+
+export interface SyncInvitation {
+  invitation_key: string;
+  dn_id: string;
+  dn_invitation_id: string;
+  dn_sig: string;
 }
 
 export interface Backup {
@@ -99,7 +113,7 @@ export interface Backup {
   document_type?: string;
   child_invoice_ids?: string[];
   redirect?: string;
-  adjustable_amount?: number
+  adjustable_amount?: number;
   notes?: string;
 }
 export interface Activity {

@@ -17,7 +17,7 @@ import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTota
 import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
 import { useTranslation } from 'react-i18next';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { Link, useOutletContext, useSearchParams } from 'react-router-dom';
 import { QuoteDetails } from '../common/components/QuoteDetails';
 import { QuoteFooter } from '../common/components/QuoteFooter';
 import { useQuoteUtilities } from '../common/hooks';
@@ -31,6 +31,8 @@ import { TasksTabLabel } from '$app/pages/invoices/common/components/TasksTabLab
 import { useProductQuoteColumns } from '$app/pages/invoices/common/hooks/useProductQuoteColumns';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
+import { Badge } from '$app/components/Badge';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -56,7 +58,7 @@ export default function Edit() {
   const taskColumns = useTaskColumns();
   const productColumns = useProductColumns();
   const productQuoteColumns = useProductQuoteColumns();
-
+  const statusThemeColors = useStatusThemeColorScheme();
   const {
     handleChange,
     handleInvitationChange,
@@ -64,6 +66,7 @@ export default function Edit() {
     handleLineItemPropertyChange,
     handleCreateLineItem,
     handleDeleteLineItem,
+    handleContactCanSignChange,
   } = useQuoteUtilities({ client });
 
   return (
@@ -83,8 +86,24 @@ export default function Edit() {
                   {t('status')}
                 </span>
 
-                <div>
+                <div className="flex items-center space-x-2">
                   <QuoteStatusBadge entity={quote} />
+
+                  {quote &&
+                    quote.sync?.dn_completed &&
+                    quote.sync?.invitations[0]?.dn_id && (
+                      <Badge
+                        variant="green"
+                        style={{ backgroundColor: statusThemeColors.$3 }}
+                      >
+                        <Link
+                          className="font-medium"
+                          to={`/docuninja/${quote.sync?.invitations[0]?.dn_id}`}
+                        >
+                          {t('signed_document')}
+                        </Link>
+                      </Badge>
+                    )}
                 </div>
               </div>
             )}
@@ -97,6 +116,7 @@ export default function Edit() {
                 handleChange('location_id', locationId)
               }
               onContactCheckboxChange={handleInvitationChange}
+              onContactCanSignCheckboxChange={handleContactCanSignChange}
               errorMessage={errors?.errors.client_id}
               textOnly
               readonly

@@ -18,6 +18,9 @@ import { clearLocalStorage } from './local-storage';
 
 const client = axios.create();
 
+// Create a client without interceptors
+const noInterceptClient = axios.create();
+
 client.interceptors.response.use(
   (response) => {
     const payload = checkJsonObject(response.config.data);
@@ -58,13 +61,6 @@ client.interceptors.response.use(
         error.response?.status === 404)
     ) {
       console.error(error);
-
-      // if (!url.includes('quota')) {
-      //   $toast.error(trans('einvoice_something_went_wrong', {}), {
-      //     duration: 10_000,
-      //   });
-      // }
-
       return;
     }
 
@@ -129,9 +125,11 @@ export function request(
   method: Method,
   url: string,
   data?: any,
-  config?: AxiosRequestConfig
+  config?: AxiosRequestConfig & { skipIntercept?: boolean }
 ) {
-  return client({
+  const axiosClient = config?.skipIntercept ? noInterceptClient : client;
+
+  return axiosClient({
     method,
     url,
     data,
