@@ -24,12 +24,18 @@ import { useQuickbooksConnection } from '../common/hooks/useQuickbooksConnection
 import { useQuickbooksConnect } from '../common/hooks/useQuickbooksConnect';
 import { useQuickbooksDisconnect } from '../common/hooks/useQuickbooksDisconnect';
 import { useQuickbooksSync } from '../common/hooks/useQuickbooksSync';
-import { QuickBooksConnectTab } from './QuickBooksConnectTab';
-import { QuickBooksImportTab } from './QuickBooksImportTab';
-import { QuickBooksSyncTab } from './QuickBooksSyncTab';
+import { QuickBooksConnectTab } from './QuickbooksConnectTab';
+import { QuickBooksImportTab } from './QuickbooksImportTab';
+import { QuickBooksSyncTab } from './QuickbooksSyncTab';
 import { ConnectedDots } from '$app/components/icons/ConnectedDots';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
 import styled from 'styled-components';
+import { IncomeAccountSelector } from '$app/components/IncomeAccountSelector';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../../common/hooks/useHandleCompanySave';
+import { useAtomValue } from 'jotai';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
@@ -44,10 +50,11 @@ export function QuickBooks() {
 
   const colors = useColorScheme();
   const companyChanges = useInjectCompanyChanges();
+  const { quickbooks, isConnected } = useQuickbooksConnection();
 
   const handleChange = useHandleCurrentCompanyChangeProperty();
-  const { quickbooks, isConnected } = useQuickbooksConnection();
   const { handleConnect, isFormBusy: isConnectBusy } = useQuickbooksConnect();
+
   const {
     handleDisconnect,
     isFormBusy: isDisconnectBusy,
@@ -63,10 +70,13 @@ export function QuickBooks() {
     hasSyncSelection,
   } = useQuickbooksSync();
 
+  const onSave = useHandleCompanySave({
+    onFinally: () => setIsSyncInfoModalVisible(false),
+  });
+
+  const isSavingCompany = useAtomValue(isCompanySettingsFormBusy);
   const [isDisconnectModalVisible, setIsDisconnectModalVisible] =
     useState<boolean>(false);
-
-  const isFormBusy = isConnectBusy || isDisconnectBusy;
 
   const quickbooksSettings: QuickbooksSettings | undefined = isConnected
     ? companyChanges?.quickbooks?.settings ?? quickbooks?.settings
@@ -102,7 +112,7 @@ export function QuickBooks() {
                 quickbooksSettings={quickbooksSettings}
                 onDisconnectClick={() => setIsDisconnectModalVisible(true)}
                 onIncomeAccountIdChange={handleIncomeAccountIdChange}
-                isFormBusy={isFormBusy}
+                isFormBusy={isConnectBusy || isDisconnectBusy}
                 errors={errors}
               />
             </div>
@@ -143,7 +153,7 @@ export function QuickBooks() {
             <ConnectedDots color={colors.$3} size="1.4rem" />
 
             <span className="text-sm" style={{ color: colors.$3 }}>
-              QuickBooks
+              Quickbooks
             </span>
 
             {isConnected && (
@@ -166,27 +176,39 @@ export function QuickBooks() {
       )}
 
       <Modal
-        title={t('initial_sync')}
+        title={t('default_income_account')}
         visible={isSyncInfoModalVisible}
         onClose={() => setIsSyncInfoModalVisible(false)}
+        overflowVisible
       >
         <div className="flex flex-col space-y-4">
-          <div
-            className="text-sm whitespace-pre-line"
-            style={{ color: colors.$3 }}
-          >
-            {t('quickbooks_sync_info')}
-          </div>
+          <IncomeAccountSelector
+            label={t('default_income_account')}
+            value={
+              companyChanges?.quickbooks?.settings?.default_income_account || ''
+            }
+            onValueChange={(value) =>
+              handleChange(
+                'quickbooks.settings.default_income_account',
+                value || null
+              )
+            }
+            errorMessage={
+              errors?.errors?.['quickbooks.settings.default_income_account']
+            }
+          />
 
-          <div className="flex justify-end">
-            <Button
-              type="secondary"
-              behavior="button"
-              onClick={() => setIsSyncInfoModalVisible(false)}
-            >
-              {t('close')}
-            </Button>
-          </div>
+          <Button
+            behavior="button"
+            onClick={onSave}
+            disabled={
+              isSavingCompany ||
+              !companyChanges?.quickbooks?.settings?.default_income_account
+            }
+            disableWithoutIcon={isSavingCompany}
+          >
+            {t('save')}
+          </Button>
         </div>
       </Modal>
 
@@ -216,7 +238,7 @@ export function QuickBooks() {
                 setIsDisconnectModalVisible(false);
                 handleDisconnect();
               }}
-              disabled={isFormBusy}
+              disabled={isDisconnectBusy}
               className="bg-red-500 border-red-500 text-white hover:bg-red-600 hover:border-red-600"
             >
               {t('disconnect')}

@@ -10,7 +10,6 @@
 
 import { Element } from '$app/components/cards';
 import { Button } from '$app/components/forms';
-import { SelectField } from '$app/components/forms/SelectField';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import {
@@ -69,7 +68,7 @@ export function QuickBooksConnectTab({
         </Element>
       )}
 
-      {quickbooksSettings && (
+      {/* {quickbooksSettings && (
         <Element leftSide={t('default_income_account')} noExternalPadding>
           <SelectField
             value={quickbooksSettings.default_income_account || ''}
@@ -88,7 +87,7 @@ export function QuickBooksConnectTab({
               ))}
           </SelectField>
         </Element>
-      )}
+      )} */}
     </>
   );
 }

@@ -65,9 +65,10 @@ export function useHandleProductChange(props: Props) {
 
       if (resource.client_id) {
         // Use client from resource if available to avoid permission issues
-        const clientPromise = ('client' in resource && resource.client)
-          ? Promise.resolve(resource.client)
-          : resolveClient.find(resource.client_id).catch(() => null);
+        const clientPromise =
+          'client' in resource && resource.client
+            ? Promise.resolve(resource.client)
+            : resolveClient.find(resource.client_id).catch(() => null);
 
         await clientPromise.then((client) => {
           if (!client) {
@@ -128,6 +129,8 @@ export function useHandleProductChange(props: Props) {
     lineItem.tax_id = product?.tax_id || '1';
 
     lineItem.product_cost = product?.cost;
+
+    lineItem.income_account_id = product?.qb_income_account_id || '';
 
     return props.onChange(index, lineItem);
   };

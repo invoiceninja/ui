@@ -14,7 +14,7 @@ import {
 } from '$app/common/interfaces/quickbooks';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
-const mockQuickbooksData: Quickbooks = {
+export const mockQuickbooksData: Quickbooks = {
   accessTokenKey:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ',
   refresh_token:
@@ -86,7 +86,7 @@ const mockQuickbooksData: Quickbooks = {
 export function useQuickbooksConnection() {
   const company = useCurrentCompany();
 
-  const quickbooks: Quickbooks | undefined = mockQuickbooksData;
+  const quickbooks: Quickbooks | undefined = company?.quickbooks;
 
   const isConnected = true;
 

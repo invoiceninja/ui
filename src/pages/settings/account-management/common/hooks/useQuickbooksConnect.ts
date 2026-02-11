@@ -28,6 +28,8 @@ export function useQuickbooksConnect() {
       .then((response) => {
         const token = response.data.hash;
 
+        toast.dismiss();
+
         window.location.href = endpoint('/quickbooks/authorize/:token', {
           token,
         });
