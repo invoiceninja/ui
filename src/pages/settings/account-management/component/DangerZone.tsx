@@ -29,6 +29,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { resetChanges, updateUser } from '$app/common/stores/slices/user';
+import { useQueryClient } from 'react-query';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
@@ -44,6 +45,7 @@ export function DangerZone() {
   const user = useCurrentUser();
   const colors = useColorScheme();
   const company = useCurrentCompany();
+  const queryClient = useQueryClient();
 
   const dispatch = useDispatch();
 
@@ -95,6 +97,7 @@ export function DangerZone() {
 
           handleUpdateUserDetails()
             .then(() => {
+              queryClient.invalidateQueries();
               setIsFormBusy(false);
               setIsPurgeModalOpen(false);
             })
