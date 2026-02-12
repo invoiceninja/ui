@@ -337,15 +337,6 @@ export function ClientCreate({
             </div>
 
             <div className="flex flex-col space-y-3 px-4 sm:px-6">
-              <GroupSettingsSelector
-                label={t('group')}
-                value={client?.group_settings_id || ''}
-                onValueChange={(value) =>
-                  handleChange('group_settings_id', value)
-                }
-                errorMessage={errors?.errors.group_settings_id}
-              />
-
               <CurrencySelector
                 label={t('currency')}
                 value={client?.settings?.currency_id || ''}
@@ -439,6 +430,15 @@ export function ClientCreate({
                 <option value="enabled">{t('enabled')}</option>
                 <option value="disabled">{t('disabled')}</option>
               </SelectField>
+
+              <GroupSettingsSelector
+                label={t('group')}
+                value={client?.group_settings_id || ''}
+                onValueChange={(value) =>
+                  handleChange('group_settings_id', value)
+                }
+                errorMessage={errors?.errors.group_settings_id}
+              />
             </div>
           </TabGroup>
         ) : (
