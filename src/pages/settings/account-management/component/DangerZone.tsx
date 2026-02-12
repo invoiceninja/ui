@@ -58,8 +58,6 @@ export function DangerZone() {
 
   const [purgeInputField, setPurgeInputField] = useState('');
 
-  console.log(user);
-
   const handleUpdateUserDetails = async () => {
     const updatedUser = cloneDeep(user) as User;
 
