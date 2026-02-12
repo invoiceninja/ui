@@ -15,13 +15,20 @@ import { Modal } from '$app/components/Modal';
 import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '$app/common/stores/store';
 import { toast } from '$app/common/helpers/toast/toast';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { Trash } from '$app/components/icons/Trash';
 import { TrashXMark } from '$app/components/icons/TrashXMark';
+import { cloneDeep, set } from 'lodash';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { User } from '$app/common/interfaces/user';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { CompanyUser } from '$app/common/interfaces/company-user';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { resetChanges, updateUser } from '$app/common/stores/slices/user';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
@@ -34,37 +41,76 @@ const Box = styled.div`
 export function DangerZone() {
   const [t] = useTranslation();
 
+  const user = useCurrentUser();
   const colors = useColorScheme();
   const company = useCurrentCompany();
+
+  const dispatch = useDispatch();
 
   const companyUsers = useSelector((state: RootState) => state.companyUsers);
 
   const [password, setPassword] = useState('');
   const [feedback, setFeedback] = useState('');
 
+  const [isFormBusy, setIsFormBusy] = useState(false);
   const [isPurgeModalOpen, setIsPurgeModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [purgeInputField, setPurgeInputField] = useState('');
 
-  const purge = () => {
-    toast.processing();
+  console.log(user);
 
-    request(
-      'POST',
-      endpoint('/api/v1/companies/purge_save_settings/:id', {
-        id: company.id,
-      }),
-      { cancellation_message: feedback },
-      { headers: { 'X-Api-Password': password } }
-    )
-      .then(() => toast.success('purge_successful'))
-      .catch((error) => {
-        if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-        }
-      })
-      .finally(() => setIsPurgeModalOpen(false));
+  const handleUpdateUserDetails = async () => {
+    const updatedUser = cloneDeep(user) as User;
+
+    set(updatedUser, 'company_user.react_settings', {});
+
+    return request(
+      'PUT',
+      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
+      updatedUser
+    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
+      set(updatedUser, 'company_user', response.data.data);
+
+      $refetch(['company_users']);
+
+      dispatch(updateUser(updatedUser));
+      dispatch(resetChanges());
+    });
+  };
+
+  const purge = () => {
+    if (!isFormBusy) {
+      toast.processing();
+      setIsFormBusy(true);
+
+      request(
+        'POST',
+        endpoint('/api/v1/companies/purge_save_settings/:id', {
+          id: company.id,
+        }),
+        { cancellation_message: feedback },
+        { headers: { 'X-Api-Password': password } }
+      )
+        .then(() => {
+          toast.success('purge_successful');
+
+          handleUpdateUserDetails()
+            .then(() => {
+              setIsFormBusy(false);
+              setIsPurgeModalOpen(false);
+            })
+            .catch(() => setIsFormBusy(false));
+        })
+        .catch((error) => {
+          if (error.response?.status === 412) {
+            toast.error('password_error_incorrect');
+          }
+
+          setIsFormBusy(false);
+          setIsPurgeModalOpen(false);
+        });
+    }
   };
 
   const destroy = () => {
@@ -118,8 +164,8 @@ export function DangerZone() {
         <Button
           behavior="button"
           onClick={purge}
-          disabled={purgeInputField !== 'purge' || !password}
-          disableWithoutIcon
+          disabled={purgeInputField !== 'purge' || !password || isFormBusy}
+          disableWithoutIcon={!isFormBusy}
         >
           {t('continue')}
         </Button>
