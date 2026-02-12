@@ -1,13 +1,14 @@
 /**
-* Invoice Ninja (https://invoiceninja.com).
-*
-* @link https://github.com/invoiceninja/invoiceninja source repository
-*
-* @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
-*
-* @license https://www.elastic.co/licensing/elastic-license
-*/
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
 
+import { describe, test, it, expect } from 'vitest';
 import currencies from '../../helpers/data/currencies';
 import { Number } from './../../../src/common/helpers/number';
 
@@ -33,10 +34,18 @@ describe('Test Number Formatting', () => {
     expect(Number.formatValue(10_000.25, currency)).toEqual('10,000.25');
     expect(Number.formatValue(100_000.25, currency)).toEqual('100,000.25');
     expect(Number.formatValue(1_000_000.25, currency)).toEqual('1,000,000.25');
-    expect(Number.formatValue(10_000_000.25, currency)).toEqual('10,000,000.25');
-    expect(Number.formatValue(100_000_000.25, currency)).toEqual('100,000,000.25');
-    expect(Number.formatValue(100_000_000_000.25, currency)).toEqual('100,000,000,000.25');
-    expect(Number.formatValue(100_000_000_000_000.25, currency)).toEqual('100,000,000,000,000.25');
+    expect(Number.formatValue(10_000_000.25, currency)).toEqual(
+      '10,000,000.25'
+    );
+    expect(Number.formatValue(100_000_000.25, currency)).toEqual(
+      '100,000,000.25'
+    );
+    expect(Number.formatValue(100_000_000_000.25, currency)).toEqual(
+      '100,000,000,000.25'
+    );
+    expect(Number.formatValue(100_000_000_000_000.25, currency)).toEqual(
+      '100,000,000,000,000.25'
+    );
 
     // Negative values
     expect(Number.formatValue(-10, currency)).toEqual('-10.00');
@@ -45,11 +54,21 @@ describe('Test Number Formatting', () => {
     expect(Number.formatValue(-1000.25, currency)).toEqual('-1,000.25');
     expect(Number.formatValue(-10_000.25, currency)).toEqual('-10,000.25');
     expect(Number.formatValue(-100_000.25, currency)).toEqual('-100,000.25');
-    expect(Number.formatValue(-1_000_000.25, currency)).toEqual('-1,000,000.25');
-    expect(Number.formatValue(-10_000_000.25, currency)).toEqual('-10,000,000.25');
-    expect(Number.formatValue(-100_000_000.25, currency)).toEqual('-100,000,000.25');
-    expect(Number.formatValue(-100_000_000_000.25, currency)).toEqual('-100,000,000,000.25');
-    expect(Number.formatValue(-100_000_000_000_000.25, currency)).toEqual('-100,000,000,000,000.25');
+    expect(Number.formatValue(-1_000_000.25, currency)).toEqual(
+      '-1,000,000.25'
+    );
+    expect(Number.formatValue(-10_000_000.25, currency)).toEqual(
+      '-10,000,000.25'
+    );
+    expect(Number.formatValue(-100_000_000.25, currency)).toEqual(
+      '-100,000,000.25'
+    );
+    expect(Number.formatValue(-100_000_000_000.25, currency)).toEqual(
+      '-100,000,000,000.25'
+    );
+    expect(Number.formatValue(-100_000_000_000_000.25, currency)).toEqual(
+      '-100,000,000,000,000.25'
+    );
   });
 
   it('EUR', async () => {
@@ -63,10 +82,18 @@ describe('Test Number Formatting', () => {
     expect(Number.formatValue(10_000.25, currency)).toEqual('10.000,25');
     expect(Number.formatValue(100_000.25, currency)).toEqual('100.000,25');
     expect(Number.formatValue(1_000_000.25, currency)).toEqual('1.000.000,25');
-    expect(Number.formatValue(10_000_000.25, currency)).toEqual('10.000.000,25');
-    expect(Number.formatValue(100_000_000.25, currency)).toEqual('100.000.000,25');
-    expect(Number.formatValue(100_000_000_000.25, currency)).toEqual('100.000.000.000,25');
-    expect(Number.formatValue(100_000_000_000_000.25, currency)).toEqual('100.000.000.000.000,25');
+    expect(Number.formatValue(10_000_000.25, currency)).toEqual(
+      '10.000.000,25'
+    );
+    expect(Number.formatValue(100_000_000.25, currency)).toEqual(
+      '100.000.000,25'
+    );
+    expect(Number.formatValue(100_000_000_000.25, currency)).toEqual(
+      '100.000.000.000,25'
+    );
+    expect(Number.formatValue(100_000_000_000_000.25, currency)).toEqual(
+      '100.000.000.000.000,25'
+    );
 
     // Negative values
     expect(Number.formatValue(-10, currency)).toEqual('-10,00');
@@ -75,11 +102,21 @@ describe('Test Number Formatting', () => {
     expect(Number.formatValue(-1000.25, currency)).toEqual('-1.000,25');
     expect(Number.formatValue(-10_000.25, currency)).toEqual('-10.000,25');
     expect(Number.formatValue(-100_000.25, currency)).toEqual('-100.000,25');
-    expect(Number.formatValue(-1_000_000.25, currency)).toEqual('-1.000.000,25');
-    expect(Number.formatValue(-10_000_000.25, currency)).toEqual('-10.000.000,25');
-    expect(Number.formatValue(-100_000_000.25, currency)).toEqual('-100.000.000,25');
-    expect(Number.formatValue(-100_000_000_000.25, currency)).toEqual('-100.000.000.000,25');
-    expect(Number.formatValue(-100_000_000_000_000.25, currency)).toEqual('-100.000.000.000.000,25');
+    expect(Number.formatValue(-1_000_000.25, currency)).toEqual(
+      '-1.000.000,25'
+    );
+    expect(Number.formatValue(-10_000_000.25, currency)).toEqual(
+      '-10.000.000,25'
+    );
+    expect(Number.formatValue(-100_000_000.25, currency)).toEqual(
+      '-100.000.000,25'
+    );
+    expect(Number.formatValue(-100_000_000_000.25, currency)).toEqual(
+      '-100.000.000.000,25'
+    );
+    expect(Number.formatValue(-100_000_000_000_000.25, currency)).toEqual(
+      '-100.000.000.000.000,25'
+    );
   });
 
   it('GBP', async () => {
@@ -93,10 +130,18 @@ describe('Test Number Formatting', () => {
     expect(Number.formatValue(10_000.25, currency)).toEqual('10,000.25');
     expect(Number.formatValue(100_000.25, currency)).toEqual('100,000.25');
     expect(Number.formatValue(1_000_000.25, currency)).toEqual('1,000,000.25');
-    expect(Number.formatValue(10_000_000.25, currency)).toEqual('10,000,000.25');
-    expect(Number.formatValue(100_000_000.25, currency)).toEqual('100,000,000.25');
-    expect(Number.formatValue(100_000_000_000.25, currency)).toEqual('100,000,000,000.25');
-    expect(Number.formatValue(100_000_000_000_000.25, currency)).toEqual('100,000,000,000,000.25');
+    expect(Number.formatValue(10_000_000.25, currency)).toEqual(
+      '10,000,000.25'
+    );
+    expect(Number.formatValue(100_000_000.25, currency)).toEqual(
+      '100,000,000.25'
+    );
+    expect(Number.formatValue(100_000_000_000.25, currency)).toEqual(
+      '100,000,000,000.25'
+    );
+    expect(Number.formatValue(100_000_000_000_000.25, currency)).toEqual(
+      '100,000,000,000,000.25'
+    );
 
     // Negative values
     expect(Number.formatValue(-10, currency)).toEqual('-10.00');
@@ -105,11 +150,21 @@ describe('Test Number Formatting', () => {
     expect(Number.formatValue(-1000.25, currency)).toEqual('-1,000.25');
     expect(Number.formatValue(-10_000.25, currency)).toEqual('-10,000.25');
     expect(Number.formatValue(-100_000.25, currency)).toEqual('-100,000.25');
-    expect(Number.formatValue(-1_000_000.25, currency)).toEqual('-1,000,000.25');
-    expect(Number.formatValue(-10_000_000.25, currency)).toEqual('-10,000,000.25');
-    expect(Number.formatValue(-100_000_000.25, currency)).toEqual('-100,000,000.25');
-    expect(Number.formatValue(-100_000_000_000.25, currency)).toEqual('-100,000,000,000.25');
-    expect(Number.formatValue(-100_000_000_000_000.25, currency)).toEqual('-100,000,000,000,000.25');
+    expect(Number.formatValue(-1_000_000.25, currency)).toEqual(
+      '-1,000,000.25'
+    );
+    expect(Number.formatValue(-10_000_000.25, currency)).toEqual(
+      '-10,000,000.25'
+    );
+    expect(Number.formatValue(-100_000_000.25, currency)).toEqual(
+      '-100,000,000.25'
+    );
+    expect(Number.formatValue(-100_000_000_000.25, currency)).toEqual(
+      '-100,000,000,000.25'
+    );
+    expect(Number.formatValue(-100_000_000_000_000.25, currency)).toEqual(
+      '-100,000,000,000,000.25'
+    );
   });
 
   it('JPY', async () => {
@@ -126,8 +181,12 @@ describe('Test Number Formatting', () => {
     expect(Number.formatValue(1_000_000.25, currency)).toEqual('1,000,000');
     expect(Number.formatValue(10_000_000.25, currency)).toEqual('10,000,000');
     expect(Number.formatValue(100_000_000.25, currency)).toEqual('100,000,000');
-    expect(Number.formatValue(100_000_000_000.25, currency)).toEqual('100,000,000,000');
-    expect(Number.formatValue(100_000_000_000_000.25, currency)).toEqual('100,000,000,000,000');
+    expect(Number.formatValue(100_000_000_000.25, currency)).toEqual(
+      '100,000,000,000'
+    );
+    expect(Number.formatValue(100_000_000_000_000.25, currency)).toEqual(
+      '100,000,000,000,000'
+    );
 
     // Negative values
     expect(Number.formatValue(-10, currency)).toEqual('-10');
@@ -139,13 +198,19 @@ describe('Test Number Formatting', () => {
     expect(Number.formatValue(-100_000.25, currency)).toEqual('-100,000');
     expect(Number.formatValue(-1_000_000.25, currency)).toEqual('-1,000,000');
     expect(Number.formatValue(-10_000_000.25, currency)).toEqual('-10,000,000');
-    expect(Number.formatValue(-100_000_000.25, currency)).toEqual('-100,000,000');
-    expect(Number.formatValue(-100_000_000_000.25, currency)).toEqual('-100,000,000,000');
-    expect(Number.formatValue(-100_000_000_000_000.25, currency)).toEqual('-100,000,000,000,000');
+    expect(Number.formatValue(-100_000_000.25, currency)).toEqual(
+      '-100,000,000'
+    );
+    expect(Number.formatValue(-100_000_000_000.25, currency)).toEqual(
+      '-100,000,000,000'
+    );
+    expect(Number.formatValue(-100_000_000_000_000.25, currency)).toEqual(
+      '-100,000,000,000,000'
+    );
 
     // Decimal values (testing non-standard usage)
-    expect(Number.formatValue(100.00, currency)).toEqual('100');
-    expect(Number.formatValue(-100.00, currency)).toEqual('-100');
+    expect(Number.formatValue(100.0, currency)).toEqual('100');
+    expect(Number.formatValue(-100.0, currency)).toEqual('-100');
     expect(Number.formatValue(1000.01, currency)).toEqual('1,000');
     expect(Number.formatValue(-1000.99, currency)).toEqual('-1,001');
   });

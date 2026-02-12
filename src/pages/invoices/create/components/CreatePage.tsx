@@ -60,6 +60,7 @@ export default function CreatePage() {
   const {
     handleChange,
     handleInvitationChange,
+    handleContactCanSignChange,
     handleLineItemChange,
     handleLineItemPropertyChange,
     handleCreateLineItem,
@@ -93,6 +94,7 @@ export default function CreatePage() {
             onLocationChange={(id) => handleChange('location_id', id)}
             onClearButtonClick={resetInvoiceForm}
             onContactCheckboxChange={handleInvitationChange}
+            onContactCanSignCheckboxChange={handleContactCanSignChange}
             readonly={searchParams.get('project') === 'true'}
             errorMessage={errors?.errors.client_id}
             disableWithSpinner={searchParams.get('action') === 'create'}
