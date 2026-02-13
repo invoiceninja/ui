@@ -30,9 +30,10 @@ import { useEffect } from 'react';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 
 const $cache = atom<NavigationItem[] | null>(null);
+const $navigationLanguage = atom<string | null>(null);
 
 export function useNavigation() {
-  const [t] = useTranslation();
+  const [t, i18n] = useTranslation();
   const enabled = useEnabled();
   const hasPermission = useHasPermission();
   const docuCompanyAccountDetails = useAtomValue(docuNinjaAtom);
@@ -40,6 +41,7 @@ export function useNavigation() {
   const company = useCurrentCompany();
 
   const [cache, setCache] = useAtom($cache);
+  const [cachedLanguage, setCachedLanguage] = useAtom($navigationLanguage);
 
   const initialNavigation: NavigationItem[] = [
     {
@@ -327,10 +329,13 @@ export function useNavigation() {
   ];
 
   useEffect(() => {
-    if (cache === null) {
+    const currentLanguage = i18n.language;
+
+    if (cache === null || cachedLanguage !== currentLanguage) {
       setCache(initialNavigation);
+      setCachedLanguage(currentLanguage);
     }
-  }, []);
+  }, [i18n.language]);
 
   useEffect(() => {
     window.addEventListener('navigation.changeVisibility', (event) => {
