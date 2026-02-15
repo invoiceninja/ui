@@ -15,14 +15,13 @@ import { Modal } from '$app/components/Modal';
 import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '$app/common/stores/store';
 import { toast } from '$app/common/helpers/toast/toast';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { Trash } from '$app/components/icons/Trash';
 import { TrashXMark } from '$app/components/icons/TrashXMark';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useQueryClient } from 'react-query';
 
 const Box = styled.div`
@@ -36,12 +35,9 @@ const Box = styled.div`
 export function DangerZone() {
   const [t] = useTranslation();
 
-  const user = useCurrentUser();
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const queryClient = useQueryClient();
-
-  const dispatch = useDispatch();
 
   const companyUsers = useSelector((state: RootState) => state.companyUsers);
 
@@ -71,6 +67,8 @@ export function DangerZone() {
           toast.success('purge_successful');
 
           queryClient.invalidateQueries();
+
+          setIsPurgeModalOpen(false);
         })
         .catch((error) => {
           if (error.response?.status === 412) {
