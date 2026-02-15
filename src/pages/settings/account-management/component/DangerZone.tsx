@@ -22,13 +22,7 @@ import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { Trash } from '$app/components/icons/Trash';
 import { TrashXMark } from '$app/components/icons/TrashXMark';
-import { cloneDeep, set } from 'lodash';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { User } from '$app/common/interfaces/user';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { CompanyUser } from '$app/common/interfaces/company-user';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { resetChanges, updateUser } from '$app/common/stores/slices/user';
 import { useQueryClient } from 'react-query';
 
 const Box = styled.div`
@@ -60,25 +54,6 @@ export function DangerZone() {
 
   const [purgeInputField, setPurgeInputField] = useState('');
 
-  const handleUpdateUserDetails = async () => {
-    const updatedUser = cloneDeep(user) as User;
-
-    set(updatedUser, 'company_user.react_settings', {});
-
-    return request(
-      'PUT',
-      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
-      updatedUser
-    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
-      set(updatedUser, 'company_user', response.data.data);
-
-      $refetch(['company_users']);
-
-      dispatch(updateUser(updatedUser));
-      dispatch(resetChanges());
-    });
-  };
-
   const purge = () => {
     if (!isFormBusy) {
       toast.processing();
@@ -95,22 +70,14 @@ export function DangerZone() {
         .then(() => {
           toast.success('purge_successful');
 
-          handleUpdateUserDetails()
-            .then(() => {
-              queryClient.invalidateQueries();
-              setIsFormBusy(false);
-              setIsPurgeModalOpen(false);
-            })
-            .catch(() => setIsFormBusy(false));
+          queryClient.invalidateQueries();
         })
         .catch((error) => {
           if (error.response?.status === 412) {
             toast.error('password_error_incorrect');
           }
-
-          setIsFormBusy(false);
-          setIsPurgeModalOpen(false);
-        });
+        })
+        .finally(() => setIsFormBusy(false));
     }
   };
 
