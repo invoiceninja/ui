@@ -132,6 +132,7 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
       -1;
 
     if (potential !== -1 && checked === false) {
+      // When unchecking invitation, also remove can_sign property
       invitations = invitations.filter((i) => i.client_contact_id !== id);
     }
 
@@ -144,6 +145,42 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
     }
 
     handleChange('invitations', invitations);
+  };
+
+  const handleContactCanSignChange = (id: string, checked: boolean) => {
+    const clientContacts = quote?.client?.contacts || props.client?.contacts;
+
+    if(!clientContacts) return;
+
+    // Find the contact by id
+    const contact = clientContacts.find(c => c.id === id);
+    if (!contact) return;
+
+    // Check if contact is invited - if not, don't allow can_sign changes
+    const isInvited = quote?.invitations?.some(inv => inv.client_contact_id === contact.id) || false;
+    if (!isInvited) return;
+
+    // Update the invitations array with the can_sign property
+    const invitations = [...(quote?.invitations || [])];
+    
+    // Find existing invitation for this contact
+    const existingInvitationIndex = invitations.findIndex(inv => inv.client_contact_id === contact.id);
+    
+    if (existingInvitationIndex >= 0) {
+      // Update existing invitation
+      invitations[existingInvitationIndex] = {
+        ...invitations[existingInvitationIndex],
+        can_sign: checked
+      };
+    }
+
+    // Update the quote with the modified invitations
+    setQuote((current) => 
+      current && {
+        ...current,
+        invitations: invitations,
+      }
+    );
   };
 
   const handleLineItemChange = (index: number, lineItem: InvoiceItem) => {
@@ -164,7 +201,7 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
     if (lineItems[index][key] === value) {
       return;
     }
-
+    
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     lineItems[index][key] = value;
@@ -212,6 +249,7 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
   return {
     handleChange,
     handleInvitationChange,
+    handleContactCanSignChange,
     handleLineItemChange,
     handleLineItemPropertyChange,
     handleCreateLineItem,

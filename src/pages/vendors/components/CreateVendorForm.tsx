@@ -50,6 +50,7 @@ export function CreateVendorForm(props: Props) {
       email: '',
       phone: '',
       send_email: false,
+      can_sign: false,
     },
   ]);
 

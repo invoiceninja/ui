@@ -64,6 +64,7 @@ import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivi
 import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 import { useMarkPaid } from '../hooks/useMarkPaid';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { useShouldDisplayClientGatewaysAndAutoBill } from '$app/pages/clients/show/hooks/useShouldDisplayClientGatewaysAndAutoBill';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -94,6 +95,8 @@ export function useActions(params?: Params) {
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
   const verifactuEnabled = useCompanyVerifactu();
+  const shouldDisplayClientGatewaysAndAutoBill =
+    useShouldDisplayClientGatewaysAndAutoBill();
 
   const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
     useDisplayRunTemplateActions();
@@ -337,7 +340,8 @@ export function useActions(params?: Params) {
         </EntityActionElement>
       ),
     (invoice: Invoice) =>
-      isInvoiceAutoBillable(invoice) && (
+      isInvoiceAutoBillable(invoice) &&
+      shouldDisplayClientGatewaysAndAutoBill(invoice?.client) && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'auto_bill',

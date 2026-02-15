@@ -43,6 +43,7 @@ import CardsCustomizationModal, {
   ClientShowCard,
 } from './components/CardsCustomizationModal';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useShouldDisplayClientGatewaysAndAutoBill } from './hooks/useShouldDisplayClientGatewaysAndAutoBill';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -77,6 +78,8 @@ export default function Client() {
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
+  const shouldDisplayClientGatewaysAndAutoBill =
+    useShouldDisplayClientGatewaysAndAutoBill();
 
   const isCardVisible = (card: ClientShowCard) => {
     const currentCards = reactSettings.client_show_cards || [
@@ -88,7 +91,9 @@ export default function Client() {
 
     if (card === 'gateways') {
       return (
-        (client?.gateway_tokens?.length ?? 0) > 0 && currentCards.includes(card)
+        (client?.gateway_tokens?.length ?? 0) > 0 &&
+        currentCards.includes(card) &&
+        shouldDisplayClientGatewaysAndAutoBill(client)
       );
     }
 

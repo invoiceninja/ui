@@ -92,6 +92,7 @@ export interface Company {
   legal_entity_id: string | null;
   session_timeout?: number;
   quickbooks?: Quickbooks;
+  enable_modules?: number;
 }
 
 export interface Settings {

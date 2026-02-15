@@ -114,6 +114,8 @@ jobs:
           php artisan serve --port=8000 &
 
       - name: Prepare React FrontEnd
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           git clone https://${{secrets.commit_secret}}@github.com/invoiceninja/ui.git
           cd ui
