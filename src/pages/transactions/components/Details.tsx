@@ -187,21 +187,27 @@ export function Details(props: Props) {
 
       {!showTransactionMatchDetails ? (
         <>
-          {matchedInvoices?.map(({ id, number }) => (
-            <Element
-              key={id}
-              leftSide={t('invoice')}
-              className="cursor-pointer"
-            >
-              <Link
-                to={route('/invoices/:id/edit', {
-                  id,
-                })}
-              >
-                {number}
-              </Link>
+          {(matchedInvoices?.length || 0) > 0 && (
+            <Element leftSide={t('invoice')} className="cursor-pointer">
+              <div className="flex">
+                {matchedInvoices?.map(({ id, number }, index) => (
+                  <div key={id} className="flex">
+                    <Link
+                      to={route('/invoices/:id/edit', {
+                        id,
+                      })}
+                    >
+                      {number}
+                    </Link>
+
+                    {matchedInvoices?.length - 1 !== index && (
+                      <span className="pr-1">,</span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </Element>
-          ))}
+          )}
 
           {transaction?.payment_id && (
             <Element leftSide={t('payment')} className="cursor-pointer">
@@ -239,21 +245,27 @@ export function Details(props: Props) {
             </Element>
           )}
 
-          {matchedExpenses?.map(({ id, number, date }) => (
-            <Element
-              key={id}
-              leftSide={t('expense')}
-              className="cursor-pointer"
-            >
-              <Link
-                to={route('/expenses/:id/edit', {
-                  id,
-                })}
-              >
-                {number || formatDate(date, dateFormat)}
-              </Link>
+          {(matchedExpenses?.length || 0) > 0 && (
+            <Element leftSide={t('expense')} className="cursor-pointer">
+              <div className="flex">
+                {matchedExpenses?.map(({ id, number, date }, index) => (
+                  <div key={id} className="flex">
+                    <Link
+                      to={route('/expenses/:id/edit', {
+                        id,
+                      })}
+                    >
+                      {number || formatDate(date, dateFormat)}
+                    </Link>
+
+                    {matchedExpenses?.length - 1 !== index && (
+                      <span className="pr-1">,</span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </Element>
-          ))}
+          )}
         </>
       ) : (
         <TransactionMatchDetails
