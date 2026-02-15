@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^3.28.1",
-    "@docuninja/builder2.0": "^0.0.49",
+    "@docuninja/builder2.0": "^0.0.72",
     "@emotion/styled": "^11.14.0",
     "@excalidraw/excalidraw": "^0.18.0",
     "@fontsource/alex-brush": "^5.2.6",
@@ -183,5 +183,11 @@
     "node": ">=22"
   },
   "engineStrict": true,
-  "type": "module"
+  "type": "module",
+  "overrides": {
+    "@docuninja/builder2.0": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    }
+  }
 }
