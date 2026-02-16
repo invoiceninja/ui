@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
@@ -17,7 +18,9 @@ import { ChevronLeft } from '../icons/ChevronLeft';
 import { DoubleChevronLeft } from '../icons/DoubleChevronLeft';
 import { ChevronRight } from '../icons/ChevronRight';
 import { DoubleChevronRight } from '../icons/DoubleChevronRight';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import styled from 'styled-components';
+import classNames from 'classnames';
 
 const PaginationButton = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};
@@ -51,10 +54,51 @@ export function Pagination(props: Props) {
 
   const [t] = useTranslation();
   const colors = useColorScheme();
+  const reactSettings = useReactSettings({ overwrite: false });
+
+  const [pageInputValue, setPageInputValue] = useState<string>(
+    String(props.currentPage)
+  );
+
+  useEffect(() => {
+    setPageInputValue(String(props.currentPage));
+  }, [props.currentPage]);
 
   const goToPage = (pageNumber: number) => {
     if (pageNumber >= 1 && pageNumber <= props.totalPages) {
       props.onPageChange(pageNumber);
+    }
+  };
+
+  const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    if (value === '') {
+      setPageInputValue('');
+      return;
+    }
+
+    const numericValue = value.replace(/[^0-9]/g, '');
+    setPageInputValue(numericValue);
+  };
+
+  const handlePageInputBlur = () => {
+    const pageNumber = parseInt(pageInputValue, 10);
+
+    if (
+      !isNaN(pageNumber) &&
+      pageNumber >= 1 &&
+      pageNumber <= props.totalPages
+    ) {
+      goToPage(pageNumber);
+    } else {
+      setPageInputValue(String(props.currentPage));
+    }
+  };
+
+  const handlePageInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      (e.target as HTMLInputElement).blur();
     }
   };
 
@@ -96,9 +140,39 @@ export function Pagination(props: Props) {
           </PaginationButton>
         </div>
 
-        <span className="text-sm font-medium">
-          {props.currentPage} / {props.totalPages}
-        </span>
+        <div className="flex items-center space-x-1.5">
+          <input
+            type="text"
+            value={pageInputValue}
+            onChange={handlePageInputChange}
+            onBlur={handlePageInputBlur}
+            onKeyDown={handlePageInputKeyDown}
+            onFocus={(e) => e.target.select()}
+            style={{
+              backgroundColor: 'transparent',
+              color: colors.$3,
+              minWidth: '2.25rem',
+              width: `${
+                Math.max(
+                  String(props.totalPages).length,
+                  pageInputValue.length,
+                  1
+                ) * 1.375
+              }rem`,
+            }}
+            className={classNames(
+              'h-8 text-sm font-medium text-center rounded-md focus:outline-none focus:ring-0',
+              {
+                'border border-[#09090B26] focus:border-black':
+                  !reactSettings.dark_mode,
+                'border border-[#1f2e41] focus:border-white':
+                  reactSettings.dark_mode,
+              }
+            )}
+          />
+
+          <span className="text-sm font-medium">/ {props.totalPages}</span>
+        </div>
 
         <div className="flex">
           <PaginationButton
