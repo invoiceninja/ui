@@ -27,9 +27,6 @@ const Blueprints = lazy(
 const CreateBlueprint = lazy(
   () => import('$app/pages/documents/pages/blueprints/create/Create')
 );
-const BlueprintEditor = lazy(
-  () => import('$app/pages/documents/pages/blueprints/editor/Editor')
-);
 
 const Settings = lazy(
   () => import('$app/pages/documents/pages/settings/CompanyDetails')
@@ -165,21 +162,6 @@ const routes = (
                     }),
                   ]}
                   component={<CreateBlueprint />}
-                />
-              }
-            />
-
-            <Route
-              path="templates/:id/editor"
-              element={
-                <DocuNinjaGuard
-                  guards={[
-                    docuNinjaPermission({
-                      model: 'blueprints',
-                      action: 'create',
-                    }),
-                  ]}
-                  component={<BlueprintEditor />}
                 />
               }
             />
