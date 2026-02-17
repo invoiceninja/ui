@@ -17,7 +17,7 @@ import { CustomBlueprintStep } from './steps/CustomBlueprintStep';
 import { TemplateSelectionStep } from './steps/TemplateSelectionStep';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
-import { Clipboard, FileText, Tool } from 'react-feather';
+import { FileText, Tool } from 'react-feather';
 
 export type WizardStep = 'selection' | 'invoice-ninja' | 'custom' | 'template';
 
