@@ -75,17 +75,6 @@ export function useTableColumns() {
       ),
     },
     {
-      id: 'description',
-      label: t('description'),
-      format: (field, blueprint) => (
-        <>
-          <span className="truncate block max-w-xs">
-            {blueprint.description}
-          </span>
-        </>
-      ),
-    },
-    {
       id: 'type',
       label: t('type'),
       format: (field, blueprint) => (
