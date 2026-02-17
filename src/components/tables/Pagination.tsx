@@ -18,9 +18,7 @@ import { ChevronLeft } from '../icons/ChevronLeft';
 import { DoubleChevronLeft } from '../icons/DoubleChevronLeft';
 import { ChevronRight } from '../icons/ChevronRight';
 import { DoubleChevronRight } from '../icons/DoubleChevronRight';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import styled from 'styled-components';
-import classNames from 'classnames';
 
 const PaginationButton = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};
@@ -28,6 +26,18 @@ const PaginationButton = styled.div`
 
   &:hover {
     background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
+
+const PageInput = styled.input`
+  field-sizing: content;
+  min-width: 3ch;
+  background-color: transparent;
+  border-color: ${(props) => props.theme.borderColor};
+  color: ${(props) => props.theme.color};
+
+  &:focus {
+    border-color: ${(props) => props.theme.focusBorderColor};
   }
 `;
 
@@ -54,7 +64,6 @@ export function Pagination(props: Props) {
 
   const [t] = useTranslation();
   const colors = useColorScheme();
-  const reactSettings = useReactSettings({ overwrite: false });
 
   const [pageInputValue, setPageInputValue] = useState<string>(
     String(props.currentPage)
@@ -141,34 +150,19 @@ export function Pagination(props: Props) {
         </div>
 
         <div className="flex items-center space-x-1.5">
-          <input
+          <PageInput
             type="text"
             value={pageInputValue}
             onChange={handlePageInputChange}
             onBlur={handlePageInputBlur}
             onKeyDown={handlePageInputKeyDown}
             onFocus={(e) => e.target.select()}
-            style={{
-              backgroundColor: 'transparent',
+            theme={{
+              borderColor: colors.$24,
+              focusBorderColor: colors.$3,
               color: colors.$3,
-              minWidth: '2.25rem',
-              width: `${
-                Math.max(
-                  String(props.totalPages).length,
-                  pageInputValue.length,
-                  1
-                ) * 1.375
-              }rem`,
             }}
-            className={classNames(
-              'h-8 text-sm font-medium text-center rounded-md focus:outline-none focus:ring-0',
-              {
-                'border border-[#09090B26] focus:border-black':
-                  !reactSettings.dark_mode,
-                'border border-[#1f2e41] focus:border-white':
-                  reactSettings.dark_mode,
-              }
-            )}
+            className="h-8 text-sm font-medium text-center rounded-md border focus:outline-none focus:ring-0"
           />
 
           <span className="text-sm font-medium">/ {props.totalPages}</span>
