@@ -65,7 +65,7 @@ export function DocumentCreationDropZone({ onSelectFiles }: Props) {
           toast.success('document_created');
 
           navigate(
-            route('/docuninja/:id/builder', { id: response.data.data.id })
+            route('/docuninja/:id/builder?pendingFiles=true', { id: response.data.data.id })
           );
         })
         .catch((e) => {
