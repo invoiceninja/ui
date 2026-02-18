@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { Button, InputField } from '$app/components/forms';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Modal } from '$app/components/Modal';
@@ -162,14 +162,16 @@ export function DangerZone() {
           required
         />
 
-        <InputField
-          type="text"
-          label={t('reason_for_canceling')}
-          id="feedback"
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            setFeedback(event.target.value)
-          }
-        />
+        {isHosted() && (
+          <InputField
+            type="text"
+            label={t('reason_for_canceling')}
+            id="feedback"
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              setFeedback(event.target.value)
+            }
+          />
+        )}
 
         <InputField
           type="password"
