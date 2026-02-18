@@ -9,13 +9,16 @@
  */
 
 import { Element } from '$app/components/cards';
-import { Button, Link } from '$app/components/forms';
+import { Button, InputField, Link } from '$app/components/forms';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatLabel } from '../helpers/format-label';
 import { useResolveInputField } from '../hooks/useResolveInputField';
+import { useHandleCredentialsChange } from '../hooks/useHandleCredentialsChange';
+import { useResolveConfigValue } from '../hooks/useResolveConfigValue';
 import { StripeConnect } from './gateways/StripeConnect';
 import { WePay } from './gateways/WePay';
 import { PayPalPPCP } from './gateways/PayPalPPCP';
@@ -27,7 +30,6 @@ import { useState } from 'react';
 import { Modal } from '$app/components/Modal';
 import { GoCardlessOAuth2 } from './gateways/GoCardlessOAuth2';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
-import { useResolveConfigValue } from '$app/pages/settings/gateways/create/hooks/useResolveConfigValue';
 import { useLocation } from 'react-router-dom';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useColorScheme } from '$app/common/colors';
@@ -56,6 +58,10 @@ export function Credentials(props: Props) {
   );
 
   const config = useResolveConfigValue(props.companyGateway);
+  const handleCredentialChange = useHandleCredentialsChange(
+    props.setCompanyGateway
+  );
+  const resolveConfigValue = useResolveConfigValue(props.companyGateway);
 
   const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
   const WEPAY = '8fdeed552015b3c7b44ed6c8ebd9e992';
@@ -64,6 +70,11 @@ export function Credentials(props: Props) {
   const PAYWARE = 'b0a6294fca4488c2bab58f3e11e3c623';
 
   const paywareSettingsFields = ['timeToLive'];
+  const paywareTextFields = ['partnerId', 'vposId'];
+  const paywareFieldLabels: Record<string, string> = {
+    partnerId: t('payware_partner_id_label'),
+    vposId: t('payware_vpos_id_label'),
+  };
   const paywareFieldHelp: Record<string, string> = {
     partnerId: t('payware_partner_id_help'),
     vposId: t('payware_vpos_id_help'),
@@ -146,16 +157,29 @@ export function Credentials(props: Props) {
           )
           .map((field, index) => (
           <Element
-            leftSide={formatLabel(field)}
+            leftSide={props.gateway.key === PAYWARE && paywareFieldLabels[field]
+              ? paywareFieldLabels[field]
+              : formatLabel(field)}
             key={index}
             {...(props.gateway.key === PAYWARE && paywareFieldHelp[field]
               ? { leftSideHelp: paywareFieldHelp[field] }
               : {})}
           >
-            {resolveInputField(
-              field,
-              JSON.parse(props.gateway.fields)[field],
-              props.errors
+            {props.gateway.key === PAYWARE && paywareTextFields.includes(field) ? (
+              <InputField
+                type="text"
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  (handleCredentialChange as (field: string, value: string) => void)(field, event.target.value)
+                }
+                value={resolveConfigValue(field)}
+                errorMessage={props.errors?.errors[field]}
+              />
+            ) : (
+              resolveInputField(
+                field,
+                JSON.parse(props.gateway.fields)[field],
+                props.errors
+              )
             )}
           </Element>
         ))}

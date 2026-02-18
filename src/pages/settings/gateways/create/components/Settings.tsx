@@ -115,7 +115,7 @@ export function Settings(props: Props) {
 
       {gateway?.key === PAYWARE && (
         <Element
-          leftSide={t('time_to_live')}
+          leftSide={t('payware_ttl_label')}
           leftSideHelp={t('payware_ttl_help')}
         >
           <InputField
@@ -123,7 +123,7 @@ export function Settings(props: Props) {
             value={resolveConfigValue('timeToLive') || '600'}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               const val = Math.max(60, Math.min(600, parseInt(event.target.value) || 600));
-              handleCredentialChange('timeToLive' as any, val.toString());
+              (handleCredentialChange as (field: string, value: string) => void)('timeToLive', val.toString());
             }}
             errorMessage={props.errors?.errors.timeToLive}
           />
