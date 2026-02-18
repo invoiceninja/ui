@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
@@ -25,6 +26,18 @@ const PaginationButton = styled.div`
 
   &:hover {
     background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
+
+const PageInput = styled.input`
+  field-sizing: content;
+  min-width: 3ch;
+  background-color: transparent;
+  border-color: ${(props) => props.theme.borderColor};
+  color: ${(props) => props.theme.color};
+
+  &:focus {
+    border-color: ${(props) => props.theme.focusBorderColor};
   }
 `;
 
@@ -52,9 +65,49 @@ export function Pagination(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
+  const [pageInputValue, setPageInputValue] = useState<string>(
+    String(props.currentPage)
+  );
+
+  useEffect(() => {
+    setPageInputValue(String(props.currentPage));
+  }, [props.currentPage]);
+
   const goToPage = (pageNumber: number) => {
     if (pageNumber >= 1 && pageNumber <= props.totalPages) {
       props.onPageChange(pageNumber);
+    }
+  };
+
+  const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    if (value === '') {
+      setPageInputValue('');
+      return;
+    }
+
+    const numericValue = value.replace(/[^0-9]/g, '');
+    setPageInputValue(numericValue);
+  };
+
+  const handlePageInputBlur = () => {
+    const pageNumber = parseInt(pageInputValue, 10);
+
+    if (
+      !isNaN(pageNumber) &&
+      pageNumber >= 1 &&
+      pageNumber <= props.totalPages
+    ) {
+      goToPage(pageNumber);
+    } else {
+      setPageInputValue(String(props.currentPage));
+    }
+  };
+
+  const handlePageInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      (e.target as HTMLInputElement).blur();
     }
   };
 
@@ -96,9 +149,24 @@ export function Pagination(props: Props) {
           </PaginationButton>
         </div>
 
-        <span className="text-sm font-medium">
-          {props.currentPage} / {props.totalPages}
-        </span>
+        <div className="flex items-center space-x-1.5">
+          <PageInput
+            type="text"
+            value={pageInputValue}
+            onChange={handlePageInputChange}
+            onBlur={handlePageInputBlur}
+            onKeyDown={handlePageInputKeyDown}
+            onFocus={(e) => e.target.select()}
+            theme={{
+              borderColor: colors.$24,
+              focusBorderColor: colors.$3,
+              color: colors.$3,
+            }}
+            className="h-8 text-sm font-medium text-center rounded-md border focus:outline-none focus:ring-0"
+          />
+
+          <span className="text-sm font-medium">/ {props.totalPages}</span>
+        </div>
 
         <div className="flex">
           <PaginationButton
