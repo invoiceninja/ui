@@ -17,7 +17,7 @@ import { CustomBlueprintStep } from './steps/CustomBlueprintStep';
 import { TemplateSelectionStep } from './steps/TemplateSelectionStep';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
-import { Clipboard, FileText, Tool } from 'react-feather';
+import { FileText, Tool } from 'react-feather';
 
 export type WizardStep = 'selection' | 'invoice-ninja' | 'custom' | 'template';
 
@@ -130,13 +130,13 @@ function SelectionStep({
       icon: <Icon element={Tool} size={32} />,
       onClick: onSelectCustom,
     },
-    {
-      id: 'template',
-      title: t('templates'),
-      description: t('new_template_description'),
-      icon: <Icon element={Clipboard} size={32} />,
-      onClick: onSelectTemplate,
-    },
+    // {
+    //   id: 'template',
+    //   title: t('templates'),
+    //   description: t('new_template_description'),
+    //   icon: <Icon element={Clipboard} size={32} />,
+    //   onClick: onSelectTemplate,
+    // },
   ];
 
   return (
@@ -147,7 +147,7 @@ function SelectionStep({
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {options.map((option) => (
           <button
             type="button"
