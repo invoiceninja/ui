@@ -156,6 +156,12 @@ function Builder() {
       allowClose: false,
       showButtons: ['next'],
       disableActiveInteraction: true,
+      onDestroyed: () => {
+        if (!preferences.document_builder_tour_shown) {
+          update('preferences.document_builder_tour_shown', true);
+          save({ silent: true });
+        }
+      },
     },
   });
 
@@ -180,6 +186,12 @@ function Builder() {
       showProgress: true,
       allowClose: false,
       disableActiveInteraction: true,
+      onDestroyed: () => {
+        if (!preferences.document_builder_tour_shown) {
+          update('preferences.document_builder_tour_shown', true);
+          save({ silent: true });
+        }
+      },
     },
     delay: 500,
   });
