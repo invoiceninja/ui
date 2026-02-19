@@ -150,7 +150,7 @@ function DateInput({ value, onChange }: DateInputProps) {
   );
 }
 
-function Success({ closeTab }: SuccessProps) {
+function Success() {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
@@ -173,15 +173,6 @@ function Success({ closeTab }: SuccessProps) {
         <div className="text-sm" style={{ color: colors.$3 }}>
           {t('download_signed_document')}
         </div>
-
-        <Button
-          type="primary"
-          behavior="button"
-          className="w-full"
-          onClick={closeTab}
-        >
-          {t('close_tab')}
-        </Button>
       </div>
     </Card>
   );
