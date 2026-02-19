@@ -25,7 +25,6 @@ import {
   type SignatureSelectorInputProps,
   type StartSigningButtonProps,
   type SubmitButtonProps,
-  SuccessProps,
 } from '@docuninja/builder2.0';
 import classNames from 'classnames';
 import { Check, ChevronLeft, ChevronRight } from 'react-feather';
