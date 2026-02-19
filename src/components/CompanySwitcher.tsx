@@ -92,8 +92,8 @@ export function CompanySwitcher() {
 
     sessionStorage.setItem('COMPANY-ACTIVITY-SHOWN', 'false');
 
-    queryClient.invalidateQueries();
-    
+    //queryClient.invalidateQueries();
+
     // Clear DocuNinja data and cache when switching companies
     flushData();
 

@@ -180,11 +180,19 @@ export function useTransactionColumns() {
       format: (value) => {
         if (!value) return null;
 
+        const expenseIds = value.toString().split(',');
+
         return (
-          <div className="flex space-x-2">
-            <Link to={route('/expenses/:id/edit', { id: value })}>
-              {t('link')}
-            </Link>
+          <div className="flex space-x-1">
+            {expenseIds.map((id, index) => (
+              <div key={id} className="flex">
+                <Link to={route('/expenses/:id/edit', { id })}>
+                  {t('expense')} #{index + 1}
+                </Link>
+
+                <span>{expenseIds.length - 1 !== index && ','}</span>
+              </div>
+            ))}
           </div>
         );
       },
