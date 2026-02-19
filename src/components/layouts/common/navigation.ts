@@ -163,7 +163,7 @@ export function useNavigation() {
         to: '/credits/create',
         label: t('new_credit'),
         visible: hasPermission('create_credit'),
-        tooltipLabel: t('new_credit') as string,
+        tooltipLabel: `${t('new_credit')} (Ctrl + Shift + D)`,
       },
     },
     {
@@ -180,7 +180,7 @@ export function useNavigation() {
         to: '/projects/create',
         label: t('new_project'),
         visible: hasPermission('create_project'),
-        tooltipLabel: t('new_project') as string,
+        tooltipLabel: `${t('new_project')} (Ctrl + Shift + J)`,
       },
     },
     {
@@ -197,7 +197,7 @@ export function useNavigation() {
         to: '/tasks/create',
         label: t('new_task'),
         visible: hasPermission('create_task'),
-        tooltipLabel: t('new_task') as string,
+        tooltipLabel: `${t('new_task')} (Ctrl + Shift + T)`,
       },
     },
     {
@@ -214,7 +214,7 @@ export function useNavigation() {
         to: '/vendors/create',
         label: t('new_vendor'),
         visible: hasPermission('create_vendor'),
-        tooltipLabel: t('new_vendor') as string,
+        tooltipLabel: `${t('new_vendor')} (Ctrl + Shift + V)`,
       },
     },
     {
@@ -265,7 +265,7 @@ export function useNavigation() {
         to: '/recurring_expenses/create',
         label: t('new_recurring_expense'),
         visible: hasPermission('create_recurring_expense'),
-        tooltipLabel: t('new_recurring_expense') as string,
+        tooltipLabel: `${t('new_recurring_expense')} (Ctrl + Shift + X)`,
       },
     },
     {
@@ -282,7 +282,7 @@ export function useNavigation() {
         to: '/transactions/create',
         label: t('new_transaction'),
         visible: hasPermission('create_bank_transaction'),
-        tooltipLabel: t('new_transaction') as string,
+        tooltipLabel: `${t('new_transaction')} (Ctrl + Shift + A)`,
       },
     },
     {
@@ -300,7 +300,7 @@ export function useNavigation() {
         to: '/docuninja/create',
         label: t('new_document'),
         visible: import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
-        tooltipLabel: t('new_document') as string,
+        tooltipLabel: `${t('new_document')} (Ctrl + Shift + N)`,
       },
       visible: import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
       subOptions: [

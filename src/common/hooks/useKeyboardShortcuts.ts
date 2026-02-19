@@ -10,6 +10,13 @@ const SHORTCUT_KEYS: Record<string, string> = {
   p: '/payments/create',
   e: '/expenses/create',
   o: '/purchase_orders/create',
+  d: '/credits/create',
+  j: '/projects/create',
+  t: '/tasks/create',
+  v: '/vendors/create',
+  x: '/recurring_expenses/create',
+  a: '/transactions/create',
+  n: '/docuninja/create',
 };
 
 export function useKeyboardShortcuts() {
@@ -32,7 +39,6 @@ export function useKeyboardShortcuts() {
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown, true);
-
     return () => document.removeEventListener('keydown', handleKeyDown, true);
   }, []);
 }
