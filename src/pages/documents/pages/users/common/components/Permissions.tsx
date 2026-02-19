@@ -95,7 +95,6 @@ export default function Permissions(props?: DocuninjaUserProps) {
   }
 
   const {
-    user,
     isFormBusy,
     permissions,
     setPermissions,
@@ -197,24 +196,6 @@ export default function Permissions(props?: DocuninjaUserProps) {
       }
     }
     setPermissions(newPermissions);
-  };
-
-  const hasChanges = () => {
-    const originalIsAdmin = user?.company_user?.is_admin ?? false;
-    const originalPermissions = user?.permissions ?? [];
-
-    if (isAdmin !== originalIsAdmin) {
-      return true;
-    }
-
-    if (!isAdmin) {
-      return (
-        JSON.stringify(permissions.sort()) !==
-        JSON.stringify(originalPermissions.sort())
-      );
-    }
-
-    return false;
   };
 
   const isPermissionDisabled = () => {
