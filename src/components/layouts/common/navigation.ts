@@ -36,7 +36,6 @@ export function useNavigation() {
   const [t, i18n] = useTranslation();
   const enabled = useEnabled();
   const hasPermission = useHasPermission();
-  const docuCompanyAccountDetails = useAtomValue(docuNinjaAtom);
   const companyUser = useCurrentCompanyUser();
   const company = useCurrentCompany();
 
@@ -310,9 +309,7 @@ export function useNavigation() {
             icon: Plus,
             to: '/docuninja/users/create',
             label: t('new_user'),
-            visible:
-              (docuCompanyAccountDetails?.account?.num_users || 0) !==
-              (docuCompanyAccountDetails?.account?.users || [])?.length,
+            visible: companyUser?.is_owner ?? false,
           },
         },
       ],
