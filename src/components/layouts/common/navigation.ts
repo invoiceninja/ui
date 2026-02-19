@@ -20,14 +20,13 @@ import SackCoins from '$app/components/icons/SackCoins';
 import { CurrencyExchange } from '$app/components/icons/CurrencyExchange';
 import { ArrowsTransaction } from '$app/components/icons/ArrowsTransaction';
 import { ChartLine } from '$app/components/icons/ChartLine';
-import { atom, useAtom, useAtomValue } from 'jotai';
+import { atom, useAtom } from 'jotai';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { Gear } from '$app/components/icons/Gear';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { File } from 'react-feather';
 import collect from 'collect.js';
 import { useEffect } from 'react';
-import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 
 const $cache = atom<NavigationItem[] | null>(null);
 const $navigationLanguage = atom<string | null>(null);
