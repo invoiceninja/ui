@@ -34,7 +34,7 @@ import { RestoreDocumentAction } from '../../show/components/RestoreDocumentActi
 import { SendInvitationsModal } from '../../show/components/SendInvitationsModal';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { route } from '$app/common/helpers/route';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { VoidAction } from '../components/VoidAction';
 import { CloneAction } from '../components/CloneAction';
 import { MakeTemplateAction } from '../components/MakeTemplateAction';
@@ -182,9 +182,11 @@ export function useActions(params?: Params) {
     );
   };
 
+  const location =  useLocation();
+
   const actions: Action<Document>[] = [
     (doc) =>
-      Boolean(doc && !doc.is_deleted) && (
+      Boolean(doc && !doc.is_deleted && !location.pathname.endsWith(doc.id)) && (
         <DropdownElement
           onClick={() => navigate(route('/docuninja/:id', { id: doc.id }))}
           icon={<Icon element={MdTimer} />}
