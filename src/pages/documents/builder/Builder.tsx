@@ -149,66 +149,22 @@ function Builder() {
           nextBtnText: t('tour_continue_select_signatory') as string,
         },
       },
-    ],
-    eventName: 'builder:loaded',
-    options: {
-      showProgress: false,
-      allowClose: false,
-      showButtons: ['next'],
-      disableActiveInteraction: true,
-      onDestroyed: () => {
-        if (!preferences.document_builder_tour_shown) {
-          update('preferences.document_builder_tour_shown', true);
-          save({ silent: true });
-        }
-      },
-    },
-  });
-
-  useDriverTour({
-    show: !preferences.document_builder_tour_shown,
-    steps: [
-      {
-        element: '.builder-toolbox',
-        popover: {
-          description: t('tour_toolbox_description') as string,
-        },
-      },
       {
         element: '.builder-central',
         popover: {
           description: t('tour_document_canvas') as string,
         },
       },
-    ],
-    eventName: 'builder:signatory-selected',
-    options: {
-      showProgress: true,
-      allowClose: false,
-      disableActiveInteraction: true,
-      onDestroyed: () => {
-        if (!preferences.document_builder_tour_shown) {
-          update('preferences.document_builder_tour_shown', true);
-          save({ silent: true });
-        }
-      },
-    },
-    delay: 500,
-  });
-
-  useDriverTour({
-    show: !preferences.document_builder_tour_shown,
-    steps: [
       {
         element: '.builder-save-button',
         popover: {
           description: t('tour_save_document') as string,
         },
-      },
+      }
     ],
-    eventName: 'builder:first-rectangle-drawn',
+    eventName: 'builder:loaded',
     options: {
-      showProgress: false,
+      showProgress: true,
       allowClose: false,
       showButtons: ['next'],
       disableActiveInteraction: true,
