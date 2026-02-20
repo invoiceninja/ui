@@ -248,6 +248,17 @@ function Builder() {
     return rectangles.length > 0;
   };
 
+  const hasRealSignatories = () => {
+    const rectangles =
+      entity?.files?.flatMap((file) => file.metadata?.rectangles ?? []) ?? [];
+
+    return rectangles.every(
+      (rectangle: any) =>
+        rectangle.signatory_id &&
+        !rectangle.signatory_id.startsWith('blueprint|')
+    );
+  };
+
   const getDocuNinjaCompany = () => {
     return docuninjaAccount?.companies?.find(
       (company) => company.id === localStorage.getItem('DOCUNINJA_COMPANY_ID')
@@ -273,6 +284,8 @@ function Builder() {
   };
 
   useEffect(() => {
+    toast.dismiss();
+
     const refetchDocuninjaDocument = () => {
       $refetch(['docuninja_documents', 'docuninja_document_timeline']);
     };
@@ -371,7 +384,9 @@ function Builder() {
               type="secondary"
               behavior="button"
               onClick={handleSend}
-              disabled={isDocumentSaving || isDocumentSending}
+              disabled={
+                isDocumentSaving || isDocumentSending || !hasRealSignatories()
+              }
               disableWithoutIcon
             >
               <div>
