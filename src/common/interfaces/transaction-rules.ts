@@ -33,4 +33,5 @@ export interface TransactionRule {
   vendor_id: string;
   vendor: Vendor;
   expense_category: ExpenseCategory;
+  on_credit_match: string;
 }
