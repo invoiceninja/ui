@@ -43,6 +43,7 @@ import {
 } from '@docuninja/builder2.0';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { LuTrash } from 'react-icons/lu';
 
 export function Loading() {
   return (
@@ -392,19 +393,17 @@ export function RectangleSettingsSelect({
 export function RectangleSettingsRemoveButton({
   onClick,
 }: RectangleSettingsRemoveButtonProps) {
-  const [t] = useTranslation();
-
   return (
-    <Button behavior="button" onClick={onClick} type="secondary">
-      {t('remove')}
-    </Button>
+    <button type="button" onClick={onClick}>
+      <LuTrash size={16} />
+    </button>
   );
 }
 
 export function RectangleSettingsOptionItem({
   children,
 }: RectangleSettingsOptionItemProps) {
-  return <div className="py-2 px-3 hover:bg-gray-50">{children}</div>;
+  return <div className="py-2 px-3 hover:bg-gray-50 flex gap-1 items-center">{children}</div>;
 }
 
 export function RectangleSettingsOptionsList({
