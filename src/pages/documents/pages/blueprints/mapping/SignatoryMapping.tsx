@@ -18,7 +18,7 @@ import { useColorScheme } from '$app/common/colors';
 import { Client } from '$app/common/interfaces/client';
 import { User as DocuNinjaUser } from '$app/common/interfaces/docuninja/api';
 import { ClientContact } from '$app/common/interfaces/docuninja/api';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { request } from '$app/common/helpers/request';
@@ -63,6 +63,10 @@ export default function SignatoryMapping() {
   const [mappings, setMappings] = useState<Record<string, SignatoryMap>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    toast.dismiss();
+  }, []);
 
   const getSignatoryColor = (signatoryId: string): string => {
     if (signatoryInfo && signatoryInfo[signatoryId]) {
