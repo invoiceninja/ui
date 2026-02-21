@@ -13,18 +13,19 @@ import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
 import { Actions } from './components/Actions';
 import { Page } from '$app/components/Breadcrumbs';
 import { route } from '$app/common/helpers/route';
-import { Document } from '$app/common/interfaces/docuninja/api';
+import { Document, DocumentStatus } from '$app/common/interfaces/docuninja/api';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 
 export default function Pdf() {
   const [t] = useTranslation();
 
   const { id } = useParams();
+  const navigate = useNavigate();
   const { data } = useDocumentQuery({ id, enabled: Boolean(id) });
 
   const [pdfUrl, setPdfUrl] = useState<string>();
@@ -35,6 +36,11 @@ export default function Pdf() {
     if (data) {
       setDocument(data);
 
+      if (data.status_id !== DocumentStatus.Completed) {
+        navigate(route('/docuninja/:id', { id }));
+        return;
+      }
+
       if (data.files && data.files.length > 0 && data.files[0].url) {
         setPdfUrl(
           docuNinjaEndpoint(
@@ -43,7 +49,7 @@ export default function Pdf() {
         );
       }
     }
-  }, [data]);
+  }, [data, navigate, id]);
 
   const onLink = (url: string) => setBlobUrl(url);
 
