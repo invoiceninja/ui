@@ -198,7 +198,7 @@ export function UninviteButton({
   form,
 }: UninviteDialogButtonProps) {
   return (
-    <Button form={form} behavior="button" disabled={isSubmitting}>
+    <Button form={form} disabled={isSubmitting}>
       Continue
     </Button>
   );
