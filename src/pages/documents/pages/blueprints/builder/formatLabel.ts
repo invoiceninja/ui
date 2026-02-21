@@ -19,10 +19,6 @@ export function formatLabel(
   const emailAddr = email || '';
   const name = [first, last].filter(Boolean).join(' ').trim();
 
-  if (name && emailAddr) {
-    return `${name} (${emailAddr})`;
-  }
-
   if (name) {
     return name;
   }
