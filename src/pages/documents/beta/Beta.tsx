@@ -20,6 +20,7 @@ import { endpoint } from '$app/common/helpers';
 import { routeWithOrigin } from '$app/common/helpers/route';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function Beta() {
   return (
@@ -140,6 +141,7 @@ function Join() {
 
   const navigate = useNavigate();
   const account = useCurrentAccount();
+  const { isOwner } = useAdmin();
 
   const isPro = account?.plan === 'pro' || account?.plan === 'enterprise';
 
@@ -183,6 +185,16 @@ function Join() {
         toast.error();
       });
   };
+
+  if (!isOwner) {
+    return (
+      <div className="text-center">
+        <p className="text-sm opacity-70 mb-3">
+          Contact the admin to request access to the Docu Ninja Beta.
+        </p>
+      </div>
+    );
+  }
 
   if (!isPro) {
     return (
