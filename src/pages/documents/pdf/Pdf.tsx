@@ -19,13 +19,15 @@ import { Actions } from './components/Actions';
 import { Page } from '$app/components/Breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { Document, DocumentStatus } from '$app/common/interfaces/docuninja/api';
+import { docuNinjaEndpoint } from '$app/common/helpers';
 
 export default function Pdf() {
+  const [t] = useTranslation();
+
   const { id } = useParams();
   const navigate = useNavigate();
   const { data } = useDocumentQuery({ id, enabled: Boolean(id) });
 
-  const [t] = useTranslation();
   const [pdfUrl, setPdfUrl] = useState<string>();
   const [blobUrl, setBlobUrl] = useState('');
   const [document, setDocument] = useState<Document>();
@@ -40,7 +42,11 @@ export default function Pdf() {
       }
 
       if (data.files && data.files.length > 0 && data.files[0].url) {
-        setPdfUrl(data.files[0].url);
+        setPdfUrl(
+          docuNinjaEndpoint(
+            `/api/documents/${data.id}/files/${data.files[0].id}/download_pdf`
+          )
+        );
       }
     }
   }, [data, navigate, id]);
@@ -68,7 +74,14 @@ export default function Pdf() {
       }
     >
       {pdfUrl ? (
-        <InvoiceViewer onLink={onLink} link={pdfUrl} method="GET" />
+        <InvoiceViewer
+          onLink={onLink}
+          link={pdfUrl}
+          method="GET"
+          headers={{
+            Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+          }}
+        />
       ) : (
         <div
           className="flex justify-center items-center"
