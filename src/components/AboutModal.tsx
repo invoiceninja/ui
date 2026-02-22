@@ -391,7 +391,7 @@ export function AboutModal(props: Props) {
               onClick={() =>
                 window
                   .open(
-                    'https://invoiceninja.github.io/docs/self-host-troubleshooting/#pdf-conversion-issues',
+                    'https://invoiceninja.github.io/docs/self-host/self-host-troubleshooting#pdf-conversion-issues',
                     '_blank'
                   )
                   ?.focus()
