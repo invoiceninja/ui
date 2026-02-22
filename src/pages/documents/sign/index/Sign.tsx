@@ -171,7 +171,12 @@ function Success() {
     >
       <div className="flex flex-col gap-6 px-4 sm:px-6">
         <div className="text-sm" style={{ color: colors.$3 }}>
-          {t('download_signed_document')}
+          Done! You’ve successfully signed the document!
+          <br /> <br />
+          You’ll receive an email once the document is finalized—immediately for
+          self-signed, or after all parties have signed.
+          <br /> <br />
+          This page is now safe to close.
         </div>
       </div>
     </Card>
