@@ -358,7 +358,7 @@ export function AboutModal(props: Props) {
                 onClick={() =>
                   window
                     .open(
-                      'https://invoiceninja.github.io/en/self-host-installation/#file-permissions',
+                      'https://invoiceninja.github.io/docs/self-host/self-host-installation#file-permissions',
                       '_blank'
                     )
                     ?.focus()
@@ -391,7 +391,7 @@ export function AboutModal(props: Props) {
               onClick={() =>
                 window
                   .open(
-                    'https://invoiceninja.github.io/en/self-host-troubleshooting/#pdf-conversion-issues',
+                    'https://invoiceninja.github.io/docs/self-host-troubleshooting/#pdf-conversion-issues',
                     '_blank'
                   )
                   ?.focus()
@@ -420,7 +420,7 @@ export function AboutModal(props: Props) {
               onClick={() =>
                 window
                   .open(
-                    'https://invoiceninja.github.io/en/self-host-installation/#currency-conversion',
+                    'https://invoiceninja.github.io/docs/self-host-installation/#currency-conversion',
                     '_blank'
                   )
                   ?.focus()
