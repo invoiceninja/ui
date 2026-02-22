@@ -35,7 +35,7 @@ export default function Beta() {
   
   return (
     <Default
-      title="Join Docu Ninja Beta"
+      title="Join DocuNinja Beta"
       breadcrumbs={[{ name: 'Beta', href: '/beta' }]}
     >
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)] p-4">
@@ -45,11 +45,11 @@ export default function Beta() {
             <div className="w-40 h-10 rounded mx-auto mb-4 flex items-center justify-center">
               <img
                 src="https://docuninja.co/wp-content/uploads/2025/03/logo.svg"
-                alt="Docu Ninja Logo"
+                alt="DocuNinja Logo"
                 className="size-32 object-contain"
               />
             </div>
-            <h1 className="text-3xl font-bold mb-3">Join Docu Ninja Beta</h1>
+            <h1 className="text-3xl font-bold mb-3">Join DocuNinja Beta</h1>
             <p className="text-lg opacity-80 max-w-lg mx-auto">
               Get early access to new document automation features.
             </p>
@@ -200,7 +200,7 @@ function Join() {
     return (
       <div className="text-center">
         <p className="text-sm opacity-70 mb-3">
-          Contact the admin to request access to the Docu Ninja Beta.
+          Contact the admin to request access to the DocuNinja Beta.
         </p>
       </div>
     );
@@ -210,7 +210,7 @@ function Join() {
     return (
       <div className="text-center">
         <p className="text-sm opacity-70 mb-3">
-          A Pro or Enterprise plan is required to join the Docu Ninja Beta.
+          A Pro or Enterprise plan is required to join the DocuNinja Beta.
         </p>
         <Link to="/settings/account_management">
           <Button type="primary" behavior="button">
@@ -233,7 +233,7 @@ function Join() {
       </Button>
 
       <Modal
-        title="Join Docu Ninja Beta"
+        title="Join DocuNinja Beta"
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         size="small"
@@ -243,7 +243,7 @@ function Join() {
             <div className="w-40 h-10 bg-white rounded mx-auto mb-4 flex items-center justify-center">
               <img
                 src="https://docuninja.co/wp-content/uploads/2025/03/logo.svg"
-                alt="Docu Ninja Logo"
+                alt="DocuNinja Logo"
                 className="size-32 object-contain"
               />
             </div>
@@ -251,7 +251,7 @@ function Join() {
               Confirm Beta Enrollment
             </h3>
             <p className="text-sm opacity-70">
-              You're about to join the Docu Ninja Beta program. You'll get early
+              You're about to join the DocuNinja Beta program. You'll get early
               access to new features and can provide feedback to help shape the
               product.
             </p>

@@ -131,7 +131,7 @@ export function HostedPlan() {
             )}
             <div>
               <span className="mr-4">
-                Docu Ninja users: (<b>{account.docuninja_num_users}</b>)
+                DocuNinja users: (<b>{account.docuninja_num_users}</b>)
               </span>
             </div>
           </div>
