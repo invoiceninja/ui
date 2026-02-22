@@ -622,7 +622,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                     </div>
                                                 </div>
                                                 <div className="flex justify-between">
-                                                    <span>Docu Ninja users: ({docuNinjaUsers})</span>
+                                                    <span>DocuNinja users: ({docuNinjaUsers})</span>
                                                     <div className="flex items-center space-x-2">
                                                         <span className="font-medium">{pricing.docuninja_price}</span>
                                                         {isLoading && (

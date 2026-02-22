@@ -14,6 +14,7 @@ import { lazy } from 'react';
 import { DocuNinjaGuard } from '$app/common/guards/DocuNinjaGuard';
 import {
   docuNinjaAdmin,
+  docuNinjaOwner,
   docuNinjaPermission,
 } from '$app/common/guards/guards/docuninja/permission';
 import { DocuNinjaProvider } from '$app/common/components/DocuNinjaProvider';
@@ -197,7 +198,7 @@ const routes = (
               path="users"
               element={
                 <DocuNinjaGuard
-                  guards={[docuNinjaAdmin()]}
+                  guards={[docuNinjaOwner()]}
                   component={<Users />}
                 />
               }
@@ -207,7 +208,7 @@ const routes = (
               path="users/:id/edit"
               element={
                 <DocuNinjaGuard
-                  guards={[docuNinjaAdmin()]}
+                  guards={[docuNinjaOwner()]}
                   component={<EditUser />}
                 />
               }

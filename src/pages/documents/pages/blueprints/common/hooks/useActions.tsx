@@ -21,6 +21,7 @@ import { request } from '$app/common/helpers/request';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Document } from '$app/common/interfaces/docuninja/api';
+import { toast } from '$app/common/helpers/toast/toast';
 
 interface UseActionsParams {
   onSettingsClick: (blueprint: Blueprint) => void;
@@ -72,6 +73,7 @@ export function useActions(params: UseActionsParams) {
   };
 
   const handleUseTemplate = (blueprint: Blueprint) => {
+    toast.processing();
     const { signatoryIds, signatoryInfo } = extractSignatoryInfo(blueprint);
 
     if (signatoryIds.length > 0) {
@@ -97,6 +99,7 @@ export function useActions(params: UseActionsParams) {
   };
   
   const handleUseTemplateNoMapping = (blueprint: Blueprint) => {
+    toast.processing();
 
       request(
         'POST',

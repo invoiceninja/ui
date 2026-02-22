@@ -374,7 +374,7 @@ export default function Settings() {
             }}
             onClick={() =>
               window.open(
-                'https://invoiceninja.github.io/en/custom-fields/',
+                'https://invoiceninja.github.io/docs/advanced-topics/custom-fields#custom-fields',
                 '_blank'
               )
             }

@@ -52,7 +52,7 @@ export default function Import() {
 
           <HelpWidget
             id="import-and-export"
-            url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/source/en/import-and-export.md"
+            url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/docs/advanced-topics/import-and-export.md"
           />
         </div>
       </div>
