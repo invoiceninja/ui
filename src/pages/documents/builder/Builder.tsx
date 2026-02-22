@@ -160,7 +160,7 @@ function Builder() {
         popover: {
           description: t('tour_save_document') as string,
         },
-      }
+      },
     ],
     eventName: 'builder:loaded',
     options: {
