@@ -17,7 +17,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
-import { routeWithOrigin } from '$app/common/helpers/route';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
