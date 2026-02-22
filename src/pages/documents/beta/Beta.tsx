@@ -32,7 +32,7 @@ export default function Beta() {
       navigate('/docuninja', { replace: true });
     }
   }, [account, navigate]);
-  
+
   return (
     <Default
       title="Join DocuNinja Beta"
@@ -172,7 +172,7 @@ function Join() {
         );
 
         setTimeout(() => {
-          window.location.href = routeWithOrigin('/docuninja');
+          window.location.reload();
         }, 3000);
       })
       .catch((error: AxiosError<ValidationBag>) => {
