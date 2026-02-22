@@ -37,9 +37,11 @@ export function usePurgeUser({ setPasswordConfirmModalOpen }: Params) {
       .then(() => {
         toast.success('purged_user');
 
-        $refetch(['users']);
-
         navigate('/settings/users');
+
+        setTimeout(() => {
+          $refetch(['users']);
+        }, 150);
       })
       .catch((error: AxiosError) => {
         if (error.response?.status === 412) {
