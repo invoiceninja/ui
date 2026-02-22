@@ -251,7 +251,7 @@ function PlanCheck({ onContinue }: StepProps) {
           {t('add_license_to_env')}
           &nbsp;
           <a
-            href="https://invoiceninja.github.io/en/env-variables/"
+            href="https://invoiceninja.github.io/docs/self-host/env-variables/"
             target="_blank"
             rel="noreferrer"
             style={{ color: accentColor }}
