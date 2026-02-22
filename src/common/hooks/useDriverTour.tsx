@@ -45,7 +45,7 @@ export function useDriverTour({
 
     if (!eventName) {
       handler();
-     
+
       return;
     }
 
@@ -54,5 +54,5 @@ export function useDriverTour({
     return () => {
       window.removeEventListener(eventName, handler);
     };
-  }, []);
+  }, [show]);
 }

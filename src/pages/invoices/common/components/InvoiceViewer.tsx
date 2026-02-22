@@ -28,6 +28,7 @@ interface Props {
   renderAsHTML?: boolean;
   onError?: (error: any) => unknown;
   onRequest?: () => unknown;
+  headers?: Record<string, string>;
 }
 
 export const android = Boolean(navigator.userAgent.match(/Android/i));
@@ -61,6 +62,7 @@ export function InvoiceViewer(props: Props) {
           return request(props.method, props.link, props.resource, {
             responseType: 'arraybuffer',
             signal,
+            ...(props.headers && { headers: props.headers }),
           })
             .then((response) => {
               const blob = new Blob([response.data], {

@@ -354,7 +354,7 @@ export function Create() {
     >
       <HelpWidget
         id="gateways"
-        url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/source/en/gateways.md"
+        url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/docs/user-guide/gateways.mdx"
       />
 
       <DuplicatingGatewayModal
