@@ -149,44 +149,12 @@ function Builder() {
           nextBtnText: t('tour_continue_select_signatory') as string,
         },
       },
-    ],
-    eventName: 'builder:loaded',
-    options: {
-      showProgress: false,
-      allowClose: false,
-      showButtons: ['next'],
-      disableActiveInteraction: true,
-    },
-  });
-
-  useDriverTour({
-    show: !preferences.document_builder_tour_shown,
-    steps: [
-      {
-        element: '.builder-toolbox',
-        popover: {
-          description: t('tour_toolbox_description') as string,
-        },
-      },
       {
         element: '.builder-central',
         popover: {
           description: t('tour_document_canvas') as string,
         },
       },
-    ],
-    eventName: 'builder:signatory-selected',
-    options: {
-      showProgress: true,
-      allowClose: false,
-      disableActiveInteraction: true,
-    },
-    delay: 500,
-  });
-
-  useDriverTour({
-    show: !preferences.document_builder_tour_shown,
-    steps: [
       {
         element: '.builder-save-button',
         popover: {
@@ -194,9 +162,9 @@ function Builder() {
         },
       },
     ],
-    eventName: 'builder:first-rectangle-drawn',
+    eventName: 'builder:loaded',
     options: {
-      showProgress: false,
+      showProgress: true,
       allowClose: false,
       showButtons: ['next'],
       disableActiveInteraction: true,
@@ -236,6 +204,17 @@ function Builder() {
     return rectangles.length > 0;
   };
 
+  const hasRealSignatories = () => {
+    const rectangles =
+      entity?.files?.flatMap((file) => file.metadata?.rectangles ?? []) ?? [];
+
+    return rectangles.every(
+      (rectangle: any) =>
+        rectangle.signatory_id &&
+        !rectangle.signatory_id.startsWith('blueprint|')
+    );
+  };
+
   const getDocuNinjaCompany = () => {
     return docuninjaAccount?.companies?.find(
       (company) => company.id === localStorage.getItem('DOCUNINJA_COMPANY_ID')
@@ -261,6 +240,8 @@ function Builder() {
   };
 
   useEffect(() => {
+    toast.dismiss();
+
     const refetchDocuninjaDocument = () => {
       $refetch(['docuninja_documents', 'docuninja_document_timeline']);
     };
@@ -359,7 +340,9 @@ function Builder() {
               type="secondary"
               behavior="button"
               onClick={handleSend}
-              disabled={isDocumentSaving || isDocumentSending}
+              disabled={
+                isDocumentSaving || isDocumentSending || !hasRealSignatories()
+              }
               disableWithoutIcon
             >
               <div>

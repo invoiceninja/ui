@@ -22,6 +22,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useEffect, useState } from 'react';
 import { Modal } from '$app/components/Modal';
 import { get } from 'lodash';
+import { formatLabel } from './formatLabel';
 
 export function SignatorySwap(props: SignatorySwapProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -136,7 +137,12 @@ export function SignatorySelector({
     )
     .filter((client) => !existingKeys.includes(client.contacts[0].contact_key))
     .map((client) => ({
-      label: client.name,
+      label: formatLabel(
+        client.contacts[0].first_name,
+        client.contacts[0].last_name,
+        client.contacts[0].email,
+        client.name
+      ),
       value: `contact|${client.contacts[0].contact_key}`,
     }))
     .filter((client) => !existing.includes(client.value))
