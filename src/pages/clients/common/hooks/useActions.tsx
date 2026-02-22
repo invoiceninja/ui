@@ -37,6 +37,7 @@ import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/cust
 import { useBulk } from '$app/common/queries/clients';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { EntityCreationModalAction } from '../components/EntityCreationModalAction';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 interface Params {
   setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
@@ -48,6 +49,8 @@ export function useActions(params?: Params) {
   const { setIsPurgeOrMergeActionCalled } = params || {};
 
   const { isAdmin, isOwner } = useAdmin();
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const { isEditOrShowPage, isShowPage } = useEntityPageIdentifier({
     entity: 'client',
@@ -122,21 +125,22 @@ export function useActions(params?: Params) {
           setIsPurgeOrMergeActionCalled={setIsPurgeOrMergeActionCalled}
         />
       ),
-    (client) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources([client]);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/clients/bulk',
-            entity: 'clients',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    (client) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources([client]);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/clients/bulk',
+              entity: 'clients',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
     (client) =>
       isEditOrShowPage && !client.is_deleted && <Divider withoutPadding />,
     (client) =>

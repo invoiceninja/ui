@@ -139,6 +139,17 @@ export default function Payments() {
           )
         }
         enableSavingFilterPreference
+        dateRangeColumns={[
+          {
+            column: 'date',
+            queryParameterKey: 'date_range',
+            includeColumnNameInQuery: true,
+          },
+          {
+            column: 'created_at',
+            queryParameterKey: 'created_between',
+          },
+        ]}
       />
 
       {!disableNavigation('payment', paymentSlider) && <PaymentSlider />}

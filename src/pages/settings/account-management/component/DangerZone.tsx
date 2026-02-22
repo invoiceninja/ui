@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { Button, InputField } from '$app/components/forms';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Modal } from '$app/components/Modal';
@@ -22,6 +22,7 @@ import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { Trash } from '$app/components/icons/Trash';
 import { TrashXMark } from '$app/components/icons/TrashXMark';
+import { useQueryClient } from 'react-query';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
@@ -36,35 +37,46 @@ export function DangerZone() {
 
   const colors = useColorScheme();
   const company = useCurrentCompany();
+  const queryClient = useQueryClient();
 
   const companyUsers = useSelector((state: RootState) => state.companyUsers);
 
   const [password, setPassword] = useState('');
   const [feedback, setFeedback] = useState('');
 
+  const [isFormBusy, setIsFormBusy] = useState(false);
   const [isPurgeModalOpen, setIsPurgeModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [purgeInputField, setPurgeInputField] = useState('');
 
   const purge = () => {
-    toast.processing();
+    if (!isFormBusy) {
+      toast.processing();
+      setIsFormBusy(true);
 
-    request(
-      'POST',
-      endpoint('/api/v1/companies/purge_save_settings/:id', {
-        id: company.id,
-      }),
-      { cancellation_message: feedback },
-      { headers: { 'X-Api-Password': password } }
-    )
-      .then(() => toast.success('purge_successful'))
-      .catch((error) => {
-        if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-        }
-      })
-      .finally(() => setIsPurgeModalOpen(false));
+      request(
+        'POST',
+        endpoint('/api/v1/companies/purge_save_settings/:id', {
+          id: company.id,
+        }),
+        { cancellation_message: feedback },
+        { headers: { 'X-Api-Password': password } }
+      )
+        .then(() => {
+          toast.success('purge_successful');
+
+          queryClient.invalidateQueries();
+
+          setIsPurgeModalOpen(false);
+        })
+        .catch((error) => {
+          if (error.response?.status === 412) {
+            toast.error('password_error_incorrect');
+          }
+        })
+        .finally(() => setIsFormBusy(false));
+    }
   };
 
   const destroy = () => {
@@ -118,8 +130,8 @@ export function DangerZone() {
         <Button
           behavior="button"
           onClick={purge}
-          disabled={purgeInputField !== 'purge' || !password}
-          disableWithoutIcon
+          disabled={purgeInputField !== 'purge' || !password || isFormBusy}
+          disableWithoutIcon={!isFormBusy}
         >
           {t('continue')}
         </Button>
@@ -150,14 +162,16 @@ export function DangerZone() {
           required
         />
 
-        <InputField
-          type="text"
-          label={t('reason_for_canceling')}
-          id="feedback"
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            setFeedback(event.target.value)
-          }
-        />
+        {isHosted() && (
+          <InputField
+            type="text"
+            label={t('reason_for_canceling')}
+            id="feedback"
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              setFeedback(event.target.value)
+            }
+          />
+        )}
 
         <InputField
           type="password"

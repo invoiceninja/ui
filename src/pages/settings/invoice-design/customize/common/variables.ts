@@ -69,4 +69,38 @@ export const variables = {
     '$company.vat_number',
     '$company.website',
   ],
+  docu_company: [
+    '{{ company.name }}',
+    '{{ company.address1 }}',
+    '{{ company.address2 }}',
+    '{{ company.city }}',
+    '{{ company.state }}',
+    '{{ company.postal_code }}',
+  ],
+  docu_document: [
+    '{{ document.description }}',
+    '{{ document.link }}',
+  ],
+  docu_sender: [
+    '{{ sender.first_name }}',
+    '{{ sender.last_name }}',
+    '{{ sender.phone_number }}',
+    '{{ sender.email }}',
+    '{{ sender.name }}',
+  ],
+  docu_user: [
+    '{{ user.first_name }}',
+    '{{ user.last_name }}',
+    '{{ user.phone_number }}',
+    '{{ user.email }}',
+    '{{ user.name }}',
+  ],
+  docu_contact: [
+    '{{ contact.first_name }}',
+    '{{ contact.last_name }}',
+    '{{ contact.phone }}',
+    '{{ contact.email }}',
+    '{{ contact.name }}',
+  ]
+
 };

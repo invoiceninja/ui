@@ -79,6 +79,9 @@ export function useAuthenticated(): boolean {
         dispatch(updateCompanyUsers(response.data.data));
         dispatch(resetChanges('company'));
         dispatch(changeCurrentIndex(currentIndex));
+
+        // Trigger DocuNinja data fetch after successful refresh
+        queryClient.invalidateQueries(['/api/docuninja/login']);
       })
       .catch((e) => {
         console.error(e);

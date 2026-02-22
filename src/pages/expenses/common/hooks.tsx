@@ -74,14 +74,18 @@ import { Link } from '$app/components/forms';
 import classNames from 'classnames';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 export function useActions() {
   const [t] = useTranslation();
 
   const hasPermission = useHasPermission();
 
-  const navigate = useNavigate();
   const bulk = useBulk();
+  const navigate = useNavigate();
+
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const setExpense = useSetAtom(expenseAtom);
   const setRecurringExpense = useSetAtom(recurringExpenseAtom);
@@ -159,21 +163,22 @@ export function useActions() {
           {t('clone_to_recurring')}
         </DropdownElement>
       ),
-    (expense) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources([expense]);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/expenses/bulk',
-            entity: 'expense',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    (expense) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources([expense]);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/expenses/bulk',
+              entity: 'expense',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
     () => isEditPage && <Divider withoutPadding />,
     (expense) =>
       getEntityState(expense) === EntityState.Active &&

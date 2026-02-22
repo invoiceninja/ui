@@ -34,6 +34,7 @@ import {
   useApplyInvoiceTableColumns,
 } from '../common/hooks/useApplyInvoiceTableColumns';
 import { PaymentOnCreation } from '..';
+import { v4 } from 'uuid';
 
 export default function Apply() {
   const [t] = useTranslation();
@@ -186,7 +187,7 @@ export default function Apply() {
 
                   selectedResources.forEach((resource: Invoice) => {
                     newInvoices.push({
-                      _id: window.crypto.randomUUID(),
+                      _id: v4(),
                       amount: calcApplyAmount(resource.balance, newInvoices),
                       credit_id: '',
                       invoice_id: resource.id,

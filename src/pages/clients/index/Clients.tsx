@@ -85,6 +85,9 @@ export default function Clients() {
         linkToCreateGuards={[permission('create_client')]}
         hideEditableOptions={!hasPermission('edit_client')}
         enableSavingFilterPreference
+        dateRangeColumns={[
+          { column: 'created_at', queryParameterKey: 'created_between' },
+        ]}
       />
 
       <ChangeTemplateModal<Client>
