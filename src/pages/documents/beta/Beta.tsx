@@ -21,8 +21,18 @@ import { routeWithOrigin } from '$app/common/helpers/route';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useEffect } from 'react';
 
 export default function Beta() {
+  const navigate = useNavigate();
+  const account = useCurrentAccount();
+
+  useEffect(() => {
+    if (account && account.docuninja_num_users > 0) {
+      navigate('/docuninja', { replace: true });
+    }
+  }, [account, navigate]);
+  
   return (
     <Default
       title="Join Docu Ninja Beta"
