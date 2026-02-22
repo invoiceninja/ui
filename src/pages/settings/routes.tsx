@@ -70,7 +70,7 @@ export const settingsRoutes = (
                 type="subPage"
               />
             ) : (
-              <Settings.Plan />
+              <Settings.Plan2 />
             )
           }
         />
