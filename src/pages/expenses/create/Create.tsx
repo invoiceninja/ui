@@ -125,6 +125,10 @@ export default function Create() {
           _expense.client_id = searchParams.get('client') as string;
         }
 
+        if (searchParams.has('project')) {
+          _expense.project_id = searchParams.get('project') as string;
+        }
+
         value = {
           ..._expense,
           payment_date: company?.mark_expenses_paid

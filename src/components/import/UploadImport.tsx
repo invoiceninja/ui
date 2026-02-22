@@ -261,6 +261,18 @@ export function UploadImport(props: Props) {
     return payload?.column_map[props.entity]?.mapping[index] ?? null;
   };
 
+  const isColumnAlreadyMapped = (
+    column: string,
+    currentColumnIndex: number
+  ) => {
+    if (!Object.keys(payload?.column_map[props.entity]?.mapping).length)
+      return false;
+
+    return Object.entries(payload?.column_map[props.entity]?.mapping).some(
+      ([key, value]) => value === column && Number(key) !== currentColumnIndex
+    );
+  };
+
   const removeFileFromFormData = (fileIndex: number) => {
     const filteredFileList = files.filter((file, index) => fileIndex !== index);
 
@@ -456,32 +468,34 @@ export function UploadImport(props: Props) {
           ) : null}
 
           {!files.length ? (
-            <div
-              {...getRootProps()}
-              className="flex flex-col md:flex-row md:items-center"
-            >
-              <Box
-                className="relative block w-full border-2 border-dashed rounded-lg p-12 text-center"
-                theme={{
-                  borderColor: colors.$21,
-                  hoverBorderColor: colors.$17,
-                }}
+            <div className="flex flex-col w-full gap-y-4">
+              <div
+                {...getRootProps()}
+                className="flex flex-col md:flex-row md:items-center"
               >
-                <input {...getInputProps()} />
-
-                <div className="flex justify-center">
-                  <CloudUpload size="2.3rem" color={colors.$3} />
-                </div>
-
-                <span
-                  className="mt-2 block text-sm font-medium"
-                  style={{ color: colors.$3, colorScheme: colors.$0 }}
+                <Box
+                  className="relative block w-full border-2 border-dashed rounded-lg p-12 text-center"
+                  theme={{
+                    borderColor: colors.$21,
+                    hoverBorderColor: colors.$17,
+                  }}
                 >
-                  {isDragActive
-                    ? t('drop_file_here')
-                    : t('dropzone_default_message')}
-                </span>
-              </Box>
+                  <input {...getInputProps()} />
+
+                  <div className="flex justify-center">
+                    <CloudUpload size="2.3rem" color={colors.$3} />
+                  </div>
+
+                  <span
+                    className="mt-2 block text-sm font-medium"
+                    style={{ color: colors.$3, colorScheme: colors.$0 }}
+                  >
+                    {isDragActive
+                      ? t('drop_file_here')
+                      : t('dropzone_default_message')}
+                  </span>
+                </Box>
+              </div>
 
               {errors &&
                 Object.keys(errors.errors).map((key, index) => (
@@ -608,13 +622,16 @@ export function UploadImport(props: Props) {
                           onChange={handleChange}
                           withBlank
                         >
-                          {mapData.mappings[props.entity].available.map(
-                            (mapping: any, index: number) => (
+                          {mapData.mappings[props.entity].available
+                            .filter(
+                              (mapping: string) =>
+                                !isColumnAlreadyMapped(mapping, index)
+                            )
+                            .map((mapping: string, index: number) => (
                               <option value={mapping} key={index}>
                                 {decorateMapping(mapping)}
                               </option>
-                            )
-                          )}
+                            ))}
                         </SelectField>
                       </div>
 

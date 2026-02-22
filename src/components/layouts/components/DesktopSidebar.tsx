@@ -16,11 +16,10 @@ import { Tooltip } from '$app/components/Tooltip';
 import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import classNames from 'classnames';
 
-export interface NavigationItem {
+interface SubNavigationItem {
   name: string;
   href: string;
   icon: React.ElementType;
-  current: boolean;
   visible: boolean;
   rightButton?: {
     icon: React.ElementType;
@@ -28,6 +27,20 @@ export interface NavigationItem {
     label: string;
     visible: boolean;
   };
+}
+
+export interface NavigationItem {
+  name: string;
+  href: string;
+  icon: React.ElementType;
+  visible: boolean;
+  rightButton?: {
+    icon: React.ElementType;
+    to: string;
+    label: string;
+    visible: boolean;
+  };
+  subOptions?: SubNavigationItem[];
 }
 
 interface Props {

@@ -22,6 +22,7 @@ import { Tooltip } from '$app/components/Tooltip';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import {
+  MdAddCircleOutline,
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
@@ -54,6 +55,7 @@ import {
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 export const defaultColumns: string[] = [
   'name',
@@ -310,13 +312,14 @@ export function useProjectColumns() {
 
 export function useActions() {
   const [t] = useTranslation();
-  const navigate = useNavigate();
-
-  const hasPermission = useHasPermission();
 
   const bulk = useBulkAction();
-
+  const navigate = useNavigate();
+  const hasPermission = useHasPermission();
   const invoiceProject = useInvoiceProject();
+
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const { isEditOrShowPage } = useEntityPageIdentifier({
     entity: 'project',
@@ -329,6 +332,10 @@ export function useActions() {
     setProject({ ...project, id: '', documents: [], number: '' });
 
     navigate('/projects/create?action=clone');
+  };
+
+  const handleAddExpense = (projectId: string) => {
+    navigate(route('/expenses/create?project=:projectId', { projectId }));
   };
 
   const {
@@ -348,6 +355,15 @@ export function useActions() {
         </DropdownElement>
       ),
     (project: Project) =>
+      hasPermission('create_expense') && (
+        <DropdownElement
+          onClick={() => handleAddExpense(project.id)}
+          icon={<Icon element={MdAddCircleOutline} />}
+        >
+          {t('create_expense')}
+        </DropdownElement>
+      ),
+    (project: Project) =>
       hasPermission('create_project') && (
         <DropdownElement
           onClick={() => cloneToProject(project)}
@@ -356,21 +372,22 @@ export function useActions() {
           {t('clone')}
         </DropdownElement>
       ),
-    (project: Project) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources([project]);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/projects/bulk',
-            entity: 'project',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    (project: Project) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources([project]);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/projects/bulk',
+              entity: 'project',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
     () => isEditOrShowPage && <Divider withoutPadding />,
     (project: Project) =>
       getEntityState(project) === EntityState.Active &&
@@ -416,6 +433,9 @@ export const useCustomBulkActions = () => {
   const documentsBulk = useDocumentsBulk();
 
   const invoiceProject = useInvoiceProject();
+
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const shouldDownloadDocuments = (projects: Project[]) => {
     return projects.some(({ documents }) => documents.length);
@@ -467,21 +487,22 @@ export const useCustomBulkActions = () => {
         {t('documents')}
       </DropdownElement>
     ),
-    ({ selectedResources }) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources(selectedResources);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/projects/bulk',
-            entity: 'project',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    ({ selectedResources }) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources(selectedResources);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/projects/bulk',
+              entity: 'project',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
   ];
 
   return customBulkActions;

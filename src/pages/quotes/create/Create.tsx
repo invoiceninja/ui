@@ -30,6 +30,7 @@ import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { Tab, Tabs } from '$app/components/Tabs';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { Invitation } from '$app/common/interfaces/purchase-order';
 
 export interface QuoteContext {
   quote: Quote | undefined;
@@ -162,13 +163,14 @@ export default function Create() {
       clientResolver.find(quote.client_id).then((client) => {
         setClient(client);
 
-        const invitations: Record<string, unknown>[] = [];
+        const invitations: Invitation[] = [];
 
         client.contacts.map((contact) => {
           if (contact.send_email) {
-            const invitation = cloneDeep(blankInvitation);
+            const invitation = cloneDeep(blankInvitation) as unknown as Invitation;
 
             invitation.client_contact_id = contact.id;
+            invitation.can_sign = contact.can_sign;
             invitations.push(invitation);
           }
         });

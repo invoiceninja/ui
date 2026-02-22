@@ -161,7 +161,7 @@ export function Credentials(props: Props) {
             />
           </div>
 
-          <div className="flex justify-end pr-6">
+          <div className="flex flex-col items-end justify-end pr-6">
             <Button
               behavior="button"
               onClick={handleTestCredentials}
@@ -170,6 +170,12 @@ export function Credentials(props: Props) {
             >
               {t('health_check')}
             </Button>
+
+            {!props.isGatewaySaved ? (
+              <p className="mt-2 text-sm font-medium">
+                {t('save_to_enable_health_check')}
+              </p>
+            ) : null}
           </div>
         </>
       )}

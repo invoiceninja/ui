@@ -34,6 +34,7 @@ import { route } from '$app/common/helpers/route';
 import { useNavigate } from 'react-router-dom';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 export function useCustomBulkActions() {
   const [t] = useTranslation();
@@ -45,6 +46,9 @@ export function useCustomBulkActions() {
   const bulk = useBulk();
 
   const documentsBulk = useDocumentsBulk();
+
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const printPdf = usePrintPdf({ entity: 'purchase_order' });
   const downloadPdfs = useDownloadPdfs({ entity: 'purchase_order' });
@@ -186,21 +190,22 @@ export function useCustomBulkActions() {
         {t('documents')}
       </DropdownElement>
     ),
-    ({ selectedResources }) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources(selectedResources);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/purchase_orders/bulk',
-            entity: 'purchase_order',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    ({ selectedResources }) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources(selectedResources);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/purchase_orders/bulk',
+              entity: 'purchase_order',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
   ];
 
   return customBulkActions;

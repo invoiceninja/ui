@@ -40,7 +40,7 @@ import {
   taskSliderAtom,
   taskSliderVisibilityAtom,
 } from '../common/components/TaskSlider';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAtom } from 'jotai';
 import { useTaskQuery } from '$app/common/queries/tasks';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
@@ -69,9 +69,9 @@ export default function Tasks() {
   const filterColumns = useFilterColumns();
   const customBulkActions = useCustomBulkActions();
 
-  const [dateRange, setDateRange] = useAtom(dateRangeAtom);
   const [taskSlider, setTaskSlider] = useAtom(taskSliderAtom);
   const [sliderTaskId, setSliderTaskId] = useState<string>('');
+  const [dateRangeEntries, setDateRangeEntries] = useAtom(dateRangeAtom);
   const [taskSliderVisibility, setTaskSliderVisibility] = useAtom(
     taskSliderVisibilityAtom
   );
@@ -80,6 +80,14 @@ export default function Tasks() {
   );
 
   const { data: taskResponse } = useTaskQuery({ id: sliderTaskId });
+
+  const currentDateRangeColumnsCount = useMemo(
+    () =>
+      dateRangeEntries.filter(
+        (entry) => entry.startDate.length > 0 && entry.endDate.length > 0
+      ).length,
+    [dateRangeEntries]
+  );
 
   useEffect(() => {
     if (taskResponse && taskSliderVisibility) {
@@ -119,18 +127,19 @@ export default function Tasks() {
         rightSide={
           <div className="flex items-center space-x-2">
             {(Object.keys(filterColumnsValues).length > 0 ||
-              dateRange.length > 0) && (
+              currentDateRangeColumnsCount > 0) && (
               <Button
                 type="secondary"
                 behavior="button"
                 onClick={() => {
                   setFilterColumnsValues({});
+                  setDateRangeEntries([]);
                   emitter.emit('date_range_picker.clear');
                 }}
               >
                 {t('clear_filters')} (
                 {Object.keys(filterColumnsValues).length +
-                  (dateRange.length > 0 ? 1 : 0)}
+                  currentDateRangeColumnsCount}
                 )
               </Button>
             )}
@@ -168,6 +177,7 @@ export default function Tasks() {
         filterColumns={filterColumns}
         dateRangeColumns={[
           { column: 'calculated_start_date', queryParameterKey: 'date_range' },
+          { column: 'created_at', queryParameterKey: 'created_between' },
         ]}
       />
 
