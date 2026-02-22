@@ -66,11 +66,11 @@ export const settingsRoutes = (
             // isHosted() ? (
               <Guard
                 guards={[owner()]}
-                component={<Settings.Plan3 />}
+                component={<Settings.Plan2 />}
                 type="subPage"
               />
             ) : (
-              <Settings.Plan2 />
+              <Settings.Plan />
             )
           }
         />
