@@ -29,6 +29,7 @@ import {
   MdSend,
 } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
+import { PurgeUserAction } from './PurgeUserAction';
 
 interface Props {
   user: User;
@@ -173,6 +174,8 @@ export function Actions(props: Props) {
               {t('delete')}
             </DropdownElement>
           )}
+
+          <PurgeUserAction user={user} />
         </div>
       </Dropdown>
     </>
