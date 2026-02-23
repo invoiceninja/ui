@@ -10,7 +10,6 @@
 
 import { useMemo, useState } from 'react';
 import { Modal } from '$app/components/Modal';
-import { TabGroup } from '$app/components/TabGroup';
 import { Button } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
@@ -24,9 +23,7 @@ import { useQuickbooksConnection } from '../common/hooks/useQuickbooksConnection
 import { useQuickbooksConnect } from '../common/hooks/useQuickbooksConnect';
 import { useQuickbooksDisconnect } from '../common/hooks/useQuickbooksDisconnect';
 import { useQuickbooksSync } from '../common/hooks/useQuickbooksSync';
-import { QuickBooksConnectTab } from './QuickbooksConnectTab';
-import { QuickBooksImportTab } from './QuickbooksImportTab';
-import { QuickBooksSyncTab } from './QuickbooksSyncTab';
+import { QuickBooksDetails } from './QuickBooksDetails';
 import { ConnectedDots } from '$app/components/icons/ConnectedDots';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
 import styled from 'styled-components';
@@ -105,39 +102,14 @@ export function QuickBooks() {
         <div className="flex flex-col space-y-4">
           <h3 className="leading-6 font-medium text-lg">QuickBooks</h3>
 
-          <TabGroup tabs={TABS} fullRightPadding>
-            <div>
-              <QuickBooksConnectTab
-                quickbooks={quickbooks}
-                quickbooksSettings={quickbooksSettings}
-                onDisconnectClick={() => setIsDisconnectModalVisible(true)}
-                onIncomeAccountIdChange={handleIncomeAccountIdChange}
-                isFormBusy={isConnectBusy || isDisconnectBusy}
-                errors={errors}
-              />
-            </div>
-
-            <div>
-              <QuickBooksImportTab
-                syncSelections={syncSelections}
-                onSyncSelectionChange={setSyncSelection}
-                onSync={handleInitialSync}
-                isSyncBusy={isSyncBusy}
-                hasSyncSelection={hasSyncSelection}
-              />
-            </div>
-
-            {quickbooksSettings ? (
-              <div>
-                <QuickBooksSyncTab
-                  quickbooksSettings={quickbooksSettings}
-                  onSyncDirectionChange={handleSyncDirectionChange}
-                />
-              </div>
-            ) : (
-              <div />
-            )}
-          </TabGroup>
+          <QuickBooksDetails
+            quickbooks={quickbooks}
+            quickbooksSettings={quickbooksSettings}
+            onDisconnectClick={() => setIsDisconnectModalVisible(true)}
+            onIncomeAccountIdChange={handleIncomeAccountIdChange}
+            isFormBusy={isConnectBusy || isDisconnectBusy}
+            errors={errors}
+          />
         </div>
       ) : (
         <Box
@@ -153,7 +125,7 @@ export function QuickBooks() {
             <ConnectedDots color={colors.$3} size="1.4rem" />
 
             <span className="text-sm" style={{ color: colors.$3 }}>
-              Quickbooks
+              QuickBooks
             </span>
 
             {isConnected && (
@@ -217,33 +189,18 @@ export function QuickBooks() {
         visible={isDisconnectModalVisible}
         onClose={() => setIsDisconnectModalVisible(false)}
       >
-        <div className="flex flex-col space-y-4">
-          <p className="text-sm" style={{ color: colors.$3 }}>
-            {t('are_you_sure')}
-          </p>
+        <div className="flex flex-col space-y-6">
+          <span className="font-medium text-sm">{t('are_you_sure')}</span>
 
-          <div className="flex flex-wrap gap-2 justify-end">
-            <Button
-              type="secondary"
-              behavior="button"
-              onClick={() => setIsDisconnectModalVisible(false)}
-            >
-              {t('cancel')}
-            </Button>
-
-            <Button
-              type="primary"
-              behavior="button"
-              onClick={() => {
-                setIsDisconnectModalVisible(false);
-                handleDisconnect();
-              }}
-              disabled={isDisconnectBusy}
-              className="bg-red-500 border-red-500 text-white hover:bg-red-600 hover:border-red-600"
-            >
-              {t('disconnect')}
-            </Button>
-          </div>
+          <Button
+            behavior="button"
+            onClick={() => {
+              setIsDisconnectModalVisible(false);
+              handleDisconnect();
+            }}
+          >
+            {t('continue')}
+          </Button>
         </div>
       </Modal>
     </>

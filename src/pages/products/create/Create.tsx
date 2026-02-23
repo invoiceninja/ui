@@ -29,14 +29,17 @@ import { productAtom } from '../common/atoms';
 import { CreateProduct } from '../common/components/CreateProduct';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_product');
 
   const [t] = useTranslation();
 
-  const [product, setProduct] = useAtom(productAtom);
   const navigate = useNavigate();
+
+  const currentCompany = useCurrentCompany();
+  const [product, setProduct] = useAtom(productAtom);
 
   const { data } = useBlankProductQuery({
     enabled: typeof product === 'undefined',
@@ -47,9 +50,9 @@ export default function Create() {
     { name: t('new_product'), href: '/products/create' },
   ];
 
-  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-  const [errors, setErrors] = useState<ValidationBag>();
   const [searchParams] = useSearchParams();
+  const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const handleSave = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -95,6 +98,11 @@ export default function Create() {
         searchParams.get('action') !== 'clone'
       ) {
         value = cloneDeep(data);
+
+        if (currentCompany?.quickbooks) {
+          value.income_account_id =
+            currentCompany.quickbooks.settings?.default_income_account || '';
+        }
       }
 
       return value;
