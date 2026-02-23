@@ -28,6 +28,7 @@ interface Props {
   disabled?: boolean;
   withoutWrapping?: boolean;
   centerVertically?: boolean;
+  childrenWrapperClassName?: string;
 }
 
 export function Tooltip(props: Props) {
@@ -41,6 +42,7 @@ export function Tooltip(props: Props) {
     message,
     disabled,
     withoutWrapping,
+    childrenWrapperClassName,
   } = props;
 
   const parentChildrenElement = useRef<HTMLDivElement>(null);
@@ -118,10 +120,14 @@ export function Tooltip(props: Props) {
       >
         <div
           ref={parentChildrenElement}
-          className={classNames('cursor-pointer', {
-            'truncate w-full': props.truncate,
-            'flex items-center': props.centerVertically,
-          })}
+          className={classNames(
+            'cursor-pointer',
+            {
+              'truncate w-full': props.truncate,
+              'flex items-center': props.centerVertically,
+            },
+            childrenWrapperClassName
+          )}
         >
           {props.children}
         </div>

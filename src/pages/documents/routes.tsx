@@ -14,6 +14,7 @@ import { lazy } from 'react';
 import { DocuNinjaGuard } from '$app/common/guards/DocuNinjaGuard';
 import {
   docuNinjaAdmin,
+  docuNinjaOwner,
   docuNinjaPermission,
 } from '$app/common/guards/guards/docuninja/permission';
 import { DocuNinjaProvider } from '$app/common/components/DocuNinjaProvider';
@@ -26,9 +27,6 @@ const Blueprints = lazy(
 );
 const CreateBlueprint = lazy(
   () => import('$app/pages/documents/pages/blueprints/create/Create')
-);
-const BlueprintEditor = lazy(
-  () => import('$app/pages/documents/pages/blueprints/editor/Editor')
 );
 
 const Settings = lazy(
@@ -170,21 +168,6 @@ const routes = (
             />
 
             <Route
-              path="templates/:id/editor"
-              element={
-                <DocuNinjaGuard
-                  guards={[
-                    docuNinjaPermission({
-                      model: 'blueprints',
-                      action: 'create',
-                    }),
-                  ]}
-                  component={<BlueprintEditor />}
-                />
-              }
-            />
-
-            <Route
               path="templates/:id/edit"
               element={
                 <DocuNinjaGuard
@@ -215,7 +198,7 @@ const routes = (
               path="users"
               element={
                 <DocuNinjaGuard
-                  guards={[docuNinjaAdmin()]}
+                  guards={[docuNinjaOwner()]}
                   component={<Users />}
                 />
               }
@@ -225,7 +208,7 @@ const routes = (
               path="users/:id/edit"
               element={
                 <DocuNinjaGuard
-                  guards={[docuNinjaAdmin()]}
+                  guards={[docuNinjaOwner()]}
                   component={<EditUser />}
                 />
               }

@@ -213,7 +213,7 @@ export function TaxSettings() {
 
       <HelpWidget
         id="calculate-taxes"
-        url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/source/en/taxes.md"
+        url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/docs/user-guide/taxes.mdx"
       />
     </Settings>
   );

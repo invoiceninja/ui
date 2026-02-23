@@ -145,3 +145,22 @@ export function docuNinjaAdmin(): DocuNinjaGuard {
     return Promise.resolve(false);
   };
 }
+
+export function docuNinjaOwner(): DocuNinjaGuard {
+  return ({ docuData }: { docuData?: DocuNinjaData; queryClient: any }) => {
+    const data = docuData || undefined;
+    
+    if (!data?.company_user) {
+      return Promise.resolve(false);
+    }
+
+    const { company_user } = data;
+    
+    // Only owner has access (not admin)
+    if (company_user.is_owner) {
+      return Promise.resolve(true);
+    }
+
+    return Promise.resolve(false);
+  };
+}

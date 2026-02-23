@@ -30,7 +30,9 @@ export const useCustomBulkActions = () => {
   };
 
   const showUnlinkAction = (selectedTransactions: Transaction[]) => {
-    return selectedTransactions.every(({ payment_id }) => payment_id);
+    return selectedTransactions.every(
+      ({ payment_id, expense_id }) => payment_id || expense_id
+    );
   };
 
   const customBulkActions: CustomBulkAction<Transaction>[] = [
