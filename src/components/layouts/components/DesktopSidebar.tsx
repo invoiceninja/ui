@@ -39,6 +39,7 @@ export interface NavigationItem {
     to: string;
     label: string;
     visible: boolean;
+    tooltipLabel?: string;
   };
   subOptions?: SubNavigationItem[];
 }
