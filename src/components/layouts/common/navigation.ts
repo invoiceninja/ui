@@ -61,6 +61,7 @@ export function useNavigation() {
         to: '/clients/create',
         label: t('new_client'),
         visible: hasPermission('create_client'),
+        tooltipLabel: `${t('new_client')} (Ctrl + Shift + C)`,
       },
     },
     {
@@ -76,6 +77,7 @@ export function useNavigation() {
         to: '/products/create',
         label: t('new_product'),
         visible: hasPermission('create_product'),
+        tooltipLabel: `${t('new_product')} (Ctrl + Shift + K)`,
       },
     },
     {
@@ -92,6 +94,7 @@ export function useNavigation() {
         to: '/invoices/create',
         label: t('new_invoice'),
         visible: hasPermission('create_invoice'),
+        tooltipLabel: `${t('new_invoice')} (Ctrl + Shift + I)`,
       },
     },
     {
@@ -108,6 +111,7 @@ export function useNavigation() {
         to: '/recurring_invoices/create',
         label: t('new_recurring_invoice'),
         visible: hasPermission('create_recurring_invoice'),
+        tooltipLabel: `${t('new_recurring_invoice')} (Ctrl + Shift + R)`,
       },
     },
     {
@@ -123,6 +127,7 @@ export function useNavigation() {
         to: '/payments/create',
         label: t('new_payment'),
         visible: hasPermission('create_payment'),
+        tooltipLabel: `${t('new_payment')} (Ctrl + Shift + P)`,
       },
     },
     {
@@ -139,6 +144,7 @@ export function useNavigation() {
         to: '/quotes/create',
         label: t('new_quote'),
         visible: hasPermission('create_quote'),
+        tooltipLabel: `${t('new_quote')} (Ctrl + Shift + Q)`,
       },
     },
     {
@@ -155,6 +161,7 @@ export function useNavigation() {
         to: '/credits/create',
         label: t('new_credit'),
         visible: hasPermission('create_credit'),
+        tooltipLabel: `${t('new_credit')} (Ctrl + Shift + D)`,
       },
     },
     {
@@ -171,6 +178,7 @@ export function useNavigation() {
         to: '/projects/create',
         label: t('new_project'),
         visible: hasPermission('create_project'),
+        tooltipLabel: `${t('new_project')} (Ctrl + Shift + J)`,
       },
     },
     {
@@ -187,6 +195,7 @@ export function useNavigation() {
         to: '/tasks/create',
         label: t('new_task'),
         visible: hasPermission('create_task'),
+        tooltipLabel: `${t('new_task')} (Ctrl + Shift + T)`,
       },
     },
     {
@@ -203,6 +212,7 @@ export function useNavigation() {
         to: '/vendors/create',
         label: t('new_vendor'),
         visible: hasPermission('create_vendor'),
+        tooltipLabel: `${t('new_vendor')} (Ctrl + Shift + V)`,
       },
     },
     {
@@ -219,6 +229,7 @@ export function useNavigation() {
         to: '/purchase_orders/create',
         label: t('new_purchase_order'),
         visible: hasPermission('create_purchase_order'),
+        tooltipLabel: `${t('new_purchase_order')} (Ctrl + Shift + O)`,
       },
     },
     {
@@ -235,6 +246,7 @@ export function useNavigation() {
         to: '/expenses/create',
         label: t('new_expense'),
         visible: hasPermission('create_expense'),
+        tooltipLabel: `${t('new_expense')} (Ctrl + Shift + E)`,
       },
     },
     {
@@ -251,6 +263,7 @@ export function useNavigation() {
         to: '/recurring_expenses/create',
         label: t('new_recurring_expense'),
         visible: hasPermission('create_recurring_expense'),
+        tooltipLabel: `${t('new_recurring_expense')} (Ctrl + Shift + X)`,
       },
     },
     {
@@ -267,6 +280,7 @@ export function useNavigation() {
         to: '/transactions/create',
         label: t('new_transaction'),
         visible: hasPermission('create_bank_transaction'),
+        tooltipLabel: `${t('new_transaction')} (Ctrl + Shift + A)`,
       },
     },
     {
@@ -284,6 +298,7 @@ export function useNavigation() {
         to: '/docuninja/create',
         label: t('new_document'),
         visible: import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
+        tooltipLabel: `${t('new_document')} (Ctrl + Shift + N)`,
       },
       visible: import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
       subOptions: [

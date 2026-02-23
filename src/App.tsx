@@ -45,6 +45,7 @@ import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
 import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
 import { useSystemFonts } from './common/hooks/useSystemFonts';
 import { useReactSettings } from './common/hooks/useReactSettings';
+import { useKeyboardShortcuts } from './common/hooks/useKeyboardShortcuts';
 
 interface RefreshEntityData {
   entity: 'invoices' | 'recurring_invoices';
@@ -75,6 +76,7 @@ export function App() {
   const location = useLocation();
   const company = useCurrentCompany();
 
+  useKeyboardShortcuts();
   useWebSessionTimeout();
   useAddPreventNavigationEvents();
 
