@@ -88,7 +88,5 @@ export function useQuickbooksConnection() {
 
   const quickbooks: Quickbooks | undefined = company?.quickbooks;
 
-  const isConnected = true;
-
-  return { quickbooks, isConnected };
+  return { quickbooks, isConnected: Boolean(quickbooks) };
 }

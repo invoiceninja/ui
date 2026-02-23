@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Modal } from '$app/components/Modal';
 import { Button } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
@@ -90,11 +90,11 @@ export function QuickBooks() {
     handleChange('quickbooks.settings.default_income_account', value || null);
   };
 
-  const TABS = useMemo(() => {
-    return quickbooksSettings
-      ? [t('connect'), t('import'), t('sync')]
-      : [t('connect'), t('import')];
-  }, [quickbooksSettings]);
+  // const TABS = useMemo(() => {
+  //   return quickbooksSettings
+  //     ? [t('connect'), t('import'), t('sync')]
+  //     : [t('connect'), t('import')];
+  // }, [quickbooksSettings]);
 
   return (
     <>
