@@ -101,17 +101,8 @@ export function QBOUpdatesModal({ visible, onClose }: QBOUpdatesModalProps) {
         {ENTITY_CONFIGS.map((config) => (
           <Element
             key={config.key}
-            leftSide={
-              <span className="text-sm">
-                {config.label}
-
-                {config.description && (
-                  <span className="text-xs text-gray-500 ml-1">
-                    ({config.description})
-                  </span>
-                )}
-              </span>
-            }
+            leftSide={config.label}
+            leftSideHelp={config.description}
             noExternalPadding
             twoGridColumns
           >

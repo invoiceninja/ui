@@ -100,8 +100,8 @@ export default function Create() {
         value = cloneDeep(data);
 
         if (currentCompany?.quickbooks) {
-          value.income_account_id =
-            currentCompany.quickbooks.settings?.default_income_account || '';
+          value.qb_income_account_id =
+            currentCompany.quickbooks.settings?.qb_income_account_id || '';
         }
       }
 

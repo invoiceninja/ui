@@ -113,9 +113,11 @@ export function ProductForm(props: Props) {
       {company?.quickbooks && (
         <Element leftSide={t('income_account')}>
           <IncomeAccountSelector
-            value={product.income_account_id || ''}
-            onValueChange={(value) => handleChange('income_account_id', value)}
-            errorMessage={errors?.errors.income_account_id}
+            value={product.qb_income_account_id || ''}
+            onValueChange={(value) =>
+              handleChange('qb_income_account_id', value)
+            }
+            errorMessage={errors?.errors.qb_income_account_id}
           />
         </Element>
       )}

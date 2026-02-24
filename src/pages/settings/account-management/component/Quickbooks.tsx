@@ -90,12 +90,6 @@ export function QuickBooks() {
     handleChange('quickbooks.settings.default_income_account', value || null);
   };
 
-  // const TABS = useMemo(() => {
-  //   return quickbooksSettings
-  //     ? [t('connect'), t('import'), t('sync')]
-  //     : [t('connect'), t('import')];
-  // }, [quickbooksSettings]);
-
   return (
     <>
       {isConnected && quickbooks ? (
@@ -157,16 +151,16 @@ export function QuickBooks() {
           <IncomeAccountSelector
             label={t('default_income_account')}
             value={
-              companyChanges?.quickbooks?.settings?.default_income_account || ''
+              companyChanges?.quickbooks?.settings?.qb_income_account_id || ''
             }
             onValueChange={(value) =>
               handleChange(
-                'quickbooks.settings.default_income_account',
+                'quickbooks.settings.qb_income_account_id',
                 value || null
               )
             }
             errorMessage={
-              errors?.errors?.['quickbooks.settings.default_income_account']
+              errors?.errors?.['quickbooks.settings.qb_income_account_id']
             }
           />
 
@@ -175,7 +169,7 @@ export function QuickBooks() {
             onClick={onSave}
             disabled={
               isSavingCompany ||
-              !companyChanges?.quickbooks?.settings?.default_income_account
+              !companyChanges?.quickbooks?.settings?.qb_income_account_id
             }
             disableWithoutIcon={isSavingCompany}
           >

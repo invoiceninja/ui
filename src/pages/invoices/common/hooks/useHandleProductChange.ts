@@ -130,7 +130,7 @@ export function useHandleProductChange(props: Props) {
 
     lineItem.product_cost = product?.cost;
 
-    lineItem.income_account_id = product?.income_account_id || '';
+    lineItem.qb_income_account_id = product?.qb_income_account_id || '';
 
     return props.onChange(index, lineItem);
   };

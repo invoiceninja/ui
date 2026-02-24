@@ -21,6 +21,7 @@ import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHan
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { InitialSyncModal } from './InitialSyncModal';
 import { QBOUpdatesModal } from './QBOUpdatesModal';
+import { IncomeAccountSelector } from '$app/components/IncomeAccountSelector';
 
 interface QuickBooksDetailsProps {
   quickbooks: Quickbooks;
@@ -77,6 +78,23 @@ export function QuickBooksDetails({
           <span className="text-sm">{quickbooks.realmID}</span>
         </Element>
       )}
+
+      <Element leftSide={t('default_income_account')} noExternalPadding>
+        <IncomeAccountSelector
+          value={
+            companyChanges?.quickbooks?.settings?.qb_income_account_id || ''
+          }
+          onValueChange={(value) =>
+            handleChange(
+              'quickbooks.settings.qb_income_account_id',
+              value || null
+            )
+          }
+          errorMessage={
+            errors?.errors?.['quickbooks.settings.qb_income_account_id']
+          }
+        />
+      </Element>
 
       <Element leftSide={t('automatic_taxes')} noExternalPadding>
         <SelectField
