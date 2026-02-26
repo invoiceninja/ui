@@ -23,7 +23,6 @@ import { ArrowsOppositeDirection } from '$app/components/icons/ArrowsOppositeDir
 import { BookOpen } from '$app/components/icons/BookOpen';
 import { ConnectedDots } from '$app/components/icons/ConnectedDots';
 import { ChartLine } from '$app/components/icons/ChartLine';
-import { QuickBooks } from './QuickBooks';
 
 interface BoxTheme {
   backgroundColor: string;
@@ -176,20 +175,6 @@ export function Integrations() {
           <ArrowRight color={colors.$3} size="1.4rem" strokeWidth="1.5" />
         </div>
       </Box>
-
-      {(proPlan() || enterprisePlan()) && isHosted() && isAdmin && (
-        <>
-          <div className="py-4">
-            <Divider
-              className="border-dashed"
-              withoutPadding
-              style={{ borderColor: colors.$20 }}
-            />
-          </div>
-
-          <QuickBooks />
-        </>
-      )}
     </div>
   );
 }
