@@ -8,59 +8,82 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useState } from 'react';
 import { Element } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { toast } from '$app/common/helpers/toast/toast';
 
-interface SyncSelections {
-  product: boolean;
-  client: boolean;
-  invoice: boolean;
-}
-
-interface QuickBooksImportTabProps {
-  syncSelections: SyncSelections;
-  onSyncSelectionChange: (key: keyof SyncSelections, value: boolean) => void;
-  onSync: () => void;
-  isSyncBusy: boolean;
-  hasSyncSelection: boolean;
-}
-
-export function QuickBooksImportTab({
-  syncSelections,
-  onSyncSelectionChange,
-  onSync,
-  isSyncBusy,
-  hasSyncSelection,
-}: QuickBooksImportTabProps) {
+export function QuickBooksImportTab() {
   const [t] = useTranslation();
-
   const colors = useColorScheme();
+  const [isSyncBusy, setIsSyncBusy] = useState(false);
+
+  const [syncSelections, setSyncSelections] = useState({
+    product: false,
+    client: false,
+    invoice: false,
+  });
+
+  const hasSyncSelection = Object.values(syncSelections).some(Boolean);
+
+  const handleSync = () => {
+    if (isSyncBusy || !hasSyncSelection) return;
+
+    setIsSyncBusy(true);
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/quickbooks/sync'), {
+      product: syncSelections.product,
+      client: syncSelections.client,
+      invoice: syncSelections.invoice,
+    })
+      .then(() => {
+        toast.success('synced');
+        setSyncSelections({ product: false, client: false, invoice: false });
+      })
+      .catch(() => {
+        toast.error();
+      })
+      .finally(() => {
+        setIsSyncBusy(false);
+      });
+  };
 
   return (
     <>
-      <h3 className="leading-6 font-medium mb-4">{t('sync_data')}</h3>
+      <p className="text-sm mb-4" style={{ color: colors.$3 }}>
+        {t('sync_data_from_quickbooks_to_invoice_ninja')}
+      </p>
 
       <Element leftSide={t('products')} noExternalPadding>
         <Toggle
           checked={syncSelections.product}
-          onChange={(value: boolean) => onSyncSelectionChange('product', value)}
+          onChange={(value: boolean) =>
+            setSyncSelections((prev) => ({ ...prev, product: value }))
+          }
         />
       </Element>
 
       <Element leftSide={t('clients')} noExternalPadding>
         <Toggle
           checked={syncSelections.client}
-          onChange={(value: boolean) => onSyncSelectionChange('client', value)}
+          onChange={(value: boolean) =>
+            setSyncSelections((prev) => ({ ...prev, client: value }))
+          }
         />
       </Element>
 
       <Element leftSide={t('invoices')} noExternalPadding>
         <Toggle
           checked={syncSelections.invoice}
-          onChange={(value: boolean) => onSyncSelectionChange('invoice', value)}
+          onChange={(value: boolean) =>
+            setSyncSelections((prev) => ({ ...prev, invoice: value }))
+          }
         />
       </Element>
 
@@ -68,9 +91,8 @@ export function QuickBooksImportTab({
         <Button
           type="primary"
           behavior="button"
-          onClick={onSync}
+          onClick={handleSync}
           disabled={isSyncBusy || !hasSyncSelection}
-          disableWithoutIcon
         >
           {t('sync')}
         </Button>

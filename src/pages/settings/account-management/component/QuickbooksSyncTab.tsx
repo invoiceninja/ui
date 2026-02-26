@@ -9,58 +9,46 @@
  */
 
 import { Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms/SelectField';
+import { SelectField } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import {
   QuickbooksSettings,
   QuickbooksSyncDirection,
 } from '$app/common/interfaces/quickbooks';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
-interface SyncDirectionOption {
-  value: QuickbooksSyncDirection;
-  label: string;
-}
-
-interface SyncEntityConfig {
-  key: string;
-  translationKey: string;
-}
-
-const SYNC_ENTITIES: SyncEntityConfig[] = [
-  { key: 'client', translationKey: 'client' },
-  { key: 'invoice', translationKey: 'invoice' },
-  { key: 'product', translationKey: 'products' },
-];
-
-interface QuickBooksSyncTabProps {
-  quickbooksSettings: QuickbooksSettings;
-  onSyncDirectionChange: (
-    entity: string,
-    direction: QuickbooksSyncDirection
-  ) => void;
-}
-
-export function QuickBooksSyncTab({
-  quickbooksSettings,
-  onSyncDirectionChange,
-}: QuickBooksSyncTabProps) {
+export function QuickBooksSyncTab() {
   const [t] = useTranslation();
   const colors = useColorScheme();
+  const handleChange = useHandleCurrentCompanyChangeProperty();
+  const companyChanges = useCompanyChanges();
 
-  const syncDirectionOptions: SyncDirectionOption[] = [
+  const quickbooksSettings: QuickbooksSettings | undefined =
+    companyChanges?.quickbooks?.settings;
+
+  const syncDirectionOptions = [
     { value: QuickbooksSyncDirection.None, label: t('none') },
     { value: QuickbooksSyncDirection.Push, label: t('push') },
     { value: QuickbooksSyncDirection.Pull, label: t('pull') },
-    {
-      value: QuickbooksSyncDirection.Bidirectional,
-      label: t('bidirectional'),
-    },
+    { value: QuickbooksSyncDirection.Bidirectional, label: t('bidirectional') },
   ];
+
+  const handleSyncDirectionChange = (
+    entity: string,
+    direction: QuickbooksSyncDirection
+  ) => {
+    handleChange(`quickbooks.settings.${entity}.direction`, direction);
+  };
+
+  if (!quickbooksSettings) {
+    return null;
+  }
 
   return (
     <>
-      <div className="space-y-3 pb-4">
+      <div className="space-y-3 mb-4">
         <p className="text-sm" style={{ color: colors.$3 }}>
           These settings control the direction of data sync between QuickBooks
           and Invoice Ninja.
@@ -71,51 +59,140 @@ export function QuickBooksSyncTab({
           style={{ color: colors.$3 }}
         >
           <li>
-            <strong>{t('none')}:</strong> 'No data will be synced.'
+            <strong>None:</strong> No data will be synced.
           </li>
           <li>
-            <strong>{t('push')}:</strong> 'Only data from Invoice Ninja will be
-            synced to QuickBooks.'
+            <strong>Push:</strong> Only data from Invoice Ninja will be synced
+            to QuickBooks.
           </li>
           <li>
-            <strong>{t('pull')}:</strong> 'Only data from QuickBooks will be
-            synced to Invoice Ninja.'
+            <strong>Pull:</strong> Only data from QuickBooks will be synced to
+            Invoice Ninja.
           </li>
           <li>
-            <strong>{t('bidirectional')}:</strong> 'Data will be synced in both
-            directions.' <strong>{t('caution') || 'Caution'}:</strong> 'This may
-            have unintended consequences!'
+            <strong>Bidirectional:</strong> Data will be synced in both
+            directions. <strong>Caution:</strong> This may have unintended
+            consequences!!!
           </li>
         </ul>
       </div>
 
-      {SYNC_ENTITIES.map(({ key, translationKey }) => {
-        const setting = quickbooksSettings[key as keyof QuickbooksSettings];
+      <Element leftSide={t('client')} noExternalPadding>
+        <SelectField
+          value={
+            quickbooksSettings.client?.direction ?? QuickbooksSyncDirection.None
+          }
+          onValueChange={(value) =>
+            handleSyncDirectionChange(
+              'client',
+              value as QuickbooksSyncDirection
+            )
+          }
+          customSelector
+          dismissable={false}
+        >
+          {syncDirectionOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </SelectField>
+      </Element>
 
-        const direction =
-          setting && typeof setting === 'object' && 'direction' in setting
-            ? setting.direction
-            : QuickbooksSyncDirection.None;
+      <Element leftSide={t('invoice')} noExternalPadding>
+        <SelectField
+          value={
+            quickbooksSettings.invoice?.direction ??
+            QuickbooksSyncDirection.None
+          }
+          onValueChange={(value) =>
+            handleSyncDirectionChange(
+              'invoice',
+              value as QuickbooksSyncDirection
+            )
+          }
+          customSelector
+          dismissable={false}
+        >
+          {syncDirectionOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </SelectField>
+      </Element>
 
-        return (
-          <Element key={key} leftSide={t(translationKey)} noExternalPadding>
-            <SelectField
-              value={direction}
-              onValueChange={(value) =>
-                onSyncDirectionChange(key, value as QuickbooksSyncDirection)
-              }
-              customSelector
-              dismissable={false}
-            >
-              {syncDirectionOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </SelectField>
-          </Element>
-        );
-      })}
+      <Element leftSide={t('products')} noExternalPadding>
+        <SelectField
+          value={
+            quickbooksSettings.product?.direction ??
+            QuickbooksSyncDirection.None
+          }
+          onValueChange={(value) =>
+            handleSyncDirectionChange(
+              'product',
+              value as QuickbooksSyncDirection
+            )
+          }
+          customSelector
+          dismissable={false}
+        >
+          {syncDirectionOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </SelectField>
+      </Element>
+
+      <div className="border-t pt-4 mt-4" style={{ borderColor: colors.$20 }}>
+        <h3 className="text-sm font-medium mb-4" style={{ color: colors.$3 }}>
+          QuickBooks Read Only Data
+        </h3>
+
+        {quickbooksSettings.income_account_map &&
+          quickbooksSettings.income_account_map.length > 0 && (
+            <Element leftSide="Income Accounts" noExternalPadding>
+              <div
+                className="grid grid-cols-2 gap-2 text-sm"
+                style={{ color: colors.$3 }}
+              >
+                {quickbooksSettings.income_account_map.map((entry) => (
+                  <div
+                    key={entry.id}
+                    className="p-2 rounded truncate"
+                    style={{ backgroundColor: colors.$4 }}
+                    title={entry.name}
+                  >
+                    {entry.name}
+                  </div>
+                ))}
+              </div>
+            </Element>
+          )}
+
+        {quickbooksSettings.tax_rate_map &&
+          quickbooksSettings.tax_rate_map.length > 0 && (
+            <Element leftSide={t('taxes')} noExternalPadding>
+              <div className="space-y-2">
+                {quickbooksSettings.tax_rate_map.map((entry, index) => (
+                  <div
+                    key={index}
+                    className="text-sm p-2 rounded"
+                    style={{
+                      backgroundColor: colors.$4,
+                      color: colors.$3,
+                    }}
+                  >
+                    <div>
+                      {entry[1]} <strong>{entry[2]}%</strong>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Element>
+          )}
+      </div>
     </>
   );
 }

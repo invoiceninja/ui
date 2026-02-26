@@ -24,7 +24,7 @@ import { BookOpen } from '$app/components/icons/BookOpen';
 import { ConnectedDots } from '$app/components/icons/ConnectedDots';
 import { ChartLine } from '$app/components/icons/ChartLine';
 import { useQuickbooksConnection } from '../common/hooks/useQuickbooksConnection';
-import { QuickBooks } from './Quickbooks';
+import { QuickBooks } from './QuickBooks';
 
 interface BoxTheme {
   backgroundColor: string;
