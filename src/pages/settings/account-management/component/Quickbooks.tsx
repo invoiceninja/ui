@@ -121,7 +121,6 @@ export function QuickBooks() {
         </Box>
       )}
 
-      {/* Modal: Default Income Account (shown after first connect) */}
       <Modal
         title={t('default_income_account')}
         visible={isSyncInfoModalVisible}

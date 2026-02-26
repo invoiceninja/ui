@@ -18,22 +18,34 @@ import {
 } from '$app/common/interfaces/quickbooks';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useMemo } from 'react';
 
 export function QuickBooksSyncTab() {
   const [t] = useTranslation();
+
   const colors = useColorScheme();
-  const handleChange = useHandleCurrentCompanyChangeProperty();
   const companyChanges = useCompanyChanges();
 
-  const quickbooksSettings: QuickbooksSettings | undefined =
-    companyChanges?.quickbooks?.settings;
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
-  const syncDirectionOptions = [
-    { value: QuickbooksSyncDirection.None, label: t('none') },
-    { value: QuickbooksSyncDirection.Push, label: t('push') },
-    { value: QuickbooksSyncDirection.Pull, label: t('pull') },
-    { value: QuickbooksSyncDirection.Bidirectional, label: t('bidirectional') },
-  ];
+  const quickbooksSettings = useMemo(
+    () =>
+      companyChanges?.quickbooks?.settings as QuickbooksSettings | undefined,
+    [companyChanges?.quickbooks?.settings]
+  );
+
+  const syncDirectionOptions = useMemo(
+    () => [
+      { value: QuickbooksSyncDirection.None, label: t('none') },
+      { value: QuickbooksSyncDirection.Push, label: t('push') },
+      { value: QuickbooksSyncDirection.Pull, label: t('pull') },
+      {
+        value: QuickbooksSyncDirection.Bidirectional,
+        label: t('bidirectional'),
+      },
+    ],
+    []
+  );
 
   const handleSyncDirectionChange = (
     entity: string,
