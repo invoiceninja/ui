@@ -48,33 +48,33 @@ export function QuickBooksSyncTab() {
 
   return (
     <>
-      <div className="space-y-3 mb-4">
-        <p className="text-sm" style={{ color: colors.$3 }}>
-          These settings control the direction of data sync between QuickBooks
-          and Invoice Ninja.
-        </p>
+      <div
+        className="text-sm p-4 rounded-md mb-4 space-y-3"
+        style={{ backgroundColor: colors.$4, color: colors.$3 }}
+      >
+        <p>{t('sync_direction_description')}</p>
 
-        <ul
-          className="list-disc list-inside space-y-2 text-sm"
-          style={{ color: colors.$3 }}
-        >
-          <li>
-            <strong>None:</strong> No data will be synced.
-          </li>
-          <li>
-            <strong>Push:</strong> Only data from Invoice Ninja will be synced
-            to QuickBooks.
-          </li>
-          <li>
-            <strong>Pull:</strong> Only data from QuickBooks will be synced to
-            Invoice Ninja.
-          </li>
-          <li>
-            <strong>Bidirectional:</strong> Data will be synced in both
-            directions. <strong>Caution:</strong> This may have unintended
-            consequences!!!
-          </li>
-        </ul>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="flex items-start space-x-2">
+            <span className="font-medium">{t('none')}:</span>
+            <span>{t('sync_direction_none_help')}</span>
+          </div>
+
+          <div className="flex items-start space-x-2">
+            <span className="font-medium">{t('push')}:</span>
+            <span>{t('sync_direction_push_help')}</span>
+          </div>
+
+          <div className="flex items-start space-x-2">
+            <span className="font-medium">{t('pull')}:</span>
+            <span>{t('sync_direction_pull_help')}</span>
+          </div>
+
+          <div className="flex items-start space-x-2">
+            <span className="font-medium">{t('bidirectional')}:</span>
+            <span>{t('sync_direction_bidirectional_help')}</span>
+          </div>
+        </div>
       </div>
 
       <Element leftSide={t('client')} noExternalPadding>
