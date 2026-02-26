@@ -37,7 +37,7 @@ export function TasksTabLabel({ lineItems }: Props) {
       <div className="flex space-x-2">
         <span>{t('tasks')}</span>
 
-        <span className="font-medium">({Math.floor(totalQuantity)} h)</span>
+        <span className="font-medium">({Math.round(totalQuantity)} h)</span>
       </div>
     );
   }
