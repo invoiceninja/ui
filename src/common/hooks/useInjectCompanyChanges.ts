@@ -29,7 +29,10 @@ export function useInjectCompanyChanges(
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   useEffect(() => {
-    if (companyChanges && options?.overwrite === false) {
+    if (
+      (companyChanges && options?.overwrite === false) ||
+      !isCompanySettingsActive
+    ) {
       // We don't want to overwrite existing changes,
       // so let's just not inject anything if we already have a value,
       // and relative argument.
@@ -38,9 +41,11 @@ export function useInjectCompanyChanges(
     }
 
     if (isCompanySettingsActive) {
+      console.log('INJECTING COMPANY CHANGES');
+
       dispatch(injectInChanges({ object: 'company', data: company }));
     }
-  }, [company]);
+  }, [company, isCompanySettingsActive]);
 
   return companyChanges;
 }

@@ -23,6 +23,7 @@ export function LanguageSelector(props: GenericSelectorProps) {
       errorMessage={props.errorMessage}
       dismissable={props.dismissable}
       withBlank={props.withBlank}
+      disabled={props.disabled}
       customSelector
       readOnly={props.readOnly}
     >
