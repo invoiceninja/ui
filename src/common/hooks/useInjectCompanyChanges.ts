@@ -40,11 +40,7 @@ export function useInjectCompanyChanges(
       return;
     }
 
-    if (isCompanySettingsActive) {
-      console.log('INJECTING COMPANY CHANGES');
-
-      dispatch(injectInChanges({ object: 'company', data: company }));
-    }
+    dispatch(injectInChanges({ object: 'company', data: company }));
   }, [company, isCompanySettingsActive]);
 
   return companyChanges;
