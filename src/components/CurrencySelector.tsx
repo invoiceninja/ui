@@ -36,6 +36,7 @@ export function CurrencySelector(props: CurrencySelectorProps) {
       withBlank={props.withBlank}
       customSelector
       readOnly={props.readOnly}
+      disabled={props.disabled}
     >
       {additionalCurrencies.map((currency, index) => (
         <option key={index} value={currency.id}>
