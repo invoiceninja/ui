@@ -31,6 +31,7 @@ import { version } from '$app/common/helpers/version';
 import { toast } from '$app/common/helpers/toast/toast';
 import classNames from 'classnames';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { authenticatePasskey } from '$app/common/helpers/passkeys';
 
 export function Login() {
   useTitle('login');
@@ -44,6 +45,10 @@ export function Login() {
 
   const [isDisable2faModalOpen, setIsDisable2faModalOpen] =
     useState<boolean>(false);
+  const [passkeyChallengeToken, setPasskeyChallengeToken] = useState<
+    string | undefined
+  >(undefined);
+  const [passkeyOptions, setPasskeyOptions] = useState<any>(undefined);
 
   const login = useLogin();
 
@@ -56,11 +61,23 @@ export function Login() {
 
     const secret = formData.get('secret') as string;
 
-    request('POST', endpoint('/api/v1/login'), Object.fromEntries(formData), {
+    request(
+      'POST',
+      endpoint('/api/v1/login'),
+      Object.assign({}, Object.fromEntries(formData), {
+        ...(passkeyChallengeToken && passkeyOptions
+          ? {
+              passkey_challenge_token: passkeyChallengeToken,
+              passkey_authentication: passkeyOptions.response,
+            }
+          : {}),
+      }),
+      {
       ...(secret && {
         headers: { 'X-API-SECRET': secret },
       }),
-    })
+    }
+    )
       .then((response) => login(response))
       .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
         if (error.response?.status === 422) {
@@ -68,6 +85,12 @@ export function Login() {
 
           if (error.response.data.message) {
             setMessage(error.response.data.message);
+          }
+
+          const passkeyData = (error.response.data as any)?.passkey_options;
+          if (passkeyData?.publicKey && passkeyData?.challenge_token) {
+            setPasskeyOptions(passkeyData.publicKey);
+            setPasskeyChallengeToken(passkeyData.challenge_token);
           }
         } else if (error.response?.status === 503) {
           toast.error('app_maintenance');
@@ -79,6 +102,59 @@ export function Login() {
       })
       .finally(() => setIsFormBusy(false));
   }
+
+  const handlePasskeyOnlyLogin = async () => {
+    const emailInput = (
+      document.querySelector('input[name="email"]') as HTMLInputElement | null
+    )?.value;
+
+    if (!emailInput) {
+      setMessage(t('email_address') as string);
+      return;
+    }
+
+    setIsFormBusy(true);
+    setErrors(undefined);
+    setMessage(undefined);
+
+    try {
+      const optionsResponse = await request(
+        'POST',
+        endpoint('/api/v1/passkeys/login/options'),
+        { email: emailInput }
+      );
+
+      const assertion = await authenticatePasskey(
+        optionsResponse.data.data.publicKey
+      );
+
+      const response = await request('POST', endpoint('/api/v1/login'), {
+        email: emailInput,
+        passkey_challenge_token: optionsResponse.data.data.challenge_token,
+        passkey_authentication: assertion.response,
+      });
+
+      login(response);
+    } catch (error) {
+      setMessage(t('invalid_credentials') as string);
+    } finally {
+      setIsFormBusy(false);
+    }
+  };
+
+  const handlePasskeySecondFactor = async () => {
+    if (!passkeyOptions || !passkeyChallengeToken) {
+      return;
+    }
+
+    try {
+      const assertion = await authenticatePasskey(passkeyOptions);
+      setPasskeyOptions(assertion);
+      setMessage(undefined);
+    } catch (error) {
+      setMessage(t('invalid_one_time_password') as string);
+    }
+  };
 
   const colors = useColorScheme();
 
@@ -177,6 +253,28 @@ export function Login() {
             <Button disabled={isFormBusy} className="mt-4" variant="block">
               {t('login')}
             </Button>
+
+            <Button
+              behavior="button"
+              disabled={isFormBusy}
+              className="mt-2"
+              type="minimal"
+              onClick={handlePasskeyOnlyLogin}
+            >
+              {t('passkey')}
+            </Button>
+
+            {passkeyOptions && (
+              <Button
+                behavior="button"
+                disabled={isFormBusy}
+                className="mt-2"
+                type="minimal"
+                onClick={handlePasskeySecondFactor}
+              >
+                {t('continue')}
+              </Button>
+            )}
           </form>
 
           <div className="flex justify-center">
