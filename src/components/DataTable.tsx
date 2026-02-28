@@ -87,6 +87,7 @@ export type DataTableColumns<T = any> = {
   id: string;
   label: string;
   format?: (field: string | number, resource: T) => unknown;
+  sortKey?: string;
 }[];
 
 export type FooterColumns<T = any> = {
@@ -1011,7 +1012,8 @@ export function DataTable<T extends object>(props: Props<T>) {
                     id={column.id}
                     key={index}
                     className={styleOptions?.thClassName}
-                    isCurrentlyUsed={sortedBy === column.id}
+                    isCurrentlyUsed={sortedBy === (column.sortKey ?? column.id)}
+                    sortKey={column.sortKey}
                     onColumnClick={(data: ColumnSortPayload) => {
                       setSortedBy(data.field);
                       setSort(data.sort);
