@@ -9,7 +9,7 @@
  */
 
 import { useMemo, useState } from 'react';
-import { Card, Element } from '$app/components/cards';
+import { Card } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
@@ -59,15 +59,25 @@ export function QuickBooksTaxRates() {
       </div>
 
       {taxRateMap && taxRateMap.length > 0 ? (
-        <>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 px-4 mb-4">
           {taxRateMap.map((entry) => (
-            <Element key={entry.id} leftSide={entry.name}>
+            <div
+              key={entry.id}
+              className="flex justify-between items-center py-2 border-b"
+              style={{ borderColor: colors.$20 }}
+            >
               <span className="text-sm" style={{ color: colors.$3 }}>
+                {entry.name}
+              </span>
+              <span
+                className="text-sm font-medium"
+                style={{ color: colors.$3 }}
+              >
                 {entry.rate}%
               </span>
-            </Element>
+            </div>
           ))}
-        </>
+        </div>
       ) : (
         <div className="text-sm px-4 pb-4" style={{ color: colors.$3 }}>
           {t('no_tax_rates_found')}
