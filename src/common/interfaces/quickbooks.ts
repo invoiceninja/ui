@@ -34,7 +34,10 @@ export interface QuickbooksSettings {
   qb_income_account_id: string | null;
   tax_rate_map: TaxRateMapEntry[];
   automatic_taxes: boolean;
-  default_income_account: string | null;
+  default_taxable_code: string | null;
+  default_exempt_code: string | null;
+  default_income_account?: string | null;
+  country: string | null;
 }
 
 export enum QuickbooksSyncDirection {
@@ -52,5 +55,11 @@ export type IncomeAccountMapEntry = {
   id: string;
   name: string;
   fully_qualified_name: string;
+  parent_ref: string;
 };
-export type TaxRateMapEntry = [id: string, name: string, rate: string];
+
+export type TaxRateMapEntry = {
+  id: string;
+  name: string;
+  rate: number;
+};

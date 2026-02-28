@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Card, Element } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
@@ -24,22 +24,24 @@ export function QuickBooksTaxRates() {
   const colors = useColorScheme();
   const company = useCurrentCompany();
 
-  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [isSyncBusy, setIsSyncBusy] = useState<boolean>(false);
+
+  const taxRateMap = useMemo(
+    () => company?.quickbooks?.settings?.tax_rate_map,
+    [company?.quickbooks?.settings?.tax_rate_map]
+  );
 
   const handleSyncTaxRates = () => {
-    if (isFormBusy) return;
+    if (isSyncBusy) return;
 
-    setIsFormBusy(true);
     toast.processing();
+    setIsSyncBusy(true);
 
-    request('POST', endpoint('/api/v1/quickbooks/sync'))
+    request('POST', endpoint('/api/v1/quickbooks/sync_tax_rates'))
       .then(() => {
         toast.success('synced');
       })
-      .catch(() => {
-        toast.error();
-      })
-      .finally(() => setIsFormBusy(false));
+      .finally(() => setIsSyncBusy(false));
   };
 
   return (
@@ -56,12 +58,12 @@ export function QuickBooksTaxRates() {
         {t('manage_taxes_in_quickbooks')}
       </div>
 
-      {(company?.quickbooks?.settings?.tax_rate_map || []).length > 0 ? (
+      {taxRateMap && taxRateMap.length > 0 ? (
         <>
-          {company.quickbooks?.settings?.tax_rate_map.map((entry, index) => (
-            <Element key={index} leftSide={entry[1]}>
+          {taxRateMap.map((entry) => (
+            <Element key={entry.id} leftSide={entry.name}>
               <span className="text-sm" style={{ color: colors.$3 }}>
-                {entry[2]}%
+                {entry.rate}%
               </span>
             </Element>
           ))}
@@ -77,8 +79,8 @@ export function QuickBooksTaxRates() {
           type="primary"
           behavior="button"
           onClick={handleSyncTaxRates}
-          disabled={isFormBusy}
-          disableWithoutIcon={!isFormBusy}
+          disabled={isSyncBusy}
+          disableWithoutIcon={isSyncBusy}
         >
           {t('sync_tax_rates')}
         </Button>

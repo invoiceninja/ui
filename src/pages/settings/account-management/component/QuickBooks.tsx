@@ -59,6 +59,7 @@ export function QuickBooks() {
     errors,
   } = useQuickbooksDisconnect();
 
+  const [isConnectModalVisible, setIsConnectModalVisible] = useState(false);
   const [isSyncInfoModalVisible, setIsSyncInfoModalVisible] = useState(false);
   const [isDisconnectModalVisible, setIsDisconnectModalVisible] =
     useState<boolean>(false);
@@ -104,7 +105,7 @@ export function QuickBooks() {
             backgroundColor: colors.$1,
             hoverBackgroundColor: colors.$4,
           }}
-          onClick={handleConnect}
+          onClick={() => setIsConnectModalVisible(true)}
           style={{ borderColor: colors.$24 }}
         >
           <div className="flex items-center space-x-2">
@@ -120,6 +121,30 @@ export function QuickBooks() {
           </div>
         </Box>
       )}
+
+      <Modal
+        title="QuickBooks"
+        visible={isConnectModalVisible}
+        onClose={() => setIsConnectModalVisible(false)}
+      >
+        <div className="flex flex-col space-y-4">
+          <p className="text-sm" style={{ color: colors.$3 }}>
+            {t('quickbooks_connect_description')}
+          </p>
+
+          <Button
+            behavior="button"
+            onClick={() => {
+              setIsConnectModalVisible(false);
+              handleConnect();
+            }}
+            disabled={isConnectBusy}
+            disableWithoutIcon={isConnectBusy}
+          >
+            {t('connect')}
+          </Button>
+        </div>
+      </Modal>
 
       <Modal
         title={t('default_income_account')}

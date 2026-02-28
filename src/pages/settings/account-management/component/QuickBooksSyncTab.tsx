@@ -196,9 +196,7 @@ export function QuickBooksSyncTab() {
                       color: colors.$3,
                     }}
                   >
-                    <div>
-                      {entry[1]} <strong>{entry[2]}%</strong>
-                    </div>
+                    {entry.name} <strong>{entry.rate}%</strong>
                   </div>
                 ))}
               </div>
