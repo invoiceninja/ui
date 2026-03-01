@@ -24,6 +24,7 @@ import { BookOpen } from '$app/components/icons/BookOpen';
 import { ConnectedDots } from '$app/components/icons/ConnectedDots';
 import { ChartLine } from '$app/components/icons/ChartLine';
 import { QuickBooks } from './QuickBooks';
+import { usePaidOrSelfHost } from '$app/common/hooks/usePaidOrSelfhost';
 
 interface BoxTheme {
   backgroundColor: string;
@@ -44,6 +45,8 @@ export function Integrations() {
 
   const { isAdmin } = useAdmin();
   const colors = useColorScheme();
+
+  const isPaidOrSelfHost = usePaidOrSelfHost();
 
   return (
     <div className="flex flex-col space-y-4 px-4 sm:px-6 pt-2 pb-4">
@@ -177,7 +180,7 @@ export function Integrations() {
         </div>
       </Box>
 
-      {(proPlan() || enterprisePlan()) && isHosted() && isAdmin && (
+      {isAdmin && isPaidOrSelfHost && (
         <>
           <div className="py-4">
             <Divider

@@ -32,6 +32,7 @@ import {
 } from '../../common/hooks/useHandleCompanySave';
 import { useAtomValue } from 'jotai';
 import styled from 'styled-components';
+import { usePaidOrSelfHost } from '$app/common/hooks/usePaidOrSelfhost';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
@@ -72,13 +73,15 @@ export function QuickBooks() {
     ? companyChanges?.quickbooks?.settings ?? quickbooks?.settings
     : undefined;
 
+    const isPaidOrSelfHost = usePaidOrSelfHost();
+
   return (
     <>
-      {isConnected && quickbooks ? (
+      {isConnected && quickbooks && isPaidOrSelfHost ? (
         <div className="flex flex-col space-y-4">
           <h3 className="leading-6 font-medium text-lg">QuickBooks</h3>
 
-          <TabGroup tabs={[t('connect'), t('import'), t('sync')]}>
+          <TabGroup tabs={[t('connect'), t('import'), t('sync_settings')]}>
             <div>
               <QuickBooksDetails
                 quickbooks={quickbooks}
