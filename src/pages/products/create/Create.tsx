@@ -99,7 +99,10 @@ export default function Create() {
       ) {
         value = cloneDeep(data);
 
-        if (currentCompany?.quickbooks) {
+        if (
+          currentCompany?.quickbooks &&
+          import.meta.env.VITE_DISABLE_QUICKBOOKS_INTEGRATION !== 'true'
+        ) {
           value.qb_income_account_id =
             currentCompany.quickbooks.settings?.qb_income_account_id || '';
         }
