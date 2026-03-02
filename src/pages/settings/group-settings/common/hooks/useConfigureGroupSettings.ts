@@ -48,9 +48,9 @@ export function useConfigureGroupSettings(params?: Params) {
     );
 
     if (!withoutNavigation) {
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         navigate('/settings/company_details');
-      }, 150);
+      });
     }
   };
 }
