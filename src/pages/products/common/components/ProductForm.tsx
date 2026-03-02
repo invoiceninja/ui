@@ -110,18 +110,17 @@ export function ProductForm(props: Props) {
         />
       </Element>
 
-      {company?.quickbooks &&
-        import.meta.env.VITE_DISABLE_QUICKBOOKS_INTEGRATION !== 'true' && (
-          <Element leftSide={t('income_account')}>
-            <IncomeAccountSelector
-              value={product.qb_income_account_id || ''}
-              onValueChange={(value) =>
-                handleChange('qb_income_account_id', value)
-              }
-              errorMessage={errors?.errors.qb_income_account_id}
-            />
-          </Element>
-        )}
+      {company?.quickbooks && (
+        <Element leftSide={t('income_account')}>
+          <IncomeAccountSelector
+            value={product.qb_income_account_id || ''}
+            onValueChange={(value) =>
+              handleChange('qb_income_account_id', value)
+            }
+            errorMessage={errors?.errors.qb_income_account_id}
+          />
+        </Element>
+      )}
 
       <Element leftSide={t('tax_category')}>
         <SelectField
