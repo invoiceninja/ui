@@ -157,6 +157,29 @@ export function QuickBooksSyncTab() {
         </SelectField>
       </Element>
 
+      <Element leftSide={t('payments')} noExternalPadding>
+        <SelectField
+          value={
+            quickbooksSettings.payment?.direction ??
+            QuickbooksSyncDirection.None
+          }
+          onValueChange={(value) =>
+            handleSyncDirectionChange(
+              'payment',
+              value as QuickbooksSyncDirection
+            )
+          }
+          customSelector
+          dismissable={false}
+        >
+          {syncDirectionOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </SelectField>
+      </Element>
+
       <div className="border-t pt-4 mt-4" style={{ borderColor: colors.$20 }}>
         <h3 className="text-sm font-medium mb-4" style={{ color: colors.$3 }}>
           {t('quickbooks_read_only_data')}
