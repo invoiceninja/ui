@@ -28,6 +28,8 @@ export interface User extends Timestamps {
   first_name: string;
   last_name: string;
   google_2fa_secret: boolean;
+  passkey_enabled?: boolean;
+  passkey_count?: number;
   has_password: boolean;
   is_deleted: boolean;
   last_confirmed_email_address: string;
