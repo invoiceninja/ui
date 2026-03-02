@@ -210,7 +210,12 @@ export function TaxSettings() {
         <Selector title="tax_settings" />
       )}
 
-      {companyChanges.quickbooks ? <QuickBooksTaxRates /> : <TaxRates />}
+      {companyChanges.quickbooks &&
+      import.meta.env.VITE_DISABLE_QUICKBOOKS_INTEGRATION !== 'true' ? (
+        <QuickBooksTaxRates />
+      ) : (
+        <TaxRates />
+      )}
 
       <HelpWidget
         id="calculate-taxes"

@@ -180,19 +180,21 @@ export function Integrations() {
         </div>
       </Box>
 
-      {isAdmin && isPaidOrSelfHost && (
-        <>
-          <div className="py-4">
-            <Divider
-              className="border-dashed"
-              withoutPadding
-              style={{ borderColor: colors.$20 }}
-            />
-          </div>
+      {isAdmin &&
+        isPaidOrSelfHost &&
+        import.meta.env.VITE_DISABLE_QUICKBOOKS_INTEGRATION !== 'true' && (
+          <>
+            <div className="py-4">
+              <Divider
+                className="border-dashed"
+                withoutPadding
+                style={{ borderColor: colors.$20 }}
+              />
+            </div>
 
-          <QuickBooks />
-        </>
-      )}
+            <QuickBooks />
+          </>
+        )}
     </div>
   );
 }

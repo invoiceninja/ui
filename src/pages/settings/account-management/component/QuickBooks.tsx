@@ -46,6 +46,7 @@ export function QuickBooks() {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
+  const isPaidOrSelfHost = usePaidOrSelfHost();
   const companyChanges = useInjectCompanyChanges();
   const isSavingCompany = useAtomValue(isCompanySettingsFormBusy);
 
@@ -72,8 +73,6 @@ export function QuickBooks() {
   const quickbooksSettings: QuickbooksSettings | undefined = isConnected
     ? companyChanges?.quickbooks?.settings ?? quickbooks?.settings
     : undefined;
-
-    const isPaidOrSelfHost = usePaidOrSelfHost();
 
   return (
     <>
