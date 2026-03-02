@@ -177,19 +177,22 @@ export function Integrations() {
         </div>
       </Box>
 
-      {(proPlan() || enterprisePlan()) && isHosted() && isAdmin && (
-        <>
-          <div className="py-4">
-            <Divider
-              className="border-dashed"
-              withoutPadding
-              style={{ borderColor: colors.$20 }}
-            />
-          </div>
+      {(proPlan() || enterprisePlan()) &&
+        isHosted() &&
+        isAdmin &&
+        import.meta.env.VITE_DISABLE_QUICKBOOKS_INTEGRATION !== 'true' && (
+          <>
+            <div className="py-4">
+              <Divider
+                className="border-dashed"
+                withoutPadding
+                style={{ borderColor: colors.$20 }}
+              />
+            </div>
 
-          <QuickBooks />
-        </>
-      )}
+            <QuickBooks />
+          </>
+        )}
     </div>
   );
 }
