@@ -23,6 +23,7 @@ import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useTaxCategories } from '$app/components/tax-rates/TaxCategorySelector';
 import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { IncomeAccountSelector } from '$app/components/IncomeAccountSelector';
 
 interface Props {
   type?: 'create' | 'edit';
@@ -108,6 +109,18 @@ export function ProductForm(props: Props) {
           errorMessage={errors?.errors.max_quantity}
         />
       </Element>
+
+      {company?.quickbooks && (
+        <Element leftSide={t('income_account')}>
+          <IncomeAccountSelector
+            value={product.qb_income_account_id || ''}
+            onValueChange={(value) =>
+              handleChange('qb_income_account_id', value)
+            }
+            errorMessage={errors?.errors.qb_income_account_id}
+          />
+        </Element>
+      )}
 
       <Element leftSide={t('tax_category')}>
         <SelectField

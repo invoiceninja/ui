@@ -45,4 +45,5 @@ export interface InvoiceItem {
   tax_id: string;
   task_id?: string;
   expense_id?: string;
+  qb_income_account_id?: string;
 }

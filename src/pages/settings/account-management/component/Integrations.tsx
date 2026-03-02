@@ -23,8 +23,15 @@ import { ArrowsOppositeDirection } from '$app/components/icons/ArrowsOppositeDir
 import { BookOpen } from '$app/components/icons/BookOpen';
 import { ConnectedDots } from '$app/components/icons/ConnectedDots';
 import { ChartLine } from '$app/components/icons/ChartLine';
+import { QuickBooks } from './QuickBooks';
+import { usePaidOrSelfHost } from '$app/common/hooks/usePaidOrSelfhost';
 
-const Box = styled.div`
+interface BoxTheme {
+  backgroundColor: string;
+  hoverBackgroundColor: string;
+}
+
+const Box = styled.div<{ theme: BoxTheme }>`
   background-color: ${({ theme }) => theme.backgroundColor};
 
   &:hover {
@@ -34,12 +41,12 @@ const Box = styled.div`
 
 export function Integrations() {
   const [t] = useTranslation();
-
   const navigate = useNavigate();
 
+  const { isAdmin } = useAdmin();
   const colors = useColorScheme();
 
-  const { isAdmin } = useAdmin();
+  const isPaidOrSelfHost = usePaidOrSelfHost();
 
   return (
     <div className="flex flex-col space-y-4 px-4 sm:px-6 pt-2 pb-4">
@@ -172,6 +179,20 @@ export function Integrations() {
           <ArrowRight color={colors.$3} size="1.4rem" strokeWidth="1.5" />
         </div>
       </Box>
+
+      {isAdmin && isPaidOrSelfHost && (
+        <>
+          <div className="py-4">
+            <Divider
+              className="border-dashed"
+              withoutPadding
+              style={{ borderColor: colors.$20 }}
+            />
+          </div>
+
+          <QuickBooks />
+        </>
+      )}
     </div>
   );
 }
