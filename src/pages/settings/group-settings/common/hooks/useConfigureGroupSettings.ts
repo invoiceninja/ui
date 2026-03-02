@@ -31,14 +31,6 @@ export function useConfigureGroupSettings(params?: Params) {
     setActiveSettingsAtom(group);
 
     dispatch(
-      updateChanges({
-        object: 'company',
-        property: 'settings',
-        value: group.settings,
-      })
-    );
-
-    dispatch(
       setActiveSettings({
         status: {
           name: group.name,
@@ -47,6 +39,18 @@ export function useConfigureGroupSettings(params?: Params) {
       })
     );
 
-    !withoutNavigation && navigate('/settings/company_details');
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: 'settings',
+        value: group.settings,
+      })
+    );
+
+    if (!withoutNavigation) {
+      setTimeout(() => {
+        navigate('/settings/company_details');
+      }, 150);
+    }
   };
 }

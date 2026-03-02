@@ -169,7 +169,7 @@ export function Settings() {
         }
       >
         <SelectField
-          value={company?.settings?.timezone_id || '1'}
+          value={company?.settings?.timezone_id || ''}
           disabled={disableSettingsField('timezone_id')}
           errorMessage={errors?.errors['settings.timezone_id']}
           onValueChange={(v) => handleChange('settings.timezone_id', v)}
