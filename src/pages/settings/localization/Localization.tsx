@@ -52,7 +52,7 @@ export function Localization() {
     >
       <Card
         className="shadow-sm"
-        title={t('user_details')}
+        title={t('localization')}
         withoutBodyPadding
         withoutHeaderBorder
         style={{ borderColor: colors.$24 }}
