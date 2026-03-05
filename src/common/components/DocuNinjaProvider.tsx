@@ -85,7 +85,7 @@ export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
 
   useEffect(() => {
     if (error) {
-      navigate('/docuninja/beta');
+      navigate('/docuninja/beta?ie=true');
     }
   }, [error, navigate]);
 
