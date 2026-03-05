@@ -114,11 +114,11 @@ export function ProductForm(props: Props) {
         import.meta.env.VITE_DISABLE_QUICKBOOKS_INTEGRATION !== 'true' && (
           <Element leftSide={t('income_account')}>
             <IncomeAccountSelector
-              value={product.qb_income_account_id || ''}
+              value={product.income_account_id || ''}
               onValueChange={(value) =>
-                handleChange('qb_income_account_id', value)
+                handleChange('income_account_id', value)
               }
-              errorMessage={errors?.errors.qb_income_account_id}
+              errorMessage={errors?.errors.income_account_id}
             />
           </Element>
         )}

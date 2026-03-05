@@ -158,16 +158,16 @@ export function QuickBooks() {
           <IncomeAccountSelector
             label={t('default_income_account')}
             value={
-              companyChanges?.quickbooks?.settings?.qb_income_account_id || ''
+              companyChanges?.quickbooks?.settings?.income_account_id || ''
             }
             onValueChange={(value) =>
               handleChange(
-                'quickbooks.settings.qb_income_account_id',
+                'quickbooks.settings.income_account_id',
                 value || null
               )
             }
             errorMessage={
-              errors?.errors?.['quickbooks.settings.qb_income_account_id']
+              errors?.errors?.['quickbooks.settings.income_account_id']
             }
           />
 
@@ -176,7 +176,7 @@ export function QuickBooks() {
             onClick={onSave}
             disabled={
               isSavingCompany ||
-              !companyChanges?.quickbooks?.settings?.qb_income_account_id
+              !companyChanges?.quickbooks?.settings?.income_account_id
             }
             disableWithoutIcon={isSavingCompany}
           >

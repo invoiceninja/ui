@@ -32,12 +32,12 @@ export interface QuickbooksSettings {
   expense: QuickbooksSync;
   expense_category: QuickbooksSync;
   income_account_map: IncomeAccountMapEntry[];
-  qb_income_account_id: string | null;
+  income_account_id: string | null;
   tax_rate_map: TaxRateMapEntry[];
   automatic_taxes: boolean;
   default_taxable_code: string | null;
   default_exempt_code: string | null;
-  default_income_account?: string | null;
+  qb_income_account_id?: string | null;
   country: string | null;
 }
 

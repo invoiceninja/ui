@@ -40,5 +40,5 @@ export interface Product {
   stock_notification_threshold: number;
   documents: any[];
   company?: Company;
-  qb_income_account_id: string;
+  income_account_id: string;
 }
