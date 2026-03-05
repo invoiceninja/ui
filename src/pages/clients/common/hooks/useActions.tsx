@@ -38,6 +38,7 @@ import { useBulk } from '$app/common/queries/clients';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { EntityCreationModalAction } from '../components/EntityCreationModalAction';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { CloneAction } from '../components/CloneAction';
 
 interface Params {
   setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
@@ -93,6 +94,7 @@ export function useActions(params?: Params) {
           {t('client_portal')}
         </DropdownElement>
       ),
+    (client) => <CloneAction client={client} />,
     (client) => (
       <AddActivityComment
         entity="client"
