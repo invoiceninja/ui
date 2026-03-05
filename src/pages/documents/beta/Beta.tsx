@@ -14,7 +14,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { Modal } from '$app/components/Modal';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
@@ -26,11 +26,15 @@ export default function Beta() {
   const navigate = useNavigate();
   const account = useCurrentAccount();
 
+  const [searchParams] = useSearchParams();
+
   useEffect(() => {
-    if (account && account.docuninja_num_users > 0) {
+    const hasInternalError = searchParams.get('ie') === 'true';
+
+    if (!hasInternalError && account && account.docuninja_num_users > 0) {
       navigate('/docuninja', { replace: true });
     }
-  }, [account, navigate]);
+  }, [account, navigate, searchParams]);
 
   return (
     <Default
