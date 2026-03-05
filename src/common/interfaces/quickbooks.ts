@@ -17,6 +17,7 @@ export interface Quickbooks {
   baseURL: string;
   companyName: string;
   settings: QuickbooksSettings;
+  requires_reconnect: boolean;
 }
 
 export interface QuickbooksSettings {

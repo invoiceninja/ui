@@ -19,6 +19,8 @@ import {
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { Alert } from '$app/components/Alert';
+import { useQuickbooksReconnect } from '../common/hooks/useQuickbooksReconnect';
 
 interface QuickBooksDetailsProps {
   quickbooks: Quickbooks;
@@ -39,9 +41,29 @@ export function QuickBooksDetails({
   const colors = useColorScheme();
   const companyChanges = useCompanyChanges();
   const handleChange = useHandleCurrentCompanyChangeProperty();
+  const { handleReconnect, isFormBusy: isReconnectBusy } =
+    useQuickbooksReconnect();
 
   return (
     <>
+      {quickbooks.requires_reconnect && (
+        <Alert type="warning" disableClosing className="mb-4">
+          <div className="flex items-center justify-between">
+            <span>{t('quickbooks_requires_reconnection')}</span>
+
+            <Button
+              type="minimal"
+              behavior="button"
+              onClick={handleReconnect}
+              disabled={isReconnectBusy}
+              disableWithoutIcon={isReconnectBusy}
+            >
+              {t('reconnect')}
+            </Button>
+          </div>
+        </Alert>
+      )}
+
       <Element leftSide={t('status')} noExternalPadding>
         <div className="flex flex-wrap items-center gap-3">
           <span className="text-sm font-medium" style={{ color: colors.$3 }}>
