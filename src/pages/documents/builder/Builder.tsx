@@ -483,6 +483,11 @@ function Builder() {
                   marginBottom: '0.5rem',
                 },
               },
+              general: {
+                backgroundColor: colors.$1,
+                textColor: colors.$3,
+                foregroundColor: colors.$4,
+              }
             },
             options: {
               header: {
