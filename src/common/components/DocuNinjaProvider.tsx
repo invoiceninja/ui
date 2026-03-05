@@ -79,14 +79,7 @@ export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
       enabled: !!company?.company_key,
       staleTime: Infinity, // Never refetch unless invalidated
       cacheTime: Infinity, // Keep in cache forever
-      retry: (failureCount, error) => {
-        // Don't retry on 401 errors (expected when no account exists)
-        if ((error as any)?.response?.status === 401) {
-          return false;
-        }
-        // Retry other errors up to 3 times
-        return failureCount < 3;
-      },
+      retry: false,
     }
   );
 
