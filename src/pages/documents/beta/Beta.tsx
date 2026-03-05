@@ -21,6 +21,7 @@ import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useEffect } from 'react';
+import { ValidationAlert } from '$app/components/ValidationAlert';
 
 export default function Beta() {
   const navigate = useNavigate();
@@ -265,6 +266,8 @@ function Join() {
             placeholder="Enter beta invite code"
             onValueChange={setCode}
           />
+
+          {errors && <ValidationAlert errors={errors} />}
 
           <p className="text-sm opacity-70">
             If you don't have a beta invite code, please contact us at{' '}
