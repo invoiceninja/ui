@@ -159,6 +159,10 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
     });
 
   const isPeppolEnabled = (currentInvoice: Invoice) => {
+    if (reactSettings?.preferences?.hide_peppol_sent_status) {
+      return false;
+    }
+    
     return (
       currentCompany.settings.e_invoice_type === 'PEPPOL' && PEPPOL_COUNTRIES.includes(currentInvoice.client?.country_id || '')
     );
