@@ -471,9 +471,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     isInitialConfiguration && setIsInitialConfiguration(false);
 
     return () => {
-      if (isProduction()) {
-        setInvalidationQueryAtom(undefined);
-      }
+      isProduction() && setInvalidationQueryAtom(undefined);
     };
   }, [
     perPage,
