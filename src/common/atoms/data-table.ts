@@ -8,6 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Resource } from '$app/components/PreviousNextNavigation';
 import { atom } from 'jotai';
 
+interface FullTableLatestData {
+  type: string;
+  resources: Resource[];
+}
+
 export const invalidationQueryAtom = atom<string | undefined>(undefined);
+export const fullTableLatestDataAtom = atom<FullTableLatestData | undefined>(
+  undefined
+);

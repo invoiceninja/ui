@@ -150,6 +150,7 @@ export default function Payments() {
             queryParameterKey: 'created_between',
           },
         ]}
+        enableSavingLatestDataForNavigation
       />
 
       {!disableNavigation('payment', paymentSlider) && <PaymentSlider />}
