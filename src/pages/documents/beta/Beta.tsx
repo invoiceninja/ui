@@ -271,8 +271,8 @@ function Join() {
 
           <p className="text-sm opacity-70">
             If you don't have a beta invite code, please contact us at{' '}
-            <a href="mailto:contact@docuninja.com" className="underline">
-              contact@docuninja.com
+            <a href="mailto:contact@invoiceninja.com" className="underline">
+              contact@invoiceninja.com
             </a>{' '}
             for more information.
           </p>
