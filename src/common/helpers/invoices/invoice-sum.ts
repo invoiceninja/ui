@@ -16,6 +16,7 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Credit } from '$app/common/interfaces/credit';
 import { Quote } from '$app/common/interfaces/quote';
+import { roundToPrecision } from './round';
 
 export interface TaxItem {
   key?: string;
@@ -160,7 +161,7 @@ export class InvoiceSum {
       });
     }
 
-    this.totalTaxes = parseFloat(calculatedTax.toFixed(this.currency?.precision || 2));
+    this.totalTaxes = roundToPrecision(calculatedTax, this.currency?.precision || 2);
 
     return this;
   }
@@ -180,34 +181,30 @@ export class InvoiceSum {
     let taxComponent = 0;
 
     if (this.invoice.custom_surcharge_tax1) {
-      taxComponent += parseFloat(
-        (this.invoice.custom_surcharge1 * (rate / 100)).toFixed(
-          this.currency?.precision || 2
-        )
+      taxComponent += roundToPrecision(
+        this.invoice.custom_surcharge1 * (rate / 100),
+        this.currency?.precision || 2
       );
     }
 
     if (this.invoice.custom_surcharge_tax2) {
-      taxComponent += parseFloat(
-        (this.invoice.custom_surcharge2 * (rate / 100)).toFixed(
-          this.currency?.precision || 2
-        )
+      taxComponent += roundToPrecision(
+        this.invoice.custom_surcharge2 * (rate / 100),
+        this.currency?.precision || 2
       );
     }
 
     if (this.invoice.custom_surcharge_tax3) {
-      taxComponent += parseFloat(
-        (this.invoice.custom_surcharge3 * (rate / 100)).toFixed(
-          this.currency?.precision || 2
-        )
+      taxComponent += roundToPrecision(
+        this.invoice.custom_surcharge3 * (rate / 100),
+        this.currency?.precision || 2
       );
     }
 
     if (this.invoice.custom_surcharge_tax4) {
-      taxComponent += parseFloat(
-        (this.invoice.custom_surcharge4 * (rate / 100)).toFixed(
-          this.currency?.precision || 2
-        )
+      taxComponent += roundToPrecision(
+        this.invoice.custom_surcharge4 * (rate / 100),
+        this.currency?.precision || 2
       );
     }
 
@@ -255,7 +252,7 @@ export class InvoiceSum {
   protected calculateTotals() {
     this.total += this.totalTaxes;
 
-    this.total.toFixed(this.currency?.precision || 2);
+    this.total = roundToPrecision(this.total, this.currency?.precision || 2);
 
     return this;
   }
@@ -296,36 +293,16 @@ export class InvoiceSum {
       return this.invoice.discount;
     }
 
-    return parseFloat(
-      (amount * (this.invoice.discount / 100)).toFixed(
-        this.currency?.precision || 2
-      )
+    return roundToPrecision(
+      amount * (this.invoice.discount / 100),
+      this.currency?.precision || 2
     );
   }
 
   protected taxer(amount: number, tax_rate: number) {
-
     const taxAmount = amount * ((tax_rate ?? 0) / 100) + 0.000000000000004;
 
-    return this.roundToPrecision(taxAmount);
-    
-  }
-
-  protected roundToPrecision(number: number) {
-    // prevent negative numbers from rounding to 0
-    const isNegative = number < 0;
-    const precision = this.currency?.precision || 2;
-    if (isNegative) {
-      number = number * -1;
-    }
-
-    number = Number(Math.round(Number(number + `e+${precision}`)) + `e-${precision}`);
-    
-    if (isNegative) {
-      number = number * -1;
-    }
-
-    return number;
+    return roundToPrecision(taxAmount, this.currency?.precision || 2);
   }
 
   protected valuer(customValue: number | undefined): number {

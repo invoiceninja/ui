@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { roundToPrecision } from './invoices/round';
+
 export function numberFormat(
   value: string | number,
   decimals = 0,
@@ -18,7 +20,8 @@ export function numberFormat(
 
   const sign = number < 0 ? '-' : '';
 
-  const str = Math.abs(number).toFixed(decimals).toString().split('.');
+  const rounded = roundToPrecision(Math.abs(number), decimals);
+  const str = rounded.toFixed(decimals).toString().split('.');
   const int = str[0];
   const decimal = str[1] || '';
 
