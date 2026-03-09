@@ -62,6 +62,7 @@ const EINVOICE_ACTIVITY_TYPES = [145, 146, 147] as number[];
 
 export default function EInvoice() {
   const [t] = useTranslation();
+
   const queryClient = useQueryClient();
 
   const location = useLocation();
@@ -115,7 +116,9 @@ export default function EInvoice() {
         .then(() => {
           setTimeout(() => {
             queryClient.invalidateQueries(['/api/v1/invoices', invoice?.id]);
+            queryClient.invalidateQueries(['/api/v1/activities/entity']);
           }, 2000);
+
           toast.success('success');
         })
         .finally(() => setIsFormBusy(false));
