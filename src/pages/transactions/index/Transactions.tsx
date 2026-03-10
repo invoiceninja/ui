@@ -159,6 +159,7 @@ export default function Transactions() {
             { column: 'date', queryParameterKey: 'date_range' },
             { column: 'created_at', queryParameterKey: 'created_between' },
           ]}
+          enableSavingLatestDataForNavigation
         />
       </Default>
     </>
