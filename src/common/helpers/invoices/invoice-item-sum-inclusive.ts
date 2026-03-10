@@ -14,6 +14,7 @@ import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Credit } from '$app/common/interfaces/credit';
 import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { roundToPrecision } from './round';
 
 export class InvoiceItemSumInclusive {
   public taxCollection = collect();
@@ -74,9 +75,9 @@ export class InvoiceItemSumInclusive {
 
   protected setDiscount() {
     if (this.invoice.is_amount_discount) {
-      this.item.line_total = parseFloat((this.item.line_total - this.item.discount).toFixed(2));
+      this.item.line_total = roundToPrecision(this.item.line_total - this.item.discount, 2);
     } else {
-      this.item.line_total = parseFloat((this.item.line_total - this.item.line_total * (this.item.discount / 100)).toFixed(2));
+      this.item.line_total = roundToPrecision(this.item.line_total - this.item.line_total * (this.item.discount / 100), 2);
     }
 
     this.item.is_amount_discount = this.invoice.is_amount_discount;

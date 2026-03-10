@@ -13,6 +13,7 @@ import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Currency } from '$app/common/interfaces/currency';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { roundToPrecision } from './round';
 
 export class InvoiceItemSum {
   public taxCollection = collect();
@@ -70,11 +71,11 @@ export class InvoiceItemSum {
 
   protected setDiscount() {
     if (this.invoice.is_amount_discount) {
-      this.item.line_total = parseFloat((this.item.line_total - this.item.discount).toFixed(2));
+      this.item.line_total = roundToPrecision(this.item.line_total - this.item.discount, this.currency?.precision || 2);
     } else {
       const discount = this.item.line_total * (this.item.discount / 100);
 
-      this.item.line_total = parseFloat((this.item.line_total - discount).toFixed(2));
+      this.item.line_total = roundToPrecision(this.item.line_total - discount, this.currency?.precision || 2);
     }
 
     this.item.is_amount_discount = this.invoice.is_amount_discount;
@@ -156,32 +157,24 @@ export class InvoiceItemSum {
     this.taxCollection.push(collect(group));
   }
 
-  // protected calculateAmountLineTax(rate: number, amount: number) {
-  //   return Math.round((((amount * rate) / 100) * 1000) / 10) / 100;
-  // }
-
   protected calculateAmountLineTax(rate: number, amount: number) {
     const result = (amount * rate) / 100;
-    
-    if(this.isPeppol){
+
+    if (this.isPeppol) {
       return result;
-    }else if(result > 0){
-      return Math.round((result * 1000) / 10) / 100; // for positive numbers, we need to round towards zero
-    }else{
-      return Math.floor((result * 1000) / 10) / 100; // for negative numbers, we need to round away from zero
     }
 
+    return roundToPrecision(result, this.currency?.precision || 2);
   }
 
   protected push() {
-    //why? because dealing with floating point maths hurts. Epsilon does not cover the edge cases, but this does.
-    this.subTotal += parseFloat(
-      (this.item.line_total + 0.000000000000004).toFixed(
-        this.currency?.precision || 2
-      )
+    this.subTotal += roundToPrecision(
+      this.item.line_total + 0.000000000000004,
+      this.currency?.precision || 2
     );
-    this.subTotal = parseFloat(
-      this.subTotal.toFixed(this.currency?.precision || 2)
+    this.subTotal = roundToPrecision(
+      this.subTotal,
+      this.currency?.precision || 2
     );
 
     this.grossSubTotal += this.item.gross_line_total;
