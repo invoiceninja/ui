@@ -32,7 +32,7 @@ export function useMakeTemplate() {
         'POST',
         docuNinjaEndpoint('/api/documents/:id/action', { id: document.id }),
         {
-          action: 'make_template',
+          action: 'make_blueprint',
           id: document.id,
         },
         {
