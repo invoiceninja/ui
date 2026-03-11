@@ -26,7 +26,15 @@ function bufferToBase64(buffer: ArrayBuffer): string {
 }
 
 function base64ToBuffer(value: string): ArrayBuffer {
-  const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+  let raw = value;
+
+  const mimeMatch = raw.match(/^=\?BINARY\?B\?(.+?)\?=$/);
+
+  if (mimeMatch) {
+    raw = mimeMatch[1];
+  }
+
+  const normalized = raw.replace(/-/g, '+').replace(/_/g, '/');
   const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
   const binary = atob(padded);
   const bytes = new Uint8Array(binary.length);
@@ -67,9 +75,17 @@ export function prepareRequestOptions(publicKey: any) {
 }
 
 export async function registerPasskey(publicKey: any): Promise<PasskeyCredentialResponse> {
+  if (!window.PublicKeyCredential) {
+    throw new Error('WebAuthn is not supported in this browser.');
+  }
+
   const credential = (await navigator.credentials.create({
     publicKey: prepareCreationOptions(publicKey),
-  })) as PublicKeyCredential;
+  })) as PublicKeyCredential | null;
+
+  if (!credential) {
+    throw new Error('Passkey registration was cancelled.');
+  }
 
   const response = credential.response as AuthenticatorAttestationResponse;
 
@@ -87,9 +103,17 @@ export async function registerPasskey(publicKey: any): Promise<PasskeyCredential
 export async function authenticatePasskey(
   publicKey: any
 ): Promise<PasskeyCredentialResponse> {
+  if (!window.PublicKeyCredential) {
+    throw new Error('WebAuthn is not supported in this browser.');
+  }
+
   const credential = (await navigator.credentials.get({
     publicKey: prepareRequestOptions(publicKey),
-  })) as PublicKeyCredential;
+  })) as PublicKeyCredential | null;
+
+  if (!credential) {
+    throw new Error('Passkey authentication was cancelled.');
+  }
 
   const response = credential.response as AuthenticatorAssertionResponse;
 

@@ -62,7 +62,12 @@ export function PasskeyAuthenticationModal(props: Props) {
 
       await request('POST', endpoint('/api/v1/settings/passkeys'), {
         challenge_token: optionsResponse.data.data.challenge_token,
-        credential: credential.response,
+        credential: {
+          id: credential.id,
+          rawId: credential.rawId,
+          type: credential.type,
+          ...credential.response,
+        },
         name: name || undefined,
       });
 
@@ -78,7 +83,15 @@ export function PasskeyAuthenticationModal(props: Props) {
       toast.success('updated_settings');
       setName('');
     } catch (error) {
+      console.error('[Passkey] Registration failed:', error);
+
       const axiosError = error as AxiosError;
+
+      if (axiosError.response) {
+        console.error('[Passkey] Response status:', axiosError.response.status);
+        console.error('[Passkey] Response data:', axiosError.response.data);
+      }
+
       if (axiosError.response?.status === 422) {
         toast.error('validation_error');
       } else {
@@ -90,8 +103,8 @@ export function PasskeyAuthenticationModal(props: Props) {
   };
 
   const onDeletePasskey = (id: string) =>
-    request('DELETE', endpoint(`/api/v1/settings/passkeys/${id}`)).then(
-      async () => {
+    request('DELETE', endpoint(`/api/v1/settings/passkeys/${id}`))
+      .then(async () => {
         const nextCount = Math.max((user?.passkey_count || 1) - 1, 0);
         dispatch(
           updateUser({
@@ -103,8 +116,10 @@ export function PasskeyAuthenticationModal(props: Props) {
 
         await refreshPasskeys();
         toast.success('updated_settings');
-      }
-    );
+      })
+      .catch(() => {
+        toast.error('error_title');
+      });
 
   return (
     <Modal title={t('passkey')} visible={props.visible} onClose={props.setVisible}>

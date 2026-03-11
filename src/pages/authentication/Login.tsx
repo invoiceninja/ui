@@ -64,14 +64,7 @@ export function Login() {
     request(
       'POST',
       endpoint('/api/v1/login'),
-      Object.assign({}, Object.fromEntries(formData), {
-        ...(passkeyChallengeToken && passkeyOptions
-          ? {
-              passkey_challenge_token: passkeyChallengeToken,
-              passkey_authentication: passkeyOptions.response,
-            }
-          : {}),
-      }),
+      Object.fromEntries(formData),
       {
       ...(secret && {
         headers: { 'X-API-SECRET': secret },
@@ -128,11 +121,29 @@ export function Login() {
         optionsResponse.data.data.publicKey
       );
 
-      const response = await request('POST', endpoint('/api/v1/login'), {
-        email: emailInput,
-        passkey_challenge_token: optionsResponse.data.data.challenge_token,
-        passkey_authentication: assertion.response,
-      });
+      const secret = (
+        document.querySelector('input[name="secret"]') as HTMLInputElement | null
+      )?.value;
+
+      const response = await request(
+        'POST',
+        endpoint('/api/v1/login'),
+        {
+          email: emailInput,
+          passkey_challenge_token: optionsResponse.data.data.challenge_token,
+          passkey_authentication: {
+            id: assertion.id,
+            rawId: assertion.rawId,
+            type: assertion.type,
+            ...assertion.response,
+          },
+        },
+        {
+          ...(secret && {
+            headers: { 'X-API-SECRET': secret },
+          }),
+        }
+      );
 
       login(response);
     } catch (error) {
@@ -147,12 +158,40 @@ export function Login() {
       return;
     }
 
+    setIsFormBusy(true);
+
     try {
       const assertion = await authenticatePasskey(passkeyOptions);
-      setPasskeyOptions(assertion);
-      setMessage(undefined);
+
+      const form = document.querySelector('form') as HTMLFormElement | null;
+      const formData = form ? new FormData(form) : new FormData();
+      const secret = formData.get('secret') as string;
+
+      const response = await request(
+        'POST',
+        endpoint('/api/v1/login'),
+        {
+          ...Object.fromEntries(formData),
+          passkey_challenge_token: passkeyChallengeToken,
+          passkey_authentication: {
+            id: assertion.id,
+            rawId: assertion.rawId,
+            type: assertion.type,
+            ...assertion.response,
+          },
+        },
+        {
+          ...(secret && {
+            headers: { 'X-API-SECRET': secret },
+          }),
+        }
+      );
+
+      login(response);
     } catch (error) {
       setMessage(t('invalid_one_time_password') as string);
+    } finally {
+      setIsFormBusy(false);
     }
   };
 
