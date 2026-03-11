@@ -89,14 +89,7 @@ export function PasskeyAuthenticationModal(props: Props) {
       toast.success('updated_settings');
       setName('');
     } catch (error) {
-      console.error('[Passkey] Registration failed:', error);
-
       const axiosError = error as AxiosError;
-
-      if (axiosError.response) {
-        console.error('[Passkey] Response status:', axiosError.response.status);
-        console.error('[Passkey] Response data:', axiosError.response.data);
-      }
 
       if (axiosError.response?.status === 422) {
         toast.error('validation_error');

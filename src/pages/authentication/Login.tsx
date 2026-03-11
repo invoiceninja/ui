@@ -93,7 +93,7 @@ export function Login() {
     const secret = formData.get('secret') as string;
 
     if (!emailInput) {
-      setMessage(t('email_address') as string);
+      setMessage(t('provide_email') as string);
       return;
     }
 
