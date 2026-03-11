@@ -45,11 +45,6 @@ export function Login() {
 
   const [isDisable2faModalOpen, setIsDisable2faModalOpen] =
     useState<boolean>(false);
-  const [passkeyChallengeToken, setPasskeyChallengeToken] = useState<
-    string | undefined
-  >(undefined);
-  const [passkeyOptions, setPasskeyOptions] = useState<any>(undefined);
-
   const login = useLogin();
 
   function handleSubmit(form: HTMLFormElement) {
@@ -80,11 +75,6 @@ export function Login() {
             setMessage(error.response.data.message);
           }
 
-          const passkeyData = (error.response.data as any)?.passkey_options;
-          if (passkeyData?.publicKey && passkeyData?.challenge_token) {
-            setPasskeyOptions(passkeyData.publicKey);
-            setPasskeyChallengeToken(passkeyData.challenge_token);
-          }
         } else if (error.response?.status === 503) {
           toast.error('app_maintenance');
         } else {
@@ -96,19 +86,20 @@ export function Login() {
       .finally(() => setIsFormBusy(false));
   }
 
-  const handlePasskeyOnlyLogin = async () => {
-    const emailInput = (
-      document.querySelector('input[name="email"]') as HTMLInputElement | null
-    )?.value;
+  const handlePasskeyLogin = async () => {
+    const form = document.querySelector('form') as HTMLFormElement | null;
+    const formData = form ? new FormData(form) : new FormData();
+    const emailInput = formData.get('email') as string;
+    const secret = formData.get('secret') as string;
 
     if (!emailInput) {
       setMessage(t('email_address') as string);
       return;
     }
 
-    setIsFormBusy(true);
-    setErrors(undefined);
     setMessage(undefined);
+    setErrors(undefined);
+    setIsFormBusy(true);
 
     try {
       const optionsResponse = await request(
@@ -117,20 +108,22 @@ export function Login() {
         { email: emailInput }
       );
 
-      const assertion = await authenticatePasskey(
-        optionsResponse.data.data.publicKey
-      );
+      const publicKey = optionsResponse.data.data.publicKey;
+      const challengeToken = optionsResponse.data.data.challenge_token;
 
-      const secret = (
-        document.querySelector('input[name="secret"]') as HTMLInputElement | null
-      )?.value;
+      if (!publicKey || !publicKey.allowCredentials?.length) {
+        setMessage(t('no_passkeys_registered') as string);
+        return;
+      }
+
+      const assertion = await authenticatePasskey(publicKey);
 
       const response = await request(
         'POST',
         endpoint('/api/v1/login'),
         {
           email: emailInput,
-          passkey_challenge_token: optionsResponse.data.data.challenge_token,
+          passkey_challenge_token: challengeToken,
           passkey_authentication: {
             id: assertion.id,
             rawId: assertion.rawId,
@@ -147,49 +140,21 @@ export function Login() {
 
       login(response);
     } catch (error) {
-      setMessage(t('invalid_credentials') as string);
-    } finally {
-      setIsFormBusy(false);
-    }
-  };
+      const axiosError = error as AxiosError<GenericValidationBag<LoginValidation>>;
 
-  const handlePasskeySecondFactor = async () => {
-    if (!passkeyOptions || !passkeyChallengeToken) {
-      return;
-    }
+      if (axiosError.response?.status === 422) {
+        setErrors(axiosError.response.data.errors);
 
-    setIsFormBusy(true);
-
-    try {
-      const assertion = await authenticatePasskey(passkeyOptions);
-
-      const form = document.querySelector('form') as HTMLFormElement | null;
-      const formData = form ? new FormData(form) : new FormData();
-      const secret = formData.get('secret') as string;
-
-      const response = await request(
-        'POST',
-        endpoint('/api/v1/login'),
-        {
-          ...Object.fromEntries(formData),
-          passkey_challenge_token: passkeyChallengeToken,
-          passkey_authentication: {
-            id: assertion.id,
-            rawId: assertion.rawId,
-            type: assertion.type,
-            ...assertion.response,
-          },
-        },
-        {
-          ...(secret && {
-            headers: { 'X-API-SECRET': secret },
-          }),
+        if (axiosError.response.data.message) {
+          setMessage(axiosError.response.data.message);
         }
-      );
-
-      login(response);
-    } catch (error) {
-      setMessage(t('invalid_one_time_password') as string);
+      } else if (axiosError.response?.status === 503) {
+        toast.error('app_maintenance');
+      } else {
+        setMessage(
+          axiosError.response?.data?.message ?? (t('invalid_credentials') as string)
+        );
+      }
     } finally {
       setIsFormBusy(false);
     }
@@ -293,27 +258,21 @@ export function Login() {
               {t('login')}
             </Button>
 
+            <div className="flex items-center gap-4 my-4">
+              <div className="flex-1 border-t" style={{ borderColor: colors.$5 }} />
+              <span className="text-sm" style={{ color: colors.$3 }}>{t('or')}</span>
+              <div className="flex-1 border-t" style={{ borderColor: colors.$5 }} />
+            </div>
+
             <Button
               behavior="button"
               disabled={isFormBusy}
-              className="mt-2"
-              type="minimal"
-              onClick={handlePasskeyOnlyLogin}
+              variant="block"
+              onClick={handlePasskeyLogin}
             >
-              {t('passkey')}
+              {t('login_with_passkey')}
             </Button>
 
-            {passkeyOptions && (
-              <Button
-                behavior="button"
-                disabled={isFormBusy}
-                className="mt-2"
-                type="minimal"
-                onClick={handlePasskeySecondFactor}
-              >
-                {t('continue')}
-              </Button>
-            )}
           </form>
 
           <div className="flex justify-center">

@@ -10,6 +10,8 @@ import { AxiosError } from 'axios';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDateTime } from '$app/common/hooks/useDateTime';
 
 interface Props {
   visible: boolean;
@@ -32,6 +34,10 @@ export function PasskeyAuthenticationModal(props: Props) {
   const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
 
+  const { dateFormat } = useCurrentCompanyDateFormats();
+  const dateTime = useDateTime({ withTimezone: false, formatOnlyDate: true });
+
+  
   const refreshPasskeys = () =>
     request('GET', endpoint('/api/v1/settings/passkeys')).then((response) =>
       setPasskeys(response.data.data ?? [])
@@ -122,7 +128,7 @@ export function PasskeyAuthenticationModal(props: Props) {
       });
 
   return (
-    <Modal title={t('passkey')} visible={props.visible} onClose={props.setVisible}>
+    <Modal title={t('manage_passkeys')} visible={props.visible} onClose={props.setVisible}>
       <div className="space-y-4">
         <InputField
           id="passkey_name"
@@ -144,7 +150,7 @@ export function PasskeyAuthenticationModal(props: Props) {
             >
               <div>
                 <div className="font-semibold">{passkey.name || t('passkey')}</div>
-                <div className="text-sm opacity-80">{passkey.id}</div>
+                <div className="text-sm opacity-80">{t('last_used')}: {passkey.last_used_at ? dateTime(passkey.last_used_at, dateFormat) : t('never')}</div>
               </div>
 
               <Button
