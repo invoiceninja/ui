@@ -48,7 +48,6 @@ import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
 import { PEPPOLPlanBanner } from './common/components/PEPPOLPlanBanner';
 import { CloudUpload } from '$app/components/icons/CloudUpload';
 import { useColorScheme } from '$app/common/colors';
-import { freePlan } from '$app/common/guards/guards/free-plan';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
