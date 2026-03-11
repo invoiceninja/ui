@@ -76,6 +76,7 @@ export default function Vendors() {
         dateRangeColumns={[
           { column: 'created_at', queryParameterKey: 'created_between' },
         ]}
+        enableSavingLatestDataForNavigation
       />
     </Default>
   );

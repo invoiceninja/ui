@@ -187,6 +187,18 @@ export function Preferences() {
         />
       </Element>
 
+      <Element leftSide={t('hide_peppol_sent_status')}>
+        <Toggle
+          checked={Boolean(reactSettings.preferences.hide_peppol_sent_status)}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.preferences.hide_peppol_sent_status',
+              value
+            )
+          }
+        />
+      </Element>
+
       <StatusColorTheme />
 
       <PreferenceCard

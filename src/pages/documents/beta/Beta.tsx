@@ -14,23 +14,28 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { Modal } from '$app/components/Modal';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useEffect } from 'react';
+import { ValidationAlert } from '$app/components/ValidationAlert';
 
 export default function Beta() {
   const navigate = useNavigate();
   const account = useCurrentAccount();
 
+  const [searchParams] = useSearchParams();
+
   useEffect(() => {
-    if (account && account.docuninja_num_users > 0) {
+    const hasInternalError = searchParams.get('ie') === 'true';
+
+    if (!hasInternalError && account && account.docuninja_num_users > 0) {
       navigate('/docuninja', { replace: true });
     }
-  }, [account, navigate]);
+  }, [account, navigate, searchParams]);
 
   return (
     <Default
@@ -262,10 +267,12 @@ function Join() {
             onValueChange={setCode}
           />
 
+          {errors && <ValidationAlert errors={errors} />}
+
           <p className="text-sm opacity-70">
             If you don't have a beta invite code, please contact us at{' '}
-            <a href="mailto:contact@docuninja.com" className="underline">
-              contact@docuninja.com
+            <a href="mailto:contact@invoiceninja.com" className="underline">
+              contact@invoiceninja.com
             </a>{' '}
             for more information.
           </p>

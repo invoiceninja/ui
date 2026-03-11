@@ -62,6 +62,7 @@ const EINVOICE_ACTIVITY_TYPES = [145, 146, 147] as number[];
 
 export default function EInvoice() {
   const [t] = useTranslation();
+
   const queryClient = useQueryClient();
 
   const location = useLocation();
@@ -115,7 +116,9 @@ export default function EInvoice() {
         .then(() => {
           setTimeout(() => {
             queryClient.invalidateQueries(['/api/v1/invoices', invoice?.id]);
+            queryClient.invalidateQueries(['/api/v1/activities/entity']);
           }, 2000);
+
           toast.success('success');
         })
         .finally(() => setIsFormBusy(false));
@@ -281,6 +284,15 @@ export default function EInvoice() {
               }}
             >
               <div className="flex flex-col space-y-2.5">
+                {invoice?.backup?.guid && invoice.backup.guid.length > 1 && (
+                  <div className="flex items-center space-x-4">
+                    <span className="whitespace-nowrap font-medium">
+                      {t('reference')}:
+                    </span>
+                    <span>{invoice.backup.guid}</span>
+                  </div>
+                )}
+
                 {activities
                   ?.filter((activity) =>
                     EINVOICE_ACTIVITY_TYPES.includes(activity.activity_type_id)

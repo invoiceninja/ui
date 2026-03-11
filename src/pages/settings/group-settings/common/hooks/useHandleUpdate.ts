@@ -17,6 +17,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useSettingsConfigurationFallbackValues } from '$app/common/hooks/useSettingsConfigurationFallbackValues';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -39,12 +40,17 @@ interface Params {
 
 export function useHandleUpdate(params: Params) {
   const { id } = useParams();
-  const queryClient = useQueryClient();
   const dispatch = useDispatch();
+
+  const queryClient = useQueryClient();
   const companyChanges = useCompanyChanges();
+  const { isGroupSettingsActive } = useCurrentSettingsLevel();
+
   const activeGroupSettings = useAtomValue(activeSettingsAtom);
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
-  const { isGroupSettingsActive } = useCurrentSettingsLevel();
+
+  const settingsConfigurationFallbackValues =
+    useSettingsConfigurationFallbackValues();
 
   const { groupSettings, setErrors, setIsFormBusy, isFormBusy } = params;
 
@@ -77,9 +83,18 @@ export function useHandleUpdate(params: Params) {
       }
 
       Object.entries(adjustedSettings).forEach(([property, value]) => {
-        if (value === null) {
-          adjustedSettings[property] =
-            defaultSettings[property as keyof typeof defaultSettings];
+        const currentPropertyFallbackValue =
+          settingsConfigurationFallbackValues[
+            property as keyof typeof settingsConfigurationFallbackValues
+          ];
+
+        if (!value) {
+          if (currentPropertyFallbackValue) {
+            adjustedSettings[property] = currentPropertyFallbackValue;
+          } else if (value === null) {
+            adjustedSettings[property] =
+              defaultSettings[property as keyof typeof defaultSettings];
+          }
         }
       });
     }

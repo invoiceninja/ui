@@ -827,6 +827,7 @@ export function useCreditColumns() {
       column: 'client',
       id: 'client_id',
       label: t('client'),
+      sortKey: 'client.name',
       format: (_, credit) => (
         <DynamicLink
           to={route('/clients/:id', { id: credit.client_id })}
@@ -874,12 +875,14 @@ export function useCreditColumns() {
       column: 'client_city',
       id: 'client_id',
       label: t('client_city'),
+      sortKey: 'client.city',
       format: (value, credit) => credit.client?.city,
     },
     {
       column: 'client_country',
       id: 'client_id',
       label: t('client_country'),
+      sortKey: 'client.country_id',
       format: (value, credit) =>
         credit.client?.country_id &&
         resolveCountry(credit.client?.country_id)?.name,
@@ -888,18 +891,21 @@ export function useCreditColumns() {
       column: 'client_postal_code',
       id: 'client_id',
       label: t('client_postal_code'),
+      sortKey: 'client.postal_code',
       format: (value, credit) => credit.client?.postal_code,
     },
     {
       column: 'client_state',
       id: 'client_id',
       label: t('client_state'),
+      sortKey: 'client.state',
       format: (value, credit) => credit.client?.state,
     },
     {
       column: 'contact_email',
       id: 'client_id',
       label: t('contact_email'),
+      sortKey: 'contact.email',
       format: (value, credit) =>
         credit.client &&
         credit.client.contacts.length > 0 && (
@@ -910,6 +916,7 @@ export function useCreditColumns() {
       column: 'contact_name',
       id: 'client_id',
       label: t('contact_name'),
+      sortKey: 'contact.first_name',
       format: (value, credit) =>
         credit.client &&
         credit.client.contacts.length > 0 &&

@@ -35,7 +35,11 @@ interface SaveOptions {
 
 export const isCompanySettingsFormBusy = atom<boolean>(false);
 
-export function useHandleCompanySave() {
+interface Params {
+  onFinally?: () => void;
+}
+
+export function useHandleCompanySave({ onFinally }: Params = {}) {
   const dispatch = useDispatch();
 
   const companyChanges = useInjectCompanyChanges();
@@ -114,6 +118,9 @@ export function useHandleCompanySave() {
           toast.dismiss();
         }
       })
-      .finally(() => setIsFormBusy(false));
+      .finally(() => {
+        setIsFormBusy(false);
+        onFinally?.();
+      });
   };
 }

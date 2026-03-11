@@ -889,6 +889,7 @@ export function useQuoteColumns() {
       column: 'client',
       id: 'client_id',
       label: t('client'),
+      sortKey: 'client.name',
       format: (_, quote) => (
         <DynamicLink
           to={route('/clients/:id', { id: quote.client_id })}
@@ -942,12 +943,14 @@ export function useQuoteColumns() {
       column: 'client_city',
       id: 'client_id',
       label: t('client_city'),
+      sortKey: 'client.city',
       format: (value, quote) => quote.client?.city,
     },
     {
       column: 'client_country',
       id: 'client_id',
       label: t('client_country'),
+      sortKey: 'client.country_id',
       format: (value, quote) =>
         quote.client?.country_id &&
         resolveCountry(quote.client?.country_id)?.name,
@@ -956,18 +959,21 @@ export function useQuoteColumns() {
       column: 'client_postal_code',
       id: 'client_id',
       label: t('client_postal_code'),
+      sortKey: 'client.postal_code',
       format: (value, quote) => quote.client?.postal_code,
     },
     {
       column: 'client_state',
       id: 'client_id',
       label: t('client_state'),
+      sortKey: 'client.state',
       format: (value, quote) => quote.client?.state,
     },
     {
       column: 'contact_email',
       id: 'client_id',
       label: t('contact_email'),
+      sortKey: 'contact.email',
       format: (value, quote) =>
         quote.client &&
         quote.client.contacts.length > 0 && (
@@ -978,6 +984,7 @@ export function useQuoteColumns() {
       column: 'contact_name',
       id: 'client_id',
       label: t('contact_name'),
+      sortKey: 'contact.first_name',
       format: (value, quote) =>
         quote.client &&
         quote.client.contacts.length > 0 &&

@@ -73,8 +73,9 @@ export function EmailSettings() {
 
   const handleOnSaveClick = () => {
     if (
+      typeof company?.settings.entity_send_time !== 'undefined' &&
       currentCompany?.settings.entity_send_time !==
-      company?.settings.entity_send_time
+        Number(company?.settings.entity_send_time)
     ) {
       setIsSendTimeModalOpen(true);
     } else {

@@ -86,6 +86,7 @@ export function useClientQuery({ id, enabled }: GenericQueryOptions) {
 const successMessages = {
   assign_group: 'updated_group',
   bulk_update: 'updated_records',
+  clone: 'cloned_client',
 };
 
 interface Details {
@@ -94,13 +95,23 @@ interface Details {
   newValue?: string | number | boolean;
 }
 
-export function useBulk() {
+interface Params {
+  onSuccess?: (clients: Client[]) => void;
+}
+
+export function useBulk({ onSuccess }: Params = {}) {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return async (
     ids: string[],
-    action: 'archive' | 'restore' | 'delete' | 'assign_group' | 'bulk_update',
+    action:
+      | 'archive'
+      | 'restore'
+      | 'delete'
+      | 'assign_group'
+      | 'bulk_update'
+      | 'clone',
     details?: Details
   ) => {
     const { groupSettingsId, column, newValue } = details || {};
@@ -113,12 +124,14 @@ export function useBulk() {
       ...(groupSettingsId && { group_settings_id: groupSettingsId }),
       ...(column && { column }),
       ...(action === 'bulk_update' && { new_value: newValue }),
-    }).then(() => {
+    }).then((response) => {
       const message =
         successMessages[action as keyof typeof successMessages] ||
         `${action}d_client`;
 
       toast.success(message);
+
+      onSuccess?.(response.data.data);
 
       invalidateQueryValue &&
         queryClient.invalidateQueries([invalidateQueryValue]);

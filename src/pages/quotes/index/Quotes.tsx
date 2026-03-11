@@ -137,6 +137,7 @@ export default function Quotes() {
         linkToCreateGuards={[permission('create_quote')]}
         hideEditableOptions={!hasPermission('edit_quote')}
         enableSavingFilterPreference
+        enableSavingLatestDataForNavigation
       />
 
       {!disableNavigation('quote', quoteSlider) && <QuoteSlider />}
