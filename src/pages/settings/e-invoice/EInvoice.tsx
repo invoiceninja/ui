@@ -524,12 +524,7 @@ export function EInvoice() {
         entity="company"
       />
 
-      {company?.settings.enable_e_invoice &&
-      company?.legal_entity_id &&
-      shouldShowPEPPOLOption() &&
-      !freePlan() ? (
-        <EUTaxDetails />
-      ) : null}
+      <EUTaxDetails />
     </Settings>
   );
 }
