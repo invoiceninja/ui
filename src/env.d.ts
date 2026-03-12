@@ -23,3 +23,9 @@ interface ImportMetaEnv extends Readonly<Record<string, string>> {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+declare module '@fontsource/dancing-script';
+declare module '@fontsource/great-vibes';
+declare module '@fontsource/pacifico';
+declare module '@fontsource/satisfy';
+declare module '@fontsource/alex-brush';

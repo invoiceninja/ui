@@ -11,22 +11,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSignStore } from '$app/_builder/SignStore';
 import { useTranslation } from 'react-i18next';
-
-// @ts-ignore
 import '@fontsource/dancing-script';
-
-// @ts-ignore
 import '@fontsource/great-vibes';
-
-// @ts-ignore
 import '@fontsource/pacifico';
-
-// @ts-ignore
 import '@fontsource/satisfy';
-
-// @ts-ignore
 import '@fontsource/alex-brush';
-
 import classNames from 'classnames';
 import { Modal } from './Modal';
 import { Button, InputField } from './forms';
