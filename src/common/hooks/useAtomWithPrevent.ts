@@ -24,6 +24,7 @@ import { diff } from 'deep-object-diff';
 import { useDebounce } from 'react-use';
 import { Quote } from '../interfaces/quote';
 import { PurchaseOrder } from '../interfaces/purchase-order';
+import { useReactSettings } from './useReactSettings';
 
 type Entity = Invoice | Quote | PurchaseOrder;
 type SetAtom<Args extends any[], Result> = (...args: Args) => Result;
@@ -47,6 +48,7 @@ export function useAtomWithPrevent<T extends Entity>(
 ): [T | undefined, SetAtom<[SetStateAction<T | undefined>], void>] {
   const { id } = useParams();
 
+  const reactSettings = useReactSettings();
   const { disableFunctionality = false } = options || {};
 
   const setChanges = useSetAtom(changesAtom);
@@ -90,6 +92,12 @@ export function useAtomWithPrevent<T extends Entity>(
     ) {
       const currentEntityPaths = generatePaths(entity as T);
 
+      let updatedExcludingPropertiesKeys: string[] = [];
+
+      if (reactSettings.preferences.use_legacy_editor) {
+        updatedExcludingPropertiesKeys = EXCLUDING_PROPERTIES_KEYS;
+      }
+
       /**
        * Filters out:
        * 1. Properties specified in EXCLUDING_PROPERTIES_KEYS (e.g. terms, footer etc.)
@@ -97,7 +105,7 @@ export function useAtomWithPrevent<T extends Entity>(
        *    when joining the page
        */
       const currentPathsForExcluding = currentEntityPaths.filter((path) =>
-        EXCLUDING_PROPERTIES_KEYS.some(
+        updatedExcludingPropertiesKeys.some(
           (excludingPropertyKey) =>
             path?.includes(excludingPropertyKey) ||
             (path?.includes('line_items') && path?.split('.')?.[2] === '_id')
