@@ -44,6 +44,7 @@
     "@tiptap/react": "^3.11.1",
     "@tiptap/starter-kit": "^3.11.1",
     "@types/js-beautify": "^1.14.3",
+    "@typescript/native-preview": "^7.0.0-dev.20260312.1",
     "antd": "^5.24.3",
     "array-move": "^4.0.0",
     "axios": "^1.8.3",
@@ -125,7 +126,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsgo && vite build",
     "format": "prettier --write src/",
     "lint": "eslint src --max-warnings=0",
     "test": "vitest run",
@@ -177,7 +178,6 @@
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.26.1",
     "vite": "^8.0.0",
-    "vite-tsconfig-paths": "^6.1.0",
     "vitest": "^4.1.0"
   },
   "engines": {
