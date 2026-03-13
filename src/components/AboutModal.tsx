@@ -420,7 +420,7 @@ export function AboutModal(props: Props) {
               onClick={() =>
                 window
                   .open(
-                    'https://invoiceninja.github.io/docs/self-host-installation/#currency-conversion',
+                    'https://invoiceninja.github.io/docs/self-host/self-host-installation/#currency-conversion',
                     '_blank'
                   )
                   ?.focus()
