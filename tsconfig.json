@@ -17,15 +17,15 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "downlevelIteration": true,
-    "baseUrl": "./",
     "paths": {
-      "$app": ["src"],
-      "$app/*": ["src/*"],
-      "$tests": ["tests"],
-      "$tests/*": ["tests/*"],
+      "$app": ["./src"],
+      "$app/*": ["./src/*"],
+      "$tests": ["./tests"],
+      "$tests/*": ["./tests/*"],
       "~/*": ["./*"]
     },
-    "types": ["node", "vite/client"]
+    "types": ["node", "vite/client"],
+    "incremental": true
   },
   "exclude": ["node_modules", "public/tinymce_6.4.2"]
 }

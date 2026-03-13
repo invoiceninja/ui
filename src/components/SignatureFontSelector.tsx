@@ -11,7 +11,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSignStore } from '$app/_builder/SignStore';
 import { useTranslation } from 'react-i18next';
-
 import '@fontsource/dancing-script';
 import '@fontsource/great-vibes';
 import '@fontsource/pacifico';

@@ -37,3 +37,5 @@ cypress/screenshots
 /playwright/.cache/
 
 .idea/*
+
+tsconfig.tsbuildinfo

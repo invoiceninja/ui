@@ -44,6 +44,7 @@
     "@tiptap/react": "^3.11.1",
     "@tiptap/starter-kit": "^3.11.1",
     "@types/js-beautify": "^1.14.3",
+    "@typescript/native-preview": "^7.0.0-dev.20260312.1",
     "antd": "^5.24.3",
     "array-move": "^4.0.0",
     "axios": "^1.8.3",
@@ -125,7 +126,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsgo && vite build",
     "format": "prettier --write src/",
     "lint": "eslint src --max-warnings=0",
     "test": "vitest run",
@@ -164,7 +165,7 @@
     "@types/react-dom": "^18.3.5",
     "@types/socket.io-client": "^3.0.0",
     "@types/uuid": "^9.0.8",
-    "@vitejs/plugin-react": "^5.1.0",
+    "@vitejs/plugin-react": "^6.0.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.22.0",
     "eslint-plugin-react": "^7.37.4",
@@ -176,9 +177,8 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.26.1",
-    "vite": "^7.3.1",
-    "vite-tsconfig-paths": "^6.1.0",
-    "vitest": "^4.0.18"
+    "vite": "^8.0.0",
+    "vitest": "^4.1.0"
   },
   "engines": {
     "node": ">=22"
