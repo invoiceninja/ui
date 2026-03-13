@@ -31,6 +31,7 @@ import { version } from '$app/common/helpers/version';
 import { toast } from '$app/common/helpers/toast/toast';
 import classNames from 'classnames';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { authenticatePasskey } from '$app/common/helpers/passkeys';
 
 export function Login() {
   useTitle('login');
@@ -44,7 +45,6 @@ export function Login() {
 
   const [isDisable2faModalOpen, setIsDisable2faModalOpen] =
     useState<boolean>(false);
-
   const login = useLogin();
 
   function handleSubmit(form: HTMLFormElement) {
@@ -56,11 +56,16 @@ export function Login() {
 
     const secret = formData.get('secret') as string;
 
-    request('POST', endpoint('/api/v1/login'), Object.fromEntries(formData), {
+    request(
+      'POST',
+      endpoint('/api/v1/login'),
+      Object.fromEntries(formData),
+      {
       ...(secret && {
         headers: { 'X-API-SECRET': secret },
       }),
-    })
+    }
+    )
       .then((response) => login(response))
       .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
         if (error.response?.status === 422) {
@@ -69,6 +74,7 @@ export function Login() {
           if (error.response.data.message) {
             setMessage(error.response.data.message);
           }
+
         } else if (error.response?.status === 503) {
           toast.error('app_maintenance');
         } else {
@@ -79,6 +85,80 @@ export function Login() {
       })
       .finally(() => setIsFormBusy(false));
   }
+
+  const handlePasskeyLogin = async () => {
+    const form = document.querySelector('form') as HTMLFormElement | null;
+    const formData = form ? new FormData(form) : new FormData();
+    const emailInput = formData.get('email') as string;
+    const secret = formData.get('secret') as string;
+
+    if (!emailInput) {
+      setMessage(t('provide_email') as string);
+      return;
+    }
+
+    setMessage(undefined);
+    setErrors(undefined);
+    setIsFormBusy(true);
+
+    try {
+      const optionsResponse = await request(
+        'POST',
+        endpoint('/api/v1/passkeys/login/options'),
+        { email: emailInput }
+      );
+
+      const publicKey = optionsResponse.data.data.publicKey;
+      const challengeToken = optionsResponse.data.data.challenge_token;
+
+      if (!publicKey || !publicKey.allowCredentials?.length) {
+        setMessage(t('no_passkeys_registered') as string);
+        return;
+      }
+
+      const assertion = await authenticatePasskey(publicKey);
+
+      const response = await request(
+        'POST',
+        endpoint('/api/v1/login'),
+        {
+          email: emailInput,
+          passkey_challenge_token: challengeToken,
+          passkey_authentication: {
+            id: assertion.id,
+            rawId: assertion.rawId,
+            type: assertion.type,
+            ...assertion.response,
+          },
+        },
+        {
+          ...(secret && {
+            headers: { 'X-API-SECRET': secret },
+          }),
+        }
+      );
+
+      login(response);
+    } catch (error) {
+      const axiosError = error as AxiosError<GenericValidationBag<LoginValidation>>;
+
+      if (axiosError.response?.status === 422) {
+        setErrors(axiosError.response.data.errors);
+
+        if (axiosError.response.data.message) {
+          setMessage(axiosError.response.data.message);
+        }
+      } else if (axiosError.response?.status === 503) {
+        toast.error('app_maintenance');
+      } else {
+        setMessage(
+          axiosError.response?.data?.message ?? (t('invalid_credentials') as string)
+        );
+      }
+    } finally {
+      setIsFormBusy(false);
+    }
+  };
 
   const colors = useColorScheme();
 
@@ -177,6 +257,22 @@ export function Login() {
             <Button disabled={isFormBusy} className="mt-4" variant="block">
               {t('login')}
             </Button>
+
+            <div className="flex items-center gap-4 my-4">
+              <div className="flex-1 border-t" style={{ borderColor: colors.$5 }} />
+              <span className="text-sm" style={{ color: colors.$3 }}>{t('or')}</span>
+              <div className="flex-1 border-t" style={{ borderColor: colors.$5 }} />
+            </div>
+
+            <Button
+              behavior="button"
+              disabled={isFormBusy}
+              variant="block"
+              onClick={handlePasskeyLogin}
+            >
+              {t('login_with_passkey')}
+            </Button>
+
           </form>
 
           <div className="flex justify-center">
