@@ -26,6 +26,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useState } from 'react';
 import { Modal } from '$app/components/Modal';
 import { GoCardlessOAuth2 } from './gateways/GoCardlessOAuth2';
+import { SquareOAuth } from './gateways/SquareOAuth';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 import { useResolveConfigValue } from '$app/pages/settings/gateways/create/hooks/useResolveConfigValue';
 import { useLocation } from 'react-router-dom';
@@ -61,6 +62,7 @@ export function Credentials(props: Props) {
   const WEPAY = '8fdeed552015b3c7b44ed6c8ebd9e992';
   const PAYPAL_PPCP = '80af24a6a691230bbec33e930ab40666';
   const GOCARDLESS = 'b9886f9257f0c6ee7c302f1c74475f6c';
+  const SQUARE = '65faab2ab6e3223dbe848b1686490baz';
 
   const hostedGateways = [STRIPE_CONNECT, WEPAY, PAYPAL_PPCP];
 
@@ -70,6 +72,10 @@ export function Credentials(props: Props) {
     config('oauth2') === true
   ) {
     hostedGateways.push(GOCARDLESS);
+  }
+
+  if (/* isHosted() && // TODO: restore isHosted() guard after testing */ props.gateway.key === SQUARE) {
+    hostedGateways.push(SQUARE);
   }
 
   const [isTestingBusy, setIsTestingBusy] = useState<boolean>(false);
@@ -127,6 +133,10 @@ export function Credentials(props: Props) {
         props.gateway.key === GOCARDLESS &&
         isHosted() &&
         config('oauth2') === true && <GoCardlessOAuth2 />}
+
+      {props.gateway && props.gateway.key === SQUARE && /* isHosted() && // TODO: restore after testing */ (
+        <SquareOAuth companyGateway={props.companyGateway} />
+      )}
 
       {props.gateway &&
         !hostedGateways.includes(props.gateway.key) &&
