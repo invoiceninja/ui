@@ -169,7 +169,7 @@ export function Create() {
 
     if (
       gateway?.key === '65faab2ab6e3223dbe848b1686490baz' &&
-      // isHosted() && // TODO: restore isHosted() guard after testing
+      isHosted() &&
       !isDuplicating
     ) {
       return handleSquareOAuth();
@@ -193,7 +193,7 @@ export function Create() {
       return handleGoCardless();
     }
 
-    if (gateway?.key === '65faab2ab6e3223dbe848b1686490baz' /* && isHosted() // TODO: restore after testing */) {
+    if (gateway?.key === '65faab2ab6e3223dbe848b1686490baz' && isHosted()) {
       return handleSquareOAuth();
     }
 

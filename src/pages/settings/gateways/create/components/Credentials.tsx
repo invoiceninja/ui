@@ -74,7 +74,7 @@ export function Credentials(props: Props) {
     hostedGateways.push(GOCARDLESS);
   }
 
-  if (/* isHosted() && // TODO: restore isHosted() guard after testing */ props.gateway.key === SQUARE) {
+  if (isHosted() && props.gateway.key === SQUARE) {
     hostedGateways.push(SQUARE);
   }
 
@@ -134,7 +134,7 @@ export function Credentials(props: Props) {
         isHosted() &&
         config('oauth2') === true && <GoCardlessOAuth2 />}
 
-      {props.gateway && props.gateway.key === SQUARE && /* isHosted() && // TODO: restore after testing */ (
+      {props.gateway && props.gateway.key === SQUARE && isHosted() && (
         <SquareOAuth companyGateway={props.companyGateway} />
       )}
 

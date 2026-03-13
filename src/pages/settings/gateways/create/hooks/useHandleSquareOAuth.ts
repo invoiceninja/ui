@@ -19,7 +19,7 @@ export function useHandleSquareOAuth() {
     }).then((response) =>
       window
         .open(
-          route('https://grok.romulus.com.au/square/oauth/connect/:token', {
+          route('https://invoicing.co/square/oauth/connect/:token', {
             token: response.data.hash,
           }),
           '_blank'
