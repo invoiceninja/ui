@@ -463,6 +463,21 @@ export function useActions(params?: Params) {
     (quote) => (
       <EntityActionElement
         {...(!dropdown && {
+          key: 'email_quote',
+        })}
+        entity="quote"
+        actionKey="email_quote"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('email_quote')}
+        to={route('/quotes/:id/email', { id: quote.id })}
+        icon={MdSend}
+      >
+        {t('email_quote')}
+      </EntityActionElement>
+    ),
+    (quote) => (
+      <EntityActionElement
+        {...(!dropdown && {
           key: 'view_pdf',
         })}
         entity="quote"
@@ -564,21 +579,6 @@ export function useActions(params?: Params) {
           </EntityActionElement>
         }
       />
-    ),
-    (quote) => (
-      <EntityActionElement
-        {...(!dropdown && {
-          key: 'email_quote',
-        })}
-        entity="quote"
-        actionKey="email_quote"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('email_quote')}
-        to={route('/quotes/:id/email', { id: quote.id })}
-        icon={MdSend}
-      >
-        {t('email_quote')}
-      </EntityActionElement>
     ),
     (quote) => (
       <EntityActionElement
