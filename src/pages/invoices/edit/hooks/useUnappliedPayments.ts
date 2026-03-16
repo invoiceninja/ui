@@ -14,11 +14,11 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { Payment } from '$app/common/interfaces/payment';
 import { useQuery } from 'react-query';
 
-export function useUnappliedPayments({
-  clientId,
-}: {
+interface Params {
   clientId: string | undefined;
-}) {
+}
+
+export function useUnappliedPayments({ clientId }: Params) {
   const { data: payments = [], isLoading } = useQuery({
     queryKey: ['/api/v1/payments', clientId, 'partially_unapplied'],
     queryFn: () =>

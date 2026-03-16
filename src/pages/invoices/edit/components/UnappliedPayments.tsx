@@ -14,11 +14,7 @@ import { useOutletContext, useNavigate } from 'react-router-dom';
 import { Context } from '../Edit';
 import { Card } from '$app/components/cards';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { DynamicLink } from '$app/components/DynamicLink';
-import dayjs from 'dayjs';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import { Spinner } from '$app/components/Spinner';
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
@@ -30,33 +26,32 @@ import { Button } from '$app/components/forms';
 import { CreditCard } from '$app/components/icons/CreditCard';
 import { Badge } from '$app/components/Badge';
 
-dayjs.extend(relativeTime);
-
-const PaymentRow = styled.div`
+const Box = styled.div`
   display: flex;
   background-color: ${(props) => props.theme.backgroundColor};
+
+  &:hover {
+    background-color: ${(props) => props.theme.hoverBackgroundColor};
+  }
 `;
 
 export default function UnappliedPayments() {
   const [t] = useTranslation();
+
   const navigate = useNavigate();
+  const formatMoney = useFormatMoney();
 
   const colors = useColorScheme();
-
   const context: Context = useOutletContext();
   const { invoice } = context;
 
-  const formatMoney = useFormatMoney();
-  const disableNavigation = useDisableNavigation();
-
   const { dateFormat } = useCurrentCompanyDateFormats();
-
   const { payments, isLoading } = useUnappliedPayments({
     clientId: invoice?.client_id,
   });
 
   const getUnappliedAmount = (payment: Payment) => {
-    return payment.amount - (payment.applied ?? 0);
+    return payment.amount - (payment.applied || 0);
   };
 
   return (
@@ -79,27 +74,16 @@ export default function UnappliedPayments() {
           </div>
         )}
 
-        {!isLoading && payments.length === 0 && (
-          <div
-            className="flex flex-col items-center justify-center py-10 space-y-2"
-            style={{ color: colors.$17 }}
-          >
-            <CreditCard color={colors.$17} />
-
-            <p className="text-sm">{t('no_unapplied_payments')}</p>
-          </div>
-        )}
-
         <div className="flex flex-col w-full gap-2">
           {payments.map((payment) => {
             const unappliedAmount = getUnappliedAmount(payment);
 
             return (
-              <PaymentRow
+              <Box
                 key={payment.id}
                 className="flex items-center justify-between p-3 rounded-lg cursor-pointer"
                 onClick={() =>
-                  navigate(route('/payments/:id', { id: payment.id }))
+                  navigate(route('/payments/:id/edit', { id: payment.id }))
                 }
                 theme={{
                   backgroundColor: colors.$4,
@@ -116,43 +100,27 @@ export default function UnappliedPayments() {
 
                   <div className="flex flex-col items-start space-y-1 min-w-0">
                     <div
-                      className="flex items-center space-x-2 text-sm font-medium truncate"
+                      className="flex items-center space-x-2 text-sm"
                       style={{ color: colors.$3 }}
                     >
-                      {payment.number && (
-                        <span className="font-medium">#{payment.number}</span>
-                      )}
+                      {payment.number && <span>#{payment.number}</span>}
 
                       {payment.number && (
                         <span style={{ color: colors.$17 }}>·</span>
                       )}
 
-                      <DynamicLink
-                        to={`/clients/${payment.client_id}`}
-                        renderSpan={disableNavigation(
-                          'client',
-                          invoice?.client
+                      <span>{date(payment.date, `${dateFormat}`)}</span>
+                    </div>
+
+                    {invoice?.client && (
+                      <Badge variant="green">
+                        {formatMoney(
+                          unappliedAmount,
+                          invoice.client.country_id,
+                          invoice.client.settings.currency_id
                         )}
-                      >
-                        {invoice?.client?.display_name}
-                      </DynamicLink>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xs">
-                        {date(payment.date, `${dateFormat}`)}
-                      </span>
-
-                      {invoice?.client && (
-                        <Badge variant="green">
-                          {formatMoney(
-                            unappliedAmount,
-                            invoice.client.country_id,
-                            invoice.client.settings.currency_id
-                          )}
-                        </Badge>
-                      )}
-                    </div>
+                      </Badge>
+                    )}
                   </div>
                 </div>
 
@@ -174,7 +142,7 @@ export default function UnappliedPayments() {
                     {t('apply')}
                   </Button>
                 </div>
-              </PaymentRow>
+              </Box>
             );
           })}
         </div>
