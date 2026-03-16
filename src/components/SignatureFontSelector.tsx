@@ -11,6 +11,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSignStore } from '$app/_builder/SignStore';
 import { useTranslation } from 'react-i18next';
+import { compressSignature } from '$app/common/helpers/image-compression';
 
 import '@fontsource/dancing-script';
 import '@fontsource/great-vibes';
@@ -157,7 +158,7 @@ export function SignatureFontSelector({
 
   const currentFont = SIGNATURE_FONTS.find((f) => f.value === selectedFont);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     canvas.width = 1200;
@@ -170,7 +171,7 @@ export function SignatureFontSelector({
       tempElement.textContent = text;
       document.body.appendChild(tempElement);
 
-      document.fonts.ready.then(() => {
+      document.fonts.ready.then(async () => {
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -244,11 +245,12 @@ export function SignatureFontSelector({
           );
 
           const signatureImage = croppedCanvas.toDataURL('image/png');
+          const compressed = await compressSignature(signatureImage);
 
           if (onSignatureCreated) {
-            onSignatureCreated(signatureImage);
+            onSignatureCreated(compressed);
           } else {
-            updateTemporarySignature(signatureImage);
+            updateTemporarySignature(compressed);
             // Dispatch event for new font signature
             window.dispatchEvent(new CustomEvent('signature:font-updated'));
           }

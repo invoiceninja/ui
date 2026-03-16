@@ -9,6 +9,7 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
+import { compressSignature } from '$app/common/helpers/image-compression';
 import { useEffect, useRef, useState } from 'react';
 import SignaturePad from 'signature_pad';
 
@@ -39,16 +40,18 @@ export function DefaultSignature({
       pad.fromDataURL(defaultValue);
     }
 
-    pad.addEventListener('endStroke', () => {
-      onChange?.(pad.toDataURL());
-    });
+    const handleEndStroke = async () => {
+      const rawSignature = pad.toDataURL();
+      const compressed = await compressSignature(rawSignature);
+      onChange?.(compressed);
+    };
+
+    pad.addEventListener('endStroke', handleEndStroke);
 
     signature.current = pad;
 
     return () => {
-      pad.removeEventListener('endStroke', () => {
-        onChange?.(pad.toDataURL());
-      });
+      pad.removeEventListener('endStroke', handleEndStroke);
       signature.current = null;
     };
   }, []);
