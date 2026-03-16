@@ -61,6 +61,7 @@ export function useNavigation() {
         to: '/clients/create',
         label: t('new_client'),
         visible: hasPermission('create_client'),
+        tooltipLabel: 'Ctrl + Shift + C',
       },
     },
     {
@@ -76,6 +77,7 @@ export function useNavigation() {
         to: '/products/create',
         label: t('new_product'),
         visible: hasPermission('create_product'),
+        tooltipLabel: 'Ctrl + Shift + K',
       },
     },
     {
@@ -92,6 +94,7 @@ export function useNavigation() {
         to: '/invoices/create',
         label: t('new_invoice'),
         visible: hasPermission('create_invoice'),
+        tooltipLabel: 'Ctrl + Shift + I',
       },
     },
     {
@@ -108,6 +111,7 @@ export function useNavigation() {
         to: '/recurring_invoices/create',
         label: t('new_recurring_invoice'),
         visible: hasPermission('create_recurring_invoice'),
+        tooltipLabel: 'Ctrl + Shift + R',
       },
     },
     {
@@ -123,6 +127,7 @@ export function useNavigation() {
         to: '/payments/create',
         label: t('new_payment'),
         visible: hasPermission('create_payment'),
+        tooltipLabel: 'Ctrl + Shift + P',
       },
     },
     {
@@ -139,6 +144,7 @@ export function useNavigation() {
         to: '/quotes/create',
         label: t('new_quote'),
         visible: hasPermission('create_quote'),
+        tooltipLabel: 'Ctrl + Shift + Q',
       },
     },
     {
@@ -155,6 +161,7 @@ export function useNavigation() {
         to: '/credits/create',
         label: t('new_credit'),
         visible: hasPermission('create_credit'),
+        tooltipLabel: 'Ctrl + Shift + D',
       },
     },
     {
@@ -171,6 +178,7 @@ export function useNavigation() {
         to: '/projects/create',
         label: t('new_project'),
         visible: hasPermission('create_project'),
+        tooltipLabel: 'Ctrl + Shift + J',
       },
     },
     {
@@ -187,6 +195,7 @@ export function useNavigation() {
         to: '/tasks/create',
         label: t('new_task'),
         visible: hasPermission('create_task'),
+        tooltipLabel: 'Ctrl + Shift + T',
       },
     },
     {
@@ -203,6 +212,7 @@ export function useNavigation() {
         to: '/vendors/create',
         label: t('new_vendor'),
         visible: hasPermission('create_vendor'),
+        tooltipLabel: 'Ctrl + Shift + V',
       },
     },
     {
@@ -219,6 +229,7 @@ export function useNavigation() {
         to: '/purchase_orders/create',
         label: t('new_purchase_order'),
         visible: hasPermission('create_purchase_order'),
+        tooltipLabel: 'Ctrl + Shift + O',
       },
     },
     {
@@ -235,6 +246,7 @@ export function useNavigation() {
         to: '/expenses/create',
         label: t('new_expense'),
         visible: hasPermission('create_expense'),
+        tooltipLabel: 'Ctrl + Shift + E',
       },
     },
     {
@@ -251,6 +263,7 @@ export function useNavigation() {
         to: '/recurring_expenses/create',
         label: t('new_recurring_expense'),
         visible: hasPermission('create_recurring_expense'),
+        tooltipLabel: 'Ctrl + Shift + X',
       },
     },
     {
@@ -267,6 +280,7 @@ export function useNavigation() {
         to: '/transactions/create',
         label: t('new_transaction'),
         visible: hasPermission('create_bank_transaction'),
+        tooltipLabel: 'Ctrl + Shift + A',
       },
     },
     {
@@ -284,6 +298,7 @@ export function useNavigation() {
         to: '/docuninja/create',
         label: t('new_document'),
         visible: import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
+        tooltipLabel: 'Ctrl + Shift + N',
       },
       visible: import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
       subOptions: [

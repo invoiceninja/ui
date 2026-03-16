@@ -88,6 +88,7 @@ export default function Clients() {
         dateRangeColumns={[
           { column: 'created_at', queryParameterKey: 'created_between' },
         ]}
+        enableSavingLatestDataForNavigation
       />
 
       <ChangeTemplateModal<Client>

@@ -13,6 +13,7 @@ import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 import { QuoteStatus as QuoteStatusEnum } from '$app/common/enums/quote-status';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import dayjs from 'dayjs';
 
 interface Props {
   entity: Quote;
@@ -21,8 +22,14 @@ interface Props {
 export function QuoteStatus(props: Props) {
   const [t] = useTranslation();
 
-  const { status_id, is_deleted, archived_at, invoice_id, invitations } =
-    props.entity;
+  const {
+    status_id,
+    is_deleted,
+    archived_at,
+    invoice_id,
+    invitations,
+    due_date,
+  } = props.entity;
 
   const statusThemeColors = useStatusThemeColorScheme();
 
@@ -36,8 +43,10 @@ export function QuoteStatus(props: Props) {
   const isUnpaid = !isApproved;
   const isViewed = checkQuoteInvitationsViewedDate();
 
+  const isExpiringToday = dayjs(due_date).isSame(dayjs(), 'day');
   const statusExpired = status_id === QuoteStatusEnum.Expired;
   const statusRejected = status_id === QuoteStatusEnum.Rejected;
+
   if (is_deleted) return <Badge variant="red">{t('deleted')}</Badge>;
 
   if (archived_at) return <Badge variant="orange">{t('archived')}</Badge>;
@@ -50,7 +59,7 @@ export function QuoteStatus(props: Props) {
     );
   }
 
-  if (statusExpired) {
+  if (statusExpired && !isExpiringToday) {
     return (
       <Badge variant="red" style={{ backgroundColor: statusThemeColors.$5 }}>
         {t('expired')}
@@ -74,7 +83,10 @@ export function QuoteStatus(props: Props) {
     return <Badge variant="generic">{t('draft')}</Badge>;
   }
 
-  if (status_id === QuoteStatusEnum.Sent) {
+  if (
+    status_id === QuoteStatusEnum.Sent ||
+    (statusExpired && isExpiringToday)
+  ) {
     return (
       <Badge
         variant="light-blue"

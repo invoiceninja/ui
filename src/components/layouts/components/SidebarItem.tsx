@@ -17,6 +17,7 @@ import classNames from 'classnames';
 import { Link } from '$app/components/forms';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Tooltip } from '$app/components/Tooltip';
 
 const Div = styled.div`
   background-color: ${(props) => props.theme.color};
@@ -100,25 +101,55 @@ export function SidebarItem(props: Props) {
           </LinkStyled>
         </div>
 
-        {item.rightButton && !isMiniSidebar && item.rightButton.visible && (
-          <LinkStyled
-            theme={{
-              hoverColor: colors.$6,
-            }}
-            to={item.rightButton.to}
-            className="rounded-sm p-[0.1rem]"
-            withoutDefaultStyling
-          >
-            <item.rightButton.icon
-              size="1.1rem"
-              color={
-                current
-                  ? themeColors.$2 || 'white'
-                  : themeColors.$4 || '#d1d5db'
-              }
-            />
-          </LinkStyled>
-        )}
+        {item.rightButton &&
+          !isMiniSidebar &&
+          item.rightButton.visible &&
+          (item.rightButton.tooltipLabel ? (
+            <Tooltip
+              message={item.rightButton.tooltipLabel}
+              withoutArrow
+              childrenWrapperClassName="inline-flex"
+              withoutWrapping
+              width="auto"
+              placement="right"
+            >
+              <LinkStyled
+                theme={{
+                  hoverColor: colors.$6,
+                }}
+                to={item.rightButton.to}
+                className="rounded-sm p-[0.1rem]"
+                withoutDefaultStyling
+              >
+                <item.rightButton.icon
+                  size="1.1rem"
+                  color={
+                    current
+                      ? themeColors.$2 || 'white'
+                      : themeColors.$4 || '#d1d5db'
+                  }
+                />
+              </LinkStyled>
+            </Tooltip>
+          ) : (
+            <LinkStyled
+              theme={{
+                hoverColor: colors.$6,
+              }}
+              to={item.rightButton.to}
+              className="rounded-sm p-[0.1rem]"
+              withoutDefaultStyling
+            >
+              <item.rightButton.icon
+                size="1.1rem"
+                color={
+                  current
+                    ? themeColors.$2 || 'white'
+                    : themeColors.$4 || '#d1d5db'
+                }
+              />
+            </LinkStyled>
+          ))}
       </Div>
 
       {current && (

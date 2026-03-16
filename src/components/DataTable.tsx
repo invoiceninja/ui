@@ -50,7 +50,10 @@ import {
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { Icon } from './icons/Icon';
 import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
-import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import {
+  fullTableLatestDataAtom,
+  invalidationQueryAtom,
+} from '$app/common/atoms/data-table';
 import CommonProps from '$app/common/interfaces/common-props.interface';
 import classNames from 'classnames';
 import { Guard } from '$app/common/guards/Guard';
@@ -69,6 +72,7 @@ import { useDebounce } from 'react-use';
 import { cloneDeep, get, isEqual } from 'lodash';
 import { FilterColumn } from './FilterColumn';
 import { buildDateRangeQueryParameter } from '$app/common/helpers/data-table';
+import { Resource } from './PreviousNextNavigation';
 
 export interface DateRangeColumn {
   column: string;
@@ -87,6 +91,7 @@ export type DataTableColumns<T = any> = {
   id: string;
   label: string;
   format?: (field: string | number, resource: T) => unknown;
+  sortKey?: string;
 }[];
 
 export type FooterColumns<T = any> = {
@@ -208,6 +213,7 @@ interface Props<T> extends CommonProps {
   useRestoreForDeletedResources?: boolean;
   disabledCreateButton?: boolean;
   filterParameterKey?: 'filter' | 'search';
+  enableSavingLatestDataForNavigation?: boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -270,6 +276,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
 
   const setInvalidationQueryAtom = useSetAtom(invalidationQueryAtom);
+  const setFullTableLatestDataAtom = useSetAtom(fullTableLatestDataAtom);
 
   const {
     styleOptions,
@@ -305,6 +312,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     useRestoreForDeletedResources = false,
     disabledCreateButton = false,
     filterParameterKey = 'filter',
+    enableSavingLatestDataForNavigation = false,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -733,6 +741,15 @@ export function DataTable<T extends object>(props: Props<T>) {
     setInvalidationQueryAtom(apiEndpoint.pathname);
   }, [apiEndpoint.pathname]);
 
+  useEffect(() => {
+    if (currentData.length && enableSavingLatestDataForNavigation) {
+      setFullTableLatestDataAtom({
+        type: props.resource,
+        resources: currentData as unknown as Resource[],
+      });
+    }
+  }, [currentData]);
+
   useDebounce(
     () => {
       if (data && !isFetching) {
@@ -1011,7 +1028,8 @@ export function DataTable<T extends object>(props: Props<T>) {
                     id={column.id}
                     key={index}
                     className={styleOptions?.thClassName}
-                    isCurrentlyUsed={sortedBy === column.id}
+                    isCurrentlyUsed={sortedBy === (column.sortKey ?? column.id)}
+                    sortKey={column.sortKey}
                     onColumnClick={(data: ColumnSortPayload) => {
                       setSortedBy(data.field);
                       setSort(data.sort);

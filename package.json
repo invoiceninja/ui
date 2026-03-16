@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^3.28.1",
-    "@docuninja/builder2.0": "^0.0.85",
+    "@docuninja/builder2.0": "^0.0.87",
     "@emotion/styled": "^11.14.0",
     "@excalidraw/excalidraw": "^0.18.0",
     "@fontsource/alex-brush": "^5.2.6",
@@ -93,6 +93,7 @@
     "react-hot-toast": "^2.5.2",
     "react-i18next": "^12.3.1",
     "react-icons": "^4.12.0",
+    "react-image-crop": "^11.0.10",
     "react-json-tree": "^0.20.0",
     "react-markdown": "^10.1.0",
     "react-number-format": "^5.4.3",

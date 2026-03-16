@@ -241,7 +241,7 @@ export function usePaymentColumns() {
         formatMoney(
           calculateConvertedAmount(payment),
           payment.client?.country_id,
-          payment.client?.settings.currency_id
+          payment.exchange_currency_id || payment.client?.settings.currency_id
         ),
     },
     {

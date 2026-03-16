@@ -276,6 +276,11 @@ function Builder() {
 
     window.addEventListener('builder:save.error', handleSaveError);
 
+    window.addEventListener(
+      'builder:document.updated',
+      refetchDocuninjaDocument
+    );
+
     return () => {
       window.removeEventListener(
         'refetch.docuninja.document',
@@ -293,6 +298,11 @@ function Builder() {
       );
 
       window.removeEventListener('builder:save.error', handleSaveError);
+
+      window.removeEventListener(
+        'builder:document.updated',
+        refetchDocuninjaDocument
+      );
     };
   }, []);
 
@@ -473,6 +483,11 @@ function Builder() {
                   marginBottom: '0.5rem',
                 },
               },
+              general: {
+                backgroundColor: colors.$1,
+                textColor: colors.$3,
+                foregroundColor: colors.$4,
+              }
             },
             options: {
               header: {
@@ -490,6 +505,7 @@ function Builder() {
               undefined,
             readonly: false,
             onEntityReady: (entity) => setEntity(entity as Document),
+            onEntityRefresh: (entity) => setEntity(entity as Document),
             services: {
               google: {
                 appId: import.meta.env.VITE_GOOGLE_APP_ID,

@@ -14,8 +14,6 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { Project } from '$app/common/interfaces/project';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import classNames from 'classnames';
-import { useEffect, useState } from 'react';
-import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { Product } from '$app/common/interfaces/product';
@@ -35,6 +33,9 @@ import styled from 'styled-components';
 import { ChevronLeft } from './icons/ChevronLeft';
 import { useColorScheme } from '$app/common/colors';
 import { ChevronRight } from './icons/ChevronRight';
+import { useAtomValue } from 'jotai';
+import { fullTableLatestDataAtom } from '$app/common/atoms/data-table';
+import { useMemo } from 'react';
 
 const Button = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};
@@ -61,7 +62,7 @@ type Entity =
   | 'recurring_expense'
   | 'transaction';
 
-type Resource =
+export type Resource =
   | RecurringInvoice
   | Invoice
   | Project
@@ -82,13 +83,7 @@ interface Props {
   entityEndpointName?: 'bank_transaction';
 }
 
-interface QueryState {
-  data: {
-    data: Resource[];
-  };
-}
-
-export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
+export function PreviousNextNavigation({ entity }: Props) {
   const { id } = useParams();
 
   if (!id) {
@@ -100,34 +95,29 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
   const preventNavigation = usePreventNavigation();
 
   const colors = useColorScheme();
-  const queryClient = useQueryClient();
+  const { isEditPage } = useEntityPageIdentifier({ entity });
 
-  const { isEditPage } = useEntityPageIdentifier({
-    entity,
-  });
+  const navigationData = useAtomValue(fullTableLatestDataAtom);
 
-  const [currentData, setCurrentData] = useState<Resource[]>([]);
+  const currentList = useMemo(() => {
+    return navigationData?.resources as Resource[] | undefined;
+  }, [navigationData]);
 
   const getPreviousIndex = () => {
-    const currentIndex = currentData.findIndex(
-      (resource) => resource.id === id
-    );
+    const currentIndex =
+      currentList?.findIndex((resource) => resource.id === id) ?? -1;
 
-    if (currentIndex === 0) {
-      return null;
-    }
+    if (currentIndex <= 0) return null;
 
     return currentIndex - 1;
   };
 
   const getNextIndex = () => {
-    const currentIndex = currentData.findIndex(
-      (resource) => resource.id === id
-    );
+    const currentIndex =
+      currentList?.findIndex((resource) => resource.id === id) ?? -1;
 
-    if (currentIndex === currentData.length - 1) {
+    if (currentIndex === -1 || currentIndex === (currentList?.length ?? 0) - 1)
       return null;
-    }
 
     return currentIndex + 1;
   };
@@ -135,10 +125,10 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
   const navigateToPrevious = () => {
     const previousIndex = getPreviousIndex();
 
-    if (previousIndex !== null) {
+    if (previousIndex !== null && currentList) {
       navigate(
         route(`/${entity}s/:id/${isEditPage ? 'edit' : ''}`, {
-          id: currentData[previousIndex].id,
+          id: currentList[previousIndex].id,
         })
       );
     }
@@ -147,42 +137,19 @@ export function PreviousNextNavigation({ entity, entityEndpointName }: Props) {
   const navigateToNext = () => {
     const nextIndex = getNextIndex();
 
-    if (nextIndex !== null) {
+    if (nextIndex !== null && currentList) {
       navigate(
         route(`/${entity}s/:id/${isEditPage ? 'edit' : ''}`, {
-          id: currentData[nextIndex].id,
+          id: currentList[nextIndex].id,
         })
       );
     }
   };
 
-  useEffect(() => {
-    const data = queryClient
-      .getQueryCache()
-      .findAll({ queryKey: [`/api/v1/${entityEndpointName ?? entity}s`] })
-      .filter(
-        (query) =>
-          (query.state.data as QueryState)?.data?.data &&
-          Array.isArray((query.state.data as QueryState)?.data?.data)
-      )
-      .flatMap((query) => (query.state.data as QueryState)?.data?.data)
-      .reduce((acc: Resource[], resource: Resource) => {
-        if (!acc.some((item) => item.id === resource.id)) {
-          acc.push(resource);
-        }
-        return acc;
-      }, [] as Resource[])
-      .sort((a, b) => a.created_at - b.created_at);
-
-    setCurrentData(data);
-
-    return () => setCurrentData([]);
-  }, [queryClient]);
-
   if (
-    !currentData.length ||
-    currentData.length === 1 ||
-    (currentData.length && !currentData.find((resource) => resource.id === id))
+    !currentList?.length ||
+    currentList.length === 1 ||
+    !currentList.find((resource) => resource.id === id)
   ) {
     return null;
   }
