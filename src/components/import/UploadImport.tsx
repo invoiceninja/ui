@@ -34,6 +34,7 @@ import { parse as papaParse, ParseResult } from 'papaparse';
 import { CloudUpload } from '../icons/CloudUpload';
 import styled from 'styled-components';
 import { ErrorMessage } from '../ErrorMessage';
+import { cloneDeep } from 'lodash';
 
 interface Props {
   entity: string;
@@ -217,6 +218,10 @@ export function UploadImport(props: Props) {
 
       request('POST', endpoint('/api/v1/preimport'), formData)
         .then((response) => {
+          payload.column_map[props.entity].mapping = {};
+          setPayloadData(cloneDeep(payload));
+          setDefaultMapping({});
+
           setMapData(response.data);
           props.onSuccess;
           toast.dismiss();

@@ -20,6 +20,8 @@ export function roundToPrecision(
   value: number,
   precision: number = 2
 ): number {
+  if (Math.abs(value) < 1e-10) return 0;
+
   const isNegative = value < 0;
 
   if (isNegative) {

@@ -196,6 +196,13 @@ export function ClientCreate({
               />
 
               <InputField
+                label={t('vat_number')}
+                value={client?.vat_number || ''}
+                onValueChange={(value) => handleChange('vat_number', value)}
+                errorMessage={errors?.errors.vat_number}
+              />
+
+              <InputField
                 label={`${t('contact')} ${t('first_name')}`}
                 value={contacts[0].first_name}
                 onValueChange={(value) =>
