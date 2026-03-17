@@ -126,7 +126,7 @@ export function App() {
   };
 
   useEffect(() => {
-    if (reactSettings?.dark_mode !== undefined) {
+    if (reactSettings) {
       const colorScheme = reactSettings.dark_mode
         ? darkColorScheme
         : lightColorScheme;
