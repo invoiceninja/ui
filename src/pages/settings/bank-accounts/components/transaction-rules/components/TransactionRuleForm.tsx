@@ -64,8 +64,6 @@ export function TransactionRuleForm(props: Props) {
 
   const colors = useColorScheme();
 
-  const isCredit = transactionRule.applies_to === 'CREDIT';
-
   return (
     <>
       <Card
@@ -116,7 +114,9 @@ export function TransactionRuleForm(props: Props) {
         <Element
           leftSide={t('auto_convert')}
           leftSideHelp={
-            isCredit ? t('auto_convert_credit_help') : t('auto_convert_help')
+            transactionRule.applies_to === 'CREDIT'
+              ? t('auto_convert_credit_help')
+              : t('auto_convert_help')
           }
         >
           <Toggle
