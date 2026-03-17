@@ -469,12 +469,12 @@ export function EInvoice() {
                         type="password"
                         onValueChange={(value) =>
                           handleChange(
-                            'has_e_invoice_certificate_passphrase',
+                            'e_invoice_certificate_passphrase',
                             value
                           )
                         }
                         errorMessage={
-                          errors?.errors.has_e_invoice_certificate_passphrase
+                          errors?.errors.e_invoice_certificate_passphrase
                         }
                       />
                     </Element>
