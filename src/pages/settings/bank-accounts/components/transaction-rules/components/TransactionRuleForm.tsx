@@ -104,6 +104,9 @@ export function TransactionRuleForm(props: Props) {
               handleChange('applies_to', value as 'DEBIT' | 'CREDIT')
             }
             errorMessage={errors?.errors.applies_to}
+            customSelector
+            searchable={false}
+            dismissable={false}
           >
             <option value="DEBIT">{t('debit')}</option>
             <option value="CREDIT">{t('credit')}</option>
