@@ -52,6 +52,14 @@ export function Permissions(props: Props) {
     'recurring_expense',
   ];
 
+  const isPermissionDisabled = () => {
+    if (user?.company_user?.is_admin) {
+      return true;
+    }
+
+    return false;
+  };
+
   const handleAdministratorToggle = (value: boolean) => {
     setUser(
       (user) =>
@@ -176,6 +184,7 @@ export function Permissions(props: Props) {
             handlePermissionChange('view_dashboard', value)
           }
           cypressRef="viewDashboard"
+          disabled={isPermissionDisabled()}
         />
       </Element>
 
@@ -189,6 +198,7 @@ export function Permissions(props: Props) {
             handlePermissionChange('view_reports', value)
           }
           cypressRef="viewReports"
+          disabled={isPermissionDisabled()}
         />
       </Element>
 
@@ -201,6 +211,7 @@ export function Permissions(props: Props) {
           onValueChange={(value) =>
             handlePermissionChange('disable_emails', value)
           }
+          disabled={isPermissionDisabled()}
         />
       </Element>
 
@@ -235,6 +246,7 @@ export function Permissions(props: Props) {
                 handlePermissionChange('create_all', event.target.checked)
               }
               cypressRef="create_all"
+              disabled={isPermissionDisabled()}
             />
           </div>
           <div className="col-1">
@@ -244,6 +256,7 @@ export function Permissions(props: Props) {
                 handlePermissionChange('view_all', event.target.checked)
               }
               cypressRef="view_all"
+              disabled={isPermissionDisabled()}
             />
           </div>
           <div className="col-1">
@@ -253,6 +266,7 @@ export function Permissions(props: Props) {
                 handlePermissionChange('edit_all', event.target.checked)
               }
               cypressRef="edit_all"
+              disabled={isPermissionDisabled()}
             />
           </div>
         </div>
@@ -273,6 +287,7 @@ export function Permissions(props: Props) {
                   )
                 }
                 cypressRef={`create_${permission}`}
+                disabled={isPermissionDisabled()}
               />
             </div>
             <div className="col-1">
@@ -287,6 +302,7 @@ export function Permissions(props: Props) {
                   )
                 }
                 cypressRef={`view_${permission}`}
+                disabled={isPermissionDisabled()}
               />
             </div>
             <div className="col-1">
@@ -301,6 +317,7 @@ export function Permissions(props: Props) {
                   )
                 }
                 cypressRef={`edit_${permission}`}
+                disabled={isPermissionDisabled()}
               />
             </div>
           </div>
