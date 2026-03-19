@@ -180,8 +180,6 @@ export function Default(props: Props) {
 
               <QuickCreatePopover />
               <Search />
-
-              {t('benjamin')}
             </div>
 
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
