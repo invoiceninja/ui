@@ -100,6 +100,9 @@ export function ClientSelector(props: Props) {
   useEffect(() => {
     // Use the client data that's already included in the invoice relation
     // instead of fetching it separately (which requires view_client permission)
+
+    console.log(resource?.client);
+
     if (resource?.client) {
       setClient(resource.client);
     } else if (resource?.client_id) {
