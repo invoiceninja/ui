@@ -45,7 +45,6 @@ import classNames from 'classnames';
 import { Feedback } from '../Feedback';
 import { PriceIncreaseBanner } from '../banners/PriceIncrease';
 import { useNavigation } from './common/navigation';
-import { useCompanyTranslations } from '$app/common/hooks/useCompanyTranslations';
 
 export interface SaveOption {
   label: string;
@@ -69,8 +68,6 @@ interface Props extends CommonProps {
 }
 
 export function Default(props: Props) {
-  useCompanyTranslations();
-
   const [t] = useTranslation();
 
   const colors = useColorScheme();
@@ -183,6 +180,8 @@ export function Default(props: Props) {
 
               <QuickCreatePopover />
               <Search />
+
+              {t('benjamin')}
             </div>
 
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
