@@ -29,9 +29,13 @@ import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { STATUS_VARIANTS } from '../common/hooks/useTableColumns';
-import { Document as DocumentType, DocumentStatus } from '$app/common/interfaces/docuninja/api';
+import {
+  Document as DocumentType,
+  DocumentStatus,
+} from '$app/common/interfaces/docuninja/api';
 import { useActions } from '../common/hooks/useActions';
 import { DocumentSettingsModal } from './components/DocumentSettingsModal';
+import { useWebSocketSubscription } from '@docuninja/builder2.0';
 
 export default function Document() {
   const { documentTitle } = useTitle('view_document');
@@ -46,6 +50,7 @@ export default function Document() {
     isLoading,
     error,
     isFetching: isDocumentFetching,
+    refetch,
   } = useDocumentQuery({
     id,
     enabled: Boolean(id),
@@ -88,6 +93,14 @@ export default function Document() {
     enabled: Boolean(id),
   });
 
+  useWebSocketSubscription({
+    events: ['App\\Events\\Document\\DocumentWasSigned'],
+    token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
+    companyId: localStorage.getItem('DOCUNINJA_COMPANY_ID') as string,
+    endpoint: 'https://api.docuninja.co',
+    onEvent: () => refetch(),
+  });
+
   return (
     <Default
       title={document?.description || documentTitle}
@@ -112,7 +125,9 @@ export default function Document() {
             cardActions
             labelButtonBorderColor={colors.$1}
           >
-            {actions.map((action: any, index: number) => document ? action(document) : null)}
+            {actions.map((action: any, index: number) =>
+              document ? action(document) : null
+            )}
           </Dropdown>
         </div>
       }
