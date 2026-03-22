@@ -41,5 +41,6 @@ export const blankLineItem = (): InvoiceItem => {
     custom_value4: '',
     type_id: InvoiceItemType.Product,
     tax_id: '1',
+    income_account_id: '',
   };
 };

@@ -42,6 +42,7 @@ import { Table } from '@tiptap/extension-table';
 import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
+import { Paragraph } from '@tiptap/extension-paragraph';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Underline from '@tiptap/extension-underline';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -119,6 +120,190 @@ interface ColorPickerProps {
   title?: string;
   type?: 'text' | 'background';
 }
+
+function styleAttribute() {
+  return {
+    default: null,
+    parseHTML: (element: HTMLElement) => element.getAttribute('style') || null,
+    renderHTML: (attributes: Record<string, any>) => {
+      if (!attributes.style) return {};
+      return { style: attributes.style };
+    },
+  };
+}
+
+function simpleAttribute(name: string, defaultValue: any = null) {
+  return {
+    default: defaultValue,
+    parseHTML: (element: HTMLElement) =>
+      element.getAttribute(name) ?? defaultValue,
+    renderHTML: (attributes: Record<string, any>) => {
+      const val = attributes[name];
+      if (val === null || val === undefined) return {};
+      return { [name]: val };
+    },
+  };
+}
+
+const CustomTable = Table.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      style: styleAttribute(),
+      role: simpleAttribute('role'),
+      border: simpleAttribute('border'),
+      cellspacing: simpleAttribute('cellspacing'),
+      cellpadding: simpleAttribute('cellpadding'),
+      align: simpleAttribute('align'),
+      class: simpleAttribute('class'),
+      width: simpleAttribute('width'),
+    };
+  },
+});
+
+const CustomTableRow = TableRow.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      style: styleAttribute(),
+      class: simpleAttribute('class'),
+    };
+  },
+});
+
+const CustomTableCell = TableCell.extend({
+  content: '(block | table)+',
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      style: styleAttribute(),
+      class: simpleAttribute('class'),
+    };
+  },
+});
+
+const CustomTableHeader = TableHeader.extend({
+  content: '(block | table)+',
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      style: styleAttribute(),
+      class: simpleAttribute('class'),
+    };
+  },
+});
+
+const CustomParagraph = Paragraph.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      style: styleAttribute(),
+    };
+  },
+});
+
+const CustomLink = Link.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      style: styleAttribute(),
+    };
+  },
+});
+
+const FontSize = Extension.create({
+  name: 'fontSize',
+  addOptions() {
+    return {
+      types: ['textStyle'],
+    };
+  },
+  addGlobalAttributes() {
+    return [
+      {
+        types: this.options.types,
+        attributes: {
+          fontSize: {
+            default: null,
+            parseHTML: (element: HTMLElement) => element.style.fontSize,
+            renderHTML: (attributes: { fontSize?: string }) => {
+              if (!attributes.fontSize) {
+                return {};
+              }
+              return {
+                style: `font-size: ${attributes.fontSize}`,
+              };
+            },
+          },
+        },
+      },
+    ];
+  },
+  addCommands() {
+    return {
+      setFontSize:
+        (fontSize: string) =>
+        ({ chain }: { chain: () => any }) => {
+          return chain().setMark('textStyle', { fontSize }).run();
+        },
+      unsetFontSize:
+        () =>
+        ({ chain }: { chain: () => any }) => {
+          return chain()
+            .setMark('textStyle', { fontSize: null })
+            .removeEmptyTextStyle()
+            .run();
+        },
+    };
+  },
+});
+
+const BackgroundColorExtension = Extension.create({
+  name: 'backgroundColor',
+  addOptions() {
+    return {
+      types: ['textStyle'],
+    };
+  },
+  addGlobalAttributes() {
+    return [
+      {
+        types: this.options.types,
+        attributes: {
+          backgroundColor: {
+            default: null,
+            parseHTML: (element: HTMLElement) => element.style.backgroundColor,
+            renderHTML: (attributes: { backgroundColor?: string }) => {
+              if (!attributes.backgroundColor) {
+                return {};
+              }
+              return {
+                style: `background-color: ${attributes.backgroundColor}`,
+              };
+            },
+          },
+        },
+      },
+    ];
+  },
+  addCommands() {
+    return {
+      setBackgroundColor:
+        (backgroundColor: string) =>
+        ({ chain }: { chain: () => any }) => {
+          return chain().setMark('textStyle', { backgroundColor }).run();
+        },
+      unsetBackgroundColor:
+        () =>
+        ({ chain }: { chain: () => any }) => {
+          return chain()
+            .setMark('textStyle', { backgroundColor: null })
+            .removeEmptyTextStyle()
+            .run();
+        },
+    };
+  },
+});
 
 const ToolbarSection = styled.div`
   display: flex;
@@ -253,7 +438,7 @@ const DropdownMenu = styled.div<{ theme: ThemeProps }>`
   }
 `;
 
-const DropdownItem = styled.button<{ theme: ThemeProps }>`
+const DropdownItemStyled = styled.button<{ theme: ThemeProps }>`
   display: flex;
   align-items: center;
   gap: 8px;
@@ -470,6 +655,23 @@ const EditorWrapper = styled.div<{ theme: ThemeProps }>`
       }
     }
 
+    table[role='presentation'] {
+      border-collapse: collapse;
+      margin: 0;
+
+      td,
+      th {
+        border: none;
+        padding: 0;
+        min-width: 0;
+      }
+
+      th {
+        background: transparent;
+        font-weight: normal;
+      }
+    }
+
     ul[data-type='taskList'] {
       list-style: none;
       padding: 0;
@@ -496,100 +698,6 @@ const EditorWrapper = styled.div<{ theme: ThemeProps }>`
 const HiddenFileInput = styled.input`
   display: none;
 `;
-
-const FontSize = Extension.create({
-  name: 'fontSize',
-  addOptions() {
-    return {
-      types: ['textStyle'],
-    };
-  },
-  addGlobalAttributes() {
-    return [
-      {
-        types: this.options.types,
-        attributes: {
-          fontSize: {
-            default: null,
-            parseHTML: (element: HTMLElement) => element.style.fontSize,
-            renderHTML: (attributes: { fontSize?: string }) => {
-              if (!attributes.fontSize) {
-                return {};
-              }
-              return {
-                style: `font-size: ${attributes.fontSize}`,
-              };
-            },
-          },
-        },
-      },
-    ];
-  },
-  addCommands() {
-    return {
-      setFontSize:
-        (fontSize: string) =>
-        ({ chain }: { chain: () => any }) => {
-          return chain().setMark('textStyle', { fontSize }).run();
-        },
-      unsetFontSize:
-        () =>
-        ({ chain }: { chain: () => any }) => {
-          return chain()
-            .setMark('textStyle', { fontSize: null })
-            .removeEmptyTextStyle()
-            .run();
-        },
-    };
-  },
-});
-
-const BackgroundColor = Extension.create({
-  name: 'backgroundColor',
-  addOptions() {
-    return {
-      types: ['textStyle'],
-    };
-  },
-  addGlobalAttributes() {
-    return [
-      {
-        types: this.options.types,
-        attributes: {
-          backgroundColor: {
-            default: null,
-            parseHTML: (element: HTMLElement) => element.style.backgroundColor,
-            renderHTML: (attributes: { backgroundColor?: string }) => {
-              if (!attributes.backgroundColor) {
-                return {};
-              }
-              return {
-                style: `background-color: ${attributes.backgroundColor}`,
-              };
-            },
-          },
-        },
-      },
-    ];
-  },
-  addCommands() {
-    return {
-      setBackgroundColor:
-        (backgroundColor: string) =>
-        ({ chain }: { chain: () => any }) => {
-          return chain().setMark('textStyle', { backgroundColor }).run();
-        },
-      unsetBackgroundColor:
-        () =>
-        ({ chain }: { chain: () => any }) => {
-          return chain()
-            .setMark('textStyle', { backgroundColor: null })
-            .removeEmptyTextStyle()
-            .run();
-        },
-    };
-  },
-});
 
 function ToolbarButtonComponent({
   onClick,
@@ -709,7 +817,7 @@ function DropdownComponent({ label, icon, items }: DropdownProps) {
       {dropdownOpen && (
         <DropdownMenu theme={theme}>
           {items.map((item, index) => (
-            <DropdownItem
+            <DropdownItemStyled
               key={index}
               theme={theme}
               onClick={(e) => {
@@ -720,7 +828,7 @@ function DropdownComponent({ label, icon, items }: DropdownProps) {
             >
               {item.icon && <DropdownItemIcon>{item.icon}</DropdownItemIcon>}
               <span>{item.label}</span>
-            </DropdownItem>
+            </DropdownItemStyled>
           ))}
         </DropdownMenu>
       )}
@@ -886,17 +994,19 @@ export function TipTapEditor({
         heading: {
           levels: [1, 2, 3, 4],
         },
+        paragraph: false,
       }),
+      CustomParagraph,
       Placeholder.configure({
         placeholder,
       }),
-      Link.configure({
+      CustomLink.configure({
         openOnClick: false,
         HTMLAttributes: {
           target: '_blank',
           rel: 'noopener noreferrer',
         },
-        validate: (href) => /^https?:\/\//.test(href),
+        validate: (href: string) => /^https?:\/\//.test(href),
       }),
       Image.configure({
         inline: true,
@@ -905,12 +1015,12 @@ export function TipTapEditor({
           class: 'editor-image',
         },
       }),
-      Table.configure({
+      CustomTable.configure({
         resizable: true,
       }),
-      TableRow,
-      TableHeader,
-      TableCell,
+      CustomTableRow,
+      CustomTableHeader,
+      CustomTableCell,
       Underline,
       Strike,
       Subscript,
@@ -923,20 +1033,14 @@ export function TipTapEditor({
       }),
       TextStyle,
       Color,
-      BackgroundColor,
+      BackgroundColorExtension,
       FontFamily,
       FontSize,
       TaskList,
       TaskItem.configure({
         nested: true,
       }),
-      HardBreak.extend({
-        addKeyboardShortcuts() {
-          return {
-            Enter: () => this.editor.commands.setHardBreak(),
-          };
-        },
-      }),
+      HardBreak,
     ],
     content: currentValue,
     editable: !disabled,

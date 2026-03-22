@@ -63,6 +63,16 @@ export function ProductSelector(props: Props) {
           label: 'product_key',
           value: 'id',
           searchable: 'notes',
+          customSearchableValue: (product) => {
+            const productFields = [
+              product.custom_value1,
+              product.custom_value2,
+              product.custom_value3,
+              product.custom_value4,
+            ].filter(Boolean);
+
+            return productFields.join(',');
+          },
           dropdownLabelFn: (product) => (
             <div className="flex flex-col flex-1 max-w-[33rem]">
               <div className="flex space-x-1">

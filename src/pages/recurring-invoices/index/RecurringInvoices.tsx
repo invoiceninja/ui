@@ -152,6 +152,7 @@ export default function RecurringInvoices() {
             queryParameterKey: 'created_between',
           },
         ]}
+        enableSavingLatestDataForNavigation
       />
 
       {!disableNavigation('recurring_invoice', recurringInvoiceSlider) && (

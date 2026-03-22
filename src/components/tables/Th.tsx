@@ -35,6 +35,7 @@ interface Props extends CommonProps {
   descIcon?: ReactNode;
   ascIcon?: ReactNode;
   withoutHorizontalPadding?: boolean;
+  sortKey?: string;
 }
 
 const defaultProps: Props = {
@@ -63,17 +64,19 @@ export function Th$(props: Props) {
     isResizing,
   } = useResizeColumn(props.resizable);
 
-  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+  const [order, setOrder] = useState<'asc' | 'desc'>('desc');
 
   const handleClick = useCallback(() => {
     if (props.onColumnClick) {
-      setOrder(order === 'desc' ? 'asc' : 'desc');
+      const sortField = props.sortKey ?? props.id;
+      const newOrder = order === 'asc' ? 'desc' : 'asc';
+      setOrder(newOrder);
       props.onColumnClick({
-        sort: `${props.id}|${order}`,
-        field: props.id,
+        sort: `${sortField}|${newOrder}`,
+        field: sortField,
       });
     }
-  }, [order, props.onColumnClick, props.id]);
+  }, [order, props.onColumnClick, props.id, props.sortKey]);
 
   return (
     <th

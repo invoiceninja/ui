@@ -11,7 +11,7 @@
 import { Alert } from '$app/components/Alert';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button, InputField } from '$app/components/forms';
+import {Button, InputField, SelectField} from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/icons/Settings';
 import { Modal } from '$app/components/Modal';
@@ -379,15 +379,10 @@ export function RectangleSettingsSelect({
   children,
 }: RectangleSettingsSelectProps) {
   return (
-    <select
-      id={id}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-    >
-      {children}
-    </select>
-  );
+      <SelectField id={id} defaultValue={value} onValueChange={onChange}>
+        {children}
+      </SelectField>
+  )
 }
 
 export function RectangleSettingsRemoveButton({
@@ -403,7 +398,7 @@ export function RectangleSettingsRemoveButton({
 export function RectangleSettingsOptionItem({
   children,
 }: RectangleSettingsOptionItemProps) {
-  return <div className="py-2 px-3 hover:bg-gray-50 flex gap-1 items-center">{children}</div>;
+  return <div className="py-2 px-3 flex gap-1 items-center">{children}</div>;
 }
 
 export function RectangleSettingsOptionsList({

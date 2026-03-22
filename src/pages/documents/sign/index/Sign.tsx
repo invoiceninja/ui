@@ -81,6 +81,11 @@ export default function Index() {
               background: colors.$1,
               color: colors.$3,
             },
+            general: {
+              backgroundColor: colors.$1,
+              textColor: colors.$3,
+              foregroundColor: colors.$4,
+            }
           },
         }}
       >
