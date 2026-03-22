@@ -51,9 +51,12 @@ export function useDocumentQuery({ id, enabled }: GenericQueryOptions) {
     () =>
       request(
         'GET',
-        docuNinjaEndpoint('/api/documents/:id?includeUrl&includePreviews', {
-          id,
-        }),
+        docuNinjaEndpoint(
+          '/api/documents/:id?includeUrl&includePreviews&includeUser',
+          {
+            id,
+          }
+        ),
         {},
         {
           headers: {

@@ -14,10 +14,17 @@ import { Button, InputField } from '$app/components/forms';
 import { cloneDeep, set } from 'lodash';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
+import {
+  User,
+  Permission as PermissionType,
+} from '$app/common/interfaces/docuninja/api';
 import { DefaultSignature } from './DefaultSignature';
 import { SignatureFontSelector } from '$app/components/SignatureFontSelector';
 import { NotificationValue } from '../constants/notifications';
+import {
+  compressSignature,
+  compressInitials,
+} from '$app/common/helpers/image-compression';
 export interface DocuninjaUserProps {
   user: User;
   setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
@@ -28,15 +35,19 @@ export interface DocuninjaUserProps {
   permissions: PermissionType[];
   setPermissions: React.Dispatch<React.SetStateAction<PermissionType[]>>;
   notifications: Record<string, string>;
-  setNotifications: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setNotifications: React.Dispatch<
+    React.SetStateAction<Record<string, string>>
+  >;
   allNotificationsValue: NotificationValue;
-  setAllNotificationsValue: React.Dispatch<React.SetStateAction<NotificationValue>>;
+  setAllNotificationsValue: React.Dispatch<
+    React.SetStateAction<NotificationValue>
+  >;
   editPage?: boolean;
 }
 
 export default function Details(props?: DocuninjaUserProps) {
   const [t] = useTranslation();
-  
+
   if (!props) {
     return null; // Early return if no props available
   }
@@ -140,13 +151,16 @@ export default function Details(props?: DocuninjaUserProps) {
                             const file = e.target.files?.[0];
                             if (file) {
                               const reader = new FileReader();
-                              reader.onload = (event) => {
+                              reader.onload = async (event) => {
                                 const base64 = event.target?.result as string;
+                                const compressed = await compressSignature(
+                                  base64
+                                );
                                 setUser(
                                   (user) =>
                                     user && {
                                       ...user,
-                                      e_signature: base64,
+                                      e_signature: compressed,
                                     }
                                 );
                                 setShowStoredSignature(true);
@@ -239,13 +253,16 @@ export default function Details(props?: DocuninjaUserProps) {
                           const file = e.target.files?.[0];
                           if (file) {
                             const reader = new FileReader();
-                            reader.onload = (event) => {
+                            reader.onload = async (event) => {
                               const base64 = event.target?.result as string;
+                              const compressed = await compressSignature(
+                                base64
+                              );
                               setUser(
                                 (user) =>
                                   user && {
                                     ...user,
-                                    e_signature: base64,
+                                    e_signature: compressed,
                                   }
                               );
                               setShowStoredSignature(true);
@@ -343,7 +360,7 @@ export default function Details(props?: DocuninjaUserProps) {
                         <Button
                           type="secondary"
                           behavior="button"
-                          onClick={() => {
+                          onClick={async () => {
                             const firstName = user?.first_name || '';
                             const lastName = user?.last_name || '';
                             const initials = `${firstName.charAt(
@@ -362,7 +379,7 @@ export default function Details(props?: DocuninjaUserProps) {
                               tempElement.textContent = initials;
                               document.body.appendChild(tempElement);
 
-                              document.fonts.ready.then(() => {
+                              document.fonts.ready.then(async () => {
                                 ctx.fillStyle = 'white';
                                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                                 ctx.font = '120px "Dancing Script"';
@@ -377,11 +394,14 @@ export default function Details(props?: DocuninjaUserProps) {
 
                                 const initialsImage =
                                   canvas.toDataURL('image/png');
+                                const compressed = await compressInitials(
+                                  initialsImage
+                                );
                                 setUser(
                                   (user) =>
                                     user && {
                                       ...user,
-                                      e_initials: initialsImage,
+                                      e_initials: compressed,
                                     }
                                 );
                                 setShowStoredInitials(true);
@@ -445,7 +465,7 @@ export default function Details(props?: DocuninjaUserProps) {
                     <Button
                       type="secondary"
                       behavior="button"
-                      onClick={() => {
+                      onClick={async () => {
                         const firstName = user?.first_name || '';
                         const lastName = user?.last_name || '';
                         const initials = `${firstName.charAt(
@@ -464,7 +484,7 @@ export default function Details(props?: DocuninjaUserProps) {
                           tempElement.textContent = initials;
                           document.body.appendChild(tempElement);
 
-                          document.fonts.ready.then(() => {
+                          document.fonts.ready.then(async () => {
                             ctx.fillStyle = 'white';
                             ctx.fillRect(0, 0, canvas.width, canvas.height);
                             ctx.font = '120px "Dancing Script"';
@@ -477,11 +497,14 @@ export default function Details(props?: DocuninjaUserProps) {
                             ctx.fillText(initials, x, y);
 
                             const initialsImage = canvas.toDataURL('image/png');
+                            const compressed = await compressInitials(
+                              initialsImage
+                            );
                             setUser(
                               (user) =>
                                 user && {
                                   ...user,
-                                  e_initials: initialsImage,
+                                  e_initials: compressed,
                                 }
                             );
                             setShowStoredInitials(true);

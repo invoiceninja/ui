@@ -54,6 +54,9 @@ const EmailHistory = lazy(
 const CreatePage = lazy(
   () => import('$app/pages/invoices/create/components/CreatePage')
 );
+const UnappliedPayments = lazy(
+  () => import('$app/pages/invoices/edit/components/UnappliedPayments')
+);
 
 export const invoiceRoutes = (
   <Route path="/invoices">
@@ -129,6 +132,7 @@ export const invoiceRoutes = (
       <Route path="email_history" element={<EmailHistory />} />
       <Route path="payments" element={<Payments />} />
       <Route path="payment_schedule" element={<PaymentSchedule />} />
+      <Route path="unapplied_payments" element={<UnappliedPayments />} />
     </Route>
 
     <Route

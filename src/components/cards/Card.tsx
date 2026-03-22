@@ -91,6 +91,11 @@ export function Card(props: Props) {
     >
       <form
         onSubmit={props.onFormSubmit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !props.onFormSubmit) {
+            e.preventDefault();
+          }
+        }}
         className={classNames({ 'h-full': height === 'full' })}
       >
         {props.title && (

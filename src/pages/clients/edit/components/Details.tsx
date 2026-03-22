@@ -10,9 +10,7 @@
 
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
-import { User } from '$app/common/interfaces/user';
 import { useGroupSettingsQuery } from '$app/common/queries/group-settings';
-import { useUsersQuery } from '$app/common/queries/users';
 import { useTranslation } from 'react-i18next';
 import { Client } from '$app/common/interfaces/client';
 import { set } from 'lodash';
@@ -23,6 +21,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import Toggle from '$app/components/forms/Toggle';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { useColorScheme } from '$app/common/colors';
+import { UserSelector } from '$app/components/users/UserSelector';
 interface Props {
   client: Client | undefined;
   setClient: Dispatch<SetStateAction<Client | undefined>>;
@@ -36,7 +35,6 @@ export function Details(props: Props) {
 
   const colors = useColorScheme();
 
-  const { data: users } = useUsersQuery();
   const { data: groupSettings } = useGroupSettingsQuery();
 
   const handleChange = (property: keyof Client, value: string | number) => {
@@ -101,23 +99,14 @@ export function Details(props: Props) {
         </Element>
       )}
 
-      {users && (
-        <Element leftSide={t('assigned_user')}>
-          <SelectField
-            value={props.client?.assigned_user_id}
-            onValueChange={(value) => handleChange('assigned_user_id', value)}
-            errorMessage={props.errors?.errors.assigned_user_id}
-            withBlank
-            customSelector
-          >
-            {users.data.data.map((user: User, index: number) => (
-              <option value={user.id} key={index}>
-                {user.first_name} {user.last_name}
-              </option>
-            ))}
-          </SelectField>
-        </Element>
-      )}
+      <Element leftSide={t('assigned_user')}>
+        <UserSelector
+          value={props.client?.assigned_user_id || ''}
+          onChange={(user) => handleChange('assigned_user_id', user.id)}
+          onClearButtonClick={() => handleChange('assigned_user_id', '')}
+          errorMessage={props.errors?.errors.assigned_user_id}
+        />
+      </Element>
 
       <Element leftSide={t('id_number')}>
         <InputField

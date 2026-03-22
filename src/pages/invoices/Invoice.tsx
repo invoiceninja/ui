@@ -143,6 +143,14 @@ export default function Invoice() {
     }
   }, [saveChanges]);
 
+  useEffect(() => {
+    if (errors?.errors?.paid_to_date) {
+      document
+        .getElementById('paidToDateWarningBanner')
+        ?.classList.remove('hidden');
+    }
+  }, [errors]);
+
   useSocketEvent<WithSocketId<InvoiceType>>({
     on: ['App\\Events\\Invoice\\InvoiceWasPaid'],
     callback: ({ data }) => {
@@ -176,9 +184,23 @@ export default function Invoice() {
             ),
           })}
         aboveMainContainer={
-          <Banner id="invoiceUpdateBanner" className="hidden" variant="orange">
-            {t('invoice_status_changed')}
-          </Banner>
+          <>
+            <Banner
+              id="paidToDateWarningBanner"
+              className="hidden"
+              variant="orange"
+            >
+              {errors?.errors?.paid_to_date?.[0]}
+            </Banner>
+
+            <Banner
+              id="invoiceUpdateBanner"
+              className="hidden"
+              variant="orange"
+            >
+              {t('invoice_status_changed')}
+            </Banner>
+          </>
         }
         afterBreadcrumbs={<PreviousNextNavigation entity="invoice" />}
       >
