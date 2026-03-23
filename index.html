@@ -6,11 +6,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta name="color-scheme" content="light dark" />
     <meta
       name="description"
       content="Leading free invoice generator for freelancers and small businesses. Invoice clients, accept payments, track expenses &amp; time billable-tasks online."
     />
+
+    <script>
+      if (
+        window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches
+      ) {
+        document.documentElement.style.backgroundColor = '#18181b';
+      }
+    </script>
 
     <link rel="stylesheet" href="/rsms/inter.css" />
 

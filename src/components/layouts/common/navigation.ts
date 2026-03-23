@@ -342,11 +342,12 @@ export function useNavigation() {
   useEffect(() => {
     const currentLanguage = i18n.language;
 
-    if (cache === null || cachedLanguage !== currentLanguage) {
-      setCache(initialNavigation);
+    if (cachedLanguage !== currentLanguage) {
       setCachedLanguage(currentLanguage);
     }
-  }, [i18n.language]);
+
+    setCache(initialNavigation);
+  }, [i18n.language, company?.settings?.translations]);
 
   useEffect(() => {
     window.addEventListener('navigation.changeVisibility', (event) => {
