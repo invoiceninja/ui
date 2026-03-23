@@ -88,6 +88,7 @@ export default function Document() {
     data: timelineData,
     isLoading: isTimelineLoading,
     isFetching: isTimelineFetching,
+    refetch: refetchTimeline
   } = useDocumentTimelineQuery({
     id,
     enabled: Boolean(id),
@@ -98,7 +99,10 @@ export default function Document() {
     token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
     companyId: localStorage.getItem('DOCUNINJA_COMPANY_ID') as string,
     endpoint: 'https://api.docuninja.co',
-    onEvent: () => refetch(),
+    onEvent: () => {
+      refetch();
+      refetchTimeline();
+    },
   });
 
   return (
