@@ -77,10 +77,13 @@ export function RuleModal({
   const handleChangeRuleField = (value: string) => {
     handleChangeRule('search_key', value);
 
-    if (value === 'description') handleChangeRule('operator', 'contains');
-    if (value === 'amount') handleChangeRule('operator', '<');
+    if (value === 'description') {
+      handleChangeRule('operator', 'contains');
+    }
 
-    handleChangeRule('value', '');
+    if (value === 'amount') {
+      handleChangeRule('operator', '<');
+    }
   };
 
   const handleAddRule = () => {
@@ -99,12 +102,12 @@ export function RuleModal({
   };
 
   useEffect(() => {
-    if (!transactionRule) return;
-
-    if (ruleIndex > -1) {
-      setRule(transactionRule.rules[ruleIndex]);
-    } else {
-      setRule(defaultRule);
+    if (transactionRule) {
+      if (ruleIndex > -1) {
+        setRule(transactionRule.rules[ruleIndex]);
+      } else {
+        setRule(defaultRule);
+      }
     }
   }, [transactionRule, ruleIndex, appliesTo]);
 

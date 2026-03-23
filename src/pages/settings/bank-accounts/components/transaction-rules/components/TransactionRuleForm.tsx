@@ -17,7 +17,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ExpenseCategorySelector } from '$app/components/expense-categories/ExpenseCategorySelector';
 import Toggle from '$app/components/forms/Toggle';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleChange } from '../hooks/useHandleChange';
 import { useCreditRuleFields } from '../hooks/useCreditRuleFields';
@@ -35,18 +35,6 @@ interface Props {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
   page?: 'create' | 'edit';
 }
-
-const OPERATOR_LABELS: Record<string, string> = {
-  is: 'Is',
-  contains: 'Contains',
-  starts_with: 'Starts With',
-  is_empty: 'Is Empty',
-  '=': '=',
-  '>': '>',
-  '>=': '>=',
-  '<': '<',
-  '<=': '<=',
-};
 
 const AddRuleButton = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
@@ -73,6 +61,21 @@ export function TransactionRuleForm({
   const creditKeyMap = Object.fromEntries(creditFields.map((f) => [f.key, f]));
 
   const handleChange = useHandleChange({ setErrors, setTransactionRule });
+
+  const OPERATOR_LABELS: Record<string, string> = useMemo(
+    () => ({
+      is: t('is'),
+      contains: t('contains'),
+      starts_with: t('starts_with'),
+      is_empty: t('is_empty'),
+      '=': '=',
+      '>': '>',
+      '>=': '>=',
+      '<': '<',
+      '<=': '<=',
+    }),
+    []
+  );
 
   const handleRemoveRule = (index: number) => {
     const updatedRulesList = transactionRule.rules.filter(
