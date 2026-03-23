@@ -10,8 +10,8 @@
 
 import { Card, Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
+import { SelectField } from '$app/components/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { TransactionRule } from '$app/common/interfaces/transaction-rules';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ExpenseCategorySelector } from '$app/components/expense-categories/ExpenseCategorySelector';
@@ -20,6 +20,7 @@ import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleChange } from '../hooks/useHandleChange';
+import { useCreditRuleFields } from '../hooks/useCreditRuleFields';
 import { RuleModal } from './RuleModal';
 import { useColorScheme } from '$app/common/colors';
 import styled from 'styled-components';
@@ -35,6 +36,18 @@ interface Props {
   page?: 'create' | 'edit';
 }
 
+const OPERATOR_LABELS: Record<string, string> = {
+  is: 'Is',
+  contains: 'Contains',
+  starts_with: 'Starts With',
+  is_empty: 'Is Empty',
+  '=': '=',
+  '>': '>',
+  '>=': '>=',
+  '<': '<',
+  '<=': '<=',
+};
+
 const AddRuleButton = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
 
@@ -43,31 +56,53 @@ const AddRuleButton = styled.div`
   }
 `;
 
-export function TransactionRuleForm(props: Props) {
+export function TransactionRuleForm({
+  transactionRule,
+  setTransactionRule,
+  errors,
+  setErrors,
+  page,
+}: Props) {
   const [t] = useTranslation();
-  const accentColor = useAccentColor();
+  const colors = useColorScheme();
 
-  const [isRuleModalOpen, setIsRuleModalOpen] = useState<boolean>(false);
   const [ruleIndex, setRuleIndex] = useState<number>(-1);
+  const [isRuleModalOpen, setIsRuleModalOpen] = useState<boolean>(false);
 
-  const { transactionRule, setTransactionRule, errors, setErrors } = props;
+  const creditFields = useCreditRuleFields();
+  const creditKeyMap = Object.fromEntries(creditFields.map((f) => [f.key, f]));
 
   const handleChange = useHandleChange({ setErrors, setTransactionRule });
 
-  const handleRemoveRule = (ruleIndex: number) => {
+  const handleRemoveRule = (index: number) => {
     const updatedRulesList = transactionRule.rules.filter(
-      (rule, index) => index !== ruleIndex
+      (_, i) => i !== index
     );
 
     handleChange('rules', updatedRulesList);
   };
-  const colors = useColorScheme();
+
+  const getSearchKeyLabel = (searchKey: string) => {
+    if (creditKeyMap[searchKey]) {
+      return creditKeyMap[searchKey].label;
+    }
+
+    return t(searchKey);
+  };
+
+  const getOperatorLabel = (operator: string) => {
+    if (OPERATOR_LABELS[operator]) {
+      return OPERATOR_LABELS[operator];
+    }
+
+    return t(operator);
+  };
 
   return (
     <>
       <Card
         title={
-          props.page === 'create'
+          page === 'create'
             ? t('new_transaction_rule')
             : t('edit_transaction_rule')
         }
@@ -84,6 +119,27 @@ export function TransactionRuleForm(props: Props) {
           />
         </Element>
 
+        <Element leftSide={t('applies_to')}>
+          <SelectField
+            value={transactionRule.applies_to || 'DEBIT'}
+            onValueChange={(value) => {
+              handleChange('applies_to', value as 'DEBIT' | 'CREDIT');
+
+              if (value === 'CREDIT') {
+                handleChange('vendor_id', '');
+                handleChange('category_id', '');
+              }
+            }}
+            errorMessage={errors?.errors.applies_to}
+            customSelector
+            searchable={false}
+            dismissable={false}
+          >
+            <option value="DEBIT">{t('debit')}</option>
+            <option value="CREDIT">{t('credit')}</option>
+          </SelectField>
+        </Element>
+
         <Element
           leftSide={t('match_all_rules')}
           leftSideHelp={t('match_all_rules_help')}
@@ -96,7 +152,11 @@ export function TransactionRuleForm(props: Props) {
 
         <Element
           leftSide={t('auto_convert')}
-          leftSideHelp={t('auto_convert_help')}
+          leftSideHelp={
+            transactionRule.applies_to === 'CREDIT'
+              ? t('auto_convert_credit_help')
+              : t('auto_convert_help')
+          }
         >
           <Toggle
             checked={transactionRule.auto_convert || false}
@@ -104,25 +164,29 @@ export function TransactionRuleForm(props: Props) {
           />
         </Element>
 
-        <Element leftSide={t('vendor')}>
-          <VendorSelector
-            value={transactionRule.vendor_id}
-            onChange={(vendor) => handleChange('vendor_id', vendor.id)}
-            onClearButtonClick={() => handleChange('vendor_id', '')}
-            errorMessage={errors?.errors.vendor_id}
-          />
-        </Element>
+        {transactionRule.applies_to !== 'CREDIT' && (
+          <>
+            <Element leftSide={t('vendor')}>
+              <VendorSelector
+                value={transactionRule.vendor_id}
+                onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+                onClearButtonClick={() => handleChange('vendor_id', '')}
+                errorMessage={errors?.errors.vendor_id}
+              />
+            </Element>
 
-        <Element leftSide={t('expense_category')}>
-          <ExpenseCategorySelector
-            value={transactionRule.category_id}
-            onChange={(expenseCategory) =>
-              handleChange('category_id', expenseCategory.id)
-            }
-            onClearButtonClick={() => handleChange('category_id', '')}
-            errorMessage={errors?.errors.category_id}
-          />
-        </Element>
+            <Element leftSide={t('expense_category')}>
+              <ExpenseCategorySelector
+                value={transactionRule.category_id}
+                onChange={(expenseCategory) =>
+                  handleChange('category_id', expenseCategory.id)
+                }
+                onClearButtonClick={() => handleChange('category_id', '')}
+                errorMessage={errors?.errors.category_id}
+              />
+            </Element>
+          </>
+        )}
       </Card>
 
       <Table>
@@ -137,17 +201,15 @@ export function TransactionRuleForm(props: Props) {
             <Tr
               key={index}
               className="py-2 border-b"
-              style={{
-                borderColor: colors.$20,
-              }}
+              style={{ borderColor: colors.$20 }}
             >
-              <Td width="30%">{t(rule.search_key)}</Td>
+              <Td width="30%">{getSearchKeyLabel(rule.search_key)}</Td>
 
-              <Td width="30%">{t(rule.operator)}</Td>
+              <Td width="30%">{getOperatorLabel(rule.operator)}</Td>
 
               <Td width="40%">
-                <div className="flex justify-between">
-                  <span>{rule.value}</span>
+                <div className="flex justify-between items-center">
+                  <span>{rule.operator === 'is_empty' ? '—' : rule.value}</span>
 
                   <div className="flex space-x-6">
                     <div
@@ -186,7 +248,6 @@ export function TransactionRuleForm(props: Props) {
                 }}
               >
                 <Plus color={colors.$3} size="1rem" />
-
                 <span>{t('add_rule')}</span>
               </AddRuleButton>
             </Td>
@@ -201,6 +262,9 @@ export function TransactionRuleForm(props: Props) {
         setTransactionRule={setTransactionRule}
         setErrors={setErrors}
         transactionRule={transactionRule}
+        appliesTo={
+          (transactionRule.applies_to || 'DEBIT') as 'DEBIT' | 'CREDIT'
+        }
       />
     </>
   );
