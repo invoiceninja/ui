@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^3.28.1",
-    "@docuninja/builder2.0": "^0.0.87",
+    "@docuninja/builder2.0": "^0.0.88",
     "@emotion/styled": "^11.14.0",
     "@excalidraw/excalidraw": "^0.18.0",
     "@fontsource/alex-brush": "^5.2.6",
@@ -114,7 +114,7 @@
     "remove": "^0.1.5",
     "sha256": "^0.2.0",
     "signature_pad": "^5.0.10",
-    "socket.io-client": "^4.8.1",
+    "socket.io-client": "^4.8.3",
     "styled-components": "^6.1.15",
     "tailwind-scrollbar": "^3.1.0",
     "tiptap-extension-font-size": "^1.2.0",
@@ -162,7 +162,6 @@
     "@types/react-date-range": "^1.4.10",
     "@types/react-datepicker": "^4.19.6",
     "@types/react-dom": "^18.3.5",
-    "@types/socket.io-client": "^3.0.0",
     "@types/uuid": "^9.0.8",
     "@vitejs/plugin-react": "^5.1.0",
     "autoprefixer": "^10.4.21",
@@ -189,6 +188,7 @@
     "@docuninja/builder2.0": {
       "react": "$react",
       "react-dom": "$react-dom"
-    }
+    },
+    "socket.io-parser": "^4.2.6"
   }
 }

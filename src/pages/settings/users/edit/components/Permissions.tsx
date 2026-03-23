@@ -75,10 +75,6 @@ export function Permissions(props: Props) {
   };
 
   const isPermissionChecked = (permission: PermissionsType) => {
-    if (user?.company_user?.is_admin) {
-      return true;
-    }
-
     const permissions = user?.company_user?.permissions;
     const [type] = permission.split('_');
 
