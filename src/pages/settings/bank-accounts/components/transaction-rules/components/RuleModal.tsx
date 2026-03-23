@@ -31,7 +31,7 @@ interface Props {
   appliesTo: 'DEBIT' | 'CREDIT';
 }
 
-const DEBIT_OPERATORS = {
+const OPERATORS = {
   description: [
     { value: 'contains', label: 'contains' },
     { value: 'starts_with', label: 'starts_with' },
@@ -47,21 +47,6 @@ const DEBIT_OPERATORS = {
   ],
 };
 
-const STRING_OPERATORS = [
-  { value: 'is', label: 'is' },
-  { value: 'contains', label: 'contains' },
-  { value: 'starts_with', label: 'starts_with' },
-  { value: 'is_empty', label: 'is_empty' },
-];
-
-const NUMBER_OPERATORS = [
-  { value: '=', label: '=' },
-  { value: '>', label: '>' },
-  { value: '>=', label: '>=' },
-  { value: '<', label: '<' },
-  { value: '<=', label: '<=' },
-];
-
 export function RuleModal({
   visible,
   setVisible,
@@ -74,31 +59,6 @@ export function RuleModal({
   const [t] = useTranslation();
 
   const creditFields = useCreditRuleFields();
-  const creditKeyMap = Object.fromEntries(creditFields.map((f) => [f.key, f]));
-
-  const getCreditFieldType = (searchKey: string) => {
-    if (creditKeyMap[searchKey]) {
-      return creditKeyMap[searchKey].type;
-    }
-
-    return 'string';
-  };
-
-  const getDefaultCreditOperator = (searchKey: string) => {
-    if (getCreditFieldType(searchKey) === 'number') {
-      return '=';
-    }
-
-    return 'is';
-  };
-
-  const getCreditOperators = (searchKey: string) => {
-    if (getCreditFieldType(searchKey) === 'number') {
-      return NUMBER_OPERATORS;
-    }
-
-    return STRING_OPERATORS;
-  };
 
   const [rule, setRule] = useState<Rule>();
 
@@ -117,13 +77,10 @@ export function RuleModal({
   const handleChangeRuleField = (value: string) => {
     handleChangeRule('search_key', value);
 
-    if (appliesTo === 'DEBIT') {
-      if (value === 'description') handleChangeRule('operator', 'contains');
-      if (value === 'amount') handleChangeRule('operator', '<');
-    } else {
-      handleChangeRule('operator', getDefaultCreditOperator(value));
-      handleChangeRule('value', '');
-    }
+    if (value === 'description') handleChangeRule('operator', 'contains');
+    if (value === 'amount') handleChangeRule('operator', '<');
+
+    handleChangeRule('value', '');
   };
 
   const handleAddRule = () => {
@@ -147,16 +104,7 @@ export function RuleModal({
     if (ruleIndex > -1) {
       setRule(transactionRule.rules[ruleIndex]);
     } else {
-      if (appliesTo === 'CREDIT') {
-        const defaultKey = creditFields[0].key;
-        setRule({
-          search_key: defaultKey,
-          operator: getDefaultCreditOperator(defaultKey),
-          value: '',
-        });
-      } else {
-        setRule(defaultRule);
-      }
+      setRule(defaultRule);
     }
   }, [transactionRule, ruleIndex, appliesTo]);
 
@@ -167,12 +115,44 @@ export function RuleModal({
       onClose={() => setVisible(false)}
       overflowVisible
     >
+      <SelectField
+        required
+        label={t('field')}
+        value={rule?.search_key}
+        onValueChange={(value) => handleChangeRuleField(value)}
+        customSelector
+        dismissable={false}
+      >
+        <option defaultChecked value="description">
+          {t('description')}
+        </option>
+        <option value="amount">{t('amount')}</option>
+      </SelectField>
+
+      <SelectField
+        required
+        label={t('operator')}
+        value={rule?.operator}
+        onValueChange={(value) => handleChangeRule('operator', value)}
+        customSelector
+        dismissable={false}
+      >
+        {rule?.search_key &&
+          OPERATORS[rule.search_key as keyof typeof OPERATORS]?.map(
+            (operator, index) => (
+              <option key={index} value={operator.value}>
+                {t(operator.label)}
+              </option>
+            )
+          )}
+      </SelectField>
+
       {appliesTo === 'CREDIT' ? (
         <SelectField
           required
-          label={t('field')}
-          value={rule?.search_key}
-          onValueChange={(value) => handleChangeRuleField(value)}
+          label={t('value')}
+          value={rule?.value}
+          onValueChange={(value) => handleChangeRule('value', value)}
           customSelector
           dismissable={false}
         >
@@ -183,60 +163,15 @@ export function RuleModal({
           ))}
         </SelectField>
       ) : (
-        <SelectField
-          required
-          label={t('field')}
-          value={rule?.search_key}
-          onValueChange={(value) => handleChangeRuleField(value)}
-          customSelector
-          dismissable={false}
-        >
-          <option defaultChecked value="description">
-            {t('description')}
-          </option>
-          <option value="amount">{t('amount')}</option>
-        </SelectField>
-      )}
-
-      <SelectField
-        required
-        label={t('operator')}
-        value={rule?.operator}
-        onValueChange={(value) => handleChangeRule('operator', value)}
-        customSelector
-        dismissable={false}
-      >
-        {appliesTo === 'CREDIT' && rule?.search_key
-          ? getCreditOperators(rule.search_key).map((op, index) => (
-              <option key={index} value={op.value}>
-                {t(op.label)}
-              </option>
-            ))
-          : rule?.search_key &&
-            DEBIT_OPERATORS[
-              rule.search_key as keyof typeof DEBIT_OPERATORS
-            ]?.map((operator, index) => (
-              <option key={index} value={operator.value}>
-                {t(operator.label)}
-              </option>
-            ))}
-      </SelectField>
-
-      {rule?.operator !== 'is_empty' && (
-        <InputField
-          changeOverride={true}
-          required
-          label={t('value')}
-          value={rule?.value}
-          type={
-            appliesTo === 'CREDIT' &&
-            rule?.search_key &&
-            getCreditFieldType(rule.search_key) === 'number'
-              ? 'number'
-              : 'text'
-          }
-          onValueChange={(value) => handleChangeRule('value', value)}
-        />
+        rule?.operator !== 'is_empty' && (
+          <InputField
+            changeOverride={true}
+            required
+            label={t('value')}
+            value={rule?.value}
+            onValueChange={(value) => handleChangeRule('value', value)}
+          />
+        )
       )}
 
       <Button

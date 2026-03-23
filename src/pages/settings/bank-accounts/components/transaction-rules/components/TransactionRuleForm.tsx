@@ -82,20 +82,20 @@ export function TransactionRuleForm({
     handleChange('rules', updatedRulesList);
   };
 
-  const getSearchKeyLabel = (searchKey: string) => {
-    if (creditKeyMap[searchKey]) {
-      return creditKeyMap[searchKey].label;
-    }
-
-    return t(searchKey);
-  };
-
   const getOperatorLabel = (operator: string) => {
     if (OPERATOR_LABELS[operator]) {
       return OPERATOR_LABELS[operator];
     }
 
     return t(operator);
+  };
+
+  const getValueLabel = (value: string) => {
+    if (creditKeyMap[value]) {
+      return creditKeyMap[value].label;
+    }
+
+    return value;
   };
 
   return (
@@ -203,13 +203,17 @@ export function TransactionRuleForm({
               className="py-2 border-b"
               style={{ borderColor: colors.$20 }}
             >
-              <Td width="30%">{getSearchKeyLabel(rule.search_key)}</Td>
+              <Td width="30%">{t(rule.search_key)}</Td>
 
               <Td width="30%">{getOperatorLabel(rule.operator)}</Td>
 
               <Td width="40%">
                 <div className="flex justify-between items-center">
-                  <span>{rule.operator === 'is_empty' ? '—' : rule.value}</span>
+                  <span>
+                    {rule.operator === 'is_empty'
+                      ? '—'
+                      : getValueLabel(rule.value)}
+                  </span>
 
                   <div className="flex space-x-6">
                     <div
