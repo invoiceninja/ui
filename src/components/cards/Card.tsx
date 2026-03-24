@@ -90,7 +90,10 @@ export function Card(props: Props) {
       }}
     >
       <form
-        onSubmit={props.onFormSubmit}
+        onSubmit={(e) => {
+          e.preventDefault();
+          props.onFormSubmit?.(e);
+        }}
         className={classNames({ 'h-full': height === 'full' })}
       >
         {props.title && (
