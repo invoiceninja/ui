@@ -17,7 +17,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ExpenseCategorySelector } from '$app/components/expense-categories/ExpenseCategorySelector';
 import Toggle from '$app/components/forms/Toggle';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
-import { Dispatch, SetStateAction, useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleChange } from '../hooks/useHandleChange';
 import { useCreditRuleFields } from '../hooks/useCreditRuleFields';
@@ -62,20 +62,17 @@ export function TransactionRuleForm({
 
   const handleChange = useHandleChange({ setErrors, setTransactionRule });
 
-  const OPERATOR_LABELS: Record<string, string> = useMemo(
-    () => ({
-      is: t('is'),
-      contains: t('contains'),
-      starts_with: t('starts_with'),
-      is_empty: t('is_empty'),
-      '=': '=',
-      '>': '>',
-      '>=': '>=',
-      '<': '<',
-      '<=': '<=',
-    }),
-    []
-  );
+  const OPERATOR_LABELS: Record<string, string> = {
+    is: t('is'),
+    contains: t('contains'),
+    starts_with: t('starts_with'),
+    is_empty: t('is_empty'),
+    '=': '=',
+    '>': '>',
+    '>=': '>=',
+    '<': '<',
+    '<=': '<=',
+  };
 
   const handleRemoveRule = (index: number) => {
     const updatedRulesList = transactionRule.rules.filter(
