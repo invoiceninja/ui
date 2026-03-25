@@ -936,9 +936,12 @@ export function ComboboxAsync<T = any>({
                 : entry[entryOptions.value],
               resource: entry,
               eventType: 'external',
-              searchable:
-                entryOptions.customSearchableValue?.(entry) ||
+              searchable: [
+                entryOptions.customSearchableValue?.(entry),
                 entry[entryOptions.searchable || entryOptions.id],
+              ]
+                .filter(Boolean)
+                .join(','),
             })
           );
 
