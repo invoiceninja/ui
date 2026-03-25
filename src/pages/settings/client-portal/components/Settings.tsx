@@ -30,6 +30,7 @@ import { SettingsLabel } from '$app/components/SettingsLabel';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { freePlan } from '$app/common/guards/guards/free-plan';
 import { useColorScheme } from '$app/common/colors';
+import { Spinner } from '$app/components/Spinner';
 
 export function Settings() {
   const [t] = useTranslation();
@@ -46,12 +47,16 @@ export function Settings() {
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
-  const [subdomainValidation, setSubdomainValidation] = useState('');
+  const [subdomainValidation, setSubdomainValidation] = useState<string>('');
+  const [isCheckingSubdomain, setIsCheckingSubdomain] =
+    useState<boolean>(false);
 
   const checkSubdomain = (value: string) => {
     handleChange('subdomain', value);
 
     setErrors(undefined);
+    setIsCheckingSubdomain(true);
+
     request('POST', endpoint('/api/v1/check_subdomain'), {
       subdomain: value,
     })
@@ -60,7 +65,8 @@ export function Settings() {
       })
       .catch(() => {
         setSubdomainValidation(t('subdomain_is_not_available') ?? '');
-      });
+      })
+      .finally(() => setIsCheckingSubdomain(false));
   };
 
   return (
@@ -97,12 +103,20 @@ export function Settings() {
 
           {company?.portal_mode === 'subdomain' && (
             <Element leftSide={t('subdomain')}>
-              <InputField
-                value={company?.subdomain || ''}
-                disabled={freePlan()}
-                onValueChange={(value) => checkSubdomain(value)}
-                errorMessage={errors?.errors.subdomain ?? subdomainValidation}
-              />
+              <div className="flex items-center gap-x-4 w-full">
+                <div className="flex-1">
+                  <InputField
+                    value={company?.subdomain || ''}
+                    disabled={freePlan()}
+                    onValueChange={(value) => checkSubdomain(value)}
+                    errorMessage={
+                      errors?.errors.subdomain ?? subdomainValidation
+                    }
+                  />
+                </div>
+
+                {isCheckingSubdomain && <Spinner />}
+              </div>
             </Element>
           )}
 

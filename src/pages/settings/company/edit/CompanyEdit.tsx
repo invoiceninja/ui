@@ -34,6 +34,7 @@ import { GatewayTypeIcon } from '$app/pages/clients/show/components/GatewayTypeI
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { Spinner } from '$app/components/Spinner';
 
 interface Props {
   isModalOpen: boolean;
@@ -58,6 +59,8 @@ export function CompanyEdit(props: Props) {
   const [errors, setErrors] = useState<ValidationBag>();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [isCheckingSubdomain, setIsCheckingSubdomain] =
+    useState<boolean>(false);
 
   const [stepIndex, setStepIndex] = useState<number>(0);
 
@@ -141,11 +144,16 @@ export function CompanyEdit(props: Props) {
       setIsFormBusy(true);
 
       if (companyChanges?.subdomain && isHosted()) {
+        setIsCheckingSubdomain(true);
+
         request('POST', endpoint('/api/v1/check_subdomain'), {
           subdomain: companyChanges.subdomain,
         })
           .then(() => handleUpdateCompany(isWizard))
-          .finally(() => setIsFormBusy(false));
+          .finally(() => {
+            setIsCheckingSubdomain(false);
+            setIsFormBusy(false);
+          });
       } else {
         handleUpdateCompany(isWizard);
       }
@@ -181,13 +189,23 @@ export function CompanyEdit(props: Props) {
             />
 
             {isHosted() && (
-              <InputField
-                label={t('subdomain')}
-                value={companyChanges?.subdomain}
-                onValueChange={(value) => handleChange('subdomain', value)}
-                errorMessage={errors?.errors?.subdomain}
-                changeOverride
-              />
+              <div className="flex items-center gap-x-4 w-full">
+                <div className="flex-1">
+                  <InputField
+                    label={t('subdomain')}
+                    value={companyChanges?.subdomain}
+                    onValueChange={(value) => handleChange('subdomain', value)}
+                    errorMessage={errors?.errors?.subdomain}
+                    changeOverride
+                  />
+                </div>
+
+                {isCheckingSubdomain && (
+                  <div className="pt-5">
+                    <Spinner />
+                  </div>
+                )}
+              </div>
             )}
 
             <LanguageSelector
