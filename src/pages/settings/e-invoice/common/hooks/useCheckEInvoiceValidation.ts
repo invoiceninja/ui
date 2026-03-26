@@ -68,12 +68,12 @@ export function useCheckEInvoiceValidation(params: Params) {
       passes: true,
     };
 
-    if (validationResponse?.status === 422 || validationResponse?.status === 200) {
+    if (validationResponse?.status === 422) {
       currentValidationResult = {
         company: validationResponse.data.company ?? [],
         client: validationResponse.data.client ?? [],
         invoice: validationResponse.data.invoice ?? [],
-        passes: validationResponse.data.passes ?? false,
+        passes: false,
       };
     }
 
