@@ -11,26 +11,41 @@
 import { useTranslation } from 'react-i18next';
 import { Palette, FileText, Database, LayoutGrid } from 'lucide-react';
 import { blockLibrary } from '../block-library';
-import { Block, BlockDefinition } from '../types';
+import { Block, BlockDefinition, generateBlockId } from '../types';
 
 interface ComponentLibraryProps {
   onAddBlock: (block: Block) => void;
   onDragStart?: (definition: BlockDefinition) => void;
 }
 
-export function ComponentLibrary({ onAddBlock, onDragStart }: ComponentLibraryProps) {
+export function ComponentLibrary({
+  onAddBlock,
+  onDragStart,
+}: ComponentLibraryProps) {
   const [t] = useTranslation();
 
   const categories = [
-    { id: 'branding', name: t('branding'), icon: <Palette className="w-4 h-4" /> },
-    { id: 'content', name: t('content'), icon: <FileText className="w-4 h-4" /> },
+    {
+      id: 'branding',
+      name: t('branding'),
+      icon: <Palette className="w-4 h-4" />,
+    },
+    {
+      id: 'content',
+      name: t('content'),
+      icon: <FileText className="w-4 h-4" />,
+    },
     { id: 'data', name: t('data'), icon: <Database className="w-4 h-4" /> },
-    { id: 'layout', name: t('layout'), icon: <LayoutGrid className="w-4 h-4" /> },
+    {
+      id: 'layout',
+      name: t('layout'),
+      icon: <LayoutGrid className="w-4 h-4" />,
+    },
   ];
 
   const handleAddBlock = (definition: BlockDefinition) => {
     const newBlock: Block = {
-      id: `${definition.type}-${Date.now()}`,
+      id: generateBlockId(definition.type),
       type: definition.type,
       gridPosition: {
         x: 0,
@@ -81,7 +96,11 @@ interface BlockCardProps {
   onDragStart?: (definition: BlockDefinition) => void;
 }
 
-function BlockCard({ definition, onClick, onDragStart: onDragStartProp }: BlockCardProps) {
+function BlockCard({
+  definition,
+  onClick,
+  onDragStart: onDragStartProp,
+}: BlockCardProps) {
   const handleDragStart = (e: React.DragEvent) => {
     // CRITICAL for Firefox compatibility
     e.dataTransfer.setData('text/plain', '');
