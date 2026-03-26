@@ -9,6 +9,7 @@
  */
 
 import { ReactNode } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 export type BlockType =
   | 'text'
@@ -111,4 +112,8 @@ export interface PropertyPanelProps {
   onChange: (block: Block) => void;
   onDelete?: () => void;
   onDuplicate?: () => void;
+}
+
+export function generateBlockId(type: string): string {
+  return `${type}-${uuidv4()}`;
 }
