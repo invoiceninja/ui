@@ -158,11 +158,11 @@ export function InvoiceBuilder() {
           setIsEditMode(true);
         } else {
           // Design exists but wasn't created with visual builder
-          toast.error(String(t('design_not_created_with_visual_builder')));
+          toast.error('design_not_created_with_visual_builder');
           navigate(route('/settings/invoice_design/custom_designs'));
         }
       } catch (error) {
-        toast.error(String(t('error_loading_design')));
+        toast.error('error_loading_design');
         navigate(route('/settings/invoice_design/custom_designs'));
       }
     }
@@ -443,7 +443,7 @@ export function InvoiceBuilder() {
       const definition = data || currentDragDefinition;
 
       if (!definition) {
-        toast.error(String(t('error_dropping_block')));
+        toast.error('error_dropping_block');
         setCurrentDragDefinition(null);
         return;
       }
@@ -516,46 +516,6 @@ export function InvoiceBuilder() {
     (b) => b.id === state.selectedBlockId
   );
 
-  // Convert blocks to HTML for PDF generation
-  const blocksToHTML = useCallback((blocks: Block[]) => {
-    let html = '<div style="font-family: Arial, sans-serif; padding: 20px;">';
-
-    blocks.forEach((block) => {
-      const { gridPosition, properties, type } = block;
-      const top = gridPosition.y * 30; // rowHeight
-      const left = (gridPosition.x / 12) * 100; // percentage
-      const width = (gridPosition.w / 12) * 100;
-      const height = gridPosition.h * 30;
-
-      html += `<div style="position: absolute; top: ${top}px; left: ${left}%; width: ${width}%; min-height: ${height}px;">`;
-
-      switch (type) {
-        case 'text':
-          html += `<div style="font-size: ${properties.fontSize}; color: ${properties.color}; text-align: ${properties.align};">${properties.content}</div>`;
-          break;
-        case 'logo':
-        case 'image':
-          html += `<img src="${properties.source}" style="max-width: ${properties.maxWidth}; object-fit: ${properties.objectFit};" />`;
-          break;
-        case 'divider':
-          html += `<hr style="border: none; border-top: ${properties.thickness} ${properties.style} ${properties.color}; margin: ${properties.marginTop} 0 ${properties.marginBottom};" />`;
-          break;
-        case 'company-info':
-        case 'client-info':
-        case 'invoice-details':
-          html += `<div style="font-size: ${properties.fontSize}; line-height: ${properties.lineHeight}; color: ${properties.color}; text-align: ${properties.align}; white-space: pre-line;">${properties.content}</div>`;
-          break;
-        default:
-          html += `<div>${type}</div>`;
-      }
-
-      html += '</div>';
-    });
-
-    html += '</div>';
-    return html;
-  }, []);
-
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showNameModal, setShowNameModal] = useState(false);
@@ -571,7 +531,7 @@ export function InvoiceBuilder() {
 
   const handleSave = async () => {
     if (!state.blocks.length) {
-      toast.error(String(t('add_blocks_first')));
+      toast.error('add_blocks_first');
       return;
     }
 
@@ -621,7 +581,7 @@ export function InvoiceBuilder() {
           designPayload
         );
         $refetch(['designs']);
-        toast.success(String(t('updated_design')));
+        toast.success('updated_design');
       } else {
         // Create new design
         const response = (await request(
@@ -630,7 +590,7 @@ export function InvoiceBuilder() {
           designPayload
         )) as GenericSingleResourceResponse<Design>;
         $refetch(['designs']);
-        toast.success(String(t('saved_design')));
+        toast.success('saved_design');
         // Navigate to edit mode for the new design
         navigate(
           route('/settings/invoice_design/builder/:id', {
@@ -646,7 +606,7 @@ export function InvoiceBuilder() {
           ? error.message
           : (error as { response?: { data?: { message?: string } } })?.response
               ?.data?.message;
-      toast.error(errorMessage || String(t('error_saving_design')));
+      toast.error(errorMessage || 'error_saving_design');
     } finally {
       setSaving(false);
     }
@@ -654,7 +614,7 @@ export function InvoiceBuilder() {
 
   const handleNameModalConfirm = () => {
     if (!designNameInput.trim()) {
-      toast.error(String(t('design_name_required')));
+      toast.error('design_name_required');
       return;
     }
     setDesignName(designNameInput.trim());
@@ -799,7 +759,7 @@ export function InvoiceBuilder() {
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                toast.success('JSON downloaded');
+                toast.success('json_downloaded');
               }}
               disabled={state.blocks.length === 0}
               className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -885,7 +845,7 @@ export function InvoiceBuilder() {
                           // Copy block JSON to clipboard
                           const blockJson = JSON.stringify(block, null, 2);
                           navigator.clipboard.writeText(blockJson);
-                          toast.success('Block copied to clipboard');
+                          toast.success('block_copied_to_clipboard');
                         }}
                         onMouseDown={(e) => e.stopPropagation()}
                         className="hover:bg-gray-700 p-1 rounded transition-colors"

@@ -11,7 +11,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { PlusCircle, Sparkles, Minimize2, Palette, FileText } from 'lucide-react';
+import {
+  PlusCircle,
+  Sparkles,
+  Minimize2,
+  Palette,
+  FileText,
+} from 'lucide-react';
 import { Button } from '$app/components/forms';
 import { templates } from './templates/templates';
 import { route } from '$app/common/helpers/route';
@@ -21,23 +27,45 @@ type CategoryFilter = 'all' | 'modern' | 'classic' | 'minimal' | 'creative';
 export function TemplateGallery() {
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
+  const [selectedCategory, setSelectedCategory] =
+    useState<CategoryFilter>('all');
 
   const categoryConfig = [
-    { id: 'all' as const, label: t('all'), icon: <Sparkles className="w-4 h-4" /> },
-    { id: 'modern' as const, label: 'Modern', icon: <Palette className="w-4 h-4" /> },
-    { id: 'minimal' as const, label: 'Minimal', icon: <Minimize2 className="w-4 h-4" /> },
-    { id: 'classic' as const, label: 'Classic', icon: <FileText className="w-4 h-4" /> },
+    {
+      id: 'all' as const,
+      label: t('all'),
+      icon: <Sparkles className="w-4 h-4" />,
+    },
+    {
+      id: 'modern' as const,
+      label: t('modern'),
+      icon: <Palette className="w-4 h-4" />,
+    },
+    {
+      id: 'minimal' as const,
+      label: t('minimal'),
+      icon: <Minimize2 className="w-4 h-4" />,
+    },
+    {
+      id: 'classic' as const,
+      label: t('classic'),
+      icon: <FileText className="w-4 h-4" />,
+    },
   ];
 
-  const filteredTemplates = selectedCategory === 'all'
-    ? templates.filter(t => t.id !== 'blank')
-    : templates.filter(t => t.category === selectedCategory);
+  const filteredTemplates =
+    selectedCategory === 'all'
+      ? templates.filter((t) => t.id !== 'blank')
+      : templates.filter((t) => t.category === selectedCategory);
 
-  const blankTemplate = templates.find(t => t.id === 'blank');
+  const blankTemplate = templates.find((t) => t.id === 'blank');
 
   const handleSelectTemplate = (templateId: string) => {
-    navigate(route('/settings/invoice_design/builder/new?template=:id', { id: templateId }));
+    navigate(
+      route('/settings/invoice_design/builder/new?template=:id', {
+        id: templateId,
+      })
+    );
   };
 
   return (
@@ -49,7 +77,9 @@ export function TemplateGallery() {
             {t('create_your_perfect_invoice_design')}
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            {t('choose_a_professional_template_and_customize_it_to_match_your_brand')}
+            {t(
+              'choose_a_professional_template_and_customize_it_to_match_your_brand'
+            )}
           </p>
         </div>
       </div>
@@ -64,9 +94,10 @@ export function TemplateGallery() {
               behavior="button"
               onClick={() => setSelectedCategory(category.id)}
               className={`
-                ${selectedCategory === category.id
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                ${
+                  selectedCategory === category.id
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
                 }
               `}
             >
