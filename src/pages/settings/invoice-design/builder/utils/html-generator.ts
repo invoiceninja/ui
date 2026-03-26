@@ -10,14 +10,18 @@
 
 import { Block } from '../types';
 import { GRID_CONFIG } from './grid-converter';
-import { InvoiceData, replaceVariables, resolveVariable } from './variable-replacer';
+import {
+  InvoiceData,
+  replaceVariables,
+  resolveVariable,
+} from './variable-replacer';
 
 /**
  * Group blocks by their Y position (row)
  */
 function groupBlocksByRow(blocks: Block[]): Map<number, Block[]> {
   const rows = new Map<number, Block[]>();
-  blocks.forEach(block => {
+  blocks.forEach((block) => {
     const y = block.gridPosition.y;
     if (!rows.has(y)) {
       rows.set(y, []);
@@ -66,7 +70,8 @@ function estimateContentHeight(block: Block, data: InvoiceData): number {
       const replacedContent = replaceVariables(content, data);
       const fontSizeNum = parseFloat(fontSize) || 14;
       const lineHeightNum = parseFloat(lineHeight) || 1.5;
-      const lines = replacedContent.split('\n').filter(line => line.trim()).length || 1;
+      const lines =
+        replacedContent.split('\n').filter((line) => line.trim()).length || 1;
       const estimatedHeight = lines * fontSizeNum * lineHeightNum + 20; // Add padding
       return Math.max(estimatedHeight, minHeight);
     }
@@ -75,13 +80,15 @@ function estimateContentHeight(block: Block, data: InvoiceData): number {
       const headerHeight = 40; // Header row
       const rowHeight = 30; // Data row height
       const rowCount = data.line_items.length || 1;
-      const estimatedHeight = headerHeight + (rowCount * rowHeight) + 10; // Add padding
+      const estimatedHeight = headerHeight + rowCount * rowHeight + 10; // Add padding
       return Math.max(estimatedHeight, minHeight);
     }
 
     case 'total': {
       const { items } = block.properties;
-      const itemCount = Array.isArray(items) ? items.filter((item: { show: boolean }) => item.show).length : 5;
+      const itemCount = Array.isArray(items)
+        ? items.filter((item: { show: boolean }) => item.show).length
+        : 5;
       const itemHeight = 25;
       const estimatedHeight = itemCount * itemHeight + 20; // Add padding
       return Math.max(estimatedHeight, minHeight);
@@ -120,16 +127,19 @@ function estimateContentHeight(block: Block, data: InvoiceData): number {
 /**
  * Calculate row heights based on the tallest content in each row
  */
-function calculateRowHeights(rows: Map<number, Block[]>, data: InvoiceData): Map<number, number> {
+function calculateRowHeights(
+  rows: Map<number, Block[]>,
+  data: InvoiceData
+): Map<number, number> {
   const rowHeights = new Map<number, number>();
   const { margin } = GRID_CONFIG;
 
   rows.forEach((blocks, y) => {
     // Find the maximum content height among all blocks in this row
     const maxContentHeight = Math.max(
-      ...blocks.map(block => estimateContentHeight(block, data))
+      ...blocks.map((block) => estimateContentHeight(block, data))
     );
-    
+
     // Store the row height (content height + vertical margin if not first row)
     rowHeights.set(y, maxContentHeight);
   });
@@ -140,16 +150,18 @@ function calculateRowHeights(rows: Map<number, Block[]>, data: InvoiceData): Map
 /**
  * Calculate cumulative top positions for each row
  */
-function calculateRowPositions(rowHeights: Map<number, number>): Map<number, number> {
+function calculateRowPositions(
+  rowHeights: Map<number, number>
+): Map<number, number> {
   const rowPositions = new Map<number, number>();
   const { containerPadding, margin } = GRID_CONFIG;
-  
+
   let currentTop = containerPadding[1];
   const sortedRows = Array.from(rowHeights.keys()).sort((a, b) => a - b);
 
   sortedRows.forEach((y, index) => {
     rowPositions.set(y, currentTop);
-    
+
     // Move to next row: current row height + margin
     const rowHeight = rowHeights.get(y) || GRID_CONFIG.rowHeight;
     if (index < sortedRows.length - 1) {
@@ -167,7 +179,10 @@ function calculateRowPositions(rowHeights: Map<number, number>): Map<number, num
  * Generate complete HTML document from blocks using row-based height calculation
  * This ensures content-driven heights and eliminates wasted vertical space
  */
-export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string {
+export function generateInvoiceHTML(
+  blocks: Block[],
+  data: InvoiceData
+): string {
   // Sort blocks by Y position, then by X position for same row
   const sortedBlocks = [...blocks].sort((a, b) => {
     if (a.gridPosition.y !== b.gridPosition.y) {
@@ -180,17 +195,23 @@ export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string 
   const rows = groupBlocksByRow(blocks);
   const rowHeights = calculateRowHeights(rows, data);
   const rowPositions = calculateRowPositions(rowHeights);
-  
+
   // Render blocks with row-based positioning
-  const blocksHTML = sortedBlocks.map(block => renderBlockWithRowHeight(block, data, rowHeights, rowPositions)).join('\n');
-  
+  const blocksHTML = sortedBlocks
+    .map((block) =>
+      renderBlockWithRowHeight(block, data, rowHeights, rowPositions)
+    )
+    .join('\n');
+
   // Extract containerPadding at function level to avoid scope issues
   const { margin, containerPadding } = GRID_CONFIG;
-  
+
   // Calculate container height based on row positions
   let maxBottom = 0;
   if (rowPositions.size > 0) {
-    const sortedYPositions = Array.from(rowPositions.keys()).sort((a, b) => b - a);
+    const sortedYPositions = Array.from(rowPositions.keys()).sort(
+      (a, b) => b - a
+    );
     const lastRowY = sortedYPositions[0];
     const lastRowTop = rowPositions.get(lastRowY) || containerPadding[1];
     const lastRowHeight = rowHeights.get(lastRowY) || GRID_CONFIG.rowHeight;
@@ -198,19 +219,21 @@ export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string 
   } else {
     maxBottom = containerPadding[1];
   }
-  
+
   // Add bottom padding
   maxBottom += containerPadding[1];
-  
+
   // Ensure minimum A4 height
   const containerHeight = Math.max(maxBottom || 1122, 1122);
-  
+
   // Extract values for template string to avoid scope issues
   // Defensive check to ensure GRID_CONFIG is properly defined
   if (!GRID_CONFIG || !GRID_CONFIG.containerPadding) {
-    throw new Error('GRID_CONFIG.containerPadding is not defined. Please check grid-converter.ts');
+    throw new Error(
+      'GRID_CONFIG.containerPadding is not defined. Please check grid-converter.ts'
+    );
   }
-  
+
   const canvasWidth = GRID_CONFIG.canvasWidth;
   const containerPaddingVertical = GRID_CONFIG.containerPadding[1];
   const containerPaddingHorizontal = GRID_CONFIG.containerPadding[0];
@@ -305,49 +328,48 @@ export function generateInvoiceHTML(blocks: Block[], data: InvoiceData): string 
   `.trim();
 }
 
-
 /**
  * Render a single block to HTML with row-based height calculation
  * This ensures content-driven heights and proper row alignment
  */
 function renderBlockWithRowHeight(
-  block: Block, 
-  data: InvoiceData, 
+  block: Block,
+  data: InvoiceData,
   rowHeights: Map<number, number>,
   rowPositions: Map<number, number>
 ): string {
   const content = renderBlockContent(block, data);
-  
+
   // Calculate absolute pixel positions based on grid coordinates
   const { x, y, w } = block.gridPosition;
   const { cols, canvasWidth, margin, containerPadding } = GRID_CONFIG;
-  
+
   // Calculate column width
-  const availableWidth = canvasWidth - (containerPadding[0] * 2);
+  const availableWidth = canvasWidth - containerPadding[0] * 2;
   const colWidth = availableWidth / cols;
-  
+
   // Calculate horizontal position
-  const left = containerPadding[0] + (x * (colWidth + margin[0]));
-  
+  const left = containerPadding[0] + x * (colWidth + margin[0]);
+
   // Calculate width
-  const width = (w * colWidth) + ((w - 1) * margin[0]);
-  
+  const width = w * colWidth + (w - 1) * margin[0];
+
   // Get row-based position and height
   const top = rowPositions.get(y) || containerPadding[1];
   const rowHeight = rowHeights.get(y) || GRID_CONFIG.rowHeight;
-  
+
   // Ensure blocks never exceed container bounds
   const maxLeft = containerPadding[0];
   const maxRight = canvasWidth - containerPadding[0];
   const constrainedLeft = Math.max(maxLeft, Math.min(left, maxRight - width));
   const constrainedWidth = Math.min(width, maxRight - constrainedLeft);
-  
+
   // For expandable blocks (tables, totals), allow content to grow beyond row height
   const isExpandableBlock = block.type === 'table' || block.type === 'total';
-  const heightStyle = isExpandableBlock 
-    ? `min-height: ${rowHeight}px;` 
+  const heightStyle = isExpandableBlock
+    ? `min-height: ${rowHeight}px;`
     : `height: ${rowHeight}px;`;
-  
+
   const styles = `
     position: absolute;
     left: ${constrainedLeft}px;
@@ -355,7 +377,9 @@ function renderBlockWithRowHeight(
     width: ${constrainedWidth}px;
     ${heightStyle}
     box-sizing: border-box;
-  `.trim().replace(/\s+/g, ' ');
+  `
+    .trim()
+    .replace(/\s+/g, ' ');
 
   return `<div class="block" style="${styles}">${content}</div>`;
 }
@@ -394,7 +418,8 @@ function renderBlockContent(block: Block, data: InvoiceData): string {
 }
 
 function renderTextBlock(block: Block, data: InvoiceData): string {
-  const { content, fontSize, fontWeight, color, align, lineHeight } = block.properties;
+  const { content, fontSize, fontWeight, color, align, lineHeight } =
+    block.properties;
   const replacedContent = replaceVariables(content, data);
 
   return `
@@ -424,11 +449,16 @@ function renderImageBlock(block: Block, data: InvoiceData): string {
   }
 
   // Map text alignment to flexbox justify-content
-  const justifyContent = align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center';
-  
+  const justifyContent =
+    align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center';
+
   return `
     <div style="text-align: ${align}; height: 100%; display: flex; align-items: center; justify-content: ${justifyContent};">
-      <img src="${escapeHtml(resolvedSource)}" style="max-width: ${maxWidth}; max-height: 100%; object-fit: ${objectFit};" alt="${block.type}" />
+      <img src="${escapeHtml(
+        resolvedSource
+      )}" style="max-width: ${maxWidth}; max-height: 100%; object-fit: ${objectFit};" alt="${
+    block.type
+  }" />
     </div>
   `;
 }
@@ -451,12 +481,23 @@ function renderCompanyInfoBlock(block: Block, data: InvoiceData): string {
 }
 
 function renderClientInfoBlock(block: Block, data: InvoiceData): string {
-  const { content, fontSize, lineHeight, align, color, showTitle, title, titleFontWeight } = block.properties;
+  const {
+    content,
+    fontSize,
+    lineHeight,
+    align,
+    color,
+    showTitle,
+    title,
+    titleFontWeight,
+  } = block.properties;
   const replacedContent = replaceVariables(content, data);
 
   return `
     <div>
-      ${showTitle ? `
+      ${
+        showTitle
+          ? `
         <div style="
           font-size: ${fontSize};
           font-weight: ${titleFontWeight};
@@ -465,7 +506,9 @@ function renderClientInfoBlock(block: Block, data: InvoiceData): string {
         ">
           ${escapeHtml(title)}
         </div>
-      ` : ''}
+      `
+          : ''
+      }
       <div style="
         font-size: ${fontSize};
         line-height: ${lineHeight};
@@ -514,9 +557,23 @@ function renderTableBlock(block: Block, data: InvoiceData): string {
   const borderStyle = showBorders ? `1px solid ${borderColor}` : 'none';
 
   // Generate header
-  let headerHTML = '<thead><tr style="background: ' + headerBg + '; color: ' + headerColor + '; font-weight: ' + headerFontWeight + ';">';
-  columns.forEach((col: { id: string; header: string; align: string; width: string; field: string }) => {
-    headerHTML += `
+  let headerHTML =
+    '<thead><tr style="background: ' +
+    headerBg +
+    '; color: ' +
+    headerColor +
+    '; font-weight: ' +
+    headerFontWeight +
+    ';">';
+  columns.forEach(
+    (col: {
+      id: string;
+      header: string;
+      align: string;
+      width: string;
+      field: string;
+    }) => {
+      headerHTML += `
       <th style="
         padding: ${padding};
         text-align: ${col.align};
@@ -526,13 +583,15 @@ function renderTableBlock(block: Block, data: InvoiceData): string {
         ${escapeHtml(col.header)}
       </th>
     `;
-  });
+    }
+  );
   headerHTML += '</tr></thead>';
 
   // Generate rows
   let rowsHTML = '<tbody>';
   data.line_items.forEach((item, index) => {
-    const rowBackground = alternateRows && index % 2 === 1 ? alternateRowBg : rowBg;
+    const rowBackground =
+      alternateRows && index % 2 === 1 ? alternateRowBg : rowBg;
     rowsHTML += `<tr style="background: ${rowBackground};">`;
 
     columns.forEach((col: { id: string; align: string; field: string }) => {
@@ -581,8 +640,12 @@ function renderTotalBlock(block: Block, data: InvoiceData): string {
   } = block.properties;
 
   // Use a table for proper label/value alignment
-  const tableAlign = align === 'right' ? 'margin-left: auto;' : 
-                     align === 'center' ? 'margin: 0 auto;' : '';
+  const tableAlign =
+    align === 'right'
+      ? 'margin-left: auto;'
+      : align === 'center'
+      ? 'margin: 0 auto;'
+      : '';
   const gap = labelValueGap || '20px';
   const minWidthStyle = valueMinWidth ? `min-width: ${valueMinWidth};` : '';
 
@@ -591,31 +654,36 @@ function renderTotalBlock(block: Block, data: InvoiceData): string {
 
   items
     .filter((item: { show: boolean }) => item.show)
-    .forEach((item: { 
-      show: boolean; 
-      isTotal?: boolean; 
-      isBalance?: boolean; 
-      field: string; 
-      label: string 
-    }) => {
-      const isTotal = item.isTotal;
-      const isBalance = item.isBalance;
-      const value = replaceVariables(item.field, data);
-      const itemFontSize = isTotal ? totalFontSize : fontSize;
-      const itemFontWeight = isTotal ? totalFontWeight : 'normal';
-      const valueColor = isBalance ? balanceColor : isTotal ? totalColor : amountColor;
+    .forEach(
+      (item: {
+        show: boolean;
+        isTotal?: boolean;
+        isBalance?: boolean;
+        field: string;
+        label: string;
+      }) => {
+        const isTotal = item.isTotal;
+        const isBalance = item.isBalance;
+        const value = replaceVariables(item.field, data);
+        const itemFontSize = isTotal ? totalFontSize : fontSize;
+        const itemFontWeight = isTotal ? totalFontWeight : 'normal';
+        const valueColor = isBalance
+          ? balanceColor
+          : isTotal
+          ? totalColor
+          : amountColor;
 
-      // Build label cell padding (user padding + gap on right)
-      const labelPaddingStyle = labelPadding 
-        ? `padding: ${labelPadding}; padding-right: ${gap};`
-        : `padding-right: ${gap}; padding-bottom: ${spacing};`;
+        // Build label cell padding (user padding + gap on right)
+        const labelPaddingStyle = labelPadding
+          ? `padding: ${labelPadding}; padding-right: ${gap};`
+          : `padding-right: ${gap}; padding-bottom: ${spacing};`;
 
-      // Build value cell padding
-      const valuePaddingStyle = valuePadding
-        ? `padding: ${valuePadding};`
-        : `padding-bottom: ${spacing};`;
+        // Build value cell padding
+        const valuePaddingStyle = valuePadding
+          ? `padding: ${valuePadding};`
+          : `padding-bottom: ${spacing};`;
 
-      html += `
+        html += `
         <tr style="font-size: ${itemFontSize}; font-weight: ${itemFontWeight};">
           <td style="
             color: ${labelColor};
@@ -632,7 +700,8 @@ function renderTotalBlock(block: Block, data: InvoiceData): string {
           ">${value}</td>
         </tr>
       `;
-    });
+      }
+    );
 
   html += '</tbody></table>';
   return html;
@@ -679,36 +748,50 @@ function renderQRCodeBlock(block: Block, data: InvoiceData): string {
 }
 
 function renderSignatureBlock(block: Block): string {
-  const { label, showLine, showDate, align, fontSize, color } = block.properties;
+  const { label, showLine, showDate, align, fontSize, color } =
+    block.properties;
 
   return `
     <div style="text-align: ${align};">
       <div style="margin-bottom: 40px;"></div>
-      ${showLine ? `
+      ${
+        showLine
+          ? `
         <div style="
           border-top: 1px solid #000;
           width: 200px;
           margin-bottom: 8px;
           display: ${align === 'center' ? 'inline-block' : 'block'};
         "></div>
-      ` : ''}
+      `
+          : ''
+      }
       <div style="font-size: ${fontSize}; color: ${color};">
         ${escapeHtml(label)}
       </div>
-      ${showDate ? `
+      ${
+        showDate
+          ? `
         <div style="font-size: ${fontSize}; color: ${color}; margin-top: 4px;">
           Date: ________________
         </div>
-      ` : ''}
+      `
+          : ''
+      }
     </div>
   `;
 }
 
 /**
- * Escape HTML special characters
+ * Escape HTML special characters to prevent XSS
  */
 function escapeHtml(text: string): string {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+  const htmlEscapes: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  };
+  return text.replace(/[&<>"']/g, (match) => htmlEscapes[match]);
 }
