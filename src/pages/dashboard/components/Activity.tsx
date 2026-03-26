@@ -17,13 +17,15 @@ import { useTranslation } from 'react-i18next';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import { useGenerateActivityElement } from '../hooks/useGenerateActivityElement';
-import React from 'react';
-import { useColorScheme } from '$app/common/colors';
+import React, { ReactNode } from 'react';
 
-export function Activity() {
+interface Props {
+  isEditMode?: boolean;
+  topRight?: ReactNode;
+}
+
+export function Activity({ topRight, isEditMode }: Props) {
   const [t] = useTranslation();
-
-  const colors = useColorScheme();
 
   const { data, isLoading, isError } = useQuery(
     ['/api/v1/activities'],
@@ -36,13 +38,11 @@ export function Activity() {
   return (
     <Card
       title={t('recent_activity')}
-      className="h-96 relative shadow-sm"
+      className="relative"
+      height="full"
       withoutBodyPadding
-      headerClassName="px-3 sm:px-4 py-3 sm:py-4"
-      childrenClassName="px-0"
-      style={{ borderColor: colors.$24 }}
-      headerStyle={{ borderColor: colors.$20 }}
-      withoutHeaderPadding
+      topRight={topRight}
+      renderFromShadcn
     >
       {isLoading && (
         <NonClickableElement>
@@ -54,11 +54,11 @@ export function Activity() {
         <NonClickableElement>{t('error_refresh_page')}</NonClickableElement>
       )}
 
-      <div className="pt-4">
-        <div
-          className="flex flex-col overflow-y-auto px-4"
-          style={{ height: '18.9rem' }}
-        >
+      <div
+        className="pl-6 pr-4 overflow-y-auto"
+        style={{ height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}` }}
+      >
+        <div className="flex flex-col pr-4">
           {data?.data.data &&
             data.data.data.map((record: ActivityRecord, index: number) => (
               <React.Fragment key={index}>
