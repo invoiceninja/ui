@@ -40,56 +40,33 @@ export interface Block {
   locked?: boolean; // Prevent accidental editing/deletion
 }
 
-// Union type for all block properties
-export type BlockProperties =
-  | TextBlockProperties
-  | ImageBlockProperties
-  | LogoBlockProperties
-  | TableBlockProperties
-  | DividerBlockProperties
-  | SpacerBlockProperties
-  | TotalBlockProperties
-  | QRCodeBlockProperties
-  | SignatureBlockProperties
-  | ClientInfoBlockProperties
-  | CompanyInfoBlockProperties
-  | InvoiceDetailsBlockProperties;
+// Flexible property type that allows any properties with type hints
+export type BlockProperties = Record<string, any>;
 
-// Individual block property interfaces
-export interface TextBlockProperties {
-  content: string;
-  fontSize: string;
-  fontWeight:
-    | 'normal'
-    | 'bold'
-    | 'lighter'
-    | 'bolder'
-    | '100'
-    | '200'
-    | '300'
-    | '400'
-    | '500'
-    | '600'
-    | '700'
-    | '800'
-    | '900';
-  lineHeight: string;
-  color: string;
-  align: 'left' | 'center' | 'right' | 'justify';
+// Type hints for common block properties (not strict requirements)
+export interface TextBlockPropertiesHint {
+  content?: string;
+  fontSize?: string;
+  fontWeight?: string;
+  lineHeight?: string;
+  color?: string;
+  align?: string;
+  fontStyle?: string;
+  padding?: string;
 }
 
-export interface ImageBlockProperties {
-  source: string;
-  align: 'left' | 'center' | 'right';
-  maxWidth: string;
-  objectFit: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
+export interface ImageBlockPropertiesHint {
+  source?: string;
+  align?: string;
+  maxWidth?: string;
+  objectFit?: string;
 }
 
-export interface LogoBlockProperties {
-  source: string;
-  align: 'left' | 'center' | 'right';
-  maxWidth: string;
-  objectFit: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
+export interface LogoBlockPropertiesHint {
+  source?: string;
+  align?: string;
+  maxWidth?: string;
+  objectFit?: string;
 }
 
 export interface TableColumn {
@@ -97,33 +74,33 @@ export interface TableColumn {
   header: string;
   field: string;
   width: string;
-  align: 'left' | 'center' | 'right';
+  align: string;
 }
 
-export interface TableBlockProperties {
-  columns: TableColumn[];
-  headerBg: string;
-  headerColor: string;
-  headerFontWeight: string;
-  rowBg: string;
-  alternateRowBg: string;
-  borderColor: string;
-  fontSize: string;
-  padding: string;
-  showBorders: boolean;
-  alternateRows: boolean;
+export interface TableBlockPropertiesHint {
+  columns?: TableColumn[];
+  headerBg?: string;
+  headerColor?: string;
+  headerFontWeight?: string;
+  rowBg?: string;
+  alternateRowBg?: string;
+  borderColor?: string;
+  fontSize?: string;
+  padding?: string;
+  showBorders?: boolean;
+  alternateRows?: boolean;
 }
 
-export interface DividerBlockProperties {
-  thickness: string;
-  color: string;
-  style: 'solid' | 'dashed' | 'dotted' | 'double' | 'none';
-  marginTop: string;
-  marginBottom: string;
+export interface DividerBlockPropertiesHint {
+  thickness?: string;
+  color?: string;
+  style?: string;
+  marginTop?: string;
+  marginBottom?: string;
 }
 
-export interface SpacerBlockProperties {
-  height: string;
+export interface SpacerBlockPropertiesHint {
+  height?: string;
 }
 
 export interface TotalItem {
@@ -134,66 +111,66 @@ export interface TotalItem {
   isBalance?: boolean;
 }
 
-export interface TotalBlockProperties {
-  items: TotalItem[];
-  fontSize: string;
-  align: 'left' | 'center' | 'right';
-  labelColor: string;
-  amountColor: string;
-  totalFontSize: string;
-  totalFontWeight: string;
-  totalColor: string;
-  balanceColor: string;
-  spacing: string;
-  labelPadding: string;
-  valuePadding: string;
-  labelValueGap: string;
-  valueMinWidth: string;
-  showLabels: boolean;
+export interface TotalBlockPropertiesHint {
+  items?: TotalItem[];
+  fontSize?: string;
+  align?: string;
+  labelColor?: string;
+  amountColor?: string;
+  totalFontSize?: string;
+  totalFontWeight?: string;
+  totalColor?: string;
+  balanceColor?: string;
+  spacing?: string;
+  labelPadding?: string;
+  valuePadding?: string;
+  labelValueGap?: string;
+  valueMinWidth?: string;
+  showLabels?: boolean;
 }
 
-export interface QRCodeBlockProperties {
-  data: string;
-  size: string;
-  align: 'left' | 'center' | 'right';
+export interface QRCodeBlockPropertiesHint {
+  data?: string;
+  size?: string;
+  align?: string;
 }
 
-export interface SignatureBlockProperties {
-  label: string;
-  showLine: boolean;
-  showDate: boolean;
-  align: 'left' | 'center' | 'right';
-  fontSize: string;
-  color: string;
+export interface SignatureBlockPropertiesHint {
+  label?: string;
+  showLine?: boolean;
+  showDate?: boolean;
+  align?: string;
+  fontSize?: string;
+  color?: string;
 }
 
-export interface ClientInfoBlockProperties {
-  content: string;
-  fontSize: string;
-  lineHeight: string;
-  align: 'left' | 'center' | 'right';
-  color: string;
-  showTitle: boolean;
-  title: string;
-  titleFontWeight: string;
+export interface ClientInfoBlockPropertiesHint {
+  content?: string;
+  fontSize?: string;
+  lineHeight?: string;
+  align?: string;
+  color?: string;
+  showTitle?: boolean;
+  title?: string;
+  titleFontWeight?: string;
 }
 
-export interface CompanyInfoBlockProperties {
-  content: string;
-  fontSize: string;
-  lineHeight: string;
-  align: 'left' | 'center' | 'right';
-  color: string;
+export interface CompanyInfoBlockPropertiesHint {
+  content?: string;
+  fontSize?: string;
+  lineHeight?: string;
+  align?: string;
+  color?: string;
 }
 
-export interface InvoiceDetailsBlockProperties {
-  content: string;
-  fontSize: string;
-  lineHeight: string;
-  align: 'left' | 'center' | 'right';
-  color: string;
-  labelColor: string;
-  showLabels: boolean;
+export interface InvoiceDetailsBlockPropertiesHint {
+  content?: string;
+  fontSize?: string;
+  lineHeight?: string;
+  align?: string;
+  color?: string;
+  labelColor?: string;
+  showLabels?: boolean;
 }
 
 export interface LayoutConfig {
@@ -217,13 +194,13 @@ export interface InvoiceTemplate {
 
 export type BlockCategory = 'branding' | 'content' | 'data' | 'layout';
 
-export interface BlockDefinition<T extends BlockProperties = BlockProperties> {
+export interface BlockDefinition {
   type: BlockType;
   label: string;
   icon: ReactNode;
   description: string;
   defaultSize: { w: number; h: number };
-  defaultProperties: T;
+  defaultProperties: BlockProperties;
   category: BlockCategory;
   essential?: boolean; // Mark as required/recommended block
 }

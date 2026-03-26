@@ -8,11 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Code } from 'lucide-react';
 import { PropertyEditorProps } from '../../types';
 import { VariablePicker } from '../VariablePicker';
+import { useDebouncedCallback } from '../../hooks/useDebounce';
 import {
   FontSizeInput,
   FontStyleInput,
@@ -26,6 +27,29 @@ import {
 export function TextBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
   const [showVariablePicker, setShowVariablePicker] = useState(false);
+  // Local state for immediate textarea updates
+  const [contentValue, setContentValue] = useState(
+    block.properties.content || ''
+  );
+
+  // Debounced callback to update the actual property (prevents excessive re-renders)
+  const debouncedUpdateContent = useDebouncedCallback((value: string) => {
+    onChange({
+      ...block,
+      properties: { ...block.properties, content: value },
+    });
+  }, 300);
+
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    setContentValue(newValue); // Update local state immediately for responsive typing
+    debouncedUpdateContent(newValue); // Debounced update to parent
+  };
+
+  // Sync local state when block changes externally
+  useEffect(() => {
+    setContentValue(block.properties.content || '');
+  }, [block.properties.content]);
 
   const updateProperty = (key: string, value: any) => {
     onChange({
@@ -51,8 +75,8 @@ export function TextBlockProperties({ block, onChange }: PropertyEditorProps) {
           </button>
         </div>
         <textarea
-          value={block.properties.content || ''}
-          onChange={(e) => updateProperty('content', e.target.value)}
+          value={contentValue}
+          onChange={handleContentChange}
           className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-mono"
           rows={4}
           placeholder={String(t('enter_your_text'))}

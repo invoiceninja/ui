@@ -9,7 +9,8 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
+import { ChevronUp, ChevronDown, Trash2, Plus } from 'lucide-react';
+import { Button } from '$app/components/forms';
 
 export interface FieldDefinition {
   id: string;
@@ -52,14 +53,20 @@ export function ReorderableFieldList({
   const moveFieldUp = (index: number) => {
     if (index === 0) return;
     const newFields = [...fields];
-    [newFields[index - 1], newFields[index]] = [newFields[index], newFields[index - 1]];
+    [newFields[index - 1], newFields[index]] = [
+      newFields[index],
+      newFields[index - 1],
+    ];
     onReorder(newFields);
   };
 
   const moveFieldDown = (index: number) => {
     if (index >= fields.length - 1) return;
     const newFields = [...fields];
-    [newFields[index], newFields[index + 1]] = [newFields[index + 1], newFields[index]];
+    [newFields[index], newFields[index + 1]] = [
+      newFields[index + 1],
+      newFields[index],
+    ];
     onReorder(newFields);
   };
 
@@ -70,7 +77,7 @@ export function ReorderableFieldList({
           {label}
         </label>
       )}
-      
+
       <div className="space-y-1">
         {fields.map((field, index) => (
           <div
@@ -79,42 +86,37 @@ export function ReorderableFieldList({
           >
             {/* Reorder buttons */}
             <div className="flex flex-col">
-              <button
+              <Button
+                behavior="button"
+                type="minimal"
                 onClick={() => moveFieldUp(index)}
                 disabled={index === 0}
-                className={`p-0.5 rounded ${
-                  index === 0
-                    ? 'text-gray-300 cursor-not-allowed'
-                    : 'text-gray-500 hover:bg-gray-100'
-                }`}
-                title={String(t('move_up'))}
+                className="p-0.5 h-auto"
               >
                 <ChevronUp className="w-4 h-4" />
-              </button>
-              <button
+              </Button>
+              <Button
+                behavior="button"
+                type="minimal"
                 onClick={() => moveFieldDown(index)}
                 disabled={index >= fields.length - 1}
-                className={`p-0.5 rounded ${
-                  index >= fields.length - 1
-                    ? 'text-gray-300 cursor-not-allowed'
-                    : 'text-gray-500 hover:bg-gray-100'
-                }`}
-                title={String(t('move_down'))}
+                className="p-0.5 h-auto"
               >
                 <ChevronDown className="w-4 h-4" />
-              </button>
+              </Button>
             </div>
 
-            <span className="flex-1 text-sm text-gray-700">{field.label}</span>
+            <span className="flex-1 text-sm">{field.label}</span>
 
             {showRemove && (
-              <button
+              <Button
+                behavior="button"
+                type="minimal"
                 onClick={() => removeField(index)}
-                className="p-1 rounded hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors"
-                title={String(t('remove'))}
+                className="p-1 h-auto"
               >
                 <Trash2 className="w-4 h-4" />
-              </button>
+              </Button>
             )}
           </div>
         ))}
@@ -134,13 +136,16 @@ export function ReorderableFieldList({
           </label>
           <div className="flex flex-wrap gap-2">
             {availableFields.map((field) => (
-              <button
+              <Button
                 key={field.id}
+                behavior="button"
+                type="secondary"
                 onClick={() => addField(field)}
-                className="px-3 py-1.5 text-xs border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 transition-colors"
+                className="py-1.5 px-3 text-xs h-auto"
               >
-                + {field.label}
-              </button>
+                <Plus className="w-3 h-3 mr-1" />
+                {field.label}
+              </Button>
             ))}
           </div>
         </div>
@@ -148,4 +153,3 @@ export function ReorderableFieldList({
     </div>
   );
 }
-

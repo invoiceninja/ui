@@ -977,7 +977,6 @@ export function InvoiceBuilder() {
               value={designNameInput}
               onValueChange={(value) => setDesignNameInput(value)}
               placeholder={String(t('design_name'))}
-              autoFocus
             />
           </div>
           <div className="flex justify-end gap-2">

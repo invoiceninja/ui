@@ -22,15 +22,69 @@ import {
 // Available columns that can be added to the table
 // Maps field to canonical ID for consistent matching
 const AVAILABLE_COLUMNS = [
-  { id: 'product_key', header: 'Item', field: 'item.product_key', width: '25%', align: 'left' as const },
-  { id: 'notes', header: 'Description', field: 'item.notes', width: '30%', align: 'left' as const },
-  { id: 'quantity', header: 'Qty', field: 'item.quantity', width: '10%', align: 'center' as const },
-  { id: 'cost', header: 'Rate', field: 'item.cost', width: '15%', align: 'right' as const },
-  { id: 'line_total', header: 'Amount', field: 'item.line_total', width: '15%', align: 'right' as const },
-  { id: 'discount', header: 'Discount', field: 'item.discount', width: '10%', align: 'right' as const },
-  { id: 'tax_rate1', header: 'Tax', field: 'item.tax_rate1', width: '10%', align: 'right' as const },
-  { id: 'custom_value1', header: 'Custom 1', field: 'item.custom_value1', width: '15%', align: 'left' as const },
-  { id: 'custom_value2', header: 'Custom 2', field: 'item.custom_value2', width: '15%', align: 'left' as const },
+  {
+    id: 'product_key',
+    header: 'Item',
+    field: 'item.product_key',
+    width: '25%',
+    align: 'left' as const,
+  },
+  {
+    id: 'notes',
+    header: 'Description',
+    field: 'item.notes',
+    width: '30%',
+    align: 'left' as const,
+  },
+  {
+    id: 'quantity',
+    header: 'Qty',
+    field: 'item.quantity',
+    width: '10%',
+    align: 'center' as const,
+  },
+  {
+    id: 'cost',
+    header: 'Rate',
+    field: 'item.cost',
+    width: '15%',
+    align: 'right' as const,
+  },
+  {
+    id: 'line_total',
+    header: 'Amount',
+    field: 'item.line_total',
+    width: '15%',
+    align: 'right' as const,
+  },
+  {
+    id: 'discount',
+    header: 'Discount',
+    field: 'item.discount',
+    width: '10%',
+    align: 'right' as const,
+  },
+  {
+    id: 'tax_rate1',
+    header: 'Tax',
+    field: 'item.tax_rate1',
+    width: '10%',
+    align: 'right' as const,
+  },
+  {
+    id: 'custom_value1',
+    header: 'Custom 1',
+    field: 'item.custom_value1',
+    width: '15%',
+    align: 'left' as const,
+  },
+  {
+    id: 'custom_value2',
+    header: 'Custom 2',
+    field: 'item.custom_value2',
+    width: '15%',
+    align: 'left' as const,
+  },
 ];
 
 export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
@@ -53,7 +107,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
   };
 
   // Add a column
-  const addColumn = (columnDef: typeof AVAILABLE_COLUMNS[0]) => {
+  const addColumn = (columnDef: (typeof AVAILABLE_COLUMNS)[0]) => {
     if (!isColumnEnabled(columnDef.field)) {
       updateProperty('columns', [...currentColumns, { ...columnDef }]);
     }
@@ -70,7 +124,10 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
   const moveColumnUp = (index: number) => {
     if (index === 0) return;
     const newColumns = [...currentColumns];
-    [newColumns[index - 1], newColumns[index]] = [newColumns[index], newColumns[index - 1]];
+    [newColumns[index - 1], newColumns[index]] = [
+      newColumns[index],
+      newColumns[index - 1],
+    ];
     updateProperty('columns', newColumns);
   };
 
@@ -78,7 +135,10 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
   const moveColumnDown = (index: number) => {
     if (index >= currentColumns.length - 1) return;
     const newColumns = [...currentColumns];
-    [newColumns[index], newColumns[index + 1]] = [newColumns[index + 1], newColumns[index]];
+    [newColumns[index], newColumns[index + 1]] = [
+      newColumns[index + 1],
+      newColumns[index],
+    ];
     updateProperty('columns', newColumns);
   };
 
@@ -90,7 +150,9 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
   };
 
   // Get columns not yet added
-  const availableToAdd = AVAILABLE_COLUMNS.filter(col => !isColumnEnabled(col.field));
+  const availableToAdd = AVAILABLE_COLUMNS.filter(
+    (col) => !isColumnEnabled(col.field)
+  );
 
   return (
     <div className="space-y-4">
@@ -102,16 +164,23 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
         <div className="space-y-1">
           {currentColumns.map((column: any, index: number) => {
             const isExpanded = expandedColumn === column.field;
-            
+
             return (
-              <div key={`${column.field}-${index}`} className="border border-gray-200 rounded-md bg-white">
+              <div
+                key={`${column.field}-${index}`}
+                className="border border-gray-200 rounded-md bg-white"
+              >
                 <div className="flex items-center gap-1 p-2">
                   {/* Reorder buttons */}
                   <div className="flex flex-col">
                     <button
                       onClick={() => moveColumnUp(index)}
                       disabled={index === 0}
-                      className={`p-0.5 rounded ${index === 0 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-100'}`}
+                      className={`p-0.5 rounded ${
+                        index === 0
+                          ? 'text-gray-300'
+                          : 'text-gray-500 hover:bg-gray-100'
+                      }`}
                       title={String(t('move_up'))}
                     >
                       <ChevronUp className="w-4 h-4" />
@@ -119,13 +188,17 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                     <button
                       onClick={() => moveColumnDown(index)}
                       disabled={index >= currentColumns.length - 1}
-                      className={`p-0.5 rounded ${index >= currentColumns.length - 1 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-100'}`}
+                      className={`p-0.5 rounded ${
+                        index >= currentColumns.length - 1
+                          ? 'text-gray-300'
+                          : 'text-gray-500 hover:bg-gray-100'
+                      }`}
                       title={String(t('move_down'))}
                     >
                       <ChevronDown className="w-4 h-4" />
                     </button>
                   </div>
-                  
+
                   {/* Column info */}
                   <div className="flex-1 min-w-0">
                     <span className="text-sm font-medium text-gray-700 truncate block">
@@ -135,16 +208,22 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                       {column.width} · {column.align}
                     </span>
                   </div>
-                  
+
                   {/* Settings toggle */}
                   <button
-                    onClick={() => setExpandedColumn(isExpanded ? null : column.field)}
-                    className={`p-1.5 rounded transition-colors ${isExpanded ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100 text-gray-500'}`}
+                    onClick={() =>
+                      setExpandedColumn(isExpanded ? null : column.field)
+                    }
+                    className={`p-1.5 rounded transition-colors ${
+                      isExpanded
+                        ? 'bg-blue-100 text-blue-600'
+                        : 'hover:bg-gray-100 text-gray-500'
+                    }`}
                     title={String(t('settings'))}
                   >
                     <Settings2 className="w-4 h-4" />
                   </button>
-                  
+
                   {/* Remove button */}
                   <button
                     onClick={() => removeColumn(index)}
@@ -154,38 +233,50 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-                
+
                 {/* Expanded settings */}
                 {isExpanded && (
                   <div className="px-2 pb-2 pt-1 border-t border-gray-100 bg-gray-50 space-y-2">
                     <div className="flex gap-2">
                       <div className="flex-1">
-                        <label className="block text-xs text-gray-500 mb-1">{t('header_label')}</label>
+                        <label className="block text-xs text-gray-500 mb-1">
+                          {t('header_label')}
+                        </label>
                         <input
                           type="text"
                           value={column.header}
-                          onChange={(e) => updateColumnProp(index, 'header', e.target.value)}
+                          onChange={(e) =>
+                            updateColumnProp(index, 'header', e.target.value)
+                          }
                           className="w-full px-2 py-1 border border-gray-300 rounded text-xs"
                         />
                       </div>
                       <div className="w-20">
-                        <label className="block text-xs text-gray-500 mb-1">{t('width')}</label>
+                        <label className="block text-xs text-gray-500 mb-1">
+                          {t('width')}
+                        </label>
                         <input
                           type="text"
                           value={column.width}
-                          onChange={(e) => updateColumnProp(index, 'width', e.target.value)}
+                          onChange={(e) =>
+                            updateColumnProp(index, 'width', e.target.value)
+                          }
                           className="w-full px-2 py-1 border border-gray-300 rounded text-xs"
                           placeholder="15%"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">{t('alignment')}</label>
+                      <label className="block text-xs text-gray-500 mb-1">
+                        {t('alignment')}
+                      </label>
                       <div className="flex gap-1">
                         {['left', 'center', 'right'].map((align) => (
                           <button
                             key={align}
-                            onClick={() => updateColumnProp(index, 'align', align)}
+                            onClick={() =>
+                              updateColumnProp(index, 'align', align)
+                            }
                             className={`flex-1 px-2 py-1 text-xs rounded border transition-all ${
                               column.align === align
                                 ? 'border-blue-500 bg-blue-50 text-blue-700'
@@ -202,7 +293,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
               </div>
             );
           })}
-          
+
           {currentColumns.length === 0 && (
             <div className="text-center py-4 text-gray-500 text-sm border border-dashed border-gray-300 rounded-md">
               {t('no_columns_selected')}
@@ -265,7 +356,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
       <CheckboxInput
         id="alternateRows"
         label={String(t('alternate_row_colors'))}
-        value={block.properties.alternateRows}
+        checked={block.properties.alternateRows}
         onChange={(value) => updateProperty('alternateRows', value)}
       />
 
@@ -284,7 +375,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
       <CheckboxInput
         id="showBorders"
         label={String(t('show_borders'))}
-        value={block.properties.showBorders}
+        checked={block.properties.showBorders}
         onChange={(value) => updateProperty('showBorders', value)}
       />
 

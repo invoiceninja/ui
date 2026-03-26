@@ -23,36 +23,98 @@ import {
 
 // Available invoice detail fields
 const AVAILABLE_FIELDS = [
-  { id: 'number', label: 'Invoice Number', variable: '$invoice.number', labelText: 'Invoice #:' },
-  { id: 'date', label: 'Invoice Date', variable: '$invoice.date', labelText: 'Date:' },
-  { id: 'due_date', label: 'Due Date', variable: '$invoice.due_date', labelText: 'Due Date:' },
-  { id: 'po_number', label: 'PO Number', variable: '$invoice.po_number', labelText: 'PO Number:' },
-  { id: 'amount', label: 'Amount', variable: '$invoice.amount', labelText: 'Amount:' },
-  { id: 'balance', label: 'Balance Due', variable: '$invoice.balance', labelText: 'Balance Due:' },
-  { id: 'partial', label: 'Partial/Deposit', variable: '$invoice.partial', labelText: 'Deposit:' },
-  { id: 'custom_value1', label: 'Custom Field 1', variable: '$invoice.custom_value1', labelText: 'Custom 1:' },
-  { id: 'custom_value2', label: 'Custom Field 2', variable: '$invoice.custom_value2', labelText: 'Custom 2:' },
-  { id: 'custom_value3', label: 'Custom Field 3', variable: '$invoice.custom_value3', labelText: 'Custom 3:' },
-  { id: 'custom_value4', label: 'Custom Field 4', variable: '$invoice.custom_value4', labelText: 'Custom 4:' },
+  {
+    id: 'number',
+    label: 'Invoice Number',
+    variable: '$invoice.number',
+    labelText: 'Invoice #:',
+  },
+  {
+    id: 'date',
+    label: 'Invoice Date',
+    variable: '$invoice.date',
+    labelText: 'Date:',
+  },
+  {
+    id: 'due_date',
+    label: 'Due Date',
+    variable: '$invoice.due_date',
+    labelText: 'Due Date:',
+  },
+  {
+    id: 'po_number',
+    label: 'PO Number',
+    variable: '$invoice.po_number',
+    labelText: 'PO Number:',
+  },
+  {
+    id: 'amount',
+    label: 'Amount',
+    variable: '$invoice.amount',
+    labelText: 'Amount:',
+  },
+  {
+    id: 'balance',
+    label: 'Balance Due',
+    variable: '$invoice.balance',
+    labelText: 'Balance Due:',
+  },
+  {
+    id: 'partial',
+    label: 'Partial/Deposit',
+    variable: '$invoice.partial',
+    labelText: 'Deposit:',
+  },
+  {
+    id: 'custom_value1',
+    label: 'Custom Field 1',
+    variable: '$invoice.custom_value1',
+    labelText: 'Custom 1:',
+  },
+  {
+    id: 'custom_value2',
+    label: 'Custom Field 2',
+    variable: '$invoice.custom_value2',
+    labelText: 'Custom 2:',
+  },
+  {
+    id: 'custom_value3',
+    label: 'Custom Field 3',
+    variable: '$invoice.custom_value3',
+    labelText: 'Custom 3:',
+  },
+  {
+    id: 'custom_value4',
+    label: 'Custom Field 4',
+    variable: '$invoice.custom_value4',
+    labelText: 'Custom 4:',
+  },
 ];
 
-export function InvoiceDetailsBlockProperties({ block, onChange }: PropertyEditorProps) {
+export function InvoiceDetailsBlockProperties({
+  block,
+  onChange,
+}: PropertyEditorProps) {
   const [t] = useTranslation();
 
   // Parse current content to get fields in order
   const currentContent = block.properties.content || '';
-  const contentLines = currentContent.split('\n').filter((line: string) => line.trim());
+  const contentLines = currentContent
+    .split('\n')
+    .filter((line: string) => line.trim());
   const showLabels = block.properties.showLabels !== false;
-  
+
   // Get enabled fields in their current order by finding which field each line contains
   const enabledFieldsOrdered = contentLines
-    .map((line: string) => AVAILABLE_FIELDS.find(f => line.includes(f.variable)))
+    .map((line: string) =>
+      AVAILABLE_FIELDS.find((f) => line.includes(f.variable))
+    )
     .filter(Boolean) as typeof AVAILABLE_FIELDS;
 
   // Get fields not yet added
-  const enabledVariables = enabledFieldsOrdered.map(f => f.variable);
+  const enabledVariables = enabledFieldsOrdered.map((f) => f.variable);
   const availableToAdd = AVAILABLE_FIELDS.filter(
-    field => !enabledVariables.includes(field.variable)
+    (field) => !enabledVariables.includes(field.variable)
   );
 
   const updateProperty = (key: string, value: any) => {
@@ -62,14 +124,19 @@ export function InvoiceDetailsBlockProperties({ block, onChange }: PropertyEdito
     });
   };
 
-  const rebuildContent = (fields: typeof AVAILABLE_FIELDS, withLabels: boolean) => {
+  const rebuildContent = (
+    fields: typeof AVAILABLE_FIELDS,
+    withLabels: boolean
+  ) => {
     const newContent = fields
-      .map(field => withLabels ? `${field.labelText} ${field.variable}` : field.variable)
+      .map((field) =>
+        withLabels ? `${field.labelText} ${field.variable}` : field.variable
+      )
       .join('\n');
     updateProperty('content', newContent);
   };
 
-  const addField = (field: typeof AVAILABLE_FIELDS[0]) => {
+  const addField = (field: (typeof AVAILABLE_FIELDS)[0]) => {
     rebuildContent([...enabledFieldsOrdered, field], showLabels);
   };
 
@@ -82,14 +149,20 @@ export function InvoiceDetailsBlockProperties({ block, onChange }: PropertyEdito
   const moveFieldUp = (index: number) => {
     if (index === 0) return;
     const newFields = [...enabledFieldsOrdered];
-    [newFields[index - 1], newFields[index]] = [newFields[index], newFields[index - 1]];
+    [newFields[index - 1], newFields[index]] = [
+      newFields[index],
+      newFields[index - 1],
+    ];
     rebuildContent(newFields, showLabels);
   };
 
   const moveFieldDown = (index: number) => {
     if (index >= enabledFieldsOrdered.length - 1) return;
     const newFields = [...enabledFieldsOrdered];
-    [newFields[index], newFields[index + 1]] = [newFields[index + 1], newFields[index]];
+    [newFields[index], newFields[index + 1]] = [
+      newFields[index + 1],
+      newFields[index],
+    ];
     rebuildContent(newFields, showLabels);
   };
 
@@ -99,7 +172,7 @@ export function InvoiceDetailsBlockProperties({ block, onChange }: PropertyEdito
       <CheckboxInput
         id="showLabels"
         label={String(t('show_labels'))}
-        value={showLabels}
+        checked={showLabels}
         onChange={(value) => {
           updateProperty('showLabels', value);
           rebuildContent(enabledFieldsOrdered, value);
@@ -111,7 +184,7 @@ export function InvoiceDetailsBlockProperties({ block, onChange }: PropertyEdito
         <label className="block text-sm font-medium text-gray-700">
           {t('field_order')}
         </label>
-        
+
         <div className="space-y-1">
           {enabledFieldsOrdered.map((field, index) => (
             <div
@@ -145,7 +218,9 @@ export function InvoiceDetailsBlockProperties({ block, onChange }: PropertyEdito
                 </button>
               </div>
 
-              <span className="flex-1 text-sm text-gray-700">{field.label}</span>
+              <span className="flex-1 text-sm text-gray-700">
+                {field.label}
+              </span>
 
               <button
                 onClick={() => removeField(index)}

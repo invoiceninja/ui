@@ -37,15 +37,18 @@ export function PropertyPanel({
           <h3 className="font-semibold text-lg text-gray-900 mb-1">
             {getBlockLabel(block.type)}
           </h3>
-          <p className="text-sm text-gray-600">{getBlockDescription(block.type)}</p>
+          <p className="text-sm text-gray-600">
+            {getBlockDescription(block.type)}
+          </p>
         </div>
-        <button
+        <Button
+          behavior="button"
+          type="minimal"
           onClick={onDuplicate}
-          className="flex-shrink-0 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-          title={String(t('duplicate'))}
+          className="flex-shrink-0 p-2"
         >
           <Clipboard className="w-4 h-4" />
-        </button>
+        </Button>
       </div>
 
       {/* Block-specific properties */}

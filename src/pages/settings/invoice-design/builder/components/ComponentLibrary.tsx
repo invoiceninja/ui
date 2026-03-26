@@ -9,7 +9,8 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Palette, FileText, Database, LayoutGrid } from 'lucide-react';
+import { Palette, FileText, Database, LayoutGrid, Plus } from 'lucide-react';
+import { Button } from '$app/components/forms/Button';
 import { blockLibrary } from '../block-library';
 import { Block, BlockDefinition, generateBlockId } from '../types';
 
@@ -110,52 +111,33 @@ function BlockCard({
   };
 
   return (
-    <button
-      onClick={onClick}
-      draggable
-      onDragStart={handleDragStart}
-      className="
-        w-full flex items-start gap-3 p-3 rounded-lg
-        border border-gray-200 hover:border-blue-500
-        bg-white hover:bg-blue-50
-        transition-all duration-150
-        text-left group cursor-move
-        active:scale-95
-      "
-    >
-      <div className="text-gray-600 group-hover:text-blue-600 transition-colors mt-0.5">
-        {definition.icon}
-      </div>
+    <div draggable onDragStart={handleDragStart} className="w-full">
+      <Button
+        behavior="button"
+        type="secondary"
+        onClick={onClick}
+        className="w-full justify-start text-left items-start gap-3 py-3 px-3 h-auto cursor-move"
+      >
+        <div className="mt-0.5 flex-shrink-0">{definition.icon}</div>
 
-      <div className="flex-1 min-w-0">
-        <div className="font-medium text-sm text-gray-900 mb-0.5 flex items-center gap-2">
-          {definition.label}
-          {definition.essential && (
-            <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-normal">
-              Essential
-            </span>
-          )}
+        <div className="flex-1 min-w-0">
+          <div className="font-medium text-sm mb-0.5 flex items-center gap-2">
+            {definition.label}
+            {definition.essential && (
+              <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-normal">
+                Essential
+              </span>
+            )}
+          </div>
+          <div className="text-xs opacity-75 line-clamp-2">
+            {definition.description}
+          </div>
         </div>
-        <div className="text-xs text-gray-500 line-clamp-2">
-          {definition.description}
-        </div>
-      </div>
 
-      <div className="text-gray-400 group-hover:text-blue-600 transition-colors">
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 4v16m8-8H4"
-          />
-        </svg>
-      </div>
-    </button>
+        <div className="opacity-60 flex-shrink-0 mt-0.5">
+          <Plus className="w-4 h-4" />
+        </div>
+      </Button>
+    </div>
   );
 }
