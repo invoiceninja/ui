@@ -80,7 +80,8 @@ export function RecoverPassword() {
               type="email"
               label={t('email_address')}
               id="email"
-              onChange={form.handleChange}
+              onValueChange={(value) => form.setFieldValue('email', value)}
+              changeOverride
             />
 
             <ErrorMessage className="mt-2">
