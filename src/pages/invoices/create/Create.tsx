@@ -245,6 +245,22 @@ export default function Create() {
     invoice && calculateInvoiceSum(invoice);
   }, [invoice]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault();
+
+        if (invoice && invoice.client_id.length > 0 && !isFormBusy) {
+          save(invoice as Invoice);
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [invoice, isFormBusy, save]);
+
   return (
     <>
       <Default
