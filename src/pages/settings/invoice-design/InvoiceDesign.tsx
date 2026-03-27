@@ -57,7 +57,8 @@ export default function InvoiceDesign() {
   const { isClientSettingsActive, isGroupSettingsActive } =
     useCurrentSettingsLevel();
   const displaySaveButtonAndPreview =
-    !location.pathname.includes('custom_designs');
+    !location.pathname.includes('custom_designs') &&
+    !location.pathname.includes('builder');
 
   const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
   const activeSettingsValue = useAtomValue(activeSettingsAtom);
@@ -66,7 +67,7 @@ export default function InvoiceDesign() {
 
   const showsMainTabs = location.pathname.includes('custom_designs')
     ? location.pathname.endsWith('/custom_designs')
-    : true;
+    : !location.pathname.includes('builder');
 
   const ProBadge = () => (
     <div className="flex space-x-0.5 items-center text-xs py-1 px-2 bg-[#2176FF26] rounded">
