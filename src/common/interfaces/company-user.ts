@@ -13,6 +13,35 @@ import { Account } from './account';
 import { Company } from './company.interface';
 import { User } from './user';
 
+export type Field =
+  | 'active_invoices'
+  | 'outstanding_invoices'
+  | 'completed_payments'
+  | 'refunded_payments'
+  | 'active_quotes'
+  | 'unapproved_quotes'
+  | 'logged_tasks'
+  | 'invoiced_tasks'
+  | 'paid_tasks'
+  | 'logged_expenses'
+  | 'pending_expenses'
+  | 'invoiced_expenses'
+  | 'invoice_paid_expenses';
+
+export type Period = 'current' | 'previous' | 'total';
+
+export type Calculate = 'sum' | 'avg' | 'count';
+
+export type Format = 'money' | 'time';
+
+export interface DashboardCardField {
+  id: string;
+  field: Field;
+  period: Period;
+  calculate: Calculate;
+  format: Format;
+}
+
 export interface CompanyUser {
   permissions: string;
   notifications: Notifications;

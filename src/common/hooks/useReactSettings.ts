@@ -17,6 +17,7 @@ import { Entity } from '$app/components/CommonActionsPreferenceModal';
 import { PerPage } from '$app/components/DataTable';
 import { ThemeColorField } from '$app/pages/settings/user/components/StatusColorTheme';
 import { ClientShowCard } from '$app/pages/clients/show/components/CardsCustomizationModal';
+import { DashboardCardField } from '$app/common/interfaces/company-user';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
 
@@ -77,6 +78,8 @@ export interface ReactSettings {
   dark_mode?: boolean;
   color_theme?: ColorTheme;
   client_show_cards?: ClientShowCard[];
+  dashboard_fields?: DashboardCardField[];
+  preference_cards_order?: string[];
 }
 
 export type ReactTableColumns =

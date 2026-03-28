@@ -19,17 +19,18 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useTranslation } from 'react-i18next';
-import { ReactNode } from 'react';
+import { useColorScheme } from '$app/common/colors';
+import { ArrowUp } from '$app/components/icons/ArrowUp';
+import { ArrowDown } from '$app/components/icons/ArrowDown';
+import { CalendarAlert } from '$app/components/icons/CalendarAlert';
 
-interface Props {
-  topRight?: ReactNode;
-  isEditMode: boolean;
-}
-
-export function PastDueInvoices({ topRight, isEditMode }: Props) {
+export function PastDueInvoices() {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
+
+  const colors = useColorScheme();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
   const disableNavigation = useDisableNavigation();
 
   const columns: DataTableColumns<Invoice> = [
@@ -71,7 +72,7 @@ export function PastDueInvoices({ topRight, isEditMode }: Props) {
       id: 'balance',
       label: t('balance'),
       format: (value, invoice) => (
-        <Badge variant="red">
+        <Badge variant="red" className="font-mono">
           {formatMoney(
             value,
             invoice.client?.country_id,
@@ -84,40 +85,56 @@ export function PastDueInvoices({ topRight, isEditMode }: Props) {
 
   return (
     <Card
-      title={t('past_due_invoices')}
-      className="h-full relative"
+      title={
+        <div className="flex items-center gap-2">
+          <CalendarAlert
+            size="1.4rem"
+            color="#F5B041"
+            exclamationMarkColor="#E74C3C"
+          />
+
+          <span>{t('past_due_invoices')}</span>
+        </div>
+      }
+      className="h-96 relative shadow-sm"
+      headerClassName="px-3 sm:px-4 py-3 sm:py-4"
       withoutBodyPadding
-      withoutHeaderBorder
-      topRight={topRight}
-      renderFromShadcn
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+      withoutHeaderPadding
     >
-      <div
-        className="pl-6 pr-4 relative"
-        style={{
-          height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}`,
-        }}
-      >
+      <div className="px-4 pt-4">
         <DataTable
           resource="invoice"
           columns={columns}
           className="pr-4"
-          height="full"
           endpoint="/api/v1/invoices?include=client.group_settings&overdue=true&without_deleted_clients=true&per_page=50&page=1&sort=due_date|asc"
           withoutActions
           withoutPagination
           withoutPadding
           withoutPerPageAsPreference
           styleOptions={{
-            addRowSeparator: true,
             withoutBottomBorder: true,
             withoutTopBorder: true,
             withoutLeftBorder: true,
             withoutRightBorder: true,
+            disableThUppercase: true,
+            withoutThVerticalPadding: true,
+            useOnlyCurrentSortDirectionIcon: true,
             headerBackgroundColor: 'transparent',
-            thChildrenClassName: 'text-gray-500 dark:text-white',
-            tdClassName: 'first:pl-0 py-4',
-            thClassName: 'first:pl-0',
+            thChildrenClassName: 'text-gray-500',
+            tdClassName: 'first:pl-2 py-3',
+            thClassName: 'first:pl-2 py-3 border-r-0 text-sm',
             tBodyStyle: { border: 0 },
+            thTextSize: 'small',
+            thStyle: {
+              borderBottom: `1px solid ${colors.$20}`,
+            },
+            ascIcon: <ArrowUp size="1.1rem" color="#6b7280" />,
+            descIcon: <ArrowDown size="1.1rem" color="#6b7280" />,
+          }}
+          style={{
+            height: '18.9rem',
           }}
           withoutSortQueryParameter
         />

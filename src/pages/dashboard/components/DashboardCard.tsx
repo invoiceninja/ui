@@ -8,117 +8,99 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { DashboardField } from '$app/common/interfaces/company-user';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FIELDS_LABELS } from './DashboardCardSelector';
 import { useQueryClient } from 'react-query';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { DashboardCardField } from '$app/common/interfaces/company-user';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { Spinner } from '$app/components/Spinner';
-import { Card as ShadcnCard } from '../../../../components/ui/card';
-import classNames from 'classnames';
+import { Card as ShadcnCard } from '$app/components/cards';
+import { FIELDS_LABELS } from './DashboardCardSelector';
 
-interface DashboardCardsProps {
+export const PERIOD_LABELS: Record<string, string> = {
+  current: 'current_period',
+  previous: 'previous_period',
+  total: 'total',
+};
+
+interface Props {
+  field: DashboardCardField;
   dateRange: string;
   startDate: string;
   endDate: string;
   currencyId: string;
 }
 
-interface CardProps extends DashboardCardsProps {
-  field: DashboardField;
-  layoutBreakpoint: string | undefined;
-  fillHeight?: boolean;
-}
-
-export const PERIOD_LABELS = {
-  current: 'current_period',
-  previous: 'previous_period',
-};
-
-export function DashboardCard(props: CardProps) {
+export function DashboardCard({
+  field,
+  dateRange,
+  startDate,
+  endDate,
+  currencyId,
+}: Props) {
   const [t] = useTranslation();
-  const { dateRange, startDate, endDate, field, currencyId } = props;
-
   const queryClient = useQueryClient();
   const formatMoney = useFormatMoney();
 
-  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-  const [responseData, setResponseData] = useState<number>();
+  const [isBusy, setIsBusy] = useState(false);
+  const [value, setValue] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     (async () => {
-      typeof responseData === 'undefined' && setIsFormBusy(true);
-
-      const response = await queryClient.fetchQuery(
-        [
-          '/api/v1/charts/calculated_fields',
-          dateRange,
-          startDate,
-          endDate,
-          field.field,
-          field.calculate,
-          field.period,
-          currencyId,
-        ],
-        () =>
-          request('POST', endpoint('/api/v1/charts/calculated_fields'), {
-            date_range: dateRange,
-            start_date: startDate,
-            end_date: endDate,
-            field: field.field,
-            calculation: field.calculate,
-            period: field.period,
-            format: field.format,
-            currency_id: currencyId,
-          }).then((response) => response.data),
-        { staleTime: Infinity }
-      );
-
-      setResponseData(response);
-      typeof responseData === 'undefined' && setIsFormBusy(false);
+      setIsBusy(true);
+      try {
+        const response = await queryClient.fetchQuery(
+          [
+            '/api/v1/charts/calculated_fields',
+            dateRange,
+            startDate,
+            endDate,
+            field.field,
+            field.calculate,
+            field.period,
+            currencyId,
+          ],
+          () =>
+            request('POST', endpoint('/api/v1/charts/calculated_fields'), {
+              date_range: dateRange,
+              start_date: startDate,
+              end_date: endDate,
+              field: field.field,
+              calculation: field.calculate,
+              period: field.period,
+              format: field.format,
+              currency_id: currencyId,
+            }).then((r) => r.data),
+          { staleTime: Infinity }
+        );
+        setValue(response);
+      } finally {
+        setIsBusy(false);
+      }
     })();
-  }, [field]);
+  }, [field, dateRange, startDate, endDate, currencyId]);
+
+  const displayValue =
+    field.format === 'money' && field.calculate !== 'count'
+      ? formatMoney(value ?? 0, '', '')
+      : value;
 
   return (
-    <ShadcnCard
-      className={classNames('px-6 py-6', {
-        'h-full min-h-0': props.fillHeight !== false,
-        'col-span-2':
-          props.layoutBreakpoint === 'xxl' ||
-          props.layoutBreakpoint === 'xl' ||
-          !props.layoutBreakpoint,
-        'col-span-3': props.layoutBreakpoint === 'lg',
-        'col-span-4': props.layoutBreakpoint === 'md',
-        'col-span-6': props.layoutBreakpoint === 'sm',
-        'col-span-12':
-          props.layoutBreakpoint === 'xs' || props.layoutBreakpoint === 'xxs',
-      })}
-      style={{ pointerEvents: 'auto', cursor: 'pointer' }}
-    >
-      {isFormBusy && (
-        <div className="flex items-center justify-center">
-          <Spinner />
-        </div>
-      )}
-
-      {!isFormBusy && (
-        <div className="flex flex-col items-center justify-center space-y-1 h-full w-full">
-          <span className="font-medium">{t(FIELDS_LABELS[field.field])}</span>
-          <span>
-            {field.format === 'money' && field.calculate !== 'count'
-              ? formatMoney(responseData ?? 0, '', '')
-              : responseData}
+    <ShadcnCard className="flex h-full flex-col items-center justify-center gap-1 px-6 py-6">
+      {isBusy ? (
+        <Spinner />
+      ) : (
+        <>
+          <span className="text-center text-sm font-medium text-gray-700 dark:text-gray-300">
+            {t(FIELDS_LABELS[field.field] ?? field.field)}
           </span>
-          <span className="text-gray-500">
-            {t(
-              PERIOD_LABELS[field.period as keyof typeof PERIOD_LABELS] ??
-                field.period
-            )}
+          <span className="text-xl font-semibold">{displayValue}</span>
+          <span className="text-xs text-gray-500">
+            {t(PERIOD_LABELS[field.period] ?? field.period)}
           </span>
-        </div>
+        </>
       )}
     </ShadcnCard>
   );

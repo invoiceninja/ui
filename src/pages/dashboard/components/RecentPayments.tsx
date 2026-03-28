@@ -20,17 +20,19 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useTranslation } from 'react-i18next';
-import { ReactNode } from 'react';
+import { useColorScheme } from '$app/common/colors';
+import { CreditCardChecked } from '$app/components/icons/CreditCardChecked';
+import { ArrowUp } from '$app/components/icons/ArrowUp';
+import { ArrowDown } from '$app/components/icons/ArrowDown';
 
-interface Props {
-  topRight?: ReactNode;
-  isEditMode?: boolean;
-}
-
-export function RecentPayments({ topRight, isEditMode }: Props) {
+export function RecentPayments() {
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
+
+  const colors = useColorScheme();
+
   const { dateFormat } = useCurrentCompanyDateFormats();
+
   const disableNavigation = useDisableNavigation();
 
   const columns: DataTableColumns<Payment> = [
@@ -85,7 +87,7 @@ export function RecentPayments({ topRight, isEditMode }: Props) {
       id: 'amount',
       label: t('amount'),
       format: (value, payment) => (
-        <Badge variant="green">
+        <Badge variant="green" className="font-mono">
           {formatMoney(
             value,
             payment.client?.country_id,
@@ -98,37 +100,52 @@ export function RecentPayments({ topRight, isEditMode }: Props) {
 
   return (
     <Card
-      title={t('recent_payments')}
-      className="h-full relative"
+      title={
+        <div className="flex items-center gap-2">
+          <CreditCardChecked size="1.4rem" color="#22C55E" />
+
+          <span>{t('recent_payments')}</span>
+        </div>
+      }
+      className="h-96 relative shadow-sm"
+      headerClassName="px-3 sm:px-4 py-3 sm:py-4"
       withoutBodyPadding
-      topRight={topRight}
-      renderFromShadcn
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+      withoutHeaderPadding
     >
-      <div
-        className="pl-6 pr-4 relative"
-        style={{ height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}` }}
-      >
+      <div className="px-4 pt-4">
         <DataTable
           resource="payment"
           columns={columns}
           className="pr-4"
-          height="full"
           endpoint="/api/v1/payments?include=client,invoices&sort=date|desc&per_page=50&without_deleted_clients=true&page=1"
           withoutActions
           withoutPagination
           withoutPadding
           withoutPerPageAsPreference
           styleOptions={{
-            addRowSeparator: true,
             withoutBottomBorder: true,
             withoutTopBorder: true,
             withoutLeftBorder: true,
             withoutRightBorder: true,
+            disableThUppercase: true,
+            withoutThVerticalPadding: true,
+            useOnlyCurrentSortDirectionIcon: true,
             headerBackgroundColor: 'transparent',
-            thChildrenClassName: 'text-gray-500 dark:text-white',
-            tdClassName: 'first:pl-0 py-4',
-            thClassName: 'first:pl-0',
+            thChildrenClassName: 'text-gray-500',
+            tdClassName: 'first:pl-2 py-3',
+            thClassName: 'first:pl-2 py-3 border-r-0 text-sm',
             tBodyStyle: { border: 0 },
+            thTextSize: 'small',
+            thStyle: {
+              borderBottom: `1px solid ${colors.$20}`,
+            },
+            ascIcon: <ArrowUp size="1.1rem" color="#6b7280" />,
+            descIcon: <ArrowDown size="1.1rem" color="#6b7280" />,
+          }}
+          style={{
+            height: '18.9rem',
           }}
         />
       </div>

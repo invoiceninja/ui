@@ -18,15 +18,16 @@ import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
-import { ReactNode } from 'react';
+import { useColorScheme } from '$app/common/colors';
+import { ArrowUp } from '$app/components/icons/ArrowUp';
+import { ArrowDown } from '$app/components/icons/ArrowDown';
+import { CalendarCheckOut } from '$app/components/icons/CalendarCheckOut';
 
-interface Props {
-  isEditMode: boolean;
-  topRight?: ReactNode;
-}
-
-export function UpcomingQuotes({ topRight, isEditMode }: Props) {
+export function UpcomingQuotes() {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
 
@@ -64,7 +65,7 @@ export function UpcomingQuotes({ topRight, isEditMode }: Props) {
       id: 'amount',
       label: t('amount'),
       format: (value, quote) => (
-        <Badge variant="orange">
+        <Badge variant="orange" className="font-mono">
           {formatMoney(
             value,
             quote.client?.country_id,
@@ -77,41 +78,52 @@ export function UpcomingQuotes({ topRight, isEditMode }: Props) {
 
   return (
     <Card
-      title={t('upcoming_quotes')}
-      className="relative"
+      title={
+        <div className="flex items-center gap-2">
+          <CalendarCheckOut size="1.4rem" color="#66B2FF" />
+
+          <span>{t('upcoming_quotes')}</span>
+        </div>
+      }
+      className="h-96 relative shadow-sm"
+      headerClassName="px-3 sm:px-4 py-3 sm:py-4"
       withoutBodyPadding
-      withoutHeaderBorder
-      height="full"
-      topRight={topRight}
-      renderFromShadcn
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+      withoutHeaderPadding
     >
-      <div
-        className="pl-6 pr-4 relative"
-        style={{
-          height: `calc(100% - ${!isEditMode ? '3.7rem' : '4.9rem'}`,
-        }}
-      >
+      <div className="px-4 pt-4">
         <DataTable
           resource="quote"
           columns={columns}
           className="pr-4"
-          height="full"
           endpoint="/api/v1/quotes?include=client&client_status=upcoming&without_deleted_clients=true&per_page=50&page=1"
           withoutActions
           withoutPagination
           withoutPadding
           withoutPerPageAsPreference
           styleOptions={{
-            addRowSeparator: true,
             withoutBottomBorder: true,
             withoutTopBorder: true,
             withoutLeftBorder: true,
             withoutRightBorder: true,
+            disableThUppercase: true,
+            withoutThVerticalPadding: true,
+            useOnlyCurrentSortDirectionIcon: true,
             headerBackgroundColor: 'transparent',
-            thChildrenClassName: 'text-gray-500 dark:text-white',
-            tdClassName: 'first:pl-0 py-4',
-            thClassName: 'first:pl-0',
+            thChildrenClassName: 'text-gray-500',
+            tdClassName: 'first:pl-2 py-3',
+            thClassName: 'first:pl-2 py-3 border-r-0 text-sm',
             tBodyStyle: { border: 0 },
+            thTextSize: 'small',
+            thStyle: {
+              borderBottom: `1px solid ${colors.$20}`,
+            },
+            ascIcon: <ArrowUp size="1.1rem" color="#6b7280" />,
+            descIcon: <ArrowDown size="1.1rem" color="#6b7280" />,
+          }}
+          style={{
+            height: '18.9rem',
           }}
           withoutSortQueryParameter
         />
