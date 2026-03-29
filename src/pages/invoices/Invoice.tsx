@@ -144,6 +144,27 @@ export default function Invoice() {
   }, [saveChanges]);
 
   useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault();
+
+        if (
+          invoice &&
+          !isFormBusy &&
+          !invoice.is_locked &&
+          invoice.status_id !== InvoiceStatus.Cancelled
+        ) {
+          setSaveChanges(true);
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [invoice, isFormBusy]);
+
+  useEffect(() => {
     if (errors?.errors?.paid_to_date) {
       document
         .getElementById('paidToDateWarningBanner')
