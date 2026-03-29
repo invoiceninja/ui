@@ -1,13 +1,3 @@
-/**
- * Invoice Ninja (https://invoiceninja.com).
- *
- * @link https://github.com/invoiceninja/invoiceninja source repository
- *
- * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
- * @license https://www.elastic.co/licensing/elastic-license
- */
-
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -16,7 +6,7 @@ import { DashboardCardField } from '$app/common/interfaces/company-user';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { Spinner } from '$app/components/Spinner';
-import { Card as ShadcnCard } from '$app/components/cards';
+import { Card } from '$app/components/cards';
 import { FIELDS_LABELS } from './DashboardCardSelector';
 
 export const PERIOD_LABELS: Record<string, string> = {
@@ -88,20 +78,20 @@ export function DashboardCard({
       : value;
 
   return (
-    <ShadcnCard className="flex h-full flex-col items-center justify-center gap-1 px-6 py-6">
+    <Card className="flex h-full flex-col items-center justify-center gap-1 px-6 py-4">
       {isBusy ? (
         <Spinner />
       ) : (
-        <>
-          <span className="text-center text-sm font-medium text-gray-700 dark:text-gray-300">
+        <div className="flex flex-col items-center justify-center gap-1">
+          <span className="text-center text-sm font-medium">
             {t(FIELDS_LABELS[field.field] ?? field.field)}
           </span>
           <span className="text-xl font-semibold">{displayValue}</span>
           <span className="text-xs text-gray-500">
             {t(PERIOD_LABELS[field.period] ?? field.period)}
           </span>
-        </>
+        </div>
       )}
-    </ShadcnCard>
+    </Card>
   );
 }

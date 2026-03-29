@@ -33,6 +33,10 @@ import dayjs from 'dayjs';
 import styled from 'styled-components';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import Toggle from '$app/components/forms/Toggle';
+import { Icon } from '$app/components/icons/Icon';
+import { BiMove } from 'react-icons/bi';
+import { DashboardCardSelector } from './DashboardCardSelector';
+import { PreferenceCardsGrid } from './PreferenceCardsGrid';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -129,15 +133,13 @@ export function Totals() {
   const [t] = useTranslation();
 
   const settings = useReactSettings();
-
   const { Preferences, update } = usePreferences();
-
   const formatMoney = useFormatMoney();
-
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const currentUser = useCurrentUser();
 
+  const [isEditMode, setIsEditMode] = useState(false);
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
@@ -149,6 +151,8 @@ export function Totals() {
     settings?.preferences?.dashboard_charts?.range || 'this_month';
   const includeDrafts =
     settings?.preferences?.dashboard_charts?.include_drafts || false;
+
+  const currentDashboardFields = settings?.dashboard_fields ?? [];
 
   const [dates, setDates] = useState<{ start_date: string; end_date: string }>({
     start_date: GLOBAL_DATE_RANGES[dateRange]?.start || '',
@@ -209,9 +213,7 @@ export function Totals() {
         'POST',
         endpoint(
           '/api/v1/charts/chart_summary_v2?include_drafts=:includeDrafts',
-          {
-            includeDrafts,
-          }
+          { includeDrafts }
         ),
         body
       ).then((response) => response.data),
@@ -223,7 +225,6 @@ export function Totals() {
       setTotalsData(totals.data);
 
       const currencies: Currency[] = [];
-
       Object.entries(totals.data.currencies).map(([id, name]) => {
         currencies.push({ value: id, label: name as unknown as string });
       });
@@ -247,7 +248,6 @@ export function Totals() {
         start_date: chart.data.start_date,
         end_date: chart.data.end_date,
       });
-
       setChartData(chart.data);
     }
   }, [chart.data]);
@@ -258,7 +258,6 @@ export function Totals() {
         const currentRange =
           currentUser?.company_user?.react_settings?.preferences
             ?.dashboard_charts?.range;
-
         update(
           'preferences.dashboard_charts.range',
           currentRange || 'this_month'
@@ -275,7 +274,7 @@ export function Totals() {
         </div>
       )}
 
-      {/* Quick date, currency & date picker. */}
+      {/* Toolbar — identical to original, + DashboardCardSelector and BiMove */}
       <div className="flex items-center justify-end lg:justify-between">
         <span className="hidden lg:inline-block text-sm text-gray-500">
           {t('account_login_text')}
@@ -297,7 +296,6 @@ export function Totals() {
                 dismissable={false}
               >
                 <option value="999">{t('all')}</option>
-
                 {currencies.map((currency, index) => (
                   <option key={index} value={currency.value}>
                     {currency.label}
@@ -364,7 +362,7 @@ export function Totals() {
               </ChartScaleBox>
             </div>
 
-            <div className="flex flex-auto justify-center sm:col-start-3 ">
+            <div className="flex flex-auto justify-center sm:col-start-3">
               <DropdownDateRangePicker
                 handleDateChange={handleDateChange}
                 startDate={dates.start_date}
@@ -374,6 +372,15 @@ export function Totals() {
                 }
                 value={body.date_range}
               />
+            </div>
+
+            <DashboardCardSelector />
+
+            <div
+              className="flex items-center cursor-pointer"
+              onClick={() => setIsEditMode((prev) => !prev)}
+            >
+              <Icon element={BiMove} size={23} />
             </div>
 
             <Preferences>
@@ -431,6 +438,22 @@ export function Totals() {
         </div>
       </div>
 
+      {/* Preference cards — between toolbar and main grid */}
+      {currentDashboardFields.length > 0 && (
+        <div className="mt-6 w-full">
+          <PreferenceCardsGrid
+            currentDashboardFields={currentDashboardFields}
+            dateRange={dateRange}
+            startDate={dates.start_date}
+            endDate={dates.end_date}
+            currencyId={currency.toString()}
+            layoutBreakpoint="lg"
+            isEditMode={isEditMode}
+          />
+        </div>
+      )}
+
+      {/* Main grid — Recent Transactions + Overview chart */}
       <div className="grid grid-cols-10 mt-4 gap-8">
         {company && (
           <Card
@@ -448,7 +471,6 @@ export function Totals() {
                 style={{ borderColor: colors.$21 }}
               >
                 <span className="text-gray-500">{t('invoices')}</span>
-
                 <Badge style={{ backgroundColor: '#2176FF26' }}>
                   <span
                     className="text-base font-mono"
@@ -469,7 +491,6 @@ export function Totals() {
                 style={{ borderColor: colors.$21 }}
               >
                 <span className="text-gray-500">{t('payments')}</span>
-
                 <Badge style={{ backgroundColor: '#22C55E26' }}>
                   <span
                     className="text-base font-mono"
@@ -490,7 +511,6 @@ export function Totals() {
                 style={{ borderColor: colors.$21 }}
               >
                 <span className="text-gray-500">{t('expenses')}</span>
-
                 <Badge style={{ backgroundColor: '#A1A1AA26' }}>
                   <span
                     className="text-base font-mono"
@@ -511,7 +531,6 @@ export function Totals() {
                 style={{ borderColor: colors.$21 }}
               >
                 <span className="text-gray-500">{t('outstanding')}</span>
-
                 <Badge style={{ backgroundColor: '#EF444426' }}>
                   <span
                     className="text-base font-mono"
@@ -531,7 +550,6 @@ export function Totals() {
                 <span className="text-gray-500">
                   {t('total_invoices_outstanding')}
                 </span>
-
                 <Badge
                   variant="transparent"
                   className="border"
