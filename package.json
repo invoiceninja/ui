@@ -1,10 +1,10 @@
 {
   "name": "@invoiceninja/ui",
-  "version": "25.03.2026.1",
+  "version": "29.03.2026.1",
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^3.28.1",
-    "@docuninja/builder2.0": "^0.0.88",
+    "@docuninja/builder2.0": "^0.0.90",
     "@emotion/styled": "^11.14.0",
     "@excalidraw/excalidraw": "^0.18.0",
     "@fontsource/alex-brush": "^5.2.6",

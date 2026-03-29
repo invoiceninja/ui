@@ -48,6 +48,8 @@ import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
 import { PEPPOLPlanBanner } from './common/components/PEPPOLPlanBanner';
 import { CloudUpload } from '$app/components/icons/CloudUpload';
 import { useColorScheme } from '$app/common/colors';
+import { Trash } from '$app/components/icons/Trash';
+import { Button } from '$app/components/forms';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;
@@ -132,6 +134,8 @@ export function EInvoice() {
 
   const [formData, setFormData] = useState(new FormData());
   const [saveChanges, setSaveChanges] = useState<boolean>(false);
+  const [certificateCleared, setCertificateCleared] = useState<boolean>(false);
+  const [passphraseCleared, setPassphraseCleared] = useState<boolean>(false);
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -152,6 +156,9 @@ export function EInvoice() {
             updateRecord({ object: 'company', data: response.data.data })
           );
           dispatch(resetChanges('company'));
+
+          setCertificateCleared(false);
+          setPassphraseCleared(false);
 
           toast.success('uploaded_document');
         })
@@ -427,29 +434,51 @@ export function EInvoice() {
                     <Element
                       leftSide={t('upload_certificate')}
                       leftSideHelp={
-                        company?.has_e_invoice_certificate
+                        company?.has_e_invoice_certificate &&
+                        !certificateCleared
                           ? t('certificate_set')
                           : t('certificate_not_set')
                       }
                     >
-                      <div
-                        {...getRootProps()}
-                        className="flex flex-col md:flex-row md:items-center"
-                      >
-                        <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                          <input {...getInputProps()} />
-
-                          <div className="flex justify-center">
-                            <CloudUpload size="2.3rem" color={colors.$3} />
+                      {company?.has_e_invoice_certificate &&
+                      !certificateCleared ? (
+                        <Button
+                          behavior="button"
+                          type="secondary"
+                          onClick={() => {
+                            handleChange('e_invoice_certificate', null);
+                            setCertificateCleared(true);
+                          }}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <div>
+                              <Trash size="1rem" color="#ef4444" />
+                            </div>
+                            <span className="text-sm text-red-500">
+                              {t('remove')}
+                            </span>
                           </div>
+                        </Button>
+                      ) : (
+                        <div
+                          {...getRootProps()}
+                          className="flex flex-col md:flex-row md:items-center"
+                        >
+                          <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <input {...getInputProps()} />
 
-                          <span className="mt-2 block text-sm font-medium text-gray-900">
-                            {isDragActive
-                              ? 'drop_your_logo_here'
-                              : t('dropzone_default_message')}
-                          </span>
+                            <div className="flex justify-center">
+                              <CloudUpload size="2.3rem" color={colors.$3} />
+                            </div>
+
+                            <span className="mt-2 block text-sm font-medium text-gray-900">
+                              {isDragActive
+                                ? 'upload_certificate'
+                                : t('dropzone_default_message')}
+                            </span>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </Element>
                   )}
 
@@ -457,25 +486,50 @@ export function EInvoice() {
                     <Element
                       leftSide={t('certificate_passphrase')}
                       leftSideHelp={
-                        company?.has_e_invoice_certificate_passphrase
+                        company?.has_e_invoice_certificate_passphrase &&
+                        !passphraseCleared
                           ? t('passphrase_set')
                           : t('passphrase_not_set')
                       }
                     >
-                      <InputField
-                        value=""
-                        id="password"
-                        type="password"
-                        onValueChange={(value) =>
-                          handleChange(
-                            'e_invoice_certificate_passphrase',
-                            value
-                          )
-                        }
-                        errorMessage={
-                          errors?.errors.e_invoice_certificate_passphrase
-                        }
-                      />
+                      {company?.has_e_invoice_certificate_passphrase &&
+                      !passphraseCleared ? (
+                        <Button
+                          behavior="button"
+                          type="secondary"
+                          onClick={() => {
+                            handleChange(
+                              'e_invoice_certificate_passphrase',
+                              null
+                            );
+                            setPassphraseCleared(true);
+                          }}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <div>
+                              <Trash size="1rem" color="#ef4444" />
+                            </div>
+                            <span className="text-sm text-red-500">
+                              {t('remove')}
+                            </span>
+                          </div>
+                        </Button>
+                      ) : (
+                        <InputField
+                          value=""
+                          id="password"
+                          type="password"
+                          onValueChange={(value) =>
+                            handleChange(
+                              'e_invoice_certificate_passphrase',
+                              value
+                            )
+                          }
+                          errorMessage={
+                            errors?.errors.e_invoice_certificate_passphrase
+                          }
+                        />
+                      )}
                     </Element>
                   )}
 
