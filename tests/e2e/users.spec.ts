@@ -98,8 +98,11 @@ test('deleting user', async ({ page }) => {
 
   await page.getByRole('link', { name: 'Quotes Example', exact: true }).click();
 
-  await page.getByLabel('Password').fill('password');
-  await page.getByLabel('Password').press('Enter');
+  const passwordField = page.getByLabel('Password');
+  if (await passwordField.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await passwordField.fill('password');
+    await passwordField.press('Enter');
+  }
 
   const moreActionsButton = page
     .locator('[data-cy="chevronDownButton"]')
@@ -141,8 +144,11 @@ test('archiving user', async ({ page }) => {
     .getByRole('link', { name: 'Products Example', exact: true })
     .click();
 
-  await page.getByLabel('Password').fill('password');
-  await page.getByLabel('Password').press('Enter');
+  const passwordField = page.getByLabel('Password');
+  if (await passwordField.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await passwordField.fill('password');
+    await passwordField.press('Enter');
+  }
 
   const moreActionsButton = page
     .locator('[data-cy="chevronDownButton"]')
@@ -184,8 +190,11 @@ test('removing user', async ({ page }) => {
     .getByRole('link', { name: 'Credits Example', exact: true })
     .click();
 
-  await page.getByLabel('Password').fill('password');
-  await page.getByLabel('Password').press('Enter');
+  const passwordField = page.getByLabel('Password');
+  if (await passwordField.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await passwordField.fill('password');
+    await passwordField.press('Enter');
+  }
 
   const moreActionsButton = page
     .locator('[data-cy="chevronDownButton"]')

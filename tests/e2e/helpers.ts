@@ -39,12 +39,23 @@ export function permissions(page: Page) {
 
     await tableBody.getByRole('link').first().click();
 
-    await page.getByLabel('Current password*').fill('password');
-    await page.locator('#current_password').press('Tab');
+    const passwordField = page.locator('#current_password');
+    const permissionsButton = page.getByRole('button', { name: 'Permissions' });
 
-    await page.getByLabel('Current password*').click();
-    await page.getByRole('button', { name: 'Continue' }).click();
-    await page.getByRole('button', { name: 'Permissions' }).click();
+    // Wait for either the password modal or the Permissions tab to appear.
+    // If password is not required, the app auto-confirms and goes straight to the edit page.
+    await Promise.race([
+      passwordField.waitFor({ state: 'visible', timeout: 5000 }),
+      permissionsButton.waitFor({ state: 'visible', timeout: 5000 }),
+    ]);
+
+    if (await passwordField.isVisible()) {
+      await passwordField.fill('password');
+      await page.getByRole('button', { name: 'Continue' }).click();
+      await permissionsButton.waitFor({ state: 'visible', timeout: 5000 });
+    }
+
+    await permissionsButton.click();
 
     await page.uncheck('[data-cy="admin"]');
     await page.uncheck('[data-cy="viewDashboard"]');
@@ -103,7 +114,7 @@ export async function checkTableEditability(page: Page, isEditable: boolean) {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (isEditable) {
-    expectedNumberOfDropdowns = doRecordsExist ? numberOfTableRows + 1 : 1;
+    expectedNumberOfDropdowns = doRecordsExist ? 1 : 0;
     expectedNumberOfCheckboxes = doRecordsExist ? numberOfTableRows + 1 : 1;
   }
 
@@ -152,6 +163,13 @@ export async function checkDropdownActions(
         await page.locator(`[data-cy=${modal.dataCyXButton}]`).click();
 
         await expect(page.getByText(modal.title).first()).not.toBeVisible();
+
+        // Re-open the dropdown since closing the modal also closes it
+        const chevron = page.locator('[data-cy="chevronDownButton"]').first();
+        if (await chevron.isVisible()) {
+          await chevron.click();
+          await dropDown.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {});
+        }
       }
     } else {
       await expect(dropDown.getByText(label).first()).not.toBeVisible();

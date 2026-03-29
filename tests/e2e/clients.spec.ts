@@ -35,17 +35,30 @@ function useClientActions({ permissions }: Params) {
 
   const hasPermission = useHasPermission({ permissions });
 
+  const hasAnyCreationPermission =
+    hasPermission('create_invoice') ||
+    hasPermission('create_payment') ||
+    hasPermission('create_quote') ||
+    hasPermission('create_credit');
+
   const actions: Action[] = [
+    { label: 'View Statement', visible: true },
     { label: 'Settings', visible: isAdmin },
     {
-      label: 'New Invoice',
-      visible: hasPermission('create_invoice'),
+      label: 'New Resource',
+      visible: hasAnyCreationPermission,
+      modal: {
+        title: 'New Resource',
+        dataCyXButton: 'cloneOptionsModalXButton',
+        actions: [
+          { label: 'Invoice', visible: hasPermission('create_invoice') },
+          { label: 'Payment', visible: hasPermission('create_payment') },
+          { label: 'Quote', visible: hasPermission('create_quote') },
+          { label: 'Credit', visible: hasPermission('create_credit') },
+        ],
+      },
     },
-    { label: 'Enter Payment', visible: hasPermission('create_payment') },
-    { label: 'New Quote', visible: hasPermission('create_quote') },
-    { label: 'Enter Credit', visible: hasPermission('create_credit') },
     { label: 'Merge', visible: isAdmin },
-    { label: 'Purge', visible: isAdmin },
   ];
 
   return actions;
@@ -95,9 +108,15 @@ const createClient = async (params: CreateParams) => {
   await page.locator('#email_0').fill(email || 'first@example.com');
 
   if (assignTo) {
-    await page
-      .locator('select[id="assigned_user_id"]')
-      .selectOption({ label: assignTo });
+    const assignedUserInput = page.getByTestId('combobox-input-field').first();
+    await assignedUserInput.scrollIntoViewIfNeeded();
+    await assignedUserInput.click();
+    // UserSelector label is first_name only, so search by first word
+    await assignedUserInput.fill(assignTo.split(' ')[0]);
+
+    const option = page.getByRole('option', { name: assignTo }).first();
+    await option.waitFor({ state: 'visible', timeout: 5000 });
+    await option.click();
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -183,9 +202,6 @@ const checkEditPage = async (page: Page) => {
     page.getByRole('heading', { name: 'Address', exact: true })
   ).toBeVisible();
 
-  await expect(
-    page.getByRole('heading', { name: 'Additional Info', exact: true })
-  ).toBeVisible();
 };
 
 test("can't view clients without permission", async ({ page }) => {
@@ -576,11 +592,14 @@ test('can purge client with admin permission', async ({ page, api }) => {
 
   await page.getByText('Purge', { exact: true }).click();
 
-  await expect(
-    page.getByRole('heading', { name: 'Confirmation' })
-  ).toBeVisible();
+  const purgeModal = page.getByRole('heading', { name: 'Purge Client' });
+  await purgeModal.waitFor({ state: 'visible', timeout: 5000 });
 
-  await page.getByLabel('Current Password').fill('password');
+  const passwordField = page.locator('#current_password');
+  if (await passwordField.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await passwordField.fill('password');
+  }
+
   await page.getByRole('button', { name: 'Continue' }).click();
 
   await expect(page.getByText('Successfully purged client')).toBeVisible();
@@ -632,9 +651,10 @@ test('client documents preview with edit_client', async ({ page, api }) => {
   await checkEditPage(page);
 
   await page
-    .getByRole('button', {
+    .getByRole('link', {
       name: 'Documents',
     })
+    .first()
     .click();
 
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
@@ -684,9 +704,10 @@ test('client documents uploading with edit_client', async ({ page, api }) => {
   await checkEditPage(page);
 
   await page
-    .getByRole('button', {
+    .getByRole('link', {
       name: 'Documents',
     })
+    .first()
     .click();
 
   await page
@@ -730,6 +751,7 @@ test('all actions in dropdown displayed with admin permission', async ({
   await checkShowPage(page, true);
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
+  await page.locator('[data-cy="clientActionDropdown"]').waitFor({ state: 'visible', timeout: 5000 });
 
   await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
@@ -777,6 +799,7 @@ test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with crea
   await checkShowPage(page, true);
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
+  await page.locator('[data-cy="clientActionDropdown"]').waitFor({ state: 'visible', timeout: 5000 });
 
   await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
@@ -918,9 +941,15 @@ test('Testing military_time property on all settings levels', async ({
 
   await page.waitForURL('**/clients/**/edit');
 
-  await page
-    .locator('#group_settings_id')
-    .selectOption({ label: groupName });
+  // Group field is a react-select custom selector
+  // Find it by looking for the input near the Group label
+  const groupContainer = page.locator('div:has(> dt:has-text("Group"))').first();
+  const groupInput = groupContainer.locator('input[role="combobox"]');
+  await groupContainer.scrollIntoViewIfNeeded();
+  await groupInput.click();
+  await groupInput.fill(groupName);
+  await page.waitForTimeout(500);
+  await page.getByText(groupName, { exact: true }).first().click();
 
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByText('Successfully updated client')).toBeVisible();

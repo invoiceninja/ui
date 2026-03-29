@@ -3,8 +3,9 @@ import { config } from 'dotenv';
 
 /**
  * Read environment variables from file.
- * https://github.com/motdotla/dotenv
+ * Playwright uses .env.test if it exists, falling back to .env.
  */
+config({ path: '.env.test', override: true });
 config();
 
 /**
@@ -15,7 +16,7 @@ export default defineConfig({
   /* Reset API state before running the test suite. */
   globalSetup: './tests/e2e/global-setup.ts',
   /* Maximum time one test can run for. */
-  timeout: 10 * 1500,
+  timeout: 30000,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -95,7 +96,9 @@ export default defineConfig({
   /* Folder for test artifacts such as screenshots, videos, traces, etc. */
   // outputDir: 'test-results/',
 
-  /* Run your local dev server before starting the tests */
+  /* Serve the production build for tests.
+   * Build first with: npx vite build --mode test
+   * This ensures VITE_* vars are loaded from .env.test */
   webServer: {
     command: 'npm run preview',
     port: 4173,

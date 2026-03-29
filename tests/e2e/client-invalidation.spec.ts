@@ -45,33 +45,36 @@ test('test appropriate invalidation of clients', async ({ page, api }) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await page.locator('div').filter({ hasText: /^Purchase White LabelSave$/ }).getByRole('button').nth(2).click();
 
   // Track invoice 1
   const invoice1Url = page.url();
   const invoice1Id = invoice1Url.match(/invoices\/([^/]+)/)?.[1];
   if (invoice1Id) api.trackEntity('invoices', invoice1Id);
 
-  await page.getByRole('button', { name: 'Mark Sent' }).click();
-  await page.getByRole('link', { name: 'View Client' }).click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  const markSent1 = page.getByRole('button', { name: 'Mark Sent' });
+  await markSent1.waitFor({ state: 'visible', timeout: 5000 });
+  await markSent1.click();
+
+  await page.getByRole('link', { name: 'View', exact: true }).click();
+
+  // await page.getByRole('button', { name: 'Discard Changes' }).click();
+  // await page.getByRole('link', { name: 'View Client' }).click();
+  
   await expect(
-    page
-      .locator('div')
+    page.getByText('Paid to Date$')
       .filter({ hasText: /^Paid to Date\$ 0\.00$/ })
-      .getByRole('definition')
   ).toBeVisible();
   await expect(
-    page
-      .locator('div')
+    page.getByText('Outstanding$')
       .filter({ hasText: /^Outstanding\$ 0\.00$/ })
-      .getByRole('definition')
   ).toBeVisible();
   await expect(
-    page
-      .locator('div')
+    page.getByText('Credit Balance$')
       .filter({ hasText: /^Credit Balance\$ 0\.00$/ })
-      .getByRole('definition')
   ).toBeVisible();
+
   await page
     .getByRole('main')
     .getByRole('link', { name: 'New Invoice' })
@@ -99,68 +102,46 @@ test('test appropriate invalidation of clients', async ({ page, api }) => {
   const invoice2Id = invoice2Url.match(/invoices\/([^/]+)/)?.[1];
   if (invoice2Id) api.trackEntity('invoices', invoice2Id);
 
-  await page.locator('div').filter({ hasText: /^Purchase White LabelSave$/ }).getByRole('button').nth(2).click();
-  await page.getByRole('button', { name: 'Mark Sent' }).click();
-  await page.getByRole('link', { name: 'View Client' }).click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  const markSentButton = page.getByRole('button', { name: 'Mark Sent' });
+  await markSentButton.waitFor({ state: 'visible', timeout: 5000 });
+  await markSentButton.click();
+
+  await page.getByRole('link', { name: 'View', exact: true }).click();
 
   await expect(
-    page
-      .locator('div')
+    page.getByText('Paid to Date$')
       .filter({ hasText: /^Paid to Date\$ 0\.00$/ })
-      .getByRole('definition')
   ).toBeVisible();
   await expect(
-    page
-      .locator('div')
+    page.getByText('Outstanding$')
       .filter({ hasText: /^Outstanding\$ 100\.00$/ })
-      .getByRole('definition')
   ).toBeVisible();
   await expect(
-    page
-      .locator('div')
+    page.getByText('Credit Balance$')
       .filter({ hasText: /^Credit Balance\$ 0\.00$/ })
-      .getByRole('definition')
   ).toBeVisible();
 
-  await page.getByRole('button', { name: 'Actions' }).nth(3).first().click();
+  await page.getByRole('button', { name: 'Actions' }).first().click();
   await page.getByRole('button', { name: 'Mark Paid' }).click();
 
   await expect(
-    page
-      .locator('div')
+    page.getByText('Paid to Date$')
       .filter({ hasText: /^Paid to Date\$ 100\.00$/ })
-      .getByRole('definition')
   ).toBeVisible();
   await expect(
-    page
-      .locator('div')
+    page.getByText('Outstanding$')
       .filter({ hasText: /^Outstanding\$ 0\.00$/ })
-      .getByRole('definition')
   ).toBeVisible();
   await expect(
-    page
-      .locator('div')
+    page.getByText('Credit Balance$')
       .filter({ hasText: /^Credit Balance\$ 0\.00$/ })
-      .getByRole('definition')
   ).toBeVisible();
 
-  // Original cleanup via UI (validates the UI flow)
-  await page.getByRole('row').first().getByRole('checkbox').click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^ActionsActive$/ })
-    .locator('button')
-    .click();
-  await page.getByRole('button', { name: 'Delete' }).click();
-
-  await page.getByRole('link', { name: 'Clients' }).first().click();
-  await page.getByRole('row').first().getByRole('checkbox').first().click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^ActionsActive$/ })
-    .locator('button')
-    .click();
-  await page.getByRole('button', { name: 'Delete' }).click();
-
+await page.getByRole('link', { name: 'Clients' }).first().click();
+await page.getByRole('cell').first().getByRole('checkbox').first().click();
+await page.getByRole('button', { name: 'Actions' }).first().click();
+await page.getByRole('button', { name: 'Delete' }).click();
   // API-based cleanup is handled automatically by the fixture teardown
 });
