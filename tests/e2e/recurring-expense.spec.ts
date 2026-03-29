@@ -6,6 +6,7 @@ import {
   logout,
   permissions,
   useHasPermission,
+  waitForTableData,
 } from '$tests/e2e/helpers';
 import { test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
@@ -341,9 +342,7 @@ test('deleting recurring expense with edit_recurring_expense', async ({
 
   await page.waitForURL('**/recurring_expenses');
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createRecurringExpense({ page });
@@ -394,9 +393,7 @@ test('archiving recurring expense with edit_recurring_expense', async ({
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createRecurringExpense({ page });
@@ -451,9 +448,7 @@ test('recurring expense documents preview with edit_recurring_expense', async ({
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createRecurringExpense({ page });
@@ -508,9 +503,7 @@ test('recurring expense documents uploading with edit_recurring_expense', async 
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createRecurringExpense({ page });
@@ -649,9 +642,7 @@ test('cloning recurring expense', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createRecurringExpense({ page });

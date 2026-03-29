@@ -6,6 +6,7 @@ import {
   logout,
   permissions,
   useHasPermission,
+  waitForTableData,
 } from '$tests/e2e/helpers';
 import { test, expect, uniqueName, type ApiFixture } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
@@ -450,9 +451,7 @@ test('deleting client with edit_client', async ({ page, api }) => {
 
   await page.waitForURL('**/clients');
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createClient({ page, api, withNavigation: false });
@@ -498,9 +497,7 @@ test('archiving client withe edit_client', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createClient({ page, api, withNavigation: false });
@@ -626,9 +623,7 @@ test('client documents preview with edit_client', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createClient({ page, api });
@@ -679,9 +674,7 @@ test('client documents uploading with edit_client', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createClient({ page, api });

@@ -6,6 +6,7 @@ import {
   logout,
   permissions,
   useHasPermission,
+  waitForTableData,
 } from '$tests/e2e/helpers';
 import { test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
@@ -316,9 +317,7 @@ test('deleting expense with edit_expense', async ({ page, api }) => {
 
   await page.waitForURL('**/expenses');
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createExpense({ page });
@@ -362,9 +361,7 @@ test('archiving expense with edit_expense', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createExpense({ page });
@@ -412,9 +409,7 @@ test('expense documents preview with edit_expense', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createExpense({ page });
@@ -464,9 +459,7 @@ test('expense documents uploading with edit_expense', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createExpense({ page });
@@ -593,9 +586,7 @@ test('cloning expense', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createExpense({ page });

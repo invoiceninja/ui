@@ -6,6 +6,7 @@ import {
   logout,
   permissions,
   useHasPermission,
+  waitForTableData,
 } from '$tests/e2e/helpers';
 import { test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
@@ -383,9 +384,7 @@ test('deleting invoice with edit_invoice', async ({ page, api }) => {
 
   await page.waitForURL('**/invoices');
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     const clientName = uniqueName('inv-del');
@@ -435,9 +434,7 @@ test('archiving invoice withe edit_invoice', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     const clientName = uniqueName('inv-arch');
@@ -492,9 +489,7 @@ test('invoice documents preview with edit_invoice', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     const clientName = uniqueName('inv-docprev');
@@ -545,9 +540,7 @@ test('invoice documents uploading with edit_invoice', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     const clientName = uniqueName('inv-docup');
@@ -692,9 +685,7 @@ test('cloning invoice', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     const clientName = uniqueName('inv-clone');

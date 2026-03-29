@@ -3,6 +3,7 @@ import {
   login,
   logout,
   permissions,
+  waitForTableData,
 } from '$tests/e2e/helpers';
 import { test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
@@ -256,9 +257,7 @@ test('deleting payment with edit_payment', async ({ page, api }) => {
 
   await page.waitForURL('**/payments');
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createPayment({ page, withNavigation: false, clientName });
@@ -315,9 +314,7 @@ test('archiving payment with edit_payment', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createPayment({ page, withNavigation: false, clientName });
@@ -375,9 +372,7 @@ test('payment documents preview with edit_payment', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createPayment({ page, withNavigation: false, clientName });
@@ -430,9 +425,7 @@ test('payment documents uploading with edit_payment', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createPayment({ page, withNavigation: false, clientName });

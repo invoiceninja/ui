@@ -3,6 +3,7 @@ import {
   login,
   logout,
   permissions,
+  waitForTableData,
 } from '$tests/e2e/helpers';
 import { test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
@@ -41,7 +42,7 @@ const createVendor = async (params: CreateParams) => {
     .first()
     .click();
 
-  await page.locator('#name').fill(vendorName || 'Vendor Name');
+  await page.locator('div').filter({ hasText: /^Name$/ }).getByRole('textbox').fill(vendorName || 'Vendor Name');
   await page.locator('#first_name_0').fill('First Name');
   await page.locator('#last_name_0').fill('Last Name');
   await page.locator('#email_0').fill(email || 'first@example.com');
@@ -369,9 +370,7 @@ test('deleting vendor with edit_vendor', async ({ page, api }) => {
 
   await page.waitForURL('**/vendors');
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createVendor({ page, vendorName, withNavigation: false });
@@ -422,9 +421,7 @@ test('archiving vendor withe edit_vendor', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createVendor({ page, vendorName, withNavigation: false });
@@ -475,9 +472,7 @@ test('vendor documents preview with view_vendor', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createVendor({ page, vendorName });
@@ -524,9 +519,7 @@ test('vendor documents uploading with edit_vendor', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createVendor({ page, vendorName });

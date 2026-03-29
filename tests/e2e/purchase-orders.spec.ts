@@ -6,6 +6,7 @@ import {
   logout,
   permissions,
   useHasPermission,
+  waitForTableData,
 } from '$tests/e2e/helpers';
 import { test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
@@ -420,9 +421,7 @@ test('deleting purchase_order with edit_purchase_order', async ({
 
   await page.waitForURL('**/purchase_orders');
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createPurchaseOrder({ page, vendorName });
@@ -484,9 +483,7 @@ test('archiving purchase_order with edit_purchase_order', async ({
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createPurchaseOrder({ page, vendorName });
@@ -552,9 +549,7 @@ test('purchase_order documents preview with edit_purchase_order', async ({
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createPurchaseOrder({ page, vendorName });
@@ -614,9 +609,7 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createPurchaseOrder({ page, vendorName });
@@ -772,9 +765,7 @@ test('cloning purchase_order', async ({ page, api }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createPurchaseOrder({ page, vendorName });

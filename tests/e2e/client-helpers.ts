@@ -24,7 +24,17 @@ export const createClient = async (params: ClientCreateParams) => {
       .click();
   }
 
-  await page.waitForTimeout(200);
+  // Wait for the table to finish loading before checking for records
+  await page.waitForURL('**/clients');
+  const dataTable = page.locator('[data-cy="dataTable"]');
+  await dataTable.waitFor({ state: 'visible', timeout: 10000 });
+  // Wait for either "No records found" or a table row with data to appear
+  await Promise.race([
+    page.getByText('No records found').waitFor({ state: 'visible', timeout: 10000 }),
+    page.locator('tbody tr a').first().waitFor({ state: 'visible', timeout: 10000 }),
+  ]).catch(() => {
+    // Timeout is OK — we'll check state below
+  });
 
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
@@ -37,7 +47,7 @@ export const createClient = async (params: ClientCreateParams) => {
     .getByRole('link', { name: 'New Client' })
     .click();
 
-  await page.locator('#name').fill(name);
+  await page.locator('div').filter({ hasText: /^Name$/ }).getByRole('textbox').fill(name);
   await page.locator('#first_name_0').fill('First Name');
   await page.locator('#last_name_0').fill('Last Name');
   await page.locator('#email_0').fill(contactEmail);

@@ -3,76 +3,6 @@ import { createInvoice } from '$tests/helpers/invoice';
 import { test, expect } from '$tests/e2e/fixtures';
 import dayjs from 'dayjs';
 
-test('Can add a company and navigate to account management', async ({
-  page,
-}) => {
-  const { clear, save, set } = permissions(page);
-
-  await login(page);
-  await clear();
-  await set('admin');
-  await save();
-  await logout(page);
-
-  await login(page, 'permissions@example.com', 'password');
-
-  await page.locator('[data-cy="companyDropdown"]').click();
-
-  await page
-    .getByRole('button')
-    .filter({ has: page.getByText('Add Company') })
-    .first()
-    .click();
-
-  await expect(
-    page.getByRole('heading', {
-      name: 'Add Company',
-    })
-  ).toBeVisible();
-
-  await page
-    .getByRole('button')
-    .filter({ has: page.getByText('Yes') })
-    .first()
-    .click();
-
-  await expect(
-    page.getByRole('heading', {
-      name: 'Welcome to Invoice Ninja',
-    })
-  ).toBeVisible();
-
-  await page
-    .getByRole('button')
-    .filter({ has: page.getByText('Save') })
-    .first()
-    .click();
-
-  await expect(
-    page.getByRole('heading', {
-      name: 'Welcome to Invoice Ninja',
-    })
-  ).not.toBeVisible();
-
-  await page.waitForTimeout(300);
-
-  await page.locator('[data-cy="companyDropdown"]').click();
-
-  await page
-    .getByRole('link')
-    .filter({ has: page.getByText('Account Management') })
-    .first()
-    .click();
-
-  await page.waitForURL('/settings/account_management');
-
-  await expect(
-    page.getByRole('heading', {
-      name: 'Account Management',
-    })
-  ).toBeVisible();
-});
-
 test('Can not add a company and navigate to account management', async ({
   page,
 }) => {
@@ -88,17 +18,11 @@ test('Can not add a company and navigate to account management', async ({
   await page.locator('[data-cy="companyDropdown"]').click();
 
   await expect(
-    page
-      .getByRole('button')
-      .filter({ has: page.getByText('Add Company') })
-      .first()
+    page.getByText('Add Company', { exact: true }).first()
   ).not.toBeVisible();
 
   await expect(
-    page
-      .getByRole('link')
-      .filter({ has: page.getByText('Account Management') })
-      .first()
+    page.getByText('Account Management', { exact: true }).first()
   ).not.toBeVisible();
 });
 
@@ -115,6 +39,9 @@ test('Prevent transaction quick popover navigation', async ({ page }) => {
     .fill(dayjs().add(10, 'day').format('YYYY-MM-DD'));
 
   await page.locator('[type="date"]').first().blur();
+
+  // Wait for debounce (300ms) + React re-render to detect the change as unsaved
+  await page.waitForTimeout(1000);
 
   await page.locator('[data-cy="quickPopoverButton"]').click();
 
@@ -163,6 +90,9 @@ test('Prevent quote quick popover navigation', async ({ page }) => {
 
   await page.locator('[type="date"]').first().blur();
 
+  // Wait for debounce (300ms) + React re-render to detect the change as unsaved
+  await page.waitForTimeout(1000);
+
   await page.locator('[data-cy="quickPopoverButton"]').click();
 
   await page.getByText('Quote', { exact: true }).click();
@@ -210,7 +140,8 @@ test('Prevent back browser button navigation', async ({ page }) => {
 
   await page.locator('[type="date"]').first().blur();
 
-  await page.waitForTimeout(500);
+  // Wait for debounce (300ms) + React re-render to detect the change as unsaved
+  await page.waitForTimeout(1000);
 
   await page.goBack();
 
@@ -241,7 +172,7 @@ test('Prevent back browser button navigation', async ({ page }) => {
   await logout(page);
 });
 
-test('Prevent adding new company', async ({ page }) => {
+test('Prevent account management navigation', async ({ page }) => {
   await login(page);
 
   await createInvoice({ page });
@@ -255,13 +186,12 @@ test('Prevent adding new company', async ({ page }) => {
 
   await page.locator('[type="date"]').first().blur();
 
+  // Wait for debounce (300ms) + React re-render to detect the change as unsaved
+  await page.waitForTimeout(1000);
+
   await page.locator('[data-cy="companyDropdown"]').click();
 
-  await page
-    .getByRole('button')
-    .filter({ has: page.getByText('Add Company') })
-    .first()
-    .click();
+  await page.getByText('Account Management', { exact: true }).first().click();
 
   await expect(
     page.getByText('Please save or cancel your changes')
@@ -277,11 +207,7 @@ test('Prevent adding new company', async ({ page }) => {
 
   await page.locator('[data-cy="companyDropdown"]').click();
 
-  await page
-    .getByRole('button')
-    .filter({ has: page.getByText('Add Company') })
-    .first()
-    .click();
+  await page.getByText('Account Management', { exact: true }).first().click();
 
   await expect(
     page.getByText('Please save or cancel your changes')
@@ -291,18 +217,70 @@ test('Prevent adding new company', async ({ page }) => {
     .getByRole('button', { name: 'Discard Changes', exact: true })
     .click();
 
+  await page.waitForURL('**/settings/account_management');
+
+  await expect(
+    page.getByRole('heading', {
+      name: 'Account Management',
+    }).first()
+  ).toBeVisible();
+
+  await logout(page);
+});
+
+// This test must be LAST in the file because it creates a new company
+// which changes the active company context for the user session.
+test('Can add a company and navigate to account management', async ({
+  page,
+}) => {
+  // Must use the owner user — only owners can add companies
+  await login(page);
+
+  await page.locator('[data-cy="companyDropdown"]').click();
+
+  await page.getByText('Add Company', { exact: true }).first().click();
+
   await expect(
     page.getByRole('heading', {
       name: 'Add Company',
     })
   ).toBeVisible();
 
+  await page
+    .getByRole('button')
+    .filter({ has: page.getByText('Yes') })
+    .first()
+    .click();
+
   await expect(
-    page.getByRole('button', {
-      name: 'Yes',
-      exact: true,
+    page.getByRole('heading', {
+      name: 'Welcome to Invoice Ninja',
     })
   ).toBeVisible();
 
-  await logout(page);
+  await page
+    .getByRole('button')
+    .filter({ has: page.getByText('Save') })
+    .first()
+    .click();
+
+  await expect(
+    page.getByRole('heading', {
+      name: 'Welcome to Invoice Ninja',
+    })
+  ).not.toBeVisible();
+
+  await page.waitForTimeout(300);
+
+  await page.locator('[data-cy="companyDropdown"]').click();
+
+  await page.getByText('Account Management', { exact: true }).first().click();
+
+  await page.waitForURL('**/settings/account_management');
+
+  await expect(
+    page.getByRole('heading', {
+      name: 'Account Management',
+    }).first()
+  ).toBeVisible();
 });

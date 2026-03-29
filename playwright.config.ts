@@ -100,8 +100,8 @@ export default defineConfig({
    * Build first with: npx vite build --mode test
    * This ensures VITE_* vars are loaded from .env.test */
   webServer: {
-    command: 'npm run preview',
+    command: 'npx vite build --mode test && npx vite preview',
     port: 4173,
-    reuseExistingServer: !process.env.REUSE_SERVER,
+    reuseExistingServer: !!process.env.REUSE_SERVER,
   },
 });

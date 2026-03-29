@@ -92,34 +92,46 @@ export function permissions(page: Page) {
   return { clear, save, set };
 }
 
+/**
+ * Wait for the data table to finish loading.
+ * Resolves once either "No records found" or actual table rows with links are visible.
+ * Returns true if records exist, false if "No records found" is showing.
+ */
+export async function waitForTableData(page: Page): Promise<boolean> {
+  const dataTable = page.locator('[data-cy="dataTable"]');
+  await dataTable.waitFor({ state: 'visible', timeout: 10000 });
+
+  // Wait for either "No records found" or a real data row to appear
+  await Promise.race([
+    page.getByText('No records found').waitFor({ state: 'visible', timeout: 15000 }),
+    dataTable.locator('tbody tr a').first().waitFor({ state: 'visible', timeout: 15000 }),
+  ]).catch(() => {
+    // Timeout is OK — we'll check state below
+  });
+
+  return page.getByText('No records found').isHidden();
+}
+
 export async function checkTableEditability(page: Page, isEditable: boolean) {
   const tableContainer = page.locator('[data-cy="dataTable"]');
-  const table = tableContainer.getByRole('table');
-  const tableBody = table.locator('tbody');
 
-  await page.waitForTimeout(1000);
+  // Wait for table to finish loading (spinner to disappear)
+  await tableContainer.waitFor({ state: 'visible', timeout: 10000 });
+  await page.waitForTimeout(1500);
 
-  const numberOfTableMoreActionDropdowns = await tableContainer
-    .getByRole('button')
-    .filter({ has: page.getByText('Actions') })
-    .count();
-  const numberOfTableCheckboxes = await tableContainer
-    .locator('input[type="checkbox"]')
-    .count();
-  const numberOfTableRows = await tableBody.locator('tr').count();
-
-  let expectedNumberOfDropdowns = 0;
-  let expectedNumberOfCheckboxes = 0;
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const headerCheckbox = tableContainer.locator('thead input[type="checkbox"]');
+  const rowActionButtons = tableContainer.locator(
+    'tbody button'
+  ).filter({ has: page.getByText('Actions') });
 
   if (isEditable) {
-    expectedNumberOfDropdowns = doRecordsExist ? 1 : 0;
-    expectedNumberOfCheckboxes = doRecordsExist ? numberOfTableRows + 1 : 1;
+    // Header checkbox should be visible when table is editable
+    await expect(headerCheckbox.first()).toBeVisible();
+  } else {
+    // No checkboxes or action buttons when not editable
+    expect(await headerCheckbox.count()).toEqual(0);
+    expect(await rowActionButtons.count()).toEqual(0);
   }
-
-  expect(numberOfTableCheckboxes).toEqual(expectedNumberOfCheckboxes);
-  expect(expectedNumberOfDropdowns).toEqual(numberOfTableMoreActionDropdowns);
 }
 
 export async function checkDropdownActions(

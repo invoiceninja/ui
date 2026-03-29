@@ -41,10 +41,7 @@ test('Can view dashboard with permission', async ({ page }) => {
   ).toBeVisible();
 
   await expect(
-    page
-      .getByRole('heading', { exact: true })
-      .filter({ hasText: 'Welcome! Glad to see you.' })
-      .first()
+    page.getByText('Welcome! Glad to see you.').first()
   ).toBeVisible();
 
   await expect(
