@@ -121,16 +121,27 @@ jobs:
           cd ui
           git checkout develop
           cp .env.example .env
+          cat > .env.test <<'ENVEOF'
+          VITE_API_URL=http://ninja.test:8000
+          VITE_IS_HOSTED=false
+          VITE_IS_TEST=true
+          VITE_ROUTER=browser
+          PLAYWRIGHT_BASE_URL=http://localhost:4173
+          VITE_DISABLE_PREVENT_NAVIGATION_FEATURE=false
+          VITE_DISABLE_FEEDBACK_FEATURE=true
+          VITE_ENABLE_DOCUNINJA=true
+          VITE_ENABLE_PEPPOL_STANDARD=true
+          ENVEOF
           npm ci
           npx playwright install --with-deps
-          npm run build
+          npx vite build --mode test
           npx playwright test --workers=1 --reporter=list --max-failures=1
-          env:
-            VITE_API_URL: http://ninja.test:8000
-            PLAYWRIGHT_BASE_URL: http://localhost:4173
-            PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
-            VITE_IS_TEST: true
-            VITE_ROUTER: browser
+        env:
+          VITE_API_URL: http://ninja.test:8000
+          PLAYWRIGHT_BASE_URL: http://localhost:4173
+          PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
+          VITE_IS_TEST: true
+          VITE_ROUTER: browser
       - uses: actions/upload-artifact@v4
         if: always()
         with:

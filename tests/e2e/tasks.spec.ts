@@ -518,6 +518,7 @@ test('task documents uploading with edit_task', async ({ page, api }) => {
 
   await page
     .locator('input[type="file"]')
+    .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
   await expect(page.getByText('Successfully uploaded document')).toBeVisible();

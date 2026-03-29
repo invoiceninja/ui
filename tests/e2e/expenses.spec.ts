@@ -489,6 +489,7 @@ test('expense documents uploading with edit_expense', async ({ page, api }) => {
 
   await page
     .locator('input[type="file"]')
+    .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
   await expect(page.getByText('Successfully uploaded document')).toBeVisible();

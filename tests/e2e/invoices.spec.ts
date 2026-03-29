@@ -152,6 +152,7 @@ const createInvoice = async (params: CreateParams) => {
 
   await page.waitForTimeout(900);
 
+  await page.getByRole('option').first().waitFor({ state: 'visible', timeout: 5000 });
   await page.getByRole('option').first().click();
 
   if (assignTo) {
@@ -250,7 +251,7 @@ test('can edit invoice', async ({ page, api }) => {
 
   await checkTableEditability(page, true);
 
-  const tableRow = page.locator('tbody').first().getByRole('row').nth(3);
+  const tableRow = page.locator('tbody').first().getByRole('row').first();
 
   await tableRow.getByRole('link').first().click();
 
@@ -571,6 +572,7 @@ test('invoice documents uploading with edit_invoice', async ({ page, api }) => {
 
   await page
     .locator('input[type="file"]')
+    .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
   await expect(page.getByText('Successfully uploaded document')).toBeVisible();
@@ -838,6 +840,12 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await login(page);
 
+  const clientName = uniqueName('inv-custom-email');
+  await createInvoice({ page, clientName });
+
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
+
   await page
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Invoices', exact: true })
@@ -845,7 +853,7 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await page.waitForTimeout(200);
 
-  await page.locator('[data-cy="dataTableCheckbox"]').nth(1).click();
+  await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
   await page
     .locator("[data-cy='dataTable']")
@@ -906,7 +914,7 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await page.waitForTimeout(200);
 
-  await page.locator('[data-cy="dataTableCheckbox"]').nth(1).click();
+  await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
   await page
     .locator("[data-cy='dataTable']")
@@ -939,6 +947,8 @@ test('Prevent navigation in the main navbar', async ({ page, api }) => {
     .fill(dayjs().add(10, 'day').format('YYYY-MM-DD'));
 
   await page.locator('[type="date"]').first().blur();
+
+  await page.waitForTimeout(1000);
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -993,6 +1003,8 @@ test('Prevent archive invoice action', async ({ page, api }) => {
 
   await page.locator('[type="date"]').first().blur();
 
+  await page.waitForTimeout(1000);
+
   await page.locator('[data-cy="chevronDownButton"]').click();
 
   await page.getByRole('button', { name: 'Archive', exact: true }).click();
@@ -1044,6 +1056,8 @@ test('Prevent email invoice action', async ({ page, api }) => {
 
   await page.locator('[type="date"]').first().blur();
 
+  await page.waitForTimeout(1000);
+
   await page.locator('[data-cy="chevronDownButton"]').click();
 
   await page.getByRole('link', { name: 'Email Invoice', exact: true }).click();
@@ -1094,6 +1108,8 @@ test('Prevent back button', async ({ page, api }) => {
     .fill(dayjs().add(10, 'day').format('YYYY-MM-DD'));
 
   await page.locator('[type="date"]').first().blur();
+
+  await page.waitForTimeout(1000);
 
   await page.getByRole('button', { name: 'Back', exact: true }).click();
 

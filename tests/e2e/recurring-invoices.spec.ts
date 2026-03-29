@@ -653,6 +653,7 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
 
   await page
     .locator('input[type="file"]')
+    .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
   await expect(page.getByText('Successfully uploaded document')).toBeVisible();
