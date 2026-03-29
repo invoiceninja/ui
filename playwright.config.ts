@@ -3,9 +3,9 @@ import { config } from 'dotenv';
 
 /**
  * Read environment variables from file.
- * Playwright uses .env.test if it exists, falling back to .env.
+ * Playwright uses .env.testing if it exists, falling back to .env.
  */
-config({ path: '.env.test', override: true });
+config({ path: '.env.testing', override: true });
 config();
 
 /**
@@ -97,10 +97,10 @@ export default defineConfig({
   // outputDir: 'test-results/',
 
   /* Serve the production build for tests.
-   * Build first with: npx vite build --mode test
-   * This ensures VITE_* vars are loaded from .env.test */
+   * Build first with: npx vite build --mode testing
+   * This ensures VITE_* vars are loaded from .env.testing */
   webServer: {
-    command: 'npx vite build --mode test && npx vite preview',
+    command: 'npx vite build --mode testing && npx vite preview',
     port: 4173,
     reuseExistingServer: !!process.env.REUSE_SERVER,
   },

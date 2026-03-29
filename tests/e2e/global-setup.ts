@@ -16,7 +16,7 @@ import {
   resetCompanySettings,
 } from './api-helpers';
 
-config({ path: '.env.test', override: true });
+config({ path: '.env.testing', override: true });
 config();
 
 const PERMISSION_EMAILS = [
