@@ -7,7 +7,8 @@ import {
   permissions,
   useHasPermission,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName, type ApiFixture } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 
 interface ModalAction {
   label: string;
@@ -52,6 +53,7 @@ function useClientActions({ permissions }: Params) {
 
 interface CreateParams {
   page: Page;
+  api: ApiFixture;
   isTableEditable?: boolean;
   clientName?: string;
   assignTo?: string;
@@ -62,7 +64,8 @@ interface CreateParams {
 const createClient = async (params: CreateParams) => {
   const {
     page,
-    clientName,
+    api,
+    clientName = uniqueName('client'),
     assignTo,
     withNavigation = true,
     isTableEditable = true,
@@ -85,8 +88,8 @@ const createClient = async (params: CreateParams) => {
 
   await page.waitForTimeout(200);
 
-  await page.locator('div').filter({ hasText: /^Name$/ }).getByRole('textbox').fill(clientName || 'CompanyName');
-  // await page.locator('#name').fill(clientName || 'Company Name');
+  await page.locator('div').filter({ hasText: /^Name$/ }).getByRole('textbox').fill(clientName);
+  // await page.locator('#name').fill(clientName);
   await page.locator('#first_name_0').fill('First Name');
   await page.locator('#last_name_0').fill('Last Name');
   await page.locator('#email_0').fill(email || 'first@example.com');
@@ -102,6 +105,9 @@ const createClient = async (params: CreateParams) => {
   await expect(
     page.getByText('Successfully created client', { exact: true })
   ).toBeVisible();
+
+  const id = page.url().match(/clients\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('clients', id);
 };
 
 const checkShowPage = async (page: Page, isEditable: boolean) => {
@@ -199,15 +205,17 @@ test("can't view clients without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view client', async ({ page }) => {
+test('can view client', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('test view client');
 
   await login(page);
   await clear('clients@example.com');
   await set('view_client');
   await save();
 
-  await createClient({ page, clientName: 'test view client' });
+  await createClient({ page, api, clientName });
 
   await logout(page);
 
@@ -219,7 +227,7 @@ test('can view client', async ({ page }) => {
     .click();
 
   await page
-    .getByRole('link', { name: 'test view client', exact: true })
+    .getByRole('link', { name: clientName, exact: true })
     .first()
     .click();
 
@@ -228,19 +236,21 @@ test('can view client', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit client', async ({ page }) => {
+test('can edit client', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useClientActions({
     permissions: ['edit_client'],
   });
 
+  const clientName = uniqueName('test edit client');
+
   await login(page);
   await clear('clients@example.com');
   await set('edit_client');
   await save();
 
-  await createClient({ page, clientName: 'test edit client' });
+  await createClient({ page, api, clientName });
 
   await logout(page);
 
@@ -252,7 +262,7 @@ test('can edit client', async ({ page }) => {
     .click();
 
   await page
-    .getByRole('link', { name: 'test edit client', exact: true })
+    .getByRole('link', { name: clientName, exact: true })
     .first()
     .click();
 
@@ -281,12 +291,14 @@ test('can edit client', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a client', async ({ page }) => {
+test('can create a client', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useClientActions({
     permissions: ['create_client'],
   });
+
+  const clientName = uniqueName('test create client');
 
   await login(page);
   await clear('clients@example.com');
@@ -298,7 +310,8 @@ test('can create a client', async ({ page }) => {
 
   await createClient({
     page,
-    clientName: 'test create client',
+    api,
+    clientName,
     isTableEditable: false,
   });
 
@@ -310,7 +323,7 @@ test('can create a client', async ({ page }) => {
   await page.waitForURL('**/clients');
 
   await page
-    .getByRole('link', { name: 'test create client', exact: true })
+    .getByRole('link', { name: clientName, exact: true })
     .first()
     .click();
 
@@ -341,12 +354,15 @@ test('can create a client', async ({ page }) => {
 
 test('can view and edit assigned client with create_client', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useClientActions({
     permissions: ['create_client'],
   });
+
+  const clientName = uniqueName('test assigned client');
 
   await login(page);
   await clear('clients@example.com');
@@ -355,7 +371,8 @@ test('can view and edit assigned client with create_client', async ({
 
   await createClient({
     page,
-    clientName: 'test assigned client',
+    api,
+    clientName,
     assignTo: 'Clients Example',
   });
 
@@ -369,7 +386,7 @@ test('can view and edit assigned client with create_client', async ({
     .click();
 
   await page
-    .getByRole('link', { name: 'test assigned client', exact: true })
+    .getByRole('link', { name: clientName, exact: true })
     .first()
     .click();
 
@@ -398,7 +415,7 @@ test('can view and edit assigned client with create_client', async ({
   await logout(page);
 });
 
-test('deleting client with edit_client', async ({ page }) => {
+test('deleting client with edit_client', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -422,7 +439,7 @@ test('deleting client with edit_client', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createClient({ page, withNavigation: false });
+    await createClient({ page, api, withNavigation: false });
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -446,7 +463,7 @@ test('deleting client with edit_client', async ({ page }) => {
   }
 });
 
-test('archiving client withe edit_client', async ({ page }) => {
+test('archiving client withe edit_client', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -470,7 +487,7 @@ test('archiving client withe edit_client', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createClient({ page, withNavigation: false });
+    await createClient({ page, api, withNavigation: false });
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -495,12 +512,14 @@ test('archiving client withe edit_client', async ({ page }) => {
   }
 });
 
-test("can't purge client without admin permission", async ({ page }) => {
+test("can't purge client without admin permission", async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useClientActions({
     permissions: ['create_client'],
   });
+
+  const clientName = uniqueName('test purge client');
 
   await login(page);
   await clear('clients@example.com');
@@ -517,7 +536,8 @@ test("can't purge client without admin permission", async ({ page }) => {
 
   await createClient({
     page,
-    clientName: 'test purge client',
+    api,
+    clientName,
     isTableEditable: false,
   });
 
@@ -530,8 +550,10 @@ test("can't purge client without admin permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can purge client with admin permission', async ({ page }) => {
+test('can purge client with admin permission', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('test purge client');
 
   await login(page);
   await clear('clients@example.com');
@@ -543,7 +565,8 @@ test('can purge client with admin permission', async ({ page }) => {
 
   await createClient({
     page,
-    clientName: 'test purge client',
+    api,
+    clientName,
     isTableEditable: true,
   });
 
@@ -565,7 +588,7 @@ test('can purge client with admin permission', async ({ page }) => {
   await logout(page);
 });
 
-test('client documents preview with edit_client', async ({ page }) => {
+test('client documents preview with edit_client', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -589,7 +612,7 @@ test('client documents preview with edit_client', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createClient({ page });
+    await createClient({ page, api });
 
     await page
       .getByRole('button')
@@ -617,7 +640,7 @@ test('client documents preview with edit_client', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test('client documents uploading with edit_client', async ({ page }) => {
+test('client documents uploading with edit_client', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -641,7 +664,7 @@ test('client documents uploading with edit_client', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createClient({ page });
+    await createClient({ page, api });
 
     await page
       .getByRole('button')
@@ -679,12 +702,15 @@ test('client documents uploading with edit_client', async ({ page }) => {
 
 test('all actions in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useClientActions({
     permissions: ['admin'],
   });
+
+  const clientName = uniqueName('test dropdown client');
 
   await login(page);
   await clear('clients@example.com');
@@ -696,7 +722,8 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await createClient({
     page,
-    clientName: 'test dropdown client',
+    api,
+    clientName,
     isTableEditable: true,
   });
 
@@ -711,6 +738,7 @@ test('all actions in dropdown displayed with admin permission', async ({
 
 test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -722,6 +750,8 @@ test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with crea
       'create_payment',
     ],
   });
+
+  const clientName = uniqueName('test actions client');
 
   await login(page);
   await clear('clients@example.com');
@@ -739,7 +769,8 @@ test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with crea
 
   await createClient({
     page,
-    clientName: 'test actions client',
+    api,
+    clientName,
     isTableEditable: false,
   });
 
@@ -752,18 +783,23 @@ test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with crea
   await logout(page);
 });
 
-test('Merge client action', async ({ page }) => {
+test('Merge client action', async ({ page, api }) => {
+  const mergeOneName = uniqueName('test merge one');
+  const mergeTwoName = uniqueName('test merge two');
+
   await login(page);
 
   await createClient({
     page,
-    clientName: 'test merge one',
+    api,
+    clientName: mergeOneName,
     email: 'firstMerge@example.com',
   });
 
   await createClient({
     page,
-    clientName: 'test merge two',
+    api,
+    clientName: mergeTwoName,
     email: 'secondMerge@example.com',
   });
 
@@ -807,12 +843,20 @@ test('Merge client action', async ({ page }) => {
 
 test('Testing military_time property on all settings levels', async ({
   page,
+  api,
+  settingsGuard,
 }) => {
+  await settingsGuard.snapshot();
+
+  const clientName = uniqueName('test settings prop');
+  const groupName = uniqueName('test group');
+
   await login(page);
 
   await createClient({
     page,
-    clientName: 'test settings prop',
+    api,
+    clientName,
   });
 
   await page.waitForTimeout(100);
@@ -838,10 +882,12 @@ test('Testing military_time property on all settings levels', async ({
 
   await page.waitForURL('**/settings/group_settings/create');
 
-  await page.locator('[data-cy="groupSettingsNameField"]').fill('test group');
+  await page.locator('[data-cy="groupSettingsNameField"]').fill(groupName);
 
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByText('Successfully created group')).toBeVisible();
+
+  await api.trackEntityByName('group_settings', groupName);
 
   await page.getByRole('button', { name: 'Configure Settings' }).click();
 
@@ -864,7 +910,7 @@ test('Testing military_time property on all settings levels', async ({
     .click();
 
   await page
-    .getByRole('link', { name: 'test settings prop', exact: true })
+    .getByRole('link', { name: clientName, exact: true })
     .first()
     .click();
 
@@ -874,7 +920,7 @@ test('Testing military_time property on all settings levels', async ({
 
   await page
     .locator('#group_settings_id')
-    .selectOption({ label: 'test group' });
+    .selectOption({ label: groupName });
 
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByText('Successfully updated client')).toBeVisible();
@@ -913,7 +959,7 @@ test('Testing military_time property on all settings levels', async ({
     .click();
 
   await page
-    .getByRole('link', { name: 'test settings prop', exact: true })
+    .getByRole('link', { name: clientName, exact: true })
     .first()
     .click();
 

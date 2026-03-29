@@ -4,7 +4,8 @@ import {
   logout,
   permissions,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 
 interface CreateParams {
   page: Page;
@@ -151,15 +152,20 @@ test("can't view vendors without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view vendor', async ({ page }) => {
+test('can view vendor', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('view-vendor');
 
   await login(page);
   await clear('vendors@example.com');
   await set('view_vendor');
   await save();
 
-  await createVendor({ page, vendorName: 'test view vendor' });
+  await createVendor({ page, vendorName });
+
+  const viewVendorId = page.url().match(/vendors\/([^/]+)/)?.[1];
+  if (viewVendorId) api.trackEntity('vendors', viewVendorId);
 
   await logout(page);
 
@@ -171,7 +177,7 @@ test('can view vendor', async ({ page }) => {
     .click();
 
   await page
-    .getByRole('link', { name: 'test view vendor', exact: true })
+    .getByRole('link', { name: vendorName, exact: true })
     .first()
     .click();
 
@@ -180,15 +186,20 @@ test('can view vendor', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit vendor', async ({ page }) => {
+test('can edit vendor', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('edit-vendor');
 
   await login(page);
   await clear('vendors@example.com');
   await set('edit_vendor');
   await save();
 
-  await createVendor({ page, vendorName: 'test edit vendor' });
+  await createVendor({ page, vendorName });
+
+  const editVendorId = page.url().match(/vendors\/([^/]+)/)?.[1];
+  if (editVendorId) api.trackEntity('vendors', editVendorId);
 
   await logout(page);
 
@@ -200,7 +211,7 @@ test('can edit vendor', async ({ page }) => {
     .click();
 
   await page
-    .getByRole('link', { name: 'test edit vendor', exact: true })
+    .getByRole('link', { name: vendorName, exact: true })
     .first()
     .click();
 
@@ -225,8 +236,10 @@ test('can edit vendor', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a vendor', async ({ page }) => {
+test('can create a vendor', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('create-vendor');
 
   await login(page);
   await clear('vendors@example.com');
@@ -238,9 +251,12 @@ test('can create a vendor', async ({ page }) => {
 
   await createVendor({
     page,
-    vendorName: 'test create vendor',
+    vendorName,
     isTableEditable: false,
   });
+
+  const createVendorId = page.url().match(/vendors\/([^/]+)/)?.[1];
+  if (createVendorId) api.trackEntity('vendors', createVendorId);
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -250,7 +266,7 @@ test('can create a vendor', async ({ page }) => {
   await page.waitForURL('**/vendors');
 
   await page
-    .getByRole('link', { name: 'test create vendor', exact: true })
+    .getByRole('link', { name: vendorName, exact: true })
     .first()
     .click();
 
@@ -277,8 +293,11 @@ test('can create a vendor', async ({ page }) => {
 
 test('can view and edit assigned vendor with create_vendor', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('assigned-vendor');
 
   await login(page);
   await clear('vendors@example.com');
@@ -287,9 +306,12 @@ test('can view and edit assigned vendor with create_vendor', async ({
 
   await createVendor({
     page,
-    vendorName: 'test assigned vendor',
+    vendorName,
     assignTo: 'Vendors Example',
   });
+
+  const assignedVendorId = page.url().match(/vendors\/([^/]+)/)?.[1];
+  if (assignedVendorId) api.trackEntity('vendors', assignedVendorId);
 
   await logout(page);
 
@@ -301,7 +323,7 @@ test('can view and edit assigned vendor with create_vendor', async ({
     .click();
 
   await page
-    .getByRole('link', { name: 'test assigned vendor', exact: true })
+    .getByRole('link', { name: vendorName, exact: true })
     .first()
     .click();
 
@@ -326,8 +348,10 @@ test('can view and edit assigned vendor with create_vendor', async ({
   await logout(page);
 });
 
-test('deleting vendor with edit_vendor', async ({ page }) => {
+test('deleting vendor with edit_vendor', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('delete-vendor');
 
   await login(page);
   await clear('vendors@example.com');
@@ -350,7 +374,10 @@ test('deleting vendor with edit_vendor', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createVendor({ page, withNavigation: false });
+    await createVendor({ page, vendorName, withNavigation: false });
+
+    const id = page.url().match(/vendors\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('vendors', id);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -374,8 +401,10 @@ test('deleting vendor with edit_vendor', async ({ page }) => {
   }
 });
 
-test('archiving vendor withe edit_vendor', async ({ page }) => {
+test('archiving vendor withe edit_vendor', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('archive-vendor');
 
   await login(page);
   await clear('vendors@example.com');
@@ -398,7 +427,10 @@ test('archiving vendor withe edit_vendor', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createVendor({ page, withNavigation: false });
+    await createVendor({ page, vendorName, withNavigation: false });
+
+    const id = page.url().match(/vendors\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('vendors', id);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -422,8 +454,10 @@ test('archiving vendor withe edit_vendor', async ({ page }) => {
   }
 });
 
-test('vendor documents preview with view_vendor', async ({ page }) => {
+test('vendor documents preview with view_vendor', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('docpreview-vendor');
 
   await login(page);
   await clear('vendors@example.com');
@@ -446,7 +480,10 @@ test('vendor documents preview with view_vendor', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createVendor({ page });
+    await createVendor({ page, vendorName });
+
+    const id = page.url().match(/vendors\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('vendors', id);
 
     await checkShowPage(page, true);
   } else {
@@ -466,8 +503,10 @@ test('vendor documents preview with view_vendor', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test('vendor documents uploading with edit_vendor', async ({ page }) => {
+test('vendor documents uploading with edit_vendor', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('docupload-vendor');
 
   await login(page);
   await clear('vendors@example.com');
@@ -490,7 +529,10 @@ test('vendor documents uploading with edit_vendor', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createVendor({ page });
+    await createVendor({ page, vendorName });
+
+    const id = page.url().match(/vendors\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('vendors', id);
   } else {
     await tableRow.getByRole('link').first().click();
   }

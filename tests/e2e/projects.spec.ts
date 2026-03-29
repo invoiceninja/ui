@@ -7,7 +7,8 @@ import {
   permissions,
   useHasPermission,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
 
@@ -102,7 +103,12 @@ interface CreateParams {
 const createProject = async (params: CreateParams) => {
   const { page, isTableEditable = true, assignTo, name } = params;
 
-  await createClient({ page, withNavigation: true, createIfNotExist: true });
+  await createClient({
+    page,
+    withNavigation: true,
+    createIfNotExist: true,
+    name: uniqueName('proj-client'),
+  });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -118,7 +124,7 @@ const createProject = async (params: CreateParams) => {
 
   await page.waitForTimeout(500);
 
-  await page.locator('[data-cy="name"]').fill(name ?? 'test project');
+  await page.locator('[data-cy="name"]').fill(name ?? uniqueName('project'));
 
   await page.locator('[data-testid="combobox-input-field"]').first().click();
 
@@ -151,15 +157,20 @@ test("can't view projects without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view project', async ({ page }) => {
+test('can view project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const projectName = uniqueName('view-project');
 
   await login(page);
   await clear('projects@example.com');
   await set('view_project', 'view_client');
   await save();
 
-  await createProject({ page, name: 'test viewing project' });
+  await createProject({ page, name: projectName });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await logout(page);
 
@@ -173,7 +184,7 @@ test('can view project', async ({ page }) => {
   await checkTableEditability(page, false);
 
   await page
-    .getByRole('link', { name: 'test viewing project', exact: true })
+    .getByRole('link', { name: projectName, exact: true })
     .first()
     .click();
 
@@ -182,19 +193,24 @@ test('can view project', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit project', async ({ page }) => {
+test('can edit project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
     permissions: ['edit_project', 'view_client'],
   });
 
+  const projectName = uniqueName('edit-project');
+
   await login(page);
   await clear('projects@example.com');
   await set('edit_project', 'view_client');
   await save();
 
-  await createProject({ page, name: 'test editing project' });
+  await createProject({ page, name: projectName });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await logout(page);
 
@@ -208,7 +224,7 @@ test('can edit project', async ({ page }) => {
   await checkTableEditability(page, true);
 
   await page
-    .getByRole('link', { name: 'test editing project', exact: true })
+    .getByRole('link', { name: projectName, exact: true })
     .first()
     .click();
 
@@ -234,12 +250,14 @@ test('can edit project', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a project', async ({ page }) => {
+test('can create a project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
     permissions: ['create_project'],
   });
+
+  const projectName = uniqueName('create-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -249,7 +267,10 @@ test('can create a project', async ({ page }) => {
 
   await login(page, 'projects@example.com', 'password');
 
-  await createProject({ page, isTableEditable: false });
+  await createProject({ page, name: projectName, isTableEditable: false });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await checkEditPage(page, true);
 
@@ -271,12 +292,15 @@ test('can create a project', async ({ page }) => {
 
 test('can view and edit assigned project with create_project', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
     permissions: ['create_project'],
   });
+
+  const projectName = uniqueName('assigned-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -286,8 +310,11 @@ test('can view and edit assigned project with create_project', async ({
   await createProject({
     page,
     assignTo: 'Projects Example',
-    name: 'test assigned project',
+    name: projectName,
   });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await logout(page);
 
@@ -301,7 +328,7 @@ test('can view and edit assigned project with create_project', async ({
   await checkTableEditability(page, false);
 
   await page
-    .getByRole('link', { name: 'test assigned project', exact: true })
+    .getByRole('link', { name: projectName, exact: true })
     .first()
     .click();
 
@@ -329,8 +356,10 @@ test('can view and edit assigned project with create_project', async ({
   await logout(page);
 });
 
-test('deleting project with edit_project', async ({ page }) => {
+test('deleting project with edit_project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const projectName = uniqueName('delete-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -353,7 +382,10 @@ test('deleting project with edit_project', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createProject({ page });
+    await createProject({ page, name: projectName });
+
+    const id = page.url().match(/projects\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('projects', id);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -373,8 +405,10 @@ test('deleting project with edit_project', async ({ page }) => {
   }
 });
 
-test('archiving project withe edit_project', async ({ page }) => {
+test('archiving project withe edit_project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const projectName = uniqueName('archive-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -397,7 +431,10 @@ test('archiving project withe edit_project', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createProject({ page });
+    await createProject({ page, name: projectName });
+
+    const id = page.url().match(/projects\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('projects', id);
 
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
@@ -426,8 +463,10 @@ test('archiving project withe edit_project', async ({ page }) => {
   }
 });
 
-test('project documents preview with edit_project', async ({ page }) => {
+test('project documents preview with edit_project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const projectName = uniqueName('docpreview-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -450,7 +489,10 @@ test('project documents preview with edit_project', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createProject({ page });
+    await createProject({ page, name: projectName });
+
+    const id = page.url().match(/projects\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('projects', id);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -473,8 +515,10 @@ test('project documents preview with edit_project', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test('project documents uploading with edit_project', async ({ page }) => {
+test('project documents uploading with edit_project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const projectName = uniqueName('docupload-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -497,7 +541,10 @@ test('project documents uploading with edit_project', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createProject({ page });
+    await createProject({ page, name: projectName });
+
+    const id = page.url().match(/projects\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('projects', id);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -530,12 +577,15 @@ test('project documents uploading with edit_project', async ({ page }) => {
 
 test('Invoice project and clone action in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
     permissions: ['admin'],
   });
+
+  const projectName = uniqueName('admin-dropdown-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -545,7 +595,10 @@ test('Invoice project and clone action in dropdown displayed with admin permissi
 
   await login(page, 'projects@example.com', 'password');
 
-  await createProject({ page });
+  await createProject({ page, name: projectName });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await checkEditPage(page, true);
 
@@ -558,12 +611,15 @@ test('Invoice project and clone action in dropdown displayed with admin permissi
 
 test('Invoice project and clone action displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
     permissions: ['create_project', 'create_invoice'],
   });
+
+  const projectName = uniqueName('create-dropdown-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -573,7 +629,10 @@ test('Invoice project and clone action displayed with creation permissions', asy
 
   await login(page, 'projects@example.com', 'password');
 
-  await createProject({ page, isTableEditable: false });
+  await createProject({ page, name: projectName, isTableEditable: false });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await checkEditPage(page, true);
 
@@ -584,8 +643,10 @@ test('Invoice project and clone action displayed with creation permissions', asy
   await logout(page);
 });
 
-test('cloning project', async ({ page }) => {
+test('cloning project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const projectName = uniqueName('clone-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -611,7 +672,10 @@ test('cloning project', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createProject({ page });
+    await createProject({ page, name: projectName });
+
+    const id = page.url().match(/projects\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('projects', id);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
@@ -633,17 +697,25 @@ test('cloning project', async ({ page }) => {
 
   await page.waitForURL('**/projects/**/edit');
 
+  const clonedId = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (clonedId) api.trackEntity('projects', clonedId);
+
   await expect(
     page.getByRole('heading', { name: 'Edit project' }).first()
   ).toBeVisible();
 });
 
-test('Invoice Project displayed with admin permission', async ({ page }) => {
+test('Invoice Project displayed with admin permission', async ({
+  page,
+  api,
+}) => {
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomQuoteActions({
     permissions: ['admin'],
   });
+
+  const projectName = uniqueName('admin-bulk-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -653,7 +725,10 @@ test('Invoice Project displayed with admin permission', async ({ page }) => {
 
   await login(page, 'projects@example.com', 'password');
 
-  await createProject({ page });
+  await createProject({ page, name: projectName });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await checkEditPage(page, true);
 
@@ -678,6 +753,7 @@ test('Invoice Project displayed with admin permission', async ({ page }) => {
 
 test('Invoice Project displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -690,6 +766,8 @@ test('Invoice Project displayed with creation permissions', async ({
       'view_client',
     ],
   });
+
+  const projectName = uniqueName('create-bulk-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -705,7 +783,10 @@ test('Invoice Project displayed with creation permissions', async ({
 
   await login(page, 'projects@example.com', 'password');
 
-  await createProject({ page });
+  await createProject({ page, name: projectName });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await checkEditPage(page, true);
 

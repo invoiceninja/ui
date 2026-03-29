@@ -7,7 +7,8 @@ import {
   permissions,
   useHasPermission,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
 
@@ -166,11 +167,17 @@ interface CreateParams {
   page: Page;
   assignTo?: string;
   isTableEditable?: boolean;
+  clientName?: string;
 }
 const createQuote = async (params: CreateParams) => {
-  const { page, isTableEditable = true, assignTo } = params;
+  const { page, isTableEditable = true, assignTo, clientName } = params;
 
-  await createClient({ page, withNavigation: true, createIfNotExist: true });
+  await createClient({
+    page,
+    withNavigation: true,
+    createIfNotExist: true,
+    name: clientName ?? uniqueName('qt-client'),
+  });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -200,7 +207,7 @@ const createQuote = async (params: CreateParams) => {
   await expect(page.getByText('Successfully created quote')).toBeVisible();
 };
 
-test("can't view quotes without permission", async ({ page }) => {
+test("can't view quotes without permission", async ({ page, api }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -217,7 +224,7 @@ test("can't view quotes without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view quote', async ({ page }) => {
+test('can view quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -225,7 +232,11 @@ test('can view quote', async ({ page }) => {
   await set('view_quote', 'view_client');
   await save();
 
-  await createQuote({ page });
+  const clientName = uniqueName('qt-view');
+  await createQuote({ page, clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await logout(page);
 
@@ -247,7 +258,7 @@ test('can view quote', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit quote', async ({ page }) => {
+test('can edit quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useQuotesActions({
@@ -259,7 +270,11 @@ test('can edit quote', async ({ page }) => {
   await set('edit_quote', 'view_client');
   await save();
 
-  await createQuote({ page });
+  const clientName = uniqueName('qt-edit');
+  await createQuote({ page, clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await logout(page);
 
@@ -294,7 +309,7 @@ test('can edit quote', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a quote', async ({ page }) => {
+test('can create a quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useQuotesActions({
@@ -309,7 +324,11 @@ test('can create a quote', async ({ page }) => {
 
   await login(page, 'quotes@example.com', 'password');
 
-  await createQuote({ page, isTableEditable: false });
+  const clientName = uniqueName('qt-create');
+  await createQuote({ page, isTableEditable: false, clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await checkEditPage(page, true, false);
 
@@ -329,7 +348,10 @@ test('can create a quote', async ({ page }) => {
   await logout(page);
 });
 
-test('can view and edit assigned quote with create_quote', async ({ page }) => {
+test('can view and edit assigned quote with create_quote', async ({
+  page,
+  api,
+}) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useQuotesActions({
@@ -341,7 +363,11 @@ test('can view and edit assigned quote with create_quote', async ({ page }) => {
   await set('create_quote');
   await save();
 
-  await createQuote({ page, assignTo: 'Quotes Example' });
+  const clientName = uniqueName('qt-assigned');
+  await createQuote({ page, assignTo: 'Quotes Example', clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await logout(page);
 
@@ -376,7 +402,7 @@ test('can view and edit assigned quote with create_quote', async ({ page }) => {
   await logout(page);
 });
 
-test('deleting quote with edit_quote', async ({ page }) => {
+test('deleting quote with edit_quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -400,7 +426,11 @@ test('deleting quote with edit_quote', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createQuote({ page });
+    const clientName = uniqueName('qt-del');
+    await createQuote({ page, clientName });
+
+    const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+    if (quoteId) api.trackEntity('quotes', quoteId);
 
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
@@ -424,7 +454,7 @@ test('deleting quote with edit_quote', async ({ page }) => {
   }
 });
 
-test('archiving quote withe edit_quote', async ({ page }) => {
+test('archiving quote withe edit_quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -448,7 +478,11 @@ test('archiving quote withe edit_quote', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createQuote({ page });
+    const clientName = uniqueName('qt-arch');
+    await createQuote({ page, clientName });
+
+    const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+    if (quoteId) api.trackEntity('quotes', quoteId);
 
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
@@ -477,7 +511,7 @@ test('archiving quote withe edit_quote', async ({ page }) => {
   }
 });
 
-test('quote documents preview with edit_quote', async ({ page }) => {
+test('quote documents preview with edit_quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -501,7 +535,11 @@ test('quote documents preview with edit_quote', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createQuote({ page });
+    const clientName = uniqueName('qt-docprev');
+    await createQuote({ page, clientName });
+
+    const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+    if (quoteId) api.trackEntity('quotes', quoteId);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -524,7 +562,7 @@ test('quote documents preview with edit_quote', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test('quote documents uploading with edit_quote', async ({ page }) => {
+test('quote documents uploading with edit_quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -548,7 +586,11 @@ test('quote documents uploading with edit_quote', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createQuote({ page });
+    const clientName = uniqueName('qt-docup');
+    await createQuote({ page, clientName });
+
+    const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+    if (quoteId) api.trackEntity('quotes', quoteId);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -581,6 +623,7 @@ test('quote documents uploading with edit_quote', async ({ page }) => {
 
 test('all actions in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -596,7 +639,11 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await login(page, 'quotes@example.com', 'password');
 
-  await createQuote({ page });
+  const clientName = uniqueName('qt-admin');
+  await createQuote({ page, clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await checkEditPage(page, true, true);
 
@@ -609,6 +656,7 @@ test('all actions in dropdown displayed with admin permission', async ({
 
 test('convert_to_invoice, convert_to_project and all clone actions displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -637,7 +685,11 @@ test('convert_to_invoice, convert_to_project and all clone actions displayed wit
 
   await login(page, 'quotes@example.com', 'password');
 
-  await createQuote({ page, isTableEditable: false });
+  const clientName = uniqueName('qt-clone-actions');
+  await createQuote({ page, isTableEditable: false, clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await checkEditPage(page, true, false);
 
@@ -648,7 +700,7 @@ test('convert_to_invoice, convert_to_project and all clone actions displayed wit
   await logout(page);
 });
 
-test('cloning quote', async ({ page }) => {
+test('cloning quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -675,7 +727,11 @@ test('cloning quote', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createQuote({ page });
+    const clientName = uniqueName('qt-clone');
+    await createQuote({ page, clientName });
+
+    const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+    if (quoteId) api.trackEntity('quotes', quoteId);
 
     const moreActionsButton = page
       .locator('[data-cy="topNavbar"]')
@@ -701,6 +757,9 @@ test('cloning quote', async ({ page }) => {
 
   await page.waitForURL('**/quotes/**/edit');
 
+  const clonedQuoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (clonedQuoteId) api.trackEntity('quotes', clonedQuoteId);
+
   await expect(
     page.getByRole('heading', { name: 'Edit Quote' }).first()
   ).toBeVisible();
@@ -708,6 +767,7 @@ test('cloning quote', async ({ page }) => {
 
 test('Convert to Invoice and Convert to Project displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -723,7 +783,11 @@ test('Convert to Invoice and Convert to Project displayed with admin permission'
 
   await login(page, 'quotes@example.com', 'password');
 
-  await createQuote({ page });
+  const clientName = uniqueName('qt-conv-admin');
+  await createQuote({ page, clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await checkEditPage(page, true, true);
 
@@ -748,6 +812,7 @@ test('Convert to Invoice and Convert to Project displayed with admin permission'
 
 test('Convert to Invoice and Convert to Project displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -774,7 +839,11 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
 
   await login(page, 'quotes@example.com', 'password');
 
-  await createQuote({ page });
+  const clientName = uniqueName('qt-conv-create');
+  await createQuote({ page, clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await checkEditPage(page, true, false);
 

@@ -1,5 +1,5 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
-import test, { expect } from '@playwright/test';
+import { test, expect } from '$tests/e2e/fixtures';
 
 test("Can't view dashboard without permission", async ({ page }) => {
   const { clear, save } = permissions(page);

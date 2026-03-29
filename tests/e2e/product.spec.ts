@@ -7,7 +7,8 @@ import {
   permissions,
   useHasPermission,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import type { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 
 interface Params {
@@ -157,8 +158,10 @@ test("can't view products without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view product', async ({ page }) => {
+test('can view product', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const productName = uniqueName('test-view-product');
 
   await login(page);
   await clear('products@example.com');
@@ -167,8 +170,11 @@ test('can view product', async ({ page }) => {
 
   await createProduct({
     page,
-    name: 'test view product',
+    name: productName,
   });
+
+  const viewId = page.url().match(/products\/([^/]+)/)?.[1];
+  if (viewId) api.trackEntity('products', viewId);
 
   await logout(page);
 
@@ -182,7 +188,7 @@ test('can view product', async ({ page }) => {
   await checkTableEditability(page, false);
 
   await page
-    .getByRole('link', { name: 'test view product', exact: true })
+    .getByRole('link', { name: productName, exact: true })
     .first()
     .click();
 
@@ -191,8 +197,10 @@ test('can view product', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit product', async ({ page }) => {
+test('can edit product', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const productName = uniqueName('test-edit-product');
 
   const actions = useProductActions({
     permissions: ['edit_product'],
@@ -203,7 +211,10 @@ test('can edit product', async ({ page }) => {
   await set('edit_product');
   await save();
 
-  await createProduct({ page, name: 'test edit product' });
+  await createProduct({ page, name: productName });
+
+  const editId = page.url().match(/products\/([^/]+)/)?.[1];
+  if (editId) api.trackEntity('products', editId);
 
   await logout(page);
 
@@ -217,7 +228,7 @@ test('can edit product', async ({ page }) => {
   await checkTableEditability(page, true);
 
   await page
-    .getByRole('link', { name: 'test edit product', exact: true })
+    .getByRole('link', { name: productName, exact: true })
     .first()
     .click();
 
@@ -241,8 +252,10 @@ test('can edit product', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a product', async ({ page }) => {
+test('can create a product', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const productName = uniqueName('test-create-product');
 
   const actions = useProductActions({
     permissions: ['create_product'],
@@ -258,9 +271,12 @@ test('can create a product', async ({ page }) => {
 
   await createProduct({
     page,
-    name: 'test create product',
+    name: productName,
     isTableEditable: false,
   });
+
+  const createId = page.url().match(/products\/([^/]+)/)?.[1];
+  if (createId) api.trackEntity('products', createId);
 
   await checkEditPage(page, true, false);
 
@@ -280,7 +296,7 @@ test('can create a product', async ({ page }) => {
   await logout(page);
 });
 
-test('deleting product with edit_product', async ({ page }) => {
+test('deleting product with edit_product', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -304,7 +320,12 @@ test('deleting product with edit_product', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createProduct({ page, withNavigation: false });
+    const deleteName = uniqueName('test-delete-product');
+
+    await createProduct({ page, withNavigation: false, name: deleteName });
+
+    const deleteId = page.url().match(/products\/([^/]+)/)?.[1];
+    if (deleteId) api.trackEntity('products', deleteId);
 
     const moreActionsButton = page
       .getByRole('button')
@@ -333,7 +354,7 @@ test('deleting product with edit_product', async ({ page }) => {
   }
 });
 
-test('archiving product withe edit_product', async ({ page }) => {
+test('archiving product withe edit_product', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -357,7 +378,12 @@ test('archiving product withe edit_product', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createProduct({ page, withNavigation: false });
+    const archiveName = uniqueName('test-archive-product');
+
+    await createProduct({ page, withNavigation: false, name: archiveName });
+
+    const archiveId = page.url().match(/products\/([^/]+)/)?.[1];
+    if (archiveId) api.trackEntity('products', archiveId);
 
     const moreActionsButton = page
       .getByRole('button')
@@ -387,7 +413,7 @@ test('archiving product withe edit_product', async ({ page }) => {
   }
 });
 
-test('product documents preview with edit_product', async ({ page }) => {
+test('product documents preview with edit_product', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -411,7 +437,12 @@ test('product documents preview with edit_product', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createProduct({ page, withNavigation: false });
+    const docPreviewName = uniqueName('test-doc-preview-product');
+
+    await createProduct({ page, withNavigation: false, name: docPreviewName });
+
+    const docPreviewId = page.url().match(/products\/([^/]+)/)?.[1];
+    if (docPreviewId) api.trackEntity('products', docPreviewId);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -436,7 +467,7 @@ test('product documents preview with edit_product', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test('product documents uploading with edit_product', async ({ page }) => {
+test('product documents uploading with edit_product', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -460,7 +491,12 @@ test('product documents uploading with edit_product', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createProduct({ page, withNavigation: false });
+    const docUploadName = uniqueName('test-doc-upload-product');
+
+    await createProduct({ page, withNavigation: false, name: docUploadName });
+
+    const docUploadId = page.url().match(/products\/([^/]+)/)?.[1];
+    if (docUploadId) api.trackEntity('products', docUploadId);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -495,8 +531,11 @@ test('product documents uploading with edit_product', async ({ page }) => {
 
 test('all actions in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const productName = uniqueName('test-dropdown-product');
 
   const actions = useProductActions({
     permissions: ['admin'],
@@ -510,7 +549,10 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await login(page, 'products@example.com', 'password');
 
-  await createProduct({ page, name: 'test dropdown product' });
+  await createProduct({ page, name: productName });
+
+  const dropdownId = page.url().match(/products\/([^/]+)/)?.[1];
+  if (dropdownId) api.trackEntity('products', dropdownId);
 
   await checkEditPage(page, true, true);
 
@@ -523,8 +565,11 @@ test('all actions in dropdown displayed with admin permission', async ({
 
 test('New Invoice, New Purchase Order, and Clone displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const productName = uniqueName('test-actions-product');
 
   const actions = useProductActions({
     permissions: ['create_invoice', 'create_purchase_order', 'create_product'],
@@ -540,9 +585,12 @@ test('New Invoice, New Purchase Order, and Clone displayed with creation permiss
 
   await createProduct({
     page,
-    name: 'test actions product',
+    name: productName,
     isTableEditable: false,
   });
+
+  const actionsId = page.url().match(/products\/([^/]+)/)?.[1];
+  if (actionsId) api.trackEntity('products', actionsId);
 
   await checkEditPage(page, true, false);
 
@@ -553,7 +601,7 @@ test('New Invoice, New Purchase Order, and Clone displayed with creation permiss
   await logout(page);
 });
 
-test('cloning product with edit_product', async ({ page }) => {
+test('cloning product with edit_product', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -577,7 +625,12 @@ test('cloning product with edit_product', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createProduct({ page, withNavigation: false });
+    const cloneName = uniqueName('test-clone-product');
+
+    await createProduct({ page, withNavigation: false, name: cloneName });
+
+    const cloneSourceId = page.url().match(/products\/([^/]+)/)?.[1];
+    if (cloneSourceId) api.trackEntity('products', cloneSourceId);
 
     const moreActionsButton = page
       .getByRole('button')
@@ -594,6 +647,9 @@ test('cloning product with edit_product', async ({ page }) => {
     await expect(page.getByText('Successfully created product')).toBeVisible();
 
     await page.waitForURL('**/products/**/edit');
+
+    const clonedId = page.url().match(/products\/([^/]+)/)?.[1];
+    if (clonedId) api.trackEntity('products', clonedId);
 
     await expect(
       page.getByRole('heading', { name: 'Edit Product' }).first()
@@ -615,6 +671,9 @@ test('cloning product with edit_product', async ({ page }) => {
 
     await page.waitForURL('**/products/**/edit');
 
+    const clonedId = page.url().match(/products\/([^/]+)/)?.[1];
+    if (clonedId) api.trackEntity('products', clonedId);
+
     await expect(
       page.getByRole('heading', { name: 'Edit Product' }).first()
     ).toBeVisible();
@@ -623,8 +682,11 @@ test('cloning product with edit_product', async ({ page }) => {
 
 test('all custom actions in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const productName = uniqueName('test-bulk-actions-product');
 
   const customActions = useProductCustomActions({
     permissions: ['admin'],
@@ -638,7 +700,10 @@ test('all custom actions in dropdown displayed with admin permission', async ({
 
   await login(page, 'products@example.com', 'password');
 
-  await createProduct({ page, name: 'test bulk actions product' });
+  await createProduct({ page, name: productName });
+
+  const bulkId = page.url().match(/products\/([^/]+)/)?.[1];
+  if (bulkId) api.trackEntity('products', bulkId);
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -661,8 +726,11 @@ test('all custom actions in dropdown displayed with admin permission', async ({
 
 test('New Invoice and New Purchase Order displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const productName = uniqueName('test-bulk-actions-product');
 
   const customActions = useProductCustomActions({
     permissions: ['create_invoice', 'create_purchase_order'],
@@ -681,7 +749,10 @@ test('New Invoice and New Purchase Order displayed with creation permissions', a
 
   await login(page, 'products@example.com', 'password');
 
-  await createProduct({ page, name: 'test bulk actions product' });
+  await createProduct({ page, name: productName });
+
+  const bulkId = page.url().match(/products\/([^/]+)/)?.[1];
+  if (bulkId) api.trackEntity('products', bulkId);
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -704,10 +775,16 @@ test('New Invoice and New Purchase Order displayed with creation permissions', a
 
 test('rendering documents and product_fields tabs with admin permission', async ({
   page,
+  api,
 }) => {
+  const productName = uniqueName('test-product-tabs');
+
   await login(page);
 
-  await createProduct({ page, name: 'test product tabs' });
+  await createProduct({ page, name: productName });
+
+  const tabsId = page.url().match(/products\/([^/]+)/)?.[1];
+  if (tabsId) api.trackEntity('products', tabsId);
 
   await page
     .locator('[data-cy="tabs"]')
@@ -742,10 +819,16 @@ test('rendering documents and product_fields tabs with admin permission', async 
 
 test('Product selector list gets updated on the report page when it is created', async ({
   page,
+  api,
 }) => {
+  const productName = uniqueName('test-product-selector');
+
   await login(page);
 
-  await createProduct({ page, name: 'test product selector' });
+  await createProduct({ page, name: productName });
+
+  const selectorId = page.url().match(/products\/([^/]+)/)?.[1];
+  if (selectorId) api.trackEntity('products', selectorId);
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -764,12 +847,12 @@ test('Product selector list gets updated on the report page when it is created',
     .locator('[id="productItemSelector"]')
     .locator('[type="text"]')
     .first()
-    .fill('test product selector');
+    .fill(productName);
 
   await page.waitForTimeout(200);
 
   await expect(
-    page.getByText('test product selector', { exact: true })
+    page.getByText(productName, { exact: true })
   ).toBeVisible();
 
   await logout(page);

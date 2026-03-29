@@ -37,3 +37,7 @@ cypress/screenshots
 /playwright/.cache/
 
 .idea/*
+
+# Playwright
+node_modules/
+/playwright/.auth/

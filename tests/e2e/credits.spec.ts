@@ -7,7 +7,8 @@ import {
   permissions,
   useHasPermission,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
 
@@ -134,11 +135,23 @@ interface CreateParams {
   assignTo?: string;
   isTableEditable?: boolean;
   returnCreditNumber?: boolean;
+  clientName?: string;
 }
 const createCredit = async (params: CreateParams) => {
-  const { page, isTableEditable = true, assignTo, returnCreditNumber } = params;
+  const {
+    page,
+    isTableEditable = true,
+    assignTo,
+    returnCreditNumber,
+    clientName,
+  } = params;
 
-  await createClient({ page, withNavigation: true, createIfNotExist: true });
+  await createClient({
+    page,
+    withNavigation: true,
+    createIfNotExist: true,
+    name: clientName ?? uniqueName('cr-client'),
+  });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -178,7 +191,7 @@ const createCredit = async (params: CreateParams) => {
   }
 };
 
-test("can't view credits without permission", async ({ page }) => {
+test("can't view credits without permission", async ({ page, api }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -195,7 +208,7 @@ test("can't view credits without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view credit', async ({ page }) => {
+test('can view credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -203,7 +216,11 @@ test('can view credit', async ({ page }) => {
   await set('view_credit', 'view_client');
   await save();
 
-  await createCredit({ page });
+  const clientName = uniqueName('cr-view');
+  await createCredit({ page, clientName });
+
+  const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (creditId) api.trackEntity('credits', creditId);
 
   await logout(page);
 
@@ -225,7 +242,7 @@ test('can view credit', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit credit', async ({ page }) => {
+test('can edit credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useCreditsActions({
@@ -237,7 +254,11 @@ test('can edit credit', async ({ page }) => {
   await set('edit_credit', 'view_client');
   await save();
 
-  await createCredit({ page });
+  const clientName = uniqueName('cr-edit');
+  await createCredit({ page, clientName });
+
+  const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (creditId) api.trackEntity('credits', creditId);
 
   await logout(page);
 
@@ -272,7 +293,7 @@ test('can edit credit', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a credit', async ({ page }) => {
+test('can create a credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useCreditsActions({
@@ -287,7 +308,11 @@ test('can create a credit', async ({ page }) => {
 
   await login(page, 'credits@example.com', 'password');
 
-  await createCredit({ page, isTableEditable: false });
+  const clientName = uniqueName('cr-create');
+  await createCredit({ page, isTableEditable: false, clientName });
+
+  const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (creditId) api.trackEntity('credits', creditId);
 
   await checkEditPage(page, true, false);
 
@@ -309,6 +334,7 @@ test('can create a credit', async ({ page }) => {
 
 test('can view and edit assigned credit with create_credit', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -321,11 +347,16 @@ test('can view and edit assigned credit with create_credit', async ({
   await set('create_credit');
   await save();
 
+  const clientName = uniqueName('cr-assigned');
   const creditNumber = await createCredit({
     page,
     assignTo: 'Credits Example',
     returnCreditNumber: true,
+    clientName,
   });
+
+  const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (creditId) api.trackEntity('credits', creditId);
 
   await logout(page);
 
@@ -358,7 +389,7 @@ test('can view and edit assigned credit with create_credit', async ({
   await logout(page);
 });
 
-test('deleting credit with edit_credit', async ({ page }) => {
+test('deleting credit with edit_credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -382,7 +413,11 @@ test('deleting credit with edit_credit', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createCredit({ page });
+    const clientName = uniqueName('cr-del');
+    await createCredit({ page, clientName });
+
+    const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+    if (creditId) api.trackEntity('credits', creditId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -402,7 +437,7 @@ test('deleting credit with edit_credit', async ({ page }) => {
   }
 });
 
-test('archiving credit withe edit_credit', async ({ page }) => {
+test('archiving credit withe edit_credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -426,7 +461,11 @@ test('archiving credit withe edit_credit', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createCredit({ page });
+    const clientName = uniqueName('cr-arch');
+    await createCredit({ page, clientName });
+
+    const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+    if (creditId) api.trackEntity('credits', creditId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -451,7 +490,7 @@ test('archiving credit withe edit_credit', async ({ page }) => {
   }
 });
 
-test('credit documents preview with edit_credit', async ({ page }) => {
+test('credit documents preview with edit_credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -475,7 +514,11 @@ test('credit documents preview with edit_credit', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createCredit({ page });
+    const clientName = uniqueName('cr-docprev');
+    await createCredit({ page, clientName });
+
+    const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+    if (creditId) api.trackEntity('credits', creditId);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -499,7 +542,7 @@ test('credit documents preview with edit_credit', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test('credit documents uploading with edit_credit', async ({ page }) => {
+test('credit documents uploading with edit_credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -523,7 +566,11 @@ test('credit documents uploading with edit_credit', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createCredit({ page });
+    const clientName = uniqueName('cr-docup');
+    await createCredit({ page, clientName });
+
+    const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+    if (creditId) api.trackEntity('credits', creditId);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -557,6 +604,7 @@ test('credit documents uploading with edit_credit', async ({ page }) => {
 
 test('all actions in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -572,7 +620,11 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await login(page, 'credits@example.com', 'password');
 
-  await createCredit({ page });
+  const clientName = uniqueName('cr-admin');
+  await createCredit({ page, clientName });
+
+  const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (creditId) api.trackEntity('credits', creditId);
 
   await checkEditPage(page, true, true);
 
@@ -585,6 +637,7 @@ test('all actions in dropdown displayed with admin permission', async ({
 
 test('all clone actions displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -613,7 +666,11 @@ test('all clone actions displayed with creation permissions', async ({
 
   await login(page, 'credits@example.com', 'password');
 
-  await createCredit({ page, isTableEditable: false });
+  const clientName = uniqueName('cr-clone-actions');
+  await createCredit({ page, isTableEditable: false, clientName });
+
+  const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (creditId) api.trackEntity('credits', creditId);
 
   await checkEditPage(page, true, false);
 
@@ -624,7 +681,7 @@ test('all clone actions displayed with creation permissions', async ({
   await logout(page);
 });
 
-test('cloning credit', async ({ page }) => {
+test('cloning credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -651,7 +708,11 @@ test('cloning credit', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createCredit({ page });
+    const clientName = uniqueName('cr-clone');
+    await createCredit({ page, clientName });
+
+    const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+    if (creditId) api.trackEntity('credits', creditId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
@@ -672,6 +733,9 @@ test('cloning credit', async ({ page }) => {
   await expect(page.getByText('Successfully created credit')).toBeVisible();
 
   await page.waitForURL('**/credits/**/edit');
+
+  const clonedCreditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (clonedCreditId) api.trackEntity('credits', clonedCreditId);
 
   await expect(
     page.getByRole('heading', { name: 'Edit Credit' }).first()

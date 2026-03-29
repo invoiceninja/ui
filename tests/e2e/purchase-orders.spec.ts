@@ -7,7 +7,8 @@ import {
   permissions,
   useHasPermission,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createVendor } from './vendor-helpers';
 
@@ -123,11 +124,17 @@ interface CreateParams {
   page: Page;
   assignTo?: string;
   isTableEditable?: boolean;
+  vendorName?: string;
 }
 const createPurchaseOrder = async (params: CreateParams) => {
-  const { page, isTableEditable = true, assignTo } = params;
+  const { page, isTableEditable = true, assignTo, vendorName } = params;
 
-  await createVendor({ page, withNavigation: true, createIfNotExist: true });
+  await createVendor({
+    page,
+    withNavigation: true,
+    createIfNotExist: true,
+    name: vendorName,
+  });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -179,15 +186,21 @@ test("can't view purchase_orders without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view purchase_order', async ({ page }) => {
+test('can view purchase_order', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   await login(page);
   await clear('purchase_orders@example.com');
   await set('view_purchase_order', 'view_vendor');
   await save();
 
-  await createPurchaseOrder({ page });
+  await createPurchaseOrder({ page, vendorName });
+
+  await page.waitForURL('**/purchase_orders/**/edit');
+  const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('purchase_orders', createdId);
 
   await logout(page);
 
@@ -209,8 +222,10 @@ test('can view purchase_order', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit purchase_order', async ({ page }) => {
+test('can edit purchase_order', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   const actions = usePurchaseOrdersActions({
     permissions: ['edit_purchase_order', 'view_vendor'],
@@ -221,7 +236,11 @@ test('can edit purchase_order', async ({ page }) => {
   await set('edit_purchase_order', 'view_vendor');
   await save();
 
-  await createPurchaseOrder({ page });
+  await createPurchaseOrder({ page, vendorName });
+
+  await page.waitForURL('**/purchase_orders/**/edit');
+  const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('purchase_orders', createdId);
 
   await logout(page);
 
@@ -262,8 +281,10 @@ test('can edit purchase_order', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a purchase_order', async ({ page }) => {
+test('can create a purchase_order', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   const actions = usePurchaseOrdersActions({
     permissions: ['create_purchase_order'],
@@ -277,7 +298,11 @@ test('can create a purchase_order', async ({ page }) => {
 
   await login(page, 'purchase_orders@example.com', 'password');
 
-  await createPurchaseOrder({ page, isTableEditable: false });
+  await createPurchaseOrder({ page, isTableEditable: false, vendorName });
+
+  await page.waitForURL('**/purchase_orders/**/edit');
+  const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('purchase_orders', createdId);
 
   await checkEditPage(page, true);
 
@@ -305,8 +330,11 @@ test('can create a purchase_order', async ({ page }) => {
 
 test('can view and edit assigned purchase_order with create_purchase_order', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   const actions = usePurchaseOrdersActions({
     permissions: ['create_purchase_order'],
@@ -317,7 +345,15 @@ test('can view and edit assigned purchase_order with create_purchase_order', asy
   await set('create_purchase_order');
   await save();
 
-  await createPurchaseOrder({ page, assignTo: 'Purchase_orders Example' });
+  await createPurchaseOrder({
+    page,
+    assignTo: 'Purchase_orders Example',
+    vendorName,
+  });
+
+  await page.waitForURL('**/purchase_orders/**/edit');
+  const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('purchase_orders', createdId);
 
   await logout(page);
 
@@ -358,8 +394,13 @@ test('can view and edit assigned purchase_order with create_purchase_order', asy
   await logout(page);
 });
 
-test('deleting purchase_order with edit_purchase_order', async ({ page }) => {
+test('deleting purchase_order with edit_purchase_order', async ({
+  page,
+  api,
+}) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   await login(page);
   await clear('purchase_orders@example.com');
@@ -384,7 +425,11 @@ test('deleting purchase_order with edit_purchase_order', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createPurchaseOrder({ page });
+    await createPurchaseOrder({ page, vendorName });
+
+    await page.waitForURL('**/purchase_orders/**/edit');
+    const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('purchase_orders', createdId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -408,8 +453,13 @@ test('deleting purchase_order with edit_purchase_order', async ({ page }) => {
   }
 });
 
-test('archiving purchase_order with edit_purchase_order', async ({ page }) => {
+test('archiving purchase_order with edit_purchase_order', async ({
+  page,
+  api,
+}) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   await login(page);
   await clear('purchase_orders@example.com');
@@ -439,7 +489,11 @@ test('archiving purchase_order with edit_purchase_order', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createPurchaseOrder({ page });
+    await createPurchaseOrder({ page, vendorName });
+
+    await page.waitForURL('**/purchase_orders/**/edit');
+    const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('purchase_orders', createdId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -469,8 +523,11 @@ test('archiving purchase_order with edit_purchase_order', async ({ page }) => {
 
 test('purchase_order documents preview with edit_purchase_order', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   await login(page);
   await clear('purchase_orders@example.com');
@@ -500,7 +557,11 @@ test('purchase_order documents preview with edit_purchase_order', async ({
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createPurchaseOrder({ page });
+    await createPurchaseOrder({ page, vendorName });
+
+    await page.waitForURL('**/purchase_orders/**/edit');
+    const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('purchase_orders', createdId);
   } else {
     await tableRow
       .getByRole('button')
@@ -524,8 +585,11 @@ test('purchase_order documents preview with edit_purchase_order', async ({
 
 test('purchase_order documents uploading with edit_purchase_order', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   await login(page);
   await clear('purchase_orders@example.com');
@@ -555,7 +619,11 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createPurchaseOrder({ page });
+    await createPurchaseOrder({ page, vendorName });
+
+    await page.waitForURL('**/purchase_orders/**/edit');
+    const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('purchase_orders', createdId);
   } else {
     await tableRow
       .getByRole('button')
@@ -587,8 +655,11 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
 
 test('all actions in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   const actions = usePurchaseOrdersActions({
     permissions: ['admin'],
@@ -602,7 +673,11 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await login(page, 'purchase_orders@example.com', 'password');
 
-  await createPurchaseOrder({ page });
+  await createPurchaseOrder({ page, vendorName });
+
+  await page.waitForURL('**/purchase_orders/**/edit');
+  const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('purchase_orders', createdId);
 
   await checkEditPage(page, true);
 
@@ -621,8 +696,11 @@ test('all actions in dropdown displayed with admin permission', async ({
 
 test('all clone actions displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   const actions = usePurchaseOrdersActions({
     permissions: [
@@ -649,7 +727,11 @@ test('all clone actions displayed with creation permissions', async ({
 
   await login(page, 'purchase_orders@example.com', 'password');
 
-  await createPurchaseOrder({ page, isTableEditable: false });
+  await createPurchaseOrder({ page, isTableEditable: false, vendorName });
+
+  await page.waitForURL('**/purchase_orders/**/edit');
+  const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('purchase_orders', createdId);
 
   await checkEditPage(page, true);
 
@@ -666,8 +748,10 @@ test('all clone actions displayed with creation permissions', async ({
   await logout(page);
 });
 
-test('cloning purchase_order', async ({ page }) => {
+test('cloning purchase_order', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   await login(page);
   await clear('purchase_orders@example.com');
@@ -693,7 +777,11 @@ test('cloning purchase_order', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createPurchaseOrder({ page });
+    await createPurchaseOrder({ page, vendorName });
+
+    await page.waitForURL('**/purchase_orders/**/edit');
+    const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('purchase_orders', createdId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
@@ -715,6 +803,9 @@ test('cloning purchase_order', async ({ page }) => {
   ).toBeVisible();
 
   await page.waitForURL('**/purchase_orders/**/edit');
+
+  const clonedId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (clonedId) api.trackEntity('purchase_orders', clonedId);
 
   await expect(
     page

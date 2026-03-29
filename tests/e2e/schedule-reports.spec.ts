@@ -1,8 +1,21 @@
 import { login } from '$tests/e2e/helpers';
-import test, { expect } from '@playwright/test';
+import { test, expect, uniqueName, extractIdFromUrl } from '$tests/e2e/fixtures';
+import {
+  createClientViaApi,
+  createProductViaApi,
+  createProjectViaApi,
+  createExpenseCategoryViaApi,
+  createApiContext,
+  type EntityType,
+} from '$tests/e2e/api-helpers';
 import dayjs from 'dayjs';
 
-test('Activity report test', async ({ page }) => {
+function trackScheduleFromUrl(page: { url: () => string }, api: { trackEntity: (type: EntityType, id: string) => void }) {
+  const id = extractIdFromUrl(page.url(), 'schedules');
+  if (id) api.trackEntity('task_schedulers', id);
+}
+
+test('Activity report test', async ({ page, api }) => {
   await login(page);
 
   await page
@@ -38,6 +51,7 @@ test('Activity report test', async ({ page }) => {
     .click();
 
   await page.waitForURL('**/settings/schedules/**/edit');
+  trackScheduleFromUrl(page, api);
 
   await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
     'activity'
@@ -52,7 +66,14 @@ test('Activity report test', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('Invoice report test', async ({ page }) => {
+test('Invoice report test', async ({ page, api }) => {
+  // Create prerequisite client via API
+  const apiCtx = await createApiContext(process.env.VITE_API_URL!);
+  const client = await createClientViaApi(apiCtx, {
+    name: uniqueName('sched-inv-client'),
+  });
+  api.trackEntity('clients', client.id);
+
   await login(page);
 
   await page
@@ -127,7 +148,7 @@ test('Invoice report test', async ({ page }) => {
   ).toBeChecked();
   await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
   await expect(page.locator('div[data-headlessui-state]').nth(2)).toContainText(
-    'test edit client'
+    client.name
   );
 
   await page
@@ -136,6 +157,7 @@ test('Invoice report test', async ({ page }) => {
     .click();
 
   await page.waitForURL('**/settings/schedules/**/edit');
+  trackScheduleFromUrl(page, api);
 
   await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
     'invoice'
@@ -158,7 +180,7 @@ test('Invoice report test', async ({ page }) => {
   ).toBeChecked();
   await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
   await expect(page.locator('div[data-headlessui-state]').nth(2)).toContainText(
-    'test edit client'
+    client.name
   );
 
   await expect(
@@ -166,7 +188,7 @@ test('Invoice report test', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('Profit and loss report test', async ({ page }) => {
+test('Profit and loss report test', async ({ page, api }) => {
   await login(page);
 
   await page
@@ -213,6 +235,7 @@ test('Profit and loss report test', async ({ page }) => {
     .click();
 
   await page.waitForURL('**/settings/schedules/**/edit');
+  trackScheduleFromUrl(page, api);
 
   await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
     'profitloss'
@@ -230,7 +253,18 @@ test('Profit and loss report test', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('Product sales report test', async ({ page }) => {
+test('Product sales report test', async ({ page, api }) => {
+  // Create prerequisite products and client via API
+  const apiCtx = await createApiContext(process.env.VITE_API_URL!);
+  const product1 = await createProductViaApi(apiCtx, {
+    product_key: uniqueName('sched-prod-1'),
+  });
+  api.trackEntity('products', product1.id);
+  const product2 = await createProductViaApi(apiCtx, {
+    product_key: uniqueName('sched-prod-2'),
+  });
+  api.trackEntity('products', product2.id);
+
   await login(page);
 
   await page
@@ -247,7 +281,7 @@ test('Product sales report test', async ({ page }) => {
     .last()
     .click();
 
-  await page.getByText('test create product', { exact: true }).first().click();
+  await page.getByText(product1.product_key, { exact: true }).first().click();
 
   await page.getByText('Products', { exact: true }).last().click();
 
@@ -257,7 +291,7 @@ test('Product sales report test', async ({ page }) => {
     .click();
 
   await page
-    .getByText('test dropdown product', { exact: true })
+    .getByText(product2.product_key, { exact: true })
     .first()
     .click();
 
@@ -304,7 +338,10 @@ test('Product sales report test', async ({ page }) => {
     dayjs().add(1, 'day').format('YYYY-MM-DD')
   );
   await expect(page.locator('[id="productItemSelector"]')).toContainText(
-    'test create producttest dropdown product'
+    product1.product_key
+  );
+  await expect(page.locator('[id="productItemSelector"]')).toContainText(
+    product2.product_key
   );
 
   await page
@@ -313,6 +350,7 @@ test('Product sales report test', async ({ page }) => {
     .click();
 
   await page.waitForURL('**/settings/schedules/**/edit');
+  trackScheduleFromUrl(page, api);
 
   await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
     'product_sales'
@@ -328,7 +366,10 @@ test('Product sales report test', async ({ page }) => {
     dayjs().add(1, 'day').format('YYYY-MM-DD')
   );
   await expect(page.locator('[id="productItemSelector"]')).toContainText(
-    'test create producttest dropdown product'
+    product1.product_key
+  );
+  await expect(page.locator('[id="productItemSelector"]')).toContainText(
+    product2.product_key
   );
   await expect(
     page.locator('[data-testid="combobox-input-field"]')
@@ -339,7 +380,7 @@ test('Product sales report test', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('Expense report test', async ({ page }) => {
+test('Expense report test', async ({ page, api }) => {
   await login(page);
 
   await page
@@ -399,6 +440,7 @@ test('Expense report test', async ({ page }) => {
     .click();
 
   await page.waitForURL('**/settings/schedules/**/edit');
+  trackScheduleFromUrl(page, api);
 
   await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
     'expense'
@@ -422,7 +464,25 @@ test('Expense report test', async ({ page }) => {
 
 test('Expense report test with clients, project and categories selectors', async ({
   page,
+  api,
 }) => {
+  // Create prerequisite entities via API
+  const apiCtx = await createApiContext(process.env.VITE_API_URL!);
+  const client = await createClientViaApi(apiCtx, {
+    name: uniqueName('sched-exp-client'),
+  });
+  api.trackEntity('clients', client.id);
+
+  const project = await createProjectViaApi(apiCtx, {
+    name: uniqueName('sched-exp-project'),
+    client_id: client.id,
+  });
+  api.trackEntity('projects', project.id);
+
+  const category = await createExpenseCategoryViaApi(apiCtx, {
+    name: uniqueName('sched-exp-cat'),
+  });
+
   await login(page);
 
   await page
@@ -454,7 +514,7 @@ test('Expense report test with clients, project and categories selectors', async
 
   await page
     .locator('#clientItemSelector')
-    .getByText('test create client', { exact: true })
+    .getByText(client.name, { exact: true })
     .first()
     .click();
 
@@ -462,7 +522,7 @@ test('Expense report test with clients, project and categories selectors', async
 
   await page
     .locator('#projectItemSelector')
-    .getByText('test assigned project', { exact: true })
+    .getByText(project.name, { exact: true })
     .first()
     .click();
 
@@ -470,7 +530,7 @@ test('Expense report test with clients, project and categories selectors', async
 
   await page
     .locator('#expenseCategoryItemSelector')
-    .getByText('testing create expense', { exact: true })
+    .getByText(category.name, { exact: true })
     .first()
     .click();
 
@@ -494,13 +554,13 @@ test('Expense report test with clients, project and categories selectors', async
     'last7_days'
   );
   await expect(page.locator('#clientItemSelector')).toContainText(
-    'test create client'
+    client.name
   );
   await expect(page.locator('#projectItemSelector')).toContainText(
-    'test assigned project'
+    project.name
   );
   await expect(page.locator('#expenseCategoryItemSelector')).toContainText(
-    'testing create expense'
+    category.name
   );
   await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
   await expect(page.locator('[id="statusSelector"]')).toContainText(
@@ -513,6 +573,7 @@ test('Expense report test with clients, project and categories selectors', async
     .click();
 
   await page.waitForURL('**/settings/schedules/**/edit');
+  trackScheduleFromUrl(page, api);
 
   await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
     'expense'
@@ -522,13 +583,13 @@ test('Expense report test with clients, project and categories selectors', async
     'last7_days'
   );
   await expect(page.locator('#clientItemSelector')).toContainText(
-    'test create client'
+    client.name
   );
   await expect(page.locator('#projectItemSelector')).toContainText(
-    'test assigned project'
+    project.name
   );
   await expect(page.locator('#expenseCategoryItemSelector')).toContainText(
-    'testing create expense'
+    category.name
   );
   await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
   await expect(page.locator('[id="statusSelector"]')).toContainText(
@@ -540,7 +601,18 @@ test('Expense report test with clients, project and categories selectors', async
   ).toBeVisible();
 });
 
-test('Product sales report test with filtering products', async ({ page }) => {
+test('Product sales report test with filtering products', async ({ page, api }) => {
+  // Create prerequisite products via API
+  const apiCtx = await createApiContext(process.env.VITE_API_URL!);
+  const product1 = await createProductViaApi(apiCtx, {
+    product_key: uniqueName('sched-filt-prod-1'),
+  });
+  api.trackEntity('products', product1.id);
+  const product2 = await createProductViaApi(apiCtx, {
+    product_key: uniqueName('sched-filt-prod-2'),
+  });
+  api.trackEntity('products', product2.id);
+
   await login(page);
 
   await page
@@ -558,11 +630,11 @@ test('Product sales report test with filtering products', async ({ page }) => {
     .locator('[id="productItemSelector"]')
     .locator('[type="text"]')
     .first()
-    .fill('test actions product');
+    .fill(product1.product_key);
 
   await page.waitForTimeout(200);
 
-  await page.getByText('test actions product', { exact: true }).click();
+  await page.getByText(product1.product_key, { exact: true }).click();
 
   await page.waitForTimeout(200);
 
@@ -570,11 +642,11 @@ test('Product sales report test with filtering products', async ({ page }) => {
     .locator('[id="productItemSelector"]')
     .locator('[type="text"]')
     .first()
-    .fill('test view product');
+    .fill(product2.product_key);
 
   await page.waitForTimeout(200);
 
-  await page.getByText('test view product', { exact: true }).first().click();
+  await page.getByText(product2.product_key, { exact: true }).first().click();
 
   await page.locator('[data-testid="combobox-input-field"]').click();
 
@@ -619,7 +691,10 @@ test('Product sales report test with filtering products', async ({ page }) => {
     dayjs().add(1, 'day').format('YYYY-MM-DD')
   );
   await expect(page.locator('[id="productItemSelector"]')).toContainText(
-    'test actions producttest view product'
+    product1.product_key
+  );
+  await expect(page.locator('[id="productItemSelector"]')).toContainText(
+    product2.product_key
   );
 
   await page
@@ -628,6 +703,7 @@ test('Product sales report test with filtering products', async ({ page }) => {
     .click();
 
   await page.waitForURL('**/settings/schedules/**/edit');
+  trackScheduleFromUrl(page, api);
 
   await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
     'product_sales'
@@ -643,7 +719,10 @@ test('Product sales report test with filtering products', async ({ page }) => {
     dayjs().add(1, 'day').format('YYYY-MM-DD')
   );
   await expect(page.locator('[id="productItemSelector"]')).toContainText(
-    'test actions producttest view product'
+    product1.product_key
+  );
+  await expect(page.locator('[id="productItemSelector"]')).toContainText(
+    product2.product_key
   );
   await expect(
     page.locator('[data-testid="combobox-input-field"]')

@@ -4,18 +4,24 @@ import {
   logout,
   permissions,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { createClient } from './client-helpers';
 
 interface CreateParams {
   page: Page;
   isTableEditable?: boolean;
   withNavigation?: boolean;
+  clientName?: string;
 }
 const createPayment = async (params: CreateParams) => {
-  const { page, isTableEditable = true } = params;
+  const { page, isTableEditable = true, clientName } = params;
 
-  await createClient({ page, createIfNotExist: true });
+  await createClient({
+    page,
+    createIfNotExist: true,
+    name: clientName,
+  });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -106,8 +112,10 @@ test("can't view payments without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view payment', async ({ page }) => {
+test('can view payment', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('pay-client');
 
   await login(page);
   await clear('payments@example.com');
@@ -116,7 +124,12 @@ test('can view payment', async ({ page }) => {
 
   await createPayment({
     page,
+    clientName,
   });
+
+  await page.waitForURL('**/payments/**/edit');
+  const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('payments', createdId);
 
   await logout(page);
 
@@ -138,15 +151,21 @@ test('can view payment', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit payment', async ({ page }) => {
+test('can edit payment', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('pay-client');
 
   await login(page);
   await clear('payments@example.com');
   await set('edit_payment');
   await save();
 
-  await createPayment({ page });
+  await createPayment({ page, clientName });
+
+  await page.waitForURL('**/payments/**/edit');
+  const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('payments', createdId);
 
   await logout(page);
 
@@ -179,8 +198,10 @@ test('can edit payment', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a payment', async ({ page }) => {
+test('can create a payment', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('pay-client');
 
   await login(page);
   await clear('payments@example.com');
@@ -193,7 +214,12 @@ test('can create a payment', async ({ page }) => {
   await createPayment({
     page,
     isTableEditable: false,
+    clientName,
   });
+
+  await page.waitForURL('**/payments/**/edit');
+  const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('payments', createdId);
 
   await checkEditPage(page, true, false);
 
@@ -209,8 +235,10 @@ test('can create a payment', async ({ page }) => {
   await logout(page);
 });
 
-test('deleting payment with edit_payment', async ({ page }) => {
+test('deleting payment with edit_payment', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('pay-client');
 
   await login(page);
   await clear('payments@example.com');
@@ -233,7 +261,11 @@ test('deleting payment with edit_payment', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createPayment({ page, withNavigation: false });
+    await createPayment({ page, withNavigation: false, clientName });
+
+    await page.waitForURL('**/payments/**/edit');
+    const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('payments', createdId);
 
     const moreActionsButton = page
       .getByRole('button')
@@ -262,8 +294,10 @@ test('deleting payment with edit_payment', async ({ page }) => {
   }
 });
 
-test('archiving payment with edit_payment', async ({ page }) => {
+test('archiving payment with edit_payment', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('pay-client');
 
   await login(page);
   await clear('payments@example.com');
@@ -286,7 +320,11 @@ test('archiving payment with edit_payment', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createPayment({ page, withNavigation: false });
+    await createPayment({ page, withNavigation: false, clientName });
+
+    await page.waitForURL('**/payments/**/edit');
+    const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('payments', createdId);
 
     const moreActionsButton = page
       .getByRole('button')
@@ -316,8 +354,10 @@ test('archiving payment with edit_payment', async ({ page }) => {
   }
 });
 
-test('payment documents preview with edit_payment', async ({ page }) => {
+test('payment documents preview with edit_payment', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('pay-client');
 
   await login(page);
   await clear('payments@example.com');
@@ -340,7 +380,11 @@ test('payment documents preview with edit_payment', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createPayment({ page, withNavigation: false });
+    await createPayment({ page, withNavigation: false, clientName });
+
+    await page.waitForURL('**/payments/**/edit');
+    const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('payments', createdId);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -365,8 +409,10 @@ test('payment documents preview with edit_payment', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test('payment documents uploading with edit_payment', async ({ page }) => {
+test('payment documents uploading with edit_payment', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('pay-client');
 
   await login(page);
   await clear('payments@example.com');
@@ -389,7 +435,11 @@ test('payment documents uploading with edit_payment', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createPayment({ page, withNavigation: false });
+    await createPayment({ page, withNavigation: false, clientName });
+
+    await page.waitForURL('**/payments/**/edit');
+    const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('payments', createdId);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -424,10 +474,17 @@ test('payment documents uploading with edit_payment', async ({ page }) => {
 
 test('rendering documents and custom_fields tabs with admin permission', async ({
   page,
+  api,
 }) => {
+  const clientName = uniqueName('pay-client');
+
   await login(page);
 
-  await createPayment({ page });
+  await createPayment({ page, clientName });
+
+  await page.waitForURL('**/payments/**/edit');
+  const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('payments', createdId);
 
   await page
     .locator('[data-cy="tabs"]')

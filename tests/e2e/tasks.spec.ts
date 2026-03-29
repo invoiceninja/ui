@@ -7,7 +7,8 @@ import {
   permissions,
   useHasPermission,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
 
@@ -94,7 +95,12 @@ interface CreateParams {
 const createTask = async (params: CreateParams) => {
   const { page, isTableEditable = true, assignTo } = params;
 
-  await createClient({ page, withNavigation: true, createIfNotExist: true });
+  await createClient({
+    page,
+    withNavigation: true,
+    createIfNotExist: true,
+    name: uniqueName('task-client'),
+  });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -138,7 +144,7 @@ test("can't view tasks without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view task', async ({ page }) => {
+test('can view task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -147,6 +153,9 @@ test('can view task', async ({ page }) => {
   await save();
 
   await createTask({ page });
+
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
 
   await logout(page);
 
@@ -168,7 +177,7 @@ test('can view task', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit task', async ({ page }) => {
+test('can edit task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
@@ -181,6 +190,9 @@ test('can edit task', async ({ page }) => {
   await save();
 
   await createTask({ page });
+
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
 
   await logout(page);
 
@@ -215,7 +227,7 @@ test('can edit task', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a task', async ({ page }) => {
+test('can create a task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
@@ -231,6 +243,9 @@ test('can create a task', async ({ page }) => {
   await login(page, 'tasks@example.com', 'password');
 
   await createTask({ page, isTableEditable: false });
+
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
 
   await checkEditPage(page, true, false);
 
@@ -250,7 +265,10 @@ test('can create a task', async ({ page }) => {
   await logout(page);
 });
 
-test('can view and edit assigned task with create_task', async ({ page }) => {
+test('can view and edit assigned task with create_task', async ({
+  page,
+  api,
+}) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
@@ -263,6 +281,9 @@ test('can view and edit assigned task with create_task', async ({ page }) => {
   await save();
 
   await createTask({ page, assignTo: 'Tasks Example' });
+
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
 
   await logout(page);
 
@@ -297,7 +318,7 @@ test('can view and edit assigned task with create_task', async ({ page }) => {
   await logout(page);
 });
 
-test('deleting task with edit_task', async ({ page }) => {
+test('deleting task with edit_task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -323,6 +344,9 @@ test('deleting task with edit_task', async ({ page }) => {
   if (!doRecordsExist) {
     await createTask({ page });
 
+    const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('tasks', id);
+
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
       .first();
@@ -345,7 +369,7 @@ test('deleting task with edit_task', async ({ page }) => {
   }
 });
 
-test('archiving task withe edit_task', async ({ page }) => {
+test('archiving task withe edit_task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -370,6 +394,9 @@ test('archiving task withe edit_task', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createTask({ page });
+
+    const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('tasks', id);
 
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
@@ -397,7 +424,7 @@ test('archiving task withe edit_task', async ({ page }) => {
   }
 });
 
-test('task documents preview with edit_task', async ({ page }) => {
+test('task documents preview with edit_task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -422,6 +449,9 @@ test('task documents preview with edit_task', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createTask({ page });
+
+    const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('tasks', id);
   } else {
     await tableRow
       .getByRole('button')
@@ -445,7 +475,7 @@ test('task documents preview with edit_task', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test('task documents uploading with edit_task', async ({ page }) => {
+test('task documents uploading with edit_task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -470,6 +500,9 @@ test('task documents uploading with edit_task', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createTask({ page });
+
+    const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('tasks', id);
   } else {
     await tableRow
       .getByRole('button')
@@ -503,6 +536,7 @@ test('task documents uploading with edit_task', async ({ page }) => {
 
 test('all actions in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -520,6 +554,9 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await createTask({ page });
 
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
+
   await checkEditPage(page, true, true);
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
@@ -531,6 +568,7 @@ test('all actions in dropdown displayed with admin permission', async ({
 
 test('invoice_task and clone action displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -548,6 +586,9 @@ test('invoice_task and clone action displayed with creation permissions', async 
 
   await createTask({ page, isTableEditable: false });
 
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
+
   await checkEditPage(page, true, false);
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
@@ -557,7 +598,7 @@ test('invoice_task and clone action displayed with creation permissions', async 
   await logout(page);
 });
 
-test('cloning task', async ({ page }) => {
+test('cloning task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -586,6 +627,9 @@ test('cloning task', async ({ page }) => {
   if (!doRecordsExist) {
     await createTask({ page });
 
+    const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('tasks', id);
+
     await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
     await tableRow
@@ -605,12 +649,15 @@ test('cloning task', async ({ page }) => {
 
   await page.waitForURL('**/tasks/**/edit');
 
+  const clonedId = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (clonedId) api.trackEntity('tasks', clonedId);
+
   await expect(
     page.getByRole('heading', { name: 'Edit Task' }).first()
   ).toBeVisible();
 });
 
-test('Invoice Task displayed with admin permission', async ({ page }) => {
+test('Invoice Task displayed with admin permission', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomTaskActions({
@@ -626,6 +673,9 @@ test('Invoice Task displayed with admin permission', async ({ page }) => {
   await login(page, 'tasks@example.com', 'password');
 
   await createTask({ page });
+
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
 
   await checkEditPage(page, true, true);
 
@@ -648,7 +698,10 @@ test('Invoice Task displayed with admin permission', async ({ page }) => {
   await logout(page);
 });
 
-test('Invoice Task displayed with creation permissions', async ({ page }) => {
+test('Invoice Task displayed with creation permissions', async ({
+  page,
+  api,
+}) => {
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomTaskActions({
@@ -670,6 +723,9 @@ test('Invoice Task displayed with creation permissions', async ({ page }) => {
   await login(page, 'tasks@example.com', 'password');
 
   await createTask({ page });
+
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
 
   await checkEditPage(page, true, false);
 

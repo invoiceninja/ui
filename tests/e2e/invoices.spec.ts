@@ -7,7 +7,8 @@ import {
   permissions,
   useHasPermission,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
 import dayjs from 'dayjs';
@@ -124,11 +125,17 @@ interface CreateParams {
   page: Page;
   assignTo?: string;
   isTableEditable?: boolean;
+  clientName?: string;
 }
 const createInvoice = async (params: CreateParams) => {
-  const { page, isTableEditable = true, assignTo } = params;
+  const { page, isTableEditable = true, assignTo, clientName } = params;
 
-  await createClient({ page, withNavigation: true, createIfNotExist: true });
+  await createClient({
+    page,
+    withNavigation: true,
+    createIfNotExist: true,
+    name: clientName ?? uniqueName('inv-client'),
+  });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -162,7 +169,7 @@ const createInvoice = async (params: CreateParams) => {
   await expect(page.getByText('Successfully created invoice')).toBeVisible();
 };
 
-test("can't view invoices without permission", async ({ page }) => {
+test("can't view invoices without permission", async ({ page, api }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -179,7 +186,7 @@ test("can't view invoices without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view invoice', async ({ page }) => {
+test('can view invoice', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -187,7 +194,11 @@ test('can view invoice', async ({ page }) => {
   await set('view_invoice', 'view_client');
   await save();
 
-  await createInvoice({ page });
+  const clientName = uniqueName('inv-view');
+  await createInvoice({ page, clientName });
+
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
 
   await logout(page);
 
@@ -209,7 +220,7 @@ test('can view invoice', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit invoice', async ({ page }) => {
+test('can edit invoice', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
@@ -221,7 +232,11 @@ test('can edit invoice', async ({ page }) => {
   await set('edit_invoice', 'view_client');
   await save();
 
-  await createInvoice({ page });
+  const clientName = uniqueName('inv-edit');
+  await createInvoice({ page, clientName });
+
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
 
   await logout(page);
 
@@ -256,7 +271,7 @@ test('can edit invoice', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a invoice', async ({ page }) => {
+test('can create a invoice', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
@@ -271,7 +286,11 @@ test('can create a invoice', async ({ page }) => {
 
   await login(page, 'invoices@example.com', 'password');
 
-  await createInvoice({ page, isTableEditable: false });
+  const clientName = uniqueName('inv-create');
+  await createInvoice({ page, isTableEditable: false, clientName });
+
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
 
   await checkEditPage(page, true, false, '**/invoices/**/edit**');
 
@@ -293,6 +312,7 @@ test('can create a invoice', async ({ page }) => {
 
 test('can view and edit assigned invoice with create_invoice', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -305,7 +325,11 @@ test('can view and edit assigned invoice with create_invoice', async ({
   await set('create_invoice');
   await save();
 
-  await createInvoice({ page, assignTo: 'Invoices Example' });
+  const clientName = uniqueName('inv-assigned');
+  await createInvoice({ page, assignTo: 'Invoices Example', clientName });
+
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
 
   await logout(page);
 
@@ -340,7 +364,7 @@ test('can view and edit assigned invoice with create_invoice', async ({
   await logout(page);
 });
 
-test('deleting invoice with edit_invoice', async ({ page }) => {
+test('deleting invoice with edit_invoice', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -364,7 +388,11 @@ test('deleting invoice with edit_invoice', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createInvoice({ page });
+    const clientName = uniqueName('inv-del');
+    await createInvoice({ page, clientName });
+
+    const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+    if (invoiceId) api.trackEntity('invoices', invoiceId);
 
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
@@ -388,7 +416,7 @@ test('deleting invoice with edit_invoice', async ({ page }) => {
   }
 });
 
-test('archiving invoice withe edit_invoice', async ({ page }) => {
+test('archiving invoice withe edit_invoice', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -412,7 +440,11 @@ test('archiving invoice withe edit_invoice', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createInvoice({ page });
+    const clientName = uniqueName('inv-arch');
+    await createInvoice({ page, clientName });
+
+    const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+    if (invoiceId) api.trackEntity('invoices', invoiceId);
 
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
@@ -441,7 +473,7 @@ test('archiving invoice withe edit_invoice', async ({ page }) => {
   }
 });
 
-test('invoice documents preview with edit_invoice', async ({ page }) => {
+test('invoice documents preview with edit_invoice', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -465,7 +497,11 @@ test('invoice documents preview with edit_invoice', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createInvoice({ page });
+    const clientName = uniqueName('inv-docprev');
+    await createInvoice({ page, clientName });
+
+    const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+    if (invoiceId) api.trackEntity('invoices', invoiceId);
 
     await page.waitForURL('**/invoices/**/edit**');
   } else {
@@ -490,7 +526,7 @@ test('invoice documents preview with edit_invoice', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test('invoice documents uploading with edit_invoice', async ({ page }) => {
+test('invoice documents uploading with edit_invoice', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -514,7 +550,11 @@ test('invoice documents uploading with edit_invoice', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createInvoice({ page });
+    const clientName = uniqueName('inv-docup');
+    await createInvoice({ page, clientName });
+
+    const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+    if (invoiceId) api.trackEntity('invoices', invoiceId);
 
     await page.waitForURL('**/invoices/**/edit**');
   } else {
@@ -549,6 +589,7 @@ test('invoice documents uploading with edit_invoice', async ({ page }) => {
 
 test('all actions in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -564,7 +605,11 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await login(page, 'invoices@example.com', 'password');
 
-  await createInvoice({ page });
+  const clientName = uniqueName('inv-admin');
+  await createInvoice({ page, clientName });
+
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
 
   await checkEditPage(page, true, true, '**/invoices/**/edit**');
 
@@ -577,6 +622,7 @@ test('all actions in dropdown displayed with admin permission', async ({
 
 test('Enter Payment and all clone actions displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -609,7 +655,11 @@ test('Enter Payment and all clone actions displayed with creation permissions', 
 
   await login(page, 'invoices@example.com', 'password');
 
-  await createInvoice({ page, isTableEditable: false });
+  const clientName = uniqueName('inv-clone-actions');
+  await createInvoice({ page, isTableEditable: false, clientName });
+
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
 
   await checkEditPage(page, true, false, '**/invoices/**/edit**');
 
@@ -620,7 +670,7 @@ test('Enter Payment and all clone actions displayed with creation permissions', 
   await logout(page);
 });
 
-test('cloning invoice', async ({ page }) => {
+test('cloning invoice', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -647,7 +697,11 @@ test('cloning invoice', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createInvoice({ page });
+    const clientName = uniqueName('inv-clone');
+    await createInvoice({ page, clientName });
+
+    const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+    if (invoiceId) api.trackEntity('invoices', invoiceId);
 
     const moreActionsButton = page.locator('[data-cy="chevronDownButton"]');
 
@@ -671,12 +725,15 @@ test('cloning invoice', async ({ page }) => {
 
   await page.waitForURL('**/invoices/**/edit**');
 
+  const clonedInvoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (clonedInvoiceId) api.trackEntity('invoices', clonedInvoiceId);
+
   await expect(
     page.getByRole('heading', { name: 'Edit Invoice' }).first()
   ).toBeVisible();
 });
 
-test('Enter Payment displayed with admin permission', async ({ page }) => {
+test('Enter Payment displayed with admin permission', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomInvoiceActions({
@@ -691,7 +748,11 @@ test('Enter Payment displayed with admin permission', async ({ page }) => {
 
   await login(page, 'invoices@example.com', 'password');
 
-  await createInvoice({ page });
+  const clientName = uniqueName('inv-pay-admin');
+  await createInvoice({ page, clientName });
+
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
 
   await checkEditPage(page, true, true, '**/invoices/**/edit**');
 
@@ -714,7 +775,10 @@ test('Enter Payment displayed with admin permission', async ({ page }) => {
   await logout(page);
 });
 
-test('Enter Payment displayed with creation permissions', async ({ page }) => {
+test('Enter Payment displayed with creation permissions', async ({
+  page,
+  api,
+}) => {
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomInvoiceActions({
@@ -747,7 +811,11 @@ test('Enter Payment displayed with creation permissions', async ({ page }) => {
 
   await login(page, 'invoices@example.com', 'password');
 
-  await createInvoice({ page });
+  const clientName = uniqueName('inv-pay-create');
+  await createInvoice({ page, clientName });
+
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
 
   await checkEditPage(page, true, false, '**/invoices/**/edit**');
 
@@ -772,7 +840,11 @@ test('Enter Payment displayed with creation permissions', async ({ page }) => {
 
 test('Second and Third Custom email sending template is displayed', async ({
   page,
+  api,
+  settingsGuard,
 }) => {
+  await settingsGuard.snapshot();
+
   await login(page);
 
   await page
@@ -812,7 +884,8 @@ test('Second and Third Custom email sending template is displayed', async ({
     .locator('[data-cy="templateSelector"]')
     .selectOption({ label: 'Second Custom' });
 
-  await page.locator('#subject').fill('testing subject second custom');
+  const secondSubject = uniqueName('second-custom');
+  await page.locator('#subject').fill(secondSubject);
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -825,7 +898,8 @@ test('Second and Third Custom email sending template is displayed', async ({
     .locator('[data-cy="templateSelector"]')
     .selectOption({ label: 'Third Custom' });
 
-  await page.locator('#subject').fill('testing subject third custom');
+  const thirdSubject = uniqueName('third-custom');
+  await page.locator('#subject').fill(thirdSubject);
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -851,16 +925,20 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await page.getByRole('button', { name: 'Send Email', exact: true }).click();
 
-  await expect(page.getByText('testing subject second custom')).toBeVisible();
-  await expect(page.getByText('testing subject third custom')).toBeVisible();
+  await expect(page.getByText(secondSubject)).toBeVisible();
+  await expect(page.getByText(thirdSubject)).toBeVisible();
 
   await logout(page);
 });
 
-test('Prevent navigation in the main navbar', async ({ page }) => {
+test('Prevent navigation in the main navbar', async ({ page, api }) => {
   await login(page);
 
-  await createInvoice({ page });
+  const clientName = uniqueName('inv-nav');
+  await createInvoice({ page, clientName });
+
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
 
   await page.waitForURL('**/invoices/**/edit**');
 
@@ -906,10 +984,14 @@ test('Prevent navigation in the main navbar', async ({ page }) => {
   await logout(page);
 });
 
-test('Prevent archive invoice action', async ({ page }) => {
+test('Prevent archive invoice action', async ({ page, api }) => {
   await login(page);
 
-  await createInvoice({ page });
+  const clientName = uniqueName('inv-prev-arch');
+  await createInvoice({ page, clientName });
+
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
 
   await page.waitForURL('**/invoices/**/edit**');
 
@@ -953,10 +1035,14 @@ test('Prevent archive invoice action', async ({ page }) => {
   await logout(page);
 });
 
-test('Prevent email invoice action', async ({ page }) => {
+test('Prevent email invoice action', async ({ page, api }) => {
   await login(page);
 
-  await createInvoice({ page });
+  const clientName = uniqueName('inv-prev-email');
+  await createInvoice({ page, clientName });
+
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
 
   await page.waitForURL('**/invoices/**/edit**');
 
@@ -1000,10 +1086,14 @@ test('Prevent email invoice action', async ({ page }) => {
   await logout(page);
 });
 
-test('Prevent back button', async ({ page }) => {
+test('Prevent back button', async ({ page, api }) => {
   await login(page);
 
-  await createInvoice({ page });
+  const clientName = uniqueName('inv-prev-back');
+  await createInvoice({ page, clientName });
+
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
 
   await page.waitForURL('**/invoices/**/edit**');
 
@@ -1043,7 +1133,7 @@ test('Prevent back button', async ({ page }) => {
   await logout(page);
 });
 
-test('Products combobox various selections', async ({ page }) => {
+test('Products combobox various selections', async ({ page, api }) => {
   await login(page);
 
   await page
@@ -1121,18 +1211,22 @@ test('Products combobox various selections', async ({ page }) => {
 
   await page.waitForTimeout(500);
 
+  const testProductName = uniqueName('test-product');
   await page
     .locator('[data-cy="comboboxInput"]')
     .nth(3)
-    .fill('test product name');
+    .fill(testProductName);
 
   await page.getByRole('button', { name: 'Save' }).click();
 
   await expect(page.getByText('Successfully created invoice')).toBeVisible();
 
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
+
   expect(
     (await page.locator('[data-cy="comboboxInput"]').nth(3).inputValue()) ===
-      'test product name'
+      testProductName
   ).toBeTruthy();
 
   await logout(page);

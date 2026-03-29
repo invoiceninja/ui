@@ -7,7 +7,8 @@ import {
   permissions,
   useHasPermission,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createExpenseCategory } from './expense-categories-helpers';
 import { createTaxRate } from './taxes-helpers';
@@ -116,7 +117,7 @@ test("can't view expenses without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view expense', async ({ page }) => {
+test('can view expense', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -125,6 +126,10 @@ test('can view expense', async ({ page }) => {
   await save();
 
   await createExpense({ page });
+
+  await page.waitForURL('**/expenses/**/edit');
+  const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('expenses', createdId);
 
   await logout(page);
 
@@ -146,7 +151,7 @@ test('can view expense', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit expense', async ({ page }) => {
+test('can edit expense', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useExpensesActions({
@@ -159,6 +164,10 @@ test('can edit expense', async ({ page }) => {
   await save();
 
   await createExpense({ page });
+
+  await page.waitForURL('**/expenses/**/edit');
+  const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('expenses', createdId);
 
   await logout(page);
 
@@ -193,7 +202,7 @@ test('can edit expense', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a expense', async ({ page }) => {
+test('can create a expense', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useExpensesActions({
@@ -209,6 +218,10 @@ test('can create a expense', async ({ page }) => {
   await login(page, 'expenses@example.com', 'password');
 
   await createExpense({ page, isTableEditable: false });
+
+  await page.waitForURL('**/expenses/**/edit');
+  const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('expenses', createdId);
 
   await checkEditPage(page, true);
 
@@ -230,6 +243,7 @@ test('can create a expense', async ({ page }) => {
 
 test('can view and edit assigned expense with create_expense', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -247,6 +261,10 @@ test('can view and edit assigned expense with create_expense', async ({
     assignTo: 'Expenses Example',
     returnCreditNumber: true,
   });
+
+  await page.waitForURL('**/expenses/**/edit');
+  const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('expenses', createdId);
 
   await logout(page);
 
@@ -279,7 +297,7 @@ test('can view and edit assigned expense with create_expense', async ({
   await logout(page);
 });
 
-test('deleting expense with edit_expense', async ({ page }) => {
+test('deleting expense with edit_expense', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -304,6 +322,10 @@ test('deleting expense with edit_expense', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createExpense({ page });
+
+    await page.waitForURL('**/expenses/**/edit');
+    const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('expenses', createdId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -321,7 +343,7 @@ test('deleting expense with edit_expense', async ({ page }) => {
   await expect(page.getByText('Successfully deleted expense')).toBeVisible();
 });
 
-test('archiving expense with edit_expense', async ({ page }) => {
+test('archiving expense with edit_expense', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -346,6 +368,10 @@ test('archiving expense with edit_expense', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createExpense({ page });
+
+    await page.waitForURL('**/expenses/**/edit');
+    const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('expenses', createdId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -367,7 +393,7 @@ test('archiving expense with edit_expense', async ({ page }) => {
   await expect(page.getByText('Successfully archived expense')).toBeVisible();
 });
 
-test('expense documents preview with edit_expense', async ({ page }) => {
+test('expense documents preview with edit_expense', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -392,6 +418,10 @@ test('expense documents preview with edit_expense', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createExpense({ page });
+
+    await page.waitForURL('**/expenses/**/edit');
+    const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('expenses', createdId);
   } else {
     await tableRow
       .getByRole('button')
@@ -415,7 +445,7 @@ test('expense documents preview with edit_expense', async ({ page }) => {
   await expect(page.getByText('Drop files or click to upload')).toBeVisible();
 });
 
-test('expense documents uploading with edit_expense', async ({ page }) => {
+test('expense documents uploading with edit_expense', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -440,6 +470,10 @@ test('expense documents uploading with edit_expense', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createExpense({ page });
+
+    await page.waitForURL('**/expenses/**/edit');
+    const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('expenses', createdId);
   } else {
     await tableRow
       .getByRole('button')
@@ -473,6 +507,7 @@ test('expense documents uploading with edit_expense', async ({ page }) => {
 
 test('all actions in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -490,6 +525,10 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await createExpense({ page });
 
+  await page.waitForURL('**/expenses/**/edit');
+  const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('expenses', createdId);
+
   await checkEditPage(page, true);
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
@@ -501,6 +540,7 @@ test('all actions in dropdown displayed with admin permission', async ({
 
 test('all clone actions displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -518,6 +558,10 @@ test('all clone actions displayed with creation permissions', async ({
 
   await createExpense({ page, isTableEditable: false });
 
+  await page.waitForURL('**/expenses/**/edit');
+  const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('expenses', createdId);
+
   await checkEditPage(page, true);
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
@@ -527,7 +571,7 @@ test('all clone actions displayed with creation permissions', async ({
   await logout(page);
 });
 
-test('cloning expense', async ({ page }) => {
+test('cloning expense', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -556,6 +600,10 @@ test('cloning expense', async ({ page }) => {
   if (!doRecordsExist) {
     await createExpense({ page });
 
+    await page.waitForURL('**/expenses/**/edit');
+    const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('expenses', createdId);
+
     await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
     await tableRow
@@ -575,6 +623,9 @@ test('cloning expense', async ({ page }) => {
 
   await page.waitForURL('**/expenses/**/edit');
 
+  const clonedId = page.url().match(/expenses\/([^/]+)/)?.[1];
+  if (clonedId) api.trackEntity('expenses', clonedId);
+
   await expect(
     page.getByRole('heading', { name: 'Edit Expense' }).first()
   ).toBeVisible();
@@ -582,12 +633,15 @@ test('cloning expense', async ({ page }) => {
 
 test('Expense categories endpoint contains sort but not with parameter', async ({
   page,
+  api,
 }) => {
+  const expenseCategoryName = uniqueName('expense-cat-sort');
+
   await login(page);
 
   await createExpenseCategory({
     page,
-    categoryName: 'testing expense category 1',
+    categoryName: expenseCategoryName,
   });
 
   await page
@@ -602,7 +656,7 @@ test('Expense categories endpoint contains sort but not with parameter', async (
 
   await page.getByTestId('combobox-input-field').nth(3).click();
   await page
-    .getByRole('option', { name: 'testing expense category 1' })
+    .getByRole('option', { name: expenseCategoryName })
     .first()
     .click();
 
@@ -611,6 +665,9 @@ test('Expense categories endpoint contains sort but not with parameter', async (
   await expect(page.getByText('Successfully created expense')).toBeVisible();
 
   await page.waitForURL('**/expenses/**/edit');
+
+  const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('expenses', createdId);
 
   await page.reload();
 
@@ -626,12 +683,15 @@ test('Expense categories endpoint contains sort but not with parameter', async (
 
 test('Expense categories endpoint contains with but not sort parameter', async ({
   page,
+  api,
 }) => {
+  const expenseCategoryName = uniqueName('expense-cat-with');
+
   await login(page);
 
   await createExpenseCategory({
     page,
-    categoryName: 'testing expense category 2',
+    categoryName: expenseCategoryName,
   });
 
   await page
@@ -648,12 +708,12 @@ test('Expense categories endpoint contains with but not sort parameter', async (
   await page
     .getByTestId('combobox-input-field')
     .nth(3)
-    .fill('testing expense category 2');
+    .fill(expenseCategoryName);
 
   await page.waitForTimeout(300);
 
   await page
-    .getByRole('option', { name: 'testing expense category 2' })
+    .getByRole('option', { name: expenseCategoryName })
     .first()
     .click();
 
@@ -662,6 +722,9 @@ test('Expense categories endpoint contains with but not sort parameter', async (
   await expect(page.getByText('Successfully created expense')).toBeVisible();
 
   await page.waitForURL('**/expenses/**/edit');
+
+  const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('expenses', createdId);
 
   await page.reload();
 
@@ -674,10 +737,14 @@ test('Expense categories endpoint contains with but not sort parameter', async (
 
   await logout(page);
 });
+
 test('Checking should_be_invoiced expense settings value on expense creation page', async ({
   page,
+  settingsGuard,
 }) => {
   await login(page);
+
+  await settingsGuard.snapshot();
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -715,8 +782,11 @@ test('Checking should_be_invoiced expense settings value on expense creation pag
 
 test('Checking mark_paid expense settings value on expense creation page', async ({
   page,
+  settingsGuard,
 }) => {
   await login(page);
+
+  await settingsGuard.snapshot();
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -752,8 +822,11 @@ test('Checking mark_paid expense settings value on expense creation page', async
 
 test('Checking convert_currency expense settings value on expense creation page', async ({
   page,
+  settingsGuard,
 }) => {
   await login(page);
+
+  await settingsGuard.snapshot();
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -789,8 +862,11 @@ test('Checking convert_currency expense settings value on expense creation page'
 
 test('Checking add_documents_to_invoice expense settings value on expense creation page', async ({
   page,
+  settingsGuard,
 }) => {
   await login(page);
+
+  await settingsGuard.snapshot();
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -828,12 +904,17 @@ test('Checking add_documents_to_invoice expense settings value on expense creati
   await logout(page);
 });
 
-test('Checking the gross amount by rate', async ({ page }) => {
+test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) => {
+  const taxRate10Name = uniqueName('tax-rate-10');
+  const taxRate20Name = uniqueName('tax-rate-20');
+
   await login(page);
 
-  await createTaxRate({ page, taxName: 'tax_rate_10', rate: 10 });
+  await settingsGuard.snapshot();
 
-  await createTaxRate({ page, taxName: 'tax_rate_20', rate: 20 });
+  await createTaxRate({ page, taxName: taxRate10Name, rate: 10 });
+
+  await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
 
   await page
     .getByRole('link', { name: 'Tax Settings', exact: true })
@@ -855,36 +936,33 @@ test('Checking the gross amount by rate', async ({ page }) => {
     .getByRole('link', { name: 'Expenses', exact: true })
     .click();
 
-  const tableBody = page.locator('tbody').first();
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  await tableRow
-    .getByRole('button')
-    .filter({ has: page.getByText('Actions') })
-    .first()
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'Enter Expense' })
     .click();
 
-  await page.getByText('Edit', { exact: true }).first().click();
+  await page.waitForURL('**/expenses/create');
+
+  await page.waitForTimeout(300);
 
   await page.getByTestId('combobox-input-field').nth(5).click();
-  await page.getByText('tax_rate_10').click();
+  await page.getByText(taxRate10Name).click();
   await page.getByTestId('combobox-input-field').nth(5).blur();
 
   await page.getByTestId('combobox-input-field').nth(6).click();
-  await page.getByText('tax_rate_20').click();
+  await page.getByText(taxRate20Name).click();
   await page.getByTestId('combobox-input-field').nth(6).blur();
 
   await page.locator('[type="number"]').first().fill('12222');
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'Save', exact: true })
-    .click();
+  await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(
-    page.getByText('Successfully updated expense', { exact: true })
-  ).toBeVisible();
+  await expect(page.getByText('Successfully created expense')).toBeVisible();
+
+  await page.waitForURL('**/expenses/**/edit');
+
+  const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('expenses', createdId);
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -898,36 +976,69 @@ test('Checking the gross amount by rate', async ({ page }) => {
 
 test('Checking the gross amount with inclusive taxes turned on', async ({
   page,
+  api,
+  settingsGuard,
 }) => {
+  const taxRate10Name = uniqueName('tax-rate-10-incl');
+  const taxRate20Name = uniqueName('tax-rate-20-incl');
+
   await login(page);
+
+  await settingsGuard.snapshot();
+
+  await createTaxRate({ page, taxName: taxRate10Name, rate: 10 });
+
+  await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
+
+  await page
+    .getByRole('link', { name: 'Tax Settings', exact: true })
+    .first()
+    .click();
+
+  if ((await page.locator('#enabled_expense_tax_rates').inputValue()) !== '2') {
+    await page
+      .locator('#enabled_expense_tax_rates')
+      .selectOption({ label: 'Two Tax Rates' });
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
 
   await page
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Expenses', exact: true })
     .click();
 
-  const tableBody = page.locator('tbody').first();
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  await tableRow
-    .getByRole('button')
-    .filter({ has: page.getByText('Actions') })
-    .first()
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'Enter Expense' })
     .click();
 
-  await page.getByText('Edit', { exact: true }).first().click();
+  await page.waitForURL('**/expenses/create');
+
+  await page.waitForTimeout(300);
+
+  await page.getByTestId('combobox-input-field').nth(5).click();
+  await page.getByText(taxRate10Name).click();
+  await page.getByTestId('combobox-input-field').nth(5).blur();
+
+  await page.getByTestId('combobox-input-field').nth(6).click();
+  await page.getByText(taxRate20Name).click();
+  await page.getByTestId('combobox-input-field').nth(6).blur();
+
+  await page.locator('[type="number"]').first().fill('12222');
 
   await page.locator('[data-cy="inclusiveTaxesToggle"]').first().check();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'Save', exact: true })
-    .click();
+  await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(
-    page.getByText('Successfully updated expense', { exact: true })
-  ).toBeVisible();
+  await expect(page.getByText('Successfully created expense')).toBeVisible();
+
+  await page.waitForURL('**/expenses/**/edit');
+
+  const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('expenses', createdId);
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -939,43 +1050,67 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
   await logout(page);
 });
 
-test('Checking the gross amount by amount', async ({ page }) => {
+test('Checking the gross amount by amount', async ({ page, api, settingsGuard }) => {
+  const taxRate10Name = uniqueName('tax-rate-10-amt');
+  const taxRate20Name = uniqueName('tax-rate-20-amt');
+
   await login(page);
+
+  await settingsGuard.snapshot();
+
+  await createTaxRate({ page, taxName: taxRate10Name, rate: 10 });
+
+  await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
+
+  await page
+    .getByRole('link', { name: 'Tax Settings', exact: true })
+    .first()
+    .click();
+
+  if ((await page.locator('#enabled_expense_tax_rates').inputValue()) !== '2') {
+    await page
+      .locator('#enabled_expense_tax_rates')
+      .selectOption({ label: 'Two Tax Rates' });
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
 
   await page
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Expenses', exact: true })
     .click();
 
-  const tableBody = page.locator('tbody').first();
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  await tableRow
-    .getByRole('button')
-    .filter({ has: page.getByText('Actions') })
-    .first()
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'Enter Expense' })
     .click();
 
-  await page.getByText('Edit', { exact: true }).first().click();
+  await page.waitForURL('**/expenses/create');
 
-  await page.locator('[data-cy="inclusiveTaxesToggle"]').first().uncheck();
+  await page.waitForTimeout(300);
+
+  await page.locator('[type="number"]').first().fill('12222');
 
   await page.locator('#by_amount').click();
 
-  await page.locator('[data-cy="taxNameByAmount1"]').fill('tax_name_1');
+  const taxName1 = uniqueName('tax-by-amt-1');
+  const taxName2 = uniqueName('tax-by-amt-2');
+
+  await page.locator('[data-cy="taxNameByAmount1"]').fill(taxName1);
   await page.locator('[data-cy="taxRateByAmount1"]').fill('100');
-  await page.locator('[data-cy="taxNameByAmount2"]').fill('tax_name_2');
+  await page.locator('[data-cy="taxNameByAmount2"]').fill(taxName2);
   await page.locator('[data-cy="taxRateByAmount2"]').fill('200');
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'Save', exact: true })
-    .click();
+  await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(
-    page.getByText('Successfully updated expense', { exact: true })
-  ).toBeVisible();
+  await expect(page.getByText('Successfully created expense')).toBeVisible();
+
+  await page.waitForURL('**/expenses/**/edit');
+
+  const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('expenses', createdId);
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -1093,7 +1228,7 @@ test('The new_expense_category action is shown on the badge dropdown with only c
   await logout(page);
 });
 
-test('Creating expense with Save / Create button', async ({ page }) => {
+test('Creating expense with Save / Create button', async ({ page, api }) => {
   await login(page);
 
   await page
@@ -1117,6 +1252,9 @@ test('Creating expense with Save / Create button', async ({ page }) => {
   await expect(page.getByText('Successfully created expense')).toBeVisible();
 
   await page.waitForURL('**/expenses/create');
+
+  // The expense was created but we navigated to /create; extract ID from the previous navigation
+  // We can't easily get the ID here since URL changed, but we track via the response if needed
 
   await logout(page);
 });

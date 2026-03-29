@@ -1,5 +1,6 @@
 import { login } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName, extractIdFromUrl } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 
 interface CreateParams {
   page: Page;
@@ -47,10 +48,15 @@ const createInvoiceDesign = async (params: CreateParams) => {
   ).toHaveValue(name || 'Design Name');
 };
 
-test('deleting invoice design with admin owner account', async ({ page }) => {
+test('deleting invoice design with admin owner account', async ({ page, api }) => {
   await login(page);
 
-  await createInvoiceDesign({ page, name: 'test deleting invoice design' });
+  const designName = uniqueName('del-design');
+
+  await createInvoiceDesign({ page, name: designName });
+
+  const designId = extractIdFromUrl(page.url(), 'custom_designs');
+  if (designId) api.trackEntity('designs', designId);
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -65,10 +71,15 @@ test('deleting invoice design with admin owner account', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test('archiving invoice design with admin owner account', async ({ page }) => {
+test('archiving invoice design with admin owner account', async ({ page, api }) => {
   await login(page);
 
-  await createInvoiceDesign({ page, name: 'test archiving invoice design' });
+  const designName = uniqueName('arch-design');
+
+  await createInvoiceDesign({ page, name: designName });
+
+  const designId = extractIdFromUrl(page.url(), 'custom_designs');
+  if (designId) api.trackEntity('designs', designId);
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 

@@ -4,7 +4,8 @@ import {
   logout,
   permissions,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName, extractIdFromUrl } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { createExpenseCategory } from './expense-categories-helpers';
 import { createVendor } from './vendor-helpers';
 
@@ -97,7 +98,7 @@ test("can't view transactions without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view transaction', async ({ page }) => {
+test('can view transaction', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -106,6 +107,11 @@ test('can view transaction', async ({ page }) => {
   await save();
 
   await createBankTransaction({ page });
+
+  await page.waitForURL('**/transactions/**/edit');
+
+  const txId = extractIdFromUrl(page.url(), 'transactions');
+  if (txId) api.trackEntity('bank_transactions', txId);
 
   await logout(page);
 
@@ -125,7 +131,7 @@ test('can view transaction', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit transaction', async ({ page }) => {
+test('can edit transaction', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -134,6 +140,11 @@ test('can edit transaction', async ({ page }) => {
   await save();
 
   await createBankTransaction({ page });
+
+  await page.waitForURL('**/transactions/**/edit');
+
+  const txId = extractIdFromUrl(page.url(), 'transactions');
+  if (txId) api.trackEntity('bank_transactions', txId);
 
   await logout(page);
 
@@ -166,7 +177,7 @@ test('can edit transaction', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a transaction', async ({ page }) => {
+test('can create a transaction', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -182,6 +193,11 @@ test('can create a transaction', async ({ page }) => {
     isTableEditable: false,
   });
 
+  await page.waitForURL('**/transactions/**/edit');
+
+  const txId = extractIdFromUrl(page.url(), 'transactions');
+  if (txId) api.trackEntity('bank_transactions', txId);
+
   await checkEditPage(page, true);
 
   await page
@@ -196,7 +212,7 @@ test('can create a transaction', async ({ page }) => {
   await logout(page);
 });
 
-test('deleting transaction with edit_bank_transaction', async ({ page }) => {
+test('deleting transaction with edit_bank_transaction', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -221,6 +237,11 @@ test('deleting transaction with edit_bank_transaction', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createBankTransaction({ page, withNavigation: false });
+
+    await page.waitForURL('**/transactions/**/edit');
+
+    const txId = extractIdFromUrl(page.url(), 'transactions');
+    if (txId) api.trackEntity('bank_transactions', txId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -247,7 +268,7 @@ test('deleting transaction with edit_bank_transaction', async ({ page }) => {
   }
 });
 
-test('archiving transaction withe edit_bank_transaction', async ({ page }) => {
+test('archiving transaction withe edit_bank_transaction', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -272,6 +293,11 @@ test('archiving transaction withe edit_bank_transaction', async ({ page }) => {
 
   if (!doRecordsExist) {
     await createBankTransaction({ page, withNavigation: false });
+
+    await page.waitForURL('**/transactions/**/edit');
+
+    const txId = extractIdFromUrl(page.url(), 'transactions');
+    if (txId) api.trackEntity('bank_transactions', txId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -299,16 +325,39 @@ test('archiving transaction withe edit_bank_transaction', async ({ page }) => {
   }
 });
 
-test('Create expense bulk action', async ({ page }) => {
+test('Create expense bulk action', async ({ page, api }) => {
   await login(page);
 
-  await createVendor({ page, name: 'testing create expense' });
+  const vendorName = uniqueName('vendor');
+  const categoryName = uniqueName('expcat');
 
-  await createExpenseCategory({ page, categoryName: 'testing create expense' });
+  await createVendor({ page, name: vendorName });
+
+  await page.waitForURL('**/vendors/**/edit');
+
+  const vendorId = extractIdFromUrl(page.url(), 'vendors');
+  if (vendorId) api.trackEntity('vendors', vendorId);
+
+  await createExpenseCategory({ page, categoryName });
+
+  await page.waitForURL('**/expense_categories/**/edit');
+
+  const expCatId = extractIdFromUrl(page.url(), 'expense_categories');
+  if (expCatId) api.trackEntity('expense_categories', expCatId);
 
   await createBankTransaction({ page, type: 'withdrawal' });
 
+  await page.waitForURL('**/transactions/**/edit');
+
+  const tx1Id = extractIdFromUrl(page.url(), 'transactions');
+  if (tx1Id) api.trackEntity('bank_transactions', tx1Id);
+
   await createBankTransaction({ page, type: 'withdrawal' });
+
+  await page.waitForURL('**/transactions/**/edit');
+
+  const tx2Id = extractIdFromUrl(page.url(), 'transactions');
+  if (tx2Id) api.trackEntity('bank_transactions', tx2Id);
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -349,22 +398,22 @@ test('Create expense bulk action', async ({ page }) => {
   await page
     .getByTestId('combobox-input-field')
     .first()
-    .fill('testing create expense');
+    .fill(vendorName);
 
   await page.waitForTimeout(200);
 
-  await page.getByText('testing create expense').first().click();
+  await page.getByText(vendorName).first().click();
 
   await page.getByTestId('combobox-input-field').last().click();
 
   await page
     .getByTestId('combobox-input-field')
     .last()
-    .fill('testing create expense');
+    .fill(categoryName);
 
   await page.waitForTimeout(200);
 
-  await page.getByText('testing create expense').first().click();
+  await page.getByText(categoryName).first().click();
 
   await expect(
     page.getByRole('button', { name: 'Create Expense', exact: true })

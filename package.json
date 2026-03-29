@@ -148,7 +148,7 @@
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@faker-js/faker": "^9.0.0",
-    "@playwright/test": "^1.51.0",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
     "@types/dompurify": "^3.2.0",

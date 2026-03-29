@@ -1,6 +1,6 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
 import { createInvoice } from '$tests/helpers/invoice';
-import test, { expect } from '@playwright/test';
+import { test, expect } from '$tests/e2e/fixtures';
 import dayjs from 'dayjs';
 
 test('Can add a company and navigate to account management', async ({

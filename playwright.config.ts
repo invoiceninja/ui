@@ -12,6 +12,8 @@ config();
  */
 export default defineConfig({
   testDir: './tests/e2e',
+  /* Reset API state before running the test suite. */
+  globalSetup: './tests/e2e/global-setup.ts',
   /* Maximum time one test can run for. */
   timeout: 10 * 1500,
   expect: {
@@ -21,14 +23,14 @@ export default defineConfig({
      */
     timeout: 10000,
   },
-  /* Run tests in files in parallel */
-  fullyParallel: true,
+  /* Tests share API state — run serially to prevent race conditions. */
+  fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 16 : undefined,
+  /* Serial execution — tests share API state and permission users. */
+  workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI ? 'github' : 'list',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */

@@ -7,7 +7,8 @@ import {
   permissions,
   useHasPermission,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
 
@@ -115,11 +116,17 @@ interface CreateParams {
   page: Page;
   assignTo?: string;
   isTableEditable?: boolean;
+  clientName?: string;
 }
 const createRecurringInvoice = async (params: CreateParams) => {
-  const { page, isTableEditable = true, assignTo } = params;
+  const { page, isTableEditable = true, assignTo, clientName } = params;
 
-  await createClient({ page, withNavigation: true, createIfNotExist: true });
+  await createClient({
+    page,
+    withNavigation: true,
+    createIfNotExist: true,
+    name: clientName,
+  });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -171,15 +178,21 @@ test("can't view recurring invoices without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view recurring invoice', async ({ page }) => {
+test('can view recurring invoice', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('ri-client');
 
   await login(page);
   await clear('invoices@example.com');
   await set('view_recurring_invoice', 'view_client');
   await save();
 
-  await createRecurringInvoice({ page });
+  await createRecurringInvoice({ page, clientName });
+
+  await page.waitForURL('**/recurring_invoices/**/edit');
+  const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('recurring_invoices', createdId);
 
   await logout(page);
 
@@ -201,8 +214,10 @@ test('can view recurring invoice', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit recurring invoice', async ({ page }) => {
+test('can edit recurring invoice', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('ri-client');
 
   const actions = useRecurringInvoiceActions({
     permissions: ['edit_recurring_invoice'],
@@ -213,7 +228,11 @@ test('can edit recurring invoice', async ({ page }) => {
   await set('edit_recurring_invoice', 'view_client');
   await save();
 
-  await createRecurringInvoice({ page });
+  await createRecurringInvoice({ page, clientName });
+
+  await page.waitForURL('**/recurring_invoices/**/edit');
+  const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('recurring_invoices', createdId);
 
   await logout(page);
 
@@ -257,8 +276,10 @@ test('can edit recurring invoice', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a recurring invoice', async ({ page }) => {
+test('can create a recurring invoice', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('ri-client');
 
   const actions = useRecurringInvoiceActions({
     permissions: ['create_recurring_invoice', 'create_client', 'view_client'],
@@ -272,7 +293,11 @@ test('can create a recurring invoice', async ({ page }) => {
 
   await login(page, 'invoices@example.com', 'password');
 
-  await createRecurringInvoice({ page, isTableEditable: false });
+  await createRecurringInvoice({ page, isTableEditable: false, clientName });
+
+  await page.waitForURL('**/recurring_invoices/**/edit');
+  const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('recurring_invoices', createdId);
 
   await checkEditPage(page, true);
 
@@ -303,8 +328,11 @@ test('can create a recurring invoice', async ({ page }) => {
 
 test('can view and edit assigned invoice with create_recurring_invoice', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('ri-client');
 
   const actions = useRecurringInvoiceActions({
     permissions: ['create_recurring_invoice'],
@@ -315,7 +343,15 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
   await set('create_recurring_invoice');
   await save();
 
-  await createRecurringInvoice({ page, assignTo: 'Invoices Example' });
+  await createRecurringInvoice({
+    page,
+    assignTo: 'Invoices Example',
+    clientName,
+  });
+
+  await page.waitForURL('**/recurring_invoices/**/edit');
+  const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('recurring_invoices', createdId);
 
   await logout(page);
 
@@ -359,8 +395,10 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
   await logout(page);
 });
 
-test('deleting invoice with edit_recurring_invoice', async ({ page }) => {
+test('deleting invoice with edit_recurring_invoice', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('ri-client');
 
   await login(page);
   await clear('invoices@example.com');
@@ -390,7 +428,11 @@ test('deleting invoice with edit_recurring_invoice', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createRecurringInvoice({ page });
+    await createRecurringInvoice({ page, clientName });
+
+    await page.waitForURL('**/recurring_invoices/**/edit');
+    const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('recurring_invoices', createdId);
 
     const moreActionsButton = page
       .locator('[data-cy="topNavbar"]')
@@ -419,8 +461,13 @@ test('deleting invoice with edit_recurring_invoice', async ({ page }) => {
   }
 });
 
-test('archiving invoice withe edit_recurring_invoice', async ({ page }) => {
+test('archiving invoice withe edit_recurring_invoice', async ({
+  page,
+  api,
+}) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('ri-client');
 
   await login(page);
   await clear('invoices@example.com');
@@ -450,7 +497,11 @@ test('archiving invoice withe edit_recurring_invoice', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createRecurringInvoice({ page });
+    await createRecurringInvoice({ page, clientName });
+
+    await page.waitForURL('**/recurring_invoices/**/edit');
+    const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('recurring_invoices', createdId);
 
     const moreActionsButton = page
       .locator('[data-cy="topNavbar"]')
@@ -486,8 +537,11 @@ test('archiving invoice withe edit_recurring_invoice', async ({ page }) => {
 
 test('invoice documents preview with edit_recurring_invoice', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('ri-client');
 
   await login(page);
   await clear('invoices@example.com');
@@ -517,7 +571,11 @@ test('invoice documents preview with edit_recurring_invoice', async ({
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createRecurringInvoice({ page });
+    await createRecurringInvoice({ page, clientName });
+
+    await page.waitForURL('**/recurring_invoices/**/edit');
+    const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('recurring_invoices', createdId);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -542,8 +600,11 @@ test('invoice documents preview with edit_recurring_invoice', async ({
 
 test('invoice documents uploading with edit_recurring_invoice', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('ri-client');
 
   await login(page);
   await clear('invoices@example.com');
@@ -573,7 +634,11 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createRecurringInvoice({ page });
+    await createRecurringInvoice({ page, clientName });
+
+    await page.waitForURL('**/recurring_invoices/**/edit');
+    const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('recurring_invoices', createdId);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -606,8 +671,11 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
 
 test('all actions in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('ri-client');
 
   const actions = useRecurringInvoiceActions({
     permissions: ['admin'],
@@ -621,7 +689,11 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await login(page, 'invoices@example.com', 'password');
 
-  await createRecurringInvoice({ page });
+  await createRecurringInvoice({ page, clientName });
+
+  await page.waitForURL('**/recurring_invoices/**/edit');
+  const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('recurring_invoices', createdId);
 
   await checkEditPage(page, true);
 
@@ -643,8 +715,11 @@ test('all actions in dropdown displayed with admin permission', async ({
 
 test('all clone actions displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('ri-client');
 
   const actions = useRecurringInvoiceActions({
     permissions: [
@@ -673,7 +748,11 @@ test('all clone actions displayed with creation permissions', async ({
 
   await login(page, 'invoices@example.com', 'password');
 
-  await createRecurringInvoice({ page, isTableEditable: false });
+  await createRecurringInvoice({ page, isTableEditable: false, clientName });
+
+  await page.waitForURL('**/recurring_invoices/**/edit');
+  const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('recurring_invoices', createdId);
 
   await checkEditPage(page, true);
 
@@ -693,8 +772,10 @@ test('all clone actions displayed with creation permissions', async ({
   await logout(page);
 });
 
-test('cloning recurring invoice', async ({ page }) => {
+test('cloning recurring invoice', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('ri-client');
 
   await login(page);
   await clear('invoices@example.com');
@@ -725,7 +806,11 @@ test('cloning recurring invoice', async ({ page }) => {
   const doRecordsExist = await page.getByText('No records found').isHidden();
 
   if (!doRecordsExist) {
-    await createRecurringInvoice({ page });
+    await createRecurringInvoice({ page, clientName });
+
+    await page.waitForURL('**/recurring_invoices/**/edit');
+    const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('recurring_invoices', createdId);
 
     const moreActionsButton = page
       .locator('[data-cy="topNavbar"]')
@@ -752,6 +837,9 @@ test('cloning recurring invoice', async ({ page }) => {
   ).toBeVisible();
 
   await page.waitForURL('**/recurring_invoices/**/edit**');
+
+  const clonedId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
+  if (clonedId) api.trackEntity('recurring_invoices', clonedId);
 
   await expect(
     page.getByRole('heading', { name: 'Edit Recurring Invoice' }).first()
