@@ -380,7 +380,7 @@ test('deleting vendor with edit_vendor', async ({ page, api }) => {
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
-    await page.getByText('Delete').click();
+    await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
     await expect(page.getByText('Successfully deleted vendor')).toBeVisible();
 
@@ -394,7 +394,7 @@ test('deleting vendor with edit_vendor', async ({ page, api }) => {
       .first()
       .click();
 
-    await page.getByText('Delete').click();
+    await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
     await expect(page.getByText('Successfully deleted vendor')).toBeVisible();
   }
@@ -431,7 +431,7 @@ test('archiving vendor withe edit_vendor', async ({ page, api }) => {
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
-    await page.getByText('Archive').click();
+    await page.getByRole('button', { name: 'Archive', exact: true }).click();
 
     await expect(page.getByText('Successfully archived vendor')).toBeVisible();
 
@@ -445,7 +445,7 @@ test('archiving vendor withe edit_vendor', async ({ page, api }) => {
       .first()
       .click();
 
-    await page.getByText('Archive').click();
+    await page.getByRole('button', { name: 'Archive', exact: true }).click();
 
     await expect(page.getByText('Successfully archived vendor')).toBeVisible();
   }
@@ -475,7 +475,7 @@ test('vendor documents preview with view_vendor', async ({ page, api }) => {
   const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createVendor({ page, vendorName });
+    await createVendor({ page, vendorName, isTableEditable: false });
 
     const id = page.url().match(/vendors\/([^/]+)/)?.[1];
     if (id) api.trackEntity('vendors', id);

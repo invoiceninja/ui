@@ -23,13 +23,17 @@ const createInvoiceDesign = async (params: CreateParams) => {
     .getByRole('link', { name: 'New Design' })
     .click();
 
-  await page.waitForTimeout(900);
+  // Wait for form to fully load and React state to initialize
+  const nameInput = page.getByRole('main').getByRole('textbox').first();
+  await nameInput.waitFor({ state: 'visible', timeout: 5000 });
+  await page.waitForTimeout(1500);
 
-  await page
-    .getByRole('main')
-    .locator('[type="text"]')
-    .first()
-    .fill(name || 'Design Name');
+  // Use click + clear + type to work with DebounceInput
+  await nameInput.click();
+  await nameInput.fill('');
+  await nameInput.pressSequentially(name || 'Design Name', { delay: 50 });
+  await nameInput.blur();
+  await page.waitForTimeout(500);
 
   await page
     .getByRole('main')
@@ -37,14 +41,16 @@ const createInvoiceDesign = async (params: CreateParams) => {
     .first()
     .click();
 
-  await page.getByRole('option').first().click();
+  const designOption = page.getByRole('option').first();
+  await designOption.waitFor({ state: 'visible', timeout: 5000 });
+  await designOption.click();
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await page.waitForURL('**/settings/invoice_design/custom_designs/**/edit');
+  await page.waitForURL('**/settings/invoice_design/custom_designs/**/edit', { timeout: 5000 });
 
   await expect(
-    page.getByRole('main').locator('[type="text"]').first()
+    page.getByRole('main').getByRole('textbox').first()
   ).toHaveValue(name || 'Design Name');
 };
 

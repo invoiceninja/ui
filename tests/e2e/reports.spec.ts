@@ -32,9 +32,14 @@ test('Expense report (clients, vendors, project, expense_categories) fields are 
     .getByRole('link', { name: 'Reports', exact: true })
     .click();
 
-  await page
-    .locator('[data-cy="reportNameSelector"]')
-    .selectOption({ label: 'Expense' });
+  // The report selector is a React Select (customSelector)
+  // Click the dropdown indicator to open the menu
+  const reportElement = page.locator('dt').filter({ hasText: 'Report' }).locator('..');
+  await reportElement.locator('svg').last().click();
+  // Select "Expense" from the dropdown menu
+  const expenseOption = page.getByText('Expense', { exact: true });
+  await expenseOption.waitFor({ state: 'visible', timeout: 5000 });
+  await expenseOption.click();
 
   await page.waitForTimeout(300);
 

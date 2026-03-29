@@ -8,6 +8,34 @@ import { test, expect, uniqueName, extractIdFromUrl } from '$tests/e2e/fixtures'
 import { Page } from '@playwright/test';
 import { createExpenseCategory } from './expense-categories-helpers';
 import { createVendor } from './vendor-helpers';
+import { createApiContext, createEntityViaApi, type ApiContext } from './api-helpers';
+
+async function ensureBankAccountExists(apiContext?: ApiContext): Promise<void> {
+  const api = apiContext || await createApiContext(process.env.VITE_API_URL!);
+  const { request } = await import('@playwright/test');
+  const ctx = await request.newContext({ baseURL: api.baseUrl });
+
+  const response = await ctx.get('/api/v1/bank_integrations?per_page=1', {
+    headers: api.headers,
+  });
+  const body = await response.json();
+  await ctx.dispose();
+
+  if (body.data?.length > 0) return;
+
+  // Create a bank account
+  const createCtx = await request.newContext({ baseURL: api.baseUrl });
+  await createCtx.post('/api/v1/bank_integrations', {
+    headers: api.headers,
+    data: {
+      bank_account_name: 'Test Bank Account',
+      provider_name: 'Test Provider',
+      bank_account_number: '123456789',
+      bank_account_type: 'checking',
+    },
+  });
+  await createCtx.dispose();
+}
 
 interface CreateParams {
   page: Page;
@@ -17,6 +45,9 @@ interface CreateParams {
 }
 const createBankTransaction = async (params: CreateParams) => {
   const { page, withNavigation = true, isTableEditable = true, type } = params;
+
+  // Ensure at least one bank account exists for the combobox
+  await ensureBankAccountExists();
 
   if (withNavigation) {
     const transactionsLink = page
@@ -41,9 +72,11 @@ const createBankTransaction = async (params: CreateParams) => {
 
   await page.getByRole('main').locator('[type="text"]').nth(0).fill('100');
 
+  // Select bank account from combobox
   await page.getByTestId('combobox-input-field').first().click();
-  await page.waitForTimeout(200);
-  await page.getByRole('main').locator('[role="option"]').first().click();
+  const bankOption = page.getByRole('main').locator('[role="option"]').first();
+  await bankOption.waitFor({ state: 'visible', timeout: 5000 });
+  await bankOption.click();
 
   await page
     .getByRole('main')

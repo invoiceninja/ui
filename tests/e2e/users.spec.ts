@@ -69,15 +69,10 @@ test("Can't see owner of the account in the list of users", async ({
 
   await page.waitForURL('/settings/users');
 
-  await page.locator('#filter').fill('');
+  // Filter for the owner's email — should not be visible to non-owners
+  await page.locator('#filter').fill('user@example.com');
 
-  await page.waitForTimeout(500);
-
-  await expect(page.getByText('user@example.com')).not.toBeVisible();
-
-  await page.locator('[data-cy="dataTableChevronRight"]').click();
-
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(1000);
 
   await expect(page.getByText('user@example.com')).not.toBeVisible();
 
@@ -130,7 +125,7 @@ test('deleting user', async ({ page }) => {
 });
 
 test('archiving user', async ({ page }) => {
-  const userId = await findUserId('Products Example');
+  const userId = await findUserId('Expenses Example');
 
   await login(page);
 
@@ -141,7 +136,7 @@ test('archiving user', async ({ page }) => {
     .click();
 
   await page
-    .getByRole('link', { name: 'Products Example', exact: true })
+    .getByRole('link', { name: 'Expenses Example', exact: true })
     .click();
 
   const passwordField = page.getByLabel('Password');
@@ -166,7 +161,7 @@ test('archiving user', async ({ page }) => {
     .click();
 
   await expect(
-    page.getByRole('link', { name: 'Products Example', exact: true })
+    page.getByRole('link', { name: 'Expenses Example', exact: true })
   ).not.toBeVisible();
 
   // Restore the user so subsequent runs still work
@@ -176,7 +171,7 @@ test('archiving user', async ({ page }) => {
 });
 
 test('removing user', async ({ page }) => {
-  const userId = await findUserId('Credits Example');
+  const userId = await findUserId('Tasks Example');
 
   await login(page);
 
@@ -187,7 +182,7 @@ test('removing user', async ({ page }) => {
     .click();
 
   await page
-    .getByRole('link', { name: 'Credits Example', exact: true })
+    .getByRole('link', { name: 'Tasks Example', exact: true })
     .click();
 
   const passwordField = page.getByLabel('Password');
@@ -212,7 +207,7 @@ test('removing user', async ({ page }) => {
     .click();
 
   await expect(
-    page.getByRole('link', { name: 'Credits Example', exact: true })
+    page.getByRole('link', { name: 'Tasks Example', exact: true })
   ).not.toBeVisible();
 
   // Restore the user so subsequent runs still work
