@@ -49,7 +49,7 @@ export function QuickBooksDetails({
       {quickbooks.requires_reconnect && (
         <Alert type="warning" disableClosing className="mb-4">
           <div className="flex items-center justify-between">
-            <span>{t('quickbooks_requires_reconnection')}</span>
+            <span>{t('quickbooks_requires_reauth')}</span>
 
             <Button
               type="minimal"

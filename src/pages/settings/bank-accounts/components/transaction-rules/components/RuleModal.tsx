@@ -19,6 +19,7 @@ import { Modal } from '$app/components/Modal';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleChange } from '../hooks/useHandleChange';
+import { useCreditRuleFields } from '../hooks/useCreditRuleFields';
 
 interface Props {
   visible: boolean;
@@ -27,6 +28,7 @@ interface Props {
   setTransactionRule: Dispatch<SetStateAction<TransactionRule | undefined>>;
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
   ruleIndex: number;
+  appliesTo: 'DEBIT' | 'CREDIT';
 }
 
 const OPERATORS = {
@@ -45,17 +47,18 @@ const OPERATORS = {
   ],
 };
 
-export function RuleModal(props: Props) {
+export function RuleModal({
+  visible,
+  setVisible,
+  transactionRule,
+  ruleIndex,
+  setTransactionRule,
+  setErrors,
+  appliesTo,
+}: Props) {
   const [t] = useTranslation();
 
-  const {
-    visible,
-    setVisible,
-    transactionRule,
-    ruleIndex,
-    setTransactionRule,
-    setErrors,
-  } = props;
+  const creditFields = useCreditRuleFields();
 
   const [rule, setRule] = useState<Rule>();
 
@@ -106,7 +109,7 @@ export function RuleModal(props: Props) {
         setRule(defaultRule);
       }
     }
-  }, [transactionRule, ruleIndex]);
+  }, [transactionRule, ruleIndex, appliesTo]);
 
   return (
     <Modal
@@ -138,7 +141,7 @@ export function RuleModal(props: Props) {
         dismissable={false}
       >
         {rule?.search_key &&
-          OPERATORS[rule.search_key as keyof typeof OPERATORS].map(
+          OPERATORS[rule.search_key as keyof typeof OPERATORS]?.map(
             (operator, index) => (
               <option key={index} value={operator.value}>
                 {t(operator.label)}
@@ -147,19 +150,38 @@ export function RuleModal(props: Props) {
           )}
       </SelectField>
 
-      <InputField
-        changeOverride={true}
-        required
-        label={t('value')}
-        value={rule?.value}
-        onValueChange={(value) => handleChangeRule('value', value)}
-      />
+      {appliesTo === 'CREDIT' ? (
+        <SelectField
+          required
+          label={t('value')}
+          value={rule?.value}
+          onValueChange={(value) => handleChangeRule('value', value)}
+          customSelector
+          dismissable={false}
+        >
+          {creditFields.map(({ key, label }) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
+        </SelectField>
+      ) : (
+        rule?.operator !== 'is_empty' && (
+          <InputField
+            changeOverride={true}
+            required
+            label={t('value')}
+            value={rule?.value}
+            onValueChange={(value) => handleChangeRule('value', value)}
+          />
+        )
+      )}
 
       <Button
         className="self-end"
         onClick={handleAddRule}
         disableWithoutIcon
-        disabled={!rule?.value}
+        disabled={rule?.operator !== 'is_empty' && !rule?.value}
       >
         {t('save')}
       </Button>
