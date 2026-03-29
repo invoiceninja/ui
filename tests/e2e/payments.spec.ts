@@ -36,9 +36,14 @@ const createPayment = async (params: CreateParams) => {
     .getByRole('link', { name: 'Enter Payment' })
     .click();
 
-  await page.waitForTimeout(900);
+  await page.waitForTimeout(500);
 
-  await page.getByRole('option').first().click();
+  // Wait for client combobox options to load
+  const comboboxInput = page.getByRole('combobox').first();
+  await comboboxInput.click();
+  const clientOption = page.getByRole('option').first();
+  await clientOption.waitFor({ state: 'visible', timeout: 5000 });
+  await clientOption.click();
 
   await page.getByRole('button', { name: 'Save' }).click();
 
@@ -53,27 +58,19 @@ const checkEditPage = async (
 
   if (isEditable) {
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'Save', exact: true })
+      page.locator('[data-cy="topNavbar"]').getByRole('button', { name: 'Save', exact: true })
     ).toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'Actions', exact: true })
+      page.locator('[data-cy="chevronDownButton"]').first()
     ).toBeVisible();
   } else {
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'Save', exact: true })
+      page.locator('[data-cy="topNavbar"]').getByRole('button', { name: 'Save', exact: true })
     ).not.toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'Actions', exact: true })
+      page.locator('[data-cy="chevronDownButton"]').first()
     ).not.toBeVisible();
   }
 
@@ -266,14 +263,9 @@ test('deleting payment with edit_payment', async ({ page, api }) => {
     const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
     if (createdId) api.trackEntity('payments', createdId);
 
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
-    await moreActionsButton.click();
-
-    await page.getByText('Delete').click();
+    await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
     await expect(page.getByText('Successfully deleted payment')).toBeVisible();
 
@@ -287,7 +279,7 @@ test('deleting payment with edit_payment', async ({ page, api }) => {
 
     await moreActionsButton.click();
 
-    await page.getByText('Delete').click();
+    await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
     await expect(page.getByText('Successfully deleted payment')).toBeVisible();
   }
