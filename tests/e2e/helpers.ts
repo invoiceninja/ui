@@ -99,12 +99,12 @@ export function permissions(page: Page) {
  */
 export async function waitForTableData(page: Page): Promise<boolean> {
   const dataTable = page.locator('[data-cy="dataTable"]');
-  await dataTable.waitFor({ state: 'visible', timeout: 10000 });
+  await dataTable.waitFor({ state: 'visible', timeout: 5000 });
 
   // Wait for either "No records found" or a real data row to appear
   await Promise.race([
-    page.getByText('No records found').waitFor({ state: 'visible', timeout: 15000 }),
-    dataTable.locator('tbody tr a').first().waitFor({ state: 'visible', timeout: 15000 }),
+    page.getByText('No records found').waitFor({ state: 'visible', timeout: 5000 }),
+    dataTable.locator('tbody tr a').first().waitFor({ state: 'visible', timeout: 5000 }),
   ]).catch(() => {
     // Timeout is OK — we'll check state below
   });
@@ -116,7 +116,7 @@ export async function checkTableEditability(page: Page, isEditable: boolean) {
   const tableContainer = page.locator('[data-cy="dataTable"]');
 
   // Wait for table to finish loading (spinner to disappear)
-  await tableContainer.waitFor({ state: 'visible', timeout: 10000 });
+  await tableContainer.waitFor({ state: 'visible', timeout: 5000 });
   await page.waitForTimeout(1500);
 
   const headerCheckbox = tableContainer.locator('thead input[type="checkbox"]');

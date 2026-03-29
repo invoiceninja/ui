@@ -35,7 +35,7 @@ export const createInvoice = async (params: CreateParams) => {
 
   // Wait for at least one option to appear (client from createClient)
   const clientOption = page.getByRole('option').first();
-  await clientOption.waitFor({ state: 'visible', timeout: 10000 });
+  await clientOption.waitFor({ state: 'visible', timeout: 5000 });
   await clientOption.click();
 
   if (assignTo) {
