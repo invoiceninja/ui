@@ -881,7 +881,9 @@ export function useQuoteColumns() {
             {field}
           </DynamicLink>
 
-          <CopyToClipboardIconOnly text={quote.number} />
+          {quote.invitations?.[0]?.link && field && (
+            <CopyToClipboardIconOnly text={quote.invitations?.[0]?.link} />
+          )}
         </div>
       ),
     },
