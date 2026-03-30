@@ -877,9 +877,16 @@ test('Second and Third Custom email sending template is displayed', async ({
     .getByRole('link', { name: 'Templates & Reminders', exact: true })
     .click();
 
-  await page
-    .locator('[data-cy="templateSelector"]')
-    .selectOption({ label: 'Second Custom' });
+  await page.waitForTimeout(500);
+
+  const selectTemplate = async (name: string) => {
+    const templateField = page.getByRole('combobox').first();
+    await templateField.click();
+    await page.getByText(name, { exact: true }).click();
+    await page.waitForTimeout(300);
+  };
+
+  await selectTemplate('Second Custom');
 
   const secondSubject = uniqueName('second-custom');
   await page.locator('#subject').fill(secondSubject);
@@ -891,9 +898,7 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await expect(page.getByText('Successfully updated settings')).toBeVisible();
 
-  await page
-    .locator('[data-cy="templateSelector"]')
-    .selectOption({ label: 'Third Custom' });
+  await selectTemplate('Third Custom');
 
   const thirdSubject = uniqueName('third-custom');
   await page.locator('#subject').fill(thirdSubject);
