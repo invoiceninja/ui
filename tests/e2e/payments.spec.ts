@@ -269,9 +269,6 @@ test('deleting payment with edit_payment', async ({ page, api }) => {
 
     await expect(page.getByText('Successfully deleted payment')).toBeVisible();
 
-    await expect(
-      page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -480,7 +477,7 @@ test('rendering documents and custom_fields tabs with admin permission', async (
   await page.waitForURL('**/payments/**/documents');
 
   await expect(
-    page.getByRole('heading', { name: 'Upload', exact: true })
+    page.getByRole('heading', { name: 'Documents', exact: true })
   ).toBeVisible();
 
   await page

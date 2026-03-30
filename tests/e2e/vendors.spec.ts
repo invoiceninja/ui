@@ -42,14 +42,20 @@ const createVendor = async (params: CreateParams) => {
     .first()
     .click();
 
-  await page.locator('div').filter({ hasText: /^Name$/ }).getByRole('textbox').fill(vendorName || 'Vendor Name');
+  await page.locator('#name').fill(vendorName || 'Vendor Name');
   await page.locator('#first_name_0').fill('First Name');
   await page.locator('#last_name_0').fill('Last Name');
   await page.locator('#email_0').fill(email || 'first@example.com');
 
   if (assignTo) {
-    await page.getByTestId('combobox-input-field').first().click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    const assignedUserInput = page.getByTestId('combobox-input-field').first();
+    await assignedUserInput.scrollIntoViewIfNeeded();
+    await assignedUserInput.click();
+    await assignedUserInput.fill(assignTo.split(' ')[0]);
+
+    const option = page.getByRole('option', { name: assignTo }).first();
+    await option.waitFor({ state: 'visible', timeout: 5000 });
+    await option.click();
   }
 
   await page.getByRole('button', { name: 'Save' }).click();

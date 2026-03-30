@@ -1132,6 +1132,16 @@ test('Prevent breadcrumb navigation', async ({ page, api }) => {
 });
 
 test('Products combobox various selections', async ({ page, api }) => {
+  // Create a product with known notes so the combobox test has data
+  const { createProductViaApi, createApiContext } = await import('./api-helpers');
+  const apiCtx = await createApiContext(process.env.VITE_API_URL!);
+  const seededProduct = await createProductViaApi(apiCtx, {
+    product_key: 'Combobox Test Product',
+    notes: 'Combobox test product notes',
+    price: 100,
+  });
+  api.trackEntity('products', seededProduct.id);
+
   await login(page);
 
   await page
@@ -1154,26 +1164,16 @@ test('Products combobox various selections', async ({ page, api }) => {
 
   await page.waitForTimeout(1000);
 
-  const hasProducts = await page
-    .locator('[data-combobox-element-id="0"]')
-    .first()
-    .isVisible()
-    .catch(() => false);
+  await page.locator('[data-combobox-element-id="0"]').first().click();
 
-  if (hasProducts) {
-    await page.locator('[data-combobox-element-id="0"]').first().click();
+  await page.waitForTimeout(300);
 
-    await page.waitForTimeout(300);
-
-    const firstNotes = await page.locator('[id="notes"]').first().inputValue();
-    expect(firstNotes.length).toBeGreaterThan(0);
-  } else {
-    await page.keyboard.press('Escape');
-  }
+  const firstNotes = await page.locator('[id="notes"]').first().inputValue();
+  expect(firstNotes.length).toBeGreaterThan(0);
 
   await page.getByRole('button', { name: 'Add Item' }).first().click();
 
-  const newItemIndex = hasProducts ? 1 : 0;
+  const newItemIndex = 1;
 
   await page.locator('[data-cy="comboboxInput"]').nth(newItemIndex).click();
 
