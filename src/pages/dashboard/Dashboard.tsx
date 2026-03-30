@@ -30,9 +30,7 @@ export default function Dashboard() {
   useTitle('dashboard');
 
   const [t] = useTranslation();
-
   const enabled = useEnabled();
-
   const openFeedbackSlider = useOpenFeedbackSlider();
 
   useSocketEvent({
