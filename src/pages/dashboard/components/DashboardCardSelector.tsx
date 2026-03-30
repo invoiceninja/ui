@@ -11,31 +11,40 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { v4 } from 'uuid';
 import { cloneDeep, set } from 'lodash';
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from '@hello-pangea/dnd';
+import { arrayMoveImmutable } from 'array-move';
 import { CgOptions } from 'react-icons/cg';
-import { MdClose } from 'react-icons/md';
-
 import {
   Calculate,
   CompanyUser,
-  DashboardCardField,
   Field,
   Format,
   Period,
 } from '$app/common/interfaces/company-user';
+import {
+  decodeDashboardField,
+  encodeDashboardField,
+} from '$app/common/helpers/react-settings';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { User } from '$app/common/interfaces/user';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
-import { updateUser } from '$app/common/stores/slices/user';
-
+import { resetChanges, updateUser } from '$app/common/stores/slices/user';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { Button, SelectField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
+import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
 import { PERIOD_LABELS } from './DashboardCard';
 
 const FIELDS: Field[] = [
@@ -70,10 +79,16 @@ export const FIELDS_LABELS: Record<string, string> = {
   invoice_paid_expenses: 'total_invoice_paid_expenses',
 };
 
-function emptyField(): DashboardCardField {
+interface NewField {
+  field: Field | '';
+  period: Period;
+  calculate: Calculate;
+  format: Format;
+}
+
+function emptyNewField(): NewField {
   return {
-    id: v4(),
-    field: '' as Field,
+    field: '',
     period: 'current',
     calculate: 'sum',
     format: 'money',
@@ -83,15 +98,16 @@ function emptyField(): DashboardCardField {
 export function DashboardCardSelector() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
+
+  const colors = useColorScheme();
   const currentUser = useCurrentUser();
 
-  const [isBusy, setIsBusy] = useState(false);
-  const [manageOpen, setManageOpen] = useState(false);
-  const [addOpen, setAddOpen] = useState(false);
-  const [fields, setFields] = useState<DashboardCardField[]>([]);
-  const [newField, setNewField] = useState<DashboardCardField>(emptyField());
+  const [fields, setFields] = useState<string[]>([]);
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [manageOpen, setManageOpen] = useState<boolean>(false);
+  const [addOpen, setAddOpen] = useState<boolean>(false);
+  const [newField, setNewField] = useState<NewField>(emptyNewField());
 
-  // Load current fields when manage modal opens
   useEffect(() => {
     if (manageOpen && currentUser) {
       setFields(
@@ -102,10 +118,11 @@ export function DashboardCardSelector() {
 
   const handleSave = () => {
     const updated = cloneDeep(currentUser) as User;
-    if (!updated || isBusy) return;
+
+    if (!updated || isFormBusy) return;
 
     toast.processing();
-    setIsBusy(true);
+    setIsFormBusy(true);
 
     set(updated, 'company_user.react_settings.dashboard_fields', fields);
 
@@ -116,31 +133,66 @@ export function DashboardCardSelector() {
     )
       .then((response: GenericSingleResourceResponse<CompanyUser>) => {
         toast.success('updated_settings');
+
         set(updated, 'company_user', response.data.data);
+
         $refetch(['company_users']);
+
         dispatch(updateUser(updated));
+        dispatch(resetChanges());
+
         setManageOpen(false);
       })
-      .finally(() => setIsBusy(false));
+      .finally(() => setIsFormBusy(false));
   };
 
   const handleAddField = () => {
-    setFields((prev) => [...prev, { ...newField, id: v4() }]);
-    setNewField(emptyField());
+    if (!newField.field) return;
+
+    const existingCount = fields.filter((k) => {
+      const d = decodeDashboardField(k);
+      return (
+        d.field === newField.field &&
+        d.period === newField.period &&
+        d.calculate === newField.calculate &&
+        d.format === newField.format
+      );
+    }).length;
+
+    const key = encodeDashboardField(
+      newField.field as Field,
+      newField.period,
+      newField.calculate,
+      newField.format,
+      existingCount
+    );
+
+    setFields((prev) => [...prev, key]);
+    setNewField(emptyNewField());
     setAddOpen(false);
+  };
+
+  const handleRemove = (index: number) => {
+    setFields((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const onDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    setFields((prev) =>
+      arrayMoveImmutable(prev, result.source.index, result.destination!.index)
+    );
   };
 
   return (
     <>
-      {/* Trigger icon */}
       <div
         className="flex cursor-pointer items-center"
         onClick={() => setManageOpen(true)}
       >
-        <Icon element={CgOptions} size={28} />
+        <Icon element={CgOptions} size={20} style={{ color: colors.$3 }} />
       </div>
 
-      {/* ── Manage cards modal ──────────────────────────────── */}
       <Modal
         title={t('settings')}
         visible={manageOpen}
@@ -154,30 +206,123 @@ export function DashboardCardSelector() {
             </span>
           )}
 
-          <div className="flex flex-col space-y-2">
-            {fields.map((field) => (
-              <div key={field.id} className="flex items-center space-x-3 py-1">
-                <Icon
-                  className="cursor-pointer"
-                  element={MdClose}
-                  size={22}
-                  onClick={() =>
-                    setFields((prev) => prev.filter((f) => f.id !== field.id))
-                  }
-                />
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium">
-                    {t(FIELDS_LABELS[field.field] ?? field.field)}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {t(PERIOD_LABELS[field.period] ?? field.period)}
-                    {' · '}
-                    {t(field.calculate === 'avg' ? 'average' : field.calculate)}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+          {fields.length > 0 && (
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable
+                droppableId="dashboard-fields"
+                renderClone={(provided, _, rubric) => {
+                  const decoded = decodeDashboardField(
+                    fields[rubric.source.index]
+                  );
+                  return (
+                    <div
+                      className="flex items-center justify-between text-sm"
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      ref={provided.innerRef}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <GridDotsVertical size="1.2rem" color={colors.$17} />
+                        <div className="flex flex-col">
+                          <span className="font-medium">
+                            {t(FIELDS_LABELS[decoded.field] ?? decoded.field)}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {t(PERIOD_LABELS[decoded.period] ?? decoded.period)}
+                            {' · '}
+                            {t(
+                              decoded.calculate === 'avg'
+                                ? 'average'
+                                : decoded.calculate
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                      <CircleXMark
+                        color={colors.$16}
+                        hoverColor={colors.$3}
+                        borderColor={colors.$5}
+                        hoverBorderColor={colors.$17}
+                        size="1.6rem"
+                      />
+                    </div>
+                  );
+                }}
+              >
+                {(droppableProvided) => (
+                  <div
+                    className="flex flex-col"
+                    {...droppableProvided.droppableProps}
+                    ref={droppableProvided.innerRef}
+                  >
+                    {fields.map((key, index) => {
+                      const decoded = decodeDashboardField(key);
+                      return (
+                        <Draggable
+                          key={`${key}-${index}`}
+                          draggableId={`${key}-${index}`}
+                          index={index}
+                        >
+                          {(provided) => (
+                            <div
+                              className="flex items-center justify-between py-1.5"
+                              {...provided.draggableProps}
+                              ref={provided.innerRef}
+                            >
+                              <div
+                                className="flex flex-1 items-center space-x-2 cursor-pointer"
+                                {...provided.dragHandleProps}
+                              >
+                                <GridDotsVertical
+                                  size="1.2rem"
+                                  color={colors.$17}
+                                />
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium">
+                                    {t(
+                                      FIELDS_LABELS[decoded.field] ??
+                                        decoded.field
+                                    )}
+                                  </span>
+                                  <span className="text-xs text-gray-500">
+                                    {t(
+                                      PERIOD_LABELS[decoded.period] ??
+                                        decoded.period
+                                    )}
+                                    {' · '}
+                                    {t(
+                                      decoded.calculate === 'avg'
+                                        ? 'average'
+                                        : decoded.calculate
+                                    )}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div
+                                className="cursor-pointer"
+                                onClick={() => handleRemove(index)}
+                              >
+                                <CircleXMark
+                                  color={colors.$16}
+                                  hoverColor={colors.$3}
+                                  borderColor={colors.$5}
+                                  hoverBorderColor={colors.$17}
+                                  size="1.6rem"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </Draggable>
+                      );
+                    })}
+
+                    {droppableProvided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          )}
 
           <Button
             behavior="button"
@@ -190,7 +335,7 @@ export function DashboardCardSelector() {
           <Button
             behavior="button"
             onClick={handleSave}
-            disabled={isBusy}
+            disabled={isFormBusy}
             disableWithoutIcon
           >
             {t('save')}
@@ -198,14 +343,13 @@ export function DashboardCardSelector() {
         </div>
       </Modal>
 
-      {/* ── Add field modal ─────────────────────────────────── */}
       <Modal
         title={t('add_field')}
         size="extraSmall"
         visible={addOpen}
         onClose={() => {
           setAddOpen(false);
-          setNewField(emptyField());
+          setNewField(emptyNewField());
         }}
       >
         <div className="flex flex-col space-y-4">

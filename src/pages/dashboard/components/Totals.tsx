@@ -33,8 +33,6 @@ import dayjs from 'dayjs';
 import styled from 'styled-components';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import Toggle from '$app/components/forms/Toggle';
-import { Icon } from '$app/components/icons/Icon';
-import { BiMove } from 'react-icons/bi';
 import { DashboardCardSelector } from './DashboardCardSelector';
 import { PreferenceCardsGrid } from './PreferenceCardsGrid';
 
@@ -51,26 +49,10 @@ interface Currency {
 }
 
 export interface ChartData {
-  invoices: {
-    total: string;
-    date: string;
-    currency: string;
-  }[];
-  payments: {
-    total: string;
-    date: string;
-    currency: string;
-  }[];
-  outstanding: {
-    total: string;
-    date: string;
-    currency: string;
-  }[];
-  expenses: {
-    total: string;
-    date: string;
-    currency: string;
-  }[];
+  invoices: { total: string; date: string; currency: string }[];
+  payments: { total: string; date: string; currency: string }[];
+  outstanding: { total: string; date: string; currency: string }[];
+  expenses: { total: string; date: string; currency: string }[];
 }
 
 export enum TotalColors {
@@ -132,14 +114,14 @@ const GLOBAL_DATE_RANGES: Record<string, { start: string; end: string }> = {
 export function Totals() {
   const [t] = useTranslation();
 
-  const settings = useReactSettings();
-  const { Preferences, update } = usePreferences();
   const formatMoney = useFormatMoney();
+  const { Preferences, update } = usePreferences();
+
   const colors = useColorScheme();
   const company = useCurrentCompany();
+  const settings = useReactSettings();
   const currentUser = useCurrentUser();
 
-  const [isEditMode, setIsEditMode] = useState(false);
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
@@ -151,7 +133,6 @@ export function Totals() {
     settings?.preferences?.dashboard_charts?.range || 'this_month';
   const includeDrafts =
     settings?.preferences?.dashboard_charts?.include_drafts || false;
-
   const currentDashboardFields = settings?.dashboard_fields ?? [];
 
   const [dates, setDates] = useState<{ start_date: string; end_date: string }>({
@@ -170,10 +151,7 @@ export function Totals() {
   });
 
   useEffect(() => {
-    setBody((current) => ({
-      ...current,
-      date_range: dateRange,
-    }));
+    setBody((current) => ({ ...current, date_range: dateRange }));
   }, [settings?.preferences?.dashboard_charts?.range]);
 
   const handleDateChange = (DateSet: string) => {
@@ -274,7 +252,6 @@ export function Totals() {
         </div>
       )}
 
-      {/* Toolbar — identical to original, + DashboardCardSelector and BiMove */}
       <div className="flex items-center justify-end lg:justify-between">
         <span className="hidden lg:inline-block text-sm text-gray-500">
           {t('account_login_text')}
@@ -374,13 +351,11 @@ export function Totals() {
               />
             </div>
 
-            <DashboardCardSelector />
-
             <div
-              className="flex items-center cursor-pointer"
-              onClick={() => setIsEditMode((prev) => !prev)}
+              className="flex items-center justify-center rounded-lg border shadow-sm px-2.5 py-1.5"
+              style={{ borderColor: colors.$24, backgroundColor: colors.$1 }}
             >
-              <Icon element={BiMove} size={23} />
+              <DashboardCardSelector />
             </div>
 
             <Preferences>
@@ -438,7 +413,6 @@ export function Totals() {
         </div>
       </div>
 
-      {/* Preference cards — between toolbar and main grid */}
       {currentDashboardFields.length > 0 && (
         <div className="mt-6 w-full">
           <PreferenceCardsGrid
@@ -448,12 +422,10 @@ export function Totals() {
             endDate={dates.end_date}
             currencyId={currency.toString()}
             layoutBreakpoint="lg"
-            isEditMode={isEditMode}
           />
         </div>
       )}
 
-      {/* Main grid — Recent Transactions + Overview chart */}
       <div className="grid grid-cols-10 mt-4 gap-8">
         {company && (
           <Card

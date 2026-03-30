@@ -1,13 +1,24 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { DashboardCardField } from '$app/common/interfaces/company-user';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { Spinner } from '$app/components/Spinner';
 import { Card } from '$app/components/cards';
 import { FIELDS_LABELS } from './DashboardCardSelector';
+import { useColorScheme } from '$app/common/colors';
+import { decodeDashboardField } from '$app/common/helpers/react-settings';
 
 export const PERIOD_LABELS: Record<string, string> = {
   current: 'current_period',
@@ -16,7 +27,7 @@ export const PERIOD_LABELS: Record<string, string> = {
 };
 
 interface Props {
-  field: DashboardCardField;
+  fieldKey: string;
   dateRange: string;
   startDate: string;
   endDate: string;
@@ -24,17 +35,22 @@ interface Props {
 }
 
 export function DashboardCard({
-  field,
+  fieldKey,
   dateRange,
   startDate,
   endDate,
   currencyId,
 }: Props) {
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
   const queryClient = useQueryClient();
+
   const formatMoney = useFormatMoney();
 
-  const [isBusy, setIsBusy] = useState(false);
+  const field = decodeDashboardField(fieldKey);
+
+  const [isBusy, setIsBusy] = useState<boolean>(false);
   const [value, setValue] = useState<number | undefined>(undefined);
 
   useEffect(() => {
@@ -70,7 +86,7 @@ export function DashboardCard({
         setIsBusy(false);
       }
     })();
-  }, [field, dateRange, startDate, endDate, currencyId]);
+  }, [fieldKey, dateRange, startDate, endDate, currencyId]);
 
   const displayValue =
     field.format === 'money' && field.calculate !== 'count'
@@ -78,16 +94,21 @@ export function DashboardCard({
       : value;
 
   return (
-    <Card className="flex h-full flex-col items-center justify-center gap-1 px-6 py-4">
+    <Card
+      className="flex h-full flex-col items-center justify-center gap-1 px-6 py-4 overflow-hidden shadow-sm"
+      style={{ borderColor: colors.$24 }}
+    >
       {isBusy ? (
         <Spinner />
       ) : (
-        <div className="flex flex-col items-center justify-center gap-1">
-          <span className="text-center text-sm font-medium">
+        <div className="flex w-full flex-col items-center justify-center gap-1 min-w-0">
+          <span className="w-full truncate text-center text-sm font-medium">
             {t(FIELDS_LABELS[field.field] ?? field.field)}
           </span>
-          <span className="text-xl font-semibold">{displayValue}</span>
-          <span className="text-xs text-gray-500">
+          <span className="w-full truncate text-center text-xl font-semibold">
+            {displayValue}
+          </span>
+          <span className="w-full truncate text-center text-xs text-gray-500">
             {t(PERIOD_LABELS[field.period] ?? field.period)}
           </span>
         </div>

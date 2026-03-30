@@ -17,7 +17,6 @@ import { Entity } from '$app/components/CommonActionsPreferenceModal';
 import { PerPage } from '$app/components/DataTable';
 import { ThemeColorField } from '$app/pages/settings/user/components/StatusColorTheme';
 import { ClientShowCard } from '$app/pages/clients/show/components/CardsCustomizationModal';
-import { DashboardCardField } from '$app/common/interfaces/company-user';
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
 
@@ -78,8 +77,7 @@ export interface ReactSettings {
   dark_mode?: boolean;
   color_theme?: ColorTheme;
   client_show_cards?: ClientShowCard[];
-  dashboard_fields?: DashboardCardField[];
-  preference_cards_order?: string[];
+  dashboard_fields?: string[];
 }
 
 export type ReactTableColumns =
@@ -142,7 +140,6 @@ export function useReactSettings(options?: Options) {
   const settings: ReactSettings = {
     show_pdf_preview: true,
     react_notification_link: true,
-    // This is legacy fallback for old settings location. If you see this in 2 years, feel free to remove it.
     react_table_columns: {
       ...previousReactTableColumns,
       ...reactSettings.react_table_columns,

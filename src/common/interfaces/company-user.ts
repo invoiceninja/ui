@@ -35,7 +35,7 @@ export type Calculate = 'sum' | 'avg' | 'count';
 export type Format = 'money' | 'time';
 
 export interface DashboardCardField {
-  id: string;
+  key: string;
   field: Field;
   period: Period;
   calculate: Calculate;
