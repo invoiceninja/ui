@@ -798,6 +798,7 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
   const customActions = useCustomQuoteActions({
     permissions: [
       'create_quote',
+      'create_invoice',
       'create_project',
       'create_client',
       'view_client',
@@ -808,6 +809,7 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
   await clear('quotes@example.com');
   await set(
     'create_quote',
+    'create_invoice',
     'create_project',
     'edit_quote',
     'create_client',
