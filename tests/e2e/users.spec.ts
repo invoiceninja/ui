@@ -45,17 +45,44 @@ async function restoreUser(userId: string): Promise<void> {
 }
 
 /**
- * Helper: ensure a seed user exists and is active before a test runs.
- * If they were deleted/archived in a prior failed run, restore them first.
+ * Helper: ensure a user exists and is active before a test runs.
+ * If they were deleted/archived in a prior failed run, restore them.
+ * If they don't exist at all, create them via API.
  */
 async function ensureUserExists(userName: string): Promise<string> {
-  const userId = await findUserId(userName);
-  if (!userId) {
-    throw new Error(
-      `Seed user "${userName}" not found. Run: php artisan migrate:fresh --seed`
-    );
+  let userId = await findUserId(userName);
+
+  if (userId) {
+    await restoreUser(userId);
+    return userId;
   }
-  await restoreUser(userId);
+
+  // User doesn't exist — create them
+  const [firstName, ...lastParts] = userName.split(' ');
+  const lastName = lastParts.join(' ');
+  const email = `${firstName.toLowerCase()}@example.com`;
+
+  const api = await createApiContext(process.env.VITE_API_URL!);
+  const { request } = await import('@playwright/test');
+  const context = await request.newContext({ baseURL: api.baseUrl });
+
+  const response = await context.post('/api/v1/users', {
+    headers: api.headers,
+    data: {
+      first_name: firstName,
+      last_name: lastName,
+      email,
+    },
+  });
+
+  const body = await response.json();
+  await context.dispose();
+
+  userId = body.data?.id;
+  if (!userId) {
+    throw new Error(`Failed to create user "${userName}": ${JSON.stringify(body).slice(0, 200)}`);
+  }
+
   return userId;
 }
 
@@ -88,7 +115,7 @@ test("Can't see owner of the account in the list of users", async ({
   // Filter for the owner's email — should not be visible to non-owners
   await page.locator('#filter').fill('user@example.com');
 
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   await expect(page.getByText('user@example.com')).not.toBeVisible();
 
@@ -135,13 +162,11 @@ test('deleting user', async ({ page }) => {
   ).not.toBeVisible();
 
   // Restore the user so subsequent runs still work
-  if (userId) {
-    await restoreUser(userId);
-  }
+  await restoreUser(userId);
 });
 
 test('archiving user', async ({ page }) => {
-  const userId = await findUserId('Expenses Example');
+  const userId = await ensureUserExists('Expenses Example');
 
   await login(page);
 
@@ -181,13 +206,11 @@ test('archiving user', async ({ page }) => {
   ).not.toBeVisible();
 
   // Restore the user so subsequent runs still work
-  if (userId) {
-    await restoreUser(userId);
-  }
+  await restoreUser(userId);
 });
 
 test('removing user', async ({ page }) => {
-  const userId = await findUserId('Tasks Example');
+  const userId = await ensureUserExists('Tasks Example');
 
   await login(page);
 
@@ -227,7 +250,5 @@ test('removing user', async ({ page }) => {
   ).not.toBeVisible();
 
   // Restore the user so subsequent runs still work
-  if (userId) {
-    await restoreUser(userId);
-  }
+  await restoreUser(userId);
 });

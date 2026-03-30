@@ -33,7 +33,7 @@ export function permissions(page: Page) {
     await page.getByRole('link', { name: 'User Management' }).click();
     await page.locator('#filter').fill(email);
 
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(500);
 
     const tableBody = page.locator('tbody').first();
 
@@ -137,7 +137,7 @@ export async function checkTableEditability(page: Page, isEditable: boolean) {
 export async function checkDropdownActions(
   page: Page,
   actions: Action[],
-  dropdownId: string,
+  dropdownId?: string,
   containerId?: string,
   withOutOpening?: boolean
 ) {
@@ -149,7 +149,10 @@ export async function checkDropdownActions(
       .click();
   }
 
-  const dropDown = page.locator(`[data-cy=${dropdownId}]`);
+  const dropDown = dropdownId
+    ? page.locator(`[data-cy=${dropdownId}]`)
+    : page.locator('[data-tippy-root]:visible');
+  await dropDown.waitFor({ state: 'visible', timeout: 5000 });
 
   for (const { label, visible, modal } of actions) {
     if (visible) {

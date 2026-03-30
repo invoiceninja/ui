@@ -41,7 +41,7 @@ test('Prevent transaction quick popover navigation', async ({ page }) => {
   await page.locator('[type="date"]').first().blur();
 
   // Wait for debounce (300ms) + React re-render to detect the change as unsaved
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   await page.locator('[data-cy="quickPopoverButton"]').click();
 
@@ -91,7 +91,7 @@ test('Prevent quote quick popover navigation', async ({ page }) => {
   await page.locator('[type="date"]').first().blur();
 
   // Wait for debounce (300ms) + React re-render to detect the change as unsaved
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   await page.locator('[data-cy="quickPopoverButton"]').click();
 
@@ -141,7 +141,7 @@ test('Prevent back browser button navigation', async ({ page }) => {
   await page.locator('[type="date"]').first().blur();
 
   // Wait for debounce (300ms) + React re-render to detect the change as unsaved
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   await page.goBack();
 
@@ -187,7 +187,7 @@ test('Prevent account management navigation', async ({ page }) => {
   await page.locator('[type="date"]').first().blur();
 
   // Wait for debounce (300ms) + React re-render to detect the change as unsaved
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   await page.locator('[data-cy="companyDropdown"]').click();
 

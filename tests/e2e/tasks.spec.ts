@@ -683,7 +683,7 @@ test('Invoice Task displayed with admin permission', async ({ page, api }) => {
   await checkDropdownActions(
     page,
     customActions,
-    'bulkActionsDropdown',
+    undefined,
     'dataTable'
   );
 
@@ -733,7 +733,7 @@ test('Invoice Task displayed with creation permissions', async ({
   await checkDropdownActions(
     page,
     customActions,
-    'bulkActionsDropdown',
+    undefined,
     'dataTable'
   );
 

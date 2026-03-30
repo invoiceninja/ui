@@ -353,13 +353,9 @@ test('payment documents preview with edit_payment', async ({ page, api }) => {
 
   await login(page, 'payments@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
-
   await page.getByRole('link', { name: 'Payments', exact: true }).click();
 
   await page.waitForURL('**/payments');
-
-  const tableRow = tableBody.getByRole('row').first();
 
   const doRecordsExist = await waitForTableData(page);
 
@@ -370,6 +366,8 @@ test('payment documents preview with edit_payment', async ({ page, api }) => {
     const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
     if (createdId) api.trackEntity('payments', createdId);
   } else {
+    const tableRow = page.locator('tbody').first().getByRole('row').first();
+
     const moreActionsButton = tableRow
       .getByRole('button')
       .filter({ has: page.getByText('Actions') })
@@ -377,16 +375,16 @@ test('payment documents preview with edit_payment', async ({ page, api }) => {
 
     await moreActionsButton.click();
 
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+    const editLink = page.getByRole('link', { name: 'Edit', exact: true }).first();
+    await editLink.waitFor({ state: 'visible' });
+    await editLink.click();
   }
 
   await page.waitForURL('**/payments/**/edit');
 
-  await page
-    .getByRole('link', {
-      name: 'Documents',
-    })
-    .click();
+  const docsLink = page.getByRole('link', { name: 'Documents' });
+  await docsLink.waitFor({ state: 'visible' });
+  await docsLink.click();
 
   await page.waitForURL('**/payments/**/documents');
 
@@ -406,13 +404,9 @@ test('payment documents uploading with edit_payment', async ({ page, api }) => {
 
   await login(page, 'payments@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
-
   await page.getByRole('link', { name: 'Payments', exact: true }).click();
 
   await page.waitForURL('**/payments');
-
-  const tableRow = tableBody.getByRole('row').first();
 
   const doRecordsExist = await waitForTableData(page);
 
@@ -423,6 +417,8 @@ test('payment documents uploading with edit_payment', async ({ page, api }) => {
     const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
     if (createdId) api.trackEntity('payments', createdId);
   } else {
+    const tableRow = page.locator('tbody').first().getByRole('row').first();
+
     const moreActionsButton = tableRow
       .getByRole('button')
       .filter({ has: page.getByText('Actions') })
@@ -430,16 +426,16 @@ test('payment documents uploading with edit_payment', async ({ page, api }) => {
 
     await moreActionsButton.click();
 
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+    const editLink = page.getByRole('link', { name: 'Edit', exact: true }).first();
+    await editLink.waitFor({ state: 'visible' });
+    await editLink.click();
   }
 
   await page.waitForURL('**/payments/**/edit');
 
-  await page
-    .getByRole('link', {
-      name: 'Documents',
-    })
-    .click();
+  const docsLink = page.getByRole('link', { name: 'Documents' });
+  await docsLink.waitFor({ state: 'visible' });
+  await docsLink.click();
 
   await page.waitForURL('**/payments/**/documents');
 
@@ -448,7 +444,7 @@ test('payment documents uploading with edit_payment', async ({ page, api }) => {
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()

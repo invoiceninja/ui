@@ -953,7 +953,7 @@ test('Prevent navigation in the main navbar', async ({ page, api }) => {
 
   await page.locator('[type="date"]').first().blur();
 
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -1008,7 +1008,7 @@ test('Prevent archive invoice action', async ({ page, api }) => {
 
   await page.locator('[type="date"]').first().blur();
 
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   await page.locator('[data-cy="chevronDownButton"]').click();
 
@@ -1041,7 +1041,7 @@ test('Prevent email invoice action', async ({ page, api }) => {
 
   await page.locator('[type="date"]').first().blur();
 
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   await page.locator('[data-cy="chevronDownButton"]').click();
 
@@ -1094,7 +1094,7 @@ test('Prevent breadcrumb navigation', async ({ page, api }) => {
 
   await page.locator('[type="date"]').first().blur();
 
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   await page
     .locator('nav[aria-label="Breadcrumb"]')
@@ -1154,7 +1154,7 @@ test('Products combobox various selections', async ({ page, api }) => {
     .getByRole('link', { name: 'New Invoice' })
     .click();
 
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   await page.getByRole('option').first().click();
 
@@ -1162,7 +1162,7 @@ test('Products combobox various selections', async ({ page, api }) => {
 
   await page.locator('[data-cy="comboboxInput"]').first().click();
 
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   await page.locator('[data-combobox-element-id="0"]').first().click();
 

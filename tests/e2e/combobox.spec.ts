@@ -15,7 +15,7 @@ test('ComboBox Async value selecting', async ({ page }) => {
 
   await page.goto('/testing');
   await page.waitForURL('/testing');
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   const comboBoxInputField = page.getByRole('combobox').first();
   await comboBoxInputField.click();
@@ -35,7 +35,7 @@ test('ComboBox Async available clearing', async ({ page }) => {
 
   await page.goto('/testing');
   await page.waitForURL('/testing');
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   const comboBoxInputField = page.getByRole('combobox').first();
   await comboBoxInputField.click();
@@ -55,7 +55,7 @@ test('ComboBox Async value clearing', async ({ page }) => {
 
   await page.goto('/testing');
   await page.waitForURL('/testing');
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   const comboBoxInputField = page.getByRole('combobox').first();
   await comboBoxInputField.click();
@@ -85,7 +85,7 @@ test('ComboBox Async action opening slider', async ({ page }) => {
 
   await page.goto('/testing');
   await page.waitForURL('/testing');
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   const comboBoxInputField = page.getByRole('combobox').first();
   await comboBoxInputField.click();
@@ -105,7 +105,7 @@ test('ComboBox Async filtering', async ({ page }) => {
 
   await page.goto('/testing');
   await page.waitForURL('/testing');
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   const comboBoxInputField = page.getByRole('combobox').first();
   await comboBoxInputField.fill('test merge one');

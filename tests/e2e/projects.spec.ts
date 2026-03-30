@@ -388,7 +388,7 @@ test('deleting project with edit_project', async ({ page, api }) => {
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
-    await page.getByText('Delete').click();
+    await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
     await expect(page.getByText('Successfully deleted project')).toBeVisible();
   } else {
@@ -404,7 +404,7 @@ test('deleting project with edit_project', async ({ page, api }) => {
   }
 });
 
-test('archiving project withe edit_project', async ({ page, api }) => {
+test('archiving project with edit_project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const projectName = uniqueName('archive-project');
@@ -439,7 +439,7 @@ test('archiving project withe edit_project', async ({ page, api }) => {
 
     await moreActionsButton.click();
 
-    await page.getByText('Archive').click();
+    await page.getByRole('button', { name: 'Archive', exact: true }).click();
 
     await expect(page.getByText('Successfully archived project')).toBeVisible();
 
@@ -679,7 +679,7 @@ test('cloning project', async ({ page, api }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Clone').first().click();
+  await page.getByRole('button', { name: 'Clone', exact: true }).first().click();
 
   await page.waitForURL('**/projects/create?action=clone');
 
@@ -736,7 +736,7 @@ test('Invoice Project displayed with admin permission', async ({
   await checkDropdownActions(
     page,
     customActions,
-    'bulkActionsDropdown',
+    undefined,
     'dataTable'
   );
 
@@ -794,7 +794,7 @@ test('Invoice Project displayed with creation permissions', async ({
   await checkDropdownActions(
     page,
     customActions,
-    'bulkActionsDropdown',
+    undefined,
     'dataTable'
   );
 
