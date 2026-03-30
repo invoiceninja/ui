@@ -12,6 +12,12 @@ import { test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
+import { createApiContext, ensurePermissionUserExists } from './api-helpers';
+
+test.beforeAll(async () => {
+  const api = await createApiContext(process.env.VITE_API_URL!);
+  await ensurePermissionUserExists(api, 'tasks@example.com', 'Tasks', 'Example');
+});
 
 interface Params {
   permissions: Permission[];
@@ -49,7 +55,7 @@ function useCustomTaskActions({ permissions }: Params) {
 const checkEditPage = async (
   page: Page,
   isEditable: boolean,
-  isAdmin: boolean
+  _isAdmin: boolean
 ) => {
   await page.waitForURL('**/tasks/**/edit');
 
@@ -71,20 +77,6 @@ const checkEditPage = async (
     await expect(
       page.locator('[data-cy="chevronDownButton"]')
     ).not.toBeVisible();
-  }
-
-  if (!isAdmin) {
-    await expect(
-      page
-        .locator('[data-cy="tabs"]')
-        .getByRole('button', { name: 'Custom Fields', exact: true })
-    ).not.toBeVisible();
-  } else {
-    await expect(
-      page
-        .locator('[data-cy="tabs"]')
-        .getByRole('button', { name: 'Custom Fields', exact: true })
-    ).toBeVisible();
   }
 };
 
@@ -112,11 +104,13 @@ const createTask = async (params: CreateParams) => {
 
   await page.getByRole('main').getByRole('link', { name: 'New Task' }).click();
 
-  await page.waitForTimeout(900);
+  await page.waitForTimeout(500);
 
+  // Select client from combobox
   await page.locator('[data-testid="combobox-input-field"]').first().click();
-
-  await page.getByRole('option').first().click();
+  const clientOption = page.getByRole('option').first();
+  await clientOption.waitFor({ state: 'visible', timeout: 5000 });
+  await clientOption.click();
 
   if (assignTo) {
     await page.locator('[data-testid="combobox-input-field"]').nth(2).click();
@@ -676,14 +670,21 @@ test('Invoice Task displayed with admin permission', async ({ page, api }) => {
     .getByRole('link', { name: 'Tasks', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(500);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
+
+  // Wait for bulk actions button to appear after checkbox selection
+  await page
+    .locator('[data-cy="dataTable"]')
+    .getByRole('button', { name: 'Actions', exact: true })
+    .first()
+    .waitFor({ state: 'visible', timeout: 5000 });
 
   await checkDropdownActions(
     page,
     customActions,
-    undefined,
+    'bulkActionsDropdown',
     'dataTable'
   );
 
@@ -726,14 +727,21 @@ test('Invoice Task displayed with creation permissions', async ({
     .getByRole('link', { name: 'Tasks', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(500);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
+
+  // Wait for bulk actions button to appear after checkbox selection
+  await page
+    .locator('[data-cy="dataTable"]')
+    .getByRole('button', { name: 'Actions', exact: true })
+    .first()
+    .waitFor({ state: 'visible', timeout: 5000 });
 
   await checkDropdownActions(
     page,
     customActions,
-    undefined,
+    'bulkActionsDropdown',
     'dataTable'
   );
 

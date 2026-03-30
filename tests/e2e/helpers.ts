@@ -161,23 +161,26 @@ export async function checkDropdownActions(
       if (modal) {
         await page.getByText(label).first().click();
 
-        await expect(page.getByText(modal.title).first()).toBeVisible();
+        const modalDialog = page.getByRole('dialog');
+        await modalDialog.waitFor({ state: 'visible', timeout: 5000 });
+
+        await expect(modalDialog.getByText(modal.title).first()).toBeVisible();
 
         for (const modalAction of modal.actions) {
           if (modalAction.visible) {
             await expect(
-              page.getByText(modalAction.label).first()
+              modalDialog.getByText(modalAction.label).first()
             ).toBeVisible();
           } else {
             await expect(
-              page.getByText(modalAction.label).first()
+              modalDialog.getByText(modalAction.label).first()
             ).not.toBeVisible();
           }
         }
 
         await page.locator(`[data-cy=${modal.dataCyXButton}]`).click();
 
-        await expect(page.getByText(modal.title).first()).not.toBeVisible();
+        await expect(modalDialog).not.toBeVisible();
 
         // Re-open the dropdown since closing the modal also closes it
         const chevron = page.locator('[data-cy="chevronDownButton"]').first();

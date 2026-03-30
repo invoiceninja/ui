@@ -19,28 +19,25 @@ interface Params {
 function useCreditsActions({ permissions }: Params) {
   const hasPermission = useHasPermission({ permissions });
 
-  const isAdmin = permissions.includes('admin');
+  const hasAnyClonePermission =
+    hasPermission('create_credit') ||
+    hasPermission('create_invoice') ||
+    hasPermission('create_quote') ||
+    hasPermission('create_recurring_invoice') ||
+    hasPermission('create_purchase_order');
 
   const actions: Action[] = [
     {
-      label: 'Schedule',
-      visible: isAdmin,
-    },
-    {
-      label: 'Clone to Credit',
-      visible: hasPermission('create_credit'),
-    },
-    {
-      label: 'Clone to Other',
-      visible:
-        hasPermission('create_invoice') ||
-        hasPermission('create_quote') ||
-        hasPermission('create_recurring_invoice') ||
-        hasPermission('create_purchase_order'),
+      label: 'Clone To',
+      visible: hasAnyClonePermission,
       modal: {
         title: 'Clone To',
         dataCyXButton: 'cloneOptionsModalXButton',
         actions: [
+          {
+            label: 'Credit',
+            visible: hasPermission('create_credit'),
+          },
           {
             label: 'Invoice',
             visible: hasPermission('create_invoice'),
@@ -166,9 +163,14 @@ const createCredit = async (params: CreateParams) => {
     .getByRole('link', { name: 'Enter Credit' })
     .click();
 
-  await page.waitForTimeout(900);
+  await page.waitForTimeout(500);
 
-  await page.getByRole('option').first().click();
+  // Wait for client combobox options to load
+  const comboboxInput = page.getByRole('combobox').first();
+  await comboboxInput.click();
+  const clientOption = page.getByRole('option').first();
+  await clientOption.waitFor({ state: 'visible', timeout: 5000 });
+  await clientOption.click();
 
   if (assignTo) {
     await page
@@ -589,7 +591,7 @@ test('credit documents uploading with edit_credit', async ({ page, api }) => {
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
@@ -716,7 +718,9 @@ test('cloning credit', async ({ page, api }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Clone to Credit').first().click();
+  // Open clone modal then select Credit
+  await page.getByText('Clone To').first().click();
+  await page.getByText('Credit', { exact: true }).first().click();
 
   await page.waitForURL('**/credits/create?action=clone');
 

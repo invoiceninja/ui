@@ -406,6 +406,58 @@ export async function restoreDeletedUsers(api: ApiContext): Promise<void> {
   }
 }
 
+/**
+ * Ensure a permission user exists by email. If missing, create them.
+ * If deleted/archived, restore them.
+ * Returns the user ID.
+ */
+export async function ensurePermissionUserExists(
+  api: ApiContext,
+  email: string,
+  firstName?: string,
+  lastName?: string
+): Promise<string> {
+  const users = await fetchAllUsers(api);
+  const existing = users.find((u) => u.email === email);
+
+  if (existing) {
+    if (existing.is_deleted) {
+      await bulkAction(api, 'users' as EntityType, [existing.id], 'restore');
+      console.log(`  Restored deleted user ${email}`);
+    }
+    return existing.id;
+  }
+
+  // User doesn't exist — derive name from email if not provided
+  const localPart = email.split('@')[0];
+  const derivedFirst =
+    firstName || localPart.charAt(0).toUpperCase() + localPart.slice(1);
+  const derivedLast = lastName || 'Example';
+
+  const context = await apiRequest(api);
+  const response = await context.post('/api/v1/users', {
+    headers: api.headers,
+    data: {
+      first_name: derivedFirst,
+      last_name: derivedLast,
+      email,
+    },
+  });
+
+  const body = await response.json();
+  await context.dispose();
+
+  const userId = body.data?.id;
+  if (!userId) {
+    throw new Error(
+      `Failed to create user ${email}: ${JSON.stringify(body).slice(0, 200)}`
+    );
+  }
+
+  console.log(`  Created missing user ${email} (${derivedFirst} ${derivedLast})`);
+  return userId;
+}
+
 // ---------------------------------------------------------------------------
 // Company settings
 // ---------------------------------------------------------------------------

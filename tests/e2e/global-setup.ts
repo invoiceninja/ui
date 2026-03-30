@@ -14,6 +14,7 @@ import {
   resetPermissionUser,
   restoreDeletedUsers,
   resetCompanySettings,
+  ensurePermissionUserExists,
 } from './api-helpers';
 
 config({ path: '.env.testing', override: true });
@@ -60,12 +61,17 @@ async function globalSetup() {
     // 3. Restore any deleted seed users
     await restoreDeletedUsers(api);
 
-    // 4. Reset permissions for all test users
+    // 4. Ensure all permission users exist (create if missing from seed)
+    for (const email of PERMISSION_EMAILS) {
+      await ensurePermissionUserExists(api, email);
+    }
+
+    // 5. Reset permissions for all test users
     for (const email of PERMISSION_EMAILS) {
       await resetPermissionUser(api, email);
     }
 
-    // 5. Purge all entities to get a clean state
+    // 6. Purge all entities to get a clean state
     await purgeAllEntities(api);
 
     console.log('API state reset complete.\n');
