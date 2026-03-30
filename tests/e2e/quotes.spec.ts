@@ -27,11 +27,11 @@ function useQuotesActions({ permissions }: Params) {
       visible: isAdmin,
     },
     {
-      label: 'Convert to Invoice',
+      label: 'Convert to',
       visible: hasPermission('create_invoice'),
     },
     {
-      label: 'Convert to Project',
+      label: 'Convert to',
       visible: hasPermission('create_project'),
     },
     {
@@ -75,11 +75,11 @@ function useCustomQuoteActions({ permissions }: Params) {
 
   const actions: Action[] = [
     {
-      label: 'Convert to Invoice',
+      label: 'Convert to',
       visible: hasPermission('create_invoice'),
     },
     {
-      label: 'Convert to Project',
+      label: 'Convert to',
       visible: hasPermission('create_project'),
     },
   ];
