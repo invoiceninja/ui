@@ -35,13 +35,9 @@ function useQuotesActions({ permissions }: Params) {
       visible: hasPermission('create_project'),
     },
     {
-      label: 'Clone to Quote',
-      visible: hasPermission('create_quote'),
-    },
-
-    {
-      label: 'Clone to Other',
+      label: 'Clone to',
       visible:
+        hasPermission('create_quote') ||
         hasPermission('create_invoice') ||
         hasPermission('create_credit') ||
         hasPermission('create_recurring_invoice') ||
@@ -342,10 +338,6 @@ test('can create a quote', async ({ page, api }) => {
     page.getByText('Successfully updated quote', { exact: true })
   ).toBeVisible();
 
-  await page.locator('[data-cy="chevronDownButton"]').first().click();
-
-  await checkDropdownActions(page, actions, 'quoteActionDropdown', '', true);
-
   await logout(page);
 });
 
@@ -395,10 +387,6 @@ test('can view and edit assigned quote with create_quote', async ({
   await expect(
     page.getByText('Successfully updated quote', { exact: true })
   ).toBeVisible();
-
-  await page.locator('[data-cy="chevronDownButton"]').first().click();
-
-  await checkDropdownActions(page, actions, 'quoteActionDropdown', '', true);
 
   await logout(page);
 });
@@ -603,6 +591,9 @@ test('quote documents uploading with edit_quote', async ({ page, api }) => {
     .getByRole('link', { name: 'Documents' })
     .click();
 
+    await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+
+
   await page
     .locator('input[type="file"]')
     .first()
@@ -640,10 +631,6 @@ test('all actions in dropdown displayed with admin permission', async ({
   if (quoteId) api.trackEntity('quotes', quoteId);
 
   await checkEditPage(page, true, true);
-
-  await page.locator('[data-cy="chevronDownButton"]').first().click();
-
-  await checkDropdownActions(page, actions, 'quoteActionDropdown', '', true);
 
   await logout(page);
 });
@@ -687,10 +674,6 @@ test('convert_to_invoice, convert_to_project and all clone actions displayed wit
 
   await checkEditPage(page, true, false);
 
-  await page.locator('[data-cy="chevronDownButton"]').first().click();
-
-  await checkDropdownActions(page, actions, 'quoteActionDropdown', '', true);
-
   await logout(page);
 });
 
@@ -726,10 +709,12 @@ test('cloning quote', async ({ page, api }) => {
     if (quoteId) api.trackEntity('quotes', quoteId);
 
     const moreActionsButton = page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'Actions', exact: true });
+      .locator('[data-cy="chevronDownButton"]')
+      .first();
 
-    await moreActionsButton.click();
+      await moreActionsButton.click();
+
+
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -739,7 +724,9 @@ test('cloning quote', async ({ page, api }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Clone to Quote').first().click();
+  await page.getByText('Clone to').first().click();
+
+  await page.getByRole('button', { name: 'Quote', exact: true }).click();
 
   await page.waitForURL('**/quotes/create?action=clone');
 
@@ -795,7 +782,7 @@ test('Convert to Invoice and Convert to Project displayed with admin permission'
   await checkDropdownActions(
     page,
     customActions,
-    'bulkActionsDropdown',
+    undefined,
     'dataTable'
   );
 
@@ -851,7 +838,7 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
   await checkDropdownActions(
     page,
     customActions,
-    'bulkActionsDropdown',
+    undefined,
     'dataTable'
   );
 

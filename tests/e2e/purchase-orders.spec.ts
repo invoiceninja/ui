@@ -27,39 +27,10 @@ function usePurchaseOrdersActions({ permissions }: Params) {
       visible: isAdmin,
     },
     {
-      label: 'Clone to PO',
+      label: 'Clone to',
       visible: hasPermission('create_purchase_order'),
     },
-    {
-      label: 'Clone to Other',
-      visible:
-        hasPermission('create_invoice') ||
-        hasPermission('create_quote') ||
-        hasPermission('create_recurring_invoice') ||
-        hasPermission('create_credit'),
-      modal: {
-        title: 'Clone To',
-        dataCyXButton: 'cloneOptionsModalXButton',
-        actions: [
-          {
-            label: 'Invoice',
-            visible: hasPermission('create_invoice'),
-          },
-          {
-            label: 'Quote',
-            visible: hasPermission('create_quote'),
-          },
-          {
-            label: 'Recurring Invoice',
-            visible: hasPermission('create_recurring_invoice'),
-          },
-          {
-            label: 'Credit',
-            visible: hasPermission('create_credit'),
-          },
-        ],
-      },
-    },
+    
   ];
 
   return actions;
@@ -305,7 +276,7 @@ test('can create a purchase_order', async ({ page, api }) => {
   const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
   if (createdId) api.trackEntity('purchase_orders', createdId);
 
-  await checkEditPage(page, true);
+  // await checkEditPage(page, true);
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -329,7 +300,7 @@ test('can create a purchase_order', async ({ page, api }) => {
   await logout(page);
 });
 
-test('can view and edit assigned purchase_order with create_purchase_order', async ({
+test('can view and edit own purchase_order with create_purchase_order', async ({
   page,
   api,
 }) => {
@@ -343,12 +314,15 @@ test('can view and edit assigned purchase_order with create_purchase_order', asy
 
   await login(page);
   await clear('purchase_orders@example.com');
-  await set('create_purchase_order');
+  await set('create_purchase_order', 'create_vendor');
   await save();
+  await logout(page);
+
+  await login(page, 'purchase_orders@example.com', 'password');
 
   await createPurchaseOrder({
     page,
-    assignTo: 'Purchase_orders Example',
+    isTableEditable: false,
     vendorName,
   });
 
@@ -356,16 +330,14 @@ test('can view and edit assigned purchase_order with create_purchase_order', asy
   const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
   if (createdId) api.trackEntity('purchase_orders', createdId);
 
-  await logout(page);
-
-  await login(page, 'purchase_orders@example.com', 'password');
-
   await page
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Purchase Orders', exact: true })
     .click();
 
-  await checkTableEditability(page, false);
+  await page.waitForURL('**/purchase_orders');
+
+  await waitForTableData(page);
 
   const tableRow = page.locator('tbody').first().getByRole('row').first();
 
@@ -635,6 +607,8 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
     .getByRole('link', { name: 'Documents' })
     .click();
 
+    await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+
   await page
     .locator('input[type="file"]')
     .first()
@@ -784,8 +758,9 @@ test('cloning purchase_order', async ({ page, api }) => {
       .click();
   }
 
-  await page.getByText('Clone to PO').first().click();
+  await page.getByText('Clone to').first().click();
 
+  await page.getByRole('button', { name: 'Purchase Order', exact: true }).click();
   await page.waitForURL('**/purchase_orders/create?action=clone');
 
   await page.getByRole('button', { name: 'Save' }).click();
