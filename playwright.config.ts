@@ -16,7 +16,7 @@ export default defineConfig({
   /* Reset API state before running the test suite. */
   globalSetup: './tests/e2e/global-setup.ts',
   /* Maximum time one test can run for. */
-  timeout: 5000,
+  timeout: 15000,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.

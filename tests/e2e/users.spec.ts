@@ -8,6 +8,7 @@ import {
 
 /**
  * Helper: find a user by display name via API and return their ID.
+ * Searches all users including deleted/archived so we can restore them.
  */
 async function findUserId(userName: string): Promise<string | null> {
   const api = await createApiContext(process.env.VITE_API_URL!);
@@ -15,7 +16,7 @@ async function findUserId(userName: string): Promise<string | null> {
   const context = await request.newContext({ baseURL: api.baseUrl });
 
   const response = await context.get(
-    `/api/v1/users?per_page=100`,
+    `/api/v1/users?per_page=100&include_deleted=true`,
     { headers: api.headers }
   );
 
@@ -36,11 +37,26 @@ async function findUserId(userName: string): Promise<string | null> {
 }
 
 /**
- * Helper: restore a user by ID via API.
+ * Helper: restore a user by ID via API (undoes delete/archive).
  */
 async function restoreUser(userId: string): Promise<void> {
   const api = await createApiContext(process.env.VITE_API_URL!);
   await bulkAction(api, 'users' as EntityType, [userId], 'restore');
+}
+
+/**
+ * Helper: ensure a seed user exists and is active before a test runs.
+ * If they were deleted/archived in a prior failed run, restore them first.
+ */
+async function ensureUserExists(userName: string): Promise<string> {
+  const userId = await findUserId(userName);
+  if (!userId) {
+    throw new Error(
+      `Seed user "${userName}" not found. Run: php artisan migrate:fresh --seed`
+    );
+  }
+  await restoreUser(userId);
+  return userId;
 }
 
 test("Can't see owner of the account in the list of users", async ({
@@ -80,8 +96,8 @@ test("Can't see owner of the account in the list of users", async ({
 });
 
 test('deleting user', async ({ page }) => {
-  // Capture user ID before deletion so we can restore afterward
-  const userId = await findUserId('Quotes Example');
+  // Ensure the user exists (restore if deleted by a prior failed run)
+  const userId = await ensureUserExists('Quotes Example');
 
   await login(page);
 
