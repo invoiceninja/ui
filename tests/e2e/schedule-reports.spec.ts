@@ -9,10 +9,47 @@ import {
   type EntityType,
 } from '$tests/e2e/api-helpers';
 import dayjs from 'dayjs';
+import { Locator, Page } from '@playwright/test';
 
 function trackScheduleFromUrl(page: { url: () => string }, api: { trackEntity: (type: EntityType, id: string) => void }) {
   const id = extractIdFromUrl(page.url(), 'schedules');
   if (id) api.trackEntity('task_schedulers', id);
+}
+
+/**
+ * Helper to interact with a React Select customSelector dropdown.
+ * Finds the Element row by its <dt> label text, then operates on the <dd> containing the React Select.
+ */
+function getCustomSelectByLabel(page: Page, labelText: string): Locator {
+  return page.locator('dt').filter({ hasText: new RegExp(`^${labelText}$`) }).locator('..').locator('dd');
+}
+
+async function openCustomSelect(page: Page, labelText: string) {
+  const dd = getCustomSelectByLabel(page, labelText);
+  await dd.locator('svg').last().click();
+}
+
+async function selectCustomOption(page: Page, labelText: string, optionText: string) {
+  await openCustomSelect(page, labelText);
+  await page.getByText(optionText, { exact: true }).click();
+}
+
+async function expectCustomSelectText(page: Page, labelText: string, expectedText: string) {
+  const dd = getCustomSelectByLabel(page, labelText);
+  await expect(dd).toContainText(expectedText);
+}
+
+/**
+ * Helper to interact with a CustomMultiSelect by its id.
+ * The id is placed on the React Select container by React Select's id prop.
+ */
+function getMultiSelectById(page: Page, id: string): Locator {
+  return page.locator(`[id="${id}"]`);
+}
+
+async function openMultiSelect(page: Page, id: string) {
+  const container = getMultiSelectById(page, id);
+  await container.locator('svg').last().click();
 }
 
 test('Activity report test', async ({ page, api }) => {
@@ -23,9 +60,8 @@ test('Activity report test', async ({ page, api }) => {
     .getByRole('link', { name: 'Reports', exact: true })
     .click();
 
-  await page
-    .locator('[data-cy="reportDateRange"]')
-    .selectOption({ label: 'Last 7 Days' });
+  // Date range: select "Last 7 Days" via React Select customSelector
+  await selectCustomOption(page, 'Range', 'Last 7 Days');
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -37,13 +73,10 @@ test('Activity report test', async ({ page, api }) => {
     .getByRole('button', { name: 'Schedule', exact: true })
     .click();
 
-  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
-    'activity'
-  );
+  // On the schedule form, verify report name and date range via React Select text
+  await expectCustomSelectText(page, 'Report', 'Activity');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
-  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
-    'last7_days'
-  );
+  await expectCustomSelectText(page, 'Range', 'Last 7 Days');
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -53,13 +86,9 @@ test('Activity report test', async ({ page, api }) => {
   await page.waitForURL('**/settings/schedules/**/edit');
   trackScheduleFromUrl(page, api);
 
-  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
-    'activity'
-  );
+  await expectCustomSelectText(page, 'Report', 'Activity');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
-  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
-    'last7_days'
-  );
+  await expectCustomSelectText(page, 'Range', 'Last 7 Days');
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
@@ -81,23 +110,19 @@ test('Invoice report test', async ({ page, api }) => {
     .getByRole('link', { name: 'Reports', exact: true })
     .click();
 
-  await page
-    .locator('[data-cy="reportNameSelector"]')
-    .selectOption({ label: 'Invoice' });
+  // Select "Invoice" report via React Select customSelector
+  await selectCustomOption(page, 'Report', 'Invoice');
 
-  await page.locator('[id="statusSelector"]').click();
-
+  await openMultiSelect(page, 'statusSelector');
   await page.getByText('Draft').click();
 
   await page.waitForTimeout(200);
 
-  await page.locator('[id="statusSelector"]').click();
-
+  await openMultiSelect(page, 'statusSelector');
   await page.getByText('Paid').first().click();
 
-  await page
-    .locator('[data-cy="reportDateRange"]')
-    .selectOption({ label: 'Custom' });
+  // Select "Custom" date range via React Select customSelector
+  await selectCustomOption(page, 'Range', 'Custom');
 
   await page.waitForTimeout(200);
 
@@ -127,13 +152,9 @@ test('Invoice report test', async ({ page, api }) => {
     .getByRole('button', { name: 'Schedule', exact: true })
     .click();
 
-  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
-    'invoice'
-  );
+  await expectCustomSelectText(page, 'Report', 'Invoice');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
-  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
-    'custom'
-  );
+  await expectCustomSelectText(page, 'Range', 'Custom');
   await expect(page.locator('[data-cy="scheduleStartDate"]')).toHaveValue(
     dayjs().format('YYYY-MM-DD')
   );
@@ -159,13 +180,9 @@ test('Invoice report test', async ({ page, api }) => {
   await page.waitForURL('**/settings/schedules/**/edit');
   trackScheduleFromUrl(page, api);
 
-  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
-    'invoice'
-  );
+  await expectCustomSelectText(page, 'Report', 'Invoice');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
-  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
-    'custom'
-  );
+  await expectCustomSelectText(page, 'Range', 'Custom');
   await expect(page.locator('[data-cy="scheduleStartDate"]')).toHaveValue(
     dayjs().format('YYYY-MM-DD')
   );
@@ -196,17 +213,15 @@ test('Profit and loss report test', async ({ page, api }) => {
     .getByRole('link', { name: 'Reports', exact: true })
     .click();
 
-  await page
-    .locator('[data-cy="reportNameSelector"]')
-    .selectOption({ label: 'Profit and Loss' });
+  // Select "Profit and Loss" report via React Select customSelector
+  await selectCustomOption(page, 'Report', 'Profit and Loss');
 
   await page.locator('[data-cy="expenseBilled"]').check();
   await page.locator('[data-cy="incomeBilled"]').check();
   await page.locator('[data-cy="includeTax"]').check();
 
-  await page
-    .locator('[data-cy="reportDateRange"]')
-    .selectOption({ label: 'This Month' });
+  // Select "This Month" date range via React Select customSelector
+  await selectCustomOption(page, 'Range', 'This Month');
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -218,16 +233,12 @@ test('Profit and loss report test', async ({ page, api }) => {
     .getByRole('button', { name: 'Schedule', exact: true })
     .click();
 
-  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
-    'profitloss'
-  );
+  await expectCustomSelectText(page, 'Report', 'Profit and Loss');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
   await expect(page.locator('[data-cy="expenseBilled"]')).toBeChecked();
   await expect(page.locator('[data-cy="incomeBilled"]')).toBeChecked();
   await expect(page.locator('[data-cy="includeTax"]')).toBeChecked();
-  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
-    'this_month'
-  );
+  await expectCustomSelectText(page, 'Range', 'This Month');
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -237,16 +248,12 @@ test('Profit and loss report test', async ({ page, api }) => {
   await page.waitForURL('**/settings/schedules/**/edit');
   trackScheduleFromUrl(page, api);
 
-  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
-    'profitloss'
-  );
+  await expectCustomSelectText(page, 'Report', 'Profit and Loss');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
   await expect(page.locator('[data-cy="expenseBilled"]')).toBeChecked();
   await expect(page.locator('[data-cy="incomeBilled"]')).toBeChecked();
   await expect(page.locator('[data-cy="includeTax"]')).toBeChecked();
-  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
-    'this_month'
-  );
+  await expectCustomSelectText(page, 'Range', 'This Month');
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
@@ -272,24 +279,17 @@ test('Product sales report test', async ({ page, api }) => {
     .getByRole('link', { name: 'Reports', exact: true })
     .click();
 
-  await page
-    .locator('[data-cy="reportNameSelector"]')
-    .selectOption({ label: 'Product Sales' });
+  // Select "Product Sales" report via React Select customSelector
+  await selectCustomOption(page, 'Report', 'Product Sales');
 
-  await page
-    .locator('[class=" css-1xc3v61-indicatorContainer"]')
-    .last()
-    .click();
-
+  // Open the product multi-select and pick product1
+  await openMultiSelect(page, 'productItemSelector');
   await page.getByText(product1.product_key, { exact: true }).first().click();
 
+  // Click away to close the menu, then reopen to pick product2
   await page.getByText('Products', { exact: true }).last().click();
 
-  await page
-    .locator('[class=" css-1xc3v61-indicatorContainer"]')
-    .last()
-    .click();
-
+  await openMultiSelect(page, 'productItemSelector');
   await page
     .getByText(product2.product_key, { exact: true })
     .first()
@@ -301,9 +301,8 @@ test('Product sales report test', async ({ page, api }) => {
 
   await page.locator('[role="listbox"]').getByRole('option').first().click();
 
-  await page
-    .locator('[data-cy="reportDateRange"]')
-    .selectOption({ label: 'Custom' });
+  // Select "Custom" date range via React Select customSelector
+  await selectCustomOption(page, 'Range', 'Custom');
 
   await page.waitForTimeout(200);
 
@@ -324,13 +323,9 @@ test('Product sales report test', async ({ page, api }) => {
     .getByRole('button', { name: 'Schedule', exact: true })
     .click();
 
-  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
-    'product_sales'
-  );
+  await expectCustomSelectText(page, 'Report', 'Product Sales');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
-  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
-    'custom'
-  );
+  await expectCustomSelectText(page, 'Range', 'Custom');
   await expect(page.locator('[data-cy="scheduleStartDate"]')).toHaveValue(
     dayjs().format('YYYY-MM-DD')
   );
@@ -352,13 +347,9 @@ test('Product sales report test', async ({ page, api }) => {
   await page.waitForURL('**/settings/schedules/**/edit');
   trackScheduleFromUrl(page, api);
 
-  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
-    'product_sales'
-  );
+  await expectCustomSelectText(page, 'Report', 'Product Sales');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
-  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
-    'custom'
-  );
+  await expectCustomSelectText(page, 'Range', 'Custom');
   await expect(page.locator('[data-cy="scheduleStartDate"]')).toHaveValue(
     dayjs().format('YYYY-MM-DD')
   );
@@ -388,23 +379,19 @@ test('Expense report test', async ({ page, api }) => {
     .getByRole('link', { name: 'Reports', exact: true })
     .click();
 
-  await page
-    .locator('[data-cy="reportNameSelector"]')
-    .selectOption({ label: 'Expense' });
+  // Select "Expense" report via React Select customSelector
+  await selectCustomOption(page, 'Report', 'Expense');
 
-  await page.locator('[id="statusSelector"]').click();
-
+  await openMultiSelect(page, 'statusSelector');
   await page.getByText('Pending').click();
 
   await page.waitForTimeout(200);
 
-  await page.locator('[id="statusSelector"]').click();
-
+  await openMultiSelect(page, 'statusSelector');
   await page.getByText('Invoiced').first().click();
 
-  await page
-    .locator('[data-cy="reportDateRange"]')
-    .selectOption({ label: 'This Month' });
+  // Select "This Month" date range via React Select customSelector
+  await selectCustomOption(page, 'Range', 'This Month');
 
   await page.locator('[data-cy="scheduleDocumentEmailAttachment"]').check();
   await page.locator('[data-cy="includeDeleted"]').check();
@@ -419,13 +406,9 @@ test('Expense report test', async ({ page, api }) => {
     .getByRole('button', { name: 'Schedule', exact: true })
     .click();
 
-  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
-    'expense'
-  );
+  await expectCustomSelectText(page, 'Report', 'Expense');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
-  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
-    'this_month'
-  );
+  await expectCustomSelectText(page, 'Range', 'This Month');
   await expect(page.locator('[id="statusSelector"]')).toContainText(
     'PendingInvoiced'
   );
@@ -442,13 +425,9 @@ test('Expense report test', async ({ page, api }) => {
   await page.waitForURL('**/settings/schedules/**/edit');
   trackScheduleFromUrl(page, api);
 
-  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
-    'expense'
-  );
+  await expectCustomSelectText(page, 'Report', 'Expense');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
-  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
-    'this_month'
-  );
+  await expectCustomSelectText(page, 'Range', 'This Month');
   await expect(page.locator('[id="statusSelector"]')).toContainText(
     'PendingInvoiced'
   );
@@ -490,44 +469,37 @@ test('Expense report test with clients, project and categories selectors', async
     .getByRole('link', { name: 'Reports', exact: true })
     .click();
 
-  await page
-    .locator('[data-cy="reportNameSelector"]')
-    .selectOption({ label: 'Expense' });
+  // Select "Expense" report via React Select customSelector
+  await selectCustomOption(page, 'Report', 'Expense');
 
   await page.waitForTimeout(300);
 
-  await page.locator('[id="statusSelector"]').click();
-
+  await openMultiSelect(page, 'statusSelector');
   await page.getByText('Pending').click();
 
   await page.waitForTimeout(200);
 
-  await page.locator('[id="statusSelector"]').click();
-
+  await openMultiSelect(page, 'statusSelector');
   await page.getByText('Invoiced').first().click();
 
-  await page
-    .locator('[data-cy="reportDateRange"]')
-    .selectOption({ label: 'Last 7 Days' });
+  // Select "Last 7 Days" date range via React Select customSelector
+  await selectCustomOption(page, 'Range', 'Last 7 Days');
 
-  await page.locator('#clientItemSelector').first().click();
-
+  await openMultiSelect(page, 'clientItemSelector');
   await page
     .locator('#clientItemSelector')
     .getByText(client.name, { exact: true })
     .first()
     .click();
 
-  await page.locator('#projectItemSelector').first().click();
-
+  await openMultiSelect(page, 'projectItemSelector');
   await page
     .locator('#projectItemSelector')
     .getByText(project.name, { exact: true })
     .first()
     .click();
 
-  await page.locator('#expenseCategoryItemSelector').first().click();
-
+  await openMultiSelect(page, 'expenseCategoryItemSelector');
   await page
     .locator('#expenseCategoryItemSelector')
     .getByText(category.name, { exact: true })
@@ -546,13 +518,9 @@ test('Expense report test with clients, project and categories selectors', async
     .getByRole('button', { name: 'Schedule', exact: true })
     .click();
 
-  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
-    'expense'
-  );
+  await expectCustomSelectText(page, 'Report', 'Expense');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
-  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
-    'last7_days'
-  );
+  await expectCustomSelectText(page, 'Range', 'Last 7 Days');
   await expect(page.locator('#clientItemSelector')).toContainText(
     client.name
   );
@@ -575,13 +543,9 @@ test('Expense report test with clients, project and categories selectors', async
   await page.waitForURL('**/settings/schedules/**/edit');
   trackScheduleFromUrl(page, api);
 
-  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
-    'expense'
-  );
+  await expectCustomSelectText(page, 'Report', 'Expense');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
-  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
-    'last7_days'
-  );
+  await expectCustomSelectText(page, 'Range', 'Last 7 Days');
   await expect(page.locator('#clientItemSelector')).toContainText(
     client.name
   );
@@ -620,11 +584,11 @@ test('Product sales report test with filtering products', async ({ page, api }) 
     .getByRole('link', { name: 'Reports', exact: true })
     .click();
 
-  await page
-    .locator('[data-cy="reportNameSelector"]')
-    .selectOption({ label: 'Product Sales' });
+  // Select "Product Sales" report via React Select customSelector
+  await selectCustomOption(page, 'Report', 'Product Sales');
 
-  await page.locator('[id="productItemSelector"]').click();
+  // Open the product multi-select and search/select product1
+  await openMultiSelect(page, 'productItemSelector');
 
   await page
     .locator('[id="productItemSelector"]')
@@ -638,6 +602,7 @@ test('Product sales report test with filtering products', async ({ page, api }) 
 
   await page.waitForTimeout(200);
 
+  // Search and select product2
   await page
     .locator('[id="productItemSelector"]')
     .locator('[type="text"]')
@@ -654,9 +619,8 @@ test('Product sales report test with filtering products', async ({ page, api }) 
 
   await page.locator('[role="listbox"]').getByRole('option').first().click();
 
-  await page
-    .locator('[data-cy="reportDateRange"]')
-    .selectOption({ label: 'Custom' });
+  // Select "Custom" date range via React Select customSelector
+  await selectCustomOption(page, 'Range', 'Custom');
 
   await page.waitForTimeout(200);
 
@@ -677,13 +641,9 @@ test('Product sales report test with filtering products', async ({ page, api }) 
     .getByRole('button', { name: 'Schedule', exact: true })
     .click();
 
-  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
-    'product_sales'
-  );
+  await expectCustomSelectText(page, 'Report', 'Product Sales');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
-  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
-    'custom'
-  );
+  await expectCustomSelectText(page, 'Range', 'Custom');
   await expect(page.locator('[data-cy="scheduleStartDate"]')).toHaveValue(
     dayjs().format('YYYY-MM-DD')
   );
@@ -705,13 +665,9 @@ test('Product sales report test with filtering products', async ({ page, api }) 
   await page.waitForURL('**/settings/schedules/**/edit');
   trackScheduleFromUrl(page, api);
 
-  await expect(page.locator('[data-cy="scheduleReportName"]')).toHaveValue(
-    'product_sales'
-  );
+  await expectCustomSelectText(page, 'Report', 'Product Sales');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
-  await expect(page.locator('[data-cy="scheduleDateRange"]')).toHaveValue(
-    'custom'
-  );
+  await expectCustomSelectText(page, 'Range', 'Custom');
   await expect(page.locator('[data-cy="scheduleStartDate"]')).toHaveValue(
     dayjs().format('YYYY-MM-DD')
   );

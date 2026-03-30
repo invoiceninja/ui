@@ -21,12 +21,9 @@ function useRecurringInvoiceActions({ permissions }: Params) {
 
   const actions: Action[] = [
     {
-      label: 'Clone to Recurring',
-      visible: hasPermission('create_recurring_invoice'),
-    },
-    {
-      label: 'Clone to Other',
+      label: 'Clone To',
       visible:
+        hasPermission('create_recurring_invoice') ||
         hasPermission('create_invoice') ||
         hasPermission('create_quote') ||
         hasPermission('create_credit') ||
@@ -35,6 +32,10 @@ function useRecurringInvoiceActions({ permissions }: Params) {
         title: 'Clone To',
         dataCyXButton: 'cloneOptionsModalXButton',
         actions: [
+          {
+            label: 'Recurring Invoice',
+            visible: hasPermission('create_recurring_invoice'),
+          },
           {
             label: 'Invoice',
             visible: hasPermission('create_invoice'),
@@ -143,6 +144,13 @@ const createRecurringInvoice = async (params: CreateParams) => {
 
   await page.waitForTimeout(900);
 
+  const comboboxInput = page.getByRole('combobox').first();
+  await comboboxInput.click();
+
+  await page
+    .getByRole('option')
+    .first()
+    .waitFor({ state: 'visible', timeout: 5000 });
   await page.getByRole('option').first().click();
 
   if (assignTo) {
@@ -206,7 +214,7 @@ test('can view recurring invoice', async ({ page, api }) => {
 
   await checkTableEditability(page, false);
 
-  const tableRow = page.locator('tbody').first().getByRole('row').nth(1);
+  const tableRow = page.locator('tbody').first().getByRole('row').first();
 
   await tableRow.getByRole('link').first().click();
 
@@ -246,7 +254,7 @@ test('can edit recurring invoice', async ({ page, api }) => {
 
   await checkTableEditability(page, true);
 
-  const tableRow = page.locator('tbody').first().getByRole('row').nth(1);
+  const tableRow = page.locator('tbody').first().getByRole('row').first();
 
   await tableRow.getByRole('link').first().click();
 
@@ -440,7 +448,7 @@ test('deleting invoice with edit_recurring_invoice', async ({ page, api }) => {
 
     await moreActionsButton.click();
 
-    await page.getByText('Delete').click();
+    await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
     await expect(
       page.getByText('Successfully deleted recurring invoice')
@@ -452,7 +460,7 @@ test('deleting invoice with edit_recurring_invoice', async ({ page, api }) => {
 
     await moreActionsButton.click();
 
-    await page.getByText('Delete').click();
+    await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
     await expect(
       page.getByText('Successfully deleted recurring invoice')
@@ -507,7 +515,7 @@ test('archiving invoice withe edit_recurring_invoice', async ({
 
     await moreActionsButton.click();
 
-    await page.getByText('Archive').click();
+    await page.getByRole('button', { name: 'Archive', exact: true }).click();
 
     await expect(
       page.getByText('Successfully archived recurring invoice')
@@ -524,7 +532,7 @@ test('archiving invoice withe edit_recurring_invoice', async ({
 
     await moreActionsButton.click();
 
-    await page.getByText('Archive').click();
+    await page.getByRole('button', { name: 'Archive', exact: true }).click();
 
     await expect(
       page.getByText('Successfully archived recurring invoice')
@@ -656,7 +664,9 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({
+    timeout: 10000,
+  });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
@@ -818,7 +828,9 @@ test('cloning recurring invoice', async ({ page, api }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Clone to Recurring').first().click();
+  await page.getByText('Clone To').first().click();
+
+  await page.getByText('Recurring Invoice').first().click();
 
   await page.waitForURL('**/recurring_invoices/create?action=clone');
 

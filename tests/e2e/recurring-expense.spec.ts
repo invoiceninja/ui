@@ -85,6 +85,10 @@ const createRecurringExpense = async (params: CreateParams) => {
 
   if (assignTo) {
     await page.getByTestId('combobox-input-field').nth(4).click();
+    await page
+      .getByRole('option', { name: assignTo })
+      .first()
+      .waitFor({ state: 'visible', timeout: 5000 });
     await page.getByRole('option', { name: assignTo }).first().click();
   }
 
@@ -353,7 +357,7 @@ test('deleting recurring expense with edit_recurring_expense', async ({
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
-    await page.getByText('Delete').click();
+    await page.getByRole('button', { name: 'Delete', exact: true }).click();
   } else {
     await tableRow
       .getByRole('button')
@@ -361,7 +365,7 @@ test('deleting recurring expense with edit_recurring_expense', async ({
       .first()
       .click();
 
-    await page.getByText('Delete').click();
+    await page.getByRole('button', { name: 'Delete', exact: true }).click();
   }
 
   await expect(
@@ -404,7 +408,7 @@ test('archiving recurring expense with edit_recurring_expense', async ({
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
-    await page.getByText('Archive').click();
+    await page.getByRole('button', { name: 'Archive', exact: true }).click();
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
@@ -416,7 +420,7 @@ test('archiving recurring expense with edit_recurring_expense', async ({
       .first()
       .click();
 
-    await page.getByText('Archive').click();
+    await page.getByRole('button', { name: 'Archive', exact: true }).click();
   }
 
   await expect(
@@ -536,7 +540,7 @@ test('recurring expense documents uploading with edit_recurring_expense', async 
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
@@ -845,10 +849,12 @@ test('Checking the gross amount by rate', async ({ page, api }) => {
   if (createdId) api.trackEntity('recurring_expenses', createdId);
 
   await page.getByTestId('combobox-input-field').nth(5).click();
+  await page.getByRole('option').first().waitFor({ state: 'visible', timeout: 5000 });
   await page.getByText('tax_rate_10').click();
   await page.getByTestId('combobox-input-field').nth(5).blur();
 
   await page.getByTestId('combobox-input-field').nth(6).click();
+  await page.getByRole('option').first().waitFor({ state: 'visible', timeout: 5000 });
   await page.getByText('tax_rate_20').click();
   await page.getByTestId('combobox-input-field').nth(6).blur();
 
@@ -886,10 +892,12 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
   if (createdId) api.trackEntity('recurring_expenses', createdId);
 
   await page.getByTestId('combobox-input-field').nth(5).click();
+  await page.getByRole('option').first().waitFor({ state: 'visible', timeout: 5000 });
   await page.getByText('tax_rate_10').click();
   await page.getByTestId('combobox-input-field').nth(5).blur();
 
   await page.getByTestId('combobox-input-field').nth(6).click();
+  await page.getByRole('option').first().waitFor({ state: 'visible', timeout: 5000 });
   await page.getByText('tax_rate_20').click();
   await page.getByTestId('combobox-input-field').nth(6).blur();
 
