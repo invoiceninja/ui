@@ -326,14 +326,9 @@ test('deleting product with edit_product', async ({ page, api }) => {
     const deleteId = page.url().match(/products\/([^/]+)/)?.[1];
     if (deleteId) api.trackEntity('products', deleteId);
 
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
-    await moreActionsButton.click();
-
-    await page.getByText('Delete').click();
+    await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
     await expect(page.getByText('Successfully deleted product')).toBeVisible();
 
@@ -382,14 +377,9 @@ test('archiving product withe edit_product', async ({ page, api }) => {
     const archiveId = page.url().match(/products\/([^/]+)/)?.[1];
     if (archiveId) api.trackEntity('products', archiveId);
 
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
-    await moreActionsButton.click();
-
-    await page.getByText('Archive').click();
+    await page.getByRole('button', { name: 'Archive', exact: true }).click();
 
     await expect(page.getByText('Successfully archived product')).toBeVisible();
 
@@ -624,13 +614,9 @@ test('cloning product with edit_product', async ({ page, api }) => {
     const cloneSourceId = page.url().match(/products\/([^/]+)/)?.[1];
     if (cloneSourceId) api.trackEntity('products', cloneSourceId);
 
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') });
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
-    await moreActionsButton.click();
-
-    await page.getByText('Clone').click();
+    await page.getByRole('button', { name: 'Clone', exact: true }).click();
 
     await page.waitForURL('**/products/create?action=clone');
 
@@ -702,16 +688,24 @@ test('all custom actions in dropdown displayed with admin permission', async ({
     .getByRole('link', { name: 'Products', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await waitForTableData(page);
 
-  await page.locator('[data-cy="dataTableCheckbox"]').first().click();
+  // Select the row checkbox (not header) to trigger bulk actions
+  await page.locator('tbody [data-cy="dataTableCheckbox"]').first().click();
 
-  await checkDropdownActions(
-    page,
-    customActions,
-    'bulkActionsDropdown',
-    'dataTable'
-  );
+  // Wait for the bulk Actions dropdown to appear in the header
+  const bulkActionsButton = page.locator('[data-cy="dataTable"]')
+    .getByRole('button', { name: 'Actions', exact: true })
+    .first();
+  await bulkActionsButton.waitFor({ state: 'visible', timeout: 5000 });
+  await bulkActionsButton.click();
+
+  // Verify dropdown items are visible on the page
+  for (const { label, visible } of customActions) {
+    if (visible) {
+      await expect(page.getByText(label, { exact: true }).first()).toBeVisible();
+    }
+  }
 
   await logout(page);
 });
@@ -751,16 +745,24 @@ test('New Invoice and New Purchase Order displayed with creation permissions', a
     .getByRole('link', { name: 'Products', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await waitForTableData(page);
 
-  await page.locator('[data-cy="dataTableCheckbox"]').first().click();
+  // Select the row checkbox (not header) to trigger bulk actions
+  await page.locator('tbody [data-cy="dataTableCheckbox"]').first().click();
 
-  await checkDropdownActions(
-    page,
-    customActions,
-    'bulkActionsDropdown',
-    'dataTable'
-  );
+  // Wait for the bulk Actions dropdown to appear in the header
+  const bulkActionsButton = page.locator('[data-cy="dataTable"]')
+    .getByRole('button', { name: 'Actions', exact: true })
+    .first();
+  await bulkActionsButton.waitFor({ state: 'visible', timeout: 5000 });
+  await bulkActionsButton.click();
+
+  // Verify dropdown items are visible on the page
+  for (const { label, visible } of customActions) {
+    if (visible) {
+      await expect(page.getByText(label, { exact: true }).first()).toBeVisible();
+    }
+  }
 
   await logout(page);
 });
@@ -786,7 +788,7 @@ test('rendering documents and product_fields tabs with admin permission', async 
   await page.waitForURL('**/products/**/documents');
 
   await expect(
-    page.getByRole('heading', { name: 'Upload', exact: true })
+    page.getByRole('heading', { name: 'Documents', exact: true })
   ).toBeVisible();
 
   await page
@@ -827,9 +829,12 @@ test('Product selector list gets updated on the report page when it is created',
     .getByRole('link', { name: 'Reports', exact: true })
     .click();
 
-  await page
-    .locator('[data-cy="reportNameSelector"]')
-    .selectOption({ label: 'Product Sales' });
+  // Report selector is a react-select custom selector
+  const reportElement = page.locator('dt').filter({ hasText: 'Report' }).locator('..');
+  await reportElement.locator('svg').last().click();
+  const productSalesOption = page.getByText('Product Sales', { exact: true });
+  await productSalesOption.waitFor({ state: 'visible', timeout: 5000 });
+  await productSalesOption.click();
 
   await page.waitForTimeout(200);
 

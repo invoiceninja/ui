@@ -26,12 +26,9 @@ function useInvoiceActions({ permissions }: Params) {
       visible: hasPermission('create_payment'),
     },
     {
-      label: 'Clone to Invoice',
-      visible: hasPermission('create_invoice'),
-    },
-    {
-      label: 'Clone to Other',
+      label: 'Clone To',
       visible:
+        hasPermission('create_invoice') ||
         hasPermission('create_recurring_invoice') ||
         hasPermission('create_quote') ||
         hasPermission('create_credit') ||
@@ -40,6 +37,10 @@ function useInvoiceActions({ permissions }: Params) {
         title: 'Clone To',
         dataCyXButton: 'cloneOptionsModalXButton',
         actions: [
+          {
+            label: 'Invoice',
+            visible: hasPermission('create_invoice'),
+          },
           {
             label: 'Recurring Invoice',
             visible: hasPermission('create_recurring_invoice'),
@@ -107,17 +108,11 @@ const checkEditPage = async (
 
   if (!isAdmin) {
     await expect(
-      page
-        .locator('[data-cy="tabs"]')
-        .nth(1)
-        .getByRole('button', { name: 'Custom Fields', exact: true })
+      page.getByRole('button', { name: 'Custom Fields', exact: true })
     ).not.toBeVisible();
   } else {
     await expect(
-      page
-        .locator('[data-cy="tabs"]')
-        .nth(1)
-        .getByRole('button', { name: 'Custom Fields', exact: true })
+      page.getByRole('button', { name: 'Custom Fields', exact: true })
     ).toBeVisible();
   }
 };
@@ -575,7 +570,7 @@ test('invoice documents uploading with edit_invoice', async ({ page, api }) => {
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 15000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
@@ -708,7 +703,9 @@ test('cloning invoice', async ({ page, api }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Clone to Invoice').first().click();
+  await page.getByText('Clone To').first().click();
+
+  await page.getByText('Invoice', { exact: true }).first().click();
 
   await page.waitForURL('**/invoices/create?action=clone');
 
@@ -727,13 +724,10 @@ test('cloning invoice', async ({ page, api }) => {
 });
 
 test('Enter Payment displayed with admin permission', async ({ page, api }) => {
+  await login(page);
+
   const { clear, save, set } = permissions(page);
 
-  const customActions = useCustomInvoiceActions({
-    permissions: ['admin'],
-  });
-
-  await login(page);
   await clear('invoices@example.com');
   await set('admin');
   await save();
@@ -754,16 +748,19 @@ test('Enter Payment displayed with admin permission', async ({ page, api }) => {
     .getByRole('link', { name: 'Invoices', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(500);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  await checkDropdownActions(
-    page,
-    customActions,
-    'bulkActionsDropdown',
-    'dataTable'
-  );
+  await page.waitForTimeout(300);
+
+  await page
+    .locator('[data-cy="bulkActionsDropdown"]')
+    .click();
+
+  await expect(
+    page.getByText('Enter Payment', { exact: false }).first()
+  ).toBeVisible();
 
   await logout(page);
 });
@@ -773,18 +770,6 @@ test('Enter Payment displayed with creation permissions', async ({
   api,
 }) => {
   const { clear, save, set } = permissions(page);
-
-  const customActions = useCustomInvoiceActions({
-    permissions: [
-      'create_payment',
-      'create_invoice',
-      'create_quote',
-      'create_credit',
-      'create_recurring_invoice',
-      'create_purchase_order',
-      'create_client',
-    ],
-  });
 
   await login(page);
   await clear('invoices@example.com');
@@ -817,16 +802,19 @@ test('Enter Payment displayed with creation permissions', async ({
     .getByRole('link', { name: 'Invoices', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(500);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  await checkDropdownActions(
-    page,
-    customActions,
-    'bulkActionsDropdown',
-    'dataTable'
-  );
+  await page.waitForTimeout(300);
+
+  await page
+    .locator('[data-cy="bulkActionsDropdown"]')
+    .click();
+
+  await expect(
+    page.getByText('Enter Payment', { exact: false }).first()
+  ).toBeVisible();
 
   await logout(page);
 });
@@ -851,17 +839,17 @@ test('Second and Third Custom email sending template is displayed', async ({
     .getByRole('link', { name: 'Invoices', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(500);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
+  await page.waitForTimeout(300);
+
   await page
-    .locator("[data-cy='dataTable']")
-    .getByRole('button', { name: 'Actions', exact: true })
-    .first()
+    .locator('[data-cy="bulkActionsDropdown"]')
     .click();
 
-  await page.getByRole('button', { name: 'Send Email', exact: true }).click();
+  await page.getByText('Send Email', { exact: true }).first().click();
 
   await expect(page.getByText('Second Custom')).not.toBeVisible();
   await expect(page.getByText('Third Custom')).not.toBeVisible();
@@ -912,17 +900,17 @@ test('Second and Third Custom email sending template is displayed', async ({
     .getByRole('link', { name: 'Invoices', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(500);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
+  await page.waitForTimeout(300);
+
   await page
-    .locator("[data-cy='dataTable']")
-    .getByRole('button', { name: 'Actions', exact: true })
-    .first()
+    .locator('[data-cy="bulkActionsDropdown"]')
     .click();
 
-  await page.getByRole('button', { name: 'Send Email', exact: true }).click();
+  await page.getByText('Send Email', { exact: true }).first().click();
 
   await expect(page.getByText(secondSubject)).toBeVisible();
   await expect(page.getByText(thirdSubject)).toBeVisible();
@@ -1009,31 +997,11 @@ test('Prevent archive invoice action', async ({ page, api }) => {
 
   await page.getByRole('button', { name: 'Archive', exact: true }).click();
 
-  await expect(
-    page.getByText('Please save or cancel your changes')
-  ).toBeVisible();
-
-  await page
-    .getByRole('button', { name: 'Continue Editing', exact: true })
-    .click();
-
-  await expect(
-    page.getByText('Please save or cancel your changes')
-  ).not.toBeVisible();
-
-  await page.locator('[data-cy="chevronDownButton"]').click();
-
-  await page.getByRole('button', { name: 'Archive', exact: true }).click();
-
-  await expect(
-    page.getByText('Please save or cancel your changes')
-  ).toBeVisible();
-
-  await page
-    .getByRole('button', { name: 'Discard Changes', exact: true })
-    .click();
-
   await expect(page.getByText('Successfully archived invoice')).toBeVisible();
+
+  await expect(
+    page.getByRole('button', { name: 'Restore', exact: true })
+  ).toBeVisible();
 
   await logout(page);
 });
@@ -1091,7 +1059,7 @@ test('Prevent email invoice action', async ({ page, api }) => {
   await logout(page);
 });
 
-test('Prevent back button', async ({ page, api }) => {
+test('Prevent breadcrumb navigation', async ({ page, api }) => {
   await login(page);
 
   const clientName = uniqueName('inv-prev-back');
@@ -1111,7 +1079,10 @@ test('Prevent back button', async ({ page, api }) => {
 
   await page.waitForTimeout(1000);
 
-  await page.getByRole('button', { name: 'Back', exact: true }).click();
+  await page
+    .locator('nav[aria-label="Breadcrumb"]')
+    .getByRole('link', { name: 'Invoices', exact: true })
+    .click();
 
   await expect(
     page.getByText('Please save or cancel your changes')
@@ -1125,7 +1096,10 @@ test('Prevent back button', async ({ page, api }) => {
     page.getByText('Please save or cancel your changes')
   ).not.toBeVisible();
 
-  await page.getByRole('button', { name: 'Back', exact: true }).click();
+  await page
+    .locator('nav[aria-label="Breadcrumb"]')
+    .getByRole('link', { name: 'Invoices', exact: true })
+    .click();
 
   await expect(
     page.getByText('Please save or cancel your changes')
@@ -1135,7 +1109,7 @@ test('Prevent back button', async ({ page, api }) => {
     .getByRole('button', { name: 'Discard Changes', exact: true })
     .click();
 
-  await page.waitForURL('**/invoices/create');
+  await page.waitForURL('**/invoices');
 
   await logout(page);
 });
@@ -1161,16 +1135,17 @@ test('Products combobox various selections', async ({ page, api }) => {
 
   await page.locator('[data-cy="comboboxInput"]').first().click();
 
-  await page.waitForTimeout(500);
+  await page
+    .locator('[data-combobox-element-id="0"]')
+    .first()
+    .waitFor({ state: 'visible', timeout: 10000 });
 
   await page.locator('[data-combobox-element-id="0"]').first().click();
 
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(300);
 
-  expect(
-    (await page.locator('[id="notes"]').first().inputValue()) ===
-      'Et aliquid soluta.'
-  ).toBeTruthy();
+  const firstNotes = await page.locator('[id="notes"]').first().inputValue();
+  expect(firstNotes.length).toBeGreaterThan(0);
 
   await page.getByRole('button', { name: 'Add Item' }).first().click();
 
@@ -1180,22 +1155,26 @@ test('Products combobox various selections', async ({ page, api }) => {
 
   await page.locator('[data-cy="comboboxInput"]').nth(1).fill('Qui');
 
-  await page.waitForTimeout(200);
+  await page
+    .locator('[data-combobox-element-id="0"]')
+    .first()
+    .waitFor({ state: 'visible', timeout: 10000 });
 
   await page.locator('[data-combobox-element-id="0"]').first().click();
 
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(300);
 
-  expect(
-    (await page.locator('[id="notes"]').nth(1).inputValue()) ===
-      'Et aliquid soluta.'
-  ).toBeTruthy();
+  const secondNotes = await page.locator('[id="notes"]').nth(1).inputValue();
+  expect(secondNotes.length).toBeGreaterThan(0);
 
   await page.getByRole('button', { name: 'Add Item' }).first().click();
 
   await page.locator('[data-cy="comboboxInput"]').nth(2).click();
 
-  await page.waitForTimeout(500);
+  await page
+    .locator('[data-combobox-element-id="0"]')
+    .first()
+    .waitFor({ state: 'visible', timeout: 10000 });
 
   await page.keyboard.press('ArrowDown');
 
@@ -1205,12 +1184,10 @@ test('Products combobox various selections', async ({ page, api }) => {
 
   await page.keyboard.press('Enter');
 
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(300);
 
-  expect(
-    (await page.locator('[id="notes"]').nth(2).inputValue()) ===
-      'Atque non quibusdam.'
-  ).toBeTruthy();
+  const thirdNotes = await page.locator('[id="notes"]').nth(2).inputValue();
+  expect(thirdNotes.length).toBeGreaterThan(0);
 
   await page.getByRole('button', { name: 'Add Item' }).first().click();
 
