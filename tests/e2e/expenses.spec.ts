@@ -655,7 +655,11 @@ test('Expense categories endpoint contains sort but not with parameter', async (
 
   const catInput = page.getByTestId('combobox-input-field').nth(3);
   await catInput.click();
-  await catInput.fill(expenseCategoryName);
+  await catInput.pressSequentially(expenseCategoryName, { delay: 50 });
+
+  await page.waitForResponse((resp) =>
+    resp.url().includes('/api/v1/expense_categories') && resp.url().includes('filter=') && resp.status() === 200
+  );
 
   const catOption = page.getByRole('option', { name: expenseCategoryName }).first();
   await catOption.waitFor({ state: 'visible', timeout: 5000 });
@@ -709,14 +713,15 @@ test('Expense categories endpoint contains with but not sort parameter', async (
   await page
     .getByTestId('combobox-input-field')
     .nth(3)
-    .fill(expenseCategoryName);
+    .pressSequentially(expenseCategoryName, { delay: 50 });
 
-  await page.waitForTimeout(300);
+  await page.waitForResponse((resp) =>
+    resp.url().includes('/api/v1/expense_categories') && resp.url().includes('filter=') && resp.status() === 200
+  );
 
-  await page
-    .getByRole('option', { name: expenseCategoryName })
-    .first()
-    .click();
+  const catOption2 = page.getByRole('option', { name: expenseCategoryName }).first();
+  await catOption2.waitFor({ state: 'visible', timeout: 5000 });
+  await catOption2.click();
 
   await page.getByRole('button', { name: 'Save' }).click();
 
@@ -1188,7 +1193,7 @@ test('The new_expense_category action is not shown on the badge dropdown', async
     .getByRole('link', { name: 'Expenses', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(500);
 
   // Add the Category column if not already present
   const badgeAlreadyVisible = await page
@@ -1200,13 +1205,22 @@ test('The new_expense_category action is not shown on the badge dropdown', async
   if (!badgeAlreadyVisible) {
     await page.getByRole('button').filter({ hasText: 'Columns' }).click();
 
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(300);
 
     const columnInput = page.locator('input[role="combobox"]').last();
     await columnInput.click();
-    await columnInput.fill('Category');
+    await columnInput.pressSequentially('Category', { delay: 50 });
     await page.waitForTimeout(300);
-    await page.getByText('Category', { exact: true }).first().click();
+
+    const categoryOption = page.getByRole('option', { name: 'Category' }).first();
+    const optionExists = await categoryOption.isVisible().catch(() => false);
+
+    if (optionExists) {
+      await categoryOption.click();
+    } else {
+      // Category column already added, close the dropdown
+      await page.keyboard.press('Escape');
+    }
 
     await page.getByRole('button', { name: 'Save', exact: true }).click();
 

@@ -816,3 +816,58 @@ test('cloning recurring invoice', async ({ page, api }) => {
     page.getByRole('heading', { name: 'Edit Recurring Invoice' }).first()
   ).toBeVisible();
 });
+
+test('recurring invoice creation and start stop sequence', async ({ page, api }) => {
+
+  const { clear, save, set } = permissions(page);
+  await login(page, 'user@example.com', 'password');
+  await page.getByRole('link', { name: 'Recurring Invoices' }).click();
+  await page.getByRole('link', { name: 'New Recurring Invoice' }).click();
+
+  // Wait for the create form to fully render — the client combobox auto-opens
+  await page.waitForURL('**/recurring_invoices/create');
+  await page.waitForTimeout(500);
+
+  // Click "New Client" in the combobox dropdown to create a new client inline
+  const newClientButton = page.getByRole('button', { name: 'New Client' });
+  await newClientButton.waitFor({ state: 'visible', timeout: 5000 });
+  await newClientButton.click();
+
+  await page.locator('section').filter({ hasText: 'Contact First Name' }).getByRole('textbox').click();
+  await page.locator('section').filter({ hasText: 'Contact First Name' }).getByRole('textbox').fill('Clients');
+  await page.locator('section').filter({ hasText: 'Contact First Name' }).getByRole('textbox').press('Tab');
+  await page.locator('section').filter({ hasText: 'Contact Last Name' }).getByRole('textbox').fill('Last Name');
+  await page.locator('section').filter({ hasText: 'Contact Last Name' }).getByRole('textbox').press('Tab');
+  await page.locator('section').filter({ hasText: 'Contact Email' }).getByRole('textbox').fill('contact@gmail.com');
+  await page.getByRole('button', { name: 'Save' }).click();
+  await page.getByRole('button', { name: 'Add Item' }).click();
+  await page.getByRole('textbox').nth(4).click();
+  await page.getByRole('cell', { name: 'New Product' }).getByRole('textbox').fill('12345');
+  await page.locator('#notes').click();
+  await page.locator('#notes').fill('67890');
+  await page.getByRole('textbox').filter({ hasText: /^$/ }).nth(5).click();
+  await page.getByRole('textbox').filter({ hasText: /^$/ }).nth(5).fill('10');
+  await page.getByRole('button', { name: 'Save' }).click();
+  // await page.getByRole('button').nth(4).click();
+
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  await page.getByRole('button', { name: 'Start' }).click();
+  await page.getByRole('link', { name: 'Documents' }).click();
+  await page.getByLabel('Tabs').getByRole('link', { name: 'Settings' }).click();
+  await page.getByRole('link', { name: 'Activity' }).click();
+  await page.getByRole('link', { name: 'History' }).click();
+  await page.getByRole('link', { name: 'Schedule' }).click();
+  await page.getByRole('link', { name: 'Edit', exact: true }).click();
+  await page.getByRole('button').nth(4).click();
+  await page.getByRole('button', { name: 'Stop' }).click();
+  await expect(page.getByText('Paused')).toBeVisible();
+  
+  // await expect(page.getByText('Clients Last Name')).toBeVisible();
+  await page.locator('div').filter({ hasText: /^Monthly$/ }).nth(2).click();
+  await page.locator('div').filter({ hasText: /^Monthly$/ }).first().click();
+  await page.getByRole('cell', { name: '12345' }).getByRole('textbox').click();
+  await expect(page.locator('#notes')).toContainText('67890');
+
+  
+});
