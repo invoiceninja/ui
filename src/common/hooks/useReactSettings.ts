@@ -140,6 +140,7 @@ export function useReactSettings(options?: Options) {
   const settings: ReactSettings = {
     show_pdf_preview: true,
     react_notification_link: true,
+    // This is legacy fallback for old settings location. If you see this in 2 years, feel free to remove it.
     react_table_columns: {
       ...previousReactTableColumns,
       ...reactSettings.react_table_columns,

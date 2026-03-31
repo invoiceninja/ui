@@ -8,9 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
@@ -19,6 +17,8 @@ import { Card } from '$app/components/cards';
 import { FIELDS_LABELS } from './DashboardCardSelector';
 import { useColorScheme } from '$app/common/colors';
 import { decodeDashboardField } from '$app/common/helpers/react-settings';
+import { useQuery } from 'react-query';
+import { useMemo } from 'react';
 
 export const PERIOD_LABELS: Record<string, string> = {
   current: 'current_period',
@@ -32,6 +32,8 @@ interface Props {
   startDate: string;
   endDate: string;
   currencyId: string;
+  refreshKey: number;
+  onSettled: () => void;
 }
 
 export function DashboardCard({
@@ -40,65 +42,46 @@ export function DashboardCard({
   startDate,
   endDate,
   currencyId,
+  refreshKey,
+  onSettled,
 }: Props) {
   const [t] = useTranslation();
-
-  const colors = useColorScheme();
-  const queryClient = useQueryClient();
-
   const formatMoney = useFormatMoney();
 
-  const field = decodeDashboardField(fieldKey);
+  const colors = useColorScheme();
+  const field = useMemo(() => decodeDashboardField(fieldKey), [fieldKey]);
 
-  const [isBusy, setIsBusy] = useState<boolean>(false);
-  const [value, setValue] = useState<number | undefined>(undefined);
-
-  useEffect(() => {
-    (async () => {
-      setIsBusy(true);
-      try {
-        const response = await queryClient.fetchQuery(
-          [
-            '/api/v1/charts/calculated_fields',
-            dateRange,
-            startDate,
-            endDate,
-            field.field,
-            field.calculate,
-            field.period,
-            currencyId,
-          ],
-          () =>
-            request('POST', endpoint('/api/v1/charts/calculated_fields'), {
-              date_range: dateRange,
-              start_date: startDate,
-              end_date: endDate,
-              field: field.field,
-              calculation: field.calculate,
-              period: field.period,
-              format: field.format,
-              currency_id: currencyId,
-            }).then((r) => r.data),
-          { staleTime: Infinity }
-        );
-        setValue(response);
-      } finally {
-        setIsBusy(false);
-      }
-    })();
-  }, [fieldKey, dateRange, startDate, endDate, currencyId]);
-
-  const displayValue =
-    field.format === 'money' && field.calculate !== 'count'
-      ? formatMoney(value ?? 0, '', '')
-      : value;
+  const { data: value, isLoading } = useQuery({
+    queryKey: [
+      'dashboard_card',
+      fieldKey,
+      dateRange,
+      startDate,
+      endDate,
+      currencyId,
+      refreshKey,
+    ],
+    queryFn: () =>
+      request('POST', endpoint('/api/v1/charts/calculated_fields'), {
+        date_range: dateRange,
+        start_date: startDate,
+        end_date: endDate,
+        field: field.field,
+        calculation: field.calculate,
+        period: field.period,
+        format: field.format,
+        currency_id: currencyId,
+      }).then((response) => response.data),
+    staleTime: Infinity,
+    onSettled,
+  });
 
   return (
     <Card
       className="flex h-full flex-col items-center justify-center gap-1 px-6 py-4 overflow-hidden shadow-sm"
       style={{ borderColor: colors.$24 }}
     >
-      {isBusy ? (
+      {isLoading ? (
         <Spinner />
       ) : (
         <div className="flex w-full flex-col items-center justify-center gap-1 min-w-0">
@@ -106,7 +89,9 @@ export function DashboardCard({
             {t(FIELDS_LABELS[field.field] ?? field.field)}
           </span>
           <span className="w-full truncate text-center text-xl font-semibold">
-            {displayValue}
+            {field.format === 'money' && field.calculate !== 'count'
+              ? formatMoney(value ?? 0, '', '')
+              : value}
           </span>
           <span className="w-full truncate text-center text-xs text-gray-500">
             {t(PERIOD_LABELS[field.period] ?? field.period)}
