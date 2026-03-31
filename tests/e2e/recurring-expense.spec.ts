@@ -84,12 +84,13 @@ const createRecurringExpense = async (params: CreateParams) => {
   await page.waitForTimeout(300);
 
   if (assignTo) {
-    await page.getByTestId('combobox-input-field').nth(4).click();
-    await page
-      .getByRole('option', { name: assignTo })
-      .first()
-      .waitFor({ state: 'visible', timeout: 5000 });
-    await page.getByRole('option', { name: assignTo }).first().click();
+    const assignedUserInput = page.getByTestId('combobox-input-field').nth(4);
+    await assignedUserInput.click();
+    await assignedUserInput.fill(assignTo.split(' ')[0]);
+
+    const option = page.getByRole('option', { name: assignTo }).first();
+    await option.waitFor({ state: 'visible', timeout: 5000 });
+    await option.click();
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -840,7 +841,29 @@ test('Checking add_documents_to_invoice expense settings value on recurring_expe
 });
 
 test('Checking the gross amount by rate', async ({ page, api }) => {
+  const taxRate10Name = uniqueName('tax-rate-10');
+  const taxRate20Name = uniqueName('tax-rate-20');
+
   await login(page);
+
+  // Create tax rates and enable "Two Tax Rates" in settings
+  const { createTaxRate } = await import('./taxes-helpers');
+  await createTaxRate({ page, taxName: taxRate10Name, rate: 10 });
+  await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
+
+  await page
+    .getByRole('link', { name: 'Tax Settings', exact: true })
+    .first()
+    .click();
+
+  const taxRateRow = page.locator('dt:has-text("Expense Tax Rates")').locator('..');
+  const currentValue = await taxRateRow.locator('[class*="singleValue"]').textContent().catch(() => '');
+  if (currentValue !== 'Two Tax Rates') {
+    await taxRateRow.locator('svg').last().click();
+    await page.getByText('Two Tax Rates', { exact: true }).click();
+    await page.getByRole('button', { name: 'Save' }).click();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
 
   await createRecurringExpense({ page });
 
@@ -850,15 +873,15 @@ test('Checking the gross amount by rate', async ({ page, api }) => {
 
   const taxInput1 = page.getByTestId('combobox-input-field').nth(5);
   await taxInput1.click();
-  await taxInput1.fill('tax_rate_10');
-  const taxOption1 = page.getByRole('option', { name: 'tax_rate_10' }).first();
+  await taxInput1.fill(taxRate10Name);
+  const taxOption1 = page.getByRole('option', { name: taxRate10Name }).first();
   await taxOption1.waitFor({ state: 'visible', timeout: 5000 });
   await taxOption1.click();
 
   const taxInput2 = page.getByTestId('combobox-input-field').nth(6);
   await taxInput2.click();
-  await taxInput2.fill('tax_rate_20');
-  const taxOption2 = page.getByRole('option', { name: 'tax_rate_20' }).first();
+  await taxInput2.fill(taxRate20Name);
+  const taxOption2 = page.getByRole('option', { name: taxRate20Name }).first();
   await taxOption2.waitFor({ state: 'visible', timeout: 5000 });
   await taxOption2.click();
 
@@ -889,7 +912,29 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
   page,
   api,
 }) => {
+  const taxRate10Name = uniqueName('tax-rate-10-incl');
+  const taxRate20Name = uniqueName('tax-rate-20-incl');
+
   await login(page);
+
+  // Create tax rates and enable "Two Tax Rates" in settings
+  const { createTaxRate } = await import('./taxes-helpers');
+  await createTaxRate({ page, taxName: taxRate10Name, rate: 10 });
+  await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
+
+  await page
+    .getByRole('link', { name: 'Tax Settings', exact: true })
+    .first()
+    .click();
+
+  const taxRateRow = page.locator('dt:has-text("Expense Tax Rates")').locator('..');
+  const currentValue = await taxRateRow.locator('[class*="singleValue"]').textContent().catch(() => '');
+  if (currentValue !== 'Two Tax Rates') {
+    await taxRateRow.locator('svg').last().click();
+    await page.getByText('Two Tax Rates', { exact: true }).click();
+    await page.getByRole('button', { name: 'Save' }).click();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
 
   await createRecurringExpense({ page });
 
@@ -899,15 +944,15 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
 
   const taxInput1 = page.getByTestId('combobox-input-field').nth(5);
   await taxInput1.click();
-  await taxInput1.fill('tax_rate_10');
-  const taxOption1 = page.getByRole('option', { name: 'tax_rate_10' }).first();
+  await taxInput1.fill(taxRate10Name);
+  const taxOption1 = page.getByRole('option', { name: taxRate10Name }).first();
   await taxOption1.waitFor({ state: 'visible', timeout: 5000 });
   await taxOption1.click();
 
   const taxInput2 = page.getByTestId('combobox-input-field').nth(6);
   await taxInput2.click();
-  await taxInput2.fill('tax_rate_20');
-  const taxOption2 = page.getByRole('option', { name: 'tax_rate_20' }).first();
+  await taxInput2.fill(taxRate20Name);
+  const taxOption2 = page.getByRole('option', { name: taxRate20Name }).first();
   await taxOption2.waitFor({ state: 'visible', timeout: 5000 });
   await taxOption2.click();
 
@@ -938,6 +983,22 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
 
 test('Checking the gross amount by amount', async ({ page, api }) => {
   await login(page);
+
+  // Ensure "Two Tax Rates" is enabled in settings
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Settings', exact: true })
+    .click();
+  await page.getByRole('link', { name: 'Tax Settings', exact: true }).click();
+
+  const taxRateRow = page.locator('dt:has-text("Expense Tax Rates")').locator('..');
+  const currentValue = await taxRateRow.locator('[class*="singleValue"]').textContent().catch(() => '');
+  if (currentValue !== 'Two Tax Rates') {
+    await taxRateRow.locator('svg').last().click();
+    await page.getByText('Two Tax Rates', { exact: true }).click();
+    await page.getByRole('button', { name: 'Save' }).click();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  }
 
   await createRecurringExpense({ page });
 
