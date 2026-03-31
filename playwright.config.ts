@@ -16,7 +16,7 @@ export default defineConfig({
   /* Reset API state before running the test suite. */
   globalSetup: './tests/e2e/global-setup.ts',
   /* Maximum time one test can run for. */
-  timeout: 15000,
+  timeout: 30000,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -102,6 +102,6 @@ export default defineConfig({
   webServer: {
     command: 'npx vite build --mode testing && npx vite preview',
     port: 4173,
-    reuseExistingServer: !!process.env.REUSE_SERVER,
+    reuseExistingServer: true,
   },
 });

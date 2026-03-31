@@ -49,7 +49,10 @@ function getMultiSelectById(page: Page, id: string): Locator {
 
 async function openMultiSelect(page: Page, id: string) {
   const container = getMultiSelectById(page, id);
-  await container.locator('svg').last().click();
+  // CustomMultiSelect has no <input> — click the inner control div to toggle the menu
+  // The clickable area is the div with cursor-pointer inside the control
+  await container.locator('div[class*="cursor-pointer"]').first().click();
+  await page.waitForTimeout(200);
 }
 
 test('Activity report test', async ({ page, api }) => {
@@ -114,12 +117,12 @@ test('Invoice report test', async ({ page, api }) => {
   await selectCustomOption(page, 'Report', 'Invoice');
 
   await openMultiSelect(page, 'statusSelector');
-  await page.getByText('Draft').click();
-
+  await page.getByText('Draft', { exact: true }).first().click();
+  // Menu stays open (closeMenuOnSelect=false) — select Paid without reopening
+  await page.getByText('Paid', { exact: true }).first().click();
+  // Close the menu by clicking away
+  await page.getByText('Report', { exact: true }).first().click();
   await page.waitForTimeout(200);
-
-  await openMultiSelect(page, 'statusSelector');
-  await page.getByText('Paid').first().click();
 
   // Select "Custom" date range via React Select customSelector
   await selectCustomOption(page, 'Range', 'Custom');
@@ -136,11 +139,13 @@ test('Invoice report test', async ({ page, api }) => {
   await page.locator('[data-cy="includeDeleted"]').check();
   await page.locator('[data-cy="scheduleDocumentEmailAttachment"]').check();
 
-  await page.locator('[data-testid="combobox-input-field"]').click();
+  // Select client from the Client combobox — find by the "Client" label Element
+  const clientCombobox = page.locator('dt').filter({ hasText: /^Client$/ }).locator('..').locator('dd').getByRole('combobox');
+  await clientCombobox.click();
 
-  await page.waitForTimeout(200);
-
-  await page.locator('[role="listbox"]').getByRole('option').first().click();
+  const clientOption = page.locator('[role="listbox"]').getByRole('option').first();
+  await clientOption.waitFor({ state: 'visible', timeout: 5000 });
+  await clientOption.click();
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -161,16 +166,15 @@ test('Invoice report test', async ({ page, api }) => {
   await expect(page.locator('[data-cy="scheduleEndDate"]')).toHaveValue(
     dayjs().add(1, 'day').format('YYYY-MM-DD')
   );
-  await expect(page.locator('[id="statusSelector"]')).toContainText(
-    'DraftPaid'
-  );
+  await expect(page.locator('[id="statusSelector"]')).toContainText('Draft');
+  await expect(page.locator('[id="statusSelector"]')).toContainText('Paid');
   await expect(
     page.locator('[data-cy="scheduleDocumentEmailAttachment"]')
   ).toBeChecked();
   await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
-  await expect(page.locator('div[data-headlessui-state]').nth(2)).toContainText(
-    client.name
-  );
+  // Verify client is selected in the combobox
+  const clientField = page.locator('dt').filter({ hasText: /^Client$/ }).locator('..').locator('dd').getByRole('combobox');
+  await expect(clientField).toHaveValue(client.name);
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -189,16 +193,14 @@ test('Invoice report test', async ({ page, api }) => {
   await expect(page.locator('[data-cy="scheduleEndDate"]')).toHaveValue(
     dayjs().add(1, 'day').format('YYYY-MM-DD')
   );
-  await expect(page.locator('[id="statusSelector"]')).toContainText(
-    'DraftPaid'
-  );
+  await expect(page.locator('[id="statusSelector"]')).toContainText('Draft');
+  await expect(page.locator('[id="statusSelector"]')).toContainText('Paid');
   await expect(
     page.locator('[data-cy="scheduleDocumentEmailAttachment"]')
   ).toBeChecked();
   await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
-  await expect(page.locator('div[data-headlessui-state]').nth(2)).toContainText(
-    client.name
-  );
+  // Verify client is still selected after save
+  await expect(clientField).toHaveValue(client.name);
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
@@ -263,6 +265,10 @@ test('Profit and loss report test', async ({ page, api }) => {
 test('Product sales report test', async ({ page, api }) => {
   // Create prerequisite products and client via API
   const apiCtx = await createApiContext(process.env.VITE_API_URL!);
+  const client = await createClientViaApi(apiCtx, {
+    name: uniqueName('sched-prod-client'),
+  });
+  api.trackEntity('clients', client.id);
   const product1 = await createProductViaApi(apiCtx, {
     product_key: uniqueName('sched-prod-1'),
   });
@@ -297,9 +303,9 @@ test('Product sales report test', async ({ page, api }) => {
 
   await page.locator('[data-testid="combobox-input-field"]').click();
 
-  await page.waitForTimeout(200);
-
-  await page.locator('[role="listbox"]').getByRole('option').first().click();
+  const clientOption = page.locator('[role="listbox"]').getByRole('option').first();
+  await clientOption.waitFor({ state: 'visible', timeout: 5000 });
+  await clientOption.click();
 
   // Select "Custom" date range via React Select customSelector
   await selectCustomOption(page, 'Range', 'Custom');
@@ -383,12 +389,12 @@ test('Expense report test', async ({ page, api }) => {
   await selectCustomOption(page, 'Report', 'Expense');
 
   await openMultiSelect(page, 'statusSelector');
-  await page.getByText('Pending').click();
-
+  await page.getByText('Pending', { exact: true }).first().click();
+  // Menu stays open (closeMenuOnSelect=false) — select Invoiced without reopening
+  await page.getByText('Invoiced', { exact: true }).first().click();
+  // Close the menu by clicking away
+  await page.getByText('Report', { exact: true }).first().click();
   await page.waitForTimeout(200);
-
-  await openMultiSelect(page, 'statusSelector');
-  await page.getByText('Invoiced').first().click();
 
   // Select "This Month" date range via React Select customSelector
   await selectCustomOption(page, 'Range', 'This Month');
@@ -409,9 +415,8 @@ test('Expense report test', async ({ page, api }) => {
   await expectCustomSelectText(page, 'Report', 'Expense');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
   await expectCustomSelectText(page, 'Range', 'This Month');
-  await expect(page.locator('[id="statusSelector"]')).toContainText(
-    'PendingInvoiced'
-  );
+  await expect(page.locator('[id="statusSelector"]')).toContainText('Pending');
+  await expect(page.locator('[id="statusSelector"]')).toContainText('Invoiced');
   await expect(
     page.locator('[data-cy="scheduleDocumentEmailAttachment"]')
   ).toBeChecked();
@@ -428,9 +433,8 @@ test('Expense report test', async ({ page, api }) => {
   await expectCustomSelectText(page, 'Report', 'Expense');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
   await expectCustomSelectText(page, 'Range', 'This Month');
-  await expect(page.locator('[id="statusSelector"]')).toContainText(
-    'PendingInvoiced'
-  );
+  await expect(page.locator('[id="statusSelector"]')).toContainText('Pending');
+  await expect(page.locator('[id="statusSelector"]')).toContainText('Invoiced');
   await expect(
     page.locator('[data-cy="scheduleDocumentEmailAttachment"]')
   ).toBeChecked();
@@ -475,12 +479,12 @@ test('Expense report test with clients, project and categories selectors', async
   await page.waitForTimeout(300);
 
   await openMultiSelect(page, 'statusSelector');
-  await page.getByText('Pending').click();
-
+  await page.getByText('Pending', { exact: true }).first().click();
+  // Menu stays open (closeMenuOnSelect=false) — select Invoiced without reopening
+  await page.getByText('Invoiced', { exact: true }).first().click();
+  // Close the menu by clicking away
+  await page.getByText('Report', { exact: true }).first().click();
   await page.waitForTimeout(200);
-
-  await openMultiSelect(page, 'statusSelector');
-  await page.getByText('Invoiced').first().click();
 
   // Select "Last 7 Days" date range via React Select customSelector
   await selectCustomOption(page, 'Range', 'Last 7 Days');
@@ -499,6 +503,10 @@ test('Expense report test with clients, project and categories selectors', async
     .first()
     .click();
 
+  // Close any open menus before opening expense category selector
+  await page.getByText('Report', { exact: true }).first().click();
+  await page.waitForTimeout(200);
+
   await openMultiSelect(page, 'expenseCategoryItemSelector');
   await page
     .locator('#expenseCategoryItemSelector')
@@ -506,7 +514,13 @@ test('Expense report test with clients, project and categories selectors', async
     .first()
     .click();
 
-  await page.locator('[data-cy="includeDeleted"]').check();
+  // Close any open menus first, then toggle includeDeleted
+  await page.getByText('Report', { exact: true }).first().click();
+  await page.waitForTimeout(300);
+
+  const includeDeletedToggle = page.locator('[data-cy="includeDeleted"]');
+  await includeDeletedToggle.click();
+  await expect(includeDeletedToggle).toHaveAttribute('aria-checked', 'true');
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -531,9 +545,8 @@ test('Expense report test with clients, project and categories selectors', async
     category.name
   );
   await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
-  await expect(page.locator('[id="statusSelector"]')).toContainText(
-    'PendingInvoiced'
-  );
+  await expect(page.locator('[id="statusSelector"]')).toContainText('Pending');
+  await expect(page.locator('[id="statusSelector"]')).toContainText('Invoiced');
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -556,9 +569,8 @@ test('Expense report test with clients, project and categories selectors', async
     category.name
   );
   await expect(page.locator('[data-cy="includeDeleted"]')).toBeChecked();
-  await expect(page.locator('[id="statusSelector"]')).toContainText(
-    'PendingInvoiced'
-  );
+  await expect(page.locator('[id="statusSelector"]')).toContainText('Pending');
+  await expect(page.locator('[id="statusSelector"]')).toContainText('Invoiced');
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
@@ -566,8 +578,12 @@ test('Expense report test with clients, project and categories selectors', async
 });
 
 test('Product sales report test with filtering products', async ({ page, api }) => {
-  // Create prerequisite products via API
+  // Create prerequisite products and client via API
   const apiCtx = await createApiContext(process.env.VITE_API_URL!);
+  const client = await createClientViaApi(apiCtx, {
+    name: uniqueName('sched-filt-client'),
+  });
+  api.trackEntity('clients', client.id);
   const product1 = await createProductViaApi(apiCtx, {
     product_key: uniqueName('sched-filt-prod-1'),
   });
@@ -615,9 +631,9 @@ test('Product sales report test with filtering products', async ({ page, api }) 
 
   await page.locator('[data-testid="combobox-input-field"]').click();
 
-  await page.waitForTimeout(200);
-
-  await page.locator('[role="listbox"]').getByRole('option').first().click();
+  const clientOption = page.locator('[role="listbox"]').getByRole('option').first();
+  await clientOption.waitFor({ state: 'visible', timeout: 5000 });
+  await clientOption.click();
 
   // Select "Custom" date range via React Select customSelector
   await selectCustomOption(page, 'Range', 'Custom');

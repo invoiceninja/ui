@@ -162,7 +162,7 @@ export async function checkDropdownActions(
       await expect(dropDown.getByText(label).first()).toBeVisible();
 
       if (modal) {
-        await page.getByText(label).first().click();
+        await dropDown.getByText(label).first().click();
 
         const modalDialog = page.getByRole('dialog');
         await modalDialog.waitFor({ state: 'visible', timeout: 5000 });
@@ -172,11 +172,11 @@ export async function checkDropdownActions(
         for (const modalAction of modal.actions) {
           if (modalAction.visible) {
             await expect(
-              modalDialog.getByText(modalAction.label).first()
+              modalDialog.getByText(modalAction.label, { exact: true }).first()
             ).toBeVisible();
           } else {
             await expect(
-              modalDialog.getByText(modalAction.label).first()
+              modalDialog.getByText(modalAction.label, { exact: true }).first()
             ).not.toBeVisible();
           }
         }

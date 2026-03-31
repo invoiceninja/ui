@@ -65,27 +65,19 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
 
   if (isEditable) {
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'Save', exact: true })
+      page.locator('[data-cy="topNavbar"]').getByRole('button', { name: 'Save', exact: true })
     ).toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'Actions', exact: true })
+      page.locator('[data-cy="chevronDownButton"]').first()
     ).toBeVisible();
   } else {
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'Save', exact: true })
+      page.locator('[data-cy="topNavbar"]').getByRole('button', { name: 'Save', exact: true })
     ).not.toBeVisible();
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'Actions', exact: true })
+      page.locator('[data-cy="chevronDownButton"]').first()
     ).not.toBeVisible();
   }
 
@@ -269,10 +261,7 @@ test('can edit recurring invoice', async ({ page, api }) => {
     page.getByText('Successfully updated recurring invoice', { exact: true })
   ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(
     page,
@@ -319,10 +308,7 @@ test('can create a recurring invoice', async ({ page, api }) => {
     page.getByText('Successfully updated recurring invoice', { exact: true })
   ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(
     page,
@@ -388,10 +374,7 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
     page.getByText('Successfully updated recurring invoice', { exact: true })
   ).toBeVisible();
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(
     page,
@@ -441,12 +424,7 @@ test('deleting invoice with edit_recurring_invoice', async ({ page, api }) => {
     const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
     if (createdId) api.trackEntity('recurring_invoices', createdId);
 
-    const moreActionsButton = page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'Actions', exact: true })
-      .first();
-
-    await moreActionsButton.click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
@@ -456,7 +434,8 @@ test('deleting invoice with edit_recurring_invoice', async ({ page, api }) => {
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
-      .filter({ has: page.getByText('Actions') });
+      .filter({ has: page.getByText('Actions') })
+      .first();
 
     await moreActionsButton.click();
 
@@ -508,12 +487,7 @@ test('archiving invoice withe edit_recurring_invoice', async ({
     const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
     if (createdId) api.trackEntity('recurring_invoices', createdId);
 
-    const moreActionsButton = page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'Actions', exact: true })
-      .first();
-
-    await moreActionsButton.click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByRole('button', { name: 'Archive', exact: true }).click();
 
@@ -701,10 +675,7 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkEditPage(page, true);
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(
     page,
@@ -760,10 +731,7 @@ test('all clone actions displayed with creation permissions', async ({
 
   await checkEditPage(page, true);
 
-  await page
-    .locator('[data-cy="topNavbar"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .click();
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(
     page,
@@ -814,11 +782,7 @@ test('cloning recurring invoice', async ({ page, api }) => {
     const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
     if (createdId) api.trackEntity('recurring_invoices', createdId);
 
-    const moreActionsButton = page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'Actions', exact: true });
-
-    await moreActionsButton.click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -830,7 +794,10 @@ test('cloning recurring invoice', async ({ page, api }) => {
 
   await page.getByText('Clone To').first().click();
 
-  await page.getByText('Recurring Invoice').first().click();
+  // Select "Recurring Invoice" from the clone modal (scoped to dialog to avoid matching nav)
+  const cloneModal = page.getByRole('dialog');
+  await cloneModal.waitFor({ state: 'visible', timeout: 5000 });
+  await cloneModal.getByText('Recurring Invoice', { exact: true }).click();
 
   await page.waitForURL('**/recurring_invoices/create?action=clone');
 

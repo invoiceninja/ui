@@ -21,12 +21,15 @@ export const createTaxRate = async (params: TaxCreateParams) => {
     .getByRole('link', { name: 'New Tax Rate' })
     .click();
 
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(500);
 
-  // await page.getByRole('main').locator('[type="text"]').first().fill(taxName);
-  await page.locator('section').filter({ hasText: 'Name*' }).getByRole('textbox').fill(taxName);
-  
-  await page.locator('section').filter({ hasText: 'Tax Rate*' }).getByRole('textbox').fill(rate.toString());
+  const nameInput = page.getByRole('main').getByRole('textbox').first();
+  await nameInput.click();
+  await nameInput.pressSequentially(taxName, { delay: 20 });
+
+  const rateInput = page.getByRole('main').getByRole('textbox').nth(1);
+  await rateInput.click();
+  await rateInput.pressSequentially(rate.toString(), { delay: 20 });
 
   await page.getByRole('button', { name: 'Save', exact: true }).click();
 
