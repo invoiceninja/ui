@@ -651,11 +651,15 @@ test('Expense categories endpoint contains sort but not with parameter', async (
     .getByRole('link', { name: 'Enter Expense' })
     .click();
 
-  await page.getByTestId('combobox-input-field').nth(3).click();
-  await page
-    .getByRole('option', { name: expenseCategoryName })
-    .first()
-    .click();
+  await page.waitForTimeout(500);
+
+  const catInput = page.getByTestId('combobox-input-field').nth(3);
+  await catInput.click();
+  await catInput.fill(expenseCategoryName);
+
+  const catOption = page.getByRole('option', { name: expenseCategoryName }).first();
+  await catOption.waitFor({ state: 'visible', timeout: 5000 });
+  await catOption.click();
 
   await page.getByRole('button', { name: 'Save' }).click();
 
