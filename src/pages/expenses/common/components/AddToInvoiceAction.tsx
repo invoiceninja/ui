@@ -84,7 +84,9 @@ export function AddToInvoiceAction(props: Props) {
 
   const getCurrentAmount = (expense: Expense, invoice: Invoice) => {
     if (expense.currency_id !== invoice.client?.settings.currency_id) {
-      return expense.foreign_amount;
+      return expense.foreign_amount > 0
+        ? expense.foreign_amount
+        : expense.amount;
     }
 
     return expense.amount;
