@@ -29,7 +29,10 @@ export async function login(
 
 export function permissions(page: Page) {
   const clear = async (email = 'permissions@example.com') => {
-    await page.getByRole('link', { name: 'Settings' }).click();
+    await page
+      .locator('[data-cy="navigationBar"]')
+      .getByRole('link', { name: 'Settings' })
+      .click();
     await page.getByRole('link', { name: 'User Management' }).click();
     await page.locator('#filter').fill(email);
 

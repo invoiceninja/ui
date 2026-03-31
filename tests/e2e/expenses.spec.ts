@@ -86,8 +86,13 @@ const createExpense = async (params: CreateParams) => {
   await page.waitForTimeout(300);
 
   if (assignTo) {
-    await page.getByTestId('combobox-input-field').nth(4).click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    const assignedUserInput = page.getByTestId('combobox-input-field').nth(4);
+    await assignedUserInput.click();
+    await assignedUserInput.fill(assignTo.split(' ')[0]);
+
+    const option = page.getByRole('option', { name: assignTo }).first();
+    await option.waitFor({ state: 'visible', timeout: 5000 });
+    await option.click();
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -913,10 +918,12 @@ test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) =
     .first()
     .click();
 
-  if ((await page.locator('#enabled_expense_tax_rates').inputValue()) !== '2') {
-    await page
-      .locator('#enabled_expense_tax_rates')
-      .selectOption({ label: 'Two Tax Rates' });
+  // Set expense tax rates to "Two Tax Rates" via react-select
+  const taxRateRow1 = page.locator('dt:has-text("Expense Tax Rates")').locator('..');
+  const currentValue1 = await taxRateRow1.locator('[class*="singleValue"]').textContent().catch(() => '');
+  if (currentValue1 !== 'Two Tax Rates') {
+    await taxRateRow1.locator('svg').last().click();
+    await page.getByText('Two Tax Rates', { exact: true }).click();
 
     await page.getByRole('button', { name: 'Save' }).click();
 
@@ -937,15 +944,24 @@ test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) =
 
   await page.waitForTimeout(300);
 
-  await page.getByTestId('combobox-input-field').nth(5).click();
-  await page.getByText(taxRate10Name).click();
-  await page.getByTestId('combobox-input-field').nth(5).blur();
+  // Type-hint the tax rate name to search, then select the matching option
+  const taxInput1 = page.getByTestId('combobox-input-field').nth(5);
+  await taxInput1.click();
+  await taxInput1.fill(taxRate10Name);
+  const taxOption1 = page.getByRole('option', { name: taxRate10Name }).first();
+  await taxOption1.waitFor({ state: 'visible', timeout: 5000 });
+  await taxOption1.click();
 
-  await page.getByTestId('combobox-input-field').nth(6).click();
-  await page.getByText(taxRate20Name).click();
-  await page.getByTestId('combobox-input-field').nth(6).blur();
+  const taxInput2 = page.getByTestId('combobox-input-field').nth(6);
+  await taxInput2.click();
+  await taxInput2.fill(taxRate20Name);
+  const taxOption2 = page.getByRole('option', { name: taxRate20Name }).first();
+  await taxOption2.waitFor({ state: 'visible', timeout: 5000 });
+  await taxOption2.click();
 
-  await page.locator('[type="number"]').first().fill('12222');
+  // Amount field uses NumericFormat (type="text"), find via label
+  const amountInput = page.locator('dt:has-text("Amount")').locator('..').locator('input').first();
+  await amountInput.fill('12222');
 
   await page.getByRole('button', { name: 'Save' }).click();
 
@@ -987,10 +1003,12 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
     .first()
     .click();
 
-  if ((await page.locator('#enabled_expense_tax_rates').inputValue()) !== '2') {
-    await page
-      .locator('#enabled_expense_tax_rates')
-      .selectOption({ label: 'Two Tax Rates' });
+  // Set expense tax rates to "Two Tax Rates" via react-select
+  const taxRateRow = page.locator('dt:has-text("Expense Tax Rates")').locator('..');
+  const currentValue = await taxRateRow.locator('[class*="singleValue"]').textContent().catch(() => '');
+  if (currentValue !== 'Two Tax Rates') {
+    await taxRateRow.locator('svg').last().click();
+    await page.getByText('Two Tax Rates', { exact: true }).click();
 
     await page.getByRole('button', { name: 'Save' }).click();
 
@@ -1011,15 +1029,24 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
 
   await page.waitForTimeout(300);
 
-  await page.getByTestId('combobox-input-field').nth(5).click();
-  await page.getByText(taxRate10Name).click();
-  await page.getByTestId('combobox-input-field').nth(5).blur();
+  // Type-hint the tax rate name to search, then select the matching option
+  const taxInput1 = page.getByTestId('combobox-input-field').nth(5);
+  await taxInput1.click();
+  await taxInput1.fill(taxRate10Name);
+  const taxOption1 = page.getByRole('option', { name: taxRate10Name }).first();
+  await taxOption1.waitFor({ state: 'visible', timeout: 5000 });
+  await taxOption1.click();
 
-  await page.getByTestId('combobox-input-field').nth(6).click();
-  await page.getByText(taxRate20Name).click();
-  await page.getByTestId('combobox-input-field').nth(6).blur();
+  const taxInput2 = page.getByTestId('combobox-input-field').nth(6);
+  await taxInput2.click();
+  await taxInput2.fill(taxRate20Name);
+  const taxOption2 = page.getByRole('option', { name: taxRate20Name }).first();
+  await taxOption2.waitFor({ state: 'visible', timeout: 5000 });
+  await taxOption2.click();
 
-  await page.locator('[type="number"]').first().fill('12222');
+  // Amount field uses NumericFormat (type="text"), find via label
+  const amountInput = page.locator('dt:has-text("Amount")').locator('..').locator('input').first();
+  await amountInput.fill('12222');
 
   await page.locator('[data-cy="inclusiveTaxesToggle"]').first().check();
 
@@ -1059,10 +1086,12 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
     .first()
     .click();
 
-  if ((await page.locator('#enabled_expense_tax_rates').inputValue()) !== '2') {
-    await page
-      .locator('#enabled_expense_tax_rates')
-      .selectOption({ label: 'Two Tax Rates' });
+  // Set expense tax rates to "Two Tax Rates" via react-select
+  const taxRateRow = page.locator('dt:has-text("Expense Tax Rates")').locator('..');
+  const currentValue = await taxRateRow.locator('[class*="singleValue"]').textContent().catch(() => '');
+  if (currentValue !== 'Two Tax Rates') {
+    await taxRateRow.locator('svg').last().click();
+    await page.getByText('Two Tax Rates', { exact: true }).click();
 
     await page.getByRole('button', { name: 'Save' }).click();
 
@@ -1083,7 +1112,9 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
 
   await page.waitForTimeout(300);
 
-  await page.locator('[type="number"]').first().fill('12222');
+  // Amount field uses NumericFormat (type="text"), find via label
+  const amountInput = page.locator('dt:has-text("Amount")').locator('..').locator('input').first();
+  await amountInput.fill('12222');
 
   await page.locator('#by_amount').click();
 
@@ -1091,9 +1122,11 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
   const taxName2 = uniqueName('tax-by-amt-2');
 
   await page.locator('[data-cy="taxNameByAmount1"]').fill(taxName1);
-  await page.locator('[data-cy="taxRateByAmount1"]').fill('100');
+  // NumberInputField's NumericFormat doesn't render data-cy
+  // From the name input, go up to its section, then to the sibling section's input
+  await page.locator('[data-cy="taxNameByAmount1"]').locator('xpath=ancestor::section/following-sibling::section//input').fill('100');
   await page.locator('[data-cy="taxNameByAmount2"]').fill(taxName2);
-  await page.locator('[data-cy="taxRateByAmount2"]').fill('200');
+  await page.locator('[data-cy="taxNameByAmount2"]').locator('xpath=ancestor::section/following-sibling::section//input').fill('200');
 
   await page.getByRole('button', { name: 'Save' }).click();
 
@@ -1116,14 +1149,32 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
 
 test('The new_expense_category action is not shown on the badge dropdown', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+  const { createExpenseCategoryViaApi, createEntityViaApi, createApiContext } = await import('./api-helpers');
 
+  // Step 1: Give create_expense + edit_expense so the user can create data
+  await login(page);
+  await clear('expenses@example.com');
+  await set('create_expense', 'edit_expense');
+  await save();
+  await logout(page);
+
+  // Step 2: Create category + expense as expenses@example.com via API
+  const userApiCtx = await createApiContext(process.env.VITE_API_URL!, 'expenses@example.com', 'password');
+  const category = await createExpenseCategoryViaApi(userApiCtx, { name: uniqueName('badge-cat') });
+  const expense = await createEntityViaApi(userApiCtx, 'expenses', {
+    category_id: category.id,
+    amount: 100,
+  });
+  api.trackEntity('expenses', expense.id as string);
+
+  // Step 3: Downgrade to edit_expense only (no create) — "Create New" should NOT appear
   await login(page);
   await clear('expenses@example.com');
   await set('edit_expense');
   await save();
-
   await logout(page);
 
   await login(page, 'expenses@example.com', 'password');
@@ -1135,26 +1186,39 @@ test('The new_expense_category action is not shown on the badge dropdown', async
 
   await page.waitForTimeout(200);
 
-  await page.getByRole('button', { name: 'Columns', exact: true }).click();
+  // Add the Category column if not already present
+  const badgeAlreadyVisible = await page
+    .locator('[data-cy="expenseCategoryBadge"]')
+    .first()
+    .isVisible()
+    .catch(() => false);
 
-  await page.waitForTimeout(100);
+  if (!badgeAlreadyVisible) {
+    await page.getByRole('button').filter({ hasText: 'Columns' }).click();
 
-  await page
-    .locator('[data-cy="columSelector"]')
-    .selectOption({ label: 'Category' });
+    await page.waitForTimeout(100);
 
-  await page.getByRole('button', { name: 'Save', exact: true }).click();
+    const columnInput = page.locator('input[role="combobox"]').last();
+    await columnInput.click();
+    await columnInput.fill('Category');
+    await page.waitForTimeout(300);
+    await page.getByText('Category', { exact: true }).first().click();
 
+    await page.getByRole('button', { name: 'Save', exact: true }).click();
+
+    await expect(
+      page.getByText('Successfully saved settings').first()
+    ).toBeVisible();
+
+    await page.waitForTimeout(200);
+  }
+
+  // Click the chevron arrow inside the badge to open the dropdown
+  await page.locator('[data-cy="expenseCategoryBadge"]').first().locator('svg').click();
+
+  // With only edit_expense (no create_expense), "Create New" should NOT be visible
   await expect(
-    page.getByText('Successfully saved settings').first()
-  ).toBeVisible();
-
-  await page.waitForTimeout(200);
-
-  await page.locator('[data-cy="expenseCategoryBadge"]').first().click();
-
-  await expect(
-    page.locator('[data-cy="newExpenseCategoryAction"]').first()
+    page.getByText('Create New', { exact: true }).first()
   ).not.toBeVisible();
 
   await logout(page);
@@ -1162,15 +1226,26 @@ test('The new_expense_category action is not shown on the badge dropdown', async
 
 test('The new_expense_category action is shown on the badge dropdown', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+  const { createExpenseCategoryViaApi, createEntityViaApi, createApiContext } = await import('./api-helpers');
 
+  // Step 1: Give admin so the user can create and see everything
   await login(page);
   await clear('expenses@example.com');
   await set('admin');
   await save();
-
   await logout(page);
+
+  // Step 2: Create category + expense as expenses@example.com via API
+  const userApiCtx = await createApiContext(process.env.VITE_API_URL!, 'expenses@example.com', 'password');
+  const category = await createExpenseCategoryViaApi(userApiCtx, { name: uniqueName('badge-cat') });
+  const expense = await createEntityViaApi(userApiCtx, 'expenses', {
+    category_id: category.id,
+    amount: 100,
+  });
+  api.trackEntity('expenses', expense.id as string);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -1181,10 +1256,11 @@ test('The new_expense_category action is shown on the badge dropdown', async ({
 
   await page.waitForTimeout(200);
 
-  await page.locator('[data-cy="expenseCategoryBadge"]').first().click();
+  // Click the chevron arrow inside the badge to open the dropdown
+  await page.locator('[data-cy="expenseCategoryBadge"]').first().locator('svg').click();
 
   await expect(
-    page.locator('[data-cy="newExpenseCategoryAction"]').first()
+    page.getByText('Create New', { exact: true }).first()
   ).toBeVisible();
 
   await logout(page);
@@ -1192,15 +1268,26 @@ test('The new_expense_category action is shown on the badge dropdown', async ({
 
 test('The new_expense_category action is shown on the badge dropdown with only create_expense permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+  const { createExpenseCategoryViaApi, createEntityViaApi, createApiContext } = await import('./api-helpers');
 
+  // Step 1: Give create_expense so the user can create data
   await login(page);
   await clear('expenses@example.com');
   await set('create_expense');
   await save();
-
   await logout(page);
+
+  // Step 2: Create category + expense as expenses@example.com via API
+  const userApiCtx = await createApiContext(process.env.VITE_API_URL!, 'expenses@example.com', 'password');
+  const category = await createExpenseCategoryViaApi(userApiCtx, { name: uniqueName('badge-cat') });
+  const expense = await createEntityViaApi(userApiCtx, 'expenses', {
+    category_id: category.id,
+    amount: 100,
+  });
+  api.trackEntity('expenses', expense.id as string);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -1211,10 +1298,11 @@ test('The new_expense_category action is shown on the badge dropdown with only c
 
   await page.waitForTimeout(200);
 
-  await page.locator('[data-cy="expenseCategoryBadge"]').first().click();
+  // Click the chevron arrow inside the badge to open the dropdown
+  await page.locator('[data-cy="expenseCategoryBadge"]').first().locator('svg').click();
 
   await expect(
-    page.locator('[data-cy="newExpenseCategoryAction"]').first()
+    page.getByText('Create New', { exact: true }).first()
   ).toBeVisible();
 
   await logout(page);

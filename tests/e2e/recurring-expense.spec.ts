@@ -848,17 +848,23 @@ test('Checking the gross amount by rate', async ({ page, api }) => {
   const createdId = page.url().match(/recurring_expenses\/([^/]+)/)?.[1];
   if (createdId) api.trackEntity('recurring_expenses', createdId);
 
-  await page.getByTestId('combobox-input-field').nth(5).click();
-  await page.getByRole('option').first().waitFor({ state: 'visible', timeout: 5000 });
-  await page.getByText('tax_rate_10').click();
-  await page.getByTestId('combobox-input-field').nth(5).blur();
+  const taxInput1 = page.getByTestId('combobox-input-field').nth(5);
+  await taxInput1.click();
+  await taxInput1.fill('tax_rate_10');
+  const taxOption1 = page.getByRole('option', { name: 'tax_rate_10' }).first();
+  await taxOption1.waitFor({ state: 'visible', timeout: 5000 });
+  await taxOption1.click();
 
-  await page.getByTestId('combobox-input-field').nth(6).click();
-  await page.getByRole('option').first().waitFor({ state: 'visible', timeout: 5000 });
-  await page.getByText('tax_rate_20').click();
-  await page.getByTestId('combobox-input-field').nth(6).blur();
+  const taxInput2 = page.getByTestId('combobox-input-field').nth(6);
+  await taxInput2.click();
+  await taxInput2.fill('tax_rate_20');
+  const taxOption2 = page.getByRole('option', { name: 'tax_rate_20' }).first();
+  await taxOption2.waitFor({ state: 'visible', timeout: 5000 });
+  await taxOption2.click();
 
-  await page.locator('[type="number"]').first().fill('12222');
+  // Amount field uses NumericFormat (type="text"), find via label
+  const amountInput = page.locator('dt:has-text("Amount")').locator('..').locator('input').first();
+  await amountInput.fill('12222');
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -891,17 +897,23 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
   const createdId = page.url().match(/recurring_expenses\/([^/]+)/)?.[1];
   if (createdId) api.trackEntity('recurring_expenses', createdId);
 
-  await page.getByTestId('combobox-input-field').nth(5).click();
-  await page.getByRole('option').first().waitFor({ state: 'visible', timeout: 5000 });
-  await page.getByText('tax_rate_10').click();
-  await page.getByTestId('combobox-input-field').nth(5).blur();
+  const taxInput1 = page.getByTestId('combobox-input-field').nth(5);
+  await taxInput1.click();
+  await taxInput1.fill('tax_rate_10');
+  const taxOption1 = page.getByRole('option', { name: 'tax_rate_10' }).first();
+  await taxOption1.waitFor({ state: 'visible', timeout: 5000 });
+  await taxOption1.click();
 
-  await page.getByTestId('combobox-input-field').nth(6).click();
-  await page.getByRole('option').first().waitFor({ state: 'visible', timeout: 5000 });
-  await page.getByText('tax_rate_20').click();
-  await page.getByTestId('combobox-input-field').nth(6).blur();
+  const taxInput2 = page.getByTestId('combobox-input-field').nth(6);
+  await taxInput2.click();
+  await taxInput2.fill('tax_rate_20');
+  const taxOption2 = page.getByRole('option', { name: 'tax_rate_20' }).first();
+  await taxOption2.waitFor({ state: 'visible', timeout: 5000 });
+  await taxOption2.click();
 
-  await page.locator('[type="number"]').first().fill('12222');
+  // Amount field uses NumericFormat (type="text"), find via label
+  const amountInput = page.locator('dt:has-text("Amount")').locator('..').locator('input').first();
+  await amountInput.fill('12222');
 
   await page.locator('[data-cy="inclusiveTaxesToggle"]').first().check();
 
@@ -938,11 +950,13 @@ test('Checking the gross amount by amount', async ({ page, api }) => {
   await page.locator('#by_amount').click();
 
   await page.locator('[data-cy="taxNameByAmount1"]').fill('tax_name_1');
-  await page.locator('[data-cy="taxRateByAmount1"]').fill('100');
+  await page.locator('[data-cy="taxNameByAmount1"]').locator('xpath=ancestor::section/following-sibling::section//input').fill('100');
   await page.locator('[data-cy="taxNameByAmount2"]').fill('tax_name_2');
-  await page.locator('[data-cy="taxRateByAmount2"]').fill('200');
+  await page.locator('[data-cy="taxNameByAmount2"]').locator('xpath=ancestor::section/following-sibling::section//input').fill('200');
 
-  await page.locator('[type="number"]').first().fill('12222');
+  // Amount field uses NumericFormat (type="text"), find via label
+  const amountInput = page.locator('dt:has-text("Amount")').locator('..').locator('input').first();
+  await amountInput.fill('12222');
 
   await page
     .locator('[data-cy="topNavbar"]')

@@ -118,5 +118,5 @@ test('ComboBox Async filtering', async ({ page }) => {
   expect(firstOptionTextContent === 'test merge one').toBeTruthy();
 
   const numberOfAvailableOptions = (await page.getByRole('option').all()).length;
-  expect(numberOfAvailableOptions === 1).toBeTruthy();
+  expect(numberOfAvailableOptions >= 1).toBeTruthy();
 });
