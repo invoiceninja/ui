@@ -65,13 +65,13 @@ test('deleting invoice design with admin owner account', async ({ page, api }) =
   if (designId) api.trackEntity('designs', designId);
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
-
+  await page.waitForTimeout(200);
   await page.getByText('Delete').click();
-
+  await page.waitForTimeout(200);
   await expect(
     page.getByRole('button', { name: 'Restore', exact: true })
   ).toBeVisible({ timeout: 10000 });
-
+  await page.waitForTimeout(200);
   await expect(
     page.getByRole('button', { name: 'Archive', exact: true })
   ).not.toBeVisible({ timeout: 10000 });

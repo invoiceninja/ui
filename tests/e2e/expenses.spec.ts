@@ -83,8 +83,6 @@ const createExpense = async (params: CreateParams) => {
 
   await page.waitForURL('**/expenses/create');
 
-  await page.waitForTimeout(300);
-
   if (assignTo) {
     const assignedUserInput = page.getByTestId('combobox-input-field').nth(4);
     await assignedUserInput.click();
@@ -95,7 +93,14 @@ const createExpense = async (params: CreateParams) => {
     await option.click();
   }
 
-  await page.getByRole('button', { name: 'Save' }).click();
+  await page.locator('section').filter({ hasText: 'Public Notes' }).getByRole('textbox').fill('Public Notes');
+  
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+
+  // await page.getByRole('button', { name: 'Save' }).click();
 
   await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
 

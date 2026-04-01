@@ -76,7 +76,7 @@
     "mitt": "^3.0.1",
     "monaco-editor": "^0.53.0",
     "papaparse": "^5.5.2",
-    "playwright": "^1.51.0",
+    "playwright": "^1.59.0",
     "pretty-bytes": "^6.1.1",
     "pusher-js": "^8.4.0",
     "randexp": "^0.5.3",

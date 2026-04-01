@@ -956,6 +956,20 @@ test('Prevent navigation in the main navbar', async ({ page, api }) => {
   await page.waitForTimeout(200);
 
   await page
+    .locator('[type="date"]')
+    .last()
+    .fill(dayjs().add(20, 'day').format('YYYY-MM-DD'));
+
+  await page.locator('[type="date"]').last().blur();
+
+  await page.waitForTimeout(200);
+
+  await page.locator('#po_number').first().fill('po-number');
+  await page.locator('#po_number').first().blur();
+
+  await page.waitForTimeout(200);
+
+  await page
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Projects', exact: true })
     .click();
