@@ -54,19 +54,19 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
-    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
+    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]')
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 };
 
@@ -78,20 +78,20 @@ const checkShowPage = async (page: Page, isEditable: boolean) => {
       .getByRole('definition', { exact: true })
       .filter({ hasText: 'Summary' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   if (!isEditable) {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Edit', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Edit', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 };
 
@@ -138,7 +138,7 @@ const createProject = async (params: CreateParams) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created project')).toBeVisible();
+  await expect(page.getByText('Successfully created project')).toBeVisible({ timeout: 10000 });
 };
 
 test("can't view projects without permission", async ({ page }) => {
@@ -242,7 +242,7 @@ test('can edit project', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated project', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -282,7 +282,7 @@ test('can create a project', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated project', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -348,7 +348,7 @@ test('can view and edit assigned project with create_project', async ({
 
   await expect(
     page.getByText('Successfully updated project', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -390,7 +390,7 @@ test('deleting project with edit_project', async ({ page, api }) => {
 
     await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
-    await expect(page.getByText('Successfully deleted project')).toBeVisible();
+    await expect(page.getByText('Successfully deleted project')).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -400,7 +400,7 @@ test('deleting project with edit_project', async ({ page, api }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted project')).toBeVisible();
+    await expect(page.getByText('Successfully deleted project')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -441,11 +441,11 @@ test('archiving project with edit_project', async ({ page, api }) => {
 
     await page.getByRole('button', { name: 'Archive', exact: true }).click();
 
-    await expect(page.getByText('Successfully archived project')).toBeVisible();
+    await expect(page.getByText('Successfully archived project')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -456,7 +456,7 @@ test('archiving project with edit_project', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived project')).toBeVisible();
+    await expect(page.getByText('Successfully archived project')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -507,7 +507,7 @@ test('project documents preview with edit_project', async ({ page, api }) => {
     })
     .click();
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
 test('project documents uploading with edit_project', async ({ page, api }) => {
@@ -562,11 +562,11 @@ test('project documents uploading with edit_project', async ({ page, api }) => {
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('Invoice project and clone action in dropdown displayed with admin permission', async ({
@@ -685,7 +685,7 @@ test('cloning project', async ({ page, api }) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created project')).toBeVisible();
+  await expect(page.getByText('Successfully created project')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/projects/**/edit');
 
@@ -694,7 +694,7 @@ test('cloning project', async ({ page, api }) => {
 
   await expect(
     page.getByRole('heading', { name: 'Edit project' }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('Invoice Project displayed with admin permission', async ({

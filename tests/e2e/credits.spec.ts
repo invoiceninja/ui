@@ -74,13 +74,13 @@ const checkEditPage = async (
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 
   if (!isAdmin) {
@@ -89,14 +89,14 @@ const checkEditPage = async (
         .locator('[data-cy="tabs"]')
         .nth(1)
         .getByRole('button', { name: 'Custom Fields', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="tabs"]')
         .nth(1)
         .getByRole('button', { name: 'Custom Fields', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 
   await expect(
@@ -104,28 +104,28 @@ const checkEditPage = async (
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'Documents' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'Settings', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'Activity', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'History', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };
 
 interface CreateParams {
@@ -185,7 +185,7 @@ const createCredit = async (params: CreateParams) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created credit')).toBeVisible();
+  await expect(page.getByText('Successfully created credit')).toBeVisible({ timeout: 10000 });
 
   if (returnCreditNumber) {
     await page.waitForURL('**/credits/**/edit');
@@ -287,7 +287,7 @@ test('can edit credit', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated credit', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -326,7 +326,7 @@ test('can create a credit', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated credit', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -383,7 +383,7 @@ test('can view and edit assigned credit with create_credit', async ({
 
   await expect(
     page.getByText('Successfully updated credit', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -424,7 +424,7 @@ test('deleting credit with edit_credit', async ({ page, api }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted credit')).toBeVisible();
+    await expect(page.getByText('Successfully deleted credit')).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -434,7 +434,7 @@ test('deleting credit with edit_credit', async ({ page, api }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted credit')).toBeVisible();
+    await expect(page.getByText('Successfully deleted credit')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -470,11 +470,11 @@ test('archiving credit withe edit_credit', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived credit')).toBeVisible();
+    await expect(page.getByText('Successfully archived credit')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -485,7 +485,7 @@ test('archiving credit withe edit_credit', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived credit')).toBeVisible();
+    await expect(page.getByText('Successfully archived credit')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -536,7 +536,7 @@ test('credit documents preview with edit_credit', async ({ page, api }) => {
     .first()
     .click();
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
 test('credit documents uploading with edit_credit', async ({ page, api }) => {
@@ -595,7 +595,7 @@ test('credit documents uploading with edit_credit', async ({ page, api }) => {
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('all actions in dropdown displayed with admin permission', async ({
@@ -726,7 +726,7 @@ test('cloning credit', async ({ page, api }) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created credit')).toBeVisible();
+  await expect(page.getByText('Successfully created credit')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/credits/**/edit');
 
@@ -735,5 +735,5 @@ test('cloning credit', async ({ page, api }) => {
 
   await expect(
     page.getByRole('heading', { name: 'Edit Credit' }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });

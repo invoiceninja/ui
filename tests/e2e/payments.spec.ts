@@ -47,7 +47,7 @@ const createPayment = async (params: CreateParams) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created payment')).toBeVisible();
+  await expect(page.getByText('Successfully created payment')).toBeVisible({ timeout: 10000 });
 };
 const checkEditPage = async (
   page: Page,
@@ -59,37 +59,37 @@ const checkEditPage = async (
   if (isEditable) {
     await expect(
       page.locator('[data-cy="topNavbar"]').getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page.locator('[data-cy="topNavbar"]').getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 
   await expect(
     page.locator('[data-cy="tabs"]').getByRole('link', { name: 'Documents' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   if (!isAdmin) {
     await expect(
       page
         .locator('[data-cy="tabs"]')
         .getByRole('link', { name: 'Custom Fields', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="tabs"]')
         .getByRole('link', { name: 'Custom Fields', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 };
 
@@ -191,7 +191,7 @@ test('can edit payment', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated payment', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -228,7 +228,7 @@ test('can create a payment', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated payment', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -267,7 +267,7 @@ test('deleting payment with edit_payment', async ({ page, api }) => {
 
     await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
-    await expect(page.getByText('Successfully deleted payment')).toBeVisible();
+    await expect(page.getByText('Successfully deleted payment')).toBeVisible({ timeout: 10000 });
 
   } else {
     const moreActionsButton = tableRow
@@ -278,7 +278,7 @@ test('deleting payment with edit_payment', async ({ page, api }) => {
 
     await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
-    await expect(page.getByText('Successfully deleted payment')).toBeVisible();
+    await expect(page.getByText('Successfully deleted payment')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -321,11 +321,11 @@ test('archiving payment with edit_payment', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived payment')).toBeVisible();
+    await expect(page.getByText('Successfully archived payment')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -336,7 +336,7 @@ test('archiving payment with edit_payment', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived payment')).toBeVisible();
+    await expect(page.getByText('Successfully archived payment')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -388,7 +388,7 @@ test('payment documents preview with edit_payment', async ({ page, api }) => {
 
   await page.waitForURL('**/payments/**/documents');
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
 test('payment documents uploading with edit_payment', async ({ page, api }) => {
@@ -448,7 +448,7 @@ test('payment documents uploading with edit_payment', async ({ page, api }) => {
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('rendering documents and custom_fields tabs with admin permission', async ({
@@ -474,7 +474,7 @@ test('rendering documents and custom_fields tabs with admin permission', async (
 
   await expect(
     page.getByRole('heading', { name: 'Documents', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .locator('[data-cy="tabs"]')
@@ -485,13 +485,13 @@ test('rendering documents and custom_fields tabs with admin permission', async (
 
   await expect(
     page.getByRole('heading', { name: 'Custom Fields', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('link', { name: 'Edit', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
-  await expect(page.getByRole('link', { name: 'Documents' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Documents' })).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });

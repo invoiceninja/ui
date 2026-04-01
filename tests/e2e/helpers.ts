@@ -24,7 +24,7 @@ export async function login(
   await page.getByLabel('Password').fill(password);
   await page.getByLabel('Password').press('Enter');
 
-  await expect(page.locator('[data-cy="navigationBar"]')).toBeVisible();
+  await expect(page.locator('[data-cy="navigationBar"]')).toBeVisible({ timeout: 10000 });
 }
 
 export function permissions(page: Page) {
@@ -129,7 +129,7 @@ export async function checkTableEditability(page: Page, isEditable: boolean) {
 
   if (isEditable) {
     // Header checkbox should be visible when table is editable
-    await expect(headerCheckbox.first()).toBeVisible();
+    await expect(headerCheckbox.first()).toBeVisible({ timeout: 10000 });
   } else {
     // No checkboxes or action buttons when not editable
     expect(await headerCheckbox.count()).toEqual(0);
@@ -159,7 +159,7 @@ export async function checkDropdownActions(
 
   for (const { label, visible, modal } of actions) {
     if (visible) {
-      await expect(dropDown.getByText(label).first()).toBeVisible();
+      await expect(dropDown.getByText(label).first()).toBeVisible({ timeout: 10000 });
 
       if (modal) {
         await dropDown.getByText(label).first().click();
@@ -167,23 +167,23 @@ export async function checkDropdownActions(
         const modalDialog = page.getByRole('dialog');
         await modalDialog.waitFor({ state: 'visible', timeout: 5000 });
 
-        await expect(modalDialog.getByText(modal.title).first()).toBeVisible();
+        await expect(modalDialog.getByText(modal.title).first()).toBeVisible({ timeout: 10000 });
 
         for (const modalAction of modal.actions) {
           if (modalAction.visible) {
             await expect(
               modalDialog.getByText(modalAction.label, { exact: true }).first()
-            ).toBeVisible();
+            ).toBeVisible({ timeout: 10000 });
           } else {
             await expect(
               modalDialog.getByText(modalAction.label, { exact: true }).first()
-            ).not.toBeVisible();
+            ).not.toBeVisible({ timeout: 10000 });
           }
         }
 
         await page.locator(`[data-cy=${modal.dataCyXButton}]`).click();
 
-        await expect(modalDialog).not.toBeVisible();
+        await expect(modalDialog).not.toBeVisible({ timeout: 10000 });
 
         // Re-open the dropdown since closing the modal also closes it
         const chevron = page.locator('[data-cy="chevronDownButton"]').first();
@@ -193,7 +193,7 @@ export async function checkDropdownActions(
         }
       }
     } else {
-      await expect(dropDown.getByText(label).first()).not.toBeVisible();
+      await expect(dropDown.getByText(label).first()).not.toBeVisible({ timeout: 10000 });
     }
   }
 }

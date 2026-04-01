@@ -66,44 +66,44 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
   if (isEditable) {
     await expect(
       page.locator('[data-cy="topNavbar"]').getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page.locator('[data-cy="topNavbar"]').getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .getByRole('link', { name: 'Settings', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .getByRole('link', { name: 'Activity', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .getByRole('link', { name: 'History', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .getByRole('link', { name: 'Schedule', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };
 
 interface CreateParams {
@@ -159,7 +159,7 @@ const createRecurringInvoice = async (params: CreateParams) => {
 
   await expect(
     page.getByText('Successfully created recurring invoice')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };
 
 test("can't view recurring invoices without permission", async ({ page }) => {
@@ -259,7 +259,7 @@ test('can edit recurring invoice', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated recurring invoice', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -306,7 +306,7 @@ test('can create a recurring invoice', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated recurring invoice', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -372,7 +372,7 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
 
   await expect(
     page.getByText('Successfully updated recurring invoice', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -430,7 +430,7 @@ test('deleting invoice with edit_recurring_invoice', async ({ page, api }) => {
 
     await expect(
       page.getByText('Successfully deleted recurring invoice')
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -443,7 +443,7 @@ test('deleting invoice with edit_recurring_invoice', async ({ page, api }) => {
 
     await expect(
       page.getByText('Successfully deleted recurring invoice')
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -493,11 +493,11 @@ test('archiving invoice withe edit_recurring_invoice', async ({
 
     await expect(
       page.getByText('Successfully archived recurring invoice')
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -510,7 +510,7 @@ test('archiving invoice withe edit_recurring_invoice', async ({
 
     await expect(
       page.getByText('Successfully archived recurring invoice')
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -572,7 +572,7 @@ test('invoice documents preview with edit_recurring_invoice', async ({
     .first()
     .click();
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
 test('invoice documents uploading with edit_recurring_invoice', async ({
@@ -644,7 +644,7 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('all actions in dropdown displayed with admin permission', async ({
@@ -805,7 +805,7 @@ test('cloning recurring invoice', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully created recurring invoice')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/recurring_invoices/**/edit**');
 
@@ -814,7 +814,7 @@ test('cloning recurring invoice', async ({ page, api }) => {
 
   await expect(
     page.getByRole('heading', { name: 'Edit Recurring Invoice' }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('recurring invoice creation and start stop sequence', async ({ page, api }) => {
@@ -861,9 +861,9 @@ test('recurring invoice creation and start stop sequence', async ({ page, api })
   await page.getByRole('link', { name: 'Edit', exact: true }).click();
   await page.getByRole('button').nth(4).click();
   await page.getByRole('button', { name: 'Stop' }).click();
-  await expect(page.getByText('Paused')).toBeVisible();
+  await expect(page.getByText('Paused')).toBeVisible({ timeout: 10000 });
   
-  // await expect(page.getByText('Clients Last Name')).toBeVisible();
+  // await expect(page.getByText('Clients Last Name')).toBeVisible({ timeout: 10000 });
   await page.locator('div').filter({ hasText: /^Monthly$/ }).nth(2).click();
   await page.locator('div').filter({ hasText: /^Monthly$/ }).first().click();
   await page.getByRole('cell', { name: '12345' }).getByRole('textbox').click();

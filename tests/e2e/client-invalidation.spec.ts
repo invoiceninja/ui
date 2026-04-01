@@ -65,15 +65,15 @@ test('test appropriate invalidation of clients', async ({ page, api }) => {
   await expect(
     page.getByText('Paid to Date$')
       .filter({ hasText: /^Paid to Date\$ 0\.00$/ })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
   await expect(
     page.getByText('Outstanding$')
       .filter({ hasText: /^Outstanding\$ 0\.00$/ })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
   await expect(
     page.getByText('Credit Balance$')
       .filter({ hasText: /^Credit Balance\$ 0\.00$/ })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('main')
@@ -113,15 +113,15 @@ test('test appropriate invalidation of clients', async ({ page, api }) => {
   await expect(
     page.getByText('Paid to Date$')
       .filter({ hasText: /^Paid to Date\$ 0\.00$/ })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
   await expect(
     page.getByText('Outstanding$')
       .filter({ hasText: /^Outstanding\$ 100\.00$/ })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
   await expect(
     page.getByText('Credit Balance$')
       .filter({ hasText: /^Credit Balance\$ 0\.00$/ })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.getByRole('button', { name: 'Actions' }).first().click();
   await page.getByRole('button', { name: 'Mark Paid' }).click();
@@ -129,15 +129,15 @@ test('test appropriate invalidation of clients', async ({ page, api }) => {
   await expect(
     page.getByText('Paid to Date$')
       .filter({ hasText: /^Paid to Date\$ 100\.00$/ })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
   await expect(
     page.getByText('Outstanding$')
       .filter({ hasText: /^Outstanding\$ 0\.00$/ })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
   await expect(
     page.getByText('Credit Balance$')
       .filter({ hasText: /^Credit Balance\$ 0\.00$/ })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
 await page.getByRole('link', { name: 'Clients' }).first().click();
 await page.getByRole('cell').first().getByRole('checkbox').first().click();

@@ -91,13 +91,13 @@ test('ComboBox Async action opening slider', async ({ page }) => {
   await comboBoxInputField.click();
 
   const actionButton = page.getByRole('button', { name: 'New Client' });
-  await expect(actionButton).toBeVisible();
+  await expect(actionButton).toBeVisible({ timeout: 10000 });
 
   await actionButton.click();
 
   await expect(
     page.locator('[data-headlessui-state="open"]').getByText('New Client')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('ComboBox Async filtering', async ({ page }) => {

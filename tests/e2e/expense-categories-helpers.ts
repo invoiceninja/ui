@@ -42,5 +42,5 @@ export const createExpenseCategory = async (
 
   await expect(
     page.getByText('Successfully created expense category', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };

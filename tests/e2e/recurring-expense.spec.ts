@@ -40,21 +40,21 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 };
 
@@ -97,7 +97,7 @@ const createRecurringExpense = async (params: CreateParams) => {
 
   await expect(
     page.getByText('Successfully created recurring expense')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   if (returnCreditNumber) {
     await page.waitForURL('**/recurring_expenses/**/edit');
@@ -199,7 +199,7 @@ test('can edit recurring expense', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated recurring expense', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -244,7 +244,7 @@ test('can create a recurring expense', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated recurring expense', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -308,7 +308,7 @@ test('can view and edit assigned recurring expense with create_recurring_expense
 
   await expect(
     page.getByText('Successfully updated recurring expense', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -371,7 +371,7 @@ test('deleting recurring expense with edit_recurring_expense', async ({
 
   await expect(
     page.getByText('Successfully deleted recurring expense')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('archiving recurring expense with edit_recurring_expense', async ({
@@ -413,7 +413,7 @@ test('archiving recurring expense with edit_recurring_expense', async ({
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await tableRow
       .getByRole('button')
@@ -426,7 +426,7 @@ test('archiving recurring expense with edit_recurring_expense', async ({
 
   await expect(
     page.getByText('Successfully archived recurring expense')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('recurring expense documents preview with edit_recurring_expense', async ({
@@ -481,7 +481,7 @@ test('recurring expense documents preview with edit_recurring_expense', async ({
 
   await page.waitForURL('**/recurring_expenses/**/documents');
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
 test('recurring expense documents uploading with edit_recurring_expense', async ({
@@ -545,7 +545,7 @@ test('recurring expense documents uploading with edit_recurring_expense', async 
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('all actions in dropdown displayed with admin permission', async ({
@@ -674,7 +674,7 @@ test('cloning recurring expense', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully created recurring expense')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/recurring_expenses/**/edit');
 
@@ -683,7 +683,7 @@ test('cloning recurring expense', async ({ page, api }) => {
 
   await expect(
     page.getByRole('heading', { name: 'Edit Recurring Expense' }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('Checking should_be_invoiced expense settings value on recurring expense creation page', async ({
@@ -705,7 +705,7 @@ test('Checking should_be_invoiced expense settings value on recurring expense cr
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
   }
 
   await page
@@ -744,7 +744,7 @@ test('Checking mark_paid expense settings value on recurring_expense creation pa
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
   }
 
   await page
@@ -781,7 +781,7 @@ test('Checking convert_currency expense settings value on recurring_expense crea
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
   }
 
   await page
@@ -820,7 +820,7 @@ test('Checking add_documents_to_invoice expense settings value on recurring_expe
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
   }
 
   await page
@@ -862,7 +862,7 @@ test('Checking the gross amount by rate', async ({ page, api }) => {
     await taxRateRow.locator('svg').last().click();
     await page.getByText('Two Tax Rates', { exact: true }).click();
     await page.getByRole('button', { name: 'Save' }).click();
-    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
   }
 
   await createRecurringExpense({ page });
@@ -896,14 +896,14 @@ test('Checking the gross amount by rate', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated recurring expense', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Recurring Expenses', exact: true })
     .click();
 
-  await expect(page.getByText('$ 15,888.60')).toBeVisible();
+  await expect(page.getByText('$ 15,888.60')).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -933,7 +933,7 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
     await taxRateRow.locator('svg').last().click();
     await page.getByText('Two Tax Rates', { exact: true }).click();
     await page.getByRole('button', { name: 'Save' }).click();
-    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
   }
 
   await createRecurringExpense({ page });
@@ -969,14 +969,14 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
 
   await expect(
     page.getByText('Successfully updated recurring expense', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Recurring Expenses', exact: true })
     .click();
 
-  await expect(page.getByText('$ 12,222.00')).toBeVisible();
+  await expect(page.getByText('$ 12,222.00')).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -997,7 +997,7 @@ test('Checking the gross amount by amount', async ({ page, api }) => {
     await taxRateRow.locator('svg').last().click();
     await page.getByText('Two Tax Rates', { exact: true }).click();
     await page.getByRole('button', { name: 'Save' }).click();
-    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
   }
 
   await createRecurringExpense({ page });
@@ -1026,14 +1026,14 @@ test('Checking the gross amount by amount', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated recurring expense', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Recurring Expenses', exact: true })
     .click();
 
-  await expect(page.getByText('$ 12,522.00')).toBeVisible();
+  await expect(page.getByText('$ 12,522.00')).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });

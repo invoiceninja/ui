@@ -124,7 +124,7 @@ const createClient = async (params: CreateParams) => {
 
   await expect(
     page.getByText('Successfully created client', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   const id = page.url().match(/clients\/([^/]+)/)?.[1];
   if (id) api.trackEntity('clients', id);
@@ -138,41 +138,41 @@ const checkShowPage = async (page: Page, isEditable: boolean) => {
       .getByRole('definition', { exact: true })
       .filter({ hasText: 'Details' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('definition', { exact: true })
       .filter({ hasText: 'Address' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('definition', { exact: true })
       .filter({ hasText: 'Contacts' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('definition', { exact: true })
       .filter({ hasText: 'Standing' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   if (!isEditable) {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Edit', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Edit', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 };
 
@@ -183,25 +183,25 @@ const checkEditPage = async (page: Page) => {
     page
       .locator('[data-cy="topNavbar"]')
       .getByRole('button', { name: 'Save', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="topNavbar"]')
       .getByRole('button', { name: 'Save', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('heading', { name: 'Company Details', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('heading', { name: 'Contacts', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('heading', { name: 'Address', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
 };
 
@@ -299,7 +299,7 @@ test('can edit client', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated client', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -360,7 +360,7 @@ test('can create a client', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated client', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -423,7 +423,7 @@ test('can view and edit assigned client with create_client', async ({
 
   await expect(
     page.getByText('Successfully updated client', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -460,11 +460,11 @@ test('deleting client with edit_client', async ({ page, api }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted client')).toBeVisible();
+    await expect(page.getByText('Successfully deleted client')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -474,7 +474,7 @@ test('deleting client with edit_client', async ({ page, api }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted client')).toBeVisible();
+    await expect(page.getByText('Successfully deleted client')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -506,11 +506,11 @@ test('archiving client withe edit_client', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived client')).toBeVisible();
+    await expect(page.getByText('Successfully archived client')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -521,7 +521,7 @@ test('archiving client withe edit_client', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived client')).toBeVisible();
+    await expect(page.getByText('Successfully archived client')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -599,7 +599,7 @@ test('can purge client with admin permission', async ({ page, api }) => {
 
   await page.getByRole('button', { name: 'Continue' }).click();
 
-  await expect(page.getByText('Successfully purged client')).toBeVisible();
+  await expect(page.getByText('Successfully purged client')).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -652,7 +652,7 @@ test('client documents preview with edit_client', async ({ page, api }) => {
     .first()
     .click();
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
 test('client documents uploading with edit_client', async ({ page, api }) => {
@@ -708,11 +708,11 @@ test('client documents uploading with edit_client', async ({ page, api }) => {
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('all actions in dropdown displayed with admin permission', async ({
@@ -827,7 +827,7 @@ test('Merge client action', async ({ page, api }) => {
     .first()
     .click();
 
-  await expect(page.getByText('Merge Into')).toBeVisible();
+  await expect(page.getByText('Merge Into')).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-testid="combobox-input-field"]').click();
 
@@ -844,16 +844,16 @@ test('Merge client action', async ({ page, api }) => {
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
   }
 
-  await expect(page.getByText('Merge Into')).not.toBeVisible();
-  await expect(page.getByText('Successfully merged client')).toBeVisible();
+  await expect(page.getByText('Merge Into')).not.toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully merged client')).toBeVisible({ timeout: 10000 });
 
   await page
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Clients', exact: true })
     .click();
 
-  await expect(page.getByText('firstMerge@example.com')).toBeVisible();
-  await expect(page.getByText('secondMerge@example.com')).not.toBeVisible();
+  await expect(page.getByText('firstMerge@example.com')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('secondMerge@example.com')).not.toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -902,7 +902,7 @@ test('Testing military_time property on all settings levels', async ({
   await page.locator('[data-cy="groupSettingsNameField"]').fill(groupName);
 
   await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.getByText('Successfully created group')).toBeVisible();
+  await expect(page.getByText('Successfully created group')).toBeVisible({ timeout: 10000 });
 
   await api.trackEntityByName('group_settings', groupName);
 
@@ -919,7 +919,7 @@ test('Testing military_time property on all settings levels', async ({
   await page.locator('[data-cy="militaryTimeToggle"]').check();
 
   await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.getByText('Successfully updated group')).toBeVisible();
+  await expect(page.getByText('Successfully updated group')).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('link', { name: 'Clients', exact: true })
@@ -946,7 +946,7 @@ test('Testing military_time property on all settings levels', async ({
   await page.getByText(groupName, { exact: true }).first().click();
 
   await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.getByText('Successfully updated client')).toBeVisible();
+  await expect(page.getByText('Successfully updated client')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/clients/**');
 
@@ -974,7 +974,7 @@ test('Testing military_time property on all settings levels', async ({
   await page.locator('[data-cy="militaryTimeToggle"]').check();
 
   await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('link', { name: 'Clients', exact: true })

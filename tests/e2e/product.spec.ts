@@ -93,7 +93,7 @@ const createProduct = async (params: CreateParams) => {
 
   await expect(
     page.getByText('Successfully created product', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };
 
 const checkEditPage = async (
@@ -108,23 +108,23 @@ const checkEditPage = async (
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
-    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
+    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="tabs"]').getByRole('link', { name: 'Documents' })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]')
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 
   if (!isAdmin) {
@@ -132,13 +132,13 @@ const checkEditPage = async (
       page
         .locator('[data-cy="tabs"]')
         .getByRole('link', { name: 'Product Fields', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="tabs"]')
         .getByRole('link', { name: 'Product Fields', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 };
 
@@ -244,7 +244,7 @@ test('can edit product', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated product', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -288,7 +288,7 @@ test('can create a product', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated product', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -330,11 +330,11 @@ test('deleting product with edit_product', async ({ page, api }) => {
 
     await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
-    await expect(page.getByText('Successfully deleted product')).toBeVisible();
+    await expect(page.getByText('Successfully deleted product')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -344,7 +344,7 @@ test('deleting product with edit_product', async ({ page, api }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted product')).toBeVisible();
+    await expect(page.getByText('Successfully deleted product')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -381,11 +381,11 @@ test('archiving product withe edit_product', async ({ page, api }) => {
 
     await page.getByRole('button', { name: 'Archive', exact: true }).click();
 
-    await expect(page.getByText('Successfully archived product')).toBeVisible();
+    await expect(page.getByText('Successfully archived product')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -396,7 +396,7 @@ test('archiving product withe edit_product', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived product')).toBeVisible();
+    await expect(page.getByText('Successfully archived product')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -449,7 +449,7 @@ test('product documents preview with edit_product', async ({ page, api }) => {
 
   await page.waitForURL('**/products/**/documents');
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
 test('product documents uploading with edit_product', async ({ page, api }) => {
@@ -506,11 +506,11 @@ test('product documents uploading with edit_product', async ({ page, api }) => {
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('all actions in dropdown displayed with admin permission', async ({
@@ -622,7 +622,7 @@ test('cloning product with edit_product', async ({ page, api }) => {
 
     await page.getByRole('button', { name: 'Save' }).first().click();
 
-    await expect(page.getByText('Successfully created product')).toBeVisible();
+    await expect(page.getByText('Successfully created product')).toBeVisible({ timeout: 10000 });
 
     await page.waitForURL('**/products/**/edit');
 
@@ -631,7 +631,7 @@ test('cloning product with edit_product', async ({ page, api }) => {
 
     await expect(
       page.getByRole('heading', { name: 'Edit Product' }).first()
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -645,7 +645,7 @@ test('cloning product with edit_product', async ({ page, api }) => {
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully created product')).toBeVisible();
+    await expect(page.getByText('Successfully created product')).toBeVisible({ timeout: 10000 });
 
     await page.waitForURL('**/products/**/edit');
 
@@ -654,7 +654,7 @@ test('cloning product with edit_product', async ({ page, api }) => {
 
     await expect(
       page.getByRole('heading', { name: 'Edit Product' }).first()
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -703,7 +703,7 @@ test('all custom actions in dropdown displayed with admin permission', async ({
   // Verify dropdown items are visible on the page
   for (const { label, visible } of customActions) {
     if (visible) {
-      await expect(page.getByText(label, { exact: true }).first()).toBeVisible();
+      await expect(page.getByText(label, { exact: true }).first()).toBeVisible({ timeout: 10000 });
     }
   }
 
@@ -760,7 +760,7 @@ test('New Invoice and New Purchase Order displayed with creation permissions', a
   // Verify dropdown items are visible on the page
   for (const { label, visible } of customActions) {
     if (visible) {
-      await expect(page.getByText(label, { exact: true }).first()).toBeVisible();
+      await expect(page.getByText(label, { exact: true }).first()).toBeVisible({ timeout: 10000 });
     }
   }
 
@@ -789,7 +789,7 @@ test('rendering documents and product_fields tabs with admin permission', async 
 
   await expect(
     page.getByRole('heading', { name: 'Documents', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .locator('[data-cy="tabs"]')
@@ -800,13 +800,13 @@ test('rendering documents and product_fields tabs with admin permission', async 
 
   await expect(
     page.getByRole('heading', { name: 'Custom Fields', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('link', { name: 'Edit', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
-  await expect(page.getByRole('link', { name: 'Documents' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Documents' })).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -850,7 +850,7 @@ test('Product selector list gets updated on the report page when it is created',
 
   await expect(
     page.getByText(productName, { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });

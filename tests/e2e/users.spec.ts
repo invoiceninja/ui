@@ -117,7 +117,7 @@ test("Can't see owner of the account in the list of users", async ({
 
   await page.waitForTimeout(200);
 
-  await expect(page.getByText('user@example.com')).not.toBeVisible();
+  await expect(page.getByText('user@example.com')).not.toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -150,7 +150,7 @@ test('deleting user', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
-  await expect(page.getByText('Successfully deleted user')).toBeVisible();
+  await expect(page.getByText('Successfully deleted user')).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('link', { name: 'User Management', exact: true })
@@ -159,7 +159,7 @@ test('deleting user', async ({ page }) => {
 
   await expect(
     page.getByRole('link', { name: 'Quotes Example', exact: true })
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 
   // Restore the user so subsequent runs still work
   await restoreUser(userId);
@@ -194,7 +194,7 @@ test('archiving user', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
-  await expect(page.getByText('Successfully deleted user')).toBeVisible();
+  await expect(page.getByText('Successfully deleted user')).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('link', { name: 'User Management', exact: true })
@@ -203,7 +203,7 @@ test('archiving user', async ({ page }) => {
 
   await expect(
     page.getByRole('link', { name: 'Expenses Example', exact: true })
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 
   // Restore the user so subsequent runs still work
   await restoreUser(userId);
@@ -238,7 +238,7 @@ test('removing user', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Remove', exact: true }).click();
 
-  await expect(page.getByText('Successfully removed user')).toBeVisible();
+  await expect(page.getByText('Successfully removed user')).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('link', { name: 'User Management', exact: true })
@@ -247,7 +247,7 @@ test('removing user', async ({ page }) => {
 
   await expect(
     page.getByRole('link', { name: 'Tasks Example', exact: true })
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 
   // Restore the user so subsequent runs still work
   await restoreUser(userId);

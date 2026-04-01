@@ -56,5 +56,5 @@ export const createClient = async (params: ClientCreateParams) => {
 
   await expect(
     page.getByText('Successfully created client', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };

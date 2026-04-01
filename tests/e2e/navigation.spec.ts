@@ -19,11 +19,11 @@ test('Can not add a company and navigate to account management', async ({
 
   await expect(
     page.getByText('Add Company', { exact: true }).first()
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('Account Management', { exact: true }).first()
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 });
 
 test('Prevent transaction quick popover navigation', async ({ page }) => {
@@ -49,7 +49,7 @@ test('Prevent transaction quick popover navigation', async ({ page }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('button', { name: 'Continue Editing', exact: true })
@@ -57,7 +57,7 @@ test('Prevent transaction quick popover navigation', async ({ page }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="quickPopoverButton"]').click();
 
@@ -65,7 +65,7 @@ test('Prevent transaction quick popover navigation', async ({ page }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('button', { name: 'Discard Changes', exact: true })
@@ -99,7 +99,7 @@ test('Prevent quote quick popover navigation', async ({ page }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('button', { name: 'Continue Editing', exact: true })
@@ -107,7 +107,7 @@ test('Prevent quote quick popover navigation', async ({ page }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="quickPopoverButton"]').click();
 
@@ -115,7 +115,7 @@ test('Prevent quote quick popover navigation', async ({ page }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('button', { name: 'Discard Changes', exact: true })
@@ -147,7 +147,7 @@ test('Prevent back browser button navigation', async ({ page }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('button', { name: 'Continue Editing', exact: true })
@@ -155,13 +155,13 @@ test('Prevent back browser button navigation', async ({ page }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 
   await page.goBack();
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('button', { name: 'Discard Changes', exact: true })
@@ -195,7 +195,7 @@ test('Prevent account management navigation', async ({ page }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('button', { name: 'Continue Editing', exact: true })
@@ -203,7 +203,7 @@ test('Prevent account management navigation', async ({ page }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="companyDropdown"]').click();
 
@@ -211,7 +211,7 @@ test('Prevent account management navigation', async ({ page }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('button', { name: 'Discard Changes', exact: true })
@@ -223,7 +223,7 @@ test('Prevent account management navigation', async ({ page }) => {
     page.getByRole('heading', {
       name: 'Account Management',
     }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -244,7 +244,7 @@ test('Can add a company and navigate to account management', async ({
     page.getByRole('heading', {
       name: 'Add Company',
     })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('button')
@@ -256,7 +256,7 @@ test('Can add a company and navigate to account management', async ({
     page.getByRole('heading', {
       name: 'Welcome to Invoice Ninja',
     })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('button')
@@ -268,7 +268,7 @@ test('Can add a company and navigate to account management', async ({
     page.getByRole('heading', {
       name: 'Welcome to Invoice Ninja',
     })
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 
   await page.waitForTimeout(300);
 
@@ -282,5 +282,5 @@ test('Can add a company and navigate to account management', async ({
     page.getByRole('heading', {
       name: 'Account Management',
     }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });

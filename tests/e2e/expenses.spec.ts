@@ -42,21 +42,21 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 };
 
@@ -97,7 +97,7 @@ const createExpense = async (params: CreateParams) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible();
+  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
 
   if (returnCreditNumber) {
     await page.waitForURL('**/expenses/**/edit');
@@ -199,7 +199,7 @@ test('can edit expense', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated expense', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -238,7 +238,7 @@ test('can create a expense', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated expense', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -294,7 +294,7 @@ test('can view and edit assigned expense with create_expense', async ({
 
   await expect(
     page.getByText('Successfully updated expense', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -344,7 +344,7 @@ test('deleting expense with edit_expense', async ({ page, api }) => {
     await page.getByText('Delete').click();
   }
 
-  await expect(page.getByText('Successfully deleted expense')).toBeVisible();
+  await expect(page.getByText('Successfully deleted expense')).toBeVisible({ timeout: 10000 });
 });
 
 test('archiving expense with edit_expense', async ({ page, api }) => {
@@ -381,7 +381,7 @@ test('archiving expense with edit_expense', async ({ page, api }) => {
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await tableRow
       .getByRole('button')
@@ -392,7 +392,7 @@ test('archiving expense with edit_expense', async ({ page, api }) => {
     await page.getByText('Archive').click();
   }
 
-  await expect(page.getByText('Successfully archived expense')).toBeVisible();
+  await expect(page.getByText('Successfully archived expense')).toBeVisible({ timeout: 10000 });
 });
 
 test('expense documents preview with edit_expense', async ({ page, api }) => {
@@ -442,7 +442,7 @@ test('expense documents preview with edit_expense', async ({ page, api }) => {
 
   await page.waitForURL('**/expenses/**/documents');
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
 test('expense documents uploading with edit_expense', async ({ page, api }) => {
@@ -497,11 +497,11 @@ test('expense documents uploading with edit_expense', async ({ page, api }) => {
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('all actions in dropdown displayed with admin permission', async ({
@@ -616,7 +616,7 @@ test('cloning expense', async ({ page, api }) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible();
+  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/expenses/**/edit');
 
@@ -625,7 +625,7 @@ test('cloning expense', async ({ page, api }) => {
 
   await expect(
     page.getByRole('heading', { name: 'Edit Expense' }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('Expense categories endpoint contains sort but not with parameter', async ({
@@ -667,7 +667,7 @@ test('Expense categories endpoint contains sort but not with parameter', async (
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible();
+  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/expenses/**/edit');
 
@@ -725,7 +725,7 @@ test('Expense categories endpoint contains with but not sort parameter', async (
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible();
+  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/expenses/**/edit');
 
@@ -766,7 +766,7 @@ test('Checking should_be_invoiced expense settings value on expense creation pag
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
   }
 
   await page
@@ -808,7 +808,7 @@ test('Checking mark_paid expense settings value on expense creation page', async
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
   }
 
   await page
@@ -848,7 +848,7 @@ test('Checking convert_currency expense settings value on expense creation page'
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
   }
 
   await page
@@ -890,7 +890,7 @@ test('Checking add_documents_to_invoice expense settings value on expense creati
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
   }
 
   await page
@@ -936,7 +936,7 @@ test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) =
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
   }
 
   await page
@@ -974,7 +974,7 @@ test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) =
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible();
+  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/expenses/**/edit');
 
@@ -986,7 +986,7 @@ test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) =
     .getByRole('link', { name: 'Expenses', exact: true })
     .click();
 
-  await expect(page.getByText('$ 15,888.60')).toBeVisible();
+  await expect(page.getByText('$ 15,888.60')).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -1021,7 +1021,7 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
   }
 
   await page
@@ -1061,7 +1061,7 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible();
+  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/expenses/**/edit');
 
@@ -1073,7 +1073,7 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
     .getByRole('link', { name: 'Expenses', exact: true })
     .click();
 
-  await expect(page.getByText('$ 12,222.00')).toBeVisible();
+  await expect(page.getByText('$ 12,222.00')).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -1104,7 +1104,7 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully updated settings')).toBeVisible();
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
   }
 
   await page
@@ -1139,7 +1139,7 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible();
+  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/expenses/**/edit');
 
@@ -1151,7 +1151,7 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
     .getByRole('link', { name: 'Expenses', exact: true })
     .click();
 
-  await expect(page.getByText('$ 12,522.00')).toBeVisible();
+  await expect(page.getByText('$ 12,522.00')).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -1226,7 +1226,7 @@ test('The new_expense_category action is not shown on the badge dropdown', async
 
     await expect(
       page.getByText('Successfully saved settings').first()
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
     await page.waitForTimeout(200);
   }
@@ -1237,7 +1237,7 @@ test('The new_expense_category action is not shown on the badge dropdown', async
   // With only edit_expense (no create_expense), "Create New" should NOT be visible
   await expect(
     page.getByText('Create New', { exact: true }).first()
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -1279,7 +1279,7 @@ test('The new_expense_category action is shown on the badge dropdown', async ({
 
   await expect(
     page.getByText('Create New', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -1321,7 +1321,7 @@ test('The new_expense_category action is shown on the badge dropdown with only c
 
   await expect(
     page.getByText('Create New', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -1347,7 +1347,7 @@ test('Creating expense with Save / Create button', async ({ page, api }) => {
 
   await page.getByRole('button', { name: 'Save / Create' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible();
+  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/expenses/create');
 

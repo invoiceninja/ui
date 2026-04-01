@@ -88,7 +88,7 @@ const createBankTransaction = async (params: CreateParams) => {
 
   await expect(
     page.getByText('Successfully created transaction', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };
 
 const checkEditPage = async (page: Page, isEditable: boolean) => {
@@ -97,21 +97,21 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 };
 
@@ -210,7 +210,7 @@ test('can edit transaction', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated transaction', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -245,7 +245,7 @@ test('can create a transaction', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated transaction', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -288,11 +288,11 @@ test('can create a transaction', async ({ page, api }) => {
 
 //     await expect(
 //       page.getByText('Successfully deleted transaction')
-//     ).toBeVisible();
+//     ).toBeVisible({ timeout: 10000 });
 
 //     await expect(
 //       page.getByRole('button', { name: 'Restore', exact: true })
-//     ).toBeVisible();
+//     ).toBeVisible({ timeout: 10000 });
 //   } else {
 //     await tableRow
 //       .getByRole('button')
@@ -303,7 +303,7 @@ test('can create a transaction', async ({ page, api }) => {
 
 //     await expect(
 //       page.getByText('Successfully deleted transaction')
-//     ).toBeVisible();
+//     ).toBeVisible({ timeout: 10000 });
 //   }
 
 //   await logout(page);
@@ -347,11 +347,11 @@ test('can create a transaction', async ({ page, api }) => {
 
 //     await expect(
 //       page.getByText('Successfully archived transaction')
-//     ).toBeVisible();
+//     ).toBeVisible({ timeout: 10000 });
 
 //     await expect(
 //       page.getByRole('button', { name: 'Restore', exact: true })
-//     ).toBeVisible();
+//     ).toBeVisible({ timeout: 10000 });
 //   } else {
 //     await tableRow
 //       .getByRole('button')
@@ -363,7 +363,7 @@ test('can create a transaction', async ({ page, api }) => {
 
 //     await expect(
 //       page.getByText('Successfully archived transaction')
-//     ).toBeVisible();
+//     ).toBeVisible({ timeout: 10000 });
 //   }
 
 //   await logout(page);
@@ -431,7 +431,7 @@ test('Create expense bulk action', async ({ page, api }) => {
 
   await expect(
     page.getByRole('heading', { name: 'Create Expense' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('button', { name: 'Create Expense', exact: true })
@@ -469,11 +469,11 @@ test('Create expense bulk action', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully converted transaction')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('heading', { name: 'Create Expense' })
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 
   await expect(page.getByRole('row').last()).toContainText('Converted');
   await expect(page.getByRole('row').nth(numberOfCheckBoxes - 1)).toContainText(

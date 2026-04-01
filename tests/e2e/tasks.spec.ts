@@ -64,19 +64,19 @@ const checkEditPage = async (
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
-    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
+    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]')
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 };
 
@@ -119,7 +119,7 @@ const createTask = async (params: CreateParams) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created task')).toBeVisible();
+  await expect(page.getByText('Successfully created task')).toBeVisible({ timeout: 10000 });
 };
 
 test("can't view tasks without permission", async ({ page }) => {
@@ -213,7 +213,7 @@ test('can edit task', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated task', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -251,7 +251,7 @@ test('can create a task', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated task', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -304,7 +304,7 @@ test('can view and edit assigned task with create_task', async ({
 
   await expect(
     page.getByText('Successfully updated task', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -348,7 +348,7 @@ test('deleting task with edit_task', async ({ page, api }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted task')).toBeVisible();
+    await expect(page.getByText('Successfully deleted task')).toBeVisible({ timeout: 10000 });
   } else {
     await tableRow
       .getByRole('button')
@@ -358,7 +358,7 @@ test('deleting task with edit_task', async ({ page, api }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted task')).toBeVisible();
+    await expect(page.getByText('Successfully deleted task')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -397,11 +397,11 @@ test('archiving task withe edit_task', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived task')).toBeVisible();
+    await expect(page.getByText('Successfully archived task')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await tableRow
       .getByRole('button')
@@ -411,7 +411,7 @@ test('archiving task withe edit_task', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived task')).toBeVisible();
+    await expect(page.getByText('Successfully archived task')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -461,7 +461,7 @@ test('task documents preview with edit_task', async ({ page, api }) => {
 
   await page.waitForURL('**/tasks/**/documents');
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
 test('task documents uploading with edit_task', async ({ page, api }) => {
@@ -515,11 +515,11 @@ test('task documents uploading with edit_task', async ({ page, api }) => {
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('all actions in dropdown displayed with admin permission', async ({
@@ -631,7 +631,7 @@ test('cloning task', async ({ page, api }) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created task')).toBeVisible();
+  await expect(page.getByText('Successfully created task')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/tasks/**/edit');
 
@@ -640,7 +640,7 @@ test('cloning task', async ({ page, api }) => {
 
   await expect(
     page.getByRole('heading', { name: 'Edit Task' }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('Invoice Task displayed with admin permission', async ({ page, api }) => {

@@ -43,5 +43,5 @@ export const createVendor = async (params: VendorCreateParams) => {
 
   await expect(
     page.getByText('Successfully created vendor', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };

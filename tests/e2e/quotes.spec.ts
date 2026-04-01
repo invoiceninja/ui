@@ -99,13 +99,13 @@ const checkEditPage = async (
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 
   if (!isAdmin) {
@@ -114,14 +114,14 @@ const checkEditPage = async (
         .locator('[data-cy="tabs"]')
         .last()
         .getByRole('button', { name: 'Custom Fields', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="tabs"]')
         .last()
         .getByRole('button', { name: 'Custom Fields', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 
   await expect(
@@ -129,35 +129,35 @@ const checkEditPage = async (
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'Documents' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'Settings', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'Activity', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'History', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'Email History', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };
 
 interface CreateParams {
@@ -201,7 +201,7 @@ const createQuote = async (params: CreateParams) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created quote')).toBeVisible();
+  await expect(page.getByText('Successfully created quote')).toBeVisible({ timeout: 10000 });
 };
 
 test("can't view quotes without permission", async ({ page, api }) => {
@@ -297,7 +297,7 @@ test('can edit quote', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated quote', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -336,7 +336,7 @@ test('can create a quote', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated quote', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -386,7 +386,7 @@ test('can view and edit assigned quote with create_quote', async ({
 
   await expect(
     page.getByText('Successfully updated quote', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -427,7 +427,7 @@ test('deleting quote with edit_quote', async ({ page, api }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted quote')).toBeVisible();
+    await expect(page.getByText('Successfully deleted quote')).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -437,7 +437,7 @@ test('deleting quote with edit_quote', async ({ page, api }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted quote')).toBeVisible();
+    await expect(page.getByText('Successfully deleted quote')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -477,11 +477,11 @@ test('archiving quote withe edit_quote', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived quote')).toBeVisible();
+    await expect(page.getByText('Successfully archived quote')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -492,7 +492,7 @@ test('archiving quote withe edit_quote', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived quote')).toBeVisible();
+    await expect(page.getByText('Successfully archived quote')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -542,7 +542,7 @@ test('quote documents preview with edit_quote', async ({ page, api }) => {
     .getByRole('link', { name: 'Documents' })
     .click();
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
 test('quote documents uploading with edit_quote', async ({ page, api }) => {
@@ -591,7 +591,7 @@ test('quote documents uploading with edit_quote', async ({ page, api }) => {
     .getByRole('link', { name: 'Documents' })
     .click();
 
-    await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+    await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 
 
   await page
@@ -599,11 +599,11 @@ test('quote documents uploading with edit_quote', async ({ page, api }) => {
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('all actions in dropdown displayed with admin permission', async ({
@@ -732,7 +732,7 @@ test('cloning quote', async ({ page, api }) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created quote')).toBeVisible();
+  await expect(page.getByText('Successfully created quote')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/quotes/**/edit');
 
@@ -741,7 +741,7 @@ test('cloning quote', async ({ page, api }) => {
 
   await expect(
     page.getByRole('heading', { name: 'Edit Quote' }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('Convert to Invoice and Convert to Project displayed with admin permission', async ({

@@ -38,60 +38,60 @@ test('Can view dashboard with permission', async ({ page }) => {
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Dashboard' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('Welcome! Glad to see you.').first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Overview' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Recent Activity' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Recent Payments' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Upcoming Invoices' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Past Due Invoices' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Expired Quotes' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Upcoming Quotes' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });

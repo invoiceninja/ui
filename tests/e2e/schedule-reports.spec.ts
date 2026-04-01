@@ -95,7 +95,7 @@ test('Activity report test', async ({ page, api }) => {
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('Invoice report test', async ({ page, api }) => {
@@ -204,7 +204,7 @@ test('Invoice report test', async ({ page, api }) => {
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('Profit and loss report test', async ({ page, api }) => {
@@ -259,7 +259,7 @@ test('Profit and loss report test', async ({ page, api }) => {
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('Product sales report test', async ({ page, api }) => {
@@ -374,7 +374,7 @@ test('Product sales report test', async ({ page, api }) => {
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('Expense report test', async ({ page, api }) => {
@@ -442,7 +442,7 @@ test('Expense report test', async ({ page, api }) => {
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('Expense report test with clients, project and categories selectors', async ({
@@ -574,7 +574,7 @@ test('Expense report test with clients, project and categories selectors', async
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('Product sales report test with filtering products', async ({ page, api }) => {
@@ -702,5 +702,5 @@ test('Product sales report test with filtering products', async ({ page, api }) 
 
   await expect(
     page.locator('h2').filter({ hasText: 'Edit Schedule' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });

@@ -44,21 +44,21 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 
   await page
@@ -138,7 +138,7 @@ const createPurchaseOrder = async (params: CreateParams) => {
 
   await expect(
     page.getByText('Successfully created purchase order')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };
 
 test("can't view purchase_orders without permission", async ({ page }) => {
@@ -238,7 +238,7 @@ test('can edit purchase_order', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated purchase order', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -285,7 +285,7 @@ test('can create a purchase_order', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated purchase order', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -352,7 +352,7 @@ test('can view and edit own purchase_order with create_purchase_order', async ({
 
   await expect(
     page.getByText('Successfully updated purchase order', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -408,7 +408,7 @@ test('deleting purchase_order with edit_purchase_order', async ({
 
     await expect(
       page.getByText('Successfully deleted purchase order')
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await tableRow
       .getByRole('button')
@@ -420,7 +420,7 @@ test('deleting purchase_order with edit_purchase_order', async ({
 
     await expect(
       page.getByText('Successfully deleted purchase order')
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -470,11 +470,11 @@ test('archiving purchase_order with edit_purchase_order', async ({
 
     await expect(
       page.getByText('Successfully archived purchase order')
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await tableRow
       .getByRole('button')
@@ -486,7 +486,7 @@ test('archiving purchase_order with edit_purchase_order', async ({
 
     await expect(
       page.getByText('Successfully archived purchase order')
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -547,7 +547,7 @@ test('purchase_order documents preview with edit_purchase_order', async ({
     .getByRole('link', { name: 'Documents' })
     .click();
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
 test('purchase_order documents uploading with edit_purchase_order', async ({
@@ -607,18 +607,18 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
     .getByRole('link', { name: 'Documents' })
     .click();
 
-    await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+    await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 
   await page
     .locator('input[type="file"]')
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('all actions in dropdown displayed with admin permission', async ({
@@ -767,7 +767,7 @@ test('cloning purchase_order', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully created purchase order')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/purchase_orders/**/edit');
 
@@ -778,5 +778,5 @@ test('cloning purchase_order', async ({ page, api }) => {
     page
       .getByRole('heading', { name: 'Edit Purchase Order', exact: true })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });

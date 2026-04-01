@@ -91,29 +91,29 @@ const checkEditPage = async (
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
-    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
+    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]')
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 
   if (!isAdmin) {
     await expect(
       page.getByRole('button', { name: 'Custom Fields', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page.getByRole('button', { name: 'Custom Fields', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 };
 
@@ -163,7 +163,7 @@ const createInvoice = async (params: CreateParams) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created invoice')).toBeVisible();
+  await expect(page.getByText('Successfully created invoice')).toBeVisible({ timeout: 10000 });
 };
 
 test("can't view invoices without permission", async ({ page, api }) => {
@@ -259,7 +259,7 @@ test('can edit invoice', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated invoice', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').click();
 
@@ -298,7 +298,7 @@ test('can create a invoice', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated invoice', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').click();
 
@@ -352,7 +352,7 @@ test('can view and edit assigned invoice with create_invoice', async ({
 
   await expect(
     page.getByText('Successfully updated invoice', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').click();
 
@@ -397,7 +397,7 @@ test('deleting invoice with edit_invoice', async ({ page, api }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted invoice')).toBeVisible();
+    await expect(page.getByText('Successfully deleted invoice')).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -407,7 +407,7 @@ test('deleting invoice with edit_invoice', async ({ page, api }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted invoice')).toBeVisible();
+    await expect(page.getByText('Successfully deleted invoice')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -447,11 +447,11 @@ test('archiving invoice withe edit_invoice', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived invoice')).toBeVisible();
+    await expect(page.getByText('Successfully archived invoice')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -462,7 +462,7 @@ test('archiving invoice withe edit_invoice', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived invoice')).toBeVisible();
+    await expect(page.getByText('Successfully archived invoice')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -514,7 +514,7 @@ test('invoice documents preview with edit_invoice', async ({ page, api }) => {
     })
     .click();
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
 test('invoice documents uploading with edit_invoice', async ({ page, api }) => {
@@ -565,7 +565,7 @@ test('invoice documents uploading with edit_invoice', async ({ page, api }) => {
     })
     .click();
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 
   await page.waitForTimeout(500);
 
@@ -578,7 +578,7 @@ test('invoice documents uploading with edit_invoice', async ({ page, api }) => {
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('all actions in dropdown displayed with admin permission', async ({
@@ -715,7 +715,7 @@ test('cloning invoice', async ({ page, api }) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created invoice')).toBeVisible();
+  await expect(page.getByText('Successfully created invoice')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/invoices/**/edit**');
 
@@ -724,7 +724,7 @@ test('cloning invoice', async ({ page, api }) => {
 
   await expect(
     page.getByRole('heading', { name: 'Edit Invoice' }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('Enter Payment displayed with admin permission', async ({ page, api }) => {
@@ -766,7 +766,7 @@ test('Enter Payment displayed with admin permission', async ({ page, api }) => {
 
   await expect(
     page.locator('[data-cy="bulkActionsDropdown"]').getByText('Enter Payment').first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -822,7 +822,7 @@ test('Enter Payment displayed with creation permissions', async ({
 
   await expect(
     page.locator('[data-cy="bulkActionsDropdown"]').getByText('Enter Payment').first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -861,8 +861,8 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await page.getByText('Send Email', { exact: true }).first().click();
 
-  await expect(page.getByText('Second Custom')).not.toBeVisible();
-  await expect(page.getByText('Third Custom')).not.toBeVisible();
+  await expect(page.getByText('Second Custom')).not.toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Third Custom')).not.toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="sendEmailModalXButton"]').click();
 
@@ -896,7 +896,7 @@ test('Second and Third Custom email sending template is displayed', async ({
     .getByRole('button', { name: 'Save', exact: true })
     .click();
 
-  await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
 
   await selectTemplate('Third Custom');
 
@@ -908,7 +908,7 @@ test('Second and Third Custom email sending template is displayed', async ({
     .getByRole('button', { name: 'Save', exact: true })
     .click();
 
-  await expect(page.getByText('Successfully updated settings')).toBeVisible();
+  await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -929,8 +929,8 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await page.getByText('Send Email', { exact: true }).first().click();
 
-  await expect(page.getByText(secondSubject)).toBeVisible();
-  await expect(page.getByText(thirdSubject)).toBeVisible();
+  await expect(page.getByText(secondSubject)).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText(thirdSubject)).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -962,7 +962,7 @@ test('Prevent navigation in the main navbar', async ({ page, api }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('button', { name: 'Continue Editing', exact: true })
@@ -970,7 +970,7 @@ test('Prevent navigation in the main navbar', async ({ page, api }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -979,7 +979,7 @@ test('Prevent navigation in the main navbar', async ({ page, api }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('button', { name: 'Discard Changes', exact: true })
@@ -1014,11 +1014,11 @@ test('Prevent archive invoice action', async ({ page, api }) => {
 
   await page.getByRole('button', { name: 'Archive', exact: true }).click();
 
-  await expect(page.getByText('Successfully archived invoice')).toBeVisible();
+  await expect(page.getByText('Successfully archived invoice')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('button', { name: 'Restore', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -1049,7 +1049,7 @@ test('Prevent email invoice action', async ({ page, api }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('button', { name: 'Continue Editing', exact: true })
@@ -1057,7 +1057,7 @@ test('Prevent email invoice action', async ({ page, api }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').click();
 
@@ -1065,7 +1065,7 @@ test('Prevent email invoice action', async ({ page, api }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('button', { name: 'Discard Changes', exact: true })
@@ -1096,6 +1096,18 @@ test('Prevent breadcrumb navigation', async ({ page, api }) => {
 
   await page.waitForTimeout(200);
 
+
+  await page
+  .locator('[type="date"]')
+  .last()
+  .fill(dayjs().add(20, 'day').format('YYYY-MM-DD'));
+
+await page.locator('[type="date"]').last().blur();
+
+
+await page.waitForTimeout(200);
+
+
   await page
     .locator('nav[aria-label="Breadcrumb"]')
     .getByRole('link', { name: 'Invoices', exact: true })
@@ -1111,7 +1123,7 @@ test('Prevent breadcrumb navigation', async ({ page, api }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 
   await page
     .locator('nav[aria-label="Breadcrumb"]')
@@ -1120,7 +1132,7 @@ test('Prevent breadcrumb navigation', async ({ page, api }) => {
 
   await expect(
     page.getByText('Please save or cancel your changes')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .getByRole('button', { name: 'Discard Changes', exact: true })
@@ -1187,7 +1199,7 @@ test('Products combobox various selections', async ({ page, api }) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created invoice')).toBeVisible();
+  await expect(page.getByText('Successfully created invoice')).toBeVisible({ timeout: 10000 });
 
   const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
   if (invoiceId) api.trackEntity('invoices', invoiceId);

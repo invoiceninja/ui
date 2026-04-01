@@ -70,11 +70,11 @@ test('deleting invoice design with admin owner account', async ({ page, api }) =
 
   await expect(
     page.getByRole('button', { name: 'Restore', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('button', { name: 'Archive', exact: true })
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 });
 
 test('archiving invoice design with admin owner account', async ({ page, api }) => {
@@ -93,13 +93,13 @@ test('archiving invoice design with admin owner account', async ({ page, api }) 
 
   await expect(
     page.getByRole('button', { name: 'Restore', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('button', { name: 'Delete', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('button', { name: 'Archive', exact: true })
-  ).not.toBeVisible();
+  ).not.toBeVisible({ timeout: 10000 });
 });

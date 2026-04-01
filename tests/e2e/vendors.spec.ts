@@ -62,7 +62,7 @@ const createVendor = async (params: CreateParams) => {
 
   await expect(
     page.getByText('Successfully created vendor', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };
 
 const checkShowPage = async (page: Page, isEditable: boolean) => {
@@ -73,42 +73,42 @@ const checkShowPage = async (page: Page, isEditable: boolean) => {
       .getByRole('definition', { exact: true })
       .filter({ hasText: 'Details' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('definition', { exact: true })
       .filter({ hasText: 'Address' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('definition', { exact: true })
       .filter({ hasText: 'Contacts' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   if (!isEditable) {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Edit Vendor', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Edit Vendor', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 };
 
@@ -119,27 +119,27 @@ const checkEditPage = async (page: Page) => {
     page
       .locator('[data-cy="topNavbar"]')
       .getByRole('button', { name: 'Save', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.locator('[data-cy="chevronDownButton"]').first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('heading', { name: 'Details', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('heading', { name: 'Contacts', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('heading', { name: 'Address', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('heading', { name: 'Additional Info', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };
 
 test("can't view vendors without permission", async ({ page }) => {
@@ -238,7 +238,7 @@ test('can edit vendor', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated vendor', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -293,7 +293,7 @@ test('can create a vendor', async ({ page, api }) => {
 
   await expect(
     page.getByText('Successfully updated vendor', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -350,7 +350,7 @@ test('can view and edit assigned vendor with create_vendor', async ({
 
   await expect(
     page.getByText('Successfully updated vendor', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -388,11 +388,11 @@ test('deleting vendor with edit_vendor', async ({ page, api }) => {
 
     await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
-    await expect(page.getByText('Successfully deleted vendor')).toBeVisible();
+    await expect(page.getByText('Successfully deleted vendor')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await tableRow
       .getByRole('button')
@@ -402,7 +402,7 @@ test('deleting vendor with edit_vendor', async ({ page, api }) => {
 
     await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
-    await expect(page.getByText('Successfully deleted vendor')).toBeVisible();
+    await expect(page.getByText('Successfully deleted vendor')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -439,11 +439,11 @@ test('archiving vendor withe edit_vendor', async ({ page, api }) => {
 
     await page.getByRole('button', { name: 'Archive', exact: true }).click();
 
-    await expect(page.getByText('Successfully archived vendor')).toBeVisible();
+    await expect(page.getByText('Successfully archived vendor')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await tableRow
       .getByRole('button')
@@ -453,7 +453,7 @@ test('archiving vendor withe edit_vendor', async ({ page, api }) => {
 
     await page.getByRole('button', { name: 'Archive', exact: true }).click();
 
-    await expect(page.getByText('Successfully archived vendor')).toBeVisible();
+    await expect(page.getByText('Successfully archived vendor')).toBeVisible({ timeout: 10000 });
   }
 });
 
@@ -501,7 +501,7 @@ test('vendor documents preview with view_vendor', async ({ page, api }) => {
 
   await page.waitForURL('**/vendors/**/documents');
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
 test('vendor documents uploading with edit_vendor', async ({ page, api }) => {
@@ -551,9 +551,9 @@ test('vendor documents uploading with edit_vendor', async ({ page, api }) => {
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });

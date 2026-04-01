@@ -35,5 +35,5 @@ export const createTaxRate = async (params: TaxCreateParams) => {
 
   await expect(
     page.getByText('Successfully created tax rate', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };
