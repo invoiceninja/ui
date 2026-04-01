@@ -120,7 +120,7 @@ export async function checkTableEditability(page: Page, isEditable: boolean) {
 
   // Wait for table to finish loading (spinner to disappear)
   await tableContainer.waitFor({ state: 'visible', timeout: 5000 });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(500);
 
   const headerCheckbox = tableContainer.locator('thead input[type="checkbox"]');
   const rowActionButtons = tableContainer.locator(
