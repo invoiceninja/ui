@@ -44,6 +44,8 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { Design } from '$app/common/interfaces/design';
 import { useDesignQuery } from '$app/common/queries/designs';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useColorScheme } from '$app/common/colors';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import './InvoiceBuilder.css';
@@ -89,6 +91,8 @@ function encodeBlocksForDesign(blocks: Block[]): string {
 export function InvoiceBuilder() {
   const [t] = useTranslation();
   const navigate = useNavigate();
+  const colors = useColorScheme();
+  const accentColor = useAccentColor();
   const { id: designId } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const templateId = searchParams.get('template');
@@ -643,14 +647,26 @@ export function InvoiceBuilder() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div
+      className="flex h-screen overflow-hidden"
+      style={{ backgroundColor: colors.$23 }}
+    >
       {/* Left Sidebar: Component Library */}
-      <div className="w-72 bg-white border-r flex flex-col overflow-hidden">
-        <div className="p-4 border-b">
-          <h2 className="font-semibold text-lg text-gray-900">
+      <div
+        className="w-72 flex flex-col overflow-hidden"
+        style={{
+          backgroundColor: colors.$1,
+          borderRight: `1px solid ${colors.$24}`,
+        }}
+      >
+        <div
+          className="p-4"
+          style={{ borderBottom: `1px solid ${colors.$24}` }}
+        >
+          <h2 className="font-semibold text-lg" style={{ color: colors.$3 }}>
             {t('components')}
           </h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm mt-1" style={{ color: colors.$17 }}>
             {t('drag_and_drop_to_add')}
           </p>
         </div>
@@ -666,7 +682,13 @@ export function InvoiceBuilder() {
       {/* Center: Canvas */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Toolbar */}
-        <div className="bg-white border-b px-6 py-3 flex items-center justify-between shadow-sm">
+        <div
+          className="px-6 py-3 flex items-center justify-between shadow-sm"
+          style={{
+            backgroundColor: colors.$1,
+            borderBottom: `1px solid ${colors.$24}`,
+          }}
+        >
           <div className="flex items-center gap-4">
             <Button
               type="secondary"
@@ -678,7 +700,7 @@ export function InvoiceBuilder() {
               {t('back')}
             </Button>
 
-            <div className="h-6 w-px bg-gray-300" />
+            <div className="h-6 w-px" style={{ backgroundColor: colors.$24 }} />
 
             <div className="flex items-center gap-2">
               <Button
@@ -701,17 +723,23 @@ export function InvoiceBuilder() {
               </Button>
             </div>
 
-            <div className="h-6 w-px bg-gray-300" />
+            <div className="h-6 w-px" style={{ backgroundColor: colors.$24 }} />
 
-            <span className="text-sm text-gray-600">
+            <span className="text-sm" style={{ color: colors.$17 }}>
               {t('zoom')}: {state.zoom}%
             </span>
 
             {/* Design name */}
             {(isEditMode || designName) && (
               <>
-                <div className="h-6 w-px bg-gray-300" />
-                <span className="text-sm font-medium text-gray-900">
+                <div
+                  className="h-6 w-px"
+                  style={{ backgroundColor: colors.$24 }}
+                />
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$3 }}
+                >
                   {designName || t('untitled')}
                 </span>
               </>
@@ -818,20 +846,43 @@ export function InvoiceBuilder() {
                   key={block.id}
                   className={`
                     block-wrapper
-                    group border-2 border-dashed rounded transition-all
+                    group rounded-lg transition-all duration-200
                     ${
                       state.selectedBlockId === block.id
-                        ? 'border-blue-500 border-solid shadow-lg z-10 selected'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? 'ring-1 z-10 selected'
+                        : 'hover:ring-1'
                     }
                   `}
+                  style={{
+                    backgroundColor: colors.$1,
+                    border: `1px dashed ${
+                      state.selectedBlockId === block.id
+                        ? colors.$3
+                        : colors.$24
+                    }`,
+                    borderColor:
+                      state.selectedBlockId === block.id
+                        ? `${colors.$3}60`
+                        : `${colors.$24}60`,
+                    boxShadow:
+                      state.selectedBlockId === block.id
+                        ? `0 1px 3px ${colors.$24}40`
+                        : 'none',
+                  }}
                 >
                   {/* Top Bar - Always visible with drag handle, title, and actions */}
-                  <div className="block-topbar drag-handle h-7 bg-gray-800 text-white rounded-t px-2 flex items-center justify-between text-xs cursor-move">
+                  <div
+                    className="block-topbar drag-handle h-7 rounded-t px-3 flex items-center justify-between text-xs cursor-move transition-colors"
+                    style={{
+                      backgroundColor: accentColor,
+                      color: '#ffffff',
+                      borderBottom: `1px solid ${accentColor}80`,
+                    }}
+                  >
                     {/* Drag Handle Icon */}
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <GripVertical className="w-3 h-3 text-gray-400 flex-shrink-0" />
-                      <span className="font-medium truncate">
+                      <GripVertical className="w-3 h-3 flex-shrink-0 text-white/70" />
+                      <span className="font-medium truncate text-white">
                         {getBlockLabel(block.type)}
                       </span>
                     </div>
@@ -842,13 +893,12 @@ export function InvoiceBuilder() {
                         onClick={(e) => {
                           e.stopPropagation();
                           e.preventDefault();
-                          // Copy block JSON to clipboard
                           const blockJson = JSON.stringify(block, null, 2);
                           navigator.clipboard.writeText(blockJson);
                           toast.success('block_copied_to_clipboard');
                         }}
                         onMouseDown={(e) => e.stopPropagation()}
-                        className="hover:bg-gray-700 p-1 rounded transition-colors"
+                        className="p-1 rounded transition-colors text-white/80 hover:text-white hover:bg-white/20"
                         title="Copy block to clipboard"
                       >
                         <Clipboard className="w-3 h-3" />
@@ -860,7 +910,7 @@ export function InvoiceBuilder() {
                           handleDuplicateBlock(block.id);
                         }}
                         onMouseDown={(e) => e.stopPropagation()}
-                        className="hover:bg-gray-700 p-1 rounded transition-colors"
+                        className="p-1 rounded transition-colors text-white/80 hover:text-white hover:bg-white/20"
                         title="Duplicate block"
                       >
                         ⎘
@@ -872,7 +922,7 @@ export function InvoiceBuilder() {
                           handleDeleteBlock(block.id);
                         }}
                         onMouseDown={(e) => e.stopPropagation()}
-                        className="hover:bg-red-600 p-1 rounded transition-colors"
+                        className="p-1 rounded transition-colors text-white/80 hover:text-white hover:bg-red-500"
                         title="Delete block"
                       >
                         ×
@@ -896,7 +946,10 @@ export function InvoiceBuilder() {
 
             {/* Empty State */}
             {state.blocks.length === 0 && (
-              <div className="flex items-center justify-center h-full min-h-[297mm] text-gray-400">
+              <div
+                className="flex items-center justify-center h-full min-h-[297mm]"
+                style={{ color: colors.$17 }}
+              >
                 <div className="text-center">
                   <Download className="w-16 h-16 mx-auto mb-4 opacity-50" />
                   <p className="text-lg font-medium">
@@ -913,9 +966,18 @@ export function InvoiceBuilder() {
       </div>
 
       {/* Right Sidebar: Properties Panel */}
-      <div className="w-80 bg-white border-l flex flex-col overflow-hidden">
-        <div className="p-4 border-b">
-          <h2 className="font-semibold text-lg text-gray-900">
+      <div
+        className="w-80 flex flex-col overflow-hidden"
+        style={{
+          backgroundColor: colors.$1,
+          borderLeft: `1px solid ${colors.$24}`,
+        }}
+      >
+        <div
+          className="p-4"
+          style={{ borderBottom: `1px solid ${colors.$24}` }}
+        >
+          <h2 className="font-semibold text-lg" style={{ color: colors.$3 }}>
             {t('properties')}
           </h2>
         </div>
@@ -929,10 +991,13 @@ export function InvoiceBuilder() {
               onDuplicate={() => handleDuplicateBlock(selectedBlock.id)}
             />
           ) : (
-            <div className="p-6 text-center text-gray-500">
+            <div className="p-6 text-center" style={{ color: colors.$17 }}>
               <div className="mb-4">
-                <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
-                  <Eye className="w-8 h-8 text-gray-400" />
+                <div
+                  className="w-16 h-16 mx-auto rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: colors.$20 }}
+                >
+                  <Eye className="w-8 h-8" style={{ color: colors.$17 }} />
                 </div>
               </div>
               <p className="text-sm">
