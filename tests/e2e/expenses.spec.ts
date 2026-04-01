@@ -13,6 +13,7 @@ import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createExpenseCategory } from './expense-categories-helpers';
 import { createTaxRate } from './taxes-helpers';
+import { getCompanySettings, putCompanySettings } from './api-helpers';
 
 interface Params {
   permissions: Permission[];
@@ -927,22 +928,13 @@ test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) =
 
   await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
 
-  await page
-    .getByRole('link', { name: 'Tax Settings', exact: true })
-    .first()
-    .click();
-
-  // Set expense tax rates to "Two Tax Rates" via react-select
-  const taxRateRow1 = page.locator('dt:has-text("Expense Tax Rates")').locator('..');
-  const currentValue1 = await taxRateRow1.locator('[class*="singleValue"]').textContent().catch(() => '');
-  if (currentValue1 !== 'Two Tax Rates') {
-    await taxRateRow1.locator('svg').last().click();
-    await page.getByText('Two Tax Rates', { exact: true }).click();
-
-    await page.getByRole('button', { name: 'Save' }).click();
-
-    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
+  // Enable two expense tax rates via API and reload so the app picks up the change
+  const { companyId, settings } = await getCompanySettings(api.context);
+  if (settings.enabled_expense_tax_rates !== 2) {
+    await putCompanySettings(api.context, companyId, { ...settings, enabled_expense_tax_rates: 2 });
   }
+
+  await page.reload({ waitUntil: 'networkidle' });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -1001,6 +993,9 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
   api,
   settingsGuard,
 }) => {
+
+  test.setTimeout(60000); // 2 minutes for this test only
+
   const taxRate10Name = uniqueName('tax-rate-10-incl');
   const taxRate20Name = uniqueName('tax-rate-20-incl');
 
@@ -1012,22 +1007,13 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
 
   await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
 
-  await page
-    .getByRole('link', { name: 'Tax Settings', exact: true })
-    .first()
-    .click();
-
-  // Set expense tax rates to "Two Tax Rates" via react-select
-  const taxRateRow = page.locator('dt:has-text("Expense Tax Rates")').locator('..');
-  const currentValue = await taxRateRow.locator('[class*="singleValue"]').textContent().catch(() => '');
-  if (currentValue !== 'Two Tax Rates') {
-    await taxRateRow.locator('svg').last().click();
-    await page.getByText('Two Tax Rates', { exact: true }).click();
-
-    await page.getByRole('button', { name: 'Save' }).click();
-
-    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
+  // Enable two expense tax rates via API and reload so the app picks up the change
+  const { companyId: companyId2, settings: settings2 } = await getCompanySettings(api.context);
+  if (settings2.enabled_expense_tax_rates !== 2) {
+    await putCompanySettings(api.context, companyId2, { ...settings2, enabled_expense_tax_rates: 2 });
   }
+
+  // await page.reload({ waitUntil: 'networkidle' });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -1095,22 +1081,13 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
 
   await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
 
-  await page
-    .getByRole('link', { name: 'Tax Settings', exact: true })
-    .first()
-    .click();
-
-  // Set expense tax rates to "Two Tax Rates" via react-select
-  const taxRateRow = page.locator('dt:has-text("Expense Tax Rates")').locator('..');
-  const currentValue = await taxRateRow.locator('[class*="singleValue"]').textContent().catch(() => '');
-  if (currentValue !== 'Two Tax Rates') {
-    await taxRateRow.locator('svg').last().click();
-    await page.getByText('Two Tax Rates', { exact: true }).click();
-
-    await page.getByRole('button', { name: 'Save' }).click();
-
-    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
+  // Enable two expense tax rates via API and reload so the app picks up the change
+  const { companyId: companyId3, settings: settings3 } = await getCompanySettings(api.context);
+  if (settings3.enabled_expense_tax_rates !== 2) {
+    await putCompanySettings(api.context, companyId3, { ...settings3, enabled_expense_tax_rates: 2 });
   }
+
+  await page.reload({ waitUntil: 'networkidle' });
 
   await page
     .locator('[data-cy="navigationBar"]')

@@ -94,8 +94,10 @@ test('Prevent quote quick popover navigation', async ({ page }) => {
   await page.waitForTimeout(200);
 
   await page.locator('[data-cy="quickPopoverButton"]').click();
+  await page.waitForTimeout(200);
 
   await page.getByText('Quote', { exact: true }).click();
+  await page.waitForTimeout(200);
 
   await expect(
     page.getByText('Please save or cancel your changes')

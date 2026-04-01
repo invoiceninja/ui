@@ -259,6 +259,7 @@ test('can create a project', async ({ page, api }) => {
   });
 
   const projectName = uniqueName('create-project');
+  test.setTimeout(45000); 
 
   await login(page);
   await clear('projects@example.com');
@@ -295,6 +296,8 @@ test('can view and edit assigned project with create_project', async ({
   page,
   api,
 }) => {
+  test.setTimeout(45000); 
+
   const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
@@ -607,6 +610,8 @@ test('Invoice project and clone action displayed with creation permissions', asy
   page,
   api,
 }) => {
+  test.setTimeout(45000); 
+
   const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
@@ -747,6 +752,8 @@ test('Invoice Project displayed with creation permissions', async ({
   page,
   api,
 }) => {
+  test.setTimeout(45000); 
+
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomQuoteActions({

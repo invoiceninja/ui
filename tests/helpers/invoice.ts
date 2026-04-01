@@ -30,6 +30,7 @@ export const createInvoice = async (params: CreateParams) => {
 
   // The combobox is initially visible for new invoices — click to focus and trigger search
   const comboboxInput = page.getByRole('combobox', { name: 'Client' });
+  await comboboxInput.waitFor({ state: 'visible', timeout: 5000 });
   await comboboxInput.click();
   await page.waitForTimeout(500);
 
