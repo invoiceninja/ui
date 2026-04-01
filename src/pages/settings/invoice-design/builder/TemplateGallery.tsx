@@ -12,43 +12,226 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  PlusCircle,
+  Plus,
   Sparkles,
   Minimize2,
   Palette,
   FileText,
+  Check,
 } from 'lucide-react';
 import { Button } from '$app/components/forms';
+import { Card } from '$app/components/cards';
 import { templates } from './templates/templates';
 import { route } from '$app/common/helpers/route';
+import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
+import { CSSProperties } from 'react';
 
 type CategoryFilter = 'all' | 'modern' | 'classic' | 'minimal' | 'creative';
+
+function TemplatePreview({
+  templateId,
+  colors,
+}: {
+  templateId: string;
+  colors: ReturnType<typeof useColorScheme>;
+}) {
+  const previews: Record<string, JSX.Element> = {
+    'modern-professional': (
+      <div
+        className="w-full h-full p-3 flex flex-col gap-2"
+        style={{ backgroundColor: colors.$1 }}
+      >
+        <div className="flex justify-between items-start">
+          <div
+            className="w-12 h-3 rounded"
+            style={{ backgroundColor: colors.$3 }}
+          />
+          <div
+            className="w-16 h-2 rounded"
+            style={{ backgroundColor: colors.$17 }}
+          />
+        </div>
+        <div
+          className="mt-2 w-20 h-4 rounded"
+          style={{ backgroundColor: colors.$3 }}
+        />
+        <div
+          className="mt-1 w-full h-px"
+          style={{ backgroundColor: colors.$20 }}
+        />
+        <div className="flex gap-2 mt-1">
+          <div className="flex-1 space-y-1">
+            <div
+              className="w-16 h-2 rounded"
+              style={{ backgroundColor: colors.$3 }}
+            />
+            <div
+              className="w-12 h-1.5 rounded"
+              style={{ backgroundColor: colors.$17 }}
+            />
+          </div>
+          <div className="space-y-1">
+            <div
+              className="w-14 h-1.5 rounded"
+              style={{ backgroundColor: colors.$17 }}
+            />
+            <div
+              className="w-10 h-1.5 rounded"
+              style={{ backgroundColor: colors.$17 }}
+            />
+          </div>
+        </div>
+        <div className="mt-auto">
+          <div
+            className="w-full h-8 rounded flex items-center px-1 gap-1"
+            style={{ backgroundColor: colors.$20 }}
+          >
+            <div
+              className="flex-1 h-1.5 rounded"
+              style={{ backgroundColor: colors.$17 }}
+            />
+            <div
+              className="w-6 h-1.5 rounded"
+              style={{ backgroundColor: colors.$17 }}
+            />
+            <div
+              className="w-6 h-1.5 rounded"
+              style={{ backgroundColor: colors.$17 }}
+            />
+          </div>
+          <div className="mt-1 flex justify-end gap-1">
+            <div
+              className="w-8 h-1.5 rounded"
+              style={{ backgroundColor: colors.$17 }}
+            />
+            <div
+              className="w-8 h-1.5 rounded"
+              style={{ backgroundColor: colors.$3 }}
+            />
+          </div>
+        </div>
+      </div>
+    ),
+    minimalist: (
+      <div
+        className="w-full h-full p-4 flex flex-col"
+        style={{ backgroundColor: colors.$1 }}
+      >
+        <div className="flex justify-between items-start">
+          <div
+            className="w-14 h-2 rounded"
+            style={{ backgroundColor: colors.$3 }}
+          />
+          <div
+            className="w-12 h-1.5 rounded"
+            style={{ backgroundColor: colors.$17 }}
+          />
+        </div>
+        <div
+          className="mt-3 w-full h-px"
+          style={{ backgroundColor: colors.$3 }}
+        />
+        <div className="flex gap-4 mt-3">
+          <div className="flex-1 space-y-0.5">
+            <div
+              className="w-12 h-1.5 rounded"
+              style={{ backgroundColor: colors.$3 }}
+            />
+            <div
+              className="w-10 h-1 rounded"
+              style={{ backgroundColor: colors.$17 }}
+            />
+          </div>
+          <div className="space-y-0.5">
+            <div
+              className="w-10 h-1 rounded"
+              style={{ backgroundColor: colors.$17 }}
+            />
+            <div
+              className="w-8 h-1 rounded"
+              style={{ backgroundColor: colors.$17 }}
+            />
+          </div>
+        </div>
+        <div className="mt-auto space-y-1">
+          <div
+            className="w-full h-px"
+            style={{ backgroundColor: colors.$20 }}
+          />
+          <div className="flex gap-1">
+            <div
+              className="flex-1 h-1 rounded"
+              style={{ backgroundColor: colors.$17 }}
+            />
+            <div
+              className="w-4 h-1 rounded"
+              style={{ backgroundColor: colors.$17 }}
+            />
+            <div
+              className="w-4 h-1 rounded"
+              style={{ backgroundColor: colors.$17 }}
+            />
+          </div>
+          <div
+            className="w-full h-px"
+            style={{ backgroundColor: colors.$20 }}
+          />
+        </div>
+      </div>
+    ),
+    blank: (
+      <div
+        className="w-full h-full flex items-center justify-center"
+        style={{ backgroundColor: colors.$20 }}
+      >
+        <Plus className="w-12 h-12" style={{ color: colors.$17 }} />
+      </div>
+    ),
+  };
+
+  return (
+    <div className="w-full h-full overflow-hidden">
+      {previews[templateId] || (
+        <div
+          className="w-full h-full flex items-center justify-center"
+          style={{ backgroundColor: colors.$20 }}
+        >
+          <FileText className="w-12 h-12" style={{ color: colors.$17 }} />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function TemplateGallery() {
   const [t] = useTranslation();
   const navigate = useNavigate();
+  const colors = useColorScheme();
+
   const [selectedCategory, setSelectedCategory] =
     useState<CategoryFilter>('all');
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
 
   const categoryConfig = [
     {
       id: 'all' as const,
-      label: t('all'),
+      label: t('all') || 'All',
       icon: <Sparkles className="w-4 h-4" />,
     },
     {
       id: 'modern' as const,
-      label: t('modern'),
+      label: t('modern') || 'Modern',
       icon: <Palette className="w-4 h-4" />,
     },
     {
       id: 'minimal' as const,
-      label: t('minimal'),
+      label: t('minimal') || 'Minimal',
       icon: <Minimize2 className="w-4 h-4" />,
     },
     {
       id: 'classic' as const,
-      label: t('classic'),
+      label: t('classic') || 'Classic',
       icon: <FileText className="w-4 h-4" />,
     },
   ];
@@ -61,136 +244,198 @@ export function TemplateGallery() {
   const blankTemplate = templates.find((t) => t.id === 'blank');
 
   const handleSelectTemplate = (templateId: string) => {
-    navigate(
-      route('/settings/invoice_design/builder/new?template=:id', {
-        id: templateId,
-      })
-    );
+    setSelectedTemplate(templateId);
   };
 
+  const handleContinue = () => {
+    if (selectedTemplate) {
+      navigate(
+        route('/settings/invoice_design/builder/new?template=:id', {
+          id: selectedTemplate,
+        })
+      );
+    }
+  };
+
+  const getCardStyle = (isSelected: boolean): CSSProperties =>
+    ({
+      backgroundColor: colors.$1,
+      border: `1px solid ${isSelected ? colors.$3 : colors.$24}`,
+      '--tw-ring-color': isSelected ? colors.$3 : 'transparent',
+    } as CSSProperties);
+
   return (
-    <div className="w-full">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
-        <div className="max-w-7xl mx-auto px-6 py-12 text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            {t('create_your_perfect_invoice_design')}
+    <div className="w-full max-w-5xl mx-auto px-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between py-4">
+        <div>
+          <h1 className="text-2xl font-medium" style={{ color: colors.$3 }}>
+            Choose a Template
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            {t(
-              'choose_a_professional_template_and_customize_it_to_match_your_brand'
-            )}
+          <p className="text-sm mt-1" style={{ color: colors.$17 }}>
+            Select a starting point for your invoice design
           </p>
         </div>
+        {selectedTemplate && (
+          <Button
+            type="primary"
+            behavior="button"
+            onClick={handleContinue}
+            className="flex items-center gap-2"
+          >
+            Continue
+            <Check className="w-4 h-4" />
+          </Button>
+        )}
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Category Filters */}
-        <div className="flex gap-3 mb-8 justify-center flex-wrap">
+      {/* Category Filters */}
+      <Card
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        withoutHeaderBorder
+        withoutBodyPadding
+        padding="small"
+      >
+        <div className="flex gap-2 flex-wrap px-4 py-3 justify-center">
           {categoryConfig.map((category) => (
-            <Button
+            <button
               key={category.id}
-              type="secondary"
-              behavior="button"
               onClick={() => setSelectedCategory(category.id)}
-              className={`
-                ${
-                  selectedCategory === category.id
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
-                }
-              `}
+              className={classNames(
+                'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-150',
+                selectedCategory === category.id
+                  ? 'shadow-sm'
+                  : 'hover:shadow-sm'
+              )}
+              style={{
+                backgroundColor:
+                  selectedCategory === category.id ? colors.$3 : colors.$1,
+                color: selectedCategory === category.id ? colors.$1 : colors.$3,
+                border: `1px solid ${
+                  selectedCategory === category.id ? colors.$3 : colors.$24
+                }`,
+              }}
             >
-              <span className="flex items-center gap-2">
-                {category.icon}
-                {category.label}
-              </span>
-            </Button>
+              {category.icon}
+              {category.label}
+            </button>
           ))}
         </div>
+      </Card>
 
-        {/* Template Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTemplates.map((template) => (
+      {/* Template Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-6">
+        {filteredTemplates.map((template) => {
+          const isSelected = selectedTemplate === template.id;
+          return (
             <div
               key={template.id}
-              className="cursor-pointer hover:shadow-xl transition-all duration-200 group overflow-hidden border-2 hover:border-blue-500 bg-white rounded-lg"
               onClick={() => handleSelectTemplate(template.id)}
+              className={classNames(
+                'group cursor-pointer rounded-xl overflow-hidden transition-all duration-200',
+                isSelected ? 'ring-2 shadow-lg' : 'hover:shadow-md'
+              )}
+              style={getCardStyle(isSelected)}
             >
-              {/* Template Preview Placeholder */}
-              <div className="aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <FileText className="w-24 h-24 text-gray-400 group-hover:text-gray-500 transition-colors" />
-                </div>
-
-                {/* Tags */}
-                {template.tags && template.tags.length > 0 && (
-                  <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-                    {template.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-1 bg-white/90 backdrop-blur-sm text-xs font-medium rounded-full text-gray-700"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+              {/* Template Preview */}
+              <div
+                className="aspect-[3/4] relative border-b"
+                style={{ borderColor: colors.$20 }}
+              >
+                <TemplatePreview templateId={template.id} colors={colors} />
+                {isSelected && (
+                  <div
+                    className="absolute inset-0 flex items-center justify-center"
+                    style={{ backgroundColor: `${colors.$3}10` }}
+                  >
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
+                      style={{ backgroundColor: colors.$3 }}
+                    >
+                      <Check className="w-6 h-6" style={{ color: colors.$1 }} />
+                    </div>
                   </div>
                 )}
-
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-blue-600/90 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Button
-                    type="secondary"
-                    className="bg-white text-blue-600 hover:bg-gray-100"
-                  >
-                    {t('use_this_template')}
-                  </Button>
-                </div>
               </div>
 
               {/* Template Info */}
               <div className="p-5">
-                <h3 className="font-semibold text-lg mb-2 text-gray-900">
+                <h3
+                  className="font-semibold text-lg"
+                  style={{ color: colors.$3 }}
+                >
                   {template.name}
                 </h3>
-                <p className="text-sm text-gray-600 line-clamp-2">
+                <p
+                  className="text-sm mt-1 line-clamp-2"
+                  style={{ color: colors.$17 }}
+                >
                   {template.description}
                 </p>
               </div>
             </div>
-          ))}
+          );
+        })}
 
-          {/* Blank Canvas Option */}
-          {blankTemplate && (
+        {/* Blank Canvas Option */}
+        {blankTemplate && (
+          <div
+            onClick={() => handleSelectTemplate('blank')}
+            className={classNames(
+              'group cursor-pointer rounded-xl overflow-hidden transition-all duration-200',
+              selectedTemplate === 'blank'
+                ? 'ring-2 shadow-lg'
+                : 'hover:shadow-md'
+            )}
+            style={getCardStyle(selectedTemplate === 'blank')}
+          >
             <div
-              className="cursor-pointer hover:shadow-xl transition-all duration-200 border-2 border-dashed border-gray-300 hover:border-blue-500 group bg-white rounded-lg"
-              onClick={() => handleSelectTemplate('blank')}
+              className="aspect-[3/4] relative border-b"
+              style={{ borderColor: colors.$20 }}
             >
-              <div className="aspect-[3/4] flex items-center justify-center bg-gray-50 group-hover:bg-blue-50 transition-colors">
-                <div className="text-center px-6">
-                  <PlusCircle className="w-20 h-20 mx-auto mb-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
-                  <h3 className="font-semibold text-xl mb-2 text-gray-900">
-                    {blankTemplate.name}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    {blankTemplate.description}
-                  </p>
+              <TemplatePreview templateId="blank" colors={colors} />
+              {selectedTemplate === 'blank' && (
+                <div
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{ backgroundColor: `${colors.$3}10` }}
+                >
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
+                    style={{ backgroundColor: colors.$3 }}
+                  >
+                    <Check className="w-6 h-6" style={{ color: colors.$1 }} />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
-          )}
-        </div>
-
-        {/* Empty State */}
-        {filteredTemplates.length === 0 && (
-          <div className="text-center py-12">
-            <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <p className="text-gray-500">
-              {t('no_templates_found_in_this_category')}
-            </p>
+            <div className="p-5">
+              <h3
+                className="font-semibold text-lg"
+                style={{ color: colors.$3 }}
+              >
+                {blankTemplate.name}
+              </h3>
+              <p className="text-sm mt-1" style={{ color: colors.$17 }}>
+                {blankTemplate.description}
+              </p>
+            </div>
           </div>
         )}
       </div>
+
+      {/* Empty State - only show if no templates AND no blank canvas */}
+      {filteredTemplates.length === 0 && !blankTemplate && (
+        <div className="text-center py-16">
+          <FileText
+            className="w-16 h-16 mx-auto mb-4"
+            style={{ color: colors.$17 }}
+          />
+          <p style={{ color: colors.$17 }}>
+            No templates found in this category
+          </p>
+        </div>
+      )}
     </div>
   );
 }
