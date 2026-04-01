@@ -709,6 +709,7 @@ export function InvoiceBuilder() {
                 onClick={handleUndo}
                 disabled={state.historyIndex <= 0}
                 className="p-2"
+                disableWithoutIcon={state.historyIndex <= 0}
               >
                 <Undo2 className="w-4 h-4" />
               </Button>
@@ -718,6 +719,7 @@ export function InvoiceBuilder() {
                 onClick={handleRedo}
                 disabled={state.historyIndex >= state.history.length - 1}
                 className="p-2"
+                disableWithoutIcon={state.historyIndex >= state.history.length - 1}
               >
                 <Redo2 className="w-4 h-4" />
               </Button>
