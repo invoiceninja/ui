@@ -1096,17 +1096,14 @@ test('Prevent breadcrumb navigation', async ({ page, api }) => {
 
   await page.waitForTimeout(200);
 
-
   await page
   .locator('[type="date"]')
   .last()
   .fill(dayjs().add(20, 'day').format('YYYY-MM-DD'));
 
-await page.locator('[type="date"]').last().blur();
+  await page.locator('[type="date"]').last().blur();
 
-
-await page.waitForTimeout(200);
-
+  await page.waitForTimeout(200);
 
   await page
     .locator('nav[aria-label="Breadcrumb"]')
