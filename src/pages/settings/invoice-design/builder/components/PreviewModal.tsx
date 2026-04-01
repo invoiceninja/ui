@@ -8,8 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { X, Download, ZoomIn, ZoomOut } from 'lucide-react';
 import { useState } from 'react';
+import { Download, ZoomIn, ZoomOut, Printer } from 'lucide-react';
+import { Modal } from '$app/components/Modal';
+import { Button } from '$app/components/forms';
+import { useColorScheme } from '$app/common/colors';
 import { Block } from '../types';
 import { generateInvoiceHTML } from '../utils/html-generator';
 import { SAMPLE_INVOICE_DATA } from '../utils/variable-replacer';
@@ -21,6 +24,7 @@ interface PreviewModalProps {
 
 export function PreviewModal({ blocks, onClose }: PreviewModalProps) {
   const [zoom, setZoom] = useState(100);
+  const colors = useColorScheme();
   const html = generateInvoiceHTML(blocks, SAMPLE_INVOICE_DATA);
 
   const handleDownloadHTML = () => {
@@ -48,82 +52,104 @@ export function PreviewModal({ blocks, onClose }: PreviewModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">Invoice Preview</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Preview with sample data
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
+    <Modal
+      visible={true}
+      onClose={onClose}
+      title="Invoice Preview"
+      size="large"
+      overflowVisible
+      enableClosingOnXMark
+    >
+      <div
+        className="flex flex-col"
+        style={{ minHeight: '600px', maxHeight: '80vh' }}
+      >
+        {/* Toolbar */}
+        <div
+          className="flex items-center justify-between py-3 border-b"
+          style={{ borderColor: colors.$24 }}
+        >
+          <div className="flex items-center gap-4">
             {/* Zoom Controls */}
-            <div className="flex items-center gap-2 mr-4">
-              <button
+            <div className="flex items-center gap-2">
+              <Button
+                type="secondary"
+                behavior="button"
                 onClick={() => setZoom(Math.max(50, zoom - 10))}
-                className="p-2 hover:bg-gray-100 rounded"
-                title="Zoom out"
+                className="p-2"
               >
                 <ZoomOut className="w-4 h-4" />
-              </button>
-              <span className="text-sm font-medium min-w-[60px] text-center">
+              </Button>
+              <span
+                className="text-sm font-medium min-w-[60px] text-center"
+                style={{ color: colors.$3 }}
+              >
                 {zoom}%
               </span>
-              <button
+              <Button
+                type="secondary"
+                behavior="button"
                 onClick={() => setZoom(Math.min(150, zoom + 10))}
-                className="p-2 hover:bg-gray-100 rounded"
-                title="Zoom in"
+                className="p-2"
               >
                 <ZoomIn className="w-4 h-4" />
-              </button>
+              </Button>
             </div>
 
-            {/* Action Buttons */}
-            <button
-              onClick={handlePrint}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-sm font-medium transition-colors"
-            >
-              Print
-            </button>
+            <div className="h-6 w-px" style={{ backgroundColor: colors.$24 }} />
 
-            <button
+            <span className="text-sm" style={{ color: colors.$17 }}>
+              Preview uses sample data
+            </span>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2">
+            <Button
+              type="secondary"
+              behavior="button"
+              onClick={handlePrint}
+              className="flex items-center gap-2"
+            >
+              <Printer className="w-4 h-4" />
+              Print
+            </Button>
+
+            <Button
+              type="primary"
+              behavior="button"
               onClick={handleDownloadHTML}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium flex items-center gap-2 transition-colors"
+              className="flex items-center gap-2"
             >
               <Download className="w-4 h-4" />
               Download HTML
-            </button>
-
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              title="Close"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Preview Content */}
-        <div className="flex-1 overflow-auto bg-gray-100 p-8">
+        <div
+          className="flex-1 overflow-auto py-6 -mx-5 px-5"
+          style={{ backgroundColor: colors.$23 }}
+        >
           <div
-            className="mx-auto bg-white shadow-lg"
+            className="mx-auto shadow-lg"
             style={{
+              backgroundColor: colors.$1,
               transform: `scale(${zoom / 100})`,
               transformOrigin: 'top center',
               transition: 'transform 0.2s ease',
+              width: 'fit-content',
             }}
           >
             <iframe
               srcDoc={html}
-              className="w-full border-0"
+              className="border-0 block"
               style={{
                 width: '794px',
-                height: '1122px', // A4 at 96dpi
+                height: '1122px',
                 minHeight: '1122px',
+                backgroundColor: colors.$1,
               }}
               title="Invoice Preview"
               sandbox="allow-same-origin"
@@ -132,17 +158,17 @@ export function PreviewModal({ blocks, onClose }: PreviewModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t bg-gray-50">
-          <div className="flex items-center justify-between text-sm text-gray-600">
-            <div>
-              <span className="font-medium">{blocks.length}</span> blocks in design
-            </div>
-            <div>
-              Preview uses sample data • Actual invoices will use real client and invoice data
-            </div>
-          </div>
+        <div
+          className="py-3 border-t flex items-center justify-between text-sm -mx-5 px-5 -mb-5"
+          style={{ borderColor: colors.$24, color: colors.$17 }}
+        >
+          <span>
+            <strong style={{ color: colors.$3 }}>{blocks.length}</strong> blocks
+            in design
+          </span>
+          <span>Actual invoices will use real client and invoice data</span>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
