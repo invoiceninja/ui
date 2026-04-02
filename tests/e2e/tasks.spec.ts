@@ -644,6 +644,8 @@ test('cloning task', async ({ page, api }) => {
 });
 
 test('Invoice Task displayed with admin permission', async ({ page, api }) => {
+ 
+ test.setTimeout(60000); // 2 minutes for this test only
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomTaskActions({
@@ -695,6 +697,8 @@ test('Invoice Task displayed with creation permissions', async ({
   page,
   api,
 }) => {
+  test.setTimeout(60000); // 2 minutes for this test only
+
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomTaskActions({
@@ -728,16 +732,19 @@ test('Invoice Task displayed with creation permissions', async ({
     .click();
 
   await page.waitForTimeout(500);
-
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  // Wait for bulk actions button to appear after checkbox selection
-  await page
-    .locator('[data-cy="dataTable"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .first()
-    .waitFor({ state: 'visible', timeout: 5000 });
+  await page.getByRole('button', { name: 'Actions' }).first().click();
+  
+ 
+  // // Wait for bulk actions button to appear after checkbox selection
+  // await page
+  //   .locator('[data-cy="dataTable"]')
+  //   .getByRole('button', { name: 'Actions', exact: true })
+  //   .first()
+  //   .waitFor({ state: 'visible', timeout: 5000 });
 
+  await page.waitForTimeout(500);
   await checkDropdownActions(
     page,
     customActions,

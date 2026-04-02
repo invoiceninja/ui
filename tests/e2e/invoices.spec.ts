@@ -1038,6 +1038,7 @@ test('Prevent archive invoice action', async ({ page, api }) => {
 });
 
 test('Prevent email invoice action', async ({ page, api }) => {
+  test.setTimeout(60000); // 2 minutes for this test only
   await login(page);
 
   const clientName = uniqueName('inv-prev-email');

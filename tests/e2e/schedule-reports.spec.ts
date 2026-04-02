@@ -493,12 +493,15 @@ test('Expense report test with clients, project and categories selectors', async
   await page
     .locator('#clientItemSelector')
     // .getByText(client.name, { exact: true })
+    // 
+  .getByRole('option', { name: client.name })
+    .getByRole('checkbox')
   // .getByRole('option', { name: 'Company Name' })
-    .getByRole('option', { name: 'Company Name' }).getByRole('checkbox')
+    // .getByRole('option', { name: 'Company Name' }).getByRole('checkbox')
     .first()
     .click();
 
-
+ 
   await page.getByRole('main').getByText('Clients').first().click();
   await page.waitForTimeout(200);
 
@@ -542,7 +545,7 @@ test('Expense report test with clients, project and categories selectors', async
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
   await expectCustomSelectText(page, 'Range', 'Last 7 Days');
   await expect(page.locator('#clientItemSelector')).toContainText(
-    "Company Name"
+    client.name
   );
   await expect(page.locator('#projectItemSelector')).toContainText(
     project.name
@@ -565,8 +568,9 @@ test('Expense report test with clients, project and categories selectors', async
   await expectCustomSelectText(page, 'Report', 'Expense');
   await expect(page.locator('[data-cy="scheduleSendEmail"]')).toBeChecked();
   await expectCustomSelectText(page, 'Range', 'Last 7 Days');
+  
   await expect(page.locator('#clientItemSelector')).toContainText(
-    "Company Name"
+    client.name
   );
   await expect(page.locator('#projectItemSelector')).toContainText(
     project.name
