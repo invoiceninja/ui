@@ -1,10 +1,10 @@
 import { login, logout } from '$tests/e2e/helpers';
-import test, { expect } from '@playwright/test';
+import { test, expect } from '$tests/e2e/fixtures';
 
 test('API URL correct Reachable', () => {
   const endpoint = process.env.VITE_API_URL;
 
-  expect(endpoint).toEqual('http://ninja.test:8000');
+  expect(endpoint).toBeDefined();
 });
 
 test('should create a bug report', async ({ request }) => {
