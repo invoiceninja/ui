@@ -29,6 +29,8 @@ export interface TransactionDetails {
   base_type: string;
   transaction_id: string;
   status_id: string;
+  invoice_ids?: string;
+  payment_id?: string;
 }
 
 interface Props {
@@ -212,6 +214,20 @@ export function TransactionMatchDetails(props: Props) {
       }
     }
   }, [transactionRule]);
+
+  useEffect(() => {
+    const { invoice_ids, payment_id } = props.transactionDetails;
+
+    if (invoice_ids) {
+      setInvoiceIds(invoice_ids.split(',').filter(Boolean));
+    }
+
+    if (payment_id) {
+      setPaymentIds([payment_id]);
+    }
+  }, [props.transactionDetails.transaction_id]);
+
+  console.log('invoice_ids', invoiceIds);
 
   return (
     <div className="flex flex-col flex-1">
