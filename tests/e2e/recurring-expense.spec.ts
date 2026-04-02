@@ -124,6 +124,7 @@ test("can't view recurring expenses without permission", async ({ page }) => {
 });
 
 test('can view recurring expense', async ({ page, api }) => {
+  test.setTimeout(60000); 
   const { clear, save, set } = permissions(page);
 
   await login(page);

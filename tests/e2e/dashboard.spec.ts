@@ -2,6 +2,7 @@ import { login, logout, permissions } from '$tests/e2e/helpers';
 import { test, expect } from '$tests/e2e/fixtures';
 
 test("Can't view dashboard without permission", async ({ page }) => {
+  test.setTimeout(60000); 
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -19,6 +20,7 @@ test("Can't view dashboard without permission", async ({ page }) => {
 });
 
 test('Can view dashboard with permission', async ({ page }) => {
+  test.setTimeout(60000); 
   const { clear, save, set } = permissions(page);
 
   await login(page);

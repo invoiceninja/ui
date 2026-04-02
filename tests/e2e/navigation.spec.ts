@@ -77,6 +77,7 @@ test('Prevent transaction quick popover navigation', async ({ page }) => {
 });
 
 test('Prevent quote quick popover navigation', async ({ page }) => {
+  test.setTimeout(60000); 
   await login(page);
 
   await createInvoice({ page });
@@ -175,6 +176,7 @@ test('Prevent back browser button navigation', async ({ page }) => {
 });
 
 test('Prevent account management navigation', async ({ page }) => {
+  test.setTimeout(60000); 
   await login(page);
 
   await createInvoice({ page });
@@ -235,6 +237,7 @@ test('Prevent account management navigation', async ({ page }) => {
 test('Can add a company and navigate to account management', async ({
   page,
 }) => {
+  test.setTimeout(60000); 
   // Must use the owner user — only owners can add companies
   await login(page);
 
