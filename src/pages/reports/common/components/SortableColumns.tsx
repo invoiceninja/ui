@@ -364,11 +364,7 @@ export function SortableColumns({ report, columns }: Props) {
 
         const word = newData[sourceIndex][result.source.index];
         newData[sourceIndex].splice(result.source.index, 1);
-        newData[destinationIndex].splice(
-          result.destination.index,
-          0,
-          word
-        );
+        newData[destinationIndex].splice(result.destination.index, 0, word);
 
         setLocalData(newData);
         syncToPreferences(newData);
@@ -383,9 +379,7 @@ export function SortableColumns({ report, columns }: Props) {
   const onRemove = useCallback(
     (record: Record) => {
       const current = localDataRef.current;
-      const index = positions.indexOf(
-        record.map as (typeof positions)[number]
-      );
+      const index = positions.indexOf(record.map as (typeof positions)[number]);
 
       const newData = current.map((arr, i) =>
         i === reportColumn || i === index ? [...arr] : arr
@@ -408,126 +402,19 @@ export function SortableColumns({ report, columns }: Props) {
     syncToPreferences(defaultColumns);
   }, [defaultColumns, syncToPreferences]);
 
-  const handleAddAll0 = useCallback(() => {
-    const current = localDataRef.current;
-    const newData = current.map((arr, i) =>
-      i === reportColumn || i === 0 ? [...arr] : arr
-    );
-    newData[reportColumn] = [...newData[reportColumn], ...newData[0]];
-    newData[0] = [];
-    setLocalData(newData);
-    syncToPreferences(newData);
-  }, [syncToPreferences]);
-
-  const handleAddAll1 = useCallback(() => {
-    const current = localDataRef.current;
-    const newData = current.map((arr, i) =>
-      i === reportColumn || i === 1 ? [...arr] : arr
-    );
-    newData[reportColumn] = [...newData[reportColumn], ...newData[1]];
-    newData[1] = [];
-    setLocalData(newData);
-    syncToPreferences(newData);
-  }, [syncToPreferences]);
-
-  const handleAddAll2 = useCallback(() => {
-    const current = localDataRef.current;
-    const newData = current.map((arr, i) =>
-      i === reportColumn || i === 2 ? [...arr] : arr
-    );
-    newData[reportColumn] = [...newData[reportColumn], ...newData[2]];
-    newData[2] = [];
-    setLocalData(newData);
-    syncToPreferences(newData);
-  }, [syncToPreferences]);
-
-  const handleAddAll3 = useCallback(() => {
-    const current = localDataRef.current;
-    const newData = current.map((arr, i) =>
-      i === reportColumn || i === 3 ? [...arr] : arr
-    );
-    newData[reportColumn] = [...newData[reportColumn], ...newData[3]];
-    newData[3] = [];
-    setLocalData(newData);
-    syncToPreferences(newData);
-  }, [syncToPreferences]);
-
-  const handleAddAll4 = useCallback(() => {
-    const current = localDataRef.current;
-    const newData = current.map((arr, i) =>
-      i === reportColumn || i === 4 ? [...arr] : arr
-    );
-    newData[reportColumn] = [...newData[reportColumn], ...newData[4]];
-    newData[4] = [];
-    setLocalData(newData);
-    syncToPreferences(newData);
-  }, [syncToPreferences]);
-
-  const handleAddAll5 = useCallback(() => {
-    const current = localDataRef.current;
-    const newData = current.map((arr, i) =>
-      i === reportColumn || i === 5 ? [...arr] : arr
-    );
-    newData[reportColumn] = [...newData[reportColumn], ...newData[5]];
-    newData[5] = [];
-    setLocalData(newData);
-    syncToPreferences(newData);
-  }, [syncToPreferences]);
-
-  const handleAddAll6 = useCallback(() => {
-    const current = localDataRef.current;
-    const newData = current.map((arr, i) =>
-      i === reportColumn || i === 6 ? [...arr] : arr
-    );
-    newData[reportColumn] = [...newData[reportColumn], ...newData[6]];
-    newData[6] = [];
-    setLocalData(newData);
-    syncToPreferences(newData);
-  }, [syncToPreferences]);
-
-  const handleAddAll7 = useCallback(() => {
-    const current = localDataRef.current;
-    const newData = current.map((arr, i) =>
-      i === reportColumn || i === 7 ? [...arr] : arr
-    );
-    newData[reportColumn] = [...newData[reportColumn], ...newData[7]];
-    newData[7] = [];
-    setLocalData(newData);
-    syncToPreferences(newData);
-  }, [syncToPreferences]);
-
-  const handleAddAll8 = useCallback(() => {
-    const current = localDataRef.current;
-    const newData = current.map((arr, i) =>
-      i === reportColumn || i === 8 ? [...arr] : arr
-    );
-    newData[reportColumn] = [...newData[reportColumn], ...newData[8]];
-    newData[8] = [];
-    setLocalData(newData);
-    syncToPreferences(newData);
-  }, [syncToPreferences]);
-
-  const handleAddAll9 = useCallback(() => {
-    const current = localDataRef.current;
-    const newData = current.map((arr, i) =>
-      i === reportColumn || i === 9 ? [...arr] : arr
-    );
-    newData[reportColumn] = [...newData[reportColumn], ...newData[9]];
-    newData[9] = [];
-    setLocalData(newData);
-    syncToPreferences(newData);
-  }, [syncToPreferences]);
-
-  const handleAddAll10 = useCallback(() => {
-    const current = localDataRef.current;
-    const newData = current.map((arr, i) =>
-      i === reportColumn || i === 10 ? [...arr] : arr
-    );
-    newData[reportColumn] = [...newData[reportColumn], ...newData[10]];
-    newData[10] = [];
-    setLocalData(newData);
-    syncToPreferences(newData);
-  }, [syncToPreferences]);
+  const handleAddAll = useCallback(
+    (index: number) => {
+      const current = localDataRef.current;
+      const newData = current.map((arr, i) =>
+        i === reportColumn || i === index ? [...arr] : arr
+      );
+      newData[reportColumn] = [...newData[reportColumn], ...newData[index]];
+      newData[index] = [];
+      setLocalData(newData);
+      syncToPreferences(newData);
+    },
+    [syncToPreferences]
+  );
 
   const reportColumnsLabel = `${t('report')} ${t('columns')}`;
 
@@ -547,7 +434,7 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('client') && (
                 <Column
                   label={t('client')}
-                  onAddAll={handleAddAll0}
+                  onAddAll={() => handleAddAll(0)}
                   data={localData[0]}
                   droppableId="0"
                   isDropDisabled={true}
@@ -557,7 +444,7 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('invoice') && (
                 <Column
                   label={t('invoice')}
-                  onAddAll={handleAddAll1}
+                  onAddAll={() => handleAddAll(1)}
                   data={localData[1]}
                   droppableId="1"
                   isDropDisabled={true}
@@ -567,7 +454,7 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('credit') && (
                 <Column
                   label={t('credit')}
-                  onAddAll={handleAddAll2}
+                  onAddAll={() => handleAddAll(2)}
                   data={localData[2]}
                   droppableId="2"
                   isDropDisabled={true}
@@ -577,7 +464,7 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('quote') && (
                 <Column
                   label={t('quote')}
-                  onAddAll={handleAddAll3}
+                  onAddAll={() => handleAddAll(3)}
                   data={localData[3]}
                   droppableId="3"
                   isDropDisabled={true}
@@ -587,7 +474,7 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('payment') && (
                 <Column
                   label={t('payment')}
-                  onAddAll={handleAddAll4}
+                  onAddAll={() => handleAddAll(4)}
                   data={localData[4]}
                   droppableId="4"
                   isDropDisabled={true}
@@ -597,7 +484,7 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('vendor') && (
                 <Column
                   label={t('vendor')}
-                  onAddAll={handleAddAll5}
+                  onAddAll={() => handleAddAll(5)}
                   data={localData[5]}
                   droppableId="5"
                   isDropDisabled={true}
@@ -607,7 +494,7 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('purchase_order') && (
                 <Column
                   label={t('purchase_order')}
-                  onAddAll={handleAddAll6}
+                  onAddAll={() => handleAddAll(6)}
                   data={localData[6]}
                   droppableId="6"
                   isDropDisabled={true}
@@ -617,7 +504,7 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('task') && (
                 <Column
                   label={t('task')}
-                  onAddAll={handleAddAll7}
+                  onAddAll={() => handleAddAll(7)}
                   data={localData[7]}
                   droppableId="7"
                   isDropDisabled={true}
@@ -627,7 +514,7 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('expense') && (
                 <Column
                   label={t('expense')}
-                  onAddAll={handleAddAll8}
+                  onAddAll={() => handleAddAll(8)}
                   data={localData[8]}
                   droppableId="8"
                   isDropDisabled={true}
@@ -637,7 +524,7 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('recurring_invoice') && (
                 <Column
                   label={t('recurring_invoice')}
-                  onAddAll={handleAddAll9}
+                  onAddAll={() => handleAddAll(9)}
                   data={localData[9]}
                   droppableId="9"
                   isDropDisabled={true}
@@ -647,7 +534,7 @@ export function SortableColumns({ report, columns }: Props) {
               {columns.includes('contact') && (
                 <Column
                   label={t('contact')}
-                  onAddAll={handleAddAll10}
+                  onAddAll={() => handleAddAll(10)}
                   data={localData[10]}
                   droppableId="10"
                   isDropDisabled={true}
