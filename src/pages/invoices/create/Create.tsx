@@ -33,6 +33,7 @@ import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { AddUninvoicedItemsButton } from '../common/components/AddUninvoicedItemsButton';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { useSaveKeyboardShortcut } from '$app/common/hooks/useSaveKeyboardShortcut';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -245,21 +246,10 @@ export default function Create() {
     invoice && calculateInvoiceSum(invoice);
   }, [invoice]);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-        event.preventDefault();
-
-        if (invoice && invoice.client_id.length > 0 && !isFormBusy) {
-          save(invoice);
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [invoice, isFormBusy, save]);
+  useSaveKeyboardShortcut({
+    isEnabled: Boolean(invoice && invoice.client_id.length > 0 && !isFormBusy),
+    onSave: () => save(invoice as Invoice),
+  });
 
   return (
     <>

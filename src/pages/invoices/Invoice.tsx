@@ -47,6 +47,7 @@ import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/u
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { useSaveKeyboardShortcut } from '$app/common/hooks/useSaveKeyboardShortcut';
 dayjs.extend(utc);
 
 export default function Invoice() {
@@ -143,26 +144,15 @@ export default function Invoice() {
     }
   }, [saveChanges]);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-        event.preventDefault();
-
-        if (
-          invoice &&
-          !isFormBusy &&
-          !invoice.is_locked &&
-          invoice.status_id !== InvoiceStatus.Cancelled
-        ) {
-          setSaveChanges(true);
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [invoice, isFormBusy]);
+  useSaveKeyboardShortcut({
+    isEnabled: Boolean(
+      invoice &&
+        !isFormBusy &&
+        !invoice.is_locked &&
+        invoice.status_id !== InvoiceStatus.Cancelled
+    ),
+    onSave: () => setSaveChanges(true),
+  });
 
   useEffect(() => {
     if (errors?.errors?.paid_to_date) {
