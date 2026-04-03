@@ -49,6 +49,7 @@ export const DEFAULT_SCHEDULE_PARAMETERS: Parameters = {
   auto_send: false,
   include_project_tasks: false,
   template: '',
+  group_by: '',
 };
 
 export function useHandleChange(params: Params) {
