@@ -14,7 +14,6 @@ import {
   Droppable,
   Draggable,
 } from '@hello-pangea/dnd';
-import { cloneDeep } from 'lodash';
 import { Record, clientMap } from '$app/common/constants/exports/client-map';
 import { paymentMap } from '$app/common/constants/exports/payment-map';
 import { quoteMap } from '$app/common/constants/exports/quote-map';
@@ -36,6 +35,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { customField } from '$app/components/CustomField';
 import { DoubleChevronRight } from '$app/components/icons/DoubleChevronRight';
 import { XMark } from '$app/components/icons/XMark';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 export const reportColumn = 11;
 
@@ -96,7 +96,7 @@ interface ColumnProps {
   onRemove?: (record: Record) => unknown;
 }
 
-export function Column({
+export const Column = React.memo(function Column({
   title,
   droppableId,
   isDropDisabled,
@@ -176,7 +176,6 @@ export function Column({
                         {...provided.dragHandleProps}
                       >
                         <div
-                          key={i}
                           className="border-b p-2 flex justify-between items-center cursor-grab text-sm"
                           style={{
                             color: colors.$3,
@@ -214,7 +213,7 @@ export function Column({
       </Droppable>
     </div>
   );
-}
+});
 
 interface Props {
   report: Identifier;
@@ -238,44 +237,47 @@ const positions = [
 export function useColumns({ report, columns }: Props) {
   const { preferences } = usePreferences();
 
-  const defaultColumns = [
-    columns.includes('client') ? clientMap : [],
-    columns.includes('invoice')
-      ? columns.includes('item')
-        ? invoiceMap.concat(itemMap.map((i) => ({ ...i, origin: 'invoice' })))
-        : invoiceMap
-      : [],
-    columns.includes('credit')
-      ? columns.includes('item')
-        ? creditMap.concat(itemMap.map((i) => ({ ...i, origin: 'credit' })))
-        : creditMap
-      : [],
-    columns.includes('quote')
-      ? columns.includes('item')
-        ? quoteMap.concat(itemMap.map((i) => ({ ...i, origin: 'quote' })))
-        : quoteMap
-      : [],
-    columns.includes('payment') ? paymentMap : [],
-    columns.includes('vendor') ? vendorMap : [],
-    columns.includes('purchase_order')
-      ? columns.includes('item')
-        ? purchaseorderMap.concat(
-            itemMap.map((i) => ({ ...i, origin: 'purchase_order' }))
-          )
-        : purchaseorderMap
-      : [],
-    columns.includes('task') ? taskMap : [],
-    columns.includes('expense') ? expenseMap : [],
-    columns.includes('recurring_invoice')
-      ? columns.includes('item')
-        ? recurringinvoiceMap.concat(
-            itemMap.map((i) => ({ ...i, origin: 'recurring_invoice' }))
-          )
-        : recurringinvoiceMap
-      : [],
-    columns.includes('contact') ? contactMap : [],
-    [],
-  ];
+  const defaultColumns = useMemo(
+    () => [
+      columns.includes('client') ? clientMap : [],
+      columns.includes('invoice')
+        ? columns.includes('item')
+          ? invoiceMap.concat(itemMap.map((i) => ({ ...i, origin: 'invoice' })))
+          : invoiceMap
+        : [],
+      columns.includes('credit')
+        ? columns.includes('item')
+          ? creditMap.concat(itemMap.map((i) => ({ ...i, origin: 'credit' })))
+          : creditMap
+        : [],
+      columns.includes('quote')
+        ? columns.includes('item')
+          ? quoteMap.concat(itemMap.map((i) => ({ ...i, origin: 'quote' })))
+          : quoteMap
+        : [],
+      columns.includes('payment') ? paymentMap : [],
+      columns.includes('vendor') ? vendorMap : [],
+      columns.includes('purchase_order')
+        ? columns.includes('item')
+          ? purchaseorderMap.concat(
+              itemMap.map((i) => ({ ...i, origin: 'purchase_order' }))
+            )
+          : purchaseorderMap
+        : [],
+      columns.includes('task') ? taskMap : [],
+      columns.includes('expense') ? expenseMap : [],
+      columns.includes('recurring_invoice')
+        ? columns.includes('item')
+          ? recurringinvoiceMap.concat(
+              itemMap.map((i) => ({ ...i, origin: 'recurring_invoice' }))
+            )
+          : recurringinvoiceMap
+        : [],
+      columns.includes('contact') ? contactMap : [],
+      [],
+    ],
+    [columns]
+  );
 
   const data =
     report in preferences.reports.columns &&
@@ -293,69 +295,97 @@ export function SortableColumns({ report, columns }: Props) {
 
   const { update } = usePreferences();
 
-  const { data, defaultColumns } = useColumns({ report, columns });
+  const { data: persistedData, defaultColumns } = useColumns({
+    report,
+    columns,
+  });
 
-  const onDragEnd = (result: DropResult) => {
-    if (!result.destination) {
-      return;
-    }
+  const [localData, setLocalData] = useState<Record[][]>(persistedData);
 
-    try {
-      // Create a copy of the data array
-      const $data = cloneDeep(data);
+  useEffect(() => {
+    setLocalData(persistedData);
+  }, [report]);
 
-      // Find a source index
-      const sourceIndex = parseInt(result.source.droppableId);
+  const syncToPreferences = useCallback(
+    (newData: Record[][]) => {
+      update(`preferences.reports.columns.${report}`, [...newData]);
+    },
+    [report, update]
+  );
 
-      // Find a string
-      const word = $data[sourceIndex][result.source.index];
+  const onDragEnd = useCallback(
+    (result: DropResult) => {
+      if (!result.destination) {
+        return;
+      }
 
-      // Cut a word from the original array
-      $data[sourceIndex].splice(result.source.index, 1);
+      try {
+        const sourceIndex = parseInt(result.source.droppableId);
+        const destinationIndex = parseInt(result.destination.droppableId);
 
-      // Find a destination index
-      const destinationIndex = parseInt(result.destination.droppableId);
+        const newData = localData.map((arr, i) =>
+          i === sourceIndex || i === destinationIndex ? [...arr] : arr
+        );
 
-      // Then we can insert the word into new array at specific index
-      $data[destinationIndex].splice(result.destination.index, 0, word);
+        const word = newData[sourceIndex][result.source.index];
+        newData[sourceIndex].splice(result.source.index, 1);
+        newData[destinationIndex].splice(
+          result.destination.index,
+          0,
+          word
+        );
 
-      update(`preferences.reports.columns.${report}`, [...$data]);
-    } catch (e) {
-      // In case we hit any error, due to wrong data or something similar, we should just reset the state.
+        setLocalData(newData);
+        syncToPreferences(newData);
+      } catch (e) {
+        setLocalData(defaultColumns);
+        syncToPreferences(defaultColumns);
+      }
+    },
+    [localData, defaultColumns, syncToPreferences]
+  );
 
-      update(`preferences.reports.columns.${report}`, defaultColumns);
-    }
-  };
+  const onRemove = useCallback(
+    (record: Record) => {
+      const index = positions.indexOf(
+        record.map as (typeof positions)[number]
+      );
 
-  const onRemove = (record: Record) => {
-    const index = positions.indexOf(record.map as (typeof positions)[number]);
+      const newData = localData.map((arr, i) =>
+        i === reportColumn || i === index ? [...arr] : arr
+      );
 
-    // Remove it from the reports
-    const $data = cloneDeep(data);
+      newData[reportColumn] = newData[reportColumn].filter(
+        (r) => r.value !== record.value
+      );
 
-    $data[reportColumn] = $data[reportColumn].filter(
-      (r) => r.value !== record.value
-    );
+      newData[index].push(record);
 
-    // Add it back to the original
-    $data[index].push(record);
+      setLocalData(newData);
+      syncToPreferences(newData);
+    },
+    [localData, syncToPreferences]
+  );
 
-    update(`preferences.reports.columns.${report}`, [...$data]);
-  };
+  const onRemoveAll = useCallback(() => {
+    setLocalData(defaultColumns);
+    syncToPreferences(defaultColumns);
+  }, [defaultColumns, syncToPreferences]);
 
-  const onRemoveAll = () => {
-    update(`preferences.reports.columns.${report}`, defaultColumns);
-  };
+  const onAddAll = useCallback(
+    (index: number) => {
+      const newData = localData.map((arr, i) =>
+        i === reportColumn || i === index ? [...arr] : arr
+      );
 
-  const onAddAll = (index: number) => {
-    const $data = cloneDeep(data);
+      newData[reportColumn] = [...newData[reportColumn], ...newData[index]];
+      newData[index] = [];
 
-    $data[reportColumn] = [...$data[reportColumn], ...$data[index]];
-
-    $data[index] = [];
-
-    update(`preferences.reports.columns.${report}`, [...$data]);
-  };
+      setLocalData(newData);
+      syncToPreferences(newData);
+    },
+    [localData, syncToPreferences]
+  );
 
   return (
     <div
@@ -381,7 +411,7 @@ export function SortableColumns({ report, columns }: Props) {
                       </button>
                     </div>
                   )}
-                  data={data[0]}
+                  data={localData[0]}
                   droppableId="0"
                   isDropDisabled={true}
                 />
@@ -398,7 +428,7 @@ export function SortableColumns({ report, columns }: Props) {
                       </button>
                     </div>
                   )}
-                  data={data[1]}
+                  data={localData[1]}
                   droppableId="1"
                   isDropDisabled={true}
                 />
@@ -415,7 +445,7 @@ export function SortableColumns({ report, columns }: Props) {
                       </button>
                     </div>
                   )}
-                  data={data[2]}
+                  data={localData[2]}
                   droppableId="2"
                   isDropDisabled={true}
                 />
@@ -432,7 +462,7 @@ export function SortableColumns({ report, columns }: Props) {
                       </button>
                     </div>
                   )}
-                  data={data[3]}
+                  data={localData[3]}
                   droppableId="3"
                   isDropDisabled={true}
                 />
@@ -449,7 +479,7 @@ export function SortableColumns({ report, columns }: Props) {
                       </button>
                     </div>
                   )}
-                  data={data[4]}
+                  data={localData[4]}
                   droppableId="4"
                   isDropDisabled={true}
                 />
@@ -466,7 +496,7 @@ export function SortableColumns({ report, columns }: Props) {
                       </button>
                     </div>
                   )}
-                  data={data[5]}
+                  data={localData[5]}
                   droppableId="5"
                   isDropDisabled={true}
                 />
@@ -485,7 +515,7 @@ export function SortableColumns({ report, columns }: Props) {
                       </button>
                     </div>
                   )}
-                  data={data[6]}
+                  data={localData[6]}
                   droppableId="6"
                   isDropDisabled={true}
                 />
@@ -502,7 +532,7 @@ export function SortableColumns({ report, columns }: Props) {
                       </button>
                     </div>
                   )}
-                  data={data[7]}
+                  data={localData[7]}
                   droppableId="7"
                   isDropDisabled={true}
                 />
@@ -519,7 +549,7 @@ export function SortableColumns({ report, columns }: Props) {
                       </button>
                     </div>
                   )}
-                  data={data[8]}
+                  data={localData[8]}
                   droppableId="8"
                   isDropDisabled={true}
                 />
@@ -538,7 +568,7 @@ export function SortableColumns({ report, columns }: Props) {
                       </button>
                     </div>
                   )}
-                  data={data[9]}
+                  data={localData[9]}
                   droppableId="9"
                   isDropDisabled={true}
                 />
@@ -555,7 +585,7 @@ export function SortableColumns({ report, columns }: Props) {
                       </button>
                     </div>
                   )}
-                  data={data[10]}
+                  data={localData[10]}
                   droppableId="10"
                   isDropDisabled={true}
                 />
@@ -582,7 +612,7 @@ export function SortableColumns({ report, columns }: Props) {
                     </div>
                   </div>
                 )}
-                data={data[reportColumn]}
+                data={localData[reportColumn]}
                 droppableId={reportColumn.toString()}
                 isDropDisabled={false}
                 onRemove={onRemove}
