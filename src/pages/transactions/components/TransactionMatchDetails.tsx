@@ -227,8 +227,6 @@ export function TransactionMatchDetails(props: Props) {
     }
   }, [props.transactionDetails.transaction_id]);
 
-  console.log('invoice_ids', invoiceIds);
-
   return (
     <div className="flex flex-col flex-1">
       <div
