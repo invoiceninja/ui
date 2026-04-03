@@ -35,7 +35,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { customField } from '$app/components/CustomField';
 import { DoubleChevronRight } from '$app/components/icons/DoubleChevronRight';
 import { XMark } from '$app/components/icons/XMark';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export const reportColumn = 11;
 
