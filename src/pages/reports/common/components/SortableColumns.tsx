@@ -333,9 +333,6 @@ export function SortableColumns({ report, columns }: Props) {
 
   const [localData, setLocalData] = useState<Record[][]>(persistedData);
 
-  const localDataRef = useRef(localData);
-  localDataRef.current = localData;
-
   useEffect(() => {
     setLocalData(persistedData);
   }, [report]);
@@ -354,20 +351,22 @@ export function SortableColumns({ report, columns }: Props) {
       }
 
       try {
-        const current = localDataRef.current;
         const sourceIndex = parseInt(result.source.droppableId);
-        const destinationIndex = parseInt(result.destination.droppableId);
+        const destinationIndex = parseInt(result.destination!.droppableId);
+        const destinationIndexPosition = result.destination!.index;
 
-        const newData = current.map((arr, i) =>
-          i === sourceIndex || i === destinationIndex ? [...arr] : arr
-        );
+        setLocalData((current) => {
+          const newData = current.map((arr, i) =>
+            i === sourceIndex || i === destinationIndex ? [...arr] : arr
+          );
 
-        const word = newData[sourceIndex][result.source.index];
-        newData[sourceIndex].splice(result.source.index, 1);
-        newData[destinationIndex].splice(result.destination.index, 0, word);
+          const word = newData[sourceIndex][result.source.index];
+          newData[sourceIndex].splice(result.source.index, 1);
+          newData[destinationIndex].splice(destinationIndexPosition, 0, word);
 
-        setLocalData(newData);
-        syncToPreferences(newData);
+          syncToPreferences(newData);
+          return newData;
+        });
       } catch (e) {
         setLocalData(defaultColumns);
         syncToPreferences(defaultColumns);
@@ -378,21 +377,22 @@ export function SortableColumns({ report, columns }: Props) {
 
   const onRemove = useCallback(
     (record: Record) => {
-      const current = localDataRef.current;
       const index = positions.indexOf(record.map as (typeof positions)[number]);
 
-      const newData = current.map((arr, i) =>
-        i === reportColumn || i === index ? [...arr] : arr
-      );
+      setLocalData((current) => {
+        const newData = current.map((arr, i) =>
+          i === reportColumn || i === index ? [...arr] : arr
+        );
 
-      newData[reportColumn] = newData[reportColumn].filter(
-        (r) => r.value !== record.value
-      );
+        newData[reportColumn] = newData[reportColumn].filter(
+          (r) => r.value !== record.value
+        );
 
-      newData[index].push(record);
+        newData[index].push(record);
 
-      setLocalData(newData);
-      syncToPreferences(newData);
+        syncToPreferences(newData);
+        return newData;
+      });
     },
     [syncToPreferences]
   );
@@ -404,14 +404,15 @@ export function SortableColumns({ report, columns }: Props) {
 
   const handleAddAll = useCallback(
     (index: number) => {
-      const current = localDataRef.current;
-      const newData = current.map((arr, i) =>
-        i === reportColumn || i === index ? [...arr] : arr
-      );
-      newData[reportColumn] = [...newData[reportColumn], ...newData[index]];
-      newData[index] = [];
-      setLocalData(newData);
-      syncToPreferences(newData);
+      setLocalData((current) => {
+        const newData = current.map((arr, i) =>
+          i === reportColumn || i === index ? [...arr] : arr
+        );
+        newData[reportColumn] = [...newData[reportColumn], ...newData[index]];
+        newData[index] = [];
+        syncToPreferences(newData);
+        return newData;
+      });
     },
     [syncToPreferences]
   );
