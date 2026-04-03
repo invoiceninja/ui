@@ -251,7 +251,7 @@ export default function Create() {
         event.preventDefault();
 
         if (invoice && invoice.client_id.length > 0 && !isFormBusy) {
-          save(invoice as Invoice);
+          save(invoice);
         }
       }
     };
