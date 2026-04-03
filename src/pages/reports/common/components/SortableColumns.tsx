@@ -356,9 +356,9 @@ export function SortableColumns({ report, columns }: Props) {
         const destinationIndexPosition = result.destination!.index;
 
         setLocalData((current) => {
-          const newData = current.map((arr, i) =>
-            i === sourceIndex || i === destinationIndex ? [...arr] : arr
-          );
+          const newData = [...current];
+          newData[sourceIndex] = [...current[sourceIndex]];
+          newData[destinationIndex] = [...current[destinationIndex]];
 
           const word = newData[sourceIndex][result.source.index];
           newData[sourceIndex].splice(result.source.index, 1);
@@ -380,9 +380,9 @@ export function SortableColumns({ report, columns }: Props) {
       const index = positions.indexOf(record.map as (typeof positions)[number]);
 
       setLocalData((current) => {
-        const newData = current.map((arr, i) =>
-          i === reportColumn || i === index ? [...arr] : arr
-        );
+        const newData = [...current];
+        newData[reportColumn] = [...current[reportColumn]];
+        newData[index] = [...current[index]];
 
         newData[reportColumn] = newData[reportColumn].filter(
           (r) => r.value !== record.value
@@ -405,9 +405,9 @@ export function SortableColumns({ report, columns }: Props) {
   const handleAddAll = useCallback(
     (index: number) => {
       setLocalData((current) => {
-        const newData = current.map((arr, i) =>
-          i === reportColumn || i === index ? [...arr] : arr
-        );
+        const newData = [...current];
+        newData[reportColumn] = [...current[reportColumn]];
+        newData[index] = [...current[index]];
         newData[reportColumn] = [...newData[reportColumn], ...newData[index]];
         newData[index] = [];
         syncToPreferences(newData);
