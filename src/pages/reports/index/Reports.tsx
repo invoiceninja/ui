@@ -580,6 +580,7 @@ export default function Reports() {
           {showReportField('status') && (
             <Element leftSide={t('status')} className={'mb-50 py-50'}>
               <StatusSelector
+                key={`${report.identifier}-status-selector`}
                 report={report.identifier}
                 onValueChange={(statuses) =>
                   handlePayloadChange('status', statuses)
