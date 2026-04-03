@@ -33,7 +33,7 @@ interface Props {
   endDate: string;
   currencyId: string;
   refreshKey: number;
-  onSettled: () => void;
+  onSettled?: () => void;
 }
 
 export function DashboardCard({
@@ -87,14 +87,18 @@ export function DashboardCard({
         <div className="flex w-full flex-col items-center justify-center gap-1 min-w-0">
           <span className="w-full truncate text-center text-sm font-medium">
             {t(FIELDS_LABELS[field.field] ?? field.field)}
-          </span>
+            </span>
+            
           <span className="w-full truncate text-center text-xl font-semibold">
             {field.format === 'money' && field.calculate !== 'count'
               ? formatMoney(value ?? 0, '', '')
               : value}
-          </span>
-          <span className="w-full truncate text-center text-xs text-gray-500">
+            </span>
+            
+          <span className="w-full truncate text-center text-xs" style={{ color: colors.$17 }}>
             {t(PERIOD_LABELS[field.period] ?? field.period)}
+            {' · '}
+            {t(field.calculate === 'avg' ? 'average' : field.calculate)}
           </span>
         </div>
       )}

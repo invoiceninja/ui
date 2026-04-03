@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { cloneDeep, set } from 'lodash';
 import { CompanyUser } from '$app/common/interfaces/company-user';
@@ -21,10 +21,6 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { resetChanges, updateUser } from '$app/common/stores/slices/user';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { DashboardCard } from './DashboardCard';
-import { useTranslation } from 'react-i18next';
-import { useColorScheme } from '$app/common/colors';
-import { MdRefresh } from 'react-icons/md';
-import dayjs from 'dayjs';
 
 interface Props {
   currentDashboardFields: string[];
@@ -42,19 +38,18 @@ export function PreferenceCardsGrid({
   endDate,
   currencyId,
 }: Props) {
-  const [t] = useTranslation();
+  //const [t] = useTranslation();
   const dispatch = useDispatch();
 
   const user = useCurrentUser();
-  const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
-  const pendingRef = useRef<number>(0);
+  //const pendingRef = useRef<number>(0);
 
   const [refreshKey, setRefreshKey] = useState<number>(0);
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  //const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [order, setOrder] = useState<string[]>(currentDashboardFields);
-  const [lastRefreshedAt, setLastRefreshedAt] = useState<string | null>(null);
+  //const [lastRefreshedAt, setLastRefreshedAt] = useState<string | null>(null);
 
   useEffect(() => {
     setOrder(currentDashboardFields);
@@ -88,27 +83,27 @@ export function PreferenceCardsGrid({
     });
   }, [order]);
 
-  const handleRefresh = useCallback(() => {
-    pendingRef.current = currentDashboardFields.length;
+  // const handleRefresh = useCallback(() => {
+  //   pendingRef.current = currentDashboardFields.length;
 
-    setIsRefreshing(true);
-    setRefreshKey((prev) => prev + 1);
-  }, [currentDashboardFields.length]);
+  //   setIsRefreshing(true);
+  //   setRefreshKey((prev) => prev + 1);
+  // }, [currentDashboardFields.length]);
 
-  const handleCardSettled = useCallback(() => {
-    pendingRef.current -= 1;
+  // const handleCardSettled = useCallback(() => {
+  //   pendingRef.current -= 1;
 
-    if (pendingRef.current <= 0) {
-      setLastRefreshedAt(dayjs().format('HH:mm'));
-      setIsRefreshing(false);
+  //   if (pendingRef.current <= 0) {
+  //     setLastRefreshedAt(dayjs().format('HH:mm'));
+  //     setIsRefreshing(false);
 
-      pendingRef.current = 0;
-    }
-  }, []);
+  //     pendingRef.current = 0;
+  //   }
+  // }, []);
 
   return (
     <div>
-      <div className="flex justify-end items-center mb-2 gap-3">
+      {/* <div className="flex justify-end items-center mb-2 gap-3">
         {lastRefreshedAt && (
           <span style={{ fontSize: '0.75rem', color: colors.$17 }}>
             {t('last_updated')}: {lastRefreshedAt}
@@ -129,7 +124,7 @@ export function PreferenceCardsGrid({
         >
           <MdRefresh size={18} className={isRefreshing ? 'animate-spin' : ''} />
         </button>
-      </div>
+      </div> */}
 
       <div className="grid grid-cols-4 gap-4 w-full">
         {currentDashboardFields.map((key, index) => (
@@ -141,7 +136,7 @@ export function PreferenceCardsGrid({
               endDate={endDate}
               currencyId={currencyId}
               refreshKey={refreshKey}
-              onSettled={handleCardSettled}
+              //onSettled={handleCardSettled}
             />
           </div>
         ))}
