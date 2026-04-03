@@ -63,6 +63,7 @@ export function CreateExpenseCategoryForm(props: Props) {
           onValueChange={(value) => handleChange('name', value)}
           errorMessage={errors?.errors.name}
           cypressRef="expenseCategoryNameField"
+          changeOverride
         />
 
         <div>
