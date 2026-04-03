@@ -35,7 +35,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { customField } from '$app/components/CustomField';
 import { DoubleChevronRight } from '$app/components/icons/DoubleChevronRight';
 import { XMark } from '$app/components/icons/XMark';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export const reportColumn = 11;
 
@@ -89,18 +89,22 @@ export function useTranslationAlias() {
 }
 
 interface ColumnProps {
-  title: string | (() => JSX.Element);
+  label: string;
   droppableId: string;
   isDropDisabled: boolean;
   data: Record[];
+  onAddAll?: () => void;
+  onReset?: () => void;
   onRemove?: (record: Record) => unknown;
 }
 
-export const Column = React.memo(function Column({
-  title,
+export function Column({
+  label,
   droppableId,
   isDropDisabled,
   data,
+  onAddAll,
+  onReset,
   onRemove,
 }: ColumnProps) {
   const [t] = useTranslation();
@@ -121,7 +125,34 @@ export const Column = React.memo(function Column({
   return (
     <div>
       <h2 className="font-medium" style={{ color: colors.$17 }}>
-        {typeof title === 'string' ? <p>{title}</p> : title()}
+        {onReset ? (
+          <div className="flex items-center justify-between">
+            <span style={{ color: colors.$3 }}>{label}</span>
+
+            <div
+              className="flex items-center space-x-1 cursor-pointer"
+              onClick={onReset}
+            >
+              <div>
+                <XMark size="0.85rem" color={colors.$3} />
+              </div>
+
+              <span className="text-xs" style={{ color: colors.$3 }}>
+                ({t('reset')})
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-between items-center">
+            <span style={{ color: colors.$3 }}>{label}</span>
+
+            {onAddAll && (
+              <button type="button" onClick={onAddAll}>
+                <DoubleChevronRight size="0.85rem" color={colors.$3} />
+              </button>
+            )}
+          </div>
+        )}
       </h2>
 
       <Droppable
@@ -213,7 +244,7 @@ export const Column = React.memo(function Column({
       </Droppable>
     </div>
   );
-});
+}
 
 interface Props {
   report: Identifier;
@@ -302,6 +333,9 @@ export function SortableColumns({ report, columns }: Props) {
 
   const [localData, setLocalData] = useState<Record[][]>(persistedData);
 
+  const localDataRef = useRef(localData);
+  localDataRef.current = localData;
+
   useEffect(() => {
     setLocalData(persistedData);
   }, [report]);
@@ -320,10 +354,11 @@ export function SortableColumns({ report, columns }: Props) {
       }
 
       try {
+        const current = localDataRef.current;
         const sourceIndex = parseInt(result.source.droppableId);
         const destinationIndex = parseInt(result.destination.droppableId);
 
-        const newData = localData.map((arr, i) =>
+        const newData = current.map((arr, i) =>
           i === sourceIndex || i === destinationIndex ? [...arr] : arr
         );
 
@@ -342,16 +377,17 @@ export function SortableColumns({ report, columns }: Props) {
         syncToPreferences(defaultColumns);
       }
     },
-    [localData, defaultColumns, syncToPreferences]
+    [defaultColumns, syncToPreferences]
   );
 
   const onRemove = useCallback(
     (record: Record) => {
+      const current = localDataRef.current;
       const index = positions.indexOf(
         record.map as (typeof positions)[number]
       );
 
-      const newData = localData.map((arr, i) =>
+      const newData = current.map((arr, i) =>
         i === reportColumn || i === index ? [...arr] : arr
       );
 
@@ -364,7 +400,7 @@ export function SortableColumns({ report, columns }: Props) {
       setLocalData(newData);
       syncToPreferences(newData);
     },
-    [localData, syncToPreferences]
+    [syncToPreferences]
   );
 
   const onRemoveAll = useCallback(() => {
@@ -372,20 +408,128 @@ export function SortableColumns({ report, columns }: Props) {
     syncToPreferences(defaultColumns);
   }, [defaultColumns, syncToPreferences]);
 
-  const onAddAll = useCallback(
-    (index: number) => {
-      const newData = localData.map((arr, i) =>
-        i === reportColumn || i === index ? [...arr] : arr
-      );
+  const handleAddAll0 = useCallback(() => {
+    const current = localDataRef.current;
+    const newData = current.map((arr, i) =>
+      i === reportColumn || i === 0 ? [...arr] : arr
+    );
+    newData[reportColumn] = [...newData[reportColumn], ...newData[0]];
+    newData[0] = [];
+    setLocalData(newData);
+    syncToPreferences(newData);
+  }, [syncToPreferences]);
 
-      newData[reportColumn] = [...newData[reportColumn], ...newData[index]];
-      newData[index] = [];
+  const handleAddAll1 = useCallback(() => {
+    const current = localDataRef.current;
+    const newData = current.map((arr, i) =>
+      i === reportColumn || i === 1 ? [...arr] : arr
+    );
+    newData[reportColumn] = [...newData[reportColumn], ...newData[1]];
+    newData[1] = [];
+    setLocalData(newData);
+    syncToPreferences(newData);
+  }, [syncToPreferences]);
 
-      setLocalData(newData);
-      syncToPreferences(newData);
-    },
-    [localData, syncToPreferences]
-  );
+  const handleAddAll2 = useCallback(() => {
+    const current = localDataRef.current;
+    const newData = current.map((arr, i) =>
+      i === reportColumn || i === 2 ? [...arr] : arr
+    );
+    newData[reportColumn] = [...newData[reportColumn], ...newData[2]];
+    newData[2] = [];
+    setLocalData(newData);
+    syncToPreferences(newData);
+  }, [syncToPreferences]);
+
+  const handleAddAll3 = useCallback(() => {
+    const current = localDataRef.current;
+    const newData = current.map((arr, i) =>
+      i === reportColumn || i === 3 ? [...arr] : arr
+    );
+    newData[reportColumn] = [...newData[reportColumn], ...newData[3]];
+    newData[3] = [];
+    setLocalData(newData);
+    syncToPreferences(newData);
+  }, [syncToPreferences]);
+
+  const handleAddAll4 = useCallback(() => {
+    const current = localDataRef.current;
+    const newData = current.map((arr, i) =>
+      i === reportColumn || i === 4 ? [...arr] : arr
+    );
+    newData[reportColumn] = [...newData[reportColumn], ...newData[4]];
+    newData[4] = [];
+    setLocalData(newData);
+    syncToPreferences(newData);
+  }, [syncToPreferences]);
+
+  const handleAddAll5 = useCallback(() => {
+    const current = localDataRef.current;
+    const newData = current.map((arr, i) =>
+      i === reportColumn || i === 5 ? [...arr] : arr
+    );
+    newData[reportColumn] = [...newData[reportColumn], ...newData[5]];
+    newData[5] = [];
+    setLocalData(newData);
+    syncToPreferences(newData);
+  }, [syncToPreferences]);
+
+  const handleAddAll6 = useCallback(() => {
+    const current = localDataRef.current;
+    const newData = current.map((arr, i) =>
+      i === reportColumn || i === 6 ? [...arr] : arr
+    );
+    newData[reportColumn] = [...newData[reportColumn], ...newData[6]];
+    newData[6] = [];
+    setLocalData(newData);
+    syncToPreferences(newData);
+  }, [syncToPreferences]);
+
+  const handleAddAll7 = useCallback(() => {
+    const current = localDataRef.current;
+    const newData = current.map((arr, i) =>
+      i === reportColumn || i === 7 ? [...arr] : arr
+    );
+    newData[reportColumn] = [...newData[reportColumn], ...newData[7]];
+    newData[7] = [];
+    setLocalData(newData);
+    syncToPreferences(newData);
+  }, [syncToPreferences]);
+
+  const handleAddAll8 = useCallback(() => {
+    const current = localDataRef.current;
+    const newData = current.map((arr, i) =>
+      i === reportColumn || i === 8 ? [...arr] : arr
+    );
+    newData[reportColumn] = [...newData[reportColumn], ...newData[8]];
+    newData[8] = [];
+    setLocalData(newData);
+    syncToPreferences(newData);
+  }, [syncToPreferences]);
+
+  const handleAddAll9 = useCallback(() => {
+    const current = localDataRef.current;
+    const newData = current.map((arr, i) =>
+      i === reportColumn || i === 9 ? [...arr] : arr
+    );
+    newData[reportColumn] = [...newData[reportColumn], ...newData[9]];
+    newData[9] = [];
+    setLocalData(newData);
+    syncToPreferences(newData);
+  }, [syncToPreferences]);
+
+  const handleAddAll10 = useCallback(() => {
+    const current = localDataRef.current;
+    const newData = current.map((arr, i) =>
+      i === reportColumn || i === 10 ? [...arr] : arr
+    );
+    newData[reportColumn] = [...newData[reportColumn], ...newData[10]];
+    newData[10] = [];
+    setLocalData(newData);
+    syncToPreferences(newData);
+  }, [syncToPreferences]);
+
+  const reportColumnsLabel = `${t('report')} ${t('columns')}`;
 
   return (
     <div
@@ -402,15 +546,8 @@ export function SortableColumns({ report, columns }: Props) {
             <div className="flex w-full py-2 px-6 space-x-4">
               {columns.includes('client') && (
                 <Column
-                  title={() => (
-                    <div className="flex justify-between items-center">
-                      <span style={{ color: colors.$3 }}>{t('client')}</span>
-
-                      <button type="button" onClick={() => onAddAll(0)}>
-                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
-                      </button>
-                    </div>
-                  )}
+                  label={t('client')}
+                  onAddAll={handleAddAll0}
                   data={localData[0]}
                   droppableId="0"
                   isDropDisabled={true}
@@ -419,15 +556,8 @@ export function SortableColumns({ report, columns }: Props) {
 
               {columns.includes('invoice') && (
                 <Column
-                  title={() => (
-                    <div className="flex justify-between items-center">
-                      <span style={{ color: colors.$3 }}>{t('invoice')}</span>
-
-                      <button type="button" onClick={() => onAddAll(1)}>
-                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
-                      </button>
-                    </div>
-                  )}
+                  label={t('invoice')}
+                  onAddAll={handleAddAll1}
                   data={localData[1]}
                   droppableId="1"
                   isDropDisabled={true}
@@ -436,15 +566,8 @@ export function SortableColumns({ report, columns }: Props) {
 
               {columns.includes('credit') && (
                 <Column
-                  title={() => (
-                    <div className="flex justify-between items-center">
-                      <span style={{ color: colors.$3 }}>{t('credit')}</span>
-
-                      <button type="button" onClick={() => onAddAll(2)}>
-                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
-                      </button>
-                    </div>
-                  )}
+                  label={t('credit')}
+                  onAddAll={handleAddAll2}
                   data={localData[2]}
                   droppableId="2"
                   isDropDisabled={true}
@@ -453,15 +576,8 @@ export function SortableColumns({ report, columns }: Props) {
 
               {columns.includes('quote') && (
                 <Column
-                  title={() => (
-                    <div className="flex justify-between items-center">
-                      <span style={{ color: colors.$3 }}>{t('quote')}</span>
-
-                      <button type="button" onClick={() => onAddAll(3)}>
-                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
-                      </button>
-                    </div>
-                  )}
+                  label={t('quote')}
+                  onAddAll={handleAddAll3}
                   data={localData[3]}
                   droppableId="3"
                   isDropDisabled={true}
@@ -470,15 +586,8 @@ export function SortableColumns({ report, columns }: Props) {
 
               {columns.includes('payment') && (
                 <Column
-                  title={() => (
-                    <div className="flex justify-between items-center">
-                      <span style={{ color: colors.$3 }}>{t('payment')}</span>
-
-                      <button type="button" onClick={() => onAddAll(4)}>
-                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
-                      </button>
-                    </div>
-                  )}
+                  label={t('payment')}
+                  onAddAll={handleAddAll4}
                   data={localData[4]}
                   droppableId="4"
                   isDropDisabled={true}
@@ -487,15 +596,8 @@ export function SortableColumns({ report, columns }: Props) {
 
               {columns.includes('vendor') && (
                 <Column
-                  title={() => (
-                    <div className="flex justify-between items-center">
-                      <span style={{ color: colors.$3 }}>{t('vendor')}</span>
-
-                      <button type="button" onClick={() => onAddAll(5)}>
-                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
-                      </button>
-                    </div>
-                  )}
+                  label={t('vendor')}
+                  onAddAll={handleAddAll5}
                   data={localData[5]}
                   droppableId="5"
                   isDropDisabled={true}
@@ -504,17 +606,8 @@ export function SortableColumns({ report, columns }: Props) {
 
               {columns.includes('purchase_order') && (
                 <Column
-                  title={() => (
-                    <div className="flex justify-between items-center">
-                      <span style={{ color: colors.$3 }}>
-                        {t('purchase_order')}
-                      </span>
-
-                      <button type="button" onClick={() => onAddAll(6)}>
-                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
-                      </button>
-                    </div>
-                  )}
+                  label={t('purchase_order')}
+                  onAddAll={handleAddAll6}
                   data={localData[6]}
                   droppableId="6"
                   isDropDisabled={true}
@@ -523,15 +616,8 @@ export function SortableColumns({ report, columns }: Props) {
 
               {columns.includes('task') && (
                 <Column
-                  title={() => (
-                    <div className="flex justify-between items-center">
-                      <span style={{ color: colors.$3 }}>{t('task')}</span>
-
-                      <button type="button" onClick={() => onAddAll(7)}>
-                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
-                      </button>
-                    </div>
-                  )}
+                  label={t('task')}
+                  onAddAll={handleAddAll7}
                   data={localData[7]}
                   droppableId="7"
                   isDropDisabled={true}
@@ -540,15 +626,8 @@ export function SortableColumns({ report, columns }: Props) {
 
               {columns.includes('expense') && (
                 <Column
-                  title={() => (
-                    <div className="flex justify-between items-center">
-                      <span style={{ color: colors.$3 }}>{t('expense')}</span>
-
-                      <button type="button" onClick={() => onAddAll(8)}>
-                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
-                      </button>
-                    </div>
-                  )}
+                  label={t('expense')}
+                  onAddAll={handleAddAll8}
                   data={localData[8]}
                   droppableId="8"
                   isDropDisabled={true}
@@ -557,17 +636,8 @@ export function SortableColumns({ report, columns }: Props) {
 
               {columns.includes('recurring_invoice') && (
                 <Column
-                  title={() => (
-                    <div className="flex justify-between items-center">
-                      <span style={{ color: colors.$3 }}>
-                        {t('recurring_invoice')}
-                      </span>
-
-                      <button type="button" onClick={() => onAddAll(9)}>
-                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
-                      </button>
-                    </div>
-                  )}
+                  label={t('recurring_invoice')}
+                  onAddAll={handleAddAll9}
                   data={localData[9]}
                   droppableId="9"
                   isDropDisabled={true}
@@ -576,15 +646,8 @@ export function SortableColumns({ report, columns }: Props) {
 
               {columns.includes('contact') && (
                 <Column
-                  title={() => (
-                    <div className="flex justify-between items-center">
-                      <span style={{ color: colors.$3 }}>{t('contact')}</span>
-
-                      <button type="button" onClick={() => onAddAll(10)}>
-                        <DoubleChevronRight size="0.85rem" color={colors.$3} />
-                      </button>
-                    </div>
-                  )}
+                  label={t('contact')}
+                  onAddAll={handleAddAll10}
                   data={localData[10]}
                   droppableId="10"
                   isDropDisabled={true}
@@ -592,26 +655,8 @@ export function SortableColumns({ report, columns }: Props) {
               )}
 
               <Column
-                title={() => (
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: colors.$3 }}>
-                      {t('report')} {t('columns')}
-                    </span>
-
-                    <div
-                      className="flex items-center space-x-1 cursor-pointer"
-                      onClick={onRemoveAll}
-                    >
-                      <div>
-                        <XMark size="0.85rem" color={colors.$3} />
-                      </div>
-
-                      <span className="text-xs" style={{ color: colors.$3 }}>
-                        ({t('reset')})
-                      </span>
-                    </div>
-                  </div>
-                )}
+                label={reportColumnsLabel}
+                onReset={onRemoveAll}
                 data={localData[reportColumn]}
                 droppableId={reportColumn.toString()}
                 isDropDisabled={false}
