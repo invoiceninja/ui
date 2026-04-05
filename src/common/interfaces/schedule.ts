@@ -41,6 +41,7 @@ export interface Parameters {
   schedule?: ScheduleParams[];
   template?: string; // This is the EMAIL template
   template_id?: string;  // This is the REPORT template
+  group_by?: string;
 }
 
 export interface ScheduleParams {

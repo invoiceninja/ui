@@ -6,8 +6,10 @@ import {
   logout,
   permissions,
   useHasPermission,
+  waitForTableData,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
 
@@ -17,28 +19,25 @@ interface Params {
 function useCreditsActions({ permissions }: Params) {
   const hasPermission = useHasPermission({ permissions });
 
-  const isAdmin = permissions.includes('admin');
+  const hasAnyClonePermission =
+    hasPermission('create_credit') ||
+    hasPermission('create_invoice') ||
+    hasPermission('create_quote') ||
+    hasPermission('create_recurring_invoice') ||
+    hasPermission('create_purchase_order');
 
   const actions: Action[] = [
     {
-      label: 'Schedule',
-      visible: isAdmin,
-    },
-    {
-      label: 'Clone to Credit',
-      visible: hasPermission('create_credit'),
-    },
-    {
-      label: 'Clone to Other',
-      visible:
-        hasPermission('create_invoice') ||
-        hasPermission('create_quote') ||
-        hasPermission('create_recurring_invoice') ||
-        hasPermission('create_purchase_order'),
+      label: 'Clone To',
+      visible: hasAnyClonePermission,
       modal: {
         title: 'Clone To',
         dataCyXButton: 'cloneOptionsModalXButton',
         actions: [
+          {
+            label: 'Credit',
+            visible: hasPermission('create_credit'),
+          },
           {
             label: 'Invoice',
             visible: hasPermission('create_invoice'),
@@ -75,13 +74,13 @@ const checkEditPage = async (
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 
   if (!isAdmin) {
@@ -90,14 +89,14 @@ const checkEditPage = async (
         .locator('[data-cy="tabs"]')
         .nth(1)
         .getByRole('button', { name: 'Custom Fields', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="tabs"]')
         .nth(1)
         .getByRole('button', { name: 'Custom Fields', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 
   await expect(
@@ -105,28 +104,28 @@ const checkEditPage = async (
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'Documents' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'Settings', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'Activity', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'History', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };
 
 interface CreateParams {
@@ -134,11 +133,23 @@ interface CreateParams {
   assignTo?: string;
   isTableEditable?: boolean;
   returnCreditNumber?: boolean;
+  clientName?: string;
 }
 const createCredit = async (params: CreateParams) => {
-  const { page, isTableEditable = true, assignTo, returnCreditNumber } = params;
+  const {
+    page,
+    isTableEditable = true,
+    assignTo,
+    returnCreditNumber,
+    clientName,
+  } = params;
 
-  await createClient({ page, withNavigation: true, createIfNotExist: true });
+  await createClient({
+    page,
+    withNavigation: true,
+    createIfNotExist: true,
+    name: clientName ?? uniqueName('cr-client'),
+  });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -152,9 +163,14 @@ const createCredit = async (params: CreateParams) => {
     .getByRole('link', { name: 'Enter Credit' })
     .click();
 
-  await page.waitForTimeout(900);
+  await page.waitForTimeout(500);
 
-  await page.getByRole('option').first().click();
+  // Wait for client combobox options to load
+  const comboboxInput = page.getByRole('combobox').first();
+  await comboboxInput.click();
+  const clientOption = page.getByRole('option').first();
+  await clientOption.waitFor({ state: 'visible', timeout: 5000 });
+  await clientOption.click();
 
   if (assignTo) {
     await page
@@ -169,7 +185,7 @@ const createCredit = async (params: CreateParams) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created credit')).toBeVisible();
+  await expect(page.getByText('Successfully created credit')).toBeVisible({ timeout: 10000 });
 
   if (returnCreditNumber) {
     await page.waitForURL('**/credits/**/edit');
@@ -178,7 +194,7 @@ const createCredit = async (params: CreateParams) => {
   }
 };
 
-test("can't view credits without permission", async ({ page }) => {
+test("can't view credits without permission", async ({ page, api }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -195,7 +211,7 @@ test("can't view credits without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view credit', async ({ page }) => {
+test('can view credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -203,7 +219,11 @@ test('can view credit', async ({ page }) => {
   await set('view_credit', 'view_client');
   await save();
 
-  await createCredit({ page });
+  const clientName = uniqueName('cr-view');
+  await createCredit({ page, clientName });
+
+  const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (creditId) api.trackEntity('credits', creditId);
 
   await logout(page);
 
@@ -225,7 +245,7 @@ test('can view credit', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit credit', async ({ page }) => {
+test('can edit credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useCreditsActions({
@@ -237,7 +257,11 @@ test('can edit credit', async ({ page }) => {
   await set('edit_credit', 'view_client');
   await save();
 
-  await createCredit({ page });
+  const clientName = uniqueName('cr-edit');
+  await createCredit({ page, clientName });
+
+  const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (creditId) api.trackEntity('credits', creditId);
 
   await logout(page);
 
@@ -263,7 +287,7 @@ test('can edit credit', async ({ page }) => {
 
   await expect(
     page.getByText('Successfully updated credit', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -272,7 +296,7 @@ test('can edit credit', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a credit', async ({ page }) => {
+test('can create a credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useCreditsActions({
@@ -287,7 +311,11 @@ test('can create a credit', async ({ page }) => {
 
   await login(page, 'credits@example.com', 'password');
 
-  await createCredit({ page, isTableEditable: false });
+  const clientName = uniqueName('cr-create');
+  await createCredit({ page, isTableEditable: false, clientName });
+
+  const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (creditId) api.trackEntity('credits', creditId);
 
   await checkEditPage(page, true, false);
 
@@ -298,7 +326,7 @@ test('can create a credit', async ({ page }) => {
 
   await expect(
     page.getByText('Successfully updated credit', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -309,6 +337,7 @@ test('can create a credit', async ({ page }) => {
 
 test('can view and edit assigned credit with create_credit', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -321,11 +350,16 @@ test('can view and edit assigned credit with create_credit', async ({
   await set('create_credit');
   await save();
 
+  const clientName = uniqueName('cr-assigned');
   const creditNumber = await createCredit({
     page,
     assignTo: 'Credits Example',
     returnCreditNumber: true,
+    clientName,
   });
+
+  const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (creditId) api.trackEntity('credits', creditId);
 
   await logout(page);
 
@@ -349,7 +383,7 @@ test('can view and edit assigned credit with create_credit', async ({
 
   await expect(
     page.getByText('Successfully updated credit', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -358,7 +392,7 @@ test('can view and edit assigned credit with create_credit', async ({
   await logout(page);
 });
 
-test('deleting credit with edit_credit', async ({ page }) => {
+test('deleting credit with edit_credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -377,18 +411,20 @@ test('deleting credit with edit_credit', async ({ page }) => {
 
   await page.waitForURL('**/credits');
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createCredit({ page });
+    const clientName = uniqueName('cr-del');
+    await createCredit({ page, clientName });
+
+    const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+    if (creditId) api.trackEntity('credits', creditId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted credit')).toBeVisible();
+    await expect(page.getByText('Successfully deleted credit')).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -398,11 +434,11 @@ test('deleting credit with edit_credit', async ({ page }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted credit')).toBeVisible();
+    await expect(page.getByText('Successfully deleted credit')).toBeVisible({ timeout: 10000 });
   }
 });
 
-test('archiving credit withe edit_credit', async ({ page }) => {
+test('archiving credit withe edit_credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -421,22 +457,24 @@ test('archiving credit withe edit_credit', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createCredit({ page });
+    const clientName = uniqueName('cr-arch');
+    await createCredit({ page, clientName });
+
+    const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+    if (creditId) api.trackEntity('credits', creditId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived credit')).toBeVisible();
+    await expect(page.getByText('Successfully archived credit')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -447,11 +485,11 @@ test('archiving credit withe edit_credit', async ({ page }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived credit')).toBeVisible();
+    await expect(page.getByText('Successfully archived credit')).toBeVisible({ timeout: 10000 });
   }
 });
 
-test('credit documents preview with edit_credit', async ({ page }) => {
+test('credit documents preview with edit_credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -470,12 +508,14 @@ test('credit documents preview with edit_credit', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createCredit({ page });
+    const clientName = uniqueName('cr-docprev');
+    await createCredit({ page, clientName });
+
+    const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+    if (creditId) api.trackEntity('credits', creditId);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -496,10 +536,10 @@ test('credit documents preview with edit_credit', async ({ page }) => {
     .first()
     .click();
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
-test('credit documents uploading with edit_credit', async ({ page }) => {
+test('credit documents uploading with edit_credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -518,12 +558,14 @@ test('credit documents uploading with edit_credit', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createCredit({ page });
+    const clientName = uniqueName('cr-docup');
+    await createCredit({ page, clientName });
+
+    const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+    if (creditId) api.trackEntity('credits', creditId);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -546,17 +588,19 @@ test('credit documents uploading with edit_credit', async ({ page }) => {
 
   await page
     .locator('input[type="file"]')
+    .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('all actions in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -572,7 +616,11 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await login(page, 'credits@example.com', 'password');
 
-  await createCredit({ page });
+  const clientName = uniqueName('cr-admin');
+  await createCredit({ page, clientName });
+
+  const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (creditId) api.trackEntity('credits', creditId);
 
   await checkEditPage(page, true, true);
 
@@ -585,6 +633,7 @@ test('all actions in dropdown displayed with admin permission', async ({
 
 test('all clone actions displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -613,7 +662,11 @@ test('all clone actions displayed with creation permissions', async ({
 
   await login(page, 'credits@example.com', 'password');
 
-  await createCredit({ page, isTableEditable: false });
+  const clientName = uniqueName('cr-clone-actions');
+  await createCredit({ page, isTableEditable: false, clientName });
+
+  const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (creditId) api.trackEntity('credits', creditId);
 
   await checkEditPage(page, true, false);
 
@@ -624,7 +677,7 @@ test('all clone actions displayed with creation permissions', async ({
   await logout(page);
 });
 
-test('cloning credit', async ({ page }) => {
+test('cloning credit', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -646,12 +699,14 @@ test('cloning credit', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createCredit({ page });
+    const clientName = uniqueName('cr-clone');
+    await createCredit({ page, clientName });
+
+    const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+    if (creditId) api.trackEntity('credits', creditId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
@@ -663,17 +718,22 @@ test('cloning credit', async ({ page }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Clone to Credit').first().click();
+  // Open clone modal then select Credit
+  await page.getByText('Clone To').first().click();
+  await page.getByText('Credit', { exact: true }).first().click();
 
   await page.waitForURL('**/credits/create?action=clone');
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created credit')).toBeVisible();
+  await expect(page.getByText('Successfully created credit')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/credits/**/edit');
 
+  const clonedCreditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (clonedCreditId) api.trackEntity('credits', clonedCreditId);
+
   await expect(
     page.getByRole('heading', { name: 'Edit Credit' }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });

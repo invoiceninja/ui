@@ -43,7 +43,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useNavigate } from 'react-router-dom';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
-import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
+import { PEPPOL_COUNTRIES, PEPPOL_CLASSIFICATIONS } from '$app/common/helpers/peppol-countries';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -164,7 +164,9 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
     }
     
     return (
-      currentCompany.settings.e_invoice_type === 'PEPPOL' && PEPPOL_COUNTRIES.includes(currentInvoice.client?.country_id || '')
+      currentCompany.settings.e_invoice_type === 'PEPPOL' && 
+      PEPPOL_COUNTRIES.includes(currentInvoice.client?.country_id || '') &&
+      PEPPOL_CLASSIFICATIONS[currentInvoice.client?.country_id as keyof typeof PEPPOL_CLASSIFICATIONS]?.includes(currentInvoice.client?.classification || 'business')
     );
   };
 
