@@ -41,6 +41,7 @@ export function CompanyInfoBlockProperties({
       onChange={onChange}
       availableFields={AVAILABLE_FIELDS}
       title={String(t('company_info'))}
+      showTitleOption
     />
   );
 }
