@@ -51,6 +51,7 @@ export function ClientInfoBlockProperties({
       onChange={onChange}
       availableFields={AVAILABLE_FIELDS}
       title={String(t('client_info'))}
+      showTitleOption
     />
   );
 }
