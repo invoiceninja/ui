@@ -15,18 +15,19 @@ import {
   AlignmentInput,
   ColorInput,
   LineHeightInput,
+  SectionDivider,
+  TextInput,
+  CheckboxInput,
 } from './PropertyInputs';
-
-interface FieldDefinition {
-  id: string;
-  label: string;
-  variable: string;
-}
+import { ReorderableFieldList, FieldDefinition } from './ReorderableFieldList';
 
 interface InfoBlockPropertiesProps extends PropertyEditorProps {
   availableFields: FieldDefinition[];
   title?: string;
   showTitleOption?: boolean;
+  addFieldLabel?: string;
+  fieldOrderLabel?: string;
+  emptyLabel?: string;
 }
 
 export function InfoBlockProperties({
@@ -34,8 +35,23 @@ export function InfoBlockProperties({
   onChange,
   availableFields,
   title,
+  showTitleOption,
+  addFieldLabel,
+  fieldOrderLabel,
+  emptyLabel,
 }: InfoBlockPropertiesProps) {
   const [t] = useTranslation();
+
+  const currentContent = block.properties.content || '';
+  const contentLines = currentContent.split('\n').filter((line: string) => line.trim());
+
+  const enabledFieldsOrdered = contentLines
+    .map((line: string) => availableFields.find((f) => f.variable === line.trim()))
+    .filter(Boolean) as FieldDefinition[];
+
+  const availableToAdd = availableFields.filter(
+    (field) => !contentLines.includes(field.variable)
+  );
 
   const updateProperty = (key: string, value: any) => {
     onChange({
@@ -44,9 +60,47 @@ export function InfoBlockProperties({
     });
   };
 
+  const rebuildContent = (fields: FieldDefinition[]) => {
+    updateProperty(
+      'content',
+      fields.map((f) => f.variable || '').filter(Boolean).join('\n')
+    );
+  };
+
   return (
     <div className="space-y-4">
       {title && <h3 className="font-semibold text-gray-900">{title}</h3>}
+
+      {showTitleOption && (
+        <div className="space-y-3">
+          <CheckboxInput
+            id="show_title"
+            label={String(t('show_title'))}
+            checked={block.properties.showTitle ?? true}
+            onChange={(value) => updateProperty('showTitle', value)}
+          />
+
+          {block.properties.showTitle !== false && (
+            <TextInput
+              label={String(t('title_text'))}
+              value={block.properties.title || ''}
+              onChange={(value) => updateProperty('title', value)}
+              placeholder={String(t('title_text_placeholder'))}
+            />
+          )}
+        </div>
+      )}
+
+      <ReorderableFieldList
+        label={fieldOrderLabel || String(t('field_order'))}
+        fields={enabledFieldsOrdered}
+        availableFields={availableToAdd}
+        onReorder={rebuildContent}
+        addFieldLabel={addFieldLabel || String(t('add_field'))}
+        emptyLabel={emptyLabel || String(t('no_fields_selected'))}
+      />
+
+      <SectionDivider label={String(t('typography'))} />
 
       <div className="space-y-4">
         <FontSizeInput
@@ -70,6 +124,16 @@ export function InfoBlockProperties({
           onChange={(value: string) => updateProperty('color', value)}
         />
       </div>
+
+      <SectionDivider label={String(t('spacing'))} />
+
+      <TextInput
+        label={String(t('padding'))}
+        value={block.properties.padding}
+        onChange={(value) => updateProperty('padding', value)}
+        placeholder="0px"
+      />
+      <p className="text-xs text-gray-500 -mt-3">{t('css_padding_format')}</p>
     </div>
   );
 }
