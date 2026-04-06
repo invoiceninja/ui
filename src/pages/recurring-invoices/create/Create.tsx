@@ -156,7 +156,9 @@ export default function Create() {
     });
 
     return () => {
-      setRecurringInvoice(undefined);
+      if (searchParams.get('action') !== 'clone') {
+        setRecurringInvoice(undefined);
+      }
     };
   }, [data]);
 

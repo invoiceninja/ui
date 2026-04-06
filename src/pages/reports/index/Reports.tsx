@@ -60,6 +60,7 @@ import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { cloneDeep } from 'lodash';
 import { ActivitySelector } from '$app/components/layouts/ActivitySelector';
 import { TemplateSelector } from '../common/components/TemplateSelector';
+import { useGroupByOptions } from '../common/hooks/useGroupByOptions';
 
 interface Range {
   identifier: string;
@@ -206,6 +207,7 @@ export default function Reports() {
   const [preview, setPreview] = useAtom(previewAtom);
 
   const showReportField = useShowReportField({ report: report.identifier });
+  const groupByOptions = useGroupByOptions(report.identifier);
 
   const handleReportChange = (identifier: Identifier) => {
     const report = reports.find((report) => report.identifier === identifier);
@@ -580,6 +582,7 @@ export default function Reports() {
           {showReportField('status') && (
             <Element leftSide={t('status')} className={'mb-50 py-50'}>
               <StatusSelector
+                key={`${report.identifier}-status-selector`}
                 report={report.identifier}
                 onValueChange={(statuses) =>
                   handlePayloadChange('status', statuses)
@@ -655,6 +658,26 @@ export default function Reports() {
                   handlePayloadChange('activity_type_id', activity_type_id)
                 }
               />
+            </Element>
+          )}
+
+          {showReportField('group_by') && groupByOptions.length > 0 && (
+            <Element leftSide={t('group_by')}>
+              <SelectField
+                value={report.payload.group_by || ''}
+                onValueChange={(value) =>
+                  handlePayloadChange('group_by', value)
+                }
+                customSelector
+                dismissable={false}
+              >
+                <option value="">{t('none')}</option>
+                {groupByOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </SelectField>
             </Element>
           )}
         </Card>

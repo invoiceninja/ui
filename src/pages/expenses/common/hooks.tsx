@@ -75,6 +75,7 @@ import classNames from 'classnames';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { Frequency } from '$app/common/enums/frequency';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -117,6 +118,7 @@ export function useActions() {
       documents: [],
       number: '',
       date: dayjs().format('YYYY-MM-DD'),
+      frequency_id: Frequency.Monthly,
     });
 
     navigate('/recurring_expenses/create?action=clone');

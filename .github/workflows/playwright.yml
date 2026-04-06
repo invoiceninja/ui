@@ -113,27 +113,32 @@ jobs:
           php artisan db:seed --class=RandomDataSeeder
           php artisan serve --port=8000 &
 
+      - name: Checkout React FrontEnd
+        uses: actions/checkout@v4
+        with:
+          repository: invoiceninja/ui
+          ref: ${{ github.head_ref || github.ref_name }}
+          token: ${{ secrets.commit_secret }}
+          path: ui
+
       - name: Prepare React FrontEnd
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          git clone https://${{secrets.commit_secret}}@github.com/invoiceninja/ui.git
           cd ui
-          git checkout develop
           cp .env.example .env
           npm ci
           npx playwright install --with-deps
-          npm run build
-          npx playwright test --workers=1 --reporter=list --max-failures=1
-          env:
-            VITE_API_URL: http://ninja.test:8000
-            PLAYWRIGHT_BASE_URL: http://localhost:4173
-            PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
-            VITE_IS_TEST: true
-            VITE_ROUTER: browser
+          npx playwright test --max-failures=1
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          VITE_API_URL: http://ninja.test:8000
+          PLAYWRIGHT_BASE_URL: http://localhost:4173
+          PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
+          VITE_IS_TEST: true
+          VITE_ROUTER: browser
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
-          path: playwright-report/
+          path: ui/playwright-report/
           retention-days: 30
