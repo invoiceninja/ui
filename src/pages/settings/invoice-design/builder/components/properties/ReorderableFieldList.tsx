@@ -78,32 +78,30 @@ export function ReorderableFieldList({
         </label>
       )}
 
-      <div className="space-y-1">
+      <div className="space-y-2">
         {fields.map((field, index) => (
           <div
             key={field.id}
-            className="flex items-center gap-1 p-2 border border-gray-200 rounded-md bg-white"
+            className="flex items-center gap-3 p-3 border border-gray-200 rounded-md bg-white"
           >
-            {/* Reorder buttons */}
-            <div className="flex flex-col">
-              <Button
-                behavior="button"
-                type="minimal"
+            <div className="flex flex-col border border-gray-200 rounded overflow-hidden">
+              <button
                 onClick={() => moveFieldUp(index)}
                 disabled={index === 0}
-                className="p-0.5 h-auto"
+                className="p-1 flex items-center justify-center hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                title={String(t('move_up'))}
               >
-                <ChevronUp className="w-4 h-4" />
-              </Button>
-              <Button
-                behavior="button"
-                type="minimal"
+                <ChevronUp className="w-4 h-4 text-gray-600" />
+              </button>
+              <div className="border-t border-gray-200" />
+              <button
                 onClick={() => moveFieldDown(index)}
                 disabled={index >= fields.length - 1}
-                className="p-0.5 h-auto"
+                className="p-1 flex items-center justify-center hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                title={String(t('move_down'))}
               >
-                <ChevronDown className="w-4 h-4" />
-              </Button>
+                <ChevronDown className="w-4 h-4 text-gray-600" />
+              </button>
             </div>
 
             <span className="flex-1 text-sm">{field.label}</span>
