@@ -550,9 +550,11 @@ export function InvoiceBuilder() {
     await performSave();
   };
 
-  const performSave = async () => {
+  const performSave = async (nameToUseParam?: string) => {
     const nameToUse =
-      designName || 'Visual Design ' + new Date().toLocaleDateString();
+      nameToUseParam ||
+      designName ||
+      'Visual Design ' + new Date().toLocaleDateString();
 
     setSaving(true);
 
@@ -603,14 +605,28 @@ export function InvoiceBuilder() {
         );
         setIsEditMode(true);
         setDesignName(nameToUse);
+        setShowNameModal(false);
       }
     } catch (error: unknown) {
+      const errorResponse = (
+        error as {
+          response?: {
+            status?: number;
+            data?: { errors?: Record<string, string[]>; message?: string };
+          };
+        }
+      )?.response;
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : (error as { response?: { data?: { message?: string } } })?.response
-              ?.data?.message;
-      toast.error(errorMessage || 'error_saving_design');
+        errorResponse?.data?.message ||
+        (error instanceof Error ? error.message : undefined);
+
+      if (errorResponse?.status === 422) {
+        setShowNameModal(true);
+        toast.error(errorMessage || 'error_saving_design');
+      } else {
+        setShowNameModal(false);
+        toast.error(errorMessage || 'error_saving_design');
+      }
     } finally {
       setSaving(false);
     }
@@ -622,8 +638,7 @@ export function InvoiceBuilder() {
       return;
     }
     setDesignName(designNameInput.trim());
-    setShowNameModal(false);
-    performSave();
+    performSave(designNameInput.trim());
   };
 
   const handlePreview = () => {
@@ -719,7 +734,9 @@ export function InvoiceBuilder() {
                 onClick={handleRedo}
                 disabled={state.historyIndex >= state.history.length - 1}
                 className="p-2"
-                disableWithoutIcon={state.historyIndex >= state.history.length - 1}
+                disableWithoutIcon={
+                  state.historyIndex >= state.history.length - 1
+                }
               >
                 <Redo2 className="w-4 h-4" />
               </Button>
