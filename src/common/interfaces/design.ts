@@ -15,6 +15,8 @@ export interface Parts {
   product: string;
   task: string;
   footer: string;
+  blocks?: any[];
+  pageSettings?: Record<string, string>;
 }
 
 export interface Design {

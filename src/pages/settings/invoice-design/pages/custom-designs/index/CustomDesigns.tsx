@@ -21,14 +21,11 @@ import { Paintbrush, Plus } from 'lucide-react';
 import { route } from '$app/common/helpers/route';
 import { Design } from '$app/common/interfaces/design';
 
-// Visual builder metadata marker
-const VISUAL_BUILDER_MARKER = '<!-- VISUAL_BUILDER_BLOCKS:';
-
 /**
  * Check if a design was created with the visual builder
  */
 function isVisualBuilderDesign(design: Design): boolean {
-  return design.design?.includes?.includes(VISUAL_BUILDER_MARKER) ?? false;
+  return Array.isArray(design.design?.blocks) && design.design.blocks.length > 0;
 }
 
 export default function CustomDesigns() {

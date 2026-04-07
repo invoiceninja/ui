@@ -50,42 +50,15 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import './InvoiceBuilder.css';
 
-// Visual builder metadata marker
-const VISUAL_BUILDER_MARKER = '<!-- VISUAL_BUILDER_BLOCKS:';
-const VISUAL_BUILDER_MARKER_END = ':END_BLOCKS -->';
-
 /**
- * Extract blocks JSON from design includes field
+ * Extract blocks from design object
  */
 function extractBlocksFromDesign(design: Design): Block[] | null {
-  try {
-    const includes = design.design?.includes || '';
-    const startMarker = includes.indexOf(VISUAL_BUILDER_MARKER);
-    if (startMarker === -1) return null;
-
-    const jsonStart = startMarker + VISUAL_BUILDER_MARKER.length;
-    const jsonEnd = includes.indexOf(VISUAL_BUILDER_MARKER_END, jsonStart);
-    if (jsonEnd === -1) return null;
-
-    const jsonString = includes.slice(jsonStart, jsonEnd);
-    const parsed = JSON.parse(jsonString);
-    if (!Array.isArray(parsed)) {
-      throw new Error('Parsed data is not an array');
-    }
-    return parsed;
-  } catch (error) {
-    // Error will be handled by the calling component
-    return null;
+  const blocks = design.design?.blocks;
+  if (Array.isArray(blocks) && blocks.length > 0) {
+    return blocks as Block[];
   }
-}
-
-/**
- * Encode blocks JSON for storage in design includes field
- */
-function encodeBlocksForDesign(blocks: Block[]): string {
-  return `${VISUAL_BUILDER_MARKER}${JSON.stringify(
-    blocks
-  )}${VISUAL_BUILDER_MARKER_END}`;
+  return null;
 }
 
 export function InvoiceBuilder() {
@@ -562,17 +535,15 @@ export function InvoiceBuilder() {
       // Generate HTML using the proper HTML generator
       const htmlBody = generateInvoiceHTML(state.blocks, SAMPLE_INVOICE_DATA);
 
-      // Encode blocks JSON for storage
-      const blocksJson = encodeBlocksForDesign(state.blocks);
-
       const designPayload = {
         name: nameToUse,
         design: {
-          includes: blocksJson, // Store blocks JSON in includes field
+          blocks: state.blocks,
+          includes: '',
           header: '',
           body: htmlBody,
-          product: '', // Will be generated server-side
-          task: '', // Will be generated server-side
+          product: '',
+          task: '',
           footer: '',
         },
         is_custom: true,
