@@ -9,18 +9,74 @@
  */
 
 import { memo } from 'react';
-import { Block } from '../types';
+import { Block, FieldConfig } from '../types';
 import { getBlockLabel } from '../block-library';
-import { SAMPLE_INVOICE_DATA, replaceVariables } from '../utils/variable-replacer';
+import {
+  SAMPLE_INVOICE_DATA,
+  replaceVariables,
+} from '../utils/variable-replacer';
 import { useLogo } from '$app/common/hooks/useLogo';
 
 interface BlockRendererProps {
   block: Block;
 }
 
-export const BlockRenderer = memo(function BlockRenderer({ block }: BlockRendererProps) {
+function buildFieldDisplayText(
+  config: FieldConfig,
+  data: typeof SAMPLE_INVOICE_DATA
+): string | null {
+  const resolvedValue = replaceVariables(config.variable, data);
+
+  if (
+    config.hideIfEmpty !== false &&
+    (!resolvedValue || resolvedValue.trim() === '')
+  ) {
+    return null;
+  }
+
+  return `${config.prefix || ''}${resolvedValue}${config.suffix || ''}`;
+}
+
+function renderFieldConfigs(
+  fieldConfigs: FieldConfig[] | undefined,
+  data: typeof SAMPLE_INVOICE_DATA,
+  style: React.CSSProperties
+): React.ReactNode {
+  if (!fieldConfigs || fieldConfigs.length === 0) {
+    return null;
+  }
+
+  const lines: string[] = [];
+
+  fieldConfigs.forEach((config) => {
+    const displayText = buildFieldDisplayText(config, data);
+    if (displayText !== null) {
+      lines.push(displayText);
+    }
+  });
+
+  if (lines.length === 0) {
+    return <div style={style}>&nbsp;</div>;
+  }
+
+  return (
+    <div style={style}>
+      {lines.map((line, index) => (
+        <div key={index}>{line}</div>
+      ))}
+    </div>
+  );
+}
+
+interface BlockRendererProps {
+  block: Block;
+}
+
+export const BlockRenderer = memo(function BlockRenderer({
+  block,
+}: BlockRendererProps) {
   const companyLogo = useLogo();
-  
+
   switch (block.type) {
     case 'text':
       return <TextBlockRenderer block={block} />;
@@ -67,8 +123,12 @@ export const BlockRenderer = memo(function BlockRenderer({ block }: BlockRendere
 
 // Individual block renderers
 function TextBlockRenderer({ block }: BlockRendererProps) {
-  const { content, fontSize, fontWeight, color, align, lineHeight } = block.properties;
-  const displayContent = replaceVariables(content || 'Enter text...', SAMPLE_INVOICE_DATA);
+  const { content, fontSize, fontWeight, color, align, lineHeight } =
+    block.properties;
+  const displayContent = replaceVariables(
+    content || 'Enter text...',
+    SAMPLE_INVOICE_DATA
+  );
 
   return (
     <div
@@ -94,7 +154,7 @@ interface ImageBlockRendererProps extends BlockRendererProps {
 
 function ImageBlockRenderer({ block, companyLogo }: ImageBlockRendererProps) {
   const { source, align, maxWidth, objectFit } = block.properties;
-  
+
   // If source is $company.logo, use the actual company logo
   let resolvedSource = source;
   if (source === '$company.logo' && companyLogo) {
@@ -104,16 +164,19 @@ function ImageBlockRenderer({ block, companyLogo }: ImageBlockRendererProps) {
   }
 
   // Map text alignment to flexbox justify-content
-  const justifyContent = align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center';
-  
+  const justifyContent =
+    align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center';
+
   return (
-    <div style={{ 
-      textAlign: align, 
-      height: '100%', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent 
-    }}>
+    <div
+      style={{
+        textAlign: align,
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent,
+      }}
+    >
       {resolvedSource ? (
         <img
           src={resolvedSource}
@@ -130,7 +193,18 @@ function ImageBlockRenderer({ block, companyLogo }: ImageBlockRendererProps) {
 }
 
 function CompanyInfoRenderer({ block }: BlockRendererProps) {
-  const { content, fontSize, lineHeight, align, color } = block.properties;
+  const { fieldConfigs, content, fontSize, lineHeight, align, color } =
+    block.properties;
+
+  if (fieldConfigs && fieldConfigs.length > 0) {
+    return renderFieldConfigs(fieldConfigs, SAMPLE_INVOICE_DATA, {
+      fontSize,
+      lineHeight,
+      textAlign: align,
+      color,
+    });
+  }
+
   const displayContent = replaceVariables(content, SAMPLE_INVOICE_DATA);
 
   return (
@@ -149,9 +223,17 @@ function CompanyInfoRenderer({ block }: BlockRendererProps) {
 }
 
 function ClientInfoRenderer({ block }: BlockRendererProps) {
-  const { content, fontSize, lineHeight, align, color, showTitle, title, titleFontWeight } =
-    block.properties;
-  const displayContent = replaceVariables(content, SAMPLE_INVOICE_DATA);
+  const {
+    fieldConfigs,
+    content,
+    fontSize,
+    lineHeight,
+    align,
+    color,
+    showTitle,
+    title,
+    titleFontWeight,
+  } = block.properties;
 
   return (
     <div>
@@ -167,17 +249,28 @@ function ClientInfoRenderer({ block }: BlockRendererProps) {
           {title}
         </div>
       )}
-      <div
-        style={{
+
+      {fieldConfigs && fieldConfigs.length > 0 ? (
+        renderFieldConfigs(fieldConfigs, SAMPLE_INVOICE_DATA, {
           fontSize,
           lineHeight,
           textAlign: align,
           color,
-          whiteSpace: 'pre-line',
-        }}
-      >
-        {displayContent}
-      </div>
+        })
+      ) : (
+        // Legacy fallback
+        <div
+          style={{
+            fontSize,
+            lineHeight,
+            textAlign: align,
+            color,
+            whiteSpace: 'pre-line',
+          }}
+        >
+          {replaceVariables(content, SAMPLE_INVOICE_DATA)}
+        </div>
+      )}
     </div>
   );
 }
@@ -216,14 +309,22 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
     alternateRows,
   } = block.properties;
 
-  const resolveItemValue = (field: string, item: Record<string, unknown>): string => {
+  const resolveItemValue = (
+    field: string,
+    item: Record<string, unknown>
+  ): string => {
     // Extract field from item.field format (e.g., "item.product_key" -> "product_key")
-    const fieldKey = field.startsWith('item.') ? field.replace('item.', '') : field;
+    const fieldKey = field.startsWith('item.')
+      ? field.replace('item.', '')
+      : field;
     const value = item[fieldKey];
 
     if (typeof value === 'number') {
       if (fieldKey === 'cost' || fieldKey === 'line_total') {
-        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        }).format(value);
       }
       return String(value);
     }
@@ -232,7 +333,10 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
 
   return (
     <div className="w-full h-full overflow-auto">
-      <table className="w-full" style={{ fontSize, borderCollapse: 'collapse' }}>
+      <table
+        className="w-full"
+        style={{ fontSize, borderCollapse: 'collapse' }}
+      >
         <thead>
           <tr
             style={{
@@ -241,19 +345,27 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
               fontWeight: headerFontWeight,
             }}
           >
-            {columns.map((col: { id: string; header: string; align: string; width: string; field: string }) => (
-              <th
-                key={col.id}
-                style={{
-                  padding,
-                  textAlign: col.align as 'left' | 'center' | 'right',
-                  width: col.width,
-                  border: showBorders ? `1px solid ${borderColor}` : 'none',
-                }}
-              >
-                {col.header}
-              </th>
-            ))}
+            {columns.map(
+              (col: {
+                id: string;
+                header: string;
+                align: string;
+                width: string;
+                field: string;
+              }) => (
+                <th
+                  key={col.id}
+                  style={{
+                    padding,
+                    textAlign: col.align as 'left' | 'center' | 'right',
+                    width: col.width,
+                    border: showBorders ? `1px solid ${borderColor}` : 'none',
+                  }}
+                >
+                  {col.header}
+                </th>
+              )
+            )}
           </tr>
         </thead>
         <tbody>
@@ -261,21 +373,24 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
             <tr
               key={index}
               style={{
-                backgroundColor: alternateRows && index % 2 === 1 ? alternateRowBg : rowBg,
+                backgroundColor:
+                  alternateRows && index % 2 === 1 ? alternateRowBg : rowBg,
               }}
             >
-              {columns.map((col: { id: string; align: string; field: string }) => (
-                <td
-                  key={col.id}
-                  style={{
-                    padding,
-                    textAlign: col.align as 'left' | 'center' | 'right',
-                    border: showBorders ? `1px solid ${borderColor}` : 'none',
-                  }}
-                >
-                  {resolveItemValue(col.field, item)}
-                </td>
-              ))}
+              {columns.map(
+                (col: { id: string; align: string; field: string }) => (
+                  <td
+                    key={col.id}
+                    style={{
+                      padding,
+                      textAlign: col.align as 'left' | 'center' | 'right',
+                      border: showBorders ? `1px solid ${borderColor}` : 'none',
+                    }}
+                  >
+                    {resolveItemValue(col.field, item)}
+                  </td>
+                )
+              )}
             </tr>
           ))}
         </tbody>
@@ -316,46 +431,64 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
       <tbody>
         {items
           .filter((item: any) => item.show)
-          .map((item: { show: boolean; isTotal?: boolean; isBalance?: boolean; field: string; label: string }, index: number) => {
-            const isTotal = item.isTotal;
-            const isBalance = item.isBalance;
-            const displayValue = replaceVariables(item.field, SAMPLE_INVOICE_DATA);
+          .map(
+            (
+              item: {
+                show: boolean;
+                isTotal?: boolean;
+                isBalance?: boolean;
+                field: string;
+                label: string;
+              },
+              index: number
+            ) => {
+              const isTotal = item.isTotal;
+              const isBalance = item.isBalance;
+              const displayValue = replaceVariables(
+                item.field,
+                SAMPLE_INVOICE_DATA
+              );
 
-            return (
-              <tr
-                key={index}
-                style={{
-                  fontSize: isTotal ? totalFontSize : fontSize,
-                  fontWeight: isTotal ? totalFontWeight : 'normal',
-                }}
-              >
-                <td
+              return (
+                <tr
+                  key={index}
                   style={{
-                    color: labelColor,
-                    paddingBottom: spacing,
-                    padding: labelPadding || undefined,
-                    paddingRight: gap, // Override right padding with gap
-                    textAlign: 'right',
-                    whiteSpace: 'nowrap',
+                    fontSize: isTotal ? totalFontSize : fontSize,
+                    fontWeight: isTotal ? totalFontWeight : 'normal',
                   }}
                 >
-                  {item.label}:
-                </td>
-                <td
-                  style={{
-                    color: isBalance ? balanceColor : isTotal ? totalColor : amountColor,
-                    paddingBottom: spacing,
-                    padding: valuePadding || undefined,
-                    textAlign: 'right',
-                    whiteSpace: 'nowrap',
-                    ...(valueMinWidth ? { minWidth: valueMinWidth } : {}),
-                  }}
-                >
-                  {displayValue}
-                </td>
-              </tr>
-            );
-          })}
+                  <td
+                    style={{
+                      color: labelColor,
+                      paddingBottom: spacing,
+                      padding: labelPadding || undefined,
+                      paddingRight: gap, // Override right padding with gap
+                      textAlign: 'right',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {item.label}:
+                  </td>
+                  <td
+                    style={{
+                      color: isBalance
+                        ? balanceColor
+                        : isTotal
+                          ? totalColor
+                          : amountColor,
+                      paddingBottom: spacing,
+                      padding: valuePadding || undefined,
+                      textAlign: 'right',
+                      whiteSpace: 'nowrap',
+                      ...(valueMinWidth ? { minWidth: valueMinWidth } : {}),
+                    }}
+                  >
+                    {displayValue}
+                  </td>
+                </tr>
+              );
+            }
+          )}
       </tbody>
     </table>
   );
@@ -405,7 +538,8 @@ function QRCodeBlockRenderer({ block }: BlockRendererProps) {
 }
 
 function SignatureBlockRenderer({ block }: BlockRendererProps) {
-  const { label, showLine, showDate, align, fontSize, color } = block.properties;
+  const { label, showLine, showDate, align, fontSize, color } =
+    block.properties;
 
   return (
     <div style={{ textAlign: align }}>
