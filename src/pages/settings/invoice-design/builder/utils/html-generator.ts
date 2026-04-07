@@ -66,12 +66,37 @@ function estimateContentHeight(block: Block, data: InvoiceData): number {
     case 'company-info':
     case 'client-info':
     case 'invoice-details': {
-      const { content, fontSize, lineHeight } = block.properties;
-      const replacedContent = replaceVariables(content, data);
+      const { fieldConfigs, content, fontSize, lineHeight } = block.properties;
       const fontSizeNum = parseFloat(fontSize) || 14;
       const lineHeightNum = parseFloat(lineHeight) || 1.5;
-      const lines =
-        replacedContent.split('\n').filter((line) => line.trim()).length || 1;
+
+      let lines: number;
+
+      if (
+        fieldConfigs &&
+        Array.isArray(fieldConfigs) &&
+        fieldConfigs.length > 0
+      ) {
+        let visibleCount = 0;
+        fieldConfigs.forEach(
+          (config: { variable: string; hideIfEmpty?: boolean }) => {
+            const resolvedValue = replaceVariables(config.variable, data);
+            if (
+              config.hideIfEmpty !== false &&
+              (!resolvedValue || resolvedValue.trim() === '')
+            ) {
+              return;
+            }
+            visibleCount++;
+          }
+        );
+        lines = visibleCount || 1;
+      } else {
+        const replacedContent = replaceVariables(content, data);
+        lines =
+          replacedContent.split('\n').filter((line) => line.trim()).length || 1;
+      }
+
       const estimatedHeight = lines * fontSizeNum * lineHeightNum + 20; // Add padding
       return Math.max(estimatedHeight, minHeight);
     }
@@ -457,14 +482,56 @@ function renderImageBlock(block: Block, data: InvoiceData): string {
       <img src="${escapeHtml(
         resolvedSource
       )}" style="max-width: ${maxWidth}; max-height: 100%; object-fit: ${objectFit};" alt="${
-    block.type
-  }" />
+        block.type
+      }" />
     </div>
   `;
 }
 
 function renderCompanyInfoBlock(block: Block, data: InvoiceData): string {
-  const { content, fontSize, lineHeight, align, color } = block.properties;
+  const { fieldConfigs, content, fontSize, lineHeight, align, color } =
+    block.properties;
+
+  if (fieldConfigs && Array.isArray(fieldConfigs) && fieldConfigs.length > 0) {
+    const lines: string[] = [];
+
+    fieldConfigs.forEach(
+      (config: {
+        variable: string;
+        prefix?: string;
+        suffix?: string;
+        hideIfEmpty?: boolean;
+      }) => {
+        const resolvedValue = replaceVariables(config.variable, data);
+
+        if (
+          config.hideIfEmpty !== false &&
+          (!resolvedValue || resolvedValue.trim() === '')
+        ) {
+          return;
+        }
+
+        const line = `${config.prefix || ''}${resolvedValue}${config.suffix || ''}`;
+        lines.push(line);
+      }
+    );
+
+    if (lines.length === 0) {
+      return '<div>&nbsp;</div>';
+    }
+
+    return `
+      <div style="
+        font-size: ${fontSize};
+        line-height: ${lineHeight};
+        text-align: ${align};
+        color: ${color};
+      ">
+        ${lines.map((line) => `<div>${escapeHtml(line)}</div>`).join('')}
+      </div>
+    `;
+  }
+
   const replacedContent = replaceVariables(content, data);
 
   return `
@@ -482,6 +549,7 @@ function renderCompanyInfoBlock(block: Block, data: InvoiceData): string {
 
 function renderClientInfoBlock(block: Block, data: InvoiceData): string {
   const {
+    fieldConfigs,
     content,
     fontSize,
     lineHeight,
@@ -491,7 +559,44 @@ function renderClientInfoBlock(block: Block, data: InvoiceData): string {
     title,
     titleFontWeight,
   } = block.properties;
-  const replacedContent = replaceVariables(content, data);
+
+  let contentHtml = '';
+
+  if (fieldConfigs && Array.isArray(fieldConfigs) && fieldConfigs.length > 0) {
+    const lines: string[] = [];
+
+    fieldConfigs.forEach(
+      (config: {
+        variable: string;
+        prefix?: string;
+        suffix?: string;
+        hideIfEmpty?: boolean;
+      }) => {
+        const resolvedValue = replaceVariables(config.variable, data);
+
+        if (
+          config.hideIfEmpty !== false &&
+          (!resolvedValue || resolvedValue.trim() === '')
+        ) {
+          return;
+        }
+
+        const line = `${config.prefix || ''}${resolvedValue}${config.suffix || ''}`;
+        lines.push(line);
+      }
+    );
+
+    if (lines.length === 0) {
+      contentHtml = '<div>&nbsp;</div>';
+    } else {
+      contentHtml = lines
+        .map((line) => `<div>${escapeHtml(line)}</div>`)
+        .join('');
+    }
+  } else {
+    const replacedContent = replaceVariables(content, data);
+    contentHtml = escapeHtml(replacedContent);
+  }
 
   return `
     <div>
@@ -516,7 +621,7 @@ function renderClientInfoBlock(block: Block, data: InvoiceData): string {
         color: ${color};
         white-space: pre-line;
       ">
-        ${escapeHtml(replacedContent)}
+        ${contentHtml}
       </div>
     </div>
   `;
@@ -644,8 +749,8 @@ function renderTotalBlock(block: Block, data: InvoiceData): string {
     align === 'right'
       ? 'margin-left: auto;'
       : align === 'center'
-      ? 'margin: 0 auto;'
-      : '';
+        ? 'margin: 0 auto;'
+        : '';
   const gap = labelValueGap || '20px';
   const minWidthStyle = valueMinWidth ? `min-width: ${valueMinWidth};` : '';
 
@@ -670,8 +775,8 @@ function renderTotalBlock(block: Block, data: InvoiceData): string {
         const valueColor = isBalance
           ? balanceColor
           : isTotal
-          ? totalColor
-          : amountColor;
+            ? totalColor
+            : amountColor;
 
         // Build label cell padding (user padding + gap on right)
         const labelPaddingStyle = labelPadding
