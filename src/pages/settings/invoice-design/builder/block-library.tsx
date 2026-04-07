@@ -10,7 +10,6 @@
 
 import {
   Building2,
-  Type,
   Image,
   Table,
   Minus,
