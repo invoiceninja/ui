@@ -12,7 +12,6 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { cloneDeep, set } from 'lodash';
 import { CompanyUser } from '$app/common/interfaces/company-user';
-import { User } from '$app/common/interfaces/user';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { request } from '$app/common/helpers/request';
@@ -52,10 +51,6 @@ export function PreferenceCardsGrid({
   //const [lastRefreshedAt, setLastRefreshedAt] = useState<string | null>(null);
 
   useEffect(() => {
-    setOrder(currentDashboardFields);
-  }, [currentDashboardFields.length]);
-
-  useEffect(() => {
     if (!user) {
       return;
     }
@@ -66,7 +61,8 @@ export function PreferenceCardsGrid({
       return;
     }
 
-    const updated = cloneDeep(user) as User;
+    const updated = cloneDeep(user);
+
     set(updated, 'company_user.react_settings.dashboard_fields', order);
 
     request(

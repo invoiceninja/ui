@@ -416,6 +416,7 @@ export function Totals() {
       {currentDashboardFields.length > 0 && (
         <div className="mt-6 w-full">
           <PreferenceCardsGrid
+            key={currentDashboardFields.join(',')}
             currentDashboardFields={currentDashboardFields}
             dateRange={dateRange}
             startDate={dates.start_date}

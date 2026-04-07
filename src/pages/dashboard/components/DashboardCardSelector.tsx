@@ -23,7 +23,6 @@ import { CgOptions } from 'react-icons/cg';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { decodeDashboardField } from '$app/common/helpers/react-settings';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { User } from '$app/common/interfaces/user';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
@@ -74,7 +73,7 @@ export function DashboardCardSelector() {
   }, [manageOpen, currentUser]);
 
   const handleSave = () => {
-    const updated = cloneDeep(currentUser) as User;
+    const updated = cloneDeep(currentUser);
 
     if (!updated || isFormBusy) {
       return;
