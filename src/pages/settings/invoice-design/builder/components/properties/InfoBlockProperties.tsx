@@ -9,7 +9,8 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { PropertyEditorProps } from '../../types';
+import { useMemo, useCallback } from 'react';
+import { PropertyEditorProps, FieldConfig } from '../../types';
 import {
   FontSizeInput,
   AlignmentInput,
@@ -42,30 +43,88 @@ export function InfoBlockProperties({
 }: InfoBlockPropertiesProps) {
   const [t] = useTranslation();
 
-  const currentContent = block.properties.content || '';
-  const contentLines = currentContent.split('\n').filter((line: string) => line.trim());
+  const migrateFromLegacy = useCallback((): FieldConfig[] => {
+    const content = block.properties.content || '';
+    if (!content) return [];
 
-  const enabledFieldsOrdered = contentLines
-    .map((line: string) => availableFields.find((f) => f.variable === line.trim()))
-    .filter(Boolean) as FieldDefinition[];
+    const lines = content.split('\n').filter((line: string) => line.trim());
+    
+    return lines
+      .map((line: string) => {
+        const variable = line.trim();
+        const fieldDef = availableFields.find((f) => f.variable === variable);
+        if (fieldDef) {
+          return {
+            id: fieldDef.id,
+            label: fieldDef.label,
+            variable: fieldDef.variable || '',
+            prefix: '',
+            suffix: '',
+            hideIfEmpty: true,
+          };
+        }
+        
+        const variableMatch = variable.match(/\$([^.]+)\.(.+)/);
+        
+        if (variableMatch) {
+          return {
+            id: variable.replace(/\$/g, '').replace(/\./g, '_'),
+            label: variableMatch[2]
+              .replace(/_/g, ' ')
+              .replace(/\b\w/g, (l: string) => l.toUpperCase()),
+            variable: variable,
+            prefix: '',
+            suffix: '',
+            hideIfEmpty: true,
+          };
+        }
+        return null;
+      })
+      .filter((f: FieldConfig | null): f is FieldConfig => f !== null);
+  }, [block.properties.content, availableFields]);
 
-  const availableToAdd = availableFields.filter(
-    (field) => !contentLines.includes(field.variable)
+  const fieldConfigs: FieldConfig[] = useMemo(
+    () => block.properties.fieldConfigs || migrateFromLegacy(),
+    [block.properties.fieldConfigs, migrateFromLegacy]
   );
 
-  const updateProperty = (key: string, value: any) => {
-    onChange({
-      ...block,
-      properties: { ...block.properties, [key]: value },
-    });
-  };
+  const availableToAdd = useMemo(
+    () =>
+      availableFields.filter(
+        (field: FieldDefinition) =>
+          !fieldConfigs.some((config) => config.id === field.id)
+      ),
+    [availableFields, fieldConfigs]
+  );
 
-  const rebuildContent = (fields: FieldDefinition[]) => {
-    updateProperty(
-      'content',
-      fields.map((f) => f.variable || '').filter(Boolean).join('\n')
-    );
-  };
+  const updateProperty = useCallback(
+    (key: string, value: any) => {
+      onChange({
+        ...block,
+        properties: { ...block.properties, [key]: value },
+      });
+    },
+    [block, onChange]
+  );
+
+  const handleFieldConfigsChange = useCallback(
+    (newConfigs: FieldConfig[]) => {
+      const content = newConfigs
+        .map((c) => c.variable)
+        .filter(Boolean)
+        .join('\n');
+
+      onChange({
+        ...block,
+        properties: {
+          ...block.properties,
+          fieldConfigs: newConfigs,
+          content,
+        },
+      });
+    },
+    [block, onChange]
+  );
 
   return (
     <div className="space-y-4">
@@ -93,9 +152,9 @@ export function InfoBlockProperties({
 
       <ReorderableFieldList
         label={fieldOrderLabel || String(t('field_order'))}
-        fields={enabledFieldsOrdered}
+        fields={fieldConfigs}
         availableFields={availableToAdd}
-        onReorder={rebuildContent}
+        onChange={handleFieldConfigsChange}
         addFieldLabel={addFieldLabel || String(t('add_field'))}
         emptyLabel={emptyLabel || String(t('no_fields_selected'))}
       />
