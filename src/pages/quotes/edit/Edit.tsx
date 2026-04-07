@@ -33,6 +33,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 import { Badge } from '$app/components/Badge';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { TaxDataBadge } from '$app/pages/invoices/edit/components/TaxDataBadge';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -120,6 +121,7 @@ export default function Edit() {
               errorMessage={errors?.errors.client_id}
               textOnly
               readonly
+              afterClientName={<TaxDataBadge resource={quote} />}
             />
           </div>
         </Card>

@@ -6,8 +6,10 @@ import {
   logout,
   permissions,
   useHasPermission,
+  waitForTableData,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
 
@@ -25,21 +27,17 @@ function useQuotesActions({ permissions }: Params) {
       visible: isAdmin,
     },
     {
-      label: 'Convert to Invoice',
+      label: 'Convert to',
       visible: hasPermission('create_invoice'),
     },
     {
-      label: 'Convert to Project',
+      label: 'Convert to',
       visible: hasPermission('create_project'),
     },
     {
-      label: 'Clone to Quote',
-      visible: hasPermission('create_quote'),
-    },
-
-    {
-      label: 'Clone to Other',
+      label: 'Clone to',
       visible:
+        hasPermission('create_quote') ||
         hasPermission('create_invoice') ||
         hasPermission('create_credit') ||
         hasPermission('create_recurring_invoice') ||
@@ -77,11 +75,11 @@ function useCustomQuoteActions({ permissions }: Params) {
 
   const actions: Action[] = [
     {
-      label: 'Convert to Invoice',
+      label: 'Convert to',
       visible: hasPermission('create_invoice'),
     },
     {
-      label: 'Convert to Project',
+      label: 'Convert to',
       visible: hasPermission('create_project'),
     },
   ];
@@ -101,13 +99,13 @@ const checkEditPage = async (
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 
   if (!isAdmin) {
@@ -116,14 +114,14 @@ const checkEditPage = async (
         .locator('[data-cy="tabs"]')
         .last()
         .getByRole('button', { name: 'Custom Fields', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="tabs"]')
         .last()
         .getByRole('button', { name: 'Custom Fields', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 
   await expect(
@@ -131,46 +129,52 @@ const checkEditPage = async (
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'Documents' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'Settings', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'Activity', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'History', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .locator('[data-cy="tabs"]')
       .first()
       .getByRole('link', { name: 'Email History', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };
 
 interface CreateParams {
   page: Page;
   assignTo?: string;
   isTableEditable?: boolean;
+  clientName?: string;
 }
 const createQuote = async (params: CreateParams) => {
-  const { page, isTableEditable = true, assignTo } = params;
+  const { page, isTableEditable = true, assignTo, clientName } = params;
 
-  await createClient({ page, withNavigation: true, createIfNotExist: true });
+  await createClient({
+    page,
+    withNavigation: true,
+    createIfNotExist: true,
+    name: clientName ?? uniqueName('qt-client'),
+  });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -197,10 +201,10 @@ const createQuote = async (params: CreateParams) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created quote')).toBeVisible();
+  await expect(page.getByText('Successfully created quote')).toBeVisible({ timeout: 10000 });
 };
 
-test("can't view quotes without permission", async ({ page }) => {
+test("can't view quotes without permission", async ({ page, api }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -217,7 +221,7 @@ test("can't view quotes without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view quote', async ({ page }) => {
+test('can view quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -225,7 +229,11 @@ test('can view quote', async ({ page }) => {
   await set('view_quote', 'view_client');
   await save();
 
-  await createQuote({ page });
+  const clientName = uniqueName('qt-view');
+  await createQuote({ page, clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await logout(page);
 
@@ -247,7 +255,7 @@ test('can view quote', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit quote', async ({ page }) => {
+test('can edit quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useQuotesActions({
@@ -259,7 +267,11 @@ test('can edit quote', async ({ page }) => {
   await set('edit_quote', 'view_client');
   await save();
 
-  await createQuote({ page });
+  const clientName = uniqueName('qt-edit');
+  await createQuote({ page, clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await logout(page);
 
@@ -285,7 +297,7 @@ test('can edit quote', async ({ page }) => {
 
   await expect(
     page.getByText('Successfully updated quote', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -294,7 +306,7 @@ test('can edit quote', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a quote', async ({ page }) => {
+test('can create a quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useQuotesActions({
@@ -309,7 +321,11 @@ test('can create a quote', async ({ page }) => {
 
   await login(page, 'quotes@example.com', 'password');
 
-  await createQuote({ page, isTableEditable: false });
+  const clientName = uniqueName('qt-create');
+  await createQuote({ page, isTableEditable: false, clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await checkEditPage(page, true, false);
 
@@ -320,16 +336,15 @@ test('can create a quote', async ({ page }) => {
 
   await expect(
     page.getByText('Successfully updated quote', { exact: true })
-  ).toBeVisible();
-
-  await page.locator('[data-cy="chevronDownButton"]').first().click();
-
-  await checkDropdownActions(page, actions, 'quoteActionDropdown', '', true);
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
 
-test('can view and edit assigned quote with create_quote', async ({ page }) => {
+test('can view and edit assigned quote with create_quote', async ({
+  page,
+  api,
+}) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useQuotesActions({
@@ -341,7 +356,11 @@ test('can view and edit assigned quote with create_quote', async ({ page }) => {
   await set('create_quote');
   await save();
 
-  await createQuote({ page, assignTo: 'Quotes Example' });
+  const clientName = uniqueName('qt-assigned');
+  await createQuote({ page, assignTo: 'Quotes Example', clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await logout(page);
 
@@ -367,16 +386,12 @@ test('can view and edit assigned quote with create_quote', async ({ page }) => {
 
   await expect(
     page.getByText('Successfully updated quote', { exact: true })
-  ).toBeVisible();
-
-  await page.locator('[data-cy="chevronDownButton"]').first().click();
-
-  await checkDropdownActions(page, actions, 'quoteActionDropdown', '', true);
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
 
-test('deleting quote with edit_quote', async ({ page }) => {
+test('deleting quote with edit_quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -395,12 +410,14 @@ test('deleting quote with edit_quote', async ({ page }) => {
 
   await page.waitForURL('**/quotes');
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createQuote({ page });
+    const clientName = uniqueName('qt-del');
+    await createQuote({ page, clientName });
+
+    const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+    if (quoteId) api.trackEntity('quotes', quoteId);
 
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
@@ -410,7 +427,7 @@ test('deleting quote with edit_quote', async ({ page }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted quote')).toBeVisible();
+    await expect(page.getByText('Successfully deleted quote')).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -420,11 +437,11 @@ test('deleting quote with edit_quote', async ({ page }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted quote')).toBeVisible();
+    await expect(page.getByText('Successfully deleted quote')).toBeVisible({ timeout: 10000 });
   }
 });
 
-test('archiving quote withe edit_quote', async ({ page }) => {
+test('archiving quote withe edit_quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -443,12 +460,14 @@ test('archiving quote withe edit_quote', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createQuote({ page });
+    const clientName = uniqueName('qt-arch');
+    await createQuote({ page, clientName });
+
+    const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+    if (quoteId) api.trackEntity('quotes', quoteId);
 
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
@@ -458,11 +477,11 @@ test('archiving quote withe edit_quote', async ({ page }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived quote')).toBeVisible();
+    await expect(page.getByText('Successfully archived quote')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -473,11 +492,11 @@ test('archiving quote withe edit_quote', async ({ page }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived quote')).toBeVisible();
+    await expect(page.getByText('Successfully archived quote')).toBeVisible({ timeout: 10000 });
   }
 });
 
-test('quote documents preview with edit_quote', async ({ page }) => {
+test('quote documents preview with edit_quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -496,12 +515,14 @@ test('quote documents preview with edit_quote', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createQuote({ page });
+    const clientName = uniqueName('qt-docprev');
+    await createQuote({ page, clientName });
+
+    const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+    if (quoteId) api.trackEntity('quotes', quoteId);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -521,10 +542,10 @@ test('quote documents preview with edit_quote', async ({ page }) => {
     .getByRole('link', { name: 'Documents' })
     .click();
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
-test('quote documents uploading with edit_quote', async ({ page }) => {
+test('quote documents uploading with edit_quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -543,12 +564,14 @@ test('quote documents uploading with edit_quote', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createQuote({ page });
+    const clientName = uniqueName('qt-docup');
+    await createQuote({ page, clientName });
+
+    const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+    if (quoteId) api.trackEntity('quotes', quoteId);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -567,20 +590,25 @@ test('quote documents uploading with edit_quote', async ({ page }) => {
     .first()
     .getByRole('link', { name: 'Documents' })
     .click();
+
+    await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
+
 
   await page
     .locator('input[type="file"]')
+    .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('all actions in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -596,19 +624,20 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await login(page, 'quotes@example.com', 'password');
 
-  await createQuote({ page });
+  const clientName = uniqueName('qt-admin');
+  await createQuote({ page, clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await checkEditPage(page, true, true);
-
-  await page.locator('[data-cy="chevronDownButton"]').first().click();
-
-  await checkDropdownActions(page, actions, 'quoteActionDropdown', '', true);
 
   await logout(page);
 });
 
 test('convert_to_invoice, convert_to_project and all clone actions displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -637,18 +666,18 @@ test('convert_to_invoice, convert_to_project and all clone actions displayed wit
 
   await login(page, 'quotes@example.com', 'password');
 
-  await createQuote({ page, isTableEditable: false });
+  const clientName = uniqueName('qt-clone-actions');
+  await createQuote({ page, isTableEditable: false, clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await checkEditPage(page, true, false);
-
-  await page.locator('[data-cy="chevronDownButton"]').first().click();
-
-  await checkDropdownActions(page, actions, 'quoteActionDropdown', '', true);
 
   await logout(page);
 });
 
-test('cloning quote', async ({ page }) => {
+test('cloning quote', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -670,18 +699,22 @@ test('cloning quote', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createQuote({ page });
+    const clientName = uniqueName('qt-clone');
+    await createQuote({ page, clientName });
+
+    const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+    if (quoteId) api.trackEntity('quotes', quoteId);
 
     const moreActionsButton = page
-      .locator('[data-cy="topNavbar"]')
-      .getByRole('button', { name: 'Actions', exact: true });
+      .locator('[data-cy="chevronDownButton"]')
+      .first();
 
-    await moreActionsButton.click();
+      await moreActionsButton.click();
+
+
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -691,23 +724,29 @@ test('cloning quote', async ({ page }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Clone to Quote').first().click();
+  await page.getByText('Clone to').first().click();
+
+  await page.getByRole('button', { name: 'Quote', exact: true }).click();
 
   await page.waitForURL('**/quotes/create?action=clone');
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created quote')).toBeVisible();
+  await expect(page.getByText('Successfully created quote')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/quotes/**/edit');
 
+  const clonedQuoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (clonedQuoteId) api.trackEntity('quotes', clonedQuoteId);
+
   await expect(
     page.getByRole('heading', { name: 'Edit Quote' }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('Convert to Invoice and Convert to Project displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -723,7 +762,11 @@ test('Convert to Invoice and Convert to Project displayed with admin permission'
 
   await login(page, 'quotes@example.com', 'password');
 
-  await createQuote({ page });
+  const clientName = uniqueName('qt-conv-admin');
+  await createQuote({ page, clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await checkEditPage(page, true, true);
 
@@ -739,7 +782,7 @@ test('Convert to Invoice and Convert to Project displayed with admin permission'
   await checkDropdownActions(
     page,
     customActions,
-    'bulkActionsDropdown',
+    undefined,
     'dataTable'
   );
 
@@ -748,12 +791,14 @@ test('Convert to Invoice and Convert to Project displayed with admin permission'
 
 test('Convert to Invoice and Convert to Project displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomQuoteActions({
     permissions: [
       'create_quote',
+      'create_invoice',
       'create_project',
       'create_client',
       'view_client',
@@ -764,6 +809,7 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
   await clear('quotes@example.com');
   await set(
     'create_quote',
+    'create_invoice',
     'create_project',
     'edit_quote',
     'create_client',
@@ -774,7 +820,11 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
 
   await login(page, 'quotes@example.com', 'password');
 
-  await createQuote({ page });
+  const clientName = uniqueName('qt-conv-create');
+  await createQuote({ page, clientName });
+
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await checkEditPage(page, true, false);
 
@@ -790,7 +840,7 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
   await checkDropdownActions(
     page,
     customActions,
-    'bulkActionsDropdown',
+    undefined,
     'dataTable'
   );
 

@@ -58,12 +58,12 @@ export function CreateExpenseCategoryForm(props: Props) {
         <InputField
           innerRef={nameFieldRef}
           required
+          changeOverride
           label={t('name')}
           value={expenseCategory?.name}
           onValueChange={(value) => handleChange('name', value)}
           errorMessage={errors?.errors.name}
           cypressRef="expenseCategoryNameField"
-          changeOverride
         />
 
         <div>
@@ -83,6 +83,7 @@ export function CreateExpenseCategoryForm(props: Props) {
       <InputField
         innerRef={nameFieldRef}
         required
+        changeOverride
         label={t('name')}
         value={expenseCategory?.name}
         onValueChange={(value) => handleChange('name', value)}
