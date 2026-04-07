@@ -144,8 +144,18 @@ export interface SignatureBlockPropertiesHint {
   color?: string;
 }
 
+export interface FieldConfig {
+  id: string;
+  label: string;
+  variable: string;
+  prefix?: string;
+  suffix?: string;
+  hideIfEmpty?: boolean;
+}
+
 export interface ClientInfoBlockPropertiesHint {
-  content?: string;
+  content?: string; // Legacy format
+  fieldConfigs?: FieldConfig[];
   fontSize?: string;
   lineHeight?: string;
   align?: string;
@@ -156,7 +166,8 @@ export interface ClientInfoBlockPropertiesHint {
 }
 
 export interface CompanyInfoBlockPropertiesHint {
-  content?: string;
+  content?: string; // Legacy format
+  fieldConfigs?: FieldConfig[];
   fontSize?: string;
   lineHeight?: string;
   align?: string;
