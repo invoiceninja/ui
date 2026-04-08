@@ -197,6 +197,13 @@ export function replaceVariables(template: string, data: InvoiceData): string {
   result = result.replace(/\$invoice\.footer/g, data.invoice.footer);
   result = result.replace(/\$invoice\.terms/g, data.invoice.terms);
 
+  // QR Code variables (placeholders for preview)
+  result = result.replace(/\$payment_qr_code/g, '[Payment QR Code]');
+  result = result.replace(/\$sepa_qr_code/g, '[SEPA/EPC QR Code]');
+  result = result.replace(/\$swiss_qr/g, '[Swiss QR Bill]');
+  result = result.replace(/\$spc_qr_code/g, '[SPC QR Code]');
+  result = result.replace(/\$verifactu_qr_code/g, '[Verifactu QR Code]');
+
   return result;
 }
 
