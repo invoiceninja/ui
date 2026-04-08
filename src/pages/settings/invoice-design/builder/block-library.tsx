@@ -455,10 +455,11 @@ export const blockLibrary: BlockDefinition[] = [
     type: 'qrcode',
     label: 'QR Code',
     icon: <QrCode className="w-5 h-5" />,
-    description: 'QR code for payment/link',
+    description: 'QR code for payment or compliance',
     defaultSize: { w: 2, h: 2 },
     defaultProperties: {
-      data: '$invoice.public_url',
+      qrType: 'payment_link',
+      data: '$payment_qr_code',
       size: '100px',
       align: 'center',
     },
