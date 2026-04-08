@@ -26,4 +26,5 @@ export interface VendorContact {
   link: string;
   last_login: number;
   can_sign: boolean;
+  cc_only: boolean;
 }

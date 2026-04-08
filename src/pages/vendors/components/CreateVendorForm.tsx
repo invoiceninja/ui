@@ -51,6 +51,7 @@ export function CreateVendorForm(props: Props) {
       phone: '',
       send_email: false,
       can_sign: false,
+      cc_only: false,
     },
   ]);
 

@@ -58,6 +58,7 @@ export default function Create() {
       email: '',
       phone: '',
       send_email: false,
+      cc_only: false,
     },
   ]);
 
