@@ -20,6 +20,7 @@ import { TotalBlockProperties } from './properties/TotalBlockProperties';
 import { CompanyInfoBlockProperties } from './properties/CompanyInfoBlockProperties';
 import { ClientInfoBlockProperties } from './properties/ClientInfoBlockProperties';
 import { InvoiceDetailsBlockProperties } from './properties/InvoiceDetailsBlockProperties';
+import { QRCodeBlockProperties } from './properties/QRCodeBlockProperties';
 
 export function PropertyPanel({
   block,
@@ -90,6 +91,10 @@ export function PropertyPanel({
 
         {block.type === 'spacer' && (
           <SpacerProperties block={block} onChange={onChange} />
+        )}
+
+        {block.type === 'qrcode' && (
+          <QRCodeBlockProperties block={block} onChange={onChange} />
         )}
       </div>
 
