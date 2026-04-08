@@ -53,7 +53,7 @@ export function PropertyPanel({
 
       {/* Block-specific properties */}
       <div className="space-y-4">
-        {block.type === 'text' && (
+        {(block.type === 'text' || block.type === 'public-notes') && (
           <TextBlockProperties block={block} onChange={onChange} />
         )}
 
