@@ -21,10 +21,10 @@ import {
 
 // Available columns that can be added to the table
 // Maps field to canonical ID for consistent matching
-const AVAILABLE_COLUMNS = [
+const getAvailableColumns = (isTasksTable: boolean) => [
   {
     id: 'product_key',
-    header: 'Item',
+    header: isTasksTable ? 'Service' : 'Item',
     field: 'item.product_key',
     width: '25%',
     align: 'left' as const,
@@ -38,14 +38,14 @@ const AVAILABLE_COLUMNS = [
   },
   {
     id: 'quantity',
-    header: 'Qty',
+    header: isTasksTable ? 'Hours' : 'Qty',
     field: 'item.quantity',
     width: '10%',
     align: 'center' as const,
   },
   {
     id: 'cost',
-    header: 'Rate',
+    header: isTasksTable ? 'Rate' : 'Rate',
     field: 'item.cost',
     width: '15%',
     align: 'right' as const,
@@ -90,6 +90,10 @@ const AVAILABLE_COLUMNS = [
 export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
   const [expandedColumn, setExpandedColumn] = useState<string | null>(null);
+
+  const isTasksTable = block.type === 'tasks-table';
+
+  const AVAILABLE_COLUMNS = getAvailableColumns(isTasksTable);
 
   const updateProperty = (key: string, value: any) => {
     onChange({
