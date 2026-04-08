@@ -19,6 +19,7 @@ import {
   User,
   Receipt,
   Space,
+  Type,
 } from 'lucide-react';
 import { BlockDefinition } from './types';
 
@@ -97,7 +98,24 @@ export const blockLibrary: BlockDefinition[] = [
     category: 'branding',
   },
 
-  // Content
+  {
+    type: 'text',
+    label: 'Text',
+    icon: <Type className="size-5" />,
+    description: 'Custom text with formatting',
+    defaultSize: { w: 6, h: 2 },
+    defaultProperties: {
+      content: 'Enter your text here...',
+      fontSize: '14px',
+      fontWeight: 'normal',
+      lineHeight: '1.5',
+      color: '#374151',
+      align: 'left',
+      fontStyle: 'normal',
+      padding: '0px',
+    },
+    category: 'content',
+  },
   {
     type: 'client-info',
     label: 'Client Info',
