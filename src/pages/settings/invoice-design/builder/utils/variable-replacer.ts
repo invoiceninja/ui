@@ -25,6 +25,7 @@ export interface InvoiceData {
     balance: number;
     public_url: string;
     public_notes: string;
+    footer: string;
   };
   client: {
     name: string;
@@ -66,7 +67,9 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
     paid_to_date: 0.0,
     balance: 1650.0,
     public_url: 'https://example.com/invoice/view/INV-0001',
-    public_notes: 'Example: Thank you for your business! Payment is due within 14 days.',
+    public_notes: 'Thank you for your business! Payment is due within 14 days.',
+    footer:
+      'If you have any questions, please contact us at hello@yourcompany.com',
   },
   client: {
     name: 'Acme Corporation',
@@ -188,6 +191,7 @@ export function replaceVariables(template: string, data: InvoiceData): string {
     /\$invoice\.public_notes/g,
     data.invoice.public_notes
   );
+  result = result.replace(/\$invoice\.footer/g, data.invoice.footer);
 
   return result;
 }
