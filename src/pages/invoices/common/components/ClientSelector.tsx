@@ -196,123 +196,118 @@ export function ClientSelector(props: Props) {
               'divide-[#1f2e41]': reactSettings.dark_mode,
             })}
           >
-            {client.contacts
-              .filter((contact) => !contact.cc_only)
-              .map((contact, index) => (
-                <div
-                  key={index}
-                  className={classNames(
-                    'flex justify-between items-center first:pt-0 pt-2',
-                    {
-                      'pb-1.5': !resource.invitations[0]?.link,
-                    }
-                  )}
-                >
-                  <div className="flex flex-col w-full">
-                    <div className="flex space-x-2.5 w-full">
-                      <Checkbox
-                        id={contact.id}
-                        value={contact.id}
-                        checked={handleCheckedState(contact.id)}
-                        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                          props.onContactCheckboxChange(
-                            event.target.value,
-                            event.target.checked
-                          )
-                        }
-                      />
+            {client.contacts.filter(contact => !contact.cc_only).map((contact, index) => (
+              <div
+                key={index}
+                className={classNames(
+                  'flex justify-between items-center first:pt-0 pt-2',
+                  {
+                    'pb-1.5': !resource.invitations[0]?.link,
+                  }
+                )}
+              >
+                <div className="flex flex-col w-full">
+                  <div className="flex space-x-2.5 w-full">
+                    <Checkbox
+                      id={contact.id}
+                      value={contact.id}
+                      checked={handleCheckedState(contact.id)}
+                      onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                        props.onContactCheckboxChange(
+                          event.target.value,
+                          event.target.checked
+                        )
+                      }
+                    />
 
-                      <div
-                        className={classNames('flex truncate', {
-                          'flex-col': !resource.invitations[0]?.link,
-                          'space-x-4': resource.invitations[0]?.link,
-                        })}
+                    <div
+                      className={classNames('flex truncate', {
+                        'flex-col': !resource.invitations[0]?.link,
+                        'space-x-4': resource.invitations[0]?.link,
+                      })}
+                    >
+                      <span
+                        className="text-sm font-medium"
+                        style={{ color: colors.$3 }}
                       >
-                        <span
-                          className="text-sm font-medium"
-                          style={{ color: colors.$3 }}
-                        >
-                          {contact.first_name.length >= 1
-                            ? `${contact.first_name} ${contact.last_name}`
-                            : contact.email || client.display_name}
+                        {contact.first_name.length >= 1
+                          ? `${contact.first_name} ${contact.last_name}`
+                          : contact.email || client.display_name}
+                      </span>
+
+                      {contact.first_name && (
+                        <span className="text-sm" style={{ color: colors.$22 }}>
+                          {contact.email}
                         </span>
-
-                        {contact.first_name && (
-                          <span
-                            className="text-sm"
-                            style={{ color: colors.$22 }}
-                          >
-                            {contact.email}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {company?.enable_modules && (
-                      <div className="flex space-x-2.5 w-full mt-2">
-                        <Checkbox
-                          id={`can-sign-${contact.id}`}
-                          checked={getCanSignState(contact.id)}
-                          disabled={false}
-                          onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                            props.onContactCanSignCheckboxChange?.(
-                              contact.id,
-                              event.target.checked
-                            );
-                          }}
-                        />
-
-                        <div className="flex truncate">
-                          <span
-                            className={`text-sm font-medium ${
-                              !isContactInvited(contact.id) ? 'opacity-50' : ''
-                            }`}
-                            style={{ color: colors.$3 }}
-                          >
-                            {t('authorized_to_sign')}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex flex-col relative left-7">
-                      {(() => {
-                        const contactInvitation = resource.invitations?.find(
-                          (inv) => inv.client_contact_id === contact.id
-                        );
-                        return (
-                          Boolean(contactInvitation?.link) && (
-                            <div className="flex items-center space-x-2">
-                              <Link
-                                className="font-medium"
-                                to={`${contactInvitation.link}?silent=true&client_hash=${client.client_hash}`}
-                                external
-                              >
-                                {t('view_in_portal')}
-                              </Link>
-
-                              <Tooltip
-                                width="auto"
-                                placement="bottom"
-                                message={t('copy_link') as string}
-                                withoutArrow
-                              >
-                                <div className="mt-1.5">
-                                  <CopyToClipboardIconOnly
-                                    text={contactInvitation.link}
-                                  />
-                                </div>
-                              </Tooltip>
-                            </div>
-                          )
-                        );
-                      })()}
+                      )}
                     </div>
                   </div>
 
-                  {contact.is_locked && <UserUnsubscribedTooltip size={24} />}
+                  {company?.enable_modules && (
+                    <div className="flex space-x-2.5 w-full mt-2">
+                      <Checkbox
+                        id={`can-sign-${contact.id}`}
+                        checked={getCanSignState(contact.id)}
+                        disabled={false}
+                        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                          props.onContactCanSignCheckboxChange?.(
+                            contact.id,
+                            event.target.checked
+                          );
+                        }}
+                      />
+
+                      <div className="flex truncate">
+                        <span
+                          className={`text-sm font-medium ${
+                            !isContactInvited(contact.id) ? 'opacity-50' : ''
+                          }`}
+                          style={{ color: colors.$3 }}
+                        >
+                          {t('authorized_to_sign')}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col relative left-7">
+                    {(() => {
+                      const contactInvitation = resource.invitations?.find(
+                        (inv) => inv.client_contact_id === contact.id
+                      );
+                      return (
+                        Boolean(contactInvitation?.link) && (
+                          <div className="flex items-center space-x-2">
+                            <Link
+                              className="font-medium"
+                              to={`${contactInvitation.link}?silent=true&client_hash=${client.client_hash}`}
+                              external
+                            >
+                              {t('view_in_portal')}
+                            </Link>
+
+                            <Tooltip
+                              width="auto"
+                              placement="bottom"
+                              message={t('copy_link') as string}
+                              withoutArrow
+                            >
+                              <div className="mt-1.5">
+                                <CopyToClipboardIconOnly
+                                  text={contactInvitation.link}
+                                />
+                              </div>
+                            </Tooltip>
+                          </div>
+                        )
+                      );
+                    })()}
+                  </div>
                 </div>
-              ))}
+
+                {contact.is_locked && <UserUnsubscribedTooltip size={24} />}
+              </div>
+            ))}
           </div>
         </div>
       )}
