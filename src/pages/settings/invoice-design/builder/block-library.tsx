@@ -20,6 +20,7 @@ import {
   Receipt,
   Space,
   Type,
+  Clock,
 } from 'lucide-react';
 import { BlockDefinition } from './types';
 
@@ -213,9 +214,9 @@ export const blockLibrary: BlockDefinition[] = [
   // Data
   {
     type: 'table',
-    label: 'Line Items Table',
+    label: 'Products Table',
     icon: <Table className="w-5 h-5" />,
-    description: 'Invoice items with columns',
+    description: 'Product line items with columns',
     defaultSize: { w: 12, h: 8 },
     defaultProperties: {
       columns: [
@@ -242,6 +243,64 @@ export const blockLibrary: BlockDefinition[] = [
         },
         {
           id: 'cost',
+          header: 'Rate',
+          field: 'item.cost',
+          width: '15%',
+          align: 'right',
+        },
+        {
+          id: 'line_total',
+          header: 'Amount',
+          field: 'item.line_total',
+          width: '15%',
+          align: 'right',
+        },
+      ],
+      headerBg: '#F3F4F6',
+      headerColor: '#111827',
+      headerFontWeight: 'bold',
+      rowBg: '#FFFFFF',
+      alternateRowBg: '#F9FAFB',
+      borderColor: '#E5E7EB',
+      fontSize: '12px',
+      padding: '8px',
+      showBorders: true,
+      alternateRows: true,
+    },
+    category: 'data',
+    essential: true,
+  },
+  {
+    type: 'tasks-table',
+    label: 'Tasks Table',
+    icon: <Clock className="w-5 h-5" />,
+    description: 'Task line items with columns',
+    defaultSize: { w: 12, h: 8 },
+    defaultProperties: {
+      columns: [
+        {
+          id: 'service',
+          header: 'Service',
+          field: 'item.product_key',
+          width: '25%',
+          align: 'left',
+        },
+        {
+          id: 'notes',
+          header: 'Description',
+          field: 'item.notes',
+          width: '30%',
+          align: 'left',
+        },
+        {
+          id: 'hours',
+          header: 'Hours',
+          field: 'item.quantity',
+          width: '10%',
+          align: 'center',
+        },
+        {
+          id: 'rate',
           header: 'Rate',
           field: 'item.cost',
           width: '15%',
