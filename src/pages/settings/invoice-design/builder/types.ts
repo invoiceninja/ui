@@ -25,7 +25,8 @@ export type BlockType =
   | 'client-info'
   | 'company-info'
   | 'invoice-details'
-  | 'public-notes';
+  | 'public-notes'
+  | 'footer';
 
 export interface GridPosition {
   x: number; // Grid column (0-11 for 12-column grid)
