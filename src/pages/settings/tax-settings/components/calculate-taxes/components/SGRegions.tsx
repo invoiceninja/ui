@@ -155,6 +155,26 @@ export function SGRegions() {
                 subregion={subRegion}
                 taxSetting={taxSetting}
             />
+
+            <Element
+                leftSide={
+                    <p className="lg:pl-5">(SG) {t('sales_above_threshold')}</p>
+                }
+            >
+                <Toggle
+                    id="tax_data.regions.SG.has_sales_above_threshold"
+                    checked={
+                        companyChanges?.tax_data?.regions?.SG
+                            ?.has_sales_above_threshold
+                    }
+                    onValueChange={(v) =>
+                        handleChange(
+                            'tax_data.regions.SG.has_sales_above_threshold',
+                            v
+                        )
+                    }
+                />
+            </Element>
         </>
     );
 }
