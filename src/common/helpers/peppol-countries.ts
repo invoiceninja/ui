@@ -9,6 +9,7 @@
  */
 
 export const PEPPOL_COUNTRIES = [
+  '20',
   '40',
   '56',
   '208',
@@ -23,6 +24,7 @@ export const PEPPOL_COUNTRIES = [
 ];
 
 export const PEPPOL_CLASSIFICATIONS: Record<string, string[]> = {
+    '20': ['business', 'government'],            // AD
     '840': ['business'],                          // US
     '124': ['business'],                          // CA
     '484': ['business'],                          // MX

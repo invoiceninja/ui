@@ -13,6 +13,7 @@ import { EURegions } from './components/EURegions';
 import { UKRegions } from './components/UKRegions';
 import { SellerSubregion } from './components/SellerSubregion';
 import { USRegions } from './components/USRegions';
+import { AndorraRegions } from './components/AndorraRegions';
 
 export function CalculateTaxes() {
   return (
@@ -22,6 +23,7 @@ export function CalculateTaxes() {
       <EURegions />
       <UKRegions />
       <AURegions />
+      <AndorraRegions />
 
     </>
   );
