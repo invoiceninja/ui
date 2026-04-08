@@ -26,6 +26,7 @@ export interface InvoiceData {
     public_url: string;
     public_notes: string;
     footer: string;
+    terms: string;
   };
   client: {
     name: string;
@@ -70,6 +71,8 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
     public_notes: 'Thank you for your business! Payment is due within 14 days.',
     footer:
       'If you have any questions, please contact us at hello@yourcompany.com',
+    terms:
+      'Payment is due within 14 days of invoice date. Late payments may be subject to a 1.5% monthly service charge.',
   },
   client: {
     name: 'Acme Corporation',
@@ -192,6 +195,7 @@ export function replaceVariables(template: string, data: InvoiceData): string {
     data.invoice.public_notes
   );
   result = result.replace(/\$invoice\.footer/g, data.invoice.footer);
+  result = result.replace(/\$invoice\.terms/g, data.invoice.terms);
 
   return result;
 }

@@ -55,7 +55,8 @@ export function PropertyPanel({
       <div className="space-y-4">
         {(block.type === 'text' ||
           block.type === 'public-notes' ||
-          block.type === 'footer') && (
+          block.type === 'footer' ||
+          block.type === 'terms') && (
           <TextBlockProperties block={block} onChange={onChange} />
         )}
 
