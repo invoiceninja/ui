@@ -100,6 +100,9 @@ export const BlockRenderer = memo(function BlockRenderer({
     case 'footer':
       return <FooterRenderer block={block} />;
 
+    case 'terms':
+      return <TermsRenderer block={block} />;
+
     case 'table':
     case 'tasks-table':
       return <TableBlockRenderer block={block} />;
@@ -352,6 +355,33 @@ function FooterRenderer({ block }: BlockRendererProps) {
     >
       {displayContent || (
         <span className="text-gray-400 italic">Footer will appear here</span>
+      )}
+    </div>
+  );
+}
+
+function TermsRenderer({ block }: BlockRendererProps) {
+  const { content, fontSize, fontWeight, color, align, lineHeight, padding } =
+    block.properties;
+
+  const contentToRender = content || '$invoice.terms';
+  const displayContent = replaceVariables(contentToRender, SAMPLE_INVOICE_DATA);
+
+  return (
+    <div
+      style={{
+        fontSize,
+        fontWeight,
+        color,
+        textAlign: align,
+        lineHeight,
+        padding,
+        height: '100%',
+        whiteSpace: 'pre-line',
+      }}
+    >
+      {displayContent || (
+        <span className="text-gray-400 italic">Terms will appear here</span>
       )}
     </div>
   );
