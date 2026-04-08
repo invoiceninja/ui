@@ -94,6 +94,9 @@ export const BlockRenderer = memo(function BlockRenderer({
     case 'invoice-details':
       return <InvoiceDetailsRenderer block={block} />;
 
+    case 'public-notes':
+      return <PublicNotesRenderer block={block} />;
+
     case 'table':
     case 'tasks-table':
       return <TableBlockRenderer block={block} />;
@@ -291,6 +294,35 @@ function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
       }}
     >
       {displayContent}
+    </div>
+  );
+}
+
+function PublicNotesRenderer({ block }: BlockRendererProps) {
+  const { content, fontSize, fontWeight, color, align, lineHeight, padding } =
+    block.properties;
+
+  const contentToRender = content || '$invoice.public_notes';
+  const displayContent = replaceVariables(contentToRender, SAMPLE_INVOICE_DATA);
+
+  return (
+    <div
+      style={{
+        fontSize,
+        fontWeight,
+        color,
+        textAlign: align,
+        lineHeight,
+        padding,
+        height: '100%',
+        whiteSpace: 'pre-line',
+      }}
+    >
+      {displayContent || (
+        <span className="text-gray-400 italic">
+          Public notes will appear here
+        </span>
+      )}
     </div>
   );
 }
