@@ -609,7 +609,23 @@ function SpacerBlockRenderer({ block }: BlockRendererProps) {
 }
 
 function QRCodeBlockRenderer({ block }: BlockRendererProps) {
-  const { size, align } = block.properties;
+  const { size, align, qrType } = block.properties;
+
+  const getQrLabel = () => {
+    switch (qrType) {
+      case 'sepa':
+        return 'SEPA QR';
+      case 'swiss':
+        return 'Swiss QR';
+      case 'spc':
+        return 'SPC QR';
+      case 'verifactu':
+        return 'Verifactu QR';
+      case 'payment_link':
+      default:
+        return 'Payment QR';
+    }
+  };
 
   return (
     <div style={{ textAlign: align }}>
@@ -622,9 +638,14 @@ function QRCodeBlockRenderer({ block }: BlockRendererProps) {
           alignItems: 'center',
           justifyContent: 'center',
           border: '2px solid #e5e7eb',
+          flexDirection: 'column',
+          gap: '4px',
         }}
       >
-        <span className="text-gray-400 text-xs">QR Code</span>
+        <span className="text-gray-400 text-xs font-medium">
+          {getQrLabel()}
+        </span>
+        <span className="text-gray-300 text-[10px]">{size}</span>
       </div>
     </div>
   );
