@@ -1,4 +1,5 @@
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
@@ -12,6 +13,8 @@ interface Props {
 export function TaxDataBadge({ resource }: Props) {
   const currentCompany = useCurrentCompany();
 
+  const numericFormatter = useNumericFormatter();
+
   if (
     !resource ||
     currentCompany?.settings.country_id !== '840' ||
@@ -24,7 +27,10 @@ export function TaxDataBadge({ resource }: Props) {
     <>
       {Object.entries(resource.client?.tax_info || {}).length ? (
         <Badge variant="yellow">
-          {(resource.client?.tax_info?.taxSales || 0) * 100} %
+          {numericFormatter(
+            String((resource.client?.tax_info?.taxSales || 0) * 100)
+          )}{' '}
+          %
         </Badge>
       ) : (
         <TaxDataModal
