@@ -22,6 +22,7 @@ import {
   Type,
   Clock,
   StickyNote,
+  PanelBottom,
 } from 'lucide-react';
 import { BlockDefinition } from './types';
 
@@ -210,6 +211,24 @@ export const blockLibrary: BlockDefinition[] = [
       lineHeight: '1.5',
       color: '#374151',
       align: 'left',
+      fontStyle: 'normal',
+      padding: '0px',
+    },
+    category: 'content',
+  },
+  {
+    type: 'footer',
+    label: 'Footer',
+    icon: <PanelBottom className="w-5 h-5" />,
+    description: 'Invoice footer text',
+    defaultSize: { w: 12, h: 2 },
+    defaultProperties: {
+      content: '$invoice.footer',
+      fontSize: '11px',
+      fontWeight: 'normal',
+      lineHeight: '1.4',
+      color: '#6B7280',
+      align: 'center',
       fontStyle: 'normal',
       padding: '0px',
     },
