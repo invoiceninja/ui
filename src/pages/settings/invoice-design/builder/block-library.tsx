@@ -23,6 +23,7 @@ import {
   Clock,
   StickyNote,
   PanelBottom,
+  FileText,
 } from 'lucide-react';
 import { BlockDefinition } from './types';
 
@@ -229,6 +230,24 @@ export const blockLibrary: BlockDefinition[] = [
       lineHeight: '1.4',
       color: '#6B7280',
       align: 'center',
+      fontStyle: 'normal',
+      padding: '0px',
+    },
+    category: 'content',
+  },
+  {
+    type: 'terms',
+    label: 'Terms',
+    icon: <FileText className="w-5 h-5" />,
+    description: 'Invoice terms and conditions',
+    defaultSize: { w: 12, h: 3 },
+    defaultProperties: {
+      content: '$invoice.terms',
+      fontSize: '11px',
+      fontWeight: 'normal',
+      lineHeight: '1.5',
+      color: '#374151',
+      align: 'left',
       fontStyle: 'normal',
       padding: '0px',
     },
