@@ -24,7 +24,8 @@ export type BlockType =
   | 'signature'
   | 'client-info'
   | 'company-info'
-  | 'invoice-details';
+  | 'invoice-details'
+  | 'public-notes';
 
 export interface GridPosition {
   x: number; // Grid column (0-11 for 12-column grid)
