@@ -16,6 +16,7 @@ export type BlockType =
   | 'image'
   | 'logo'
   | 'table'
+  | 'tasks-table'
   | 'divider'
   | 'spacer'
   | 'total'
