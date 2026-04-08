@@ -73,7 +73,7 @@ export function PropertyPanel({
           <ImageBlockProperties block={block} onChange={onChange} />
         )}
 
-        {block.type === 'table' && (
+        {(block.type === 'table' || block.type === 'tasks-table') && (
           <TableBlockProperties block={block} onChange={onChange} />
         )}
 
