@@ -24,6 +24,7 @@ export interface InvoiceData {
     paid_to_date: number;
     balance: number;
     public_url: string;
+    public_notes: string;
   };
   client: {
     name: string;
@@ -58,13 +59,14 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
     date: '2025-12-09',
     due_date: '2025-12-23',
     po_number: 'PO-2025-001',
-    subtotal: 1500.00,
-    tax: 150.00,
-    discount: 0.00,
-    total: 1650.00,
-    paid_to_date: 0.00,
-    balance: 1650.00,
+    subtotal: 1500.0,
+    tax: 150.0,
+    discount: 0.0,
+    total: 1650.0,
+    paid_to_date: 0.0,
+    balance: 1650.0,
     public_url: 'https://example.com/invoice/view/INV-0001',
+    public_notes: 'Example: Thank you for your business! Payment is due within 14 days.',
   },
   client: {
     name: 'Acme Corporation',
@@ -86,15 +88,15 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
       product_key: 'WEB-DESIGN',
       notes: 'Website Design & Development',
       quantity: 1,
-      cost: 1000.00,
-      line_total: 1000.00,
+      cost: 1000.0,
+      line_total: 1000.0,
     },
     {
       product_key: 'CONSULTING',
       notes: 'Technical Consulting Services',
       quantity: 5,
-      cost: 100.00,
-      line_total: 500.00,
+      cost: 100.0,
+      line_total: 500.0,
     },
   ],
 };
@@ -135,29 +137,57 @@ export function replaceVariables(template: string, data: InvoiceData): string {
   result = result.replace(/\$company\.name/g, data.company.name);
   result = result.replace(/\$company\.logo/g, data.company.logo);
   result = result.replace(/\$company\.address/g, data.company.address);
-  result = result.replace(/\$company\.city_state_postal/g, data.company.city_state_postal);
+  result = result.replace(
+    /\$company\.city_state_postal/g,
+    data.company.city_state_postal
+  );
   result = result.replace(/\$company\.phone/g, data.company.phone);
   result = result.replace(/\$company\.email/g, data.company.email);
 
   // Client variables
   result = result.replace(/\$client\.name/g, data.client.name);
   result = result.replace(/\$client\.address/g, data.client.address);
-  result = result.replace(/\$client\.city_state_postal/g, data.client.city_state_postal);
+  result = result.replace(
+    /\$client\.city_state_postal/g,
+    data.client.city_state_postal
+  );
   result = result.replace(/\$client\.phone/g, data.client.phone);
   result = result.replace(/\$client\.email/g, data.client.email);
 
   // Invoice variables
   result = result.replace(/\$invoice\.number/g, data.invoice.number);
   result = result.replace(/\$invoice\.date/g, formatDate(data.invoice.date));
-  result = result.replace(/\$invoice\.due_date/g, formatDate(data.invoice.due_date));
+  result = result.replace(
+    /\$invoice\.due_date/g,
+    formatDate(data.invoice.due_date)
+  );
   result = result.replace(/\$invoice\.po_number/g, data.invoice.po_number);
-  result = result.replace(/\$invoice\.subtotal/g, formatCurrency(data.invoice.subtotal));
+  result = result.replace(
+    /\$invoice\.subtotal/g,
+    formatCurrency(data.invoice.subtotal)
+  );
   result = result.replace(/\$invoice\.tax/g, formatCurrency(data.invoice.tax));
-  result = result.replace(/\$invoice\.discount/g, formatCurrency(data.invoice.discount));
-  result = result.replace(/\$invoice\.total/g, formatCurrency(data.invoice.total));
-  result = result.replace(/\$invoice\.paid_to_date/g, formatCurrency(data.invoice.paid_to_date));
-  result = result.replace(/\$invoice\.balance/g, formatCurrency(data.invoice.balance));
+  result = result.replace(
+    /\$invoice\.discount/g,
+    formatCurrency(data.invoice.discount)
+  );
+  result = result.replace(
+    /\$invoice\.total/g,
+    formatCurrency(data.invoice.total)
+  );
+  result = result.replace(
+    /\$invoice\.paid_to_date/g,
+    formatCurrency(data.invoice.paid_to_date)
+  );
+  result = result.replace(
+    /\$invoice\.balance/g,
+    formatCurrency(data.invoice.balance)
+  );
   result = result.replace(/\$invoice\.public_url/g, data.invoice.public_url);
+  result = result.replace(
+    /\$invoice\.public_notes/g,
+    data.invoice.public_notes
+  );
 
   return result;
 }
