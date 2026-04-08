@@ -21,6 +21,7 @@ import {
   Space,
   Type,
   Clock,
+  StickyNote,
 } from 'lucide-react';
 import { BlockDefinition } from './types';
 
@@ -193,6 +194,24 @@ export const blockLibrary: BlockDefinition[] = [
       color: '#374151',
       labelColor: '#6B7280',
       showLabels: true,
+    },
+    category: 'content',
+  },
+  {
+    type: 'public-notes',
+    label: 'Public Notes',
+    icon: <StickyNote className="w-5 h-5" />,
+    description: 'Invoice public notes',
+    defaultSize: { w: 12, h: 3 },
+    defaultProperties: {
+      content: '$invoice.public_notes',
+      fontSize: '12px',
+      fontWeight: 'normal',
+      lineHeight: '1.5',
+      color: '#374151',
+      align: 'left',
+      fontStyle: 'normal',
+      padding: '0px',
     },
     category: 'content',
   },
