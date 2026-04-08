@@ -25,13 +25,15 @@ import { Button, InputField, Link } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import classNames from 'classnames';
 import { useFormik } from 'formik';
 import { get } from 'lodash';
 import { useEffect, useState } from 'react';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+
+export type Classification = 'individual' | 'business' | 'government';
 
 export type Step =
   | 'plan_check'
@@ -63,11 +65,14 @@ export function Onboarding() {
   const accentColor = useAccentColor();
 
   const { t } = useTranslation();
+  const company = useCurrentCompany();
+
+  const isSingapore = company?.settings?.country_id === '702';
 
   const [isVisible, setIsVisible] = useState(false);
   const [step, setStep] = useState<Step>('plan_check');
   const [steps, setSteps] = useState<Step[]>(defaultSteps);
-  const [businessType, setBusinessType] = useState<'individual' | 'business'>();
+  const [businessType, setBusinessType] = useState<Classification>();
 
   useEffect(() => {
     if (step === 'completed') {
@@ -143,7 +148,9 @@ export function Onboarding() {
                         {t('step')} {i + 1}
                       </span>
                       <h4 className="text-base lg:text-lg text-gray-900">
-                        {t(translations[s])}
+                        {s === 'vat_check' && isSingapore
+                          ? t('classification')
+                          : t(translations[s])}
                       </h4>
                     </a>
                   </li>
@@ -162,6 +169,7 @@ export function Onboarding() {
                 setBusinessType={setBusinessType}
                 onContinue={next}
                 step={step}
+                isSingapore={isSingapore}
               />
             ) : null}
 
@@ -174,6 +182,7 @@ export function Onboarding() {
                 step={step}
                 onContinue={next}
                 businessType={businessType!}
+                isSingapore={isSingapore}
               />
             ) : null}
           </div>
@@ -363,10 +372,11 @@ function BuyCredits({ onContinue }: StepProps) {
 }
 
 type FormProps = StepProps & {
-  businessType: 'individual' | 'business';
+  businessType: Classification;
+  isSingapore: boolean;
 };
 
-function Form({ onContinue, businessType }: FormProps) {
+function Form({ onContinue, businessType, isSingapore }: FormProps) {
   const { t } = useTranslation();
   const company = useCurrentCompany();
   const refresh = useRefreshCompanyUsers();
@@ -383,7 +393,7 @@ function Form({ onContinue, businessType }: FormProps) {
       city: company?.settings?.city || '',
       county: company?.settings?.state || '',
       zip: company?.settings?.postal_code || '',
-      country: company?.settings?.country_id || '',
+      country: isSingapore ? '702' : (company?.settings?.country_id || ''),
       acts_as_sender: true,
       acts_as_receiver: true,
       vat_number: company?.settings?.vat_number || '',
@@ -400,7 +410,15 @@ function Form({ onContinue, businessType }: FormProps) {
         e_invoicing_token: account?.e_invoicing_token,
         classification: businessType,
       })
-        .then(() => {
+        .then((response: AxiosResponse) => {
+          const corppassUrl = response.data?.corppass?.corppass_url;
+
+          if (corppassUrl) {
+            toast.success('Redirecting to CorpPass for verification...');
+            window.location.href = corppassUrl;
+            return;
+          }
+
           toast.success('peppol_successfully_configured');
 
           onContinue();
@@ -452,31 +470,45 @@ function Form({ onContinue, businessType }: FormProps) {
           errorMessage={get(errors, 'errors.party_name')}
         />
 
-        {businessType === 'business' ? (
-          <InputField
-            value={form.values.vat_number}
-            onChange={form.handleChange}
-            label={t('vat_number')}
-            id="vat_number"
-            errorMessage={get(errors, 'errors.vat_number')}
-          />
-        ) : null}
-
-        {businessType === 'individual' ? (
+        {isSingapore ? (
           <InputField
             value={form.values.id_number}
             onChange={form.handleChange}
-            label={t('id_number')}
+            label="UEN (Unique Entity Number)"
             id="id_number"
+            placeholder="e.g. 12345678A"
             errorMessage={get(errors, 'errors.id_number')}
           />
-        ) : null}
+        ) : (
+          <>
+            {businessType === 'business' ? (
+              <InputField
+                value={form.values.vat_number}
+                onChange={form.handleChange}
+                label={t('vat_number')}
+                id="vat_number"
+                errorMessage={get(errors, 'errors.vat_number')}
+              />
+            ) : null}
+
+            {businessType === 'individual' ? (
+              <InputField
+                value={form.values.id_number}
+                onChange={form.handleChange}
+                label={t('id_number')}
+                id="id_number"
+                errorMessage={get(errors, 'errors.id_number')}
+              />
+            ) : null}
+          </>
+        )}
 
         <CountrySelector
           value={form.values.country}
           label={t('country')}
           onChange={(e) => form.setFieldValue('country', e)}
           errorMessage={get(errors, 'errors.country')}
+          disabled={isSingapore}
         />
 
         <InputField
@@ -544,19 +576,83 @@ function Form({ onContinue, businessType }: FormProps) {
 }
 
 type VatCheckProps = StepProps & {
-  businessType: 'business' | 'individual' | undefined;
-  setBusinessType: (businessType: 'business' | 'individual') => void;
+  businessType: Classification | undefined;
+  setBusinessType: (businessType: Classification) => void;
+  isSingapore: boolean;
 };
 
 function VatCheck({
   businessType,
   setBusinessType,
   onContinue,
+  isSingapore,
 }: VatCheckProps) {
   const { t } = useTranslation();
 
   const accentColor = useAccentColor();
   const colors = useColorScheme();
+
+  if (isSingapore) {
+    return (
+      <div>
+        <p className="text-lg">Select your entity classification</p>
+
+        <div className="my-5 space-y-2">
+          <button
+            className="rounded w-full p-3 text-left border flex justify-between items-center"
+            style={{
+              backgroundColor: colors.$1,
+              borderColor:
+                businessType === 'business' ? accentColor : colors.$5,
+            }}
+            onClick={() => setBusinessType('business')}
+          >
+            <p>{t('business')}</p>
+
+            <Check
+              size={18}
+              color={accentColor}
+              className={classNames({
+                hidden: businessType !== 'business',
+              })}
+            />
+          </button>
+
+          <button
+            className="rounded w-full p-3 text-left border flex justify-between items-center"
+            style={{
+              backgroundColor: colors.$1,
+              borderColor:
+                businessType === 'government' ? accentColor : colors.$5,
+            }}
+            onClick={() => setBusinessType('government')}
+          >
+            <p>{t('government')}</p>
+
+            <Check
+              size={18}
+              color={accentColor}
+              className={classNames({
+                hidden: businessType !== 'government',
+              })}
+            />
+          </button>
+        </div>
+
+        <div className="flex justify-end">
+          <Button
+            behavior="button"
+            type="primary"
+            disabled={!businessType}
+            disableWithoutIcon
+            onClick={() => onContinue()}
+          >
+            {t('continue')}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -611,7 +707,7 @@ function VatCheck({
           disableWithoutIcon
           onClick={() => onContinue()}
         >
-          {t('Continue')}
+          {t('continue')}
         </Button>
       </div>
     </div>

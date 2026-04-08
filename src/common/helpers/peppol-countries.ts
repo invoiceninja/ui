@@ -19,6 +19,7 @@ export const PEPPOL_COUNTRIES = [
   '442',
   '528',
   '578',
+  '702',
   '752',
   '826',
 ];
