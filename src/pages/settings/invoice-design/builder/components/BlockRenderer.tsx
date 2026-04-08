@@ -95,6 +95,7 @@ export const BlockRenderer = memo(function BlockRenderer({
       return <InvoiceDetailsRenderer block={block} />;
 
     case 'table':
+    case 'tasks-table':
       return <TableBlockRenderer block={block} />;
 
     case 'total':
