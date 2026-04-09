@@ -859,6 +859,9 @@ export function InvoiceBuilder() {
                         ? `0 1px 3px ${colors.$24}40`
                         : 'none',
                   }}
+                  onClick={() => {
+                    handleSelectBlock(block.id);
+                  }}
                 >
                   {/* Top Bar - Always visible with drag handle, title, and actions */}
                   <div
