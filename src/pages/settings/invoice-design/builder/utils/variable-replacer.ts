@@ -18,7 +18,6 @@ export interface InvoiceData {
     due_date: string;
     po_number: string;
     subtotal: number;
-    tax: number;
     discount: number;
     total: number;
     paid_to_date: number;
@@ -63,11 +62,11 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
     due_date: '2025-12-23',
     po_number: 'PO-2025-001',
     subtotal: 1500.0,
-    tax: 150.0,
     discount: 0.0,
     total: 1650.0,
     paid_to_date: 0.0,
     balance: 1650.0,
+    total_taxes: 150.0,
     public_url: 'https://example.com/invoice/view/INV-0001',
     public_notes: 'Thank you for your business! Payment is due within 14 days.',
     footer:
