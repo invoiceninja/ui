@@ -411,7 +411,7 @@ function Form({ onContinue, businessType, isSingapore }: FormProps) {
         classification: businessType,
       })
         .then((response: AxiosResponse) => {
-          const corppassUrl = response.data?.corppass?.corppass_url;
+          const corppassUrl = response.data?.corppass_url;
 
           if (corppassUrl) {
             toast.success('Redirecting to CorpPass for verification...');
