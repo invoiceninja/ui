@@ -286,8 +286,8 @@ function ClientInfoRenderer({ block }: BlockRendererProps) {
 }
 
 function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
-  const { content, fontSize, lineHeight, align, color } = block.properties;
-  const displayContent = replaceVariables(content, SAMPLE_INVOICE_DATA);
+  const { fieldConfigs, fontSize, lineHeight, align, color, showLabels } =
+    block.properties;
 
   return (
     <div
@@ -296,10 +296,41 @@ function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
         lineHeight,
         textAlign: align,
         color,
-        whiteSpace: 'pre-line',
       }}
     >
-      {displayContent}
+      {fieldConfigs?.map((field: FieldConfig, index: number) => {
+        const displayValue = replaceVariables(
+          field.variable,
+          SAMPLE_INVOICE_DATA
+        );
+
+        if (
+          field.hideIfEmpty !== false &&
+          (!displayValue || displayValue.trim() === '')
+        ) {
+          return null;
+        }
+
+        const fieldFontSize = field.fontSize || fontSize;
+        const fieldColor = field.color || color;
+
+        const prefix = showLabels !== false ? field.prefix || '' : '';
+
+        return (
+          <div
+            key={field.id || index}
+            style={{
+              fontSize: fieldFontSize,
+              fontWeight: field.fontWeight,
+              color: fieldColor,
+              fontStyle: field.fontStyle,
+            }}
+          >
+            {prefix}
+            {displayValue}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -532,6 +563,10 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
                 isBalance?: boolean;
                 field: string;
                 label: string;
+                fontSize?: string;
+                fontWeight?: string;
+                color?: string;
+                fontStyle?: string;
               },
               index: number
             ) => {
@@ -542,22 +577,29 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
                 SAMPLE_INVOICE_DATA
               );
 
+              const itemFontSize =
+                item.fontSize || (isTotal ? totalFontSize : fontSize);
+              const itemFontWeight =
+                item.fontWeight || (isTotal ? totalFontWeight : 'normal');
+              const itemColor = item.color || labelColor;
+
               return (
                 <tr
                   key={index}
                   style={{
-                    fontSize: isTotal ? totalFontSize : fontSize,
-                    fontWeight: isTotal ? totalFontWeight : 'normal',
+                    fontSize: itemFontSize,
+                    fontWeight: itemFontWeight,
                   }}
                 >
                   <td
                     style={{
-                      color: labelColor,
+                      color: itemColor,
                       paddingBottom: spacing,
                       padding: labelPadding || undefined,
                       paddingRight: gap, // Override right padding with gap
                       textAlign: 'right',
                       whiteSpace: 'nowrap',
+                      fontStyle: item.fontStyle || undefined,
                     }}
                   >
                     {item.label}:
