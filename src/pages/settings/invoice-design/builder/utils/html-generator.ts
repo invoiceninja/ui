@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Block } from '../types';
+import { Block, FieldConfig } from '../types';
 import { GRID_CONFIG } from './grid-converter';
 import {
   InvoiceData,
@@ -628,8 +628,37 @@ function renderClientInfoBlock(block: Block, data: InvoiceData): string {
 }
 
 function renderInvoiceDetailsBlock(block: Block, data: InvoiceData): string {
-  const { content, fontSize, lineHeight, align, color } = block.properties;
-  const replacedContent = replaceVariables(content, data);
+  const { fieldConfigs, fontSize, lineHeight, align, color, showLabels } =
+    block.properties;
+
+  const fieldsHtml =
+    fieldConfigs
+      ?.map((field: FieldConfig) => {
+        const displayValue = replaceVariables(field.variable, data);
+
+        if (
+          field.hideIfEmpty !== false &&
+          (!displayValue || displayValue.trim() === '')
+        ) {
+          return '';
+        }
+
+        const fieldFontSize = field.fontSize || fontSize;
+        const fieldColor = field.color || color;
+        const prefix = showLabels !== false ? field.prefix || '' : '';
+
+        return `
+        <div style="
+          font-size: ${fieldFontSize};
+          font-weight: ${field.fontWeight || 'normal'};
+          color: ${fieldColor};
+          font-style: ${field.fontStyle || 'normal'};
+        ">
+          ${escapeHtml(prefix)}${escapeHtml(displayValue)}
+        </div>
+      `;
+      })
+      .join('\n') || '';
 
   return `
     <div style="
@@ -637,9 +666,8 @@ function renderInvoiceDetailsBlock(block: Block, data: InvoiceData): string {
       line-height: ${lineHeight};
       text-align: ${align};
       color: ${color};
-      white-space: pre-line;
     ">
-      ${escapeHtml(replacedContent)}
+      ${fieldsHtml}
     </div>
   `;
 }
