@@ -89,7 +89,7 @@ export default function EInvoice() {
     enabled:
       credit !== null &&
       location.pathname.includes('e_invoice') &&
-      Boolean(credit?.status_id === InvoiceStatus.Sent && credit?.backup?.guid),
+      Boolean(credit?.status_id === InvoiceStatus.Sent),
     staleTime: Infinity,
   });
 
@@ -227,7 +227,7 @@ export default function EInvoice() {
                       className="flex items-center space-x-4 border-l-2 border-green-600 pl-4 py-4"
                     >
                       <div className="whitespace-nowrap font-medium w-24">
-                        { entity === 'invoice' ? t('credit') : t(entity)}:
+                        {entity === 'invoice' ? t('credit') : t(entity)}:
                       </div>
 
                       <div>
