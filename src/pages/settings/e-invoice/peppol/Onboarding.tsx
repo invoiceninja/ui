@@ -15,6 +15,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useIsWhitelabelled } from '$app/common/hooks/usePaidOrSelfhost';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -381,6 +382,7 @@ function Form({ onContinue, businessType, isSingapore }: FormProps) {
   const company = useCurrentCompany();
   const refresh = useRefreshCompanyUsers();
   const account = useCurrentAccount();
+  const user = useCurrentUser();
 
   const [errors, setErrors] = useState<ValidationBag | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -398,6 +400,8 @@ function Form({ onContinue, businessType, isSingapore }: FormProps) {
       acts_as_receiver: true,
       vat_number: company?.settings?.vat_number || '',
       id_number: company?.settings.id_number || '',
+      c5_signer_name: isSingapore ? `${user?.first_name || ''} ${user?.last_name || ''}`.trim() : '',
+      c5_signer_email: isSingapore ? (user?.email || '') : '',
     },
     onSubmit: (values, { setSubmitting }) => {
       toast.processing();
@@ -471,14 +475,32 @@ function Form({ onContinue, businessType, isSingapore }: FormProps) {
         />
 
         {isSingapore ? (
-          <InputField
-            value={form.values.id_number}
-            onChange={form.handleChange}
-            label="UEN (Unique Entity Number)"
-            id="id_number"
-            placeholder="e.g. 12345678A"
-            errorMessage={get(errors, 'errors.id_number')}
-          />
+          <>
+            <InputField
+              value={form.values.id_number}
+              onChange={form.handleChange}
+              label="UEN (Unique Entity Number)"
+              id="id_number"
+              placeholder="e.g. 12345678A"
+              errorMessage={get(errors, 'errors.id_number')}
+            />
+
+            <InputField
+              value={form.values.c5_signer_name}
+              onChange={form.handleChange}
+              label={t('name')}
+              id="c5_signer_name"
+              errorMessage={get(errors, 'errors.c5_signer_name')}
+            />
+
+            <InputField
+              value={form.values.c5_signer_email}
+              onChange={form.handleChange}
+              label={t('email')}
+              id="c5_signer_email"
+              errorMessage={get(errors, 'errors.c5_signer_email')}
+            />
+          </>
         ) : (
           <>
             {businessType === 'business' ? (
