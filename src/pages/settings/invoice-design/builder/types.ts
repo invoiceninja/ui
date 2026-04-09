@@ -113,6 +113,10 @@ export interface TotalItem {
   show: boolean;
   isTotal?: boolean;
   isBalance?: boolean;
+  fontSize?: string;
+  fontWeight?: string;
+  color?: string;
+  fontStyle?: string;
 }
 
 export interface TotalBlockPropertiesHint {
@@ -155,6 +159,10 @@ export interface FieldConfig {
   prefix?: string;
   suffix?: string;
   hideIfEmpty?: boolean;
+  fontSize?: string;
+  fontWeight?: string;
+  color?: string;
+  fontStyle?: string;
 }
 
 export interface ClientInfoBlockPropertiesHint {
@@ -179,7 +187,7 @@ export interface CompanyInfoBlockPropertiesHint {
 }
 
 export interface InvoiceDetailsBlockPropertiesHint {
-  content?: string;
+  fieldConfigs?: FieldConfig[]; // Per-field typography
   fontSize?: string;
   lineHeight?: string;
   align?: string;
