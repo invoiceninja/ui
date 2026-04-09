@@ -58,6 +58,10 @@ export const TotalBlock = memo(function TotalBlock({ block }: TotalBlockProps) {
                 isBalance?: boolean;
                 field: string;
                 label: string;
+                fontSize?: string;
+                fontWeight?: string;
+                color?: string;
+                fontStyle?: string;
               },
               index: number
             ) => {
@@ -68,22 +72,29 @@ export const TotalBlock = memo(function TotalBlock({ block }: TotalBlockProps) {
                 SAMPLE_INVOICE_DATA
               );
 
+              const itemFontSize =
+                item.fontSize || (isTotal ? totalFontSize : fontSize);
+              const itemFontWeight =
+                item.fontWeight || (isTotal ? totalFontWeight : 'normal');
+              const itemColor = item.color || labelColor;
+
               return (
                 <tr
                   key={index}
                   style={{
-                    fontSize: isTotal ? totalFontSize : fontSize,
-                    fontWeight: isTotal ? totalFontWeight : 'normal',
+                    fontSize: itemFontSize,
+                    fontWeight: itemFontWeight,
                   }}
                 >
                   <td
                     style={{
-                      color: labelColor,
+                      color: itemColor,
                       paddingBottom: spacing,
                       padding: labelPadding || undefined,
                       paddingRight: gap,
                       textAlign: 'right',
                       whiteSpace: 'nowrap',
+                      fontStyle: item.fontStyle || undefined,
                     }}
                   >
                     {item.label}:
@@ -93,8 +104,8 @@ export const TotalBlock = memo(function TotalBlock({ block }: TotalBlockProps) {
                       color: isBalance
                         ? balanceColor
                         : isTotal
-                        ? totalColor
-                        : amountColor,
+                          ? totalColor
+                          : amountColor,
                       paddingBottom: spacing,
                       padding: valuePadding || undefined,
                       textAlign: 'right',
