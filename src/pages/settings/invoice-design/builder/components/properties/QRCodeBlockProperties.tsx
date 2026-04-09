@@ -16,7 +16,7 @@ const QR_CODE_TYPES = [
   {
     value: 'payment_link',
     label: 'Payment Link',
-    variable: '$payment_qr_code',
+    variable: '$payment_qrcode',
   },
   { value: 'sepa', label: 'SEPA/EPC QR', variable: '$sepa_qr_code' },
   { value: 'swiss', label: 'Swiss QR Bill', variable: '$swiss_qr' },
@@ -112,7 +112,7 @@ export function QRCodeBlockProperties({
           value={
             block.properties.data ||
             currentTypeConfig?.variable ||
-            '$payment_qr_code'
+            '$payment_qrcode'
           }
           readOnly
           className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-50 text-gray-500"

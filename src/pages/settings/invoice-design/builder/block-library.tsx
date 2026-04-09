@@ -189,7 +189,7 @@ export const blockLibrary: BlockDefinition[] = [
     defaultSize: { w: 6, h: 4 },
     defaultProperties: {
       content:
-        'Invoice #: $invoice.number\nDate: $invoice.date\nDue Date: $invoice.due_date\nPO Number: $invoice.po_number',
+        'Invoice #: $entity.number\nDate: $entity.date\nDue Date: $entity.due_date\nPO Number: $entity.po_number',
       fontSize: '12px',
       lineHeight: '1.8',
       align: 'left',
@@ -203,10 +203,10 @@ export const blockLibrary: BlockDefinition[] = [
     type: 'public-notes',
     label: 'Public Notes',
     icon: <StickyNote className="w-5 h-5" />,
-    description: 'Invoice public notes',
+    description: 'Public notes',
     defaultSize: { w: 12, h: 3 },
     defaultProperties: {
-      content: '$invoice.public_notes',
+      content: '$public_notes',
       fontSize: '12px',
       fontWeight: 'normal',
       lineHeight: '1.5',
@@ -224,7 +224,7 @@ export const blockLibrary: BlockDefinition[] = [
     description: 'Invoice footer text',
     defaultSize: { w: 12, h: 2 },
     defaultProperties: {
-      content: '$invoice.footer',
+      content: '$entity.footer',
       fontSize: '11px',
       fontWeight: 'normal',
       lineHeight: '1.4',
@@ -242,7 +242,7 @@ export const blockLibrary: BlockDefinition[] = [
     description: 'Invoice terms and conditions',
     defaultSize: { w: 12, h: 3 },
     defaultProperties: {
-      content: '$invoice.terms',
+      content: '$entity.terms',
       fontSize: '11px',
       fontWeight: 'normal',
       lineHeight: '1.5',
@@ -393,14 +393,14 @@ export const blockLibrary: BlockDefinition[] = [
     defaultSize: { w: 6, h: 6 },
     defaultProperties: {
       items: [
-        { label: 'Subtotal', field: '$invoice.subtotal', show: true },
-        { label: 'Discount', field: '$invoice.discount', show: true },
-        { label: 'Tax', field: '$invoice.tax', show: true },
-        { label: 'Total', field: '$invoice.total', show: true, isTotal: true },
-        { label: 'Amount Paid', field: '$invoice.paid_to_date', show: true },
+        { label: 'Subtotal', field: '$entity.subtotal', show: true },
+        { label: 'Discount', field: '$entity.discount', show: true },
+        { label: 'Tax', field: '$entity.total_taxes', show: true },
+        { label: 'Total', field: '$entity.total', show: true, isTotal: true },
+        { label: 'Amount Paid', field: '$paid_to_date', show: true },
         {
           label: 'Balance Due',
-          field: '$invoice.balance',
+          field: '$entity.balance',
           show: true,
           isBalance: true,
         },
@@ -459,7 +459,7 @@ export const blockLibrary: BlockDefinition[] = [
     defaultSize: { w: 2, h: 2 },
     defaultProperties: {
       qrType: 'payment_link',
-      data: '$payment_qr_code',
+      data: '$payment_qrcode',
       size: '100px',
       align: 'center',
     },

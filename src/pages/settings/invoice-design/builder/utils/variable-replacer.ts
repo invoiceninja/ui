@@ -27,6 +27,7 @@ export interface InvoiceData {
     public_notes: string;
     footer: string;
     terms: string;
+    total_taxes: number;
   };
   client: {
     name: string;
@@ -161,41 +162,41 @@ export function replaceVariables(template: string, data: InvoiceData): string {
   result = result.replace(/\$client\.email/g, data.client.email);
 
   // Invoice variables
-  result = result.replace(/\$invoice\.number/g, data.invoice.number);
-  result = result.replace(/\$invoice\.date/g, formatDate(data.invoice.date));
+  result = result.replace(/\$entity\.number/g, data.invoice.number);
+  result = result.replace(/\$entity\.date/g, formatDate(data.invoice.date));
   result = result.replace(
-    /\$invoice\.due_date/g,
+    /\$entity\.due_date/g,
     formatDate(data.invoice.due_date)
   );
-  result = result.replace(/\$invoice\.po_number/g, data.invoice.po_number);
+  result = result.replace(/\$entity\.po_number/g, data.invoice.po_number);
   result = result.replace(
-    /\$invoice\.subtotal/g,
+    /\$entity\.subtotal/g,
     formatCurrency(data.invoice.subtotal)
   );
-  result = result.replace(/\$invoice\.tax/g, formatCurrency(data.invoice.tax));
+  result = result.replace(/\$entity\.tax/g, formatCurrency(data.invoice.total_taxes));
   result = result.replace(
-    /\$invoice\.discount/g,
+    /\$entity\.discount/g,
     formatCurrency(data.invoice.discount)
   );
   result = result.replace(
-    /\$invoice\.total/g,
+    /\$entity\.total/g,
     formatCurrency(data.invoice.total)
   );
   result = result.replace(
-    /\$invoice\.paid_to_date/g,
+    /\$entity\.paid_to_date/g,
     formatCurrency(data.invoice.paid_to_date)
   );
   result = result.replace(
-    /\$invoice\.balance/g,
+    /\$entity\.balance/g,
     formatCurrency(data.invoice.balance)
   );
-  result = result.replace(/\$invoice\.public_url/g, data.invoice.public_url);
+  result = result.replace(/\$entity\.public_url/g, data.invoice.public_url);
   result = result.replace(
-    /\$invoice\.public_notes/g,
+    /\$entity\.public_notes/g,
     data.invoice.public_notes
   );
-  result = result.replace(/\$invoice\.footer/g, data.invoice.footer);
-  result = result.replace(/\$invoice\.terms/g, data.invoice.terms);
+  result = result.replace(/\$entity\.footer/g, data.invoice.footer);
+  result = result.replace(/\$entity\.terms/g, data.invoice.terms);
 
   // QR Code variables (placeholders for preview)
   result = result.replace(/\$payment_qr_code/g, '[Payment QR Code]');
