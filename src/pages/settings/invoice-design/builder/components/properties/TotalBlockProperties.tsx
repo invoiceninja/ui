@@ -9,17 +9,22 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronUp, ChevronDown, Type } from 'lucide-react';
 import { PropertyEditorProps } from '../../types';
 import {
   ColorInput,
   TextInput,
   AlignmentInput,
   SectionDivider,
+  FontStyleInput,
 } from './PropertyInputs';
 
 export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
+  const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>(
+    {}
+  );
 
   const updateProperty = (key: string, value: any) => {
     onChange({
@@ -34,10 +39,19 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
     updateProperty('items', updatedItems);
   };
 
+  const updateItemTypography = (index: number, key: string, value: any) => {
+    const updatedItems = [...block.properties.items];
+    updatedItems[index] = { ...updatedItems[index], [key]: value };
+    updateProperty('items', updatedItems);
+  };
+
   const moveItemUp = (index: number) => {
     if (index === 0) return;
     const updatedItems = [...block.properties.items];
-    [updatedItems[index - 1], updatedItems[index]] = [updatedItems[index], updatedItems[index - 1]];
+    [updatedItems[index - 1], updatedItems[index]] = [
+      updatedItems[index],
+      updatedItems[index - 1],
+    ];
     updateProperty('items', updatedItems);
   };
 
@@ -45,8 +59,15 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
     const items = block.properties.items;
     if (index >= items.length - 1) return;
     const updatedItems = [...items];
-    [updatedItems[index], updatedItems[index + 1]] = [updatedItems[index + 1], updatedItems[index]];
+    [updatedItems[index], updatedItems[index + 1]] = [
+      updatedItems[index + 1],
+      updatedItems[index],
+    ];
     updateProperty('items', updatedItems);
+  };
+
+  const toggleItemExpand = (index: number) => {
+    setExpandedItems((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
   return (
@@ -56,39 +77,118 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
         <label className="block text-sm font-medium text-gray-700 mb-3">
           {t('items_to_display')}
         </label>
-        <div className="space-y-1">
+        <div className="space-y-2">
           {block.properties.items?.map((item: any, index: number) => (
-            <div key={index} className="flex items-center gap-1 p-2 border border-gray-200 rounded-md bg-white">
-              {/* Reorder buttons */}
-              <div className="flex flex-col">
-                <button
-                  onClick={() => moveItemUp(index)}
-                  disabled={index === 0}
-                  className={`p-0.5 rounded ${index === 0 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-100'}`}
-                  title={String(t('move_up'))}
+            <div
+              key={index}
+              className="border border-gray-200 rounded-md bg-white overflow-hidden"
+            >
+              <div className="flex items-center gap-1 p-2">
+                <div className="flex flex-col">
+                  <button
+                    onClick={() => moveItemUp(index)}
+                    disabled={index === 0}
+                    className={`p-0.5 rounded ${index === 0 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-100'}`}
+                    title={String(t('move_up'))}
+                  >
+                    <ChevronUp className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => moveItemDown(index)}
+                    disabled={index >= block.properties.items.length - 1}
+                    className={`p-0.5 rounded ${index >= block.properties.items.length - 1 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-100'}`}
+                    title={String(t('move_down'))}
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <input
+                  type="checkbox"
+                  id={`item-${index}`}
+                  checked={item.show}
+                  onChange={(e) =>
+                    updateItemVisibility(index, e.target.checked)
+                  }
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                />
+                <label
+                  htmlFor={`item-${index}`}
+                  className="flex-1 text-sm text-gray-700"
                 >
-                  <ChevronUp className="w-4 h-4" />
-                </button>
+                  {item.label}
+                </label>
+
                 <button
-                  onClick={() => moveItemDown(index)}
-                  disabled={index >= block.properties.items.length - 1}
-                  className={`p-0.5 rounded ${index >= block.properties.items.length - 1 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-100'}`}
-                  title={String(t('move_down'))}
+                  onClick={() => toggleItemExpand(index)}
+                  className={`p-1.5 rounded transition-colors ${expandedItems[index] ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:bg-gray-100'}`}
+                  title={String(t('typography'))}
                 >
-                  <ChevronDown className="w-4 h-4" />
+                  <Type className="w-4 h-4" />
                 </button>
               </div>
-              
-              <input
-                type="checkbox"
-                id={`item-${index}`}
-                checked={item.show}
-                onChange={(e) => updateItemVisibility(index, e.target.checked)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded"
-              />
-              <label htmlFor={`item-${index}`} className="flex-1 text-sm text-gray-700">
-                {item.label}
-              </label>
+
+              {expandedItems[index] && (
+                <div className="px-3 pb-3 pt-1 border-t border-gray-100 bg-gray-50 space-y-3">
+                  {/* Font Size */}
+                  <TextInput
+                    label={String(t('font_size'))}
+                    value={item.fontSize || ''}
+                    onChange={(value) =>
+                      updateItemTypography(
+                        index,
+                        'fontSize',
+                        value || undefined
+                      )
+                    }
+                    placeholder={
+                      item.isTotal
+                        ? block.properties.totalFontSize || '18px'
+                        : block.properties.fontSize || '13px'
+                    }
+                  />
+
+                  <FontStyleInput
+                    label={String(t('font_style'))}
+                    fontWeight={
+                      item.fontWeight ||
+                      (item.isTotal
+                        ? block.properties.totalFontWeight
+                        : 'normal')
+                    }
+                    fontStyle={item.fontStyle || 'normal'}
+                    onFontWeightChange={(value) =>
+                      updateItemTypography(
+                        index,
+                        'fontWeight',
+                        value === 'normal' ? undefined : value
+                      )
+                    }
+                    onFontStyleChange={(value) =>
+                      updateItemTypography(
+                        index,
+                        'fontStyle',
+                        value === 'normal' ? undefined : value
+                      )
+                    }
+                  />
+
+                  <ColorInput
+                    label={String(t('label_color'))}
+                    value={item.color || ''}
+                    onChange={(value) =>
+                      updateItemTypography(index, 'color', value || undefined)
+                    }
+                    defaultValue={
+                      item.isTotal
+                        ? block.properties.totalColor || '#111827'
+                        : item.isBalance
+                          ? block.properties.balanceColor || '#DC2626'
+                          : block.properties.labelColor || '#6B7280'
+                    }
+                  />
+                </div>
+              )}
             </div>
           ))}
         </div>
