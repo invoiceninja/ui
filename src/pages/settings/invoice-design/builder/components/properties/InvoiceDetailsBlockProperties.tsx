@@ -9,8 +9,9 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
-import { PropertyEditorProps } from '../../types';
+import { useState } from 'react';
+import { ChevronUp, ChevronDown, Trash2, Type } from 'lucide-react';
+import { PropertyEditorProps, FieldConfig } from '../../types';
 import {
   FontSizeInput,
   AlignmentInput,
@@ -19,75 +20,76 @@ import {
   TextInput,
   CheckboxInput,
   SectionDivider,
+  FontStyleInput,
 } from './PropertyInputs';
 
-// Available invoice detail fields
-const AVAILABLE_FIELDS = [
+// Available entity detail fields with entity-agnostic labels
+const AVAILABLE_FIELDS: Omit<FieldConfig, 'id'>[] = [
   {
-    id: 'number',
-    label: 'Invoice Number',
-    variable: '$invoice.number',
-    labelText: 'Invoice #:',
+    label: 'Number',
+    variable: '$entity.number',
+    prefix: 'Number: ',
+    hideIfEmpty: true,
   },
   {
-    id: 'date',
-    label: 'Invoice Date',
-    variable: '$invoice.date',
-    labelText: 'Date:',
+    label: 'Date',
+    variable: '$entity.date',
+    prefix: 'Date: ',
+    hideIfEmpty: true,
   },
   {
-    id: 'due_date',
     label: 'Due Date',
-    variable: '$invoice.due_date',
-    labelText: 'Due Date:',
+    variable: '$entity.due_date',
+    prefix: 'Due Date: ',
+    hideIfEmpty: true,
   },
   {
-    id: 'po_number',
     label: 'PO Number',
-    variable: '$invoice.po_number',
-    labelText: 'PO Number:',
+    variable: '$entity.po_number',
+    prefix: 'PO Number: ',
+    hideIfEmpty: true,
   },
   {
-    id: 'amount',
     label: 'Amount',
-    variable: '$invoice.amount',
-    labelText: 'Amount:',
+    variable: '$entity.amount',
+    prefix: 'Amount: ',
+    hideIfEmpty: true,
   },
   {
-    id: 'balance',
-    label: 'Balance Due',
-    variable: '$invoice.balance',
-    labelText: 'Balance Due:',
+    label: 'Balance',
+    variable: '$entity.balance',
+    prefix: 'Balance: ',
+    hideIfEmpty: true,
   },
   {
-    id: 'partial',
     label: 'Partial/Deposit',
-    variable: '$invoice.partial',
-    labelText: 'Deposit:',
+    variable: '$entity.partial',
+    prefix: 'Partial/Deposit: ',
+    hideIfEmpty: true,
   },
   {
-    id: 'custom_value1',
     label: 'Custom Field 1',
-    variable: '$invoice.custom_value1',
-    labelText: 'Custom 1:',
+    variable: '$entity.custom_value1',
+    prefix: 'Custom 1: ',
+    hideIfEmpty: true,
   },
   {
-    id: 'custom_value2',
     label: 'Custom Field 2',
-    variable: '$invoice.custom_value2',
-    labelText: 'Custom 2:',
+    variable: '$entity.custom_value2',
+    prefix: 'Custom 2: ',
+    hideIfEmpty: true,
   },
   {
-    id: 'custom_value3',
     label: 'Custom Field 3',
-    variable: '$invoice.custom_value3',
-    labelText: 'Custom 3:',
+    variable: '$entity.custom_value3',
+    prefix: 'Custom 3: ',
+    hideIfEmpty: true,
   },
   {
-    id: 'custom_value4',
     label: 'Custom Field 4',
-    variable: '$invoice.custom_value4',
-    labelText: 'Custom 4:',
+    variable: '$entity.custom_value4',
+    prefix: 'Custom 4: ',
+    hideIfEmpty: true,
   },
 ];
 
@@ -96,26 +98,13 @@ export function InvoiceDetailsBlockProperties({
   onChange,
 }: PropertyEditorProps) {
   const [t] = useTranslation();
-
-  // Parse current content to get fields in order
-  const currentContent = block.properties.content || '';
-  const contentLines = currentContent
-    .split('\n')
-    .filter((line: string) => line.trim());
-  const showLabels = block.properties.showLabels !== false;
-
-  // Get enabled fields in their current order by finding which field each line contains
-  const enabledFieldsOrdered = contentLines
-    .map((line: string) =>
-      AVAILABLE_FIELDS.find((f) => line.includes(f.variable))
-    )
-    .filter(Boolean) as typeof AVAILABLE_FIELDS;
-
-  // Get fields not yet added
-  const enabledVariables = enabledFieldsOrdered.map((f) => f.variable);
-  const availableToAdd = AVAILABLE_FIELDS.filter(
-    (field) => !enabledVariables.includes(field.variable)
+  const [expandedFields, setExpandedFields] = useState<Record<string, boolean>>(
+    {}
   );
+
+  // Migrate from old content-based format to fieldConfigs if needed
+  const fieldConfigs: FieldConfig[] = block.properties.fieldConfigs || [];
+  const showLabels = block.properties.showLabels !== false;
 
   const updateProperty = (key: string, value: any) => {
     onChange({
@@ -124,115 +113,181 @@ export function InvoiceDetailsBlockProperties({
     });
   };
 
-  const rebuildContent = (
-    fields: typeof AVAILABLE_FIELDS,
-    withLabels: boolean
-  ) => {
-    const newContent = fields
-      .map((field) =>
-        withLabels ? `${field.labelText} ${field.variable}` : field.variable
-      )
-      .join('\n');
-    updateProperty('content', newContent);
+  const updateFieldTypography = (index: number, key: string, value: any) => {
+    const updatedConfigs = [...fieldConfigs];
+    updatedConfigs[index] = {
+      ...updatedConfigs[index],
+      [key]: value || undefined,
+    };
+    updateProperty('fieldConfigs', updatedConfigs);
   };
 
-  const addField = (field: (typeof AVAILABLE_FIELDS)[0]) => {
-    rebuildContent([...enabledFieldsOrdered, field], showLabels);
+  const addField = (fieldTemplate: (typeof AVAILABLE_FIELDS)[0]) => {
+    const newField: FieldConfig = {
+      id: `${fieldTemplate.variable}-${Date.now()}`,
+      ...fieldTemplate,
+    };
+    updateProperty('fieldConfigs', [...fieldConfigs, newField]);
   };
 
   const removeField = (index: number) => {
-    const newFields = [...enabledFieldsOrdered];
-    newFields.splice(index, 1);
-    rebuildContent(newFields, showLabels);
+    const newConfigs = [...fieldConfigs];
+    newConfigs.splice(index, 1);
+    updateProperty('fieldConfigs', newConfigs);
   };
 
   const moveFieldUp = (index: number) => {
     if (index === 0) return;
-    const newFields = [...enabledFieldsOrdered];
-    [newFields[index - 1], newFields[index]] = [
-      newFields[index],
-      newFields[index - 1],
+    const newConfigs = [...fieldConfigs];
+    [newConfigs[index - 1], newConfigs[index]] = [
+      newConfigs[index],
+      newConfigs[index - 1],
     ];
-    rebuildContent(newFields, showLabels);
+    updateProperty('fieldConfigs', newConfigs);
   };
 
   const moveFieldDown = (index: number) => {
-    if (index >= enabledFieldsOrdered.length - 1) return;
-    const newFields = [...enabledFieldsOrdered];
-    [newFields[index], newFields[index + 1]] = [
-      newFields[index + 1],
-      newFields[index],
+    if (index >= fieldConfigs.length - 1) return;
+    const newConfigs = [...fieldConfigs];
+    [newConfigs[index], newConfigs[index + 1]] = [
+      newConfigs[index + 1],
+      newConfigs[index],
     ];
-    rebuildContent(newFields, showLabels);
+    updateProperty('fieldConfigs', newConfigs);
   };
+
+  const toggleFieldExpand = (fieldId: string) => {
+    setExpandedFields((prev) => ({ ...prev, [fieldId]: !prev[fieldId] }));
+  };
+
+  // Get available fields not yet added
+  const addedVariables = fieldConfigs.map((f) => f.variable);
+  const availableToAdd = AVAILABLE_FIELDS.filter(
+    (field) => !addedVariables.includes(field.variable)
+  );
 
   return (
     <div className="space-y-4">
-      {/* Show Labels */}
+      {/* Show Labels - Toggle to hide/show all prefixes */}
       <CheckboxInput
         id="showLabels"
         label={String(t('show_labels'))}
         checked={showLabels}
-        onChange={(value) => {
-          updateProperty('showLabels', value);
-          rebuildContent(enabledFieldsOrdered, value);
-        }}
+        onChange={(value) => updateProperty('showLabels', value)}
       />
 
-      {/* Active Fields - Reorderable (custom implementation due to labelText handling) */}
+      {/* Active Fields - Reorderable with per-field typography */}
       <div className="space-y-3">
         <label className="block text-sm font-medium text-gray-700">
           {t('field_order')}
         </label>
 
-        <div className="space-y-1">
-          {enabledFieldsOrdered.map((field, index) => (
+        <div className="space-y-2">
+          {fieldConfigs.map((field, index) => (
             <div
               key={field.id}
-              className="flex items-center gap-1 p-2 border border-gray-200 rounded-md bg-white"
+              className="border border-gray-200 rounded-md bg-white overflow-hidden"
             >
-              <div className="flex flex-col">
+              {/* Field Header Row */}
+              <div className="flex items-center gap-1 p-2">
+                <div className="flex flex-col">
+                  <button
+                    onClick={() => moveFieldUp(index)}
+                    disabled={index === 0}
+                    className={`p-0.5 rounded ${
+                      index === 0
+                        ? 'text-gray-300 cursor-not-allowed'
+                        : 'text-gray-500 hover:bg-gray-100'
+                    }`}
+                    title={String(t('move_up'))}
+                  >
+                    <ChevronUp className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => moveFieldDown(index)}
+                    disabled={index >= fieldConfigs.length - 1}
+                    className={`p-0.5 rounded ${
+                      index >= fieldConfigs.length - 1
+                        ? 'text-gray-300 cursor-not-allowed'
+                        : 'text-gray-500 hover:bg-gray-100'
+                    }`}
+                    title={String(t('move_down'))}
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <span className="flex-1 text-sm text-gray-700">
+                  {field.label}
+                </span>
+
+                {/* Typography Toggle Button */}
                 <button
-                  onClick={() => moveFieldUp(index)}
-                  disabled={index === 0}
-                  className={`p-0.5 rounded ${
-                    index === 0
-                      ? 'text-gray-300 cursor-not-allowed'
-                      : 'text-gray-500 hover:bg-gray-100'
-                  }`}
-                  title={String(t('move_up'))}
+                  onClick={() => toggleFieldExpand(field.id)}
+                  className={`p-1.5 rounded transition-colors ${expandedFields[field.id] ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:bg-gray-100'}`}
+                  title={String(t('typography'))}
                 >
-                  <ChevronUp className="w-4 h-4" />
+                  <Type className="w-4 h-4" />
                 </button>
+
                 <button
-                  onClick={() => moveFieldDown(index)}
-                  disabled={index >= enabledFieldsOrdered.length - 1}
-                  className={`p-0.5 rounded ${
-                    index >= enabledFieldsOrdered.length - 1
-                      ? 'text-gray-300 cursor-not-allowed'
-                      : 'text-gray-500 hover:bg-gray-100'
-                  }`}
-                  title={String(t('move_down'))}
+                  onClick={() => removeField(index)}
+                  className="p-1 rounded hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors"
+                  title={String(t('remove'))}
                 >
-                  <ChevronDown className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
 
-              <span className="flex-1 text-sm text-gray-700">
-                {field.label}
-              </span>
+              {/* Expanded Typography Controls */}
+              {expandedFields[field.id] && (
+                <div className="px-3 pb-3 pt-1 border-t border-gray-100 bg-gray-50 space-y-3">
+                  {/* Font Size */}
+                  <TextInput
+                    label={String(t('font_size'))}
+                    value={field.fontSize || ''}
+                    onChange={(value) =>
+                      updateFieldTypography(index, 'fontSize', value)
+                    }
+                    placeholder={block.properties.fontSize || '12px'}
+                  />
 
-              <button
-                onClick={() => removeField(index)}
-                className="p-1 rounded hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors"
-                title={String(t('remove'))}
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+                  {/* Font Weight & Style */}
+                  <FontStyleInput
+                    label={String(t('font_style'))}
+                    fontWeight={field.fontWeight || 'normal'}
+                    fontStyle={field.fontStyle || 'normal'}
+                    onFontWeightChange={(value) =>
+                      updateFieldTypography(
+                        index,
+                        'fontWeight',
+                        value === 'normal' ? undefined : value
+                      )
+                    }
+                    onFontStyleChange={(value) =>
+                      updateFieldTypography(
+                        index,
+                        'fontStyle',
+                        value === 'normal' ? undefined : value
+                      )
+                    }
+                  />
+
+                  {/* Text Color */}
+                  <ColorInput
+                    label={String(t('text_color'))}
+                    value={field.color || ''}
+                    onChange={(value) =>
+                      updateFieldTypography(index, 'color', value || undefined)
+                    }
+                    defaultValue={block.properties.color || '#374151'}
+                  />
+                </div>
+              )}
             </div>
           ))}
 
-          {enabledFieldsOrdered.length === 0 && (
+          {fieldConfigs.length === 0 && (
             <div className="text-center py-4 text-gray-500 text-sm border border-dashed border-gray-300 rounded-md">
               {t('no_fields_selected')}
             </div>
@@ -248,7 +303,7 @@ export function InvoiceDetailsBlockProperties({
             <div className="flex flex-wrap gap-2">
               {availableToAdd.map((field) => (
                 <button
-                  key={field.id}
+                  key={field.variable}
                   onClick={() => addField(field)}
                   className="px-3 py-1.5 text-xs border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 transition-colors"
                 >
@@ -262,7 +317,7 @@ export function InvoiceDetailsBlockProperties({
 
       <SectionDivider label={String(t('typography'))} />
 
-      {/* Font Size */}
+      {/* Global Font Size */}
       <FontSizeInput
         label={String(t('font_size'))}
         value={block.properties.fontSize}
