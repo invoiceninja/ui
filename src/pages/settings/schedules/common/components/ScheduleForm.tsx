@@ -65,6 +65,14 @@ export function ScheduleForm(props: Props) {
       headerStyle={{ borderColor: colors.$20 }}
       withoutBodyPadding
     >
+      <Element leftSide={t('name')} required>
+        <InputField
+          value={schedule.name || ''}
+          onValueChange={(value) => handleChange('name', value)}
+          errorMessage={errors?.errors.name}
+        />
+      </Element>
+
       {displayTemplateField('template') && (
         <Element leftSide={t('template')} required>
           <SelectField
@@ -78,7 +86,9 @@ export function ScheduleForm(props: Props) {
             <option value="email_statement">{t('email_statement')}</option>
             <option value="email_record">{t('email_record')}</option>
             <option value="email_report">{t('email_report')}</option>
-            <option value="invoice_outstanding_tasks">{t('invoice_outstanding_tasks')}</option>
+            <option value="invoice_outstanding_tasks">
+              {t('invoice_outstanding_tasks')}
+            </option>
             <option value="payment_schedule">{t('payment_schedule')}</option>
           </SelectField>
         </Element>
