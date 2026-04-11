@@ -12,6 +12,7 @@ import { Schedule } from '$app/common/interfaces/schedule';
 import { DataTableColumns } from '$app/components/DataTable';
 import { useTranslation } from 'react-i18next';
 import frequencies from '$app/common/constants/frequency';
+import { Templates } from '$app/pages/settings/schedules/common/components/ScheduleForm';
 
 export function useScheduleColumns() {
   const [t] = useTranslation();
@@ -20,6 +21,35 @@ export function useScheduleColumns() {
     {
       id: 'name',
       label: t('name'),
+      format: (value, schedule) => {
+        if (value) {
+          return value;
+        }
+
+        if (schedule.template === Templates.EMAIL_RECORD) {
+          return `${t(schedule.template as string)}: ${t(
+            schedule.parameters.entity
+          )}`;
+        }
+
+        if (schedule.template === Templates.EMAIL_REPORT) {
+          return `${t(schedule.template as string)}: ${t(
+            schedule.parameters.report_name
+          )} | ${t(schedule.parameters.date_range)}`;
+        }
+
+        if (schedule.template === Templates.PAYMENT_SCHEDULE) {
+          return schedule.name;
+        }
+
+        if (schedule.template === Templates.INVOICE_OUTSTANDING_TASKS) {
+          return schedule.name;
+        }
+
+        return `${t(schedule.template as string)}: ${t(
+          schedule.parameters.date_range
+        )}`;
+      },
     },
     {
       id: 'next_run',

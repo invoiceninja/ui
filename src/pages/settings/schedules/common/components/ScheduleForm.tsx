@@ -65,7 +65,7 @@ export function ScheduleForm(props: Props) {
       headerStyle={{ borderColor: colors.$20 }}
       withoutBodyPadding
     >
-      <Element leftSide={t('name')} required>
+      <Element leftSide={t('name')}>
         <InputField
           value={schedule.name || ''}
           onValueChange={(value) => handleChange('name', value)}
