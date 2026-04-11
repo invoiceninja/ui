@@ -43,6 +43,7 @@ const History = lazy(
 const EmailHistory = lazy(
   () => import('$app/pages/purchase-orders/edit/components/EmailHistory')
 );
+const Import = lazy(() => import('$app/pages/purchase-orders/import/Import'));
 
 export const purchaseOrderRoutes = (
   <Route path="/purchase_orders">
@@ -59,6 +60,22 @@ export const purchaseOrderRoutes = (
             ),
           ]}
           component={<PurchaseOrders />}
+        />
+      }
+    />
+
+    <Route
+      path="import"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.PurchaseOrders),
+            or(
+              permission('create_purchase_order'),
+              permission('edit_purchase_order')
+            ),
+          ]}
+          component={<Import />}
         />
       }
     />

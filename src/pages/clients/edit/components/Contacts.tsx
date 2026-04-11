@@ -76,6 +76,7 @@ export function Contacts(props: Props) {
       phone: '',
       send_email: false,
       can_sign: false,
+      cc_only: false,
     });
 
     props.setContacts(contacts);
@@ -219,22 +220,42 @@ export function Contacts(props: Props) {
                     contact.contact_key as string
                   )
                 }
+                disabled={Boolean(contact?.cc_only)}
+              />
+            </Element>
+
+            <Element leftSide={t('cc_only')} noExternalPadding>
+              <Toggle
+                checked={Boolean(contact?.cc_only)}
+                onChange={(value) => {
+                  handleChange(value, 'cc_only', contact.contact_key as string);
+
+                  if (value) {
+                    setTimeout(() => {
+                      handleChange(
+                        false,
+                        'send_email',
+                        contact.contact_key as string
+                      );
+                    }, 100);
+                  }
+                }}
               />
             </Element>
 
             {company?.enable_modules && (
-            <Element leftSide={t('authorized_to_sign')} noExternalPadding>
-              <Toggle
-                checked={Boolean(contact?.can_sign)}
-                onChange={(value) =>
-                  handleChange(
-                    value,
-                    'can_sign',
-                    contact.contact_key as string
-                  )
-                }
-              />
-            </Element>
+              <Element leftSide={t('authorized_to_sign')} noExternalPadding>
+                <Toggle
+                  checked={Boolean(contact?.can_sign)}
+                  onChange={(value) =>
+                    handleChange(
+                      value,
+                      'can_sign',
+                      contact.contact_key as string
+                    )
+                  }
+                />
+              </Element>
             )}
 
             {company?.custom_fields?.contact1 && (
