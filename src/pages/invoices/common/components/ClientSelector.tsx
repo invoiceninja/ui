@@ -196,7 +196,7 @@ export function ClientSelector(props: Props) {
               'divide-[#1f2e41]': reactSettings.dark_mode,
             })}
           >
-            {client.contacts.map((contact, index) => (
+            {client.contacts.filter(contact => !contact.cc_only).map((contact, index) => (
               <div
                 key={index}
                 className={classNames(
