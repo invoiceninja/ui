@@ -261,6 +261,8 @@ export function Details(props: Props) {
             base_type: transaction?.base_type || '',
             transaction_id: transaction?.id || '',
             status_id: transaction?.status_id || '',
+            invoice_ids: transaction?.invoice_ids || '',
+            payment_id: transaction?.payment_id || '',
           }}
           isCreditTransactionType={isCreditTransactionType}
           transactionRule={bankTransactionRuleResponse}
