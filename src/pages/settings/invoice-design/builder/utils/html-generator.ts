@@ -493,30 +493,46 @@ function renderCompanyInfoBlock(block: Block, data: InvoiceData): string {
     block.properties;
 
   if (fieldConfigs && Array.isArray(fieldConfigs) && fieldConfigs.length > 0) {
-    const lines: string[] = [];
+    const fieldsHtml = fieldConfigs
+      .map(
+        (config: {
+          variable: string;
+          prefix?: string;
+          suffix?: string;
+          hideIfEmpty?: boolean;
+          fontSize?: string;
+          fontWeight?: string;
+          fontStyle?: string;
+          color?: string;
+        }) => {
+          const resolvedValue = replaceVariables(config.variable, data);
 
-    fieldConfigs.forEach(
-      (config: {
-        variable: string;
-        prefix?: string;
-        suffix?: string;
-        hideIfEmpty?: boolean;
-      }) => {
-        const resolvedValue = replaceVariables(config.variable, data);
+          if (
+            config.hideIfEmpty !== false &&
+            (!resolvedValue || resolvedValue.trim() === '')
+          ) {
+            return '';
+          }
 
-        if (
-          config.hideIfEmpty !== false &&
-          (!resolvedValue || resolvedValue.trim() === '')
-        ) {
-          return;
+          const fieldFontSize = config.fontSize || fontSize;
+          const fieldColor = config.color || color;
+
+          return `
+          <div style="
+            font-size: ${fieldFontSize};
+            font-weight: ${config.fontWeight || 'normal'};
+            color: ${fieldColor};
+            font-style: ${config.fontStyle || 'normal'};
+          ">
+            ${escapeHtml(config.prefix || '')}${escapeHtml(resolvedValue)}${escapeHtml(config.suffix || '')}
+          </div>
+        `;
         }
+      )
+      .filter(Boolean)
+      .join('');
 
-        const line = `${config.prefix || ''}${resolvedValue}${config.suffix || ''}`;
-        lines.push(line);
-      }
-    );
-
-    if (lines.length === 0) {
+    if (!fieldsHtml) {
       return '<div>&nbsp;</div>';
     }
 
@@ -527,7 +543,7 @@ function renderCompanyInfoBlock(block: Block, data: InvoiceData): string {
         text-align: ${align};
         color: ${color};
       ">
-        ${lines.map((line) => `<div>${escapeHtml(line)}</div>`).join('')}
+        ${fieldsHtml}
       </div>
     `;
   }
