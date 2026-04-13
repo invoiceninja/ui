@@ -34,6 +34,7 @@ import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAle
 import { Badge } from '$app/components/Badge';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { TaxDataBadge } from '$app/pages/invoices/edit/components/TaxDataBadge';
+import { TaxExemptBadge } from '$app/pages/clients/show/components/TaxExemptBadge';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -79,33 +80,39 @@ export default function Edit() {
         >
           <div className="flex flex-col space-y-4">
             {quote && (
-              <div className="flex items-center space-x-9">
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: colors.$22 }}
-                >
-                  {t('status')}
-                </span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-9">
+                  <span
+                    className="text-sm font-medium"
+                    style={{ color: colors.$22 }}
+                  >
+                    {t('status')}
+                  </span>
 
-                <div className="flex items-center space-x-2">
-                  <QuoteStatusBadge entity={quote} />
+                  <div className="flex items-center space-x-2">
+                    <QuoteStatusBadge entity={quote} />
 
-                  {quote &&
-                    quote.sync?.dn_completed &&
-                    quote.sync?.invitations[0]?.dn_id && (
-                      <Badge
-                        variant="green"
-                        style={{ backgroundColor: statusThemeColors.$3 }}
-                      >
-                        <Link
-                          className="font-medium"
-                          to={`/docuninja/${quote.sync?.invitations[0]?.dn_id}`}
+                    {quote &&
+                      quote.sync?.dn_completed &&
+                      quote.sync?.invitations[0]?.dn_id && (
+                        <Badge
+                          variant="green"
+                          style={{ backgroundColor: statusThemeColors.$3 }}
                         >
-                          {t('signed_document')}
-                        </Link>
-                      </Badge>
-                    )}
+                          <Link
+                            className="font-medium"
+                            to={`/docuninja/${quote.sync?.invitations[0]?.dn_id}`}
+                          >
+                            {t('signed_document')}
+                          </Link>
+                        </Badge>
+                      )}
+                  </div>
                 </div>
+
+                <TaxExemptBadge
+                  isTaxExempt={Boolean(quote.client?.is_tax_exempt)}
+                />
               </div>
             )}
 
