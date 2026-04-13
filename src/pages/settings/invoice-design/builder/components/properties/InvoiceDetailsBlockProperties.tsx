@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ChevronUp, ChevronDown, Trash2, Type } from 'lucide-react';
 import { PropertyEditorProps, FieldConfig } from '../../types';
 import {
@@ -22,9 +22,10 @@ import {
   SectionDivider,
   FontStyleInput,
 } from './PropertyInputs';
+import { useCustomField } from '$app/components/CustomField';
 
-// Available entity detail fields with entity-agnostic labels
-const AVAILABLE_FIELDS: Omit<FieldConfig, 'id'>[] = [
+// Base entity detail fields (non-custom)
+const BASE_FIELDS: Omit<FieldConfig, 'id'>[] = [
   {
     label: 'Number',
     variable: '$entity.number',
@@ -67,30 +68,6 @@ const AVAILABLE_FIELDS: Omit<FieldConfig, 'id'>[] = [
     prefix: 'Partial/Deposit: ',
     hideIfEmpty: true,
   },
-  {
-    label: 'Custom Field 1',
-    variable: '$entity.custom_value1',
-    prefix: 'Custom 1: ',
-    hideIfEmpty: true,
-  },
-  {
-    label: 'Custom Field 2',
-    variable: '$entity.custom_value2',
-    prefix: 'Custom 2: ',
-    hideIfEmpty: true,
-  },
-  {
-    label: 'Custom Field 3',
-    variable: '$entity.custom_value3',
-    prefix: 'Custom 3: ',
-    hideIfEmpty: true,
-  },
-  {
-    label: 'Custom Field 4',
-    variable: '$entity.custom_value4',
-    prefix: 'Custom 4: ',
-    hideIfEmpty: true,
-  },
 ];
 
 export function InvoiceDetailsBlockProperties({
@@ -98,9 +75,54 @@ export function InvoiceDetailsBlockProperties({
   onChange,
 }: PropertyEditorProps) {
   const [t] = useTranslation();
+  const customField = useCustomField();
   const [expandedFields, setExpandedFields] = useState<Record<string, boolean>>(
     {}
   );
+
+  // Get available fields with custom field labels
+  const AVAILABLE_FIELDS = useMemo(() => {
+    const customFieldConfigs: Array<{
+      key: 'invoice1' | 'invoice2' | 'invoice3' | 'invoice4';
+      variable: string;
+      fallback: string;
+    }> = [
+      {
+        key: 'invoice1',
+        variable: '$entity.custom_value1',
+        fallback: t('custom_field_1'),
+      },
+      {
+        key: 'invoice2',
+        variable: '$entity.custom_value2',
+        fallback: t('custom_field_2'),
+      },
+      {
+        key: 'invoice3',
+        variable: '$entity.custom_value3',
+        fallback: t('custom_field_3'),
+      },
+      {
+        key: 'invoice4',
+        variable: '$entity.custom_value4',
+        fallback: t('custom_field_4'),
+      },
+    ];
+
+    const customFields = customFieldConfigs
+      .filter(({ key }) => customField(key).label()) // Only include if custom field has a label configured
+      .map(({ key, variable, fallback }) => {
+        const label = customField(key).label();
+        return {
+          label: label || fallback,
+          variable,
+          prefix: `${label || fallback}: `,
+          hideIfEmpty: true,
+        };
+      });
+
+    return [...BASE_FIELDS, ...customFields];
+  }, [customField, t]);
 
   // Migrate from old content-based format to fieldConfigs if needed
   const fieldConfigs: FieldConfig[] = block.properties.fieldConfigs || [];
