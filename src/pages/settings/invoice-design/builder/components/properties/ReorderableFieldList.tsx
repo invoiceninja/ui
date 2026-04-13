@@ -10,9 +10,17 @@
 
 import { useTranslation } from 'react-i18next';
 import { useState, useCallback } from 'react';
-import { ChevronUp, ChevronDown, Trash2, Plus, Settings2 } from 'lucide-react';
+import {
+  ChevronUp,
+  ChevronDown,
+  Trash2,
+  Plus,
+  Settings2,
+  Type,
+} from 'lucide-react';
 import { Button } from '$app/components/forms';
 import { FieldConfig } from '../../types';
+import { TextInput, ColorInput, FontStyleInput } from './PropertyInputs';
 
 export interface FieldDefinition {
   id: string;
@@ -170,62 +178,109 @@ export function ReorderableFieldList({
 
             {expandedField === `${field.id}-${index}` && (
               <div className="px-3 pb-3 pt-1 border-t border-gray-100 bg-gray-50 space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      {t('prefix')}
-                    </label>
-                    <input
-                      type="text"
-                      value={field.prefix || ''}
-                      onChange={(e) =>
-                        updateField(index, { prefix: e.target.value })
-                      }
-                      placeholder={String(t('prefix_placeholder'))}
-                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                    <Type className="w-3 h-3" />
+                    {t('typography')}
                   </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      {t('suffix')}
-                    </label>
-                    <input
-                      type="text"
-                      value={field.suffix || ''}
-                      onChange={(e) =>
-                        updateField(index, { suffix: e.target.value })
-                      }
-                      placeholder={String(t('suffix_placeholder'))}
-                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
+
+                  <TextInput
+                    label={String(t('font_size'))}
+                    value={field.fontSize || ''}
+                    onChange={(value) =>
+                      updateField(index, { fontSize: value || undefined })
+                    }
+                    placeholder="12px"
+                  />
+
+                  <FontStyleInput
+                    label={String(t('font_style'))}
+                    fontWeight={field.fontWeight || 'normal'}
+                    fontStyle={field.fontStyle || 'normal'}
+                    onFontWeightChange={(value) =>
+                      updateField(index, {
+                        fontWeight: value === 'normal' ? undefined : value,
+                      })
+                    }
+                    onFontStyleChange={(value) =>
+                      updateField(index, {
+                        fontStyle: value === 'normal' ? undefined : value,
+                      })
+                    }
+                  />
+
+                  <ColorInput
+                    label={String(t('text_color'))}
+                    value={field.color || ''}
+                    onChange={(value) =>
+                      updateField(index, { color: value || undefined })
+                    }
+                    defaultValue="#374151"
+                  />
                 </div>
 
-                {(field.prefix || field.suffix) && (
-                  <div className="text-xs text-gray-500 bg-white p-2 rounded border border-gray-200">
-                    <span className="font-medium">{t('preview')}: </span>
-                    <span className="text-gray-400">
-                      {field.prefix}
-                      {field.variable}
-                      {field.suffix}
-                    </span>
+                <div className="border-t border-gray-200 pt-3">
+                  <div className="flex items-center gap-2 text-xs font-medium text-gray-600 uppercase tracking-wider mb-3">
+                    <Settings2 className="w-3 h-3" />
+                    {t('field_options')}
                   </div>
-                )}
 
-                {/* Hide if empty toggle */}
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={field.hideIfEmpty !== false}
-                    onChange={(e) =>
-                      updateField(index, { hideIfEmpty: e.target.checked })
-                    }
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-gray-700">
-                    {t('hide_if_empty')}
-                  </span>
-                </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        {t('prefix')}
+                      </label>
+                      <input
+                        type="text"
+                        value={field.prefix || ''}
+                        onChange={(e) =>
+                          updateField(index, { prefix: e.target.value })
+                        }
+                        placeholder={String(t('prefix_placeholder'))}
+                        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        {t('suffix')}
+                      </label>
+                      <input
+                        type="text"
+                        value={field.suffix || ''}
+                        onChange={(e) =>
+                          updateField(index, { suffix: e.target.value })
+                        }
+                        placeholder={String(t('suffix_placeholder'))}
+                        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+
+                  {(field.prefix || field.suffix) && (
+                    <div className="text-xs text-gray-500 bg-white p-2 rounded border border-gray-200 mt-3">
+                      <span className="font-medium">{t('preview')}: </span>
+                      <span className="text-gray-400">
+                        {field.prefix}
+                        {field.variable}
+                        {field.suffix}
+                      </span>
+                    </div>
+                  )}
+
+                  <label className="flex items-center gap-2 mt-3">
+                    <input
+                      type="checkbox"
+                      checked={field.hideIfEmpty !== false}
+                      onChange={(e) =>
+                        updateField(index, { hideIfEmpty: e.target.checked })
+                      }
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">
+                      {t('hide_if_empty')}
+                    </span>
+                  </label>
+                </div>
               </div>
             )}
           </div>
