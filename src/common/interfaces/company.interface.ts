@@ -348,6 +348,8 @@ export interface Settings {
   ses_region: string;
   ses_topic_arn: string;
   ses_from_address: string;
+  e_invoice_forward_email: string;
+  skip_automatic_email_with_peppol: boolean;
 }
 
 export interface TaxData {
