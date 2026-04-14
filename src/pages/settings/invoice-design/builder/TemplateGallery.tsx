@@ -262,7 +262,7 @@ export function TemplateGallery() {
       backgroundColor: colors.$1,
       border: `1px solid ${isSelected ? colors.$3 : colors.$24}`,
       '--tw-ring-color': isSelected ? colors.$3 : 'transparent',
-    } as CSSProperties);
+    }) as CSSProperties;
 
   return (
     <div className="w-full max-w-5xl mx-auto px-6 space-y-6">
@@ -270,10 +270,10 @@ export function TemplateGallery() {
       <div className="flex items-center justify-between py-4">
         <div>
           <h1 className="text-2xl font-medium" style={{ color: colors.$3 }}>
-            Choose a Template
+            {t('choose_a_template')}
           </h1>
           <p className="text-sm mt-1" style={{ color: colors.$17 }}>
-            Select a starting point for your invoice design
+            {t('select_starting_point_for_invoice_design')}
           </p>
         </div>
         {selectedTemplate && (
@@ -283,7 +283,7 @@ export function TemplateGallery() {
             onClick={handleContinue}
             className="flex items-center gap-2"
           >
-            Continue
+            {t('continue')}
             <Check className="w-4 h-4" />
           </Button>
         )}
@@ -432,7 +432,7 @@ export function TemplateGallery() {
             style={{ color: colors.$17 }}
           />
           <p style={{ color: colors.$17 }}>
-            No templates found in this category
+            {t('no_templates_found_in_category')}
           </p>
         </div>
       )}

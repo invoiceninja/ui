@@ -9,8 +9,9 @@
  */
 
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Block, FieldConfig } from '../types';
-import { getBlockLabel } from '../block-library';
+import { useBlockLabel } from '../block-library';
 import {
   SAMPLE_INVOICE_DATA,
   replaceVariables,
@@ -76,6 +77,7 @@ export const BlockRenderer = memo(function BlockRenderer({
   block,
 }: BlockRendererProps) {
   const companyLogo = useLogo();
+  const blockLabel = useBlockLabel(block.type);
 
   switch (block.type) {
     case 'text':
@@ -125,7 +127,7 @@ export const BlockRenderer = memo(function BlockRenderer({
     default:
       return (
         <div className="flex items-center justify-center h-full bg-gray-100 text-gray-500 text-sm">
-          {getBlockLabel(block.type)}
+          {blockLabel}
         </div>
       );
   }
@@ -133,10 +135,11 @@ export const BlockRenderer = memo(function BlockRenderer({
 
 // Individual block renderers
 function TextBlockRenderer({ block }: BlockRendererProps) {
+  const { t } = useTranslation();
   const { content, fontSize, fontWeight, color, align, lineHeight } =
     block.properties;
   const displayContent = replaceVariables(
-    content || 'Enter text...',
+    content || t('enter_text'),
     SAMPLE_INVOICE_DATA
   );
 
@@ -163,6 +166,7 @@ interface ImageBlockRendererProps extends BlockRendererProps {
 }
 
 function ImageBlockRenderer({ block, companyLogo }: ImageBlockRendererProps) {
+  const { t } = useTranslation();
   const { source, align, maxWidth, objectFit } = block.properties;
 
   // If source is $company.logo, use the actual company logo
@@ -190,12 +194,12 @@ function ImageBlockRenderer({ block, companyLogo }: ImageBlockRendererProps) {
       {resolvedSource ? (
         <img
           src={resolvedSource}
-          alt={block.type === 'logo' ? 'Company Logo' : 'Block image'}
+          alt={String(block.type === 'logo' ? t('company_logo') : t('image'))}
           style={{ maxWidth, objectFit, maxHeight: '100%' }}
         />
       ) : (
         <div className="w-full h-full bg-gray-50 flex items-center justify-center text-gray-400 text-xs border-2 border-dashed border-gray-300 rounded">
-          {block.type === 'logo' ? 'Company Logo' : 'Image'}
+          {block.type === 'logo' ? t('company_logo') : t('image')}
         </div>
       )}
     </div>
@@ -336,6 +340,7 @@ function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
 }
 
 function PublicNotesRenderer({ block }: BlockRendererProps) {
+  const { t } = useTranslation();
   const { content, fontSize, fontWeight, color, align, lineHeight, padding } =
     block.properties;
 
@@ -357,7 +362,7 @@ function PublicNotesRenderer({ block }: BlockRendererProps) {
     >
       {displayContent || (
         <span className="text-gray-400 italic">
-          Public notes will appear here
+          {t('public_notes_will_appear_here')}
         </span>
       )}
     </div>
@@ -365,6 +370,7 @@ function PublicNotesRenderer({ block }: BlockRendererProps) {
 }
 
 function FooterRenderer({ block }: BlockRendererProps) {
+  const { t } = useTranslation();
   const { content, fontSize, fontWeight, color, align, lineHeight, padding } =
     block.properties;
 
@@ -385,13 +391,16 @@ function FooterRenderer({ block }: BlockRendererProps) {
       }}
     >
       {displayContent || (
-        <span className="text-gray-400 italic">Footer will appear here</span>
+        <span className="text-gray-400 italic">
+          {t('footer_will_appear_here')}
+        </span>
       )}
     </div>
   );
 }
 
 function TermsRenderer({ block }: BlockRendererProps) {
+  const { t } = useTranslation();
   const { content, fontSize, fontWeight, color, align, lineHeight, padding } =
     block.properties;
 
@@ -412,7 +421,9 @@ function TermsRenderer({ block }: BlockRendererProps) {
       }}
     >
       {displayContent || (
-        <span className="text-gray-400 italic">Terms will appear here</span>
+        <span className="text-gray-400 italic">
+          {t('terms_will_appear_here')}
+        </span>
       )}
     </div>
   );
@@ -651,21 +662,22 @@ function SpacerBlockRenderer({ block }: BlockRendererProps) {
 }
 
 function QRCodeBlockRenderer({ block }: BlockRendererProps) {
+  const { t } = useTranslation();
   const { size, align, qrType } = block.properties;
 
   const getQrLabel = () => {
     switch (qrType) {
       case 'sepa':
-        return 'SEPA QR';
+        return t('sepa_qr');
       case 'swiss':
-        return 'Swiss QR';
+        return t('swiss_qr');
       case 'spc':
-        return 'SPC QR';
+        return t('spc_qr');
       case 'verifactu':
-        return 'Verifactu QR';
+        return t('verifactu_qr');
       case 'payment_link':
       default:
-        return 'Payment QR';
+        return t('payment_qr');
     }
   };
 
@@ -694,6 +706,7 @@ function QRCodeBlockRenderer({ block }: BlockRendererProps) {
 }
 
 function SignatureBlockRenderer({ block }: BlockRendererProps) {
+  const { t } = useTranslation();
   const { label, showLine, showDate, align, fontSize, color } =
     block.properties;
 
@@ -713,7 +726,7 @@ function SignatureBlockRenderer({ block }: BlockRendererProps) {
       <div style={{ fontSize, color }}>{label}</div>
       {showDate && (
         <div style={{ fontSize, color, marginTop: '4px' }}>
-          Date: ________________
+          {t('date_colon')} ________________
         </div>
       )}
     </div>
