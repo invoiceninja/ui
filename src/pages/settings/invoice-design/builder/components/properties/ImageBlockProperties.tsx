@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Building2 } from 'lucide-react';
+import { Building2, Check } from 'lucide-react';
 import { PropertyEditorProps } from '../../types';
 import { useLogo } from '$app/common/hooks/useLogo';
 import {
@@ -38,51 +38,70 @@ export function ImageBlockProperties({ block, onChange }: PropertyEditorProps) {
 
   return (
     <div className="space-y-4">
-      {/* Company Logo Preview (for logo block type) */}
       {block.type === 'logo' && companyLogo && (
-        <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-          <label className="block text-sm font-medium text-gray-700 mb-3">
-            {t('company_logo_preview')}
-          </label>
-          <div className="flex items-center gap-4">
-            <div className="w-24 h-24 bg-white border border-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
-              <img
-                src={companyLogo}
-                alt="Company Logo"
-                className="max-w-full max-h-full object-contain"
-              />
-            </div>
-            <div className="flex-1">
-              <button
-                onClick={useCompanyLogo}
-                className={`
-                  w-full flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all
-                  ${isUsingCompanyLogo
-                    ? 'bg-green-100 text-green-700 border border-green-300'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }
-                `}
-              >
-                <Building2 className="w-4 h-4" />
-                {isUsingCompanyLogo ? t('using_company_logo') : t('use_company_logo')}
-              </button>
+        <div className="border border-gray-200 rounded-xl bg-gradient-to-b from-gray-50 to-white p-5">
+          <div className="flex items-center justify-between mb-4">
+            <label className="text-sm font-semibold text-gray-800">
+              {t('company_logo_preview')}
+            </label>
+            {isUsingCompanyLogo && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                <Check className="w-3 h-3" />
+                {t('active')}
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative">
+              <div className="w-32 h-32 bg-white border-2 border-gray-200 rounded-2xl shadow-sm flex items-center justify-center overflow-hidden">
+                <img
+                  src={companyLogo}
+                  alt={String(t('company_logo'))}
+                  className="max-w-[80%] max-h-[80%] object-contain"
+                />
+              </div>
+
               {isUsingCompanyLogo && (
-                <p className="text-xs text-green-600 mt-2 text-center">
-                  ✓ {t('company_logo_active')}
-                </p>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-sm" />
               )}
             </div>
+
+            <button
+              onClick={useCompanyLogo}
+              className={`
+                w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+                ${
+                  isUsingCompanyLogo
+                    ? 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'
+                    : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow'
+                }
+              `}
+            >
+              <Building2 className="w-4 h-4" />
+              {isUsingCompanyLogo
+                ? t('using_company_logo')
+                : t('use_company_logo')}
+            </button>
           </div>
         </div>
       )}
 
       {/* Image Source */}
       <TextInput
-        label={block.type === 'logo' ? String(t('logo_source')) : String(t('image_source'))}
+        label={
+          block.type === 'logo'
+            ? String(t('logo_source'))
+            : String(t('image_source'))
+        }
         value={block.properties.source}
         onChange={(value) => updateProperty('source', value)}
         placeholder={block.type === 'logo' ? '$company.logo' : 'https://...'}
-        hint={block.type === 'logo' ? String(t('use_variable_or_url')) : String(t('enter_image_url'))}
+        hint={
+          block.type === 'logo'
+            ? String(t('use_variable_or_url'))
+            : String(t('enter_image_url'))
+        }
       />
 
       <SectionDivider label={String(t('dimensions'))} />
