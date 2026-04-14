@@ -214,6 +214,7 @@ describe('InvoiceSum test invoice calculation', () => {
     const new_item: InvoiceItem = {
       quantity: 1,
       cost: 10,
+      net_cost: 10,
       product_key: '',
       notes: '',
       discount: 2.521254522145214511,
