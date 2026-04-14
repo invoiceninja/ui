@@ -14,23 +14,6 @@ import { PropertyEditorProps } from '../../types';
 import { InfoBlockProperties } from './InfoBlockProperties';
 import { useCustomField } from '$app/components/CustomField';
 
-const BASE_FIELDS = [
-  { id: 'name', label: 'Client Name', variable: '$client.name' },
-  { id: 'number', label: 'Client Number', variable: '$client.number' },
-  { id: 'address1', label: 'Address Line 1', variable: '$client.address1' },
-  { id: 'address2', label: 'Address Line 2', variable: '$client.address2' },
-  {
-    id: 'city_state_postal',
-    label: 'City, State, Postal',
-    variable: '$client.city_state_postal',
-  },
-  { id: 'country', label: 'Country', variable: '$client.country' },
-  { id: 'phone', label: 'Phone', variable: '$client.phone' },
-  { id: 'email', label: 'Email', variable: '$client.email' },
-  { id: 'vat_number', label: 'VAT Number', variable: '$client.vat_number' },
-  { id: 'id_number', label: 'ID Number', variable: '$client.id_number' },
-];
-
 export function ClientInfoBlockProperties({
   block,
   onChange,
@@ -39,6 +22,35 @@ export function ClientInfoBlockProperties({
   const customField = useCustomField();
 
   const availableFields = useMemo(() => {
+    const baseFields = [
+      { id: 'name', label: t('client_name'), variable: '$client.name' },
+      { id: 'number', label: t('client_number'), variable: '$client.number' },
+      {
+        id: 'address1',
+        label: t('address_line_1'),
+        variable: '$client.address1',
+      },
+      {
+        id: 'address2',
+        label: t('address_line_2'),
+        variable: '$client.address2',
+      },
+      {
+        id: 'city_state_postal',
+        label: t('city_state_postal'),
+        variable: '$client.city_state_postal',
+      },
+      { id: 'country', label: t('country'), variable: '$client.country' },
+      { id: 'phone', label: t('phone'), variable: '$client.phone' },
+      { id: 'email', label: t('email'), variable: '$client.email' },
+      {
+        id: 'vat_number',
+        label: t('vat_number'),
+        variable: '$client.vat_number',
+      },
+      { id: 'id_number', label: t('id_number'), variable: '$client.id_number' },
+    ];
+
     const customFieldConfigs: Array<{
       key: 'client1' | 'client2' | 'client3' | 'client4';
       id: string;
@@ -72,7 +84,7 @@ export function ClientInfoBlockProperties({
     ];
 
     const customFields = customFieldConfigs
-      .filter(({ key }) => customField(key).label()) // Only include if custom field has a label configured
+      .filter(({ key }) => customField(key).label())
       .map(({ key, id, variable, fallback }) => {
         const label = customField(key).label();
         return {
@@ -82,7 +94,7 @@ export function ClientInfoBlockProperties({
         };
       });
 
-    return [...BASE_FIELDS, ...customFields];
+    return [...baseFields, ...customFields];
   }, [customField, t]);
 
   return (
