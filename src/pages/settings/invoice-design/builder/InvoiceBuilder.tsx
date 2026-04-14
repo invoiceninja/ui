@@ -781,7 +781,7 @@ export function InvoiceBuilder() {
               }}
               disabled={state.blocks.length === 0}
               className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Download JSON"
+              title={String(t('download_json'))}
             >
               <FileJson className="w-4 h-4" />
             </button>
@@ -892,7 +892,7 @@ export function InvoiceBuilder() {
                         }}
                         onMouseDown={(e) => e.stopPropagation()}
                         className="p-1 rounded transition-colors text-white/80 hover:text-white hover:bg-white/20"
-                        title="Copy block to clipboard"
+                        title={String(t('copy_block_to_clipboard'))}
                       >
                         <Clipboard className="w-3 h-3" />
                       </button>
@@ -904,7 +904,7 @@ export function InvoiceBuilder() {
                         }}
                         onMouseDown={(e) => e.stopPropagation()}
                         className="p-1 rounded transition-colors text-white/80 hover:text-white hover:bg-white/20"
-                        title="Duplicate block"
+                        title={String(t('duplicate_block'))}
                       >
                         ⎘
                       </button>
@@ -916,7 +916,7 @@ export function InvoiceBuilder() {
                         }}
                         onMouseDown={(e) => e.stopPropagation()}
                         className="p-1 rounded transition-colors text-white/80 hover:text-white hover:bg-red-500"
-                        title="Delete block"
+                        title={String(t('delete_block'))}
                       >
                         ×
                       </button>
