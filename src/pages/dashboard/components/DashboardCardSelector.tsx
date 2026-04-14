@@ -7,7 +7,6 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -52,10 +51,14 @@ export const FIELDS_LABELS: Record<string, string> = {
   invoice_paid_expenses: 'total_invoice_paid_expenses',
 };
 
+interface EditState {
+  index: number;
+  key: string;
+}
+
 export function DashboardCardSelector() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
-
   const colors = useColorScheme();
   const currentUser = useCurrentUser();
 
@@ -63,6 +66,7 @@ export function DashboardCardSelector() {
   const [addOpen, setAddOpen] = useState<boolean>(false);
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [manageOpen, setManageOpen] = useState<boolean>(false);
+  const [editState, setEditState] = useState<EditState | null>(null);
 
   useEffect(() => {
     if (manageOpen && currentUser) {
@@ -91,14 +95,10 @@ export function DashboardCardSelector() {
     )
       .then((response: GenericSingleResourceResponse<CompanyUser>) => {
         toast.success('updated_settings');
-
         set(updated, 'company_user', response.data.data);
-
         $refetch(['company_users']);
-
         dispatch(updateUser(updated));
         dispatch(resetChanges());
-
         setManageOpen(false);
       })
       .finally(() => setIsFormBusy(false));
@@ -106,13 +106,37 @@ export function DashboardCardSelector() {
 
   const handleRemove = (index: number) => {
     setFields((prev) => prev.filter((_, i) => i !== index));
+    if (editState?.index === index) {
+      setEditState(null);
+    }
+  };
+
+  const handleEdit = (index: number) => {
+    setEditState({ index, key: fields[index] });
+    setAddOpen(true);
+  };
+
+  const handleAddOrEdit = (key: string) => {
+    if (editState !== null) {
+      setFields((prev) =>
+        prev.map((k, i) => (i === editState.index ? key : k))
+      );
+      setEditState(null);
+    } else {
+      setFields((prev) => [...prev, key]);
+    }
+    setAddOpen(false);
+  };
+
+  const handleAddModalClose = () => {
+    setAddOpen(false);
+    setEditState(null);
   };
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
       return;
     }
-
     setFields((prev) =>
       arrayMoveImmutable(prev, result.source.index, result.destination!.index)
     );
@@ -184,13 +208,13 @@ export function DashboardCardSelector() {
                               <FieldRow
                                 decoded={decodeDashboardField(key)}
                                 onRemove={() => handleRemove(index)}
+                                onEdit={() => handleEdit(index)}
                               />
                             </div>
                           </div>
                         )}
                       </Draggable>
                     ))}
-
                     {droppableProvided.placeholder}
                   </div>
                 )}
@@ -219,12 +243,11 @@ export function DashboardCardSelector() {
 
       <AddFieldModal
         visible={addOpen}
-        onClose={() => setAddOpen(false)}
-        onAdd={(key) => {
-          setFields((prev) => [...prev, key]);
-          setAddOpen(false);
-        }}
+        onClose={handleAddModalClose}
+        onAdd={handleAddOrEdit}
         existingFields={fields}
+        editKey={editState?.key ?? null}
+        editIndex={editState?.index ?? null}
       />
     </>
   );
