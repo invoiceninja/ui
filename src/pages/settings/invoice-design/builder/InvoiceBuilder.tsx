@@ -33,7 +33,7 @@ import { ComponentLibrary } from './components/ComponentLibrary';
 import { PropertyPanel } from './components/PropertyPanel';
 import { BlockRenderer } from './components/BlockRenderer';
 import { PreviewModal } from './components/PreviewModal';
-import { getBlockLabel } from './block-library';
+import { useBlockLabel } from './block-library';
 import { generateInvoiceHTML } from './utils/html-generator';
 import { SAMPLE_INVOICE_DATA } from './utils/variable-replacer';
 import { route } from '$app/common/helpers/route';
@@ -876,7 +876,7 @@ export function InvoiceBuilder() {
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       <GripVertical className="w-3 h-3 flex-shrink-0 text-white/70" />
                       <span className="font-medium truncate text-white">
-                        {getBlockLabel(block.type)}
+                        <BlockLabel type={block.type} />
                       </span>
                     </div>
 
@@ -1057,6 +1057,12 @@ export function InvoiceBuilder() {
       </Modal>
     </div>
   );
+}
+
+function BlockLabel({ type }: { type: string }) {
+  const label = useBlockLabel(type);
+  
+  return <>{label}</>;
 }
 
 export default InvoiceBuilder;
