@@ -18,9 +18,9 @@ import { User } from './user';
 export interface Project {
   id: string;
   user_id: string;
-  user: User;
-  assigned_user: User;
+  user?: User;
   assigned_user_id: string;
+  assigned_user?: User;
   client_id: string;
   name: string;
   number: string;

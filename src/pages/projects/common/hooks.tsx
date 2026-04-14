@@ -87,7 +87,7 @@ export function useAllProjectColumns() {
     //   'client_id_number', @Todo: Need to resolve translation
     //   'client_number', @Todo: Need to resolve translation
     'created_at',
-    'created_by',
+    'user',
     firstCustom,
     secondCustom,
     thirdCustom,
@@ -258,9 +258,9 @@ export function useProjectColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'created_by',
+      column: 'user',
       id: 'user_id',
-      label: t('created_by'),
+      label: t('user'),
       format: (value, project) =>
         project.user && `${project.user.first_name} ${project.user.last_name}`,
     },
