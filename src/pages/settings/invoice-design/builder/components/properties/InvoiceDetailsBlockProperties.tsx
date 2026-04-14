@@ -24,52 +24,6 @@ import {
 } from './PropertyInputs';
 import { useCustomField } from '$app/components/CustomField';
 
-// Base entity detail fields (non-custom)
-const BASE_FIELDS: Omit<FieldConfig, 'id'>[] = [
-  {
-    label: 'Number',
-    variable: '$entity.number',
-    prefix: 'Number: ',
-    hideIfEmpty: true,
-  },
-  {
-    label: 'Date',
-    variable: '$entity.date',
-    prefix: 'Date: ',
-    hideIfEmpty: true,
-  },
-  {
-    label: 'Due Date',
-    variable: '$entity.due_date',
-    prefix: 'Due Date: ',
-    hideIfEmpty: true,
-  },
-  {
-    label: 'PO Number',
-    variable: '$entity.po_number',
-    prefix: 'PO Number: ',
-    hideIfEmpty: true,
-  },
-  {
-    label: 'Amount',
-    variable: '$entity.amount',
-    prefix: 'Amount: ',
-    hideIfEmpty: true,
-  },
-  {
-    label: 'Balance',
-    variable: '$entity.balance',
-    prefix: 'Balance: ',
-    hideIfEmpty: true,
-  },
-  {
-    label: 'Partial/Deposit',
-    variable: '$entity.partial',
-    prefix: 'Partial/Deposit: ',
-    hideIfEmpty: true,
-  },
-];
-
 export function InvoiceDetailsBlockProperties({
   block,
   onChange,
@@ -80,8 +34,54 @@ export function InvoiceDetailsBlockProperties({
     {}
   );
 
-  // Get available fields with custom field labels
+  // Get available fields with translations
   const AVAILABLE_FIELDS = useMemo(() => {
+    // Base entity detail fields (non-custom)
+    const baseFields: Omit<FieldConfig, 'id'>[] = [
+      {
+        label: t('number'),
+        variable: '$entity.number',
+        prefix: `${t('number')}: `,
+        hideIfEmpty: true,
+      },
+      {
+        label: t('date'),
+        variable: '$entity.date',
+        prefix: `${t('date')}: `,
+        hideIfEmpty: true,
+      },
+      {
+        label: t('due_date'),
+        variable: '$entity.due_date',
+        prefix: `${t('due_date')}: `,
+        hideIfEmpty: true,
+      },
+      {
+        label: t('po_number'),
+        variable: '$entity.po_number',
+        prefix: `${t('po_number')}: `,
+        hideIfEmpty: true,
+      },
+      {
+        label: t('amount'),
+        variable: '$entity.amount',
+        prefix: `${t('amount')}: `,
+        hideIfEmpty: true,
+      },
+      {
+        label: t('balance'),
+        variable: '$entity.balance',
+        prefix: `${t('balance')}: `,
+        hideIfEmpty: true,
+      },
+      {
+        label: t('partial_deposit'),
+        variable: '$entity.partial',
+        prefix: `${t('partial_deposit')}: `,
+        hideIfEmpty: true,
+      },
+    ];
+
     const customFieldConfigs: Array<{
       key: 'invoice1' | 'invoice2' | 'invoice3' | 'invoice4';
       variable: string;
@@ -110,7 +110,7 @@ export function InvoiceDetailsBlockProperties({
     ];
 
     const customFields = customFieldConfigs
-      .filter(({ key }) => customField(key).label()) // Only include if custom field has a label configured
+      .filter(({ key }) => customField(key).label())
       .map(({ key, variable, fallback }) => {
         const label = customField(key).label();
         return {
@@ -121,7 +121,7 @@ export function InvoiceDetailsBlockProperties({
         };
       });
 
-    return [...BASE_FIELDS, ...customFields];
+    return [...baseFields, ...customFields];
   }, [customField, t]);
 
   // Migrate from old content-based format to fieldConfigs if needed
