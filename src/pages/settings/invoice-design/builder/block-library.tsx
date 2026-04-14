@@ -28,9 +28,6 @@ import {
 } from 'lucide-react';
 import { BlockDefinition } from './types';
 
-// Static block library (for backward compatibility)
-export const blockLibrary: BlockDefinition[] = [];
-
 // Hook to get translated block library
 export function useBlockLibrary(): BlockDefinition[] {
   const [t] = useTranslation();
@@ -562,20 +559,4 @@ export function useBlockLabel(type: string): string {
 export function useBlockDescription(type: string): string {
   const blockLibrary = useBlockLibrary();
   return blockLibrary.find((def) => def.type === type)?.description || '';
-}
-
-// Backward compatible helper functions (marked as deprecated, use hooks instead)
-/** @deprecated Use useBlockDefinition instead */
-export function getBlockDefinition(type: string): BlockDefinition | undefined {
-  return undefined;
-}
-
-/** @deprecated Use useBlockLabel instead */
-export function getBlockLabel(type: string): string {
-  return type;
-}
-
-/** @deprecated Use useBlockDescription instead */
-export function getBlockDescription(type: string): string {
-  return '';
 }
