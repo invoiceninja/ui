@@ -14,23 +14,6 @@ import { PropertyEditorProps } from '../../types';
 import { InfoBlockProperties } from './InfoBlockProperties';
 import { useCustomField } from '$app/components/CustomField';
 
-const BASE_FIELDS = [
-  { id: 'name', label: 'Company Name', variable: '$company.name' },
-  { id: 'address1', label: 'Address Line 1', variable: '$company.address1' },
-  { id: 'address2', label: 'Address Line 2', variable: '$company.address2' },
-  {
-    id: 'city_state_postal',
-    label: 'City, State, Postal',
-    variable: '$company.city_state_postal',
-  },
-  { id: 'country', label: 'Country', variable: '$company.country' },
-  { id: 'phone', label: 'Phone', variable: '$company.phone' },
-  { id: 'email', label: 'Email', variable: '$company.email' },
-  { id: 'website', label: 'Website', variable: '$company.website' },
-  { id: 'vat_number', label: 'VAT Number', variable: '$company.vat_number' },
-  { id: 'id_number', label: 'ID Number', variable: '$company.id_number' },
-];
-
 export function CompanyInfoBlockProperties({
   block,
   onChange,
@@ -39,6 +22,39 @@ export function CompanyInfoBlockProperties({
   const customField = useCustomField();
 
   const availableFields = useMemo(() => {
+    const baseFields = [
+      { id: 'name', label: t('company_name'), variable: '$company.name' },
+      {
+        id: 'address1',
+        label: t('address_line_1'),
+        variable: '$company.address1',
+      },
+      {
+        id: 'address2',
+        label: t('address_line_2'),
+        variable: '$company.address2',
+      },
+      {
+        id: 'city_state_postal',
+        label: t('city_state_postal'),
+        variable: '$company.city_state_postal',
+      },
+      { id: 'country', label: t('country'), variable: '$company.country' },
+      { id: 'phone', label: t('phone'), variable: '$company.phone' },
+      { id: 'email', label: t('email'), variable: '$company.email' },
+      { id: 'website', label: t('website'), variable: '$company.website' },
+      {
+        id: 'vat_number',
+        label: t('vat_number'),
+        variable: '$company.vat_number',
+      },
+      {
+        id: 'id_number',
+        label: t('id_number'),
+        variable: '$company.id_number',
+      },
+    ];
+
     const customFieldConfigs: Array<{
       key: 'company1' | 'company2' | 'company3' | 'company4';
       id: string;
@@ -72,7 +88,7 @@ export function CompanyInfoBlockProperties({
     ];
 
     const customFields = customFieldConfigs
-      .filter(({ key }) => customField(key).label()) // Only include if custom field has a label configured
+      .filter(({ key }) => customField(key).label())
       .map(({ key, id, variable, fallback }) => {
         const label = customField(key).label();
         return {
@@ -82,7 +98,7 @@ export function CompanyInfoBlockProperties({
         };
       });
 
-    return [...BASE_FIELDS, ...customFields];
+    return [...baseFields, ...customFields];
   }, [customField, t]);
 
   return (
