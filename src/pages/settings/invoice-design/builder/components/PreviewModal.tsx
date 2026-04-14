@@ -9,6 +9,7 @@
  */
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Download, ZoomIn, ZoomOut, Printer } from 'lucide-react';
 import { Modal } from '$app/components/Modal';
 import { Button } from '$app/components/forms';
@@ -23,6 +24,7 @@ interface PreviewModalProps {
 }
 
 export function PreviewModal({ blocks, onClose }: PreviewModalProps) {
+  const [t] = useTranslation();
   const [zoom, setZoom] = useState(100);
   const colors = useColorScheme();
   const html = generateInvoiceHTML(blocks, SAMPLE_INVOICE_DATA);
@@ -55,7 +57,7 @@ export function PreviewModal({ blocks, onClose }: PreviewModalProps) {
     <Modal
       visible={true}
       onClose={onClose}
-      title="Invoice Preview"
+      title={t('invoice_preview')}
       size="large"
       overflowVisible
       enableClosingOnXMark
@@ -99,7 +101,7 @@ export function PreviewModal({ blocks, onClose }: PreviewModalProps) {
             <div className="h-6 w-px" style={{ backgroundColor: colors.$24 }} />
 
             <span className="text-sm" style={{ color: colors.$17 }}>
-              Preview uses sample data
+              {t('preview_uses_sample_data')}
             </span>
           </div>
 
@@ -112,7 +114,7 @@ export function PreviewModal({ blocks, onClose }: PreviewModalProps) {
               className="flex items-center gap-2"
             >
               <Printer className="w-4 h-4" />
-              Print
+              {t('print')}
             </Button>
 
             <Button
@@ -122,7 +124,7 @@ export function PreviewModal({ blocks, onClose }: PreviewModalProps) {
               className="flex items-center gap-2"
             >
               <Download className="w-4 h-4" />
-              Download HTML
+              {t('download_html')}
             </Button>
           </div>
         </div>
@@ -151,7 +153,7 @@ export function PreviewModal({ blocks, onClose }: PreviewModalProps) {
                 minHeight: '1122px',
                 backgroundColor: colors.$1,
               }}
-              title="Invoice Preview"
+              title={String(t('invoice_preview'))}
               sandbox="allow-same-origin"
             />
           </div>
@@ -163,10 +165,10 @@ export function PreviewModal({ blocks, onClose }: PreviewModalProps) {
           style={{ borderColor: colors.$24, color: colors.$17 }}
         >
           <span>
-            <strong style={{ color: colors.$3 }}>{blocks.length}</strong> blocks
-            in design
+            <strong style={{ color: colors.$3 }}>{blocks.length}</strong>{' '}
+            {t('blocks_in_design')}
           </span>
-          <span>Actual invoices will use real client and invoice data</span>
+          <span>{t('actual_invoices_use_real_data')}</span>
         </div>
       </div>
     </Modal>

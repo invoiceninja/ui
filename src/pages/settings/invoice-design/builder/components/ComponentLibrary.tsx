@@ -11,7 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { Palette, FileText, Database, LayoutGrid, Plus } from 'lucide-react';
 import { Button } from '$app/components/forms/Button';
-import { blockLibrary } from '../block-library';
+import { useBlockLibrary } from '../block-library';
 import { Block, BlockDefinition, generateBlockId } from '../types';
 
 interface ComponentLibraryProps {
@@ -24,6 +24,7 @@ export function ComponentLibrary({
   onDragStart,
 }: ComponentLibraryProps) {
   const [t] = useTranslation();
+  const blockLibrary = useBlockLibrary();
 
   const categories = [
     {
@@ -102,6 +103,8 @@ function BlockCard({
   onClick,
   onDragStart: onDragStartProp,
 }: BlockCardProps) {
+  const [t] = useTranslation();
+
   const handleDragStart = (e: React.DragEvent) => {
     // CRITICAL for Firefox compatibility
     e.dataTransfer.setData('text/plain', '');
@@ -125,7 +128,7 @@ function BlockCard({
             {definition.label}
             {definition.essential && (
               <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-normal">
-                Essential
+                {t('essential')}
               </span>
             )}
           </div>
