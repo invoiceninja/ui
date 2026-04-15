@@ -57,6 +57,10 @@ export function ScheduleForm(props: Props) {
   });
 
   const getTemplateNameValue = () => {
+    if (page === 'create') {
+      return '';
+    }
+
     if (schedule.template === Templates.EMAIL_RECORD) {
       return `${t(schedule.template as string)}: ${t(
         schedule.parameters.entity
