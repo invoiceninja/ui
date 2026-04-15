@@ -83,11 +83,11 @@ export function useAllProjectColumns() {
     'budgeted_hours',
     'entity_state',
     'archived_at',
-    //   'assigned_to', @Todo: Need to resolve translation
+    'assigned_to',
     //   'client_id_number', @Todo: Need to resolve translation
     //   'client_number', @Todo: Need to resolve translation
     'created_at',
-    //   'created_by', @Todo: Need to resolve translation
+    'user',
     firstCustom,
     secondCustom,
     thirdCustom,
@@ -244,10 +244,25 @@ export function useProjectColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
+      column: 'assigned_to',
+      id: 'assigned_user_id',
+      label: t('assigned_to'),
+      format: (value, project) =>
+        project.assigned_user &&
+        `${project.assigned_user.first_name} ${project.assigned_user.last_name}`,
+    },
+    {
       column: 'created_at',
       id: 'created_at',
       label: t('created_at'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, project) =>
+        project.user && `${project.user.first_name} ${project.user.last_name}`,
     },
     {
       column: firstCustom,
