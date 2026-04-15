@@ -24,6 +24,14 @@ export function useSaveKeyboardShortcut({
       if ((event.ctrlKey || event.metaKey) && event.key === 's') {
         event.preventDefault();
         if (isEnabled) {
+          // Blur the active element to trigger any pending onBlur events
+          // (e.g., NumberInputField only calls onValueChange on blur)
+          if (
+            document.activeElement &&
+            document.activeElement !== document.body
+          ) {
+            (document.activeElement as HTMLElement).blur();
+          }
           onSave();
         }
       }

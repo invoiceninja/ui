@@ -48,6 +48,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 import { useSaveKeyboardShortcut } from '$app/common/hooks/useSaveKeyboardShortcut';
+
 dayjs.extend(utc);
 
 export default function Invoice() {
