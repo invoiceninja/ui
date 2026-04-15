@@ -116,14 +116,14 @@ export function DashboardCardSelector() {
     setAddOpen(true);
   };
 
-  const handleAddOrEdit = (key: string) => {
+  const handleAddOrEdit = (keys: string[]) => {
     if (editState !== null) {
       setFields((prev) =>
-        prev.map((k, i) => (i === editState.index ? key : k))
+        prev.map((k, i) => (i === editState.index ? keys[0] : k))
       );
       setEditState(null);
     } else {
-      setFields((prev) => [...prev, key]);
+      setFields((prev) => [...prev, ...keys]);
     }
     setAddOpen(false);
   };
