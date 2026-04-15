@@ -391,6 +391,22 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, [dateRangeEntries]);
 
   useEffect(() => {
+    const propsUrl = new URL(
+      props.useDocuNinjaApi
+        ? docuNinjaEndpoint(props.endpoint)
+        : endpoint(props.endpoint)
+    );
+
+    propsUrl.searchParams.forEach((value, key) => {
+      if (
+        !['per_page', 'page', filterParameterKey, 'sort', 'status'].includes(
+          key
+        )
+      ) {
+        apiEndpoint.searchParams.set(key, value);
+      }
+    });
+
     if (!isInitialConfiguration) {
       clearTimeout(companyUpdateTimeOut.current);
 
@@ -483,6 +499,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     dateRangeQueryParameter,
     filterColumns,
     filterColumnsValues,
+    props.endpoint,
   ]);
 
   useEffect(() => {

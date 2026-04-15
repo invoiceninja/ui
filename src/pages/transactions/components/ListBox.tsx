@@ -97,6 +97,7 @@ export function ListBox(props: Props) {
     filter: searchParams.searchTerm,
     clientId,
     enabled: isInvoicesDataKey,
+    with: props.selectedIds?.join(','),
   });
 
   const { data: vendorsResponse } = useVendorsQuery({
@@ -114,6 +115,7 @@ export function ListBox(props: Props) {
     filter: searchParams.searchTerm,
     enabled: isPaymentsDataKey,
     matchTransactions: true,
+    with: props.selectedIds?.join(','),
   });
 
   const { data: expensesResponse } = useExpensesQuery({
@@ -121,6 +123,7 @@ export function ListBox(props: Props) {
     filter: searchParams.searchTerm,
     enabled: isExpensesDataKey,
     matchTransactions: true,
+    with: props.selectedIds?.join(','),
   });
 
   const [resourceItems, setResourceItems] = useState<ResourceItem[]>();
@@ -159,7 +162,9 @@ export function ListBox(props: Props) {
       id: resourceItem.id,
       number: resourceItem.number,
       name: resourceItem.name,
-      clientName: resourceItem.client?.display_name || getClientName(resourceItem.client_id),
+      clientName:
+        resourceItem.client?.display_name ||
+        getClientName(resourceItem.client_id),
       statusId: resourceItem.status_id,
       amount: resourceItem.amount,
       date: resourceItem.date,
@@ -197,17 +202,31 @@ export function ListBox(props: Props) {
   useEffect(() => {
     setClients(clientsResponse);
 
+    let items: ResourceItem[] | undefined;
+
     if (isInvoicesDataKey) {
-      setResourceItems(getFormattedResourceList(invoicesResponse));
+      items = getFormattedResourceList(invoicesResponse);
     } else if (isVendorsDataKey) {
-      setResourceItems(getFormattedResourceList(vendorsResponse));
+      items = getFormattedResourceList(vendorsResponse);
     } else if (isExpenseCategoriesDataKey) {
-      setResourceItems(getFormattedResourceList(expenseCategoriesResponse));
+      items = getFormattedResourceList(expenseCategoriesResponse);
     } else if (isPaymentsDataKey) {
-      setResourceItems(getFormattedResourceList(paymentsResponse));
+      items = getFormattedResourceList(paymentsResponse);
     } else {
-      setResourceItems(getFormattedResourceList(expensesResponse));
+      items = getFormattedResourceList(expensesResponse);
     }
+
+    if (items && props.selectedIds?.length) {
+      const selectedSet = new Set(props.selectedIds);
+
+      items.sort((a, b) => {
+        const aSelected = selectedSet.has(a.id) ? 0 : 1;
+        const bSelected = selectedSet.has(b.id) ? 0 : 1;
+        return aSelected - bSelected;
+      });
+    }
+
+    setResourceItems(items);
   }, [
     props.dataKey,
     invoicesResponse,
