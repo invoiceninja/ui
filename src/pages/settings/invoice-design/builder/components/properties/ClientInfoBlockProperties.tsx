@@ -27,12 +27,12 @@ export function ClientInfoBlockProperties({
       { id: 'number', label: t('client_number'), variable: '$client.number' },
       {
         id: 'address1',
-        label: t('address_line_1'),
+        label: t('address1'),
         variable: '$client.address1',
       },
       {
         id: 'address2',
-        label: t('address_line_2'),
+        label: t('address2'),
         variable: '$client.address2',
       },
       {
@@ -61,25 +61,25 @@ export function ClientInfoBlockProperties({
         key: 'client1',
         id: 'custom_value1',
         variable: '$client.custom_value1',
-        fallback: t('custom_field_1'),
+        fallback: t('custom_field') + ' 1',
       },
       {
         key: 'client2',
         id: 'custom_value2',
         variable: '$client.custom_value2',
-        fallback: t('custom_field_2'),
+        fallback: t('custom_field') + ' 2',
       },
       {
         key: 'client3',
         id: 'custom_value3',
         variable: '$client.custom_value3',
-        fallback: t('custom_field_3'),
+        fallback: t('custom_field') + ' 3',
       },
       {
         key: 'client4',
         id: 'custom_value4',
         variable: '$client.custom_value4',
-        fallback: t('custom_field_4'),
+        fallback: t('custom_field') + ' 4',
       },
     ];
 

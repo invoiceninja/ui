@@ -57,7 +57,7 @@ export function PreviewModal({ blocks, onClose }: PreviewModalProps) {
     <Modal
       visible={true}
       onClose={onClose}
-      title={t('invoice_preview')}
+      title={t('preview')}
       size="large"
       overflowVisible
       enableClosingOnXMark
@@ -153,7 +153,7 @@ export function PreviewModal({ blocks, onClose }: PreviewModalProps) {
                 minHeight: '1122px',
                 backgroundColor: colors.$1,
               }}
-              title={String(t('invoice_preview'))}
+              title={String(t('preview'))}
               sandbox="allow-same-origin"
             />
           </div>
