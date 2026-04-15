@@ -33,6 +33,7 @@ import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { AddUninvoicedItemsButton } from '../common/components/AddUninvoicedItemsButton';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { useSaveKeyboardShortcut } from '$app/common/hooks/useSaveKeyboardShortcut';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -244,6 +245,11 @@ export default function Create() {
   useEffect(() => {
     invoice && calculateInvoiceSum(invoice);
   }, [invoice]);
+
+  useSaveKeyboardShortcut({
+    isEnabled: Boolean(invoice && invoice.client_id.length > 0 && !isFormBusy),
+    onSave: () => save(invoice as Invoice),
+  });
 
   return (
     <>
