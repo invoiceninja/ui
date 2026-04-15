@@ -26,12 +26,12 @@ export function CompanyInfoBlockProperties({
       { id: 'name', label: t('company_name'), variable: '$company.name' },
       {
         id: 'address1',
-        label: t('address_line_1'),
+        label: t('address1'),
         variable: '$company.address1',
       },
       {
         id: 'address2',
-        label: t('address_line_2'),
+        label: t('address2'),
         variable: '$company.address2',
       },
       {
@@ -65,25 +65,25 @@ export function CompanyInfoBlockProperties({
         key: 'company1',
         id: 'custom_value1',
         variable: '$company.custom_value1',
-        fallback: t('custom_field_1'),
+        fallback: t('custom_field') + ' 1',
       },
       {
         key: 'company2',
         id: 'custom_value2',
         variable: '$company.custom_value2',
-        fallback: t('custom_field_2'),
+        fallback: t('custom_field') + ' 2',
       },
       {
         key: 'company3',
         id: 'custom_value3',
         variable: '$company.custom_value3',
-        fallback: t('custom_field_3'),
+        fallback: t('custom_field') + ' 3',
       },
       {
         key: 'company4',
         id: 'custom_value4',
         variable: '$company.custom_value4',
-        fallback: t('custom_field_4'),
+        fallback: t('custom_field') + ' 4',
       },
     ];
 

@@ -90,22 +90,22 @@ export function InvoiceDetailsBlockProperties({
       {
         key: 'invoice1',
         variable: '$entity.custom_value1',
-        fallback: t('custom_field_1'),
+        fallback: t('custom_field') + ' 1',
       },
       {
         key: 'invoice2',
         variable: '$entity.custom_value2',
-        fallback: t('custom_field_2'),
+        fallback: t('custom_field') + ' 2',
       },
       {
         key: 'invoice3',
         variable: '$entity.custom_value3',
-        fallback: t('custom_field_3'),
+        fallback: t('custom_field') + ' 3',
       },
       {
         key: 'invoice4',
         variable: '$entity.custom_value4',
-        fallback: t('custom_field_4'),
+        fallback: t('custom_field') + ' 4',
       },
     ];
 
