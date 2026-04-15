@@ -16,6 +16,7 @@ import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useStop } from '../hooks/useStop';
+import dayjs from 'dayjs';
 
 interface Props {
   start: number;
@@ -23,38 +24,40 @@ interface Props {
 }
 
 export function DurationClock({ start, task }: Props) {
-  const [elapsedTime, setElapsedTime] = useState(
-    Math.floor(Date.now() / 1000) - start
-  );
+  const startRef = useRef(start);
+
+  const [elapsedTime, setElapsedTime] = useState(dayjs().unix() - start);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(
     undefined
   );
 
-  const handleVisibilityChange = () => {
-    setElapsedTime(Math.floor(Date.now() / 1000) - start);
+  const recalculate = () => {
+    setElapsedTime(dayjs().unix() - startRef.current);
+  };
 
+  const startInterval = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
 
     intervalRef.current = setInterval(() => {
-      setElapsedTime((prevTime) => prevTime + 1);
+      setElapsedTime(dayjs().unix() - startRef.current);
     }, 1000);
   };
 
-  useEffect(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      recalculate();
+      startInterval();
     }
+  };
 
-    setElapsedTime(Math.floor(Date.now() / 1000) - start);
+  useEffect(() => {
+    startRef.current = start;
 
-    intervalRef.current = setInterval(() => {
-      setElapsedTime((prevTime) => prevTime + 1);
-    }, 1000);
+    recalculate();
+    startInterval();
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
@@ -65,10 +68,6 @@ export function DurationClock({ start, task }: Props) {
 
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
-
-  useEffect(() => {
-    setElapsedTime(Math.floor(Date.now() / 1000) - start);
   }, [start]);
 
   const formatTime = (seconds: number) => {
