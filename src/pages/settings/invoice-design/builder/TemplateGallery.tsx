@@ -270,7 +270,7 @@ export function TemplateGallery() {
       <div className="flex items-center justify-between py-4">
         <div>
           <h1 className="text-2xl font-medium" style={{ color: colors.$3 }}>
-            {t('choose_a_template')}
+            {t('select')}
           </h1>
           <p className="text-sm mt-1" style={{ color: colors.$17 }}>
             {t('select_starting_point_for_invoice_design')}
