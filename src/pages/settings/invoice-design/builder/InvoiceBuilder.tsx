@@ -1061,7 +1061,7 @@ export function InvoiceBuilder() {
 
 function BlockLabel({ type }: { type: string }) {
   const label = useBlockLabel(type);
-  
+
   return <>{label}</>;
 }
 

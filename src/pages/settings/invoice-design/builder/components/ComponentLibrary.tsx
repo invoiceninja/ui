@@ -51,7 +51,7 @@ export function ComponentLibrary({
       type: definition.type,
       gridPosition: {
         x: 0,
-        y: 0, // Will be repositioned by parent
+        y: 0,
         w: definition.defaultSize.w,
         h: definition.defaultSize.h,
       },
@@ -106,10 +106,14 @@ function BlockCard({
   const [t] = useTranslation();
 
   const handleDragStart = (e: React.DragEvent) => {
-    // CRITICAL for Firefox compatibility
     e.dataTransfer.setData('text/plain', '');
     e.dataTransfer.effectAllowed = 'copy';
-    e.dataTransfer.setData('application/json', JSON.stringify(definition));
+    // Exclude non-serializable icon (ReactNode) from drag data
+    const { icon: _, ...serializableDefinition } = definition;
+    e.dataTransfer.setData(
+      'application/json',
+      JSON.stringify(serializableDefinition)
+    );
     onDragStartProp?.(definition);
   };
 
