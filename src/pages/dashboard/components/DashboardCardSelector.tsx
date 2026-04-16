@@ -95,10 +95,14 @@ export function DashboardCardSelector() {
     )
       .then((response: GenericSingleResourceResponse<CompanyUser>) => {
         toast.success('updated_settings');
+
         set(updated, 'company_user', response.data.data);
+
         $refetch(['company_users']);
+
         dispatch(updateUser(updated));
         dispatch(resetChanges());
+
         setManageOpen(false);
       })
       .finally(() => setIsFormBusy(false));
@@ -106,6 +110,7 @@ export function DashboardCardSelector() {
 
   const handleRemove = (index: number) => {
     setFields((prev) => prev.filter((_, i) => i !== index));
+
     if (editState?.index === index) {
       setEditState(null);
     }
@@ -119,12 +124,14 @@ export function DashboardCardSelector() {
   const handleAddOrEdit = (keys: string[]) => {
     if (editState !== null) {
       setFields((prev) =>
-        prev.map((k, i) => (i === editState.index ? keys[0] : k))
+        prev.map((key, index) => (index === editState.index ? keys[0] : key))
       );
+
       setEditState(null);
     } else {
       setFields((prev) => [...prev, ...keys]);
     }
+
     setAddOpen(false);
   };
 

@@ -17,6 +17,7 @@ import { CircleXMark } from '$app/components/icons/CircleXMark';
 import { Icon } from '$app/components/icons/Icon';
 import { FIELDS_LABELS } from './DashboardCardSelector';
 import { PERIOD_LABELS } from './DashboardCard';
+import classNames from 'classnames';
 
 interface Props {
   decoded: DashboardCardField;
@@ -52,7 +53,10 @@ export function FieldRow({ decoded, onRemove, onEdit }: Props) {
           </div>
         )}
 
-        <div className={onRemove ? 'cursor-pointer' : ''} onClick={onRemove}>
+        <div
+          className={classNames({ 'cursor-pointer': onRemove })}
+          onClick={onRemove}
+        >
           <CircleXMark
             color={colors.$16}
             hoverColor={colors.$3}

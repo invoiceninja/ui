@@ -172,10 +172,10 @@ export function AddFieldModal({
 
   const isEditMode = editKey !== null;
 
+  const rightPanelRef = useRef<HTMLDivElement>(null);
+
   const [search, setSearch] = useState<string>('');
   const [pending, setPending] = useState<PendingField[]>([]);
-
-  const rightPanelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (visible) {
@@ -206,7 +206,10 @@ export function AddFieldModal({
   }, [pending.length]);
 
   const handleFieldClick = (field: Field) => {
-    if (isEditMode) return;
+    if (isEditMode) {
+      return;
+    }
+
     setPending((prev) => [...prev, defaultPending(field)]);
   };
 
