@@ -151,6 +151,7 @@ describe('InvoiceSum test invoice calculation', () => {
       {
         quantity: 1,
         cost: 82.6446,
+        net_cost: 82.6446,
         product_key: '',
         notes: '',
         discount: 0,
@@ -199,6 +200,7 @@ describe('InvoiceSum test invoice calculation', () => {
       {
         quantity: 25,
         cost: 0.333,
+        net_cost: 0.333,
         product_key: '',
         notes: '',
         discount: 0,
@@ -226,6 +228,7 @@ describe('InvoiceSum test invoice calculation', () => {
       {
         quantity: 25,
         cost: 0.333,
+        net_cost: 0.333,
         product_key: '',
         notes: '',
         discount: 0,
@@ -253,6 +256,7 @@ describe('InvoiceSum test invoice calculation', () => {
       {
         quantity: 25,
         cost: 1.333,
+        net_cost: 1.333,
         product_key: '',
         notes: '',
         discount: 0,
@@ -280,6 +284,7 @@ describe('InvoiceSum test invoice calculation', () => {
       {
         quantity: 25,
         cost: 0.267,
+        net_cost: 0.267,
         product_key: '',
         notes: '',
         discount: 0,
@@ -307,6 +312,7 @@ describe('InvoiceSum test invoice calculation', () => {
       {
         quantity: 25,
         cost: 0.05,
+        net_cost: 0.05,
         product_key: '',
         notes: '',
         discount: 0,
