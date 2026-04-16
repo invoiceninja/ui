@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Trash2, Clipboard } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { Button } from '$app/components/forms';
 import { PropertyPanelProps, Block } from '../types';
 import { useBlockLabel, useBlockDescription } from '../block-library';
