@@ -19,9 +19,11 @@ import {
   SectionDivider,
   FontStyleInput,
 } from './PropertyInputs';
+import { useColorScheme } from '$app/common/colors';
 
 export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
   const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>(
     {}
   );
@@ -74,32 +76,64 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
     <div className="space-y-4">
       {/* Items to show */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-3">
+        <label
+          className="block text-sm font-medium mb-3"
+          style={{ color: colors.$3 }}
+        >
           {t('items_to_display')}
         </label>
         <div className="space-y-2">
           {block.properties.items?.map((item: any, index: number) => (
             <div
               key={index}
-              className="border border-gray-200 rounded-md bg-white overflow-hidden"
+              className="rounded-md overflow-hidden"
+              style={{
+                backgroundColor: colors.$1,
+                border: `1px solid ${colors.$24}`,
+              }}
             >
-              <div className="flex items-center gap-1 p-2">
+              <div className="flex items-center gap-2 p-2">
                 <div className="flex flex-col">
                   <button
                     onClick={() => moveItemUp(index)}
                     disabled={index === 0}
-                    className={`p-0.5 rounded ${index === 0 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-100'}`}
+                    className="p-0.5 rounded transition-colors"
+                    style={{
+                      color: index === 0 ? colors.$24 : colors.$16,
+                      cursor: index === 0 ? 'not-allowed' : 'pointer',
+                    }}
                     title={String(t('move_up'))}
                   >
-                    <ChevronUp className="w-4 h-4" />
+                    <ChevronUp
+                      className="w-4 h-4"
+                      style={{ color: index === 0 ? colors.$24 : colors.$16 }}
+                    />
                   </button>
                   <button
                     onClick={() => moveItemDown(index)}
                     disabled={index >= block.properties.items.length - 1}
-                    className={`p-0.5 rounded ${index >= block.properties.items.length - 1 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-100'}`}
+                    className="p-0.5 rounded transition-colors"
+                    style={{
+                      color:
+                        index >= block.properties.items.length - 1
+                          ? colors.$24
+                          : colors.$16,
+                      cursor:
+                        index >= block.properties.items.length - 1
+                          ? 'not-allowed'
+                          : 'pointer',
+                    }}
                     title={String(t('move_down'))}
                   >
-                    <ChevronDown className="w-4 h-4" />
+                    <ChevronDown
+                      className="w-4 h-4"
+                      style={{
+                        color:
+                          index >= block.properties.items.length - 1
+                            ? colors.$24
+                            : colors.$16,
+                      }}
+                    />
                   </button>
                 </div>
 
@@ -110,18 +144,26 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                   onChange={(e) =>
                     updateItemVisibility(index, e.target.checked)
                   }
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                  className="w-4 h-4 rounded"
+                  style={{ accentColor: colors.$3 }}
                 />
                 <label
                   htmlFor={`item-${index}`}
-                  className="flex-1 text-sm text-gray-700"
+                  className="flex-1 text-sm"
+                  style={{ color: colors.$3 }}
                 >
                   {item.label}
                 </label>
 
                 <button
                   onClick={() => toggleItemExpand(index)}
-                  className={`p-1.5 rounded transition-colors ${expandedItems[index] ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:bg-gray-100'}`}
+                  className="p-1.5 rounded transition-colors"
+                  style={{
+                    backgroundColor: expandedItems[index]
+                      ? colors.$25
+                      : 'transparent',
+                    color: expandedItems[index] ? colors.$3 : colors.$17,
+                  }}
                   title={String(t('typography'))}
                 >
                   <Type className="w-4 h-4" />
@@ -129,7 +171,13 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
               </div>
 
               {expandedItems[index] && (
-                <div className="px-3 pb-3 pt-1 border-t border-gray-100 bg-gray-50 space-y-3">
+                <div
+                  className="px-3 pb-3 pt-3 space-y-3"
+                  style={{
+                    backgroundColor: colors.$23,
+                    borderTop: `1px solid ${colors.$24}`,
+                  }}
+                >
                   {/* Font Size */}
                   <TextInput
                     label={String(t('font_size'))}
