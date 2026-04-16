@@ -442,6 +442,7 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
     rowBg,
     alternateRowBg,
     alternateRows,
+    rowColor,
   } = block.properties;
 
   const resolveItemValue = (
@@ -520,6 +521,7 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
                       padding,
                       textAlign: col.align as 'left' | 'center' | 'right',
                       border: showBorders ? `1px solid ${borderColor}` : 'none',
+                      color: rowColor ?? '#374151',
                     }}
                   >
                     {resolveItemValue(col.field, item)}
