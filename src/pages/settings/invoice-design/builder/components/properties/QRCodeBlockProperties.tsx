@@ -11,6 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { PropertyEditorProps } from '../../types';
 import { TextInput, SectionDivider, SelectInput } from './PropertyInputs';
+import { useColorScheme } from '$app/common/colors';
 
 const QR_CODE_TYPES = [
   {
@@ -33,6 +34,7 @@ export function QRCodeBlockProperties({
   onChange,
 }: PropertyEditorProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const updateProperty = (key: string, value: any) => {
     onChange({
@@ -81,7 +83,10 @@ export function QRCodeBlockProperties({
 
       {/* Alignment */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          className="block text-sm font-medium mb-2"
+          style={{ color: colors.$3 }}
+        >
           {t('alignment')}
         </label>
         <div className="flex gap-1">
@@ -89,11 +94,15 @@ export function QRCodeBlockProperties({
             <button
               key={align}
               onClick={() => updateProperty('align', align)}
-              className={`flex-1 px-3 py-2 text-xs rounded border transition-all ${
-                block.properties.align === align
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-gray-300 hover:border-gray-400'
-              }`}
+              className="flex-1 px-3 py-2 text-xs rounded border transition-all"
+              style={{
+                borderColor:
+                  block.properties.align === align ? colors.$3 : colors.$24,
+                backgroundColor:
+                  block.properties.align === align ? colors.$25 : 'transparent',
+                color:
+                  block.properties.align === align ? colors.$3 : colors.$17,
+              }}
             >
               {t(align)}
             </button>
@@ -104,7 +113,10 @@ export function QRCodeBlockProperties({
       <SectionDivider label={String(t('advanced'))} />
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          className="block text-sm font-medium mb-2"
+          style={{ color: colors.$3 }}
+        >
           {t('data_variable')}
         </label>
         <input
@@ -115,9 +127,14 @@ export function QRCodeBlockProperties({
             '$payment_qrcode'
           }
           readOnly
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-50 text-gray-500"
+          className="w-full px-3 py-2 rounded-md text-sm"
+          style={{
+            backgroundColor: colors.$23,
+            border: `1px solid ${colors.$24}`,
+            color: colors.$17,
+          }}
         />
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs mt-1" style={{ color: colors.$17 }}>
           {t('variable_determined_by_qr_type')}
         </p>
       </div>

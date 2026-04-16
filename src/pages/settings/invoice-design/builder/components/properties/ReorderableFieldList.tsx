@@ -21,6 +21,7 @@ import {
 import { Button } from '$app/components/forms';
 import { FieldConfig } from '../../types';
 import { TextInput, ColorInput, FontStyleInput } from './PropertyInputs';
+import { useColorScheme } from '$app/common/colors';
 
 export interface FieldDefinition {
   id: string;
@@ -49,6 +50,7 @@ export function ReorderableFieldList({
   showRemove = true,
 }: ReorderableFieldListProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
   const [expandedField, setExpandedField] = useState<string | null>(null);
 
   const addField = useCallback(
@@ -117,7 +119,10 @@ export function ReorderableFieldList({
   return (
     <div className="space-y-3">
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label
+          className="block text-sm font-medium"
+          style={{ color: colors.$3 }}
+        >
           {label}
         </label>
       )}
@@ -126,60 +131,104 @@ export function ReorderableFieldList({
         {fields.map((field, index) => (
           <div
             key={`${field.id}-${index}`}
-            className="border border-gray-200 rounded-md bg-white overflow-hidden"
+            className="rounded-md overflow-hidden"
+            style={{
+              backgroundColor: colors.$1,
+              border: `1px solid ${colors.$24}`,
+            }}
           >
-            <div className="flex items-center gap-3 p-3">
-              <div className="flex flex-col border border-gray-200 rounded overflow-hidden">
+            <div className="flex items-center gap-2 p-2">
+              <div className="flex flex-col">
                 <button
                   onClick={() => moveFieldUp(index)}
                   disabled={index === 0}
-                  className="p-1 flex items-center justify-center hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="p-0.5 rounded transition-colors"
+                  style={{
+                    color: index === 0 ? colors.$24 : colors.$16,
+                    cursor: index === 0 ? 'not-allowed' : 'pointer',
+                  }}
                   title={String(t('move_up'))}
                 >
-                  <ChevronUp className="w-4 h-4 text-gray-600" />
+                  <ChevronUp
+                    className="w-4 h-4"
+                    style={{ color: index === 0 ? colors.$24 : colors.$16 }}
+                  />
                 </button>
-                <div className="border-t border-gray-200" />
                 <button
                   onClick={() => moveFieldDown(index)}
                   disabled={index >= fields.length - 1}
-                  className="p-1 flex items-center justify-center hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="p-0.5 rounded transition-colors"
+                  style={{
+                    color: index >= fields.length - 1 ? colors.$24 : colors.$16,
+                    cursor:
+                      index >= fields.length - 1 ? 'not-allowed' : 'pointer',
+                  }}
                   title={String(t('move_down'))}
                 >
-                  <ChevronDown className="w-4 h-4 text-gray-600" />
+                  <ChevronDown
+                    className="w-4 h-4"
+                    style={{
+                      color:
+                        index >= fields.length - 1 ? colors.$24 : colors.$16,
+                    }}
+                  />
                 </button>
               </div>
 
-              <span className="flex-1 text-sm font-medium">{field.label}</span>
+              <span className="flex-1 text-sm" style={{ color: colors.$3 }}>
+                {field.label}
+              </span>
 
-              <Button
-                behavior="button"
-                type="minimal"
+              <button
                 onClick={() => toggleExpand(`${field.id}-${index}`)}
-                className={`p-1 h-auto transition-colors ${
-                  expandedField === `${field.id}-${index}`
-                    ? 'bg-blue-50 text-blue-600'
-                    : ''
-                }`}
+                className="p-1.5 rounded transition-colors"
+                style={{
+                  backgroundColor:
+                    expandedField === `${field.id}-${index}`
+                      ? colors.$25
+                      : 'transparent',
+                  color:
+                    expandedField === `${field.id}-${index}`
+                      ? colors.$3
+                      : colors.$17,
+                }}
               >
                 <Settings2 className="w-4 h-4" />
-              </Button>
+              </button>
 
               {showRemove && (
-                <Button
-                  behavior="button"
-                  type="minimal"
+                <button
                   onClick={() => removeField(index)}
-                  className="p-1 h-auto"
+                  className="p-1 rounded transition-colors"
+                  style={{ color: colors.$17 }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor =
+                      'rgba(239, 68, 68, 0.1)';
+                    e.currentTarget.style.color = '#ef4444';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = colors.$17;
+                  }}
                 >
                   <Trash2 className="w-4 h-4" />
-                </Button>
+                </button>
               )}
             </div>
 
             {expandedField === `${field.id}-${index}` && (
-              <div className="px-3 pb-3 pt-1 border-t border-gray-100 bg-gray-50 space-y-3">
+              <div
+                className="px-3 pb-3 pt-3 space-y-3"
+                style={{
+                  backgroundColor: colors.$23,
+                  borderTop: `1px solid ${colors.$24}`,
+                }}
+              >
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  <div
+                    className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider"
+                    style={{ color: colors.$17 }}
+                  >
                     <Type className="w-3 h-3" />
                     {t('typography')}
                   </div>
@@ -219,15 +268,24 @@ export function ReorderableFieldList({
                   />
                 </div>
 
-                <div className="border-t border-gray-200 pt-3">
-                  <div className="flex items-center gap-2 text-xs font-medium text-gray-600 uppercase tracking-wider mb-3">
+                <div
+                  className="pt-3"
+                  style={{ borderTop: `1px solid ${colors.$24}` }}
+                >
+                  <div
+                    className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider mb-3"
+                    style={{ color: colors.$17 }}
+                  >
                     <Settings2 className="w-3 h-3" />
                     {t('field_options')}
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                      <label
+                        className="block text-xs font-medium mb-1"
+                        style={{ color: colors.$17 }}
+                      >
                         {t('prefix')}
                       </label>
                       <input
@@ -237,11 +295,19 @@ export function ReorderableFieldList({
                           updateField(index, { prefix: e.target.value })
                         }
                         placeholder={String(t('prefix_placeholder'))}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-2 py-1.5 text-sm rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{
+                          backgroundColor: colors.$1,
+                          border: `1px solid ${colors.$24}`,
+                          color: colors.$3,
+                        }}
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                      <label
+                        className="block text-xs font-medium mb-1"
+                        style={{ color: colors.$17 }}
+                      >
                         {t('suffix')}
                       </label>
                       <input
@@ -251,15 +317,27 @@ export function ReorderableFieldList({
                           updateField(index, { suffix: e.target.value })
                         }
                         placeholder={String(t('suffix_placeholder'))}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-2 py-1.5 text-sm rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{
+                          backgroundColor: colors.$1,
+                          border: `1px solid ${colors.$24}`,
+                          color: colors.$3,
+                        }}
                       />
                     </div>
                   </div>
 
                   {(field.prefix || field.suffix) && (
-                    <div className="text-xs text-gray-500 bg-white p-2 rounded border border-gray-200 mt-3">
+                    <div
+                      className="text-xs p-2 rounded mt-3"
+                      style={{
+                        backgroundColor: colors.$1,
+                        border: `1px solid ${colors.$24}`,
+                        color: colors.$17,
+                      }}
+                    >
                       <span className="font-medium">{t('preview')}: </span>
-                      <span className="text-gray-400">
+                      <span style={{ color: colors.$24 }}>
                         {field.prefix}
                         {field.variable}
                         {field.suffix}
@@ -274,9 +352,10 @@ export function ReorderableFieldList({
                       onChange={(e) =>
                         updateField(index, { hideIfEmpty: e.target.checked })
                       }
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded focus:ring-blue-500"
+                      style={{ accentColor: colors.$3 }}
                     />
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm" style={{ color: colors.$3 }}>
                       {t('hide_if_empty')}
                     </span>
                   </label>
@@ -287,7 +366,10 @@ export function ReorderableFieldList({
         ))}
 
         {fields.length === 0 && (
-          <div className="text-center py-4 text-gray-500 text-sm border border-dashed border-gray-300 rounded-md">
+          <div
+            className="text-center py-4 text-sm border border-dashed rounded-md"
+            style={{ color: colors.$17, borderColor: colors.$24 }}
+          >
             {emptyLabel}
           </div>
         )}
@@ -296,7 +378,10 @@ export function ReorderableFieldList({
       {/* Add Fields */}
       {availableFields.length > 0 && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            className="block text-sm font-medium mb-2"
+            style={{ color: colors.$3 }}
+          >
             {addFieldLabel}
           </label>
           <div className="flex flex-wrap gap-2">
