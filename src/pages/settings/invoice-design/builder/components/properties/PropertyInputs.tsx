@@ -15,6 +15,7 @@ import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { Checkbox } from '$app/components/forms/Checkbox';
 import { SelectField } from '$app/components/forms/SelectField';
 import { Button } from '$app/components/forms/Button';
+import { useColorScheme } from '$app/common/colors';
 
 interface BaseInputProps {
   label?: string;
@@ -36,11 +37,15 @@ export function FontSizeInput({
   sizes = ['10px', '12px', '14px', '16px', '18px', '20px'],
 }: FontSizeInputProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   return (
     <div>
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          className="block text-sm font-medium mb-2"
+          style={{ color: colors.$3 }}
+        >
           {label}
         </label>
       )}
@@ -101,12 +106,16 @@ export function ColorInput({
   onChange,
   defaultValue = '#000000',
 }: ColorInputProps) {
+  const colors = useColorScheme();
   const currentValue = value || defaultValue;
 
   return (
     <div>
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          className="block text-sm font-medium mb-2"
+          style={{ color: colors.$3 }}
+        >
           {label}
         </label>
       )}
@@ -132,6 +141,7 @@ export function AlignmentInput({
   options = ['left', 'center', 'right'],
 }: AlignmentInputProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const icons = {
     left: AlignLeft,
@@ -142,7 +152,10 @@ export function AlignmentInput({
   return (
     <div>
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          className="block text-sm font-medium mb-2"
+          style={{ color: colors.$3 }}
+        >
           {label}
         </label>
       )}
@@ -184,10 +197,15 @@ export function FontStyleInput({
   onFontWeightChange,
   onFontStyleChange,
 }: FontStyleInputProps) {
+  const colors = useColorScheme();
+
   return (
     <div>
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          className="block text-sm font-medium mb-2"
+          style={{ color: colors.$3 }}
+        >
           {label}
         </label>
       )}
@@ -284,14 +302,19 @@ interface SectionDividerProps {
 }
 
 export function SectionDivider({ label }: SectionDividerProps) {
+  const colors = useColorScheme();
+
   return (
     <div className="relative py-2">
       <div className="absolute inset-0 flex items-center">
-        <div className="w-full border-t border-gray-200" />
+        <div className="w-full border-t" style={{ borderColor: colors.$24 }} />
       </div>
       {label && (
         <div className="relative flex justify-center">
-          <span className="bg-white px-2 text-xs text-gray-500 uppercase tracking-wider">
+          <span
+            className="px-2 text-xs uppercase tracking-wider"
+            style={{ backgroundColor: colors.$1, color: colors.$17 }}
+          >
             {label}
           </span>
         </div>

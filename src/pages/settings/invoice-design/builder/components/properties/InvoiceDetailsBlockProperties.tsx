@@ -23,12 +23,14 @@ import {
   FontStyleInput,
 } from './PropertyInputs';
 import { useCustomField } from '$app/components/CustomField';
+import { useColorScheme } from '$app/common/colors';
 
 export function InvoiceDetailsBlockProperties({
   block,
   onChange,
 }: PropertyEditorProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
   const customField = useCustomField();
   const [expandedFields, setExpandedFields] = useState<Record<string, boolean>>(
     {}
@@ -200,7 +202,10 @@ export function InvoiceDetailsBlockProperties({
 
       {/* Active Fields - Reorderable with per-field typography */}
       <div className="space-y-3">
-        <label className="block text-sm font-medium text-gray-700">
+        <label
+          className="block text-sm font-medium"
+          style={{ color: colors.$3 }}
+        >
           {t('field_order')}
         </label>
 
@@ -208,45 +213,72 @@ export function InvoiceDetailsBlockProperties({
           {fieldConfigs.map((field, index) => (
             <div
               key={field.id}
-              className="border border-gray-200 rounded-md bg-white overflow-hidden"
+              className="rounded-md overflow-hidden"
+              style={{
+                backgroundColor: colors.$1,
+                border: `1px solid ${colors.$24}`,
+              }}
             >
               {/* Field Header Row */}
-              <div className="flex items-center gap-1 p-2">
+              <div className="flex items-center gap-2 p-2">
                 <div className="flex flex-col">
                   <button
                     onClick={() => moveFieldUp(index)}
                     disabled={index === 0}
-                    className={`p-0.5 rounded ${
-                      index === 0
-                        ? 'text-gray-300 cursor-not-allowed'
-                        : 'text-gray-500 hover:bg-gray-100'
-                    }`}
+                    className="p-0.5 rounded transition-colors"
+                    style={{
+                      color: index === 0 ? colors.$24 : colors.$16,
+                      cursor: index === 0 ? 'not-allowed' : 'pointer',
+                    }}
                     title={String(t('move_up'))}
                   >
-                    <ChevronUp className="w-4 h-4" />
+                    <ChevronUp
+                      className="w-4 h-4"
+                      style={{ color: index === 0 ? colors.$24 : colors.$16 }}
+                    />
                   </button>
                   <button
                     onClick={() => moveFieldDown(index)}
                     disabled={index >= fieldConfigs.length - 1}
-                    className={`p-0.5 rounded ${
-                      index >= fieldConfigs.length - 1
-                        ? 'text-gray-300 cursor-not-allowed'
-                        : 'text-gray-500 hover:bg-gray-100'
-                    }`}
+                    className="p-0.5 rounded transition-colors"
+                    style={{
+                      color:
+                        index >= fieldConfigs.length - 1
+                          ? colors.$24
+                          : colors.$16,
+                      cursor:
+                        index >= fieldConfigs.length - 1
+                          ? 'not-allowed'
+                          : 'pointer',
+                    }}
                     title={String(t('move_down'))}
                   >
-                    <ChevronDown className="w-4 h-4" />
+                    <ChevronDown
+                      className="w-4 h-4"
+                      style={{
+                        color:
+                          index >= fieldConfigs.length - 1
+                            ? colors.$24
+                            : colors.$16,
+                      }}
+                    />
                   </button>
                 </div>
 
-                <span className="flex-1 text-sm text-gray-700">
+                <span className="flex-1 text-sm" style={{ color: colors.$3 }}>
                   {field.label}
                 </span>
 
                 {/* Typography Toggle Button */}
                 <button
                   onClick={() => toggleFieldExpand(field.id)}
-                  className={`p-1.5 rounded transition-colors ${expandedFields[field.id] ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:bg-gray-100'}`}
+                  className="p-1.5 rounded transition-colors"
+                  style={{
+                    backgroundColor: expandedFields[field.id]
+                      ? colors.$25
+                      : 'transparent',
+                    color: expandedFields[field.id] ? colors.$3 : colors.$17,
+                  }}
                   title={String(t('typography'))}
                 >
                   <Type className="w-4 h-4" />
@@ -254,7 +286,17 @@ export function InvoiceDetailsBlockProperties({
 
                 <button
                   onClick={() => removeField(index)}
-                  className="p-1 rounded hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors"
+                  className="p-1 rounded transition-colors"
+                  style={{ color: colors.$17 }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor =
+                      'rgba(239, 68, 68, 0.1)';
+                    e.currentTarget.style.color = '#ef4444';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = colors.$17;
+                  }}
                   title={String(t('remove'))}
                 >
                   <Trash2 className="w-4 h-4" />
@@ -263,7 +305,13 @@ export function InvoiceDetailsBlockProperties({
 
               {/* Expanded Typography Controls */}
               {expandedFields[field.id] && (
-                <div className="px-3 pb-3 pt-1 border-t border-gray-100 bg-gray-50 space-y-3">
+                <div
+                  className="px-3 pb-3 pt-3 space-y-3"
+                  style={{
+                    backgroundColor: colors.$23,
+                    borderTop: `1px solid ${colors.$24}`,
+                  }}
+                >
                   {/* Font Size */}
                   <TextInput
                     label={String(t('font_size'))}
@@ -310,7 +358,10 @@ export function InvoiceDetailsBlockProperties({
           ))}
 
           {fieldConfigs.length === 0 && (
-            <div className="text-center py-4 text-gray-500 text-sm border border-dashed border-gray-300 rounded-md">
+            <div
+              className="text-center py-4 text-sm rounded-md border border-dashed"
+              style={{ color: colors.$17, borderColor: colors.$24 }}
+            >
               {t('no_fields_selected')}
             </div>
           )}
@@ -319,7 +370,10 @@ export function InvoiceDetailsBlockProperties({
         {/* Add Fields */}
         {availableToAdd.length > 0 && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              className="block text-sm font-medium mb-2"
+              style={{ color: colors.$3 }}
+            >
               {t('add_field')}
             </label>
             <div className="flex flex-wrap gap-2">
@@ -327,7 +381,18 @@ export function InvoiceDetailsBlockProperties({
                 <button
                   key={field.variable}
                   onClick={() => addField(field)}
-                  className="px-3 py-1.5 text-xs border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 transition-colors"
+                  className="px-3 py-1.5 text-xs rounded-md transition-colors"
+                  style={{
+                    border: `1px solid ${colors.$24}`,
+                    color: colors.$3,
+                    backgroundColor: 'transparent',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = colors.$20;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
                 >
                   + {field.label}
                 </button>
