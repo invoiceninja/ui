@@ -52,6 +52,13 @@ const getAvailableColumns = (isTasksTable: boolean) => [
     align: 'right' as const,
   },
   {
+    id: 'net_cost',
+    header: 'Net Cost',
+    field: 'item.net_cost',
+    width: '15%',
+    align: 'right' as const,
+  },
+  {
     id: 'line_total',
     header: 'Amount',
     field: 'item.line_total',

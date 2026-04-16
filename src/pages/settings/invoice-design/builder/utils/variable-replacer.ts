@@ -48,6 +48,7 @@ export interface InvoiceData {
     notes: string;
     quantity: number;
     cost: number;
+    net_cost: number;
     line_total: number;
   }>;
 }
@@ -95,6 +96,7 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
       notes: 'Website Design & Development',
       quantity: 1,
       cost: 1000.0,
+      net_cost: 1000.0,
       line_total: 1000.0,
     },
     {
@@ -102,6 +104,7 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
       notes: 'Technical Consulting Services',
       quantity: 5,
       cost: 100.0,
+      net_cost: 100.0,
       line_total: 500.0,
     },
   ],
@@ -172,7 +175,10 @@ export function replaceVariables(template: string, data: InvoiceData): string {
     /\$entity\.subtotal/g,
     formatCurrency(data.invoice.subtotal)
   );
-  result = result.replace(/\$entity\.tax/g, formatCurrency(data.invoice.total_taxes));
+  result = result.replace(
+    /\$entity\.tax/g,
+    formatCurrency(data.invoice.total_taxes)
+  );
   result = result.replace(
     /\$entity\.discount/g,
     formatCurrency(data.invoice.discount)
@@ -190,10 +196,7 @@ export function replaceVariables(template: string, data: InvoiceData): string {
     formatCurrency(data.invoice.balance)
   );
   result = result.replace(/\$entity\.public_url/g, data.invoice.public_url);
-  result = result.replace(
-    /\$entity\.public_notes/g,
-    data.invoice.public_notes
-  );
+  result = result.replace(/\$entity\.public_notes/g, data.invoice.public_notes);
   result = result.replace(/\$entity\.footer/g, data.invoice.footer);
   result = result.replace(/\$entity\.terms/g, data.invoice.terms);
 
