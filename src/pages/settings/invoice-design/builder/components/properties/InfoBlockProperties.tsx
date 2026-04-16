@@ -21,6 +21,7 @@ import {
   CheckboxInput,
 } from './PropertyInputs';
 import { ReorderableFieldList, FieldDefinition } from './ReorderableFieldList';
+import { useColorScheme } from '$app/common/colors';
 
 interface InfoBlockPropertiesProps extends PropertyEditorProps {
   availableFields: FieldDefinition[];
@@ -42,13 +43,14 @@ export function InfoBlockProperties({
   emptyLabel,
 }: InfoBlockPropertiesProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const migrateFromLegacy = useCallback((): FieldConfig[] => {
     const content = block.properties.content || '';
     if (!content) return [];
 
     const lines = content.split('\n').filter((line: string) => line.trim());
-    
+
     return lines
       .map((line: string) => {
         const variable = line.trim();
@@ -63,9 +65,9 @@ export function InfoBlockProperties({
             hideIfEmpty: true,
           };
         }
-        
+
         const variableMatch = variable.match(/\$([^.]+)\.(.+)/);
-        
+
         if (variableMatch) {
           return {
             id: variable.replace(/\$/g, '').replace(/\./g, '_'),
@@ -128,7 +130,11 @@ export function InfoBlockProperties({
 
   return (
     <div className="space-y-4">
-      {title && <h3 className="font-semibold text-gray-900">{title}</h3>}
+      {title && (
+        <h3 className="font-semibold" style={{ color: colors.$3 }}>
+          {title}
+        </h3>
+      )}
 
       {showTitleOption && (
         <div className="space-y-3">
@@ -192,7 +198,9 @@ export function InfoBlockProperties({
         onChange={(value) => updateProperty('padding', value)}
         placeholder="0px"
       />
-      <p className="text-xs text-gray-500 -mt-3">{t('css_padding_format')}</p>
+      <p className="text-xs -mt-3" style={{ color: colors.$17 }}>
+        {t('css_padding_format')}
+      </p>
     </div>
   );
 }
