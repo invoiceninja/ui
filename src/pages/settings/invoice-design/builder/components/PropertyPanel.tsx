@@ -13,6 +13,7 @@ import { Trash2, Clipboard } from 'lucide-react';
 import { Button } from '$app/components/forms';
 import { PropertyPanelProps, Block } from '../types';
 import { useBlockLabel, useBlockDescription } from '../block-library';
+import { useColorScheme } from '$app/common/colors';
 import { TextBlockProperties } from './properties/TextBlockProperties';
 import { ImageBlockProperties } from './properties/ImageBlockProperties';
 import { TableBlockProperties } from './properties/TableBlockProperties';
@@ -26,22 +27,32 @@ export function PropertyPanel({
   block,
   onChange,
   onDelete,
-  onDuplicate,
+  // onDuplicate, // temporarily disabled
 }: PropertyPanelProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
   const blockLabel = useBlockLabel(block.type);
   const blockDescription = useBlockDescription(block.type);
 
   return (
     <div className="p-4 space-y-6">
       {/* Header with Title and Copy Button */}
-      <div className="flex items-start justify-between gap-2 pb-4 border-b">
+      <div
+        className="flex items-start justify-between gap-2 pb-4 border-b"
+        style={{ borderColor: colors.$24 }}
+      >
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-lg text-gray-900 mb-1">
+          <h3
+            className="font-semibold text-lg mb-1"
+            style={{ color: colors.$3 }}
+          >
             {blockLabel}
           </h3>
-          <p className="text-sm text-gray-600">{blockDescription}</p>
+          <p className="text-sm" style={{ color: colors.$17 }}>
+            {blockDescription}
+          </p>
         </div>
+        {/* Duplicate block button - temporarily disabled
         <Button
           behavior="button"
           type="minimal"
@@ -50,6 +61,7 @@ export function PropertyPanel({
         >
           <Clipboard className="w-4 h-4" />
         </Button>
+        */}
       </div>
 
       {/* Block-specific properties */}
