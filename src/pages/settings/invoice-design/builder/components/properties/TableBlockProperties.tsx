@@ -18,6 +18,7 @@ import {
   CheckboxInput,
   SectionDivider,
 } from './PropertyInputs';
+import { useColorScheme } from '$app/common/colors';
 
 // Available columns that can be added to the table
 // Maps field to canonical ID for consistent matching
@@ -89,6 +90,7 @@ const getAvailableColumns = (isTasksTable: boolean) => [
 
 export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
   const [expandedColumn, setExpandedColumn] = useState<string | null>(null);
 
   const isTasksTable = block.type === 'tasks-table';
@@ -162,7 +164,10 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
     <div className="space-y-4">
       {/* Active Columns - Reorderable */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-3">
+        <label
+          className="block text-sm font-medium mb-3"
+          style={{ color: colors.$3 }}
+        >
           {t('column_order')}
         </label>
         <div className="space-y-1">
@@ -172,43 +177,67 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
             return (
               <div
                 key={`${column.field}-${index}`}
-                className="border border-gray-200 rounded-md bg-white"
+                className="rounded-md"
+                style={{
+                  backgroundColor: colors.$1,
+                  border: `1px solid ${colors.$24}`,
+                }}
               >
-                <div className="flex items-center gap-1 p-2">
+                <div className="flex items-center gap-2 p-2">
                   {/* Reorder buttons */}
                   <div className="flex flex-col">
                     <button
                       onClick={() => moveColumnUp(index)}
                       disabled={index === 0}
-                      className={`p-0.5 rounded ${
-                        index === 0
-                          ? 'text-gray-300'
-                          : 'text-gray-500 hover:bg-gray-100'
-                      }`}
+                      className="p-0.5 rounded transition-colors"
+                      style={{
+                        color: index === 0 ? colors.$24 : colors.$16,
+                        cursor: index === 0 ? 'not-allowed' : 'pointer',
+                      }}
                       title={String(t('move_up'))}
                     >
-                      <ChevronUp className="w-4 h-4" />
+                      <ChevronUp
+                        className="w-4 h-4"
+                        style={{ color: index === 0 ? colors.$24 : colors.$16 }}
+                      />
                     </button>
                     <button
                       onClick={() => moveColumnDown(index)}
                       disabled={index >= currentColumns.length - 1}
-                      className={`p-0.5 rounded ${
-                        index >= currentColumns.length - 1
-                          ? 'text-gray-300'
-                          : 'text-gray-500 hover:bg-gray-100'
-                      }`}
+                      className="p-0.5 rounded transition-colors"
+                      style={{
+                        color:
+                          index >= currentColumns.length - 1
+                            ? colors.$24
+                            : colors.$16,
+                        cursor:
+                          index >= currentColumns.length - 1
+                            ? 'not-allowed'
+                            : 'pointer',
+                      }}
                       title={String(t('move_down'))}
                     >
-                      <ChevronDown className="w-4 h-4" />
+                      <ChevronDown
+                        className="w-4 h-4"
+                        style={{
+                          color:
+                            index >= currentColumns.length - 1
+                              ? colors.$24
+                              : colors.$16,
+                        }}
+                      />
                     </button>
                   </div>
 
                   {/* Column info */}
                   <div className="flex-1 min-w-0">
-                    <span className="text-sm font-medium text-gray-700 truncate block">
+                    <span
+                      className="text-sm font-medium truncate block"
+                      style={{ color: colors.$3 }}
+                    >
                       {column.header}
                     </span>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs" style={{ color: colors.$17 }}>
                       {column.width} · {column.align}
                     </span>
                   </div>
@@ -218,11 +247,11 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                     onClick={() =>
                       setExpandedColumn(isExpanded ? null : column.field)
                     }
-                    className={`p-1.5 rounded transition-colors ${
-                      isExpanded
-                        ? 'bg-blue-100 text-blue-600'
-                        : 'hover:bg-gray-100 text-gray-500'
-                    }`}
+                    className="p-1.5 rounded transition-colors"
+                    style={{
+                      backgroundColor: isExpanded ? colors.$25 : 'transparent',
+                      color: isExpanded ? colors.$3 : colors.$17,
+                    }}
                     title={String(t('settings'))}
                   >
                     <Settings2 className="w-4 h-4" />
@@ -231,7 +260,17 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                   {/* Remove button */}
                   <button
                     onClick={() => removeColumn(index)}
-                    className="p-1.5 rounded hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors"
+                    className="p-1.5 rounded transition-colors"
+                    style={{ color: colors.$17 }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        'rgba(239, 68, 68, 0.1)';
+                      e.currentTarget.style.color = '#ef4444';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.color = colors.$17;
+                    }}
                     title={String(t('remove'))}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -240,10 +279,19 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
 
                 {/* Expanded settings */}
                 {isExpanded && (
-                  <div className="px-2 pb-2 pt-1 border-t border-gray-100 bg-gray-50 space-y-2">
+                  <div
+                    className="px-3 pb-3 pt-3 space-y-3"
+                    style={{
+                      backgroundColor: colors.$23,
+                      borderTop: `1px solid ${colors.$24}`,
+                    }}
+                  >
                     <div className="flex gap-2">
                       <div className="flex-1">
-                        <label className="block text-xs text-gray-500 mb-1">
+                        <label
+                          className="block text-xs mb-1"
+                          style={{ color: colors.$17 }}
+                        >
                           {t('header_label')}
                         </label>
                         <input
@@ -252,11 +300,19 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                           onChange={(e) =>
                             updateColumnProp(index, 'header', e.target.value)
                           }
-                          className="w-full px-2 py-1 border border-gray-300 rounded text-xs"
+                          className="w-full px-2 py-1 rounded text-xs"
+                          style={{
+                            backgroundColor: colors.$1,
+                            border: `1px solid ${colors.$24}`,
+                            color: colors.$3,
+                          }}
                         />
                       </div>
                       <div className="w-20">
-                        <label className="block text-xs text-gray-500 mb-1">
+                        <label
+                          className="block text-xs mb-1"
+                          style={{ color: colors.$17 }}
+                        >
                           {t('width')}
                         </label>
                         <input
@@ -265,13 +321,21 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                           onChange={(e) =>
                             updateColumnProp(index, 'width', e.target.value)
                           }
-                          className="w-full px-2 py-1 border border-gray-300 rounded text-xs"
+                          className="w-full px-2 py-1 rounded text-xs"
+                          style={{
+                            backgroundColor: colors.$1,
+                            border: `1px solid ${colors.$24}`,
+                            color: colors.$3,
+                          }}
                           placeholder="15%"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">
+                      <label
+                        className="block text-xs mb-1"
+                        style={{ color: colors.$17 }}
+                      >
                         {t('alignment')}
                       </label>
                       <div className="flex gap-1">
@@ -281,11 +345,17 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                             onClick={() =>
                               updateColumnProp(index, 'align', align)
                             }
-                            className={`flex-1 px-2 py-1 text-xs rounded border transition-all ${
-                              column.align === align
-                                ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                : 'border-gray-300 hover:border-gray-400'
-                            }`}
+                            className="flex-1 px-2 py-1 text-xs rounded border transition-all"
+                            style={{
+                              borderColor:
+                                column.align === align ? colors.$3 : colors.$24,
+                              backgroundColor:
+                                column.align === align
+                                  ? colors.$25
+                                  : 'transparent',
+                              color:
+                                column.align === align ? colors.$3 : colors.$17,
+                            }}
                           >
                             {t(align)}
                           </button>
@@ -299,7 +369,10 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
           })}
 
           {currentColumns.length === 0 && (
-            <div className="text-center py-4 text-gray-500 text-sm border border-dashed border-gray-300 rounded-md">
+            <div
+              className="text-center py-4 text-sm border border-dashed rounded-md"
+              style={{ color: colors.$17, borderColor: colors.$24 }}
+            >
               {t('no_columns_selected')}
             </div>
           )}
@@ -309,7 +382,10 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
       {/* Add Columns */}
       {availableToAdd.length > 0 && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            className="block text-sm font-medium mb-2"
+            style={{ color: colors.$3 }}
+          >
             {t('add_column')}
           </label>
           <div className="flex flex-wrap gap-2">
@@ -317,7 +393,18 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
               <button
                 key={colDef.id}
                 onClick={() => addColumn(colDef)}
-                className="px-3 py-1.5 text-xs border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-400 transition-colors"
+                className="px-3 py-1.5 text-xs rounded-md transition-colors"
+                style={{
+                  border: `1px solid ${colors.$24}`,
+                  color: colors.$3,
+                  backgroundColor: 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.$20;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
               >
                 + {colDef.header}
               </button>
@@ -372,6 +459,14 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
           defaultValue="#F9FAFB"
         />
       )}
+
+      {/* Row Text Color */}
+      <ColorInput
+        label={String(t('row_text_color'))}
+        value={block.properties.rowColor}
+        onChange={(value) => updateProperty('rowColor', value)}
+        defaultValue="#374151"
+      />
 
       <SectionDivider label={String(t('borders'))} />
 

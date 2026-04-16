@@ -23,9 +23,11 @@ import {
   TextInput,
   SectionDivider,
 } from './PropertyInputs';
+import { useColorScheme } from '$app/common/colors';
 
 export function TextBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
   const [showVariablePicker, setShowVariablePicker] = useState(false);
   // Local state for immediate textarea updates
   const [contentValue, setContentValue] = useState(
@@ -63,12 +65,16 @@ export function TextBlockProperties({ block, onChange }: PropertyEditorProps) {
       {/* Content */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <label
+            className="block text-sm font-medium"
+            style={{ color: colors.$3 }}
+          >
             {String(t('content'))}
           </label>
           <button
             onClick={() => setShowVariablePicker(true)}
-            className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
+            className="text-xs flex items-center gap-1 transition-colors"
+            style={{ color: colors.$3 }}
           >
             <Code className="w-3 h-3" />
             {String(t('insert_variable'))}
@@ -77,11 +83,16 @@ export function TextBlockProperties({ block, onChange }: PropertyEditorProps) {
         <textarea
           value={contentValue}
           onChange={handleContentChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-mono"
+          className="w-full px-3 py-2 rounded-md text-sm font-mono"
+          style={{
+            backgroundColor: colors.$1,
+            border: `1px solid ${colors.$24}`,
+            color: colors.$3,
+          }}
           rows={4}
           placeholder={String(t('enter_your_text'))}
         />
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs mt-1" style={{ color: colors.$17 }}>
           {String(t('use_variables_like'))} $company.name, $invoice.number
         </p>
       </div>
