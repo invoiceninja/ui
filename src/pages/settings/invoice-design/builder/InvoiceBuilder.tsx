@@ -719,21 +719,18 @@ export function InvoiceBuilder() {
               {t('zoom')}: {state.zoom}%
             </span>
 
-            {/* Design name */}
-            {(isEditMode || designName) && (
-              <>
-                <div
-                  className="h-6 w-px"
-                  style={{ backgroundColor: colors.$24 }}
-                />
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: colors.$3 }}
-                >
-                  {designName || t('untitled')}
-                </span>
-              </>
-            )}
+            <div className="h-6 w-px" style={{ backgroundColor: colors.$24 }} />
+            <InputField
+              value={designName || ''}
+              onValueChange={(value) => setDesignName(value)}
+              placeholder={t('untitled')}
+              className="!py-1 !px-2 !bg-transparent border-0 focus:border-0 min-w-[150px] max-w-[300px]"
+              style={{
+                color: colors.$3,
+              }}
+              debounceTimeout={0}
+              changeOverride
+            />
           </div>
 
           <div className="flex items-center gap-3">
