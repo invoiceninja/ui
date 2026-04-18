@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Calculate,
@@ -25,7 +25,6 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { Divider } from '$app/components/cards/Divider';
 import { FIELDS_LABELS } from './DashboardCardSelector';
 import { PERIOD_LABELS } from './DashboardCard';
 
@@ -77,15 +76,20 @@ const MOCK_COUNT_VALUES: Partial<Record<Field, number>> = {
   invoice_paid_expenses: 6,
 };
 
-interface PendingField {
+interface NewField {
   field: Field;
   period: Period;
   calculate: Calculate;
   format: Format;
 }
 
-function defaultPending(field: Field): PendingField {
-  return { field, period: 'current', calculate: 'sum', format: 'money' };
+function defaultNewField(): NewField {
+  return {
+    field: 'active_invoices',
+    period: 'current',
+    calculate: 'sum',
+    format: 'money',
+  };
 }
 
 interface ToggleGroupProps {
@@ -123,10 +127,11 @@ function ToggleGroup({ options, value, onChange }: ToggleGroupProps) {
 
 interface FieldButtonProps {
   field: Field;
+  selected: boolean;
   onClick: () => void;
 }
 
-function FieldButton({ field, onClick }: FieldButtonProps) {
+function FieldButton({ field, selected, onClick }: FieldButtonProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const [hovered, setHovered] = useState<boolean>(false);
@@ -139,7 +144,11 @@ function FieldButton({ field, onClick }: FieldButtonProps) {
       onMouseLeave={() => setHovered(false)}
       className="w-full text-left px-3 py-2 rounded-md text-sm transition-colors"
       style={{
-        backgroundColor: hovered ? colors.$5 : 'transparent',
+        backgroundColor: selected
+          ? colors.$5
+          : hovered
+          ? colors.$4
+          : 'transparent',
         color: colors.$3,
       }}
     >
@@ -151,7 +160,7 @@ function FieldButton({ field, onClick }: FieldButtonProps) {
 interface Props {
   visible: boolean;
   onClose: () => void;
-  onAdd: (keys: string[]) => void;
+  onAdd: (key: string) => void;
   existingFields: string[];
   editKey: string | null;
   editIndex: number | null;
@@ -172,114 +181,73 @@ export function AddFieldModal({
 
   const isEditMode = editKey !== null;
 
-  const rightPanelRef = useRef<HTMLDivElement>(null);
-
   const [search, setSearch] = useState<string>('');
-  const [pending, setPending] = useState<PendingField[]>([]);
+  const [newField, setNewField] = useState<NewField>(defaultNewField());
 
   useEffect(() => {
     if (visible) {
       setSearch('');
       if (isEditMode && editKey) {
         const decoded = decodeDashboardField(editKey);
-        setPending([
-          {
-            field: decoded.field,
-            period: decoded.period,
-            calculate: decoded.calculate,
-            format: decoded.format,
-          },
-        ]);
+        setNewField({
+          field: decoded.field,
+          period: decoded.period,
+          calculate: decoded.calculate,
+          format: decoded.format,
+        });
       } else {
-        setPending([]);
+        setNewField(defaultNewField());
       }
     }
   }, [visible, editKey]);
 
-  useEffect(() => {
-    if (rightPanelRef.current && pending.length > 0) {
-      rightPanelRef.current.scrollTo({
-        top: rightPanelRef.current.scrollHeight,
-        behavior: 'smooth',
-      });
-    }
-  }, [pending.length]);
-
-  const handleFieldClick = (field: Field) => {
-    if (isEditMode) {
-      return;
-    }
-
-    setPending((prev) => [...prev, defaultPending(field)]);
-  };
-
-  const handleRemovePending = (index: number) => {
-    setPending((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const updatePending = (index: number, patch: Partial<PendingField>) => {
-    setPending((prev) =>
-      prev.map((p, i) => (i === index ? { ...p, ...patch } : p))
-    );
-  };
-
-  const handleConfirm = () => {
-    const keys = pending.map((p, i) => {
-      const existingCount = existingFields.filter((k, ei) => {
-        if (isEditMode && editIndex !== null && ei === editIndex) return false;
-        const d = decodeDashboardField(k);
-        return (
-          d.field === p.field &&
-          d.period === p.period &&
-          d.calculate === p.calculate &&
-          d.format === p.format
-        );
-      }).length;
-
-      const dupeInPending = pending
-        .slice(0, i)
-        .filter(
-          (pp) =>
-            pp.field === p.field &&
-            pp.period === p.period &&
-            pp.calculate === p.calculate &&
-            pp.format === p.format
-        ).length;
-
-      return encodeDashboardField(
-        p.field,
-        p.period,
-        p.calculate,
-        p.format,
-        existingCount + dupeInPending
+  const handleAdd = () => {
+    const existingCount = existingFields.filter((k, i) => {
+      if (editIndex !== null && i === editIndex) return false;
+      const d = decodeDashboardField(k);
+      return (
+        d.field === newField.field &&
+        d.period === newField.period &&
+        d.calculate === newField.calculate &&
+        d.format === newField.format
       );
-    });
+    }).length;
 
-    onAdd(keys);
-    setPending([]);
+    const key = encodeDashboardField(
+      newField.field,
+      newField.period,
+      newField.calculate,
+      newField.format,
+      existingCount
+    );
+
+    onAdd(key);
+    setNewField(defaultNewField());
     setSearch('');
   };
 
   const handleClose = () => {
-    setPending([]);
+    setNewField(defaultNewField());
     setSearch('');
     onClose();
   };
 
-  const getPreviewValue = (p: PendingField) => {
-    if (p.calculate === 'count') {
-      return String(MOCK_COUNT_VALUES[p.field] ?? 10);
+  const getPreviewValue = () => {
+    if (newField.calculate === 'count') {
+      return String(MOCK_COUNT_VALUES[newField.field] ?? 10);
     }
-    if (p.format === 'time') {
+
+    if (newField.format === 'time') {
       return '08:30';
     }
+
     const raw =
-      p.calculate === 'avg'
+      newField.calculate === 'avg'
         ? Math.round(
-            (MOCK_MONEY_VALUES[p.field] ?? 1000) /
-              (MOCK_COUNT_VALUES[p.field] ?? 10)
+            (MOCK_MONEY_VALUES[newField.field] ?? 1000) /
+              (MOCK_COUNT_VALUES[newField.field] ?? 10)
           )
-        : MOCK_MONEY_VALUES[p.field] ?? 1000;
+        : MOCK_MONEY_VALUES[newField.field] ?? 1000;
 
     return formatMoney(
       raw,
@@ -316,7 +284,7 @@ export function AddFieldModal({
       visible={visible}
       onClose={handleClose}
     >
-      <div className="flex gap-6" style={{ minHeight: '420px' }}>
+      <div className="flex gap-6" style={{ minHeight: '380px' }}>
         {!isEditMode && (
           <>
             <div className="flex flex-col w-52 flex-shrink-0 space-y-2">
@@ -335,13 +303,16 @@ export function AddFieldModal({
 
               <div
                 className="flex flex-col space-y-0.5 overflow-y-auto"
-                style={{ maxHeight: '360px' }}
+                style={{ maxHeight: '320px' }}
               >
                 {filteredFields.map((f) => (
                   <FieldButton
                     key={f}
                     field={f}
-                    onClick={() => handleFieldClick(f)}
+                    selected={newField.field === f}
+                    onClick={() =>
+                      setNewField((prev) => ({ ...prev, field: f }))
+                    }
                   />
                 ))}
               </div>
@@ -354,121 +325,74 @@ export function AddFieldModal({
           </>
         )}
 
-        <div className="flex flex-1 flex-col justify-between min-w-0">
-          <div
-            ref={rightPanelRef}
-            className="flex flex-col overflow-y-auto"
-            style={{ maxHeight: '360px' }}
-          >
-            {pending.length === 0 && (
-              <div className="flex flex-1 items-center justify-center text-sm text-gray-400 py-8">
-                {t('select_a_field')}
+        <div className="flex flex-1 flex-col justify-between">
+          <div className="flex flex-col space-y-4">
+            <div className="flex flex-col space-y-1">
+              <span className="text-xs text-gray-500">{t('period')}</span>
+              <ToggleGroup
+                options={periodOptions}
+                value={newField.period}
+                onChange={(v) =>
+                  setNewField((prev) => ({ ...prev, period: v as Period }))
+                }
+              />
+            </div>
+
+            <div className="flex flex-col space-y-1">
+              <span className="text-xs text-gray-500">{t('calculate')}</span>
+              <ToggleGroup
+                options={calcOptions}
+                value={newField.calculate}
+                onChange={(v) =>
+                  setNewField((prev) => ({
+                    ...prev,
+                    calculate: v as Calculate,
+                  }))
+                }
+              />
+            </div>
+
+            {newField.field.endsWith('tasks') && (
+              <div className="flex flex-col space-y-1">
+                <span className="text-xs text-gray-500">{t('format')}</span>
+                <ToggleGroup
+                  options={formatOptions}
+                  value={newField.format}
+                  onChange={(v) =>
+                    setNewField((prev) => ({ ...prev, format: v as Format }))
+                  }
+                />
               </div>
             )}
 
-            {pending.map((p, index) => (
-              <div key={index}>
-                {index > 0 && (
-                  <Divider
-                    className="border-dashed"
-                    withoutPadding
-                    borderColor={colors.$20}
-                  />
+            <div
+              className="rounded-lg border flex flex-col items-center justify-center gap-1 py-6"
+              style={{
+                borderColor: colors.$24,
+                backgroundColor: colors.$4,
+              }}
+            >
+              <span className="text-xs font-medium text-gray-500">
+                {t(FIELDS_LABELS[newField.field])}
+              </span>
+              <span
+                className="text-2xl font-semibold"
+                style={{ color: colors.$3 }}
+              >
+                {getPreviewValue()}
+              </span>
+              <span className="text-xs text-gray-400">
+                {t(PERIOD_LABELS[newField.period])}
+                {' · '}
+                {t(
+                  newField.calculate === 'avg' ? 'average' : newField.calculate
                 )}
-
-                <div className="flex flex-col space-y-3 py-3">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className="text-sm font-medium"
-                      style={{ color: colors.$3 }}
-                    >
-                      {t(FIELDS_LABELS[p.field])}
-                    </span>
-
-                    {!isEditMode && (
-                      <button
-                        type="button"
-                        onClick={() => handleRemovePending(index)}
-                        className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
-                      >
-                        {t('remove')}
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col space-y-1">
-                    <span className="text-xs text-gray-500">{t('period')}</span>
-                    <ToggleGroup
-                      options={periodOptions}
-                      value={p.period}
-                      onChange={(v) =>
-                        updatePending(index, { period: v as Period })
-                      }
-                    />
-                  </div>
-
-                  <div className="flex flex-col space-y-1">
-                    <span className="text-xs text-gray-500">
-                      {t('calculate')}
-                    </span>
-                    <ToggleGroup
-                      options={calcOptions}
-                      value={p.calculate}
-                      onChange={(v) =>
-                        updatePending(index, { calculate: v as Calculate })
-                      }
-                    />
-                  </div>
-
-                  {p.field.endsWith('tasks') && (
-                    <div className="flex flex-col space-y-1">
-                      <span className="text-xs text-gray-500">
-                        {t('format')}
-                      </span>
-                      <ToggleGroup
-                        options={formatOptions}
-                        value={p.format}
-                        onChange={(v) =>
-                          updatePending(index, { format: v as Format })
-                        }
-                      />
-                    </div>
-                  )}
-
-                  <div
-                    className="rounded-lg border flex flex-col items-center justify-center gap-1 py-4"
-                    style={{
-                      borderColor: colors.$24,
-                      backgroundColor: colors.$4,
-                    }}
-                  >
-                    <span className="text-xs font-medium text-gray-500">
-                      {t(FIELDS_LABELS[p.field])}
-                    </span>
-                    <span
-                      className="text-xl font-semibold"
-                      style={{ color: colors.$3 }}
-                    >
-                      {getPreviewValue(p)}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {t(PERIOD_LABELS[p.period])}
-                      {' · '}
-                      {t(p.calculate === 'avg' ? 'average' : p.calculate)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+              </span>
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button
-              behavior="button"
-              onClick={handleConfirm}
-              disabled={pending.length === 0}
-              disableWithoutIcon
-            >
+            <Button behavior="button" onClick={handleAdd} disableWithoutIcon>
               {isEditMode ? t('save') : t('add')}
             </Button>
           </div>

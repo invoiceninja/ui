@@ -7,6 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -59,6 +60,7 @@ interface EditState {
 export function DashboardCardSelector() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
+
   const colors = useColorScheme();
   const currentUser = useCurrentUser();
 
@@ -95,14 +97,10 @@ export function DashboardCardSelector() {
     )
       .then((response: GenericSingleResourceResponse<CompanyUser>) => {
         toast.success('updated_settings');
-
         set(updated, 'company_user', response.data.data);
-
         $refetch(['company_users']);
-
         dispatch(updateUser(updated));
         dispatch(resetChanges());
-
         setManageOpen(false);
       })
       .finally(() => setIsFormBusy(false));
@@ -110,7 +108,6 @@ export function DashboardCardSelector() {
 
   const handleRemove = (index: number) => {
     setFields((prev) => prev.filter((_, i) => i !== index));
-
     if (editState?.index === index) {
       setEditState(null);
     }
@@ -121,17 +118,15 @@ export function DashboardCardSelector() {
     setAddOpen(true);
   };
 
-  const handleAddOrEdit = (keys: string[]) => {
+  const handleAddOrEdit = (key: string) => {
     if (editState !== null) {
       setFields((prev) =>
-        prev.map((key, index) => (index === editState.index ? keys[0] : key))
+        prev.map((k, i) => (i === editState.index ? key : k))
       );
-
       setEditState(null);
     } else {
-      setFields((prev) => [...prev, ...keys]);
+      setFields((prev) => [...prev, key]);
     }
-
     setAddOpen(false);
   };
 
