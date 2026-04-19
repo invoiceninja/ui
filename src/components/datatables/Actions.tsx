@@ -290,6 +290,14 @@ export function Actions(props: Props) {
     }
   };
 
+  const normalizeDecimalInput = (value: string): string => {
+    if (/^\d+,\d+$/.test(value)) {
+      return value.replace(',', '.');
+    }
+
+    return value;
+  };
+
   const onCustomFilterChange = (
     options: MultiValue<SelectOption> | SingleValue<SelectOption>,
     currentDropdownKey: string
@@ -408,9 +416,11 @@ export function Actions(props: Props) {
             changeOverride={true}
             placeholder={t('filter')}
             value={props.filter}
-            onValueChange={(value) =>
-              props.onFilterChange && props.onFilterChange(value)
-            }
+            onValueChange={(value) => {
+              if (props.onFilterChange) {
+                props.onFilterChange(normalizeDecimalInput(value));
+              }
+            }}
             debounceTimeout={300}
             clearable
           />
