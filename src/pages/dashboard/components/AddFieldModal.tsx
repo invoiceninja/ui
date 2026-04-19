@@ -23,7 +23,7 @@ import {
 import { useColorScheme } from '$app/common/colors';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Button } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { FIELDS_LABELS } from './DashboardCardSelector';
 import { PERIOD_LABELS } from './DashboardCard';
@@ -83,14 +83,12 @@ interface NewField {
   format: Format;
 }
 
-function defaultNewField(): NewField {
-  return {
-    field: 'active_invoices',
-    period: 'current',
-    calculate: 'sum',
-    format: 'money',
-  };
-}
+const DEFAULT_NEW_FIELD: NewField = {
+  field: 'active_invoices',
+  period: 'current',
+  calculate: 'sum',
+  format: 'money',
+};
 
 interface ToggleGroupProps {
   options: { value: string; label: string }[];
@@ -106,20 +104,22 @@ function ToggleGroup({ options, value, onChange }: ToggleGroupProps) {
       className="flex rounded-lg overflow-hidden border"
       style={{ borderColor: colors.$24 }}
     >
-      {options.map((opt, i) => (
-        <button
-          key={opt.value}
-          type="button"
-          onClick={() => onChange(opt.value)}
-          className="flex-1 px-3 py-1.5 text-sm transition-colors"
+      {options.map((option, index) => (
+        <div
+          key={index}
+          onClick={(e) => {
+            e.stopPropagation();
+            onChange(option.value);
+          }}
+          className="flex-1 px-3 py-1.5 text-sm transition-colors cursor-pointer select-none text-center"
           style={{
-            backgroundColor: value === opt.value ? colors.$3 : colors.$1,
-            color: value === opt.value ? colors.$1 : colors.$3,
-            borderLeft: i > 0 ? `1px solid ${colors.$24}` : undefined,
+            backgroundColor: value === option.value ? colors.$3 : colors.$1,
+            color: value === option.value ? colors.$1 : colors.$3,
+            borderLeft: index > 0 ? `1px solid ${colors.$24}` : undefined,
           }}
         >
-          {opt.label}
-        </button>
+          {option.label}
+        </div>
       ))}
     </div>
   );
@@ -182,7 +182,7 @@ export function AddFieldModal({
   const isEditMode = editKey !== null;
 
   const [search, setSearch] = useState<string>('');
-  const [newField, setNewField] = useState<NewField>(defaultNewField());
+  const [newField, setNewField] = useState<NewField>(DEFAULT_NEW_FIELD);
 
   useEffect(() => {
     if (visible) {
@@ -196,7 +196,7 @@ export function AddFieldModal({
           format: decoded.format,
         });
       } else {
-        setNewField(defaultNewField());
+        setNewField(DEFAULT_NEW_FIELD);
       }
     }
   }, [visible, editKey]);
@@ -222,12 +222,12 @@ export function AddFieldModal({
     );
 
     onAdd(key);
-    setNewField(defaultNewField());
+    setNewField(DEFAULT_NEW_FIELD);
     setSearch('');
   };
 
   const handleClose = () => {
-    setNewField(defaultNewField());
+    setNewField(DEFAULT_NEW_FIELD);
     setSearch('');
     onClose();
   };
@@ -288,17 +288,10 @@ export function AddFieldModal({
         {!isEditMode && (
           <>
             <div className="flex flex-col w-52 flex-shrink-0 space-y-2">
-              <input
-                type="text"
-                placeholder={`${t('search')}...`}
+              <InputField
+                placeholder={t('search')}
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-md border px-3 py-1.5 text-sm focus:outline-none"
-                style={{
-                  borderColor: colors.$24,
-                  backgroundColor: colors.$1,
-                  color: colors.$3,
-                }}
+                onValueChange={(v) => setSearch(v)}
               />
 
               <div
@@ -311,7 +304,12 @@ export function AddFieldModal({
                     field={f}
                     selected={newField.field === f}
                     onClick={() =>
-                      setNewField((prev) => ({ ...prev, field: f }))
+                      setNewField({
+                        field: f,
+                        period: 'current',
+                        calculate: 'sum',
+                        format: 'money',
+                      })
                     }
                   />
                 ))}
@@ -328,7 +326,10 @@ export function AddFieldModal({
         <div className="flex flex-1 flex-col justify-between">
           <div className="flex flex-col space-y-4">
             <div className="flex flex-col space-y-1">
-              <span className="text-xs text-gray-500">{t('period')}</span>
+              <span className="text-xs" style={{ color: colors.$6 }}>
+                {t('period')}
+              </span>
+
               <ToggleGroup
                 options={periodOptions}
                 value={newField.period}
@@ -339,7 +340,10 @@ export function AddFieldModal({
             </div>
 
             <div className="flex flex-col space-y-1">
-              <span className="text-xs text-gray-500">{t('calculate')}</span>
+              <span className="text-xs" style={{ color: colors.$6 }}>
+                {t('calculate')}
+              </span>
+
               <ToggleGroup
                 options={calcOptions}
                 value={newField.calculate}
@@ -354,7 +358,10 @@ export function AddFieldModal({
 
             {newField.field.endsWith('tasks') && (
               <div className="flex flex-col space-y-1">
-                <span className="text-xs text-gray-500">{t('format')}</span>
+                <span className="text-xs" style={{ color: colors.$6 }}>
+                  {t('format')}
+                </span>
+
                 <ToggleGroup
                   options={formatOptions}
                   value={newField.format}
@@ -372,16 +379,21 @@ export function AddFieldModal({
                 backgroundColor: colors.$4,
               }}
             >
-              <span className="text-xs font-medium text-gray-500">
+              <span
+                className="text-xs font-medium"
+                style={{ color: colors.$6 }}
+              >
                 {t(FIELDS_LABELS[newField.field])}
               </span>
+
               <span
                 className="text-2xl font-semibold"
                 style={{ color: colors.$3 }}
               >
                 {getPreviewValue()}
               </span>
-              <span className="text-xs text-gray-400">
+
+              <span className="text-xs" style={{ color: colors.$6 }}>
                 {t(PERIOD_LABELS[newField.period])}
                 {' · '}
                 {t(
@@ -391,7 +403,7 @@ export function AddFieldModal({
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-4">
+          <div className="flex justify-end pt-4">
             <Button behavior="button" onClick={handleAdd} disableWithoutIcon>
               {isEditMode ? t('save') : t('add')}
             </Button>
