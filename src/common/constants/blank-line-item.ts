@@ -21,6 +21,7 @@ export const blankLineItem = (): InvoiceItem => {
     cost: 0,
     product_key: '',
     product_cost: 0,
+    net_cost: 0,
     notes: '',
     discount: 0,
     is_amount_discount: false,
