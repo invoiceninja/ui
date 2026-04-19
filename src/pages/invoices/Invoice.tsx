@@ -34,15 +34,9 @@ import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
 import { Spinner } from '$app/components/Spinner';
 import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
 import { EInvoiceComponent } from '../settings';
-import {
-  socketId,
-  useSocketEvent,
-  WithSocketId,
-} from '$app/common/queries/sockets';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { Banner } from '$app/components/Banner';
-import { Invoice as InvoiceType } from '$app/common/interfaces/invoice';
 import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
@@ -163,17 +157,6 @@ export default function Invoice() {
     }
   }, [errors]);
 
-  useSocketEvent<WithSocketId<InvoiceType>>({
-    on: ['App\\Events\\Invoice\\InvoiceWasPaid'],
-    callback: ({ data }) => {
-      if (socketId()?.toString() !== data['x-socket-id']) {
-        document
-          .getElementById('invoiceUpdateBanner')
-          ?.classList.remove('hidden');
-      }
-    },
-  });
-
   return (
     <>
       <Default
@@ -196,23 +179,13 @@ export default function Invoice() {
             ),
           })}
         aboveMainContainer={
-          <>
-            <Banner
-              id="paidToDateWarningBanner"
-              className="hidden"
-              variant="orange"
-            >
-              {errors?.errors?.paid_to_date?.[0]}
-            </Banner>
-
-            <Banner
-              id="invoiceUpdateBanner"
-              className="hidden"
-              variant="orange"
-            >
-              {t('invoice_status_changed')}
-            </Banner>
-          </>
+          <Banner
+            id="paidToDateWarningBanner"
+            className="hidden"
+            variant="orange"
+          >
+            {errors?.errors?.paid_to_date?.[0]}
+          </Banner>
         }
         afterBreadcrumbs={<PreviousNextNavigation entity="invoice" />}
       >

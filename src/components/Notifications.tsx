@@ -14,7 +14,12 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
-import { GenericMessage, useSocketEvent } from '$app/common/queries/sockets';
+import {
+  GenericMessage,
+  socketId,
+  useSocketEvent,
+  WithSocketId,
+} from '$app/common/queries/sockets';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { route } from '$app/common/helpers/route';
 import { date, isHosted, isSelfHosted, trans } from '$app/common/helpers';
@@ -38,6 +43,7 @@ import { FileEdit } from './icons/FileEdit';
 import dayjs from 'dayjs';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 type NotificationType =
   | 'invoiceWasPaid'
@@ -283,8 +289,6 @@ export function Notifications() {
       'App\\Events\\Payment\\PaymentWasUpdated',
     ],
     callback: ({ event, data }) => {
-      console.log(event, data);
-
       if (event === 'App\\Events\\Invoice\\InvoiceWasPaid') {
         const $invoice = data as Invoice;
 
@@ -307,6 +311,13 @@ export function Notifications() {
           notifications.some((n) => n.link === notification.link)
         ) {
           return;
+        }
+
+        if (
+          socketId()?.toString() !==
+          (data as WithSocketId<Invoice>)['x-socket-id']
+        ) {
+          $refetch(['invoices']);
         }
 
         setNotifications((notifications) => [...notifications, notification]);
@@ -344,6 +355,13 @@ export function Notifications() {
           notifications.some((n) => n.link === notification.link)
         ) {
           return;
+        }
+
+        if (
+          socketId()?.toString() !==
+          (data as WithSocketId<Invoice>)['x-socket-id']
+        ) {
+          $refetch(['invoices']);
         }
 
         setNotifications((notifications) => [...notifications, notification]);
