@@ -43,6 +43,7 @@ interface Props extends CommonProps {
   readOnly?: boolean;
   width?: string | number;
   clearable?: boolean;
+  disabledChars?: string[];
 }
 
 export function InputField(props: Props) {
@@ -107,6 +108,39 @@ export function InputField(props: Props) {
             }
           )}
           placeholder={props.placeholder || ''}
+          onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+            if (
+              props.disabledChars?.length &&
+              props.disabledChars.includes(event.key)
+            ) {
+              event.preventDefault();
+            }
+          }}
+          onPaste={(event: React.ClipboardEvent<HTMLInputElement>) => {
+            if (props.disabledChars?.length) {
+              const pasted = event.clipboardData.getData('text');
+
+              if (props.disabledChars.some((char) => pasted.includes(char))) {
+                event.preventDefault();
+
+                const filtered = pasted
+                  .split('')
+                  .filter((char) => !props.disabledChars!.includes(char))
+                  .join('');
+
+                const input = event.target as HTMLInputElement;
+                const start = input.selectionStart ?? 0;
+                const end = input.selectionEnd ?? 0;
+
+                const newValue =
+                  input.value.slice(0, start) +
+                  filtered +
+                  input.value.slice(end);
+
+                props.onValueChange?.(newValue);
+              }
+            }
+          }}
           onBlur={(event) => {
             if (!props.changeOverride) {
               event.target.value =
