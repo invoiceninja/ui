@@ -50,7 +50,7 @@ export function useBlockLibrary(): BlockDefinition[] {
     },
     {
       type: 'company-info',
-      label: t('company_info'),
+      label: t('company_details'),
       icon: <Building2 className="w-5 h-5" />,
       description: t('company_name'),
       defaultSize: { w: 6, h: 4 },
@@ -127,7 +127,7 @@ export function useBlockLibrary(): BlockDefinition[] {
     },
     {
       type: 'client-info',
-      label: t('client_info'),
+      label: t('client_details'),
       icon: <User className="w-5 h-5" />,
       description: t('client_name_and_address'),
       defaultSize: { w: 6, h: 4 },
@@ -451,7 +451,7 @@ export function useBlockLibrary(): BlockDefinition[] {
         items: [
           { label: t('subtotal'), field: '$subtotal', show: true },
           { label: t('discount'), field: '$discount', show: true },
-          { label: t('tax'), field: '$total_taxes', show: true },
+          { label: t('tax'), field: '$taxes', show: true },
           {
             label: t('total'),
             field: '$total',

@@ -16,7 +16,7 @@ import { Button } from '$app/components/forms';
 import { useColorScheme } from '$app/common/colors';
 import { Block } from '../types';
 import { generateInvoiceHTML } from '../utils/html-generator';
-import { SAMPLE_INVOICE_DATA } from '../utils/variable-replacer';
+import { useSampleInvoiceData } from '../hooks/useSampleInvoiceData';
 
 interface PreviewModalProps {
   blocks: Block[];
@@ -27,7 +27,8 @@ export function PreviewModal({ blocks, onClose }: PreviewModalProps) {
   const [t] = useTranslation();
   const [zoom, setZoom] = useState(100);
   const colors = useColorScheme();
-  const html = generateInvoiceHTML(blocks, SAMPLE_INVOICE_DATA);
+  const sampleData = useSampleInvoiceData();
+  const html = generateInvoiceHTML(blocks, sampleData);
 
   const handleDownloadHTML = () => {
     const blob = new Blob([html], { type: 'text/html' });

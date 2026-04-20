@@ -56,7 +56,7 @@ export const templates: InvoiceTemplate[] = [
         type: 'text',
         gridPosition: { x: 0, y: 4, w: 6, h: 2 },
         properties: {
-          content: 'INVOICE',
+          content: '$entity_label',
           fontSize: '32px',
           fontWeight: 'bold',
           color: '#111827',
@@ -74,21 +74,21 @@ export const templates: InvoiceTemplate[] = [
             {
               id: 'number',
               label: 'Number',
-              variable: 'number',
+              variable: '$number',
               prefix: 'Number: ',
               hideIfEmpty: true,
             },
             {
               id: 'date',
               label: 'Date',
-              variable: 'date',
+              variable: '$date',
               prefix: 'Date: ',
               hideIfEmpty: true,
             },
             {
               id: 'due_date',
               label: 'Due Date',
-              variable: 'due_date',
+              variable: '$due_date',
               prefix: 'Due Date: ',
               hideIfEmpty: true,
             },
@@ -113,7 +113,7 @@ export const templates: InvoiceTemplate[] = [
           align: 'left',
           color: '#374151',
           showTitle: true,
-          title: 'Bill To:',
+          title: 'Bill To: ',
           titleFontWeight: 'bold',
         },
       },
@@ -185,18 +185,18 @@ export const templates: InvoiceTemplate[] = [
         gridPosition: { x: 7, y: 22, w: 5, h: 6 },
         properties: {
           items: [
-            { label: 'Subtotal', field: 'subtotal', show: true },
-            { label: 'Tax', field: 'total_taxes', show: true },
+            { label: 'Subtotal', field: '$subtotal', show: true },
+            { label: 'Tax', field: '$taxes', show: true },
             {
               label: 'Total',
-              field: 'total',
+              field: '$total',
               show: true,
               isTotal: true,
             },
             { label: 'Amount Paid', field: '$paid_to_date', show: true },
             {
               label: 'Balance Due',
-              field: 'balance',
+              field: '$balance_due',
               show: true,
               isBalance: true,
             },
@@ -297,14 +297,14 @@ export const templates: InvoiceTemplate[] = [
             {
               id: 'date',
               label: 'Date',
-              variable: 'date',
+              variable: '$date',
               prefix: 'Date: ',
               hideIfEmpty: true,
             },
             {
               id: 'due_date',
               label: 'Due Date',
-              variable: 'due_date',
+              variable: '$due_date',
               prefix: 'Due: ',
               hideIfEmpty: true,
             },
@@ -322,10 +322,10 @@ export const templates: InvoiceTemplate[] = [
         gridPosition: { x: 7, y: 21, w: 5, h: 4 },
         properties: {
           items: [
-            { label: 'Subtotal', field: 'subtotal', show: true },
+            { label: 'Subtotal', field: '$subtotal', show: true },
             {
               label: 'Total',
-              field: 'total',
+              field: '$total',
               show: true,
               isTotal: true,
             },
@@ -403,10 +403,10 @@ export const templates: InvoiceTemplate[] = [
         gridPosition: { x: 7, y: 21, w: 5, h: 4 },
         properties: {
           items: [
-            { label: 'Subtotal', field: '$invoice.subtotal', show: true },
+            { label: 'Subtotal', field: '$subtotal', show: true },
             {
               label: 'Total',
-              field: '$invoice.total',
+              field: '$total',
               show: true,
               isTotal: true,
             },

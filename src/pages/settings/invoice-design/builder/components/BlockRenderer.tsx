@@ -12,11 +12,8 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Block, FieldConfig } from '../types';
 import { useBlockLabel } from '../block-library';
-import {
-  SAMPLE_INVOICE_DATA,
-  replaceVariables,
-} from '../utils/variable-replacer';
-import { useLogo } from '$app/common/hooks/useLogo';
+import { InvoiceData, replaceVariables } from '../utils/variable-replacer';
+import { useSampleInvoiceData } from '../hooks/useSampleInvoiceData';
 
 interface BlockRendererProps {
   block: Block;
@@ -24,7 +21,7 @@ interface BlockRendererProps {
 
 function buildFieldDisplayText(
   config: FieldConfig,
-  data: typeof SAMPLE_INVOICE_DATA
+  data: InvoiceData
 ): string | null {
   const resolvedValue = replaceVariables(config.variable, data);
 
@@ -40,7 +37,7 @@ function buildFieldDisplayText(
 
 function renderFieldConfigs(
   fieldConfigs: FieldConfig[] | undefined,
-  data: typeof SAMPLE_INVOICE_DATA,
+  data: InvoiceData,
   style: React.CSSProperties
 ): React.ReactNode {
   if (!fieldConfigs || fieldConfigs.length === 0) {
@@ -76,7 +73,6 @@ interface BlockRendererProps {
 export const BlockRenderer = memo(function BlockRenderer({
   block,
 }: BlockRendererProps) {
-  const companyLogo = useLogo();
   const blockLabel = useBlockLabel(block.type);
 
   switch (block.type) {
@@ -85,7 +81,7 @@ export const BlockRenderer = memo(function BlockRenderer({
 
     case 'logo':
     case 'image':
-      return <ImageBlockRenderer block={block} companyLogo={companyLogo} />;
+      return <ImageBlockRenderer block={block} />;
 
     case 'company-info':
       return <CompanyInfoRenderer block={block} />;
@@ -136,11 +132,12 @@ export const BlockRenderer = memo(function BlockRenderer({
 // Individual block renderers
 function TextBlockRenderer({ block }: BlockRendererProps) {
   const { t } = useTranslation();
+  const sampleData = useSampleInvoiceData();
   const { content, fontSize, fontWeight, color, align, lineHeight } =
     block.properties;
   const displayContent = replaceVariables(
     content || t('enter_text'),
-    SAMPLE_INVOICE_DATA
+    sampleData
   );
 
   return (
@@ -161,21 +158,14 @@ function TextBlockRenderer({ block }: BlockRendererProps) {
   );
 }
 
-interface ImageBlockRendererProps extends BlockRendererProps {
-  companyLogo?: string;
-}
-
-function ImageBlockRenderer({ block, companyLogo }: ImageBlockRendererProps) {
+function ImageBlockRenderer({ block }: BlockRendererProps) {
   const { t } = useTranslation();
+  const sampleData = useSampleInvoiceData();
   const { source, align, maxWidth, objectFit } = block.properties;
 
-  // If source is $company.logo, use the actual company logo
-  let resolvedSource = source;
-  if (source === '$company.logo' && companyLogo) {
-    resolvedSource = companyLogo;
-  } else {
-    resolvedSource = replaceVariables(source, SAMPLE_INVOICE_DATA);
-  }
+  // sampleData.company.logo is injected from useLogo() so $company.logo
+  // resolves to the current user's actual logo in the canvas preview.
+  const resolvedSource = replaceVariables(source, sampleData);
 
   // Map text alignment to flexbox justify-content
   const justifyContent =
@@ -207,11 +197,12 @@ function ImageBlockRenderer({ block, companyLogo }: ImageBlockRendererProps) {
 }
 
 function CompanyInfoRenderer({ block }: BlockRendererProps) {
+  const sampleData = useSampleInvoiceData();
   const { fieldConfigs, content, fontSize, lineHeight, align, color } =
     block.properties;
 
   if (fieldConfigs && fieldConfigs.length > 0) {
-    return renderFieldConfigs(fieldConfigs, SAMPLE_INVOICE_DATA, {
+    return renderFieldConfigs(fieldConfigs, sampleData, {
       fontSize,
       lineHeight,
       textAlign: align,
@@ -219,7 +210,7 @@ function CompanyInfoRenderer({ block }: BlockRendererProps) {
     });
   }
 
-  const displayContent = replaceVariables(content, SAMPLE_INVOICE_DATA);
+  const displayContent = replaceVariables(content, sampleData);
 
   return (
     <div
@@ -237,6 +228,7 @@ function CompanyInfoRenderer({ block }: BlockRendererProps) {
 }
 
 function ClientInfoRenderer({ block }: BlockRendererProps) {
+  const sampleData = useSampleInvoiceData();
   const {
     fieldConfigs,
     content,
@@ -265,7 +257,7 @@ function ClientInfoRenderer({ block }: BlockRendererProps) {
       )}
 
       {fieldConfigs && fieldConfigs.length > 0 ? (
-        renderFieldConfigs(fieldConfigs, SAMPLE_INVOICE_DATA, {
+        renderFieldConfigs(fieldConfigs, sampleData, {
           fontSize,
           lineHeight,
           textAlign: align,
@@ -282,7 +274,7 @@ function ClientInfoRenderer({ block }: BlockRendererProps) {
             whiteSpace: 'pre-line',
           }}
         >
-          {replaceVariables(content, SAMPLE_INVOICE_DATA)}
+          {replaceVariables(content, sampleData)}
         </div>
       )}
     </div>
@@ -290,6 +282,7 @@ function ClientInfoRenderer({ block }: BlockRendererProps) {
 }
 
 function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
+  const sampleData = useSampleInvoiceData();
   const { fieldConfigs, fontSize, lineHeight, align, color, showLabels } =
     block.properties;
 
@@ -303,10 +296,7 @@ function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
       }}
     >
       {fieldConfigs?.map((field: FieldConfig, index: number) => {
-        const displayValue = replaceVariables(
-          field.variable,
-          SAMPLE_INVOICE_DATA
-        );
+        const displayValue = replaceVariables(field.variable, sampleData);
 
         if (
           field.hideIfEmpty !== false &&
@@ -341,11 +331,12 @@ function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
 
 function PublicNotesRenderer({ block }: BlockRendererProps) {
   const { t } = useTranslation();
+  const sampleData = useSampleInvoiceData();
   const { content, fontSize, fontWeight, color, align, lineHeight, padding } =
     block.properties;
 
   const contentToRender = content || '$invoice.public_notes';
-  const displayContent = replaceVariables(contentToRender, SAMPLE_INVOICE_DATA);
+  const displayContent = replaceVariables(contentToRender, sampleData);
 
   return (
     <div
@@ -371,11 +362,12 @@ function PublicNotesRenderer({ block }: BlockRendererProps) {
 
 function FooterRenderer({ block }: BlockRendererProps) {
   const { t } = useTranslation();
+  const sampleData = useSampleInvoiceData();
   const { content, fontSize, fontWeight, color, align, lineHeight, padding } =
     block.properties;
 
   const contentToRender = content || '$invoice.footer';
-  const displayContent = replaceVariables(contentToRender, SAMPLE_INVOICE_DATA);
+  const displayContent = replaceVariables(contentToRender, sampleData);
 
   return (
     <div
@@ -401,11 +393,12 @@ function FooterRenderer({ block }: BlockRendererProps) {
 
 function TermsRenderer({ block }: BlockRendererProps) {
   const { t } = useTranslation();
+  const sampleData = useSampleInvoiceData();
   const { content, fontSize, fontWeight, color, align, lineHeight, padding } =
     block.properties;
 
   const contentToRender = content || '$invoice.terms';
-  const displayContent = replaceVariables(contentToRender, SAMPLE_INVOICE_DATA);
+  const displayContent = replaceVariables(contentToRender, sampleData);
 
   return (
     <div
@@ -430,6 +423,7 @@ function TermsRenderer({ block }: BlockRendererProps) {
 }
 
 function TableBlockRenderer({ block }: BlockRendererProps) {
+  const sampleData = useSampleInvoiceData();
   const {
     columns,
     headerBg,
@@ -505,7 +499,7 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
           </tr>
         </thead>
         <tbody>
-          {SAMPLE_INVOICE_DATA.line_items.map((item, index) => (
+          {sampleData.line_items.map((item, index) => (
             <tr
               key={index}
               style={{
@@ -537,6 +531,7 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
 }
 
 function TotalBlockRenderer({ block }: BlockRendererProps) {
+  const sampleData = useSampleInvoiceData();
   const {
     items,
     fontSize,
@@ -585,10 +580,7 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
             ) => {
               const isTotal = item.isTotal;
               const isBalance = item.isBalance;
-              const displayValue = replaceVariables(
-                item.field,
-                SAMPLE_INVOICE_DATA
-              );
+              const displayValue = replaceVariables(item.field, sampleData);
 
               const itemFontSize =
                 item.fontSize || (isTotal ? totalFontSize : fontSize);

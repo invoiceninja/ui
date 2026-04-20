@@ -12,6 +12,7 @@ import { Block, FieldConfig } from '../types';
 import { GRID_CONFIG } from './grid-converter';
 import {
   InvoiceData,
+  SAMPLE_INVOICE_DATA,
   replaceVariables,
   resolveVariable,
 } from './variable-replacer';
@@ -206,8 +207,12 @@ function calculateRowPositions(
  */
 export function generateInvoiceHTML(
   blocks: Block[],
-  data: InvoiceData
+  previewData?: InvoiceData
 ): string {
+  // Layout/height calculations always need a concrete data shape.
+  // Variable substitution is gated on previewData — when absent, tokens stay literal.
+  const layoutData = previewData || SAMPLE_INVOICE_DATA;
+
   // Sort blocks by Y position, then by X position for same row
   const sortedBlocks = [...blocks].sort((a, b) => {
     if (a.gridPosition.y !== b.gridPosition.y) {
@@ -218,13 +223,19 @@ export function generateInvoiceHTML(
 
   // Group blocks by row and calculate row-based heights
   const rows = groupBlocksByRow(blocks);
-  const rowHeights = calculateRowHeights(rows, data);
+  const rowHeights = calculateRowHeights(rows, layoutData);
   const rowPositions = calculateRowPositions(rowHeights);
 
   // Render blocks with row-based positioning
   const blocksHTML = sortedBlocks
     .map((block) =>
-      renderBlockWithRowHeight(block, data, rowHeights, rowPositions)
+      renderBlockWithRowHeight(
+        block,
+        previewData,
+        layoutData,
+        rowHeights,
+        rowPositions
+      )
     )
     .join('\n');
 
@@ -269,7 +280,7 @@ export function generateInvoiceHTML(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Invoice ${data.invoice.number}</title>
+  <title>Invoice ${layoutData.invoice.number}</title>
   <style>
     @page {
       size: A4;
@@ -359,11 +370,12 @@ export function generateInvoiceHTML(
  */
 function renderBlockWithRowHeight(
   block: Block,
-  data: InvoiceData,
+  previewData: InvoiceData | undefined,
+  layoutData: InvoiceData,
   rowHeights: Map<number, number>,
   rowPositions: Map<number, number>
 ): string {
-  const content = renderBlockContent(block, data);
+  const content = renderBlockContent(block, previewData, layoutData);
 
   // Calculate absolute pixel positions based on grid coordinates
   const { x, y, w } = block.gridPosition;
@@ -412,29 +424,33 @@ function renderBlockWithRowHeight(
 /**
  * Render block content based on type
  */
-function renderBlockContent(block: Block, data: InvoiceData): string {
+function renderBlockContent(
+  block: Block,
+  previewData: InvoiceData | undefined,
+  layoutData: InvoiceData
+): string {
   switch (block.type) {
     case 'text':
-      return renderTextBlock(block, data);
+      return renderTextBlock(block, previewData);
     case 'logo':
     case 'image':
-      return renderImageBlock(block, data);
+      return renderImageBlock(block, previewData);
     case 'company-info':
-      return renderCompanyInfoBlock(block, data);
+      return renderCompanyInfoBlock(block, previewData);
     case 'client-info':
-      return renderClientInfoBlock(block, data);
+      return renderClientInfoBlock(block, previewData);
     case 'invoice-details':
-      return renderInvoiceDetailsBlock(block, data);
+      return renderInvoiceDetailsBlock(block, previewData);
     case 'table':
-      return renderTableBlock(block, data);
+      return renderTableBlock(block, previewData, layoutData);
     case 'total':
-      return renderTotalBlock(block, data);
+      return renderTotalBlock(block, previewData);
     case 'divider':
       return renderDividerBlock(block);
     case 'spacer':
       return renderSpacerBlock(block);
     case 'qrcode':
-      return renderQRCodeBlock(block, data);
+      return renderQRCodeBlock(block, previewData);
     case 'signature':
       return renderSignatureBlock(block);
     default:
@@ -442,7 +458,7 @@ function renderBlockContent(block: Block, data: InvoiceData): string {
   }
 }
 
-function renderTextBlock(block: Block, data: InvoiceData): string {
+function renderTextBlock(block: Block, data: InvoiceData | undefined): string {
   const { content, fontSize, fontWeight, color, align, lineHeight } =
     block.properties;
   const replacedContent = replaceVariables(content, data);
@@ -463,7 +479,10 @@ function renderTextBlock(block: Block, data: InvoiceData): string {
   `;
 }
 
-function renderImageBlock(block: Block, data: InvoiceData): string {
+function renderImageBlock(
+  block: Block,
+  data: InvoiceData | undefined
+): string {
   const { source, align, maxWidth, objectFit } = block.properties;
   const resolvedSource = replaceVariables(source, data);
 
@@ -488,7 +507,10 @@ function renderImageBlock(block: Block, data: InvoiceData): string {
   `;
 }
 
-function renderCompanyInfoBlock(block: Block, data: InvoiceData): string {
+function renderCompanyInfoBlock(
+  block: Block,
+  data: InvoiceData | undefined
+): string {
   const { fieldConfigs, content, fontSize, lineHeight, align, color } =
     block.properties;
 
@@ -563,7 +585,10 @@ function renderCompanyInfoBlock(block: Block, data: InvoiceData): string {
   `;
 }
 
-function renderClientInfoBlock(block: Block, data: InvoiceData): string {
+function renderClientInfoBlock(
+  block: Block,
+  data: InvoiceData | undefined
+): string {
   const {
     fieldConfigs,
     content,
@@ -653,7 +678,10 @@ function renderClientInfoBlock(block: Block, data: InvoiceData): string {
   `;
 }
 
-function renderInvoiceDetailsBlock(block: Block, data: InvoiceData): string {
+function renderInvoiceDetailsBlock(
+  block: Block,
+  data: InvoiceData | undefined
+): string {
   const { fieldConfigs, fontSize, lineHeight, align, color, showLabels } =
     block.properties;
 
@@ -698,7 +726,11 @@ function renderInvoiceDetailsBlock(block: Block, data: InvoiceData): string {
   `;
 }
 
-function renderTableBlock(block: Block, data: InvoiceData): string {
+function renderTableBlock(
+  block: Block,
+  previewData: InvoiceData | undefined,
+  layoutData: InvoiceData
+): string {
   const {
     columns,
     headerBg,
@@ -746,15 +778,18 @@ function renderTableBlock(block: Block, data: InvoiceData): string {
   );
   headerHTML += '</tr></thead>';
 
-  // Generate rows
+  // Generate rows. In preview mode, iterate sample items and resolve values.
+  // In save mode (no previewData), emit a single template row with literal
+  // column-field tokens so the backend can substitute per-item.
   let rowsHTML = '<tbody>';
-  data.line_items.forEach((item, index) => {
+  const rowItems = previewData ? layoutData.line_items : [null];
+  rowItems.forEach((item, index) => {
     const rowBackground =
       alternateRows && index % 2 === 1 ? alternateRowBg : rowBg;
     rowsHTML += `<tr style="background: ${rowBackground};">`;
 
     columns.forEach((col: { id: string; align: string; field: string }) => {
-      const value = resolveVariable(col.field, item, data);
+      const value = resolveVariable(col.field, item, previewData);
       rowsHTML += `
         <td style="
           padding: ${padding};
@@ -780,7 +815,10 @@ function renderTableBlock(block: Block, data: InvoiceData): string {
   `;
 }
 
-function renderTotalBlock(block: Block, data: InvoiceData): string {
+function renderTotalBlock(
+  block: Block,
+  data: InvoiceData | undefined
+): string {
   const {
     items,
     fontSize,
@@ -884,7 +922,10 @@ function renderSpacerBlock(block: Block): string {
   return `<div style="height: ${height};"></div>`;
 }
 
-function renderQRCodeBlock(block: Block, data: InvoiceData): string {
+function renderQRCodeBlock(
+  block: Block,
+  _data: InvoiceData | undefined
+): string {
   const { size, align } = block.properties;
 
   // For now, just show a placeholder

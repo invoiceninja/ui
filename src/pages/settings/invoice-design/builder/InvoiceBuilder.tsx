@@ -35,7 +35,6 @@ import { BlockRenderer } from './components/BlockRenderer';
 import { PreviewModal } from './components/PreviewModal';
 import { useBlockLabel } from './block-library';
 import { generateInvoiceHTML } from './utils/html-generator';
-import { SAMPLE_INVOICE_DATA } from './utils/variable-replacer';
 import { route } from '$app/common/helpers/route';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -532,8 +531,9 @@ export function InvoiceBuilder() {
     setSaving(true);
 
     try {
-      // Generate HTML using the proper HTML generator
-      const htmlBody = generateInvoiceHTML(state.blocks, SAMPLE_INVOICE_DATA);
+      // Save path: emit HTML with literal $tokens so the backend's
+      // HtmlEngine::parseLabelsAndValues can substitute real data at render time.
+      const htmlBody = generateInvoiceHTML(state.blocks);
 
       const designPayload = {
         name: nameToUse,

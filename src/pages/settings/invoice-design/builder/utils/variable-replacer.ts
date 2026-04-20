@@ -28,6 +28,7 @@ export interface InvoiceData {
     terms: string;
     total_taxes: number;
   };
+  subtotal: number;
   client: {
     name: string;
     address: string;
@@ -75,6 +76,7 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
     terms:
       'Payment is due within 14 days of invoice date. Late payments may be subject to a 1.5% monthly service charge.',
   },
+  subtotal: 1500.0,
   client: {
     name: 'Acme Corporation',
     address: '123 Business Street',
@@ -84,7 +86,7 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
   },
   company: {
     name: 'Your Company LLC',
-    logo: 'https://via.placeholder.com/150x50/4F46E5/FFFFFF?text=Company+Logo',
+    logo: '/logo180.png',
     address: '456 Commerce Avenue',
     city_state_postal: 'San Francisco, CA 94102',
     phone: '(555) 987-6543',
@@ -139,7 +141,20 @@ export function formatDate(dateString: string): string {
  * @param data - Invoice data
  * @returns String with variables replaced
  */
-export function replaceVariables(template: string, data: InvoiceData): string {
+export function replaceVariables(
+  template: string,
+  data?: InvoiceData
+): string {
+  if (typeof template !== 'string') {
+    return '';
+  }
+
+  // When no data is supplied we're in "save mode" — leave tokens literal
+  // so the backend (HtmlEngine::parseLabelsAndValues) can substitute them.
+  if (!data) {
+    return template;
+  }
+
   let result = template;
 
   // Company variables
@@ -163,7 +178,7 @@ export function replaceVariables(template: string, data: InvoiceData): string {
   result = result.replace(/\$client\.phone/g, data.client.phone);
   result = result.replace(/\$client\.email/g, data.client.email);
 
-  // Invoice variables
+  // Invoice variables (legacy $entity.* aliases)
   result = result.replace(/\$entity\.number/g, data.invoice.number);
   result = result.replace(/\$entity\.date/g, formatDate(data.invoice.date));
   result = result.replace(
@@ -171,34 +186,49 @@ export function replaceVariables(template: string, data: InvoiceData): string {
     formatDate(data.invoice.due_date)
   );
   result = result.replace(/\$entity\.po_number/g, data.invoice.po_number);
-  result = result.replace(
-    /\$entity\.subtotal/g,
-    formatCurrency(data.invoice.subtotal)
-  );
-  result = result.replace(
-    /\$entity\.tax/g,
-    formatCurrency(data.invoice.total_taxes)
-  );
-  result = result.replace(
-    /\$entity\.discount/g,
-    formatCurrency(data.invoice.discount)
-  );
-  result = result.replace(
-    /\$entity\.total/g,
-    formatCurrency(data.invoice.total)
-  );
-  result = result.replace(
-    /\$entity\.paid_to_date/g,
-    formatCurrency(data.invoice.paid_to_date)
-  );
-  result = result.replace(
-    /\$entity\.balance/g,
-    formatCurrency(data.invoice.balance)
-  );
   result = result.replace(/\$entity\.public_url/g, data.invoice.public_url);
   result = result.replace(/\$entity\.public_notes/g, data.invoice.public_notes);
   result = result.replace(/\$entity\.footer/g, data.invoice.footer);
   result = result.replace(/\$entity\.terms/g, data.invoice.terms);
+
+  // Flat entity-details variables (match API: HtmlEngine.php)
+  // Order: longer tokens first; \b prevents $date matching inside $date_company_now etc.
+  result = result.replace(/\$po_number\b/g, data.invoice.po_number);
+  result = result.replace(/\$due_date\b/g, formatDate(data.invoice.due_date));
+  result = result.replace(/\$public_url\b/g, data.invoice.public_url);
+  result = result.replace(/\$public_notes\b/g, data.invoice.public_notes);
+  result = result.replace(/\$footer\b/g, data.invoice.footer);
+  result = result.replace(/\$terms\b/g, data.invoice.terms);
+  result = result.replace(/\$number\b/g, data.invoice.number);
+  result = result.replace(/\$date\b/g, formatDate(data.invoice.date));
+  result = result.replace(/\$amount\b/g, formatCurrency(data.invoice.total));
+
+  // Flat total variables (match API: HtmlEngine.php)
+  // Order matters — longer tokens first so $balance doesn't eat $balance_due,
+  // and \b stops $total from matching inside $total_anything.
+  result = result.replace(
+    /\$balance_due\b/g,
+    formatCurrency(data.invoice.balance)
+  );
+  result = result.replace(
+    /\$paid_to_date\b/g,
+    formatCurrency(data.invoice.paid_to_date)
+  );
+  result = result.replace(
+    /\$subtotal\b/g,
+    formatCurrency(data.invoice.subtotal)
+  );
+  result = result.replace(
+    /\$discount\b/g,
+    formatCurrency(data.invoice.discount)
+  );
+  result = result.replace(
+    /\$taxes\b/g,
+    formatCurrency(data.invoice.total_taxes)
+  );
+  result = result.replace(/\$total\b/g, formatCurrency(data.invoice.total));
+  result = result.replace(/\$balance\b/g, formatCurrency(data.invoice.balance));
+  result = result.replace(/\$partial\b/g, formatCurrency(0));
 
   // QR Code variables (placeholders for preview)
   result = result.replace(/\$payment_qr_code/g, '[Payment QR Code]');
@@ -221,8 +251,13 @@ export function replaceVariables(template: string, data: InvoiceData): string {
 export function resolveVariable(
   variable: string,
   itemData: InvoiceData['line_items'][0] | null,
-  invoiceData: InvoiceData
+  invoiceData?: InvoiceData
 ): string {
+  // Save mode — emit the variable literal so the backend substitutes it.
+  if (!invoiceData) {
+    return variable;
+  }
+
   // Handle item.field format (e.g., "item.product_key")
   if (variable.startsWith('item.') && itemData) {
     const field = variable.replace('item.', '') as keyof typeof itemData;
