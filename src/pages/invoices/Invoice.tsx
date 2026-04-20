@@ -205,7 +205,7 @@ export default function Invoice() {
               {errors?.errors?.paid_to_date?.[0]}
             </Banner>
 
-            <Banner id="invoiceUpdateBanner" variant="blue">
+            <Banner id="invoiceUpdateBanner" className="hidden" variant="blue">
               {t('invoice_status_changed')}
             </Banner>
           </>
