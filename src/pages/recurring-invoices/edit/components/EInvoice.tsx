@@ -36,7 +36,7 @@ export default function EInvoice() {
     company?.tax_data?.acts_as_sender);
 
   const context: RecurringInvoiceContext = useOutletContext();
-  const { recurringInvoice, errors, setRecurringInvoice, eInvoiceValidationEntityResponse, setTriggerValidationQuery } = context;
+  const { recurringInvoice, errors, setRecurringInvoice, eInvoiceValidationEntityResponse, triggerValidationQuery, setTriggerValidationQuery } = context;
 
   const handleChange = (property: string, value: string | number | boolean) => {
     const updatedInvoice = cloneDeep(recurringInvoice) as RecurringInvoice;
@@ -68,6 +68,7 @@ export default function EInvoice() {
               $refetch(['entity_validations']);
               setTriggerValidationQuery(true);
             }}
+            disabled={triggerValidationQuery}
           >
             {t('validate')}
           </Button>

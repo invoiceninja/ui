@@ -11,7 +11,7 @@
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
 import { useQueryClient } from 'react-query';
-import { Dispatch, ReactNode, SetStateAction, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useOutletContext } from 'react-router-dom';
 import {
@@ -35,6 +35,7 @@ import reactStringReplace from 'react-string-replace';
 import { useColorScheme } from '$app/common/colors';
 import { cloneDeep, get, set } from 'lodash';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useSendCooldown } from '$app/common/hooks/useSendCooldown';
 import { Credit } from '$app/common/interfaces/credit';
 import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
 
@@ -47,6 +48,7 @@ export interface Context {
   setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
   errors: ValidationBag | undefined;
   eInvoiceValidationEntityResponse: ValidationEntityResponse | undefined;
+  triggerValidationQuery: boolean;
   setTriggerValidationQuery: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -67,6 +69,7 @@ export default function EInvoice() {
   const {
     credit,
     eInvoiceValidationEntityResponse,
+    triggerValidationQuery,
     setTriggerValidationQuery,
     setCredit,
     errors,
@@ -93,25 +96,24 @@ export default function EInvoice() {
     staleTime: Infinity,
   });
 
-  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const { send, isBusy, secondsRemaining } = useSendCooldown({
+    onElapsed: () => {
+      queryClient.invalidateQueries(['/api/v1/credits', credit?.id]);
+      queryClient.invalidateQueries(['/api/v1/activities/entity']);
+    },
+  });
 
   const handleSend = () => {
-    if (!isFormBusy) {
-      toast.processing();
-      setIsFormBusy(true);
+    toast.processing();
 
+    send(() =>
       request('POST', endpoint('/api/v1/einvoice/peppol/send'), {
         entity: 'credit',
         entity_id: credit?.id,
+      }).then(() => {
+        toast.success('success');
       })
-        .then(() => {
-          setTimeout(() => {
-            queryClient.invalidateQueries(['/api/v1/credits', credit?.id]);
-          }, 2000);
-          toast.success('success');
-        })
-        .finally(() => setIsFormBusy(false));
-    }
+    );
   };
 
   const getActivityText = (activityTypeId: number) => {
@@ -152,6 +154,7 @@ export default function EInvoice() {
                 $refetch(['entity_validations']);
                 setTriggerValidationQuery(true);
               }}
+              disabled={triggerValidationQuery}
             >
               {t('validate')}
             </Button>
@@ -296,10 +299,12 @@ export default function EInvoice() {
                   <Button
                     behavior="button"
                     onClick={handleSend}
-                    disabled={isFormBusy}
+                    disabled={isBusy}
                     disableWithoutIcon
                   >
-                    {t('send')}
+                    {secondsRemaining > 0
+                      ? `${t('send')} (${secondsRemaining}s)`
+                      : t('send')}
                   </Button>
                 </div>
               )}

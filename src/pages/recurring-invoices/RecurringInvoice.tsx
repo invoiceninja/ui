@@ -165,6 +165,7 @@ export default function RecurringInvoice() {
               errors,
               client,
               eInvoiceValidationEntityResponse: validationResponse,
+              triggerValidationQuery,
               setTriggerValidationQuery,
             }}
           />
