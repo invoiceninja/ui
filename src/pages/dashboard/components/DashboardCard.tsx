@@ -11,7 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, date } from '$app/common/helpers';
 import { Spinner } from '$app/components/Spinner';
 import { Card } from '$app/components/cards';
 import { FIELDS_LABELS } from './DashboardCardSelector';
@@ -19,6 +19,7 @@ import { useColorScheme } from '$app/common/colors';
 import { decodeDashboardField } from '$app/common/helpers/react-settings';
 import { useQuery } from 'react-query';
 import { useMemo } from 'react';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 export const PERIOD_LABELS: Record<string, string> = {
   current: 'current_period',
@@ -49,6 +50,8 @@ export function DashboardCard({
   const formatMoney = useFormatMoney();
 
   const colors = useColorScheme();
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
   const field = useMemo(() => decodeDashboardField(fieldKey), [fieldKey]);
 
   const { data: value, isLoading } = useQuery({
@@ -87,18 +90,41 @@ export function DashboardCard({
         <div className="flex w-full flex-col items-center justify-center gap-1 min-w-0">
           <span className="w-full truncate text-center text-sm font-medium">
             {t(FIELDS_LABELS[field.field] ?? field.field)}
-            </span>
-            
+          </span>
+
           <span className="w-full truncate text-center text-xl font-semibold">
             {field.format === 'money' && field.calculate !== 'count'
               ? formatMoney(value ?? 0, '', '')
               : value}
-            </span>
-            
-          <span className="w-full truncate text-center text-xs" style={{ color: colors.$17 }}>
+          </span>
+
+          <span
+            className="inline-flex items-center gap-1.5 truncate rounded-full px-2.5 py-0.5 text-xs font-medium"
+            style={{
+              backgroundColor: colors.$0 === 'dark' ? colors.$25 : colors.$23,
+              color: colors.$17,
+            }}
+          >
+            <span
+              className="h-1.5 w-1.5 shrink-0 rounded-full"
+              style={{ backgroundColor: '#5DCAA5' }}
+            />
             {t(PERIOD_LABELS[field.period] ?? field.period)}
             {' · '}
             {t(field.calculate === 'avg' ? 'average' : field.calculate)}
+          </span>
+
+          <span
+            className="w-full truncate text-center"
+            style={{
+              color: colors.$17,
+              fontSize: '11px',
+              opacity: 0.7,
+            }}
+          >
+            {date(startDate, dateFormat)}
+            {' — '}
+            {date(endDate, dateFormat)}
           </span>
         </div>
       )}
