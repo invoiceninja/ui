@@ -44,6 +44,7 @@ import dayjs from 'dayjs';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useQueryClient } from 'react-query';
 
 type NotificationType =
   | 'invoiceWasPaid'
@@ -81,6 +82,8 @@ export const notificationsAtom = atomWithStorage<Notification[]>(
 
 export function Notifications() {
   const [t] = useTranslation();
+
+  const queryClient = useQueryClient();
 
   const replaceVariables = useReplaceVariables();
 
@@ -317,7 +320,7 @@ export function Notifications() {
           socketId()?.toString() !==
           (data as WithSocketId<Invoice>)['x-socket-id']
         ) {
-          $refetch(['invoices']);
+          queryClient.invalidateQueries(['/api/v1/invoices', $invoice.id]);
         }
 
         setNotifications((notifications) => [...notifications, notification]);

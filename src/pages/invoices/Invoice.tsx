@@ -206,7 +206,7 @@ export default function Invoice() {
             </Banner>
 
             <Banner id="invoiceUpdateBanner" className="hidden" variant="blue">
-              {t('invoice_status_changed')}
+              {t('invoice_status_paid')}
             </Banner>
           </>
         }
