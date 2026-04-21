@@ -24,6 +24,7 @@ import {
 } from './PropertyInputs';
 import { useCustomField } from '$app/components/CustomField';
 import { useColorScheme } from '$app/common/colors';
+import { useLabelMapping } from '../../utils/label-variables';
 
 export function InvoiceDetailsBlockProperties({
   block,
@@ -32,54 +33,56 @@ export function InvoiceDetailsBlockProperties({
   const [t] = useTranslation();
   const colors = useColorScheme();
   const customField = useCustomField();
+  const labelMapping = useLabelMapping();
   const [expandedFields, setExpandedFields] = useState<Record<string, boolean>>(
     {}
   );
 
-  // Get available fields with translations
+  // Get available fields with label variables
+  // Label variables (e.g., $number_label) are replaced by backend based on entity type
   const AVAILABLE_FIELDS = useMemo(() => {
-    // Base entity detail fields (non-custom)
+    // Base entity detail fields (non-custom) - using label variables for backend replacement
     const baseFields: Omit<FieldConfig, 'id'>[] = [
       {
-        label: t('number'),
+        label: '$number_label',
         variable: '$number',
-        prefix: `${t('number')}: `,
+        prefix: '$number_label: ',
         hideIfEmpty: true,
       },
       {
-        label: t('date'),
+        label: '$date_label',
         variable: '$date',
-        prefix: `${t('date')}: `,
+        prefix: '$date_label: ',
         hideIfEmpty: true,
       },
       {
-        label: t('due_date'),
+        label: '$due_date_label',
         variable: '$due_date',
-        prefix: `${t('due_date')}: `,
+        prefix: '$due_date_label: ',
         hideIfEmpty: true,
       },
       {
-        label: t('po_number'),
+        label: '$po_number_label',
         variable: '$po_number',
-        prefix: `${t('po_number')}: `,
+        prefix: '$po_number_label: ',
         hideIfEmpty: true,
       },
       {
-        label: t('amount'),
+        label: '$amount_label',
         variable: '$amount',
-        prefix: `${t('amount')}: `,
+        prefix: '$amount_label: ',
         hideIfEmpty: true,
       },
       {
-        label: t('balance'),
+        label: '$balance_label',
         variable: '$balance',
-        prefix: `${t('balance')}: `,
+        prefix: '$balance_label: ',
         hideIfEmpty: true,
       },
       {
-        label: t('partial_deposit'),
+        label: '$partial_label',
         variable: '$partial',
-        prefix: `${t('partial_deposit')}: `,
+        prefix: '$partial_label: ',
         hideIfEmpty: true,
       },
     ];
@@ -266,7 +269,7 @@ export function InvoiceDetailsBlockProperties({
                 </div>
 
                 <span className="flex-1 text-sm" style={{ color: colors.$3 }}>
-                  {field.label}
+                  {labelMapping.getDisplayLabel(field.label)}
                 </span>
 
                 {/* Typography Toggle Button */}
@@ -394,7 +397,7 @@ export function InvoiceDetailsBlockProperties({
                     e.currentTarget.style.backgroundColor = 'transparent';
                   }}
                 >
-                  + {field.label}
+                  + {labelMapping.getDisplayLabel(field.label)}
                 </button>
               ))}
             </div>
