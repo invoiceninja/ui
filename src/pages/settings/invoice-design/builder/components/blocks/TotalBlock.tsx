@@ -9,17 +9,22 @@
  */
 
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   SAMPLE_INVOICE_DATA,
   replaceVariables,
 } from '../../utils/variable-replacer';
 import { Block } from '../../types';
+import { useLabelMapping } from '../../utils/label-variables';
 
 interface TotalBlockProps {
   block: Block;
 }
 
 export const TotalBlock = memo(function TotalBlock({ block }: TotalBlockProps) {
+  const [t] = useTranslation();
+  const labelMapping = useLabelMapping();
+  
   const {
     items,
     fontSize,
@@ -97,7 +102,7 @@ export const TotalBlock = memo(function TotalBlock({ block }: TotalBlockProps) {
                       fontStyle: item.fontStyle || undefined,
                     }}
                   >
-                    {item.label}:
+                    {labelMapping.getDisplayLabel(item.label)}:
                   </td>
                   <td
                     style={{
