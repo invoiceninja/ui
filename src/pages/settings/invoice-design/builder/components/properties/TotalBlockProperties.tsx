@@ -20,10 +20,12 @@ import {
   FontStyleInput,
 } from './PropertyInputs';
 import { useColorScheme } from '$app/common/colors';
+import { useLabelMapping } from '../../utils/label-variables';
 
 export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
+  const labelMapping = useLabelMapping();
   const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>(
     {}
   );
@@ -152,7 +154,7 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                   className="flex-1 text-sm"
                   style={{ color: colors.$3 }}
                 >
-                  {item.label}
+                  {labelMapping.getDisplayLabel(item.label)}
                 </label>
 
                 <button
