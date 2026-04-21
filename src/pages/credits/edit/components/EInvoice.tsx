@@ -97,9 +97,23 @@ export default function EInvoice() {
   });
 
   const { send, isBusy, secondsRemaining } = useSendCooldown({
-    onElapsed: () => {
-      queryClient.invalidateQueries(['/api/v1/credits', credit?.id]);
+    onElapsed: async () => {
       queryClient.invalidateQueries(['/api/v1/activities/entity']);
+
+      if (!credit?.id) return;
+
+      const response = await request(
+        'GET',
+        endpoint('/api/v1/credits/:id', { id: credit.id })
+      );
+      const fresh = response.data.data as Credit;
+
+      // Patch only server-owned fields so unsaved form edits survive the refetch.
+      setCredit((current) =>
+        current
+          ? { ...current, backup: fresh.backup, status_id: fresh.status_id }
+          : current
+      );
     },
   });
 

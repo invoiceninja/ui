@@ -105,9 +105,23 @@ export default function EInvoice() {
   });
 
   const { send, isBusy, secondsRemaining } = useSendCooldown({
-    onElapsed: () => {
-      queryClient.invalidateQueries(['/api/v1/invoices', invoice?.id]);
+    onElapsed: async () => {
       queryClient.invalidateQueries(['/api/v1/activities/entity']);
+
+      if (!invoice?.id) return;
+
+      const response = await request(
+        'GET',
+        endpoint('/api/v1/invoices/:id?include=payments', { id: invoice.id })
+      );
+      const fresh = response.data.data as Invoice;
+
+      // Patch only server-owned fields so unsaved form edits survive the refetch.
+      setInvoice((current) =>
+        current
+          ? { ...current, backup: fresh.backup, status_id: fresh.status_id }
+          : current
+      );
     },
   });
 
@@ -341,6 +355,8 @@ export default function EInvoice() {
         <Element leftSide={t('start_date')}>
           <InputField
             type="date"
+            changeOverride
+            debounceTimeout={0}
             value={
               get(invoice, 'e_invoice.Invoice.InvoicePeriod.0.StartDate') || ''
             }
@@ -356,6 +372,8 @@ export default function EInvoice() {
         <Element leftSide={t('end_date')}>
           <InputField
             type="date"
+            changeOverride
+            debounceTimeout={0}
             value={
               get(invoice, 'e_invoice.Invoice.InvoicePeriod.0.EndDate') || ''
             }
@@ -374,6 +392,8 @@ export default function EInvoice() {
         >
           <InputField
             type="date"
+            changeOverride
+            debounceTimeout={0}
             value={
               get(invoice, 'e_invoice.Invoice.Delivery.0.ActualDeliveryDate') ||
               ''
