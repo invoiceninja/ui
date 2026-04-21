@@ -94,7 +94,7 @@ export function DashboardCard({
 
           <span className="w-full truncate text-center text-xl font-semibold">
             {field.format === 'money' && field.calculate !== 'count'
-              ? formatMoney(value ?? 0, '', '')
+              ? formatMoney(value ?? 0, '', currencyId)
               : value}
           </span>
 
@@ -114,18 +114,20 @@ export function DashboardCard({
             {t(field.calculate === 'avg' ? 'average' : field.calculate)}
           </span>
 
-          <span
-            className="w-full truncate text-center"
-            style={{
-              color: colors.$17,
-              fontSize: '11px',
-              opacity: 0.7,
-            }}
-          >
-            {date(startDate, dateFormat)}
-            {' — '}
-            {date(endDate, dateFormat)}
-          </span>
+          {field.period === 'current' && (
+            <span
+              className="w-full truncate text-center"
+              style={{
+                color: colors.$17,
+                fontSize: '11px',
+                opacity: 0.7,
+              }}
+            >
+              {date(startDate, dateFormat)}
+              {' — '}
+              {date(endDate, dateFormat)}
+            </span>
+          )}
         </div>
       )}
     </Card>
