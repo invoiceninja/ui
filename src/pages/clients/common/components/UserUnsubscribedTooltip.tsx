@@ -30,7 +30,7 @@ export function UserUnsubscribedTooltip(props?: Props) {
         () => (
           <Link
             className="lowercase text-xs"
-            to="https://invoiceninja.github.io/docs/hosted/hosted-mail/"
+            to="https://invoiceninja.github.io/docs/hosted/hosted-mail/#handling-spam--contacts-unsubscribing-from-your-emails"
             external
           >
             {t('link')}.
