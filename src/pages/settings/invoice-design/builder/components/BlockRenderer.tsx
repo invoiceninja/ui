@@ -14,6 +14,7 @@ import { Block, FieldConfig } from '../types';
 import { useBlockLabel } from '../block-library';
 import { InvoiceData, replaceVariables } from '../utils/variable-replacer';
 import { useSampleInvoiceData } from '../hooks/useSampleInvoiceData';
+import { replaceLabelVariables, getSampleLabelValue } from '../utils/label-variables';
 
 interface BlockRendererProps {
   block: Block;
@@ -282,6 +283,7 @@ function ClientInfoRenderer({ block }: BlockRendererProps) {
 }
 
 function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
+  const { t } = useTranslation();
   const sampleData = useSampleInvoiceData();
   const { fieldConfigs, fontSize, lineHeight, align, color, showLabels } =
     block.properties;
@@ -308,7 +310,10 @@ function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
         const fieldFontSize = field.fontSize || fontSize;
         const fieldColor = field.color || color;
 
-        const prefix = showLabels !== false ? field.prefix || '' : '';
+        // Replace label variables in prefix with display labels for preview
+        const prefix = (showLabels !== false && field.prefix)
+          ? replaceLabelVariables(field.prefix, t)
+          : '';
 
         return (
           <div
@@ -531,6 +536,7 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
 }
 
 function TotalBlockRenderer({ block }: BlockRendererProps) {
+  const { t } = useTranslation();
   const sampleData = useSampleInvoiceData();
   const {
     items,
@@ -607,7 +613,7 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
                       fontStyle: item.fontStyle || undefined,
                     }}
                   >
-                    {item.label}:
+                    {getSampleLabelValue(item.label, t)}:
                   </td>
                   <td
                     style={{
