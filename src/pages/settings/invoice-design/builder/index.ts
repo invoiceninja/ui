@@ -13,3 +13,4 @@ export { InvoiceBuilder } from './InvoiceBuilder';
 export * from './types';
 export * from './block-library';
 export * from './templates/templates';
+export * from './utils/label-variables';
