@@ -16,6 +16,8 @@ import {
   replaceVariables,
   resolveVariable,
 } from './variable-replacer';
+import { getSampleLabelValue, replaceLabelVariables } from './label-variables';
+import { t } from 'i18next';
 
 /**
  * Group blocks by their Y position (row)
@@ -699,7 +701,11 @@ function renderInvoiceDetailsBlock(
 
         const fieldFontSize = field.fontSize || fontSize;
         const fieldColor = field.color || color;
-        const prefix = showLabels !== false ? field.prefix || '' : '';
+        
+        // Handle label variable replacement in prefix
+        const prefix = (showLabels !== false && field.prefix)
+          ? (data ? replaceLabelVariables(field.prefix, t) : field.prefix)
+          : '';
 
         return `
         <div style="
@@ -880,6 +886,14 @@ function renderTotalBlock(
           ? `padding: ${valuePadding};`
           : `padding-bottom: ${spacing};`;
 
+        // Handle label variables - replace with friendly labels for preview
+        let displayLabel = item.label;
+        if (data) {
+          // Preview mode: replace label variables with display labels using translations
+          displayLabel = getSampleLabelValue(item.label, t);
+        }
+        // Save mode (no data): keep label variables for backend replacement
+
         html += `
         <tr style="font-size: ${itemFontSize}; font-weight: ${itemFontWeight};">
           <td style="
@@ -887,7 +901,7 @@ function renderTotalBlock(
             ${labelPaddingStyle}
             text-align: right;
             white-space: nowrap;
-          ">${escapeHtml(item.label)}:</td>
+          ">${escapeHtml(displayLabel)}:</td>
           <td style="
             color: ${valueColor};
             ${valuePaddingStyle}
