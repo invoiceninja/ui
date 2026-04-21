@@ -27,10 +27,11 @@ import { endpoint, trans } from '$app/common/helpers';
 import { AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { useColorScheme } from '$app/common/colors';
 import reactStringReplace from 'react-string-replace';
 import { Element } from '$app/components/cards';
+import { useSendCooldown } from '$app/common/hooks/useSendCooldown';
 
 export interface Context {
     invoice: Invoice | undefined;
@@ -62,26 +63,42 @@ export default function Verifactu() {
 
     const colors = useColorScheme();
     const location = useLocation();
-    
+    const queryClient = useQueryClient();
+
     const VALIDATION_ENTITIES = ['invoice', 'client', 'company'];
 
-    const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+    const { send, isBusy, secondsRemaining } = useSendCooldown({
+        onElapsed: async () => {
+            queryClient.invalidateQueries(['/api/v1/activities/entity']);
+
+            if (!invoice?.id) return;
+
+            const response = await request(
+                'GET',
+                endpoint('/api/v1/invoices/:id?include=payments', { id: invoice.id })
+            );
+            const fresh = response.data.data as Invoice;
+
+            // Patch only server-owned fields so unsaved form edits survive the refetch.
+            setInvoice((current) =>
+                current
+                    ? { ...current, backup: fresh.backup, status_id: fresh.status_id }
+                    : current
+            );
+        },
+    });
 
     const handleSend = () => {
-        if (!isFormBusy) {
-            toast.processing();
-            setIsFormBusy(true);
+        toast.processing();
 
+        send(() =>
             request('POST', endpoint('/api/v1/einvoice/peppol/send'), {
                 entity: 'invoice',
                 entity_id: invoice?.id,
+            }).then(() => {
+                toast.success('success');
             })
-                .then(() => {
-                    $refetch(['invoices']);
-                    toast.success('success');
-                })
-                .finally(() => setIsFormBusy(false));
-        }
+        );
     };
 
     const { data: activities } = useQuery({
@@ -252,10 +269,12 @@ export default function Verifactu() {
                                 <Button
                                     behavior="button"
                                     onClick={handleSend}
-                                    disabled={isFormBusy}
+                                    disabled={isBusy}
                                     disableWithoutIcon
                                 >
-                                    {t('send')}
+                                    {secondsRemaining > 0
+                                        ? `${t('send')} (${secondsRemaining}s)`
+                                        : t('send')}
                                 </Button>
                             )}
                         </div>
