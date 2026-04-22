@@ -17,17 +17,19 @@ import {
   Undo2,
   Redo2,
   Eye,
-  Save,
-  ArrowLeft,
   Download,
   FileJson,
   Clipboard,
   GripVertical,
   LayoutGrid,
+  Type,
+  Pencil,
 } from 'lucide-react';
 import { Button } from '$app/components/forms';
 import { InputField } from '$app/components/forms/InputField';
 import { Modal } from '$app/components/Modal';
+import { Card } from '$app/components/cards';
+import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { Block, BuilderState, BlockDefinition, generateBlockId } from './types';
 import { getTemplateById } from './templates/templates';
 import { ComponentLibrary } from './components/ComponentLibrary';
@@ -559,7 +561,7 @@ export function InvoiceBuilder() {
     };
   }, []);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!state.blocks.length) {
       toast.error('add_blocks_first');
       return;
@@ -574,7 +576,7 @@ export function InvoiceBuilder() {
     }
 
     await performSave();
-  };
+  }, [isEditMode, designName, state.blocks.length]);
 
   const performSave = async (nameToUseParam?: string) => {
     const nameToUse =
@@ -670,9 +672,13 @@ export function InvoiceBuilder() {
     setShowPreview(true);
   };
 
-  const handleGoBack = () => {
-    navigate(route('/settings/invoice_design/custom_designs'));
-  };
+  useSaveBtn(
+    {
+      onClick: handleSave,
+      disableSaveButton: saving || state.blocks.length === 0,
+    },
+    [saving, state.blocks.length, handleSave, isEditMode, designId]
+  );
 
   // Show loading state when loading existing design
   if (isLoadingDesign && designId) {
@@ -687,180 +693,148 @@ export function InvoiceBuilder() {
   }
 
   return (
-    <div
-      className="flex h-screen overflow-hidden"
-      style={{ backgroundColor: colors.$23 }}
-    >
-      {/* Left Sidebar: Component Library */}
-      <div
-        className="w-72 flex flex-col overflow-hidden"
-        style={{
-          backgroundColor: colors.$1,
-          borderRight: `1px solid ${colors.$24}`,
-        }}
+    <>
+      <Card 
+        className="mb-4" 
+        withoutBodyPadding
+        style={{ borderColor: colors.$24 }}
       >
-        <div
-          className="p-4"
-          style={{ borderBottom: `1px solid ${colors.$24}` }}
-        >
-          <h2 className="font-semibold text-lg" style={{ color: colors.$3 }}>
-            {t('components')}
-          </h2>
-          <p className="text-sm mt-1" style={{ color: colors.$17 }}>
-            {t('drag_and_drop_to_add')}
-          </p>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4">
-          <ComponentLibrary
-            onAddBlock={handleAddBlock}
-            onDragStart={setCurrentDragDefinition}
-          />
-        </div>
-      </div>
-
-      {/* Center: Canvas */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Toolbar */}
-        <div
-          className="px-6 py-3 flex items-center justify-between shadow-sm"
-          style={{
-            backgroundColor: colors.$1,
-            borderBottom: `1px solid ${colors.$24}`,
-          }}
-        >
-          <div className="flex items-center gap-4">
-            <Button
-              type="secondary"
-              behavior="button"
-              onClick={handleGoBack}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              {t('back')}
-            </Button>
-
-            <div className="h-6 w-px" style={{ backgroundColor: colors.$24 }} />
-
-            <div className="flex items-center gap-2">
-              <Button
-                type="secondary"
-                behavior="button"
-                onClick={handleUndo}
-                disabled={state.historyIndex <= 0}
-                className="p-2"
-                disableWithoutIcon={state.historyIndex <= 0}
-              >
-                <Undo2 className="w-4 h-4" />
-              </Button>
-              <Button
-                type="secondary"
-                behavior="button"
-                onClick={handleRedo}
-                disabled={state.historyIndex >= state.history.length - 1}
-                className="p-2"
-                disableWithoutIcon={
-                  state.historyIndex >= state.history.length - 1
-                }
-              >
-                <Redo2 className="w-4 h-4" />
-              </Button>
-            </div>
-
-            <div className="h-6 w-px" style={{ backgroundColor: colors.$24 }} />
-
-            <span className="text-sm" style={{ color: colors.$17 }}>
-              {t('zoom')}: {state.zoom}%
-            </span>
-
-            <div className="h-6 w-px" style={{ backgroundColor: colors.$24 }} />
-
-            <Button
-              type="secondary"
-              behavior="button"
-              onClick={compactLayout}
-              disabled={state.blocks.length === 0}
-              className="flex items-center gap-2"
-            >
-              <LayoutGrid className="w-4 h-4" />
-              {t('fix_overlaps')}
-            </Button>
-
-            <div className="h-6 w-px" style={{ backgroundColor: colors.$24 }} />
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-2 group">
+            <Type className="w-4 h-4" style={{ color: colors.$17 }} />
+            
             <InputField
               value={designName || ''}
               onValueChange={(value) => setDesignName(value)}
-              placeholder={t('untitled')}
-              className="!py-1 !px-2 !bg-transparent border-0 focus:border-0 min-w-[150px] max-w-[300px]"
-              style={{
-                color: colors.$3,
-              }}
+              placeholder={t('design_name')}
+              className="w-64 !border-0 !bg-transparent focus:ring-0 focus:border-b focus:border-gray-300"
               debounceTimeout={0}
               changeOverride
             />
+            
+            <Pencil 
+              className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" 
+              style={{ color: colors.$17 }} 
+            />
           </div>
 
-          <div className="flex items-center gap-3">
-            <Button
-              type="secondary"
-              behavior="button"
-              onClick={handlePreview}
-              className="flex items-center gap-2"
-            >
-              <Eye className="w-4 h-4" />
-              {t('preview')}
-            </Button>
-            <Button
-              type="secondary"
-              behavior="button"
-              onClick={handleSave}
-              disabled={saving || state.blocks.length === 0}
-              disableWithoutIcon={!saving}
-              className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
-            >
-              <Save className="w-4 h-4" />
-              {saving ? t('saving') : t('save_design')}
-            </Button>
-            <button
-              type="button"
-              onClick={() => {
-                const json = JSON.stringify(
-                  {
-                    blocks: state.blocks,
-                    templateId: state.templateId,
-                  },
-                  null,
-                  2
-                );
-                const blob = new Blob([json], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `invoice-design-${Date.now()}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                toast.success('json_downloaded');
-              }}
-              disabled={state.blocks.length === 0}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-              title={String(t('download_json'))}
-            >
-              <FileJson className="w-4 h-4" />
-            </button>
+          {/* Action Buttons - Right Side */}
+          <div className="flex items-center gap-2">
+          <Button
+            type="secondary"
+            behavior="button"
+            onClick={handleUndo}
+            disabled={state.historyIndex <= 0}
+            className="p-2"
+            disableWithoutIcon={state.historyIndex <= 0}
+          >
+            <Undo2 className="w-4 h-4" />
+          </Button>
+          <Button
+            type="secondary"
+            behavior="button"
+            onClick={handleRedo}
+            disabled={state.historyIndex >= state.history.length - 1}
+            className="p-2"
+            disableWithoutIcon={
+              state.historyIndex >= state.history.length - 1
+            }
+          >
+            <Redo2 className="w-4 h-4" />
+          </Button>
+          <Button
+            type="secondary"
+            behavior="button"
+            onClick={compactLayout}
+            disabled={state.blocks.length === 0}
+            className="flex items-center gap-2"
+          >
+            <LayoutGrid className="w-4 h-4" />
+            {t('fix_overlaps')}
+          </Button>
+          <Button
+            type="secondary"
+            behavior="button"
+            onClick={handlePreview}
+            className="flex items-center gap-2"
+          >
+            <Eye className="w-4 h-4" />
+            {t('preview')}
+          </Button>
+          <button
+            type="button"
+            onClick={() => {
+              const json = JSON.stringify(
+                {
+                  blocks: state.blocks,
+                  templateId: state.templateId,
+                },
+                null,
+                2
+              );
+              const blob = new Blob([json], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `invoice-design-${Date.now()}.json`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              toast.success('json_downloaded');
+            }}
+            disabled={state.blocks.length === 0}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            title={String(t('download_json'))}
+          >
+            <FileJson className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </Card>
+
+      <div
+        className="flex h-screen overflow-hidden"
+        style={{ backgroundColor: colors.$23 }}
+      >
+        <div
+          className="w-72 flex flex-col overflow-hidden rounded-md"
+          style={{
+            backgroundColor: colors.$1,
+            border: `1px solid ${colors.$24}`,
+          }}
+        >
+          <div
+            className="p-4"
+            style={{ borderBottom: `1px solid ${colors.$24}` }}
+          >
+            <h2 className="font-semibold text-lg" style={{ color: colors.$3 }}>
+              {t('components')}
+            </h2>
+            <p className="text-sm mt-1" style={{ color: colors.$17 }}>
+              {t('drag_and_drop_to_add')}
+            </p>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-4">
+            <ComponentLibrary
+              onAddBlock={handleAddBlock}
+              onDragStart={setCurrentDragDefinition}
+            />
           </div>
         </div>
 
-        {/* Canvas Area */}
-        <div className="flex-1 overflow-auto p-8 bg-gray-100">
-          <div
-            className={`mx-auto bg-white shadow-2xl relative transition-all canvas-drop-target`}
-            style={{
-              width: '210mm',
-              minHeight: '297mm',
-              transform: `scale(${state.zoom / 100})`,
-              transformOrigin: 'top center',
+        {/* Center: Canvas */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Canvas Area */}
+          <div className="flex-1 overflow-auto p-8 bg-gray-100">
+            <div
+              className={`mx-auto bg-white shadow-2xl relative transition-all canvas-drop-target`}
+              style={{
+                width: '210mm',
+                minHeight: '297mm',
+                transform: `scale(${state.zoom / 100})`,
+                transformOrigin: 'top center',
             }}
             onClick={(e) => {
               // Deselect when clicking on canvas background (not on a block)
@@ -891,7 +865,7 @@ export function InvoiceBuilder() {
               isDroppable
               droppingItem={droppingItem}
               compactType="vertical" // Pack items toward top (Grafana-style)
-              preventCollision={false}
+              preventCollision={true}
               useCSSTransforms={true}
               style={{ minHeight: '1000px' }}
             >
@@ -1022,46 +996,47 @@ export function InvoiceBuilder() {
         </div>
       </div>
 
-      {/* Right Sidebar: Properties Panel */}
-      <div
-        className="w-80 flex flex-col overflow-hidden"
-        style={{
-          backgroundColor: colors.$1,
-          borderLeft: `1px solid ${colors.$24}`,
-        }}
-      >
+        {/* Right Sidebar: Properties Panel */}
         <div
-          className="p-4"
-          style={{ borderBottom: `1px solid ${colors.$24}` }}
+          className="w-80 flex flex-col overflow-hidden rounded-md"
+          style={{
+            backgroundColor: colors.$1,
+            border: `1px solid ${colors.$24}`,
+          }}
         >
-          <h2 className="font-semibold text-lg" style={{ color: colors.$3 }}>
-            {t('properties')}
-          </h2>
-        </div>
+          <div
+            className="p-4"
+            style={{ borderBottom: `1px solid ${colors.$24}` }}
+          >
+            <h2 className="font-semibold text-lg" style={{ color: colors.$3 }}>
+              {t('properties')}
+            </h2>
+          </div>
 
-        <div className="flex-1 overflow-y-auto">
-          {selectedBlock ? (
-            <PropertyPanel
-              block={selectedBlock}
-              onChange={handleUpdateBlock}
-              onDelete={() => handleDeleteBlock(selectedBlock.id)}
-              onDuplicate={() => handleDuplicateBlock(selectedBlock.id)}
-            />
-          ) : (
-            <div className="p-6 text-center" style={{ color: colors.$17 }}>
-              <div className="mb-4">
-                <div
-                  className="w-16 h-16 mx-auto rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: colors.$20 }}
-                >
-                  <Eye className="w-8 h-8" style={{ color: colors.$17 }} />
+          <div className="flex-1 overflow-y-auto">
+            {selectedBlock ? (
+              <PropertyPanel
+                block={selectedBlock}
+                onChange={handleUpdateBlock}
+                onDelete={() => handleDeleteBlock(selectedBlock.id)}
+                onDuplicate={() => handleDuplicateBlock(selectedBlock.id)}
+              />
+            ) : (
+              <div className="p-6 text-center" style={{ color: colors.$17 }}>
+                <div className="mb-4">
+                  <div
+                    className="w-16 h-16 mx-auto rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: colors.$20 }}
+                  >
+                    <Eye className="w-8 h-8" style={{ color: colors.$17 }} />
+                  </div>
                 </div>
+                <p className="text-sm">
+                  {t('select_a_component_to_edit_properties')}
+                </p>
               </div>
-              <p className="text-sm">
-                {t('select_a_component_to_edit_properties')}
-              </p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
@@ -1119,7 +1094,7 @@ export function InvoiceBuilder() {
           </div>
         </div>
       </Modal>
-    </div>
+    </>
   );
 }
 
