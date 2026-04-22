@@ -9,7 +9,9 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Building2, Check } from 'lucide-react';
+import { Building2, Check, X, ImageIcon } from 'lucide-react';
+import { useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
 import { PropertyEditorProps } from '../../types';
 import { useLogo } from '$app/common/hooks/useLogo';
 import {
@@ -116,12 +118,9 @@ export function ImageBlockProperties({ block, onChange }: PropertyEditorProps) {
       )}
 
       {block.type !== 'logo' && (
-        <TextInput
-          label={String(t('image_source'))}
+        <ImageUploader
           value={block.properties.source}
           onChange={(value) => updateProperty('source', value)}
-          placeholder="https://..."
-          hint={String(t('enter_image_url'))}
         />
       )}
 
@@ -175,6 +174,108 @@ export function ImageBlockProperties({ block, onChange }: PropertyEditorProps) {
         placeholder="0px"
         hint={String(t('css_padding_format'))}
       />
+    </div>
+  );
+}
+
+interface ImageUploaderProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+function ImageUploader({ value, onChange }: ImageUploaderProps) {
+  const [t] = useTranslation();
+  const colors = useColorScheme();
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      if (result) {
+        onChange(result);
+      }
+    };
+    reader.readAsDataURL(file);
+  }, [onChange]);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    multiple: false,
+    accept: {
+      'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.svg'],
+    },
+  });
+
+  const handleRemove = useCallback(() => {
+    onChange('');
+  }, [onChange]);
+
+  const hasImage = value?.startsWith('data:image') || value?.startsWith('http');
+
+  return (
+    <div className="space-y-3">
+      <label
+        className="block text-sm font-medium"
+        style={{ color: colors.$3 }}
+      >
+        {t('image')}
+      </label>
+
+      {hasImage && (
+        <div className="relative">
+          <div
+            className="w-full h-32 rounded-lg flex items-center justify-center overflow-hidden"
+            style={{
+              backgroundColor: colors.$23,
+              border: `2px solid ${colors.$24}`,
+            }}
+          >
+            <img
+              src={value}
+              alt={String(t('preview'))}
+              className="max-w-full max-h-full object-contain"
+            />
+          </div>
+          <button
+            onClick={handleRemove}
+            className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center"
+            style={{
+              backgroundColor: colors.$20,
+              color: colors.$3,
+            }}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      <div
+        {...getRootProps()}
+        className="relative border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer"
+        style={{
+          borderColor: isDragActive ? colors.$3 : colors.$24,
+          backgroundColor: isDragActive ? colors.$20 : colors.$1,
+        }}
+      >
+        <input {...getInputProps()} />
+        
+        <ImageIcon
+          className="w-8 h-8"
+          style={{ color: colors.$17 }}
+        />
+        
+        <div className="text-center">
+          <p
+            className="text-sm font-medium"
+            style={{ color: colors.$3 }}
+          >
+            {hasImage ? t('upload') : t('drag_and_drop_to_add')}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
