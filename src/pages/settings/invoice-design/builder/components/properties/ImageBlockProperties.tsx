@@ -115,22 +115,15 @@ export function ImageBlockProperties({ block, onChange }: PropertyEditorProps) {
         </div>
       )}
 
-      {/* Image Source */}
-      <TextInput
-        label={
-          block.type === 'logo'
-            ? String(t('logo_source'))
-            : String(t('image_source'))
-        }
-        value={block.properties.source}
-        onChange={(value) => updateProperty('source', value)}
-        placeholder={block.type === 'logo' ? '$company.logo' : 'https://...'}
-        hint={
-          block.type === 'logo'
-            ? String(t('use_variable_or_url'))
-            : String(t('enter_image_url'))
-        }
-      />
+      {block.type !== 'logo' && (
+        <TextInput
+          label={String(t('image_source'))}
+          value={block.properties.source}
+          onChange={(value) => updateProperty('source', value)}
+          placeholder="https://..."
+          hint={String(t('enter_image_url'))}
+        />
+      )}
 
       <SectionDivider label={String(t('dimensions'))} />
 
