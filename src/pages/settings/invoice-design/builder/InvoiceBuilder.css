@@ -34,8 +34,7 @@
 
 /* Smooth transitions for grid items */
 .react-grid-item {
-  transition: all 200ms ease;
-  transition-property: left, top, width, height;
+  transition: transform 200ms ease, width 200ms ease, height 200ms ease;
   box-sizing: border-box !important;
 }
 
@@ -43,6 +42,11 @@
 .react-grid-item.react-draggable-dragging,
 .react-grid-item.resizing {
   transition: none !important;
+}
+
+/* Ensure proper positioning during layout changes */
+.react-grid-item {
+  will-change: transform, width, height;
 }
 
 /* Visual feedback for drop target canvas */
