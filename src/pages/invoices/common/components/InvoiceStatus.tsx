@@ -48,7 +48,9 @@ export function InvoiceStatus(props: Props) {
   const isCancelledOrReversed = isCancelled || isReversed;
   const isDeleted = Boolean(props.entity.is_deleted);
 
-  const isRectificativa = verifactuEnabled && ['R1','R2'].includes(props.entity.backup?.document_type ?? '');
+  const isRectificativa =
+    verifactuEnabled &&
+    ['R1', 'R2'].includes(props.entity.backup?.document_type ?? '');
 
   const isPastDue = () => {
     const date =
@@ -148,7 +150,7 @@ export function InvoiceStatus(props: Props) {
 
   if (status_id === InvoiceStatusEnum.Cancelled) {
     return (
-      <Badge variant="black" style={props.style}>
+      <Badge variant="purple" style={props.style}>
         {t('cancelled')}
       </Badge>
     );
@@ -156,14 +158,14 @@ export function InvoiceStatus(props: Props) {
 
   if (status_id === InvoiceStatusEnum.Reversed) {
     return (
-      <Badge variant="purple" style={props.style}>
+      <Badge variant="teal" style={props.style}>
         {t('reversed')}
       </Badge>
     );
   }
 
   return (
-    <Badge variant="purple" style={props.style}>
+    <Badge variant="teal" style={props.style}>
       {t('reversed')}
     </Badge>
   );
