@@ -23,6 +23,7 @@ import {
   FileJson,
   Clipboard,
   GripVertical,
+  LayoutGrid,
 } from 'lucide-react';
 import { Button } from '$app/components/forms';
 import { InputField } from '$app/components/forms/InputField';
@@ -463,13 +464,16 @@ export function InvoiceBuilder() {
       });
 
       // Set flag to prevent handleLayoutChange from overwriting the drop position
+      // Use a very short timeout to allow the grid to process but then immediately
+      // allow layout changes to sync block positions (resolves overlap issues)
       setJustDropped(true);
       const dropTimeoutId = setTimeout(() => {
         setJustDropped(false);
+        setTimeout(() => compactLayout(), 50);
         timeoutRefs.current = timeoutRefs.current.filter(
           (id) => id !== dropTimeoutId
         );
-      }, 100);
+      }, 50);
       timeoutRefs.current.push(dropTimeoutId);
 
       // Clear the drag state
@@ -487,6 +491,56 @@ export function InvoiceBuilder() {
     }
     return { w: 6, h: 3 }; // Default fallback size
   }, [droppingItem]);
+
+  const compactLayout = useCallback(() => {
+    setLayout((prevLayout) => {
+      const sorted = [...prevLayout].sort((a, b) => {
+        if (a.y !== b.y) return a.y - b.y;
+        return a.x - b.x;
+      });
+      
+      const compacted: Layout[] = [];
+
+      for (const item of sorted) {
+        let newY = item.y;
+
+        while (newY > 0) {
+          const testY = newY - 1;
+          const wouldOverlap = compacted.some(
+            (other) =>
+              item.x < other.x + other.w &&
+              item.x + item.w > other.x &&
+              testY < other.y + other.h &&
+              item.h + testY > other.y
+          );
+          if (wouldOverlap) break;
+          newY = testY;
+        }
+        compacted.push({ ...item, y: newY });
+      }
+      
+      setState((prev) => ({
+        ...prev,
+        blocks: prev.blocks.map((block) => {
+          const layoutItem = compacted.find((l) => l.i === block.id);
+          if (layoutItem) {
+            return {
+              ...block,
+              gridPosition: {
+                x: layoutItem.x,
+                y: layoutItem.y,
+                w: layoutItem.w,
+                h: layoutItem.h,
+              },
+            };
+          }
+          return block;
+        }),
+      }));
+      
+      return compacted;
+    });
+  }, []);
 
   const selectedBlock = state.blocks.find(
     (b) => b.id === state.selectedBlockId
@@ -720,6 +774,19 @@ export function InvoiceBuilder() {
             </span>
 
             <div className="h-6 w-px" style={{ backgroundColor: colors.$24 }} />
+
+            <Button
+              type="secondary"
+              behavior="button"
+              onClick={compactLayout}
+              disabled={state.blocks.length === 0}
+              className="flex items-center gap-2"
+            >
+              <LayoutGrid className="w-4 h-4" />
+              {t('fix_overlaps')}
+            </Button>
+
+            <div className="h-6 w-px" style={{ backgroundColor: colors.$24 }} />
             <InputField
               value={designName || ''}
               onValueChange={(value) => setDesignName(value)}
@@ -824,7 +891,7 @@ export function InvoiceBuilder() {
               isDroppable
               droppingItem={droppingItem}
               compactType="vertical" // Pack items toward top (Grafana-style)
-              preventCollision={false} // Allow items to push each other
+              preventCollision={false}
               useCSSTransforms={true}
               style={{ minHeight: '1000px' }}
             >
