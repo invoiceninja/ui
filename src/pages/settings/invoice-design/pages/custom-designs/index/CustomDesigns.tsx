@@ -17,6 +17,8 @@ import { DataTable } from '$app/components/DataTable';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Inline } from '$app/components/Inline';
 import { Button } from '$app/components/forms';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
 import { Paintbrush, Plus } from 'lucide-react';
 import { route } from '$app/common/helpers/route';
 import { Design } from '$app/common/interfaces/design';
@@ -79,23 +81,7 @@ export default function CustomDesigns() {
           {
             id: 'actions',
             label: '',
-            format: (_, resource: Design) => (
-              <div className="flex justify-end">
-                {isVisualBuilderDesign(resource) && (
-                  <Button
-                    type="minimal"
-                    behavior="button"
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                      e.stopPropagation();
-                      navigate(route('/settings/invoice_design/builder/:id', { id: resource.id }));
-                    }}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    <Paintbrush className="w-4 h-4" />
-                  </Button>
-                )}
-              </div>
-            ),
+            format: (_, resource: Design) => null,
           },
         ]}
         resource="design"
@@ -104,6 +90,18 @@ export default function CustomDesigns() {
         withResourcefulActions
         hideEditableOptions={!proPlan() && !enterprisePlan()}
         enableSavingFilterPreference
+        customActions={[
+          (resource: Design) =>
+            isVisualBuilderDesign(resource) && (
+              <DropdownElement
+                key="visual-builder"
+                to={route('/settings/invoice_design/builder/:id', { id: resource.id })}
+                icon={<Icon element={Paintbrush} />}
+              >
+                {t('visual_builder')}
+              </DropdownElement>
+            ),
+        ]}
       />
     </>
   );
