@@ -413,7 +413,6 @@ export function Actions(props: Props) {
             }
             debounceTimeout={300}
             clearable
-            disabledChars={[',']}
           />
         </div>
 
