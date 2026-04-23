@@ -45,7 +45,7 @@ export function PurchaseOrderStatus(props: Props) {
 
   if (isCancelled) {
     return (
-      <Badge variant="black" style={{ backgroundColor: statusThemeColors.$5 }}>
+      <Badge variant="purple" style={{ backgroundColor: statusThemeColors.$5 }}>
         {t('cancelled')}
       </Badge>
     );
