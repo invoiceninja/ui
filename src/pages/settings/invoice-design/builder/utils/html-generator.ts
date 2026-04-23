@@ -209,11 +209,26 @@ function calculateRowPositions(
  */
 export function generateInvoiceHTML(
   blocks: Block[],
-  previewData?: InvoiceData
+  previewData?: InvoiceData,
+  designSettings?: {
+    page_size?: string;
+    primary_font?: string;
+    font_size?: number;
+    primary_color?: string;
+    secondary_color?: string;
+    show_paid_stamp?: boolean;
+    page_numbering?: boolean;
+  }
 ): string {
   // Layout/height calculations always need a concrete data shape.
   // Variable substitution is gated on previewData — when absent, tokens stay literal.
   const layoutData = previewData || SAMPLE_INVOICE_DATA;
+  
+  const fontStack = `Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
+  const fontSize = designSettings?.font_size || 16;
+  const primaryColor = designSettings?.primary_color || '#374151';
+  const secondaryColor = designSettings?.secondary_color || '#6B7280';
+  const pageSize = designSettings?.page_size || 'A4';
 
   // Sort blocks by Y position, then by X position for same row
   const sortedBlocks = [...blocks].sort((a, b) => {
@@ -276,6 +291,9 @@ export function generateInvoiceHTML(
   const containerPaddingVertical = GRID_CONFIG.containerPadding[1];
   const containerPaddingHorizontal = GRID_CONFIG.containerPadding[0];
 
+  const pageSizeCss = pageSize === 'letter' ? 'letter' : 'A4';
+  const showPageNumbering = designSettings?.page_numbering;
+  
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -285,7 +303,7 @@ export function generateInvoiceHTML(
   <title>Invoice ${layoutData.invoice.number}</title>
   <style>
     @page {
-      size: A4;
+      size: ${pageSizeCss};
       margin: 0;
     }
 
@@ -301,9 +319,15 @@ export function generateInvoiceHTML(
       width: ${canvasWidth}px;
       height: ${containerHeight}px;
       overflow: hidden; /* Prevent scrollbars */
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      font-family: ${fontStack};
+      font-size: ${fontSize}px;
+      color: ${primaryColor};
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
+    }
+    
+    .text-secondary {
+      color: ${secondaryColor};
     }
 
     .invoice-container {
@@ -340,6 +364,46 @@ export function generateInvoiceHTML(
       overflow-wrap: break-word;
     }
 
+    /* Paid Stamp - Matches backend API styling */
+    .stamp {
+      transform: rotate(12deg);
+      color: #555;
+      font-size: 3rem;
+      font-weight: 700;
+      border: 0.25rem solid #555;
+      display: inline-block;
+      padding: 0.25rem 1rem;
+      text-transform: uppercase;
+      border-radius: 1rem;
+      font-family: 'Courier', monospace;
+      mix-blend-mode: multiply;
+      z-index: 200 !important;
+      position: fixed;
+      text-align: center;
+    }
+
+    .stamp.is-paid {
+      color: #D23;
+      border: 1rem double #D23;
+      transform: rotate(-5deg);
+      font-size: 6rem;
+      font-family: "Open sans", Helvetica, Arial, sans-serif;
+      border-radius: 0;
+      padding: 0.5rem;
+      opacity: 0.2;
+      z-index: 200 !important;
+      position: fixed;
+    }
+
+    /* Page Number */
+    .page-number {
+      position: absolute;
+      bottom: 20px;
+      right: 30px;
+      font-size: 11px;
+      color: ${secondaryColor};
+    }
+
     @media print {
       body {
         margin: 0;
@@ -360,6 +424,7 @@ export function generateInvoiceHTML(
 <body>
   <div class="invoice-container">
     ${blocksHTML}
+    ${showPageNumbering ? '<div class="page-number">Page 1 of 1</div>' : ''}
   </div>
 </body>
 </html>
@@ -915,6 +980,19 @@ function renderTotalBlock(
     );
 
   html += '</tbody></table>';
+  
+  // Add paid stamp if enabled for this block and invoice is in paid/cancelled status
+  // For preview, we simulate a paid status to show the stamp
+  if (block.properties.showPaidStamp) {
+    // In production, this would check: entity.status_id in [4, 5] && settings.show_paid_stamp
+    // For preview mode, we show the stamp to demonstrate the design
+    html += `
+      <div class="stamp is-paid" style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
+        PAID
+      </div>
+    `;
+  }
+  
   return html;
 }
 
