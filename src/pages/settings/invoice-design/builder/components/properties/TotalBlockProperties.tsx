@@ -21,6 +21,7 @@ import {
 } from './PropertyInputs';
 import { useColorScheme } from '$app/common/colors';
 import { useLabelMapping } from '../../utils/label-variables';
+import { Checkbox } from '$app/components/forms';
 
 export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
@@ -76,6 +77,18 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
 
   return (
     <div className="space-y-4">
+      <div
+        className="p-3 rounded-md"
+        style={{ backgroundColor: colors.$23, border: `1px solid ${colors.$24}` }}
+      >
+        <Checkbox
+          id="show-paid-stamp"
+          label={t('show_paid_stamp')}
+          checked={block.properties.showPaidStamp || false}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateProperty('showPaidStamp', event.target.checked)}
+        />
+      </div>
+
       {/* Items to show */}
       <div>
         <label
