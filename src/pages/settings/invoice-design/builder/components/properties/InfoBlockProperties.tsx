@@ -140,24 +140,24 @@ export function InfoBlockProperties({
         <div className="space-y-3">
           <CheckboxInput
             id="show_title"
-            label={String(t('show_title'))}
+            label={String(t('show_header'))}
             checked={block.properties.showTitle ?? true}
             onChange={(value) => updateProperty('showTitle', value)}
           />
 
           {block.properties.showTitle !== false && (
             <TextInput
-              label={String(t('title_text'))}
+              label={String(t('header'))}
               value={block.properties.title || ''}
               onChange={(value) => updateProperty('title', value)}
-              placeholder={String(t('title_text_placeholder'))}
+              placeholder={String(t('bill_to'))}
             />
           )}
         </div>
       )}
 
       <ReorderableFieldList
-        label={fieldOrderLabel || String(t('field_order'))}
+        label={fieldOrderLabel || String(t('fields'))}
         fields={fieldConfigs}
         availableFields={availableToAdd}
         onChange={handleFieldConfigsChange}
