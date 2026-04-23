@@ -135,6 +135,7 @@ export interface TotalBlockPropertiesHint {
   labelValueGap?: string;
   valueMinWidth?: string;
   showLabels?: boolean;
+  showPaidStamp?: boolean;
 }
 
 export interface QRCodeBlockPropertiesHint {
