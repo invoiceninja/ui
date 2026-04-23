@@ -468,6 +468,7 @@ export function useBlockLibrary(): BlockDefinition[] {
         labelValueGap: '20px',
         valueMinWidth: '',
         showLabels: true,
+        showPaidStamp: false,
       },
       category: 'data',
       essential: true,
