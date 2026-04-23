@@ -221,11 +221,11 @@ export interface BlockDefinition {
   type: BlockType;
   label: string;
   icon: ReactNode;
-  description: string;
+  description?: string;
   defaultSize: { w: number; h: number };
   defaultProperties: BlockProperties;
   category: BlockCategory;
-  essential?: boolean; // Mark as required/recommended block
+  essential?: boolean;
 }
 
 export interface Variable {

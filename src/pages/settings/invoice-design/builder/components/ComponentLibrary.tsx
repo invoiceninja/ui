@@ -136,9 +136,11 @@ function BlockCard({
               </span>
             )}
           </div>
-          <div className="text-xs opacity-75 line-clamp-2">
-            {definition.description}
-          </div>
+          {definition.description && (
+            <div className="text-xs opacity-75 line-clamp-2">
+              {definition.description}
+            </div>
+          )}
         </div>
 
         <div className="opacity-60 flex-shrink-0 mt-0.5">
