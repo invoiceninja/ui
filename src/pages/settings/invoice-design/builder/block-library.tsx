@@ -38,7 +38,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'logo',
       label: t('company_logo'),
       icon: <Building2 className="w-5 h-5" />,
-      description: t('logo'),
       defaultSize: { w: 4, h: 4 },
       defaultProperties: {
         source: '$company.logo',
@@ -52,7 +51,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'company-info',
       label: t('company_details'),
       icon: <Building2 className="w-5 h-5" />,
-      description: t('company_name'),
       defaultSize: { w: 6, h: 4 },
       defaultProperties: {
         fieldConfigs: [
@@ -111,7 +109,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'text',
       label: t('text'),
       icon: <Type className="size-5" />,
-      description: t('custom_text_with_formatting'),
       defaultSize: { w: 6, h: 2 },
       defaultProperties: {
         content: t('enter_text'),
@@ -129,7 +126,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'client-info',
       label: t('client_details'),
       icon: <User className="w-5 h-5" />,
-      description: t('client_name_and_address'),
       defaultSize: { w: 6, h: 4 },
       defaultProperties: {
         fieldConfigs: [
@@ -190,7 +186,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'invoice-details',
       label: t('entity_details'),
       icon: <Receipt className="w-5 h-5" />,
-      description: t('number_date_due_date_amount_balance'),
       defaultSize: { w: 6, h: 5 },
       defaultProperties: {
         fieldConfigs: [
@@ -257,7 +252,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'public-notes',
       label: t('public_notes'),
       icon: <StickyNote className="w-5 h-5" />,
-      description: t('public_notes'),
       defaultSize: { w: 12, h: 3 },
       defaultProperties: {
         content: '$public_notes',
@@ -275,7 +269,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'footer',
       label: t('footer'),
       icon: <PanelBottom className="w-5 h-5" />,
-      description: t('invoice_footer'),
       defaultSize: { w: 12, h: 2 },
       defaultProperties: {
         content: '$footer',
@@ -293,7 +286,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'terms',
       label: t('terms'),
       icon: <FileText className="w-5 h-5" />,
-      description: t('invoice_terms'),
       defaultSize: { w: 12, h: 3 },
       defaultProperties: {
         content: '$terms',
@@ -311,7 +303,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'image',
       label: t('image'),
       icon: <Image className="w-5 h-5" />,
-      description: t('upload'),
       defaultSize: { w: 3, h: 3 },
       defaultProperties: {
         source: '',
@@ -327,7 +318,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'table',
       label: t('products'),
       icon: <Table className="w-5 h-5" />,
-      description: t('product_line_items_with_columns'),
       defaultSize: { w: 12, h: 8 },
       defaultProperties: {
         columns: [
@@ -386,7 +376,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'tasks-table',
       label: t('tasks'),
       icon: <Clock className="w-5 h-5" />,
-      description: t('task_line_items_with_columns'),
       defaultSize: { w: 12, h: 8 },
       defaultProperties: {
         columns: [
@@ -445,7 +434,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'total',
       label: t('invoice_total'),
       icon: <DollarSign className="w-5 h-5" />,
-      description: t('subtotal'),
       defaultSize: { w: 6, h: 6 },
       defaultProperties: {
         items: [
@@ -490,7 +478,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'divider',
       label: t('divider_line'),
       icon: <Minus className="w-5 h-5" />,
-      description: t('divider_line'),
       defaultSize: { w: 12, h: 1 },
       defaultProperties: {
         thickness: '1px',
@@ -505,7 +492,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'spacer',
       label: t('spacer'),
       icon: <Space className="w-5 h-5" />,
-      description: t('spacer'),
       defaultSize: { w: 12, h: 2 },
       defaultProperties: {
         height: '40px',
@@ -516,7 +502,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'qrcode',
       label: t('qr_code'),
       icon: <QrCode className="w-5 h-5" />,
-      description: t('qr_code'),
       defaultSize: { w: 2, h: 2 },
       defaultProperties: {
         qrType: 'payment_link',
@@ -530,7 +515,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       type: 'signature',
       label: t('signature_line'),
       icon: <PenTool className="w-5 h-5" />,
-      description: t('signature_line'),
       defaultSize: { w: 4, h: 3 },
       defaultProperties: {
         label: t('authorized_signature'),
