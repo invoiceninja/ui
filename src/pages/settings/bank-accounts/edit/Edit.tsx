@@ -18,7 +18,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import Toggle from '$app/components/forms/Toggle';
@@ -26,12 +26,15 @@ import { useBankAccountQuery } from '$app/pages/settings/bank-accounts/common/qu
 import { Settings } from '$app/components/layouts/Settings';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useColorScheme } from '$app/common/colors';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { useActions } from '../common/hooks/useActions';
 
 export function Edit() {
   useTitle('edit_bank_account');
 
   const [t] = useTranslation();
 
+  const actions = useActions();
   const colors = useColorScheme();
 
   const navigate = useNavigate();
@@ -40,10 +43,8 @@ export function Edit() {
 
   const { data: response } = useBankAccountQuery({ id });
 
-  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-
   const [errors, setErrors] = useState<ValidationBag>();
-
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [accountDetails, setAccountDetails] = useState<BankAccount>();
 
   const pages = [
@@ -64,10 +65,8 @@ export function Edit() {
     );
   };
 
-  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSave = async () => {
     if (!isFormBusy) {
-      event.preventDefault();
-
       toast.processing();
       setErrors(undefined);
       setIsFormBusy(true);
@@ -105,8 +104,16 @@ export function Edit() {
       title={t('edit_bank_account')}
       breadcrumbs={pages}
       docsLink="en/basic-settings/#edit_bank_account"
-      onSaveClick={handleSave}
-      disableSaveButton={isFormBusy}
+      navigationTopRight={
+        accountDetails && (
+          <ResourceActions
+            resource={accountDetails}
+            onSaveClick={handleSave}
+            actions={actions}
+            disableSaveButton={!accountDetails || isFormBusy}
+          />
+        )
+      }
     >
       <Card
         onFormSubmit={handleSave}
