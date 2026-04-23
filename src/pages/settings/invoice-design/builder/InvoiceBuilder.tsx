@@ -899,8 +899,8 @@ export function InvoiceBuilder() {
                     group rounded-lg transition-all duration-200
                     ${
                       state.selectedBlockId === block.id
-                        ? 'ring-1 z-10 selected'
-                        : 'hover:ring-1'
+                        ? 'z-10 selected'
+                        : ''
                     }
                   `}
                   style={{
@@ -910,14 +910,6 @@ export function InvoiceBuilder() {
                         ? colors.$3
                         : colors.$24
                     }`,
-                    borderColor:
-                      state.selectedBlockId === block.id
-                        ? `${colors.$3}60`
-                        : `${colors.$24}60`,
-                    boxShadow:
-                      state.selectedBlockId === block.id
-                        ? `0 1px 3px ${colors.$24}40`
-                        : 'none',
                   }}
                   onClick={() => {
                     handleSelectBlock(block.id);
