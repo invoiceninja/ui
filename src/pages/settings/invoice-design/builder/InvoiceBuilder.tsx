@@ -48,6 +48,7 @@ import { useDesignQuery } from '$app/common/queries/designs';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import './InvoiceBuilder.css';
@@ -61,6 +62,22 @@ function extractBlocksFromDesign(design: Design): Block[] | null {
     return blocks as Block[];
   }
   return null;
+}
+
+interface PageDimensions {
+  width: string;
+  minHeight: string;
+  pixels: number;
+}
+
+function getPageDimensions(pageSize: string = 'A4'): PageDimensions {
+  switch (pageSize) {
+    case 'letter':
+      return { width: '215.9mm', minHeight: '279.4mm', pixels: 816 }; // 8.5 x 11 inches at 96dpi
+    case 'A4':
+    default:
+      return { width: '210mm', minHeight: '297mm', pixels: 794 }; // A4 at 96dpi
+  }
 }
 
 export function InvoiceBuilder() {
@@ -77,6 +94,9 @@ export function InvoiceBuilder() {
     id: designId,
     enabled: Boolean(designId),
   });
+
+  const company = useCurrentCompany();
+  const designSettings = company?.settings;
 
   const [state, setState] = useState<BuilderState>({
     blocks: [],
@@ -831,8 +851,10 @@ export function InvoiceBuilder() {
             <div
               className={`mx-auto bg-white shadow-2xl relative transition-all canvas-drop-target`}
               style={{
-                width: '210mm',
-                minHeight: '297mm',
+                width: getPageDimensions(designSettings?.page_size).width,
+                minHeight: getPageDimensions(designSettings?.page_size).minHeight,
+                fontSize: designSettings?.font_size ? `${designSettings.font_size}px` : '16px',
+                color: designSettings?.primary_color || '#000000',
                 transform: `scale(${state.zoom / 100})`,
                 transformOrigin: 'top center',
             }}
@@ -856,7 +878,7 @@ export function InvoiceBuilder() {
               onDropDragOver={handleDropDragOver}
               cols={12}
               rowHeight={60}
-              width={794} // 210mm in pixels at 96dpi
+              width={getPageDimensions(designSettings?.page_size).pixels}
               margin={[10, 16]} // [horizontal, vertical] - vertical is 1rem (16px)
               containerPadding={[30, 30]}
               draggableHandle=".drag-handle"
@@ -1045,6 +1067,7 @@ export function InvoiceBuilder() {
         <PreviewModal
           blocks={state.blocks}
           onClose={() => setShowPreview(false)}
+          designSettings={designSettings}
         />
       )}
 
