@@ -378,6 +378,10 @@ export function DataTable<T extends object>(props: Props<T>) {
     customFilters,
   });
 
+  const normalizeNumericCommas = (value: string): string => {
+    return value.replace(/(\d),(\d)/g, '$1.$2');
+  };
+
   useEffect(() => {
     const queryParam = buildDateRangeQueryParameter(dateRangeEntries);
 
@@ -428,7 +432,10 @@ export function DataTable<T extends object>(props: Props<T>) {
 
     apiEndpoint.searchParams.set('per_page', perPage);
     apiEndpoint.searchParams.set('page', currentPage.toString());
-    apiEndpoint.searchParams.set(filterParameterKey, filter);
+    apiEndpoint.searchParams.set(
+      filterParameterKey,
+      filter.length ? normalizeNumericCommas(filter) : filter
+    );
 
     handleChangingCustomFilters();
 
