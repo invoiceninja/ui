@@ -26,6 +26,14 @@ export function useUsersQuery() {
   );
 }
 
+export function useUsersForDocuNinjaQuery() {
+  return useQuery(
+    ['/api/v1/users/docuninja-eligible'],
+    () => request('GET', endpoint('/api/v1/users?hideOwnerUsers=true&showAccountUsers=true&status=active&sort=id|desc')),
+    { staleTime: Infinity }
+  );
+}
+
 interface UserQueryProps extends GenericQueryOptions {
   id: string;
 }
@@ -78,7 +86,7 @@ export function useBulk(params: Params) {
         action,
         ids,
       },
-      { headers: { 'X-Api-Password': password } }
+      { headers: { 'X-Api-Password': password }, skipIntercept: true }
     )
       .then(() => {
         toast.success(`${action}d_user`);

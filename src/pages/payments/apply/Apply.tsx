@@ -19,7 +19,7 @@ import { usePaymentQuery } from '$app/common/queries/payments';
 import { FormikProps, useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
@@ -34,12 +34,14 @@ import {
   useApplyInvoiceTableColumns,
 } from '../common/hooks/useApplyInvoiceTableColumns';
 import { PaymentOnCreation } from '..';
+import { v4 } from 'uuid';
 
 export default function Apply() {
   const [t] = useTranslation();
 
   const { id } = useParams();
   const colors = useColorScheme();
+  const [searchParams] = useSearchParams();
 
   const { data: payment } = usePaymentQuery({ id });
 
@@ -186,7 +188,7 @@ export default function Apply() {
 
                   selectedResources.forEach((resource: Invoice) => {
                     newInvoices.push({
-                      _id: window.crypto.randomUUID(),
+                      _id: v4(),
                       amount: calcApplyAmount(resource.balance, newInvoices),
                       credit_id: '',
                       invoice_id: resource.id,
@@ -202,6 +204,11 @@ export default function Apply() {
               withoutPagination
               withoutStatusFilter
               withoutAllBulkActions
+              preSelected={
+                searchParams.get('invoice_id')
+                  ? [searchParams.get('invoice_id') as string]
+                  : undefined
+              }
               emptyState={
                 <div className="flex items-center justify-center py-2">
                   <span className="text-sm" style={{ color: colors.$17 }}>

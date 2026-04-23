@@ -82,6 +82,7 @@ export function ProductCreate(props: Props) {
       onClose={props.setIsModalOpen}
       backgroundColor="gray"
       size="small"
+      overflowVisible
     >
       {product && (
         <ProductForm

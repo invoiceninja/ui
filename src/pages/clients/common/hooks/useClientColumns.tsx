@@ -20,11 +20,9 @@ import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
 import { Client } from '$app/common/interfaces/client';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { EntityStatus } from '$app/components/EntityStatus';
-import { Inline } from '$app/components/Inline';
 import { Tooltip } from '$app/components/Tooltip';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useCallback } from 'react';
-import { ExternalLink } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
@@ -415,10 +413,7 @@ export function useClientColumns() {
       label: t('website'),
       format: (value) => (
         <Link to={value.toString()} external>
-          <Inline>
-            <span>{value}</span>
-            {value.toString().length > 0 && <ExternalLink size={14} />}
-          </Inline>
+          {value}
         </Link>
       ),
     },

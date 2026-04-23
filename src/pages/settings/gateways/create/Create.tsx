@@ -40,6 +40,7 @@ import { route } from '$app/common/helpers/route';
 import { request } from '$app/common/helpers/request';
 import { arrayMoveImmutable } from 'array-move';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
+import { useHandleSquareOAuth } from '$app/pages/settings/gateways/create/hooks/useHandleSquareOAuth';
 import classNames from 'classnames';
 import { $help, HelpWidget } from '$app/components/HelpWidget';
 import { DuplicatingGatewayModal } from './components/DuplicatingGatewayModal';
@@ -167,6 +168,14 @@ export function Create() {
       return handleGoCardless();
     }
 
+    if (
+      gateway?.key === '65faab2ab6e3223dbe848b1686490baz' &&
+      isHosted() &&
+      !isDuplicating
+    ) {
+      return handleSquareOAuth();
+    }
+
     if (isManualChange && value && !isDuplicating) {
       setTabIndex(1);
     }
@@ -183,6 +192,10 @@ export function Create() {
 
     if (gateway?.key === 'b9886f9257f0c6ee7c302f1c74475f6c' && isHosted()) {
       return handleGoCardless();
+    }
+
+    if (gateway?.key === '65faab2ab6e3223dbe848b1686490baz' && isHosted()) {
+      return handleSquareOAuth();
     }
 
     if (gateway && !createBySetup) {
@@ -230,6 +243,7 @@ export function Create() {
   };
 
   const handleGoCardless = useHandleGoCardless();
+  const handleSquareOAuth = useHandleSquareOAuth();
 
   const getGatewayNameByKey = (key: string) => {
     const gateway = gatewaysDetails.find((gateway) => gateway.key === key);
@@ -355,7 +369,7 @@ export function Create() {
     >
       <HelpWidget
         id="gateways"
-        url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/source/en/gateways.md"
+        url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/docs/user-guide/gateways.mdx"
       />
 
       <DuplicatingGatewayModal

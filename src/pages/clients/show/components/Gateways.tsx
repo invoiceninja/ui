@@ -14,7 +14,7 @@ import { MdChevronRight, MdDelete, MdLaunch, MdPayment } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 import { GatewayLogoName, GatewayTypeIcon } from './GatewayTypeIcon';
 import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Button, Link } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
@@ -31,6 +31,8 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { ChevronDown } from '$app/components/icons/ChevronDown';
 import { InfoCard } from '$app/components/InfoCard';
 import { Modal } from '$app/components/Modal';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 interface Props {
   client: Client;
@@ -49,6 +51,9 @@ export function Gateways(props: Props) {
 
   const { isAdmin } = useAdmin();
   const colors = useColorScheme();
+  const currentCompany = useCurrentCompany();
+
+  const getSetting = useGetSetting({ withoutCompanySettingsFallback: true });
 
   const { data: companyGatewaysResponse } = useCompanyGatewaysQuery();
 
@@ -102,6 +107,23 @@ export function Gateways(props: Props) {
     });
   };
 
+  const currentCompanyGatewayIds = useMemo(() => {
+    if (!Object.keys(currentCompany?.settings || {}).length) {
+      return null;
+    }
+
+    const currentStoredCompanyGatewayIds = getSetting(
+      client,
+      'company_gateway_ids'
+    );
+
+    if (!currentStoredCompanyGatewayIds) {
+      return null;
+    }
+
+    return currentStoredCompanyGatewayIds.split(',') as string[];
+  }, [client, currentCompany, getSetting]);
+
   useEffect(() => {
     if (companyGatewaysResponse) {
       setCompanyGateways(companyGatewaysResponse.data.data);
@@ -142,187 +164,199 @@ export function Gateways(props: Props) {
         withoutPadding
       >
         <div className="flex flex-col h-44 overflow-y-auto text-sm">
-          {client.gateway_tokens.map((token) => (
-            <div
-              key={token.id}
-              className={classNames(
-                'flex flex-col space-y-1.5 border-b border-dashed py-4',
-                {
-                  'h-22': !token.is_default,
-                  'h-20': token.is_default,
-                }
-              )}
-              style={{ borderColor: colors.$24 }}
-            >
-              <div className="flex items-center justify-between h-12">
-                <div className="flex flex-col space-y-1.5">
-                  <div className="inline-flex items-center space-x-1">
-                    <div>
-                      <MdPayment fontSize={22} />
-                    </div>
-                    <div className="inline-flex items-center">
-                      <span>{t('gateway')}</span>
-                      <MdChevronRight size={20} />
+          {client.gateway_tokens
+            .filter((token) =>
+              currentCompanyGatewayIds
+                ? currentCompanyGatewayIds.some(
+                    (companyGatewayId) =>
+                      companyGatewayId === token.company_gateway_id
+                  )
+                : true
+            )
+            .map((token) => (
+              <div
+                key={token.id}
+                className={classNames(
+                  'flex flex-col space-y-1.5 border-b border-dashed py-4',
+                  {
+                    'h-22': !token.is_default,
+                    'h-20': token.is_default,
+                  }
+                )}
+                style={{ borderColor: colors.$24 }}
+              >
+                <div className="flex items-center justify-between h-12">
+                  <div className="flex flex-col space-y-1.5">
+                    <div className="inline-flex items-center space-x-1">
+                      <div>
+                        <MdPayment fontSize={22} />
+                      </div>
+                      <div className="inline-flex items-center">
+                        <span>{t('gateway')}</span>
+                        <MdChevronRight size={20} />
 
-                      <Link
-                        to={route('/settings/gateways/:id/edit', {
-                          id: token.company_gateway_id,
-                        })}
-                      >
-                        {getCompanyGateway(token.company_gateway_id)?.label}
-                      </Link>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <GatewayTypeIcon
-                      name={token.meta.brand as GatewayLogoName}
-                    />
-
-                    <div
-                      className="flex items-center"
-                      style={{ color: colors.$17 }}
-                    >
-                      <span className="mt-1">****</span>
-                      <span className="ml-1">{token.meta.last4}</span>
+                        <Link
+                          to={route('/settings/gateways/:id/edit', {
+                            id: token.company_gateway_id,
+                          })}
+                        >
+                          {getCompanyGateway(token.company_gateway_id)?.label}
+                        </Link>
+                      </div>
                     </div>
 
-                    <span style={{ color: colors.$17 }}>
-                      {token.meta.exp_month}/{token.meta.exp_year}
-                    </span>
-                  </div>
-                </div>
+                    <div className="flex items-center space-x-2">
+                      <GatewayTypeIcon
+                        name={token.meta.brand as GatewayLogoName}
+                      />
 
-                <div
-                  className={classNames('flex flex-col items-end h-full', {
-                    'justify-center':
-                      !isStripeGateway(
-                        getCompanyGateway(token.company_gateway_id)?.gateway_key
-                      ) && token.is_default,
-                    'justify-between':
-                      isStripeGateway(
-                        getCompanyGateway(token.company_gateway_id)?.gateway_key
-                      ) &&
-                      (token.is_default || !token.is_default),
-                    'justify-end':
-                      !token.is_default &&
-                      !isStripeGateway(
-                        getCompanyGateway(token.company_gateway_id)?.gateway_key
-                      ),
-                  })}
-                >
-                  {isStripeGateway(
-                    getCompanyGateway(token.company_gateway_id)?.gateway_key
-                  ) && (
-                    <Link
-                      external
-                      to={route(
-                        'https://dashboard.stripe.com/customers/:customerReference',
-                        {
-                          customerReference: token.gateway_customer_reference,
-                        }
-                      )}
-                      withoutExternalIcon
-                    >
-                      <Icon element={MdLaunch} size={18} />
-                    </Link>
-                  )}
-
-                  {token.is_default ? (
-                    <div
-                      className="inline-flex items-center text-xs"
-                      style={{ height: '1.5rem' }}
-                    >
                       <div
-                        className="flex items-center border pr-2 pl-3 rounded-l-full h-full"
-                        style={{
-                          borderColor: colors.$5,
-                          backgroundColor: colors.$5,
-                        }}
+                        className="flex items-center"
+                        style={{ color: colors.$17 }}
                       >
-                        {t('default')}
+                        <span className="mt-1">****</span>
+                        <span className="ml-1">{token.meta.last4}</span>
                       </div>
 
-                      {isAdmin && (
-                        <Dropdown
-                          className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
-                          customLabel={
-                            <Div
-                              className="cursor-pointer pl-1 pr-2 border border-l-0 rounded-r-full h-full"
-                              style={{
-                                borderColor: colors.$5,
-                                paddingTop: '0.24rem',
-                                paddingBottom: '0.24rem',
-                              }}
-                              theme={{ hoverBgColor: colors.$4 }}
-                            >
-                              <ChevronDown size="0.9rem" color={colors.$3} />
-                            </Div>
-                          }
-                          minWidth="9rem"
-                          maxWidth="11rem"
-                        >
-                          <DropdownElement
-                            icon={<Icon element={MdDelete} />}
-                            onClick={() => setDeleteGatewayTokenId(token.id)}
-                          >
-                            {t('delete')}
-                          </DropdownElement>
-                        </Dropdown>
-                      )}
+                      <span style={{ color: colors.$17 }}>
+                        {token.meta.exp_month}/{token.meta.exp_year}
+                      </span>
                     </div>
-                  ) : (
-                    <div
-                      className="inline-flex items-center text-xs cursor-pointer self-end"
-                      style={{ height: '1.5rem' }}
-                    >
-                      <Div
-                        className="flex items-center border pr-2 pl-3 rounded-l-full h-full"
-                        onClick={() => handleSetDefault(token.id)}
-                        style={{
-                          borderColor: colors.$5,
-                        }}
-                        theme={{ hoverBgColor: colors.$5 }}
-                      >
-                        {t('save_as_default')}
-                      </Div>
+                  </div>
 
-                      {isAdmin && (
-                        <Dropdown
-                          className="rounded-bl-none rounded-tl-none h-full px-1 border-l-1 border-y-0 border-r-0"
-                          customLabel={
-                            <Div
-                              className="cursor-pointer pl-1 pr-2 border border-l-0 rounded-r-full h-full"
-                              style={{
-                                borderColor: colors.$5,
-                                paddingTop: '0.26rem',
-                                paddingBottom: '0.26rem',
-                              }}
-                              theme={{ hoverBgColor: colors.$4 }}
-                            >
-                              <ChevronDown size="0.9rem" color={colors.$3} />
-                            </Div>
+                  <div
+                    className={classNames('flex flex-col items-end h-full', {
+                      'justify-center':
+                        !isStripeGateway(
+                          getCompanyGateway(token.company_gateway_id)
+                            ?.gateway_key
+                        ) && token.is_default,
+                      'justify-between':
+                        isStripeGateway(
+                          getCompanyGateway(token.company_gateway_id)
+                            ?.gateway_key
+                        ) &&
+                        (token.is_default || !token.is_default),
+                      'justify-end':
+                        !token.is_default &&
+                        !isStripeGateway(
+                          getCompanyGateway(token.company_gateway_id)
+                            ?.gateway_key
+                        ),
+                    })}
+                  >
+                    {isStripeGateway(
+                      getCompanyGateway(token.company_gateway_id)?.gateway_key
+                    ) && (
+                      <Link
+                        external
+                        to={route(
+                          'https://dashboard.stripe.com/customers/:customerReference',
+                          {
+                            customerReference: token.gateway_customer_reference,
                           }
-                          minWidth="10rem"
-                          maxWidth="12rem"
+                        )}
+                        withoutExternalIcon
+                      >
+                        <Icon element={MdLaunch} size={18} />
+                      </Link>
+                    )}
+
+                    {token.is_default ? (
+                      <div
+                        className="inline-flex items-center text-xs"
+                        style={{ height: '1.5rem' }}
+                      >
+                        <div
+                          className="flex items-center border pr-2 pl-3 rounded-l-full h-full"
+                          style={{
+                            borderColor: colors.$5,
+                            backgroundColor: colors.$5,
+                          }}
+                        >
+                          {t('default')}
+                        </div>
+
+                        {isAdmin && (
+                          <Dropdown
+                            className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
+                            customLabel={
+                              <Div
+                                className="cursor-pointer pl-1 pr-2 border border-l-0 rounded-r-full h-full"
+                                style={{
+                                  borderColor: colors.$5,
+                                  paddingTop: '0.24rem',
+                                  paddingBottom: '0.24rem',
+                                }}
+                                theme={{ hoverBgColor: colors.$4 }}
+                              >
+                                <ChevronDown size="0.9rem" color={colors.$3} />
+                              </Div>
+                            }
+                            minWidth="9rem"
+                            maxWidth="11rem"
+                          >
+                            <DropdownElement
+                              icon={<Icon element={MdDelete} />}
+                              onClick={() => setDeleteGatewayTokenId(token.id)}
+                            >
+                              {t('delete')}
+                            </DropdownElement>
+                          </Dropdown>
+                        )}
+                      </div>
+                    ) : (
+                      <div
+                        className="inline-flex items-center text-xs cursor-pointer self-end"
+                        style={{ height: '1.5rem' }}
+                      >
+                        <Div
+                          className="flex items-center border pr-2 pl-3 rounded-l-full h-full"
+                          onClick={() => handleSetDefault(token.id)}
                           style={{
                             borderColor: colors.$5,
                           }}
+                          theme={{ hoverBgColor: colors.$5 }}
                         >
-                          <DropdownElement
-                            icon={<Icon element={MdDelete} />}
-                            onClick={() => setDeleteGatewayTokenId(token.id)}
+                          {t('save_as_default')}
+                        </Div>
+
+                        {isAdmin && (
+                          <Dropdown
+                            className="rounded-bl-none rounded-tl-none h-full px-1 border-l-1 border-y-0 border-r-0"
+                            customLabel={
+                              <Div
+                                className="cursor-pointer pl-1 pr-2 border border-l-0 rounded-r-full h-full"
+                                style={{
+                                  borderColor: colors.$5,
+                                  paddingTop: '0.26rem',
+                                  paddingBottom: '0.26rem',
+                                }}
+                                theme={{ hoverBgColor: colors.$4 }}
+                              >
+                                <ChevronDown size="0.9rem" color={colors.$3} />
+                              </Div>
+                            }
+                            minWidth="10rem"
+                            maxWidth="12rem"
+                            style={{
+                              borderColor: colors.$5,
+                            }}
                           >
-                            {t('delete')}
-                          </DropdownElement>
-                        </Dropdown>
-                      )}
-                    </div>
-                  )}
+                            <DropdownElement
+                              icon={<Icon element={MdDelete} />}
+                              onClick={() => setDeleteGatewayTokenId(token.id)}
+                            >
+                              {t('delete')}
+                            </DropdownElement>
+                          </Dropdown>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       </InfoCard>
     </>

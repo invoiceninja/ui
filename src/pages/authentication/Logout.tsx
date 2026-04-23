@@ -31,8 +31,8 @@ export function Logout() {
     clearLocalStorage();
     sessionStorage.clear();
 
-    queryClient.invalidateQueries();
-    queryClient.removeQueries();
+    // queryClient.invalidateQueries();
+    // queryClient.removeQueries();
 
     window.location.href = '/';
   }, []);

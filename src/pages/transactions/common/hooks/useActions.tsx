@@ -77,7 +77,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (transaction) =>
-      transaction.payment_id && (
+      (transaction.payment_id || transaction.expense_id) && (
         <DropdownElement
           onClick={() => bulk([transaction.id], 'unlink')}
           icon={<Icon element={MdLinkOff} />}
@@ -85,10 +85,10 @@ export function useActions() {
           {t('unlink')}
         </DropdownElement>
       ),
-
     (transaction) =>
       Boolean(
         (transaction.payment_id ||
+          transaction.expense_id ||
           transaction.base_type === ApiTransactionType.Credit) &&
           isEditPage
       ) && <Divider withoutPadding />,

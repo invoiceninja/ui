@@ -97,6 +97,7 @@ import { EntityActionElement } from '$app/components/EntityActionElement';
 import classNames from 'classnames';
 import { Dispatch, SetStateAction } from 'react';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -117,6 +118,7 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
   const handleChange: ChangeHandler = (property, value) => {
     setCredit((current) => current && { ...current, [property]: value });
   };
+
 
   const handleInvitationChange = (id: string, checked: boolean) => {
     let invitations = [...credit!.invitations];
@@ -182,6 +184,9 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     );
   };
 
+
+
+
   const handleDeleteLineItem = (index: number) => {
     const lineItems = credit?.line_items || [];
 
@@ -206,6 +211,45 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     }
   };
 
+
+
+  const handleContactCanSignChange = (id: string, checked: boolean) => {
+    const clientContacts = credit?.client?.contacts || props.client?.contacts;
+
+    if(!clientContacts) return;
+
+    // Find the contact by id
+    const contact = clientContacts.find(c => c.id === id);
+    if (!contact) return;
+
+    // Check if contact is invited - if not, don't allow can_sign changes
+    const isInvited = credit?.invitations?.some(inv => inv.client_contact_id === contact.id) || false;
+    if (!isInvited) return;
+
+    // Update the invitations array with the can_sign property
+    const invitations = [...(credit?.invitations || [])];
+    
+    // Find existing invitation for this contact
+    const existingInvitationIndex = invitations.findIndex(inv => inv.client_contact_id === contact.id);
+    
+    if (existingInvitationIndex >= 0) {
+      // Update existing invitation
+      invitations[existingInvitationIndex] = {
+        ...invitations[existingInvitationIndex],
+        can_sign: checked
+      };
+    }
+
+    // Update the credit with the modified invitations
+    setCredit((current) => 
+      current && {
+        ...current,
+        invitations: invitations,
+      }
+    );
+  };
+  
+
   return {
     handleChange,
     handleInvitationChange,
@@ -214,6 +258,7 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     handleCreateLineItem,
     handleDeleteLineItem,
     calculateInvoiceSum,
+    handleContactCanSignChange,
   };
 }
 
@@ -360,6 +405,9 @@ export function useActions(params?: Params) {
   const hasPermission = useHasPermission();
 
   const { dropdown = true } = params || {};
+
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
@@ -577,28 +625,29 @@ export function useActions(params?: Params) {
           {t('mark_paid')}
         </EntityActionElement>
       ),
-    (credit) => (
-      <EntityActionElement
-        {...(!dropdown && {
-          key: 'run_template',
-        })}
-        entity="credit"
-        actionKey="run_template"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('run_template')}
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources([credit]);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/credits/bulk',
-            entity: 'credit',
-          });
-        }}
-        icon={MdDesignServices}
-      >
-        {t('run_template')}
-      </EntityActionElement>
-    ),
+    (credit) =>
+      shouldBeRunTemplateActionVisible && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'run_template',
+          })}
+          entity="credit"
+          actionKey="run_template"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('run_template')}
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources([credit]);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/credits/bulk',
+              entity: 'credit',
+            });
+          }}
+          icon={MdDesignServices}
+        >
+          {t('run_template')}
+        </EntityActionElement>
+      ),
     () => <Divider withoutPadding />,
     (credit) => (
       <CloneOptionsModal
@@ -778,6 +827,7 @@ export function useCreditColumns() {
       column: 'client',
       id: 'client_id',
       label: t('client'),
+      sortKey: 'client.name',
       format: (_, credit) => (
         <DynamicLink
           to={route('/clients/:id', { id: credit.client_id })}
@@ -825,12 +875,14 @@ export function useCreditColumns() {
       column: 'client_city',
       id: 'client_id',
       label: t('client_city'),
+      sortKey: 'client.city',
       format: (value, credit) => credit.client?.city,
     },
     {
       column: 'client_country',
       id: 'client_id',
       label: t('client_country'),
+      sortKey: 'client.country_id',
       format: (value, credit) =>
         credit.client?.country_id &&
         resolveCountry(credit.client?.country_id)?.name,
@@ -839,18 +891,21 @@ export function useCreditColumns() {
       column: 'client_postal_code',
       id: 'client_id',
       label: t('client_postal_code'),
+      sortKey: 'client.postal_code',
       format: (value, credit) => credit.client?.postal_code,
     },
     {
       column: 'client_state',
       id: 'client_id',
       label: t('client_state'),
+      sortKey: 'client.state',
       format: (value, credit) => credit.client?.state,
     },
     {
       column: 'contact_email',
       id: 'client_id',
       label: t('contact_email'),
+      sortKey: 'contact.email',
       format: (value, credit) =>
         credit.client &&
         credit.client.contacts.length > 0 && (
@@ -861,6 +916,7 @@ export function useCreditColumns() {
       column: 'contact_name',
       id: 'client_id',
       label: t('contact_name'),
+      sortKey: 'contact.first_name',
       format: (value, credit) =>
         credit.client &&
         credit.client.contacts.length > 0 &&

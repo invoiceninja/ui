@@ -23,6 +23,7 @@ export interface Vendor {
   address2: string;
   phone: string;
   city: string;
+  vendor_hash: string;
   state: string;
   postal_code: string;
   country_id: string;

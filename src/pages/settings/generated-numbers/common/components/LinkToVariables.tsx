@@ -17,7 +17,7 @@ export function LinkToVariables() {
   return (
     <Link
       className="pl-4 sm:pl-6"
-      to="https://invoiceninja.github.io/en/custom-fields/#custom-fields"
+      to="https://invoiceninja.github.io/docs/advanced-topics/custom-fields#custom-fields"
       external
     >
       {t('click_to_variables')}

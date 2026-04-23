@@ -20,6 +20,7 @@ import { Tab } from '$app/components/Tabs';
 import { ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import { useUnappliedPayments } from '../../edit/hooks/useUnappliedPayments';
 
 interface Params {
   invoice: Invoice | undefined;
@@ -33,10 +34,11 @@ export function useTabs(params: Params) {
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const verifactuEnabled = useCompanyVerifactu();
-  
-  const { id } = useParams();
 
+  const { id } = useParams();
   const { invoice, eInvoiceValidationResponse } = params;
+
+  const { payments } = useUnappliedPayments({ clientId: invoice?.client_id });
 
   const canEditAndView =
     hasPermission('view_invoice') ||
@@ -51,7 +53,9 @@ export function useTabs(params: Params) {
     {
       name: t('e_invoice'),
       href: route('/invoices/:id/e_invoice', { id }),
-      enabled: company?.settings.enable_e_invoice === true || company?.settings.e_invoice_type === 'PEPPOL',
+      enabled:
+        company?.settings.enable_e_invoice === true ||
+        company?.settings.e_invoice_type === 'PEPPOL',
       formatName: () => (
         <div className="flex space-x-1">
           <span>{t('e_invoice')}</span>
@@ -82,17 +86,17 @@ export function useTabs(params: Params) {
 
           {Boolean(
             eInvoiceValidationResponse?.client.length ||
-            eInvoiceValidationResponse?.company.length ||
-            eInvoiceValidationResponse?.invoice.length
+              eInvoiceValidationResponse?.company.length ||
+              eInvoiceValidationResponse?.invoice.length
           ) && (
-              <span className="font-bold">
-                (
-                {(eInvoiceValidationResponse?.client.length || 0) +
-                  (eInvoiceValidationResponse?.company.length || 0) +
-                  (eInvoiceValidationResponse?.invoice.length || 0)}
-                )
-              </span>
-            )}
+            <span className="font-bold">
+              (
+              {(eInvoiceValidationResponse?.client.length || 0) +
+                (eInvoiceValidationResponse?.company.length || 0) +
+                (eInvoiceValidationResponse?.invoice.length || 0)}
+              )
+            </span>
+          )}
         </div>
       ),
     },
@@ -123,12 +127,26 @@ export function useTabs(params: Params) {
     {
       name: t('payments'),
       href: route('/invoices/:id/payments', { id }),
-      enabled: invoice?.status_id === InvoiceStatus.Paid || invoice?.status_id === InvoiceStatus.Partial,
+      enabled:
+        invoice?.status_id === InvoiceStatus.Paid ||
+        invoice?.status_id === InvoiceStatus.Partial,
     },
     {
       name: t('payment_schedule'),
       href: route('/invoices/:id/payment_schedule', { id }),
-      enabled: invoice?.status_id === InvoiceStatus.Draft || invoice?.status_id === InvoiceStatus.Sent || invoice?.status_id === InvoiceStatus.Partial && canEditAndView,
+      enabled:
+        invoice?.status_id === InvoiceStatus.Draft ||
+        invoice?.status_id === InvoiceStatus.Sent ||
+        (invoice?.status_id === InvoiceStatus.Partial && canEditAndView),
+    },
+    {
+      name: t('unapplied_payments'),
+      href: route('/invoices/:id/unapplied_payments', { id }),
+      enabled:
+        payments?.length > 0 &&
+        invoice?.status_id === InvoiceStatus.Sent &&
+        canEditAndView &&
+        hasPermission('edit_payment'),
     },
   ];
 

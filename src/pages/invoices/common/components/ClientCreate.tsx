@@ -30,10 +30,11 @@ import { LanguageSelector } from '$app/components/LanguageSelector';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { GroupSettingsSelector } from '$app/components/GroupSettingsSelector';
 
 interface Props {
   isModalOpen: boolean;
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsModalOpen: (open: boolean) => void;
   onClientCreated?: (client: Client) => unknown;
 }
 
@@ -192,6 +193,13 @@ export function ClientCreate({
                 value={client?.name || ''}
                 onValueChange={(value) => handleChange('name', value)}
                 errorMessage={errors?.errors.name || errors?.errors.id}
+              />
+
+              <InputField
+                label={t('vat_number')}
+                value={client?.vat_number || ''}
+                onValueChange={(value) => handleChange('vat_number', value)}
+                errorMessage={errors?.errors.vat_number}
               />
 
               <InputField
@@ -429,6 +437,15 @@ export function ClientCreate({
                 <option value="enabled">{t('enabled')}</option>
                 <option value="disabled">{t('disabled')}</option>
               </SelectField>
+
+              <GroupSettingsSelector
+                label={t('group')}
+                value={client?.group_settings_id || ''}
+                onValueChange={(value) =>
+                  handleChange('group_settings_id', value)
+                }
+                errorMessage={errors?.errors.group_settings_id}
+              />
             </div>
           </TabGroup>
         ) : (

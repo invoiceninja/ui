@@ -74,6 +74,7 @@ import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivi
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { Dispatch, SetStateAction } from 'react';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -450,6 +451,9 @@ export function useActions(params: ActionsParams = {}) {
     entity: 'purchase_order',
   });
 
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
+
   const bulk = useBulk();
   const navigate = useNavigate();
   const markSent = useMarkSent();
@@ -687,28 +691,29 @@ export function useActions(params: ActionsParams = {}) {
         dropdown={dropdown}
       />
     ),
-    (purchaseOrder) => (
-      <EntityActionElement
-        {...(!dropdown && {
-          key: 'run_template',
-        })}
-        entity="purchase_order"
-        actionKey="run_template"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('run_template')}
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources([purchaseOrder]);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/purchase_orders/bulk',
-            entity: 'purchase_order',
-          });
-        }}
-        icon={MdDesignServices}
-      >
-        {t('run_template')}
-      </EntityActionElement>
-    ),
+    (purchaseOrder) =>
+      shouldBeRunTemplateActionVisible && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'run_template',
+          })}
+          entity="purchase_order"
+          actionKey="run_template"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('run_template')}
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources([purchaseOrder]);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/purchase_orders/bulk',
+              entity: 'purchase_order',
+            });
+          }}
+          icon={MdDesignServices}
+        >
+          {t('run_template')}
+        </EntityActionElement>
+      ),
     () => isEditPage && <Divider withoutPadding />,
     (purchaseOrder) =>
       Boolean(!purchaseOrder.archived_at) &&

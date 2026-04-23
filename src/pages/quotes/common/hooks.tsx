@@ -102,6 +102,7 @@ import { EntityActionElement } from '$app/components/EntityActionElement';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { ConvertOptionsModal } from './components/ConvertOptionsModal';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -131,6 +132,7 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
       -1;
 
     if (potential !== -1 && checked === false) {
+      // When unchecking invitation, also remove can_sign property
       invitations = invitations.filter((i) => i.client_contact_id !== id);
     }
 
@@ -143,6 +145,42 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
     }
 
     handleChange('invitations', invitations);
+  };
+
+  const handleContactCanSignChange = (id: string, checked: boolean) => {
+    const clientContacts = quote?.client?.contacts || props.client?.contacts;
+
+    if(!clientContacts) return;
+
+    // Find the contact by id
+    const contact = clientContacts.find(c => c.id === id);
+    if (!contact) return;
+
+    // Check if contact is invited - if not, don't allow can_sign changes
+    const isInvited = quote?.invitations?.some(inv => inv.client_contact_id === contact.id) || false;
+    if (!isInvited) return;
+
+    // Update the invitations array with the can_sign property
+    const invitations = [...(quote?.invitations || [])];
+    
+    // Find existing invitation for this contact
+    const existingInvitationIndex = invitations.findIndex(inv => inv.client_contact_id === contact.id);
+    
+    if (existingInvitationIndex >= 0) {
+      // Update existing invitation
+      invitations[existingInvitationIndex] = {
+        ...invitations[existingInvitationIndex],
+        can_sign: checked
+      };
+    }
+
+    // Update the quote with the modified invitations
+    setQuote((current) => 
+      current && {
+        ...current,
+        invitations: invitations,
+      }
+    );
   };
 
   const handleLineItemChange = (index: number, lineItem: InvoiceItem) => {
@@ -163,7 +201,7 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
     if (lineItems[index][key] === value) {
       return;
     }
-
+    
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     lineItems[index][key] = value;
@@ -211,6 +249,7 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
   return {
     handleChange,
     handleInvitationChange,
+    handleContactCanSignChange,
     handleLineItemChange,
     handleLineItemPropertyChange,
     handleCreateLineItem,
@@ -378,6 +417,9 @@ export function useActions(params?: Params) {
     dropdown = true,
   } = params || {};
 
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
+
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
   const { isEditPage } = useEntityPageIdentifier({
@@ -418,6 +460,21 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
+    (quote) => (
+      <EntityActionElement
+        {...(!dropdown && {
+          key: 'email_quote',
+        })}
+        entity="quote"
+        actionKey="email_quote"
+        isCommonActionSection={!dropdown}
+        tooltipText={t('email_quote')}
+        to={route('/quotes/:id/email', { id: quote.id })}
+        icon={MdSend}
+      >
+        {t('email_quote')}
+      </EntityActionElement>
+    ),
     (quote) => (
       <EntityActionElement
         {...(!dropdown && {
@@ -526,21 +583,6 @@ export function useActions(params?: Params) {
     (quote) => (
       <EntityActionElement
         {...(!dropdown && {
-          key: 'email_quote',
-        })}
-        entity="quote"
-        actionKey="email_quote"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('email_quote')}
-        to={route('/quotes/:id/email', { id: quote.id })}
-        icon={MdSend}
-      >
-        {t('email_quote')}
-      </EntityActionElement>
-    ),
-    (quote) => (
-      <EntityActionElement
-        {...(!dropdown && {
           key: 'client_portal',
         })}
         entity="quote"
@@ -598,28 +640,29 @@ export function useActions(params?: Params) {
         quote={quote}
       />
     ),
-    (quote) => (
-      <EntityActionElement
-        {...(!dropdown && {
-          key: 'run_template',
-        })}
-        entity="quote"
-        actionKey="run_template"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('run_template')}
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources([quote]);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/quotes/bulk',
-            entity: 'quote',
-          });
-        }}
-        icon={MdDesignServices}
-      >
-        {t('run_template')}
-      </EntityActionElement>
-    ),
+    (quote) =>
+      shouldBeRunTemplateActionVisible && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'run_template',
+          })}
+          entity="quote"
+          actionKey="run_template"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('run_template')}
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources([quote]);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/quotes/bulk',
+              entity: 'quote',
+            });
+          }}
+          icon={MdDesignServices}
+        >
+          {t('run_template')}
+        </EntityActionElement>
+      ),
     () => <Divider withoutPadding />,
     (quote) => (
       <CloneOptionsModal
@@ -846,6 +889,7 @@ export function useQuoteColumns() {
       column: 'client',
       id: 'client_id',
       label: t('client'),
+      sortKey: 'client.name',
       format: (_, quote) => (
         <DynamicLink
           to={route('/clients/:id', { id: quote.client_id })}
@@ -899,12 +943,14 @@ export function useQuoteColumns() {
       column: 'client_city',
       id: 'client_id',
       label: t('client_city'),
+      sortKey: 'client.city',
       format: (value, quote) => quote.client?.city,
     },
     {
       column: 'client_country',
       id: 'client_id',
       label: t('client_country'),
+      sortKey: 'client.country_id',
       format: (value, quote) =>
         quote.client?.country_id &&
         resolveCountry(quote.client?.country_id)?.name,
@@ -913,18 +959,21 @@ export function useQuoteColumns() {
       column: 'client_postal_code',
       id: 'client_id',
       label: t('client_postal_code'),
+      sortKey: 'client.postal_code',
       format: (value, quote) => quote.client?.postal_code,
     },
     {
       column: 'client_state',
       id: 'client_id',
       label: t('client_state'),
+      sortKey: 'client.state',
       format: (value, quote) => quote.client?.state,
     },
     {
       column: 'contact_email',
       id: 'client_id',
       label: t('contact_email'),
+      sortKey: 'contact.email',
       format: (value, quote) =>
         quote.client &&
         quote.client.contacts.length > 0 && (
@@ -935,6 +984,7 @@ export function useQuoteColumns() {
       column: 'contact_name',
       id: 'client_id',
       label: t('contact_name'),
+      sortKey: 'contact.first_name',
       format: (value, quote) =>
         quote.client &&
         quote.client.contacts.length > 0 &&

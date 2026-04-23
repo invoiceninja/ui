@@ -51,6 +51,10 @@ export function Link(props: Props) {
       : `https://${props.to}`;
   };
 
+  if (!props.to) {
+    return null;
+  }
+
   if (props.external) {
     return (
       <div

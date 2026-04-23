@@ -20,6 +20,7 @@ import {
 } from '$app/common/stores/slices/company-users';
 import { authenticate } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
+import { useQueryClient } from 'react-query';
 import { ReactNode } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -47,6 +48,7 @@ export function SignInProviderButton(props: SignInProviderButtonProps) {
 
 export function SignInProviders() {
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   const login = (response: AxiosResponse) => {
     localStorage.removeItem('X-CURRENT-INDEX');
@@ -72,6 +74,9 @@ export function SignInProviders() {
     dispatch(updateCompanyUsers(response.data.data));
     dispatch(resetChanges('company'));
     dispatch(changeCurrentIndex(currentIndex));
+
+    // Trigger DocuNinja data fetch after successful login
+    queryClient.invalidateQueries(['/api/docuninja/login']);
   };
 
   const handleGoogle = (token: string) => {

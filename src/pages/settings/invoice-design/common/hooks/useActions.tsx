@@ -32,6 +32,8 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { route } from '$app/common/helpers/route';
 import { useState } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useSetAtom } from 'jotai';
+import { designPreviewPropertiesAtom } from '../../pages/custom-designs/pages/edit/components/Settings';
 
 interface Params {
   withoutExportAction?: boolean;
@@ -49,6 +51,8 @@ export function useActions({ withoutExportAction = false }: Params = {}) {
   const exportInvoiceDesign = useExportInvoiceDesign();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+
+  const designPreviewProperties = useSetAtom(designPreviewPropertiesAtom);
 
   const cloneToInvoiceDesign = (invoiceDesign: Design) => {
     if (!isFormBusy) {
@@ -126,7 +130,15 @@ export function useActions({ withoutExportAction = false }: Params = {}) {
             getEntityState(invoiceDesign) === EntityState.Archived)
       ) && (
         <DropdownElement
-          onClick={() => bulk([invoiceDesign.id], 'delete')}
+          onClick={() =>
+            bulk([invoiceDesign.id], 'delete').then(() => {
+              designPreviewProperties((current) =>
+                current.filter(
+                  (property) => property.design_id !== invoiceDesign.id
+                )
+              );
+            })
+          }
           icon={<Icon element={MdDelete} />}
           disabled={isFormBusy}
         >

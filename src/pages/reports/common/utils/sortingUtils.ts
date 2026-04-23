@@ -51,23 +51,23 @@ function naturalCompare(a: string, b: string): number {
   return 0;
 }
 
-function extractDisplayValue(cell: Cell): string | number {
+export function extractDisplayValue(cell: Cell): string | number {
   const { display_value } = cell;
-  
+
   if (typeof display_value === 'number') {
     return display_value;
   }
-  
+
   if (typeof display_value === 'string') {
     return display_value;
   }
-  
+
   if (typeof display_value === 'object' && display_value !== null) {
     if ('props' in display_value && display_value.props?.children) {
       return String(display_value.props.children);
     }
   }
-  
+
   return String(display_value);
 }
 

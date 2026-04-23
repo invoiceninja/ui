@@ -63,6 +63,8 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 import { useMarkPaid } from '../hooks/useMarkPaid';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { useShouldDisplayClientGatewaysAndAutoBill } from '$app/pages/clients/show/hooks/useShouldDisplayClientGatewaysAndAutoBill';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -93,6 +95,11 @@ export function useActions(params?: Params) {
   const company = useCurrentCompany();
   const { isAdmin, isOwner } = useAdmin();
   const verifactuEnabled = useCompanyVerifactu();
+  const shouldDisplayClientGatewaysAndAutoBill =
+    useShouldDisplayClientGatewaysAndAutoBill();
+
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'invoice',
@@ -333,7 +340,8 @@ export function useActions(params?: Params) {
         </EntityActionElement>
       ),
     (invoice: Invoice) =>
-      isInvoiceAutoBillable(invoice) && (
+      isInvoiceAutoBillable(invoice) &&
+      shouldDisplayClientGatewaysAndAutoBill(invoice?.client) && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'auto_bill',
@@ -425,28 +433,29 @@ export function useActions(params?: Params) {
           {t('schedule')}
         </EntityActionElement>
       ),
-    (invoice: Invoice) => (
-      <EntityActionElement
-        {...(!dropdown && {
-          key: 'run_template',
-        })}
-        entity="invoice"
-        actionKey="run_template"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('run_template')}
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources([invoice]);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/invoices/bulk',
-            entity: 'invoice',
-          });
-        }}
-        icon={MdDesignServices}
-      >
-        {t('run_template')}
-      </EntityActionElement>
-    ),
+    (invoice: Invoice) =>
+      shouldBeRunTemplateActionVisible && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'run_template',
+          })}
+          entity="invoice"
+          actionKey="run_template"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('run_template')}
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources([invoice]);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/invoices/bulk',
+              entity: 'invoice',
+            });
+          }}
+          icon={MdDesignServices}
+        >
+          {t('run_template')}
+        </EntityActionElement>
+      ),
     () => dropdown && <Divider withoutPadding />,
     (invoice: Invoice) => (
       <CloneOptionsModal

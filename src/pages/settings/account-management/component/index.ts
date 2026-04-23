@@ -16,3 +16,4 @@ export * from './SecuritySettings';
 export * from './DangerZone';
 export * from './ReferralProgram';
 export * from './Plan2';
+export * from './Plan3';

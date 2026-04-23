@@ -31,15 +31,15 @@ interface Props {
   for: 'create' | 'invoice';
   resource: Resource;
   entity:
-  | 'invoice'
-  | 'recurring_invoice'
-  | 'quote'
-  | 'credit'
-  | 'purchase_order';
+    | 'invoice'
+    | 'recurring_invoice'
+    | 'quote'
+    | 'credit'
+    | 'purchase_order';
   relationType: RelationType;
   endpoint?:
-  | '/api/v1/live_preview?entity=:entity'
-  | '/api/v1/live_preview/purchase_order?entity=:entity';
+    | '/api/v1/live_preview?entity=:entity'
+    | '/api/v1/live_preview/purchase_order?entity=:entity';
   initiallyVisible?: boolean;
   observable?: boolean;
   withRemoveLogoCTA?: boolean;
@@ -48,7 +48,9 @@ interface Props {
 
 export function InvoicePreview(props: Props) {
   const [isIntersecting, setIsIntersecting] = useState(false);
-  const [debouncedResource, setDebouncedResource] = useState<Resource>(props.resource);
+  const [debouncedResource, setDebouncedResource] = useState<Resource>(
+    props.resource
+  );
   const endpoint = props.endpoint || '/api/v1/live_preview?entity=:entity';
   const divRef = useRef<HTMLDivElement>(null);
   const triggerUpdate = useRef(false);
@@ -83,36 +85,39 @@ export function InvoicePreview(props: Props) {
 
     window.addEventListener('mousedown', handleKeydown);
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (intersectionTimer.current) {
-          clearTimeout(intersectionTimer.current);
-          intersectionTimer.current = null;
-        }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (intersectionTimer.current) {
+            clearTimeout(intersectionTimer.current);
+            intersectionTimer.current = null;
+          }
 
-        if (entry.isIntersecting) {
-          intersectionTimer.current = setTimeout(() => {
-            isCurrentlyIntersecting.current = true;
-            
-            // Handle initial load case
-            if (!hasInitialLoadOccurred.current) {
-              hasInitialLoadOccurred.current = true;
-              setIsIntersecting(true);
-              return;
-            }
+          if (entry.isIntersecting) {
+            intersectionTimer.current = setTimeout(() => {
+              isCurrentlyIntersecting.current = true;
 
-            // Handle regular updates
-            if (triggerUpdate.current) {
-              setIsIntersecting(true);
-              triggerUpdate.current = false;
-            }
-          }, 1000);
-        } else {
-          isCurrentlyIntersecting.current = false;
-          setIsIntersecting(false);
-        }
-      });
-    }, { threshold: 0.3, rootMargin: '0px' });
+              // Handle initial load case
+              if (!hasInitialLoadOccurred.current) {
+                hasInitialLoadOccurred.current = true;
+                setIsIntersecting(true);
+                return;
+              }
+
+              // Handle regular updates
+              if (triggerUpdate.current) {
+                setIsIntersecting(true);
+                triggerUpdate.current = false;
+              }
+            }, 1000);
+          } else {
+            isCurrentlyIntersecting.current = false;
+            setIsIntersecting(false);
+          }
+        });
+      },
+      { threshold: 0.3, rootMargin: '0px' }
+    );
 
     if (divRef.current) {
       observer.observe(divRef.current);

@@ -36,7 +36,7 @@ export function UserSelector(props: UserSelectorProps) {
     <ComboboxAsync<User>
       inputOptions={{
         label: props.inputLabel?.toString(),
-        value: props.value ?? null,
+        value: props.value || null,
       }}
       endpoint={endpoint(props.endpoint || '/api/v1/users?status=active')}
       entryOptions={{

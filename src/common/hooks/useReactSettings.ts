@@ -49,9 +49,12 @@ export interface Preferences {
   enable_public_notifications: boolean | null;
   use_system_fonts: boolean;
   use_legacy_editor: boolean;
+  hide_peppol_sent_status: boolean;
   feedback_slider_displayed_at: number;
   feedback_given_at: number;
   price_increase_banner_dismissed_at?: number;
+  document_builder_tour_shown?: boolean;
+  document_upload_tour_shown?: boolean;
 }
 
 export type ImportTemplates = Record<string, Record<string, (string | null)[]>>;
@@ -112,6 +115,7 @@ export const preferencesDefaults: Preferences = {
   enable_public_notifications: null,
   use_system_fonts: false,
   use_legacy_editor: false,
+  hide_peppol_sent_status: false,
   feedback_slider_displayed_at: 0,
   feedback_given_at: 0,
   price_increase_banner_dismissed_at: 0,

@@ -15,6 +15,7 @@ import { atom, useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { compareValues, detectSortType, extractDisplayValue } from '../utils/sortingUtils';
 
 export const previewAtom = atom<Preview | null>(null);
 
@@ -130,25 +131,33 @@ export function Preview() {
   };
 
   const sort = (column: string) => {
-    const value = sorts?.[column] === 'asc' ? 'desc' : 'asc';
+    const direction = sorts?.[column] === 'asc' ? 'desc' : 'asc';
 
-    setSorts((current) => ({ ...current, [column]: value }));
+    setSorts((current) => ({ ...current, [column]: direction }));
 
     const copy = cloneDeep(preview);
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    copy.rows = copy.rows.sort((first, second) => {
-      const a = first.find((cell) => cell.identifier === column);
-      const b = second.find((cell) => cell.identifier === column);
+    // Detect the sort type from the first non-empty cell in this column
+    const sampleCell = copy.rows
+      .map(row => row.find(cell => cell.identifier === column))
+      .find(cell => cell && cell.display_value !== '' && cell.display_value !== null);
 
-      if (a && b) {
-        if (value === 'asc') {
-          return a.display_value > b.display_value ? 1 : -1;
-        } else {
-          return a.display_value < b.display_value ? 1 : -1;
-        }
+    const sortType = sampleCell
+      ? detectSortType(column, extractDisplayValue(sampleCell))
+      : 'case-insensitive';
+
+    copy.rows = copy.rows.sort((first, second) => {
+      const cellA = first.find((cell) => cell.identifier === column);
+      const cellB = second.find((cell) => cell.identifier === column);
+
+      if (cellA && cellB) {
+        const valueA = extractDisplayValue(cellA);
+        const valueB = extractDisplayValue(cellB);
+
+        return compareValues(valueA, valueB, sortType, direction);
       }
+
+      return 0;
     });
 
     setFiltered(copy);

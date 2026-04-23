@@ -13,7 +13,9 @@ import { Client } from './client';
 import { Activity } from './invoice';
 import { InvoiceItem } from './invoice-item';
 import { Payment } from './payment';
+import { Invitation } from './purchase-order';
 import { ScheduleItem } from './schedule';
+import { Sync } from './invoice';
 
 export interface Quote {
   id: string;
@@ -78,7 +80,7 @@ export interface Quote {
   paid_to_date: number;
   subscription_id: string;
   auto_bill_enabled: boolean;
-  invitations: any[];
+  invitations: Invitation[];
   documents: any[];
   client?: Client;
   e_invoice?: EInvoiceType;
@@ -87,4 +89,5 @@ export interface Quote {
   reminder_schedule?: string;
   location_id: string;
   schedule?: ScheduleItem[]
+  sync?: Sync;
 }

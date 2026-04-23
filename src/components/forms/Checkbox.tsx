@@ -19,6 +19,7 @@ interface Props extends CommonProps {
   checked?: boolean;
   onValueChange?: (value: string, checked?: boolean) => unknown;
   cypressRef?: string;
+  disabled?: boolean;
 }
 
 const Input = styled.input`

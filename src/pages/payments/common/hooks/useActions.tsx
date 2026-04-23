@@ -11,6 +11,7 @@
 import { EntityState } from '$app/common/enums/entity-state';
 import { getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { Payment } from '$app/common/interfaces/payment';
 import { useBulk } from '$app/common/queries/payments';
@@ -40,9 +41,18 @@ export function useActions(params?: Params) {
 
   const { showEditAction, showCommonBulkAction } = params || {};
 
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
+
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'payment',
-    editPageTabs: ['documents', 'payment_fields', 'apply', 'refund', 'activity'],
+    editPageTabs: [
+      'documents',
+      'payment_fields',
+      'apply',
+      'refund',
+      'activity',
+    ],
   });
 
   const bulk = useBulk();
@@ -92,21 +102,22 @@ export function useActions(params?: Params) {
         {t('email_payment')}
       </DropdownElement>
     ),
-    (payment: Payment) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources([payment]);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/payments/bulk',
-            entity: 'payment',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    (payment: Payment) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources([payment]);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/payments/bulk',
+              entity: 'payment',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
     (payment: Payment) =>
       (isEditPage || showCommonBulkAction) &&
       getEntityState(payment) !== EntityState.Deleted && (

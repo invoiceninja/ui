@@ -13,7 +13,7 @@ import { useAtomValue } from 'jotai';
 import { antdLocaleAtom } from '../DropdownDateRangePicker';
 import dayjs from 'dayjs';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import Tippy from '@tippyjs/react/headless';
 import { Icon } from '../icons/Icon';
@@ -23,10 +23,24 @@ import { useColorScheme } from '$app/common/colors';
 import { emitter } from '$app';
 
 interface Props {
-  setDateRange: Dispatch<SetStateAction<string>>;
+  columnId: string;
+  startDate: string;
+  endDate: string;
+  onDateRangeChange: (
+    columnId: string,
+    startDate: string,
+    endDate: string
+  ) => void;
   onClick: () => void;
 }
-export function DateRangePicker({ setDateRange, onClick }: Props) {
+
+export function DateRangePicker({
+  columnId,
+  startDate,
+  endDate,
+  onDateRangeChange,
+  onClick,
+}: Props) {
   const divRef = useRef(null);
 
   const { RangePicker } = DatePicker;
@@ -34,11 +48,18 @@ export function DateRangePicker({ setDateRange, onClick }: Props) {
   const colors = useColorScheme();
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [currentDateRange, setCurrentDateRange] = useState<string>('');
   const [isCalendarVisible, setIsCalendarVisible] = useState<boolean>(false);
+
+  const [internalStartDate, setInternalStartDate] = useState<string>(startDate);
+  const [internalEndDate, setInternalEndDate] = useState<string>(endDate);
 
   const antdLocale = useAtomValue(antdLocaleAtom);
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  useEffect(() => {
+    setInternalStartDate(startDate);
+    setInternalEndDate(endDate);
+  }, [startDate, endDate]);
 
   useClickAway(divRef, () => {
     isVisible && !isCalendarVisible && setIsVisible(false);
@@ -65,33 +86,24 @@ export function DateRangePicker({ setDateRange, onClick }: Props) {
         ).format('YYYY-MM-DD')
       : '';
 
-    setCurrentDateRange(start || end ? [start, end].join(',') : '');
+    setInternalStartDate(start);
+    setInternalEndDate(end);
 
-    setDateRange(start || end ? [start, end].join(',') : '');
+    if ((start.length && end.length) || (!start.length && !end.length)) {
+      onDateRangeChange(columnId, start, end);
+    }
   };
 
   const isCurrentDateRangeActive = () => {
-    const startDate = currentDateRange?.split(',')?.[0];
-    const endDate = currentDateRange?.split(',')?.[1];
-
-    return Boolean(startDate && endDate);
+    return Boolean(
+      startDate && startDate.length > 0 && endDate && endDate.length > 0
+    );
   };
 
   useEffect(() => {
-    if (isVisible) {
-      const startDate = currentDateRange?.split(',')?.[0];
-      const endDate = currentDateRange?.split(',')?.[1];
-
-      setDateRange(
-        currentDateRange?.length > 1 ? [startDate, endDate].join(',') : ''
-      );
-    }
-  }, [isVisible]);
-
-  useEffect(() => {
     emitter.on('date_range_picker.clear', () => {
-      setCurrentDateRange('');
-      setDateRange('');
+      setInternalStartDate('');
+      setInternalEndDate('');
     });
   }, []);
 
@@ -116,12 +128,10 @@ export function DateRangePicker({ setDateRange, onClick }: Props) {
               <RangePicker
                 size="large"
                 value={[
-                  currentDateRange?.split(',')?.[0]
-                    ? dayjs(currentDateRange.split(',')[0])
+                  internalStartDate.length > 0
+                    ? dayjs(internalStartDate)
                     : null,
-                  currentDateRange?.split(',')?.[1]
-                    ? dayjs(currentDateRange.split(',')[1])
-                    : null,
+                  internalEndDate.length > 0 ? dayjs(internalEndDate) : null,
                 ]}
                 format={dateFormat}
                 onCalendarChange={(_, dateString) =>

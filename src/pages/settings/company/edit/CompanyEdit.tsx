@@ -185,6 +185,7 @@ export function CompanyEdit(props: Props) {
                 label={t('subdomain')}
                 value={companyChanges?.subdomain}
                 onValueChange={(value) => handleChange('subdomain', value)}
+                errorMessage={errors?.errors?.subdomain}
                 changeOverride
               />
             )}

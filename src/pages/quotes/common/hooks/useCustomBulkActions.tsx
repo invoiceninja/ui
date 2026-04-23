@@ -36,6 +36,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Assigned } from '$app/components/Assigned';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 export function useCustomBulkActions() {
   const [t] = useTranslation();
@@ -46,6 +47,9 @@ export function useCustomBulkActions() {
 
   const printPdf = usePrintPdf({ entity: 'quote' });
   const downloadPdfs = useDownloadPdfs({ entity: 'quote' });
+
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const bulk = useBulkAction();
 
@@ -207,21 +211,22 @@ export function useCustomBulkActions() {
           dropdown
         />
       ),
-    ({ selectedResources }) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources(selectedResources);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/quotes/bulk',
-            entity: 'quote',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    ({ selectedResources }) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources(selectedResources);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/quotes/bulk',
+              entity: 'quote',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
   ];
 
   return customBulkActions;

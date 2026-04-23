@@ -28,6 +28,7 @@ import { MdCategory, MdDesignServices, MdDownload } from 'react-icons/md';
 import { AddToInvoiceAction } from '../components/AddToInvoiceAction';
 import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 interface Props {
   isVisible: boolean;
@@ -121,6 +122,9 @@ export const useCustomBulkActions = () => {
 
   const documentsBulk = useDocumentsBulk();
 
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
+
   const shouldDownloadDocuments = (expenses: Expense[]) => {
     return expenses.some(({ documents }) => documents.length);
   };
@@ -152,7 +156,7 @@ export const useCustomBulkActions = () => {
     setChangeTemplateResources,
     setChangeTemplateEntityContext,
   } = useChangeTemplate();
-  
+
   const customBulkActions: CustomBulkAction<Expense>[] = [
     ({ selectedResources, setSelected }) => (
       <DropdownElement
@@ -200,21 +204,22 @@ export const useCustomBulkActions = () => {
         setSelected={setSelected}
       />
     ),
-    ({ selectedResources }) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources(selectedResources);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/expenses/bulk',
-            entity: 'expense',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    ({ selectedResources }) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources(selectedResources);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/expenses/bulk',
+              entity: 'expense',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
   ];
 
   return customBulkActions;

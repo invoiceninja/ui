@@ -43,13 +43,14 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useNavigate } from 'react-router-dom';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
-import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
+import { PEPPOL_COUNTRIES, PEPPOL_CLASSIFICATIONS } from '$app/common/helpers/peppol-countries';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
   id: keyof TResource;
   label: string;
   format?: (field: string | number, resource: TResource) => unknown;
+  sortKey?: string;
 }[];
 
 export function resourceViewedAt(resource: Invoice | Credit) {
@@ -158,8 +159,14 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
     });
 
   const isPeppolEnabled = (currentInvoice: Invoice) => {
+    if (reactSettings?.preferences?.hide_peppol_sent_status) {
+      return false;
+    }
+    
     return (
-      currentCompany.settings.e_invoice_type === 'PEPPOL' && PEPPOL_COUNTRIES.includes(currentInvoice.client?.country_id || '')
+      currentCompany.settings.e_invoice_type === 'PEPPOL' && 
+      PEPPOL_COUNTRIES.includes(currentInvoice.client?.country_id || '') &&
+      PEPPOL_CLASSIFICATIONS[currentInvoice.client?.country_id as keyof typeof PEPPOL_CLASSIFICATIONS]?.includes(currentInvoice.client?.classification || 'business')
     );
   };
 
@@ -310,6 +317,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'client',
       id: 'client_id',
       label: t('client'),
+      sortKey: 'client.name',
       format: (value, invoice) => (
         <DynamicLink
           to={route('/clients/:id', { id: invoice.client_id })}
@@ -366,6 +374,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'client_postal_code',
       id: 'client_id',
       label: t('client_postal_code'),
+      sortKey: 'client.postal_code',
       format: (value, invoice) => invoice.client?.postal_code,
     },
     {
@@ -378,12 +387,14 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'client_city',
       id: 'client_id',
       label: t('client_city'),
+      sortKey: 'client.city',
       format: (value, invoice) => invoice.client?.city,
     },
     {
       column: 'client_country',
       id: 'client_id',
       label: t('client_country'),
+      sortKey: 'client.country_id',
       format: (value, invoice) =>
         invoice.client?.country_id &&
         resolveCountry(invoice.client?.country_id)?.name,
@@ -392,12 +403,14 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'client_state',
       id: 'client_id',
       label: t('client_state'),
+      sortKey: 'client.state',
       format: (value, invoice) => invoice.client?.state,
     },
     {
       column: 'contact_email',
       id: 'client_id',
       label: t('contact_email'),
+      sortKey: 'contact.email',
       format: (value, invoice) =>
         invoice.client &&
         invoice.client.contacts.length > 0 && (
@@ -408,6 +421,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'contact_name',
       id: 'client_id',
       label: t('contact_name'),
+      sortKey: 'contact.first_name',
       format: (value, invoice) =>
         invoice.client &&
         invoice.client.contacts.length > 0 &&

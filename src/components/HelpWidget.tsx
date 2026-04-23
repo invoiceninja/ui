@@ -26,13 +26,14 @@ interface Props {
 function processMarkdownContent(content: string) {
   return content
     .replace(/^<x-next.*$/gm, '')
+    .replace(/^import\s+\w+.*from\s+['"].*['"];?\s*$/gm, '')
 
     .replace(/---[\s\S]*?---/g, '')
     .replace(/!\[.*?\]\((\/[^)]+)\)/g, (match, p1) => {
       const alt = match.match(/!\[(.*?)\]/);
       const altText = alt ? alt[1] : 'An image';
 
-      return `![${altText}](https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/source${p1})`;
+      return `![${altText}](https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/static${p1})`;
     })
     .trim();
 }
@@ -48,7 +49,7 @@ export function HelpWidget({ id, url }: Props) {
       ),
   });
 
-  const [, slug] = url.split('v5-rework/source');
+  const [, slug] = url.split('v5-rework/docs');
 
   const colors = useColorScheme();
   const contentRef = useRef<HTMLDivElement>(null);

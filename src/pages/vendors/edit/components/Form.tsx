@@ -106,6 +106,7 @@ export function Form(props: Props) {
       custom_value4: '',
       link: '',
       last_login: 0,
+      can_sign: false,
     });
 
     setContacts(currentContacts);
@@ -486,6 +487,17 @@ export function Form(props: Props) {
                         }
                       />
                     </Element>
+
+                    {company?.enable_modules && (
+                    <Element leftSide={t('authorized_to_sign')} noExternalPadding>
+                      <Toggle
+                        checked={contact.can_sign}
+                        onChange={(value) =>
+                          handleContactChange('can_sign', value, index)
+                        }
+                        />
+                      </Element>
+                    )}
 
                     {company?.custom_fields?.vendor_contact1 && (
                       <CustomField

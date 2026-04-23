@@ -73,6 +73,10 @@ export default function Vendors() {
         linkToCreateGuards={[permission('create_vendor')]}
         hideEditableOptions={!hasPermission('edit_vendor')}
         enableSavingFilterPreference
+        dateRangeColumns={[
+          { column: 'created_at', queryParameterKey: 'created_between' },
+        ]}
+        enableSavingLatestDataForNavigation
       />
     </Default>
   );

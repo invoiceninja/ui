@@ -147,7 +147,12 @@ export default function RecurringInvoices() {
             column: 'next_send_datetime',
             queryParameterKey: 'next_send_between',
           },
+          {
+            column: 'created_at',
+            queryParameterKey: 'created_between',
+          },
         ]}
+        enableSavingLatestDataForNavigation
       />
 
       {!disableNavigation('recurring_invoice', recurringInvoiceSlider) && (

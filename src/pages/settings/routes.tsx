@@ -13,9 +13,10 @@ import { admin, owner } from '$app/common/guards/guards/admin';
 import { Outlet, Route } from 'react-router-dom';
 import { plan } from '$app/common/guards/guards/plan';
 import * as Settings from './index';
-import { isDemo, isHosted } from '$app/common/helpers';
+import { isDemo } from '$app/common/helpers';
 import { invoiceDesignRoutes } from '$app/pages/settings/invoice-design/routes';
 import { or } from '$app/common/guards/guards/or';
+import { isHosted } from '$app/common/helpers';
 
 export const settingsRoutes = (
   <Route path="/settings">
@@ -61,8 +62,9 @@ export const settingsRoutes = (
         <Route
           path=""
           element={
-            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
-            isHosted() ? (
+            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' && isHosted() ? (
+            // import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
+             
               <Guard
                 guards={[owner()]}
                 component={<Settings.Plan2 />}

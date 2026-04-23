@@ -29,6 +29,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useState } from 'react';
 import { Modal } from '$app/components/Modal';
 import { GoCardlessOAuth2 } from './gateways/GoCardlessOAuth2';
+import { SquareOAuth } from './gateways/SquareOAuth';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 import { useLocation } from 'react-router-dom';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
@@ -67,6 +68,7 @@ export function Credentials(props: Props) {
   const WEPAY = '8fdeed552015b3c7b44ed6c8ebd9e992';
   const PAYPAL_PPCP = '80af24a6a691230bbec33e930ab40666';
   const GOCARDLESS = 'b9886f9257f0c6ee7c302f1c74475f6c';
+  const SQUARE = '65faab2ab6e3223dbe848b1686490baz';
   const PAYWARE = 'b0a6294fca4488c2bab58f3e11e3c623';
 
   const paywareSettingsFields = ['timeToLive'];
@@ -89,6 +91,10 @@ export function Credentials(props: Props) {
     config('oauth2') === true
   ) {
     hostedGateways.push(GOCARDLESS);
+  }
+
+  if (isHosted() && props.gateway.key === SQUARE) {
+    hostedGateways.push(SQUARE);
   }
 
   const [isTestingBusy, setIsTestingBusy] = useState<boolean>(false);
@@ -146,6 +152,10 @@ export function Credentials(props: Props) {
         props.gateway.key === GOCARDLESS &&
         isHosted() &&
         config('oauth2') === true && <GoCardlessOAuth2 />}
+
+      {props.gateway && props.gateway.key === SQUARE && isHosted() && (
+        <SquareOAuth companyGateway={props.companyGateway} />
+      )}
 
       {props.gateway &&
         !hostedGateways.includes(props.gateway.key) &&
@@ -205,7 +215,7 @@ export function Credentials(props: Props) {
             />
           </div>
 
-          <div className="flex justify-end pr-6">
+          <div className="flex flex-col items-end justify-end pr-6">
             <Button
               behavior="button"
               onClick={handleTestCredentials}
@@ -214,6 +224,12 @@ export function Credentials(props: Props) {
             >
               {t('health_check')}
             </Button>
+
+            {!props.isGatewaySaved ? (
+              <p className="mt-2 text-sm font-medium">
+                {t('save_to_enable_health_check')}
+              </p>
+            ) : null}
           </div>
         </>
       )}

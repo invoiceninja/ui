@@ -115,8 +115,8 @@ export function Settings(props: Props) {
 
       {gateway?.key === PAYWARE && (
         <Element
-          leftSide={t('payware_ttl_label')}
-          leftSideHelp={t('payware_ttl_help')}
+          leftSide={t('payment_period')}
+          leftSideHelp={t('payment_period_help')}
         >
           <InputField
             type="number"

@@ -32,17 +32,18 @@ import collect from 'collect.js';
 import { useApplyCredits } from './useApplyCredits';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
 
   const bulk = useBulk();
-
+  const applyCredits = useApplyCredits();
   const hasPermission = useHasPermission();
-
   const documentsBulk = useDocumentsBulk();
 
-  const applyCredits = useApplyCredits();
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const printPdf = usePrintPdf({ entity: 'credit' });
   const downloadPdfs = useDownloadPdfs({ entity: 'credit' });
@@ -163,21 +164,22 @@ export const useCustomBulkActions = () => {
         {t('documents')}
       </DropdownElement>
     ),
-    ({ selectedResources }) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources(selectedResources);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/credits/bulk',
-            entity: 'credit',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    ({ selectedResources }) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources(selectedResources);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/credits/bulk',
+              entity: 'credit',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
   ];
 
   return customBulkActions;

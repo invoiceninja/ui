@@ -20,11 +20,15 @@ import { Dispatch, SetStateAction } from 'react';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { AssignToGroupBulkAction } from '../components/AssignToGroupBulkAction';
 import { BulkUpdatesAction } from '../components/BulkUpdatesAction';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
 
   const documentsBulk = useDocumentsBulk();
+
+  const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
+    useDisplayRunTemplateActions();
 
   const getDocumentsIds = (clients: Client[]) => {
     return clients.flatMap(({ documents }) => documents.map(({ id }) => id));
@@ -72,21 +76,22 @@ export const useCustomBulkActions = () => {
           {t('documents')}
         </DropdownElement>
       ),
-    ({ selectedResources }) => (
-      <DropdownElement
-        onClick={() => {
-          setChangeTemplateVisible(true);
-          setChangeTemplateResources(selectedResources);
-          setChangeTemplateEntityContext({
-            endpoint: '/api/v1/clients/bulk',
-            entity: 'client',
-          });
-        }}
-        icon={<Icon element={MdDesignServices} />}
-      >
-        {t('run_template')}
-      </DropdownElement>
-    ),
+    ({ selectedResources }) =>
+      shouldBeRunTemplateActionVisible && (
+        <DropdownElement
+          onClick={() => {
+            setChangeTemplateVisible(true);
+            setChangeTemplateResources(selectedResources);
+            setChangeTemplateEntityContext({
+              endpoint: '/api/v1/clients/bulk',
+              entity: 'client',
+            });
+          }}
+          icon={<Icon element={MdDesignServices} />}
+        >
+          {t('run_template')}
+        </DropdownElement>
+      ),
     ({ selectedResources, setSelected }) =>
       showAssignGroupAction(selectedResources) && (
         <AssignToGroupBulkAction

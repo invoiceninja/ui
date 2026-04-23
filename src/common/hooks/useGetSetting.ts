@@ -13,7 +13,13 @@ import { Settings } from '../interfaces/company.interface';
 import { useGroupSettingsQuery } from '../queries/group-settings';
 import { useCurrentCompany } from './useCurrentCompany';
 
-export function useGetSetting() {
+interface Props {
+  withoutCompanySettingsFallback?: boolean;
+}
+
+export function useGetSetting({
+  withoutCompanySettingsFallback = false,
+}: Props = {}) {
   const company = useCurrentCompany();
 
   const { data: groupSettings } = useGroupSettingsQuery({ perPage: 1000 });
@@ -58,6 +64,10 @@ export function useGetSetting() {
 
       if (import.meta.env.VITE_IS_TEST === 'true') {
         return `Company: ${company.settings[propertyKey]}`;
+      }
+
+      if (withoutCompanySettingsFallback) {
+        return undefined;
       }
 
       return company.settings[propertyKey];

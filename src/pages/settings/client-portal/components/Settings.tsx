@@ -144,7 +144,7 @@ export function Settings() {
                   <span>(</span>
 
                   <Link
-                    to="https://invoiceninja.github.io/en/hosted-custom-domain/#custom-domain-configuration"
+                    to="https://invoiceninja.github.io/docs/hosted/hosted-custom-domain#custom-domain-configuration"
                     external
                     withoutExternalIcon
                   >

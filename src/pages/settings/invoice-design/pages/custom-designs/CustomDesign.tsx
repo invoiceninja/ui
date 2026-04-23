@@ -12,7 +12,7 @@ import { Design } from '$app/common/interfaces/design';
 import { useEffect, useState } from 'react';
 import { useDesignQuery } from '$app/common/queries/designs';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
-import { atom } from 'jotai';
+import { atom, useAtom } from 'jotai';
 import { useNavigationTopRightElement } from '$app/components/layouts/common/hooks';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
@@ -30,6 +30,7 @@ import { Tabs } from '$app/components/Tabs';
 import { useTabs } from './pages/edit/common/hooks/useTabs';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { designPreviewPropertiesAtom } from './pages/edit/components/Settings';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -56,6 +57,9 @@ export default function CustomDesign() {
   const { id } = useParams();
   const { data } = useDesignQuery({ id, enabled: true });
 
+  const [designPreviewProperties, setDesignPreviewProperties] = useAtom(
+    designPreviewPropertiesAtom
+  );
   const [payload, setPayload] = useState<PreviewPayload>({
     design: null,
     entity_id: '-1',
@@ -102,10 +106,36 @@ export default function CustomDesign() {
 
   useEffect(() => {
     if (data) {
-      setPayload((current) => ({
-        ...current,
-        design: data,
-      }));
+      const storedDesignPreviewProperties = designPreviewProperties.find(
+        (property) => property.design_id === data.id
+      );
+
+      if (storedDesignPreviewProperties) {
+        setPayload(
+          (current) =>
+            ({
+              ...current,
+              design: data,
+              entity: storedDesignPreviewProperties.entity,
+              entity_id: storedDesignPreviewProperties.entity_id,
+            } as PreviewPayload)
+        );
+      } else {
+        setDesignPreviewProperties((current) => [
+          ...current,
+          {
+            design_id: data.id,
+            entity_id: '-1',
+            entity: 'invoice',
+            html_mode: false,
+          },
+        ]);
+
+        setPayload((current) => ({
+          ...current,
+          design: data,
+        }));
+      }
     }
 
     return () =>

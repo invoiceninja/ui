@@ -35,6 +35,7 @@ import { Tooltip } from '$app/components/Tooltip';
 import { Icon } from '$app/components/icons/Icon';
 import { MdInfo } from 'react-icons/md';
 import { TaxExemptBadge } from '$app/pages/clients/show/components/TaxExemptBadge';
+import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -120,6 +121,13 @@ export default function Edit() {
         <InvoiceDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
+          {recurringInvoice && (
+            <HiddenResourceTaxesAlert
+              className="mb-2"
+              resource={recurringInvoice}
+            />
+          )}
+
           <TabGroup
             tabs={[t('products'), t('tasks')]}
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
