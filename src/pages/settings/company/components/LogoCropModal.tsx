@@ -12,12 +12,7 @@ import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { SyntheticEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactCrop, {
-  Crop,
-  PixelCrop,
-  centerCrop,
-  makeAspectCrop,
-} from 'react-image-crop';
+import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import { getCroppedImg } from '../common/helpers/crop-image';
 import 'react-image-crop/dist/ReactCrop.css';
 
@@ -42,28 +37,43 @@ export function LogoCropModal({
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
 
-  const getDefaultCrop = (width: number, height: number): Crop => {
-    return centerCrop(
-      makeAspectCrop({ unit: '%', width: 90 }, width / height, width, height),
-      width,
-      height
-    );
+  const getFullCrop = (): Crop => {
+    return {
+      unit: '%',
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    };
   };
 
   const handleImageLoad = (event: SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = event.currentTarget;
 
-    const defaultCrop = getDefaultCrop(width, height);
+    const defaultCrop = getFullCrop();
 
     setCrop(defaultCrop);
+    setCompletedCrop({
+      unit: 'px',
+      x: 0,
+      y: 0,
+      width,
+      height,
+    });
   };
 
   const handleReset = () => {
     if (imgRef.current) {
       const { width, height } = imgRef.current;
 
-      setCrop(getDefaultCrop(width, height));
-      setCompletedCrop(undefined);
+      setCrop(getFullCrop());
+      setCompletedCrop({
+        unit: 'px',
+        x: 0,
+        y: 0,
+        width,
+        height,
+      });
     }
   };
 
@@ -96,7 +106,7 @@ export function LogoCropModal({
       disableClosing={isFormBusy}
     >
       <div className="flex flex-col space-y-5">
-        <div className="flex items-center justify-center w-full overflow-hidden">
+        <div className="flex items-center justify-center w-full pb-2">
           {imageSrc && (
             <ReactCrop
               crop={crop}
