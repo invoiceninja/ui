@@ -21,14 +21,39 @@ import { useSampleInvoiceData } from '../hooks/useSampleInvoiceData';
 interface PreviewModalProps {
   blocks: Block[];
   onClose: () => void;
+  designSettings?: {
+    page_size?: string;
+    primary_font?: string;
+    font_size?: number;
+    primary_color?: string;
+    secondary_color?: string;
+    show_paid_stamp?: boolean;
+    page_numbering?: boolean;
+  };
 }
 
-export function PreviewModal({ blocks, onClose }: PreviewModalProps) {
+interface PageDimensions {
+  width: number;
+  height: number;
+}
+
+function getPreviewDimensions(pageSize: string = 'A4'): PageDimensions {
+  switch (pageSize) {
+    case 'letter':
+      return { width: 816, height: 1056 }; // 8.5 x 11 inches at 96dpi
+    case 'A4':
+    default:
+      return { width: 794, height: 1122 }; // A4 at 96dpi
+  }
+}
+
+export function PreviewModal({ blocks, onClose, designSettings }: PreviewModalProps) {
   const [t] = useTranslation();
   const [zoom, setZoom] = useState(100);
   const colors = useColorScheme();
   const sampleData = useSampleInvoiceData();
-  const html = generateInvoiceHTML(blocks, sampleData);
+  const html = generateInvoiceHTML(blocks, sampleData, designSettings);
+  const dimensions = getPreviewDimensions(designSettings?.page_size);
 
   const handleDownloadHTML = () => {
     const blob = new Blob([html], { type: 'text/html' });
@@ -149,9 +174,9 @@ export function PreviewModal({ blocks, onClose }: PreviewModalProps) {
               srcDoc={html}
               className="border-0 block"
               style={{
-                width: '794px',
-                height: '1122px',
-                minHeight: '1122px',
+                width: `${dimensions.width}px`,
+                height: `${dimensions.height}px`,
+                minHeight: `${dimensions.height}px`,
                 backgroundColor: colors.$1,
               }}
               title={String(t('preview'))}
