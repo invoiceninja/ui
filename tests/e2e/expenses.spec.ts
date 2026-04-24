@@ -961,9 +961,7 @@ test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) =
   await taxOption2.waitFor({ state: 'visible', timeout: 5000 });
   await taxOption2.click();
 
-  // Amount field uses NumericFormat (type="text"), find via label
-  const amountInput = page.locator('dt:has-text("Amount")').locator('..').locator('input').first();
-  await amountInput.fill('12222');
+  await page.locator('[data-cy="expenseAmount"]').fill('12222');
 
   await page.getByRole('button', { name: 'Save' }).click();
 
@@ -1041,8 +1039,7 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
   await taxOption2.click();
 
   // Amount field uses NumericFormat (type="text"), find via label
-  const amountInput = page.locator('dt:has-text("Amount")').locator('..').locator('input').first();
-  await amountInput.fill('12222');
+  await page.locator('[data-cy="expenseAmount"]').fill('12222');
 
   await page.locator('[data-cy="inclusiveTaxesToggle"]').first().check();
 
@@ -1060,7 +1057,7 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
     .getByRole('link', { name: 'Expenses', exact: true })
     .click();
 
-  await expect(page.getByText('$ 12,222.00')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('$ 12,222.00').first()).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -1098,8 +1095,7 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
   await page.waitForURL('**/expenses/create');
 
   // Amount field uses NumericFormat (type="text"), find via label
-  const amountInput = page.locator('dt:has-text("Amount")').locator('..').locator('input').first();
-  await amountInput.fill('12222');
+  await page.locator('[data-cy="expenseAmount"]').fill('12222');
 
   await page.locator('#by_amount').click();
 
