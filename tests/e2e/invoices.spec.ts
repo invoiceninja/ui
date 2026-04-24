@@ -752,14 +752,14 @@ test('Enter Payment displayed with admin permission', async ({ page, api }) => {
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  await page
-    .locator('[data-cy="dataTable"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .first()
-    .click();
+  // Bulk Actions only mounts after selection; .first() "Actions" can be a row menu before then.
+  await expect(page.locator('[data-cy="bulkActionsTrigger"]')).toBeVisible({ timeout: 10000 });
+  await page.locator('[data-cy="bulkActionsTrigger"]').click();
 
   await expect(
-    page.locator('[data-cy="bulkActionsDropdown"]').getByText('Enter Payment').first()
+    page
+      .locator('[data-cy="bulkActionsDropdown"]')
+      .getByRole('button', { name: 'Enter Payment', exact: true })
   ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
@@ -806,14 +806,13 @@ test('Enter Payment displayed with creation permissions', async ({
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  await page
-    .locator('[data-cy="dataTable"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .first()
-    .click();
+  await expect(page.locator('[data-cy="bulkActionsTrigger"]')).toBeVisible({ timeout: 10000 });
+  await page.locator('[data-cy="bulkActionsTrigger"]').click();
 
   await expect(
-    page.locator('[data-cy="bulkActionsDropdown"]').getByText('Enter Payment').first()
+    page
+      .locator('[data-cy="bulkActionsDropdown"]')
+      .getByRole('button', { name: 'Enter Payment', exact: true })
   ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
@@ -843,11 +842,8 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  await page
-    .locator('[data-cy="dataTable"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .first()
-    .click();
+  await expect(page.locator('[data-cy="bulkActionsTrigger"]')).toBeVisible({ timeout: 10000 });
+  await page.locator('[data-cy="bulkActionsTrigger"]').click();
 
   await page.getByText('Send Email', { exact: true }).first().click();
 
@@ -908,11 +904,8 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  await page
-    .locator('[data-cy="dataTable"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .first()
-    .click();
+  await expect(page.locator('[data-cy="bulkActionsTrigger"]')).toBeVisible({ timeout: 10000 });
+  await page.locator('[data-cy="bulkActionsTrigger"]').click();
 
   await page.getByText('Send Email', { exact: true }).first().click();
 
