@@ -41,7 +41,7 @@ test('Prevent transaction quick popover navigation', async ({ page }) => {
   await page.locator('[type="date"]').first().blur();
 
   // Wait for debounce (300ms) + React re-render to detect the change as unsaved
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
 
   await page
@@ -52,11 +52,11 @@ test('Prevent transaction quick popover navigation', async ({ page }) => {
 
   await page.locator('[type="date"]').nth(1).first().blur();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page.locator('[data-cy="quickPopoverButton"]').click();
-  await page.waitForTimeout(200);
-  
+  await page.waitForTimeout(400);
+
   await page.getByText('Transaction', { exact: true }).click();
 
   await expect(
@@ -104,13 +104,13 @@ test('Prevent quote quick popover navigation', async ({ page }) => {
   await page.locator('[type="date"]').first().blur();
 
   // Wait for debounce (300ms) + React re-render to detect the change as unsaved
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page.locator('[data-cy="quickPopoverButton"]').click();
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page.getByText('Quote', { exact: true }).click();
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await expect(
     page.getByText('Please save or cancel your changes')
@@ -156,7 +156,7 @@ test('Prevent back browser button navigation', async ({ page }) => {
   await page.locator('[type="date"]').first().blur();
 
   // Wait for debounce (300ms) + React re-render to detect the change as unsaved
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page.goBack();
 
@@ -203,7 +203,7 @@ test('Prevent account management navigation', async ({ page }) => {
   await page.locator('[type="date"]').first().blur();
 
   // Wait for debounce (300ms) + React re-render to detect the change as unsaved
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page.locator('[data-cy="companyDropdown"]').click();
 
@@ -287,8 +287,7 @@ test('Can add a company and navigate to account management', async ({
     })
   ).not.toBeVisible({ timeout: 10000 });
 
-  await page.waitForTimeout(300);
-
+  await page.locator('[data-cy="companyDropdown"]').waitFor({ state: 'visible', timeout: 5000 });
   await page.locator('[data-cy="companyDropdown"]').click();
 
   await page.getByText('Account Management', { exact: true }).first().click();

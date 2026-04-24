@@ -120,8 +120,7 @@ const createPurchaseOrder = async (params: CreateParams) => {
     .getByRole('link', { name: 'New Purchase Order' })
     .click();
 
-  await page.waitForTimeout(900);
-
+  await page.getByRole('option').first().waitFor({ state: 'visible', timeout: 5000 });
   await page.getByRole('option').first().click();
 
   if (assignTo) {

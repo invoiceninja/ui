@@ -52,7 +52,11 @@ async function openMultiSelect(page: Page, id: string) {
   // CustomMultiSelect has no <input> — click the inner control div to toggle the menu
   // The clickable area is the div with cursor-pointer inside the control
   await container.locator('div[class*="cursor-pointer"]').first().click();
-  await page.waitForTimeout(600);
+  // Wait for options to appear in the dropdown
+  await container.locator('[role="option"]').first().waitFor({ state: 'visible', timeout: 5000 }).catch(async () => {
+    // Fallback: wait for any list item to appear
+    await container.locator('li').first().waitFor({ state: 'visible', timeout: 3000 }).catch(() => {});
+  });
 }
 
 test('Activity report test', async ({ page, api }) => {
@@ -122,12 +126,11 @@ test('Invoice report test', async ({ page, api }) => {
   await page.getByText('Paid', { exact: true }).first().click();
   // Close the menu by clicking away
   await page.getByText('Report', { exact: true }).first().click();
-  await page.waitForTimeout(200);
 
   // Select "Custom" date range via React Select customSelector
   await selectCustomOption(page, 'Range', 'Custom');
 
-  await page.waitForTimeout(200);
+  await page.locator('[data-cy="reportStartDate"]').waitFor({ state: 'visible', timeout: 5000 });
 
   await page.fill('[data-cy="reportStartDate"]', dayjs().format('YYYY-MM-DD'));
 
@@ -310,7 +313,7 @@ test('Product sales report test', async ({ page, api }) => {
   // Select "Custom" date range via React Select customSelector
   await selectCustomOption(page, 'Range', 'Custom');
 
-  await page.waitForTimeout(200);
+  await page.locator('[data-cy="reportStartDate"]').waitFor({ state: 'visible', timeout: 5000 });
 
   await page.fill('[data-cy="reportStartDate"]', dayjs().format('YYYY-MM-DD'));
 
@@ -394,7 +397,6 @@ test('Expense report test', async ({ page, api }) => {
   await page.getByText('Invoiced', { exact: true }).first().click();
   // Close the menu by clicking away
   await page.getByText('Report', { exact: true }).first().click();
-  await page.waitForTimeout(200);
 
   // Select "This Month" date range via React Select customSelector
   await selectCustomOption(page, 'Range', 'This Month');
@@ -476,15 +478,12 @@ test('Expense report test with clients, project and categories selectors', async
   // Select "Expense" report via React Select customSelector
   await selectCustomOption(page, 'Report', 'Expense');
 
-  await page.waitForTimeout(300);
-
   await openMultiSelect(page, 'statusSelector');
   await page.getByText('Pending', { exact: true }).first().click();
   // Menu stays open (closeMenuOnSelect=false) — select Invoiced without reopening
   await page.getByText('Invoiced', { exact: true }).first().click();
   // Close the menu by clicking away
   await page.getByText('Report', { exact: true }).first().click();
-  await page.waitForTimeout(200);
 
   // Select "Last 7 Days" date range via React Select customSelector
   await selectCustomOption(page, 'Range', 'Last 7 Days');
@@ -503,7 +502,6 @@ test('Expense report test with clients, project and categories selectors', async
 
  
   await page.getByRole('main').getByText('Clients').first().click();
-  await page.waitForTimeout(200);
 
   await openMultiSelect(page, 'projectItemSelector');
   await page
@@ -514,7 +512,6 @@ test('Expense report test with clients, project and categories selectors', async
 
   // Close any open menus before opening expense category selector
   await page.getByText('Report', { exact: true }).first().click();
-  await page.waitForTimeout(200);
 
   await openMultiSelect(page, 'expenseCategoryItemSelector');
   await page
@@ -525,7 +522,6 @@ test('Expense report test with clients, project and categories selectors', async
 
   // Close any open menus first, then toggle includeDeleted
   await page.getByText('Report', { exact: true }).first().click();
-  await page.waitForTimeout(300);
 
   const includeDeletedToggle = page.locator('[data-cy="includeDeleted"]');
   await includeDeletedToggle.click();
@@ -622,11 +618,8 @@ test('Product sales report test with filtering products', async ({ page, api }) 
     .first()
     .fill(product1.product_key);
 
-  await page.waitForTimeout(200);
-
+  await page.getByText(product1.product_key, { exact: true }).waitFor({ state: 'visible', timeout: 5000 });
   await page.getByText(product1.product_key, { exact: true }).click();
-
-  await page.waitForTimeout(200);
 
   // Search and select product2
   await page
@@ -635,8 +628,7 @@ test('Product sales report test with filtering products', async ({ page, api }) 
     .first()
     .fill(product2.product_key);
 
-  await page.waitForTimeout(200);
-
+  await page.getByText(product2.product_key, { exact: true }).first().waitFor({ state: 'visible', timeout: 5000 });
   await page.getByText(product2.product_key, { exact: true }).first().click();
 
   await page.locator('[data-testid="combobox-input-field"]').click();
@@ -648,7 +640,7 @@ test('Product sales report test with filtering products', async ({ page, api }) 
   // Select "Custom" date range via React Select customSelector
   await selectCustomOption(page, 'Range', 'Custom');
 
-  await page.waitForTimeout(200);
+  await page.locator('[data-cy="reportStartDate"]').waitFor({ state: 'visible', timeout: 5000 });
 
   await page.fill('[data-cy="reportStartDate"]', dayjs().format('YYYY-MM-DD'));
 

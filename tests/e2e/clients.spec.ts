@@ -100,8 +100,6 @@ const createClient = async (params: CreateParams) => {
     .getByRole('link', { name: 'New Client' })
     .click();
 
-  await page.waitForTimeout(200);
-
   await page.locator('div').filter({ hasText: /^Name$/ }).getByRole('textbox').fill(clientName);
   // await page.locator('#name').fill(clientName);
   await page.locator('#first_name_0').fill('First Name');
@@ -801,6 +799,9 @@ test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with crea
 });
 
 test('Merge client action', async ({ page, api }) => {
+
+    // test.setTimeout(120000); // 2 minutes
+
   const mergeOneName = uniqueName('test merge one');
   const mergeTwoName = uniqueName('test merge two');
 
@@ -852,8 +853,8 @@ test('Merge client action', async ({ page, api }) => {
     .getByRole('link', { name: 'Clients', exact: true })
     .click();
 
-  await expect(page.getByText('firstMerge@example.com')).toBeVisible({ timeout: 10000 });
-  await expect(page.getByText('secondMerge@example.com')).not.toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('firstMerge@example.com').first()).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('secondMerge@example.com').first()).not.toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
@@ -875,8 +876,6 @@ test('Testing military_time property on all settings levels', async ({
     api,
     clientName,
   });
-
-  await page.waitForTimeout(100);
 
   await expect(page.locator('[data-cy="settingsTestingSpan"]')).toContainText(
     'Company: false'
@@ -942,15 +941,13 @@ test('Testing military_time property on all settings levels', async ({
   await groupContainer.scrollIntoViewIfNeeded();
   await groupInput.click();
   await groupInput.fill(groupName);
-  await page.waitForTimeout(500);
+  await page.getByText(groupName, { exact: true }).first().waitFor({ state: 'visible', timeout: 5000 });
   await page.getByText(groupName, { exact: true }).first().click();
 
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByText('Successfully updated client')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/clients/**');
-
-  await page.waitForTimeout(200);
 
   await expect(page.locator('[data-cy="settingsTestingSpan"]')).toContainText(
     'Group: true'
@@ -985,8 +982,6 @@ test('Testing military_time property on all settings levels', async ({
     .getByRole('link', { name: clientName, exact: true })
     .first()
     .click();
-
-  await page.waitForTimeout(200);
 
   await expect(page.locator('[data-cy="settingsTestingSpan"]')).toContainText(
     'Client: true'

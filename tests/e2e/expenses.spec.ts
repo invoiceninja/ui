@@ -657,8 +657,6 @@ test('Expense categories endpoint contains sort but not with parameter', async (
     .getByRole('link', { name: 'Enter Expense' })
     .click();
 
-  await page.waitForTimeout(500);
-
   const catInput = page.getByTestId('combobox-input-field').nth(3);
   await catInput.click();
   await catInput.pressSequentially(expenseCategoryName, { delay: 50 });
@@ -948,8 +946,6 @@ test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) =
 
   await page.waitForURL('**/expenses/create');
 
-  await page.waitForTimeout(300);
-
   // Type-hint the tax rate name to search, then select the matching option
   const taxInput1 = page.getByTestId('combobox-input-field').nth(5);
   await taxInput1.click();
@@ -1101,8 +1097,6 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
 
   await page.waitForURL('**/expenses/create');
 
-  await page.waitForTimeout(300);
-
   // Amount field uses NumericFormat (type="text"), find via label
   const amountInput = page.locator('dt:has-text("Amount")').locator('..').locator('input').first();
   await amountInput.fill('12222');
@@ -1175,7 +1169,7 @@ test('The new_expense_category action is not shown on the badge dropdown', async
     .getByRole('link', { name: 'Expenses', exact: true })
     .click();
 
-  await page.waitForTimeout(500);
+  await waitForTableData(page);
 
   // Add the Category column if not already present
   const badgeAlreadyVisible = await page
@@ -1187,12 +1181,10 @@ test('The new_expense_category action is not shown on the badge dropdown', async
   if (!badgeAlreadyVisible) {
     await page.getByRole('button').filter({ hasText: 'Columns' }).click();
 
-    await page.waitForTimeout(300);
-
     const columnInput = page.locator('input[role="combobox"]').last();
+    await columnInput.waitFor({ state: 'visible', timeout: 5000 });
     await columnInput.click();
     await columnInput.pressSequentially('Category', { delay: 50 });
-    await page.waitForTimeout(300);
 
     const categoryOption = page.getByRole('option', { name: 'Category' }).first();
     const optionExists = await categoryOption.isVisible().catch(() => false);
@@ -1209,8 +1201,6 @@ test('The new_expense_category action is not shown on the badge dropdown', async
     await expect(
       page.getByText('Successfully saved settings').first()
     ).toBeVisible({ timeout: 10000 });
-
-    await page.waitForTimeout(200);
   }
 
   // Click the chevron arrow inside the badge to open the dropdown
@@ -1254,7 +1244,7 @@ test('The new_expense_category action is shown on the badge dropdown', async ({
     .getByRole('link', { name: 'Expenses', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await waitForTableData(page);
 
   // Click the chevron arrow inside the badge to open the dropdown
   await page.locator('[data-cy="expenseCategoryBadge"]').first().locator('svg').click();
@@ -1296,7 +1286,7 @@ test('The new_expense_category action is shown on the badge dropdown with only c
     .getByRole('link', { name: 'Expenses', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await waitForTableData(page);
 
   // Click the chevron arrow inside the badge to open the dropdown
   await page.locator('[data-cy="expenseCategoryBadge"]').first().locator('svg').click();
@@ -1316,14 +1306,12 @@ test('Creating expense with Save / Create button', async ({ page, api }) => {
     .getByRole('link', { name: 'Expenses', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await waitForTableData(page);
 
   await page
     .getByRole('main')
     .getByRole('link', { name: 'Enter Expense' })
     .click();
-
-  await page.waitForTimeout(200);
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 

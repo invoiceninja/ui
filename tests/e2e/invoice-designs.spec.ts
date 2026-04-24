@@ -26,14 +26,14 @@ const createInvoiceDesign = async (params: CreateParams) => {
   // Wait for form to fully load and React state to initialize
   const nameInput = page.getByRole('main').getByRole('textbox').first();
   await nameInput.waitFor({ state: 'visible', timeout: 5000 });
-  await page.waitForTimeout(1500);
+  // Wait for the blank design API call to settle before typing
+  await page.waitForLoadState('networkidle');
 
   // Use click + clear + type to work with DebounceInput
   await nameInput.click();
   await nameInput.fill('');
   await nameInput.pressSequentially(name || 'Design Name', { delay: 50 });
   await nameInput.blur();
-  await page.waitForTimeout(500);
 
   await page
     .getByRole('main')
@@ -65,13 +65,10 @@ test('deleting invoice design with admin owner account', async ({ page, api }) =
   if (designId) api.trackEntity('designs', designId);
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
-  await page.waitForTimeout(200);
   await page.getByText('Delete').click();
-  await page.waitForTimeout(200);
   await expect(
     page.getByRole('button', { name: 'Restore', exact: true })
   ).toBeVisible({ timeout: 10000 });
-  await page.waitForTimeout(200);
   await expect(
     page.getByRole('button', { name: 'Archive', exact: true })
   ).not.toBeVisible({ timeout: 10000 });

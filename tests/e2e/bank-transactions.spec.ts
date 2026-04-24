@@ -3,6 +3,7 @@ import {
   login,
   logout,
   permissions,
+  waitForTableData,
 } from '$tests/e2e/helpers';
 import { test, expect, uniqueName, extractIdFromUrl } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
@@ -408,7 +409,7 @@ test('Create expense bulk action', async ({ page, api }) => {
     .getByRole('link', { name: 'Transactions', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await waitForTableData(page);
 
   const numberOfCheckBoxes = (
     await page.locator('[data-cy="dataTableCheckbox"]').all()
@@ -444,8 +445,7 @@ test('Create expense bulk action', async ({ page, api }) => {
     .first()
     .fill(vendorName);
 
-  await page.waitForTimeout(200);
-
+  await page.getByText(vendorName).first().waitFor({ state: 'visible', timeout: 5000 });
   await page.getByText(vendorName).first().click();
 
   await page.getByTestId('combobox-input-field').last().click();
@@ -455,8 +455,7 @@ test('Create expense bulk action', async ({ page, api }) => {
     .last()
     .fill(categoryName);
 
-  await page.waitForTimeout(200);
-
+  await page.getByText(categoryName).first().waitFor({ state: 'visible', timeout: 5000 });
   await page.getByText(categoryName).first().click();
 
   await expect(

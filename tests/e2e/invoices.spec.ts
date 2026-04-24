@@ -145,8 +145,6 @@ const createInvoice = async (params: CreateParams) => {
     .getByRole('link', { name: 'New Invoice' })
     .click();
 
-  await page.waitForTimeout(900);
-
   await page.getByRole('option').first().waitFor({ state: 'visible', timeout: 5000 });
   await page.getByRole('option').first().click();
 
@@ -353,8 +351,6 @@ test('can view and edit assigned invoice with create_invoice', async ({
   await expect(
     page.getByText('Successfully updated invoice', { exact: true })
   ).toBeVisible({ timeout: 10000 });
-
-  await page.waitForTimeout(1000);
 
   await page.locator('[data-cy="chevronDownButton"]').click();
 
@@ -569,8 +565,6 @@ test('invoice documents uploading with edit_invoice', async ({ page, api }) => {
 
   await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 
-  await page.waitForTimeout(500);
-
   await page
     .locator('input[type="file"]')
     .first()
@@ -758,8 +752,6 @@ test('Enter Payment displayed with admin permission', async ({ page, api }) => {
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  await page.waitForTimeout(500);
-
   await page
     .locator('[data-cy="dataTable"]')
     .getByRole('button', { name: 'Actions', exact: true })
@@ -814,8 +806,6 @@ test('Enter Payment displayed with creation permissions', async ({
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  await page.waitForTimeout(500);
-
   await page
     .locator('[data-cy="dataTable"]')
     .getByRole('button', { name: 'Actions', exact: true })
@@ -853,8 +843,6 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  await page.waitForTimeout(500);
-
   await page
     .locator('[data-cy="dataTable"]')
     .getByRole('button', { name: 'Actions', exact: true })
@@ -868,7 +856,7 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await page.locator('[data-cy="sendEmailModalXButton"]').click();
 
-  await page.waitForTimeout(200);
+  await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 5000 });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -879,13 +867,12 @@ test('Second and Third Custom email sending template is displayed', async ({
     .getByRole('link', { name: 'Templates & Reminders', exact: true })
     .click();
 
-  await page.waitForTimeout(500);
+  await page.getByRole('combobox').first().waitFor({ state: 'visible', timeout: 5000 });
 
   const selectTemplate = async (name: string) => {
     const templateField = page.getByRole('combobox').first();
     await templateField.click();
     await page.getByText(name, { exact: true }).click();
-    await page.waitForTimeout(300);
   };
 
   await selectTemplate('Second Custom');
@@ -921,8 +908,6 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  await page.waitForTimeout(500);
-
   await page
     .locator('[data-cy="dataTable"]')
     .getByRole('button', { name: 'Actions', exact: true })
@@ -955,7 +940,7 @@ test('Prevent navigation in the main navbar', async ({ page, api }) => {
 
   await page.locator('[type="date"]').first().blur();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page
     .locator('[type="date"]')
@@ -964,12 +949,12 @@ test('Prevent navigation in the main navbar', async ({ page, api }) => {
 
   await page.locator('[type="date"]').last().blur();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page.locator('#po_number').first().fill('po-number');
   await page.locator('#po_number').first().blur();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -1024,7 +1009,7 @@ test('Prevent archive invoice action', async ({ page, api }) => {
 
   await page.locator('[type="date"]').first().blur();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page.locator('[data-cy="chevronDownButton"]').click();
 
@@ -1058,7 +1043,7 @@ test('Prevent email invoice action', async ({ page, api }) => {
 
   await page.locator('[type="date"]').first().blur();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page
     .locator('[type="date"]')
@@ -1070,10 +1055,9 @@ test('Prevent email invoice action', async ({ page, api }) => {
 
   await page.locator('#po_number').first().click();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page.locator('[data-cy="chevronDownButton"]').click();
-  await page.waitForTimeout(500);
 
   await page.getByRole('link', { name: 'Email Invoice', exact: true }).click();
 
@@ -1124,7 +1108,7 @@ test('Prevent breadcrumb navigation', async ({ page, api }) => {
 
   await page.locator('[type="date"]').first().blur();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page
   .locator('[type="date"]')
@@ -1133,7 +1117,7 @@ test('Prevent breadcrumb navigation', async ({ page, api }) => {
 
   await page.locator('[type="date"]').last().blur();
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page
     .locator('nav[aria-label="Breadcrumb"]')
@@ -1193,19 +1177,17 @@ test('Products combobox various selections', async ({ page, api }) => {
     .getByRole('link', { name: 'New Invoice' })
     .click();
 
-  await page.waitForTimeout(200);
-
+  await page.getByRole('option').first().waitFor({ state: 'visible', timeout: 5000 });
   await page.getByRole('option').first().click();
 
   await page.getByRole('button', { name: 'Add Item' }).first().click();
 
   await page.locator('[data-cy="comboboxInput"]').first().click();
 
-  await page.waitForTimeout(200);
-
+  await page.locator('[data-combobox-element-id="0"]').first().waitFor({ state: 'visible', timeout: 5000 });
   await page.locator('[data-combobox-element-id="0"]').first().click();
 
-  await page.waitForTimeout(300);
+  await expect(page.locator('[id="notes"]').first()).not.toHaveValue('', { timeout: 5000 });
 
   const firstNotes = await page.locator('[id="notes"]').first().inputValue();
   expect(firstNotes.length).toBeGreaterThan(0);
@@ -1215,8 +1197,6 @@ test('Products combobox various selections', async ({ page, api }) => {
   const newItemIndex = 1;
 
   await page.locator('[data-cy="comboboxInput"]').nth(newItemIndex).click();
-
-  await page.waitForTimeout(500);
 
   const testProductName = uniqueName('test-product');
   await page
