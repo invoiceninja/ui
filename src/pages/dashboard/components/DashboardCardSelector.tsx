@@ -20,8 +20,12 @@ import {
 } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
 import { CgOptions } from 'react-icons/cg';
+import { MdClose, MdDragIndicator } from 'react-icons/md';
 import { CompanyUser } from '$app/common/interfaces/company-user';
-import { decodeDashboardField } from '$app/common/helpers/react-settings';
+import {
+  decodeDashboardField,
+  encodeDashboardField,
+} from '$app/common/helpers/react-settings';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useColorScheme } from '$app/common/colors';
@@ -30,11 +34,15 @@ import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import { resetChanges, updateUser } from '$app/common/stores/slices/user';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { Button } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
-import { FieldRow } from './FieldRow';
-import { AddFieldModal } from './AddFieldModal';
+import {
+  Calculate,
+  Field,
+  Format,
+  Period,
+} from '$app/common/interfaces/company-user';
 
 export const FIELDS_LABELS: Record<string, string> = {
   active_invoices: 'total_active_invoices',
@@ -52,9 +60,69 @@ export const FIELDS_LABELS: Record<string, string> = {
   invoice_paid_expenses: 'total_invoice_paid_expenses',
 };
 
-interface EditState {
-  index: number;
-  key: string;
+const FIELDS: Field[] = [
+  'active_invoices',
+  'outstanding_invoices',
+  'completed_payments',
+  'refunded_payments',
+  'active_quotes',
+  'unapproved_quotes',
+  'logged_tasks',
+  'invoiced_tasks',
+  'paid_tasks',
+  'logged_expenses',
+  'pending_expenses',
+  'invoiced_expenses',
+  'invoice_paid_expenses',
+];
+
+const PERIOD_OPTIONS: { value: Period; labelKey: string }[] = [
+  { value: 'current', labelKey: 'current_period' },
+  { value: 'previous', labelKey: 'previous_period' },
+  { value: 'total', labelKey: 'total' },
+];
+
+const CALCULATE_OPTIONS: { value: Calculate; labelKey: string }[] = [
+  { value: 'sum', labelKey: 'sum' },
+  { value: 'avg', labelKey: 'average' },
+  { value: 'count', labelKey: 'count' },
+];
+
+interface ToggleGroupProps<T extends string> {
+  options: { value: T; labelKey: string }[];
+  value: T;
+  onChange: (value: T) => void;
+}
+
+function ToggleGroup<T extends string>({
+  options,
+  value,
+  onChange,
+}: ToggleGroupProps<T>) {
+  const [t] = useTranslation();
+  const colors = useColorScheme();
+
+  return (
+    <div
+      className="flex rounded-lg overflow-hidden border"
+      style={{ borderColor: colors.$24 }}
+    >
+      {options.map((option, index) => (
+        <div
+          key={option.value}
+          className="flex items-center px-3 py-1.5 cursor-pointer text-xs font-medium select-none"
+          onClick={() => onChange(option.value)}
+          style={{
+            backgroundColor: value === option.value ? colors.$3 : colors.$1,
+            color: value === option.value ? colors.$1 : colors.$3,
+            borderLeft: index > 0 ? `1px solid ${colors.$24}` : undefined,
+          }}
+        >
+          {t(option.labelKey)}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export function DashboardCardSelector() {
@@ -65,18 +133,45 @@ export function DashboardCardSelector() {
   const currentUser = useCurrentUser();
 
   const [fields, setFields] = useState<string[]>([]);
-  const [addOpen, setAddOpen] = useState<boolean>(false);
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [manageOpen, setManageOpen] = useState<boolean>(false);
-  const [editState, setEditState] = useState<EditState | null>(null);
+
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedField, setSelectedField] = useState<Field | ''>('');
+  const [period, setPeriod] = useState<Period>('current');
+  const [calculate, setCalculate] = useState<Calculate>('sum');
+  const [format, setFormat] = useState<Format>('money');
 
   useEffect(() => {
     if (manageOpen && currentUser) {
       setFields(
         currentUser.company_user?.react_settings.dashboard_fields ?? []
       );
+
+      setSearchQuery('');
+      setSelectedField('');
+      setPeriod('current');
+      setCalculate('sum');
+      setFormat('money');
     }
   }, [manageOpen, currentUser]);
+
+  const filteredFields = FIELDS.filter((f) =>
+    t(FIELDS_LABELS[f]).toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const isDuplicate = fields.some((key) => {
+    const d = decodeDashboardField(key);
+
+    return (
+      d.field === selectedField &&
+      d.period === period &&
+      d.calculate === calculate &&
+      d.format === format
+    );
+  });
+
+  const isTaskField = selectedField.endsWith('tasks');
 
   const handleSave = () => {
     const updated = cloneDeep(currentUser);
@@ -97,48 +192,56 @@ export function DashboardCardSelector() {
     )
       .then((response: GenericSingleResourceResponse<CompanyUser>) => {
         toast.success('updated_settings');
+
         set(updated, 'company_user', response.data.data);
+
         $refetch(['company_users']);
+
         dispatch(updateUser(updated));
         dispatch(resetChanges());
+
         setManageOpen(false);
       })
       .finally(() => setIsFormBusy(false));
   };
 
+  const handleAdd = () => {
+    if (!selectedField || isDuplicate) {
+      return;
+    }
+
+    const existingCount = fields.filter((k) => {
+      const d = decodeDashboardField(k);
+
+      return (
+        d.field === selectedField &&
+        d.period === period &&
+        d.calculate === calculate &&
+        d.format === format
+      );
+    }).length;
+
+    const key = encodeDashboardField(
+      selectedField as Field,
+      period,
+      calculate,
+      isTaskField ? format : 'money',
+      existingCount
+    );
+
+    setFields((prev) => [...prev, key]);
+    setSelectedField('');
+  };
+
   const handleRemove = (index: number) => {
     setFields((prev) => prev.filter((_, i) => i !== index));
-    if (editState?.index === index) {
-      setEditState(null);
-    }
-  };
-
-  const handleEdit = (index: number) => {
-    setEditState({ index, key: fields[index] });
-    setAddOpen(true);
-  };
-
-  const handleAddOrEdit = (key: string) => {
-    if (editState !== null) {
-      setFields((prev) =>
-        prev.map((k, i) => (i === editState.index ? key : k))
-      );
-      setEditState(null);
-    } else {
-      setFields((prev) => [...prev, key]);
-    }
-    setAddOpen(false);
-  };
-
-  const handleAddModalClose = () => {
-    setAddOpen(false);
-    setEditState(null);
   };
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
       return;
     }
+
     setFields((prev) =>
       arrayMoveImmutable(prev, result.source.index, result.destination!.index)
     );
@@ -157,82 +260,283 @@ export function DashboardCardSelector() {
         title={t('settings')}
         visible={manageOpen}
         onClose={() => setManageOpen(false)}
-        disableClosing={addOpen}
+        size="large"
       >
-        <div className="flex flex-col space-y-4">
-          {fields.length === 0 && (
-            <span className="text-center font-medium text-gray-500">
-              {t('no_records_found')}
+        <div
+          className="flex flex-col lg:flex-row lg:divide-x min-h-0"
+          style={{
+            borderColor: colors.$21,
+            // @ts-expect-error - This is a valid CSS variable
+            '--tw-divide-opacity': 1,
+            '--tw-divide-color': colors.$21,
+          }}
+        >
+          <div className="flex flex-col lg:w-2/5 lg:pr-5 pb-4 lg:pb-0">
+            <span
+              className="text-sm font-semibold mb-3"
+              style={{ color: colors.$3 }}
+            >
+              {t('current')} {t('cards')}
             </span>
-          )}
 
-          {fields.length > 0 && (
-            <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable
-                droppableId="dashboard-fields"
-                renderClone={(provided, _, rubric) => (
-                  <div
-                    className="flex items-center justify-between text-sm"
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    ref={provided.innerRef}
+            {fields.length === 0 && (
+              <div className="flex items-center justify-center py-8">
+                <span className="text-sm" style={{ color: colors.$17 }}>
+                  {t('no_records_found')}
+                </span>
+              </div>
+            )}
+
+            {fields.length > 0 && (
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="dashboard-fields">
+                  {(droppableProvided) => (
+                    <div
+                      className="flex flex-col space-y-1 max-h-72 overflow-y-auto"
+                      {...droppableProvided.droppableProps}
+                      ref={droppableProvided.innerRef}
+                    >
+                      {fields.map((key, index) => {
+                        const decoded = decodeDashboardField(key);
+
+                        return (
+                          <Draggable
+                            key={`${key}-${index}`}
+                            draggableId={`${key}-${index}`}
+                            index={index}
+                          >
+                            {(provided) => (
+                              <div
+                                className="flex items-center justify-between rounded-md px-2 py-2"
+                                style={{ backgroundColor: colors.$25 }}
+                                {...provided.draggableProps}
+                                ref={provided.innerRef}
+                              >
+                                <div
+                                  className="flex items-center space-x-2 min-w-0 flex-1 cursor-grab"
+                                  {...provided.dragHandleProps}
+                                >
+                                  <Icon
+                                    element={MdDragIndicator}
+                                    size={16}
+                                    style={{ color: colors.$17 }}
+                                  />
+
+                                  <div className="flex flex-col min-w-0">
+                                    <span
+                                      className="text-sm font-medium truncate"
+                                      style={{ color: colors.$3 }}
+                                    >
+                                      {t(
+                                        FIELDS_LABELS[decoded.field] ??
+                                          decoded.field
+                                      )}
+                                    </span>
+
+                                    <span
+                                      className="text-xs truncate"
+                                      style={{ color: colors.$17 }}
+                                    >
+                                      {t(
+                                        decoded.period === 'current'
+                                          ? 'current_period'
+                                          : decoded.period === 'previous'
+                                          ? 'previous_period'
+                                          : 'total'
+                                      )}
+                                      {' · '}
+                                      {t(
+                                        decoded.calculate === 'avg'
+                                          ? 'average'
+                                          : decoded.calculate
+                                      )}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  className="p-1 rounded-md shrink-0"
+                                  onClick={() => handleRemove(index)}
+                                >
+                                  <Icon
+                                    element={MdClose}
+                                    size={16}
+                                    style={{ color: colors.$17 }}
+                                  />
+                                </button>
+                              </div>
+                            )}
+                          </Draggable>
+                        );
+                      })}
+
+                      {droppableProvided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            )}
+          </div>
+
+          <div className="flex flex-col lg:w-3/5 lg:pl-5 pt-4 lg:pt-0">
+            <span
+              className="text-sm font-semibold mb-3"
+              style={{ color: colors.$3 }}
+            >
+              {t('add_field')}
+            </span>
+
+            <InputField
+              placeholder={t('search')}
+              value={searchQuery}
+              onValueChange={setSearchQuery}
+              changeOverride
+              debounceTimeout={0}
+              clearable
+            />
+
+            <div
+              className="flex flex-col mt-2 max-h-40 overflow-y-auto rounded-md border"
+              style={{ borderColor: colors.$24 }}
+            >
+              {filteredFields.map((f) => (
+                <div
+                  key={f}
+                  className="flex items-center px-3 py-2 cursor-pointer text-sm"
+                  onClick={() => setSelectedField(f)}
+                  style={{
+                    backgroundColor:
+                      selectedField === f ? colors.$25 : 'transparent',
+                    color: colors.$3,
+                  }}
+                >
+                  {t(FIELDS_LABELS[f])}
+                </div>
+              ))}
+
+              {filteredFields.length === 0 && (
+                <div className="flex items-center justify-center py-4">
+                  <span className="text-xs" style={{ color: colors.$17 }}>
+                    {t('no_records_found')}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {selectedField && (
+              <div className="flex flex-col space-y-3 mt-4">
+                <div className="flex items-center space-x-3">
+                  <span
+                    className="text-xs font-medium shrink-0"
+                    style={{ color: colors.$22 }}
                   >
-                    <FieldRow
-                      decoded={decodeDashboardField(
-                        fields[rubric.source.index]
-                      )}
+                    {t('period')}
+                  </span>
+
+                  <ToggleGroup
+                    options={PERIOD_OPTIONS}
+                    value={period}
+                    onChange={setPeriod}
+                  />
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <span
+                    className="text-xs font-medium shrink-0"
+                    style={{ color: colors.$22 }}
+                  >
+                    {t('calculate')}
+                  </span>
+
+                  <ToggleGroup
+                    options={CALCULATE_OPTIONS}
+                    value={calculate}
+                    onChange={setCalculate}
+                  />
+                </div>
+
+                {isTaskField && (
+                  <div className="flex items-center space-x-3">
+                    <span
+                      className="text-xs font-medium shrink-0"
+                      style={{ color: colors.$22 }}
+                    >
+                      {t('format')}
+                    </span>
+
+                    <ToggleGroup
+                      options={[
+                        { value: 'money' as Format, labelKey: 'money' },
+                        { value: 'time' as Format, labelKey: 'time' },
+                      ]}
+                      value={format}
+                      onChange={setFormat}
                     />
                   </div>
                 )}
-              >
-                {(droppableProvided) => (
-                  <div
-                    className="flex flex-col"
-                    {...droppableProvided.droppableProps}
-                    ref={droppableProvided.innerRef}
+
+                <div
+                  className="flex flex-col items-center justify-center rounded-md border px-4 py-3"
+                  style={{ borderColor: colors.$24 }}
+                >
+                  <span
+                    className="text-sm font-medium"
+                    style={{ color: colors.$3 }}
                   >
-                    {fields.map((key, index) => (
-                      <Draggable
-                        key={`${key}-${index}`}
-                        draggableId={`${key}-${index}`}
-                        index={index}
-                      >
-                        {(provided) => (
-                          <div
-                            className="flex items-center justify-between py-1.5"
-                            {...provided.draggableProps}
-                            ref={provided.innerRef}
-                          >
-                            <div
-                              className="flex flex-1 items-center cursor-pointer"
-                              {...provided.dragHandleProps}
-                            >
-                              <FieldRow
-                                decoded={decodeDashboardField(key)}
-                                onRemove={() => handleRemove(index)}
-                                onEdit={() => handleEdit(index)}
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {droppableProvided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          )}
+                    {t(FIELDS_LABELS[selectedField] ?? selectedField)}
+                  </span>
 
-          <Button
-            behavior="button"
-            type="secondary"
-            onClick={() => setAddOpen(true)}
-          >
-            {t('add_field')}
-          </Button>
+                  <span
+                    className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium mt-1"
+                    style={{
+                      backgroundColor:
+                        colors.$0 === 'dark' ? colors.$25 : colors.$23,
+                      color: colors.$17,
+                    }}
+                  >
+                    <span
+                      className="h-1.5 w-1.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: '#5DCAA5' }}
+                    />
+                    {t(
+                      period === 'current'
+                        ? 'current_period'
+                        : period === 'previous'
+                        ? 'previous_period'
+                        : 'total'
+                    )}
+                    {' · '}
+                    {t(calculate === 'avg' ? 'average' : calculate)}
+                  </span>
+                </div>
 
+                <div className="flex items-center justify-between">
+                  {isDuplicate && (
+                    <span className="text-xs" style={{ color: colors.$17 }}>
+                      {t('card_already_exists')}
+                    </span>
+                  )}
+
+                  <div className="flex-1" />
+
+                  <Button
+                    behavior="button"
+                    onClick={handleAdd}
+                    disabled={isDuplicate}
+                    disableWithoutIcon={isDuplicate}
+                  >
+                    {t('add')}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-5">
           <Button
+            className="w-full"
             behavior="button"
             onClick={handleSave}
             disabled={isFormBusy}
@@ -242,15 +546,6 @@ export function DashboardCardSelector() {
           </Button>
         </div>
       </Modal>
-
-      <AddFieldModal
-        visible={addOpen}
-        onClose={handleAddModalClose}
-        onAdd={handleAddOrEdit}
-        existingFields={fields}
-        editKey={editState?.key ?? null}
-        editIndex={editState?.index ?? null}
-      />
     </>
   );
 }
