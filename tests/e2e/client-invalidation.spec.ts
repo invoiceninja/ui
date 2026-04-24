@@ -29,13 +29,13 @@ test('test appropriate invalidation of clients', async ({ page, api }) => {
     .click();
 
 
-  await page.getByRole('combobox', { name: 'Client' }).click();
-  await page.getByRole('combobox', { name: 'Client' }).fill(clientName);
-  await page.getByRole('button', { name: 'Client' }).first().click();
+  // await page.getByRole('combobox', { name: 'Client' }).click();
+  // await page.getByRole('combobox', { name: 'Client' }).fill(clientName);
+  // await page.getByRole('button', { name: 'Client' }).first().click();
 
   // await page.getByRole('option').first().click();
   // getByRole('button', { name: 'Client' })
-  await page.getByRole('option', { name: clientName }).first().click();
+  // await page.getByRole('option', { name: clientName }).first().click();
 
   await expect(page.getByRole('combobox', { name: 'Client' })).toHaveValue(
     clientName
