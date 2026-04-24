@@ -283,9 +283,28 @@ test('Can add a company and navigate to account management', async ({
 
   await page.waitForURL('**/settings/account_management');
 
-  await expect(
+  await expect( 
     page.getByRole('heading', {
       name: 'Account Management',
     }).first()
   ).toBeVisible({ timeout: 10000 });
+
+  await page.getByRole('link', { name: 'Danger Zone' }).click();
+  await page.getByText('Delete Company').click();
+
+  const deleteField = page.getByRole('textbox', { name: 'Please type "delete" to' });
+  await deleteField.fill('delete');
+  await deleteField.blur();
+  await deleteField.press('Tab');
+
+  await page.getByRole('textbox', { name: 'Password*' }).click();
+  await page.getByRole('textbox', { name: 'Password*' }).fill('password');
+
+  await deleteField.click();
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
+  await page.locator('input[name="email"]').click();
+  await page.getByRole('button', { name: 'Login' }).click();
 });

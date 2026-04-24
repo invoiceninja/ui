@@ -354,6 +354,8 @@ test('can view and edit assigned invoice with create_invoice', async ({
     page.getByText('Successfully updated invoice', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
+  await page.waitForTimeout(1000);
+
   await page.locator('[data-cy="chevronDownButton"]').click();
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
@@ -1058,7 +1060,20 @@ test('Prevent email invoice action', async ({ page, api }) => {
 
   await page.waitForTimeout(200);
 
+  await page
+    .locator('[type="date"]')
+    .nth(1)
+    .first()
+    .fill(dayjs().add(14, 'day').format('YYYY-MM-DD'));
+
+  await page.locator('[type="date"]').nth(1).first().blur();
+
+  await page.locator('#po_number').first().click();
+
+  await page.waitForTimeout(200);
+
   await page.locator('[data-cy="chevronDownButton"]').click();
+  await page.waitForTimeout(500);
 
   await page.getByRole('link', { name: 'Email Invoice', exact: true }).click();
 
