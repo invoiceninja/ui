@@ -10,9 +10,13 @@
 
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { SyntheticEvent, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
+import ReactCrop, {
+  Crop,
+  PixelCrop,
+  convertToPixelCrop,
+} from 'react-image-crop';
 import { getCroppedImg } from '../common/helpers/crop-image';
 import 'react-image-crop/dist/ReactCrop.css';
 
@@ -22,6 +26,14 @@ interface Props {
   onClose: () => void;
   onCropComplete: (croppedBlob: Blob) => Promise<void>;
 }
+
+const FULL_CROP: Crop = {
+  unit: '%',
+  x: 0,
+  y: 0,
+  width: 100,
+  height: 100,
+};
 
 export function LogoCropModal({
   visible,
@@ -37,43 +49,25 @@ export function LogoCropModal({
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
 
-  const getFullCrop = (): Crop => {
-    return {
-      unit: '%',
-      x: 0,
-      y: 0,
-      width: 100,
-      height: 100,
-    };
-  };
+  const handleImageLoad = () => {
+    setCrop(FULL_CROP);
 
-  const handleImageLoad = (event: SyntheticEvent<HTMLImageElement>) => {
-    const { width, height } = event.currentTarget;
+    setTimeout(() => {
+      if (imgRef.current) {
+        const { width, height } = imgRef.current;
 
-    const defaultCrop = getFullCrop();
-
-    setCrop(defaultCrop);
-    setCompletedCrop({
-      unit: 'px',
-      x: 0,
-      y: 0,
-      width,
-      height,
-    });
+        setCompletedCrop(convertToPixelCrop(FULL_CROP, width, height));
+      }
+    }, 50);
   };
 
   const handleReset = () => {
+    setCrop(FULL_CROP);
+
     if (imgRef.current) {
       const { width, height } = imgRef.current;
 
-      setCrop(getFullCrop());
-      setCompletedCrop({
-        unit: 'px',
-        x: 0,
-        y: 0,
-        width,
-        height,
-      });
+      setCompletedCrop(convertToPixelCrop(FULL_CROP, width, height));
     }
   };
 
@@ -106,7 +100,7 @@ export function LogoCropModal({
       disableClosing={isFormBusy}
     >
       <div className="flex flex-col space-y-5">
-        <div className="flex items-center justify-center w-full pb-2">
+        <div className="flex items-center justify-center w-full p-4">
           {imageSrc && (
             <ReactCrop
               crop={crop}
