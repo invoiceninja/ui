@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { cloneDeep, set } from 'lodash';
@@ -197,6 +197,8 @@ export function DashboardCardSelector() {
   const colors = useColorScheme();
   const currentUser = useCurrentUser();
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
   const [fields, setFields] = useState<string[]>([]);
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [manageOpen, setManageOpen] = useState<boolean>(false);
@@ -309,6 +311,13 @@ export function DashboardCardSelector() {
 
     setFields((prev) => [...prev, key]);
     setSelectedField('');
+
+    requestAnimationFrame(() => {
+      scrollContainerRef.current?.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    });
   }, [
     selectedField,
     isDuplicate,
@@ -361,6 +370,7 @@ export function DashboardCardSelector() {
             </span>
 
             <div
+              ref={scrollContainerRef}
               className="flex-1 overflow-y-auto rounded-md p-2"
               style={{
                 maxHeight: '24rem',
