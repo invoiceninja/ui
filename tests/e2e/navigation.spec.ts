@@ -106,6 +106,15 @@ test('Prevent quote quick popover navigation', async ({ page }) => {
   // Wait for debounce (300ms) + React re-render to detect the change as unsaved
   await page.waitForTimeout(400);
 
+  await page
+    .locator('[type="date"]')
+    .nth(1)
+    .first()
+    .fill(dayjs().add(14, 'day').format('YYYY-MM-DD'));
+
+  await page.locator('[type="date"]').nth(1).first().blur();
+  await page.locator('[type="date"]').first().blur();
+
   await page.locator('[data-cy="quickPopoverButton"]').click();
   await page.waitForTimeout(400);
 

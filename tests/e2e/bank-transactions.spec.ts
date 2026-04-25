@@ -6,15 +6,14 @@ import {
   waitForTableData,
 } from '$tests/e2e/helpers';
 import { test, expect, uniqueName, extractIdFromUrl } from '$tests/e2e/fixtures';
-import { Page } from '@playwright/test';
+import { Page, request as playwrightRequest } from '@playwright/test';
 import { createExpenseCategory } from './expense-categories-helpers';
 import { createVendor } from './vendor-helpers';
 import { createApiContext, createEntityViaApi, type ApiContext } from './api-helpers';
 
 async function ensureBankAccountExists(apiContext?: ApiContext): Promise<void> {
   const api = apiContext || await createApiContext(process.env.VITE_API_URL!);
-  const { request } = await import('@playwright/test');
-  const ctx = await request.newContext({ baseURL: api.baseUrl });
+  const ctx = await playwrightRequest.newContext({ baseURL: api.baseUrl });
 
   const response = await ctx.get('/api/v1/bank_integrations?per_page=1', {
     headers: api.headers,
@@ -25,7 +24,7 @@ async function ensureBankAccountExists(apiContext?: ApiContext): Promise<void> {
   if (body.data?.length > 0) return;
 
   // Create a bank account
-  const createCtx = await request.newContext({ baseURL: api.baseUrl });
+  const createCtx = await playwrightRequest.newContext({ baseURL: api.baseUrl });
   await createCtx.post('/api/v1/bank_integrations', {
     headers: api.headers,
     data: {
@@ -38,14 +37,40 @@ async function ensureBankAccountExists(apiContext?: ApiContext): Promise<void> {
   await createCtx.dispose();
 }
 
+async function fetchBankTransaction(id: string, apiContext?: ApiContext): Promise<Record<string, unknown>> {
+  const api = apiContext || (await createApiContext(process.env.VITE_API_URL!));
+  const ctx = await playwrightRequest.newContext({ baseURL: api.baseUrl });
+  const response = await ctx.get(`/api/v1/bank_transactions/${id}`, {
+    headers: api.headers,
+  });
+
+  if (!response.ok()) {
+    const errorBody = await response.text();
+    await ctx.dispose();
+    throw new Error(`Failed to fetch bank transaction ${id}: ${response.status()} ${errorBody}`);
+  }
+
+  const body = await response.json();
+  await ctx.dispose();
+
+  return body?.data?.data || body?.data || body;
+}
+
 interface CreateParams {
   page: Page;
   isTableEditable?: boolean;
   withNavigation?: boolean;
   type?: 'withdrawal';
+  notes?: string;
 }
 const createBankTransaction = async (params: CreateParams) => {
-  const { page, withNavigation = true, isTableEditable = true, type } = params;
+  const {
+    page,
+    withNavigation = true,
+    isTableEditable = true,
+    type,
+    notes = 'Transaction Notes',
+  } = params;
 
   // Ensure at least one bank account exists for the combobox
   await ensureBankAccountExists();
@@ -83,7 +108,7 @@ const createBankTransaction = async (params: CreateParams) => {
     .getByRole('main')
     .locator('[type="text"]')
     .nth(1)
-    .fill('Transaction Notes');
+    .fill(notes);
 
   await page.getByRole('button', { name: 'Save' }).click();
 
@@ -369,6 +394,133 @@ test('can create a transaction', async ({ page, api }) => {
 
 //   await logout(page);
 // });
+
+test('archiving transaction with edit_bank_transaction removes it from active list', async ({
+  page,
+  api,
+}) => {
+  const { clear, save, set } = permissions(page);
+  const notes = uniqueName('txn-archive');
+
+  await login(page);
+  await clear('bank_transactions@example.com');
+  await set('create_bank_transaction', 'edit_bank_transaction');
+  await save();
+  await logout(page);
+
+  await login(page, 'bank_transactions@example.com', 'password');
+
+  await createBankTransaction({ page, notes });
+  await page.waitForURL('**/transactions/**/edit');
+
+  const txId = extractIdFromUrl(page.url(), 'transactions');
+  expect(txId).toBeTruthy();
+  if (!txId) throw new Error('Failed to extract transaction id');
+  if (txId) api.trackEntity('bank_transactions', txId);
+
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+  await page.getByRole('button', { name: 'Archive', exact: true }).click();
+
+  await expect(
+    page.locator('[data-cy="topNavbar"]').getByRole('button', { name: 'Restore', exact: true })
+  ).toBeVisible({ timeout: 10000 });
+  await expect
+    .poll(
+      async () => {
+        const tx = await fetchBankTransaction(txId);
+        return Number(tx.archived_at ?? 0);
+      },
+      { timeout: 10000 }
+    )
+    .toBeGreaterThan(0);
+
+  await logout(page);
+});
+
+test('restoring an archived transaction returns it to active list', async ({
+  page,
+  api,
+}) => {
+  const { clear, save, set } = permissions(page);
+  const notes = uniqueName('txn-restore');
+
+  await login(page);
+  await clear('bank_transactions@example.com');
+  await set('create_bank_transaction', 'edit_bank_transaction');
+  await save();
+  await logout(page);
+
+  await login(page, 'bank_transactions@example.com', 'password');
+
+  await createBankTransaction({ page, notes });
+  await page.waitForURL('**/transactions/**/edit');
+
+  const txId = extractIdFromUrl(page.url(), 'transactions');
+  expect(txId).toBeTruthy();
+  if (!txId) throw new Error('Failed to extract transaction id');
+  if (txId) api.trackEntity('bank_transactions', txId);
+
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+  await page.getByRole('button', { name: 'Archive', exact: true }).click();
+  await page
+    .locator('[data-cy="topNavbar"]')
+    .getByRole('button', { name: 'Restore', exact: true })
+    .click();
+
+  await expect
+    .poll(
+      async () => {
+        const tx = await fetchBankTransaction(txId);
+        return Number(tx.archived_at ?? 0);
+      },
+      { timeout: 10000 }
+    )
+    .toBe(0);
+  await expect(
+    page.locator('[data-cy="topNavbar"]').getByRole('button', { name: 'Restore', exact: true })
+  ).not.toBeVisible({ timeout: 10000 });
+
+  await logout(page);
+});
+
+test('deleting transaction with edit_bank_transaction removes it from active list', async ({
+  page,
+  api,
+}) => {
+  const { clear, save, set } = permissions(page);
+  const notes = uniqueName('txn-delete');
+
+  await login(page);
+  await clear('bank_transactions@example.com');
+  await set('create_bank_transaction', 'edit_bank_transaction');
+  await save();
+  await logout(page);
+
+  await login(page, 'bank_transactions@example.com', 'password');
+
+  await createBankTransaction({ page, notes });
+  await page.waitForURL('**/transactions/**/edit');
+
+  const createdId = extractIdFromUrl(page.url(), 'transactions');
+  expect(createdId).toBeTruthy();
+  if (!createdId) throw new Error('Failed to extract transaction id');
+  if (createdId) api.trackEntity('bank_transactions', createdId);
+
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+  await page.getByRole('button', { name: 'Delete', exact: true }).click();
+
+  await expect
+    .poll(
+      async () => {
+        const tx = await fetchBankTransaction(createdId);
+        return Number(tx.is_deleted ?? 0);
+      },
+      { timeout: 10000 }
+    )
+    .toBeGreaterThan(0);
+
+  await logout(page);
+});
 
 test('Create expense bulk action', async ({ page, api }) => {
   await login(page);
