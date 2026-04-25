@@ -10,6 +10,7 @@ import {
 } from '$tests/e2e/helpers';
 import { test, expect, uniqueName, type ApiFixture } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
+import { createApiContext, fetchEntityIds } from './api-helpers';
 
 interface ModalAction {
   label: string;
@@ -599,6 +600,14 @@ test('can purge client with admin permission', async ({ page, api }) => {
 
   await expect(page.getByText('Successfully purged client')).toBeVisible({ timeout: 10000 });
 
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Clients', exact: true })
+    .click();
+  await page.waitForURL('**/clients');
+  await page.locator('#filter').fill(clientName);
+  await expect(page.getByRole('link', { name: clientName, exact: true })).toHaveCount(0);
+
   await logout(page);
 });
 
@@ -903,6 +912,90 @@ test('New Resource action routes to Invoice create for selected client', async (
   await page.getByRole('button', { name: 'Invoice', exact: true }).click();
 
   await page.waitForURL(`**/invoices/create?client=${clientId}`);
+
+  await logout(page);
+});
+
+test('Clone action creates a new client from overview', async ({ page, api }) => {
+  const { clear, save, set } = permissions(page);
+  const clientName = uniqueName('test clone client');
+
+  await login(page);
+  await clear('clients@example.com');
+  await set('create_client', 'edit_client');
+  await save();
+  await logout(page);
+
+  await login(page, 'clients@example.com', 'password');
+
+  await createClient({
+    page,
+    api,
+    clientName,
+    isTableEditable: true,
+  });
+
+  const adminApi = await createApiContext(process.env.VITE_API_URL!);
+  const beforeCount = (await fetchEntityIds(adminApi, 'clients')).length;
+
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+  await page
+    .locator('[data-cy="clientActionDropdown"]')
+    .getByRole('button', { name: 'Clone', exact: true })
+    .click();
+
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+  await page.waitForURL('**/clients');
+  await waitForTableData(page);
+
+  await expect
+    .poll(async () => (await fetchEntityIds(adminApi, 'clients')).length, {
+      timeout: 10000,
+    })
+    .toBeGreaterThan(beforeCount);
+
+  await logout(page);
+});
+
+test('Add Comment action saves and displays a client comment', async ({ page, api }) => {
+  const { clear, save, set } = permissions(page);
+  const clientName = uniqueName('test comment client');
+  const comment = uniqueName('client-comment');
+
+  await login(page);
+  await clear('clients@example.com');
+  await set('create_client', 'edit_client');
+  await save();
+  await logout(page);
+
+  await login(page, 'clients@example.com', 'password');
+
+  await createClient({
+    page,
+    api,
+    clientName,
+    isTableEditable: true,
+  });
+
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+  await page
+    .locator('[data-cy="clientActionDropdown"]')
+    .getByRole('button', { name: 'Add Comment', exact: true })
+    .click();
+
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible({ timeout: 10000 });
+  await dialog.locator('textarea').fill(comment);
+  await dialog.getByRole('button', { name: 'Add', exact: true }).click();
+
+  await expect(dialog).not.toBeVisible({ timeout: 10000 });
+
+  await page
+    .getByRole('link', { name: 'History / Activity', exact: true })
+    .click();
+  await page.waitForURL('**/history_and_activities');
+
+  await expect(page.getByText(comment)).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
