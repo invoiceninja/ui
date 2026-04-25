@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { cloneDeep, set } from 'lodash';
@@ -21,6 +21,7 @@ import {
 import { arrayMoveImmutable } from 'array-move';
 import { CgOptions } from 'react-icons/cg';
 import { MdClose, MdDragIndicator } from 'react-icons/md';
+import { IoWarning } from 'react-icons/io5';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
   decodeDashboardField,
@@ -88,29 +89,40 @@ const CALCULATE_OPTIONS: { value: Calculate; labelKey: string }[] = [
   { value: 'count', labelKey: 'count' },
 ];
 
-interface ToggleGroupProps<T extends string> {
-  options: { value: T; labelKey: string }[];
-  value: T;
-  onChange: (value: T) => void;
+interface ToggleOption {
+  value: string;
+  labelKey: string;
 }
 
-function ToggleGroup<T extends string>({
+interface ToggleGroupProps {
+  options: ToggleOption[];
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+}
+
+function ToggleGroup({
   options,
   value,
   onChange,
-}: ToggleGroupProps<T>) {
+  disabled = false,
+}: ToggleGroupProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
   return (
     <div
-      className="flex rounded-lg overflow-hidden border"
-      style={{ borderColor: colors.$24 }}
+      className="flex rounded-lg overflow-hidden border w-full"
+      style={{
+        borderColor: colors.$24,
+        opacity: disabled ? 0.4 : 1,
+        pointerEvents: disabled ? 'none' : 'auto',
+      }}
     >
       {options.map((option, index) => (
         <div
           key={option.value}
-          className="flex items-center px-3 py-1.5 cursor-pointer text-xs font-medium select-none"
+          className="flex flex-1 items-center justify-center px-2 py-1.5 cursor-pointer text-xs font-medium select-none"
           onClick={() => onChange(option.value)}
           style={{
             backgroundColor: value === option.value ? colors.$3 : colors.$1,
@@ -122,6 +134,59 @@ function ToggleGroup<T extends string>({
         </div>
       ))}
     </div>
+  );
+}
+
+interface DragItemProps {
+  decoded: ReturnType<typeof decodeDashboardField>;
+  onRemove?: () => void;
+}
+
+function DragItem({ decoded, onRemove }: DragItemProps) {
+  const [t] = useTranslation();
+  const colors = useColorScheme();
+
+  return (
+    <>
+      <div className="flex items-center space-x-2 min-w-0 flex-1">
+        <Icon
+          element={MdDragIndicator}
+          size={16}
+          style={{ color: colors.$17 }}
+        />
+
+        <div className="flex flex-col min-w-0">
+          <span
+            className="text-sm font-medium truncate"
+            style={{ color: colors.$3 }}
+          >
+            {t(FIELDS_LABELS[decoded.field] ?? decoded.field)}
+          </span>
+
+          <span className="text-xs truncate" style={{ color: colors.$17 }}>
+            {t(
+              decoded.period === 'current'
+                ? 'current_period'
+                : decoded.period === 'previous'
+                ? 'previous_period'
+                : 'total'
+            )}
+            {' · '}
+            {t(decoded.calculate === 'avg' ? 'average' : decoded.calculate)}
+          </span>
+        </div>
+      </div>
+
+      {onRemove && (
+        <button
+          type="button"
+          className="p-1 rounded-md shrink-0"
+          onClick={onRemove}
+        >
+          <Icon element={MdClose} size={16} style={{ color: colors.$17 }} />
+        </button>
+      )}
+    </>
   );
 }
 
@@ -156,24 +221,37 @@ export function DashboardCardSelector() {
     }
   }, [manageOpen, currentUser]);
 
-  const filteredFields = FIELDS.filter((f) =>
-    t(FIELDS_LABELS[f]).toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredFields = useMemo(
+    () =>
+      FIELDS.filter((f) =>
+        t(FIELDS_LABELS[f]).toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    [searchQuery, t]
   );
 
-  const isDuplicate = fields.some((key) => {
-    const d = decodeDashboardField(key);
+  const isDuplicate = useMemo(
+    () =>
+      selectedField
+        ? fields.some((key) => {
+            const d = decodeDashboardField(key);
 
-    return (
-      d.field === selectedField &&
-      d.period === period &&
-      d.calculate === calculate &&
-      d.format === format
-    );
-  });
+            return (
+              d.field === selectedField &&
+              d.period === period &&
+              d.calculate === calculate &&
+              d.format === format
+            );
+          })
+        : false,
+    [selectedField, fields, period, calculate, format]
+  );
 
-  const isTaskField = selectedField.endsWith('tasks');
+  const isTaskField = useMemo(
+    () => selectedField.endsWith('tasks'),
+    [selectedField]
+  );
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     const updated = cloneDeep(currentUser);
 
     if (!updated || isFormBusy) {
@@ -203,9 +281,9 @@ export function DashboardCardSelector() {
         setManageOpen(false);
       })
       .finally(() => setIsFormBusy(false));
-  };
+  }, [currentUser, isFormBusy, fields, dispatch]);
 
-  const handleAdd = () => {
+  const handleAdd = useCallback(() => {
     if (!selectedField || isDuplicate) {
       return;
     }
@@ -231,13 +309,21 @@ export function DashboardCardSelector() {
 
     setFields((prev) => [...prev, key]);
     setSelectedField('');
-  };
+  }, [
+    selectedField,
+    isDuplicate,
+    fields,
+    period,
+    calculate,
+    format,
+    isTaskField,
+  ]);
 
-  const handleRemove = (index: number) => {
+  const handleRemove = useCallback((index: number) => {
     setFields((prev) => prev.filter((_, i) => i !== index));
-  };
+  }, []);
 
-  const onDragEnd = (result: DropResult) => {
+  const onDragEnd = useCallback((result: DropResult) => {
     if (!result.destination) {
       return;
     }
@@ -245,7 +331,7 @@ export function DashboardCardSelector() {
     setFields((prev) =>
       arrayMoveImmutable(prev, result.source.index, result.destination!.index)
     );
-  };
+  }, []);
 
   return (
     <>
@@ -263,15 +349,10 @@ export function DashboardCardSelector() {
         size="large"
       >
         <div
-          className="flex flex-col lg:flex-row lg:divide-x min-h-0"
-          style={{
-            borderColor: colors.$21,
-            // @ts-expect-error - This is a valid CSS variable
-            '--tw-divide-opacity': 1,
-            '--tw-divide-color': colors.$21,
-          }}
+          className="flex flex-col lg:flex-row"
+          style={{ minHeight: '28rem' }}
         >
-          <div className="flex flex-col lg:w-2/5 lg:pr-5 pb-4 lg:pb-0">
+          <div className="flex flex-col lg:w-1/3 lg:pr-5 pb-4 lg:pb-0">
             <span
               className="text-sm font-semibold mb-3"
               style={{ color: colors.$3 }}
@@ -279,107 +360,96 @@ export function DashboardCardSelector() {
               {t('current')} {t('cards')}
             </span>
 
-            {fields.length === 0 && (
-              <div className="flex items-center justify-center py-8">
-                <span className="text-sm" style={{ color: colors.$17 }}>
-                  {t('no_records_found')}
-                </span>
-              </div>
-            )}
+            <div
+              className="flex-1 overflow-y-auto rounded-md p-2"
+              style={{
+                maxHeight: '24rem',
+              }}
+            >
+              {fields.length === 0 && (
+                <div className="flex items-center justify-center h-full">
+                  <span className="text-sm" style={{ color: colors.$17 }}>
+                    {t('no_records_found')}
+                  </span>
+                </div>
+              )}
 
-            {fields.length > 0 && (
-              <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="dashboard-fields">
-                  {(droppableProvided) => (
-                    <div
-                      className="flex flex-col space-y-1 max-h-72 overflow-y-auto"
-                      {...droppableProvided.droppableProps}
-                      ref={droppableProvided.innerRef}
-                    >
-                      {fields.map((key, index) => {
-                        const decoded = decodeDashboardField(key);
+              {fields.length > 0 && (
+                <DragDropContext onDragEnd={onDragEnd}>
+                  <Droppable
+                    droppableId="dashboard-fields"
+                    renderClone={(provided, _, rubric) => {
+                      const decoded = decodeDashboardField(
+                        fields[rubric.source.index]
+                      );
 
-                        return (
-                          <Draggable
-                            key={`${key}-${index}`}
-                            draggableId={`${key}-${index}`}
-                            index={index}
-                          >
-                            {(provided) => (
-                              <div
-                                className="flex items-center justify-between rounded-md px-2 py-2"
-                                style={{ backgroundColor: colors.$25 }}
-                                {...provided.draggableProps}
-                                ref={provided.innerRef}
-                              >
+                      return (
+                        <div
+                          className="flex items-center justify-between rounded-md px-2 py-2 bg-gray-100"
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          ref={provided.innerRef}
+                        >
+                          <DragItem decoded={decoded} onRemove={() => {}} />
+                        </div>
+                      );
+                    }}
+                  >
+                    {(droppableProvided) => (
+                      <div
+                        className="flex flex-col space-y-2.5"
+                        {...droppableProvided.droppableProps}
+                        ref={droppableProvided.innerRef}
+                      >
+                        {fields.map((key, index) => {
+                          const decoded = decodeDashboardField(key);
+
+                          return (
+                            <Draggable
+                              key={`${key}-${index}`}
+                              draggableId={`${key}-${index}`}
+                              index={index}
+                            >
+                              {(provided) => (
                                 <div
-                                  className="flex items-center space-x-2 min-w-0 flex-1 cursor-grab"
-                                  {...provided.dragHandleProps}
+                                  className="flex items-center justify-between rounded-md px-2 py-2 bg-gray-100"
+                                  {...provided.draggableProps}
+                                  ref={provided.innerRef}
                                 >
-                                  <Icon
-                                    element={MdDragIndicator}
-                                    size={16}
-                                    style={{ color: colors.$17 }}
-                                  />
-
-                                  <div className="flex flex-col min-w-0">
-                                    <span
-                                      className="text-sm font-medium truncate"
-                                      style={{ color: colors.$3 }}
-                                    >
-                                      {t(
-                                        FIELDS_LABELS[decoded.field] ??
-                                          decoded.field
-                                      )}
-                                    </span>
-
-                                    <span
-                                      className="text-xs truncate"
-                                      style={{ color: colors.$17 }}
-                                    >
-                                      {t(
-                                        decoded.period === 'current'
-                                          ? 'current_period'
-                                          : decoded.period === 'previous'
-                                          ? 'previous_period'
-                                          : 'total'
-                                      )}
-                                      {' · '}
-                                      {t(
-                                        decoded.calculate === 'avg'
-                                          ? 'average'
-                                          : decoded.calculate
-                                      )}
-                                    </span>
+                                  <div
+                                    className="flex items-center space-x-2 min-w-0 flex-1 cursor-grab"
+                                    {...provided.dragHandleProps}
+                                  >
+                                    <DragItem
+                                      decoded={decoded}
+                                      onRemove={() => handleRemove(index)}
+                                    />
                                   </div>
                                 </div>
+                              )}
+                            </Draggable>
+                          );
+                        })}
 
-                                <button
-                                  type="button"
-                                  className="p-1 rounded-md shrink-0"
-                                  onClick={() => handleRemove(index)}
-                                >
-                                  <Icon
-                                    element={MdClose}
-                                    size={16}
-                                    style={{ color: colors.$17 }}
-                                  />
-                                </button>
-                              </div>
-                            )}
-                          </Draggable>
-                        );
-                      })}
-
-                      {droppableProvided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </DragDropContext>
-            )}
+                        {droppableProvided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              )}
+            </div>
           </div>
 
-          <div className="flex flex-col lg:w-3/5 lg:pl-5 pt-4 lg:pt-0">
+          <div
+            className="hidden lg:block"
+            style={{
+              width: '1px',
+              backgroundColor: colors.$21,
+              flexShrink: 0,
+            }}
+          />
+
+          <div className="flex flex-col lg:w-2/3 lg:pl-5 pt-4 lg:pt-0">
             <span
               className="text-sm font-semibold mb-3"
               style={{ color: colors.$3 }}
@@ -387,156 +457,194 @@ export function DashboardCardSelector() {
               {t('add_field')}
             </span>
 
-            <InputField
-              placeholder={t('search')}
-              value={searchQuery}
-              onValueChange={setSearchQuery}
-              changeOverride
-              debounceTimeout={0}
-              clearable
-            />
+            <div className="flex flex-col lg:flex-row lg:space-x-4 flex-1">
+              <div className="flex flex-col lg:w-1/2">
+                <InputField
+                  placeholder={t('search')}
+                  value={searchQuery}
+                  onValueChange={setSearchQuery}
+                  changeOverride
+                  debounceTimeout={0}
+                  clearable
+                />
 
-            <div
-              className="flex flex-col mt-2 max-h-40 overflow-y-auto rounded-md border"
-              style={{ borderColor: colors.$24 }}
-            >
-              {filteredFields.map((f) => (
                 <div
-                  key={f}
-                  className="flex items-center px-3 py-2 cursor-pointer text-sm"
-                  onClick={() => setSelectedField(f)}
+                  className="flex flex-col mt-2 overflow-y-auto rounded-md border"
                   style={{
-                    backgroundColor:
-                      selectedField === f ? colors.$25 : 'transparent',
-                    color: colors.$3,
+                    borderColor: colors.$24,
+                    height: '20rem',
                   }}
                 >
-                  {t(FIELDS_LABELS[f])}
-                </div>
-              ))}
-
-              {filteredFields.length === 0 && (
-                <div className="flex items-center justify-center py-4">
-                  <span className="text-xs" style={{ color: colors.$17 }}>
-                    {t('no_records_found')}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {selectedField && (
-              <div className="flex flex-col space-y-3 mt-4">
-                <div className="flex items-center space-x-3">
-                  <span
-                    className="text-xs font-medium shrink-0"
-                    style={{ color: colors.$22 }}
-                  >
-                    {t('period')}
-                  </span>
-
-                  <ToggleGroup
-                    options={PERIOD_OPTIONS}
-                    value={period}
-                    onChange={setPeriod}
-                  />
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  <span
-                    className="text-xs font-medium shrink-0"
-                    style={{ color: colors.$22 }}
-                  >
-                    {t('calculate')}
-                  </span>
-
-                  <ToggleGroup
-                    options={CALCULATE_OPTIONS}
-                    value={calculate}
-                    onChange={setCalculate}
-                  />
-                </div>
-
-                {isTaskField && (
-                  <div className="flex items-center space-x-3">
-                    <span
-                      className="text-xs font-medium shrink-0"
-                      style={{ color: colors.$22 }}
+                  {filteredFields.map((f) => (
+                    <div
+                      key={f}
+                      className="flex items-center px-3 py-2 cursor-pointer text-sm shrink-0"
+                      onClick={() => setSelectedField(f)}
+                      style={{
+                        backgroundColor:
+                          selectedField === f ? colors.$25 : 'transparent',
+                        color: colors.$3,
+                      }}
                     >
-                      {t('format')}
+                      {t(FIELDS_LABELS[f])}
+                    </div>
+                  ))}
+
+                  {filteredFields.length === 0 && (
+                    <div className="flex items-center justify-center flex-1">
+                      <span className="text-xs" style={{ color: colors.$17 }}>
+                        {t('no_records_found')}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col lg:w-1/2 pt-4 lg:pt-0">
+                <div className="flex flex-col space-y-4">
+                  <div className="flex flex-col space-y-1.5">
+                    <span
+                      className="text-xs font-medium"
+                      style={{
+                        color: colors.$22,
+                        opacity: selectedField ? 1 : 0.4,
+                      }}
+                    >
+                      {t('period')}
                     </span>
 
                     <ToggleGroup
-                      options={[
-                        { value: 'money' as Format, labelKey: 'money' },
-                        { value: 'time' as Format, labelKey: 'time' },
-                      ]}
-                      value={format}
-                      onChange={setFormat}
+                      options={PERIOD_OPTIONS}
+                      value={period}
+                      onChange={(value) => setPeriod(value as Period)}
+                      disabled={!selectedField}
                     />
                   </div>
-                )}
 
-                <div
-                  className="flex flex-col items-center justify-center rounded-md border px-4 py-3"
-                  style={{ borderColor: colors.$24 }}
-                >
-                  <span
-                    className="text-sm font-medium"
-                    style={{ color: colors.$3 }}
-                  >
-                    {t(FIELDS_LABELS[selectedField] ?? selectedField)}
-                  </span>
-
-                  <span
-                    className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium mt-1"
-                    style={{
-                      backgroundColor:
-                        colors.$0 === 'dark' ? colors.$25 : colors.$23,
-                      color: colors.$17,
-                    }}
-                  >
+                  <div className="flex flex-col space-y-1.5">
                     <span
-                      className="h-1.5 w-1.5 shrink-0 rounded-full"
-                      style={{ backgroundColor: '#5DCAA5' }}
-                    />
-                    {t(
-                      period === 'current'
-                        ? 'current_period'
-                        : period === 'previous'
-                        ? 'previous_period'
-                        : 'total'
-                    )}
-                    {' · '}
-                    {t(calculate === 'avg' ? 'average' : calculate)}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  {isDuplicate && (
-                    <span className="text-xs" style={{ color: colors.$17 }}>
-                      {t('card_already_exists')}
+                      className="text-xs font-medium"
+                      style={{
+                        color: colors.$22,
+                        opacity: selectedField ? 1 : 0.4,
+                      }}
+                    >
+                      {t('calculate')}
                     </span>
+
+                    <ToggleGroup
+                      options={CALCULATE_OPTIONS}
+                      value={calculate}
+                      onChange={(value) => setCalculate(value as Calculate)}
+                      disabled={!selectedField}
+                    />
+                  </div>
+
+                  {isTaskField && (
+                    <div className="flex flex-col space-y-1.5">
+                      <span
+                        className="text-xs font-medium"
+                        style={{ color: colors.$22 }}
+                      >
+                        {t('format')}
+                      </span>
+
+                      <ToggleGroup
+                        options={[
+                          { value: 'money', labelKey: 'money' },
+                          { value: 'time', labelKey: 'time' },
+                        ]}
+                        value={format}
+                        onChange={(value) => setFormat(value as Format)}
+                      />
+                    </div>
                   )}
 
-                  <div className="flex-1" />
+                  <div className="flex flex-col space-y-1.5 w-full">
+                    <div
+                      className="flex flex-col items-center justify-center rounded-md border px-4 py-3"
+                      style={{
+                        borderColor: colors.$24,
+                        opacity: selectedField ? 1 : 0.4,
+                      }}
+                    >
+                      <span
+                        className="text-sm font-medium"
+                        style={{ color: colors.$3 }}
+                      >
+                        {selectedField
+                          ? t(FIELDS_LABELS[selectedField] ?? selectedField)
+                          : t('field')}
+                      </span>
 
-                  <Button
-                    behavior="button"
-                    onClick={handleAdd}
-                    disabled={isDuplicate}
-                    disableWithoutIcon={isDuplicate}
-                  >
-                    {t('add')}
-                  </Button>
+                      <span
+                        className="text-xl font-semibold mt-0.5"
+                        style={{ color: colors.$3 }}
+                      >
+                        {calculate === 'count' ? '0' : '0.00'}
+                      </span>
+
+                      <span
+                        className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium mt-1"
+                        style={{
+                          backgroundColor:
+                            colors.$0 === 'dark' ? colors.$25 : colors.$23,
+                          color: colors.$17,
+                        }}
+                      >
+                        <span
+                          className="h-1.5 w-1.5 shrink-0 rounded-full"
+                          style={{ backgroundColor: '#5DCAA5' }}
+                        />
+                        {t(
+                          period === 'current'
+                            ? 'current_period'
+                            : period === 'previous'
+                            ? 'previous_period'
+                            : 'total'
+                        )}
+                        {' · '}
+                        {t(calculate === 'avg' ? 'average' : calculate)}
+                      </span>
+                    </div>
+
+                    {isDuplicate && (
+                      <div className="flex items-center space-x-2">
+                        <Icon
+                          element={IoWarning}
+                          size={16}
+                          style={{ color: '#EAB308' }}
+                        />
+
+                        <span className="text-xs" style={{ color: colors.$17 }}>
+                          {t('card_already_exists')}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {!isDuplicate && (
+                    <div className="flex justify-end">
+                      <Button
+                        behavior="button"
+                        type="secondary"
+                        onClick={handleAdd}
+                        disabled={!selectedField}
+                        disableWithoutIcon={!selectedField}
+                      >
+                        {t('add')}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
 
-        <div className="mt-5">
+        <div className="flex justify-end mt-5">
           <Button
-            className="w-full"
+            className="w-full lg:w-auto"
             behavior="button"
             onClick={handleSave}
             disabled={isFormBusy}
