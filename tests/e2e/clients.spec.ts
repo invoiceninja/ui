@@ -798,6 +798,115 @@ test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with crea
   await logout(page);
 });
 
+test('View Statement action opens the statement page', async ({ page, api }) => {
+  const { clear, save, set } = permissions(page);
+  const clientName = uniqueName('test statement client');
+
+  await login(page);
+  await clear('clients@example.com');
+  await set('admin');
+  await save();
+  await logout(page);
+
+  await login(page, 'clients@example.com', 'password');
+
+  await createClient({
+    page,
+    api,
+    clientName,
+    isTableEditable: true,
+  });
+
+  const clientId = page.url().match(/clients\/([^/]+)/)?.[1];
+  expect(clientId).toBeTruthy();
+
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+  await page
+    .locator('[data-cy="clientActionDropdown"]')
+    .getByRole('link', { name: 'View Statement', exact: true })
+    .click();
+
+  await page.waitForURL('**/clients/**/statement');
+
+  await logout(page);
+});
+
+test('Settings action opens company settings in client context', async ({ page, api }) => {
+  const { clear, save, set } = permissions(page);
+  const clientName = uniqueName('test settings action client');
+
+  await login(page);
+  await clear('clients@example.com');
+  await set('admin');
+  await save();
+  await logout(page);
+
+  await login(page, 'clients@example.com', 'password');
+
+  await createClient({
+    page,
+    api,
+    clientName,
+    isTableEditable: true,
+  });
+
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+  await page
+    .locator('[data-cy="clientActionDropdown"]')
+    .getByRole('button', { name: 'Settings', exact: true })
+    .click();
+
+  await page.waitForURL('**/settings/company_details');
+  await expect(page.getByRole('button', { name: 'Save', exact: true })).toBeVisible({
+    timeout: 10000,
+  });
+
+  await logout(page);
+});
+
+test('New Resource action routes to Invoice create for selected client', async ({
+  page,
+  api,
+}) => {
+  const { clear, save, set } = permissions(page);
+  const clientName = uniqueName('test new resource route client');
+
+  await login(page);
+  await clear('clients@example.com');
+  await set('create_client', 'edit_client', 'create_invoice');
+  await save();
+  await logout(page);
+
+  await login(page, 'clients@example.com', 'password');
+
+  await createClient({
+    page,
+    api,
+    clientName,
+    isTableEditable: true,
+  });
+
+  const clientId = page.url().match(/clients\/([^/]+)/)?.[1];
+  expect(clientId).toBeTruthy();
+  if (!clientId) throw new Error('Failed to extract client id');
+
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+  await page
+    .locator('[data-cy="clientActionDropdown"]')
+    .getByRole('button', { name: 'New Resource', exact: true })
+    .click();
+
+  await expect(page.getByRole('heading', { name: 'New Resource' })).toBeVisible({
+    timeout: 10000,
+  });
+
+  await page.getByRole('button', { name: 'Invoice', exact: true }).click();
+
+  await page.waitForURL(`**/invoices/create?client=${clientId}`);
+
+  await logout(page);
+});
+
 test('Merge client action', async ({ page, api }) => {
 
     // test.setTimeout(120000); // 2 minutes

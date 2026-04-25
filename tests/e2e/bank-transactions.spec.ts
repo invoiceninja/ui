@@ -9,7 +9,13 @@ import { test, expect, uniqueName, extractIdFromUrl } from '$tests/e2e/fixtures'
 import { Page, request as playwrightRequest } from '@playwright/test';
 import { createExpenseCategory } from './expense-categories-helpers';
 import { createVendor } from './vendor-helpers';
-import { createApiContext, createEntityViaApi, type ApiContext } from './api-helpers';
+import {
+  createApiContext,
+  createClientViaApi,
+  createEntityViaApi,
+  createExpenseCategoryViaApi,
+  type ApiContext,
+} from './api-helpers';
 
 async function ensureBankAccountExists(apiContext?: ApiContext): Promise<void> {
   const api = apiContext || await createApiContext(process.env.VITE_API_URL!);
@@ -62,6 +68,8 @@ interface CreateParams {
   withNavigation?: boolean;
   type?: 'withdrawal';
   notes?: string;
+  /** Amount string for the first amount field (deposit or withdrawal). */
+  amount?: string;
 }
 const createBankTransaction = async (params: CreateParams) => {
   const {
@@ -70,6 +78,7 @@ const createBankTransaction = async (params: CreateParams) => {
     isTableEditable = true,
     type,
     notes = 'Transaction Notes',
+    amount = '100',
   } = params;
 
   // Ensure at least one bank account exists for the combobox
@@ -96,7 +105,7 @@ const createBankTransaction = async (params: CreateParams) => {
     await page.getByRole('option', { name: 'Withdrawal' }).click();
   }
 
-  await page.getByRole('main').locator('[type="text"]').nth(0).fill('100');
+  await page.getByRole('main').locator('[type="text"]').nth(0).fill(amount);
 
   // Select bank account from combobox
   await page.getByTestId('combobox-input-field').first().click();
@@ -518,6 +527,191 @@ test('deleting transaction with edit_bank_transaction removes it from active lis
       { timeout: 10000 }
     )
     .toBeGreaterThan(0);
+
+  await logout(page);
+});
+
+test('link withdrawal on list to existing expense via match slider', async ({
+  page,
+  api,
+}) => {
+  const { clear, save, set } = permissions(page);
+  const marker = uniqueName('tx-match');
+  const matchAmount = 77.77;
+  const amountStr = String(matchAmount);
+
+  await login(page);
+  await clear('bank_transactions@example.com');
+  await set(
+    'create_bank_transaction',
+    'edit_bank_transaction',
+    'view_expense',
+    'create_expense'
+  );
+  await save();
+
+  const adminApi = await createApiContext(process.env.VITE_API_URL!);
+  const category = await createExpenseCategoryViaApi(adminApi, {
+    name: uniqueName('match-cat'),
+  });
+  const expense = await createEntityViaApi(adminApi, 'expenses', {
+    category_id: category.id,
+    amount: matchAmount,
+    public_notes: marker,
+  });
+  api.trackEntity('expenses', expense.id as string);
+
+  await logout(page);
+
+  await login(page, 'bank_transactions@example.com', 'password');
+
+  await createBankTransaction({
+    page,
+    type: 'withdrawal',
+    amount: amountStr,
+    notes: marker,
+  });
+  await page.waitForURL('**/transactions/**/edit');
+
+  const txId = extractIdFromUrl(page.url(), 'transactions');
+  expect(txId).toBeTruthy();
+  if (!txId) throw new Error('Failed to extract transaction id');
+  api.trackEntity('bank_transactions', txId);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Transactions', exact: true })
+    .click();
+  await page.waitForURL('**/transactions');
+  await waitForTableData(page);
+
+  // Table filter does not reliably match our private notes; newest rows sort first — locate by amount.
+  const row = page
+    .locator('[data-cy="dataTable"]')
+    .locator('tbody tr')
+    .filter({ hasNotText: 'No records found' })
+    .filter({ hasText: amountStr })
+    .first();
+  await expect(row).toBeVisible({ timeout: 15000 });
+
+  // Withdrawal is the 4th data cell (checkbox, status, deposit, withdrawal).
+  await row.locator('td').nth(3).click();
+
+  const dialog = page.getByRole('dialog');
+  // Headless UI + slide-in: the dialog node can exist before it is considered "visible" to Playwright.
+  await expect(dialog.getByText('Withdrawal', { exact: true }).first()).toBeVisible({
+    timeout: 20000,
+  });
+
+  await dialog.locator('[data-cy="tabs"] button').nth(1).click();
+
+  const expenseListItem = dialog.locator('li').filter({ hasText: amountStr }).first();
+  await expect(expenseListItem).toBeVisible({ timeout: 15000 });
+  await expenseListItem.click();
+
+  await dialog.getByRole('button', { name: 'Link Expense', exact: true }).last().click();
+
+  await expect
+    .poll(
+      async () => {
+        const tx = await fetchBankTransaction(txId);
+        return String(tx.expense_id ?? '');
+      },
+      { timeout: 15000 }
+    )
+    .toContain(String(expense.id));
+
+  await logout(page);
+});
+
+test('link credit transaction on list to existing payment via match slider', async ({
+  page,
+  api,
+}) => {
+  const { clear, save, set } = permissions(page);
+  const marker = uniqueName('tx-match-credit');
+  const matchAmount = 66.66;
+  const amountStr = String(matchAmount);
+
+  await login(page);
+  await clear('bank_transactions@example.com');
+  await set(
+    'create_bank_transaction',
+    'edit_bank_transaction',
+    'view_payment',
+    'create_payment'
+  );
+  await save();
+
+  const adminApi = await createApiContext(process.env.VITE_API_URL!);
+  const client = await createClientViaApi(adminApi, {
+    name: uniqueName('tx-match-client'),
+  });
+  api.trackEntity('clients', client.id);
+
+  const payment = await createEntityViaApi(adminApi, 'payments', {
+    client_id: client.id,
+    amount: matchAmount,
+    transaction_reference: marker,
+  });
+  api.trackEntity('payments', payment.id as string);
+
+  await logout(page);
+
+  await login(page, 'bank_transactions@example.com', 'password');
+
+  await createBankTransaction({
+    page,
+    amount: amountStr,
+    notes: marker,
+  });
+  await page.waitForURL('**/transactions/**/edit');
+
+  const txId = extractIdFromUrl(page.url(), 'transactions');
+  expect(txId).toBeTruthy();
+  if (!txId) throw new Error('Failed to extract transaction id');
+  api.trackEntity('bank_transactions', txId);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Transactions', exact: true })
+    .click();
+  await page.waitForURL('**/transactions');
+  await waitForTableData(page);
+
+  const row = page
+    .locator('[data-cy="dataTable"]')
+    .locator('tbody tr')
+    .filter({ hasNotText: 'No records found' })
+    .filter({ hasText: amountStr })
+    .first();
+  await expect(row).toBeVisible({ timeout: 15000 });
+
+  // Deposit is the 3rd data cell (checkbox, status, deposit, withdrawal).
+  await row.locator('td').nth(2).click();
+
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByText('Deposit', { exact: true }).first()).toBeVisible({
+    timeout: 20000,
+  });
+
+  await dialog.locator('[data-cy="tabs"] button').nth(1).click();
+
+  const paymentListItem = dialog.locator('li').filter({ hasText: amountStr }).first();
+  await expect(paymentListItem).toBeVisible({ timeout: 15000 });
+  await paymentListItem.click();
+
+  await dialog.getByRole('button', { name: 'Link Payment', exact: true }).last().click();
+
+  await expect
+    .poll(
+      async () => {
+        const tx = await fetchBankTransaction(txId);
+        return String(tx.payment_id ?? '');
+      },
+      { timeout: 15000 }
+    )
+    .toContain(String(payment.id));
 
   await logout(page);
 });
