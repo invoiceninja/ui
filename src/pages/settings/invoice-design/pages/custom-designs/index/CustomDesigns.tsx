@@ -19,7 +19,7 @@ import { Inline } from '$app/components/Inline';
 import { Button } from '$app/components/forms';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
-import { Paintbrush, Plus } from 'lucide-react';
+import { Paintbrush, Plus, Edit as EditIcon } from 'lucide-react';
 import { route } from '$app/common/helpers/route';
 import { Design } from '$app/common/interfaces/design';
 
@@ -86,21 +86,23 @@ export default function CustomDesigns() {
         ]}
         resource="design"
         bulkRoute="/api/v1/designs/bulk"
-        linkToEdit="/settings/invoice_design/custom_designs/:id/edit"
         withResourcefulActions
         hideEditableOptions={!proPlan() && !enterprisePlan()}
         enableSavingFilterPreference
         customActions={[
-          (resource: Design) =>
-            isVisualBuilderDesign(resource) && (
-              <DropdownElement
-                key="visual-builder"
-                to={route('/settings/invoice_design/builder/:id', { id: resource.id })}
-                icon={<Icon element={Paintbrush} />}
-              >
-                {t('visual_builder')}
-              </DropdownElement>
-            ),
+          (resource: Design) => (
+            <DropdownElement
+              key="edit"
+              to={
+                isVisualBuilderDesign(resource)
+                  ? route('/settings/invoice_design/builder/:id', { id: resource.id })
+                  : route('/settings/invoice_design/custom_designs/:id/edit', { id: resource.id })
+              }
+              icon={<Icon element={EditIcon} />}
+            >
+              {t('edit')}
+            </DropdownElement>
+          ),
         ]}
       />
     </>
