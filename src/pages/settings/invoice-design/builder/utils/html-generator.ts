@@ -929,17 +929,23 @@ function renderTotalBlock(
         isBalance?: boolean;
         field: string;
         label: string;
+        fontSize?: string;
+        fontWeight?: string;
+        color?: string;
+        fontStyle?: string;
+        amountColor?: string;
       }) => {
         const isTotal = item.isTotal;
         const isBalance = item.isBalance;
         const value = replaceVariables(item.field, data);
-        const itemFontSize = isTotal ? totalFontSize : fontSize;
-        const itemFontWeight = isTotal ? totalFontWeight : 'normal';
-        const valueColor = isBalance
+        const itemFontSize = item.fontSize || (isTotal ? totalFontSize : fontSize);
+        const itemFontWeight = item.fontWeight || (isTotal ? totalFontWeight : 'normal');
+        const itemLabelColor = item.color || labelColor;
+        const valueColor = item.amountColor || (isBalance
           ? balanceColor
           : isTotal
             ? totalColor
-            : amountColor;
+            : amountColor);
 
         // Build label cell padding (user padding + gap on right)
         const labelPaddingStyle = labelPadding
@@ -962,7 +968,7 @@ function renderTotalBlock(
         html += `
         <tr style="font-size: ${itemFontSize}; font-weight: ${itemFontWeight};">
           <td style="
-            color: ${labelColor};
+            color: ${itemLabelColor};
             ${labelPaddingStyle}
             text-align: right;
             white-space: nowrap;
