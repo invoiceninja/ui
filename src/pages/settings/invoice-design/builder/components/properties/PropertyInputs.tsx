@@ -370,3 +370,62 @@ export function BorderStyleInput({
     </SelectField>
   );
 }
+
+interface RangeSliderInputProps extends BaseInputProps {
+  min?: number;
+  max?: number;
+  step?: number;
+  unit?: string;
+}
+
+export function RangeSliderInput({
+  label,
+  value,
+  onChange,
+  min = 5,
+  max = 100,
+  step = 5,
+  unit = '%',
+}: RangeSliderInputProps) {
+  const colors = useColorScheme();
+  const numericValue = parseInt(value?.replace(/[^0-9]/g, '') || String(min), 10);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = parseInt(e.target.value, 10);
+    onChange(`${newValue}${unit}`);
+  };
+
+  return (
+    <div>
+      {label && (
+        <label
+          className="block text-sm font-medium mb-2"
+          style={{ color: colors.$3 }}
+        >
+          {label}
+        </label>
+      )}
+      <div className="flex items-center gap-3">
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={numericValue}
+          onChange={handleChange}
+          className="flex-1 h-2 rounded-lg appearance-none cursor-pointer"
+          style={{
+            backgroundColor: colors.$24,
+            accentColor: colors.$3,
+          }}
+        />
+        <span
+          className="text-sm font-medium min-w-[3rem] text-right"
+          style={{ color: colors.$3 }}
+        >
+          {numericValue}{unit}
+        </span>
+      </div>
+    </div>
+  );
+}
