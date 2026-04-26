@@ -310,10 +310,10 @@ function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
         const fieldFontSize = field.fontSize || fontSize;
         const fieldColor = field.color || color;
 
-        // Replace label variables in prefix with display labels for preview
         const prefix = (showLabels !== false && field.prefix)
           ? replaceLabelVariables(field.prefix, t)
           : '';
+        const suffix = field.suffix || '';
 
         return (
           <div
@@ -327,6 +327,7 @@ function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
           >
             {prefix}
             {displayValue}
+            {suffix}
           </div>
         );
       })}
