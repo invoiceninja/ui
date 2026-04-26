@@ -17,6 +17,7 @@ import {
   ColorInput,
   CheckboxInput,
   SectionDivider,
+  RangeSliderInput,
 } from './PropertyInputs';
 import { useColorScheme } from '$app/common/colors';
 
@@ -315,26 +316,17 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                           }}
                         />
                       </div>
-                      <div className="w-20">
-                        <label
-                          className="block text-xs mb-1"
-                          style={{ color: colors.$17 }}
-                        >
-                          {t('width')}
-                        </label>
-                        <input
-                          type="text"
+                      <div className="flex-1">
+                        <RangeSliderInput
+                          label={String(t('width'))}
                           value={column.width}
-                          onChange={(e) =>
-                            updateColumnProp(index, 'width', e.target.value)
+                          onChange={(value) =>
+                            updateColumnProp(index, 'width', value)
                           }
-                          className="w-full px-2 py-1 rounded text-xs"
-                          style={{
-                            backgroundColor: colors.$1,
-                            border: `1px solid ${colors.$24}`,
-                            color: colors.$3,
-                          }}
-                          placeholder="15%"
+                          min={5}
+                          max={50}
+                          step={5}
+                          unit="%"
                         />
                       </div>
                     </div>
