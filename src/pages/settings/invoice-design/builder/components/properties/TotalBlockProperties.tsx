@@ -250,6 +250,21 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                           : block.properties.labelColor || '#6B7280'
                     }
                   />
+
+                  <ColorInput
+                    label={String(t('amount_color'))}
+                    value={item.amountColor || ''}
+                    onChange={(value) =>
+                      updateItemTypography(index, 'amountColor', value || undefined)
+                    }
+                    defaultValue={
+                      item.isTotal
+                        ? block.properties.totalColor || '#111827'
+                        : item.isBalance
+                          ? block.properties.balanceColor || '#DC2626'
+                          : block.properties.amountColor || '#111827'
+                    }
+                  />
                 </div>
               )}
             </div>
@@ -282,40 +297,6 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
         value={block.properties.totalFontSize}
         onChange={(value) => updateProperty('totalFontSize', value)}
         placeholder="18px"
-      />
-
-      <SectionDivider label={String(t('colors'))} />
-
-      {/* Label Color */}
-      <ColorInput
-        label={String(t('label_color'))}
-        value={block.properties.labelColor}
-        onChange={(value) => updateProperty('labelColor', value)}
-        defaultValue="#6B7280"
-      />
-
-      {/* Amount Color */}
-      <ColorInput
-        label={String(t('amount_color'))}
-        value={block.properties.amountColor}
-        onChange={(value) => updateProperty('amountColor', value)}
-        defaultValue="#111827"
-      />
-
-      {/* Total Color */}
-      <ColorInput
-        label={String(t('total_color'))}
-        value={block.properties.totalColor}
-        onChange={(value) => updateProperty('totalColor', value)}
-        defaultValue="#111827"
-      />
-
-      {/* Balance Color */}
-      <ColorInput
-        label={String(t('balance_color'))}
-        value={block.properties.balanceColor}
-        onChange={(value) => updateProperty('balanceColor', value)}
-        defaultValue="#DC2626"
       />
 
       <SectionDivider label={String(t('spacing'))} />
