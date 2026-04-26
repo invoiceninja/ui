@@ -767,10 +767,11 @@ function renderInvoiceDetailsBlock(
         const fieldFontSize = field.fontSize || fontSize;
         const fieldColor = field.color || color;
         
-        // Handle label variable replacement in prefix
+        // Handle label variable replacement in prefix/suffix
         const prefix = (showLabels !== false && field.prefix)
           ? (data ? replaceLabelVariables(field.prefix, t) : field.prefix)
           : '';
+        const suffix = field.suffix || '';
 
         return `
         <div style="
@@ -779,7 +780,7 @@ function renderInvoiceDetailsBlock(
           color: ${fieldColor};
           font-style: ${field.fontStyle || 'normal'};
         ">
-          ${escapeHtml(prefix)}${escapeHtml(displayValue)}
+          ${escapeHtml(prefix)}${escapeHtml(displayValue)}${escapeHtml(suffix)}
         </div>
       `;
       })

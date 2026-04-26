@@ -355,6 +355,42 @@ export function InvoiceDetailsBlockProperties({
                     }
                     defaultValue={block.properties.color || '#374151'}
                   />
+
+                  <TextInput
+                    label={String(t('prefix'))}
+                    value={field.prefix || ''}
+                    onChange={(value) =>
+                      updateFieldTypography(index, 'prefix', value)
+                    }
+                    placeholder={String(t('prefix_placeholder'))}
+                  />
+
+                  <TextInput
+                    label={String(t('suffix'))}
+                    value={field.suffix || ''}
+                    onChange={(value) =>
+                      updateFieldTypography(index, 'suffix', value)
+                    }
+                    placeholder={String(t('suffix_placeholder'))}
+                  />
+
+                  {(field.prefix || field.suffix) && (
+                    <div
+                      className="text-xs p-2 rounded"
+                      style={{
+                        backgroundColor: colors.$1,
+                        border: `1px solid ${colors.$24}`,
+                        color: colors.$17,
+                      }}
+                    >
+                      <span className="font-medium">{t('preview')}: </span>
+                      <span style={{ color: colors.$24 }}>
+                        {field.prefix}
+                        {field.variable}
+                        {field.suffix}
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
