@@ -581,6 +581,7 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
                 fontWeight?: string;
                 color?: string;
                 fontStyle?: string;
+                amountColor?: string;
               },
               index: number
             ) => {
@@ -617,11 +618,11 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
                   </td>
                   <td
                     style={{
-                      color: isBalance
+                      color: item.amountColor || (isBalance
                         ? balanceColor
                         : isTotal
                           ? totalColor
-                          : amountColor,
+                          : amountColor),
                       paddingBottom: spacing,
                       padding: valuePadding || undefined,
                       textAlign: 'right',
