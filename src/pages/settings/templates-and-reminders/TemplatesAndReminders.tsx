@@ -50,6 +50,92 @@ import { useAtomValue } from 'jotai';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
+interface TemplateGroup {
+  labelKey: string;
+  items: { value: string; labelKey: string }[];
+}
+
+const TEMPLATE_GROUPS: TemplateGroup[] = [
+  {
+    labelKey: 'documents',
+    items: [
+      { value: 'invoice', labelKey: 'invoice' },
+      { value: 'quote', labelKey: 'quote' },
+      { value: 'credit', labelKey: 'credit' },
+      { value: 'purchase_order', labelKey: 'purchase_order' },
+    ],
+  },
+  {
+    labelKey: 'payments',
+    items: [
+      { value: 'payment', labelKey: 'payment' },
+      { value: 'partial_payment', labelKey: 'partial_payment' },
+      { value: 'payment_failed', labelKey: 'payment_failed' },
+    ],
+  },
+  {
+    labelKey: 'reminders',
+    items: [
+      { value: 'reminder1', labelKey: 'first_reminder' },
+      { value: 'reminder2', labelKey: 'second_reminder' },
+      { value: 'reminder3', labelKey: 'third_reminder' },
+      { value: 'reminder_endless', labelKey: 'endless_reminder' },
+      { value: 'quote_reminder1', labelKey: 'first_quote_reminder' },
+    ],
+  },
+  {
+    labelKey: 'custom',
+    items: [
+      { value: 'custom1', labelKey: 'first_custom' },
+      { value: 'custom2', labelKey: 'second_custom' },
+      { value: 'custom3', labelKey: 'third_custom' },
+    ],
+  },
+];
+
+interface TemplateChipSelectorProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+function TemplateChipSelector({ value, onChange }: TemplateChipSelectorProps) {
+  const [t] = useTranslation();
+  const colors = useColorScheme();
+
+  return (
+    <div className="flex flex-col space-y-4">
+      {TEMPLATE_GROUPS.map((group) => (
+        <div key={group.labelKey} className="flex flex-col space-y-2">
+          <span
+            className="text-xs font-medium uppercase tracking-wider"
+            style={{ color: colors.$17 }}
+          >
+            {t(group.labelKey)}
+          </span>
+
+          <div className="flex flex-wrap gap-2">
+            {group.items.map((item) => (
+              <div
+                key={item.value}
+                className="px-3 py-1.5 rounded-md text-sm font-medium cursor-pointer select-none border transition-colors duration-150"
+                onClick={() => onChange(item.value)}
+                style={{
+                  backgroundColor:
+                    value === item.value ? colors.$3 : 'transparent',
+                  color: value === item.value ? colors.$1 : colors.$3,
+                  borderColor: value === item.value ? colors.$3 : colors.$24,
+                }}
+              >
+                {t(item.labelKey)}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function TemplatesAndReminders() {
   useTitle('templates_and_reminders');
 
@@ -372,30 +458,13 @@ export function TemplatesAndReminders() {
             />
           }
         >
-          <SelectField
+          <TemplateChipSelector
             value={templateId}
-            onValueChange={(value) => {
+            onChange={(value) => {
               setTemplateId(value);
               !isCompanySettingsActive && setTemplateBody(undefined);
             }}
-            cypressRef="templateSelector"
-            customSelector
-            dismissable={false}
-          >
-            {statics &&
-              Object.keys(statics.templates).map((template, index) => (
-                <option value={template} key={index}>
-                  {t(template)}
-                </option>
-              ))}
-
-            <option value="credit">{t('credit')}</option>
-            <option value="purchase_order">{t('purchase_order')}</option>
-
-            <option value="custom1">{t('first_custom')}</option>
-            <option value="custom2">{t('second_custom')}</option>
-            <option value="custom3">{t('third_custom')}</option>
-          </SelectField>
+          />
         </Element>
 
         <Element
