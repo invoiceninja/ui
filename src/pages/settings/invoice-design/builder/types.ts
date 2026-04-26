@@ -117,6 +117,7 @@ export interface TotalItem {
   fontWeight?: string;
   color?: string;
   fontStyle?: string;
+  amountColor?: string;
 }
 
 export interface TotalBlockPropertiesHint {
