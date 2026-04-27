@@ -434,6 +434,7 @@ export function Details(props: Props) {
         {expense && (
           <Element leftSide={t('amount')}>
             <NumberInputField
+              cypressRef="expenseAmount"
               value={expense.amount || ''}
               onValueChange={(value) =>
                 handleChange('amount', parseFloat(value) || 0)

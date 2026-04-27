@@ -185,8 +185,7 @@ const createQuote = async (params: CreateParams) => {
 
   await page.getByRole('main').getByRole('link', { name: 'New Quote' }).click();
 
-  await page.waitForTimeout(900);
-
+  await page.getByRole('option').first().waitFor({ state: 'visible', timeout: 5000 });
   await page.getByRole('option').first().click();
 
   if (assignTo) {
@@ -775,7 +774,7 @@ test('Convert to Invoice and Convert to Project displayed with admin permission'
     .getByRole('link', { name: 'Quotes', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await waitForTableData(page);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
@@ -833,7 +832,7 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
     .getByRole('link', { name: 'Quotes', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await waitForTableData(page);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 

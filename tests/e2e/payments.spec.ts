@@ -36,8 +36,6 @@ const createPayment = async (params: CreateParams) => {
     .getByRole('link', { name: 'Enter Payment' })
     .click();
 
-  await page.waitForTimeout(500);
-
   // Wait for client combobox options to load
   const comboboxInput = page.getByRole('combobox').first();
   await comboboxInput.click();

@@ -41,8 +41,6 @@ test('Expense report (clients, vendors, project, expense_categories) fields are 
   await expenseOption.waitFor({ state: 'visible', timeout: 5000 });
   await expenseOption.click();
 
-  await page.waitForTimeout(300);
-
   await expect(page.locator('#clientItemSelector')).toBeVisible({ timeout: 10000 });
 
   await expect(page.locator('#vendorItemSelector')).toBeVisible({ timeout: 10000 });

@@ -8,9 +8,17 @@ type AdminPermission = 'admin';
 export type Permission = TPermissions | AdminPermission;
 
 export async function logout(page: Page) {
-  await page.goto('/logout');
+  // The /logout component calls window.location.href='/' in a useEffect, which
+  // fires after the load event and interrupts goto('/logout'). Suppress that
+  // error — the browser still completes the redirect chain (/logout → / → /login).
+  await page.goto('/logout').catch(() => {});
 
-  await page.waitForURL('**/login');
+  // Wait for the full redirect chain to land on /login.
+  await page.waitForURL('**/login', { timeout: 15000 });
+
+  // Wait for the login form to be rendered and interactive before returning,
+  // so that any subsequent login() call doesn't race with ongoing page setup.
+  await page.locator('input[name="email"]').waitFor({ state: 'visible', timeout: 10000 });
 }
 
 export async function login(
@@ -18,8 +26,14 @@ export async function login(
   email = 'user@example.com',
   password = 'password'
 ) {
-  await page.waitForTimeout(500);
-  await page.goto('/login');
+  // Only navigate to /login when not already there. logout() already lands on
+  // /login with the form ready, so a redundant goto() would cause a needless
+  // full-page reload that can race with ongoing page initialisation.
+  if (!page.url().includes('/login')) {
+    await page.goto('/login');
+  }
+
+  await page.locator('input[name="email"]').waitFor({ state: 'visible', timeout: 10000 });
   await page.locator('input[name="email"]').fill(email);
   await page.getByLabel('Password').fill(password);
   await page.getByLabel('Password').press('Enter');
@@ -36,10 +50,15 @@ export function permissions(page: Page) {
     await page.getByRole('link', { name: 'User Management' }).click();
     await page.locator('#filter').fill(email);
 
-    await page.waitForTimeout(500);
-
     const tableBody = page.locator('tbody').first();
 
+    // The filter input has a 300ms debounce before the API request fires.
+    // Wait well past it so the table reflects the filtered results before
+    // clicking — the link text is the user's name, not the email, so we
+    // cannot use hasText to distinguish filtered from unfiltered rows.
+    await page.waitForTimeout(500);
+
+    await tableBody.getByRole('link').first().waitFor({ state: 'visible', timeout: 10000 });
     await tableBody.getByRole('link').first().click();
 
     const passwordField = page.locator('#current_password');
@@ -47,7 +66,7 @@ export function permissions(page: Page) {
 
     // Wait for either the password modal or the Permissions tab to appear.
     // If password is not required, the app auto-confirms and goes straight to the edit page.
-    await Promise.race([
+    await Promise.any([
       passwordField.waitFor({ state: 'visible', timeout: 5000 }),
       permissionsButton.waitFor({ state: 'visible', timeout: 5000 }),
     ]);
@@ -71,9 +90,7 @@ export function permissions(page: Page) {
 
   const save = async () => {
     await page.getByRole('button', { name: 'Save' }).click();
-    await page.getByText('Successfully updated user').isVisible();
-
-    await page.waitForTimeout(500);
+    await expect(page.getByText('Successfully updated user')).toBeVisible({ timeout: 10000 });
   };
 
   const set = async (...permissions: Permission[]) => {
@@ -105,7 +122,7 @@ export async function waitForTableData(page: Page): Promise<boolean> {
   await dataTable.waitFor({ state: 'visible', timeout: 5000 });
 
   // Wait for either "No records found" or a real data row to appear
-  await Promise.race([
+  await Promise.any([
     page.getByText('No records found').waitFor({ state: 'visible', timeout: 5000 }),
     dataTable.locator('tbody tr a').first().waitFor({ state: 'visible', timeout: 5000 }),
   ]).catch(() => {
@@ -118,9 +135,7 @@ export async function waitForTableData(page: Page): Promise<boolean> {
 export async function checkTableEditability(page: Page, isEditable: boolean) {
   const tableContainer = page.locator('[data-cy="dataTable"]');
 
-  // Wait for table to finish loading (spinner to disappear)
   await tableContainer.waitFor({ state: 'visible', timeout: 5000 });
-  await page.waitForTimeout(500);
 
   const headerCheckbox = tableContainer.locator('thead input[type="checkbox"]');
   const rowActionButtons = tableContainer.locator(

@@ -937,6 +937,7 @@ export function DataTable<T extends object>(props: Props<T>) {
               label={t('actions')}
               disabled={!selected.length}
               cypressRef="bulkActionsDropdown"
+              triggerCypressRef="bulkActionsTrigger"
             >
               {props.customBulkActions &&
                 props.customBulkActions.map(
