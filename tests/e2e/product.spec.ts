@@ -836,8 +836,7 @@ test('Product selector list gets updated on the report page when it is created',
   await productSalesOption.waitFor({ state: 'visible', timeout: 5000 });
   await productSalesOption.click();
 
-  await page.waitForTimeout(200);
-
+  await page.locator('[id="productItemSelector"]').waitFor({ state: 'visible', timeout: 5000 });
   await page.locator('[id="productItemSelector"]').click();
 
   await page
@@ -845,8 +844,6 @@ test('Product selector list gets updated on the report page when it is created',
     .locator('[type="text"]')
     .first()
     .fill(productName);
-
-  await page.waitForTimeout(200);
 
   await expect(
     page.getByText(productName, { exact: true })

@@ -21,7 +21,8 @@ export const createTaxRate = async (params: TaxCreateParams) => {
     .getByRole('link', { name: 'New Tax Rate' })
     .click();
 
-  await page.waitForTimeout(500);
+  // Wait for the blank tax rate API call to settle before typing
+  await page.waitForLoadState('networkidle');
 
   const nameInput = page.getByRole('main').getByRole('textbox').first();
   await nameInput.click();

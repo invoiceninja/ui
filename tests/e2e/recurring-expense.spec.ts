@@ -81,8 +81,6 @@ const createRecurringExpense = async (params: CreateParams) => {
 
   await page.waitForURL('**/recurring_expenses/create');
 
-  await page.waitForTimeout(300);
-
   if (assignTo) {
     const assignedUserInput = page.getByTestId('combobox-input-field').nth(4);
     await assignedUserInput.click();

@@ -29,14 +29,12 @@ export const createExpenseCategory = async (
   const nameField = page.locator('[data-cy="expenseCategoryNameField"]');
   await nameField.waitFor({ state: 'visible' });
 
-  // Wait for the blank expense category API call to complete and React to process it
-  // before typing, otherwise the useEffect overwrites the name mid-typing
-  await page.waitForTimeout(1500);
+  // Wait for the blank expense category API call to complete before typing,
+  // otherwise the useEffect overwrites the name mid-typing.
+  await page.waitForLoadState('networkidle');
 
   await nameField.clear();
   await nameField.pressSequentially(categoryName, { delay: 50 });
-
-  await page.waitForTimeout(500);
 
   await page.getByRole('button', { name: 'Save', exact: true }).click();
 

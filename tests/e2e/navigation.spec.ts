@@ -41,9 +41,21 @@ test('Prevent transaction quick popover navigation', async ({ page }) => {
   await page.locator('[type="date"]').first().blur();
 
   // Wait for debounce (300ms) + React re-render to detect the change as unsaved
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
+
+
+  await page
+    .locator('[type="date"]')
+  .nth(1)
+    .first()
+    .fill(dayjs().add(14, 'day').format('YYYY-MM-DD'));
+
+  await page.locator('[type="date"]').nth(1).first().blur();
+
+  await page.waitForTimeout(400);
 
   await page.locator('[data-cy="quickPopoverButton"]').click();
+  await page.waitForTimeout(400);
 
   await page.getByText('Transaction', { exact: true }).click();
 
@@ -92,13 +104,22 @@ test('Prevent quote quick popover navigation', async ({ page }) => {
   await page.locator('[type="date"]').first().blur();
 
   // Wait for debounce (300ms) + React re-render to detect the change as unsaved
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
+
+  await page
+    .locator('[type="date"]')
+    .nth(1)
+    .first()
+    .fill(dayjs().add(14, 'day').format('YYYY-MM-DD'));
+
+  await page.locator('[type="date"]').nth(1).first().blur();
+  await page.locator('[type="date"]').first().blur();
 
   await page.locator('[data-cy="quickPopoverButton"]').click();
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page.getByText('Quote', { exact: true }).click();
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await expect(
     page.getByText('Please save or cancel your changes')
@@ -144,7 +165,7 @@ test('Prevent back browser button navigation', async ({ page }) => {
   await page.locator('[type="date"]').first().blur();
 
   // Wait for debounce (300ms) + React re-render to detect the change as unsaved
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page.goBack();
 
@@ -191,7 +212,7 @@ test('Prevent account management navigation', async ({ page }) => {
   await page.locator('[type="date"]').first().blur();
 
   // Wait for debounce (300ms) + React re-render to detect the change as unsaved
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(400);
 
   await page.locator('[data-cy="companyDropdown"]').click();
 
@@ -275,17 +296,35 @@ test('Can add a company and navigate to account management', async ({
     })
   ).not.toBeVisible({ timeout: 10000 });
 
-  await page.waitForTimeout(300);
-
+  await page.locator('[data-cy="companyDropdown"]').waitFor({ state: 'visible', timeout: 5000 });
   await page.locator('[data-cy="companyDropdown"]').click();
 
   await page.getByText('Account Management', { exact: true }).first().click();
 
   await page.waitForURL('**/settings/account_management');
 
-  await expect(
+  await expect( 
     page.getByRole('heading', {
       name: 'Account Management',
     }).first()
   ).toBeVisible({ timeout: 10000 });
+
+  await page.getByRole('link', { name: 'Danger Zone' }).click();
+  await page.getByText('Delete Company').click();
+
+  const deleteField = page.getByRole('textbox', { name: 'Please type "delete" to' });
+  await deleteField.fill('delete');
+  await deleteField.blur();
+  await deleteField.press('Tab');
+
+  await page.getByRole('textbox', { name: 'Password*' }).click();
+  await page.getByRole('textbox', { name: 'Password*' }).fill('password');
+
+  await deleteField.click();
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
+  await page.locator('input[name="email"]').click();
+  await page.getByRole('button', { name: 'Login' }).click();
 });
