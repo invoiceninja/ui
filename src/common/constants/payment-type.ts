@@ -60,4 +60,5 @@ export default {
   [PaymentType.GOOGLE_WALLET]: 'payment_type_Google Wallet',
   [PaymentType.MONEY_ORDER]: 'payment_type_Money Order',
   [PaymentType.SWISH]: 'payment_type_Swish',
+  [PaymentType.MOBILE_PAYMENT]: 'payment_type_Mobile Payment',
 };
