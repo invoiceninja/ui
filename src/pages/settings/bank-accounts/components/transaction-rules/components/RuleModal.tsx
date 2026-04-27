@@ -135,6 +135,8 @@ export function RuleModal({
           {t('description')}
         </option>
         <option value="amount">{t('amount')}</option>
+        <option value="participant">{t('participant')}</option>
+        <option value="participant_name">{t('participant_name')}</option>
       </SelectField>
 
       <SelectField
