@@ -320,7 +320,21 @@ export function Notifications() {
           socketId()?.toString() !==
           (data as WithSocketId<Invoice>)['x-socket-id']
         ) {
-          queryClient.invalidateQueries(['/api/v1/invoices', $invoice.id]);
+          queryClient.invalidateQueries([
+            '/api/v1/invoices',
+            'detail',
+            $invoice.id,
+          ]);
+
+          queryClient.invalidateQueries({
+            predicate: (query) => {
+              const key = query.queryKey as string[];
+
+              return (
+                key.includes('/api/v1/invoices') && !key.includes('detail')
+              );
+            },
+          });
         }
 
         setNotifications((notifications) => [...notifications, notification]);
