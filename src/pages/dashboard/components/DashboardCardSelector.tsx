@@ -77,6 +77,12 @@ const FIELDS: Field[] = [
   'invoice_paid_expenses',
 ];
 
+const PERIOD_LABEL_MAP: Record<Period, string> = {
+  current: 'current_period',
+  previous: 'previous_period',
+  total: 'total',
+};
+
 const PERIOD_OPTIONS: { value: Period; labelKey: string }[] = [
   { value: 'current', labelKey: 'current_period' },
   { value: 'previous', labelKey: 'previous_period' },
@@ -164,13 +170,7 @@ function DragItem({ decoded, onRemove }: DragItemProps) {
           </span>
 
           <span className="text-xs truncate" style={{ color: colors.$17 }}>
-            {t(
-              decoded.period === 'current'
-                ? 'current_period'
-                : decoded.period === 'previous'
-                ? 'previous_period'
-                : 'total'
-            )}
+            {t(PERIOD_LABEL_MAP[decoded.period])}
             {' · '}
             {t(decoded.calculate === 'avg' ? 'average' : decoded.calculate)}
           </span>
@@ -197,6 +197,7 @@ export function DashboardCardSelector() {
   const colors = useColorScheme();
   const currentUser = useCurrentUser();
 
+  const fieldsRef = useRef<string[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [fields, setFields] = useState<string[]>([]);
@@ -208,6 +209,10 @@ export function DashboardCardSelector() {
   const [period, setPeriod] = useState<Period>('current');
   const [calculate, setCalculate] = useState<Calculate>('sum');
   const [format, setFormat] = useState<Format>('money');
+
+  useEffect(() => {
+    fieldsRef.current = fields;
+  }, [fields]);
 
   useEffect(() => {
     if (manageOpen && currentUser) {
@@ -263,7 +268,11 @@ export function DashboardCardSelector() {
     toast.processing();
     setIsFormBusy(true);
 
-    set(updated, 'company_user.react_settings.dashboard_fields', fields);
+    set(
+      updated,
+      'company_user.react_settings.dashboard_fields',
+      fieldsRef.current
+    );
 
     request(
       'PUT',
@@ -283,14 +292,14 @@ export function DashboardCardSelector() {
         setManageOpen(false);
       })
       .finally(() => setIsFormBusy(false));
-  }, [currentUser, isFormBusy, fields, dispatch]);
+  }, [currentUser, isFormBusy, dispatch]);
 
   const handleAdd = useCallback(() => {
     if (!selectedField || isDuplicate) {
       return;
     }
 
-    const existingCount = fields.filter((k) => {
+    const existingCount = fieldsRef.current.filter((k) => {
       const d = decodeDashboardField(k);
 
       return (
@@ -318,15 +327,7 @@ export function DashboardCardSelector() {
         behavior: 'smooth',
       });
     });
-  }, [
-    selectedField,
-    isDuplicate,
-    fields,
-    period,
-    calculate,
-    format,
-    isTaskField,
-  ]);
+  }, [selectedField, isDuplicate, period, calculate, format, isTaskField]);
 
   const handleRemove = useCallback((index: number) => {
     setFields((prev) => prev.filter((_, i) => i !== index));
@@ -606,13 +607,7 @@ export function DashboardCardSelector() {
                           className="h-1.5 w-1.5 shrink-0 rounded-full"
                           style={{ backgroundColor: '#5DCAA5' }}
                         />
-                        {t(
-                          period === 'current'
-                            ? 'current_period'
-                            : period === 'previous'
-                            ? 'previous_period'
-                            : 'total'
-                        )}
+                        {t(PERIOD_LABEL_MAP[period])}
                         {' · '}
                         {t(calculate === 'avg' ? 'average' : calculate)}
                       </span>
