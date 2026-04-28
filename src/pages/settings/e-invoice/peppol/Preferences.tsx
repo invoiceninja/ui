@@ -237,6 +237,19 @@ export function Preferences() {
         )}
 
         {company.legal_entity_id && (
+          <Element leftSide={t('e_expense_forward_email')}
+          leftSideHelp={t('e_expense_forward_email_help')}>
+            <InputField
+              value={company?.settings.e_expense_forward_email || ''}
+              onValueChange={(value) =>
+                handleChange('settings.e_expense_forward_email', value)
+              }
+              errorMessage={errors?.errors['settings.e_expense_forward_email']}
+            />
+          </Element>
+        )}
+
+        {company.legal_entity_id && (
           <Element leftSide={t('skip_automatic_email_with_peppol')}
           leftSideHelp={t('skip_automatic_email_with_peppol_help')}>
             <Toggle
