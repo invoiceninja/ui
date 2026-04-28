@@ -31,6 +31,9 @@ import {
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
 import { InputLabel } from '$app/components/forms';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { ImportButton } from '$app/components/import/ImportButton';
 
 export default function PurchaseOrders() {
   const { documentTitle } = useTitle('purchase_orders');
@@ -71,11 +74,24 @@ export default function PurchaseOrders() {
         customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={
-          <DataTableColumnsPicker
-            columns={purchaseOrderColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="purchaseOrder"
-          />
+          <div className="flex items-center space-x-2">
+            <DataTableColumnsPicker
+              columns={purchaseOrderColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="purchaseOrder"
+            />
+
+            <Guard
+              type="component"
+              guards={[
+                or(
+                  permission('create_purchase_order'),
+                  permission('edit_purchase_order')
+                ),
+              ]}
+              component={<ImportButton route="/purchase_orders/import" />}
+            />
+          </div>
         }
         dateRangeColumns={dateRangeColumns}
         linkToCreateGuards={[permission('create_purchase_order')]}

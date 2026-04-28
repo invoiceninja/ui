@@ -378,6 +378,10 @@ export function DataTable<T extends object>(props: Props<T>) {
     customFilters,
   });
 
+  const normalizeNumericCommas = (value: string): string => {
+    return value.replace(/(\d),(\d)/g, '$1.$2');
+  };
+
   useEffect(() => {
     const queryParam = buildDateRangeQueryParameter(dateRangeEntries);
 
@@ -391,6 +395,22 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, [dateRangeEntries]);
 
   useEffect(() => {
+    const propsUrl = new URL(
+      props.useDocuNinjaApi
+        ? docuNinjaEndpoint(props.endpoint)
+        : endpoint(props.endpoint)
+    );
+
+    propsUrl.searchParams.forEach((value, key) => {
+      if (
+        !['per_page', 'page', filterParameterKey, 'sort', 'status'].includes(
+          key
+        )
+      ) {
+        apiEndpoint.searchParams.set(key, value);
+      }
+    });
+
     if (!isInitialConfiguration) {
       clearTimeout(companyUpdateTimeOut.current);
 
@@ -412,7 +432,10 @@ export function DataTable<T extends object>(props: Props<T>) {
 
     apiEndpoint.searchParams.set('per_page', perPage);
     apiEndpoint.searchParams.set('page', currentPage.toString());
-    apiEndpoint.searchParams.set(filterParameterKey, filter);
+    apiEndpoint.searchParams.set(
+      filterParameterKey,
+      filter.length ? normalizeNumericCommas(filter) : filter
+    );
 
     handleChangingCustomFilters();
 
@@ -483,6 +506,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     dateRangeQueryParameter,
     filterColumns,
     filterColumnsValues,
+    props.endpoint,
   ]);
 
   useEffect(() => {
@@ -913,6 +937,7 @@ export function DataTable<T extends object>(props: Props<T>) {
               label={t('actions')}
               disabled={!selected.length}
               cypressRef="bulkActionsDropdown"
+              triggerCypressRef="bulkActionsTrigger"
             >
               {props.customBulkActions &&
                 props.customBulkActions.map(

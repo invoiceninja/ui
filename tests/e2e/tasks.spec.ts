@@ -102,9 +102,9 @@ const createTask = async (params: CreateParams) => {
 
   await checkTableEditability(page, isTableEditable);
 
-  await page.getByRole('main').getByRole('link', { name: 'New Task' }).click();
-
-  await page.waitForTimeout(500);
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Task' }).click();
 
   // Select client from combobox
   await page.locator('[data-testid="combobox-input-field"]').first().click();
@@ -672,7 +672,7 @@ test('Invoice Task displayed with admin permission', async ({ page, api }) => {
     .getByRole('link', { name: 'Tasks', exact: true })
     .click();
 
-  await page.waitForTimeout(500);
+  await waitForTableData(page);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
@@ -731,20 +731,16 @@ test('Invoice Task displayed with creation permissions', async ({
     .getByRole('link', { name: 'Tasks', exact: true })
     .click();
 
-  await page.waitForTimeout(500);
+  await waitForTableData(page);
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  await page.getByRole('button', { name: 'Actions' }).first().click();
-  
- 
-  // // Wait for bulk actions button to appear after checkbox selection
-  // await page
-  //   .locator('[data-cy="dataTable"]')
-  //   .getByRole('button', { name: 'Actions', exact: true })
-  //   .first()
-  //   .waitFor({ state: 'visible', timeout: 5000 });
+  // Wait for bulk actions button to appear after checkbox selection
+  await page
+    .locator('[data-cy="dataTable"]')
+    .getByRole('button', { name: 'Actions', exact: true })
+    .first()
+    .waitFor({ state: 'visible', timeout: 5000 });
 
-  await page.waitForTimeout(500);
   await checkDropdownActions(
     page,
     customActions,
