@@ -18,7 +18,6 @@ import {
   ReactNode,
   RefObject,
   SetStateAction,
-  useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useOutletContext } from 'react-router-dom';
@@ -43,6 +42,7 @@ import reactStringReplace from 'react-string-replace';
 import { useColorScheme } from '$app/common/colors';
 import { cloneDeep, get, set } from 'lodash';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useSendCooldown } from '$app/common/hooks/useSendCooldown';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -54,6 +54,7 @@ export interface Context {
   errors: ValidationBag | undefined;
   eInvoiceRef: RefObject<EInvoiceComponent> | undefined;
   eInvoiceValidationEntityResponse: ValidationEntityResponse | undefined;
+  triggerValidationQuery: boolean;
   setTriggerValidationQuery: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -74,6 +75,7 @@ export default function EInvoice() {
   const {
     invoice,
     eInvoiceValidationEntityResponse,
+    triggerValidationQuery,
     setTriggerValidationQuery,
     setInvoice,
     errors,
@@ -102,27 +104,38 @@ export default function EInvoice() {
     staleTime: Infinity,
   });
 
-  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const { send, isBusy, secondsRemaining } = useSendCooldown({
+    onElapsed: async () => {
+      queryClient.invalidateQueries(['/api/v1/activities/entity']);
+
+      if (!invoice?.id) return;
+
+      const response = await request(
+        'GET',
+        endpoint('/api/v1/invoices/:id?include=payments', { id: invoice.id })
+      );
+      const fresh = response.data.data as Invoice;
+
+      // Patch only server-owned fields so unsaved form edits survive the refetch.
+      setInvoice((current) =>
+        current
+          ? { ...current, backup: fresh.backup, status_id: fresh.status_id }
+          : current
+      );
+    },
+  });
 
   const handleSend = () => {
-    if (!isFormBusy) {
-      toast.processing();
-      setIsFormBusy(true);
+    toast.processing();
 
+    send(() =>
       request('POST', endpoint('/api/v1/einvoice/peppol/send'), {
         entity: 'invoice',
         entity_id: invoice?.id,
+      }).then(() => {
+        toast.success('success');
       })
-        .then(() => {
-          setTimeout(() => {
-            queryClient.invalidateQueries(['/api/v1/invoices', invoice?.id]);
-            queryClient.invalidateQueries(['/api/v1/activities/entity']);
-          }, 2000);
-
-          toast.success('success');
-        })
-        .finally(() => setIsFormBusy(false));
-    }
+    );
   };
 
   const getActivityText = (activityTypeId: number) => {
@@ -184,6 +197,7 @@ export default function EInvoice() {
                 $refetch(['entity_validations']);
                 setTriggerValidationQuery(true);
               }}
+              disabled={triggerValidationQuery}
             >
               {t('validate')}
             </Button>
@@ -324,10 +338,12 @@ export default function EInvoice() {
                 <Button
                   behavior="button"
                   onClick={handleSend}
-                  disabled={isFormBusy}
+                  disabled={isBusy}
                   disableWithoutIcon
                 >
-                  {t('send')}
+                  {secondsRemaining > 0
+                    ? `${t('send')} (${secondsRemaining}s)`
+                    : t('send')}
                 </Button>
               </div>
             )}
@@ -339,6 +355,8 @@ export default function EInvoice() {
         <Element leftSide={t('start_date')}>
           <InputField
             type="date"
+            changeOverride
+            debounceTimeout={0}
             value={
               get(invoice, 'e_invoice.Invoice.InvoicePeriod.0.StartDate') || ''
             }
@@ -354,6 +372,8 @@ export default function EInvoice() {
         <Element leftSide={t('end_date')}>
           <InputField
             type="date"
+            changeOverride
+            debounceTimeout={0}
             value={
               get(invoice, 'e_invoice.Invoice.InvoicePeriod.0.EndDate') || ''
             }
@@ -372,6 +392,8 @@ export default function EInvoice() {
         >
           <InputField
             type="date"
+            changeOverride
+            debounceTimeout={0}
             value={
               get(invoice, 'e_invoice.Invoice.Delivery.0.ActualDeliveryDate') ||
               ''

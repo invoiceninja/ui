@@ -9,6 +9,7 @@
  */
 
 export const PEPPOL_COUNTRIES = [
+  '20',
   '40',
   '56',
   '208',
@@ -18,6 +19,8 @@ export const PEPPOL_COUNTRIES = [
   '442',
   '528',
   '578',
+  '616',
+  '702',
   '752',
   '826',
 ];
