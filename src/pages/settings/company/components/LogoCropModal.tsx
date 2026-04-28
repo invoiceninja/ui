@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { useRef, useState } from 'react';
@@ -84,6 +85,8 @@ export function LogoCropModal({
 }: Props) {
   const [t] = useTranslation();
 
+  const colors = useColorScheme();
+
   const timeoutRef = useRef<NodeJS.Timeout>();
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -143,7 +146,10 @@ export function LogoCropModal({
       disableClosing={isFormBusy}
     >
       <div className="flex flex-col space-y-5">
-        <div className="flex items-center justify-center w-full p-4">
+        <div
+          className="flex items-center justify-center w-full p-4 rounded-lg border"
+          style={{ backgroundColor: colors.$15, borderColor: colors.$24 }}
+        >
           {imageSrc && (
             <ReactCrop
               crop={crop}
