@@ -35,46 +35,98 @@ const FULL_CROP: Crop = {
   height: 100,
 };
 
-const cropImageToBlob = (
+const MAX_DIMENSION = 800;
+const MAX_BLOB_SIZE = 2 * 1024 * 1024;
+
+const canvasToBlob = (
+  canvas: HTMLCanvasElement,
+  type: string,
+  quality?: number
+): Promise<Blob> =>
+  new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) =>
+        blob
+          ? resolve(blob)
+          : reject(new Error('Converting canvas to blob failed')),
+      type,
+      quality
+    );
+  });
+
+const compressToMaxSize = async (canvas: HTMLCanvasElement): Promise<Blob> => {
+  const pngBlob = await canvasToBlob(canvas, 'image/png');
+
+  if (pngBlob.size <= MAX_BLOB_SIZE) {
+    return pngBlob;
+  }
+
+  let quality = 0.9;
+
+  while (quality >= 0.1) {
+    const jpegBlob = await canvasToBlob(canvas, 'image/jpeg', quality);
+
+    if (jpegBlob.size <= MAX_BLOB_SIZE) {
+      return jpegBlob;
+    }
+
+    quality -= 0.1;
+  }
+
+  return canvasToBlob(canvas, 'image/jpeg', 0.1);
+};
+
+const cropImageToBlob = async (
   image: HTMLImageElement,
   crop: PixelCrop
 ): Promise<Blob> => {
   const scaleX = image.naturalWidth / image.width;
   const scaleY = image.naturalHeight / image.height;
 
+  const sourceX = Math.floor(crop.x * scaleX);
+  const sourceY = Math.floor(crop.y * scaleY);
+  const sourceWidth = Math.floor(crop.width * scaleX);
+  const sourceHeight = Math.floor(crop.height * scaleY);
+
+  let outputWidth = sourceWidth;
+
+  let outputHeight = sourceHeight;
+
+  if (outputWidth > MAX_DIMENSION || outputHeight > MAX_DIMENSION) {
+    const ratio = Math.min(
+      MAX_DIMENSION / outputWidth,
+      MAX_DIMENSION / outputHeight
+    );
+
+    outputWidth = Math.floor(outputWidth * ratio);
+    outputHeight = Math.floor(outputHeight * ratio);
+  }
+
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
   if (!ctx) {
-    return Promise.reject(new Error('No 2d context'));
+    throw new Error('No 2d context');
   }
 
-  canvas.width = Math.floor(crop.width * scaleX);
-  canvas.height = Math.floor(crop.height * scaleY);
+  canvas.width = outputWidth;
+  canvas.height = outputHeight;
 
   ctx.imageSmoothingQuality = 'high';
 
   ctx.drawImage(
     image,
-    Math.floor(crop.x * scaleX),
-    Math.floor(crop.y * scaleY),
-    canvas.width,
-    canvas.height,
+    sourceX,
+    sourceY,
+    sourceWidth,
+    sourceHeight,
     0,
     0,
-    canvas.width,
-    canvas.height
+    outputWidth,
+    outputHeight
   );
 
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) {
-        resolve(blob);
-      } else {
-        reject(new Error('Canvas toBlob failed'));
-      }
-    }, 'image/png');
-  });
+  return compressToMaxSize(canvas);
 };
 
 export function LogoCropModal({
