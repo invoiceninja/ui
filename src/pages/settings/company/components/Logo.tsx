@@ -175,7 +175,7 @@ export function Logo({ isSettingsPage = true }: Props) {
             <div className="grid grid-cols-12 lg:gap-4 space-y-4 lg:space-y-0">
               <div
                 className="col-span-12 lg:col-span-5 rounded-lg p-6 border"
-                style={{ backgroundColor: '#E8E8E8', borderColor: '#D4D4D4' }}
+                style={{ backgroundColor: colors.$15, borderColor: colors.$24 }}
               >
                 <img
                   className="w-full h-auto object-contain"
@@ -224,7 +224,7 @@ export function Logo({ isSettingsPage = true }: Props) {
           <div className="grid grid-cols-12 gap-x-4">
             <div
               className="col-span-6 rounded-lg p-6 border"
-              style={{ backgroundColor: '#E8E8E8', borderColor: '#D4D4D4' }}
+              style={{ backgroundColor: colors.$15, borderColor: colors.$24 }}
             >
               <img
                 className="w-full h-auto object-contain"

@@ -17,7 +17,6 @@ import ReactCrop, {
   PixelCrop,
   convertToPixelCrop,
 } from 'react-image-crop';
-import { getCroppedImg } from '../common/helpers/crop-image';
 import 'react-image-crop/dist/ReactCrop.css';
 
 interface Props {
@@ -35,6 +34,48 @@ const FULL_CROP: Crop = {
   height: 100,
 };
 
+const cropImageToBlob = (
+  image: HTMLImageElement,
+  crop: PixelCrop
+): Promise<Blob> => {
+  const scaleX = image.naturalWidth / image.width;
+  const scaleY = image.naturalHeight / image.height;
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    return Promise.reject(new Error('No 2d context'));
+  }
+
+  canvas.width = Math.floor(crop.width * scaleX);
+  canvas.height = Math.floor(crop.height * scaleY);
+
+  ctx.imageSmoothingQuality = 'high';
+
+  ctx.drawImage(
+    image,
+    Math.floor(crop.x * scaleX),
+    Math.floor(crop.y * scaleY),
+    canvas.width,
+    canvas.height,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error('Canvas toBlob failed'));
+      }
+    }, 'image/png');
+  });
+};
+
 export function LogoCropModal({
   visible,
   imageSrc,
@@ -43,6 +84,7 @@ export function LogoCropModal({
 }: Props) {
   const [t] = useTranslation();
 
+  const timeoutRef = useRef<NodeJS.Timeout>();
   const imgRef = useRef<HTMLImageElement>(null);
 
   const [crop, setCrop] = useState<Crop>();
@@ -52,7 +94,7 @@ export function LogoCropModal({
   const handleImageLoad = () => {
     setCrop(FULL_CROP);
 
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       if (imgRef.current) {
         const { width, height } = imgRef.current;
 
@@ -78,7 +120,7 @@ export function LogoCropModal({
 
     setIsFormBusy(true);
 
-    getCroppedImg(imgRef.current, completedCrop)
+    cropImageToBlob(imgRef.current, completedCrop)
       .then((croppedBlob) => onCropComplete(croppedBlob))
       .then(() => {
         setCrop(undefined);
@@ -92,6 +134,7 @@ export function LogoCropModal({
       title={t('crop_logo')}
       visible={visible}
       onClose={() => {
+        clearTimeout(timeoutRef.current);
         setCrop(undefined);
         setCompletedCrop(undefined);
         onClose();
