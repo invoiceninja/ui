@@ -38,7 +38,7 @@ export function useInvoiceQuery(params: InvoiceQueryParams) {
   const isLockedParam = includeIsLocked ? '&is_locked=true' : '';
 
   return useQuery<Invoice>(
-    ['/api/v1/invoices', params.id],
+    ['/api/v1/invoices', 'detail', params.id],
     () =>
       request(
         'GET',
