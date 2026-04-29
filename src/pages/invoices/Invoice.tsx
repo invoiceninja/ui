@@ -247,6 +247,7 @@ export default function Invoice() {
                   client,
                   eInvoiceRef,
                   eInvoiceValidationEntityResponse: validationResponse,
+                  triggerValidationQuery,
                   setTriggerValidationQuery,
                 }}
               />
