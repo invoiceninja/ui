@@ -568,9 +568,7 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
   return (
     <table style={tableStyle}>
       <tbody>
-        {items
-          .filter((item: any) => item.show)
-          .map(
+        {items.map(
             (
               item: {
                 show: boolean;
