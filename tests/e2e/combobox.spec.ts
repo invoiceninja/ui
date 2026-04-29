@@ -15,19 +15,16 @@ test('ComboBox Async value selecting', async ({ page }) => {
 
   await page.goto('/testing');
   await page.waitForURL('/testing');
-  await page.waitForTimeout(200);
 
   const comboBoxInputField = page.getByRole('combobox').first();
+  await comboBoxInputField.waitFor({ state: 'visible', timeout: 5000 });
   await comboBoxInputField.click();
 
   const option = page.getByRole('option').first();
   await option.waitFor({ state: 'visible', timeout: 5000 });
   await option.click();
 
-  await page.waitForTimeout(200);
-
-  const selectedValue = await comboBoxInputField.inputValue();
-  expect(selectedValue.length > 0).toBeTruthy();
+  await expect(comboBoxInputField).not.toHaveValue('', { timeout: 5000 });
 });
 
 test('ComboBox Async available clearing', async ({ page }) => {
@@ -35,19 +32,16 @@ test('ComboBox Async available clearing', async ({ page }) => {
 
   await page.goto('/testing');
   await page.waitForURL('/testing');
-  await page.waitForTimeout(200);
 
   const comboBoxInputField = page.getByRole('combobox').first();
+  await comboBoxInputField.waitFor({ state: 'visible', timeout: 5000 });
   await comboBoxInputField.click();
 
   const option = page.getByRole('option').first();
   await option.waitFor({ state: 'visible', timeout: 5000 });
   await option.click();
 
-  await page.waitForTimeout(200);
-
-  const selectedValue = await comboBoxInputField.inputValue();
-  expect(selectedValue.length > 0).toBeTruthy();
+  await expect(comboBoxInputField).not.toHaveValue('', { timeout: 5000 });
 });
 
 test('ComboBox Async value clearing', async ({ page }) => {
@@ -55,29 +49,23 @@ test('ComboBox Async value clearing', async ({ page }) => {
 
   await page.goto('/testing');
   await page.waitForURL('/testing');
-  await page.waitForTimeout(200);
 
   const comboBoxInputField = page.getByRole('combobox').first();
+  await comboBoxInputField.waitFor({ state: 'visible', timeout: 5000 });
   await comboBoxInputField.click();
 
   const option = page.getByRole('option').first();
   await option.waitFor({ state: 'visible', timeout: 5000 });
   await option.click();
 
-  await page.waitForTimeout(200);
-
   // After selecting, the combobox should have a value
-  const selectedValue = await comboBoxInputField.inputValue();
-  expect(selectedValue.length > 0).toBeTruthy();
+  await expect(comboBoxInputField).not.toHaveValue('', { timeout: 5000 });
 
   // Clear by using the onDismiss button (the button next to the combobox input)
   const comboboxButton = page.locator('button.absolute.inset-y-0').first();
   await comboboxButton.click();
 
-  await page.waitForTimeout(200);
-
-  const clearedValue = await comboBoxInputField.inputValue();
-  expect(clearedValue.length === 0).toBeTruthy();
+  await expect(comboBoxInputField).toHaveValue('', { timeout: 5000 });
 });
 
 test('ComboBox Async action opening slider', async ({ page }) => {
@@ -85,9 +73,9 @@ test('ComboBox Async action opening slider', async ({ page }) => {
 
   await page.goto('/testing');
   await page.waitForURL('/testing');
-  await page.waitForTimeout(200);
 
   const comboBoxInputField = page.getByRole('combobox').first();
+  await comboBoxInputField.waitFor({ state: 'visible', timeout: 5000 });
   await comboBoxInputField.click();
 
   const actionButton = page.getByRole('button', { name: 'New Client' });
@@ -105,9 +93,9 @@ test('ComboBox Async filtering', async ({ page }) => {
 
   await page.goto('/testing');
   await page.waitForURL('/testing');
-  await page.waitForTimeout(200);
 
   const comboBoxInputField = page.getByRole('combobox').first();
+  await comboBoxInputField.waitFor({ state: 'visible', timeout: 5000 });
   await comboBoxInputField.fill('test merge one');
   await comboBoxInputField.click();
 

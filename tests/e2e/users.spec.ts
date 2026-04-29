@@ -115,7 +115,7 @@ test("Can't see owner of the account in the list of users", async ({
   // Filter for the owner's email — should not be visible to non-owners
   await page.locator('#filter').fill('user@example.com');
 
-  await page.waitForTimeout(200);
+  await page.locator('tbody').first().waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
 
   await expect(page.getByText('user@example.com')).not.toBeVisible({ timeout: 10000 });
 

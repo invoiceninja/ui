@@ -19,9 +19,12 @@ import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-import { Link, Button } from '$app/components/forms';
+import { InputField, Link, Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useEffect, useState } from 'react';
+import { useAtomValue } from 'jotai';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { useQuery, useQueryClient } from 'react-query';
@@ -42,6 +45,8 @@ export function Preferences() {
   const account = useCurrentAccount();
   const accentColor = useAccentColor();
 
+  const handleChange = useHandleCurrentCompanyChangeProperty();
+  const errors = useAtomValue(companySettingsErrorsAtom);
   const { data: healthCheck } = useEInvoiceHealthCheck();
   const [isRegenerating, setIsRegenerating] = useState(false);
 
@@ -214,6 +219,44 @@ export function Preferences() {
                 form.setFieldValue('acts_as_receiver', v);
                 form.submitForm();
               }}
+            />
+          </Element>
+        )}
+
+        {company.legal_entity_id && (
+          <Element leftSide={t('e_invoice_forward_email')}
+          leftSideHelp={t('e_invoice_forward_email_help')}>
+            <InputField
+              value={company?.settings.e_invoice_forward_email || ''}
+              onValueChange={(value) =>
+                handleChange('settings.e_invoice_forward_email', value)
+              }
+              errorMessage={errors?.errors['settings.e_invoice_forward_email']}
+            />
+          </Element>
+        )}
+
+        {company.legal_entity_id && (
+          <Element leftSide={t('e_expense_forward_email')}
+          leftSideHelp={t('e_expense_forward_email_help')}>
+            <InputField
+              value={company?.settings.e_expense_forward_email || ''}
+              onValueChange={(value) =>
+                handleChange('settings.e_expense_forward_email', value)
+              }
+              errorMessage={errors?.errors['settings.e_expense_forward_email']}
+            />
+          </Element>
+        )}
+
+        {company.legal_entity_id && (
+          <Element leftSide={t('skip_automatic_email_with_peppol')}
+          leftSideHelp={t('skip_automatic_email_with_peppol_help')}>
+            <Toggle
+              checked={Boolean(company?.settings.skip_automatic_email_with_peppol)}
+              onValueChange={(value) =>
+                handleChange('settings.skip_automatic_email_with_peppol', value)
+              }
             />
           </Element>
         )}

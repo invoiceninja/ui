@@ -101,8 +101,8 @@ function Payments() {
                       <span>
                         {formatMoney(
                           paymentable.amount,
-                          payment.client?.country_id,
-                          payment.client?.settings.currency_id
+                          invoice.client?.country_id,
+                          invoice.client?.settings.currency_id
                         )}
                       </span>
 

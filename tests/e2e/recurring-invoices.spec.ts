@@ -134,8 +134,6 @@ const createRecurringInvoice = async (params: CreateParams) => {
     .getByRole('link', { name: 'New Recurring Invoice' })
     .click();
 
-  await page.waitForTimeout(900);
-
   const comboboxInput = page.getByRole('combobox').first();
   await comboboxInput.click();
 
@@ -826,7 +824,6 @@ test('recurring invoice creation and start stop sequence', async ({ page, api })
 
   // Wait for the create form to fully render — the client combobox auto-opens
   await page.waitForURL('**/recurring_invoices/create');
-  await page.waitForTimeout(500);
 
   // Click "New Client" in the combobox dropdown to create a new client inline
   const newClientButton = page.getByRole('button', { name: 'New Client' });

@@ -29,7 +29,7 @@ export const createClient = async (params: ClientCreateParams) => {
   const dataTable = page.locator('[data-cy="dataTable"]');
   await dataTable.waitFor({ state: 'visible', timeout: 5000 });
   // Wait for either "No records found" or a table row with data to appear
-  await Promise.race([
+  await Promise.any([
     page.getByText('No records found').waitFor({ state: 'visible', timeout: 5000 }),
     page.locator('tbody tr a').first().waitFor({ state: 'visible', timeout: 5000 }),
   ]).catch(() => {

@@ -216,7 +216,7 @@ test('can edit project', async ({ page, api }) => {
   await logout(page);
 
   await login(page, 'projects@example.com', 'password');
-
+ 
   await page
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Projects', exact: true })
@@ -734,7 +734,7 @@ test('Invoice Project displayed with admin permission', async ({
     .getByRole('link', { name: 'Projects', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await waitForTableData(page);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
@@ -794,7 +794,7 @@ test('Invoice Project displayed with creation permissions', async ({
     .getByRole('link', { name: 'Projects', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await waitForTableData(page);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 

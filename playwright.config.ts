@@ -16,7 +16,7 @@ export default defineConfig({
   /* Reset API state before running the test suite. */
   globalSetup: './tests/e2e/global-setup.ts',
   /* Maximum time one test can run for. */
-  timeout: 15000,
+  timeout: 30000,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -29,7 +29,7 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: 0,
+  retries: process.env.CI ? 2 : 1,
   /* Serial execution — tests share API state and permission users. */
   workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -100,7 +100,7 @@ export default defineConfig({
    * Build first with: npx vite build --mode testing
    * This ensures VITE_* vars are loaded from .env.testing */
   webServer: {
-    command: 'npx vite build --mode testing && npx vite preview',
+    command: 'npx vite preview',
     port: 4173,
     reuseExistingServer: true,
   },

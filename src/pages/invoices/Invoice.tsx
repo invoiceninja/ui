@@ -205,12 +205,8 @@ export default function Invoice() {
               {errors?.errors?.paid_to_date?.[0]}
             </Banner>
 
-            <Banner
-              id="invoiceUpdateBanner"
-              className="hidden"
-              variant="orange"
-            >
-              {t('invoice_status_changed')}
+            <Banner id="invoiceUpdateBanner" className="hidden" variant="blue">
+              {t('invoice_status_paid')}
             </Banner>
           </>
         }
@@ -251,6 +247,7 @@ export default function Invoice() {
                   client,
                   eInvoiceRef,
                   eInvoiceValidationEntityResponse: validationResponse,
+                  triggerValidationQuery,
                   setTriggerValidationQuery,
                 }}
               />
