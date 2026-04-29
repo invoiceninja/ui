@@ -31,7 +31,12 @@ const TemplateProperties = {
     'remaining_cycles',
     'parameters',
   ],
-  invoice_outstanding_tasks: ['template', 'next_run', 'parameters'],
+  invoice_outstanding_tasks: [
+    'template',
+    'next_run',
+    'frequency_id',
+    'parameters',
+  ],
   payment_schedule: ['template', 'next_run', 'parameters'],
 };
 
