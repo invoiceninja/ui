@@ -437,20 +437,18 @@ export function useBlockLibrary(): BlockDefinition[] {
       defaultSize: { w: 6, h: 6 },
       defaultProperties: {
         items: [
-          { label: '$subtotal_label', field: '$subtotal', show: true },
-          { label: '$discount_label', field: '$discount', show: true },
-          { label: '$taxes_label', field: '$taxes', show: true },
+          { label: '$subtotal_label', field: '$subtotal' },
+          { label: '$discount_label', field: '$discount' },
+          { label: '$taxes_label', field: '$taxes' },
           {
             label: '$total_label',
             field: '$total',
-            show: true,
             isTotal: true,
           },
-          { label: '$paid_to_date_label', field: '$paid_to_date', show: true },
+          { label: '$paid_to_date_label', field: '$paid_to_date' },
           {
             label: '$balance_due_label',
             field: '$balance_due',
-            show: true,
             isBalance: true,
           },
         ],
