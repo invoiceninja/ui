@@ -270,7 +270,7 @@ export function replaceVariables(
   );
   result = result.replace(/\$invoice\.po_number/g, data.invoice.po_number);
   result = result.replace(/\$invoice\.public_url/g, data.invoice.public_url);
-  result = result.replace(/\invoice\.public_notes/g, data.invoice.public_notes);
+  result = result.replace(/\$invoice\.public_notes/g, data.invoice.public_notes);
   result = result.replace(/\$invoice\.terms/g, data.invoice.terms);
   result = result.replace(/\$invoice\.custom_value1/g, data.invoice.custom_value1);
   result = result.replace(/\$invoice\.custom_value2/g, data.invoice.custom_value2);

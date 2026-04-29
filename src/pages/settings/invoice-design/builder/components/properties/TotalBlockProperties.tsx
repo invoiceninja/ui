@@ -57,7 +57,6 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
         .map(({ show, ...rest }: any) => rest);
       updateProperty('items', cleaned);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const addField = (fieldTemplate: (typeof AVAILABLE_TOTAL_ITEMS)[0]) => {
