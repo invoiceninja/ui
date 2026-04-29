@@ -53,9 +53,7 @@ export const TotalBlock = memo(function TotalBlock({ block }: TotalBlockProps) {
   return (
     <table style={tableStyle}>
       <tbody>
-        {items
-          .filter((item: any) => item.show)
-          .map(
+        {items.map(
             (
               item: {
                 show: boolean;

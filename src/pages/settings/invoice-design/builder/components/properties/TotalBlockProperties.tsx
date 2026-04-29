@@ -9,8 +9,8 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
-import { ChevronUp, ChevronDown, Type } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronUp, ChevronDown, Type, Trash2 } from 'lucide-react';
 import { PropertyEditorProps } from '../../types';
 import {
   ColorInput,
@@ -18,10 +18,19 @@ import {
   AlignmentInput,
   SectionDivider,
   FontStyleInput,
+  CheckboxInput,
 } from './PropertyInputs';
 import { useColorScheme } from '$app/common/colors';
 import { useLabelMapping } from '../../utils/label-variables';
-import { Checkbox } from '$app/components/forms';
+
+const AVAILABLE_TOTAL_ITEMS = [
+  { label: '$subtotal_label', field: '$subtotal' },
+  { label: '$discount_label', field: '$discount' },
+  { label: '$taxes_label', field: '$taxes' },
+  { label: '$total_label', field: '$total', isTotal: true },
+  { label: '$paid_to_date_label', field: '$paid_to_date' },
+  { label: '$balance_due_label', field: '$balance_due', isBalance: true },
+];
 
 export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
@@ -38,67 +47,84 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
     });
   };
 
-  const updateItemVisibility = (index: number, show: boolean) => {
-    const updatedItems = [...block.properties.items];
-    updatedItems[index] = { ...updatedItems[index], show };
-    updateProperty('items', updatedItems);
+  const items = block.properties.items || [];
+
+  useEffect(() => {
+    const hasHidden = items.some((item: any) => item.show === false);
+    if (hasHidden) {
+      const cleaned = items
+        .filter((item: any) => item.show !== false)
+        .map(({ show, ...rest }: any) => rest);
+      updateProperty('items', cleaned);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const addField = (fieldTemplate: (typeof AVAILABLE_TOTAL_ITEMS)[0]) => {
+    updateProperty('items', [...items, { ...fieldTemplate }]);
   };
 
-  const updateItemTypography = (index: number, key: string, value: any) => {
-    const updatedItems = [...block.properties.items];
-    updatedItems[index] = { ...updatedItems[index], [key]: value };
-    updateProperty('items', updatedItems);
+  const removeField = (index: number) => {
+    const newItems = [...items];
+    newItems.splice(index, 1);
+    updateProperty('items', newItems);
   };
 
   const moveItemUp = (index: number) => {
     if (index === 0) return;
-    const updatedItems = [...block.properties.items];
-    [updatedItems[index - 1], updatedItems[index]] = [
-      updatedItems[index],
-      updatedItems[index - 1],
+    const newItems = [...items];
+    [newItems[index - 1], newItems[index]] = [
+      newItems[index],
+      newItems[index - 1],
     ];
-    updateProperty('items', updatedItems);
+    updateProperty('items', newItems);
   };
 
   const moveItemDown = (index: number) => {
-    const items = block.properties.items;
     if (index >= items.length - 1) return;
-    const updatedItems = [...items];
-    [updatedItems[index], updatedItems[index + 1]] = [
-      updatedItems[index + 1],
-      updatedItems[index],
+    const newItems = [...items];
+    [newItems[index], newItems[index + 1]] = [
+      newItems[index + 1],
+      newItems[index],
     ];
-    updateProperty('items', updatedItems);
+    updateProperty('items', newItems);
+  };
+
+  const updateItemTypography = (index: number, key: string, value: any) => {
+    const newItems = [...items];
+    newItems[index] = { ...newItems[index], [key]: value || undefined };
+    updateProperty('items', newItems);
   };
 
   const toggleItemExpand = (index: number) => {
     setExpandedItems((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
+  const addedFields = items.map((item: any) => item.field);
+  const availableToAdd = AVAILABLE_TOTAL_ITEMS.filter(
+    (field) => !addedFields.includes(field.field)
+  );
+
   return (
     <div className="space-y-4">
-      <div
-        className="p-3 rounded-md"
-        style={{ backgroundColor: colors.$23, border: `1px solid ${colors.$24}` }}
-      >
-        <Checkbox
-          id="show-paid-stamp"
-          label={t('show_paid_stamp')}
-          checked={block.properties.showPaidStamp || false}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateProperty('showPaidStamp', event.target.checked)}
-        />
-      </div>
+      <CheckboxInput
+        id="show-paid-stamp"
+        label={String(t('show_paid_stamp'))}
+        checked={block.properties.showPaidStamp || false}
+        onChange={(value) => updateProperty('showPaidStamp', value)}
+      />
 
       {/* Items to show */}
-      <div>
+      <div className="space-y-3">
         <label
-          className="block text-sm font-medium mb-3"
+          className="block text-sm font-medium"
           style={{ color: colors.$3 }}
         >
           {t('items_to_display')}
         </label>
+
         <div className="space-y-2">
-          {block.properties.items?.map((item: any, index: number) => (
+          {items.map((item: any, index: number) => (
             <div
               key={index}
               className="rounded-md overflow-hidden"
@@ -126,15 +152,15 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                   </button>
                   <button
                     onClick={() => moveItemDown(index)}
-                    disabled={index >= block.properties.items.length - 1}
+                    disabled={index >= items.length - 1}
                     className="p-0.5 rounded transition-colors"
                     style={{
                       color:
-                        index >= block.properties.items.length - 1
+                        index >= items.length - 1
                           ? colors.$24
                           : colors.$16,
                       cursor:
-                        index >= block.properties.items.length - 1
+                        index >= items.length - 1
                           ? 'not-allowed'
                           : 'pointer',
                     }}
@@ -144,7 +170,7 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                       className="w-4 h-4"
                       style={{
                         color:
-                          index >= block.properties.items.length - 1
+                          index >= items.length - 1
                             ? colors.$24
                             : colors.$16,
                       }}
@@ -152,23 +178,9 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                   </button>
                 </div>
 
-                <input
-                  type="checkbox"
-                  id={`item-${index}`}
-                  checked={item.show}
-                  onChange={(e) =>
-                    updateItemVisibility(index, e.target.checked)
-                  }
-                  className="w-4 h-4 rounded"
-                  style={{ accentColor: colors.$3 }}
-                />
-                <label
-                  htmlFor={`item-${index}`}
-                  className="flex-1 text-sm"
-                  style={{ color: colors.$3 }}
-                >
+                <span className="flex-1 text-sm" style={{ color: colors.$3 }}>
                   {labelMapping.getDisplayLabel(item.label)}
-                </label>
+                </span>
 
                 <button
                   onClick={() => toggleItemExpand(index)}
@@ -183,6 +195,24 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                 >
                   <Type className="w-4 h-4" />
                 </button>
+
+                <button
+                  onClick={() => removeField(index)}
+                  className="p-1 rounded transition-colors"
+                  style={{ color: colors.$17 }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor =
+                      'rgba(239, 68, 68, 0.1)';
+                    e.currentTarget.style.color = '#ef4444';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = colors.$17;
+                  }}
+                  title={String(t('remove'))}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
 
               {expandedItems[index] && (
@@ -193,7 +223,6 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                     borderTop: `1px solid ${colors.$24}`,
                   }}
                 >
-                  {/* Font Size */}
                   <TextInput
                     label={String(t('font_size'))}
                     value={item.fontSize || ''}
@@ -269,7 +298,50 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
               )}
             </div>
           ))}
+
+          {items.length === 0 && (
+            <div
+              className="text-center py-4 text-sm rounded-md border border-dashed"
+              style={{ color: colors.$17, borderColor: colors.$24 }}
+            >
+              {t('no_fields_selected')}
+            </div>
+          )}
         </div>
+
+        {/* Add Fields */}
+        {availableToAdd.length > 0 && (
+          <div>
+            <label
+              className="block text-sm font-medium mb-2"
+              style={{ color: colors.$3 }}
+            >
+              {t('add_field')}
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {availableToAdd.map((field) => (
+                <button
+                  key={field.field}
+                  onClick={() => addField(field)}
+                  className="px-3 py-1.5 text-xs rounded-md transition-colors"
+                  style={{
+                    border: `1px solid ${colors.$24}`,
+                    color: colors.$3,
+                    backgroundColor: 'transparent',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = colors.$20;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  + {labelMapping.getDisplayLabel(field.label)}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <SectionDivider label={String(t('alignment'))} />
