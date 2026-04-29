@@ -9,19 +9,23 @@
  */
 
 import { useTranslation } from 'react-i18next';
+import { MdEdit } from 'react-icons/md';
 import { DashboardCardField } from '$app/common/interfaces/company-user';
 import { useColorScheme } from '$app/common/colors';
 import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
+import { Icon } from '$app/components/icons/Icon';
 import { FIELDS_LABELS } from './DashboardCardSelector';
 import { PERIOD_LABELS } from './DashboardCard';
+import classNames from 'classnames';
 
 interface Props {
   decoded: DashboardCardField;
   onRemove?: () => void;
+  onEdit?: () => void;
 }
 
-export function FieldRow({ decoded, onRemove }: Props) {
+export function FieldRow({ decoded, onRemove, onEdit }: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
@@ -42,14 +46,25 @@ export function FieldRow({ decoded, onRemove }: Props) {
         </div>
       </div>
 
-      <div className={onRemove ? 'cursor-pointer' : ''} onClick={onRemove}>
-        <CircleXMark
-          color={colors.$16}
-          hoverColor={colors.$3}
-          borderColor={colors.$5}
-          hoverBorderColor={colors.$17}
-          size="1.6rem"
-        />
+      <div className="flex items-center gap-2">
+        {onEdit && (
+          <div className="cursor-pointer" onClick={onEdit}>
+            <Icon element={MdEdit} size={18} style={{ color: colors.$17 }} />
+          </div>
+        )}
+
+        <div
+          className={classNames({ 'cursor-pointer': onRemove })}
+          onClick={onRemove}
+        >
+          <CircleXMark
+            color={colors.$16}
+            hoverColor={colors.$3}
+            borderColor={colors.$5}
+            hoverBorderColor={colors.$17}
+            size="1.6rem"
+          />
+        </div>
       </div>
     </>
   );
