@@ -19,9 +19,10 @@ import { Inline } from '$app/components/Inline';
 import { Button } from '$app/components/forms';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
-import { Paintbrush, Plus, Edit as EditIcon } from 'lucide-react';
+import { Paintbrush, Plus } from 'lucide-react';
 import { route } from '$app/common/helpers/route';
 import { Design } from '$app/common/interfaces/design';
+import { MdEdit } from 'react-icons/md';
 
 /**
  * Check if a design was created with the visual builder
@@ -98,7 +99,7 @@ export default function CustomDesigns() {
                   ? route('/settings/invoice_design/builder/:id', { id: resource.id })
                   : route('/settings/invoice_design/custom_designs/:id/edit', { id: resource.id })
               }
-              icon={<Icon element={EditIcon} />}
+              icon={<Icon element={MdEdit} />}
             >
               {t('edit')}
             </DropdownElement>
