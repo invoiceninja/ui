@@ -33,8 +33,7 @@ import { get } from 'lodash';
 import { useEffect, useState } from 'react';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-
-export type Classification = 'individual' | 'business' | 'government';
+import { Classification } from '$app/common/helpers/peppol-countries';
 
 export type Step =
   | 'plan_check'
