@@ -27,6 +27,15 @@ export interface InvoiceData {
     footer: string;
     terms: string;
     total_taxes: number;
+    label: string;
+    custom_value1: string;
+    custom_value2: string;
+    custom_value3: string;
+    custom_value4: string;
+    tax: number;
+    created_at: string;
+    updated_at: string;
+    partial_due_date: string;
   };
   subtotal: number;
   client: {
@@ -35,6 +44,12 @@ export interface InvoiceData {
     city_state_postal: string;
     phone: string;
     email: string;
+    custom_value1: string;
+    custom_value2: string;
+    custom_value3: string;
+    custom_value4: string;
+    vat_number: string;
+    contact_name: string;
   };
   company: {
     name: string;
@@ -43,6 +58,12 @@ export interface InvoiceData {
     city_state_postal: string;
     phone: string;
     email: string;
+    custom_value1: string;
+    custom_value2: string;
+    custom_value3: string;
+    custom_value4: string;
+    website: string;
+    vat_number: string;
   };
   line_items: Array<{
     product_key: string;
@@ -51,6 +72,10 @@ export interface InvoiceData {
     cost: number;
     net_cost: number;
     line_total: number;
+    discount: number;
+    tax_rate1: string;
+    custom_value1: string;
+    custom_value2: string;
   }>;
 }
 
@@ -75,6 +100,15 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
       'If you have any questions, please contact us at hello@yourcompany.com',
     terms:
       'Payment is due within 14 days of invoice date. Late payments may be subject to a 1.5% monthly service charge.',
+    label: 'INVOICE',
+    custom_value1: 'Custom Invoice Field 1',
+    custom_value2: 'Custom Invoice Field 2',
+    custom_value3: 'Custom Invoice Field 3',
+    custom_value4: 'Custom Invoice Field 4',
+    tax: 150.0,
+    created_at: '2025-12-01',
+    updated_at: '2025-12-09',
+    partial_due_date: '2025-12-15',
   },
   subtotal: 1500.0,
   client: {
@@ -83,6 +117,12 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
     city_state_postal: 'New York, NY 10001',
     phone: '(555) 123-4567',
     email: 'billing@acme.com',
+    custom_value1: 'Custom Client Field 1',
+    custom_value2: 'Custom Client Field 2',
+    custom_value3: 'Custom Client Field 3',
+    custom_value4: 'Custom Client Field 4',
+    vat_number: 'VAT789012',
+    contact_name: 'Jane Smith',
   },
   company: {
     name: 'Your Company LLC',
@@ -91,6 +131,12 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
     city_state_postal: 'San Francisco, CA 94102',
     phone: '(555) 987-6543',
     email: 'hello@yourcompany.com',
+    custom_value1: 'Custom Company Field 1',
+    custom_value2: 'Custom Company Field 2',
+    custom_value3: 'Custom Company Field 3',
+    custom_value4: 'Custom Company Field 4',
+    website: 'www.yourcompany.com',
+    vat_number: 'VAT123456',
   },
   line_items: [
     {
@@ -100,6 +146,10 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
       cost: 1000.0,
       net_cost: 1000.0,
       line_total: 1000.0,
+      discount: 0.0,
+      tax_rate1: '10%',
+      custom_value1: 'Custom Item Field 1',
+      custom_value2: 'Custom Item Field 2',
     },
     {
       product_key: 'CONSULTING',
@@ -108,6 +158,10 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
       cost: 100.0,
       net_cost: 100.0,
       line_total: 500.0,
+      discount: 0.0,
+      tax_rate1: '10%',
+      custom_value1: 'Custom Item Field 1',
+      custom_value2: 'Custom Item Field 2',
     },
   ],
 };
@@ -167,6 +221,12 @@ export function replaceVariables(
   );
   result = result.replace(/\$company\.phone/g, data.company.phone);
   result = result.replace(/\$company\.email/g, data.company.email);
+  result = result.replace(/\$company\.website/g, data.company.website);
+  result = result.replace(/\$company\.vat_number/g, data.company.vat_number);
+  result = result.replace(/\$company\.custom_value1/g, data.company.custom_value1);
+  result = result.replace(/\$company\.custom_value2/g, data.company.custom_value2);
+  result = result.replace(/\$company\.custom_value3/g, data.company.custom_value3);
+  result = result.replace(/\$company\.custom_value4/g, data.company.custom_value4);
 
   // Client variables
   result = result.replace(/\$client\.name/g, data.client.name);
@@ -177,6 +237,12 @@ export function replaceVariables(
   );
   result = result.replace(/\$client\.phone/g, data.client.phone);
   result = result.replace(/\$client\.email/g, data.client.email);
+  result = result.replace(/\$client\.vat_number/g, data.client.vat_number);
+  result = result.replace(/\$client\.contact_name/g, data.client.contact_name);
+  result = result.replace(/\$client\.custom_value1/g, data.client.custom_value1);
+  result = result.replace(/\$client\.custom_value2/g, data.client.custom_value2);
+  result = result.replace(/\$client\.custom_value3/g, data.client.custom_value3);
+  result = result.replace(/\$client\.custom_value4/g, data.client.custom_value4);
 
   // Invoice variables (legacy $entity.* aliases)
   result = result.replace(/\$entity\.number/g, data.invoice.number);
@@ -190,9 +256,39 @@ export function replaceVariables(
   result = result.replace(/\$entity\.public_notes/g, data.invoice.public_notes);
   result = result.replace(/\$entity\.footer/g, data.invoice.footer);
   result = result.replace(/\$entity\.terms/g, data.invoice.terms);
+  result = result.replace(/\$entity\.custom_value1/g, data.invoice.custom_value1);
+  result = result.replace(/\$entity\.custom_value2/g, data.invoice.custom_value2);
+  result = result.replace(/\$entity\.custom_value3/g, data.invoice.custom_value3);
+  result = result.replace(/\$entity\.custom_value4/g, data.invoice.custom_value4);
+
+  // Invoice variables ($invoice.* aliases - same as $entity.*)
+  result = result.replace(/\$invoice\.number/g, data.invoice.number);
+  result = result.replace(/\$invoice\.date/g, formatDate(data.invoice.date));
+  result = result.replace(
+    /\$invoice\.due_date/g,
+    formatDate(data.invoice.due_date)
+  );
+  result = result.replace(/\$invoice\.po_number/g, data.invoice.po_number);
+  result = result.replace(/\$invoice\.public_url/g, data.invoice.public_url);
+  result = result.replace(/\invoice\.public_notes/g, data.invoice.public_notes);
+  result = result.replace(/\$invoice\.terms/g, data.invoice.terms);
+  result = result.replace(/\$invoice\.custom_value1/g, data.invoice.custom_value1);
+  result = result.replace(/\$invoice\.custom_value2/g, data.invoice.custom_value2);
+  result = result.replace(/\$invoice\.custom_value3/g, data.invoice.custom_value3);
+  result = result.replace(/\$invoice\.custom_value4/g, data.invoice.custom_value4);
+  result = result.replace(/\$invoice\.subtotal/g, formatCurrency(data.invoice.subtotal));
+  result = result.replace(/\$invoice\.discount/g, formatCurrency(data.invoice.discount));
+  result = result.replace(/\$invoice\.tax/g, formatCurrency(data.invoice.tax));
+  result = result.replace(/\$invoice\.total/g, formatCurrency(data.invoice.total));
+  result = result.replace(/\$invoice\.paid_to_date/g, formatCurrency(data.invoice.paid_to_date));
+  result = result.replace(/\$invoice\.balance/g, formatCurrency(data.invoice.balance));
+  result = result.replace(/\$invoice\.created_at/g, formatDate(data.invoice.created_at));
+  result = result.replace(/\$invoice\.updated_at/g, formatDate(data.invoice.updated_at));
+  result = result.replace(/\$invoice\.partial_due_date/g, formatDate(data.invoice.partial_due_date));
 
   // Flat entity-details variables (match API: HtmlEngine.php)
   // Order: longer tokens first; \b prevents $date matching inside $date_company_now etc.
+  result = result.replace(/\$entity_label\b/g, data.invoice.label);
   result = result.replace(/\$po_number\b/g, data.invoice.po_number);
   result = result.replace(/\$due_date\b/g, formatDate(data.invoice.due_date));
   result = result.replace(/\$public_url\b/g, data.invoice.public_url);
