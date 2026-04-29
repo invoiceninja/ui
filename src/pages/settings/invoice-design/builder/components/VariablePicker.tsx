@@ -12,15 +12,15 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Search,
-  X,
   Building2,
   User,
   FileText,
   DollarSign,
   Calendar,
 } from 'lucide-react';
-import { Button } from '$app/components/forms';
-import { InputField } from '$app/components/forms/InputField';
+import { InputField } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
+import { useColorScheme } from '$app/common/colors';
 import { VariableGroup } from '../types';
 
 interface VariablePickerProps {
@@ -30,6 +30,7 @@ interface VariablePickerProps {
 
 export function VariablePicker({ onInsert, onClose }: VariablePickerProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
   const [searchTerm, setSearchTerm] = useState('');
 
   const variableGroups: VariableGroup[] = [
@@ -263,90 +264,88 @@ export function VariablePicker({ onInsert, onClose }: VariablePickerProps) {
     .filter((group) => group.variables.length > 0);
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[80vh] flex flex-col">
-        {/* Header */}
-        <div className="p-4 border-b flex items-center justify-between">
-          <h2 className="text-lg font-semibold">{t('insert_variable')}</h2>
-          <Button
-            behavior="button"
-            type="minimal"
-            onClick={onClose}
-            className="p-1"
-          >
-            <X className="w-5 h-5" />
-          </Button>
-        </div>
+    <Modal
+      visible={true}
+      onClose={onClose}
+      title={t('insert_variable')}
+      size="regular"
+    >
+      <div className="space-y-4">
+        <InputField
+          label={t('search_variables')}
+          value={searchTerm}
+          onValueChange={(val) => setSearchTerm(val)}
+          placeholder={t('search_variables')}
+        />
 
-        {/* Search */}
-        <div className="p-4 border-b">
-          <InputField
-            placeholder={String(t('search_variables'))}
-            value={searchTerm}
-            onValueChange={(val) => setSearchTerm(val)}
-          />
-        </div>
-
-        {/* Search */}
-        <div className="p-4 border-b">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder={String(t('search_variables'))}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              autoFocus
-            />
-          </div>
-        </div>
-
-        {/* Variable List */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div
+          className="max-h-[60vh] overflow-y-auto space-y-6 pr-3 pb-4"
+          style={{ color: colors.$3 }}
+        >
           {filteredGroups.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               {t('no_variables_found')}
             </div>
           ) : (
-            <div className="space-y-6">
-              {filteredGroups.map((group) => (
-                <div key={group.label}>
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3 flex items-center gap-2">
-                    {group.icon}
-                    {group.label}
-                  </h3>
+            filteredGroups.map((group) => (
+              <div key={group.label}>
+                <h3
+                  className="text-xs font-semibold uppercase tracking-wider mb-3 flex items-center gap-2"
+                  style={{ color: colors.$17 }}
+                >
+                  {group.icon}
+                  {group.label}
+                </h3>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    {group.variables.map((variable) => (
-                      <Button
-                        key={variable.key}
-                        behavior="button"
-                        type="secondary"
-                        onClick={() => {
-                          onInsert(variable.key);
-                          onClose();
+                <div className="grid grid-cols-2 gap-3">
+                  {group.variables.map((variable) => (
+                    <button
+                      key={variable.key}
+                      onClick={() => {
+                        onInsert(variable.key);
+                        onClose();
+                      }}
+                      className="text-left p-3 rounded-lg border transition-colors hover:shadow-sm"
+                      style={{
+                        backgroundColor: colors.$1,
+                        borderColor: colors.$24,
+                        color: colors.$3,
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = colors.$16;
+                        e.currentTarget.style.backgroundColor = colors.$23;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = colors.$24;
+                        e.currentTarget.style.backgroundColor = colors.$1;
+                      }}
+                    >
+                      <code
+                        className="text-xs font-mono px-1.5 py-0.5 rounded"
+                        style={{
+                          backgroundColor: colors.$20,
+                          color: colors.$16,
                         }}
-                        className="justify-start text-left items-start h-auto py-3 px-3"
                       >
-                        <div className="font-mono text-sm mb-1">
-                          {variable.key}
-                        </div>
-                        <div className="text-xs opacity-75 mb-1">
-                          {variable.label}
-                        </div>
-                        <div className="text-xs opacity-50 italic">
-                          {t('example')}: {variable.example}
-                        </div>
-                      </Button>
-                    ))}
-                  </div>
+                        {variable.key}
+                      </code>
+                      <div
+                        className="text-sm font-medium mt-1.5 mb-0.5"
+                        style={{ color: colors.$3 }}
+                      >
+                        {variable.label}
+                      </div>
+                      <div className="text-xs" style={{ color: colors.$17 }}>
+                        {t('example')}: {variable.example}
+                      </div>
+                    </button>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))
           )}
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
