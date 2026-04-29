@@ -114,9 +114,7 @@ function estimateContentHeight(block: Block, data: InvoiceData): number {
 
     case 'total': {
       const { items } = block.properties;
-      const itemCount = Array.isArray(items)
-        ? items.filter((item: { show: boolean }) => item.show).length
-        : 5;
+      const itemCount = Array.isArray(items) ? items.length : 5;
       const itemHeight = 25;
       const estimatedHeight = itemCount * itemHeight + 20; // Add padding
       return Math.max(estimatedHeight, minHeight);
@@ -921,9 +919,7 @@ function renderTotalBlock(
   let html = `<table style="border-collapse: collapse; ${tableAlign}">`;
   html += '<tbody>';
 
-  items
-    .filter((item: { show: boolean }) => item.show)
-    .forEach(
+  items.forEach(
       (item: {
         show: boolean;
         isTotal?: boolean;

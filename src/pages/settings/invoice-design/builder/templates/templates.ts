@@ -185,19 +185,17 @@ export const templates: InvoiceTemplate[] = [
         gridPosition: { x: 7, y: 22, w: 5, h: 6 },
         properties: {
           items: [
-            { label: '$subtotal_label', field: '$subtotal', show: true },
-            { label: '$taxes_label', field: '$taxes', show: true },
+            { label: '$subtotal_label', field: '$subtotal' },
+            { label: '$taxes_label', field: '$taxes' },
             {
               label: '$total_label',
               field: '$total',
-              show: true,
               isTotal: true,
             },
-            { label: '$paid_to_date_label', field: '$paid_to_date', show: true },
+            { label: '$paid_to_date_label', field: '$paid_to_date' },
             {
               label: '$balance_due_label',
               field: '$balance_due',
-              show: true,
               isBalance: true,
             },
           ],
@@ -322,11 +320,10 @@ export const templates: InvoiceTemplate[] = [
         gridPosition: { x: 7, y: 21, w: 5, h: 4 },
         properties: {
           items: [
-            { label: '$subtotal_label', field: '$subtotal', show: true },
+            { label: '$subtotal_label', field: '$subtotal' },
             {
               label: '$total_label',
               field: '$total',
-              show: true,
               isTotal: true,
             },
           ],
@@ -403,11 +400,10 @@ export const templates: InvoiceTemplate[] = [
         gridPosition: { x: 7, y: 21, w: 5, h: 4 },
         properties: {
           items: [
-            { label: '$subtotal_label', field: '$subtotal', show: true },
+            { label: '$subtotal_label', field: '$subtotal' },
             {
               label: '$total_label',
               field: '$total',
-              show: true,
               isTotal: true,
             },
           ],
