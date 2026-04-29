@@ -54,6 +54,8 @@ export function useSendCooldown({
 
       setState('sending');
 
+      const abort = new AbortController();
+
       performSend()
         .then(() => {
           if (!isMountedRef.current) return;
@@ -84,6 +86,10 @@ export function useSendCooldown({
           if (!isMountedRef.current) return;
           setState('idle');
         });
+        
+        return () => {
+          abort.abort();
+        };
     },
     [durationMs, state, clearTicker]
   );
