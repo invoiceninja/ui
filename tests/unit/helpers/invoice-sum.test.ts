@@ -333,7 +333,7 @@ describe('InvoiceSum test invoice calculation', () => {
       },
     ];
 
-    var x = (25 * 1.333).toFixed(3);
+    const x = (25 * 1.333).toFixed(3);
 
     expect(x).toEqual('33.325');
     expect(parseFloat(x)).toEqual(33.325);

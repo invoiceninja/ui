@@ -11,7 +11,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Search,
   Building2,
   User,
   FileText,
