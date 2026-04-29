@@ -14,7 +14,7 @@ import { Element } from '$app/components/cards';
 import { Button, Checkbox, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
-import { ChangeEvent, ReactNode, useMemo, useState } from 'react';
+import { ChangeEvent, ReactNode, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EditSubRegionModal } from './EditSubRegionModal';
 
@@ -53,6 +53,8 @@ export function RegionComponent({
   const [taxSetting, setTaxSetting] = useState<TaxSetting>(regions[0]?.[1]);
   const [subRegion, setSubRegion] = useState<string>(regions[0]?.[0]);
 
+  const checkboxRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
   const countSelected = useMemo(() => {
     return regions.filter(([, taxSetting]) => taxSetting.apply_tax).length;
   }, [regions]);
@@ -62,9 +64,19 @@ export function RegionComponent({
     setIsOpen(!checked);
   };
 
-  const divClickIntercept = (id: string) => {
-    const checkbox = document.getElementById(id.replace('.apply_tax', ''));
-    checkbox?.click();
+  const handleRowClick = (subregionKey: string) => {
+    const checkbox = checkboxRefs.current[subregionKey];
+
+    if (checkbox && !checkbox.disabled) {
+      const newChecked = !checkbox.checked;
+    
+      checkbox.checked = newChecked;
+    
+      handleChange(
+        `tax_data.regions.${regionCode}.subregions.${subregionKey}.apply_tax`,
+        newChecked
+      );
+    }
   };
 
   const subregionBasePath = `tax_data.regions.${regionCode}.subregions`;
@@ -121,10 +133,7 @@ export function RegionComponent({
                 if (e.target instanceof HTMLInputElement) {
                   return;
                 }
-
-                divClickIntercept(
-                  `${subregionBasePath}.${value[0]}.apply_tax`
-                );
+                handleRowClick(value[0]);
               }}
             >
               <Checkbox
@@ -134,18 +143,15 @@ export function RegionComponent({
                 className="flex justify-end h-6 w-6 rounded-half shadow"
                 disabled={regionData?.tax_all_subregions}
                 onValueChange={(value, checked) => handleChange(value, checked)}
+                innerRef={(el: HTMLInputElement | null) => {
+                  checkboxRefs.current[value[0]] = el;
+                }}
               />
 
               <div>{value[0]}</div>
             </div>
 
-            <div
-              onClick={() =>
-                divClickIntercept(
-                  `${subregionBasePath}.${value[0]}.apply_tax`
-                )
-              }
-            >
+            <div onClick={() => handleRowClick(value[0])}>
               {value[1].tax_name} {value[1].tax_rate}%{' '}
               {value[1].reduced_tax_rate
                 ? ` :: ${t('reduced_rate')} ${value[1].reduced_tax_rate}%`
