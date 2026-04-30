@@ -9,7 +9,8 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
+import { Type, ChevronUp, ChevronDown } from 'lucide-react';
 import { PropertyEditorProps, FieldConfig } from '../../types';
 import {
   FontSizeInput,
@@ -19,6 +20,7 @@ import {
   SectionDivider,
   TextInput,
   CheckboxInput,
+  FontStyleInput,
 } from './PropertyInputs';
 import { ReorderableFieldList, FieldDefinition } from './ReorderableFieldList';
 import { useColorScheme } from '$app/common/colors';
@@ -44,6 +46,7 @@ export function InfoBlockProperties({
 }: InfoBlockPropertiesProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
+  const [isHeaderExpanded, setIsHeaderExpanded] = useState(false);
 
   const migrateFromLegacy = useCallback((): FieldConfig[] => {
     const content = block.properties.content || '';
@@ -146,12 +149,131 @@ export function InfoBlockProperties({
           />
 
           {block.properties.showTitle !== false && (
-            <TextInput
-              label={String(t('header'))}
-              value={block.properties.title || ''}
-              onChange={(value) => updateProperty('title', value)}
-              placeholder={String(t('bill_to'))}
-            />
+            <div
+              className="rounded-md overflow-hidden"
+              style={{
+                backgroundColor: colors.$1,
+                border: `1px solid ${colors.$24}`,
+              }}
+            >
+              <div className="flex items-center gap-2 p-2">
+                <button
+                  onClick={() => setIsHeaderExpanded(!isHeaderExpanded)}
+                  className="p-0.5 rounded transition-colors"
+                  style={{ color: colors.$16 }}
+                >
+                  {isHeaderExpanded ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
+                </button>
+
+                <span className="flex-1 text-sm" style={{ color: colors.$3 }}>
+                  {block.properties.title || t('header')}
+                </span>
+
+                <button
+                  onClick={() => setIsHeaderExpanded(!isHeaderExpanded)}
+                  className="p-1.5 rounded transition-colors"
+                  style={{
+                    backgroundColor: isHeaderExpanded ? colors.$25 : 'transparent',
+                    color: isHeaderExpanded ? colors.$3 : colors.$17,
+                  }}
+                  title={String(t('typography'))}
+                >
+                  <Type className="w-4 h-4" />
+                </button>
+              </div>
+
+              {isHeaderExpanded && (
+                <div
+                  className="px-3 pb-3 pt-3 space-y-3"
+                  style={{
+                    backgroundColor: colors.$23,
+                    borderTop: `1px solid ${colors.$24}`,
+                  }}
+                >
+                  <TextInput
+                    label={String(t('header'))}
+                    value={block.properties.title || ''}
+                    onChange={(value) => updateProperty('title', value)}
+                    placeholder={String(t('bill_to'))}
+                  />
+
+                  <TextInput
+                    label={String(t('font_size'))}
+                    value={block.properties.titleFontSize || ''}
+                    onChange={(value) => updateProperty('titleFontSize', value)}
+                    placeholder={block.properties.fontSize || '12px'}
+                  />
+
+                  <FontStyleInput
+                    label={String(t('font_style'))}
+                    fontWeight={block.properties.titleFontWeight || 'bold'}
+                    fontStyle={block.properties.titleFontStyle || 'normal'}
+                    onFontWeightChange={(value) =>
+                      updateProperty('titleFontWeight', value === 'bold' ? 'bold' : undefined)
+                    }
+                    onFontStyleChange={(value) =>
+                      updateProperty('titleFontStyle', value === 'italic' ? 'italic' : undefined)
+                    }
+                  />
+
+                  <ColorInput
+                    label={String(t('text_color'))}
+                    value={block.properties.titleColor || ''}
+                    onChange={(value) => updateProperty('titleColor', value)}
+                    defaultValue={block.properties.color || '#374151'}
+                  />
+
+                  <AlignmentInput
+                    label={String(t('alignment'))}
+                    value={block.properties.titleAlign || block.properties.align || 'left'}
+                    onChange={(value) => updateProperty('titleAlign', value)}
+                  />
+
+                  <div
+                    className="pt-3"
+                    style={{ borderTop: `1px solid ${colors.$24}` }}
+                  >
+                    <div className="grid grid-cols-2 gap-3">
+                      <TextInput
+                        label={String(t('prefix'))}
+                        value={block.properties.titlePrefix || ''}
+                        onChange={(value) => updateProperty('titlePrefix', value)}
+                        placeholder={String(t('prefix_placeholder'))}
+                      />
+
+                      <TextInput
+                        label={String(t('suffix'))}
+                        value={block.properties.titleSuffix || ''}
+                        onChange={(value) => updateProperty('titleSuffix', value)}
+                        placeholder={String(t('suffix_placeholder'))}
+                      />
+                    </div>
+
+                    {(block.properties.titlePrefix || block.properties.titleSuffix) && (
+                      <div
+                        className="text-xs p-2 rounded mt-3"
+                        style={{
+                          backgroundColor: colors.$1,
+                          border: `1px solid ${colors.$24}`,
+                          color: colors.$17,
+                        }}
+                      >
+                        <span className="font-medium">{t('preview')}: </span>
+                        <span style={{ color: colors.$24 }}>
+                          {block.properties.titlePrefix}
+                          {block.properties.title || t('header')}
+                          {block.properties.titleSuffix}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}
