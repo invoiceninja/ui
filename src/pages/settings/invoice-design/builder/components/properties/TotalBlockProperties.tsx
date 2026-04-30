@@ -26,6 +26,10 @@ import { useLabelMapping } from '../../utils/label-variables';
 const AVAILABLE_TOTAL_ITEMS = [
   { label: '$subtotal_label', field: '$subtotal' },
   { label: '$discount_label', field: '$discount' },
+  { label: '$custom_surcharge1_label', field: '$custom_surcharge1' },
+  { label: '$custom_surcharge2_label', field: '$custom_surcharge2' },
+  { label: '$custom_surcharge3_label', field: '$custom_surcharge3' },
+  { label: '$custom_surcharge4_label', field: '$custom_surcharge4' },
   { label: '$taxes_label', field: '$taxes' },
   { label: '$total_label', field: '$total', isTotal: true },
   { label: '$paid_to_date_label', field: '$paid_to_date' },
