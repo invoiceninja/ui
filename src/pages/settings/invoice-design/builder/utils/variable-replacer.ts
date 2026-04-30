@@ -28,6 +28,10 @@ export interface InvoiceData {
     terms: string;
     total_taxes: number;
     label: string;
+    custom_surcharge1: number;
+    custom_surcharge2: number;
+    custom_surcharge3: number;
+    custom_surcharge4: number;
     custom_value1: string;
     custom_value2: string;
     custom_value3: string;
@@ -124,6 +128,10 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
     paid_to_date: 0.0,
     balance: 1650.0,
     total_taxes: 150.0,
+    custom_surcharge1: 25.0,
+    custom_surcharge2: 0.0,
+    custom_surcharge3: 0.0,
+    custom_surcharge4: 0.0,
     public_url: 'https://example.com/invoice/view/INV-0001',
     public_notes: 'Thank you for your business! Payment is due within 14 days.',
     footer:
@@ -467,6 +475,22 @@ export function replaceVariables(
   result = result.replace(
     /\$discount\b/g,
     formatCurrency(data.invoice.discount)
+  );
+  result = result.replace(
+    /\$custom_surcharge1\b/g,
+    formatCurrency(data.invoice.custom_surcharge1)
+  );
+  result = result.replace(
+    /\$custom_surcharge2\b/g,
+    formatCurrency(data.invoice.custom_surcharge2)
+  );
+  result = result.replace(
+    /\$custom_surcharge3\b/g,
+    formatCurrency(data.invoice.custom_surcharge3)
+  );
+  result = result.replace(
+    /\$custom_surcharge4\b/g,
+    formatCurrency(data.invoice.custom_surcharge4)
   );
   result = result.replace(
     /\$taxes\b/g,

@@ -25,6 +25,10 @@ export const LABEL_TRANSLATION_MAP: Record<string, string> = {
   '$total_label': 'total',
   '$paid_to_date_label': 'paid_to_date',
   '$balance_due_label': 'balance_due',
+  '$custom_surcharge1_label': 'custom_surcharge1',
+  '$custom_surcharge2_label': 'custom_surcharge2',
+  '$custom_surcharge3_label': 'custom_surcharge3',
+  '$custom_surcharge4_label': 'custom_surcharge4',
   '$entity_label': 'invoice',
   
   // Client Labels
