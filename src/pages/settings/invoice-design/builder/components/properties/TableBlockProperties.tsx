@@ -302,41 +302,39 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                       borderTop: `1px solid ${colors.$24}`,
                     }}
                   >
-                    <div className="flex gap-2">
-                      <div className="flex-1">
-                        <label
-                          className="block text-xs mb-1"
-                          style={{ color: colors.$17 }}
-                        >
-                          {t('header_label')}
-                        </label>
-                        <input
-                          type="text"
-                          value={column.header}
-                          onChange={(e) =>
-                            updateColumnProp(index, 'header', e.target.value)
-                          }
-                          className="w-full px-2 py-1 rounded text-xs"
-                          style={{
-                            backgroundColor: colors.$1,
-                            border: `1px solid ${colors.$24}`,
-                            color: colors.$3,
-                          }}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <RangeSliderInput
-                          label={String(t('width'))}
-                          value={column.width}
-                          onChange={(value) =>
-                            updateColumnProp(index, 'width', value)
-                          }
-                          min={5}
-                          max={50}
-                          step={5}
-                          unit="%"
-                        />
-                      </div>
+                    <div>
+                      <label
+                        className="block text-xs mb-1"
+                        style={{ color: colors.$17 }}
+                      >
+                        {t('header_label')}
+                      </label>
+                      <input
+                        type="text"
+                        value={column.header}
+                        onChange={(e) =>
+                          updateColumnProp(index, 'header', e.target.value)
+                        }
+                        className="w-full px-2 py-1 rounded text-xs"
+                        style={{
+                          backgroundColor: colors.$1,
+                          border: `1px solid ${colors.$24}`,
+                          color: colors.$3,
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <RangeSliderInput
+                        label={String(t('width'))}
+                        value={column.width}
+                        onChange={(value) =>
+                          updateColumnProp(index, 'width', value)
+                        }
+                        min={5}
+                        max={50}
+                        step={5}
+                        unit="%"
+                      />
                     </div>
                     <div>
                       <label
