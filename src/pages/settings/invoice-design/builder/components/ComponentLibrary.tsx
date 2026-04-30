@@ -8,20 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import type { DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Palette, FileText, Database, LayoutGrid, Plus } from 'lucide-react';
-import { Button } from '$app/components/forms/Button';
+import {
+  Palette,
+  FileText,
+  Database,
+  LayoutGrid,
+  GripVertical,
+} from 'lucide-react';
+import { useColorScheme } from '$app/common/colors';
 import { useBlockLibrary } from '../block-library';
-import { Block, BlockDefinition, generateBlockId } from '../types';
+import { BlockDefinition } from '../types';
 
 interface ComponentLibraryProps {
-  onAddBlock: (block: Block) => void;
   onDragStart?: (definition: BlockDefinition) => void;
+  onDragEnd?: () => void;
 }
 
 export function ComponentLibrary({
-  onAddBlock,
   onDragStart,
+  onDragEnd,
 }: ComponentLibraryProps) {
   const [t] = useTranslation();
   const blockLibrary = useBlockLibrary();
@@ -45,22 +52,6 @@ export function ComponentLibrary({
     },
   ];
 
-  const handleAddBlock = (definition: BlockDefinition) => {
-    const newBlock: Block = {
-      id: generateBlockId(definition.type),
-      type: definition.type,
-      gridPosition: {
-        x: 0,
-        y: 0,
-        w: definition.defaultSize.w,
-        h: definition.defaultSize.h,
-      },
-      properties: { ...definition.defaultProperties },
-    };
-
-    onAddBlock(newBlock);
-  };
-
   return (
     <div className="space-y-6">
       {categories.map((category) => {
@@ -80,8 +71,8 @@ export function ComponentLibrary({
                 <BlockCard
                   key={definition.type}
                   definition={definition}
-                  onClick={() => handleAddBlock(definition)}
                   onDragStart={onDragStart}
+                  onDragEnd={onDragEnd}
                 />
               ))}
             </div>
@@ -94,18 +85,19 @@ export function ComponentLibrary({
 
 interface BlockCardProps {
   definition: BlockDefinition;
-  onClick: () => void;
   onDragStart?: (definition: BlockDefinition) => void;
+  onDragEnd?: () => void;
 }
 
 function BlockCard({
   definition,
-  onClick,
   onDragStart: onDragStartProp,
+  onDragEnd,
 }: BlockCardProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
-  const handleDragStart = (e: React.DragEvent) => {
+  const handleDragStart = (e: DragEvent) => {
     e.dataTransfer.setData('text/plain', '');
     e.dataTransfer.effectAllowed = 'copy';
     // Exclude non-serializable icon (ReactNode) from drag data
@@ -118,35 +110,48 @@ function BlockCard({
   };
 
   return (
-    <div draggable onDragStart={handleDragStart} className="w-full">
-      <Button
-        behavior="button"
-        type="secondary"
-        onClick={onClick}
-        className="w-full justify-start text-left items-start gap-3 py-3 px-3 h-auto cursor-move"
-      >
-        <div className="mt-0.5 flex-shrink-0">{definition.icon}</div>
+    <div
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={onDragEnd}
+      className="w-full rounded-md border shadow-sm flex items-start gap-3 py-3 px-3 cursor-move select-none transition-colors hover:bg-gray-50"
+      style={{
+        backgroundColor: colors.$1,
+        borderColor: colors.$24,
+        color: colors.$3,
+      }}
+      title={String(t('drag_and_drop_to_add'))}
+    >
+      <div className="mt-0.5 flex-shrink-0">{definition.icon}</div>
 
-        <div className="flex-1 min-w-0">
-          <div className="font-medium text-sm mb-0.5 flex items-center gap-2">
-            {definition.label}
-            {definition.essential && (
-              <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-normal">
-                {t('essential')}
-              </span>
-            )}
-          </div>
-          {definition.description && (
-            <div className="text-xs opacity-75 line-clamp-2">
-              {definition.description}
-            </div>
+      <div className="flex-1 min-w-0">
+        <div
+          className="font-medium text-sm mb-0.5 flex items-center gap-2"
+          style={{ color: colors.$3 }}
+        >
+          {definition.label}
+          {definition.essential && (
+            <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-normal">
+              {t('essential')}
+            </span>
           )}
         </div>
+        {definition.description && (
+          <div
+            className="text-xs line-clamp-2"
+            style={{ color: colors.$17 }}
+          >
+            {definition.description}
+          </div>
+        )}
+      </div>
 
-        <div className="opacity-60 flex-shrink-0 mt-0.5">
-          <Plus className="w-4 h-4" />
-        </div>
-      </Button>
+      <div
+        className="opacity-60 flex-shrink-0 mt-0.5"
+        title={String(t('drag_and_drop_to_add'))}
+      >
+        <GripVertical className="w-4 h-4" />
+      </div>
     </div>
   );
 }

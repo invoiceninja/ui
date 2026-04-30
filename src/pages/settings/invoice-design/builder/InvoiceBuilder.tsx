@@ -37,7 +37,9 @@ import { PropertyPanel } from './components/PropertyPanel';
 import { BlockRenderer } from './components/BlockRenderer';
 import { PreviewModal } from './components/PreviewModal';
 import { useBlockLabel } from './block-library';
+import { getContentConstrainedGridSize } from './utils/block-sizing';
 import { generateInvoiceHTML } from './utils/html-generator';
+import { pushLayoutCollisionsDown } from './utils/layout-normalizer';
 import { route } from '$app/common/helpers/route';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -100,6 +102,20 @@ function getPageDimensions(pageSize: string = 'A4'): PageDimensions {
   }
 }
 
+function blocksToLayout(blocks: Block[]): Layout[] {
+  return blocks.map((block) => ({
+    i: block.id,
+    x: block.gridPosition.x,
+    y: block.gridPosition.y,
+    w: block.gridPosition.w,
+    h: block.gridPosition.h,
+    // minW must be <= w, otherwise react-grid-layout will warn
+    minW: Math.min(block.gridPosition.w, 2),
+    minH: Math.min(block.gridPosition.h, 1),
+    maxW: block.gridPosition.w >= 12 ? 12 : undefined,
+  }));
+}
+
 export function InvoiceBuilder() {
   const [t] = useTranslation();
   const navigate = useNavigate();
@@ -149,11 +165,15 @@ export function InvoiceBuilder() {
   const [currentDragDefinition, setCurrentDragDefinition] =
     useState<BlockDefinition | null>(null);
   const [justDropped, setJustDropped] = useState(false);
+  const [isDraggingBlock, setIsDraggingBlock] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
 
   // Refs for cleanup
   const timeoutRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
   // Ref to track if we're manually setting layout (to prevent useEffect from overwriting)
   const isManuallySettingLayout = useRef(false);
+  const isResizeInteraction = useRef(false);
+  const justDroppedRef = useRef(false);
 
   // Load existing design when editing
   useEffect(() => {
@@ -168,16 +188,7 @@ export function InvoiceBuilder() {
           }));
           // Immediately convert blocks to layout format to ensure proper positioning
           isManuallySettingLayout.current = true;
-          const initialLayout = blocks.map((block) => ({
-            i: block.id,
-            x: block.gridPosition.x,
-            y: block.gridPosition.y,
-            w: block.gridPosition.w,
-            h: block.gridPosition.h,
-            minW: Math.min(block.gridPosition.w, 2),
-            minH: Math.min(block.gridPosition.h, 1),
-            maxW: block.gridPosition.w >= 12 ? 12 : undefined,
-          }));
+          const initialLayout = blocksToLayout(blocks);
           setLayout(initialLayout);
           // Reset flag after a brief delay to allow layout to be set
           setTimeout(() => {
@@ -239,16 +250,7 @@ export function InvoiceBuilder() {
         }));
         // Immediately convert blocks to layout format to ensure proper positioning
         isManuallySettingLayout.current = true;
-        const initialLayout = template.blocks.map((block) => ({
-          i: block.id,
-          x: block.gridPosition.x,
-          y: block.gridPosition.y,
-          w: block.gridPosition.w,
-          h: block.gridPosition.h,
-          minW: Math.min(block.gridPosition.w, 2),
-          minH: Math.min(block.gridPosition.h, 1),
-          maxW: block.gridPosition.w >= 12 ? 12 : undefined,
-        }));
+        const initialLayout = blocksToLayout(template.blocks);
         setLayout(initialLayout);
         // Reset flag after a brief delay to allow layout to be set
         setTimeout(() => {
@@ -265,50 +267,98 @@ export function InvoiceBuilder() {
       return;
     }
 
-    const newLayout = state.blocks.map((block) => ({
-      i: block.id,
-      x: block.gridPosition.x,
-      y: block.gridPosition.y,
-      w: block.gridPosition.w,
-      h: block.gridPosition.h,
-      // minW must be <= w, otherwise react-grid-layout will warn
-      minW: Math.min(block.gridPosition.w, 2),
-      minH: Math.min(block.gridPosition.h, 1),
-      // Ensure blocks can't be resized smaller than their current size
-      maxW: block.gridPosition.w >= 12 ? 12 : undefined,
-    }));
+    const newLayout = blocksToLayout(state.blocks);
     setLayout(newLayout);
   }, [state.blocks]);
 
-  // Simple layout change handler - let react-grid-layout handle all the logic
+  const syncBlocksToLayout = useCallback((newLayout: Layout[]) => {
+    setState((prev) => {
+      const updatedBlocks = prev.blocks.map((block) => {
+        const layoutItem = newLayout.find((l) => l.i === block.id);
+        if (layoutItem) {
+          return {
+            ...block,
+            gridPosition: {
+              x: layoutItem.x,
+              y: layoutItem.y,
+              w: layoutItem.w,
+              h: layoutItem.h,
+            },
+          };
+        }
+        return block;
+      });
+      return { ...prev, blocks: updatedBlocks };
+    });
+  }, []);
+
+  // Keep the block model in sync with react-grid-layout, with resize-only
+  // overlap cleanup so growing one widget can make room below it.
   const handleLayoutChange = useCallback(
     (newLayout: Layout[]) => {
       // Ignore layout changes immediately after external drop
-      if (justDropped) {
+      if (justDropped || justDroppedRef.current) {
         return;
       }
 
+      const layoutToApply = isResizeInteraction.current
+        ? pushLayoutCollisionsDown(newLayout)
+        : newLayout;
+
+      if (isResizeInteraction.current) {
+        setLayout(layoutToApply);
+      }
+
       // Update block positions to match the layout
-      setState((prev) => {
-        const updatedBlocks = prev.blocks.map((block) => {
-          const layoutItem = newLayout.find((l) => l.i === block.id);
-          if (layoutItem) {
-            return {
-              ...block,
-              gridPosition: {
-                x: layoutItem.x,
-                y: layoutItem.y,
-                w: layoutItem.w,
-                h: layoutItem.h,
-              },
-            };
-          }
-          return block;
-        });
-        return { ...prev, blocks: updatedBlocks };
-      });
+      syncBlocksToLayout(layoutToApply);
     },
-    [justDropped]
+    [justDropped, syncBlocksToLayout]
+  );
+
+  const handleResizeStart = useCallback(() => {
+    isResizeInteraction.current = true;
+    setIsResizing(true);
+  }, []);
+
+  const handleResizeStop = useCallback(
+    (newLayout: Layout[]) => {
+      const layoutToApply = pushLayoutCollisionsDown(newLayout);
+
+      setLayout(layoutToApply);
+      syncBlocksToLayout(layoutToApply);
+
+      const resizeTimeoutId = setTimeout(() => {
+        isResizeInteraction.current = false;
+        setIsResizing(false);
+        timeoutRefs.current = timeoutRefs.current.filter(
+          (id) => id !== resizeTimeoutId
+        );
+      }, 0);
+
+      timeoutRefs.current.push(resizeTimeoutId);
+    },
+    [syncBlocksToLayout]
+  );
+
+  const handleGridDragStart = useCallback(() => {
+    setIsDraggingBlock(true);
+  }, []);
+
+  const handleGridDragStop = useCallback(
+    (newLayout: Layout[]) => {
+      setLayout(newLayout);
+      syncBlocksToLayout(newLayout);
+
+      const dragTimeoutId = setTimeout(() => {
+        setIsDraggingBlock(false);
+        timeoutRefs.current = timeoutRefs.current.filter(
+          (id) => id !== dragTimeoutId
+        );
+      }, 0);
+
+      timeoutRefs.current.push(dragTimeoutId);
+    },
+    [syncBlocksToLayout]
   );
 
   const handleUndo = useCallback(() => {
@@ -347,46 +397,6 @@ export function InvoiceBuilder() {
     });
   }, []);
 
-  const handleAddBlock = useCallback(
-    (block: Block) => {
-      setState((prev) => {
-        // Find the lowest Y position to place the new block
-        const maxY =
-          prev.blocks.length > 0
-            ? Math.max(
-                ...prev.blocks.map((b) => b.gridPosition.y + b.gridPosition.h)
-              )
-            : 0;
-
-        const newBlock = {
-          ...block,
-          gridPosition: {
-            ...block.gridPosition,
-            y: maxY,
-          },
-        };
-
-        const newBlocks = [...prev.blocks, newBlock];
-
-        // Add to history with self-cleanup
-        const timeoutId = setTimeout(() => {
-          addToHistory(newBlocks, `Add ${block.type}`);
-          timeoutRefs.current = timeoutRefs.current.filter(
-            (id) => id !== timeoutId
-          );
-        }, 0);
-        timeoutRefs.current.push(timeoutId);
-
-        return {
-          ...prev,
-          blocks: newBlocks,
-          selectedBlockId: newBlock.id,
-        };
-      });
-    },
-    [addToHistory]
-  );
-
   const handleUpdateBlock = useCallback((updatedBlock: Block) => {
     setState((prev) => ({
       ...prev,
@@ -406,25 +416,31 @@ export function InvoiceBuilder() {
   }, []);
 
   const handleDuplicateBlock = useCallback((blockId: string) => {
+    const currentBlocks = builderStateRef.current.blocks;
+    const blockToDuplicate = currentBlocks.find((b) => b.id === blockId);
+
+    if (!blockToDuplicate) {
+      return;
+    }
+
+    const newBlock: Block = {
+      ...blockToDuplicate,
+      id: generateBlockId(blockToDuplicate.type),
+      gridPosition: {
+        ...blockToDuplicate.gridPosition,
+        y:
+          blockToDuplicate.gridPosition.y +
+          blockToDuplicate.gridPosition.h +
+          1,
+      },
+    };
+    const newBlocks = [...currentBlocks, newBlock];
+
+    setLayout(blocksToLayout(newBlocks));
     setState((prev) => {
-      const blockToDuplicate = prev.blocks.find((b) => b.id === blockId);
-      if (!blockToDuplicate) return prev;
-
-      const newBlock: Block = {
-        ...blockToDuplicate,
-        id: generateBlockId(blockToDuplicate.type),
-        gridPosition: {
-          ...blockToDuplicate.gridPosition,
-          y:
-            blockToDuplicate.gridPosition.y +
-            blockToDuplicate.gridPosition.h +
-            1,
-        },
-      };
-
       return {
         ...prev,
-        blocks: [...prev.blocks, newBlock],
+        blocks: newBlocks,
         selectedBlockId: newBlock.id,
       };
     });
@@ -437,13 +453,18 @@ export function InvoiceBuilder() {
     }));
   }, []);
 
+  const handleSidebarDragEnd = useCallback(() => {
+    setCurrentDragDefinition(null);
+  }, []);
+
   // Set droppingItem immediately when drag definition changes
   useEffect(() => {
     if (currentDragDefinition) {
+      const size = getContentConstrainedGridSize(currentDragDefinition);
       const item = {
         i: '__dropping-elem__',
-        w: currentDragDefinition.defaultSize.w,
-        h: currentDragDefinition.defaultSize.h,
+        w: size.w,
+        h: size.h,
       };
       setDroppingItem(item);
     } else {
@@ -453,7 +474,7 @@ export function InvoiceBuilder() {
   }, [currentDragDefinition]);
 
   const handleDrop = useCallback(
-    (layout: Layout[], layoutItem: Layout, event: Event) => {
+    (_layout: Layout[], layoutItem: Layout, event: Event) => {
       const nativeEvent = event as DragEvent;
       let data: BlockDefinition | null = null;
 
@@ -477,9 +498,9 @@ export function InvoiceBuilder() {
         return;
       }
 
-      // CRITICAL FIX: Use definition.defaultSize for w/h, layoutItem for x/y position
-      // layoutItem.w/h might be incorrect or the droppingItem placeholder size
+      // Use content-constrained sizing for new blocks, and layoutItem for x/y.
       const newBlockId = generateBlockId(definition.type);
+      const size = getContentConstrainedGridSize(definition);
 
       const newBlock: Block = {
         id: newBlockId,
@@ -487,8 +508,8 @@ export function InvoiceBuilder() {
         gridPosition: {
           x: layoutItem.x,
           y: layoutItem.y,
-          w: definition.defaultSize.w, // Use definition, not layoutItem
-          h: definition.defaultSize.h, // Use definition, not layoutItem
+          w: size.w,
+          h: size.h,
         },
         properties: { ...definition.defaultProperties },
       };
@@ -518,8 +539,10 @@ export function InvoiceBuilder() {
       // Set flag to prevent handleLayoutChange from overwriting the drop position
       // Use a very short timeout to allow the grid to process but then immediately
       // allow layout changes to sync block positions (resolves overlap issues)
+      justDroppedRef.current = true;
       setJustDropped(true);
       const dropTimeoutId = setTimeout(() => {
+        justDroppedRef.current = false;
         setJustDropped(false);
         setTimeout(() => compactLayout(), 50);
         timeoutRefs.current = timeoutRefs.current.filter(
@@ -531,7 +554,7 @@ export function InvoiceBuilder() {
       // Clear the drag state
       setCurrentDragDefinition(null);
     },
-    [addToHistory, currentDragDefinition, t]
+    [addToHistory, currentDragDefinition]
   );
 
   // Called by react-grid-layout during drag over
@@ -550,7 +573,7 @@ export function InvoiceBuilder() {
         if (a.y !== b.y) return a.y - b.y;
         return a.x - b.x;
       });
-      
+
       const compacted: Layout[] = [];
 
       for (const item of sorted) {
@@ -570,7 +593,7 @@ export function InvoiceBuilder() {
         }
         compacted.push({ ...item, y: newY });
       }
-      
+
       setState((prev) => ({
         ...prev,
         blocks: prev.blocks.map((block) => {
@@ -589,7 +612,7 @@ export function InvoiceBuilder() {
           return block;
         }),
       }));
-      
+
       return compacted;
     });
   }, []);
@@ -882,8 +905,8 @@ export function InvoiceBuilder() {
 
           <div className="flex-1 overflow-y-auto p-4">
             <ComponentLibrary
-              onAddBlock={handleAddBlock}
               onDragStart={setCurrentDragDefinition}
+              onDragEnd={handleSidebarDragEnd}
             />
           </div>
         </div>
@@ -918,6 +941,10 @@ export function InvoiceBuilder() {
               className="layout"
               layout={layout}
               onLayoutChange={handleLayoutChange}
+              onDragStart={handleGridDragStart}
+              onDragStop={handleGridDragStop}
+              onResizeStart={handleResizeStart}
+              onResizeStop={handleResizeStop}
               onDrop={handleDrop}
               onDropDragOver={handleDropDragOver}
               cols={12}
@@ -931,7 +958,7 @@ export function InvoiceBuilder() {
               isDroppable
               droppingItem={droppingItem}
               compactType="vertical" // Pack items toward top (Grafana-style)
-              preventCollision={true}
+              preventCollision={!isDraggingBlock && !isResizing}
               useCSSTransforms={true}
               style={{ minHeight: '1000px' }}
             >
