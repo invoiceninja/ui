@@ -169,7 +169,6 @@ export interface FieldConfig {
 }
 
 export interface ClientInfoBlockPropertiesHint {
-  content?: string; // Legacy format
   fieldConfigs?: FieldConfig[];
   fontSize?: string;
   lineHeight?: string;
@@ -177,7 +176,13 @@ export interface ClientInfoBlockPropertiesHint {
   color?: string;
   showTitle?: boolean;
   title?: string;
+  titleFontSize?: string;
   titleFontWeight?: string;
+  titleFontStyle?: string;
+  titleColor?: string;
+  titleAlign?: 'left' | 'center' | 'right';
+  titlePrefix?: string;
+  titleSuffix?: string;
 }
 
 /** Same shape as client-info; used for ship-to blocks with shipping-only fields. */
@@ -185,12 +190,20 @@ export type ClientShippingInfoBlockPropertiesHint =
   ClientInfoBlockPropertiesHint;
 
 export interface CompanyInfoBlockPropertiesHint {
-  content?: string; // Legacy format
   fieldConfigs?: FieldConfig[];
   fontSize?: string;
   lineHeight?: string;
   align?: string;
   color?: string;
+  showTitle?: boolean;
+  title?: string;
+  titleFontSize?: string;
+  titleFontWeight?: string;
+  titleFontStyle?: string;
+  titleColor?: string;
+  titleAlign?: 'left' | 'center' | 'right';
+  titlePrefix?: string;
+  titleSuffix?: string;
 }
 
 export interface InvoiceDetailsBlockPropertiesHint {
