@@ -200,31 +200,61 @@ function ImageBlockRenderer({ block }: BlockRendererProps) {
 
 function CompanyInfoRenderer({ block }: BlockRendererProps) {
   const sampleData = useSampleInvoiceData();
-  const { fieldConfigs, content, fontSize, lineHeight, align, color } =
-    block.properties;
-
-  if (fieldConfigs && fieldConfigs.length > 0) {
-    return renderFieldConfigs(fieldConfigs, sampleData, {
-      fontSize,
-      lineHeight,
-      textAlign: align,
-      color,
-    });
-  }
-
-  const displayContent = replaceVariables(content, sampleData);
+  const {
+    fieldConfigs,
+    content,
+    fontSize,
+    lineHeight,
+    align,
+    color,
+    showTitle,
+    title,
+    titleFontSize,
+    titleFontWeight,
+    titleFontStyle,
+    titleColor,
+    titleAlign,
+    titlePrefix,
+    titleSuffix,
+  } = block.properties;
 
   return (
-    <div
-      style={{
-        fontSize,
-        lineHeight,
-        textAlign: align,
-        color,
-        whiteSpace: 'pre-line',
-      }}
-    >
-      {displayContent}
+    <div>
+      {showTitle && (
+        <div
+          style={{
+            fontSize: titleFontSize || fontSize,
+            fontWeight: titleFontWeight,
+            fontStyle: titleFontStyle,
+            color: titleColor || color,
+            textAlign: titleAlign || align,
+            marginBottom: '8px',
+          }}
+        >
+          {titlePrefix}{title}{titleSuffix}
+        </div>
+      )}
+
+      {fieldConfigs?.length > 0 ? (
+        renderFieldConfigs(fieldConfigs, sampleData, {
+          fontSize,
+          lineHeight,
+          textAlign: align,
+          color,
+        })
+      ) : (
+        <div
+          style={{
+            fontSize,
+            lineHeight,
+            textAlign: align,
+            color,
+            whiteSpace: 'pre-line',
+          }}
+        >
+          {replaceVariables(content, sampleData)}
+        </div>
+      )}
     </div>
   );
 }
@@ -240,7 +270,13 @@ function ClientInfoRenderer({ block }: BlockRendererProps) {
     color,
     showTitle,
     title,
+    titleFontSize,
     titleFontWeight,
+    titleFontStyle,
+    titleColor,
+    titleAlign,
+    titlePrefix,
+    titleSuffix,
   } = block.properties;
 
   return (
@@ -248,17 +284,19 @@ function ClientInfoRenderer({ block }: BlockRendererProps) {
       {showTitle && (
         <div
           style={{
-            fontSize,
+            fontSize: titleFontSize || fontSize,
             fontWeight: titleFontWeight,
-            color,
+            fontStyle: titleFontStyle,
+            color: titleColor || color,
+            textAlign: titleAlign || align,
             marginBottom: '8px',
           }}
         >
-          {title}
+          {titlePrefix}{title}{titleSuffix}
         </div>
       )}
 
-      {fieldConfigs && fieldConfigs.length > 0 ? (
+      {fieldConfigs?.length > 0 ? (
         renderFieldConfigs(fieldConfigs, sampleData, {
           fontSize,
           lineHeight,
@@ -266,7 +304,6 @@ function ClientInfoRenderer({ block }: BlockRendererProps) {
           color,
         })
       ) : (
-        // Legacy fallback
         <div
           style={{
             fontSize,
