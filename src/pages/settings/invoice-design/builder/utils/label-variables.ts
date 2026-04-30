@@ -96,12 +96,6 @@ export const LABEL_TRANSLATION_MAP: Record<string, string> = {
 
   // Location Labels
   '$location.name_label': 'location_name',
-  '$location.address1_label': 'address1',
-  '$location.address2_label': 'address2',
-  '$location.city_label': 'city',
-  '$location.state_label': 'state',
-  '$location.postal_code_label': 'postal_code',
-  '$location.country_label': 'country',
   '$location.custom1_label': 'custom1',
   '$location.custom2_label': 'custom2',
   '$location.custom3_label': 'custom3',

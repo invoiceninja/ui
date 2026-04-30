@@ -70,12 +70,6 @@ export interface InvoiceData {
     shipping_postal_code: string;
     shipping_country: string;
     location_name: string;
-    location_address1: string;
-    location_address2: string;
-    location_city: string;
-    location_state: string;
-    location_postal_code: string;
-    location_country: string;
     location_custom_value1: string;
     location_custom_value2: string;
     location_custom_value3: string;
@@ -173,12 +167,6 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
     shipping_postal_code: '07305',
     shipping_country: 'United States',
     location_name: 'Main Location',
-    location_address1: '123 Business Street',
-    location_address2: 'Apt 4B',
-    location_city: 'New York',
-    location_state: 'NY',
-    location_postal_code: '10001',
-    location_country: 'United States',
     location_custom_value1: 'Custom Location Field 1',
     location_custom_value2: 'Custom Location Field 2',
     location_custom_value3: 'Custom Location Field 3',
@@ -315,7 +303,7 @@ export function replaceVariables(
   // Client variables
   // Order: longest tokens first (address1/2 before address, city_state_postal
   // before postal_city_state share no prefix but bare $client.number must come
-  // after compound shipping_/location_/contact_ tokens are out of the way).
+  // after compound shipping_* tokens are out of the way).
   result = result.replace(/\$client\.name\b/g, data.client.name);
   result = result.replace(/\$client\.number\b/g, data.client.number);
   result = result.replace(/\$client\.address1\b/g, data.client.address1);
@@ -390,24 +378,6 @@ export function replaceVariables(
 
   // Location variables ($location.* maps to data.client.location_*)
   result = result.replace(/\$location\.name\b/g, data.client.location_name);
-  result = result.replace(
-    /\$location\.address1\b/g,
-    data.client.location_address1
-  );
-  result = result.replace(
-    /\$location\.address2\b/g,
-    data.client.location_address2
-  );
-  result = result.replace(/\$location\.city\b/g, data.client.location_city);
-  result = result.replace(/\$location\.state\b/g, data.client.location_state);
-  result = result.replace(
-    /\$location\.postal_code\b/g,
-    data.client.location_postal_code
-  );
-  result = result.replace(
-    /\$location\.country\b/g,
-    data.client.location_country
-  );
   result = result.replace(
     /\$location\.custom1\b/g,
     data.client.location_custom_value1

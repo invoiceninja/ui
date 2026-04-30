@@ -64,6 +64,26 @@ function extractBlocksFromDesign(design: Design): Block[] | null {
   return null;
 }
 
+/** Merge visual-builder output into the API `design` shape without wiping server fields. */
+function mergeDesignParts(
+  blocks: Block[],
+  htmlBody: string,
+  previous: Design['design'] | undefined
+): Design['design'] {
+  return {
+    includes: previous?.includes ?? '',
+    header: previous?.header ?? '',
+    body: htmlBody,
+    product: previous?.product ?? '',
+    task: previous?.task ?? '',
+    footer: previous?.footer ?? '',
+    blocks,
+    ...(previous?.pageSettings
+      ? { pageSettings: previous.pageSettings }
+      : {}),
+  };
+}
+
 interface PageDimensions {
   width: string;
   minHeight: string;
@@ -109,6 +129,16 @@ export function InvoiceBuilder() {
 
   const [designName, setDesignName] = useState<string>('');
   const [isEditMode, setIsEditMode] = useState(false);
+
+  // Refs so save always reads latest builder state / loaded design. `handleSave` is
+  // memoised with shallow deps; without refs, `performSave` would close over stale
+  // `state.blocks` whenever only block properties change (same block count).
+  const builderStateRef = useRef(state);
+  builderStateRef.current = state;
+  const designNameRef = useRef(designName);
+  designNameRef.current = designName;
+  const existingDesignRef = useRef(existingDesign);
+  existingDesignRef.current = existingDesign;
 
   const [layout, setLayout] = useState<Layout[]>([]);
 
@@ -601,33 +631,41 @@ export function InvoiceBuilder() {
   const performSave = async (nameToUseParam?: string) => {
     const nameToUse =
       nameToUseParam ||
-      designName ||
+      designNameRef.current ||
       'Visual Design ' + new Date().toLocaleDateString();
 
     setSaving(true);
 
     try {
+      const blocks = builderStateRef.current.blocks;
+
       // Save path: emit HTML with literal $tokens so the backend's
       // HtmlEngine::parseLabelsAndValues can substitute real data at render time.
-      const htmlBody = generateInvoiceHTML(state.blocks);
+      const htmlBody = generateInvoiceHTML(blocks);
 
-      const designPayload = {
-        name: nameToUse,
-        design: {
-          blocks: state.blocks,
-          includes: '',
-          header: '',
-          body: htmlBody,
-          product: '',
-          task: '',
-          footer: '',
-        },
-        is_custom: true,
-        entities: 'invoice,quote,credit',
-      };
+      // PUT must send the full Design resource (same as custom design editor): merge
+      // with the loaded design so `design.blocks`, `body`, and other `design.*`
+      // parts persist. Sending only a partial `design` object can overwrite or
+      // drop keys the API merges into the JSON `design` column.
+      const mergedParts = mergeDesignParts(
+        blocks,
+        htmlBody,
+        existingDesignRef.current?.design
+      );
 
       if (isEditMode && designId) {
-        // Update existing design
+        const loaded = existingDesignRef.current;
+        if (!loaded) {
+          toast.error('loading');
+          return;
+        }
+
+        const designPayload: Design = {
+          ...loaded,
+          name: nameToUse,
+          design: mergedParts,
+        };
+
         await request(
           'PUT',
           endpoint('/api/v1/designs/:id', { id: designId }),
@@ -636,7 +674,13 @@ export function InvoiceBuilder() {
         $refetch(['designs']);
         toast.success('updated_design');
       } else {
-        // Create new design
+        const designPayload = {
+          name: nameToUse,
+          design: mergedParts,
+          is_custom: true,
+          entities: 'invoice,quote,credit',
+        };
+
         const response = (await request(
           'POST',
           endpoint('/api/v1/designs'),
@@ -1018,15 +1062,6 @@ export function InvoiceBuilder() {
             border: `1px solid ${colors.$24}`,
           }}
         >
-          <div
-            className="p-4"
-            style={{ borderBottom: `1px solid ${colors.$24}` }}
-          >
-            <h2 className="font-semibold text-lg" style={{ color: colors.$3 }}>
-              {t('properties')}
-            </h2>
-          </div>
-
           <div className="flex-1 overflow-y-auto">
             {selectedBlock ? (
               <PropertyPanel

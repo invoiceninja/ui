@@ -46,36 +46,6 @@ export function ClientInfoBlockProperties({
         variable: '$client.postal_city_state',
       },
       { id: 'location_name', label: t('location_name'), variable: '$client.location_name' },
-      {
-        id: 'location_address1',
-        label: t('location_name') + ' - ' + t('address1'),
-        variable: '$location.address1',
-      },
-      {
-        id: 'location_address2',
-        label: t('location_name') + ' - ' + t('address2'),
-        variable: '$location.address2',
-      },
-      {
-        id: 'location_city',
-        label: t('location_name') + ' - ' + t('city'),
-        variable: '$location.city',
-      },
-      {
-        id: 'location_state',
-        label: t('location_name') + ' - ' + t('state'),
-        variable: '$location.state',
-      },
-      {
-        id: 'location_postal_code',
-        label: t('location_name') + ' - ' + t('postal_code'),
-        variable: '$location.postal_code',
-      },
-      {
-        id: 'location_country',
-        label: t('location_name') + ' - ' + t('country'),
-        variable: '$location.country',
-      },
       { id: 'country', label: t('country'), variable: '$client.country' },
       { id: 'phone', label: t('phone'), variable: '$client.phone' },
       { id: 'email', label: t('email'), variable: '$client.email' },
