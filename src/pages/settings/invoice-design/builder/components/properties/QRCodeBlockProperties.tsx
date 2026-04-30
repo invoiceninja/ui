@@ -10,8 +10,9 @@
 
 import { useTranslation } from 'react-i18next';
 import { PropertyEditorProps } from '../../types';
-import { TextInput, SectionDivider, SelectInput } from './PropertyInputs';
+import { TextInput, SectionDivider, AlignmentInput } from './PropertyInputs';
 import { useColorScheme } from '$app/common/colors';
+import { Button } from '$app/components/forms';
 
 const QR_CODE_TYPES = [
   {
@@ -44,7 +45,6 @@ export function QRCodeBlockProperties({
   };
 
   const currentType = block.properties.qrType || 'payment_link';
-  const currentTypeConfig = QR_CODE_TYPES.find((t) => t.value === currentType);
 
   const handleTypeChange = (newType: string) => {
     const typeConfig = QR_CODE_TYPES.find((t) => t.value === newType);
@@ -62,15 +62,21 @@ export function QRCodeBlockProperties({
 
   return (
     <div className="space-y-4">
-      <SelectInput
-        label={String(t('qr_code_type'))}
-        value={currentType}
-        onChange={(value) => handleTypeChange(value)}
-        options={QR_CODE_TYPES.map((type) => ({
-          value: type.value,
-          label: type.label,
-        }))}
-      />
+      <div>
+        <div className="grid grid-cols-2 gap-2">
+          {QR_CODE_TYPES.map((type) => (
+            <Button
+              key={type.value}
+              behavior="button"
+              type={currentType === type.value ? 'primary' : 'secondary'}
+              onClick={() => handleTypeChange(type.value)}
+              className="justify-start text-xs py-3 px-3"
+            >
+              <span className="truncate">{type.label}</span>
+            </Button>
+          ))}
+        </div>
+      </div>
 
       <SectionDivider label={String(t('appearance'))} />
 
@@ -81,63 +87,12 @@ export function QRCodeBlockProperties({
         placeholder="100px"
       />
 
-      {/* Alignment */}
-      <div>
-        <label
-          className="block text-sm font-medium mb-2"
-          style={{ color: colors.$3 }}
-        >
-          {t('alignment')}
-        </label>
-        <div className="flex gap-1">
-          {['left', 'center', 'right'].map((align) => (
-            <button
-              key={align}
-              onClick={() => updateProperty('align', align)}
-              className="flex-1 px-3 py-2 text-xs rounded border transition-all"
-              style={{
-                borderColor:
-                  block.properties.align === align ? colors.$3 : colors.$24,
-                backgroundColor:
-                  block.properties.align === align ? colors.$25 : 'transparent',
-                color:
-                  block.properties.align === align ? colors.$3 : colors.$17,
-              }}
-            >
-              {t(align)}
-            </button>
-          ))}
-        </div>
-      </div>
+      <AlignmentInput
+        label={String(t('alignment'))}
+        value={block.properties.align}
+        onChange={(value) => updateProperty('align', value)}
+      />
 
-      <SectionDivider label={String(t('advanced'))} />
-
-      <div>
-        <label
-          className="block text-sm font-medium mb-2"
-          style={{ color: colors.$3 }}
-        >
-          {t('data_variable')}
-        </label>
-        <input
-          type="text"
-          value={
-            block.properties.data ||
-            currentTypeConfig?.variable ||
-            '$payment_qrcode'
-          }
-          readOnly
-          className="w-full px-3 py-2 rounded-md text-sm"
-          style={{
-            backgroundColor: colors.$23,
-            border: `1px solid ${colors.$24}`,
-            color: colors.$17,
-          }}
-        />
-        <p className="text-xs mt-1" style={{ color: colors.$17 }}>
-          {t('variable_determined_by_qr_type')}
-        </p>
-      </div>
     </div>
   );
 }
