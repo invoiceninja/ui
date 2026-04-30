@@ -40,8 +40,14 @@ export interface InvoiceData {
   subtotal: number;
   client: {
     name: string;
+    number: string;
     address: string;
+    address1: string;
+    address2: string;
     city_state_postal: string;
+    postal_city_state: string;
+    country: string;
+    id_number: string;
     phone: string;
     email: string;
     custom_value1: string;
@@ -50,12 +56,41 @@ export interface InvoiceData {
     custom_value4: string;
     vat_number: string;
     contact_name: string;
+    contact_full_name: string;
+    contact_email: string;
+    contact_phone: string;
+    contact_custom_value1: string;
+    contact_custom_value2: string;
+    contact_custom_value3: string;
+    contact_custom_value4: string;
+    shipping_address1: string;
+    shipping_address2: string;
+    shipping_city: string;
+    shipping_state: string;
+    shipping_postal_code: string;
+    shipping_country: string;
+    location_name: string;
+    location_address1: string;
+    location_address2: string;
+    location_city: string;
+    location_state: string;
+    location_postal_code: string;
+    location_country: string;
+    location_custom_value1: string;
+    location_custom_value2: string;
+    location_custom_value3: string;
+    location_custom_value4: string;
   };
   company: {
     name: string;
     logo: string;
     address: string;
+    address1: string;
+    address2: string;
     city_state_postal: string;
+    postal_city_state: string;
+    country: string;
+    id_number: string;
     phone: string;
     email: string;
     custom_value1: string;
@@ -71,6 +106,7 @@ export interface InvoiceData {
     quantity: number;
     cost: number;
     net_cost: number;
+    gross_line_total: number;
     line_total: number;
     discount: number;
     tax_rate1: string;
@@ -113,8 +149,14 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
   subtotal: 1500.0,
   client: {
     name: 'Acme Corporation',
+    number: 'CLIENT-0001',
     address: '123 Business Street',
+    address1: '123 Business Street',
+    address2: 'Suite 200',
     city_state_postal: 'New York, NY 10001',
+    postal_city_state: '10001 New York, NY',
+    country: 'United States',
+    id_number: 'ID-456789',
     phone: '(555) 123-4567',
     email: 'billing@acme.com',
     custom_value1: 'Custom Client Field 1',
@@ -123,12 +165,41 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
     custom_value4: 'Custom Client Field 4',
     vat_number: 'VAT789012',
     contact_name: 'Jane Smith',
+    contact_full_name: 'Jane Smith',
+    shipping_address1: '400 Warehouse Way',
+    shipping_address2: 'Loading Dock B',
+    shipping_city: 'Jersey City',
+    shipping_state: 'NJ',
+    shipping_postal_code: '07305',
+    shipping_country: 'United States',
+    location_name: 'Main Location',
+    location_address1: '123 Business Street',
+    location_address2: 'Apt 4B',
+    location_city: 'New York',
+    location_state: 'NY',
+    location_postal_code: '10001',
+    location_country: 'United States',
+    location_custom_value1: 'Custom Location Field 1',
+    location_custom_value2: 'Custom Location Field 2',
+    location_custom_value3: 'Custom Location Field 3',
+    location_custom_value4: 'Custom Location Field 4',
+    contact_email: 'jane@acme.com',
+    contact_phone: '(555) 123-4567',
+    contact_custom_value1: 'Custom Contact Field 1',
+    contact_custom_value2: 'Custom Contact Field 2',
+    contact_custom_value3: 'Custom Contact Field 3',
+    contact_custom_value4: 'Custom Contact Field 4',
   },
   company: {
     name: 'Your Company LLC',
     logo: '/logo180.png',
     address: '456 Commerce Avenue',
+    address1: '456 Commerce Avenue',
+    address2: 'Floor 12',
     city_state_postal: 'San Francisco, CA 94102',
+    postal_city_state: '94102 San Francisco, CA',
+    country: 'United States',
+    id_number: 'CO-ID-987654',
     phone: '(555) 987-6543',
     email: 'hello@yourcompany.com',
     custom_value1: 'Custom Company Field 1',
@@ -145,6 +216,7 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
       quantity: 1,
       cost: 1000.0,
       net_cost: 1000.0,
+      gross_line_total: 1100.0,
       line_total: 1000.0,
       discount: 0.0,
       tax_rate1: '10%',
@@ -157,6 +229,7 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
       quantity: 5,
       cost: 100.0,
       net_cost: 100.0,
+      gross_line_total: 550.0,
       line_total: 500.0,
       discount: 0.0,
       tax_rate1: '10%',
@@ -212,38 +285,145 @@ export function replaceVariables(
   let result = template;
 
   // Company variables
-  result = result.replace(/\$company\.name/g, data.company.name);
-  result = result.replace(/\$company\.logo/g, data.company.logo);
-  result = result.replace(/\$company\.address/g, data.company.address);
+  // Order: longest tokens first (address1/2 before address) and \b on bare tokens
+  // so $company.address doesn't swallow $company.address1, and $company.country
+  // doesn't collide with any $company.country_* future tokens.
+  result = result.replace(/\$company\.name\b/g, data.company.name);
+  result = result.replace(/\$company\.logo\b/g, data.company.logo);
+  result = result.replace(/\$company\.address1\b/g, data.company.address1);
+  result = result.replace(/\$company\.address2\b/g, data.company.address2);
+  result = result.replace(/\$company\.address\b/g, data.company.address);
   result = result.replace(
-    /\$company\.city_state_postal/g,
+    /\$company\.city_state_postal\b/g,
     data.company.city_state_postal
   );
-  result = result.replace(/\$company\.phone/g, data.company.phone);
-  result = result.replace(/\$company\.email/g, data.company.email);
-  result = result.replace(/\$company\.website/g, data.company.website);
-  result = result.replace(/\$company\.vat_number/g, data.company.vat_number);
-  result = result.replace(/\$company\.custom_value1/g, data.company.custom_value1);
-  result = result.replace(/\$company\.custom_value2/g, data.company.custom_value2);
-  result = result.replace(/\$company\.custom_value3/g, data.company.custom_value3);
-  result = result.replace(/\$company\.custom_value4/g, data.company.custom_value4);
+  result = result.replace(
+    /\$company\.postal_city_state\b/g,
+    data.company.postal_city_state
+  );
+  result = result.replace(/\$company\.country\b/g, data.company.country);
+  result = result.replace(/\$company\.id_number\b/g, data.company.id_number);
+  result = result.replace(/\$company\.phone\b/g, data.company.phone);
+  result = result.replace(/\$company\.email\b/g, data.company.email);
+  result = result.replace(/\$company\.website\b/g, data.company.website);
+  result = result.replace(/\$company\.vat_number\b/g, data.company.vat_number);
+  result = result.replace(/\$company\.custom1\b/g, data.company.custom_value1);
+  result = result.replace(/\$company\.custom2\b/g, data.company.custom_value2);
+  result = result.replace(/\$company\.custom3\b/g, data.company.custom_value3);
+  result = result.replace(/\$company\.custom4\b/g, data.company.custom_value4);
 
   // Client variables
-  result = result.replace(/\$client\.name/g, data.client.name);
-  result = result.replace(/\$client\.address/g, data.client.address);
+  // Order: longest tokens first (address1/2 before address, city_state_postal
+  // before postal_city_state share no prefix but bare $client.number must come
+  // after compound shipping_/location_/contact_ tokens are out of the way).
+  result = result.replace(/\$client\.name\b/g, data.client.name);
+  result = result.replace(/\$client\.number\b/g, data.client.number);
+  result = result.replace(/\$client\.address1\b/g, data.client.address1);
+  result = result.replace(/\$client\.address2\b/g, data.client.address2);
+  result = result.replace(/\$client\.address\b/g, data.client.address);
   result = result.replace(
-    /\$client\.city_state_postal/g,
+    /\$client\.city_state_postal\b/g,
     data.client.city_state_postal
   );
-  result = result.replace(/\$client\.phone/g, data.client.phone);
-  result = result.replace(/\$client\.email/g, data.client.email);
-  result = result.replace(/\$client\.vat_number/g, data.client.vat_number);
-  result = result.replace(/\$client\.contact_name/g, data.client.contact_name);
-  result = result.replace(/\$client\.custom_value1/g, data.client.custom_value1);
-  result = result.replace(/\$client\.custom_value2/g, data.client.custom_value2);
-  result = result.replace(/\$client\.custom_value3/g, data.client.custom_value3);
-  result = result.replace(/\$client\.custom_value4/g, data.client.custom_value4);
+  result = result.replace(
+    /\$client\.postal_city_state\b/g,
+    data.client.postal_city_state
+  );
+  result = result.replace(/\$client\.country\b/g, data.client.country);
+  result = result.replace(/\$client\.id_number\b/g, data.client.id_number);
+  result = result.replace(/\$client\.phone\b/g, data.client.phone);
+  result = result.replace(/\$client\.email\b/g, data.client.email);
+  result = result.replace(/\$client\.vat_number\b/g, data.client.vat_number);
+  result = result.replace(/\$client\.location_name\b/g, data.client.location_name);
+  result = result.replace(/\$client\.custom1\b/g, data.client.custom_value1);
+  result = result.replace(/\$client\.custom2\b/g, data.client.custom_value2);
+  result = result.replace(/\$client\.custom3\b/g, data.client.custom_value3);
+  result = result.replace(/\$client\.custom4\b/g, data.client.custom_value4);
+  result = result.replace(
+    /\$client\.shipping_address1\b/g,
+    data.client.shipping_address1
+  );
+  result = result.replace(
+    /\$client\.shipping_address2\b/g,
+    data.client.shipping_address2
+  );
+  result = result.replace(
+    /\$client\.shipping_city\b/g,
+    data.client.shipping_city
+  );
+  result = result.replace(
+    /\$client\.shipping_state\b/g,
+    data.client.shipping_state
+  );
+  result = result.replace(
+    /\$client\.shipping_postal_code\b/g,
+    data.client.shipping_postal_code
+  );
+  result = result.replace(
+    /\$client\.shipping_country\b/g,
+    data.client.shipping_country
+  );
 
+  // Contact variables ($contact.* maps to data.client.contact_*)
+  result = result.replace(
+    /\$contact\.full_name\b/g,
+    data.client.contact_full_name
+  );
+  result = result.replace(/\$contact\.email\b/g, data.client.contact_email);
+  result = result.replace(/\$contact\.phone\b/g, data.client.contact_phone);
+  result = result.replace(
+    /\$contact\.custom1\b/g,
+    data.client.contact_custom_value1
+  );
+  result = result.replace(
+    /\$contact\.custom2\b/g,
+    data.client.contact_custom_value2
+  );
+  result = result.replace(
+    /\$contact\.custom3\b/g,
+    data.client.contact_custom_value3
+  );
+  result = result.replace(
+    /\$contact\.custom4\b/g,
+    data.client.contact_custom_value4
+  );
+
+  // Location variables ($location.* maps to data.client.location_*)
+  result = result.replace(/\$location\.name\b/g, data.client.location_name);
+  result = result.replace(
+    /\$location\.address1\b/g,
+    data.client.location_address1
+  );
+  result = result.replace(
+    /\$location\.address2\b/g,
+    data.client.location_address2
+  );
+  result = result.replace(/\$location\.city\b/g, data.client.location_city);
+  result = result.replace(/\$location\.state\b/g, data.client.location_state);
+  result = result.replace(
+    /\$location\.postal_code\b/g,
+    data.client.location_postal_code
+  );
+  result = result.replace(
+    /\$location\.country\b/g,
+    data.client.location_country
+  );
+  result = result.replace(
+    /\$location\.custom1\b/g,
+    data.client.location_custom_value1
+  );
+  result = result.replace(
+    /\$location\.custom2\b/g,
+    data.client.location_custom_value2
+  );
+  result = result.replace(
+    /\$location\.custom3\b/g,
+    data.client.location_custom_value3
+  );
+  result = result.replace(
+    /\$location\.custom4\b/g,
+    data.client.location_custom_value4
+  );
   // Invoice variables (legacy $entity.* aliases)
   result = result.replace(/\$entity\.number/g, data.invoice.number);
   result = result.replace(/\$entity\.date/g, formatDate(data.invoice.date));
@@ -256,10 +436,10 @@ export function replaceVariables(
   result = result.replace(/\$entity\.public_notes/g, data.invoice.public_notes);
   result = result.replace(/\$entity\.footer/g, data.invoice.footer);
   result = result.replace(/\$entity\.terms/g, data.invoice.terms);
-  result = result.replace(/\$entity\.custom_value1/g, data.invoice.custom_value1);
-  result = result.replace(/\$entity\.custom_value2/g, data.invoice.custom_value2);
-  result = result.replace(/\$entity\.custom_value3/g, data.invoice.custom_value3);
-  result = result.replace(/\$entity\.custom_value4/g, data.invoice.custom_value4);
+  result = result.replace(/\$entity\.custom1\b/g, data.invoice.custom_value1);
+  result = result.replace(/\$entity\.custom2\b/g, data.invoice.custom_value2);
+  result = result.replace(/\$entity\.custom3\b/g, data.invoice.custom_value3);
+  result = result.replace(/\$entity\.custom4\b/g, data.invoice.custom_value4);
 
   // Invoice variables ($invoice.* aliases - same as $entity.*)
   result = result.replace(/\$invoice\.number/g, data.invoice.number);
@@ -272,10 +452,10 @@ export function replaceVariables(
   result = result.replace(/\$invoice\.public_url/g, data.invoice.public_url);
   result = result.replace(/\$invoice\.public_notes/g, data.invoice.public_notes);
   result = result.replace(/\$invoice\.terms/g, data.invoice.terms);
-  result = result.replace(/\$invoice\.custom_value1/g, data.invoice.custom_value1);
-  result = result.replace(/\$invoice\.custom_value2/g, data.invoice.custom_value2);
-  result = result.replace(/\$invoice\.custom_value3/g, data.invoice.custom_value3);
-  result = result.replace(/\$invoice\.custom_value4/g, data.invoice.custom_value4);
+  result = result.replace(/\$invoice\.custom1\b/g, data.invoice.custom_value1);
+  result = result.replace(/\$invoice\.custom2\b/g, data.invoice.custom_value2);
+  result = result.replace(/\$invoice\.custom3\b/g, data.invoice.custom_value3);
+  result = result.replace(/\$invoice\.custom4\b/g, data.invoice.custom_value4);
   result = result.replace(/\$invoice\.subtotal/g, formatCurrency(data.invoice.subtotal));
   result = result.replace(/\$invoice\.discount/g, formatCurrency(data.invoice.discount));
   result = result.replace(/\$invoice\.tax/g, formatCurrency(data.invoice.tax));

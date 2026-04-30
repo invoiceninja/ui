@@ -23,6 +23,7 @@ export type BlockType =
   | 'qrcode'
   | 'signature'
   | 'client-info'
+  | 'client-shipping-info'
   | 'company-info'
   | 'invoice-details'
   | 'public-notes'
@@ -178,6 +179,10 @@ export interface ClientInfoBlockPropertiesHint {
   title?: string;
   titleFontWeight?: string;
 }
+
+/** Same shape as client-info; used for ship-to blocks with shipping-only fields. */
+export type ClientShippingInfoBlockPropertiesHint =
+  ClientInfoBlockPropertiesHint;
 
 export interface CompanyInfoBlockPropertiesHint {
   content?: string; // Legacy format

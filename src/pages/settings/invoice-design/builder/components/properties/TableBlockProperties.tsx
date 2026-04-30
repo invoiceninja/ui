@@ -10,6 +10,7 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { ChevronUp, ChevronDown, Settings2, Trash2 } from 'lucide-react';
 import { PropertyEditorProps } from '../../types';
 import {
@@ -23,7 +24,7 @@ import { useColorScheme } from '$app/common/colors';
 
 // Available columns that can be added to the table
 // Maps field to canonical ID for consistent matching
-const getAvailableColumns = (isTasksTable: boolean) => [
+const getAvailableColumns = (isTasksTable: boolean, t: TFunction) => [
   {
     id: 'product_key',
     header: isTasksTable ? 'Service' : 'Item',
@@ -61,8 +62,15 @@ const getAvailableColumns = (isTasksTable: boolean) => [
   },
   {
     id: 'line_total',
-    header: 'Amount',
+    header: String(t('line_total')),
     field: 'item.line_total',
+    width: '15%',
+    align: 'right' as const,
+  },
+  {
+    id: 'gross_line_total',
+    header: String(t('gross_line_total')),
+    field: 'item.gross_line_total',
     width: '15%',
     align: 'right' as const,
   },
@@ -103,7 +111,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
 
   const isTasksTable = block.type === 'tasks-table';
 
-  const AVAILABLE_COLUMNS = getAvailableColumns(isTasksTable);
+  const AVAILABLE_COLUMNS = getAvailableColumns(isTasksTable, t);
 
   const updateProperty = (key: string, value: any) => {
     onChange({
@@ -176,7 +184,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
           className="block text-sm font-medium mb-3"
           style={{ color: colors.$3 }}
         >
-          {t('column_order')}
+          {t('order')}
         </label>
         <div className="space-y-1">
           {currentColumns.map((column: any, index: number) => {
@@ -422,11 +430,11 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
         placeholder="12px"
       />
 
-      <SectionDivider label={String(t('header_style'))} />
+      <SectionDivider label={String(t('header'))} />
 
       {/* Header Background */}
       <ColorInput
-        label={String(t('header_background'))}
+        label={String(t('background'))}
         value={block.properties.headerBg}
         onChange={(value) => updateProperty('headerBg', value)}
         defaultValue="#F3F4F6"
@@ -434,13 +442,13 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       {/* Header Text Color */}
       <ColorInput
-        label={String(t('header_text_color'))}
+        label={String(t('text_color'))}
         value={block.properties.headerColor}
         onChange={(value) => updateProperty('headerColor', value)}
         defaultValue="#111827"
       />
 
-      <SectionDivider label={String(t('row_style'))} />
+      <SectionDivider label={String(t('row'))} />
 
       {/* Alternate Rows */}
       <CheckboxInput
@@ -452,7 +460,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       {block.properties.alternateRows && (
         <ColorInput
-          label={String(t('alternate_row_background'))}
+          label={String(t('background'))}
           value={block.properties.alternateRowBg}
           onChange={(value) => updateProperty('alternateRowBg', value)}
           defaultValue="#F9FAFB"
@@ -461,7 +469,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       {/* Row Text Color */}
       <ColorInput
-        label={String(t('row_text_color'))}
+        label={String(t('text_color'))}
         value={block.properties.rowColor}
         onChange={(value) => updateProperty('rowColor', value)}
         defaultValue="#374151"
@@ -479,7 +487,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       {block.properties.showBorders && (
         <ColorInput
-          label={String(t('border_color'))}
+          label={String(t('color'))}
           value={block.properties.borderColor}
           onChange={(value) => updateProperty('borderColor', value)}
           defaultValue="#E5E7EB"

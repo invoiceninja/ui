@@ -118,6 +118,23 @@ export const templates: InvoiceTemplate[] = [
         },
       },
 
+      {
+        id: 'client-shipping-info',
+        gridPosition: { x: 6, y: 7, w: 6, h: 4 },
+        type: 'client-shipping-info',
+        properties: {
+          content:
+            '$client.shipping_address1\n$client.shipping_address2\n$client.shipping_city\n$client.shipping_state\n$client.shipping_postal_code\n$client.shipping_country',
+          fontSize: '12px',
+          lineHeight: '1.6',
+          align: 'left',
+          color: '#374151',
+          showTitle: true,
+          title: 'Ship To: ',
+          titleFontWeight: 'bold',
+        },
+      },
+
       // Spacer
       {
         id: 'spacer-1',
@@ -158,7 +175,7 @@ export const templates: InvoiceTemplate[] = [
             },
             {
               id: 'line_total',
-              header: 'Amount',
+              header: 'Line Total',
               field: 'item.line_total',
               width: '20%',
               align: 'right',
@@ -366,7 +383,7 @@ export const templates: InvoiceTemplate[] = [
             },
             {
               id: 'line_total',
-              header: 'Total',
+              header: 'Line Total',
               field: 'item.line_total',
               width: '18%',
               align: 'right',

@@ -94,22 +94,22 @@ export function InvoiceDetailsBlockProperties({
     }> = [
       {
         key: 'invoice1',
-        variable: '$entity.custom_value1',
+        variable: '$entity.custom1',
         fallback: t('custom_field') + ' 1',
       },
       {
         key: 'invoice2',
-        variable: '$entity.custom_value2',
+        variable: '$entity.custom2',
         fallback: t('custom_field') + ' 2',
       },
       {
         key: 'invoice3',
-        variable: '$entity.custom_value3',
+        variable: '$entity.custom3',
         fallback: t('custom_field') + ' 3',
       },
       {
         key: 'invoice4',
-        variable: '$entity.custom_value4',
+        variable: '$entity.custom4',
         fallback: t('custom_field') + ' 4',
       },
     ];
@@ -362,8 +362,7 @@ export function InvoiceDetailsBlockProperties({
                     onChange={(value) =>
                       updateFieldTypography(index, 'prefix', value)
                     }
-                    placeholder={String(t('prefix_placeholder'))}
-                  />
+                   />
 
                   <TextInput
                     label={String(t('suffix'))}
@@ -371,7 +370,6 @@ export function InvoiceDetailsBlockProperties({
                     onChange={(value) =>
                       updateFieldTypography(index, 'suffix', value)
                     }
-                    placeholder={String(t('suffix_placeholder'))}
                   />
 
                   {(field.prefix || field.suffix) && (

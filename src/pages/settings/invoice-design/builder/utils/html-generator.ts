@@ -68,6 +68,7 @@ function estimateContentHeight(block: Block, data: InvoiceData): number {
 
     case 'company-info':
     case 'client-info':
+    case 'client-shipping-info':
     case 'invoice-details': {
       const { fieldConfigs, content, fontSize, lineHeight } = block.properties;
       const fontSizeNum = parseFloat(fontSize) || 14;
@@ -503,6 +504,7 @@ function renderBlockContent(
     case 'company-info':
       return renderCompanyInfoBlock(block, previewData);
     case 'client-info':
+    case 'client-shipping-info':
       return renderClientInfoBlock(block, previewData);
     case 'invoice-details':
       return renderInvoiceDetailsBlock(block, previewData);

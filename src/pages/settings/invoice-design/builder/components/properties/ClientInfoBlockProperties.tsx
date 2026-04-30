@@ -40,6 +40,42 @@ export function ClientInfoBlockProperties({
         label: t('city_state_postal'),
         variable: '$client.city_state_postal',
       },
+      {
+        id: 'postal_city_state',
+        label: t('postal_city_state'),
+        variable: '$client.postal_city_state',
+      },
+      { id: 'location_name', label: t('location_name'), variable: '$client.location_name' },
+      {
+        id: 'location_address1',
+        label: t('location_name') + ' - ' + t('address1'),
+        variable: '$location.address1',
+      },
+      {
+        id: 'location_address2',
+        label: t('location_name') + ' - ' + t('address2'),
+        variable: '$location.address2',
+      },
+      {
+        id: 'location_city',
+        label: t('location_name') + ' - ' + t('city'),
+        variable: '$location.city',
+      },
+      {
+        id: 'location_state',
+        label: t('location_name') + ' - ' + t('state'),
+        variable: '$location.state',
+      },
+      {
+        id: 'location_postal_code',
+        label: t('location_name') + ' - ' + t('postal_code'),
+        variable: '$location.postal_code',
+      },
+      {
+        id: 'location_country',
+        label: t('location_name') + ' - ' + t('country'),
+        variable: '$location.country',
+      },
       { id: 'country', label: t('country'), variable: '$client.country' },
       { id: 'phone', label: t('phone'), variable: '$client.phone' },
       { id: 'email', label: t('email'), variable: '$client.email' },
@@ -49,36 +85,89 @@ export function ClientInfoBlockProperties({
         variable: '$client.vat_number',
       },
       { id: 'id_number', label: t('id_number'), variable: '$client.id_number' },
+
+      { id: 'contact.email', label: t('contact_email'), variable: '$contact.email' },
+      { id: 'contact_full_name', label: t('contact_full_name'), variable: '$contact.full_name' },
+      { id: 'contact_phone', label: t('contact_phone'), variable: '$contact.phone' },
+
     ];
 
     const customFieldConfigs: Array<{
-      key: 'client1' | 'client2' | 'client3' | 'client4';
+      key: 'client1' | 'client2' | 'client3' | 'client4' | 'contact1' | 'contact2' | 'contact3' | 'contact4' | 'location1' | 'location2' | 'location3' | 'location4';
       id: string;
       variable: string;
       fallback: string;
     }> = [
       {
         key: 'client1',
-        id: 'custom_value1',
-        variable: '$client.custom_value1',
+        id: 'client1',
+        variable: '$client.custom1',
         fallback: t('custom_field') + ' 1',
       },
       {
         key: 'client2',
-        id: 'custom_value2',
-        variable: '$client.custom_value2',
+        id: 'client2',
+        variable: '$client.custom2',
         fallback: t('custom_field') + ' 2',
       },
       {
         key: 'client3',
-        id: 'custom_value3',
-        variable: '$client.custom_value3',
+        id: 'client3',
+        variable: '$client.custom3',
         fallback: t('custom_field') + ' 3',
       },
       {
         key: 'client4',
-        id: 'custom_value4',
-        variable: '$client.custom_value4',
+        id: 'client4',
+        variable: '$client.custom4',
+        fallback: t('custom_field') + ' 4',
+      },
+      {
+        key: 'contact1',
+        id: 'contact1',
+        variable: '$contact.custom1',
+        fallback: t('custom_field') + ' 1',
+      },
+      {
+        key: 'contact2',
+        id: 'contact2',
+        variable: '$contact.custom2',
+        fallback: t('custom_field') + ' 2',
+      },
+      {
+        key: 'contact3',
+        id: 'contact3',
+        variable: '$contact.custom3',
+        fallback: t('custom_field') + ' 3',
+      },
+      {
+        key: 'contact4',
+        id: 'contact4',
+        variable: '$contact.custom4',
+        fallback: t('custom_field') + ' 4',
+      },
+      {
+        key: 'location1',
+        id: 'location1',
+        variable: '$location.custom1',
+        fallback: t('custom_field') + ' 1',
+      },
+      {
+        key: 'location2',
+        id: 'location2',
+        variable: '$location.custom2',
+        fallback: t('custom_field') + ' 2',
+      },
+      {
+        key: 'location3',
+        id: 'location3',
+        variable: '$location.custom3',
+        fallback: t('custom_field') + ' 3',
+      },
+      {
+        key: 'location4',
+        id: 'location4',
+        variable: '$location.custom4',
         fallback: t('custom_field') + ' 4',
       },
     ];

@@ -88,6 +88,7 @@ export const BlockRenderer = memo(function BlockRenderer({
       return <CompanyInfoRenderer block={block} />;
 
     case 'client-info':
+    case 'client-shipping-info':
       return <ClientInfoRenderer block={block} />;
 
     case 'invoice-details':
@@ -456,7 +457,11 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
     const value = item[fieldKey];
 
     if (typeof value === 'number') {
-      if (fieldKey === 'cost' || fieldKey === 'line_total') {
+      if (
+        fieldKey === 'cost' ||
+        fieldKey === 'line_total' ||
+        fieldKey === 'gross_line_total'
+      ) {
         return new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',

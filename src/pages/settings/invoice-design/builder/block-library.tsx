@@ -25,6 +25,7 @@ import {
   StickyNote,
   PanelBottom,
   FileText,
+  MapPin,
 } from 'lucide-react';
 import { BlockDefinition } from './types';
 
@@ -183,8 +184,76 @@ export function useBlockLibrary(): BlockDefinition[] {
       category: 'content',
     },
     {
+      type: 'client-shipping-info',
+      label: t('ship_to'),
+      icon: <MapPin className="w-5 h-5" />,
+      defaultSize: { w: 6, h: 4 },
+      defaultProperties: {
+        fieldConfigs: [
+          {
+            id: 'shipping_address1',
+            label: t('shipping_address1'),
+            variable: '$client.shipping_address1',
+            prefix: '',
+            suffix: '',
+            hideIfEmpty: true,
+          },
+          {
+            id: 'shipping_address2',
+            label: t('shipping_address2'),
+            variable: '$client.shipping_address2',
+            prefix: '',
+            suffix: '',
+            hideIfEmpty: true,
+          },
+          {
+            id: 'shipping_city',
+            label: t('shipping_city'),
+            variable: '$client.shipping_city',
+            prefix: '',
+            suffix: '',
+            hideIfEmpty: true,
+          },
+          {
+            id: 'shipping_state',
+            label: t('shipping_state'),
+            variable: '$client.shipping_state',
+            prefix: '',
+            suffix: '',
+            hideIfEmpty: true,
+          },
+          {
+            id: 'shipping_postal_code',
+            label: t('shipping_postal_code'),
+            variable: '$client.shipping_postal_code',
+            prefix: '',
+            suffix: '',
+            hideIfEmpty: true,
+          },
+          {
+            id: 'shipping_country',
+            label: t('shipping_country'),
+            variable: '$client.shipping_country',
+            prefix: '',
+            suffix: '',
+            hideIfEmpty: true,
+          },
+        ],
+        content:
+          '$client.shipping_address1\n$client.shipping_address2\n$client.shipping_city\n$client.shipping_state\n$client.shipping_postal_code\n$client.shipping_country',
+        fontSize: '12px',
+        lineHeight: '1.6',
+        align: 'left',
+        color: '#374151',
+        showTitle: true,
+        title: t('ship_to'),
+        titleFontWeight: 'bold',
+      },
+      category: 'content',
+    },
+    {
       type: 'invoice-details',
-      label: t('entity_details'),
+      label: t('invoice_details'),
       icon: <Receipt className="w-5 h-5" />,
       defaultSize: { w: 6, h: 5 },
       defaultProperties: {
@@ -351,7 +420,7 @@ export function useBlockLibrary(): BlockDefinition[] {
           },
           {
             id: 'line_total',
-            header: t('amount'),
+            header: t('line_total'),
             field: 'item.line_total',
             width: '15%',
             align: 'right',
@@ -409,7 +478,7 @@ export function useBlockLibrary(): BlockDefinition[] {
           },
           {
             id: 'line_total',
-            header: t('amount'),
+            header: t('line_total'),
             field: 'item.line_total',
             width: '15%',
             align: 'right',

@@ -41,7 +41,11 @@ export const TableBlock = memo(function TableBlock({ block }: TableBlockProps) {
     const value = item[fieldKey];
 
     if (typeof value === 'number') {
-      if (fieldKey === 'cost' || fieldKey === 'line_total') {
+      if (
+        fieldKey === 'cost' ||
+        fieldKey === 'line_total' ||
+        fieldKey === 'gross_line_total'
+      ) {
         return new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',

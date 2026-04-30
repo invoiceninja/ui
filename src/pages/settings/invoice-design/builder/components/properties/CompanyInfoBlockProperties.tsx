@@ -39,6 +39,11 @@ export function CompanyInfoBlockProperties({
         label: t('city_state_postal'),
         variable: '$company.city_state_postal',
       },
+      {
+        id: 'postal_city_state',
+        label: t('postal_city_state'),
+        variable: '$company.postal_city_state',
+      },
       { id: 'country', label: t('country'), variable: '$company.country' },
       { id: 'phone', label: t('phone'), variable: '$company.phone' },
       { id: 'email', label: t('email'), variable: '$company.email' },
@@ -63,26 +68,26 @@ export function CompanyInfoBlockProperties({
     }> = [
       {
         key: 'company1',
-        id: 'custom_value1',
-        variable: '$company.custom_value1',
+        id: 'custom1',
+        variable: '$company.custom1',
         fallback: t('custom_field') + ' 1',
       },
       {
         key: 'company2',
-        id: 'custom_value2',
-        variable: '$company.custom_value2',
+        id: 'custom2',
+        variable: '$company.custom2',
         fallback: t('custom_field') + ' 2',
       },
       {
         key: 'company3',
-        id: 'custom_value3',
-        variable: '$company.custom_value3',
+        id: 'custom3',
+        variable: '$company.custom3',
         fallback: t('custom_field') + ' 3',
       },
       {
         key: 'company4',
-        id: 'custom_value4',
-        variable: '$company.custom_value4',
+        id: 'custom4',
+        variable: '$company.custom4',
         fallback: t('custom_field') + ' 4',
       },
     ];
