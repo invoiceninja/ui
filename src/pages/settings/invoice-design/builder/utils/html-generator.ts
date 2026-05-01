@@ -74,175 +74,46 @@ function groupBlocksByRow(blocks: Block[]): Map<number, Block[]> {
 }
 
 /**
- * Estimate content height for a block based on its type and properties
+ * Calculate row heights based on grid dimensions (matching react-grid-layout).
+ * Subtracts 52px of designer chrome (28px toolbar + 24px p-3 padding) so the
+ * PDF content area matches the designer's usable content area.
  */
-function estimateContentHeight(
-  block: Block,
-  data: InvoiceData,
-  globals: GeneratorGlobals
-): number {
-  const { rowHeight } = GRID_CONFIG;
-  const minHeight = rowHeight; // Minimum height for any block
-  const globalFontSizeNum = parseFloat(globals.fontSize) || 16;
-
-  switch (block.type) {
-    case 'text': {
-      const { content, fontSize, lineHeight } = block.properties;
-      const replacedContent = replaceVariables(content, data);
-      const fontSizeNum = parseFloat(fontSize) || globalFontSizeNum;
-      const lineHeightNum = parseFloat(lineHeight) || 1.5;
-      const lines = replacedContent.split('\n').length || 1;
-      const estimatedHeight = lines * fontSizeNum * lineHeightNum;
-      return Math.max(estimatedHeight, minHeight);
-    }
-
-    case 'logo':
-    case 'image': {
-      const { maxHeight } = block.properties;
-      // Use maxHeight if specified, otherwise use a reasonable default
-      if (maxHeight && typeof maxHeight === 'string') {
-        const heightNum = parseFloat(maxHeight);
-        if (!isNaN(heightNum)) {
-          return Math.max(heightNum, minHeight);
-        }
-      }
-      // Default image height
-      return Math.max(100, minHeight);
-    }
-
-    case 'company-info':
-    case 'client-info':
-    case 'client-shipping-info':
-    case 'invoice-details': {
-      const { fieldConfigs, content, fontSize, lineHeight } = block.properties;
-      const fontSizeNum = parseFloat(fontSize) || globalFontSizeNum;
-      const lineHeightNum = parseFloat(lineHeight) || 1.5;
-
-      let lines: number;
-
-      if (
-        fieldConfigs &&
-        Array.isArray(fieldConfigs) &&
-        fieldConfigs.length > 0
-      ) {
-        let visibleCount = 0;
-        fieldConfigs.forEach(
-          (config: { variable: string; hideIfEmpty?: boolean }) => {
-            const resolvedValue = replaceVariables(config.variable, data);
-            if (
-              config.hideIfEmpty !== false &&
-              (!resolvedValue || resolvedValue.trim() === '')
-            ) {
-              return;
-            }
-            visibleCount++;
-          }
-        );
-        lines = visibleCount || 1;
-      } else {
-        const replacedContent = replaceVariables(content, data);
-        lines =
-          replacedContent.split('\n').filter((line) => line.trim()).length || 1;
-      }
-
-      const estimatedHeight = lines * fontSizeNum * lineHeightNum + 20; // Add padding
-      return Math.max(estimatedHeight, minHeight);
-    }
-
-    case 'table': {
-      const headerHeight = 40; // Header row
-      const rowHeight = 30; // Data row height
-      const rowCount = data.line_items.length || 1;
-      const estimatedHeight = headerHeight + rowCount * rowHeight + 10; // Add padding
-      return Math.max(estimatedHeight, minHeight);
-    }
-
-    case 'total': {
-      const { items } = block.properties;
-      const itemCount = Array.isArray(items) ? items.length : 5;
-      const itemHeight = 25;
-      const estimatedHeight = itemCount * itemHeight + 20; // Add padding
-      return Math.max(estimatedHeight, minHeight);
-    }
-
-    case 'divider': {
-      const { thickness, marginTop, marginBottom } = block.properties;
-      const thicknessNum = parseFloat(thickness) || 1;
-      const marginTopNum = parseFloat(marginTop) || 0;
-      const marginBottomNum = parseFloat(marginBottom) || 0;
-      return thicknessNum + marginTopNum + marginBottomNum;
-    }
-
-    case 'spacer': {
-      const { height } = block.properties;
-      if (height && typeof height === 'string') {
-        const heightNum = parseFloat(height);
-        if (!isNaN(heightNum)) {
-          return heightNum;
-        }
-      }
-      return minHeight;
-    }
-
-    case 'qrcode':
-    case 'signature': {
-      // Default sizes for QR code and signature
-      return Math.max(100, minHeight);
-    }
-
-    default:
-      return minHeight;
-  }
-}
-
-/**
- * Calculate row heights based on the tallest content in each row
- */
-function calculateRowHeights(
-  rows: Map<number, Block[]>,
-  data: InvoiceData,
-  globals: GeneratorGlobals
-): Map<number, number> {
+function calculateRowHeights(rows: Map<number, Block[]>): Map<number, number> {
   const rowHeights = new Map<number, number>();
-  const { margin } = GRID_CONFIG;
+  const { rowHeight, margin } = GRID_CONFIG;
 
   rows.forEach((blocks, y) => {
-    // Find the maximum content height among all blocks in this row
-    const maxContentHeight = Math.max(
-      ...blocks.map((block) => estimateContentHeight(block, data, globals))
+    const maxGridHeight = Math.max(
+      ...blocks.map((block) =>
+        Math.max(
+          0,
+          block.gridPosition.h * rowHeight +
+            (block.gridPosition.h - 1) * margin[1] -
+            52
+        )
+      )
     );
 
-    // Store the row height (content height + vertical margin if not first row)
-    rowHeights.set(y, maxContentHeight);
+    rowHeights.set(y, maxGridHeight);
   });
 
   return rowHeights;
 }
 
 /**
- * Calculate cumulative top positions for each row
+ * Calculate top positions for each row based on grid coordinates.
+ * Matches react-grid-layout positioning exactly.
  */
 function calculateRowPositions(
   rowHeights: Map<number, number>,
   topPadding: number = GRID_CONFIG.containerPadding[1]
 ): Map<number, number> {
   const rowPositions = new Map<number, number>();
-  const { margin } = GRID_CONFIG;
+  const { rowHeight, margin } = GRID_CONFIG;
 
-  let currentTop = topPadding;
-  const sortedRows = Array.from(rowHeights.keys()).sort((a, b) => a - b);
-
-  sortedRows.forEach((y, index) => {
-    rowPositions.set(y, currentTop);
-
-    // Move to next row: current row height + margin
-    const rowHeight = rowHeights.get(y) || GRID_CONFIG.rowHeight;
-    if (index < sortedRows.length - 1) {
-      // Add margin between rows (except after last row)
-      currentTop += rowHeight + margin[1];
-    } else {
-      currentTop += rowHeight;
-    }
+  rowHeights.forEach((_, y) => {
+    const top = topPadding + y * (rowHeight + margin[1]);
+    rowPositions.set(y, top);
   });
 
   return rowPositions;
@@ -368,7 +239,7 @@ export function generateInvoiceHTML(
 
   // Group blocks by row and calculate row-based heights
   const rows = groupBlocksByRow(blocks);
-  const rowHeights = calculateRowHeights(rows, layoutData, globals);
+  const rowHeights = calculateRowHeights(rows);
   const rowPositions = calculateRowPositions(rowHeights, effectivePadding.top);
 
   // Render blocks with row-based positioning
@@ -386,16 +257,21 @@ export function generateInvoiceHTML(
     )
     .join('\n');
 
-  // Calculate container height based on row positions
+  // Calculate container height from actual block positions and grid heights
   let maxBottom = 0;
-  if (rowPositions.size > 0) {
-    const sortedYPositions = Array.from(rowPositions.keys()).sort(
-      (a, b) => b - a
+  if (blocks.length > 0) {
+    const { rowHeight, margin } = GRID_CONFIG;
+    maxBottom = Math.max(
+      ...blocks.map((block) => {
+        const { y, h } = block.gridPosition;
+        const top = effectivePadding.top + y * (rowHeight + margin[1]);
+        const gridHeight = Math.max(
+          0,
+          h * rowHeight + (h - 1) * margin[1] - 52
+        );
+        return top + gridHeight;
+      })
     );
-    const lastRowY = sortedYPositions[0];
-    const lastRowTop = rowPositions.get(lastRowY) || effectivePadding.top;
-    const lastRowHeight = rowHeights.get(lastRowY) || GRID_CONFIG.rowHeight;
-    maxBottom = lastRowTop + lastRowHeight;
   } else {
     maxBottom = effectivePadding.top;
   }
@@ -552,8 +428,8 @@ export function generateInvoiceHTML(
 }
 
 /**
- * Render a single block to HTML with row-based height calculation
- * This ensures content-driven heights and proper row alignment
+ * Render a single block to HTML with grid-based positioning and sizing.
+ * Matches react-grid-layout coordinates exactly.
  */
 function renderBlockWithRowHeight(
   block: Block,
@@ -567,8 +443,8 @@ function renderBlockWithRowHeight(
   const content = renderBlockContent(block, previewData, layoutData, globals);
 
   // Calculate absolute pixel positions based on grid coordinates
-  const { x, y, w } = block.gridPosition;
-  const { cols, canvasWidth, margin } = GRID_CONFIG;
+  const { x, y, w, h } = block.gridPosition;
+  const { cols, canvasWidth, margin, rowHeight } = GRID_CONFIG;
 
   // Calculate column width using per-template horizontal padding so the grid
   // shrinks/grows with the user's padding settings.
@@ -582,9 +458,15 @@ function renderBlockWithRowHeight(
   // Calculate width
   const width = w * colWidth + (w - 1) * margin[0];
 
-  // Get row-based position and height
+  // Get row-based position (direct grid coordinate calculation)
   const top = rowPositions.get(y) || effectivePadding.top;
-  const rowHeight = rowHeights.get(y) || GRID_CONFIG.rowHeight;
+
+  // Use the block's own grid height minus 52px of editor chrome
+  // (28px toolbar + 24px p-3 padding) so the PDF matches the designer.
+  const gridHeight = Math.max(
+    0,
+    h * rowHeight + (h - 1) * margin[1] - 52
+  );
 
   // Ensure blocks never exceed container bounds
   const maxLeft = effectivePadding.left;
@@ -592,11 +474,8 @@ function renderBlockWithRowHeight(
   const constrainedLeft = Math.max(maxLeft, Math.min(left, maxRight - width));
   const constrainedWidth = Math.min(width, maxRight - constrainedLeft);
 
-  // For expandable blocks (tables, totals), allow content to grow beyond row height
-  const isExpandableBlock = block.type === 'table' || block.type === 'total';
-  const heightStyle = isExpandableBlock
-    ? `min-height: ${rowHeight}px;`
-    : `height: ${rowHeight}px;`;
+  // Use min-height so content can grow if taller than the grid cell
+  const heightStyle = `min-height: ${gridHeight}px;`;
 
   // Page-break behaviour for the totals block:
   //   keepTogether === true  → force a page break before this block
