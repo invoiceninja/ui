@@ -10,7 +10,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Download, ZoomIn, ZoomOut, Printer } from 'lucide-react';
+import { ZoomIn, ZoomOut } from 'lucide-react';
 import { Modal } from '$app/components/Modal';
 import { Button } from '$app/components/forms';
 import { useColorScheme } from '$app/common/colors';
