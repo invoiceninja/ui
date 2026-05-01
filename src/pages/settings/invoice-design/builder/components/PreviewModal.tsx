@@ -8,28 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Download, ZoomIn, ZoomOut, Printer } from 'lucide-react';
 import { Modal } from '$app/components/Modal';
 import { Button } from '$app/components/forms';
 import { useColorScheme } from '$app/common/colors';
 import { Block } from '../types';
-import { generateInvoiceHTML } from '../utils/html-generator';
+import {
+  generateInvoiceHTML,
+  GeneratorDesignSettings,
+} from '../utils/html-generator';
 import { useSampleInvoiceData } from '../hooks/useSampleInvoiceData';
 
 interface PreviewModalProps {
   blocks: Block[];
   onClose: () => void;
-  designSettings?: {
-    page_size?: string;
-    primary_font?: string;
-    font_size?: number;
-    primary_color?: string;
-    secondary_color?: string;
-    show_paid_stamp?: boolean;
-    page_numbering?: boolean;
-  };
+  designSettings?: GeneratorDesignSettings;
 }
 
 interface PageDimensions {
@@ -49,11 +44,22 @@ function getPreviewDimensions(pageSize: string = 'A4'): PageDimensions {
 
 export function PreviewModal({ blocks, onClose, designSettings }: PreviewModalProps) {
   const [t] = useTranslation();
-  const [zoom, setZoom] = useState(100);
+  const [zoom, setZoom] = useState(80);
   const colors = useColorScheme();
   const sampleData = useSampleInvoiceData();
   const html = generateInvoiceHTML(blocks, sampleData, designSettings);
   const dimensions = getPreviewDimensions(designSettings?.page_size);
+
+  // React's controlled `srcDoc` prop sets the attribute, but browsers don't
+  // always re-parse the iframe document when the attribute changes after the
+  // first render — so property edits like padding / row-spacing can appear to
+  // not update. Imperatively writing `srcdoc` from an effect forces a fresh
+  // parse on every html change.
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (iframe) iframe.srcdoc = html;
+  }, [html]);
 
   const handleDownloadHTML = () => {
     const blob = new Blob([html], { type: 'text/html' });
@@ -94,7 +100,7 @@ export function PreviewModal({ blocks, onClose, designSettings }: PreviewModalPr
       >
         {/* Toolbar */}
         <div
-          className="flex items-center justify-between py-3 border-b"
+          className="flex items-center justify-end pb-3 border-b"
           style={{ borderColor: colors.$24 }}
         >
           <div className="flex items-center gap-4">
@@ -125,33 +131,6 @@ export function PreviewModal({ blocks, onClose, designSettings }: PreviewModalPr
             </div>
 
             <div className="h-6 w-px" style={{ backgroundColor: colors.$24 }} />
-
-            <span className="text-sm" style={{ color: colors.$17 }}>
-              {t('preview_uses_sample_data')}
-            </span>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2">
-            <Button
-              type="secondary"
-              behavior="button"
-              onClick={handlePrint}
-              className="flex items-center gap-2"
-            >
-              <Printer className="w-4 h-4" />
-              {t('print')}
-            </Button>
-
-            <Button
-              type="primary"
-              behavior="button"
-              onClick={handleDownloadHTML}
-              className="flex items-center gap-2"
-            >
-              <Download className="w-4 h-4" />
-              {t('download_html')}
-            </Button>
           </div>
         </div>
 
@@ -171,6 +150,7 @@ export function PreviewModal({ blocks, onClose, designSettings }: PreviewModalPr
             }}
           >
             <iframe
+              ref={iframeRef}
               srcDoc={html}
               className="border-0 block"
               style={{
@@ -190,11 +170,7 @@ export function PreviewModal({ blocks, onClose, designSettings }: PreviewModalPr
           className="py-3 border-t flex items-center justify-between text-sm -mx-5 px-5 -mb-5"
           style={{ borderColor: colors.$24, color: colors.$17 }}
         >
-          <span>
-            <strong style={{ color: colors.$3 }}>{blocks.length}</strong>{' '}
-            {t('blocks_in_design')}
-          </span>
-          <span>{t('actual_invoices_use_real_data')}</span>
+
         </div>
       </div>
     </Modal>

@@ -73,6 +73,9 @@ export interface InvoiceData {
     shipping_state: string;
     shipping_postal_code: string;
     shipping_country: string;
+    shipping_city_state_postal: string;
+    shipping_postal_city_state: string;
+    shipping_postal_city: string;
     location_name: string;
     location_custom_value1: string;
     location_custom_value2: string;
@@ -174,6 +177,9 @@ export const SAMPLE_INVOICE_DATA: InvoiceData = {
     shipping_state: 'NJ',
     shipping_postal_code: '07305',
     shipping_country: 'United States',
+    shipping_city_state_postal: 'Jersey City, NJ 07305',
+    shipping_postal_city_state: '07305 Jersey City, NJ',
+    shipping_postal_city: '07305 Jersey City',
     location_name: 'Main Location',
     location_custom_value1: 'Custom Location Field 1',
     location_custom_value2: 'Custom Location Field 2',
@@ -281,14 +287,11 @@ export function replaceVariables(
   let result = template;
 
   // Company variables
-  // Order: longest tokens first (address1/2 before address) and \b on bare tokens
-  // so $company.address doesn't swallow $company.address1, and $company.country
-  // doesn't collide with any $company.country_* future tokens.
   result = result.replace(/\$company\.name\b/g, data.company.name);
   result = result.replace(/\$company\.logo\b/g, data.company.logo);
   result = result.replace(/\$company\.address1\b/g, data.company.address1);
   result = result.replace(/\$company\.address2\b/g, data.company.address2);
-  result = result.replace(/\$company\.address\b/g, data.company.address);
+  // result = result.replace(/\$company\.address\b/g, data.company.address);
   result = result.replace(
     /\$company\.city_state_postal\b/g,
     data.company.city_state_postal
@@ -358,6 +361,18 @@ export function replaceVariables(
   result = result.replace(
     /\$client\.shipping_country\b/g,
     data.client.shipping_country
+  );
+  result = result.replace(
+    /\$client\.shipping_city_state_postal\b/g,
+    data.client.shipping_city_state_postal
+  );
+  result = result.replace(
+    /\$client\.shipping_postal_city_state\b/g,
+    data.client.shipping_postal_city_state
+  );
+  result = result.replace(
+    /\$client\.shipping_postal_city\b/g,
+    data.client.shipping_postal_city
   );
 
   // Contact variables ($contact.* maps to data.client.contact_*)

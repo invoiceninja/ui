@@ -16,12 +16,11 @@ import {
   FontSizeInput,
   AlignmentInput,
   ColorInput,
-  LineHeightInput,
   TextInput,
   CheckboxInput,
   SectionDivider,
-  FontStyleInput,
 } from './PropertyInputs';
+import { CellTypographyEditor } from './CellTypographyEditor';
 import { useCustomField } from '$app/components/CustomField';
 import { useColorScheme } from '$app/common/colors';
 import { useLabelMapping } from '../../utils/label-variables';
@@ -315,45 +314,28 @@ export function InvoiceDetailsBlockProperties({
                     borderTop: `1px solid ${colors.$24}`,
                   }}
                 >
-                  {/* Font Size */}
-                  <TextInput
-                    label={String(t('font_size'))}
-                    value={field.fontSize || ''}
-                    onChange={(value) =>
-                      updateFieldTypography(index, 'fontSize', value)
+                  <CellTypographyEditor
+                    heading={String(t('label'))}
+                    value={field.labelStyle}
+                    onChange={(next) =>
+                      updateFieldTypography(index, 'labelStyle', next)
                     }
-                    placeholder={block.properties.fontSize || '12px'}
-                  />
-
-                  {/* Font Weight & Style */}
-                  <FontStyleInput
-                    label={String(t('font_style'))}
-                    fontWeight={field.fontWeight || 'normal'}
-                    fontStyle={field.fontStyle || 'normal'}
-                    onFontWeightChange={(value) =>
-                      updateFieldTypography(
-                        index,
-                        'fontWeight',
-                        value === 'normal' ? undefined : value
-                      )
-                    }
-                    onFontStyleChange={(value) =>
-                      updateFieldTypography(
-                        index,
-                        'fontStyle',
-                        value === 'normal' ? undefined : value
-                      )
+                    fontSizePlaceholder={block.properties.fontSize || '12px'}
+                    colorDefault={
+                      block.properties.labelColor ||
+                      block.properties.color ||
+                      '#6B7280'
                     }
                   />
 
-                  {/* Text Color */}
-                  <ColorInput
-                    label={String(t('text_color'))}
-                    value={field.color || ''}
-                    onChange={(value) =>
-                      updateFieldTypography(index, 'color', value || undefined)
+                  <CellTypographyEditor
+                    heading={String(t('value'))}
+                    value={field.valueStyle}
+                    onChange={(next) =>
+                      updateFieldTypography(index, 'valueStyle', next)
                     }
-                    defaultValue={block.properties.color || '#374151'}
+                    fontSizePlaceholder={block.properties.fontSize || '12px'}
+                    colorDefault={block.properties.color || '#374151'}
                   />
 
                   <TextInput
@@ -471,22 +453,66 @@ export function InvoiceDetailsBlockProperties({
         defaultValue="#6B7280"
       />
 
-      {/* Line Height */}
-      <LineHeightInput
-        label={String(t('line_height'))}
-        value={block.properties.lineHeight}
-        onChange={(value) => updateProperty('lineHeight', value)}
+      <SectionDivider label={String(t('columns'))} />
+
+      <AlignmentInput
+        label={String(t('label_alignment'))}
+        value={block.properties.labelAlign || 'right'}
+        onChange={(value) => updateProperty('labelAlign', value)}
+      />
+
+      <AlignmentInput
+        label={String(t('value_alignment'))}
+        value={block.properties.valueAlign || 'right'}
+        onChange={(value) => updateProperty('valueAlign', value)}
       />
 
       <SectionDivider label={String(t('spacing'))} />
 
-      {/* Padding */}
       <TextInput
         label={String(t('padding'))}
         value={block.properties.padding}
         onChange={(value) => updateProperty('padding', value)}
         placeholder="0px"
         hint={String(t('css_padding_format'))}
+      />
+
+      <TextInput
+        label={String(t('label_padding'))}
+        value={block.properties.labelPadding}
+        onChange={(value) => updateProperty('labelPadding', value)}
+        placeholder="0px"
+        hint={String(t('css_padding_format'))}
+      />
+
+      <TextInput
+        label={String(t('value_padding'))}
+        value={block.properties.valuePadding}
+        onChange={(value) => updateProperty('valuePadding', value)}
+        placeholder="0px"
+        hint={String(t('css_padding_format'))}
+      />
+
+      <TextInput
+        label={String(t('label_value_gap'))}
+        value={block.properties.labelValueGap}
+        onChange={(value) => updateProperty('labelValueGap', value)}
+        placeholder="12px"
+      />
+
+      <TextInput
+        label={String(t('row_spacing'))}
+        value={block.properties.rowSpacing}
+        onChange={(value) => updateProperty('rowSpacing', value)}
+        placeholder="0px"
+      />
+
+      <TextInput
+        label={String(t('value_min_width'))}
+        value={block.properties.valueMinWidth}
+        onChange={(value) => updateProperty('valueMinWidth', value)}
+        placeholder={String(t('auto'))}
+        hint={String(t('leave_empty_for_auto'))}
       />
     </div>
   );

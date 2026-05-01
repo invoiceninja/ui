@@ -39,15 +39,30 @@ export function FontSizeInput({
   const [t] = useTranslation();
   const colors = useColorScheme();
 
+  const isInherited = !value;
+
   return (
     <div>
       {label && (
-        <label
-          className="block text-sm font-medium mb-2"
-          style={{ color: colors.$3 }}
-        >
-          {label}
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label
+            className="block text-sm font-medium"
+            style={{ color: colors.$3 }}
+          >
+            {label}
+          </label>
+          {!isInherited && (
+            <button
+              type="button"
+              onClick={() => onChange(undefined)}
+              className="text-xs underline transition-colors"
+              style={{ color: colors.$17 }}
+              title={t('reset') || 'Reset to document default'}
+            >
+              {t('use_default') || 'Use default'}
+            </button>
+          )}
+        </div>
       )}
       <div className="grid grid-cols-3 gap-2">
         {sizes.map((size) => (
@@ -62,6 +77,11 @@ export function FontSizeInput({
           </Button>
         ))}
       </div>
+      {isInherited && (
+        <div className="text-xs mt-1.5" style={{ color: colors.$17 }}>
+          {t('inheriting_from_document_default') || 'Inheriting from document default'}
+        </div>
+      )}
     </div>
   );
 }
@@ -73,6 +93,11 @@ interface TextInputProps extends BaseInputProps {
   placeholder?: string;
   type?: 'text' | 'number';
   hint?: string;
+  /**
+   * When true and `value` is non-empty, render a "Use default" CTA next to
+   * the label that clears the value (so the cascade falls back to globals).
+   */
+  resettable?: boolean;
 }
 
 export function TextInput({
@@ -81,15 +106,42 @@ export function TextInput({
   onChange,
   placeholder,
   type = 'text',
+  resettable,
 }: TextInputProps) {
+  const [t] = useTranslation();
+  const colors = useColorScheme();
+  const showReset = resettable && value !== undefined && value !== null && value !== '';
+
   return (
-    <InputField
-      label={label}
-      type={type}
-      value={value || ''}
-      onValueChange={(val) => onChange(val)}
-      placeholder={placeholder}
-    />
+    <div>
+      {label && (
+        <div className="flex items-center justify-between mb-2">
+          <label
+            className="block text-sm font-medium"
+            style={{ color: colors.$3 }}
+          >
+            {label}
+          </label>
+          {showReset && (
+            <button
+              type="button"
+              onClick={() => onChange('')}
+              className="text-xs underline transition-colors"
+              style={{ color: colors.$17 }}
+              title={t('reset') || 'Reset to document default'}
+            >
+              {t('use_default') || 'Use default'}
+            </button>
+          )}
+        </div>
+      )}
+      <InputField
+        type={type}
+        value={value || ''}
+        onValueChange={(val) => onChange(val)}
+        placeholder={placeholder}
+      />
+    </div>
   );
 }
 
@@ -326,20 +378,53 @@ export function SectionDivider({ label }: SectionDividerProps) {
 /**
  * Line Height Input - Using SelectField
  */
+export const LINE_HEIGHT_DEFAULT = '1.5';
+
+const LINE_HEIGHT_OPTIONS = [
+  '1.0',
+  '1.1',
+  '1.2',
+  '1.3',
+  '1.4',
+  '1.5',
+  '1.6',
+  '1.7',
+  '1.8',
+  '1.9',
+  '2.0',
+];
+
+/** Normalise a stored value (e.g. '1', '1.20', '1.5') to a canonical option key. */
+function normaliseLineHeight(raw: string | undefined): string {
+  if (!raw) return LINE_HEIGHT_DEFAULT;
+  const num = parseFloat(raw);
+  if (!Number.isFinite(num)) return LINE_HEIGHT_DEFAULT;
+  return num.toFixed(1);
+}
+
 export function LineHeightInput({ label, value, onChange }: BaseInputProps) {
   const [t] = useTranslation();
+
+  const current = normaliseLineHeight(value);
+  // If a saved value sits outside our standard options, surface it as a
+  // bespoke option so the displayed selection always reflects the real value.
+  const options = LINE_HEIGHT_OPTIONS.includes(current)
+    ? LINE_HEIGHT_OPTIONS
+    : [...LINE_HEIGHT_OPTIONS, current].sort(
+        (a, b) => parseFloat(a) - parseFloat(b)
+      );
 
   return (
     <SelectField
       label={label || String(t('line_height'))}
-      value={value || '1.5'}
+      value={current}
       onValueChange={(val) => onChange(val)}
     >
-      <option value="1">1.0</option>
-      <option value="1.2">1.2</option>
-      <option value="1.5">1.5</option>
-      <option value="1.8">1.8</option>
-      <option value="2">2.0</option>
+      {options.map((opt) => (
+        <option key={opt} value={opt}>
+          {opt}
+        </option>
+      ))}
     </SelectField>
   );
 }

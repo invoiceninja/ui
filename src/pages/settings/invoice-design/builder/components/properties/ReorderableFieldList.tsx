@@ -240,6 +240,7 @@ export function ReorderableFieldList({
                       updateField(index, { fontSize: value || undefined })
                     }
                     placeholder="12px"
+                    resettable
                   />
 
                   <FontStyleInput

@@ -13,13 +13,14 @@ import { useState, useEffect } from 'react';
 import { ChevronUp, ChevronDown, Type, Trash2 } from 'lucide-react';
 import { PropertyEditorProps } from '../../types';
 import {
-  ColorInput,
   TextInput,
   AlignmentInput,
+  ColorInput,
+  FontSizeInput,
   SectionDivider,
-  FontStyleInput,
   CheckboxInput,
 } from './PropertyInputs';
+import { CellTypographyEditor } from './CellTypographyEditor';
 import { useColorScheme } from '$app/common/colors';
 import { useLabelMapping } from '../../utils/label-variables';
 
@@ -110,13 +111,6 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
 
   return (
     <div className="space-y-4">
-      <CheckboxInput
-        id="show-paid-stamp"
-        label={String(t('show_paid_stamp'))}
-        checked={block.properties.showPaidStamp || false}
-        onChange={(value) => updateProperty('showPaidStamp', value)}
-      />
-
       {/* Items to show */}
       <div className="space-y-3">
         <label
@@ -226,55 +220,14 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                     borderTop: `1px solid ${colors.$24}`,
                   }}
                 >
-                  <TextInput
-                    label={String(t('font_size'))}
-                    value={item.fontSize || ''}
-                    onChange={(value) =>
-                      updateItemTypography(
-                        index,
-                        'fontSize',
-                        value || undefined
-                      )
+                  <CellTypographyEditor
+                    heading={String(t('label'))}
+                    value={item.labelStyle}
+                    onChange={(next) =>
+                      updateItemTypography(index, 'labelStyle', next)
                     }
-                    placeholder={
-                      item.isTotal
-                        ? block.properties.totalFontSize || '18px'
-                        : block.properties.fontSize || '13px'
-                    }
-                  />
-
-                  <FontStyleInput
-                    label={String(t('font_style'))}
-                    fontWeight={
-                      item.fontWeight ||
-                      (item.isTotal
-                        ? block.properties.totalFontWeight
-                        : 'normal')
-                    }
-                    fontStyle={item.fontStyle || 'normal'}
-                    onFontWeightChange={(value) =>
-                      updateItemTypography(
-                        index,
-                        'fontWeight',
-                        value === 'normal' ? undefined : value
-                      )
-                    }
-                    onFontStyleChange={(value) =>
-                      updateItemTypography(
-                        index,
-                        'fontStyle',
-                        value === 'normal' ? undefined : value
-                      )
-                    }
-                  />
-
-                  <ColorInput
-                    label={String(t('label_color'))}
-                    value={item.color || ''}
-                    onChange={(value) =>
-                      updateItemTypography(index, 'color', value || undefined)
-                    }
-                    defaultValue={
+                    fontSizePlaceholder={block.properties.fontSize || '13px'}
+                    colorDefault={
                       item.isTotal
                         ? block.properties.totalColor || '#111827'
                         : item.isBalance
@@ -283,13 +236,14 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                     }
                   />
 
-                  <ColorInput
-                    label={String(t('amount_color'))}
-                    value={item.amountColor || ''}
-                    onChange={(value) =>
-                      updateItemTypography(index, 'amountColor', value || undefined)
+                  <CellTypographyEditor
+                    heading={String(t('value'))}
+                    value={item.valueStyle}
+                    onChange={(next) =>
+                      updateItemTypography(index, 'valueStyle', next)
                     }
-                    defaultValue={
+                    fontSizePlaceholder={block.properties.fontSize || '13px'}
+                    colorDefault={
                       item.isTotal
                         ? block.properties.totalColor || '#111827'
                         : item.isBalance
@@ -347,44 +301,79 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
         )}
       </div>
 
-      <SectionDivider label={String(t('alignment'))} />
+      <SectionDivider label={String(t('typography'))} />
 
-      {/* Alignment */}
+      {/* Global Font Size */}
+      <FontSizeInput
+        label={String(t('font_size'))}
+        value={block.properties.fontSize}
+        onChange={(value) => updateProperty('fontSize', value)}
+      />
+
+      {/* Block-level alignment (drives table position within the block) */}
       <AlignmentInput
         label={String(t('alignment'))}
         value={block.properties.align}
         onChange={(value) => updateProperty('align', value)}
       />
 
-      <SectionDivider label={String(t('typography'))} />
-
-      {/* Font Size */}
-      <TextInput
-        label={String(t('font_size'))}
-        value={block.properties.fontSize}
-        onChange={(value) => updateProperty('fontSize', value)}
-        placeholder="13px"
+      {/* Text Color (default value color, mirrors InvoiceDetails) */}
+      <ColorInput
+        label={String(t('text_color'))}
+        value={block.properties.amountColor}
+        onChange={(value) => updateProperty('amountColor', value)}
+        defaultValue="#111827"
       />
 
-      {/* Total Font Size */}
-      <TextInput
-        label={String(t('total_font_size'))}
-        value={block.properties.totalFontSize}
-        onChange={(value) => updateProperty('totalFontSize', value)}
-        placeholder="18px"
+      {/* Label Color */}
+      <ColorInput
+        label={String(t('label_color'))}
+        value={block.properties.labelColor}
+        onChange={(value) => updateProperty('labelColor', value)}
+        defaultValue="#6B7280"
+      />
+
+      {/* Total Row Color — used when item.isTotal is true */}
+      <ColorInput
+        label={String(t('total_color'))}
+        value={block.properties.totalColor}
+        onChange={(value) => updateProperty('totalColor', value)}
+        defaultValue="#111827"
+      />
+
+      {/* Balance Row Color — used when item.isBalance is true */}
+      <ColorInput
+        label={String(t('balance_color'))}
+        value={block.properties.balanceColor}
+        onChange={(value) => updateProperty('balanceColor', value)}
+        defaultValue="#DC2626"
+      />
+
+      <SectionDivider label={String(t('columns'))} />
+
+      <AlignmentInput
+        label={String(t('label_alignment'))}
+        value={block.properties.labelAlign || 'right'}
+        onChange={(value) => updateProperty('labelAlign', value)}
+      />
+
+      <AlignmentInput
+        label={String(t('value_alignment'))}
+        value={block.properties.valueAlign || 'right'}
+        onChange={(value) => updateProperty('valueAlign', value)}
       />
 
       <SectionDivider label={String(t('spacing'))} />
 
-      {/* Row Spacing */}
+      {/* Block-level padding (mirrors InvoiceDetails) */}
       <TextInput
-        label={String(t('row_spacing'))}
-        value={block.properties.spacing}
-        onChange={(value) => updateProperty('spacing', value)}
-        placeholder="8px"
+        label={String(t('padding'))}
+        value={block.properties.padding}
+        onChange={(value) => updateProperty('padding', value)}
+        placeholder="0px"
+        hint={String(t('css_padding_format'))}
       />
 
-      {/* Label Padding */}
       <TextInput
         label={String(t('label_padding'))}
         value={block.properties.labelPadding}
@@ -393,7 +382,6 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
         hint={String(t('css_padding_format'))}
       />
 
-      {/* Value Padding */}
       <TextInput
         label={String(t('value_padding'))}
         value={block.properties.valuePadding}
@@ -402,7 +390,6 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
         hint={String(t('css_padding_format'))}
       />
 
-      {/* Gap Between Label and Value */}
       <TextInput
         label={String(t('label_value_gap'))}
         value={block.properties.labelValueGap}
@@ -410,13 +397,30 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
         placeholder="20px"
       />
 
-      {/* Value Column Min Width */}
+      {/* Row spacing — historical storage key on the Total block is `spacing`. */}
+      <TextInput
+        label={String(t('row_spacing'))}
+        value={block.properties.spacing}
+        onChange={(value) => updateProperty('spacing', value)}
+        placeholder="8px"
+      />
+
       <TextInput
         label={String(t('value_min_width'))}
         value={block.properties.valueMinWidth}
         onChange={(value) => updateProperty('valueMinWidth', value)}
         placeholder={String(t('auto'))}
         hint={String(t('leave_empty_for_auto'))}
+      />
+
+      <SectionDivider label={String(t('page_break') || 'Page Break')} />
+
+      <CheckboxInput
+        label={
+          String(t('keep_together') || 'Force page break before this block')
+        }
+        checked={Boolean(block.properties.keepTogether)}
+        onChange={(value) => updateProperty('keepTogether', value)}
       />
     </div>
   );

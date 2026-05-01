@@ -15,6 +15,7 @@ import { useBlockLabel } from '../block-library';
 import { InvoiceData, replaceVariables } from '../utils/variable-replacer';
 import { useSampleInvoiceData } from '../hooks/useSampleInvoiceData';
 import { replaceLabelVariables, getSampleLabelValue } from '../utils/label-variables';
+import { ensurePx } from '../utils/html-generator';
 
 interface BlockRendererProps {
   block: Block;
@@ -45,23 +46,38 @@ function renderFieldConfigs(
     return null;
   }
 
-  const lines: string[] = [];
+  const fields = fieldConfigs
+    .map((config) => {
+      const displayText = buildFieldDisplayText(config, data);
+      if (displayText === null) return null;
+      return { config, displayText };
+    })
+    .filter(
+      (entry): entry is { config: FieldConfig; displayText: string } =>
+        entry !== null
+    );
 
-  fieldConfigs.forEach((config) => {
-    const displayText = buildFieldDisplayText(config, data);
-    if (displayText !== null) {
-      lines.push(displayText);
-    }
-  });
-
-  if (lines.length === 0) {
+  if (fields.length === 0) {
     return <div style={style}>&nbsp;</div>;
   }
 
+  // One <div> per field so per-field typography (fontSize / fontWeight /
+  // fontStyle / color) saved on the FieldConfig is honoured. Block-level
+  // style is the fallback via React style merge.
   return (
     <div style={style}>
-      {lines.map((line, index) => (
-        <div key={index}>{line}</div>
+      {fields.map(({ config, displayText }, index) => (
+        <div
+          key={index}
+          style={{
+            fontSize: config.fontSize,
+            fontWeight: config.fontWeight,
+            fontStyle: config.fontStyle,
+            color: config.color,
+          }}
+        >
+          {displayText}
+        </div>
       ))}
     </div>
   );
@@ -207,6 +223,7 @@ function CompanyInfoRenderer({ block }: BlockRendererProps) {
     lineHeight,
     align,
     color,
+    padding,
     showTitle,
     title,
     titleFontSize,
@@ -219,7 +236,7 @@ function CompanyInfoRenderer({ block }: BlockRendererProps) {
   } = block.properties;
 
   return (
-    <div>
+    <div style={{ padding }}>
       {showTitle && (
         <div
           style={{
@@ -268,6 +285,7 @@ function ClientInfoRenderer({ block }: BlockRendererProps) {
     lineHeight,
     align,
     color,
+    padding,
     showTitle,
     title,
     titleFontSize,
@@ -280,7 +298,7 @@ function ClientInfoRenderer({ block }: BlockRendererProps) {
   } = block.properties;
 
   return (
-    <div>
+    <div style={{ padding }}>
       {showTitle && (
         <div
           style={{
@@ -323,52 +341,120 @@ function ClientInfoRenderer({ block }: BlockRendererProps) {
 function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
   const { t } = useTranslation();
   const sampleData = useSampleInvoiceData();
-  const { fieldConfigs, fontSize, lineHeight, align, color, showLabels } =
-    block.properties;
+  const {
+    fieldConfigs,
+    fontSize,
+    lineHeight,
+    align,
+    color,
+    labelColor,
+    showLabels,
+    padding,
+    labelAlign,
+    valueAlign,
+    labelPadding,
+    valuePadding,
+    labelValueGap,
+    rowSpacing,
+    valueMinWidth,
+  } = block.properties;
+
+  // Match server-side rendering: two-column table (label | value). When the
+  // block is right-aligned, the table itself shrinks to fit-content and is
+  // pushed to the right edge with margin-left:auto.
+  const tableAlign = align === 'right' ? 'right' : align === 'center' ? 'center' : 'left';
+  const colLabelAlign = (labelAlign as 'left' | 'center' | 'right') || 'right';
+  const colValueAlign = (valueAlign as 'left' | 'center' | 'right') || 'right';
+  const gap = ensurePx(labelValueGap) || '12px';
+  const labelPaddingPx = ensurePx(labelPadding);
+  const valuePaddingPx = ensurePx(valuePadding);
+  const rowSpacingPx = ensurePx(rowSpacing);
+  const valueMinWidthPx = ensurePx(valueMinWidth);
+  const blockPaddingPx = ensurePx(padding);
 
   return (
-    <div
-      style={{
-        fontSize,
-        lineHeight,
-        textAlign: align,
-        color,
-      }}
-    >
-      {fieldConfigs?.map((field: FieldConfig, index: number) => {
-        const displayValue = replaceVariables(field.variable, sampleData);
+    <div style={{ padding: blockPaddingPx }}>
+      <table
+        style={{
+          borderCollapse: 'collapse',
+          width: tableAlign === 'left' ? '100%' : 'auto',
+          marginLeft: tableAlign === 'right' ? 'auto' : tableAlign === 'center' ? 'auto' : undefined,
+          marginRight: tableAlign === 'center' ? 'auto' : undefined,
+          fontSize,
+          lineHeight,
+          color,
+        }}
+      >
+        <tbody>
+          {fieldConfigs?.map((field: FieldConfig, index: number) => {
+            const displayValue = replaceVariables(field.variable, sampleData);
 
-        if (
-          field.hideIfEmpty !== false &&
-          (!displayValue || displayValue.trim() === '')
-        ) {
-          return null;
-        }
+            if (
+              field.hideIfEmpty !== false &&
+              (!displayValue || displayValue.trim() === '')
+            ) {
+              return null;
+            }
 
-        const fieldFontSize = field.fontSize || fontSize;
-        const fieldColor = field.color || color;
+            const ls = field.labelStyle;
+            const vs = field.valueStyle;
+            const labelFontSize = ls?.fontSize || field.fontSize || fontSize;
+            const labelFontWeight = ls?.fontWeight || field.fontWeight;
+            const labelFontStyle = ls?.fontStyle || field.fontStyle;
+            const labelTextColor =
+              ls?.color || field.color || labelColor || color;
 
-        const prefix = (showLabels !== false && field.prefix)
-          ? replaceLabelVariables(field.prefix, t)
-          : '';
-        const suffix = field.suffix || '';
+            const valueFontSize = vs?.fontSize || field.fontSize || fontSize;
+            const valueFontWeight = vs?.fontWeight || field.fontWeight;
+            const valueFontStyle = vs?.fontStyle || field.fontStyle;
+            const valueTextColor = vs?.color || field.color || color;
 
-        return (
-          <div
-            key={field.id || index}
-            style={{
-              fontSize: fieldFontSize,
-              fontWeight: field.fontWeight,
-              color: fieldColor,
-              fontStyle: field.fontStyle,
-            }}
-          >
-            {prefix}
-            {displayValue}
-            {suffix}
-          </div>
-        );
-      })}
+            // Label source: explicit `field.label` resolves via label
+            // variables; fall back to prefix with trailing ":\s*" stripped so
+            // the table cell doesn't double-emit the colon.
+            const labelSource =
+              field.label || field.prefix?.replace(/:\s*$/, '') || '';
+            const labelText = replaceLabelVariables(labelSource, t);
+            const valueText = `${displayValue}${field.suffix || ''}`;
+
+            return (
+              <tr key={field.id || index}>
+                {showLabels !== false && (
+                  <td
+                    style={{
+                      fontSize: labelFontSize,
+                      fontWeight: labelFontWeight,
+                      fontStyle: labelFontStyle,
+                      color: labelTextColor,
+                      padding: labelPaddingPx || 0,
+                      paddingRight: gap,
+                      paddingBottom: rowSpacingPx || undefined,
+                      whiteSpace: 'nowrap',
+                      textAlign: colLabelAlign,
+                    }}
+                  >
+                    {labelText}
+                  </td>
+                )}
+                <td
+                  style={{
+                    fontSize: valueFontSize,
+                    fontWeight: valueFontWeight,
+                    fontStyle: valueFontStyle,
+                    color: valueTextColor,
+                    padding: valuePaddingPx || 0,
+                    paddingBottom: rowSpacingPx || undefined,
+                    minWidth: valueMinWidthPx || undefined,
+                    textAlign: colValueAlign,
+                  }}
+                >
+                  {valueText}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -585,6 +671,8 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
     items,
     fontSize,
     align,
+    labelAlign,
+    valueAlign,
     labelColor,
     amountColor,
     totalFontSize,
@@ -592,6 +680,7 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
     totalColor,
     balanceColor,
     spacing,
+    padding,
     labelPadding,
     valuePadding,
     labelValueGap,
@@ -605,9 +694,17 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
     ...(align === 'center' ? { margin: '0 auto' } : {}),
   };
 
-  const gap = labelValueGap || '20px';
+  const gap = ensurePx(labelValueGap) || '20px';
+  const colLabelAlign = (labelAlign as 'left' | 'center' | 'right') || 'right';
+  const colValueAlign = (valueAlign as 'left' | 'center' | 'right') || 'right';
+  const labelPaddingPx = ensurePx(labelPadding);
+  const valuePaddingPx = ensurePx(valuePadding);
+  const spacingPx = ensurePx(spacing);
+  const valueMinWidthPx = ensurePx(valueMinWidth);
+  const blockPaddingPx = ensurePx(padding);
 
   return (
+    <div style={{ padding: blockPaddingPx }}>
     <table style={tableStyle}>
       <tbody>
         {items.map(
@@ -618,6 +715,8 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
                 isBalance?: boolean;
                 field: string;
                 label: string;
+                labelStyle?: { fontSize?: string; fontWeight?: string; fontStyle?: string; color?: string };
+                valueStyle?: { fontSize?: string; fontWeight?: string; fontStyle?: string; color?: string };
                 fontSize?: string;
                 fontWeight?: string;
                 color?: string;
@@ -630,45 +729,54 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
               const isBalance = item.isBalance;
               const displayValue = replaceVariables(item.field, sampleData);
 
-              const itemFontSize =
-                item.fontSize || (isTotal ? totalFontSize : fontSize);
-              const itemFontWeight =
-                item.fontWeight || (isTotal ? totalFontWeight : 'normal');
-              const itemColor = item.color || labelColor;
+              const ls = item.labelStyle;
+              const vs = item.valueStyle;
+              const rowDefaultFontSize = isTotal ? totalFontSize : fontSize;
+              const rowDefaultFontWeight = isTotal ? totalFontWeight : 'normal';
+              const rowDefaultValueColor = isBalance
+                ? balanceColor
+                : isTotal
+                  ? totalColor
+                  : amountColor;
+
+              const labelFontSize = ls?.fontSize || item.fontSize || rowDefaultFontSize;
+              const labelFontWeight = ls?.fontWeight || item.fontWeight || rowDefaultFontWeight;
+              const labelFontStyle = ls?.fontStyle || item.fontStyle;
+              const labelTextColor = ls?.color || item.color || labelColor;
+
+              const valueFontSize = vs?.fontSize || item.fontSize || rowDefaultFontSize;
+              const valueFontWeight = vs?.fontWeight || item.fontWeight || rowDefaultFontWeight;
+              const valueFontStyle = vs?.fontStyle || item.fontStyle;
+              const valueTextColor = vs?.color || item.amountColor || rowDefaultValueColor;
 
               return (
-                <tr
-                  key={index}
-                  style={{
-                    fontSize: itemFontSize,
-                    fontWeight: itemFontWeight,
-                  }}
-                >
+                <tr key={index}>
                   <td
                     style={{
-                      color: itemColor,
-                      paddingBottom: spacing,
-                      padding: labelPadding || undefined,
-                      paddingRight: gap, // Override right padding with gap
-                      textAlign: 'right',
+                      fontSize: labelFontSize,
+                      fontWeight: labelFontWeight,
+                      fontStyle: labelFontStyle || undefined,
+                      color: labelTextColor,
+                      paddingBottom: spacingPx,
+                      padding: labelPaddingPx || undefined,
+                      paddingRight: gap,
+                      textAlign: colLabelAlign,
                       whiteSpace: 'nowrap',
-                      fontStyle: item.fontStyle || undefined,
                     }}
                   >
                     {getSampleLabelValue(item.label, t)}:
                   </td>
                   <td
                     style={{
-                      color: item.amountColor || (isBalance
-                        ? balanceColor
-                        : isTotal
-                          ? totalColor
-                          : amountColor),
-                      paddingBottom: spacing,
-                      padding: valuePadding || undefined,
-                      textAlign: 'right',
+                      fontSize: valueFontSize,
+                      fontWeight: valueFontWeight,
+                      fontStyle: valueFontStyle || undefined,
+                      color: valueTextColor,
+                      paddingBottom: spacingPx,
+                      padding: valuePaddingPx || undefined,
+                      textAlign: colValueAlign,
                       whiteSpace: 'nowrap',
-                      ...(valueMinWidth ? { minWidth: valueMinWidth } : {}),
+                      ...(valueMinWidthPx ? { minWidth: valueMinWidthPx } : {}),
                     }}
                   >
                     {displayValue}
@@ -679,6 +787,7 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
           )}
       </tbody>
     </table>
+    </div>
   );
 }
 

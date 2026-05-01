@@ -108,12 +108,28 @@ export interface SpacerBlockPropertiesHint {
   height?: string;
 }
 
+/**
+ * Per-cell typography. Used for label and value cells in the row-based
+ * blocks (invoice-details, total). All fields are optional and fall back
+ * to block-level defaults when unset.
+ */
+export interface CellTypography {
+  fontSize?: string;
+  fontWeight?: string;
+  fontStyle?: string;
+  color?: string;
+}
+
 export interface TotalItem {
   label: string;
   field: string;
   show: boolean;
   isTotal?: boolean;
   isBalance?: boolean;
+  labelStyle?: CellTypography;
+  valueStyle?: CellTypography;
+  // Legacy flat fields - kept readable for back-compat with existing
+  // saved templates. New writes go to labelStyle / valueStyle.
   fontSize?: string;
   fontWeight?: string;
   color?: string;
@@ -125,6 +141,8 @@ export interface TotalBlockPropertiesHint {
   items?: TotalItem[];
   fontSize?: string;
   align?: string;
+  labelAlign?: 'left' | 'center' | 'right';
+  valueAlign?: 'left' | 'center' | 'right';
   labelColor?: string;
   amountColor?: string;
   totalFontSize?: string;
@@ -137,7 +155,13 @@ export interface TotalBlockPropertiesHint {
   labelValueGap?: string;
   valueMinWidth?: string;
   showLabels?: boolean;
-  showPaidStamp?: boolean;
+  /**
+   * Page-break behaviour for the totals block.
+   *  - `true`  → force a page break before the block (always start on a new page)
+   *  - `false` → avoid breaking inside the block (keep it together on one page)
+   *  - undefined → renderer default (no page-break rule emitted)
+   */
+  keepTogether?: boolean;
 }
 
 export interface QRCodeBlockPropertiesHint {
@@ -162,6 +186,10 @@ export interface FieldConfig {
   prefix?: string;
   suffix?: string;
   hideIfEmpty?: boolean;
+  labelStyle?: CellTypography;
+  valueStyle?: CellTypography;
+  // Legacy flat fields - kept readable for back-compat with existing
+  // saved templates. New writes go to labelStyle / valueStyle.
   fontSize?: string;
   fontWeight?: string;
   color?: string;
@@ -207,13 +235,20 @@ export interface CompanyInfoBlockPropertiesHint {
 }
 
 export interface InvoiceDetailsBlockPropertiesHint {
-  fieldConfigs?: FieldConfig[]; // Per-field typography
+  fieldConfigs?: FieldConfig[];
   fontSize?: string;
   lineHeight?: string;
   align?: string;
   color?: string;
   labelColor?: string;
   showLabels?: boolean;
+  labelAlign?: 'left' | 'center' | 'right';
+  valueAlign?: 'left' | 'center' | 'right';
+  labelPadding?: string;
+  valuePadding?: string;
+  labelValueGap?: string;
+  rowSpacing?: string;
+  valueMinWidth?: string;
 }
 
 export interface LayoutConfig {
@@ -261,6 +296,59 @@ export interface VariableGroup {
   variables: Variable[];
 }
 
+/**
+ * Per-template document-level settings. Initially seeded from company.settings
+ * but stored on the template so designs can override company defaults.
+ *
+ * Canonical type lives in `$app/common/interfaces/design` so both the builder
+ * and any non-builder consumer (preview, future PDF tooling) share one shape.
+ */
+export type { DocumentSettings } from '$app/common/interfaces/design';
+import type { DocumentSettings } from '$app/common/interfaces/design';
+
+interface CompanyDesignSettingsLike {
+  page_layout?: string;
+  page_size?: string;
+  font_size?: number | string;
+  primary_font?: string;
+  secondary_font?: string;
+  show_paid_stamp?: boolean;
+  show_shipping_address?: boolean;
+  embed_documents?: boolean;
+  hide_empty_columns_on_pdf?: boolean;
+  page_numbering?: boolean;
+}
+
+export function createDefaultDocumentSettings(
+  companySettings?: CompanyDesignSettingsLike | null
+): DocumentSettings {
+  const fontSize = companySettings?.font_size;
+
+  return {
+    pageLayout:
+      (companySettings?.page_layout as 'portrait' | 'landscape') || 'portrait',
+    pageSize: companySettings?.page_size || 'A4',
+    globalFontSize:
+      typeof fontSize === 'string' ? parseInt(fontSize, 10) || 16 : fontSize || 16,
+    primaryFont: companySettings?.primary_font || 'Roboto',
+    secondaryFont: companySettings?.secondary_font || 'Roboto',
+    showPaidStamp: Boolean(companySettings?.show_paid_stamp),
+    showShippingAddress: Boolean(companySettings?.show_shipping_address),
+    embedDocuments: Boolean(companySettings?.embed_documents),
+    hideEmptyColumns: Boolean(companySettings?.hide_empty_columns_on_pdf),
+    pageNumbering: Boolean(companySettings?.page_numbering),
+    // Design-level only — not seeded from company.settings.
+    pageMarginTop: 0,
+    pageMarginRight: 0,
+    pageMarginBottom: 0,
+    pageMarginLeft: 0,
+    pagePaddingTop: 30,
+    pagePaddingRight: 30,
+    pagePaddingBottom: 30,
+    pagePaddingLeft: 30,
+  };
+}
+
 // Builder state management
 export interface BuilderState {
   blocks: Block[];
@@ -269,6 +357,9 @@ export interface BuilderState {
   historyIndex: number;
   zoom: number;
   templateId?: string;
+  documentSettings: DocumentSettings;
+  /** Right-panel mode when no block is selected. */
+  panelMode?: 'block' | 'document';
 }
 
 export interface BuilderHistoryEntry {

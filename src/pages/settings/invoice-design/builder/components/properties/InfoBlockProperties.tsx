@@ -206,6 +206,7 @@ export function InfoBlockProperties({
                     value={block.properties.titleFontSize || ''}
                     onChange={(value) => updateProperty('titleFontSize', value)}
                     placeholder={block.properties.fontSize || '12px'}
+                    resettable
                   />
 
                   <FontStyleInput
@@ -233,44 +234,6 @@ export function InfoBlockProperties({
                     onChange={(value) => updateProperty('titleAlign', value)}
                   />
 
-                  <div
-                    className="pt-3"
-                    style={{ borderTop: `1px solid ${colors.$24}` }}
-                  >
-                    <div className="grid grid-cols-2 gap-3">
-                      <TextInput
-                        label={String(t('prefix'))}
-                        value={block.properties.titlePrefix || ''}
-                        onChange={(value) => updateProperty('titlePrefix', value)}
-                        placeholder={String(t('prefix_placeholder'))}
-                      />
-
-                      <TextInput
-                        label={String(t('suffix'))}
-                        value={block.properties.titleSuffix || ''}
-                        onChange={(value) => updateProperty('titleSuffix', value)}
-                        placeholder={String(t('suffix_placeholder'))}
-                      />
-                    </div>
-
-                    {(block.properties.titlePrefix || block.properties.titleSuffix) && (
-                      <div
-                        className="text-xs p-2 rounded mt-3"
-                        style={{
-                          backgroundColor: colors.$1,
-                          border: `1px solid ${colors.$24}`,
-                          color: colors.$17,
-                        }}
-                      >
-                        <span className="font-medium">{t('preview')}: </span>
-                        <span style={{ color: colors.$24 }}>
-                          {block.properties.titlePrefix}
-                          {block.properties.title || t('header')}
-                          {block.properties.titleSuffix}
-                        </span>
-                      </div>
-                    )}
-                  </div>
                 </div>
               )}
             </div>
@@ -291,12 +254,15 @@ export function InfoBlockProperties({
 
       <div className="space-y-4">
         <FontSizeInput
-          value={block.properties.fontSize || '12px'}
-          onChange={(value: string) => updateProperty('fontSize', value)}
+          label={String(t('font_size'))}
+          value={block.properties.fontSize}
+          onChange={(value: string | undefined) =>
+            updateProperty('fontSize', value)
+          }
         />
 
         <LineHeightInput
-          value={block.properties.lineHeight || '1.5'}
+          value={block.properties.lineHeight}
           onChange={(value: string) => updateProperty('lineHeight', value)}
         />
 

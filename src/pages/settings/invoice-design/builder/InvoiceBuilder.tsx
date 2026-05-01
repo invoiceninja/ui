@@ -24,21 +24,31 @@ import {
   LayoutGrid,
   Type,
   Pencil,
+  Settings as SettingsIcon,
 } from 'lucide-react';
 import { Button } from '$app/components/forms';
 import { InputField } from '$app/components/forms/InputField';
 import { Modal } from '$app/components/Modal';
 import { Card } from '$app/components/cards';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
-import { Block, BuilderState, BlockDefinition, generateBlockId } from './types';
+import {
+  Block,
+  BuilderState,
+  BlockDefinition,
+  DocumentSettings,
+  createDefaultDocumentSettings,
+  generateBlockId,
+} from './types';
 import { getTemplateById } from './templates/templates';
 import { ComponentLibrary } from './components/ComponentLibrary';
 import { PropertyPanel } from './components/PropertyPanel';
+import { DocumentSettingsPanel } from './components/DocumentSettingsPanel';
 import { BlockRenderer } from './components/BlockRenderer';
 import { PreviewModal } from './components/PreviewModal';
 import { useBlockLabel } from './block-library';
 import { getContentConstrainedGridSize } from './utils/block-sizing';
 import { generateInvoiceHTML } from './utils/html-generator';
+import { annotateBlocksWithRowLayout } from './utils/row-layout';
 import { pushLayoutCollisionsDown } from './utils/layout-normalizer';
 import { route } from '$app/common/helpers/route';
 import { endpoint } from '$app/common/helpers';
@@ -70,8 +80,14 @@ function extractBlocksFromDesign(design: Design): Block[] | null {
 function mergeDesignParts(
   blocks: Block[],
   htmlBody: string,
-  previous: Design['design'] | undefined
+  previous: Design['design'] | undefined,
+  documentSettings: DocumentSettings
 ): Design['design'] {
+  // Annotate each block with row-layout hints (rowAlign, rowWidth, colStart,
+  // colSpan) so the API can place blocks within their flex-row correctly —
+  // the API otherwise loses `gridPosition.x` and packs every block left.
+  const annotatedBlocks = annotateBlocksWithRowLayout(blocks);
+
   return {
     includes: previous?.includes ?? '',
     header: previous?.header ?? '',
@@ -79,10 +95,39 @@ function mergeDesignParts(
     product: previous?.product ?? '',
     task: previous?.task ?? '',
     footer: previous?.footer ?? '',
-    blocks,
+    blocks: annotatedBlocks,
+    documentSettings,
     ...(previous?.pageSettings
       ? { pageSettings: previous.pageSettings }
       : {}),
+  } as Design['design'];
+}
+
+/**
+ * Map per-template DocumentSettings (camelCase) → the snake_case shape that
+ * `generateInvoiceHTML` consumes. This lets the generator stay agnostic of
+ * whether values originated from company.settings or per-template overrides.
+ */
+function documentSettingsToGeneratorShape(ds: DocumentSettings) {
+  return {
+    page_size: ds.pageSize,
+    page_layout: ds.pageLayout,
+    primary_font: ds.primaryFont,
+    secondary_font: ds.secondaryFont,
+    font_size: ds.globalFontSize,
+    show_paid_stamp: ds.showPaidStamp,
+    show_shipping_address: ds.showShippingAddress,
+    embed_documents: ds.embedDocuments,
+    hide_empty_columns: ds.hideEmptyColumns,
+    page_numbering: ds.pageNumbering,
+    page_margin_top: ds.pageMarginTop,
+    page_margin_right: ds.pageMarginRight,
+    page_margin_bottom: ds.pageMarginBottom,
+    page_margin_left: ds.pageMarginLeft,
+    page_padding_top: ds.pagePaddingTop,
+    page_padding_right: ds.pagePaddingRight,
+    page_padding_bottom: ds.pagePaddingBottom,
+    page_padding_left: ds.pagePaddingLeft,
   };
 }
 
@@ -92,14 +137,35 @@ interface PageDimensions {
   pixels: number;
 }
 
-function getPageDimensions(pageSize: string = 'A4'): PageDimensions {
-  switch (pageSize) {
-    case 'letter':
-      return { width: '215.9mm', minHeight: '279.4mm', pixels: 816 }; // 8.5 x 11 inches at 96dpi
-    case 'A4':
-    default:
-      return { width: '210mm', minHeight: '297mm', pixels: 794 }; // A4 at 96dpi
-  }
+const PAGE_SIZE_DIMENSIONS: Record<
+  string,
+  { widthMm: number; heightMm: number }
+> = {
+  A3: { widthMm: 297, heightMm: 420 },
+  A4: { widthMm: 210, heightMm: 297 },
+  A5: { widthMm: 148, heightMm: 210 },
+  B4: { widthMm: 250, heightMm: 353 },
+  B5: { widthMm: 176, heightMm: 250 },
+  'JIS-B4': { widthMm: 257, heightMm: 364 },
+  'JIS-B5': { widthMm: 182, heightMm: 257 },
+  letter: { widthMm: 215.9, heightMm: 279.4 },
+  legal: { widthMm: 215.9, heightMm: 355.6 },
+  ledger: { widthMm: 279.4, heightMm: 431.8 },
+};
+
+function getPageDimensions(
+  pageSize: string = 'A4',
+  layout: 'portrait' | 'landscape' = 'portrait'
+): PageDimensions {
+  const dims = PAGE_SIZE_DIMENSIONS[pageSize] || PAGE_SIZE_DIMENSIONS.A4;
+  const widthMm = layout === 'landscape' ? dims.heightMm : dims.widthMm;
+  const heightMm = layout === 'landscape' ? dims.widthMm : dims.heightMm;
+  // 96dpi: 1mm ≈ 3.7795px
+  return {
+    width: `${widthMm}mm`,
+    minHeight: `${heightMm}mm`,
+    pixels: Math.round(widthMm * 3.7795),
+  };
 }
 
 function blocksToLayout(blocks: Block[]): Layout[] {
@@ -141,7 +207,28 @@ export function InvoiceBuilder() {
     historyIndex: -1,
     zoom: 100,
     templateId: templateId || undefined,
+    documentSettings: createDefaultDocumentSettings(designSettings),
+    panelMode: 'document',
   });
+
+  // Once company settings load, seed any unset document settings (handles the
+  // first render where designSettings may not be ready yet).
+  const documentSettingsInitialized = useRef(false);
+  useEffect(() => {
+    if (documentSettingsInitialized.current || !designSettings) return;
+    documentSettingsInitialized.current = true;
+    setState((prev) => ({
+      ...prev,
+      documentSettings: createDefaultDocumentSettings(designSettings),
+    }));
+  }, [designSettings]);
+
+  const handleUpdateDocumentSettings = useCallback(
+    (documentSettings: DocumentSettings) => {
+      setState((prev) => ({ ...prev, documentSettings }));
+    },
+    []
+  );
 
   const [designName, setDesignName] = useState<string>('');
   const [isEditMode, setIsEditMode] = useState(false);
@@ -181,11 +268,20 @@ export function InvoiceBuilder() {
       try {
         const blocks = extractBlocksFromDesign(existingDesign);
         if (blocks && blocks.length > 0) {
+          // Existing designs may not yet have documentSettings — fall back to
+          // company defaults so the panel always has a complete object.
+          const savedDocSettings = (
+            existingDesign.design as { documentSettings?: DocumentSettings }
+          )?.documentSettings;
+
           // Update state with blocks
           setState((prev) => ({
             ...prev,
             blocks,
+            documentSettings:
+              savedDocSettings || createDefaultDocumentSettings(designSettings),
           }));
+          documentSettingsInitialized.current = true;
           // Immediately convert blocks to layout format to ensure proper positioning
           isManuallySettingLayout.current = true;
           const initialLayout = blocksToLayout(blocks);
@@ -502,6 +598,25 @@ export function InvoiceBuilder() {
       const newBlockId = generateBlockId(definition.type);
       const size = getContentConstrainedGridSize(definition);
 
+      // Seed branding-relevant accents from the company's primary color so
+      // dropped blocks adopt the brand. Limited to surfaces that read as
+      // accents (table header bg, divider line) — text color and totals stay
+      // on their per-block defaults so readability is preserved.
+      const seededProperties = { ...definition.defaultProperties };
+      const companyPrimary = designSettings?.primary_color;
+      if (companyPrimary) {
+        if (
+          (definition.type === 'table' ||
+            definition.type === 'tasks-table') &&
+          'headerColor' in seededProperties
+        ) {
+          seededProperties.headerColor = companyPrimary;
+        }
+        if (definition.type === 'divider' && 'color' in seededProperties) {
+          seededProperties.color = companyPrimary;
+        }
+      }
+
       const newBlock: Block = {
         id: newBlockId,
         type: definition.type,
@@ -511,7 +626,7 @@ export function InvoiceBuilder() {
           w: size.w,
           h: size.h,
         },
-        properties: { ...definition.defaultProperties },
+        properties: seededProperties,
       };
 
       // Update state with the new block
@@ -664,7 +779,14 @@ export function InvoiceBuilder() {
 
       // Save path: emit HTML with literal $tokens so the backend's
       // HtmlEngine::parseLabelsAndValues can substitute real data at render time.
-      const htmlBody = generateInvoiceHTML(blocks);
+      // Pass the per-template document settings so styling baked into the saved
+      // HTML reflects the builder's globals (not the generator's hardcoded
+      // fallbacks).
+      const htmlBody = generateInvoiceHTML(
+        blocks,
+        undefined,
+        documentSettingsToGeneratorShape(builderStateRef.current.documentSettings)
+      );
 
       // PUT must send the full Design resource (same as custom design editor): merge
       // with the loaded design so `design.blocks`, `body`, and other `design.*`
@@ -673,7 +795,8 @@ export function InvoiceBuilder() {
       const mergedParts = mergeDesignParts(
         blocks,
         htmlBody,
-        existingDesignRef.current?.design
+        existingDesignRef.current?.design,
+        builderStateRef.current.documentSettings
       );
 
       if (isEditMode && designId) {
@@ -840,6 +963,15 @@ export function InvoiceBuilder() {
             {t('fix_overlaps')}
           </Button>
           <Button
+            type={state.selectedBlockId === null ? 'primary' : 'secondary'}
+            behavior="button"
+            onClick={() => handleSelectBlock(null)}
+            className="flex items-center gap-2"
+          >
+            <SettingsIcon className="w-4 h-4" />
+            {t('page_settings')}
+          </Button>
+          <Button
             type="secondary"
             behavior="button"
             onClick={handlePreview}
@@ -918,10 +1050,17 @@ export function InvoiceBuilder() {
             <div
               className={`mx-auto bg-white shadow-2xl relative transition-all canvas-drop-target`}
               style={{
-                width: getPageDimensions(designSettings?.page_size).width,
-                minHeight: getPageDimensions(designSettings?.page_size).minHeight,
-                fontSize: designSettings?.font_size ? `${designSettings.font_size}px` : '16px',
-                color: designSettings?.primary_color || '#000000',
+                width: getPageDimensions(
+                  state.documentSettings.pageSize,
+                  state.documentSettings.pageLayout
+                ).width,
+                minHeight: getPageDimensions(
+                  state.documentSettings.pageSize,
+                  state.documentSettings.pageLayout
+                ).minHeight,
+                fontSize: `${state.documentSettings.globalFontSize}px`,
+                fontFamily: `'${state.documentSettings.primaryFont.replace(/_/g, ' ')}', sans-serif`,
+                color: '#000000',
                 transform: `scale(${state.zoom / 100})`,
                 transformOrigin: 'top center',
             }}
@@ -949,7 +1088,12 @@ export function InvoiceBuilder() {
               onDropDragOver={handleDropDragOver}
               cols={12}
               rowHeight={60}
-              width={getPageDimensions(designSettings?.page_size).pixels}
+              width={
+                getPageDimensions(
+                  state.documentSettings.pageSize,
+                  state.documentSettings.pageLayout
+                ).pixels
+              }
               margin={[10, 16]} // [horizontal, vertical] - vertical is 1rem (16px)
               containerPadding={[30, 30]}
               draggableHandle=".drag-handle"
@@ -1098,19 +1242,10 @@ export function InvoiceBuilder() {
                 onDuplicate={() => handleDuplicateBlock(selectedBlock.id)}
               />
             ) : (
-              <div className="p-6 text-center" style={{ color: colors.$17 }}>
-                <div className="mb-4">
-                  <div
-                    className="w-16 h-16 mx-auto rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: colors.$20 }}
-                  >
-                    <Eye className="w-8 h-8" style={{ color: colors.$17 }} />
-                  </div>
-                </div>
-                <p className="text-sm">
-                  {t('select_a_component_to_edit_properties')}
-                </p>
-              </div>
+              <DocumentSettingsPanel
+                settings={state.documentSettings}
+                onChange={handleUpdateDocumentSettings}
+              />
             )}
           </div>
         </div>
@@ -1121,7 +1256,9 @@ export function InvoiceBuilder() {
         <PreviewModal
           blocks={state.blocks}
           onClose={() => setShowPreview(false)}
-          designSettings={designSettings}
+          designSettings={documentSettingsToGeneratorShape(
+            state.documentSettings
+          )}
         />
       )}
 

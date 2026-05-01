@@ -50,9 +50,15 @@ export function VariablePicker({ onInsert, onClose }: VariablePickerProps) {
           category: 'company',
         },
         {
-          key: '$company.address',
-          label: t('company_address'),
+          key: '$company.address1',
+          label: t('address1'),
           example: '123 Main St',
+          category: 'company',
+        },
+        {
+          key: '$company.address2',
+          label: t('address2'),
+          example: 'Apt 4B',
           category: 'company',
         },
         {

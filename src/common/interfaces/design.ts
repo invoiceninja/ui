@@ -8,6 +8,29 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+export interface DocumentSettings {
+  pageLayout: 'portrait' | 'landscape';
+  pageSize: string;
+  globalFontSize: number;
+  primaryFont: string;
+  secondaryFont: string;
+  showPaidStamp: boolean;
+  showShippingAddress: boolean;
+  embedDocuments: boolean;
+  hideEmptyColumns: boolean;
+  pageNumbering: boolean;
+  // Per-side page margin in px — drives @page { margin } in the rendered PDF.
+  pageMarginTop: number;
+  pageMarginRight: number;
+  pageMarginBottom: number;
+  pageMarginLeft: number;
+  // Per-side inner content padding in px — drives .invoice-container padding.
+  pagePaddingTop: number;
+  pagePaddingRight: number;
+  pagePaddingBottom: number;
+  pagePaddingLeft: number;
+}
+
 export interface Parts {
   includes: string;
   header: string;
@@ -17,6 +40,7 @@ export interface Parts {
   footer: string;
   blocks?: any[];
   pageSettings?: Record<string, string>;
+  documentSettings?: DocumentSettings;
 }
 
 export interface Design {

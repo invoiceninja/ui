@@ -426,6 +426,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
         value={block.properties.fontSize}
         onChange={(value) => updateProperty('fontSize', value)}
         placeholder="12px"
+        resettable
       />
 
       <SectionDivider label={String(t('header'))} />
