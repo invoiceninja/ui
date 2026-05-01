@@ -469,7 +469,7 @@ export function RangeSliderInput({
   onChange,
   min = 5,
   max = 100,
-  step = 5,
+  step = 1,
   unit = '%',
 }: RangeSliderInputProps) {
   const colors = useColorScheme();

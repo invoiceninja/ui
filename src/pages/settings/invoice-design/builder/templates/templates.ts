@@ -44,7 +44,7 @@ export const templates: InvoiceTemplate[] = [
           content:
             '$company.name\n$company.address1\n$company.city_state_postal\n$company.phone',
           fontSize: '11px',
-          lineHeight: '1.5',
+          lineHeight: '1.3',
           align: 'right',
           color: '#6B7280',
         },
@@ -94,7 +94,7 @@ export const templates: InvoiceTemplate[] = [
             },
           ],
           fontSize: '11px',
-          lineHeight: '1.5',
+          lineHeight: '1.3',
           align: 'right',
           color: '#374151',
           showLabels: true,
@@ -109,7 +109,7 @@ export const templates: InvoiceTemplate[] = [
         properties: {
           content: '$client.name\n$client.address\n$client.city_state_postal',
           fontSize: '12px',
-          lineHeight: '1.5',
+          lineHeight: '1.3',
           align: 'left',
           color: '#374151',
           showTitle: true,
@@ -126,7 +126,7 @@ export const templates: InvoiceTemplate[] = [
           content:
             '$client.shipping_address1\n$client.shipping_address2\n$client.shipping_city\n$client.shipping_state\n$client.shipping_postal_code\n$client.shipping_country',
           fontSize: '12px',
-          lineHeight: '1.5',
+          lineHeight: '1.3',
           align: 'left',
           color: '#374151',
           showTitle: true,
@@ -297,7 +297,7 @@ export const templates: InvoiceTemplate[] = [
         properties: {
           content: '$client.name\n$client.address\n$client.city_state_postal',
           fontSize: '12px',
-          lineHeight: '1.5',
+          lineHeight: '1.3',
           align: 'left',
           color: '#000000',
           showTitle: false,

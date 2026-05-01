@@ -307,7 +307,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                         className="block text-xs mb-1"
                         style={{ color: colors.$17 }}
                       >
-                        {t('header_label')}
+                        {t('header')}
                       </label>
                       <input
                         type="text"
@@ -332,7 +332,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                         }
                         min={5}
                         max={50}
-                        step={5}
+                        step={1}
                         unit="%"
                       />
                     </div>
