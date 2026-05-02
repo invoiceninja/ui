@@ -93,55 +93,50 @@ const TEMPLATE_GROUPS: TemplateGroup[] = [
   },
 ];
 
-interface TemplateSidebarProps {
+interface TemplateSelectorProps {
   value: string;
   onChange: (value: string) => void;
 }
 
-function TemplateSidebar({ value, onChange }: TemplateSidebarProps) {
+function TemplateSelector({ value, onChange }: TemplateSelectorProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
   return (
-    <div
-      className="flex flex-col overflow-y-auto"
-      style={{ minWidth: '14rem' }}
-    >
-      {TEMPLATE_GROUPS.map((group, groupIndex) => (
-        <div key={group.labelKey} className="flex flex-col">
-          {groupIndex > 0 && (
-            <div
-              className="mx-3 my-2"
-              style={{ height: '1px', backgroundColor: colors.$21 }}
-            />
-          )}
-
+    <div className="flex flex-col">
+      {TEMPLATE_GROUPS.map((group) => (
+        <div
+          key={group.labelKey}
+          className="flex flex-col gap-2 py-3 last:mb-4"
+          style={{
+            borderBottom: `1px solid ${colors.$21}`,
+          }}
+        >
           <span
-            className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider"
+            className="text-xs font-semibold uppercase tracking-wider"
             style={{ color: colors.$17 }}
           >
             {t(group.labelKey)}
           </span>
 
-          {group.items.map((item) => (
-            <div
-              key={item.value}
-              className="flex items-center px-3 py-2 cursor-pointer text-sm transition-colors duration-100"
-              onClick={() => onChange(item.value)}
-              style={{
-                backgroundColor:
-                  value === item.value ? colors.$25 : 'transparent',
-                color: value === item.value ? colors.$3 : colors.$17,
-                fontWeight: value === item.value ? 500 : 400,
-                borderLeft:
-                  value === item.value
-                    ? `2px solid ${colors.$3}`
-                    : '2px solid transparent',
-              }}
-            >
-              {t(item.labelKey)}
-            </div>
-          ))}
+          <div className="flex flex-wrap gap-1.5">
+            {group.items.map((item) => (
+              <button
+                key={item.value}
+                type="button"
+                className="px-3 py-1 rounded-full text-sm cursor-pointer select-none border transition-colors duration-150"
+                onClick={() => onChange(item.value)}
+                style={{
+                  backgroundColor:
+                    value === item.value ? colors.$3 : 'transparent',
+                  color: value === item.value ? colors.$1 : colors.$3,
+                  borderColor: value === item.value ? colors.$3 : colors.$24,
+                }}
+              >
+                {t(item.labelKey)}
+              </button>
+            ))}
+          </div>
         </div>
       ))}
     </div>
@@ -172,13 +167,16 @@ export function TemplatesAndReminders() {
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const { data: statics } = useStaticsQuery();
+
   const [templateId, setTemplateId] = useState(
     isCompanySettingsActive || company?.settings.email_template_invoice
       ? 'invoice'
       : ''
   );
+
   const [templateBody, setTemplateBody] = useState<TemplateBody>();
   const [preview, setPreview] = useState<EmailTemplate>();
+
   const canChangeEmailTemplate = (isHosted() && !freePlan()) || isSelfHosted();
 
   const [isInitial, setIsInitial] = useState<boolean>(true);
@@ -200,6 +198,7 @@ export function TemplatesAndReminders() {
       ? 'email_quote_subject_reminder1'
       : `email_subject_${getTemplateKey(templateId) || 'invoice'}`
   ) as keyof CompanySettings;
+
   const emailTemplateKey = (
     templateId === 'quote_reminder1'
       ? 'email_quote_template_reminder1'
@@ -451,37 +450,13 @@ export function TemplatesAndReminders() {
     >
       <AdvancedSettingsPlanAlert />
 
-      <div
-        className="flex flex-col lg:flex-row rounded-md border overflow-hidden shadow-sm"
-        style={{
-          borderColor: colors.$24,
-          backgroundColor: colors.$1,
-        }}
+      <Card
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
       >
-        <div className="lg:border-r py-3" style={{ borderColor: colors.$21 }}>
-          <TemplateSidebar
-            value={templateId}
-            onChange={(value) => {
-              setTemplateId(value);
-              !isCompanySettingsActive && setTemplateBody(undefined);
-            }}
-          />
-        </div>
-
-        <div className="flex-1 flex flex-col">
-          <div
-            className="flex items-center justify-between px-4 sm:px-6 py-3 border-b"
-            style={{ borderColor: colors.$21 }}
-          >
-            <span className="text-sm font-medium" style={{ color: colors.$3 }}>
-              {templateId &&
-                t(
-                  TEMPLATE_GROUPS.flatMap((g) => g.items).find(
-                    (i) => i.value === templateId
-                  )?.labelKey ?? templateId
-                )}
-            </span>
-
+        <div className="px-4 sm:px-6 pb-1">
+          <div className="flex items-center justify-end mb-2">
             <PropertyCheckbox
               checked={Boolean(
                 typeof company?.settings[emailTemplateKey] !== 'undefined'
@@ -493,69 +468,66 @@ export function TemplatesAndReminders() {
             />
           </div>
 
-          <div className="flex flex-col">
-            <div className="px-4 sm:px-6 py-4 space-y-4">
-              <div className="flex flex-col space-y-1">
-                <span
-                  className="text-xs font-medium"
-                  style={{ color: colors.$22 }}
-                >
-                  {t('subject')}
-                </span>
-
-                <InputField
-                  id="subject"
-                  value={templateBody?.subject || ''}
-                  onValueChange={(value) =>
-                    setTemplateBody(
-                      (current) => current && { ...current, subject: value }
-                    )
-                  }
-                  disabled={disableSettingsField(emailTemplateKey)}
-                />
-              </div>
-
-              <div className="flex flex-col space-y-1">
-                <span
-                  className="text-xs font-medium"
-                  style={{ color: colors.$22 }}
-                >
-                  {t('body')}
-                </span>
-
-                {canChangeEmailTemplate ? (
-                  <MarkdownEditor
-                    value={templateBody?.body || ''}
-                    onChange={(value) =>
-                      setTemplateBody(
-                        (current) => current && { ...current, body: value }
-                      )
-                    }
-                    disabled={disableSettingsField(emailTemplateKey)}
-                  />
-                ) : (
-                  <div className="flex flex-col items-start">
-                    <span className="text-gray-500 text-sm">
-                      {t('email_template_change')}{' '}
-                      <strong>
-                        {t('enterprise')}/{t('pro')}
-                      </strong>{' '}
-                      {t('plan')}.
-                    </span>
-                    <Button
-                      behavior="button"
-                      className="mt-2"
-                      onClick={() => route('/settings/account_management')}
-                    >
-                      {t('plan_change')}
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          <TemplateSelector
+            value={templateId}
+            onChange={(value) => {
+              setTemplateId(value);
+              !isCompanySettingsActive && setTemplateBody(undefined);
+            }}
+          />
         </div>
-      </div>
+
+        <Element
+          leftSide={t('subject')}
+          disabledLabels={disableSettingsField(emailTemplateKey)}
+        >
+          <InputField
+            id="subject"
+            value={templateBody?.subject || ''}
+            onValueChange={(value) =>
+              setTemplateBody(
+                (current) => current && { ...current, subject: value }
+              )
+            }
+            disabled={disableSettingsField(emailTemplateKey)}
+          />
+        </Element>
+
+        <Element
+          leftSide={t('body')}
+          disabledLabels={disableSettingsField(emailTemplateKey)}
+        >
+          {canChangeEmailTemplate ? (
+            <MarkdownEditor
+              value={templateBody?.body || ''}
+              onChange={(value) =>
+                setTemplateBody(
+                  (current) => current && { ...current, body: value }
+                )
+              }
+              disabled={disableSettingsField(emailTemplateKey)}
+            />
+          ) : (
+            <div className="flex flex-col items-start">
+              <span className="text-gray-500 text-sm">
+                {t('email_template_change')}{' '}
+                <strong>
+                  {t('enterprise')}/{t('pro')}
+                </strong>{' '}
+                {t('plan')}.
+              </span>
+
+              <Button
+                behavior="button"
+                className="mt-2"
+                onClick={() => route('/settings/account_management')}
+              >
+                {t('plan_change')}
+              </Button>
+            </div>
+          )}
+        </Element>
+      </Card>
 
       {(REMINDERS.includes(templateId) ||
         templateId === 'reminder_endless' ||
@@ -601,6 +573,7 @@ export function TemplatesAndReminders() {
                     <option value="disabled" defaultChecked>
                       {t('disabled')}
                     </option>
+
                     <option
                       value={
                         templateId === 'quote_reminder1'
@@ -612,6 +585,7 @@ export function TemplatesAndReminders() {
                         ? t('after_quote_date')
                         : t('after_invoice_date')}
                     </option>
+
                     <option
                       value={
                         templateId === 'quote_reminder1'
@@ -623,6 +597,7 @@ export function TemplatesAndReminders() {
                         ? t('before_valid_until_date')
                         : t('before_due_date')}
                     </option>
+
                     <option
                       value={
                         templateId === 'quote_reminder1'
