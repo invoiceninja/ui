@@ -96,14 +96,25 @@ const TEMPLATE_GROUPS: TemplateGroup[] = [
 interface TemplateSelectorProps {
   value: string;
   onChange: (value: string) => void;
+  disabled?: boolean;
 }
 
-function TemplateSelector({ value, onChange }: TemplateSelectorProps) {
+function TemplateSelector({
+  value,
+  onChange,
+  disabled = false,
+}: TemplateSelectorProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
   return (
-    <div className="flex flex-col">
+    <div
+      className="flex flex-col"
+      style={{
+        opacity: disabled ? 0.4 : 1,
+        pointerEvents: disabled ? 'none' : 'auto',
+      }}
+    >
       {TEMPLATE_GROUPS.map((group) => (
         <div
           key={group.labelKey}
@@ -456,20 +467,25 @@ export function TemplatesAndReminders() {
         headerStyle={{ borderColor: colors.$20 }}
       >
         <div className="px-4 sm:px-6 pb-1">
-          <div className="flex items-center justify-end mb-2">
-            <PropertyCheckbox
-              checked={Boolean(
-                typeof company?.settings[emailTemplateKey] !== 'undefined'
-              )}
-              propertyKey={emailTemplateKey}
-              labelElement={<SettingsLabel label={t('enabled')} />}
-              defaultValue={templateId || 'invoice'}
-              onCheckboxChange={(value) => handleChangingCheckbox(value)}
-            />
-          </div>
+          {!isCompanySettingsActive && (
+            <div className="flex items-center justify-end mb-2">
+              <PropertyCheckbox
+                checked={Boolean(
+                  typeof company?.settings[emailTemplateKey] !== 'undefined'
+                )}
+                propertyKey={emailTemplateKey}
+                labelElement={<SettingsLabel label={t('enabled')} />}
+                defaultValue={templateId || 'invoice'}
+                onCheckboxChange={(value) => handleChangingCheckbox(value)}
+              />
+            </div>
+          )}
 
           <TemplateSelector
             value={templateId}
+            disabled={
+              !isCompanySettingsActive && disableSettingsField(emailTemplateKey)
+            }
             onChange={(value) => {
               setTemplateId(value);
               !isCompanySettingsActive && setTemplateBody(undefined);
