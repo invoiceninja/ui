@@ -156,6 +156,7 @@ export function NumberInputField(props: Props) {
 
       <div className="relative">
         <NumericFormat
+          data-cy={props.cypressRef}
           className={classNames(
             `w-full py-2 px-3 rounded-md text-sm disabled:opacity-75 disabled:cursor-not-allowed focus:outline-none focus:ring-0 ${props.className}`,
             {

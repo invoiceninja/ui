@@ -74,6 +74,7 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
       vendor_id: '',
       paid_to_date: 0,
       po_number: '',
+      client: undefined,
     });
 
     setIsModalVisible(false);
@@ -102,6 +103,7 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
       paid_to_date: 0,
       po_number: '',
       design_id: company.settings.invoice_design_id,
+      client: undefined,
     });
 
     setIsModalVisible(false);
@@ -130,6 +132,7 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
       paid_to_date: 0,
       po_number: '',
       design_id: company.settings.quote_design_id,
+      client: undefined,
     });
 
     setIsModalVisible(false);
@@ -158,6 +161,7 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
       due_date: '',
       partial_due_date: '',
       design_id: company.settings.invoice_design_id,
+      client: undefined,
     });
 
     setIsModalVisible(false);
@@ -185,6 +189,7 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
       due_date: '',
       partial_due_date: '',
       design_id: company.settings.purchase_order_design_id,
+      vendor: undefined,
     });
 
     setIsModalVisible(false);

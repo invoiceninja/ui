@@ -76,7 +76,7 @@
     "mitt": "^3.0.1",
     "monaco-editor": "^0.53.0",
     "papaparse": "^5.5.2",
-    "playwright": "^1.51.0",
+    "playwright": "^1.59.0",
     "pretty-bytes": "^6.1.1",
     "pusher-js": "^8.4.0",
     "randexp": "^0.5.3",
@@ -148,7 +148,7 @@
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@faker-js/faker": "^9.0.0",
-    "@playwright/test": "^1.51.0",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
     "@types/dompurify": "^3.2.0",

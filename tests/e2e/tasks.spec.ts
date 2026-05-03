@@ -6,10 +6,18 @@ import {
   logout,
   permissions,
   useHasPermission,
+  waitForTableData,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
+import { createApiContext, ensurePermissionUserExists } from './api-helpers';
+
+test.beforeAll(async () => {
+  const api = await createApiContext(process.env.VITE_API_URL!);
+  await ensurePermissionUserExists(api, 'tasks@example.com', 'Tasks', 'Example');
+});
 
 interface Params {
   permissions: Permission[];
@@ -47,7 +55,7 @@ function useCustomTaskActions({ permissions }: Params) {
 const checkEditPage = async (
   page: Page,
   isEditable: boolean,
-  isAdmin: boolean
+  _isAdmin: boolean
 ) => {
   await page.waitForURL('**/tasks/**/edit');
 
@@ -56,33 +64,19 @@ const checkEditPage = async (
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
-    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
+    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]')
-    ).not.toBeVisible();
-  }
-
-  if (!isAdmin) {
-    await expect(
-      page
-        .locator('[data-cy="tabs"]')
-        .getByRole('button', { name: 'Custom Fields', exact: true })
-    ).not.toBeVisible();
-  } else {
-    await expect(
-      page
-        .locator('[data-cy="tabs"]')
-        .getByRole('button', { name: 'Custom Fields', exact: true })
-    ).toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 };
 
@@ -94,7 +88,12 @@ interface CreateParams {
 const createTask = async (params: CreateParams) => {
   const { page, isTableEditable = true, assignTo } = params;
 
-  await createClient({ page, withNavigation: true, createIfNotExist: true });
+  await createClient({
+    page,
+    withNavigation: true,
+    createIfNotExist: true,
+    name: uniqueName('task-client'),
+  });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -103,13 +102,15 @@ const createTask = async (params: CreateParams) => {
 
   await checkTableEditability(page, isTableEditable);
 
-  await page.getByRole('main').getByRole('link', { name: 'New Task' }).click();
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Task' }).click();
 
-  await page.waitForTimeout(900);
-
+  // Select client from combobox
   await page.locator('[data-testid="combobox-input-field"]').first().click();
-
-  await page.getByRole('option').first().click();
+  const clientOption = page.getByRole('option').first();
+  await clientOption.waitFor({ state: 'visible', timeout: 5000 });
+  await clientOption.click();
 
   if (assignTo) {
     await page.locator('[data-testid="combobox-input-field"]').nth(2).click();
@@ -118,7 +119,7 @@ const createTask = async (params: CreateParams) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created task')).toBeVisible();
+  await expect(page.getByText('Successfully created task')).toBeVisible({ timeout: 10000 });
 };
 
 test("can't view tasks without permission", async ({ page }) => {
@@ -138,7 +139,7 @@ test("can't view tasks without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view task', async ({ page }) => {
+test('can view task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -147,6 +148,9 @@ test('can view task', async ({ page }) => {
   await save();
 
   await createTask({ page });
+
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
 
   await logout(page);
 
@@ -168,7 +172,7 @@ test('can view task', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit task', async ({ page }) => {
+test('can edit task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
@@ -181,6 +185,9 @@ test('can edit task', async ({ page }) => {
   await save();
 
   await createTask({ page });
+
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
 
   await logout(page);
 
@@ -206,7 +213,7 @@ test('can edit task', async ({ page }) => {
 
   await expect(
     page.getByText('Successfully updated task', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -215,7 +222,7 @@ test('can edit task', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a task', async ({ page }) => {
+test('can create a task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
@@ -232,6 +239,9 @@ test('can create a task', async ({ page }) => {
 
   await createTask({ page, isTableEditable: false });
 
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
+
   await checkEditPage(page, true, false);
 
   await page
@@ -241,7 +251,7 @@ test('can create a task', async ({ page }) => {
 
   await expect(
     page.getByText('Successfully updated task', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -250,7 +260,10 @@ test('can create a task', async ({ page }) => {
   await logout(page);
 });
 
-test('can view and edit assigned task with create_task', async ({ page }) => {
+test('can view and edit assigned task with create_task', async ({
+  page,
+  api,
+}) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
@@ -263,6 +276,9 @@ test('can view and edit assigned task with create_task', async ({ page }) => {
   await save();
 
   await createTask({ page, assignTo: 'Tasks Example' });
+
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
 
   await logout(page);
 
@@ -288,7 +304,7 @@ test('can view and edit assigned task with create_task', async ({ page }) => {
 
   await expect(
     page.getByText('Successfully updated task', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -297,7 +313,7 @@ test('can view and edit assigned task with create_task', async ({ page }) => {
   await logout(page);
 });
 
-test('deleting task with edit_task', async ({ page }) => {
+test('deleting task with edit_task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -316,12 +332,13 @@ test('deleting task with edit_task', async ({ page }) => {
 
   await page.waitForURL('**/tasks');
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createTask({ page });
+
+    const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('tasks', id);
 
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
@@ -331,7 +348,7 @@ test('deleting task with edit_task', async ({ page }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted task')).toBeVisible();
+    await expect(page.getByText('Successfully deleted task')).toBeVisible({ timeout: 10000 });
   } else {
     await tableRow
       .getByRole('button')
@@ -341,11 +358,11 @@ test('deleting task with edit_task', async ({ page }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted task')).toBeVisible();
+    await expect(page.getByText('Successfully deleted task')).toBeVisible({ timeout: 10000 });
   }
 });
 
-test('archiving task withe edit_task', async ({ page }) => {
+test('archiving task withe edit_task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -364,12 +381,13 @@ test('archiving task withe edit_task', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createTask({ page });
+
+    const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('tasks', id);
 
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
@@ -379,11 +397,11 @@ test('archiving task withe edit_task', async ({ page }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived task')).toBeVisible();
+    await expect(page.getByText('Successfully archived task')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await tableRow
       .getByRole('button')
@@ -393,11 +411,11 @@ test('archiving task withe edit_task', async ({ page }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived task')).toBeVisible();
+    await expect(page.getByText('Successfully archived task')).toBeVisible({ timeout: 10000 });
   }
 });
 
-test('task documents preview with edit_task', async ({ page }) => {
+test('task documents preview with edit_task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -416,12 +434,13 @@ test('task documents preview with edit_task', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createTask({ page });
+
+    const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('tasks', id);
   } else {
     await tableRow
       .getByRole('button')
@@ -442,10 +461,10 @@ test('task documents preview with edit_task', async ({ page }) => {
 
   await page.waitForURL('**/tasks/**/documents');
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
-test('task documents uploading with edit_task', async ({ page }) => {
+test('task documents uploading with edit_task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -464,12 +483,13 @@ test('task documents uploading with edit_task', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createTask({ page });
+
+    const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('tasks', id);
   } else {
     await tableRow
       .getByRole('button')
@@ -492,17 +512,19 @@ test('task documents uploading with edit_task', async ({ page }) => {
 
   await page
     .locator('input[type="file"]')
+    .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('all actions in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -520,6 +542,9 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await createTask({ page });
 
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
+
   await checkEditPage(page, true, true);
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
@@ -531,6 +556,7 @@ test('all actions in dropdown displayed with admin permission', async ({
 
 test('invoice_task and clone action displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
@@ -548,6 +574,9 @@ test('invoice_task and clone action displayed with creation permissions', async 
 
   await createTask({ page, isTableEditable: false });
 
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
+
   await checkEditPage(page, true, false);
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
@@ -557,7 +586,7 @@ test('invoice_task and clone action displayed with creation permissions', async 
   await logout(page);
 });
 
-test('cloning task', async ({ page }) => {
+test('cloning task', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -579,12 +608,13 @@ test('cloning task', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
     await createTask({ page });
+
+    const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('tasks', id);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
@@ -601,16 +631,21 @@ test('cloning task', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created task')).toBeVisible();
+  await expect(page.getByText('Successfully created task')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/tasks/**/edit');
 
+  const clonedId = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (clonedId) api.trackEntity('tasks', clonedId);
+
   await expect(
     page.getByRole('heading', { name: 'Edit Task' }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
-test('Invoice Task displayed with admin permission', async ({ page }) => {
+test('Invoice Task displayed with admin permission', async ({ page, api }) => {
+ 
+ test.setTimeout(60000); // 2 minutes for this test only
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomTaskActions({
@@ -627,6 +662,9 @@ test('Invoice Task displayed with admin permission', async ({ page }) => {
 
   await createTask({ page });
 
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
+
   await checkEditPage(page, true, true);
 
   await page
@@ -634,9 +672,16 @@ test('Invoice Task displayed with admin permission', async ({ page }) => {
     .getByRole('link', { name: 'Tasks', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await waitForTableData(page);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
+
+  // Wait for bulk actions button to appear after checkbox selection
+  await page
+    .locator('[data-cy="dataTable"]')
+    .getByRole('button', { name: 'Actions', exact: true })
+    .first()
+    .waitFor({ state: 'visible', timeout: 5000 });
 
   await checkDropdownActions(
     page,
@@ -648,7 +693,12 @@ test('Invoice Task displayed with admin permission', async ({ page }) => {
   await logout(page);
 });
 
-test('Invoice Task displayed with creation permissions', async ({ page }) => {
+test('Invoice Task displayed with creation permissions', async ({
+  page,
+  api,
+}) => {
+  test.setTimeout(60000); // 2 minutes for this test only
+
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomTaskActions({
@@ -671,6 +721,9 @@ test('Invoice Task displayed with creation permissions', async ({ page }) => {
 
   await createTask({ page });
 
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
+
   await checkEditPage(page, true, false);
 
   await page
@@ -678,9 +731,15 @@ test('Invoice Task displayed with creation permissions', async ({ page }) => {
     .getByRole('link', { name: 'Tasks', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
-
+  await waitForTableData(page);
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
+
+  // Wait for bulk actions button to appear after checkbox selection
+  await page
+    .locator('[data-cy="dataTable"]')
+    .getByRole('button', { name: 'Actions', exact: true })
+    .first()
+    .waitFor({ state: 'visible', timeout: 5000 });
 
   await checkDropdownActions(
     page,

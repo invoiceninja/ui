@@ -58,6 +58,7 @@ export function CreateExpenseCategoryForm(props: Props) {
         <InputField
           innerRef={nameFieldRef}
           required
+          changeOverride
           label={t('name')}
           value={expenseCategory?.name}
           onValueChange={(value) => handleChange('name', value)}
@@ -82,6 +83,7 @@ export function CreateExpenseCategoryForm(props: Props) {
       <InputField
         innerRef={nameFieldRef}
         required
+        changeOverride
         label={t('name')}
         value={expenseCategory?.name}
         onValueChange={(value) => handleChange('name', value)}

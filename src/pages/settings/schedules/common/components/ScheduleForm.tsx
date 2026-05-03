@@ -56,6 +56,32 @@ export function ScheduleForm(props: Props) {
     template: schedule.template as Template,
   });
 
+  const getTemplateNameValue = () => {
+    if (page === 'create') {
+      return '';
+    }
+
+    if (schedule.template === Templates.EMAIL_RECORD) {
+      return `${t(schedule.template as string)}: ${t(
+        schedule.parameters.entity
+      )}`;
+    }
+
+    if (schedule.template === Templates.EMAIL_REPORT) {
+      return `${t(schedule.template as string)}: ${t(
+        schedule.parameters.report_name
+      )} | ${t(schedule.parameters.date_range)}`;
+    }
+
+    if (schedule.template) {
+      return `${t(schedule.template as string)}: ${t(
+        schedule.parameters.date_range
+      )}`;
+    }
+
+    return '';
+  };
+
   return (
     <Card
       title={page === 'edit' ? t('edit_schedule') : t('new_schedule')}
@@ -65,6 +91,14 @@ export function ScheduleForm(props: Props) {
       headerStyle={{ borderColor: colors.$20 }}
       withoutBodyPadding
     >
+      <Element leftSide={t('name')}>
+        <InputField
+          value={schedule.name || getTemplateNameValue()}
+          onValueChange={(value) => handleChange('name', value)}
+          errorMessage={errors?.errors.name}
+        />
+      </Element>
+
       {displayTemplateField('template') && (
         <Element leftSide={t('template')} required>
           <SelectField
@@ -78,7 +112,9 @@ export function ScheduleForm(props: Props) {
             <option value="email_statement">{t('email_statement')}</option>
             <option value="email_record">{t('email_record')}</option>
             <option value="email_report">{t('email_report')}</option>
-            <option value="invoice_outstanding_tasks">{t('invoice_outstanding_tasks')}</option>
+            <option value="invoice_outstanding_tasks">
+              {t('invoice_outstanding_tasks')}
+            </option>
             <option value="payment_schedule">{t('payment_schedule')}</option>
           </SelectField>
         </Element>

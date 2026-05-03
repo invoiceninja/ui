@@ -48,6 +48,7 @@ export function useCalculateTaxesRegion() {
     'NO', // Norway - EEA
     'IS', // Iceland - EEA
     'LI', // Liechtenstein - EEA
+    'AD', // Andorra
   ];
 
   const resolveCountry = useResolveCountry();

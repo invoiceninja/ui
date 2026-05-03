@@ -11,7 +11,7 @@
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
 import { useQueryClient } from 'react-query';
-import { Dispatch, ReactNode, SetStateAction, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useOutletContext } from 'react-router-dom';
 import {
@@ -35,6 +35,7 @@ import reactStringReplace from 'react-string-replace';
 import { useColorScheme } from '$app/common/colors';
 import { cloneDeep, get, set } from 'lodash';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useSendCooldown } from '$app/common/hooks/useSendCooldown';
 import { Credit } from '$app/common/interfaces/credit';
 import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
 
@@ -47,6 +48,7 @@ export interface Context {
   setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
   errors: ValidationBag | undefined;
   eInvoiceValidationEntityResponse: ValidationEntityResponse | undefined;
+  triggerValidationQuery: boolean;
   setTriggerValidationQuery: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -67,6 +69,7 @@ export default function EInvoice() {
   const {
     credit,
     eInvoiceValidationEntityResponse,
+    triggerValidationQuery,
     setTriggerValidationQuery,
     setCredit,
     errors,
@@ -89,29 +92,42 @@ export default function EInvoice() {
     enabled:
       credit !== null &&
       location.pathname.includes('e_invoice') &&
-      Boolean(credit?.status_id === InvoiceStatus.Sent && credit?.backup?.guid),
+      Boolean(credit?.status_id === InvoiceStatus.Sent),
     staleTime: Infinity,
   });
 
-  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const { send, isBusy, secondsRemaining } = useSendCooldown({
+    onElapsed: async () => {
+      queryClient.invalidateQueries(['/api/v1/activities/entity']);
+
+      if (!credit?.id) return;
+
+      const response = await request(
+        'GET',
+        endpoint('/api/v1/credits/:id', { id: credit.id })
+      );
+      const fresh = response.data.data as Credit;
+
+      // Patch only server-owned fields so unsaved form edits survive the refetch.
+      setCredit((current) =>
+        current
+          ? { ...current, backup: fresh.backup, status_id: fresh.status_id }
+          : current
+      );
+    },
+  });
 
   const handleSend = () => {
-    if (!isFormBusy) {
-      toast.processing();
-      setIsFormBusy(true);
+    toast.processing();
 
+    send(() =>
       request('POST', endpoint('/api/v1/einvoice/peppol/send'), {
         entity: 'credit',
         entity_id: credit?.id,
+      }).then(() => {
+        toast.success('success');
       })
-        .then(() => {
-          setTimeout(() => {
-            queryClient.invalidateQueries(['/api/v1/credits', credit?.id]);
-          }, 2000);
-          toast.success('success');
-        })
-        .finally(() => setIsFormBusy(false));
-    }
+    );
   };
 
   const getActivityText = (activityTypeId: number) => {
@@ -152,6 +168,7 @@ export default function EInvoice() {
                 $refetch(['entity_validations']);
                 setTriggerValidationQuery(true);
               }}
+              disabled={triggerValidationQuery}
             >
               {t('validate')}
             </Button>
@@ -227,7 +244,7 @@ export default function EInvoice() {
                       className="flex items-center space-x-4 border-l-2 border-green-600 pl-4 py-4"
                     >
                       <div className="whitespace-nowrap font-medium w-24">
-                        { entity === 'invoice' ? t('credit') : t(entity)}:
+                        {entity === 'invoice' ? t('credit') : t(entity)}:
                       </div>
 
                       <div>
@@ -296,10 +313,12 @@ export default function EInvoice() {
                   <Button
                     behavior="button"
                     onClick={handleSend}
-                    disabled={isFormBusy}
+                    disabled={isBusy}
                     disableWithoutIcon
                   >
-                    {t('send')}
+                    {secondsRemaining > 0
+                      ? `${t('send')} (${secondsRemaining}s)`
+                      : t('send')}
                   </Button>
                 </div>
               )}

@@ -85,6 +85,7 @@ function makeLineItem(overrides: Partial<InvoiceItem> = {}): InvoiceItem {
   return {
     quantity: 1,
     cost: 0,
+    net_cost: 0,
     product_key: '',
     notes: '',
     discount: 0,

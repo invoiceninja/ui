@@ -153,7 +153,9 @@ export default function Create() {
     });
 
     return () => {
-      setQuote(undefined);
+      if (searchParams.get('action') !== 'clone') {
+        setQuote(undefined);
+      }
     };
   }, [data]);
 
@@ -167,7 +169,9 @@ export default function Create() {
 
         client.contacts.map((contact) => {
           if (contact.send_email) {
-            const invitation = cloneDeep(blankInvitation) as unknown as Invitation;
+            const invitation = cloneDeep(
+              blankInvitation
+            ) as unknown as Invitation;
 
             invitation.client_contact_id = contact.id;
             invitation.can_sign = contact.can_sign;

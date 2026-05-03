@@ -15,6 +15,8 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { Params } from '$app/common/queries/common/params.interface';
+import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 interface BankAccountParams {
   id: string | undefined;
@@ -72,4 +74,19 @@ export function useBlankBankAccountQuery() {
       ),
     { staleTime: Infinity, enabled: isAdmin || isOwner }
   );
+}
+
+export function useBulkAction() {
+  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/bank_integrations/bulk'), {
+      action,
+      ids: [id],
+    }).then(() => {
+      toast.success(`${action}d_bank_account`);
+
+      $refetch(['bank_integrations']);
+    });
+  };
 }

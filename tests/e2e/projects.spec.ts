@@ -6,8 +6,10 @@ import {
   logout,
   permissions,
   useHasPermission,
+  waitForTableData,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
 
@@ -52,19 +54,19 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
-    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible();
+    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]')
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 };
 
@@ -76,20 +78,20 @@ const checkShowPage = async (page: Page, isEditable: boolean) => {
       .getByRole('definition', { exact: true })
       .filter({ hasText: 'Summary' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   if (!isEditable) {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Edit', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Edit', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 };
 
@@ -102,7 +104,12 @@ interface CreateParams {
 const createProject = async (params: CreateParams) => {
   const { page, isTableEditable = true, assignTo, name } = params;
 
-  await createClient({ page, withNavigation: true, createIfNotExist: true });
+  await createClient({
+    page,
+    withNavigation: true,
+    createIfNotExist: true,
+    name: uniqueName('proj-client'),
+  });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -118,7 +125,7 @@ const createProject = async (params: CreateParams) => {
 
   await page.waitForTimeout(500);
 
-  await page.locator('[data-cy="name"]').fill(name ?? 'test project');
+  await page.locator('[data-cy="name"]').fill(name ?? uniqueName('project'));
 
   await page.locator('[data-testid="combobox-input-field"]').first().click();
 
@@ -131,7 +138,7 @@ const createProject = async (params: CreateParams) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created project')).toBeVisible();
+  await expect(page.getByText('Successfully created project')).toBeVisible({ timeout: 10000 });
 };
 
 test("can't view projects without permission", async ({ page }) => {
@@ -151,15 +158,20 @@ test("can't view projects without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view project', async ({ page }) => {
+test('can view project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const projectName = uniqueName('view-project');
 
   await login(page);
   await clear('projects@example.com');
   await set('view_project', 'view_client');
   await save();
 
-  await createProject({ page, name: 'test viewing project' });
+  await createProject({ page, name: projectName });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await logout(page);
 
@@ -173,7 +185,7 @@ test('can view project', async ({ page }) => {
   await checkTableEditability(page, false);
 
   await page
-    .getByRole('link', { name: 'test viewing project', exact: true })
+    .getByRole('link', { name: projectName, exact: true })
     .first()
     .click();
 
@@ -182,24 +194,29 @@ test('can view project', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit project', async ({ page }) => {
+test('can edit project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
     permissions: ['edit_project', 'view_client'],
   });
 
+  const projectName = uniqueName('edit-project');
+
   await login(page);
   await clear('projects@example.com');
   await set('edit_project', 'view_client');
   await save();
 
-  await createProject({ page, name: 'test editing project' });
+  await createProject({ page, name: projectName });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await logout(page);
 
   await login(page, 'projects@example.com', 'password');
-
+ 
   await page
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Projects', exact: true })
@@ -208,7 +225,7 @@ test('can edit project', async ({ page }) => {
   await checkTableEditability(page, true);
 
   await page
-    .getByRole('link', { name: 'test editing project', exact: true })
+    .getByRole('link', { name: projectName, exact: true })
     .first()
     .click();
 
@@ -225,7 +242,7 @@ test('can edit project', async ({ page }) => {
 
   await expect(
     page.getByText('Successfully updated project', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -234,12 +251,15 @@ test('can edit project', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a project', async ({ page }) => {
+test('can create a project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
     permissions: ['create_project'],
   });
+
+  const projectName = uniqueName('create-project');
+  test.setTimeout(45000); 
 
   await login(page);
   await clear('projects@example.com');
@@ -249,7 +269,10 @@ test('can create a project', async ({ page }) => {
 
   await login(page, 'projects@example.com', 'password');
 
-  await createProject({ page, isTableEditable: false });
+  await createProject({ page, name: projectName, isTableEditable: false });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await checkEditPage(page, true);
 
@@ -260,7 +283,7 @@ test('can create a project', async ({ page }) => {
 
   await expect(
     page.getByText('Successfully updated project', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -271,12 +294,17 @@ test('can create a project', async ({ page }) => {
 
 test('can view and edit assigned project with create_project', async ({
   page,
+  api,
 }) => {
+  test.setTimeout(45000); 
+
   const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
     permissions: ['create_project'],
   });
+
+  const projectName = uniqueName('assigned-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -286,8 +314,11 @@ test('can view and edit assigned project with create_project', async ({
   await createProject({
     page,
     assignTo: 'Projects Example',
-    name: 'test assigned project',
+    name: projectName,
   });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await logout(page);
 
@@ -301,7 +332,7 @@ test('can view and edit assigned project with create_project', async ({
   await checkTableEditability(page, false);
 
   await page
-    .getByRole('link', { name: 'test assigned project', exact: true })
+    .getByRole('link', { name: projectName, exact: true })
     .first()
     .click();
 
@@ -320,7 +351,7 @@ test('can view and edit assigned project with create_project', async ({
 
   await expect(
     page.getByText('Successfully updated project', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -329,8 +360,10 @@ test('can view and edit assigned project with create_project', async ({
   await logout(page);
 });
 
-test('deleting project with edit_project', async ({ page }) => {
+test('deleting project with edit_project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const projectName = uniqueName('delete-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -348,18 +381,19 @@ test('deleting project with edit_project', async ({ page }) => {
 
   await page.waitForURL('**/projects');
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createProject({ page });
+    await createProject({ page, name: projectName });
+
+    const id = page.url().match(/projects\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('projects', id);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
-    await page.getByText('Delete').click();
+    await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
-    await expect(page.getByText('Successfully deleted project')).toBeVisible();
+    await expect(page.getByText('Successfully deleted project')).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -369,12 +403,14 @@ test('deleting project with edit_project', async ({ page }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted project')).toBeVisible();
+    await expect(page.getByText('Successfully deleted project')).toBeVisible({ timeout: 10000 });
   }
 });
 
-test('archiving project withe edit_project', async ({ page }) => {
+test('archiving project with edit_project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const projectName = uniqueName('archive-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -392,12 +428,13 @@ test('archiving project withe edit_project', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createProject({ page });
+    await createProject({ page, name: projectName });
+
+    const id = page.url().match(/projects\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('projects', id);
 
     const moreActionsButton = page
       .locator('[data-cy="chevronDownButton"]')
@@ -405,13 +442,13 @@ test('archiving project withe edit_project', async ({ page }) => {
 
     await moreActionsButton.click();
 
-    await page.getByText('Archive').click();
+    await page.getByRole('button', { name: 'Archive', exact: true }).click();
 
-    await expect(page.getByText('Successfully archived project')).toBeVisible();
+    await expect(page.getByText('Successfully archived project')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -422,12 +459,14 @@ test('archiving project withe edit_project', async ({ page }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived project')).toBeVisible();
+    await expect(page.getByText('Successfully archived project')).toBeVisible({ timeout: 10000 });
   }
 });
 
-test('project documents preview with edit_project', async ({ page }) => {
+test('project documents preview with edit_project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const projectName = uniqueName('docpreview-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -445,12 +484,13 @@ test('project documents preview with edit_project', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createProject({ page });
+    await createProject({ page, name: projectName });
+
+    const id = page.url().match(/projects\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('projects', id);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -470,11 +510,13 @@ test('project documents preview with edit_project', async ({ page }) => {
     })
     .click();
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
-test('project documents uploading with edit_project', async ({ page }) => {
+test('project documents uploading with edit_project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const projectName = uniqueName('docupload-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -492,12 +534,13 @@ test('project documents uploading with edit_project', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createProject({ page });
+    await createProject({ page, name: projectName });
+
+    const id = page.url().match(/projects\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('projects', id);
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -519,23 +562,27 @@ test('project documents uploading with edit_project', async ({ page }) => {
 
   await page
     .locator('input[type="file"]')
+    .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('Invoice project and clone action in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
     permissions: ['admin'],
   });
+
+  const projectName = uniqueName('admin-dropdown-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -545,7 +592,10 @@ test('Invoice project and clone action in dropdown displayed with admin permissi
 
   await login(page, 'projects@example.com', 'password');
 
-  await createProject({ page });
+  await createProject({ page, name: projectName });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await checkEditPage(page, true);
 
@@ -558,12 +608,17 @@ test('Invoice project and clone action in dropdown displayed with admin permissi
 
 test('Invoice project and clone action displayed with creation permissions', async ({
   page,
+  api,
 }) => {
+  test.setTimeout(45000); 
+
   const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
     permissions: ['create_project', 'create_invoice'],
   });
+
+  const projectName = uniqueName('create-dropdown-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -573,7 +628,10 @@ test('Invoice project and clone action displayed with creation permissions', asy
 
   await login(page, 'projects@example.com', 'password');
 
-  await createProject({ page, isTableEditable: false });
+  await createProject({ page, name: projectName, isTableEditable: false });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await checkEditPage(page, true);
 
@@ -584,8 +642,10 @@ test('Invoice project and clone action displayed with creation permissions', asy
   await logout(page);
 });
 
-test('cloning project', async ({ page }) => {
+test('cloning project', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const projectName = uniqueName('clone-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -606,12 +666,13 @@ test('cloning project', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createProject({ page });
+    await createProject({ page, name: projectName });
+
+    const id = page.url().match(/projects\/([^/]+)/)?.[1];
+    if (id) api.trackEntity('projects', id);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
@@ -623,27 +684,35 @@ test('cloning project', async ({ page }) => {
     await moreActionsButton.click();
   }
 
-  await page.getByText('Clone').first().click();
+  await page.getByRole('button', { name: 'Clone', exact: true }).first().click();
 
   await page.waitForURL('**/projects/create?action=clone');
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created project')).toBeVisible();
+  await expect(page.getByText('Successfully created project')).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/projects/**/edit');
 
+  const clonedId = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (clonedId) api.trackEntity('projects', clonedId);
+
   await expect(
     page.getByRole('heading', { name: 'Edit project' }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
-test('Invoice Project displayed with admin permission', async ({ page }) => {
+test('Invoice Project displayed with admin permission', async ({
+  page,
+  api,
+}) => {
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomQuoteActions({
     permissions: ['admin'],
   });
+
+  const projectName = uniqueName('admin-bulk-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -653,7 +722,10 @@ test('Invoice Project displayed with admin permission', async ({ page }) => {
 
   await login(page, 'projects@example.com', 'password');
 
-  await createProject({ page });
+  await createProject({ page, name: projectName });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await checkEditPage(page, true);
 
@@ -662,14 +734,14 @@ test('Invoice Project displayed with admin permission', async ({ page }) => {
     .getByRole('link', { name: 'Projects', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await waitForTableData(page);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
   await checkDropdownActions(
     page,
     customActions,
-    'bulkActionsDropdown',
+    undefined,
     'dataTable'
   );
 
@@ -678,7 +750,10 @@ test('Invoice Project displayed with admin permission', async ({ page }) => {
 
 test('Invoice Project displayed with creation permissions', async ({
   page,
+  api,
 }) => {
+  test.setTimeout(45000); 
+
   const { clear, save, set } = permissions(page);
 
   const customActions = useCustomQuoteActions({
@@ -690,6 +765,8 @@ test('Invoice Project displayed with creation permissions', async ({
       'view_client',
     ],
   });
+
+  const projectName = uniqueName('create-bulk-project');
 
   await login(page);
   await clear('projects@example.com');
@@ -705,7 +782,10 @@ test('Invoice Project displayed with creation permissions', async ({
 
   await login(page, 'projects@example.com', 'password');
 
-  await createProject({ page });
+  await createProject({ page, name: projectName });
+
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await checkEditPage(page, true);
 
@@ -714,14 +794,14 @@ test('Invoice Project displayed with creation permissions', async ({
     .getByRole('link', { name: 'Projects', exact: true })
     .click();
 
-  await page.waitForTimeout(200);
+  await waitForTableData(page);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
   await checkDropdownActions(
     page,
     customActions,
-    'bulkActionsDropdown',
+    undefined,
     'dataTable'
   );
 

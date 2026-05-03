@@ -157,7 +157,7 @@ export function VendorSelector(props: Props) {
               'divide-[#1f2e41]': reactSettings.dark_mode,
             })}
           >
-            {vendor.contacts.map((contact, index) => (
+            {vendor.contacts.filter((contact) => !contact.cc_only).map((contact, index) => (
               <div
                 key={index}
                 className="flex justify-between items-center first:pt-0 pt-2 pb-2"

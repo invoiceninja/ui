@@ -881,7 +881,11 @@ export function useQuoteColumns() {
             {field}
           </DynamicLink>
 
-          <CopyToClipboardIconOnly text={quote.number} />
+          {quote.invitations?.[0]?.link && field && (
+            <Tooltip width="auto" message={t('copy_link') as string} placement="top" withoutArrow>
+              <CopyToClipboardIconOnly text={quote.invitations?.[0]?.link} />
+            </Tooltip>
+          )}
         </div>
       ),
     },
