@@ -194,7 +194,7 @@ export function useClientColumns() {
     },
     {
       column: 'contact_email',
-      id: 'id',
+      id: 'contact_email',
       label: t('contact_email'),
       format: (value, client) =>
         client.contacts.length > 0 && (
