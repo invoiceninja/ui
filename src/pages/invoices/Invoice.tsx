@@ -47,6 +47,8 @@ import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/u
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { useSaveKeyboardShortcut } from '$app/common/hooks/useSaveKeyboardShortcut';
+
 dayjs.extend(utc);
 
 export default function Invoice() {
@@ -143,6 +145,16 @@ export default function Invoice() {
     }
   }, [saveChanges]);
 
+  useSaveKeyboardShortcut({
+    isEnabled: Boolean(
+      invoice &&
+        !isFormBusy &&
+        !invoice.is_locked &&
+        invoice.status_id !== InvoiceStatus.Cancelled
+    ),
+    onSave: () => setSaveChanges(true),
+  });
+
   useEffect(() => {
     if (errors?.errors?.paid_to_date) {
       document
@@ -193,12 +205,8 @@ export default function Invoice() {
               {errors?.errors?.paid_to_date?.[0]}
             </Banner>
 
-            <Banner
-              id="invoiceUpdateBanner"
-              className="hidden"
-              variant="orange"
-            >
-              {t('invoice_status_changed')}
+            <Banner id="invoiceUpdateBanner" className="hidden" variant="blue">
+              {t('invoice_status_paid')}
             </Banner>
           </>
         }
@@ -239,6 +247,7 @@ export default function Invoice() {
                   client,
                   eInvoiceRef,
                   eInvoiceValidationEntityResponse: validationResponse,
+                  triggerValidationQuery,
                   setTriggerValidationQuery,
                 }}
               />

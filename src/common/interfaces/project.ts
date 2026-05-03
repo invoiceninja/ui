@@ -13,11 +13,14 @@ import { Expense } from './expense';
 import { Invoice } from './invoice';
 import { Quote } from './quote';
 import { Task } from './task';
+import { User } from './user';
 
 export interface Project {
   id: string;
   user_id: string;
+  user?: User;
   assigned_user_id: string;
+  assigned_user?: User;
   client_id: string;
   name: string;
   number: string;

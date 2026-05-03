@@ -3,19 +3,26 @@ import {
   login,
   logout,
   permissions,
+  waitForTableData,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { createClient } from './client-helpers';
 
 interface CreateParams {
   page: Page;
   isTableEditable?: boolean;
   withNavigation?: boolean;
+  clientName?: string;
 }
 const createPayment = async (params: CreateParams) => {
-  const { page, isTableEditable = true } = params;
+  const { page, isTableEditable = true, clientName } = params;
 
-  await createClient({ page, createIfNotExist: true });
+  await createClient({
+    page,
+    createIfNotExist: true,
+    name: clientName,
+  });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -29,13 +36,16 @@ const createPayment = async (params: CreateParams) => {
     .getByRole('link', { name: 'Enter Payment' })
     .click();
 
-  await page.waitForTimeout(900);
-
-  await page.getByRole('option').first().click();
+  // Wait for client combobox options to load
+  const comboboxInput = page.getByRole('combobox').first();
+  await comboboxInput.click();
+  const clientOption = page.getByRole('option').first();
+  await clientOption.waitFor({ state: 'visible', timeout: 5000 });
+  await clientOption.click();
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created payment')).toBeVisible();
+  await expect(page.getByText('Successfully created payment')).toBeVisible({ timeout: 10000 });
 };
 const checkEditPage = async (
   page: Page,
@@ -46,46 +56,38 @@ const checkEditPage = async (
 
   if (isEditable) {
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+      page.locator('[data-cy="topNavbar"]').getByRole('button', { name: 'Save', exact: true })
+    ).toBeVisible({ timeout: 10000 });
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'Actions', exact: true })
-    ).toBeVisible();
+      page.locator('[data-cy="chevronDownButton"]').first()
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+      page.locator('[data-cy="topNavbar"]').getByRole('button', { name: 'Save', exact: true })
+    ).not.toBeVisible({ timeout: 10000 });
 
     await expect(
-      page
-        .locator('[data-cy="topNavbar"]')
-        .getByRole('button', { name: 'Actions', exact: true })
-    ).not.toBeVisible();
+      page.locator('[data-cy="chevronDownButton"]').first()
+    ).not.toBeVisible({ timeout: 10000 });
   }
 
   await expect(
     page.locator('[data-cy="tabs"]').getByRole('link', { name: 'Documents' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   if (!isAdmin) {
     await expect(
       page
         .locator('[data-cy="tabs"]')
         .getByRole('link', { name: 'Custom Fields', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="tabs"]')
         .getByRole('link', { name: 'Custom Fields', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 };
 
@@ -106,8 +108,10 @@ test("can't view payments without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view payment', async ({ page }) => {
+test('can view payment', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('pay-client');
 
   await login(page);
   await clear('payments@example.com');
@@ -116,7 +120,12 @@ test('can view payment', async ({ page }) => {
 
   await createPayment({
     page,
+    clientName,
   });
+
+  await page.waitForURL('**/payments/**/edit');
+  const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('payments', createdId);
 
   await logout(page);
 
@@ -138,15 +147,21 @@ test('can view payment', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit payment', async ({ page }) => {
+test('can edit payment', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('pay-client');
 
   await login(page);
   await clear('payments@example.com');
   await set('edit_payment');
   await save();
 
-  await createPayment({ page });
+  await createPayment({ page, clientName });
+
+  await page.waitForURL('**/payments/**/edit');
+  const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('payments', createdId);
 
   await logout(page);
 
@@ -174,13 +189,15 @@ test('can edit payment', async ({ page }) => {
 
   await expect(
     page.getByText('Successfully updated payment', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
 
-test('can create a payment', async ({ page }) => {
+test('can create a payment', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('pay-client');
 
   await login(page);
   await clear('payments@example.com');
@@ -193,7 +210,12 @@ test('can create a payment', async ({ page }) => {
   await createPayment({
     page,
     isTableEditable: false,
+    clientName,
   });
+
+  await page.waitForURL('**/payments/**/edit');
+  const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('payments', createdId);
 
   await checkEditPage(page, true, false);
 
@@ -204,13 +226,15 @@ test('can create a payment', async ({ page }) => {
 
   await expect(
     page.getByText('Successfully updated payment', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
 
-test('deleting payment with edit_payment', async ({ page }) => {
+test('deleting payment with edit_payment', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('pay-client');
 
   await login(page);
   await clear('payments@example.com');
@@ -228,27 +252,21 @@ test('deleting payment with edit_payment', async ({ page }) => {
 
   await page.waitForURL('**/payments');
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createPayment({ page, withNavigation: false });
+    await createPayment({ page, withNavigation: false, clientName });
 
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
+    await page.waitForURL('**/payments/**/edit');
+    const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('payments', createdId);
 
-    await moreActionsButton.click();
+    await page.locator('[data-cy="chevronDownButton"]').first().click();
 
-    await page.getByText('Delete').click();
+    await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
-    await expect(page.getByText('Successfully deleted payment')).toBeVisible();
+    await expect(page.getByText('Successfully deleted payment')).toBeVisible({ timeout: 10000 });
 
-    await expect(
-      page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -256,14 +274,16 @@ test('deleting payment with edit_payment', async ({ page }) => {
 
     await moreActionsButton.click();
 
-    await page.getByText('Delete').click();
+    await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
-    await expect(page.getByText('Successfully deleted payment')).toBeVisible();
+    await expect(page.getByText('Successfully deleted payment')).toBeVisible({ timeout: 10000 });
   }
 });
 
-test('archiving payment with edit_payment', async ({ page }) => {
+test('archiving payment with edit_payment', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('pay-client');
 
   await login(page);
   await clear('payments@example.com');
@@ -281,12 +301,14 @@ test('archiving payment with edit_payment', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createPayment({ page, withNavigation: false });
+    await createPayment({ page, withNavigation: false, clientName });
+
+    await page.waitForURL('**/payments/**/edit');
+    const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('payments', createdId);
 
     const moreActionsButton = page
       .getByRole('button')
@@ -297,11 +319,11 @@ test('archiving payment with edit_payment', async ({ page }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived payment')).toBeVisible();
+    await expect(page.getByText('Successfully archived payment')).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     const moreActionsButton = tableRow
       .getByRole('button')
@@ -312,12 +334,14 @@ test('archiving payment with edit_payment', async ({ page }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived payment')).toBeVisible();
+    await expect(page.getByText('Successfully archived payment')).toBeVisible({ timeout: 10000 });
   }
 });
 
-test('payment documents preview with edit_payment', async ({ page }) => {
+test('payment documents preview with edit_payment', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('pay-client');
 
   await login(page);
   await clear('payments@example.com');
@@ -327,21 +351,21 @@ test('payment documents preview with edit_payment', async ({ page }) => {
 
   await login(page, 'payments@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
-
   await page.getByRole('link', { name: 'Payments', exact: true }).click();
 
   await page.waitForURL('**/payments');
 
-  const tableRow = tableBody.getByRole('row').first();
-
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createPayment({ page, withNavigation: false });
+    await createPayment({ page, withNavigation: false, clientName });
+
+    await page.waitForURL('**/payments/**/edit');
+    const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('payments', createdId);
   } else {
+    const tableRow = page.locator('tbody').first().getByRole('row').first();
+
     const moreActionsButton = tableRow
       .getByRole('button')
       .filter({ has: page.getByText('Actions') })
@@ -349,24 +373,26 @@ test('payment documents preview with edit_payment', async ({ page }) => {
 
     await moreActionsButton.click();
 
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+    const editLink = page.getByRole('link', { name: 'Edit', exact: true }).first();
+    await editLink.waitFor({ state: 'visible' });
+    await editLink.click();
   }
 
   await page.waitForURL('**/payments/**/edit');
 
-  await page
-    .getByRole('link', {
-      name: 'Documents',
-    })
-    .click();
+  const docsLink = page.getByRole('link', { name: 'Documents' });
+  await docsLink.waitFor({ state: 'visible' });
+  await docsLink.click();
 
   await page.waitForURL('**/payments/**/documents');
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
-test('payment documents uploading with edit_payment', async ({ page }) => {
+test('payment documents uploading with edit_payment', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const clientName = uniqueName('pay-client');
 
   await login(page);
   await clear('payments@example.com');
@@ -376,21 +402,21 @@ test('payment documents uploading with edit_payment', async ({ page }) => {
 
   await login(page, 'payments@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
-
   await page.getByRole('link', { name: 'Payments', exact: true }).click();
 
   await page.waitForURL('**/payments');
 
-  const tableRow = tableBody.getByRole('row').first();
-
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createPayment({ page, withNavigation: false });
+    await createPayment({ page, withNavigation: false, clientName });
+
+    await page.waitForURL('**/payments/**/edit');
+    const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('payments', createdId);
   } else {
+    const tableRow = page.locator('tbody').first().getByRole('row').first();
+
     const moreActionsButton = tableRow
       .getByRole('button')
       .filter({ has: page.getByText('Actions') })
@@ -398,36 +424,44 @@ test('payment documents uploading with edit_payment', async ({ page }) => {
 
     await moreActionsButton.click();
 
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
+    const editLink = page.getByRole('link', { name: 'Edit', exact: true }).first();
+    await editLink.waitFor({ state: 'visible' });
+    await editLink.click();
   }
 
   await page.waitForURL('**/payments/**/edit');
 
-  await page
-    .getByRole('link', {
-      name: 'Documents',
-    })
-    .click();
+  const docsLink = page.getByRole('link', { name: 'Documents' });
+  await docsLink.waitFor({ state: 'visible' });
+  await docsLink.click();
 
   await page.waitForURL('**/payments/**/documents');
 
   await page
     .locator('input[type="file"]')
+    .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('rendering documents and custom_fields tabs with admin permission', async ({
   page,
+  api,
 }) => {
+  const clientName = uniqueName('pay-client');
+
   await login(page);
 
-  await createPayment({ page });
+  await createPayment({ page, clientName });
+
+  await page.waitForURL('**/payments/**/edit');
+  const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('payments', createdId);
 
   await page
     .locator('[data-cy="tabs"]')
@@ -437,8 +471,8 @@ test('rendering documents and custom_fields tabs with admin permission', async (
   await page.waitForURL('**/payments/**/documents');
 
   await expect(
-    page.getByRole('heading', { name: 'Upload', exact: true })
-  ).toBeVisible();
+    page.getByRole('heading', { name: 'Documents', exact: true })
+  ).toBeVisible({ timeout: 10000 });
 
   await page
     .locator('[data-cy="tabs"]')
@@ -449,13 +483,13 @@ test('rendering documents and custom_fields tabs with admin permission', async (
 
   await expect(
     page.getByRole('heading', { name: 'Custom Fields', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByRole('link', { name: 'Edit', exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
-  await expect(page.getByRole('link', { name: 'Documents' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Documents' })).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });

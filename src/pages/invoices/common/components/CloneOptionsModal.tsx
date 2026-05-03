@@ -77,6 +77,7 @@ export function CloneOptionsModal(props: Props) {
       vendor_id: '',
       paid_to_date: 0,
       backup: undefined,
+      client: undefined,
     });
 
     navigate('/invoices/create?action=clone');
@@ -100,6 +101,7 @@ export function CloneOptionsModal(props: Props) {
       vendor_id: '',
       paid_to_date: 0,
       design_id: company.settings.quote_design_id,
+      client: undefined,
     });
 
     navigate('/quotes/create?action=clone');
@@ -123,6 +125,7 @@ export function CloneOptionsModal(props: Props) {
       vendor_id: '',
       paid_to_date: 0,
       design_id: company.settings.credit_design_id,
+      client: undefined,
     });
 
     navigate('/credits/create?action=clone');
@@ -146,6 +149,7 @@ export function CloneOptionsModal(props: Props) {
       due_date: '',
       partial_due_date: '',
       design_id: company.settings.invoice_design_id,
+      client: undefined,
     });
 
     navigate('/recurring_invoices/create?action=clone');
@@ -169,6 +173,7 @@ export function CloneOptionsModal(props: Props) {
       due_date: '',
       partial_due_date: '',
       design_id: company.settings.purchase_order_design_id,
+      vendor: undefined,
     });
 
     navigate('/purchase_orders/create?action=clone');

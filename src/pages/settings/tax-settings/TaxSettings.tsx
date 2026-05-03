@@ -38,7 +38,6 @@ import { useColorScheme } from '$app/common/colors';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 import { DefaultLineItemTaxes } from './components/DefaultLineItemTaxes';
 import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
-import { QuickBooksTaxRates } from '../tax-rates/common/components/QuickBooksTaxRates';
 
 export function TaxSettings() {
   const [t] = useTranslation();
@@ -210,12 +209,7 @@ export function TaxSettings() {
         <Selector title="tax_settings" />
       )}
 
-      {companyChanges.quickbooks &&
-      import.meta.env.VITE_DISABLE_QUICKBOOKS_INTEGRATION !== 'true' ? (
-        <QuickBooksTaxRates />
-      ) : (
-        <TaxRates />
-      )}
+      <TaxRates />
 
       <HelpWidget
         id="calculate-taxes"

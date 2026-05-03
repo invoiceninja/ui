@@ -22,6 +22,7 @@ interface InvoiceParams extends Params {
   enabled?: boolean;
   include?: string;
   is_deleted?: string;
+  with?: string;
 }
 
 export function useInvoicesQuery(params: InvoiceParams) {
@@ -31,7 +32,7 @@ export function useInvoicesQuery(params: InvoiceParams) {
       request(
         'GET',
         endpoint(
-          '/api/v1/invoices?client_status=:client_status&filter=:filter&client_id=:client_id&is_deleted=:is_deleted&filter_deleted_clients=:without_deleted_clients&per_page=:per_page&page=:page&include=:include',
+          '/api/v1/invoices?client_status=:client_status&filter=:filter&client_id=:client_id&is_deleted=:is_deleted&filter_deleted_clients=:without_deleted_clients&per_page=:per_page&page=:page&include=:include&with=:with',
           {
             per_page: params.perPage ?? '100',
             page: params.currentPage ?? '1',
@@ -41,6 +42,7 @@ export function useInvoicesQuery(params: InvoiceParams) {
             without_deleted_clients: params.withoutDeletedClients || true,
             include: params.include || '',
             is_deleted: params.is_deleted ?? 'false',
+            with: params.with || '',
           }
         )
       ).then(

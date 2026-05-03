@@ -45,6 +45,7 @@ export interface RecurringInvoiceContext {
   client: Client | undefined;
   invoiceSum: InvoiceSum | InvoiceSumInclusive | undefined;
   eInvoiceValidationEntityResponse: ValidationEntityResponse | undefined;
+  triggerValidationQuery: boolean;
   setTriggerValidationQuery: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -156,7 +157,9 @@ export default function Create() {
     });
 
     return () => {
-      setRecurringInvoice(undefined);
+      if (searchParams.get('action') !== 'clone') {
+        setRecurringInvoice(undefined);
+      }
     };
   }, [data]);
 

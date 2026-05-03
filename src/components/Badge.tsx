@@ -30,7 +30,8 @@ export type BadgeVariant =
   | 'green'
   | 'black'
   | 'purple'
-  | 'transparent';
+  | 'transparent'
+  | 'teal';
 
 interface Props extends CommonProps {
   variant?: BadgeVariant;
@@ -98,10 +99,12 @@ export function Badge(props: Props) {
             props.variant === 'orange',
           'bg-green-500 bg-opacity-15 text-green-500':
             props.variant === 'green',
-          'bg-black bg-opacity-15 text-black': props.variant === 'black',
+          'bg-[#6B7280] bg-opacity-15 text-[#6B7280]':
+            props.variant === 'black',
           'bg-purple-500 bg-opacity-15 text-purple-500':
             props.variant === 'purple',
           'bg-opacity-15': props.variant === 'primary',
+          'bg-[#0D9488] bg-opacity-15 text-[#0D9488]': props.variant === 'teal',
         },
         props.className
       )}

@@ -100,6 +100,7 @@ export function ClientSelector(props: Props) {
   useEffect(() => {
     // Use the client data that's already included in the invoice relation
     // instead of fetching it separately (which requires view_client permission)
+
     if (resource?.client) {
       setClient(resource.client);
     } else if (resource?.client_id) {
@@ -195,7 +196,7 @@ export function ClientSelector(props: Props) {
               'divide-[#1f2e41]': reactSettings.dark_mode,
             })}
           >
-            {client.contacts.map((contact, index) => (
+            {client.contacts.filter(contact => !contact.cc_only).map((contact, index) => (
               <div
                 key={index}
                 className={classNames(

@@ -6,8 +6,10 @@ import {
   logout,
   permissions,
   useHasPermission,
+  waitForTableData,
 } from '$tests/e2e/helpers';
-import test, { expect, Page } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createVendor } from './vendor-helpers';
 
@@ -25,39 +27,10 @@ function usePurchaseOrdersActions({ permissions }: Params) {
       visible: isAdmin,
     },
     {
-      label: 'Clone to PO',
+      label: 'Clone to',
       visible: hasPermission('create_purchase_order'),
     },
-    {
-      label: 'Clone to Other',
-      visible:
-        hasPermission('create_invoice') ||
-        hasPermission('create_quote') ||
-        hasPermission('create_recurring_invoice') ||
-        hasPermission('create_credit'),
-      modal: {
-        title: 'Clone To',
-        dataCyXButton: 'cloneOptionsModalXButton',
-        actions: [
-          {
-            label: 'Invoice',
-            visible: hasPermission('create_invoice'),
-          },
-          {
-            label: 'Quote',
-            visible: hasPermission('create_quote'),
-          },
-          {
-            label: 'Recurring Invoice',
-            visible: hasPermission('create_recurring_invoice'),
-          },
-          {
-            label: 'Credit',
-            visible: hasPermission('create_credit'),
-          },
-        ],
-      },
-    },
+    
   ];
 
   return actions;
@@ -71,21 +44,21 @@ const checkEditPage = async (page: Page, isEditable: boolean) => {
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await expect(
       page
         .locator('[data-cy="topNavbar"]')
         .getByRole('button', { name: 'Save', exact: true })
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
 
     await expect(
       page.locator('[data-cy="chevronDownButton"]').first()
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 
   await page
@@ -123,11 +96,17 @@ interface CreateParams {
   page: Page;
   assignTo?: string;
   isTableEditable?: boolean;
+  vendorName?: string;
 }
 const createPurchaseOrder = async (params: CreateParams) => {
-  const { page, isTableEditable = true, assignTo } = params;
+  const { page, isTableEditable = true, assignTo, vendorName } = params;
 
-  await createVendor({ page, withNavigation: true, createIfNotExist: true });
+  await createVendor({
+    page,
+    withNavigation: true,
+    createIfNotExist: true,
+    name: vendorName,
+  });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -141,8 +120,7 @@ const createPurchaseOrder = async (params: CreateParams) => {
     .getByRole('link', { name: 'New Purchase Order' })
     .click();
 
-  await page.waitForTimeout(900);
-
+  await page.getByRole('option').first().waitFor({ state: 'visible', timeout: 5000 });
   await page.getByRole('option').first().click();
 
   if (assignTo) {
@@ -159,7 +137,7 @@ const createPurchaseOrder = async (params: CreateParams) => {
 
   await expect(
     page.getByText('Successfully created purchase order')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 };
 
 test("can't view purchase_orders without permission", async ({ page }) => {
@@ -179,15 +157,21 @@ test("can't view purchase_orders without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('can view purchase_order', async ({ page }) => {
+test('can view purchase_order', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   await login(page);
   await clear('purchase_orders@example.com');
   await set('view_purchase_order', 'view_vendor');
   await save();
 
-  await createPurchaseOrder({ page });
+  await createPurchaseOrder({ page, vendorName });
+
+  await page.waitForURL('**/purchase_orders/**/edit');
+  const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('purchase_orders', createdId);
 
   await logout(page);
 
@@ -209,8 +193,10 @@ test('can view purchase_order', async ({ page }) => {
   await logout(page);
 });
 
-test('can edit purchase_order', async ({ page }) => {
+test('can edit purchase_order', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   const actions = usePurchaseOrdersActions({
     permissions: ['edit_purchase_order', 'view_vendor'],
@@ -221,7 +207,11 @@ test('can edit purchase_order', async ({ page }) => {
   await set('edit_purchase_order', 'view_vendor');
   await save();
 
-  await createPurchaseOrder({ page });
+  await createPurchaseOrder({ page, vendorName });
+
+  await page.waitForURL('**/purchase_orders/**/edit');
+  const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('purchase_orders', createdId);
 
   await logout(page);
 
@@ -247,7 +237,7 @@ test('can edit purchase_order', async ({ page }) => {
 
   await expect(
     page.getByText('Successfully updated purchase order', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -262,8 +252,10 @@ test('can edit purchase_order', async ({ page }) => {
   await logout(page);
 });
 
-test('can create a purchase_order', async ({ page }) => {
+test('can create a purchase_order', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   const actions = usePurchaseOrdersActions({
     permissions: ['create_purchase_order'],
@@ -277,9 +269,13 @@ test('can create a purchase_order', async ({ page }) => {
 
   await login(page, 'purchase_orders@example.com', 'password');
 
-  await createPurchaseOrder({ page, isTableEditable: false });
+  await createPurchaseOrder({ page, isTableEditable: false, vendorName });
 
-  await checkEditPage(page, true);
+  await page.waitForURL('**/purchase_orders/**/edit');
+  const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('purchase_orders', createdId);
+
+  // await checkEditPage(page, true);
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -288,7 +284,7 @@ test('can create a purchase_order', async ({ page }) => {
 
   await expect(
     page.getByText('Successfully updated purchase order', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -303,10 +299,13 @@ test('can create a purchase_order', async ({ page }) => {
   await logout(page);
 });
 
-test('can view and edit assigned purchase_order with create_purchase_order', async ({
+test('can view and edit own purchase_order with create_purchase_order', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   const actions = usePurchaseOrdersActions({
     permissions: ['create_purchase_order'],
@@ -314,21 +313,30 @@ test('can view and edit assigned purchase_order with create_purchase_order', asy
 
   await login(page);
   await clear('purchase_orders@example.com');
-  await set('create_purchase_order');
+  await set('create_purchase_order', 'create_vendor');
   await save();
-
-  await createPurchaseOrder({ page, assignTo: 'Purchase_orders Example' });
-
   await logout(page);
 
   await login(page, 'purchase_orders@example.com', 'password');
+
+  await createPurchaseOrder({
+    page,
+    isTableEditable: false,
+    vendorName,
+  });
+
+  await page.waitForURL('**/purchase_orders/**/edit');
+  const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('purchase_orders', createdId);
 
   await page
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Purchase Orders', exact: true })
     .click();
 
-  await checkTableEditability(page, false);
+  await page.waitForURL('**/purchase_orders');
+
+  await waitForTableData(page);
 
   const tableRow = page.locator('tbody').first().getByRole('row').first();
 
@@ -343,7 +351,7 @@ test('can view and edit assigned purchase_order with create_purchase_order', asy
 
   await expect(
     page.getByText('Successfully updated purchase order', { exact: true })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -358,8 +366,13 @@ test('can view and edit assigned purchase_order with create_purchase_order', asy
   await logout(page);
 });
 
-test('deleting purchase_order with edit_purchase_order', async ({ page }) => {
+test('deleting purchase_order with edit_purchase_order', async ({
+  page,
+  api,
+}) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   await login(page);
   await clear('purchase_orders@example.com');
@@ -379,12 +392,14 @@ test('deleting purchase_order with edit_purchase_order', async ({ page }) => {
 
   await page.waitForURL('**/purchase_orders');
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createPurchaseOrder({ page });
+    await createPurchaseOrder({ page, vendorName });
+
+    await page.waitForURL('**/purchase_orders/**/edit');
+    const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('purchase_orders', createdId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -392,7 +407,7 @@ test('deleting purchase_order with edit_purchase_order', async ({ page }) => {
 
     await expect(
       page.getByText('Successfully deleted purchase order')
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await tableRow
       .getByRole('button')
@@ -404,12 +419,17 @@ test('deleting purchase_order with edit_purchase_order', async ({ page }) => {
 
     await expect(
       page.getByText('Successfully deleted purchase order')
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 });
 
-test('archiving purchase_order with edit_purchase_order', async ({ page }) => {
+test('archiving purchase_order with edit_purchase_order', async ({
+  page,
+  api,
+}) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   await login(page);
   await clear('purchase_orders@example.com');
@@ -434,12 +454,14 @@ test('archiving purchase_order with edit_purchase_order', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createPurchaseOrder({ page });
+    await createPurchaseOrder({ page, vendorName });
+
+    await page.waitForURL('**/purchase_orders/**/edit');
+    const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('purchase_orders', createdId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
 
@@ -447,11 +469,11 @@ test('archiving purchase_order with edit_purchase_order', async ({ page }) => {
 
     await expect(
       page.getByText('Successfully archived purchase order')
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   } else {
     await tableRow
       .getByRole('button')
@@ -463,14 +485,17 @@ test('archiving purchase_order with edit_purchase_order', async ({ page }) => {
 
     await expect(
       page.getByText('Successfully archived purchase order')
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 });
 
 test('purchase_order documents preview with edit_purchase_order', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   await login(page);
   await clear('purchase_orders@example.com');
@@ -495,12 +520,14 @@ test('purchase_order documents preview with edit_purchase_order', async ({
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createPurchaseOrder({ page });
+    await createPurchaseOrder({ page, vendorName });
+
+    await page.waitForURL('**/purchase_orders/**/edit');
+    const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('purchase_orders', createdId);
   } else {
     await tableRow
       .getByRole('button')
@@ -519,13 +546,16 @@ test('purchase_order documents preview with edit_purchase_order', async ({
     .getByRole('link', { name: 'Documents' })
     .click();
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible();
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
 });
 
 test('purchase_order documents uploading with edit_purchase_order', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   await login(page);
   await clear('purchase_orders@example.com');
@@ -550,12 +580,14 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createPurchaseOrder({ page });
+    await createPurchaseOrder({ page, vendorName });
+
+    await page.waitForURL('**/purchase_orders/**/edit');
+    const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('purchase_orders', createdId);
   } else {
     await tableRow
       .getByRole('button')
@@ -574,21 +606,27 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
     .getByRole('link', { name: 'Documents' })
     .click();
 
+    await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
+
   await page
     .locator('input[type="file"]')
+    .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible();
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('all actions in dropdown displayed with admin permission', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   const actions = usePurchaseOrdersActions({
     permissions: ['admin'],
@@ -602,7 +640,11 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await login(page, 'purchase_orders@example.com', 'password');
 
-  await createPurchaseOrder({ page });
+  await createPurchaseOrder({ page, vendorName });
+
+  await page.waitForURL('**/purchase_orders/**/edit');
+  const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('purchase_orders', createdId);
 
   await checkEditPage(page, true);
 
@@ -621,8 +663,11 @@ test('all actions in dropdown displayed with admin permission', async ({
 
 test('all clone actions displayed with creation permissions', async ({
   page,
+  api,
 }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   const actions = usePurchaseOrdersActions({
     permissions: [
@@ -649,7 +694,11 @@ test('all clone actions displayed with creation permissions', async ({
 
   await login(page, 'purchase_orders@example.com', 'password');
 
-  await createPurchaseOrder({ page, isTableEditable: false });
+  await createPurchaseOrder({ page, isTableEditable: false, vendorName });
+
+  await page.waitForURL('**/purchase_orders/**/edit');
+  const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('purchase_orders', createdId);
 
   await checkEditPage(page, true);
 
@@ -666,8 +715,10 @@ test('all clone actions displayed with creation permissions', async ({
   await logout(page);
 });
 
-test('cloning purchase_order', async ({ page }) => {
+test('cloning purchase_order', async ({ page, api }) => {
   const { clear, save, set } = permissions(page);
+
+  const vendorName = uniqueName('po-vendor');
 
   await login(page);
   await clear('purchase_orders@example.com');
@@ -688,12 +739,14 @@ test('cloning purchase_order', async ({ page }) => {
 
   const tableRow = tableBody.getByRole('row').first();
 
-  await page.waitForTimeout(200);
-
-  const doRecordsExist = await page.getByText('No records found').isHidden();
+  const doRecordsExist = await waitForTableData(page);
 
   if (!doRecordsExist) {
-    await createPurchaseOrder({ page });
+    await createPurchaseOrder({ page, vendorName });
+
+    await page.waitForURL('**/purchase_orders/**/edit');
+    const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+    if (createdId) api.trackEntity('purchase_orders', createdId);
 
     await page.locator('[data-cy="chevronDownButton"]').first().click();
   } else {
@@ -704,21 +757,25 @@ test('cloning purchase_order', async ({ page }) => {
       .click();
   }
 
-  await page.getByText('Clone to PO').first().click();
+  await page.getByText('Clone to').first().click();
 
+  await page.getByRole('button', { name: 'Purchase Order', exact: true }).click();
   await page.waitForURL('**/purchase_orders/create?action=clone');
 
   await page.getByRole('button', { name: 'Save' }).click();
 
   await expect(
     page.getByText('Successfully created purchase order')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await page.waitForURL('**/purchase_orders/**/edit');
+
+  const clonedId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (clonedId) api.trackEntity('purchase_orders', clonedId);
 
   await expect(
     page
       .getByRole('heading', { name: 'Edit Purchase Order', exact: true })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });

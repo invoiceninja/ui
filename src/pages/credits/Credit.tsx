@@ -190,6 +190,7 @@ export default function Credit() {
               client,
               invoiceSum,
               eInvoiceValidationEntityResponse: validationResponse,
+              triggerValidationQuery,
               setTriggerValidationQuery,
             }}
           />
