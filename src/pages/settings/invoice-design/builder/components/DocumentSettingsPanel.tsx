@@ -206,13 +206,13 @@ export function DocumentSettingsPanel({
         />
 
         <CheckboxInput
-          label={t('embed_documents') || 'Embed Images / Documents'}
+          label={t('invoice_embed_documents') || 'Embed Images / Documents'}
           checked={settings.embedDocuments}
           onChange={(v) => update('embedDocuments', v)}
         />
 
         <CheckboxInput
-          label={t('hide_empty_columns') || 'Hide Empty Columns'}
+          label={t('hide_if_empty') || 'Hide Empty Columns'}
           checked={settings.hideEmptyColumns}
           onChange={(v) => update('hideEmptyColumns', v)}
         />

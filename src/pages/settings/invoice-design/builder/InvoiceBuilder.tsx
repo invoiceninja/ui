@@ -970,7 +970,7 @@ export function InvoiceBuilder() {
             className="flex items-center gap-2"
           >
             <SettingsIcon className="w-4 h-4" />
-            {t('page_settings')}
+            {t('settings')}
           </Button>
           <Button
             type="secondary"
@@ -1278,7 +1278,7 @@ export function InvoiceBuilder() {
             return;
           }
         }}
-        title={String(t('enter_design_name'))}
+        title={String(t('name'))}
         size="small"
       >
         <div className="space-y-4">

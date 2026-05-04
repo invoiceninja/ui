@@ -353,7 +353,7 @@ export function useBlockLibrary(): BlockDefinition[] {
           },
           {
             id: 'cost',
-            header: t('rate'),
+            header: t('unit_cost'),
             field: 'item.cost',
             width: '15%',
             align: 'right',
