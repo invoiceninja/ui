@@ -27,10 +27,10 @@ interface UseActionsParams {
   onSettingsClick: (blueprint: Blueprint) => void;
 }
 
-export function useActions(params: UseActionsParams) {
+export function useActions(params?: UseActionsParams) {
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const { onSettingsClick } = params;
+  const { onSettingsClick } = params || {};
 
   const extractSignatoryInfo = (blueprint: Blueprint) => {
     if (!blueprint.document?.files) {
@@ -44,17 +44,23 @@ export function useActions(params: UseActionsParams) {
     const signatoryOrder: string[] = [];
 
     blueprint.document.files.forEach((file) => {
-      if (file.metadata?.rectangles && Array.isArray(file.metadata.rectangles)) {
+      if (
+        file.metadata?.rectangles &&
+        Array.isArray(file.metadata.rectangles)
+      ) {
         file.metadata.rectangles.forEach((rectangle: any) => {
-          if (rectangle.signatory_id && rectangle.signatory_id.startsWith('blueprint|')) {
+          if (
+            rectangle.signatory_id &&
+            rectangle.signatory_id.startsWith('blueprint|')
+          ) {
             const signatoryId = rectangle.signatory_id;
-            
+
             // Only add to signatoryOrder if we haven't seen this ID before
             if (!signatoryIds.has(signatoryId)) {
               signatoryIds.add(signatoryId);
               signatoryOrder.push(signatoryId);
             }
-            
+
             // Store or update the color for this signatory
             signatoryInfo[signatoryId] = {
               id: signatoryId,
@@ -78,9 +84,12 @@ export function useActions(params: UseActionsParams) {
 
     if (signatoryIds.length > 0) {
       // Navigate to signatory mapping page
-      navigate(route('/docuninja/templates/:id/map-signatories', { id: blueprint.id }), {
-        state: { blueprint, signatoryIds, signatoryInfo },
-      });
+      navigate(
+        route('/docuninja/templates/:id/map-signatories', { id: blueprint.id }),
+        {
+          state: { blueprint, signatoryIds, signatoryInfo },
+        }
+      );
     } else {
       // No signatories to map, proceed directly
       request(
@@ -89,7 +98,9 @@ export function useActions(params: UseActionsParams) {
         { action: 'make_document' },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+            Authorization: `Bearer ${localStorage.getItem(
+              'X-DOCU-NINJA-TOKEN'
+            )}`,
           },
         }
       ).then((response: AxiosResponse<GenericSingleResponse<Document>>) =>
@@ -97,47 +108,46 @@ export function useActions(params: UseActionsParams) {
       );
     }
   };
-  
+
   const handleUseTemplateNoMapping = (blueprint: Blueprint) => {
     toast.processing();
 
-      request(
-        'POST',
-        docuNinjaEndpoint(`/api/blueprints/${blueprint.id}/action`),
-        { action: 'make_document' },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
-          },
-        }
-      ).then((response: AxiosResponse<GenericSingleResponse<Document>>) =>
-        navigate(route('/docuninja/:id/builder', { id: response.data.data.id }))
-      );
-
+    request(
+      'POST',
+      docuNinjaEndpoint(`/api/blueprints/${blueprint.id}/action`),
+      { action: 'make_document' },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+        },
+      }
+    ).then((response: AxiosResponse<GenericSingleResponse<Document>>) =>
+      navigate(route('/docuninja/:id/builder', { id: response.data.data.id }))
+    );
   };
 
   const actions: Action<Blueprint>[] = [
-    (blueprint: Blueprint) => (
+    (blueprint: Blueprint) =>
       Boolean(blueprint.is_template && !blueprint.is_deleted) && (
-      <DropdownElement
-        onClick={() => handleUseTemplate(blueprint)}
-        icon={<Icon element={MdCreate} />}
-      >
-        {t('use_template')}
-      </DropdownElement>
-    )),
-    (blueprint: Blueprint) => (
+        <DropdownElement
+          onClick={() => handleUseTemplate(blueprint)}
+          icon={<Icon element={MdCreate} />}
+        >
+          {t('use_template')}
+        </DropdownElement>
+      ),
+    (blueprint: Blueprint) =>
       Boolean(!blueprint.is_template && !blueprint.is_deleted) && (
-      <DropdownElement
-        onClick={() => handleUseTemplateNoMapping(blueprint)}
-        icon={<Icon element={MdCreate} />}
-      >
-        {t('use_template')}
-      </DropdownElement>
-    )),
+        <DropdownElement
+          onClick={() => handleUseTemplateNoMapping(blueprint)}
+          icon={<Icon element={MdCreate} />}
+        >
+          {t('use_template')}
+        </DropdownElement>
+      ),
     (blueprint: Blueprint) => (
       <DropdownElement
-        onClick={() => onSettingsClick(blueprint)}
+        onClick={() => onSettingsClick?.(blueprint)}
         icon={<Icon element={MdSettings} />}
       >
         {t('options')}

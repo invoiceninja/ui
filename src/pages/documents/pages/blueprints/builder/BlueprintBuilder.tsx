@@ -14,6 +14,7 @@ import { Card } from '$app/components/cards';
 import { Button, InputField, SelectField } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
+import { ResourceActions } from '$app/components/ResourceActions';
 import { TabGroup } from '$app/components/TabGroup';
 import {
   Alertbox,
@@ -57,6 +58,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useMediaQuery } from 'react-responsive';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useActions } from '../common/hooks/useActions';
 
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
@@ -273,6 +275,8 @@ function BlueprintBuilder() {
 
   const [blueprint, setBlueprint] = useState<Blueprint>();
 
+  const actions = useActions();
+
   useEffect(() => {
     if (blueprintResponse) {
       setBlueprint(blueprintResponse.data.data);
@@ -375,14 +379,12 @@ function BlueprintBuilder() {
             </Button>
           )}
 
-          <Button
-            behavior="button"
-            onClick={handleSave}
-            disabled={isDocumentSaving}
-            disableWithoutIcon
-          >
-            {t('save')}
-          </Button>
+          <ResourceActions
+            resource={blueprint}
+            actions={actions}
+            onSaveClick={handleSave}
+            disableSaveButton={isDocumentSaving}
+          />
         </div>
       }
     >
