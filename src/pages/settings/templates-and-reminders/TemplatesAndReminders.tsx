@@ -23,7 +23,7 @@ import { useStaticsQuery } from '$app/common/queries/statics';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Settings } from '$app/components/layouts/Settings';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   isCompanySettingsFormBusy,
@@ -50,6 +50,144 @@ import { useAtomValue } from 'jotai';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
+const MAIN_TABS = [
+  { value: 'invoice', labelKey: 'invoice' },
+  { value: 'quote', labelKey: 'quote' },
+  { value: 'credit', labelKey: 'credit' },
+  { value: 'purchase_order', labelKey: 'purchase_order' },
+  { value: 'payment', labelKey: 'payment', hasSubmenu: true },
+  { value: 'reminder', labelKey: 'reminders', hasSubmenu: true },
+  { value: 'custom', labelKey: 'custom', hasSubmenu: true },
+];
+
+const SUBMENU_ITEMS: Record<string, { value: string; labelKey: string }[]> = {
+  payment: [
+    { value: 'payment', labelKey: 'payment' },
+    { value: 'partial_payment', labelKey: 'partial_payment' },
+    { value: 'payment_failed', labelKey: 'payment_failed' },
+  ],
+  reminder: [
+    { value: 'reminder1', labelKey: 'first_reminder' },
+    { value: 'reminder2', labelKey: 'second_reminder' },
+    { value: 'reminder3', labelKey: 'third_reminder' },
+    { value: 'reminder_endless', labelKey: 'endless_reminder' },
+    { value: 'quote_reminder1', labelKey: 'quote_reminder1' },
+  ],
+  custom: [
+    { value: 'custom1', labelKey: 'first_custom' },
+    { value: 'custom2', labelKey: 'second_custom' },
+    { value: 'custom3', labelKey: 'third_custom' },
+  ],
+};
+
+const getActiveCategory = (templateId: string): string => {
+  for (const [category, items] of Object.entries(SUBMENU_ITEMS)) {
+    if (items.some((item) => item.value === templateId)) {
+      return category;
+    }
+  }
+
+  return templateId;
+};
+
+interface TemplateSelectorProps {
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+  rightSide?: ReactNode;
+}
+
+function TemplateSelector({
+  value,
+  onChange,
+  disabled = false,
+  rightSide,
+}: TemplateSelectorProps) {
+  const [t] = useTranslation();
+  const colors = useColorScheme();
+
+  const activeCategory = useMemo(() => getActiveCategory(value), [value]);
+
+  const submenuItems = useMemo(
+    () => SUBMENU_ITEMS[activeCategory],
+    [activeCategory]
+  );
+
+  const handleCategoryClick = (tab: (typeof MAIN_TABS)[number]) => {
+    if (tab.hasSubmenu) {
+      const items = SUBMENU_ITEMS[tab.value];
+
+      if (items && !items.some((item) => item.value === value)) {
+        onChange(items[0].value);
+      }
+    } else {
+      onChange(tab.value);
+    }
+  };
+
+  const disabledStyle = {
+    opacity: disabled ? 0.4 : 1,
+    pointerEvents: (disabled
+      ? 'none'
+      : 'auto') as React.CSSProperties['pointerEvents'],
+  };
+
+  return (
+    <div className="flex flex-col mb-3">
+      <div className="flex overflow-x-auto">
+        <div className="flex" style={disabledStyle}>
+          {MAIN_TABS.map((tab) => (
+            <button
+              key={tab.value}
+              type="button"
+              className="whitespace-nowrap font-medium text-sm py-3 px-4 transition-colors duration-150"
+              onClick={() => handleCategoryClick(tab)}
+              style={{
+                color: activeCategory === tab.value ? colors.$3 : colors.$17,
+                borderBottom:
+                  activeCategory === tab.value
+                    ? `1.5px solid ${colors.$3}`
+                    : `1.5px solid ${colors.$20}`,
+              }}
+            >
+              {t(tab.labelKey)}
+            </button>
+          ))}
+        </div>
+
+        <div
+          className="flex-1 flex items-center justify-end px-2"
+          style={{ borderBottom: `1.5px solid ${colors.$20}` }}
+        >
+          {rightSide}
+        </div>
+      </div>
+
+      {submenuItems && (
+        <div className="flex flex-wrap gap-1.5 pt-3" style={disabledStyle}>
+          {submenuItems.map((item) => (
+            <button
+              key={item.value}
+              type="button"
+              className="px-3 py-1 rounded-md text-xs cursor-pointer select-none border transition-colors duration-150"
+              onClick={() => onChange(item.value)}
+              style={{
+                backgroundColor:
+                  value === item.value ? colors.$25 : 'transparent',
+                color: value === item.value ? colors.$3 : colors.$17,
+                borderColor: value === item.value ? colors.$3 : colors.$24,
+                fontWeight: value === item.value ? 500 : 400,
+              }}
+            >
+              {t(item.labelKey)}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function TemplatesAndReminders() {
   useTitle('templates_and_reminders');
 
@@ -74,13 +212,16 @@ export function TemplatesAndReminders() {
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const { data: statics } = useStaticsQuery();
+
   const [templateId, setTemplateId] = useState(
     isCompanySettingsActive || company?.settings.email_template_invoice
       ? 'invoice'
       : ''
   );
+
   const [templateBody, setTemplateBody] = useState<TemplateBody>();
   const [preview, setPreview] = useState<EmailTemplate>();
+
   const canChangeEmailTemplate = (isHosted() && !freePlan()) || isSelfHosted();
 
   const [isInitial, setIsInitial] = useState<boolean>(true);
@@ -102,6 +243,7 @@ export function TemplatesAndReminders() {
       ? 'email_quote_subject_reminder1'
       : `email_subject_${getTemplateKey(templateId) || 'invoice'}`
   ) as keyof CompanySettings;
+
   const emailTemplateKey = (
     templateId === 'quote_reminder1'
       ? 'email_quote_template_reminder1'
@@ -354,49 +496,35 @@ export function TemplatesAndReminders() {
       <AdvancedSettingsPlanAlert />
 
       <Card
-        title={t('templates_and_reminders')}
         className="shadow-sm"
         style={{ borderColor: colors.$24 }}
         headerStyle={{ borderColor: colors.$20 }}
       >
-        <Element
-          leftSide={
-            <PropertyCheckbox
-              checked={Boolean(
-                typeof company?.settings[emailTemplateKey] !== 'undefined'
-              )}
-              propertyKey={emailTemplateKey}
-              labelElement={<SettingsLabel label={t('template')} />}
-              defaultValue={templateId || 'invoice'}
-              onCheckboxChange={(value) => handleChangingCheckbox(value)}
-            />
-          }
-        >
-          <SelectField
+        <div className="px-4 sm:px-6 pb-1">
+          <TemplateSelector
             value={templateId}
-            onValueChange={(value) => {
+            disabled={
+              !isCompanySettingsActive && disableSettingsField(emailTemplateKey)
+            }
+            onChange={(value) => {
               setTemplateId(value);
               !isCompanySettingsActive && setTemplateBody(undefined);
             }}
-            cypressRef="templateSelector"
-            customSelector
-            dismissable={false}
-          >
-            {statics &&
-              Object.keys(statics.templates).map((template, index) => (
-                <option value={template} key={index}>
-                  {t(template)}
-                </option>
-              ))}
-
-            <option value="credit">{t('credit')}</option>
-            <option value="purchase_order">{t('purchase_order')}</option>
-
-            <option value="custom1">{t('first_custom')}</option>
-            <option value="custom2">{t('second_custom')}</option>
-            <option value="custom3">{t('third_custom')}</option>
-          </SelectField>
-        </Element>
+            rightSide={
+              !isCompanySettingsActive ? (
+                <PropertyCheckbox
+                  checked={Boolean(
+                    typeof company?.settings[emailTemplateKey] !== 'undefined'
+                  )}
+                  propertyKey={emailTemplateKey}
+                  labelElement={<SettingsLabel label={t('enabled')} />}
+                  defaultValue={templateId || 'invoice'}
+                  onCheckboxChange={(value) => handleChangingCheckbox(value)}
+                />
+              ) : undefined
+            }
+          />
+        </div>
 
         <Element
           leftSide={t('subject')}
@@ -437,6 +565,7 @@ export function TemplatesAndReminders() {
                 </strong>{' '}
                 {t('plan')}.
               </span>
+
               <Button
                 behavior="button"
                 className="mt-2"
@@ -493,6 +622,7 @@ export function TemplatesAndReminders() {
                     <option value="disabled" defaultChecked>
                       {t('disabled')}
                     </option>
+
                     <option
                       value={
                         templateId === 'quote_reminder1'
@@ -504,6 +634,7 @@ export function TemplatesAndReminders() {
                         ? t('after_quote_date')
                         : t('after_invoice_date')}
                     </option>
+
                     <option
                       value={
                         templateId === 'quote_reminder1'
@@ -515,6 +646,7 @@ export function TemplatesAndReminders() {
                         ? t('before_valid_until_date')
                         : t('before_due_date')}
                     </option>
+
                     <option
                       value={
                         templateId === 'quote_reminder1'
