@@ -45,7 +45,6 @@ import { PropertyPanel } from './components/PropertyPanel';
 import { DocumentSettingsPanel } from './components/DocumentSettingsPanel';
 import { BlockRenderer } from './components/BlockRenderer';
 import { PreviewModal } from './components/PreviewModal';
-import { PageBreakGuides } from './components/PageBreakGuides';
 import { useBlockLabel } from './block-library';
 import { getContentConstrainedGridSize } from './utils/block-sizing';
 import { generateInvoiceHTML } from './utils/html-generator';
@@ -1077,11 +1076,7 @@ export function InvoiceBuilder() {
               }
             }}
           >
-            <PageBreakGuides
-              blocks={state.blocks}
-              pageSize={designSettings?.page_size}
-            />
-
+           
             <GridLayout
               className="layout"
               layout={layout}
