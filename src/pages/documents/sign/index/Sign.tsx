@@ -47,6 +47,8 @@ export default function Index() {
   const params = useParams();
   const colors = useColorScheme();
 
+  const [t] = useTranslation();
+
   return (
     <div className="max-w-[90rem] mx-auto">
       {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
@@ -87,6 +89,9 @@ export default function Index() {
               foregroundColor: colors.$4,
             }
           },
+          translations: {
+            sign_the_document: String(t('sign_the_document')),
+          }
         }}
       >
         <Sign />
