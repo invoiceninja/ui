@@ -56,7 +56,7 @@ const MAIN_TABS = [
   { value: 'credit', labelKey: 'credit' },
   { value: 'purchase_order', labelKey: 'purchase_order' },
   { value: 'payment', labelKey: 'payment', hasSubmenu: true },
-  { value: 'reminder', labelKey: 'reminder', hasSubmenu: true },
+  { value: 'reminder', labelKey: 'reminders', hasSubmenu: true },
   { value: 'custom', labelKey: 'custom', hasSubmenu: true },
 ];
 
@@ -71,7 +71,7 @@ const SUBMENU_ITEMS: Record<string, { value: string; labelKey: string }[]> = {
     { value: 'reminder2', labelKey: 'second_reminder' },
     { value: 'reminder3', labelKey: 'third_reminder' },
     { value: 'reminder_endless', labelKey: 'endless_reminder' },
-    { value: 'quote_reminder1', labelKey: 'first_quote_reminder' },
+    { value: 'quote_reminder1', labelKey: 'quote_reminder1' },
   ],
   custom: [
     { value: 'custom1', labelKey: 'first_custom' },
