@@ -21,6 +21,30 @@ import {
   RangeSliderInput,
 } from './PropertyInputs';
 import { useColorScheme } from '$app/common/colors';
+import type { TableRegionBordersHint } from '../../types';
+import {
+  coerceBorderWidthPx,
+  DEFAULT_TABLE_REGION_BORDER_PROPS,
+  TABLE_BORDER_WIDTH_MAX,
+  TABLE_BORDER_WIDTH_MIN,
+} from '../../utils/table-cell-borders';
+
+function mergeTableRegion(raw?: TableRegionBordersHint) {
+  const d = DEFAULT_TABLE_REGION_BORDER_PROPS;
+  return {
+    color: raw?.color ?? (d.color as string),
+    width:
+      raw?.width !== undefined
+        ? coerceBorderWidthPx(raw.width)
+        : coerceBorderWidthPx(d.width),
+    sides: {
+      top: raw?.sides?.top !== false,
+      right: raw?.sides?.right !== false,
+      bottom: raw?.sides?.bottom !== false,
+      left: raw?.sides?.left !== false,
+    },
+  };
+}
 
 // Available columns that can be added to the table
 // Maps field to canonical ID for consistent matching
@@ -117,6 +141,27 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
     onChange({
       ...block,
       properties: { ...block.properties, [key]: value },
+    });
+  };
+
+  const patchTableRegion = (
+    which: 'headerBorders' | 'rowBorders',
+    patch: Partial<{
+      color: string;
+      width: number;
+      sides: Partial<{
+        top: boolean;
+        right: boolean;
+        bottom: boolean;
+        left: boolean;
+      }>;
+    }>
+  ) => {
+    const cur = mergeTableRegion(block.properties[which]);
+    updateProperty(which, {
+      ...cur,
+      ...patch,
+      sides: { ...cur.sides, ...(patch.sides ?? {}) },
     });
   };
 
@@ -476,21 +521,108 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       <SectionDivider label={String(t('borders'))} />
 
-      {/* Show Borders */}
       <CheckboxInput
         id="showBorders"
         label={String(t('show_borders'))}
-        checked={block.properties.showBorders}
+        checked={Boolean(block.properties.showBorders)}
         onChange={(value) => updateProperty('showBorders', value)}
       />
 
       {block.properties.showBorders && (
-        <ColorInput
-          label={String(t('color'))}
-          value={block.properties.borderColor}
-          onChange={(value) => updateProperty('borderColor', value)}
-          defaultValue="#E5E7EB"
-        />
+        <div className="space-y-4">
+          {(
+            ['headerBorders', 'rowBorders'] as const
+          ).map((regionKey, idx) => {
+            const label =
+              regionKey === 'headerBorders'
+                ? String(t('table_border_header'))
+                : String(t('table_border_rows'));
+
+            const region = mergeTableRegion(block.properties[regionKey]);
+
+            return (
+              <div key={regionKey} className="space-y-3">
+                {idx === 1 && (
+                  <div
+                    className="border-t pt-4"
+                    style={{ borderColor: colors.$24 }}
+                  />
+                )}
+                <div
+                  className="text-sm font-medium"
+                  style={{ color: colors.$3 }}
+                >
+                  {label}
+                </div>
+                <ColorInput
+                  label={String(t('color'))}
+                  value={region.color}
+                  onChange={(value) =>
+                    patchTableRegion(regionKey, { color: value })
+                  }
+                  defaultValue={
+                    DEFAULT_TABLE_REGION_BORDER_PROPS.color as string
+                  }
+                />
+                <RangeSliderInput
+                  label={String(t('border_width_label'))}
+                  value={String(region.width)}
+                  onChange={(value) =>
+                    patchTableRegion(regionKey, {
+                      width: coerceBorderWidthPx(value),
+                    })
+                  }
+                  min={TABLE_BORDER_WIDTH_MIN}
+                  max={TABLE_BORDER_WIDTH_MAX}
+                  step={1}
+                  unit=""
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <CheckboxInput
+                    id={`${regionKey}-top`}
+                    label={String(t('border_side_top'))}
+                    checked={region.sides.top}
+                    onChange={(checked) =>
+                      patchTableRegion(regionKey, {
+                        sides: { top: checked },
+                      })
+                    }
+                  />
+                  <CheckboxInput
+                    id={`${regionKey}-right`}
+                    label={String(t('border_side_right'))}
+                    checked={region.sides.right}
+                    onChange={(checked) =>
+                      patchTableRegion(regionKey, {
+                        sides: { right: checked },
+                      })
+                    }
+                  />
+                  <CheckboxInput
+                    id={`${regionKey}-bottom`}
+                    label={String(t('border_side_bottom'))}
+                    checked={region.sides.bottom}
+                    onChange={(checked) =>
+                      patchTableRegion(regionKey, {
+                        sides: { bottom: checked },
+                      })
+                    }
+                  />
+                  <CheckboxInput
+                    id={`${regionKey}-left`}
+                    label={String(t('border_side_left'))}
+                    checked={region.sides.left}
+                    onChange={(checked) =>
+                      patchTableRegion(regionKey, {
+                        sides: { left: checked },
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
       )}
 
       <SectionDivider label={String(t('spacing'))} />

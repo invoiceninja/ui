@@ -9,6 +9,7 @@
  */
 
 import { InvoiceTemplate } from '../types';
+import { DEFAULT_TABLE_REGION_BORDER_PROPS } from '../utils/table-cell-borders';
 
 export const templates: InvoiceTemplate[] = [
   {
@@ -186,7 +187,14 @@ export const templates: InvoiceTemplate[] = [
           headerFontWeight: 'bold',
           rowBg: '#FFFFFF',
           alternateRowBg: '#F9FAFB',
-          borderColor: '#E5E7EB',
+          headerBorders: {
+            ...DEFAULT_TABLE_REGION_BORDER_PROPS,
+            sides: { ...DEFAULT_TABLE_REGION_BORDER_PROPS.sides },
+          },
+          rowBorders: {
+            ...DEFAULT_TABLE_REGION_BORDER_PROPS,
+            sides: { ...DEFAULT_TABLE_REGION_BORDER_PROPS.sides },
+          },
           fontSize: '12px',
           padding: '12px',
           showBorders: true,
@@ -366,7 +374,14 @@ export const templates: InvoiceTemplate[] = [
           headerFontWeight: 'bold',
           rowBg: '#FFFFFF',
           alternateRowBg: '#FFFFFF',
-          borderColor: '#E5E7EB',
+          headerBorders: {
+            ...DEFAULT_TABLE_REGION_BORDER_PROPS,
+            sides: { ...DEFAULT_TABLE_REGION_BORDER_PROPS.sides },
+          },
+          rowBorders: {
+            ...DEFAULT_TABLE_REGION_BORDER_PROPS,
+            sides: { ...DEFAULT_TABLE_REGION_BORDER_PROPS.sides },
+          },
           fontSize: '12px',
           padding: '10px',
           showBorders: false,

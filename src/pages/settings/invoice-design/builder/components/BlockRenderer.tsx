@@ -16,6 +16,11 @@ import { InvoiceData, replaceVariables } from '../utils/variable-replacer';
 import { useSampleInvoiceData } from '../hooks/useSampleInvoiceData';
 import { replaceLabelVariables, getSampleLabelValue } from '../utils/label-variables';
 import { ensurePx } from '../utils/html-generator';
+import {
+  resolveTableBorderProps,
+  tableHeaderCellBorderStyles,
+  tableBodyCellBorderStyles,
+} from '../utils/table-cell-borders';
 
 interface BlockRendererProps {
   block: Block;
@@ -559,15 +564,15 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
     headerBg,
     headerColor,
     headerFontWeight,
-    borderColor,
     fontSize,
     padding,
-    showBorders,
     rowBg,
     alternateRowBg,
     alternateRows,
     rowColor,
   } = block.properties;
+
+  const borderResolved = resolveTableBorderProps(block.properties);
 
   const resolveItemValue = (
     field: string,
@@ -610,20 +615,27 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
             }}
           >
             {columns.map(
-              (col: {
-                id: string;
-                header: string;
-                align: string;
-                width: string;
-                field: string;
-              }) => (
+              (
+                col: {
+                  id: string;
+                  header: string;
+                  align: string;
+                  width: string;
+                  field: string;
+                },
+                colIndex: number
+              ) => (
                 <th
                   key={col.id}
                   style={{
                     padding,
                     textAlign: col.align as 'left' | 'center' | 'right',
                     width: col.width,
-                    border: showBorders ? `1px solid ${borderColor}` : 'none',
+                    ...tableHeaderCellBorderStyles(
+                      borderResolved,
+                      colIndex,
+                      columns.length
+                    ),
                   }}
                 >
                   {col.header}
@@ -642,13 +654,21 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
               }}
             >
               {columns.map(
-                (col: { id: string; align: string; field: string }) => (
+                (
+                  col: { id: string; align: string; field: string },
+                  colIndex: number
+                ) => (
                   <td
                     key={col.id}
                     style={{
                       padding,
                       textAlign: col.align as 'left' | 'center' | 'right',
-                      border: showBorders ? `1px solid ${borderColor}` : 'none',
+                      ...tableBodyCellBorderStyles(
+                        borderResolved,
+                        index,
+                        colIndex,
+                        columns.length
+                      ),
                       color: rowColor ?? '#374151',
                     }}
                   >

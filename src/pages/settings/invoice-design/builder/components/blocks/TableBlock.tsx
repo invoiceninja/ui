@@ -11,6 +11,11 @@
 import { memo } from 'react';
 import { SAMPLE_INVOICE_DATA } from '../../utils/variable-replacer';
 import { Block } from '../../types';
+import {
+  resolveTableBorderProps,
+  tableHeaderCellBorderStyles,
+  tableBodyCellBorderStyles,
+} from '../../utils/table-cell-borders';
 
 interface TableBlockProps {
   block: Block;
@@ -22,14 +27,14 @@ export const TableBlock = memo(function TableBlock({ block }: TableBlockProps) {
     headerBg,
     headerColor,
     headerFontWeight,
-    borderColor,
     fontSize,
     padding,
-    showBorders,
     rowBg,
     alternateRowBg,
     alternateRows,
   } = block.properties;
+
+  const borderResolved = resolveTableBorderProps(block.properties);
 
   const resolveItemValue = (
     field: string,
@@ -71,20 +76,27 @@ export const TableBlock = memo(function TableBlock({ block }: TableBlockProps) {
             }}
           >
             {columns.map(
-              (col: {
-                id: string;
-                header: string;
-                align: string;
-                width: string;
-                field: string;
-              }) => (
+              (
+                col: {
+                  id: string;
+                  header: string;
+                  align: string;
+                  width: string;
+                  field: string;
+                },
+                colIndex: number
+              ) => (
                 <th
                   key={col.id}
                   style={{
                     padding,
                     textAlign: col.align as 'left' | 'center' | 'right',
                     width: col.width,
-                    border: showBorders ? `1px solid ${borderColor}` : 'none',
+                    ...tableHeaderCellBorderStyles(
+                      borderResolved,
+                      colIndex,
+                      columns.length
+                    ),
                   }}
                 >
                   {col.header}
@@ -103,13 +115,21 @@ export const TableBlock = memo(function TableBlock({ block }: TableBlockProps) {
               }}
             >
               {columns.map(
-                (col: { id: string; align: string; field: string }) => (
+                (
+                  col: { id: string; align: string; field: string },
+                  colIndex: number
+                ) => (
                   <td
                     key={col.id}
                     style={{
                       padding,
                       textAlign: col.align as 'left' | 'center' | 'right',
-                      border: showBorders ? `1px solid ${borderColor}` : 'none',
+                      ...tableBodyCellBorderStyles(
+                        borderResolved,
+                        index,
+                        colIndex,
+                        columns.length
+                      ),
                     }}
                   >
                     {resolveItemValue(col.field, item)}

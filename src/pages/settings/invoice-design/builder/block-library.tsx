@@ -28,6 +28,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import { BlockDefinition } from './types';
+import { DEFAULT_TABLE_REGION_BORDER_PROPS } from './utils/table-cell-borders';
 
 // Hook to get translated block library
 export function useBlockLibrary(): BlockDefinition[] {
@@ -372,7 +373,18 @@ export function useBlockLibrary(): BlockDefinition[] {
         rowBg: '#FFFFFF',
         rowColor: '#374151',
         alternateRowBg: '#F9FAFB',
-        borderColor: '#E5E7EB',
+        headerBorders: {
+          ...DEFAULT_TABLE_REGION_BORDER_PROPS,
+          sides: {
+            ...DEFAULT_TABLE_REGION_BORDER_PROPS.sides,
+          },
+        },
+        rowBorders: {
+          ...DEFAULT_TABLE_REGION_BORDER_PROPS,
+          sides: {
+            ...DEFAULT_TABLE_REGION_BORDER_PROPS.sides,
+          },
+        },
         padding: '8px',
         showBorders: true,
         alternateRows: true,
@@ -429,7 +441,18 @@ export function useBlockLibrary(): BlockDefinition[] {
         rowBg: '#FFFFFF',
         rowColor: '#374151',
         alternateRowBg: '#F9FAFB',
-        borderColor: '#E5E7EB',
+        headerBorders: {
+          ...DEFAULT_TABLE_REGION_BORDER_PROPS,
+          sides: {
+            ...DEFAULT_TABLE_REGION_BORDER_PROPS.sides,
+          },
+        },
+        rowBorders: {
+          ...DEFAULT_TABLE_REGION_BORDER_PROPS,
+          sides: {
+            ...DEFAULT_TABLE_REGION_BORDER_PROPS.sides,
+          },
+        },
         padding: '8px',
         showBorders: true,
         alternateRows: true,

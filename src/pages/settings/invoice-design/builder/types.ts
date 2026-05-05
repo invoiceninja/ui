@@ -82,6 +82,19 @@ export interface TableColumn {
   align: string;
 }
 
+/** Stored on table / tasks-table blocks (header vs body borders). */
+export interface TableRegionBordersHint {
+  color?: string;
+  /** Pixel thickness 0–20 (integer); API may coerce string values when reading. */
+  width?: number | string;
+  sides?: {
+    top?: boolean;
+    right?: boolean;
+    bottom?: boolean;
+    left?: boolean;
+  };
+}
+
 export interface TableBlockPropertiesHint {
   columns?: TableColumn[];
   headerBg?: string;
@@ -89,10 +102,13 @@ export interface TableBlockPropertiesHint {
   headerFontWeight?: string;
   rowBg?: string;
   alternateRowBg?: string;
-  borderColor?: string;
   fontSize?: string;
   padding?: string;
   showBorders?: boolean;
+  /** Header row (`th`) border styling. */
+  headerBorders?: TableRegionBordersHint;
+  /** Body rows (`td`) border styling. */
+  rowBorders?: TableRegionBordersHint;
   alternateRows?: boolean;
 }
 

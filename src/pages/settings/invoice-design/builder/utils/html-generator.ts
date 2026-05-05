@@ -18,6 +18,11 @@ import {
 } from './variable-replacer';
 import { getSampleLabelValue, replaceLabelVariables } from './label-variables';
 import { t } from 'i18next';
+import {
+  resolveTableBorderProps,
+  tableHeaderCellBorderCssFragments,
+  tableBodyCellBorderCssFragments,
+} from './table-cell-borders';
 
 /**
  * Resolved document-level globals threaded through every block renderer so the
@@ -520,6 +525,9 @@ function renderBlockContent(
 ): string {
   switch (block.type) {
     case 'text':
+    case 'public-notes':
+    case 'footer':
+    case 'terms':
       return renderTextBlock(block, previewData, globals);
     case 'logo':
     case 'image':
@@ -553,9 +561,10 @@ function renderTextBlock(
   data: InvoiceData | undefined,
   globals: GeneratorGlobals
 ): string {
-  const { content, fontSize, fontWeight, color, align, lineHeight } =
+  const { content, fontSize, fontWeight, color, align, lineHeight, padding } =
     block.properties;
   const replacedContent = replaceVariables(content, data);
+  const paddingCss = padding ? `padding: ${padding};` : '';
 
   return `
     <div style="
@@ -564,6 +573,7 @@ function renderTextBlock(
       color: ${pick(color, globals.primaryColor)};
       text-align: ${align || 'left'};
       line-height: ${lineHeight || '1.5'};
+      ${paddingCss}
       height: 100%;
       display: flex;
       align-items: center;
@@ -889,17 +899,16 @@ function renderTableBlock(
     headerBg,
     headerColor,
     headerFontWeight,
-    borderColor,
     fontSize,
     padding,
-    showBorders,
     rowBg,
     alternateRowBg,
     alternateRows,
   } = block.properties;
   const tableFontSize = pick(fontSize, globals.fontSize);
 
-  const borderStyle = showBorders ? `1px solid ${borderColor}` : 'none';
+  const borderResolved = resolveTableBorderProps(block.properties);
+  const headerBorderCss = tableHeaderCellBorderCssFragments(borderResolved);
 
   // Generate header
   let headerHTML =
@@ -925,7 +934,7 @@ function renderTableBlock(
         padding: ${padding};
         text-align: ${col.align};
         width: ${col.width};
-        border: ${borderStyle};
+        ${headerBorderCss}
       ">
         ${escapeHtml(col.header)}
       </th>
@@ -944,13 +953,19 @@ function renderTableBlock(
       alternateRows && index % 2 === 1 ? alternateRowBg : rowBg;
     rowsHTML += `<tr style="background: ${rowBackground};">`;
 
+    const cellBorderCss = tableBodyCellBorderCssFragments(
+      borderResolved,
+      index,
+      columns.length
+    );
+
     columns.forEach((col: { id: string; align: string; field: string }) => {
       const value = resolveVariable(col.field, item, previewData);
       rowsHTML += `
         <td style="
           padding: ${padding};
           text-align: ${col.align};
-          border: ${borderStyle};
+          ${cellBorderCss}
         ">
           ${escapeHtml(value)}
         </td>
