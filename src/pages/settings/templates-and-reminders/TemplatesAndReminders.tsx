@@ -23,7 +23,7 @@ import { useStaticsQuery } from '$app/common/queries/statics';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Settings } from '$app/components/layouts/Settings';
-import { useEffect, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   isCompanySettingsFormBusy,
@@ -94,12 +94,14 @@ interface TemplateSelectorProps {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
+  rightSide?: ReactNode;
 }
 
 function TemplateSelector({
   value,
   onChange,
   disabled = false,
+  rightSide,
 }: TemplateSelectorProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
@@ -123,36 +125,46 @@ function TemplateSelector({
     }
   };
 
+  const disabledStyle = {
+    opacity: disabled ? 0.4 : 1,
+    pointerEvents: (disabled
+      ? 'none'
+      : 'auto') as React.CSSProperties['pointerEvents'],
+  };
+
   return (
-    <div
-      className="flex flex-col space-y-3 pt-2 pb-2"
-      style={{
-        opacity: disabled ? 0.4 : 1,
-        pointerEvents: disabled ? 'none' : 'auto',
-      }}
-    >
-      <div className="flex flex-wrap gap-1.5">
-        {MAIN_TABS.map((tab) => (
-          <button
-            key={tab.value}
-            type="button"
-            className="px-3 py-1.5 rounded-md text-sm cursor-pointer select-none border transition-colors duration-150"
-            onClick={() => handleCategoryClick(tab)}
-            style={{
-              backgroundColor:
-                activeCategory === tab.value ? colors.$3 : 'transparent',
-              color: activeCategory === tab.value ? colors.$1 : colors.$3,
-              borderColor:
-                activeCategory === tab.value ? colors.$3 : colors.$24,
-            }}
-          >
-            {t(tab.labelKey)}
-          </button>
-        ))}
+    <div className="flex flex-col mb-3">
+      <div className="flex overflow-x-auto">
+        <div className="flex" style={disabledStyle}>
+          {MAIN_TABS.map((tab) => (
+            <button
+              key={tab.value}
+              type="button"
+              className="whitespace-nowrap font-medium text-sm py-3 px-4 transition-colors duration-150"
+              onClick={() => handleCategoryClick(tab)}
+              style={{
+                color: activeCategory === tab.value ? colors.$3 : colors.$17,
+                borderBottom:
+                  activeCategory === tab.value
+                    ? `1.5px solid ${colors.$3}`
+                    : `1.5px solid ${colors.$20}`,
+              }}
+            >
+              {t(tab.labelKey)}
+            </button>
+          ))}
+        </div>
+
+        <div
+          className="flex-1 flex items-center justify-end px-2"
+          style={{ borderBottom: `1.5px solid ${colors.$20}` }}
+        >
+          {rightSide}
+        </div>
       </div>
 
       {submenuItems && (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1.5 pt-3" style={disabledStyle}>
           {submenuItems.map((item) => (
             <button
               key={item.value}
@@ -489,20 +501,6 @@ export function TemplatesAndReminders() {
         headerStyle={{ borderColor: colors.$20 }}
       >
         <div className="px-4 sm:px-6 pb-1">
-          {!isCompanySettingsActive && (
-            <div className="flex items-center justify-end mb-2">
-              <PropertyCheckbox
-                checked={Boolean(
-                  typeof company?.settings[emailTemplateKey] !== 'undefined'
-                )}
-                propertyKey={emailTemplateKey}
-                labelElement={<SettingsLabel label={t('enabled')} />}
-                defaultValue={templateId || 'invoice'}
-                onCheckboxChange={(value) => handleChangingCheckbox(value)}
-              />
-            </div>
-          )}
-
           <TemplateSelector
             value={templateId}
             disabled={
@@ -512,6 +510,19 @@ export function TemplatesAndReminders() {
               setTemplateId(value);
               !isCompanySettingsActive && setTemplateBody(undefined);
             }}
+            rightSide={
+              !isCompanySettingsActive ? (
+                <PropertyCheckbox
+                  checked={Boolean(
+                    typeof company?.settings[emailTemplateKey] !== 'undefined'
+                  )}
+                  propertyKey={emailTemplateKey}
+                  labelElement={<SettingsLabel label={t('enabled')} />}
+                  defaultValue={templateId || 'invoice'}
+                  onCheckboxChange={(value) => handleChangingCheckbox(value)}
+                />
+              ) : undefined
+            }
           />
         </div>
 
