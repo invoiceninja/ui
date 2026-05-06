@@ -108,7 +108,11 @@ function Payments() {
 
                       <span>-</span>
 
-                      <span>{date(paymentable.created_at, dateFormat)}</span>
+                      <span>
+                        {date(paymentable.created_at, dateFormat, {
+                          useUTC: true,
+                        })}
+                      </span>
                     </div>
 
                     <div>

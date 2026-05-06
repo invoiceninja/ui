@@ -15,6 +15,9 @@ import { route } from '$app/common/helpers/route';
 import entityState from './constants/entity-state';
 import { request } from './helpers/request';
 import { useCurrentCompanyDateFormats } from './hooks/useCurrentCompanyDateFormats';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 
 export function isHosted(): boolean {
   return import.meta.env.VITE_IS_HOSTED === 'true';
@@ -60,16 +63,28 @@ export function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
 }
 
-export function date(date: number | string, format: string) {
+interface DateOptions {
+  useUTC?: boolean;
+}
+
+export function date(
+  date: number | string,
+  format: string,
+  options?: DateOptions
+) {
   if (date === 0 || date === '' || date === undefined) {
     return '';
   }
 
   if (typeof date === 'number') {
-    return dayjs.unix(date).format(format);
+    const d = dayjs.unix(date);
+
+    return options?.useUTC ? d.utc().format(format) : d.format(format);
   }
 
-  return dayjs(date).format(format);
+  const d = dayjs(date);
+
+  return options?.useUTC ? d.utc().format(format) : d.format(format);
 }
 
 export function useParseDayjs() {

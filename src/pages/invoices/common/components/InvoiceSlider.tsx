@@ -581,7 +581,9 @@ export function InvoiceSlider() {
                           <span>-</span>
 
                           <span>
-                            {date(paymentable.created_at, dateFormat)}
+                            {date(paymentable.created_at, dateFormat, {
+                              useUTC: true,
+                            })}
                           </span>
                         </div>
 
