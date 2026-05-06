@@ -12,25 +12,34 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
-import { MdCreate, MdSettings } from 'react-icons/md';
+import { MdArchive, MdCreate, MdDelete, MdRestore, MdSettings } from 'react-icons/md';
 import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { GenericSingleResponse } from '$app/common/interfaces/docuninja/api';
 import { AxiosResponse } from 'axios';
-import { docuNinjaEndpoint } from '$app/common/helpers';
+import { docuNinjaEndpoint, getEntityState } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Document } from '$app/common/interfaces/docuninja/api';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useBulk } from '$app/common/queries/docuninja/blueprints';
+import { Divider } from '$app/components/cards/Divider';
+import { EntityState } from '$app/common/enums/entity-state';
 
 interface UseActionsParams {
   onSettingsClick: (blueprint: Blueprint) => void;
 }
 
-export function useActions(params?: UseActionsParams) {
+export function useActions(params: UseActionsParams) {
   const [t] = useTranslation();
+
+  const location = useLocation();
+
+  const bulk = useBulk();
   const navigate = useNavigate();
-  const { onSettingsClick } = params || {};
+
+  const { onSettingsClick } = params;
+
 
   const extractSignatoryInfo = (blueprint: Blueprint) => {
     if (!blueprint.document?.files) {
@@ -147,12 +156,45 @@ export function useActions(params?: UseActionsParams) {
       ),
     (blueprint: Blueprint) => (
       <DropdownElement
-        onClick={() => onSettingsClick?.(blueprint)}
+        onClick={() => onSettingsClick(blueprint)}
         icon={<Icon element={MdSettings} />}
       >
         {t('options')}
       </DropdownElement>
     ),
+    () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
+    (blueprint: Blueprint) =>
+      location.pathname.endsWith('/edit') &&
+      getEntityState(blueprint) === EntityState.Active && (
+        <DropdownElement
+          onClick={() => bulk([blueprint.id], 'archive')}
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
+        </DropdownElement>
+      ),
+    (blueprint: Blueprint) =>
+      location.pathname.endsWith('/edit') &&
+      (getEntityState(blueprint) === EntityState.Archived ||
+        getEntityState(blueprint) === EntityState.Deleted) && (
+        <DropdownElement
+          onClick={() => bulk([blueprint.id], 'restore')}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
+        </DropdownElement>
+      ),
+    (blueprint: Blueprint) =>
+      location.pathname.endsWith('/edit') &&
+      (getEntityState(blueprint) === EntityState.Active ||
+        getEntityState(blueprint) === EntityState.Archived) && (
+        <DropdownElement
+          onClick={() => bulk([blueprint.id], 'delete')}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
+        </DropdownElement>
+      ),
   ];
 
   return actions;

@@ -59,6 +59,7 @@ import { useQuery } from 'react-query';
 import { useMediaQuery } from 'react-responsive';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useActions } from '../common/hooks/useActions';
+import { EditBlueprintModal } from '../edit/components/EditBlueprintModal';
 
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
@@ -270,12 +271,16 @@ function BlueprintBuilder() {
   const { id } = useParams();
   const colors = useColorScheme();
 
+  const { data: blueprintResponse } = useBlueprintQuery({ id });
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
-  const { data: blueprintResponse, isLoading } = useBlueprintQuery({ id });
 
   const [blueprint, setBlueprint] = useState<Blueprint>();
 
-  const actions = useActions();
+  const actions = useActions({
+    onSettingsClick: () => setIsEditModalOpen(true),
+  });
 
   useEffect(() => {
     if (blueprintResponse) {
@@ -379,12 +384,14 @@ function BlueprintBuilder() {
             </Button>
           )}
 
-          <ResourceActions
-            resource={blueprint}
-            actions={actions}
-            onSaveClick={handleSave}
-            disableSaveButton={isDocumentSaving}
-          />
+          {blueprint && (
+            <ResourceActions
+              resource={blueprint}
+              actions={actions}
+              onSaveClick={handleSave}
+              disableSaveButton={isDocumentSaving}
+            />
+          )}
         </div>
       }
     >
@@ -542,6 +549,14 @@ function BlueprintBuilder() {
           <Builder$ />
         </BuilderContext.Provider>
       </Card>
+
+      {blueprint && (
+        <EditBlueprintModal
+          blueprint={blueprint}
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+        />
+      )}
     </Default>
   );
 }
