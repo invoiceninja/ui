@@ -894,12 +894,7 @@ function SignatureBlockRenderer({ block }: BlockRendererProps) {
           }}
         />
       )}
-      <div style={{ fontSize, color }}>{label}</div>
-      {showDate && (
-        <div style={{ fontSize, color, marginTop: '4px' }}>
-          {t('date') + ':'} ________________
-        </div>
-      )}
+      
     </div>
   );
 }

@@ -541,11 +541,11 @@ export function useBlockLibrary(): BlockDefinition[] {
     },
     {
       type: 'signature',
-      label: t('signature_line'),
+      label: t('invoice_signature'),
       icon: <PenTool className="w-5 h-5" />,
       defaultSize: { w: 4, h: 3 },
       defaultProperties: {
-        label: t('authorized_signature'),
+        label: '',
         showLine: true,
         showDate: true,
         align: 'left',
