@@ -23,6 +23,10 @@ import {
 import { CellTypographyEditor } from './CellTypographyEditor';
 import { useColorScheme } from '$app/common/colors';
 import { useLabelMapping } from '../../utils/label-variables';
+import {
+  DEFAULT_LABEL_TEXT_COLOR,
+  DEFAULT_VALUE_TEXT_COLOR,
+} from '../../constants/design-colors';
 
 const AVAILABLE_TOTAL_ITEMS = [
   { label: '$subtotal_label', field: '$subtotal' },
@@ -229,10 +233,10 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                     fontSizePlaceholder={block.properties.fontSize || '13px'}
                     colorDefault={
                       item.isTotal
-                        ? block.properties.totalColor || '#111827'
+                        ? block.properties.totalColor || DEFAULT_VALUE_TEXT_COLOR
                         : item.isBalance
-                          ? block.properties.balanceColor || '#DC2626'
-                          : block.properties.labelColor || '#6B7280'
+                          ? block.properties.balanceColor || DEFAULT_VALUE_TEXT_COLOR
+                          : block.properties.labelColor || DEFAULT_LABEL_TEXT_COLOR
                     }
                   />
 
@@ -245,10 +249,10 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                     fontSizePlaceholder={block.properties.fontSize || '13px'}
                     colorDefault={
                       item.isTotal
-                        ? block.properties.totalColor || '#111827'
+                        ? block.properties.totalColor || DEFAULT_VALUE_TEXT_COLOR
                         : item.isBalance
-                          ? block.properties.balanceColor || '#DC2626'
-                          : block.properties.amountColor || '#111827'
+                          ? block.properties.balanceColor || DEFAULT_VALUE_TEXT_COLOR
+                          : block.properties.amountColor || DEFAULT_VALUE_TEXT_COLOR
                     }
                   />
                 </div>
@@ -322,7 +326,7 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
         label={String(t('text_color'))}
         value={block.properties.amountColor}
         onChange={(value) => updateProperty('amountColor', value)}
-        defaultValue="#111827"
+        defaultValue={DEFAULT_VALUE_TEXT_COLOR}
       />
 
       {/* Label Color */}
@@ -330,7 +334,7 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
         label={String(t('label_color'))}
         value={block.properties.labelColor}
         onChange={(value) => updateProperty('labelColor', value)}
-        defaultValue="#6B7280"
+        defaultValue={DEFAULT_LABEL_TEXT_COLOR}
       />
 
       {/* Total Row Color — used when item.isTotal is true */}
@@ -338,7 +342,7 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
         label={String(t('total_color'))}
         value={block.properties.totalColor}
         onChange={(value) => updateProperty('totalColor', value)}
-        defaultValue="#111827"
+        defaultValue={DEFAULT_VALUE_TEXT_COLOR}
       />
 
       {/* Balance Row Color — used when item.isBalance is true */}
@@ -346,7 +350,7 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
         label={String(t('balance_color'))}
         value={block.properties.balanceColor}
         onChange={(value) => updateProperty('balanceColor', value)}
-        defaultValue="#DC2626"
+        defaultValue={DEFAULT_VALUE_TEXT_COLOR}
       />
 
       <SectionDivider label={String(t('columns'))} />

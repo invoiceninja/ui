@@ -22,6 +22,7 @@ import { Button } from '$app/components/forms';
 import { FieldConfig } from '../../types';
 import { TextInput, ColorInput, FontStyleInput } from './PropertyInputs';
 import { useColorScheme } from '$app/common/colors';
+import { DEFAULT_VALUE_TEXT_COLOR } from '../../constants/design-colors';
 
 export interface FieldDefinition {
   id: string;
@@ -265,7 +266,7 @@ export function ReorderableFieldList({
                     onChange={(value) =>
                       updateField(index, { color: value || undefined })
                     }
-                    defaultValue="#374151"
+                    defaultValue={DEFAULT_VALUE_TEXT_COLOR}
                   />
                 </div>
 

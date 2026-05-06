@@ -15,6 +15,7 @@ import {
   replaceVariables,
 } from '../../utils/variable-replacer';
 import { Block } from '../../types';
+import { DEFAULT_VALUE_TEXT_COLOR } from '../../constants/design-colors';
 import { useLabelMapping } from '../../utils/label-variables';
 
 interface TotalBlockProps {
@@ -105,11 +106,14 @@ export const TotalBlock = memo(function TotalBlock({ block }: TotalBlockProps) {
                   </td>
                   <td
                     style={{
-                      color: item.amountColor || (isBalance
-                        ? balanceColor
-                        : isTotal
-                          ? totalColor
-                          : amountColor),
+                      color:
+                        item.amountColor ||
+                        (isBalance
+                          ? balanceColor
+                          : isTotal
+                            ? totalColor
+                            : amountColor) ||
+                        DEFAULT_VALUE_TEXT_COLOR,
                       paddingBottom: spacing,
                       padding: valuePadding || undefined,
                       textAlign: 'right',

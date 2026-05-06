@@ -28,6 +28,7 @@ import {
   TABLE_BORDER_WIDTH_MAX,
   TABLE_BORDER_WIDTH_MIN,
 } from '../../utils/table-cell-borders';
+import { DEFAULT_VALUE_TEXT_COLOR } from '../../constants/design-colors';
 
 function mergeTableRegion(raw?: TableRegionBordersHint) {
   const d = DEFAULT_TABLE_REGION_BORDER_PROPS;
@@ -489,7 +490,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
         label={String(t('text_color'))}
         value={block.properties.headerColor}
         onChange={(value) => updateProperty('headerColor', value)}
-        defaultValue="#111827"
+        defaultValue={DEFAULT_VALUE_TEXT_COLOR}
       />
 
       <SectionDivider label={String(t('row'))} />
@@ -516,7 +517,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
         label={String(t('text_color'))}
         value={block.properties.rowColor}
         onChange={(value) => updateProperty('rowColor', value)}
-        defaultValue="#374151"
+        defaultValue={DEFAULT_VALUE_TEXT_COLOR}
       />
 
       <SectionDivider label={String(t('borders'))} />

@@ -24,6 +24,7 @@ import {
 } from './PropertyInputs';
 import { ReorderableFieldList, FieldDefinition } from './ReorderableFieldList';
 import { useColorScheme } from '$app/common/colors';
+import { DEFAULT_VALUE_TEXT_COLOR } from '../../constants/design-colors';
 
 interface InfoBlockPropertiesProps extends PropertyEditorProps {
   availableFields: FieldDefinition[];
@@ -225,7 +226,9 @@ export function InfoBlockProperties({
                     label={String(t('text_color'))}
                     value={block.properties.titleColor || ''}
                     onChange={(value) => updateProperty('titleColor', value)}
-                    defaultValue={block.properties.color || '#374151'}
+                    defaultValue={
+                      block.properties.color || DEFAULT_VALUE_TEXT_COLOR
+                    }
                   />
 
                   <AlignmentInput
@@ -273,7 +276,7 @@ export function InfoBlockProperties({
 
         <ColorInput
           label={String(t('text_color'))}
-          value={block.properties.color || '#374151'}
+          value={block.properties.color || DEFAULT_VALUE_TEXT_COLOR}
           onChange={(value: string) => updateProperty('color', value)}
         />
       </div>

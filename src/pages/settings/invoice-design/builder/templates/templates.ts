@@ -9,6 +9,10 @@
  */
 
 import { InvoiceTemplate } from '../types';
+import {
+  DEFAULT_LABEL_TEXT_COLOR,
+  DEFAULT_VALUE_TEXT_COLOR,
+} from '../constants/design-colors';
 import { DEFAULT_TABLE_REGION_BORDER_PROPS } from '../utils/table-cell-borders';
 
 export const templates: InvoiceTemplate[] = [
@@ -97,7 +101,8 @@ export const templates: InvoiceTemplate[] = [
           fontSize: '11px',
           lineHeight: '1.3',
           align: 'right',
-          color: '#374151',
+          labelColor: DEFAULT_LABEL_TEXT_COLOR,
+          color: DEFAULT_VALUE_TEXT_COLOR,
           showLabels: true,
         },
       },
@@ -112,7 +117,7 @@ export const templates: InvoiceTemplate[] = [
           fontSize: '12px',
           lineHeight: '1.3',
           align: 'left',
-          color: '#374151',
+          color: DEFAULT_VALUE_TEXT_COLOR,
           showTitle: true,
           title: 'Bill To: ',
           titleFontWeight: 'bold',
@@ -129,7 +134,7 @@ export const templates: InvoiceTemplate[] = [
           fontSize: '12px',
           lineHeight: '1.3',
           align: 'left',
-          color: '#374151',
+          color: DEFAULT_VALUE_TEXT_COLOR,
           showTitle: true,
           title: 'Ship To: ',
           titleFontWeight: 'bold',
@@ -199,6 +204,7 @@ export const templates: InvoiceTemplate[] = [
           padding: '12px',
           showBorders: true,
           alternateRows: true,
+          rowColor: DEFAULT_VALUE_TEXT_COLOR,
         },
         locked: false,
       },
@@ -226,12 +232,12 @@ export const templates: InvoiceTemplate[] = [
           ],
           fontSize: '13px',
           align: 'right',
-          labelColor: '#6B7280',
-          amountColor: '#111827',
+          labelColor: DEFAULT_LABEL_TEXT_COLOR,
+          amountColor: DEFAULT_VALUE_TEXT_COLOR,
           totalFontSize: '20px',
           totalFontWeight: 'bold',
-          totalColor: '#111827',
-          balanceColor: '#DC2626',
+          totalColor: DEFAULT_VALUE_TEXT_COLOR,
+          balanceColor: DEFAULT_VALUE_TEXT_COLOR,
           spacing: '10px',
         },
       },

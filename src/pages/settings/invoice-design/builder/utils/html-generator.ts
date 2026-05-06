@@ -23,6 +23,10 @@ import {
   tableHeaderCellBorderCssFragments,
   tableBodyCellBorderCssFragments,
 } from './table-cell-borders';
+import {
+  DEFAULT_LABEL_TEXT_COLOR,
+  DEFAULT_VALUE_TEXT_COLOR,
+} from '../constants/design-colors';
 
 /**
  * Resolved document-level globals threaded through every block renderer so the
@@ -570,7 +574,7 @@ function renderTextBlock(
     <div style="
       font-size: ${pick(fontSize, globals.fontSize)};
       font-weight: ${fontWeight || 'normal'};
-      color: ${pick(color, globals.primaryColor)};
+      color: ${pick(color, DEFAULT_VALUE_TEXT_COLOR, globals.primaryColor)};
       text-align: ${align || 'left'};
       line-height: ${lineHeight || '1.5'};
       ${paddingCss}
@@ -619,7 +623,7 @@ function renderCompanyInfoBlock(
   const { fieldConfigs, content, fontSize, lineHeight, align, color, padding } =
     block.properties;
   const blockFontSize = pick(fontSize, globals.fontSize);
-  const blockColor = pick(color, globals.primaryColor);
+  const blockColor = pick(color, DEFAULT_VALUE_TEXT_COLOR, globals.primaryColor);
   const paddingStyle = padding ? `padding: ${padding};` : '';
 
   if (fieldConfigs && Array.isArray(fieldConfigs) && fieldConfigs.length > 0) {
@@ -713,7 +717,7 @@ function renderClientInfoBlock(
     titleFontWeight,
   } = block.properties;
   const blockFontSize = pick(fontSize, globals.fontSize);
-  const blockColor = pick(color, globals.primaryColor);
+  const blockColor = pick(color, DEFAULT_VALUE_TEXT_COLOR, globals.primaryColor);
   const paddingStyle = padding ? `padding:${padding};` : '';
 
   let contentHtml = '';
@@ -800,8 +804,12 @@ function renderInvoiceDetailsBlock(
     valueMinWidth,
   } = block.properties;
   const blockFontSize = pick(fontSize, globals.fontSize);
-  const blockColor = pick(color, globals.primaryColor);
-  const blockLabelColor = pick(labelColor, blockColor);
+  const blockColor = pick(color, DEFAULT_VALUE_TEXT_COLOR, globals.primaryColor);
+  const blockLabelColor = pick(
+    labelColor,
+    DEFAULT_LABEL_TEXT_COLOR,
+    blockColor
+  );
   const paddingStyle = padding ? `padding:${padding};` : '';
 
   // Match server-side rendering shape: two-column table (label | value).
@@ -904,8 +912,10 @@ function renderTableBlock(
     rowBg,
     alternateRowBg,
     alternateRows,
+    rowColor,
   } = block.properties;
   const tableFontSize = pick(fontSize, globals.fontSize);
+  const resolvedRowTextColor = pick(rowColor, DEFAULT_VALUE_TEXT_COLOR);
 
   const borderResolved = resolveTableBorderProps(block.properties);
   const headerBorderCss = tableHeaderCellBorderCssFragments(borderResolved);
@@ -965,6 +975,7 @@ function renderTableBlock(
         <td style="
           padding: ${padding};
           text-align: ${col.align};
+          color: ${resolvedRowTextColor};
           ${cellBorderCss}
         ">
           ${escapeHtml(value)}
@@ -1012,8 +1023,16 @@ function renderTotalBlock(
   } = block.properties;
   const totalsFontSize = pick(fontSize, globals.fontSize);
   const blockPaddingStyle = padding ? `padding:${padding};` : '';
-  const totalsLabelColor = pick(labelColor, globals.primaryColor);
-  const totalsAmountColor = pick(amountColor, globals.primaryColor);
+  const totalsLabelColor = pick(
+    labelColor,
+    DEFAULT_LABEL_TEXT_COLOR,
+    globals.primaryColor
+  );
+  const totalsAmountColor = pick(
+    amountColor,
+    DEFAULT_VALUE_TEXT_COLOR,
+    globals.primaryColor
+  );
   const colLabelAlign = labelAlign || 'right';
   const colValueAlign = valueAlign || 'right';
 
@@ -1061,14 +1080,14 @@ function renderTotalBlock(
         const rowDefaultFontSize = isTotal ? totalFontSize : totalsFontSize;
         const rowDefaultFontWeight = isTotal ? totalFontWeight : 'normal';
         const rowDefaultValueColor = isBalance
-          ? balanceColor
+          ? pick(balanceColor, DEFAULT_VALUE_TEXT_COLOR)
           : isTotal
-            ? totalColor
+            ? pick(totalColor, DEFAULT_VALUE_TEXT_COLOR)
             : totalsAmountColor;
         const rowDefaultLabelColor = isTotal
-          ? totalColor || totalsLabelColor
+          ? pick(totalColor, totalsLabelColor)
           : isBalance
-            ? balanceColor || totalsLabelColor
+            ? pick(balanceColor, totalsLabelColor)
             : totalsLabelColor;
 
         const labelFontSize = pick(ls?.fontSize, item.fontSize, rowDefaultFontSize);
@@ -1189,7 +1208,7 @@ function renderSignatureBlock(
   const { label, showLine, showDate, align, fontSize, color } =
     block.properties;
   const sigFontSize = pick(fontSize, globals.fontSize);
-  const sigColor = pick(color, globals.primaryColor);
+  const sigColor = pick(color, DEFAULT_VALUE_TEXT_COLOR, globals.primaryColor);
 
   return `
     <div style="text-align: ${align || 'left'};">

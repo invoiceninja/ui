@@ -24,6 +24,10 @@ import { CellTypographyEditor } from './CellTypographyEditor';
 import { useCustomField } from '$app/components/CustomField';
 import { useColorScheme } from '$app/common/colors';
 import { useLabelMapping } from '../../utils/label-variables';
+import {
+  DEFAULT_LABEL_TEXT_COLOR,
+  DEFAULT_VALUE_TEXT_COLOR,
+} from '../../constants/design-colors';
 
 export function InvoiceDetailsBlockProperties({
   block,
@@ -324,7 +328,7 @@ export function InvoiceDetailsBlockProperties({
                     colorDefault={
                       block.properties.labelColor ||
                       block.properties.color ||
-                      '#6B7280'
+                      DEFAULT_LABEL_TEXT_COLOR
                     }
                   />
 
@@ -335,7 +339,9 @@ export function InvoiceDetailsBlockProperties({
                       updateFieldTypography(index, 'valueStyle', next)
                     }
                     fontSizePlaceholder={block.properties.fontSize || '12px'}
-                    colorDefault={block.properties.color || '#374151'}
+                    colorDefault={
+                      block.properties.color || DEFAULT_VALUE_TEXT_COLOR
+                    }
                   />
 
                   <TextInput
@@ -442,7 +448,7 @@ export function InvoiceDetailsBlockProperties({
         label={String(t('text_color'))}
         value={block.properties.color}
         onChange={(value) => updateProperty('color', value)}
-        defaultValue="#374151"
+        defaultValue={DEFAULT_VALUE_TEXT_COLOR}
       />
 
       {/* Label Color */}
@@ -450,7 +456,7 @@ export function InvoiceDetailsBlockProperties({
         label={String(t('label_color'))}
         value={block.properties.labelColor}
         onChange={(value) => updateProperty('labelColor', value)}
-        defaultValue="#6B7280"
+        defaultValue={DEFAULT_LABEL_TEXT_COLOR}
       />
 
       <SectionDivider label={String(t('columns'))} />

@@ -21,6 +21,10 @@ import {
   tableHeaderCellBorderStyles,
   tableBodyCellBorderStyles,
 } from '../utils/table-cell-borders';
+import {
+  DEFAULT_LABEL_TEXT_COLOR,
+  DEFAULT_VALUE_TEXT_COLOR,
+} from '../constants/design-colors';
 
 interface BlockRendererProps {
   block: Block;
@@ -159,7 +163,7 @@ function TextBlockRenderer({ block }: BlockRendererProps) {
   const { content, fontSize, fontWeight, color, align, lineHeight } =
     block.properties;
   const displayContent = replaceVariables(
-    content || t('enter_text'),
+    content || t('text'),
     sampleData
   );
 
@@ -407,12 +411,19 @@ function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
             const labelFontWeight = ls?.fontWeight || field.fontWeight;
             const labelFontStyle = ls?.fontStyle || field.fontStyle;
             const labelTextColor =
-              ls?.color || field.color || labelColor || color;
+              ls?.color ||
+              field.color ||
+              labelColor ||
+              DEFAULT_LABEL_TEXT_COLOR;
 
             const valueFontSize = vs?.fontSize || field.fontSize || fontSize;
             const valueFontWeight = vs?.fontWeight || field.fontWeight;
             const valueFontStyle = vs?.fontStyle || field.fontStyle;
-            const valueTextColor = vs?.color || field.color || color;
+            const valueTextColor =
+              vs?.color ||
+              field.color ||
+              color ||
+              DEFAULT_VALUE_TEXT_COLOR;
 
             // Label source: explicit `field.label` resolves via label
             // variables; fall back to prefix with trailing ":\s*" stripped so
@@ -669,7 +680,7 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
                         colIndex,
                         columns.length
                       ),
-                      color: rowColor ?? '#374151',
+                      color: rowColor ?? DEFAULT_VALUE_TEXT_COLOR,
                     }}
                   >
                     {resolveItemValue(col.field, item)}
@@ -753,21 +764,27 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
               const vs = item.valueStyle;
               const rowDefaultFontSize = isTotal ? totalFontSize : fontSize;
               const rowDefaultFontWeight = isTotal ? totalFontWeight : 'normal';
-              const rowDefaultValueColor = isBalance
-                ? balanceColor
-                : isTotal
-                  ? totalColor
-                  : amountColor;
+              const rowDefaultValueColor =
+                (isBalance
+                  ? balanceColor
+                  : isTotal
+                    ? totalColor
+                    : amountColor) || DEFAULT_VALUE_TEXT_COLOR;
 
               const labelFontSize = ls?.fontSize || item.fontSize || rowDefaultFontSize;
               const labelFontWeight = ls?.fontWeight || item.fontWeight || rowDefaultFontWeight;
               const labelFontStyle = ls?.fontStyle || item.fontStyle;
-              const labelTextColor = ls?.color || item.color || labelColor;
+              const labelTextColor =
+                ls?.color ||
+                item.color ||
+                labelColor ||
+                DEFAULT_LABEL_TEXT_COLOR;
 
               const valueFontSize = vs?.fontSize || item.fontSize || rowDefaultFontSize;
               const valueFontWeight = vs?.fontWeight || item.fontWeight || rowDefaultFontWeight;
               const valueFontStyle = vs?.fontStyle || item.fontStyle;
-              const valueTextColor = vs?.color || item.amountColor || rowDefaultValueColor;
+              const valueTextColor =
+                vs?.color || item.amountColor || rowDefaultValueColor;
 
               return (
                 <tr key={index}>
