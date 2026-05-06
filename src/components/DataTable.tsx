@@ -446,7 +446,9 @@ export function DataTable<T extends object>(props: Props<T>) {
       apiEndpoint.searchParams.set('sort', sort);
     }
 
-    apiEndpoint.searchParams.set('status', status as unknown as string);
+    if (!props.withoutStatusFilter) {
+      apiEndpoint.searchParams.set('status', status as unknown as string);
+    }
 
     dateRangeColumns.forEach((dateRangeColumn) => {
       apiEndpoint.searchParams.delete(dateRangeColumn.queryParameterKey);
