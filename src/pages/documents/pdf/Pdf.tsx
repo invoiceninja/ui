@@ -44,7 +44,7 @@ export default function Pdf() {
       if (data.files && data.files.length > 0 && data.files[0].url) {
         setPdfUrl(
           docuNinjaEndpoint(
-            `/api/documents/${data.id}/files/${data.files[0].id}/download_pdf`
+            `/api/documents/${data.id}/download`
           )
         );
       }
@@ -77,7 +77,7 @@ export default function Pdf() {
         <InvoiceViewer
           onLink={onLink}
           link={pdfUrl}
-          method="GET"
+          method="POST"
           headers={{
             Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
           }}
