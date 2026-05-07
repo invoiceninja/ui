@@ -28,7 +28,6 @@ import {
   MdRestore,
 } from 'react-icons/md';
 import { getEntityState } from '$app/common/helpers';
-import { useLocation } from 'react-router-dom';
 import { useBulk } from '$app/common/queries/docuninja/blueprints';
 import { Divider } from '$app/components/cards/Divider';
 import { EntityState } from '$app/common/enums/entity-state';
@@ -39,8 +38,6 @@ interface UseActionsParams {
 
 export function useActions(params: UseActionsParams) {
   const [t] = useTranslation();
-
-  const location = useLocation();
 
   const bulk = useBulk();
   const navigate = useNavigate();
@@ -158,9 +155,8 @@ export function useActions(params: UseActionsParams) {
         {t('options')}
       </DropdownElement>
     ),
-    () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
+    () => <Divider withoutPadding />,
     (blueprint: Blueprint) =>
-      location.pathname.endsWith('/edit') &&
       getEntityState(blueprint) === EntityState.Active && (
         <DropdownElement
           onClick={() => bulk([blueprint.id], 'archive')}
@@ -170,7 +166,6 @@ export function useActions(params: UseActionsParams) {
         </DropdownElement>
       ),
     (blueprint: Blueprint) =>
-      location.pathname.endsWith('/edit') &&
       (getEntityState(blueprint) === EntityState.Archived ||
         getEntityState(blueprint) === EntityState.Deleted) && (
         <DropdownElement
@@ -181,7 +176,6 @@ export function useActions(params: UseActionsParams) {
         </DropdownElement>
       ),
     (blueprint: Blueprint) =>
-      location.pathname.endsWith('/edit') &&
       (getEntityState(blueprint) === EntityState.Active ||
         getEntityState(blueprint) === EntityState.Archived) && (
         <DropdownElement
