@@ -214,7 +214,8 @@ interface Props<T> extends CommonProps {
   disabledCreateButton?: boolean;
   filterParameterKey?: 'filter' | 'search';
   enableSavingLatestDataForNavigation?: boolean;
-  defaultCustomFilter?: string[];
+  statusFilterOptions?: SelectOption[];
+  statusFilterPlaceholder?: string;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -314,7 +315,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     disabledCreateButton = false,
     filterParameterKey = 'filter',
     enableSavingLatestDataForNavigation = false,
-    defaultCustomFilter,
+    statusFilterOptions,
+    statusFilterPlaceholder,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -366,7 +368,6 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutStoringPerPage: withoutPerPageAsPreference,
     withoutStoringPage: withoutPageAsPreference,
     enableSavingFilterPreference,
-    defaultCustomFilter,
   });
 
   const {
@@ -379,7 +380,6 @@ export function DataTable<T extends object>(props: Props<T>) {
     tableKey: `${props.resource}s`,
     customFilter,
     customFilters,  
-    defaultCustomFilter,
   });
 
   const normalizeNumericCommas = (value: string): string => {
@@ -450,9 +450,7 @@ export function DataTable<T extends object>(props: Props<T>) {
       apiEndpoint.searchParams.set('sort', sort);
     }
 
-    if (!props.withoutStatusFilter) {
-      apiEndpoint.searchParams.set('status', status as unknown as string);
-    }
+    apiEndpoint.searchParams.set('status', status as unknown as string);
 
     dateRangeColumns.forEach((dateRangeColumn) => {
       apiEndpoint.searchParams.delete(dateRangeColumn.queryParameterKey);
@@ -908,6 +906,8 @@ export function DataTable<T extends object>(props: Props<T>) {
           customFilterPlaceholder={props.customFilterPlaceholder}
           onCustomFilterChange={setCustomFilter}
           customFilter={customFilter}
+          statusFilterOptions={statusFilterOptions}
+          statusFilterPlaceholder={statusFilterPlaceholder}
           rightSide={
             <>
               {props.rightSide}

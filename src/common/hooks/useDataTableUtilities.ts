@@ -19,7 +19,6 @@ interface Params {
   tableKey: string | undefined;
   customFilters?: SelectOption[];
   customFilter?: string[] | undefined;
-  defaultCustomFilter?: string[];
 }
 
 export function useDataTableUtilities(params: Params) {
@@ -31,7 +30,6 @@ export function useDataTableUtilities(params: Params) {
     customFilters,
     apiEndpoint,
     customFilter,
-    defaultCustomFilter,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
@@ -60,7 +58,7 @@ export function useDataTableUtilities(params: Params) {
 
       const currentStatuses = preferenceCustomFilters?.length
         ? preferenceCustomFilters
-        : defaultCustomFilter ?? [];
+        : [];
 
       return (
         customFilters.filter(({ value }) =>
