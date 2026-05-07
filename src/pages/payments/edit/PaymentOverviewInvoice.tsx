@@ -13,12 +13,12 @@ import { useTranslation } from 'react-i18next';
 import { Payment, Paymentable } from '$app/common/interfaces/payment';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date as formatDate } from '$app/common/helpers';
 import { Link } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { useColorScheme } from '$app/common/colors';
 import { Credit } from '$app/common/interfaces/credit';
 import { ExternalLink } from '$app/components/icons/ExternalLink';
+import { dateUTC } from '$app/common/helpers/payment';
 
 interface Props {
   payment: Payment;
@@ -93,10 +93,7 @@ export function PaymentOverviewInvoice(props: Props) {
             </span>
 
             <span style={{ color: colors.$3 }}>
-              {formatDate(
-                new Date(props.paymentable.created_at * 1000).toString(),
-                dateFormat
-              )}
+              {dateUTC(props.paymentable.created_at, dateFormat)}
             </span>
 
             {props.paymentable.refunded > 0 && (
@@ -156,8 +153,8 @@ export function PaymentOverviewInvoice(props: Props) {
             </span>
 
             <span style={{ color: colors.$3 }}>
-              {formatDate(
-                new Date(props.paymentable.created_at * 1000).toString(),
+              {dateUTC(
+                props.paymentable.created_at,
                 dateFormat
               )}
             </span>

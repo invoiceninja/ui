@@ -15,7 +15,6 @@ import { Context } from '../Edit';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { Payment } from '$app/common/interfaces/payment';
 import { useTranslation } from 'react-i18next';
-import { date } from '$app/common/helpers';
 import { PaymentStatus } from '$app/pages/payments/common/components/PaymentStatus';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -24,6 +23,7 @@ import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import classNames from 'classnames';
+import { dateUTC } from '$app/common/helpers/payment';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
@@ -107,8 +107,10 @@ function Payments() {
                       </span>
 
                       <span>-</span>
-
-                      <span>{date(paymentable.created_at, dateFormat)}</span>
+                        
+                      <span>
+                        {dateUTC(paymentable.created_at, dateFormat)}
+                      </span>
                     </div>
 
                     <div>
