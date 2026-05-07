@@ -214,6 +214,7 @@ interface Props<T> extends CommonProps {
   disabledCreateButton?: boolean;
   filterParameterKey?: 'filter' | 'search';
   enableSavingLatestDataForNavigation?: boolean;
+  defaultCustomFilter?: string[];
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -313,6 +314,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     disabledCreateButton = false,
     filterParameterKey = 'filter',
     enableSavingLatestDataForNavigation = false,
+    defaultCustomFilter,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -364,6 +366,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutStoringPerPage: withoutPerPageAsPreference,
     withoutStoringPage: withoutPageAsPreference,
     enableSavingFilterPreference,
+    defaultCustomFilter,
   });
 
   const {
@@ -375,7 +378,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     isInitialConfiguration,
     tableKey: `${props.resource}s`,
     customFilter,
-    customFilters,
+    customFilters,  
+    defaultCustomFilter,
   });
 
   const normalizeNumericCommas = (value: string): string => {

@@ -221,6 +221,7 @@ export default function Documents() {
           resource="document"
           endpoint="/api/documents?sort=id|desc"
           columns={columns}
+          defaultCustomFilter={['active']}
           customFilters={filters}
           customFilterPlaceholder="status"
           withoutStatusFilter

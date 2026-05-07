@@ -42,6 +42,7 @@ interface Params {
   withoutStoringPerPage: boolean;
   enableSavingFilterPreference?: boolean;
   withoutStoringPage?: boolean;
+  defaultCustomFilter?: string[];
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -67,6 +68,7 @@ export function useDataTablePreferences(params: Params) {
     withoutStoringPerPage,
     enableSavingFilterPreference,
     withoutStoringPage,
+    defaultCustomFilter = [],
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
@@ -178,7 +180,7 @@ export function useDataTablePreferences(params: Params) {
         if ((getPreference('customFilter') as string[]).length) {
           setCustomFilter(getPreference('customFilter') as string[]);
         } else {
-          setCustomFilter([]);
+          setCustomFilter(defaultCustomFilter);
         }
       } else {
         setCustomFilter([]);
