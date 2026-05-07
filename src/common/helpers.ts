@@ -15,9 +15,6 @@ import { route } from '$app/common/helpers/route';
 import entityState from './constants/entity-state';
 import { request } from './helpers/request';
 import { useCurrentCompanyDateFormats } from './hooks/useCurrentCompanyDateFormats';
-import utc from 'dayjs/plugin/utc';
-
-dayjs.extend(utc);
 
 export function isHosted(): boolean {
   return import.meta.env.VITE_IS_HOSTED === 'true';
