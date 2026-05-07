@@ -86,15 +86,10 @@ export function useBulk() {
 
     return request(
       'POST',
-      docuNinjaEndpoint(
-        '/api/blueprints/bulk',
-        {
-          ids: ids,
-        }
-      ),
+      docuNinjaEndpoint('/api/blueprints/bulk'),
       {
-        ...(action !== 'delete' && { action }),
-        ...(action !== 'delete' && { ids }),
+        action,
+        ids,
       },
       {
         headers: {

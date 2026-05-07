@@ -22,6 +22,15 @@ import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Document } from '$app/common/interfaces/docuninja/api';
 import { toast } from '$app/common/helpers/toast/toast';
+import {
+  MdArchive,
+  MdDelete,
+  MdRestore,
+} from 'react-icons/md';
+import { getEntityState } from '$app/common/helpers';
+import { useBulk } from '$app/common/queries/docuninja/blueprints';
+import { Divider } from '$app/components/cards/Divider';
+import { EntityState } from '$app/common/enums/entity-state';
 
 interface UseActionsParams {
   onSettingsClick: (blueprint: Blueprint) => void;
@@ -29,7 +38,10 @@ interface UseActionsParams {
 
 export function useActions(params: UseActionsParams) {
   const [t] = useTranslation();
+
+  const bulk = useBulk();
   const navigate = useNavigate();
+
   const { onSettingsClick } = params;
 
   const extractSignatoryInfo = (blueprint: Blueprint) => {
@@ -117,24 +129,24 @@ export function useActions(params: UseActionsParams) {
   };
 
   const actions: Action<Blueprint>[] = [
-    (blueprint: Blueprint) => (
+    (blueprint: Blueprint) =>
       Boolean(blueprint.is_template && !blueprint.is_deleted) && (
-      <DropdownElement
-        onClick={() => handleUseTemplate(blueprint)}
-        icon={<Icon element={MdCreate} />}
-      >
-        {t('use_template')}
-      </DropdownElement>
-    )),
-    (blueprint: Blueprint) => (
+        <DropdownElement
+          onClick={() => handleUseTemplate(blueprint)}
+          icon={<Icon element={MdCreate} />}
+        >
+          {t('use_template')}
+        </DropdownElement>
+      ),
+    (blueprint: Blueprint) =>
       Boolean(!blueprint.is_template && !blueprint.is_deleted) && (
-      <DropdownElement
-        onClick={() => handleUseTemplateNoMapping(blueprint)}
-        icon={<Icon element={MdCreate} />}
-      >
-        {t('use_template')}
-      </DropdownElement>
-    )),
+        <DropdownElement
+          onClick={() => handleUseTemplateNoMapping(blueprint)}
+          icon={<Icon element={MdCreate} />}
+        >
+          {t('use_template')}
+        </DropdownElement>
+      ),
     (blueprint: Blueprint) => (
       <DropdownElement
         onClick={() => onSettingsClick(blueprint)}
@@ -143,6 +155,36 @@ export function useActions(params: UseActionsParams) {
         {t('options')}
       </DropdownElement>
     ),
+    () => <Divider withoutPadding />,
+    (blueprint: Blueprint) =>
+      getEntityState(blueprint) === EntityState.Active && (
+        <DropdownElement
+          onClick={() => bulk([blueprint.id], 'archive')}
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
+        </DropdownElement>
+      ),
+    (blueprint: Blueprint) =>
+      (getEntityState(blueprint) === EntityState.Archived ||
+        getEntityState(blueprint) === EntityState.Deleted) && (
+        <DropdownElement
+          onClick={() => bulk([blueprint.id], 'restore')}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
+        </DropdownElement>
+      ),
+    (blueprint: Blueprint) =>
+      (getEntityState(blueprint) === EntityState.Active ||
+        getEntityState(blueprint) === EntityState.Archived) && (
+        <DropdownElement
+          onClick={() => bulk([blueprint.id], 'delete')}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
+        </DropdownElement>
+      ),
   ];
 
   return actions;
