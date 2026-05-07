@@ -418,7 +418,7 @@ export function Actions(props: Props) {
           />
         </div>
 
-        {props.options &&
+        {(props.options || statusFilterOptions) &&
           props.defaultOptions &&
           !props.withoutStatusFilter && (
             <SelectWithApplyButton

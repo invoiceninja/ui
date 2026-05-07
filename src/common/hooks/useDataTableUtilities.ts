@@ -20,7 +20,6 @@ interface Params {
   customFilters?: SelectOption[];
   customFilter?: string[] | undefined;
 }
-
 export function useDataTableUtilities(params: Params) {
   const options = useDataTableOptions();
 
