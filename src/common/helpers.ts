@@ -63,28 +63,18 @@ export function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
 }
 
-interface DateOptions {
-  useUTC?: boolean;
-}
 
-export function date(
-  date: number | string,
-  format: string,
-  options?: DateOptions
-) {
+
+export function date(date: number | string, format: string) {
   if (date === 0 || date === '' || date === undefined) {
     return '';
   }
 
   if (typeof date === 'number') {
-    const d = dayjs.unix(date);
-
-    return options?.useUTC ? d.utc().format(format) : d.format(format);
+    return dayjs.unix(date).format(format);
   }
 
-  const d = dayjs(date);
-
-  return options?.useUTC ? d.utc().format(format) : d.format(format);
+  return dayjs(date).format(format);
 }
 
 export function useParseDayjs() {
