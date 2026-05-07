@@ -60,8 +60,6 @@ export function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
 }
 
-
-
 export function date(date: number | string, format: string) {
   if (date === 0 || date === '' || date === undefined) {
     return '';
