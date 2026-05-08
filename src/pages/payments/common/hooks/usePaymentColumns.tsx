@@ -166,7 +166,7 @@ export function usePaymentColumns() {
     },
     {
       column: 'invoice_number',
-      id: 'id',
+      id: 'invoices',
       label: t('invoice_number'),
       format: (_, payment) => (
         <Tooltip

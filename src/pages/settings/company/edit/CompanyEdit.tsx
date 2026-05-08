@@ -17,7 +17,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { Modal } from '$app/components/Modal';
-import { useState, SetStateAction, Dispatch } from 'react';
+import { useRef, useState, SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { Logo } from '../components';
@@ -34,6 +34,8 @@ import { GatewayTypeIcon } from '$app/pages/clients/show/components/GatewayTypeI
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { Spinner } from '$app/components/Spinner';
+import { debounce } from 'lodash';
 
 interface Props {
   isModalOpen: boolean;
@@ -58,10 +60,28 @@ export function CompanyEdit(props: Props) {
   const [errors, setErrors] = useState<ValidationBag>();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [isCheckingSubdomain, setIsCheckingSubdomain] =
+    useState<boolean>(false);
+  const [subdomainValidation, setSubdomainValidation] = useState<string>('');
 
   const [stepIndex, setStepIndex] = useState<number>(0);
 
   const handleChange = useHandleCurrentCompanyChangeProperty();
+
+  const debouncedCheckSubdomain = useRef(
+    debounce((value: string) => {
+      if (!value || company?.subdomain === value) return;
+
+      setIsCheckingSubdomain(true);
+
+      request('POST', endpoint('/api/v1/check_subdomain'), { subdomain: value })
+        .then(() => setSubdomainValidation(''))
+        .catch(() =>
+          setSubdomainValidation(t('subdomain_is_not_available') ?? '')
+        )
+        .finally(() => setIsCheckingSubdomain(false));
+    }, 500)
+  ).current;
 
   const handleChangeName = (value: string) => {
     handleChange('settings.name', value);
@@ -73,6 +93,12 @@ export function CompanyEdit(props: Props) {
       .toLowerCase();
 
     handleChange('subdomain', subDomainValue);
+    debouncedCheckSubdomain(subDomainValue);
+  };
+
+  const handleSubdomainChange = (value: string) => {
+    handleChange('subdomain', value);
+    debouncedCheckSubdomain(value);
   };
 
   const handleUpdateCompany = (isWizard: boolean) => {
@@ -140,15 +166,7 @@ export function CompanyEdit(props: Props) {
       setErrors(undefined);
       setIsFormBusy(true);
 
-      if (companyChanges?.subdomain && isHosted()) {
-        request('POST', endpoint('/api/v1/check_subdomain'), {
-          subdomain: companyChanges.subdomain,
-        })
-          .then(() => handleUpdateCompany(isWizard))
-          .finally(() => setIsFormBusy(false));
-      } else {
-        handleUpdateCompany(isWizard);
-      }
+      handleUpdateCompany(isWizard);
     }
   };
 
@@ -181,13 +199,25 @@ export function CompanyEdit(props: Props) {
             />
 
             {isHosted() && (
-              <InputField
-                label={t('subdomain')}
-                value={companyChanges?.subdomain}
-                onValueChange={(value) => handleChange('subdomain', value)}
-                errorMessage={errors?.errors?.subdomain}
-                changeOverride
-              />
+              <div className="flex items-center gap-x-4 w-full">
+                <div className="flex-1">
+                  <InputField
+                    label={t('subdomain')}
+                    value={companyChanges?.subdomain}
+                    onValueChange={handleSubdomainChange}
+                    errorMessage={
+                      errors?.errors?.subdomain ?? subdomainValidation
+                    }
+                    changeOverride
+                  />
+                </div>
+
+                {isCheckingSubdomain && (
+                  <div className="pt-5">
+                    <Spinner />
+                  </div>
+                )}
+              </div>
             )}
 
             <LanguageSelector

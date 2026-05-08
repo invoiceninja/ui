@@ -146,11 +146,6 @@ export default function Client() {
   } = useChangeTemplate();
 
   useSocketEvent({
-    on: 'App\\Events\\Invoice\\InvoiceWasPaid',
-    callback: () => $refetch(['invoices']),
-  });
-
-  useSocketEvent({
     on: 'App\\Events\\Payment\\PaymentWasUpdated',
     callback: () => $refetch(['payments']),
   });

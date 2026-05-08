@@ -81,11 +81,13 @@ export function SecuritySettings() {
 
   return (
     <>
-      {/* <Element leftSide={t('password_timeout')}>
+      <Element leftSide={t('password_timeout')}
+      leftSideHelp={t('password_timeout_help')}
+      >
         <SelectField
           id="default_password_timeout"
           value={companyChanges?.default_password_timeout}
-          onChange={handleChange}
+          onValueChange={(value) => handleChange('default_password_timeout', value)}
           errorMessage={errors?.errors.default_password_timeout}
         >
           {options.map((option) => (
@@ -94,9 +96,11 @@ export function SecuritySettings() {
             </option>
           ))}
         </SelectField>
-      </Element> */}
+      </Element>
 
-      <Element leftSide={t('web_session_timeout')}>
+      <Element leftSide={t('web_session_timeout')}
+      leftSideHelp={t('web_session_timeout_help')}
+      >
         <SelectField
           value={companyChanges?.session_timeout}
           onValueChange={(value) => handleChange('session_timeout', value)}

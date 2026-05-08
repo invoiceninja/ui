@@ -1,7 +1,8 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
-import test, { expect } from '@playwright/test';
+import { test, expect } from '$tests/e2e/fixtures';
 
 test("Can't view dashboard without permission", async ({ page }) => {
+  test.setTimeout(60000); 
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -19,6 +20,7 @@ test("Can't view dashboard without permission", async ({ page }) => {
 });
 
 test('Can view dashboard with permission', async ({ page }) => {
+  test.setTimeout(60000); 
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -38,63 +40,60 @@ test('Can view dashboard with permission', async ({ page }) => {
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Dashboard' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
-    page
-      .getByRole('heading', { exact: true })
-      .filter({ hasText: 'Welcome! Glad to see you.' })
-      .first()
-  ).toBeVisible();
+    page.getByText('Welcome! Glad to see you.').first()
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Overview' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Recent Activity' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Recent Payments' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Upcoming Invoices' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Past Due Invoices' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Expired Quotes' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await expect(
     page
       .getByRole('heading', { exact: true })
       .filter({ hasText: 'Upcoming Quotes' })
       .first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });

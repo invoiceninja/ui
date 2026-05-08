@@ -98,6 +98,13 @@ interface TextInputProps extends BaseInputProps {
    * the label that clears the value (so the cascade falls back to globals).
    */
   resettable?: boolean;
+  /**
+   * Forwarded to `InputField`: emit `onValueChange` on each keystroke (default
+   * InputField only commits on blur — breaks live canvas preview).
+   */
+  changeOverride?: boolean;
+  /** Forwarded to `InputField` DebounceInput; use `0` with `changeOverride` for immediate updates. */
+  debounceTimeout?: number;
 }
 
 export function TextInput({
@@ -107,6 +114,8 @@ export function TextInput({
   placeholder,
   type = 'text',
   resettable,
+  changeOverride,
+  debounceTimeout,
 }: TextInputProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
@@ -140,6 +149,8 @@ export function TextInput({
         value={value || ''}
         onValueChange={(val) => onChange(val)}
         placeholder={placeholder}
+        changeOverride={changeOverride}
+        debounceTimeout={debounceTimeout}
       />
     </div>
   );

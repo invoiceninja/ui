@@ -41,6 +41,7 @@ export interface InvoiceItem {
   custom_value4: string;
   type_id: InvoiceItemType;
   product_cost: number;
+  net_cost: number;
   date: string;
   tax_id: string;
   task_id?: string;

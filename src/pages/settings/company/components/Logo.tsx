@@ -173,12 +173,23 @@ export function Logo({ isSettingsPage = true }: Props) {
         <>
           <Element leftSide={t('logo')}>
             <div className="grid grid-cols-12 lg:gap-4 space-y-4 lg:space-y-0">
-              <div className="bg-gray-200 col-span-12 lg:col-span-5 rounded-lg p-6">
-                <img src={logo} alt={t('company_logo') ?? 'Company logo'} />
+              <div
+                className="col-span-12 lg:col-span-5 rounded-lg p-6 border"
+                style={{ backgroundColor: colors.$15, borderColor: colors.$24 }}
+              >
+                <img
+                  className="w-full h-auto object-contain"
+                  src={logo}
+                  alt={t('company_logo') ?? 'Company logo'}
+                />
               </div>
 
               <div className="col-span-12 lg:col-span-5 bg-gray-900 rounded-lg p-6">
-                <img src={logo} alt={t('company_logo') ?? 'Company logo'} />
+                <img
+                  className="w-full h-auto object-contain"
+                  src={logo}
+                  alt={t('company_logo') ?? 'Company logo'}
+                />
               </div>
             </div>
           </Element>
@@ -211,12 +222,23 @@ export function Logo({ isSettingsPage = true }: Props) {
           <span className="text-lg font-medium">{t('upload_logo')}</span>
 
           <div className="grid grid-cols-12 gap-x-4">
-            <div className="bg-gray-200 col-span-6 rounded-lg p-6">
-              <img src={logo} alt={t('company_logo') ?? 'Company logo'} />
+            <div
+              className="col-span-6 rounded-lg p-6 border"
+              style={{ backgroundColor: colors.$15, borderColor: colors.$24 }}
+            >
+              <img
+                className="w-full h-auto object-contain"
+                src={logo}
+                alt={t('company_logo') ?? 'Company logo'}
+              />
             </div>
 
             <div className="col-span-6 bg-gray-900 rounded-lg p-6">
-              <img src={logo} alt={t('company_logo') ?? 'Company logo'} />
+              <img
+                className="w-full h-auto object-contain"
+                src={logo}
+                alt={t('company_logo') ?? 'Company logo'}
+              />
             </div>
           </div>
 

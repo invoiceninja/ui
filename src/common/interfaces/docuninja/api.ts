@@ -246,6 +246,7 @@ export interface Settings {
   ninja_purchase_order_notification: boolean;
   email_client_when_completed: boolean;
   force_des_signature: boolean;
+  attach_audit_log_to_completed_email: boolean;
 }
 
 export interface DocumentFile {

@@ -35,6 +35,7 @@ export function RecoverPassword() {
 
   const [t] = useTranslation();
   const [isFormBusy, setIsFormBusy] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
   const [message, setMessage] = useState<Response | undefined>(undefined);
   const [errors, setErrors] = useState<ForgotPasswordValidation | undefined>(
     undefined
@@ -49,12 +50,22 @@ export function RecoverPassword() {
       setErrors(undefined);
       setMessage(undefined);
 
-      request('POST', endpoint('/api/v1/reset_password'), values)
-        .then((response: AxiosResponse) => setMessage(response.data))
+      request('POST', endpoint('/api/v1/reset_password'), values, { skipIntercept: true })
+        .then((response: AxiosResponse) => {
+          setMessage(response.data);
+          setIsDisabled(true);
+          setTimeout(() => setIsDisabled(false), 30000);
+        })
         .catch((error: AxiosError<ForgotPasswordValidation>) => {
-          return error.response?.status === 422
-            ? setErrors(error.response?.data.errors as ForgotPasswordValidation)
-            : setMessage(error.response?.data as Response);
+          if (error.response?.status === 422) {
+            setErrors(error.response?.data as ForgotPasswordValidation);
+          } else if (error.response?.status === 429) {
+            setMessage({ message: "Too many requests.", status: false });
+            setIsDisabled(true);
+            setTimeout(() => setIsDisabled(false), 30000);
+          } else {
+            setMessage(error.response?.data as Response);
+          }
         })
         .finally(() => setIsFormBusy(false));
     },
@@ -80,7 +91,9 @@ export function RecoverPassword() {
               type="email"
               label={t('email_address')}
               id="email"
-              onChange={form.handleChange}
+              required
+              onValueChange={(value) => form.setFieldValue('email', value)}
+              changeOverride
             />
 
             <ErrorMessage className="mt-2">
@@ -89,7 +102,7 @@ export function RecoverPassword() {
 
             <ErrorMessage className="mt-4">{message?.message}</ErrorMessage>
 
-            <Button disabled={isFormBusy} className="mt-4" variant="block">
+            <Button disabled={isFormBusy || isDisabled} className="mt-4" variant="block">
               {t('send_email')}
             </Button>
           </form>

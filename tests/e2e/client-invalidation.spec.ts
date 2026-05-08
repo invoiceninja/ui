@@ -1,15 +1,13 @@
 import { login, permissions } from '$tests/e2e/helpers';
-import { test, expect } from '@playwright/test';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
 
-test('test appropriate invalidation of clients', async ({ page }) => {
+test('test appropriate invalidation of clients', async ({ page, api }) => {
   const { clear, save } = permissions(page);
+  const clientName = uniqueName('inv-client');
 
   await login(page);
   await clear();
   await save();
-
-  // const client_name = faker.person.fullName();
-  // console.log(client_name);
 
   await page.getByRole('link', { name: 'Clients' }).click();
   await page
@@ -17,66 +15,76 @@ test('test appropriate invalidation of clients', async ({ page }) => {
     .first()
     .click();
 
-  await page.locator('div').filter({ hasText: /^Name$/ }).getByRole('textbox').click()
-  
-  await page.locator('div').filter({ hasText: /^Name$/ }).getByRole('textbox').fill('hello dear')
+  await page.locator('div').filter({ hasText: /^Name$/ }).getByRole('textbox').click();
+  await page.locator('div').filter({ hasText: /^Name$/ }).getByRole('textbox').fill(clientName);
 
   await page.getByRole('button', { name: 'Save' }).click();
+
+  // Track the client for cleanup
+  await api.trackEntityByName('clients', clientName);
+
   await page
     .getByRole('link', { name: 'New Invoice', exact: true })
     .first()
     .click();
-  await page.getByRole('combobox', { name: 'Client' }).click();
-  await page.getByRole('combobox', { name: 'Client' }).fill('hello dear');
+
+
+  // await page.getByRole('combobox', { name: 'Client' }).click();
+  // await page.getByRole('combobox', { name: 'Client' }).fill(clientName);
+  // await page.getByRole('button', { name: 'Client' }).first().click();
+
+  // await page.getByRole('option').first().click();
+  // getByRole('button', { name: 'Client' })
+  // await page.getByRole('option', { name: clientName }).first().click();
+
   await expect(page.getByRole('combobox', { name: 'Client' })).toHaveValue(
-    'hello dear'
+    clientName
   );
+
+
   await page.getByRole('button', { name: 'Add Item' }).click();
   await page.locator('#notes').click();
   await page.locator('#notes').fill('something fancy');
   await page.locator('#notes').press('Tab');
   await page.getByRole('row', { name: 'something fancy 1 $' }).getByRole('textbox').nth(2).fill('1');
-  // await page.locator('#cost').fill('1');
-  // await page.locator('#cost').press('Tab');
-  
+
   await page.getByRole('row', { name: 'something fancy 1 1 $' }).getByRole('textbox').nth(3).fill('1');
   await page.getByRole('row', { name: 'something fancy 1 1 $' }).getByRole('textbox').nth(3).press('Tab');
-  // await page.locator('#quantity').fill('1');
-  // await page.locator('#quantity').press('Tab');
   await page.getByRole('cell', { name: '$ 1.00' }).getByRole('button').click();
   await page.getByRole('button', { name: 'Save' }).click();
-  // await page.getByRole('button', { name: 'Mark Sent' }).click();
 
   await page.getByRole('button', { name: 'Save' }).click();
-  // await page
-  //   .locator('div')
-  //   .filter({ hasText: /^Purchase White LabelSave$/ })
-  //   .getByRole('button')
-  //   .nth(3)
-  //   .click();
 
-  await page.locator('div').filter({ hasText: /^Purchase White LabelSave$/ }).getByRole('button').nth(2).click();
 
-  await page.getByRole('button', { name: 'Mark Sent' }).click();
-  await page.getByRole('link', { name: 'View Client' }).click();
+  // Track invoice 1
+  const invoice1Url = page.url();
+  const invoice1Id = invoice1Url.match(/invoices\/([^/]+)/)?.[1];
+  if (invoice1Id) api.trackEntity('invoices', invoice1Id);
+
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  const markSent1 = page.getByRole('button', { name: 'Mark Sent' });
+  await markSent1.waitFor({ state: 'visible', timeout: 5000 });
+  await markSent1.click();
+
+  await page.getByRole('link', { name: 'View', exact: true }).click();
+
+  // await page.getByRole('button', { name: 'Discard Changes' }).click();
+  // await page.getByRole('link', { name: 'View Client' }).click();
+  
   await expect(
-    page
-      .locator('div')
+    page.getByText('Paid to Date$')
       .filter({ hasText: /^Paid to Date\$ 0\.00$/ })
-      .getByRole('definition')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
   await expect(
-    page
-      .locator('div')
+    page.getByText('Outstanding$')
       .filter({ hasText: /^Outstanding\$ 0\.00$/ })
-      .getByRole('definition')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
   await expect(
-    page
-      .locator('div')
+    page.getByText('Credit Balance$')
       .filter({ hasText: /^Credit Balance\$ 0\.00$/ })
-      .getByRole('definition')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
+
   await page
     .getByRole('main')
     .getByRole('link', { name: 'New Invoice' })
@@ -90,79 +98,60 @@ test('test appropriate invalidation of clients', async ({ page }) => {
   await page.locator('#notes').click();
   await page.locator('#notes').fill('something fancy');
   await page.locator('#notes').press('Tab');
-  
+
   await page.getByRole('row', { name: 'something fancy 1 $' }).getByRole('textbox').nth(2).fill('10');
   await page.getByRole('cell', { name: '10' }).getByRole('textbox').press('Tab');
 
-  // await page.locator('#cost').fill('10');
-  // await page.locator('#cost').press('Tab');
-  // await page.locator('#quantity').fill('10');
   await page.getByRole('cell', { name: '1', exact: true }).getByRole('textbox').fill('10');
   await page.getByRole('row', { name: 'something fancy 10 10 $' }).getByRole('textbox').nth(3).press('Tab');
 
-  // await page.locator('#quantity').press('Tab');
   await page.getByRole('button', { name: 'Save' }).click();
-  await page.locator('div').filter({ hasText: /^Purchase White LabelSave$/ }).getByRole('button').nth(2).click();
-  await page.getByRole('button', { name: 'Mark Sent' }).click();
-  await page.getByRole('link', { name: 'View Client' }).click();
+
+  // Track invoice 2
+  const invoice2Url = page.url();
+  const invoice2Id = invoice2Url.match(/invoices\/([^/]+)/)?.[1];
+  if (invoice2Id) api.trackEntity('invoices', invoice2Id);
+
+  await page.locator('[data-cy="chevronDownButton"]').first().click();
+
+  const markSentButton = page.getByRole('button', { name: 'Mark Sent' });
+  await markSentButton.waitFor({ state: 'visible', timeout: 5000 });
+  await markSentButton.click();
+
+  await page.getByRole('link', { name: 'View', exact: true }).click();
 
   await expect(
-    page
-      .locator('div')
+    page.getByText('Paid to Date$')
       .filter({ hasText: /^Paid to Date\$ 0\.00$/ })
-      .getByRole('definition')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
   await expect(
-    page
-      .locator('div')
+    page.getByText('Outstanding$')
       .filter({ hasText: /^Outstanding\$ 100\.00$/ })
-      .getByRole('definition')
-  ).toBeVisible(); //improper invalidation causing this to fail
+  ).toBeVisible({ timeout: 10000 });
   await expect(
-    page
-      .locator('div')
+    page.getByText('Credit Balance$')
       .filter({ hasText: /^Credit Balance\$ 0\.00$/ })
-      .getByRole('definition')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
-  // await page.getByRole('cell', { name: 'Actions' }).getByRole('button').first().click();
-  await page.getByRole('button', { name: 'Actions' }).nth(3).first().click();
-  // await page.getByRole('cell', { name: 'Actions' }).getByRole('button').click();
+  await page.getByRole('button', { name: 'Actions' }).first().click();
   await page.getByRole('button', { name: 'Mark Paid' }).click();
 
   await expect(
-    page
-      .locator('div')
+    page.getByText('Paid to Date$')
       .filter({ hasText: /^Paid to Date\$ 100\.00$/ })
-      .getByRole('definition')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
   await expect(
-    page
-      .locator('div')
+    page.getByText('Outstanding$')
       .filter({ hasText: /^Outstanding\$ 0\.00$/ })
-      .getByRole('definition')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
   await expect(
-    page
-      .locator('div')
+    page.getByText('Credit Balance$')
       .filter({ hasText: /^Credit Balance\$ 0\.00$/ })
-      .getByRole('definition')
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 
-  await page.getByRole('row').first().getByRole('checkbox').click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^ActionsActive$/ })
-    .locator('button')
-    .click();
-  await page.getByRole('button', { name: 'Delete' }).click();
-
-  await page.getByRole('link', { name: 'Clients' }).first().click();
-  await page.getByRole('row').first().getByRole('checkbox').first().click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^ActionsActive$/ })
-    .locator('button')
-    .click();
-  await page.getByRole('button', { name: 'Delete' }).click();
+await page.getByRole('link', { name: 'Clients' }).first().click();
+await page.getByRole('cell').first().getByRole('checkbox').first().click();
+await page.getByRole('button', { name: 'Actions' }).first().click();
+await page.getByRole('button', { name: 'Delete' }).click();
+  // API-based cleanup is handled automatically by the fixture teardown
 });

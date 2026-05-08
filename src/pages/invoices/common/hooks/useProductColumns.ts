@@ -207,6 +207,11 @@ export function useProductColumns() {
       updatedVariables.push('$product.line_total');
     }
 
+    // Editor only: net cost is a read-only label on the unit cost column (see useResolveInputField).
+    updatedVariables = updatedVariables.filter(
+      (variable) => variable !== '$product.net_cost'
+    );
+
     setColumns(updatedVariables);
   }, [company]);
 

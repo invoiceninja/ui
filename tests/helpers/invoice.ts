@@ -25,12 +25,27 @@ export const createInvoice = async (params: CreateParams) => {
     .getByRole('link', { name: 'New Invoice' })
     .click();
 
-  await page.waitForTimeout(900);
+  // Wait for the client combobox to load and show options
+  await page.waitForTimeout(500);
 
-  await page.getByRole('option').first().click();
+  // The combobox is initially visible for new invoices — click to focus and trigger search
+  const comboboxInput = page.getByRole('combobox', { name: 'Client' });
+  await comboboxInput.waitFor({ state: 'visible', timeout: 5000 });
+  await comboboxInput.click();
+  await page.waitForTimeout(500);
+
+  // Wait for at least one option to appear (client from createClient)
+  const clientOption = page.getByRole('option').first();
+  await clientOption.waitFor({ state: 'visible', timeout: 5000 });
+  await clientOption.click();
 
   if (assignTo) {
-    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await page
+      .locator('[data-cy="tabs"]')
+      .first()
+      .getByRole('link', { name: 'Settings', exact: true })
+      .first()
+      .click();
     await page.getByLabel('User').first().click();
     await page.getByRole('option', { name: assignTo }).first().click();
   }

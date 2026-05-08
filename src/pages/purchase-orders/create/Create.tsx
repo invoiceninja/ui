@@ -155,7 +155,9 @@ export default function Create() {
     });
 
     return () => {
-      setPurchaseOrder(undefined);
+      if (searchParams.get('action') !== 'clone') {
+        setPurchaseOrder(undefined);
+      }
     };
   }, [data]);
 

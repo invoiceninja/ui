@@ -8,7 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useMemo } from 'react';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
@@ -28,6 +30,7 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Project } from '$app/common/interfaces/project';
 import { InputLabel } from '$app/components/forms';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export default function Projects() {
   useTitle('projects');
@@ -37,12 +40,10 @@ export default function Projects() {
 
   const pages = [{ name: t('projects'), href: '/projects' }];
 
-  const columns = useProjectColumns();
-
   const actions = useActions();
-
+  const columns = useProjectColumns();
+  const reactSettings = useReactSettings();
   const projectColumns = useAllProjectColumns();
-
   const customBulkActions = useCustomBulkActions();
 
   const {
@@ -51,11 +52,31 @@ export default function Projects() {
     changeTemplateResources,
   } = useChangeTemplate();
 
+  const queryInclusionEntities = useMemo(() => {
+    const selectedColumns =
+      reactSettings?.react_table_columns?.project || defaultColumns;
+
+    let value = 'client';
+
+    if (selectedColumns.includes('user')) {
+      value += ',user';
+    }
+
+    if (selectedColumns.includes('assigned_to')) {
+      value += ',assigned_user';
+    }
+
+    return value;
+  }, [reactSettings?.react_table_columns?.project]);
+
   return (
     <Default title={t('projects')} breadcrumbs={pages} docsLink="en/projects/">
       <DataTable
         resource="project"
-        endpoint="/api/v1/projects?status=active&include=client&without_deleted_clients=true&sort=id|desc"
+        endpoint={route(
+          '/api/v1/projects?status=active&include=:include&without_deleted_clients=true&sort=id|desc',
+          { include: queryInclusionEntities }
+        )}
         bulkRoute="/api/v1/projects/bulk"
         columns={columns}
         customActions={actions}

@@ -4,6 +4,7 @@ export default [
   {
     quantity: 1,
     cost: 10,
+    net_cost: 10,
     product_key: '',
     notes: '',
     discount: 0,
@@ -31,6 +32,7 @@ export default [
   {
     quantity: 1,
     cost: 10,
+    net_cost: 10,
     product_key: '',
     notes: '',
     discount: 0,

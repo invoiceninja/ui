@@ -63,6 +63,7 @@ export function CloneOptionsModal({ recurringInvoice, dropdown }: Props) {
       id: '',
       documents: [],
       number: '',
+      client: undefined,
     });
 
     navigate('/recurring_invoices/create?action=clone');
@@ -85,6 +86,7 @@ export function CloneOptionsModal({ recurringInvoice, dropdown }: Props) {
       status_id: '',
       vendor_id: '',
       design_id: company.settings.invoice_design_id,
+      client: undefined,
     });
 
     navigate('/invoices/create?action=clone');
@@ -128,6 +130,7 @@ export function CloneOptionsModal({ recurringInvoice, dropdown }: Props) {
       due_date: '',
       partial_due_date: '',
       design_id: company.settings.credit_design_id,
+      client: undefined,
     });
 
     navigate('/credits/create?action=clone');
@@ -151,6 +154,7 @@ export function CloneOptionsModal({ recurringInvoice, dropdown }: Props) {
       due_date: '',
       partial_due_date: '',
       design_id: company.settings.purchase_order_design_id,
+      vendor: undefined,
     });
 
     navigate('/purchase_orders/create?action=clone');

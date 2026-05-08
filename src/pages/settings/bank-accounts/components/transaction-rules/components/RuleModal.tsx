@@ -31,20 +31,26 @@ interface Props {
   appliesTo: 'DEBIT' | 'CREDIT';
 }
 
-const OPERATORS = {
-  description: [
-    { value: 'contains', label: 'contains' },
-    { value: 'starts_with', label: 'starts_with' },
-    { value: 'is', label: 'is' },
-    { value: 'is_empty', label: 'is_empty' },
-  ],
-  amount: [
+const stringOperators = [
+  { value: 'contains', label: 'contains' },
+  { value: 'starts_with', label: 'starts_with' },
+  { value: 'is', label: 'is' },
+  { value: 'is_empty', label: 'is_empty' },
+];
+
+const numberOperators = [
     { value: '<', label: '<' },
     { value: '<=', label: '<=' },
     { value: '=', label: '=' },
     { value: '>', label: '>' },
     { value: '>=', label: '>=' },
-  ],
+  ];
+
+const OPERATORS = {
+  description: stringOperators,
+  participant: stringOperators,
+  participant_name: stringOperators,
+  amount: numberOperators,
 };
 
 export function RuleModal({
@@ -77,9 +83,8 @@ export function RuleModal({
   const handleChangeRuleField = (value: string) => {
     handleChangeRule('search_key', value);
 
-    if (value === 'description') {
-      handleChangeRule('operator', 'contains');
-    }
+    const matches = ['description', 'participant', 'participant_name'].includes(value);
+    if (matches) handleChangeRule('operator', 'contains');
 
     if (value === 'amount') {
       handleChangeRule('operator', '<');
@@ -130,6 +135,8 @@ export function RuleModal({
           {t('description')}
         </option>
         <option value="amount">{t('amount')}</option>
+        <option value="participant">{t('participant')}</option>
+        <option value="participant_name">{t('participant_name')}</option>
       </SelectField>
 
       <SelectField

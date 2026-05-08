@@ -45,23 +45,39 @@ export function TaskClock(props: Props) {
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(
     undefined
   );
+  const anchorRef = useRef<number>(0);
+  const baseSecondsRef = useRef<number>(0);
+
+  const syncFromSource = () => {
+    const calculation = Number(
+      calculateTime(props.task.time_log, {
+        inSeconds: true,
+        calculateLastTimeLog: Boolean(props.calculateLastTimeLog),
+      })
+    );
+
+    baseSecondsRef.current = calculation;
+    anchorRef.current = dayjs().unix();
+
+    setSeconds(calculation);
+  };
+
+  const startInterval = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    intervalRef.current = setInterval(() => {
+      const elapsed = dayjs().unix() - anchorRef.current;
+
+      setSeconds(baseSecondsRef.current + elapsed);
+    }, 1000);
+  };
 
   const handleVisibilityChange = () => {
-    const calculation = calculateTime(props.task.time_log, {
-      inSeconds: true,
-      calculateLastTimeLog: Boolean(props.calculateLastTimeLog),
-    });
-
-    if (isTaskActive) {
-      setSeconds(Number(calculation));
-
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-
-      intervalRef.current = setInterval(() => {
-        setSeconds((current) => current + 1);
-      }, 1000);
+    if (document.visibilityState === 'visible' && isTaskActive) {
+      syncFromSource();
+      startInterval();
     }
   };
 
@@ -72,17 +88,10 @@ export function TaskClock(props: Props) {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     }
 
-    const calculation = calculateTime(props.task.time_log, {
-      inSeconds: true,
-      calculateLastTimeLog: Boolean(props.calculateLastTimeLog),
-    });
-
     if (isTaskActive) {
-      setSeconds(Number(calculation));
+      syncFromSource();
 
-      intervalRef.current = setInterval(() => {
-        setSeconds((current) => current + 1);
-      }, 1000);
+      startInterval();
 
       document.addEventListener('visibilitychange', handleVisibilityChange);
     }

@@ -215,7 +215,7 @@ export default function Edit() {
               errorMessage={errors?.errors.client_id}
               textOnly
               readonly
-              afterClientName={<TaxDataBadge invoice={invoice} />}
+              afterClientName={<TaxDataBadge resource={invoice} />}
             />
           </div>
         </Card>

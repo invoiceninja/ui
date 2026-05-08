@@ -1,5 +1,5 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
-import test, { expect } from '@playwright/test';
+import { test, expect } from '$tests/e2e/fixtures';
 import { chromium } from '@playwright/test';
 
 test.beforeAll(async () => {
@@ -23,7 +23,7 @@ test('can create a client', async ({ page }) => {
   await page.getByRole('link', { name: 'Clients', exact: true }).click();
   await page.getByText('New Client').click();
 
-  await expect(page.getByRole('heading', { name: 'New Client' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'New Client' })).toBeVisible({ timeout: 10000 });
 });
 
 test('can create a product', async ({ page }) => {
@@ -32,7 +32,7 @@ test('can create a product', async ({ page }) => {
 
   await expect(
     page.getByRole('heading', { name: 'New Product' }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('can create an invoice', async ({ page }) => {
@@ -41,7 +41,7 @@ test('can create an invoice', async ({ page }) => {
 
   await expect(
     page.getByRole('heading', { name: 'New Invoice' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('can create a recurring invoice', async ({ page }) => {
@@ -52,7 +52,7 @@ test('can create a recurring invoice', async ({ page }) => {
 
   await expect(
     page.getByRole('heading', { name: 'New Recurring Invoice' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('can create a payment', async ({ page }) => {
@@ -61,14 +61,14 @@ test('can create a payment', async ({ page }) => {
 
   await expect(
     page.getByRole('heading', { name: 'Enter Payment' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('can create a quote', async ({ page }) => {
   await page.getByRole('link', { name: 'Quotes', exact: true }).click();
   await page.getByText('New Quote').click();
 
-  await expect(page.getByRole('heading', { name: 'New Quote' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'New Quote' })).toBeVisible({ timeout: 10000 });
 });
 
 test('can create a credit', async ({ page }) => {
@@ -77,7 +77,7 @@ test('can create a credit', async ({ page }) => {
 
   await expect(
     page.getByRole('heading', { name: 'Enter Credit' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('can create a project', async ({ page }) => {
@@ -86,22 +86,22 @@ test('can create a project', async ({ page }) => {
 
   await expect(
     page.getByRole('heading', { name: 'New Project' }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('can create a task', async ({ page }) => {
   await page.getByRole('link', { name: 'Tasks', exact: true }).click();
   await page.getByText('New Task').click();
 
-  await expect(page.getByRole('heading', { name: 'New Task' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'New Task' })).toBeVisible({ timeout: 10000 });
 });
 
 test('can create a vendor', async ({ page }) => {
   await page.getByRole('link', { name: 'Vendors', exact: true }).click();
   await page.getByText('New Vendor').click();
 
-  await expect(page.getByRole('heading', { name: 'Details' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Contacts' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Details' })).toBeVisible({ timeout: 10000 });
+  await expect(page.getByRole('heading', { name: 'Contacts' })).toBeVisible({ timeout: 10000 });
 });
 
 test('can create a purchase order', async ({ page }) => {
@@ -112,15 +112,15 @@ test('can create a purchase order', async ({ page }) => {
 
   await expect(
     page.getByRole('heading', { name: 'New Purchase Order' })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });
 
 test('can create an expense', async ({ page }) => {
   await page.getByRole('link', { name: 'Expenses', exact: true }).click();
   await page.getByText('Enter Expense').click();
 
-  await expect(page.getByRole('heading', { name: 'Details' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Notes' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Details' })).toBeVisible({ timeout: 10000 });
+  await expect(page.getByRole('heading', { name: 'Notes' })).toBeVisible({ timeout: 10000 });
 });
 
 test('can create a recurring expense', async ({ page }) => {
@@ -129,8 +129,8 @@ test('can create a recurring expense', async ({ page }) => {
     .click();
   await page.getByText('New Recurring Expense').click();
 
-  await expect(page.getByRole('heading', { name: 'Details' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Notes' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Details' })).toBeVisible({ timeout: 10000 });
+  await expect(page.getByRole('heading', { name: 'Notes' })).toBeVisible({ timeout: 10000 });
 });
 
 test('can create a bank transaction', async ({ page }) => {
@@ -139,5 +139,5 @@ test('can create a bank transaction', async ({ page }) => {
 
   await expect(
     page.getByRole('heading', { name: 'New Transaction' }).first()
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
 });

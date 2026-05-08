@@ -28,4 +28,5 @@ export interface ClientContact {
   password: string;
   link: string;
   can_sign: boolean;
+  cc_only: boolean;
 }

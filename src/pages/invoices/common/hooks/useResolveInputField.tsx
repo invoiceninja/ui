@@ -397,6 +397,10 @@ export function useResolveInputField(props: Props) {
   return (key: string, index: number) => {
     const property = resolveProperty(key);
 
+    if (property === 'net_cost') {
+      return null;
+    }
+
     if (property === 'product_key') {
       return (
         <ProductSelector

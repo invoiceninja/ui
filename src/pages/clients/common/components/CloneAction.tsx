@@ -7,8 +7,7 @@ import { useState } from 'react';
 import { Button } from '$app/components/forms';
 import { useBulk } from '$app/common/queries/clients';
 import { Client } from '$app/common/interfaces/client';
-import { route } from '$app/common/helpers/route';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface Props {
   client: Client;
@@ -18,15 +17,19 @@ export function CloneAction({ client }: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
+  const { id } = useParams();
+
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const bulk = useBulk({
-    onSuccess: (clients) => {
+    onSuccess: () => {
       setIsModalVisible(false);
 
-      setTimeout(() => {
-        navigate(route('/clients/:id/edit', { id: clients[0].id }));
-      }, 150);
+      if (id) {
+        setTimeout(() => {
+          navigate('/clients');
+        }, 150);
+      }
     },
   });
 

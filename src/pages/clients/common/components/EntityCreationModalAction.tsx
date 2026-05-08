@@ -24,6 +24,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
+import { Refresh } from '$app/components/icons/Refresh';
 
 interface Props {
   client: Client;
@@ -45,6 +46,16 @@ export function EntityCreationModalAction({ client, dropdown }: Props) {
 
     setTimeout(() => {
       navigate(route('/invoices/create?client=:id', { id: client.id }));
+    }, 150);
+  };
+
+  const handleCreateRecurringInvoice = () => {
+    setIsModalVisible(false);
+
+    setTimeout(() => {
+      navigate(
+        route('/recurring_invoices/create?client=:id', { id: client.id })
+      );
     }, 150);
   };
 
@@ -100,6 +111,14 @@ export function EntityCreationModalAction({ client, dropdown }: Props) {
                 label={t('invoice')}
                 iconElement={<Invoice size="1.1rem" color={colors.$3} />}
                 onClick={handleCreateInvoice}
+              />
+            )}
+
+            {hasPermission('create_recurring_invoice') && (
+              <CloneOption
+                label={t('recurring_invoice')}
+                iconElement={<Refresh size="1.1rem" color={colors.$3} />}
+                onClick={handleCreateRecurringInvoice}
               />
             )}
 

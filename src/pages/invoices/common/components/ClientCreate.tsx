@@ -53,6 +53,7 @@ export function ClientCreate({
       email: '',
       phone: '',
       send_email: false,
+      cc_only: false,
     },
   ]);
 
@@ -110,6 +111,7 @@ export function ClientCreate({
         email: '',
         phone: '',
         send_email: false,
+        cc_only: false,
       },
     ]);
   };

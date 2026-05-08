@@ -348,6 +348,9 @@ export interface Settings {
   ses_region: string;
   ses_topic_arn: string;
   ses_from_address: string;
+  e_invoice_forward_email: string;
+  e_expense_forward_email: string;
+  skip_automatic_email_with_peppol: boolean;
 }
 
 export interface TaxData {
@@ -363,8 +366,29 @@ export interface Regions {
   EU: EURegion;
   AU: AURegion;
   UK: UKRegion;
+  AD: AndorraRegion;
+  SG: SGRegion;
+}
+export interface AndorraRegion {
+  has_sales_above_threshold: boolean;
+  tax_all_subregions: boolean;
+  tax_threshold: number;
+  subregions: AndorraSubregion;
+}
+export interface AndorraSubregion {
+  AD: TaxSetting;
 }
 
+export interface SGRegion {
+  has_sales_above_threshold: boolean;
+  tax_all_subregions: boolean;
+  tax_threshold: number;
+  subregions: SGSubregion;
+}
+
+export interface SGSubregion {
+  SG: TaxSetting;
+}
 export interface USRegion {
   has_sales_above_threshold: boolean;
   tax_all_subregions: boolean;

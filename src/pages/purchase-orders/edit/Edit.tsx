@@ -231,7 +231,7 @@ export default function Edit() {
         <div className="my-4">
           {purchaseOrder && (
             <InvoicePreview
-              for="create"
+              for="invoice"
               resource={purchaseOrder}
               entity="purchase_order"
               relationType="vendor_id"

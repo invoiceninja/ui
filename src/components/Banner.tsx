@@ -12,7 +12,7 @@ import classNames from 'classnames';
 import { CSSProperties, ReactNode } from 'react';
 
 interface Props {
-  variant: 'orange' | 'red';
+  variant: 'orange' | 'red' | 'blue';
   children: ReactNode;
   className?: string;
   id?: string;
@@ -28,6 +28,7 @@ export function Banner({ variant, children, className, id, style }: Props) {
         {
           'bg-orange-300': variant === 'orange',
           'bg-red-300': variant === 'red',
+          'bg-blue-300': variant === 'blue',
         },
         className
       )}

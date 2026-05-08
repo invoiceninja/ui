@@ -102,6 +102,7 @@ export function CloneOptionsModal({ purchaseOrder, dropdown }: Props) {
       paid_to_date: 0,
       po_number: purchaseOrder.number,
       design_id: company.settings.invoice_design_id,
+      client: undefined,
     });
 
     setIsModalVisible(false);
@@ -130,6 +131,7 @@ export function CloneOptionsModal({ purchaseOrder, dropdown }: Props) {
       paid_to_date: 0,
       po_number: purchaseOrder.number,
       design_id: company.settings.quote_design_id,
+      client: undefined,
     });
 
     setIsModalVisible(false);
@@ -158,6 +160,7 @@ export function CloneOptionsModal({ purchaseOrder, dropdown }: Props) {
       partial_due_date: '',
       po_number: purchaseOrder.number,
       design_id: company.settings.invoice_design_id,
+      client: undefined,
     });
 
     setIsModalVisible(false);
@@ -186,6 +189,7 @@ export function CloneOptionsModal({ purchaseOrder, dropdown }: Props) {
       paid_to_date: 0,
       po_number: purchaseOrder.number,
       design_id: company.settings.credit_design_id,
+      client: undefined,
     });
 
     setIsModalVisible(false);

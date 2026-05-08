@@ -44,8 +44,6 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useSocketEvent } from '$app/common/queries/sockets';
-import { $refetch } from '$app/common/hooks/useRefetch';
 import { InputLabel } from '$app/components/forms';
 import { confirmActionModalAtom } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
 import { DeleteInvoicesConfirmationModal } from '../common/components/DeleteInvoicesConfirmationModal';
@@ -99,14 +97,6 @@ export default function Invoices() {
     setChangeTemplateVisible,
     changeTemplateResources,
   } = useChangeTemplate();
-
-  useSocketEvent({
-    on: [
-      'App\\Events\\Invoice\\InvoiceWasPaid',
-      'App\\Events\\Invoice\\InvoiceWasViewed',
-    ],
-    callback: () => $refetch(['invoices']),
-  });
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} docsLink="en/invoices">

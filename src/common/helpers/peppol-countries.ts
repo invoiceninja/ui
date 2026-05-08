@@ -8,7 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+export type Classification = 'individual' | 'business' | 'government';
+
 export const PEPPOL_COUNTRIES = [
+  '20',
   '40',
   '56',
   '208',
@@ -18,11 +21,13 @@ export const PEPPOL_COUNTRIES = [
   '442',
   '528',
   '578',
+  '616',
+  '702',
   '752',
   '826',
 ];
 
-export const PEPPOL_CLASSIFICATIONS: Record<string, string[]> = {
+export const PEPPOL_CLASSIFICATIONS: Record<string, Classification[]> = {
     '840': ['business'],                          // US
     '124': ['business'],                          // CA
     '484': ['business'],                          // MX

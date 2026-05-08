@@ -35,6 +35,8 @@ import { activityRoutes } from '$app/pages/activities/routes';
 import { Guard } from './guards/Guard';
 import { permission } from './guards/guards/permission';
 import { documentsRoutes } from '$app/pages/documents/routes';
+import { CorpPassSuccess } from '$app/pages/settings/e-invoice/peppol/CorpPassSuccess';
+import { CorpPassFailed } from '$app/pages/settings/e-invoice/peppol/CorpPassFailed';
 const Dashboard = lazy(() => import('$app/pages/dashboard/Dashboard'));
 const NotFound = lazy(() => import('$app/components/NotFound'));
 
@@ -70,6 +72,14 @@ export const routes = (
       {documentsRoutes}
       {settingsRoutes}
       {activityRoutes}
+      <Route
+        path="/einvoice/registration/success"
+        element={<CorpPassSuccess />}
+      />
+      <Route
+        path="/einvoice/registration/failed"
+        element={<CorpPassFailed />}
+      />
       <Route element={<TestingRoute />}>
         <Route path="/testing" element={<TestingPage />} />
       </Route>

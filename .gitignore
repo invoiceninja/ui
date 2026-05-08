@@ -24,6 +24,7 @@ yarn-debug.log*
 yarn-error.log*
 
 .env
+.env.testing
 .vscode/*
 
 cypress/videos
@@ -37,3 +38,7 @@ cypress/screenshots
 /playwright/.cache/
 
 .idea/*
+
+# Playwright
+node_modules/
+/playwright/.auth/

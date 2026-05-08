@@ -36,6 +36,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { MdInfo } from 'react-icons/md';
 import { TaxExemptBadge } from '$app/pages/clients/show/components/TaxExemptBadge';
 import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
+import { TaxDataBadge } from '$app/pages/invoices/edit/components/TaxDataBadge';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -114,6 +115,7 @@ export default function Edit() {
               errorMessage={errors?.errors.client_id}
               textOnly
               readonly
+              afterClientName={<TaxDataBadge resource={recurringInvoice} />}
             />
           </div>
         </Card>

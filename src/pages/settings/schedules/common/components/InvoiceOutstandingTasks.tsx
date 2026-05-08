@@ -62,7 +62,7 @@ export function InvoiceOutstandingTasks(props: Props) {
             ...schedule.parameters as TaskParameters,
             clients: [],
             auto_send: (schedule.parameters as TaskParameters)?.auto_send ?? false,
-            include_project_tasks: (schedule.parameters as TaskParameters)?.include_project_tasks ?? false,
+            include_project_tasks: (schedule.parameters as TaskParameters)?.include_project_tasks ?? false
         };
         
         currentParameters.clients = clients.map(({ id }) => id);

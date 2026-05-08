@@ -70,6 +70,7 @@ import { History } from '$app/components/icons/History';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { Icon } from '$app/components/icons/Icon';
 import { ChevronRight } from 'react-feather';
+import { dateUTC } from '$app/common/helpers/payment';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -581,7 +582,7 @@ export function InvoiceSlider() {
                           <span>-</span>
 
                           <span>
-                            {date(paymentable.created_at, dateFormat)}
+                            {dateUTC(paymentable.created_at, dateFormat)}
                           </span>
                         </div>
 

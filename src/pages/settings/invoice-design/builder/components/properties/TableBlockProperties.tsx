@@ -11,7 +11,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
+import classNames from 'classnames';
 import { ChevronUp, ChevronDown, Settings2, Trash2 } from 'lucide-react';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { PropertyEditorProps } from '../../types';
 import {
   TextInput,
@@ -45,6 +47,33 @@ function mergeTableRegion(raw?: TableRegionBordersHint) {
       left: raw?.sides?.left !== false,
     },
   };
+}
+
+/** Stored padding is always `${n}px`; the editor shows only the integer. */
+function paddingPropertyToDisplay(value: string | undefined): string {
+  if (value == null || value === '') {
+    return '';
+  }
+  const s = String(value).trim();
+  const fromPx = s.match(/^(\d+(?:\.\d+)?)\s*px\s*$/i);
+  if (fromPx) {
+    return String(Math.round(Number(fromPx[1])));
+  }
+  const n = Number.parseFloat(s);
+  return Number.isFinite(n) ? String(Math.round(n)) : '';
+}
+
+function displayToPaddingProperty(display: string): string | undefined {
+  const s = display.trim();
+  if (s === '') {
+    return undefined;
+  }
+  const n = Number.parseFloat(s);
+  if (!Number.isFinite(n) || n < 0) {
+    return undefined;
+  }
+  const clamped = Math.min(999, Math.max(0, Math.round(n)));
+  return `${clamped}px`;
 }
 
 // Available columns that can be added to the table
@@ -132,6 +161,7 @@ const getAvailableColumns = (isTasksTable: boolean, t: TFunction) => [
 export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
+  const reactSettings = useReactSettings({ overwrite: false });
   const [expandedColumn, setExpandedColumn] = useState<string | null>(null);
 
   const isTasksTable = block.type === 'tasks-table';
@@ -477,23 +507,27 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       <SectionDivider label={String(t('header'))} />
 
-      {/* Header Background */}
-      <ColorInput
-        label={String(t('background'))}
-        value={block.properties.headerBg}
-        onChange={(value) => updateProperty('headerBg', value)}
-        defaultValue="#F3F4F6"
-      />
 
-      {/* Header Text Color */}
-      <ColorInput
-        label={String(t('text_color'))}
-        value={block.properties.headerColor}
-        onChange={(value) => updateProperty('headerColor', value)}
-        defaultValue={DEFAULT_VALUE_TEXT_COLOR}
-      />
+      <div className="grid grid-cols-2 gap-3">
+        {/* Header Background */}
+        <ColorInput
+          label={String(t('background'))}
+          value={block.properties.headerBg}
+          onChange={(value) => updateProperty('headerBg', value)}
+          defaultValue="#F3F4F6"
+        />
+
+        {/* Header Text Color */}
+        <ColorInput
+          label={String(t('text_color'))}
+          value={block.properties.headerColor}
+          onChange={(value) => updateProperty('headerColor', value)}
+          defaultValue={DEFAULT_VALUE_TEXT_COLOR}
+        />
+      </div>
 
       <SectionDivider label={String(t('row'))} />
+
 
       {/* Alternate Rows */}
       <CheckboxInput
@@ -503,6 +537,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
         onChange={(value) => updateProperty('alternateRows', value)}
       />
 
+      <div className="grid grid-cols-2 gap-3">
       {block.properties.alternateRows && (
         <ColorInput
           label={String(t('background'))}
@@ -519,7 +554,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
         onChange={(value) => updateProperty('rowColor', value)}
         defaultValue={DEFAULT_VALUE_TEXT_COLOR}
       />
-
+</div>
       <SectionDivider label={String(t('borders'))} />
 
       <CheckboxInput
@@ -536,8 +571,8 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
           ).map((regionKey, idx) => {
             const label =
               regionKey === 'headerBorders'
-                ? String(t('table_border_header'))
-                : String(t('table_border_rows'));
+                ? String(t('header'))
+                : String(t('table_rows'));
 
             const region = mergeTableRegion(block.properties[regionKey]);
 
@@ -566,7 +601,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                   }
                 />
                 <RangeSliderInput
-                  label={String(t('border_width_label'))}
+                  label={String(t('width'))}
                   value={String(region.width)}
                   onChange={(value) =>
                     patchTableRegion(regionKey, {
@@ -581,7 +616,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                 <div className="grid grid-cols-2 gap-2">
                   <CheckboxInput
                     id={`${regionKey}-top`}
-                    label={String(t('border_side_top'))}
+                    label={String(t('top'))}
                     checked={region.sides.top}
                     onChange={(checked) =>
                       patchTableRegion(regionKey, {
@@ -591,7 +626,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                   />
                   <CheckboxInput
                     id={`${regionKey}-right`}
-                    label={String(t('border_side_right'))}
+                    label={String(t('right'))}
                     checked={region.sides.right}
                     onChange={(checked) =>
                       patchTableRegion(regionKey, {
@@ -601,7 +636,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                   />
                   <CheckboxInput
                     id={`${regionKey}-bottom`}
-                    label={String(t('border_side_bottom'))}
+                    label={String(t('bottom'))}
                     checked={region.sides.bottom}
                     onChange={(checked) =>
                       patchTableRegion(regionKey, {
@@ -611,7 +646,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                   />
                   <CheckboxInput
                     id={`${regionKey}-left`}
-                    label={String(t('border_side_left'))}
+                    label={String(t('left'))}
                     checked={region.sides.left}
                     onChange={(checked) =>
                       patchTableRegion(regionKey, {
@@ -628,14 +663,45 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       <SectionDivider label={String(t('spacing'))} />
 
-      {/* Cell Padding */}
-      <TextInput
-        label={String(t('cell_padding'))}
-        value={block.properties.padding}
-        onChange={(value) => updateProperty('padding', value)}
-        placeholder="8px"
-        hint={String(t('css_padding_format'))}
-      />
+      {/* Cell padding: native input so the canvas updates on every change (InputField+DebounceInput only committed on blur unless changeOverride, and still wraps DebounceInput). */}
+      <div>
+        <label
+          className="block text-sm font-medium mb-2"
+          style={{ color: colors.$3 }}
+        >
+          {t('cell_padding')}
+        </label>
+        <input
+          type="number"
+          min={0}
+          max={999}
+          step={1}
+          className={classNames(
+            'w-full py-2 px-3 rounded-md text-sm focus:outline-none focus:ring-0',
+            {
+              border: true,
+              'border-[#09090B26] focus:border-black': !reactSettings.dark_mode,
+              'border-[#1f2e41] focus:border-white': reactSettings.dark_mode,
+            }
+          )}
+          style={{
+            backgroundColor: colors.$1,
+            color: colors.$3,
+          }}
+          placeholder="8"
+          value={paddingPropertyToDisplay(block.properties.padding)}
+          onChange={(e) => {
+            const normalized = displayToPaddingProperty(e.target.value);
+            if (normalized === undefined) {
+              const nextProps = { ...block.properties };
+              delete nextProps.padding;
+              onChange({ ...block, properties: nextProps });
+            } else {
+              updateProperty('padding', normalized);
+            }
+          }}
+        />
+      </div>
     </div>
   );
 }

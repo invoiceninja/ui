@@ -32,6 +32,7 @@ export default function ProductColumns() {
     { value: '$product.description', label: t('description') },
     { value: '$product.quantity', label: t('quantity') },
     { value: '$product.unit_cost', label: t('unit_cost') },
+    { value: '$product.net_cost', label: t('unit_cost') },
     { value: '$product.tax', label: t('tax') },
     { value: '$product.discount', label: t('discount') },
     { value: '$product.line_total', label: t('line_total') },

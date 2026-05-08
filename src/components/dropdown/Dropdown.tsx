@@ -30,6 +30,8 @@ interface Props extends CommonProps {
   label?: string | null;
   cardActions?: boolean;
   cypressRef?: string;
+  /** When set, applied to the trigger control as data-cy (defaults to chevronDownButton). */
+  triggerCypressRef?: string;
   customLabel?: ReactNode;
   minWidth?: string;
   maxWidth?: string;
@@ -143,7 +145,7 @@ export function Dropdown(props: Props) {
               backgroundColor: props.cardActions && accentColor,
               color: props.cardActions ? 'white' : '',
             }}
-            data-cy="chevronDownButton"
+            data-cy={props.triggerCypressRef ?? 'chevronDownButton'}
           >
             {!props.cardActions && <span>{props.label}</span>}
             <ChevronDown size={props.cardActions ? 18 : 14} />

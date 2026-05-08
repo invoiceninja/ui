@@ -39,6 +39,7 @@ function Notifications() {
     ninja_credit_notification: false,
     ninja_purchase_order_notification: false,
     force_des_signature: false,
+    attach_audit_log_to_completed_email: true,
   });
   const isInitialized = useRef(false);
   const settingsRef = useRef<Settings>(settings);
@@ -229,6 +230,26 @@ function Notifications() {
           onChange={(value: boolean) => handleSettingsChange('email_client_when_completed', value)}
           disabled={isFormBusy}
         />
+      </Element>
+
+      <Element
+
+      leftSide={
+        <div className="flex flex-col">
+          <span className="text-sm font-medium">
+            {t('attach_audit_log_to_completed_email')}
+          </span>
+          <span className="text-xs text-gray-500">
+            {t('attach_audit_log_to_completed_email_description')}
+          </span>
+        </div>
+      }
+      >
+      <Toggle
+        checked={settings.attach_audit_log_to_completed_email}
+        onChange={(value: boolean) => handleSettingsChange('attach_audit_log_to_completed_email', value)}
+        disabled={isFormBusy}
+      />
       </Element>
     </Card>
   </>
