@@ -487,11 +487,18 @@ function Builder() {
                 backgroundColor: colors.$1,
                 textColor: colors.$3,
                 foregroundColor: colors.$4,
-              }
+              },
             },
             options: {
               header: {
                 sticky: false,
+              },
+              widgets: {
+                showLabel: getDocuNinjaCompany()?.settings?.widget_show_label,
+                borderStyle:
+                  getDocuNinjaCompany()?.settings?.widget_border_style,
+                borderColor:
+                  getDocuNinjaCompany()?.settings?.widget_border_color,
               },
             },
             endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,

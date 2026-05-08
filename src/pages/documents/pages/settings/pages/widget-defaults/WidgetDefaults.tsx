@@ -14,8 +14,9 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
+import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { ValidationAlert } from '$app/components/ValidationAlert';
 import { useAtom } from 'jotai';
@@ -178,25 +179,29 @@ function WidgetDefaults() {
             </div>
           }
         >
-          <div className="flex items-center space-x-3">
-            <InputField
-              value={settings.widget_border_color ?? '#FF5733'}
-              onValueChange={(value) =>
-                handleSettingsChange('widget_border_color', value)
-              }
-              disabled={isFormBusy}
-            />
+          <ColorPicker
+            value={settings.widget_border_color ?? '#FF5733'}
+            onValueChange={(value) =>
+              handleSettingsChange('widget_border_color', value)
+            }
+            disabled={isFormBusy}
+            includeDefaultPalette
+            renderLabelBox={(color) => (
+              <div
+                className="rounded-md flex items-center space-x-2 border p-1 cursor-pointer"
+                style={{ borderColor: colors.$24 }}
+              >
+                <div
+                  className="w-7 h-7 rounded-sm"
+                  style={{ backgroundColor: color }}
+                />
 
-            <input
-              type="color"
-              value={settings.widget_border_color ?? '#FF5733'}
-              onChange={(e) =>
-                handleSettingsChange('widget_border_color', e.target.value)
-              }
-              disabled={isFormBusy}
-              className="h-9 w-9 rounded cursor-pointer border-0 p-0"
-            />
-          </div>
+                <span className="text-sm" style={{ color: colors.$3 }}>
+                  {color.replace('#', '')}
+                </span>
+              </div>
+            )}
+          />
         </Element>
       </Card>
     </>
