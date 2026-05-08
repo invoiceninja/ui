@@ -125,16 +125,7 @@ function WidgetDefaults() {
         style={{ borderColor: colors.$24 }}
         headerStyle={{ borderColor: colors.$20 }}
       >
-        <Element
-          leftSide={
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">{t('show_label')}</span>
-              <span className="text-xs text-gray-500">
-                {t('show_label_description')}
-              </span>
-            </div>
-          }
-        >
+        <Element leftSide={t('show_label')}>
           <Toggle
             checked={settings.widget_show_label ?? false}
             onChange={(value: boolean) =>
@@ -144,16 +135,7 @@ function WidgetDefaults() {
           />
         </Element>
 
-        <Element
-          leftSide={
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">{t('border_style')}</span>
-              <span className="text-xs text-gray-500">
-                {t('border_style_description')}
-              </span>
-            </div>
-          }
-        >
+        <Element leftSide={t('border_style')}>
           <SelectField
             value={settings.widget_border_style ?? 'hidden'}
             onValueChange={(value) =>
@@ -169,16 +151,7 @@ function WidgetDefaults() {
           </SelectField>
         </Element>
 
-        <Element
-          leftSide={
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">{t('border_color')}</span>
-              <span className="text-xs text-gray-500">
-                {t('border_color_description')}
-              </span>
-            </div>
-          }
-        >
+        <Element leftSide={t('border_color')}>
           <ColorPicker
             value={settings.widget_border_color ?? '#FF5733'}
             onValueChange={(value) =>
