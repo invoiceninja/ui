@@ -20,6 +20,10 @@ import {
   CheckboxInput,
   SectionDivider,
 } from './PropertyInputs';
+import {
+  DesignerPxNumberInput,
+  mergePxOrOmit,
+} from './DesignerPxNumberInput';
 import { CellTypographyEditor } from './CellTypographyEditor';
 import { useCustomField } from '$app/components/CustomField';
 import { useColorScheme } from '$app/common/colors';
@@ -445,7 +449,7 @@ export function InvoiceDetailsBlockProperties({
 
       {/* Text Color */}
       <ColorInput
-        label={String(t('text_color'))}
+        label={String(t('value'))}
         value={block.properties.color}
         onChange={(value) => updateProperty('color', value)}
         defaultValue={DEFAULT_VALUE_TEXT_COLOR}
@@ -453,7 +457,7 @@ export function InvoiceDetailsBlockProperties({
 
       {/* Label Color */}
       <ColorInput
-        label={String(t('label_color'))}
+        label={String(t('label'))}
         value={block.properties.labelColor}
         onChange={(value) => updateProperty('labelColor', value)}
         defaultValue={DEFAULT_LABEL_TEXT_COLOR}
@@ -462,7 +466,7 @@ export function InvoiceDetailsBlockProperties({
       <SectionDivider label={String(t('columns'))} />
 
       <AlignmentInput
-        label={String(t('label_alignment'))}
+        label={String(t('w'))}
         value={block.properties.labelAlign || 'right'}
         onChange={(value) => updateProperty('labelAlign', value)}
       />
@@ -475,50 +479,101 @@ export function InvoiceDetailsBlockProperties({
 
       <SectionDivider label={String(t('spacing'))} />
 
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('padding'))}
         value={block.properties.padding}
-        onChange={(value) => updateProperty('padding', value)}
-        placeholder="0px"
-        hint={String(t('css_padding_format'))}
+        placeholder="0"
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'padding',
+              px
+            ),
+          })
+        }
       />
 
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('label_padding'))}
         value={block.properties.labelPadding}
-        onChange={(value) => updateProperty('labelPadding', value)}
-        placeholder="0px"
-        hint={String(t('css_padding_format'))}
+        placeholder="0"
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'labelPadding',
+              px
+            ),
+          })
+        }
       />
 
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('value_padding'))}
         value={block.properties.valuePadding}
-        onChange={(value) => updateProperty('valuePadding', value)}
-        placeholder="0px"
-        hint={String(t('css_padding_format'))}
+        placeholder="0"
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'valuePadding',
+              px
+            ),
+          })
+        }
       />
 
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('label_value_gap'))}
         value={block.properties.labelValueGap}
-        onChange={(value) => updateProperty('labelValueGap', value)}
-        placeholder="12px"
+        placeholder="12"
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'labelValueGap',
+              px
+            ),
+          })
+        }
       />
 
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('row_spacing'))}
         value={block.properties.rowSpacing}
-        onChange={(value) => updateProperty('rowSpacing', value)}
-        placeholder="0px"
+        placeholder="0"
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'rowSpacing',
+              px
+            ),
+          })
+        }
       />
 
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('value_min_width'))}
         value={block.properties.valueMinWidth}
-        onChange={(value) => updateProperty('valueMinWidth', value)}
-        placeholder={String(t('auto'))}
-        hint={String(t('leave_empty_for_auto'))}
+        placeholder=""
+        resettable
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'valueMinWidth',
+              px
+            ),
+          })
+        }
       />
     </div>
   );

@@ -13,13 +13,16 @@ import { useState, useEffect } from 'react';
 import { ChevronUp, ChevronDown, Type, Trash2 } from 'lucide-react';
 import { PropertyEditorProps } from '../../types';
 import {
-  TextInput,
   AlignmentInput,
   ColorInput,
   FontSizeInput,
   SectionDivider,
   CheckboxInput,
 } from './PropertyInputs';
+import {
+  DesignerPxNumberInput,
+  mergePxOrOmit,
+} from './DesignerPxNumberInput';
 import { CellTypographyEditor } from './CellTypographyEditor';
 import { useColorScheme } from '$app/common/colors';
 import { useLabelMapping } from '../../utils/label-variables';
@@ -323,7 +326,7 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       {/* Text Color (default value color, mirrors InvoiceDetails) */}
       <ColorInput
-        label={String(t('text_color'))}
+        label={String(t('value'))}
         value={block.properties.amountColor}
         onChange={(value) => updateProperty('amountColor', value)}
         defaultValue={DEFAULT_VALUE_TEXT_COLOR}
@@ -331,7 +334,7 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       {/* Label Color */}
       <ColorInput
-        label={String(t('label_color'))}
+        label={String(t('label'))}
         value={block.properties.labelColor}
         onChange={(value) => updateProperty('labelColor', value)}
         defaultValue={DEFAULT_LABEL_TEXT_COLOR}
@@ -370,51 +373,102 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
       <SectionDivider label={String(t('spacing'))} />
 
       {/* Block-level padding (mirrors InvoiceDetails) */}
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('padding'))}
         value={block.properties.padding}
-        onChange={(value) => updateProperty('padding', value)}
-        placeholder="0px"
-        hint={String(t('css_padding_format'))}
+        placeholder="0"
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'padding',
+              px
+            ),
+          })
+        }
       />
 
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('label_padding'))}
         value={block.properties.labelPadding}
-        onChange={(value) => updateProperty('labelPadding', value)}
-        placeholder="0px"
-        hint={String(t('css_padding_format'))}
+        placeholder="0"
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'labelPadding',
+              px
+            ),
+          })
+        }
       />
 
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('value_padding'))}
         value={block.properties.valuePadding}
-        onChange={(value) => updateProperty('valuePadding', value)}
-        placeholder="0px"
-        hint={String(t('css_padding_format'))}
+        placeholder="0"
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'valuePadding',
+              px
+            ),
+          })
+        }
       />
 
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('label_value_gap'))}
         value={block.properties.labelValueGap}
-        onChange={(value) => updateProperty('labelValueGap', value)}
-        placeholder="20px"
+        placeholder="20"
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'labelValueGap',
+              px
+            ),
+          })
+        }
       />
 
       {/* Row spacing — historical storage key on the Total block is `spacing`. */}
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('row_spacing'))}
         value={block.properties.spacing}
-        onChange={(value) => updateProperty('spacing', value)}
-        placeholder="8px"
+        placeholder="8"
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'spacing',
+              px
+            ),
+          })
+        }
       />
 
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('value_min_width'))}
         value={block.properties.valueMinWidth}
-        onChange={(value) => updateProperty('valueMinWidth', value)}
-        placeholder={String(t('auto'))}
-        hint={String(t('leave_empty_for_auto'))}
+        placeholder=""
+        resettable
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'valueMinWidth',
+              px
+            ),
+          })
+        }
       />
 
       <SectionDivider label={String(t('page_break') || 'Page Break')} />

@@ -14,12 +14,11 @@ import { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { PropertyEditorProps } from '../../types';
 import { useLogo } from '$app/common/hooks/useLogo';
+import { AlignmentInput, SelectInput, SectionDivider } from './PropertyInputs';
 import {
-  TextInput,
-  AlignmentInput,
-  SelectInput,
-  SectionDivider,
-} from './PropertyInputs';
+  DesignerPxNumberInput,
+  mergePxOrOmit,
+} from './DesignerPxNumberInput';
 import { useColorScheme } from '$app/common/colors';
 
 export function ImageBlockProperties({ block, onChange }: PropertyEditorProps) {
@@ -53,19 +52,39 @@ export function ImageBlockProperties({ block, onChange }: PropertyEditorProps) {
       <SectionDivider label={String(t('dimensions'))} />
 
       {/* Max Width */}
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('max_width'))}
         value={block.properties.maxWidth}
-        onChange={(value) => updateProperty('maxWidth', value)}
-        placeholder="150px"
+        placeholder="150"
+        resettable
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'maxWidth',
+              px
+            ),
+          })
+        }
       />
 
-      {/* Max Height */}
-      <TextInput
+      {/* Max Height — omit for default sizing behaviour */}
+      <DesignerPxNumberInput
         label={String(t('max_height'))}
         value={block.properties.maxHeight}
-        onChange={(value) => updateProperty('maxHeight', value)}
-        placeholder="auto"
+        placeholder=""
+        resettable
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'maxHeight',
+              px
+            ),
+          })
+        }
       />
 
       <SectionDivider label={String(t('layout'))} />
@@ -93,12 +112,20 @@ export function ImageBlockProperties({ block, onChange }: PropertyEditorProps) {
       <SectionDivider label={String(t('spacing'))} />
 
       {/* Padding */}
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('padding'))}
         value={block.properties.padding}
-        onChange={(value) => updateProperty('padding', value)}
-        placeholder="0px"
-        hint={String(t('css_padding_format'))}
+        placeholder="0"
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'padding',
+              px
+            ),
+          })
+        }
       />
     </div>
   );

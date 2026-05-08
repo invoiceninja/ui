@@ -144,7 +144,7 @@ function DividerProperties({ block, onChange }: DividerPropertiesProps) {
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('thickness')}
+          {t('width')}
         </label>
         <input
           type="text"

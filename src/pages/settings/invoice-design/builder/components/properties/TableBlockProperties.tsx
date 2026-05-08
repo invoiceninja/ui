@@ -11,17 +11,18 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import classNames from 'classnames';
 import { ChevronUp, ChevronDown, Settings2, Trash2 } from 'lucide-react';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { PropertyEditorProps } from '../../types';
 import {
-  TextInput,
   ColorInput,
   CheckboxInput,
   SectionDivider,
   RangeSliderInput,
 } from './PropertyInputs';
+import {
+  DesignerPxNumberInput,
+  mergePxOrOmit,
+} from './DesignerPxNumberInput';
 import { useColorScheme } from '$app/common/colors';
 import type { TableRegionBordersHint } from '../../types';
 import {
@@ -47,33 +48,6 @@ function mergeTableRegion(raw?: TableRegionBordersHint) {
       left: raw?.sides?.left !== false,
     },
   };
-}
-
-/** Stored padding is always `${n}px`; the editor shows only the integer. */
-function paddingPropertyToDisplay(value: string | undefined): string {
-  if (value == null || value === '') {
-    return '';
-  }
-  const s = String(value).trim();
-  const fromPx = s.match(/^(\d+(?:\.\d+)?)\s*px\s*$/i);
-  if (fromPx) {
-    return String(Math.round(Number(fromPx[1])));
-  }
-  const n = Number.parseFloat(s);
-  return Number.isFinite(n) ? String(Math.round(n)) : '';
-}
-
-function displayToPaddingProperty(display: string): string | undefined {
-  const s = display.trim();
-  if (s === '') {
-    return undefined;
-  }
-  const n = Number.parseFloat(s);
-  if (!Number.isFinite(n) || n < 0) {
-    return undefined;
-  }
-  const clamped = Math.min(999, Math.max(0, Math.round(n)));
-  return `${clamped}px`;
 }
 
 // Available columns that can be added to the table
@@ -161,7 +135,6 @@ const getAvailableColumns = (isTasksTable: boolean, t: TFunction) => [
 export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
-  const reactSettings = useReactSettings({ overwrite: false });
   const [expandedColumn, setExpandedColumn] = useState<string | null>(null);
 
   const isTasksTable = block.type === 'tasks-table';
@@ -497,12 +470,22 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
       <SectionDivider label={String(t('typography'))} />
 
       {/* Font Size */}
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('font_size'))}
         value={block.properties.fontSize}
-        onChange={(value) => updateProperty('fontSize', value)}
-        placeholder="12px"
+        placeholder="12"
+        max={999}
         resettable
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'fontSize',
+              px
+            ),
+          })
+        }
       />
 
       <SectionDivider label={String(t('header'))} />
@@ -663,45 +646,22 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       <SectionDivider label={String(t('spacing'))} />
 
-      {/* Cell padding: native input so the canvas updates on every change (InputField+DebounceInput only committed on blur unless changeOverride, and still wraps DebounceInput). */}
-      <div>
-        <label
-          className="block text-sm font-medium mb-2"
-          style={{ color: colors.$3 }}
-        >
-          {t('cell_padding')}
-        </label>
-        <input
-          type="number"
-          min={0}
-          max={999}
-          step={1}
-          className={classNames(
-            'w-full py-2 px-3 rounded-md text-sm focus:outline-none focus:ring-0',
-            {
-              border: true,
-              'border-[#09090B26] focus:border-black': !reactSettings.dark_mode,
-              'border-[#1f2e41] focus:border-white': reactSettings.dark_mode,
-            }
-          )}
-          style={{
-            backgroundColor: colors.$1,
-            color: colors.$3,
-          }}
-          placeholder="8"
-          value={paddingPropertyToDisplay(block.properties.padding)}
-          onChange={(e) => {
-            const normalized = displayToPaddingProperty(e.target.value);
-            if (normalized === undefined) {
-              const nextProps = { ...block.properties };
-              delete nextProps.padding;
-              onChange({ ...block, properties: nextProps });
-            } else {
-              updateProperty('padding', normalized);
-            }
-          }}
-        />
-      </div>
+      <DesignerPxNumberInput
+        label={String(t('cell_padding'))}
+        value={block.properties.padding}
+        placeholder="8"
+        max={999}
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'padding',
+              px
+            ),
+          })
+        }
+      />
     </div>
   );
 }

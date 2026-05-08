@@ -11,7 +11,11 @@
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { CellTypography } from '../../types';
-import { ColorInput, TextInput, FontStyleInput } from './PropertyInputs';
+import { ColorInput, FontStyleInput } from './PropertyInputs';
+import {
+  DesignerPxNumberInput,
+  pxValueToDisplay,
+} from './DesignerPxNumberInput';
 
 interface Props {
   heading: string;
@@ -55,12 +59,16 @@ export function CellTypographyEditor({
         {heading}
       </div>
 
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('font_size'))}
-        value={v.fontSize || ''}
-        onChange={(next) => set('fontSize', next)}
-        placeholder={fontSizePlaceholder}
+        value={v.fontSize}
+        placeholder={
+          fontSizePlaceholder
+            ? pxValueToDisplay(fontSizePlaceholder) || '12'
+            : '12'
+        }
         resettable
+        onChange={(px) => set('fontSize', px)}
       />
 
       <FontStyleInput

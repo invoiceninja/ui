@@ -10,8 +10,11 @@
 
 import { useTranslation } from 'react-i18next';
 import { PropertyEditorProps } from '../../types';
-import { TextInput, SectionDivider, AlignmentInput } from './PropertyInputs';
-import { useColorScheme } from '$app/common/colors';
+import { SectionDivider, AlignmentInput } from './PropertyInputs';
+import {
+  DesignerPxNumberInput,
+  mergePxOrOmit,
+} from './DesignerPxNumberInput';
 import { Button } from '$app/components/forms';
 
 const QR_CODE_TYPES = [
@@ -35,7 +38,6 @@ export function QRCodeBlockProperties({
   onChange,
 }: PropertyEditorProps) {
   const [t] = useTranslation();
-  const colors = useColorScheme();
 
   const updateProperty = (key: string, value: any) => {
     onChange({
@@ -80,11 +82,20 @@ export function QRCodeBlockProperties({
 
       <SectionDivider label={String(t('appearance'))} />
 
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('size'))}
         value={block.properties.size}
-        onChange={(value) => updateProperty('size', value)}
-        placeholder="100px"
+        placeholder="100"
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'size',
+              px
+            ),
+          })
+        }
       />
 
       <AlignmentInput

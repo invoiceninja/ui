@@ -20,9 +20,12 @@ import {
   AlignmentInput,
   ColorInput,
   LineHeightInput,
-  TextInput,
   SectionDivider,
 } from './PropertyInputs';
+import {
+  DesignerPxNumberInput,
+  mergePxOrOmit,
+} from './DesignerPxNumberInput';
 import { useColorScheme } from '$app/common/colors';
 
 export function TextBlockProperties({ block, onChange }: PropertyEditorProps) {
@@ -151,12 +154,20 @@ export function TextBlockProperties({ block, onChange }: PropertyEditorProps) {
       <SectionDivider label={String(t('spacing'))} />
 
       {/* Padding */}
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('padding'))}
         value={block.properties.padding}
-        onChange={(value) => updateProperty('padding', value)}
-        placeholder="0px"
-        hint={String(t('css_padding_format'))}
+        placeholder="0"
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'padding',
+              px
+            ),
+          })
+        }
       />
     </div>
   );

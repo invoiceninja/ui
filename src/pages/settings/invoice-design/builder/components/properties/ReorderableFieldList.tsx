@@ -20,7 +20,8 @@ import {
 } from 'lucide-react';
 import { Button } from '$app/components/forms';
 import { FieldConfig } from '../../types';
-import { TextInput, ColorInput, FontStyleInput } from './PropertyInputs';
+import { ColorInput, FontStyleInput } from './PropertyInputs';
+import { DesignerPxNumberInput } from './DesignerPxNumberInput';
 import { useColorScheme } from '$app/common/colors';
 import { DEFAULT_VALUE_TEXT_COLOR } from '../../constants/design-colors';
 
@@ -234,14 +235,14 @@ export function ReorderableFieldList({
                     {t('typography')}
                   </div>
 
-                  <TextInput
+                  <DesignerPxNumberInput
                     label={String(t('font_size'))}
-                    value={field.fontSize || ''}
-                    onChange={(value) =>
-                      updateField(index, { fontSize: value || undefined })
-                    }
-                    placeholder="12px"
+                    value={field.fontSize}
+                    placeholder="12"
                     resettable
+                    onChange={(px) =>
+                      updateField(index, { fontSize: px })
+                    }
                   />
 
                   <FontStyleInput

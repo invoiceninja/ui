@@ -22,6 +22,11 @@ import {
   CheckboxInput,
   FontStyleInput,
 } from './PropertyInputs';
+import {
+  DesignerPxNumberInput,
+  mergePxOrOmit,
+  pxValueToDisplay,
+} from './DesignerPxNumberInput';
 import { ReorderableFieldList, FieldDefinition } from './ReorderableFieldList';
 import { useColorScheme } from '$app/common/colors';
 import { DEFAULT_VALUE_TEXT_COLOR } from '../../constants/design-colors';
@@ -202,12 +207,23 @@ export function InfoBlockProperties({
                     placeholder={String(t('bill_to'))}
                   />
 
-                  <TextInput
+                  <DesignerPxNumberInput
                     label={String(t('font_size'))}
-                    value={block.properties.titleFontSize || ''}
-                    onChange={(value) => updateProperty('titleFontSize', value)}
-                    placeholder={block.properties.fontSize || '12px'}
+                    value={block.properties.titleFontSize}
+                    placeholder={
+                      pxValueToDisplay(block.properties.fontSize) || '12'
+                    }
                     resettable
+                    onChange={(px) =>
+                      onChange({
+                        ...block,
+                        properties: mergePxOrOmit(
+                          block.properties as Record<string, unknown>,
+                          'titleFontSize',
+                          px
+                        ),
+                      })
+                    }
                   />
 
                   <FontStyleInput
@@ -283,15 +299,21 @@ export function InfoBlockProperties({
 
       <SectionDivider label={String(t('spacing'))} />
 
-      <TextInput
+      <DesignerPxNumberInput
         label={String(t('padding'))}
         value={block.properties.padding}
-        onChange={(value) => updateProperty('padding', value)}
-        placeholder="0px"
+        placeholder="0"
+        onChange={(px) =>
+          onChange({
+            ...block,
+            properties: mergePxOrOmit(
+              block.properties as Record<string, unknown>,
+              'padding',
+              px
+            ),
+          })
+        }
       />
-      <p className="text-xs -mt-3" style={{ color: colors.$17 }}>
-        {t('css_padding_format')}
-      </p>
     </div>
   );
 }
