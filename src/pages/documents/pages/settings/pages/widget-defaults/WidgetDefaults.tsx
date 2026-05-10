@@ -125,7 +125,7 @@ function WidgetDefaults() {
         style={{ borderColor: colors.$24 }}
         headerStyle={{ borderColor: colors.$20 }}
       >
-        <Element leftSide={t('show_label')}>
+        <Element leftSide={t('show_label')} leftSideHelp={t('show_label_help')}>
           <Toggle
             checked={settings.widget_show_label ?? false}
             onChange={(value: boolean) =>
@@ -135,7 +135,7 @@ function WidgetDefaults() {
           />
         </Element>
 
-        <Element leftSide={t('border_style')}>
+        <Element leftSide={t('widget_border_style')} leftSideHelp={t('widget_border_style_help')}>
           <SelectField
             value={settings.widget_border_style ?? 'hidden'}
             onValueChange={(value) =>
@@ -151,7 +151,7 @@ function WidgetDefaults() {
           </SelectField>
         </Element>
 
-        <Element leftSide={t('border_color')}>
+        <Element leftSide={t('widget_border_color')} leftSideHelp={t('widget_border_color_help')}>
           <ColorPicker
             value={settings.widget_border_color ?? '#FF5733'}
             onValueChange={(value) =>
