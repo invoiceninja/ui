@@ -24,6 +24,12 @@ export function useSettingsTabs() {
 
   const routes: SettingsRoute[] = [
     {
+      name: t('email_settings'),
+      href: '/docuninja/settings/email_settings',
+      current: location.pathname === '/docuninja/settings/email_settings',
+      enabled: true,
+    },
+    {
       name: t('email_templates'),
       href: '/docuninja/settings/email_templates',
       current: location.pathname === '/docuninja/settings/email_templates',
