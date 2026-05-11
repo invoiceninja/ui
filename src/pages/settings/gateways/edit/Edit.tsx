@@ -36,6 +36,7 @@ import { $help, HelpWidget } from '$app/components/HelpWidget';
 import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { CircleQuestion } from '$app/components/icons/CircleQuestion';
+import { HelperModal } from './components/stripe/HelperModal';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_gateway');
@@ -61,6 +62,8 @@ export function Edit() {
   const [tabs, setTabs] = useState<string[]>(defaultTab);
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
+  const [showOnboardingModal, setShowOnboardingModal] =
+    useState<boolean>(false);
 
   const additionalTabs = [
     t('credentials'),
@@ -111,6 +114,24 @@ export function Edit() {
       setTabs([...defaultTab]);
     }
   }, [gateway]);
+
+  useEffect(() => {
+    if (searchParams.get('show_onboarding') === 'true' && companyGateway) {
+      setShowOnboardingModal(true);
+
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('show_onboarding');
+
+      const newSearch = newParams.toString();
+      window.history.replaceState(
+        {},
+        '',
+        `${window.location.pathname}${newSearch ? `?${newSearch}` : ''}${
+          window.location.hash
+        }`
+      );
+    }
+  }, [companyGateway, searchParams]);
 
   return (
     <Settings
@@ -257,6 +278,12 @@ export function Edit() {
           </div>
         </TabGroup>
       </Card>
+
+      <HelperModal
+        visible={showOnboardingModal}
+        setVisible={setShowOnboardingModal}
+        setTabIndex={setTabIndex}
+      />
     </Settings>
   );
 }
