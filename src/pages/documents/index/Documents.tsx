@@ -221,8 +221,8 @@ export default function Documents() {
           resource="document"
           endpoint="/api/documents?sort=id|desc"
           columns={columns}
-          statusFilterOptions={filters}
-          statusFilterPlaceholder={t('status') as string}
+          customFilters={filters}
+          customFilterPlaceholder={t('status') as string}
           withResourcefulActions
           bulkRoute="/api/documents/bulk"
           linkToEdit="/docuninja/:id/builder"

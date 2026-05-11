@@ -65,8 +65,6 @@ interface Props extends CommonProps {
   withoutStatusFilter?: boolean;
   customFilter: string[] | undefined;
   beforeFilterInput?: ReactNode;
-  statusFilterOptions?: SelectOption[];
-  statusFilterPlaceholder?: string;
 }
 
 export const ResetButton = styled.button`
@@ -266,7 +264,7 @@ export function SelectWithApplyButton(props: any) {
 export function Actions(props: Props) {
   const [t] = useTranslation();
 
-  const { customFilter, statusFilterOptions, statusFilterPlaceholder } = props;
+  const { customFilter } = props;
 
   const colors = useColorScheme();
 
@@ -418,15 +416,15 @@ export function Actions(props: Props) {
           />
         </div>
 
-        {(props.options || statusFilterOptions) &&
+        {props.options &&
           props.defaultOptions &&
           !props.withoutStatusFilter && (
             <SelectWithApplyButton
               styles={customStyles}
               defaultValue={props.defaultOptions}
               onChange={onStatusChange}
-              placeholder={statusFilterPlaceholder ?? t('lifecycle')}
-              options={statusFilterOptions ?? props.options}
+              placeholder={t('lifecycle')}
+              options={props.options}
               isMulti={props.optionsMultiSelect}
               closeMenuOnSelect={false}
               hideSelectedOptions={false}

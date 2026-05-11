@@ -16,19 +16,10 @@ export function useDocumentFilters() {
 
   const filters: SelectOption[] = [
     {
-      label: t('active'),
-      value: 'active',
-      color: 'white',
-      backgroundColor: '#22C55E',
-      dropdownKey: '0',
-      queryKey: 'status',
-    },
-    {
       label: t('draft'),
       value: 'draft',
       color: 'white',
       backgroundColor: '#6B7280',
-      dropdownKey: '0',
       queryKey: 'status',
     },
     {
@@ -36,7 +27,6 @@ export function useDocumentFilters() {
       value: 'sent',
       color: 'white',
       backgroundColor: '#93C5FD',
-      dropdownKey: '0',
       queryKey: 'status',
     },
     {
@@ -44,7 +34,6 @@ export function useDocumentFilters() {
       value: 'pending_approval',
       color: 'white',
       backgroundColor: '#FBBF24',
-      dropdownKey: '0',
       queryKey: 'status',
     },
     {
@@ -52,7 +41,6 @@ export function useDocumentFilters() {
       value: 'completed',
       color: 'white',
       backgroundColor: '#1D4ED8',
-      dropdownKey: '0',
       queryKey: 'status',
     },
     {
@@ -60,7 +48,6 @@ export function useDocumentFilters() {
       value: 'approved',
       color: 'white',
       backgroundColor: '#3B82F6',
-      dropdownKey: '0',
       queryKey: 'status',
     },
     {
@@ -68,7 +55,6 @@ export function useDocumentFilters() {
       value: 'voided',
       color: 'white',
       backgroundColor: '#EF4444',
-      dropdownKey: '0',
       queryKey: 'status',
     },
     {
@@ -76,7 +62,6 @@ export function useDocumentFilters() {
       value: 'expired',
       color: 'white',
       backgroundColor: '#9CA3AF',
-      dropdownKey: '0',
       queryKey: 'status',
     },
     {
@@ -84,23 +69,6 @@ export function useDocumentFilters() {
       value: 'rejected',
       color: 'white',
       backgroundColor: '#DC2626',
-      dropdownKey: '0',
-      queryKey: 'status',
-    },
-    {
-      label: t('archived'),
-      value: 'archived',
-      color: 'white',
-      backgroundColor: '#F97316',
-      dropdownKey: '0',
-      queryKey: 'status',
-    },
-    {
-      label: t('deleted'),
-      value: 'deleted',
-      color: 'white',
-      backgroundColor: '#991B1B',
-      dropdownKey: '0',
       queryKey: 'status',
     },
   ];

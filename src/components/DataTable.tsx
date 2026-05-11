@@ -214,8 +214,6 @@ interface Props<T> extends CommonProps {
   disabledCreateButton?: boolean;
   filterParameterKey?: 'filter' | 'search';
   enableSavingLatestDataForNavigation?: boolean;
-  statusFilterOptions?: SelectOption[];
-  statusFilterPlaceholder?: string;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -315,8 +313,6 @@ export function DataTable<T extends object>(props: Props<T>) {
     disabledCreateButton = false,
     filterParameterKey = 'filter',
     enableSavingLatestDataForNavigation = false,
-    statusFilterOptions,
-    statusFilterPlaceholder,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -379,7 +375,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     isInitialConfiguration,
     tableKey: `${props.resource}s`,
     customFilter,
-    customFilters,  
+    customFilters,
   });
 
   const normalizeNumericCommas = (value: string): string => {
@@ -450,7 +446,17 @@ export function DataTable<T extends object>(props: Props<T>) {
       apiEndpoint.searchParams.set('sort', sort);
     }
 
-    apiEndpoint.searchParams.set('status', status as unknown as string);
+    const customStatusValues = (customFilters || [])
+      .filter(
+        (cf) => cf.queryKey === 'status' && customFilter?.includes(cf.value)
+      )
+      .map((cf) => cf.value);
+
+    const mergedStatusValues = Array.from(
+      new Set([...(status as string[]), ...customStatusValues])
+    );
+
+    apiEndpoint.searchParams.set('status', mergedStatusValues.join(','));
 
     dateRangeColumns.forEach((dateRangeColumn) => {
       apiEndpoint.searchParams.delete(dateRangeColumn.queryParameterKey);
@@ -906,8 +912,6 @@ export function DataTable<T extends object>(props: Props<T>) {
           customFilterPlaceholder={props.customFilterPlaceholder}
           onCustomFilterChange={setCustomFilter}
           customFilter={customFilter}
-          statusFilterOptions={statusFilterOptions}
-          statusFilterPlaceholder={statusFilterPlaceholder}
           rightSide={
             <>
               {props.rightSide}
