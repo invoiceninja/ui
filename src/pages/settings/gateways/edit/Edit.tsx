@@ -118,18 +118,6 @@ export function Edit() {
   useEffect(() => {
     if (searchParams.get('show_onboarding') === 'true' && companyGateway) {
       setShowOnboardingModal(true);
-
-      const newParams = new URLSearchParams(searchParams);
-      newParams.delete('show_onboarding');
-
-      const newSearch = newParams.toString();
-      window.history.replaceState(
-        {},
-        '',
-        `${window.location.pathname}${newSearch ? `?${newSearch}` : ''}${
-          window.location.hash
-        }`
-      );
     }
   }, [companyGateway, searchParams]);
 
