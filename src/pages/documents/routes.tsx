@@ -54,6 +54,13 @@ const EmailSettings = lazy(
     )
 );
 
+const SenderEmailSettings = lazy(
+  () =>
+    import(
+      '$app/pages/documents/pages/settings/pages/email-settings-sender/SenderEmailSettings'
+    )
+);
+
 const Users = lazy(() => import('$app/pages/documents/pages/users/Users'));
 
 const EditUser = lazy(
@@ -120,6 +127,16 @@ const routes = (
                     guards={[docuNinjaAdmin()]}
                     type="subPage"
                     component={<EmailSettings />}
+                  />
+                }
+              />
+              <Route
+                path="email_settings"
+                element={
+                  <DocuNinjaGuard
+                    guards={[docuNinjaAdmin()]}
+                    type="subPage"
+                    component={<SenderEmailSettings />}
                   />
                 }
               />
