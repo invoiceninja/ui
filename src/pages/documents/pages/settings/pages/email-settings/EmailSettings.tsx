@@ -1,99 +1,61 @@
-/**
- * Invoice Ninja (https://invoiceninja.com).
- *
- * @link https://github.com/invoiceninja/invoiceninja source repository
- *
- * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
- * @license https://www.elastic.co/licensing/elastic-license
- */
-
-
-import { useColorScheme } from '$app/common/colors';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { Template } from '$app/common/interfaces/docuninja/api';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
-import { Spinner } from '$app/components/Spinner';
-import { TabGroup } from '$app/components/TabGroup';
 import { ValidationAlert } from '$app/components/ValidationAlert';
-import { variables } from '$app/pages/settings/invoice-design/customize/common/variables';
-import { Variable } from '$app/pages/settings/templates-and-reminders/common/components/Variable';
-import { AxiosError } from 'axios';
+import { useAtom } from 'jotai';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
+import { AxiosError } from 'axios';
+import { useColorScheme } from '$app/common/colors';
 
 function EmailSettings() {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-  const [currentTemplates, setCurrentTemplates] = useState<Template[]>([]);
   const [errors, setErrors] = useState<ValidationBag | null>(null);
+  const [customSendingEmail, setCustomSendingEmail] = useState('');
+  const [emailFromName, setEmailFromName] = useState('');
+  const [replyToEmail, setReplyToEmail] = useState('');
 
-  const { data: templates, isLoading } = useQuery({
-    queryKey: ['/api/templates/docuninja'],
-    queryFn: async () => {
-      return request(
-        'GET',
-        docuNinjaEndpoint('/api/templates'),
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(
-              'X-DOCU-NINJA-TOKEN'
-            )}`,
-          },
-        }
-      ).then((res) => res.data.data);
-    },
-    staleTime: Infinity,
-  });
+  const [docuData] = useAtom(docuNinjaAtom);
+  const docuCompany = docuData?.companies?.[0];
+  const id = docuCompany?.id;
 
-  const handleChangeSubject = (templateIndex: number, value: string) => {
-    let updatedTemplates = cloneDeep(currentTemplates);
-
-    updatedTemplates = updatedTemplates.map((template, index) => {
-      if (index === templateIndex) {
-        return { ...template, subject: value };
-      }
-      return template;
-    });
-
-    setCurrentTemplates(updatedTemplates);
-  };
-
-  const handleChangeBody = (templateIndex: number, value: string) => {
-    let updatedTemplates = cloneDeep(currentTemplates);
-
-    updatedTemplates = updatedTemplates.map((template, index) => {
-      if (index === templateIndex) {
-        return { ...template, body: value };
-      }
-      return template;
-    });
-
-    setCurrentTemplates(updatedTemplates);
-  };
+  useEffect(() => {
+    if (docuCompany?.settings) {
+      setCustomSendingEmail(docuCompany.settings.custom_sending_email ?? '');
+      setEmailFromName(docuCompany.settings.email_from_name ?? '');
+      setReplyToEmail(docuCompany.settings.reply_to_email ?? '');
+    }
+  }, [docuCompany?.settings]);
 
   const handleSave = () => {
     if (!isFormBusy) {
       setIsFormBusy(true);
       toast.processing();
 
+      const updatedCompany = cloneDeep(docuCompany);
+      
+      if (updatedCompany) {
+        updatedCompany.settings.custom_sending_email = customSendingEmail || null;
+        updatedCompany.settings.email_from_name = emailFromName || null;
+        updatedCompany.settings.reply_to_email = replyToEmail || null;
+      }
+
       request(
-        'POST',
-        docuNinjaEndpoint('/api/templates/bulk'),
-        {
-          action: 'update',
-          templates: currentTemplates,
-        },
+        'PUT',
+        docuNinjaEndpoint('/api/companies/:id', {
+          id: id,
+        }),
+        updatedCompany,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem(
@@ -103,135 +65,98 @@ function EmailSettings() {
         }
       )
         .then(() => {
-          toast.success('templates_updated');
-          $refetch(['docuninja_templates']);
-          setErrors(null);
+          toast.success('updated_company');
+          $refetch(['docuninja_login']);
         })
         .catch((error: AxiosError<ValidationBag>) => {
-          toast.error();
-
           if (error.response?.status === 422) {
             setErrors(error.response.data);
+            const errorMessage = error.response.data.message || 'validation_errors';
+            toast.error(errorMessage);
+          } else {
+            toast.error('error_title');
           }
         })
         .finally(() => setIsFormBusy(false));
     }
   };
 
-  useEffect(() => {
-    if (templates) {
-      setCurrentTemplates(templates);
-    }
-  }, [templates]);
-
   useSaveBtn(
     {
       onClick: handleSave,
       disableSaveButton: isFormBusy,
     },
-    [currentTemplates, isFormBusy]
+    [isFormBusy]
   );
-
-  const colors = useColorScheme();
 
   return (
     <>
       {errors && <ValidationAlert errors={errors} />}
 
       <Card
-        title={t('email_templates')}
-        className="shadow-sm"
-        style={{ borderColor: colors.$24 }}
-        headerStyle={{ borderColor: colors.$20 }}
-        withoutBodyPadding
-        withoutHeaderBorder
-      >
-        {isLoading && (
-          <div className="flex justify-center items-center py-8">
-            <Spinner />
-          </div>
-        )}
-
-        {!isLoading && currentTemplates.length === 0 && (
-          <div className="flex justify-center items-center py-2 px-4 sm:px-6 font-medium">
-            {t('no_templates_found')}.
-          </div>
-        )}
-
-        {!isLoading && currentTemplates.length > 0 && (
-          <TabGroup 
-            tabs={currentTemplates.map(template => template.name)}
-            horizontalPaddingWidth="1.5rem"
-            withHorizontalPadding
-            fullRightPadding
-            withoutVerticalMargin
-          >
-            {currentTemplates.map((template, index) => (
-              <div key={template.id} className="pt-4 pb-6">
-                <Element leftSide={t('subject')}>
-                  <InputField
-                    value={template.subject}
-                    onValueChange={(value) => handleChangeSubject(index, value)}
-                  />
-                </Element>
-
-                <Element leftSide={t('body')}>
-                  <InputField
-                    element="textarea"
-                    value={template.body}
-                    onValueChange={(value) => handleChangeBody(index, value)}
-                  />
-                </Element>
-              </div>
-            ))}
-          </TabGroup>
-        )}
-      </Card>
-
-      <Card
-        title={t('variables')}
+        title={t('email_settings')}
         className="shadow-sm"
         style={{ borderColor: colors.$24 }}
         headerStyle={{ borderColor: colors.$20 }}
       >
-        <Element leftSide={t('company')} className="flex-wrap">
-          <div className="flex flex-wrap">
-            {variables.docu_company.map((variable, index) => (
-              <Variable key={index}>{variable}</Variable>
-            ))}
-          </div>
+        <Element
+          leftSide={
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">
+                {t('from_email')}
+              </span>
+              <span className="text-xs text-gray-500">
+                Custom sender email address for outgoing document emails.
+              </span>
+            </div>
+          }
+        >
+          <InputField
+            value={customSendingEmail}
+            onValueChange={setCustomSendingEmail}
+            disabled={isFormBusy}
+            placeholder="you@yourdomain.com"
+          />
         </Element>
 
-        <Element leftSide={t('document')} className="flex-wrap">
-          <div className="flex flex-wrap">
-            {variables.docu_document.map((variable, index) => (
-              <Variable key={index}>{variable}</Variable>
-            ))}
-          </div>
+        <Element
+          leftSide={
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">
+                {t('from_name')}
+              </span>
+              <span className="text-xs text-gray-500">
+                Custom sender name for outgoing document emails.
+              </span>
+            </div>
+          }
+        >
+          <InputField
+            value={emailFromName}
+            onValueChange={setEmailFromName}
+            disabled={isFormBusy}
+            placeholder="Your Company Name"
+          />
         </Element>
 
-        <Element leftSide={t('sender')} className="flex-wrap">
-          <div className="flex flex-wrap">
-            {variables.docu_sender.map((variable, index) => (
-              <Variable key={index}>{variable}</Variable>
-            ))}
-          </div>
-        </Element>
-
-        <Element leftSide={t('user')} className="flex-wrap">
-          <div className="flex flex-wrap">
-            {variables.docu_user.map((variable, index) => (
-              <Variable key={index}>{variable}</Variable>
-            ))}
-          </div>
-        </Element>
-
-        <Element leftSide={t('contact')} className="flex-wrap">
-          <div className="flex flex-wrap">
-            {variables.docu_contact.map((variable, index) => (
-              <Variable key={index}>{variable}</Variable>
-            ))}
-          </div>
+        <Element
+          leftSide={
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">
+                {t('reply_to_email')}
+              </span>
+              <span className="text-xs text-gray-500">
+                Custom reply-to email address for outgoing document emails.
+              </span>
+            </div>
+          }
+        >
+          <InputField
+            value={replyToEmail}
+            onValueChange={setReplyToEmail}
+            disabled={isFormBusy}
+            placeholder="reply@yourdomain.com"
+          />
         </Element>
       </Card>
     </>
