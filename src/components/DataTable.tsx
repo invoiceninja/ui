@@ -448,9 +448,11 @@ export function DataTable<T extends object>(props: Props<T>) {
 
     const customStatusValues = (customFilters || [])
       .filter(
-        (cf) => cf.queryKey === 'status' && customFilter?.includes(cf.value)
+        (currentFilter) =>
+          currentFilter.queryKey === 'status' &&
+          customFilter?.includes(currentFilter.value)
       )
-      .map((cf) => cf.value);
+      .map((currentFilter) => currentFilter.value);
 
     const mergedStatusValues = Array.from(
       new Set([...(status as string[]), ...customStatusValues])
