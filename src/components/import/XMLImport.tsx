@@ -37,6 +37,48 @@ const Div = styled.div`
   }
 `;
 
+function isAcceptedXmlFile(file: File): boolean {
+  if (file.name.toLowerCase().endsWith('.xml')) {
+    return true;
+  }
+
+  const raw = file.type.toLowerCase();
+  const mime = raw.split(';')[0]?.trim() ?? '';
+
+  return (
+    mime.startsWith('application/xml') ||
+    mime.startsWith('text/xml') ||
+    mime.endsWith('+xml')
+  );
+}
+
+function isWellFormedXml(file: File): Promise<boolean> {
+  return new Promise((resolve) => {
+    try {
+      const reader = new FileReader();
+
+      reader.onload = (event: ProgressEvent<FileReader>) => {
+        const text = (event.target?.result as string) ?? '';
+
+        if (!text.trim()) {
+          resolve(false);
+          return;
+        }
+
+        const doc = new DOMParser().parseFromString(text, 'application/xml');
+
+        resolve(doc.getElementsByTagName('parsererror').length === 0);
+      };
+
+      reader.onerror = () => resolve(false);
+
+      reader.readAsText(file);
+    } catch {
+      resolve(false);
+    }
+  });
+}
+
 export function XMLImport(props: Props) {
   const [t] = useTranslation();
 
@@ -100,36 +142,11 @@ export function XMLImport(props: Props) {
     setFormData(updatedFormData);
   };
 
-  const checkLinesLengthInFile = (file: File) => {
-    return new Promise((resolve) => {
-      try {
-        const reader = new FileReader();
-
-        reader.onload = (event: ProgressEvent<FileReader>) => {
-          const xmlData = (event.target?.result as string) || '';
-          const rowData = xmlData.split('\n');
-
-          if (!rowData.length || rowData.length === 1) {
-            resolve(false);
-          } else if (rowData.length === 2 && !rowData[1]) {
-            resolve(false);
-          } else {
-            resolve(true);
-          }
-        };
-
-        reader.readAsText(file);
-      } catch (error) {
-        resolve(false);
-      }
-    });
-  };
-
   const shouldUploadFiles = async (files: File[]) => {
     for (let i = 0; i < files.length; i++) {
-      const hasCorrectRowsLength = await checkLinesLengthInFile(files[i]);
+      const ok = await isWellFormedXml(files[i]);
 
-      if (!hasCorrectRowsLength) {
+      if (!ok) {
         return false;
       }
     }
@@ -143,17 +160,11 @@ export function XMLImport(props: Props) {
       const shouldAddFiles = await shouldUploadFiles(acceptedFiles);
 
       if (shouldAddFiles) {
-        const isFilesTypeCorrect = acceptedFiles.every(({ type }) =>
-          type.includes(type)
-        );
+        const isFilesTypeCorrect =
+          acceptedFiles.every(isAcceptedXmlFile);
 
         if (isFilesTypeCorrect) {
-          let currentFiles: File[] = [];
-          acceptedFiles.map((file) => {
-            currentFiles = [...currentFiles, file];
-          });
-
-          setFiles(currentFiles);
+          setFiles([...acceptedFiles]);
 
           formData.append('import_type', entity);
 
@@ -164,7 +175,7 @@ export function XMLImport(props: Props) {
           toast.error('wrong_file_extension');
         }
       } else {
-        toast.error('xml_lines_length');
+        toast.error('invalid_file');
       }
     },
   });
