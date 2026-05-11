@@ -47,17 +47,17 @@ const BlueprintBuilder = lazy(
 const SignatoryMapping = lazy(
   () => import('$app/pages/documents/pages/blueprints/mapping/SignatoryMapping')
 );
+const EmailTemplates = lazy(
+  () =>
+    import(
+      '$app/pages/documents/pages/settings/pages/email-templates/EmailTemplates'
+    )
+);
+
 const EmailSettings = lazy(
   () =>
     import(
       '$app/pages/documents/pages/settings/pages/email-settings/EmailSettings'
-    )
-);
-
-const SenderEmailSettings = lazy(
-  () =>
-    import(
-      '$app/pages/documents/pages/settings/pages/email-settings-sender/SenderEmailSettings'
     )
 );
 
@@ -126,7 +126,7 @@ const routes = (
                   <DocuNinjaGuard
                     guards={[docuNinjaAdmin()]}
                     type="subPage"
-                    component={<EmailSettings />}
+                    component={<EmailTemplates />}
                   />
                 }
               />
@@ -136,7 +136,7 @@ const routes = (
                   <DocuNinjaGuard
                     guards={[docuNinjaAdmin()]}
                     type="subPage"
-                    component={<SenderEmailSettings />}
+                    component={<EmailSettings />}
                   />
                 }
               />
