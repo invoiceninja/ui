@@ -47,7 +47,7 @@ export function HelperModal({ visible, setVisible, setTabIndex }: Props) {
   return (
     <Modal
       title={t('gateway_setup_complete')}
-      visible={true}
+      visible={visible}
       onClose={() => setVisible(false)}
       size="regular"
     >
