@@ -21,7 +21,6 @@ function EmailSettings() {
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [errors, setErrors] = useState<ValidationBag | null>(null);
-  const [customSendingEmail, setCustomSendingEmail] = useState('');
   const [emailFromName, setEmailFromName] = useState('');
   const [replyToEmail, setReplyToEmail] = useState('');
 
@@ -31,7 +30,6 @@ function EmailSettings() {
 
   useEffect(() => {
     if (docuCompany?.settings) {
-      setCustomSendingEmail(docuCompany.settings.custom_sending_email ?? '');
       setEmailFromName(docuCompany.settings.email_from_name ?? '');
       setReplyToEmail(docuCompany.settings.reply_to_email ?? '');
     }
@@ -45,7 +43,6 @@ function EmailSettings() {
       const updatedCompany = cloneDeep(docuCompany);
       
       if (updatedCompany) {
-        updatedCompany.settings.custom_sending_email = customSendingEmail || null;
         updatedCompany.settings.email_from_name = emailFromName || null;
         updatedCompany.settings.reply_to_email = replyToEmail || null;
       }
@@ -99,26 +96,6 @@ function EmailSettings() {
         style={{ borderColor: colors.$24 }}
         headerStyle={{ borderColor: colors.$20 }}
       >
-        <Element
-          leftSide={
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">
-                {t('from_email')}
-              </span>
-              <span className="text-xs text-gray-500">
-                Custom sender email address for outgoing document emails.
-              </span>
-            </div>
-          }
-        >
-          <InputField
-            value={customSendingEmail}
-            onValueChange={setCustomSendingEmail}
-            disabled={isFormBusy}
-            placeholder="you@yourdomain.com"
-          />
-        </Element>
-
         <Element
           leftSide={
             <div className="flex flex-col">
