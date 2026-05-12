@@ -45,15 +45,28 @@ function WidgetDefaults() {
 
   useEffect(() => {
     if (docuCompanies?.[0]?.settings && !isInitialized.current) {
-      setSettings(docuCompanies[0].settings);
-      settingsRef.current = docuCompanies[0].settings;
+      const currentSettings = docuCompanies[0].settings;
+
+      setSettings(currentSettings);
+      settingsRef.current = currentSettings;
       isInitialized.current = true;
     }
   }, [docuCompanies?.[0]?.settings]);
 
-  useEffect(() => {
-    settingsRef.current = settings;
-  }, [settings]);
+  const handleSettingsChange = <K extends keyof Settings>(
+    property: K,
+    value: Settings[K]
+  ) => {
+    setSettings((prev) => {
+      const updated = prev && { ...prev, [property]: value };
+
+      if (updated) {
+        settingsRef.current = updated;
+      }
+
+      return updated;
+    });
+  };
 
   const handleSave = () => {
     if (!isFormBusy) {
@@ -99,10 +112,6 @@ function WidgetDefaults() {
     }
   };
 
-  const handleSettingsChange = (property: keyof Settings, value: any) => {
-    setSettings((prev) => prev && { ...prev, [property]: value });
-  };
-
   useSaveBtn(
     {
       onClick: handleSave,
@@ -135,11 +144,17 @@ function WidgetDefaults() {
           />
         </Element>
 
-        <Element leftSide={t('widget_border_style')} leftSideHelp={t('widget_border_style_help')}>
+        <Element
+          leftSide={t('widget_border_style')}
+          leftSideHelp={t('widget_border_style_help')}
+        >
           <SelectField
             value={settings.widget_border_style ?? 'hidden'}
             onValueChange={(value) =>
-              handleSettingsChange('widget_border_style', value)
+              handleSettingsChange(
+                'widget_border_style',
+                value as Settings['widget_border_style']
+              )
             }
             disabled={isFormBusy}
             customSelector
@@ -151,7 +166,10 @@ function WidgetDefaults() {
           </SelectField>
         </Element>
 
-        <Element leftSide={t('widget_border_color')} leftSideHelp={t('widget_border_color_help')}>
+        <Element
+          leftSide={t('widget_border_color')}
+          leftSideHelp={t('widget_border_color_help')}
+        >
           <ColorPicker
             value={settings.widget_border_color ?? '#FF5733'}
             onValueChange={(value) =>
