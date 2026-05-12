@@ -14,6 +14,7 @@ import { Card } from '$app/components/cards';
 import { Button, InputField, SelectField } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
+import { ResourceActions } from '$app/components/ResourceActions';
 import { TabGroup } from '$app/components/TabGroup';
 import {
   Alertbox,
@@ -57,6 +58,8 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useMediaQuery } from 'react-responsive';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useActions } from '../common/hooks/useActions';
+import { EditBlueprintModal } from '../edit/components/EditBlueprintModal';
 
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
@@ -268,10 +271,16 @@ function BlueprintBuilder() {
   const { id } = useParams();
   const colors = useColorScheme();
 
+  const { data: blueprintResponse } = useBlueprintQuery({ id });
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
-  const { data: blueprintResponse, isLoading } = useBlueprintQuery({ id });
 
   const [blueprint, setBlueprint] = useState<Blueprint>();
+
+  const actions = useActions({
+    onSettingsClick: () => setIsEditModalOpen(true),
+  });
 
   useEffect(() => {
     if (blueprintResponse) {
@@ -375,14 +384,14 @@ function BlueprintBuilder() {
             </Button>
           )}
 
-          <Button
-            behavior="button"
-            onClick={handleSave}
-            disabled={isDocumentSaving}
-            disableWithoutIcon
-          >
-            {t('save')}
-          </Button>
+          {blueprint && (
+            <ResourceActions
+              resource={blueprint}
+              actions={actions}
+              onSaveClick={handleSave}
+              disableSaveButton={isDocumentSaving}
+            />
+          )}
         </div>
       }
     >
@@ -540,6 +549,14 @@ function BlueprintBuilder() {
           <Builder$ />
         </BuilderContext.Provider>
       </Card>
+
+      {blueprint && (
+        <EditBlueprintModal
+          blueprint={blueprint}
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+        />
+      )}
     </Default>
   );
 }

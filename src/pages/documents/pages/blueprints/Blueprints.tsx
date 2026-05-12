@@ -83,6 +83,9 @@ export default function Blueprints() {
           $refetch(['blueprints']);
         }}
         customActions={customActions}
+        showArchive={() => false}
+        showRestore={() => false}
+        showDelete={() => false}
       />
 
       {selectedBlueprint && (

@@ -127,13 +127,16 @@ export function EditBlueprintModal({ blueprint, isOpen, onClose }: Props) {
             type="secondary"
             onClick={handleClose}
             disabled={isFormBusy}
+            disableWithoutIcon
           >
             {t('cancel')}
           </Button>
+
           <Button 
             type="primary"
             onClick={handleSave}
             disabled={isFormBusy || !formData.name.trim()}
+            disableWithoutIcon={!formData.name.trim()}
           >
             {isFormBusy ? t('processing') : t('save')}
           </Button>
