@@ -247,7 +247,6 @@ export interface Settings {
   email_client_when_completed: boolean;
   force_des_signature: boolean;
   attach_audit_log_to_completed_email: boolean;
-  custom_sending_email?: string | null;
   email_from_name?: string | null;
   reply_to_email?: string | null;
   reply_to_name?: string | null;
