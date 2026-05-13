@@ -30,6 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useHandleMethodToggle } from '../hooks/useHandleMethodToggle';
 import { useHandleCredentialsChange } from '../hooks/useHandleCredentialsChange';
 import { useResolveConfigValue } from '../hooks/useResolveConfigValue';
+import { Field } from '../hooks/useResolveInputField';
 import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
 import { useColorScheme } from '$app/common/colors';
 
@@ -123,7 +124,10 @@ export function Settings(props: Props) {
             value={resolveConfigValue('timeToLive') || '600'}
             onValueChange={(value) => {
               const val = Math.max(60, Math.min(600, parseInt(value) || 600));
-              handleCredentialChange('timeToLive', val.toString());
+              handleCredentialChange(
+                'timeToLive' as keyof Field,
+                val.toString()
+              );
             }}
             errorMessage={props.errors?.errors.timeToLive}
           />

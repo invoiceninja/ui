@@ -15,7 +15,7 @@ import { Gateway } from '$app/common/interfaces/statics';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTranslation } from 'react-i18next';
 import { formatLabel } from '../helpers/format-label';
-import { useResolveInputField } from '../hooks/useResolveInputField';
+import { Field, useResolveInputField } from '../hooks/useResolveInputField';
 import { useHandleCredentialsChange } from '../hooks/useHandleCredentialsChange';
 import { useResolveConfigValue } from '../hooks/useResolveConfigValue';
 import { StripeConnect } from './gateways/StripeConnect';
@@ -189,7 +189,7 @@ export function Credentials(props: Props) {
                     type="text"
                     value={config(field)}
                     onValueChange={(value) =>
-                      handleCredentialChange(field, value)
+                      handleCredentialChange(field as keyof Field, value)
                     }
                     errorMessage={props.errors?.errors[field]}
                   />
