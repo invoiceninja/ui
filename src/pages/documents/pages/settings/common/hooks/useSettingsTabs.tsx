@@ -35,6 +35,12 @@ export function useSettingsTabs() {
       current: location.pathname === '/docuninja/settings/notifications',
       enabled: true,
     },
+    {
+      name: t('widget_defaults'),
+      href: '/docuninja/settings/widget_defaults',
+      current: location.pathname === '/docuninja/settings/widget_defaults',
+      enabled: true,
+    },
   ];
 
   return routes;
