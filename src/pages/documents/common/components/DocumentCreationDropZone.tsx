@@ -18,6 +18,7 @@ import { Document } from '$app/common/interfaces/docuninja/api';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { getDocumentNameFromFile } from '../helpers';
 import { CloudUpload } from '$app/components/icons/CloudUpload';
 import { getPasswordForPdf, isPdfPasswordProtected } from '@docuninja/builder2.0';
 import { useState } from 'react';
@@ -118,7 +119,8 @@ export function DocumentCreationDropZone({ onSelectFiles }: Props) {
     }
     
     formData.append(
-      'description', 'Untitled document'
+      'description',
+      acceptedFiles[0] ? getDocumentNameFromFile(acceptedFiles[0]) : 'Untitled document'
     );
 
     handleCreateDocument(formData);
