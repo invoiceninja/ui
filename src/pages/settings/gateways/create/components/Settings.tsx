@@ -25,7 +25,7 @@ import { Gateway, Option } from '$app/common/interfaces/statics';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleMethodToggle } from '../hooks/useHandleMethodToggle';
 import { useHandleCredentialsChange } from '../hooks/useHandleCredentialsChange';
@@ -121,9 +121,9 @@ export function Settings(props: Props) {
           <InputField
             type="number"
             value={resolveConfigValue('timeToLive') || '600'}
-            onChange={(event: ChangeEvent<HTMLInputElement>) => {
-              const val = Math.max(60, Math.min(600, parseInt(event.target.value) || 600));
-              (handleCredentialChange as (field: string, value: string) => void)('timeToLive', val.toString());
+            onValueChange={(value) => {
+              const val = Math.max(60, Math.min(600, parseInt(value) || 600));
+              handleCredentialChange('timeToLive', val.toString());
             }}
             errorMessage={props.errors?.errors.timeToLive}
           />

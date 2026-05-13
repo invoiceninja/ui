@@ -13,7 +13,6 @@ import { Button, InputField, Link } from '$app/components/forms';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatLabel } from '../helpers/format-label';
 import { useResolveInputField } from '../hooks/useResolveInputField';
@@ -62,7 +61,6 @@ export function Credentials(props: Props) {
   const handleCredentialChange = useHandleCredentialsChange(
     props.setCompanyGateway
   );
-  const resolveConfigValue = useResolveConfigValue(props.companyGateway);
 
   const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
   const WEPAY = '8fdeed552015b3c7b44ed6c8ebd9e992';
@@ -165,34 +163,46 @@ export function Credentials(props: Props) {
               ? !paywareSettingsFields.includes(field)
               : true
           )
-          .map((field, index) => (
-          <Element
-            leftSide={props.gateway.key === PAYWARE && paywareFieldLabels[field]
-              ? paywareFieldLabels[field]
-              : formatLabel(field)}
-            key={index}
-            {...(props.gateway.key === PAYWARE && paywareFieldHelp[field]
-              ? { leftSideHelp: paywareFieldHelp[field] }
-              : {})}
-          >
-            {props.gateway.key === PAYWARE && paywareTextFields.includes(field) ? (
-              <InputField
-                type="text"
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  (handleCredentialChange as (field: string, value: string) => void)(field, event.target.value)
-                }
-                value={resolveConfigValue(field)}
-                errorMessage={props.errors?.errors[field]}
-              />
-            ) : (
-              resolveInputField(
-                field,
-                JSON.parse(props.gateway.fields)[field],
-                props.errors
-              )
-            )}
-          </Element>
-        ))}
+          .map((field, index) => {
+            const isPaywareTextField =
+              props.gateway.key === PAYWARE &&
+              paywareTextFields.includes(field);
+
+            const label =
+              props.gateway.key === PAYWARE && paywareFieldLabels[field]
+                ? paywareFieldLabels[field]
+                : formatLabel(field);
+
+            const help =
+              props.gateway.key === PAYWARE
+                ? paywareFieldHelp[field]
+                : undefined;
+
+            return (
+              <Element
+                key={index}
+                leftSide={label}
+                {...(help ? { leftSideHelp: help } : {})}
+              >
+                {isPaywareTextField ? (
+                  <InputField
+                    type="text"
+                    value={config(field)}
+                    onValueChange={(value) =>
+                      handleCredentialChange(field, value)
+                    }
+                    errorMessage={props.errors?.errors[field]}
+                  />
+                ) : (
+                  resolveInputField(
+                    field,
+                    JSON.parse(props.gateway.fields)[field],
+                    props.errors
+                  )
+                )}
+              </Element>
+            );
+          })}
 
       {props.gateway &&
         props.gateway.key === GOCARDLESS &&
