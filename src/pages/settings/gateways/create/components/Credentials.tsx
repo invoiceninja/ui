@@ -63,6 +63,14 @@ export function Credentials(props: Props) {
   const PAYPAL_PPCP = '80af24a6a691230bbec33e930ab40666';
   const GOCARDLESS = 'b9886f9257f0c6ee7c302f1c74475f6c';
   const SQUARE = '65faab2ab6e3223dbe848b1686490baz';
+  const PAYWARE = 'b0a6294fca4488c2bab58f3e11e3c623';
+
+  const paywareSettingsFields = ['timeToLive'];
+  const paywareFieldHelp: Record<string, string> = {
+    partnerId: t('payware_partner_id_help'),
+    vposId: t('payware_vpos_id_help'),
+    paywarePublicKey: t('payware_public_key_help'),
+  };
 
   const hostedGateways = [STRIPE_CONNECT, WEPAY, PAYPAL_PPCP];
 
@@ -140,8 +148,20 @@ export function Credentials(props: Props) {
 
       {props.gateway &&
         !hostedGateways.includes(props.gateway.key) &&
-        Object.keys(JSON.parse(props.gateway.fields)).map((field, index) => (
-          <Element leftSide={formatLabel(field)} key={index}>
+        Object.keys(JSON.parse(props.gateway.fields))
+          .filter((field) =>
+            props.gateway.key === PAYWARE
+              ? !paywareSettingsFields.includes(field)
+              : true
+          )
+          .map((field, index) => (
+          <Element
+            leftSide={formatLabel(field)}
+            key={index}
+            {...(props.gateway.key === PAYWARE && paywareFieldHelp[field]
+              ? { leftSideHelp: paywareFieldHelp[field] }
+              : {})}
+          >
             {resolveInputField(
               field,
               JSON.parse(props.gateway.fields)[field],

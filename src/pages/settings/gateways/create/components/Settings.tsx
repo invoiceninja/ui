@@ -25,9 +25,11 @@ import { Gateway, Option } from '$app/common/interfaces/statics';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleMethodToggle } from '../hooks/useHandleMethodToggle';
+import { useHandleCredentialsChange } from '../hooks/useHandleCredentialsChange';
+import { useResolveConfigValue } from '../hooks/useResolveConfigValue';
 import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
 import { useColorScheme } from '$app/common/colors';
 
@@ -80,6 +82,13 @@ export function Settings(props: Props) {
     props.setCompanyGateway
   );
 
+  const handleCredentialChange = useHandleCredentialsChange(
+    props.setCompanyGateway
+  );
+  const resolveConfigValue = useResolveConfigValue(props.companyGateway);
+
+  const PAYWARE = 'b0a6294fca4488c2bab58f3e11e3c623';
+
   const isChecked = (gatewayTypeId: string) => {
     const property = Object.entries(props.companyGateway.fees_and_limits).find(
       ([companyGatewayId]) => gatewayTypeId === companyGatewayId
@@ -103,6 +112,23 @@ export function Settings(props: Props) {
           errorMessage={props.errors?.errors.label}
         />
       </Element>
+
+      {gateway?.key === PAYWARE && (
+        <Element
+          leftSide={t('time_to_live')}
+          leftSideHelp={t('payware_ttl_help')}
+        >
+          <InputField
+            type="number"
+            value={resolveConfigValue('timeToLive') || '600'}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              const val = Math.max(60, Math.min(600, parseInt(event.target.value) || 600));
+              handleCredentialChange('timeToLive' as any, val.toString());
+            }}
+            errorMessage={props.errors?.errors.timeToLive}
+          />
+        </Element>
+      )}
 
       {options.some((option) => option.token_billing == true) && (
         <Element leftSide={t('tokenize')} leftSideHelp={t('tokenize_help')}>
