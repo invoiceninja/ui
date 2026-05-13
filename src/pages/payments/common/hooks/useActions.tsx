@@ -21,6 +21,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import {
   MdArchive,
   MdDelete,
@@ -55,6 +56,10 @@ export function useActions(params?: Params) {
     ],
   });
 
+  const location = useLocation();
+  const isApplyPage = location.pathname.endsWith('/apply');
+  const isRefundPage = location.pathname.endsWith('/refund');
+
   const bulk = useBulk();
 
   const {
@@ -75,6 +80,7 @@ export function useActions(params?: Params) {
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
     (resource: Payment) =>
+      !isApplyPage &&
       resource.amount - resource.applied > 0 &&
       !resource.is_deleted && (
         <DropdownElement
@@ -85,6 +91,7 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (resource: Payment) =>
+      !isRefundPage &&
       resource.amount !== resource.refunded &&
       !resource.is_deleted && (
         <DropdownElement
