@@ -10,6 +10,7 @@
 
 import { isDemo } from '$app/common/helpers';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { atom, useAtom } from 'jotai';
 import { ReactNode, useEffect } from 'react';
@@ -30,6 +31,12 @@ export function useSettingsRoutes() {
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
   const { isOwner, isAdmin } = useAdmin();
+  const company = useCurrentCompany();
+  const isFranceCompany = company?.settings.country_id === '250';
+  const hasLegalEntity =
+    company?.legal_entity_id !== null &&
+    company?.legal_entity_id !== undefined &&
+    String(company.legal_entity_id) !== '0';
 
   const basic: SettingsRoute[] = [
     {
@@ -145,6 +152,13 @@ export function useSettingsRoutes() {
       href: '/settings/e_invoice',
       current: location.pathname.startsWith('/settings/e_invoice'),
       enabled: isAdmin || isOwner || false,
+    },
+    {
+      name: t('france_compliance'),
+      href: '/settings/france_compliance',
+      current: location.pathname.startsWith('/settings/france_compliance'),
+      enabled:
+        ((isAdmin || isOwner) && isFranceCompany && hasLegalEntity) || false,
     },
     {
       name: t('email_settings'),

@@ -31,6 +31,7 @@ export * from './subscriptions/index';
 export * from './schedules';
 export * from './backup-restore';
 export * from './system-logs/SystemLog';
+export * from './france-compliance/FranceCompliance';
 
 export * from './group-settings/';
 export * from './users';
