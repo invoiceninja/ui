@@ -250,6 +250,9 @@ export interface Settings {
   email_from_name?: string | null;
   reply_to_email?: string | null;
   reply_to_name?: string | null;
+  widget_show_label?: boolean;
+  widget_border_style?: 'hidden' | 'dotted' | 'solid';
+  widget_border_color?: string;
 }
 
 export interface DocumentFile {

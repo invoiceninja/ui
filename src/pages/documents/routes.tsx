@@ -40,6 +40,10 @@ const Notifications = lazy(
     )
 );
 
+const WidgetDefaults = lazy(
+  () => import('$app/pages/documents/pages/settings/pages/widget-defaults/WidgetDefaults')
+);
+
 const Builder = lazy(() => import('$app/pages/documents/builder/Builder'));
 const BlueprintBuilder = lazy(
   () => import('$app/pages/documents/pages/blueprints/builder/BlueprintBuilder')
@@ -148,6 +152,13 @@ const routes = (
                     type="subPage"
                     component={<Notifications />}
                   />
+                }
+              />
+              
+              <Route
+                path="widget_defaults"
+                element={
+                  <Guard guards={[]} type="subPage" component={<WidgetDefaults />} />
                 }
               />
             </Route>
