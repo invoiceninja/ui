@@ -9,18 +9,17 @@
  */
 
 import { Element } from '$app/components/cards';
-import { Button, InputField, Link } from '$app/components/forms';
+import { Button, Link } from '$app/components/forms';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTranslation } from 'react-i18next';
 import { formatLabel } from '../helpers/format-label';
-import { Field, useResolveInputField } from '../hooks/useResolveInputField';
-import { useHandleCredentialsChange } from '../hooks/useHandleCredentialsChange';
-import { useResolveConfigValue } from '../hooks/useResolveConfigValue';
+import { useResolveInputField } from '../hooks/useResolveInputField';
 import { StripeConnect } from './gateways/StripeConnect';
 import { WePay } from './gateways/WePay';
 import { PayPalPPCP } from './gateways/PayPalPPCP';
+import { Payware } from './gateways/Payware';
 import { Divider } from '$app/components/cards/Divider';
 import { request } from '$app/common/helpers/request';
 import { endpoint, isHosted } from '$app/common/helpers';
@@ -30,6 +29,7 @@ import { Modal } from '$app/components/Modal';
 import { GoCardlessOAuth2 } from './gateways/GoCardlessOAuth2';
 import { SquareOAuth } from './gateways/SquareOAuth';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
+import { useResolveConfigValue } from '$app/pages/settings/gateways/create/hooks/useResolveConfigValue';
 import { useLocation } from 'react-router-dom';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useColorScheme } from '$app/common/colors';
@@ -58,9 +58,6 @@ export function Credentials(props: Props) {
   );
 
   const config = useResolveConfigValue(props.companyGateway);
-  const handleCredentialChange = useHandleCredentialsChange(
-    props.setCompanyGateway
-  );
 
   const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
   const WEPAY = '8fdeed552015b3c7b44ed6c8ebd9e992';
@@ -69,19 +66,7 @@ export function Credentials(props: Props) {
   const SQUARE = '65faab2ab6e3223dbe848b1686490baz';
   const PAYWARE = 'b0a6294fca4488c2bab58f3e11e3c623';
 
-  const paywareSettingsFields = ['timeToLive'];
-  const paywareTextFields = ['partnerId', 'vposId'];
-  const paywareFieldLabels: Record<string, string> = {
-    partnerId: t('payware_partner_id_label'),
-    vposId: t('payware_vpos_id_label'),
-  };
-  const paywareFieldHelp: Record<string, string> = {
-    partnerId: t('payware_partner_id_help'),
-    vposId: t('payware_vpos_id_help'),
-    paywarePublicKey: t('payware_public_key_help'),
-  };
-
-  const hostedGateways = [STRIPE_CONNECT, WEPAY, PAYPAL_PPCP];
+  const hostedGateways = [STRIPE_CONNECT, WEPAY, PAYPAL_PPCP, PAYWARE];
 
   if (
     isHosted() &&
@@ -146,6 +131,15 @@ export function Credentials(props: Props) {
         />
       )}
 
+      {props.gateway && props.gateway.key === PAYWARE && (
+        <Payware
+          gateway={props.gateway}
+          companyGateway={props.companyGateway}
+          setCompanyGateway={props.setCompanyGateway}
+          errors={props.errors}
+        />
+      )}
+
       {props.gateway &&
         props.gateway.key === GOCARDLESS &&
         isHosted() &&
@@ -157,52 +151,15 @@ export function Credentials(props: Props) {
 
       {props.gateway &&
         !hostedGateways.includes(props.gateway.key) &&
-        Object.keys(JSON.parse(props.gateway.fields))
-          .filter((field) =>
-            props.gateway.key === PAYWARE
-              ? !paywareSettingsFields.includes(field)
-              : true
-          )
-          .map((field, index) => {
-            const isPaywareTextField =
-              props.gateway.key === PAYWARE &&
-              paywareTextFields.includes(field);
-
-            const label =
-              props.gateway.key === PAYWARE && paywareFieldLabels[field]
-                ? paywareFieldLabels[field]
-                : formatLabel(field);
-
-            const help =
-              props.gateway.key === PAYWARE
-                ? paywareFieldHelp[field]
-                : undefined;
-
-            return (
-              <Element
-                key={index}
-                leftSide={label}
-                {...(help ? { leftSideHelp: help } : {})}
-              >
-                {isPaywareTextField ? (
-                  <InputField
-                    type="text"
-                    value={config(field)}
-                    onValueChange={(value) =>
-                      handleCredentialChange(field as keyof Field, value)
-                    }
-                    errorMessage={props.errors?.errors[field]}
-                  />
-                ) : (
-                  resolveInputField(
-                    field,
-                    JSON.parse(props.gateway.fields)[field],
-                    props.errors
-                  )
-                )}
-              </Element>
-            );
-          })}
+        Object.keys(JSON.parse(props.gateway.fields)).map((field, index) => (
+          <Element leftSide={formatLabel(field)} key={index}>
+            {resolveInputField(
+              field,
+              JSON.parse(props.gateway.fields)[field],
+              props.errors
+            )}
+          </Element>
+        ))}
 
       {props.gateway &&
         props.gateway.key === GOCARDLESS &&
