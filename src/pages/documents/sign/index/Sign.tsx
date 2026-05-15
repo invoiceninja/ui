@@ -232,6 +232,7 @@ function SignatureInput({ value, onChange }: SignatureSelectorInputProps) {
       value={value}
       onValueChange={(value) => onChange(value)}
       placeholder={t('signature_name')}
+      changeOverride
     />
   );
 }

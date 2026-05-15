@@ -51,6 +51,13 @@ const BlueprintBuilder = lazy(
 const SignatoryMapping = lazy(
   () => import('$app/pages/documents/pages/blueprints/mapping/SignatoryMapping')
 );
+const EmailTemplates = lazy(
+  () =>
+    import(
+      '$app/pages/documents/pages/settings/pages/email-templates/EmailTemplates'
+    )
+);
+
 const EmailSettings = lazy(
   () =>
     import(
@@ -119,6 +126,16 @@ const routes = (
               <Route index element={<Navigate to="email_templates" replace />} />
               <Route
                 path="email_templates"
+                element={
+                  <DocuNinjaGuard
+                    guards={[docuNinjaAdmin()]}
+                    type="subPage"
+                    component={<EmailTemplates />}
+                  />
+                }
+              />
+              <Route
+                path="email_settings"
                 element={
                   <DocuNinjaGuard
                     guards={[docuNinjaAdmin()]}
