@@ -32,7 +32,7 @@ export const antdLocaleAtom = atom<any | null>(null);
 
 const { RangePicker } = DatePicker;
 
-const StyledRangePicker = styled(RangePicker)`
+export const StyledRangePicker = styled(RangePicker)`
   &:focus {
     border: none;
     outline: none;
@@ -186,6 +186,10 @@ export function DropdownDateRangePicker(props: Props) {
   }, [props.startDate, props.endDate]);
 
   useEffect(() => {
+    setIsModalVisible(props.value === 'custom');
+  }, [props.value]);
+
+  useEffect(() => {
     return () => {
       setIsModalVisible(false);
     };
@@ -246,7 +250,10 @@ export function DropdownDateRangePicker(props: Props) {
             <StyledRangePicker
               size="large"
               className="rounded-md"
-              defaultValue={[dayjs(customStartDate), dayjs(customEndDate)]}
+              value={[
+                customStartDate ? dayjs(customStartDate) : null,
+                customEndDate ? dayjs(customEndDate) : null,
+              ]}
               format={dateFormat}
               onChange={(_, dateString) => handleCustomDateChange(dateString)}
               style={{

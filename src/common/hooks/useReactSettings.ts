@@ -36,6 +36,8 @@ export interface Preferences {
     range: string;
     currency: number;
     include_drafts: boolean;
+    custom_start_date?: string;
+    custom_end_date?: string;
   };
   datatables: {
     clients: {
