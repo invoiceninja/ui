@@ -39,6 +39,9 @@ interface Params {
 }
 export function useActions(params?: Params) {
   const [t] = useTranslation();
+  const location = useLocation();
+
+  const bulk = useBulk();
 
   const { showEditAction, showCommonBulkAction } = params || {};
 
@@ -55,12 +58,6 @@ export function useActions(params?: Params) {
       'activity',
     ],
   });
-
-  const location = useLocation();
-  const isApplyPage = location.pathname.endsWith('/apply');
-  const isRefundPage = location.pathname.endsWith('/refund');
-
-  const bulk = useBulk();
 
   const {
     setChangeTemplateVisible,
@@ -80,7 +77,7 @@ export function useActions(params?: Params) {
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
     (resource: Payment) =>
-      !isApplyPage &&
+      !location.pathname.includes('/apply') &&
       resource.amount - resource.applied > 0 &&
       !resource.is_deleted && (
         <DropdownElement
@@ -91,7 +88,7 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (resource: Payment) =>
-      !isRefundPage &&
+      !location.pathname.includes('/refund') &&
       resource.amount !== resource.refunded &&
       !resource.is_deleted && (
         <DropdownElement
