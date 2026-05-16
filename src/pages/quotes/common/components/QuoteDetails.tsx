@@ -19,6 +19,7 @@ import { quoteAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
+import { PaymentTermsTooltip } from '$app/components/PaymentTermsTooltip';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -50,7 +51,15 @@ export function QuoteDetails(props: Props) {
           />
         </Element>
 
-        <Element leftSide={t('valid_until')}>
+        <Element
+          leftSide={
+            <div className="flex items-center space-x-2">
+              <span>{t('valid_until')}</span>
+
+              <PaymentTermsTooltip client={quote?.client} />
+            </div>
+          }
+        >
           <InputField
             type="date"
             onValueChange={(value) => handleChange('due_date', value)}

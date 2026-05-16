@@ -18,6 +18,7 @@ import { ChangeHandler } from '$app/pages/invoices/create/Create';
 import { useTranslation } from 'react-i18next';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
+import { PaymentTermsTooltip } from '$app/components/PaymentTermsTooltip';
 
 interface Props {
   invoice?: Invoice;
@@ -48,7 +49,15 @@ export function InvoiceDetails(props: Props) {
           />
         </Element>
 
-        <Element leftSide={t('due_date')}>
+        <Element
+          leftSide={
+            <div className="flex items-center space-x-2">
+              <span>{t('due_date')}</span>
+
+              <PaymentTermsTooltip client={invoice?.client} />
+            </div>
+          }
+        >
           <InputField
             type="date"
             onValueChange={(value) => handleChange('due_date', value)}
