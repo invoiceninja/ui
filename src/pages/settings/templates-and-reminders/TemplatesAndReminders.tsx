@@ -204,13 +204,18 @@ export function TemplatesAndReminders() {
 
   const { data: statics } = useStaticsQuery();
 
-  const [templateId, setTemplateId] = useState('invoice');
+  const [templateId, setTemplateId] = useState(
+    isCompanySettingsActive || company?.settings.email_template_invoice
+      ? 'invoice'
+      : ''
+  );
 
   const [templateBody, setTemplateBody] = useState<TemplateBody>();
   const [preview, setPreview] = useState<EmailTemplate>();
 
   const canChangeEmailTemplate = (isHosted() && !freePlan()) || isSelfHosted();
 
+  const [isInitial, setIsInitial] = useState<boolean>(true);
   const [reminderIndex, setReminderIndex] = useState<number>(-1);
   const [isLoadingPdf, setIsLoadingPdf] = useState<boolean>(false);
 
@@ -434,9 +439,18 @@ export function TemplatesAndReminders() {
 
       const template = company?.settings[emailTemplateKey];
 
-      if (isCompanySettingsActive || (template && !isCompanySettingsActive)) {
+      if (
+        isCompanySettingsActive ||
+        (template && !isCompanySettingsActive) ||
+        (templateId === 'invoice' &&
+          !template &&
+          !isCompanySettingsActive &&
+          isInitial)
+      ) {
         handleSetTemplateBody();
       }
+
+      isInitial && setIsInitial(false);
     }
   }, [statics, templateId]);
 
