@@ -142,11 +142,13 @@ function FontPreviewCard({
 type SignatureFontSelectorProps = {
   onSignatureCreated?: (signatureImage: string) => void;
   triggerButtonText?: string;
+  type?: string;
 };
 
 export function SignatureFontSelector({
   onSignatureCreated,
   triggerButtonText,
+  type,
 }: SignatureFontSelectorProps) {
   const [t] = useTranslation();
   const [text, setText] = useState('');
@@ -294,6 +296,11 @@ export function SignatureFontSelector({
     return { top, bottom, left, right };
   }
 
+  const titles: Record<string, string> = {
+    signature: t('create_signature'),
+    initials: t('create_initials'),
+  };
+
   return (
     <>
       <Button behavior="button" onClick={() => setIsOpen(true)}>
@@ -301,7 +308,7 @@ export function SignatureFontSelector({
       </Button>
 
       <Modal
-        title={t('create_signature')}
+        title={type ? titles[type] : t('create_signature')}
         visible={isOpen}
         onClose={() => setIsOpen(false)}
       >

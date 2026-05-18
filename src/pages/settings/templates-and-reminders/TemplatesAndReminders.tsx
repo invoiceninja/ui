@@ -93,14 +93,12 @@ const getActiveCategory = (templateId: string): string => {
 interface TemplateSelectorProps {
   value: string;
   onChange: (value: string) => void;
-  disabled?: boolean;
   rightSide?: ReactNode;
 }
 
 function TemplateSelector({
   value,
   onChange,
-  disabled = false,
   rightSide,
 }: TemplateSelectorProps) {
   const [t] = useTranslation();
@@ -125,17 +123,10 @@ function TemplateSelector({
     }
   };
 
-  const disabledStyle = {
-    opacity: disabled ? 0.4 : 1,
-    pointerEvents: (disabled
-      ? 'none'
-      : 'auto') as React.CSSProperties['pointerEvents'],
-  };
-
   return (
     <div className="flex flex-col mb-3">
       <div className="flex overflow-x-auto">
-        <div className="flex" style={disabledStyle}>
+        <div className="flex">
           {MAIN_TABS.map((tab) => (
             <button
               key={tab.value}
@@ -164,7 +155,7 @@ function TemplateSelector({
       </div>
 
       {submenuItems && (
-        <div className="flex flex-wrap gap-1.5 pt-3" style={disabledStyle}>
+        <div className="flex flex-wrap gap-1.5 pt-3">
           {submenuItems.map((item) => (
             <button
               key={item.value}
@@ -411,6 +402,7 @@ export function TemplatesAndReminders() {
         }
 
         setTemplateBody(undefined);
+        setPreview(undefined);
       }
     }
 
@@ -503,12 +495,13 @@ export function TemplatesAndReminders() {
         <div className="px-4 sm:px-6 pb-1">
           <TemplateSelector
             value={templateId}
-            disabled={
-              !isCompanySettingsActive && disableSettingsField(emailTemplateKey)
-            }
             onChange={(value) => {
               setTemplateId(value);
-              !isCompanySettingsActive && setTemplateBody(undefined);
+
+              if (!isCompanySettingsActive) {
+                setTemplateBody(undefined);
+                setPreview(undefined);
+              }
             }}
             rightSide={
               !isCompanySettingsActive ? (
