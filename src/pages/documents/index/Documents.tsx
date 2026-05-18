@@ -45,12 +45,15 @@ import { useActions } from '../common/hooks/useActions';
 import { DocumentSettingsModal } from '../show/components/DocumentSettingsModal';
 import { useDriverTour } from '$app/common/hooks/useDriverTour';
 import { usePreferences } from '$app/common/hooks/usePreferences';
+import { useDocumentFilters } from '../common/hooks/useDocumentFilters';
 
 export default function Documents() {
   useTitle('documents');
   const [t] = useTranslation();
   const navigate = useNavigate();
+
   const company = useCurrentCompany();
+  const filters = useDocumentFilters();
 
   const actions = useActions({
     onSettingsClick: (doc: DocumentType) => {
@@ -218,6 +221,8 @@ export default function Documents() {
           resource="document"
           endpoint="/api/documents?sort=id|desc"
           columns={columns}
+          customFilters={filters}
+          customFilterPlaceholder={t('status') as string}
           withResourcefulActions
           bulkRoute="/api/documents/bulk"
           linkToEdit="/docuninja/:id/builder"
