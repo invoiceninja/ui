@@ -9,6 +9,7 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
+import { route } from '$app/common/helpers/route';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { Client } from '$app/common/interfaces/client';
 import { useMemo } from 'react';
@@ -51,9 +52,14 @@ export function PaymentTermsTooltip({ client }: Props) {
               : t('none')}
           </span>
 
-          <Link to="/settings/payment_terms" className="text-xs">
-            {t('configure')}
-          </Link>
+          {client && (
+            <Link
+              to={route('/clients/:id/settings', { id: client.id })}
+              className="text-xs"
+            >
+              {t('configure')}
+            </Link>
+          )}
         </div>
       }
     >
