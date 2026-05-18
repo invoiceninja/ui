@@ -42,7 +42,7 @@ export function Edit() {
   const { documentTitle } = useTitle('edit_gateway');
 
   const [t] = useTranslation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const { id } = useParams();
   const actions = useActions();
@@ -118,6 +118,14 @@ export function Edit() {
   useEffect(() => {
     if (searchParams.get('show_onboarding') === 'true' && companyGateway) {
       setShowOnboardingModal(true);
+
+      setSearchParams(
+        (params) => {
+          params.delete('show_onboarding');
+          return params;
+        },
+        { replace: true }
+      );
     }
   }, [companyGateway, searchParams]);
 
