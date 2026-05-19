@@ -54,7 +54,10 @@ export function InvoiceDetails(props: Props) {
             <div className="flex items-center space-x-2">
               <span>{t('due_date')}</span>
 
-              <PaymentTermsTooltip client={invoice?.client} />
+              <PaymentTermsTooltip
+                client={invoice?.client}
+                clientId={invoice?.client_id}
+              />
             </div>
           }
         >

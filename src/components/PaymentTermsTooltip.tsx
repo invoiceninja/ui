@@ -10,9 +10,10 @@
 
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { Client } from '$app/common/interfaces/client';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdInfoOutline } from 'react-icons/md';
 import { Icon } from './icons/Icon';
@@ -21,22 +22,51 @@ import { Link } from './forms';
 
 interface Props {
   client?: Client;
+  clientId?: string;
 }
 
-export function PaymentTermsTooltip({ client }: Props) {
+export function PaymentTermsTooltip({ client, clientId }: Props) {
   const [t] = useTranslation();
 
-  const colors = useColorScheme();
   const getSetting = useGetSetting();
 
+  const colors = useColorScheme();
+  const clientResolver = useClientResolver();
+
+  const [resolvedClient, setResolvedClient] = useState<Client | undefined>(
+    client
+  );
+
+  useEffect(() => {
+    if (client) {
+      setResolvedClient(client);
+
+      return;
+    }
+
+    if (clientId) {
+      clientResolver.find(clientId).then((c) => setResolvedClient(c));
+
+      return;
+    }
+
+    setResolvedClient(undefined);
+  }, [client, clientId]);
+
   const { paymentTerms, hasPaymentTerms } = useMemo(() => {
-    const value = client ? getSetting(client, 'payment_terms') : undefined;
+    const value = resolvedClient
+      ? getSetting(resolvedClient, 'payment_terms')
+      : undefined;
 
     return {
       paymentTerms: value,
       hasPaymentTerms: value && Number(value) > 0,
     };
-  }, [client]);
+  }, [resolvedClient]);
+
+  if (!resolvedClient) {
+    return null;
+  }
 
   return (
     <Tooltip
@@ -52,14 +82,12 @@ export function PaymentTermsTooltip({ client }: Props) {
               : t('none')}
           </span>
 
-          {client && (
-            <Link
-              to={route('/clients/:id/settings', { id: client.id })}
-              className="text-xs"
-            >
-              {t('configure')}
-            </Link>
-          )}
+          <Link
+            to={route('/clients/:id/settings', { id: resolvedClient.id })}
+            className="text-xs"
+          >
+            {t('configure')}
+          </Link>
         </div>
       }
     >

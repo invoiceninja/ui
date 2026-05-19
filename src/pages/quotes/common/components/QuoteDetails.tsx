@@ -56,7 +56,10 @@ export function QuoteDetails(props: Props) {
             <div className="flex items-center space-x-2">
               <span>{t('valid_until')}</span>
 
-              <PaymentTermsTooltip client={quote?.client} />
+              <PaymentTermsTooltip
+                client={quote?.client}
+                clientId={quote?.client_id}
+              />
             </div>
           }
         >
