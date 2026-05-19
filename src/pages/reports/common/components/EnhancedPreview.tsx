@@ -14,7 +14,15 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { cloneDeep } from 'lodash';
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { sortRows, SortConfig, SortType, detectSortType, groupRows } from '../utils/sortingUtils';
+import {
+  sortRows,
+  SortConfig,
+  SortType,
+  detectSortType,
+  groupRows,
+  parseNumericValue,
+  extractDisplayValue,
+} from '../utils/sortingUtils';
 // Import the preview types and hook from Preview.tsx
 import { usePreview } from './Preview';
 
@@ -94,6 +102,55 @@ export function EnhancedPreview({
     return copy;
   }, [preview, filterValues, sortConfigs]); // Dependencies ensure re-computation when any change
   
+  const columnTotals = useMemo(() => {
+    if (!preview || filtered.columns.length === 0) {
+      return {
+        sums: {} as Record<string, number>,
+        numericColumns: new Set<string>(),
+      };
+    }
+
+    const numericColumns = new Set<string>();
+    const sums: Record<string, number> = {};
+
+    preview.columns.forEach((column) => {
+      const sampleRow = filtered.rows.find((row) => {
+        const cell = row.find((c) => c.identifier === column.identifier);
+        return cell && cell.display_value !== '' && cell.display_value !== null;
+      });
+
+      const sampleCell = sampleRow?.find(
+        (c) => c.identifier === column.identifier
+      );
+
+      const sortType = sampleCell
+        ? detectSortType(column.identifier, extractDisplayValue(sampleCell))
+        : detectSortType(column.identifier, '');
+
+      if (sortType === 'numeric' || sortType === 'currency') {
+        numericColumns.add(column.identifier);
+        sums[column.identifier] = 0;
+      }
+    });
+
+    if (numericColumns.size === 0) {
+      return { sums, numericColumns };
+    }
+
+    filtered.rows.forEach((row) => {
+      row.forEach((cell) => {
+        if (!numericColumns.has(cell.identifier)) return;
+
+        const value = extractDisplayValue(cell);
+        if (value === '' || value === null || value === undefined) return;
+
+        sums[cell.identifier] += parseNumericValue(value);
+      });
+    });
+
+    return { sums, numericColumns };
+  }, [preview, filtered]);
+
   // Early return AFTER all hooks have been called
   if (!preview) {
     return null;
@@ -328,7 +385,38 @@ export function EnhancedPreview({
             ))}
           </Tr>
 
-          {enableGrouping && groupByColumn 
+          {columnTotals.numericColumns.size > 0 && (
+            <Tr
+              className="border-b"
+              style={{ borderColor: colors.$20, backgroundColor: colors.$2 }}
+            >
+              {preview.columns.map((column, i) => {
+                const isNumeric = columnTotals.numericColumns.has(
+                  column.identifier
+                );
+
+                return (
+                  <Td key={i}>
+                    {isNumeric ? (
+                      <span className="font-semibold">
+                        {columnTotals.sums[column.identifier].toLocaleString(
+                          undefined,
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }
+                        )}
+                      </span>
+                    ) : (
+                      <span style={{ color: colors.$17 }}>—</span>
+                    )}
+                  </Td>
+                );
+              })}
+            </Tr>
+          )}
+
+          {enableGrouping && groupByColumn
             ? renderGroupedData()
             : renderNormalData()
           }
