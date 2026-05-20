@@ -96,7 +96,9 @@ export default function Settings() {
                 <div className="flex">
                   <span style={{ color: colors.$3 }}>(</span>
 
-                  <Link to="/settings/payment_terms">{t('configure')}</Link>
+                  <Link to="/settings/payment_terms/create">
+                    {t('configure')}
+                  </Link>
 
                   <span style={{ color: colors.$3 }}>)</span>
                 </div>
