@@ -104,15 +104,12 @@ export function EnhancedPreview({
   }, [preview, filterValues, sortConfigs]); // Dependencies ensure re-computation when any change
   
   const columnTotals = useMemo(() => {
-    if (!preview || filtered.columns.length === 0) {
-      return {
-        sums: {} as Record<string, number>,
-        summableColumns: new Set<string>(),
-      };
-    }
-
     const summable = new Set<string>();
     const sums: Record<string, number> = {};
+
+    if (!preview || filtered.columns.length === 0) {
+      return { sums, summable };
+    }
 
     preview.columns.forEach((column) => {
       if (isSummableColumn(column.identifier)) {
@@ -122,21 +119,26 @@ export function EnhancedPreview({
     });
 
     if (summable.size === 0) {
-      return { sums, summableColumns: summable };
+      return { sums, summable };
     }
 
     filtered.rows.forEach((row) => {
       row.forEach((cell) => {
-        if (!summable.has(cell.identifier)) return;
+        if (!summable.has(cell.identifier)) {
+          return;
+        }
 
         const value = extractDisplayValue(cell);
-        if (value === '' || value === null || value === undefined) return;
+
+        if (value === '' || value === null || value === undefined) {
+          return;
+        }
 
         sums[cell.identifier] += parseNumericValue(value);
       });
     });
 
-    return { sums, summableColumns: summable };
+    return { sums, summable };
   }, [preview, filtered]);
 
   // Early return AFTER all hooks have been called
@@ -373,15 +375,13 @@ export function EnhancedPreview({
             ))}
           </Tr>
 
-          {columnTotals.summableColumns.size > 0 && (
+          {columnTotals.summable.size > 0 && (
             <Tr
               className="border-b"
               style={{ borderColor: colors.$20, backgroundColor: colors.$2 }}
             >
               {preview.columns.map((column, i) => {
-                const isSummable = columnTotals.summableColumns.has(
-                  column.identifier
-                );
+                const isSummable = columnTotals.summable.has(column.identifier);
 
                 return (
                   <Td key={i}>
