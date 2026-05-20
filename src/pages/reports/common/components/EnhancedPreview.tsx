@@ -24,6 +24,7 @@ import {
   extractDisplayValue,
 } from '../utils/sortingUtils';
 import { isSummableColumn } from '../constants/columns';
+import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 // Import the preview types and hook from Preview.tsx
 import { usePreview } from './Preview';
 
@@ -42,6 +43,7 @@ export function EnhancedPreview({
 
   const preview = usePreview();
   const colors = useColorScheme();
+  const numericFormatter = useNumericFormatter();
 
   const [sortConfigs, setSortConfigs] = useState<SortConfig[]>([]);
   const [filterValues, setFilterValues] = useState<Record<string, string>>({});
@@ -387,12 +389,8 @@ export function EnhancedPreview({
                   <Td key={i}>
                     {isSummable ? (
                       <span className="font-semibold">
-                        {columnTotals.sums[column.identifier].toLocaleString(
-                          undefined,
-                          {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }
+                        {numericFormatter(
+                          columnTotals.sums[column.identifier].toString()
                         )}
                       </span>
                     ) : (
