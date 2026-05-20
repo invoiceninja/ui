@@ -18,6 +18,7 @@ import { set } from 'lodash';
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { useLanguages } from '$app/common/hooks/useLanguages';
 import { SelectField } from '$app/components/forms/SelectField';
+import { Link } from '$app/components/forms';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
@@ -87,7 +88,21 @@ export default function Settings() {
         )}
 
         {paymentTermsResponse && (
-          <Element leftSide={t('payment_terms')}>
+          <Element
+            leftSide={
+              <div className="flex items-center space-x-1 whitespace-nowrap">
+                <span>{t('payment_terms')}</span>
+
+                <div className="flex">
+                  <span style={{ color: colors.$3 }}>(</span>
+
+                  <Link to="/settings/payment_terms">{t('configure')}</Link>
+
+                  <span style={{ color: colors.$3 }}>)</span>
+                </div>
+              </div>
+            }
+          >
             <SelectField
               id="settings.payment_terms"
               value={client?.settings?.payment_terms || ''}
