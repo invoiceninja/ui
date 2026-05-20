@@ -23,6 +23,7 @@ import {
   parseNumericValue,
   extractDisplayValue,
 } from '../utils/sortingUtils';
+import { isSummableColumn } from '../constants/columns';
 // Import the preview types and hook from Preview.tsx
 import { usePreview } from './Preview';
 
@@ -106,40 +107,27 @@ export function EnhancedPreview({
     if (!preview || filtered.columns.length === 0) {
       return {
         sums: {} as Record<string, number>,
-        numericColumns: new Set<string>(),
+        summableColumns: new Set<string>(),
       };
     }
 
-    const numericColumns = new Set<string>();
+    const summable = new Set<string>();
     const sums: Record<string, number> = {};
 
     preview.columns.forEach((column) => {
-      const sampleRow = filtered.rows.find((row) => {
-        const cell = row.find((c) => c.identifier === column.identifier);
-        return cell && cell.display_value !== '' && cell.display_value !== null;
-      });
-
-      const sampleCell = sampleRow?.find(
-        (c) => c.identifier === column.identifier
-      );
-
-      const sortType = sampleCell
-        ? detectSortType(column.identifier, extractDisplayValue(sampleCell))
-        : detectSortType(column.identifier, '');
-
-      if (sortType === 'numeric' || sortType === 'currency') {
-        numericColumns.add(column.identifier);
+      if (isSummableColumn(column.identifier)) {
+        summable.add(column.identifier);
         sums[column.identifier] = 0;
       }
     });
 
-    if (numericColumns.size === 0) {
-      return { sums, numericColumns };
+    if (summable.size === 0) {
+      return { sums, summableColumns: summable };
     }
 
     filtered.rows.forEach((row) => {
       row.forEach((cell) => {
-        if (!numericColumns.has(cell.identifier)) return;
+        if (!summable.has(cell.identifier)) return;
 
         const value = extractDisplayValue(cell);
         if (value === '' || value === null || value === undefined) return;
@@ -148,7 +136,7 @@ export function EnhancedPreview({
       });
     });
 
-    return { sums, numericColumns };
+    return { sums, summableColumns: summable };
   }, [preview, filtered]);
 
   // Early return AFTER all hooks have been called
@@ -385,19 +373,19 @@ export function EnhancedPreview({
             ))}
           </Tr>
 
-          {columnTotals.numericColumns.size > 0 && (
+          {columnTotals.summableColumns.size > 0 && (
             <Tr
               className="border-b"
               style={{ borderColor: colors.$20, backgroundColor: colors.$2 }}
             >
               {preview.columns.map((column, i) => {
-                const isNumeric = columnTotals.numericColumns.has(
+                const isSummable = columnTotals.summableColumns.has(
                   column.identifier
                 );
 
                 return (
                   <Td key={i}>
-                    {isNumeric ? (
+                    {isSummable ? (
                       <span className="font-semibold">
                         {columnTotals.sums[column.identifier].toLocaleString(
                           undefined,
