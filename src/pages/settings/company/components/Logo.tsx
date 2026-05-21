@@ -36,6 +36,7 @@ import { useColorScheme } from '$app/common/colors';
 import { Button } from '$app/components/forms';
 import { MdCrop } from 'react-icons/md';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { compressImageFileForLogo } from '$app/common/helpers/logo-image';
 
 interface Props {
   isSettingsPage?: boolean;
@@ -120,16 +121,25 @@ export function Logo({ isSettingsPage = true }: Props) {
   };
 
   const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
+    async (acceptedFiles: File[]) => {
       const file = acceptedFiles[0];
 
       if (!file) {
         return;
       }
 
+      let preparedFile: File;
+
+      try {
+        preparedFile = await compressImageFileForLogo(file);
+      } catch {
+        toast.error();
+        return;
+      }
+
       const formData = new FormData();
 
-      formData.append('company_logo', file);
+      formData.append('company_logo', preparedFile);
       formData.append('_method', 'PUT');
 
       uploadLogo(formData);

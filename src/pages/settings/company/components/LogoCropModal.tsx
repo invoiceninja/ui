@@ -9,6 +9,10 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
+import {
+  LOGO_MAX_DIMENSION,
+  compressCanvasToMaxSize,
+} from '$app/common/helpers/logo-image';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
@@ -37,47 +41,6 @@ const FULL_CROP: Crop = {
   height: 100,
 };
 
-const MAX_DIMENSION = 800;
-const MAX_BLOB_SIZE = 2 * 1024 * 1024;
-
-const canvasToBlob = (
-  canvas: HTMLCanvasElement,
-  type: string,
-  quality?: number
-): Promise<Blob> =>
-  new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) =>
-        blob
-          ? resolve(blob)
-          : reject(new Error('Converting canvas to blob failed')),
-      type,
-      quality
-    );
-  });
-
-const compressToMaxSize = async (canvas: HTMLCanvasElement): Promise<Blob> => {
-  const pngBlob = await canvasToBlob(canvas, 'image/png');
-
-  if (pngBlob.size <= MAX_BLOB_SIZE) {
-    return pngBlob;
-  }
-
-  let quality = 0.9;
-
-  while (quality >= 0.1) {
-    const jpegBlob = await canvasToBlob(canvas, 'image/jpeg', quality);
-
-    if (jpegBlob.size <= MAX_BLOB_SIZE) {
-      return jpegBlob;
-    }
-
-    quality -= 0.1;
-  }
-
-  return canvasToBlob(canvas, 'image/jpeg', 0.1);
-};
-
 const cropImageToBlob = async (
   image: HTMLImageElement,
   crop: PixelCrop
@@ -94,10 +57,10 @@ const cropImageToBlob = async (
 
   let outputHeight = sourceHeight;
 
-  if (outputWidth > MAX_DIMENSION || outputHeight > MAX_DIMENSION) {
+  if (outputWidth > LOGO_MAX_DIMENSION || outputHeight > LOGO_MAX_DIMENSION) {
     const ratio = Math.min(
-      MAX_DIMENSION / outputWidth,
-      MAX_DIMENSION / outputHeight
+      LOGO_MAX_DIMENSION / outputWidth,
+      LOGO_MAX_DIMENSION / outputHeight
     );
 
     outputWidth = Math.floor(outputWidth * ratio);
@@ -128,7 +91,7 @@ const cropImageToBlob = async (
     outputHeight
   );
 
-  return compressToMaxSize(canvas);
+  return compressCanvasToMaxSize(canvas);
 };
 
 export function LogoCropModal({
