@@ -11,6 +11,7 @@
 import { useColorScheme } from '$app/common/colors';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
+import { Spinner } from '$app/components/Spinner';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactCrop, {
@@ -23,6 +24,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 interface Props {
   visible: boolean;
   imageSrc: string;
+  isLoading?: boolean;
   onClose: () => void;
   onCropComplete: (croppedBlob: Blob) => Promise<void>;
 }
@@ -132,6 +134,7 @@ const cropImageToBlob = async (
 export function LogoCropModal({
   visible,
   imageSrc,
+  isLoading = false,
   onClose,
   onCropComplete,
 }: Props) {
@@ -200,9 +203,15 @@ export function LogoCropModal({
       <div className="flex flex-col space-y-5">
         <div
           className="flex items-center justify-center w-full p-4 rounded-lg border"
-          style={{ backgroundColor: colors.$15, borderColor: colors.$24 }}
+          style={{
+            backgroundColor: colors.$15,
+            borderColor: colors.$24,
+            minHeight: '18rem',
+          }}
         >
-          {imageSrc && (
+          {isLoading || !imageSrc ? (
+            <Spinner />
+          ) : (
             <ReactCrop
               crop={crop}
               onChange={(c) => setCrop(c)}
@@ -225,7 +234,7 @@ export function LogoCropModal({
             behavior="button"
             type="secondary"
             onClick={handleReset}
-            disabled={isFormBusy}
+            disabled={isFormBusy || isLoading || !imageSrc}
             disableWithoutIcon
           >
             {t('reset')}
@@ -234,8 +243,8 @@ export function LogoCropModal({
           <Button
             behavior="button"
             onClick={handleConfirm}
-            disabled={isFormBusy || !completedCrop}
-            disableWithoutIcon={!completedCrop}
+            disabled={isFormBusy || isLoading || !completedCrop}
+            disableWithoutIcon={!completedCrop || isLoading}
           >
             {t('upload')}
           </Button>
