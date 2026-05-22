@@ -39,7 +39,9 @@ export default function Settings() {
   const currencies = useCurrencies();
   const { data: statics } = useStaticsQuery();
 
-  const { data: paymentTermsResponse } = usePaymentTermsQuery({});
+  const { data: paymentTermsResponse } = usePaymentTermsQuery({
+    status: ['active'],
+  });
 
   const handleChange = (property: string, value: string | number | boolean) => {
     const $client = cloneDeep(client)!;

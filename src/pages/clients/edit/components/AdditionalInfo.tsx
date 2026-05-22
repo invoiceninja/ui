@@ -50,7 +50,9 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
-  const { data: paymentTermsResponse } = usePaymentTermsQuery({});
+  const { data: paymentTermsResponse } = usePaymentTermsQuery({
+    status: ['active'],
+  });
 
   const { data: statics } = useStaticsQuery();
   const { id } = useParams();

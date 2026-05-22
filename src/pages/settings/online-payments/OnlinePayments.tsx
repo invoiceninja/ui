@@ -49,7 +49,7 @@ export function OnlinePayments() {
   const company = useInjectCompanyChanges();
   const { data: statics } = useStaticsQuery();
   const errors = useAtomValue(companySettingsErrorsAtom);
-  const { data: termsResponse } = usePaymentTermsQuery({});
+  const { data: termsResponse } = usePaymentTermsQuery({ status: ['active'] });
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
   const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
 

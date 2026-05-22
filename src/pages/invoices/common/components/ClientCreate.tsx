@@ -61,7 +61,9 @@ export function ClientCreate({
     refetchOnWindowFocus: false,
   });
 
-  const { data: paymentTermsResponse } = usePaymentTermsQuery({});
+  const { data: paymentTermsResponse } = usePaymentTermsQuery({
+    status: ['active'],
+  });
 
   const handleChange = (property: keyof Client, value: string) => {
     setErrors(undefined);
