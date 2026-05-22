@@ -14,6 +14,7 @@ import { useParams } from 'react-router-dom';
 import { useInvoiceColumns } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useActions } from '$app/pages/invoices/edit/components/Actions';
 import { useCustomBulkActions } from '$app/pages/invoices/common/hooks/useCustomBulkActions';
+import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { permission } from '$app/common/guards/guards/permission';
 import { useFooterColumns } from '$app/pages/invoices/common/hooks/useFooterColumns';
@@ -31,6 +32,7 @@ export default function Invoices() {
 
   const { actions } = useActions();
   const columns = useInvoiceColumns();
+  const filters = useInvoiceFilters();
   const { footerColumns } = useFooterColumns();
   const customBulkActions = useCustomBulkActions();
 
@@ -51,6 +53,8 @@ export default function Invoices() {
         footerColumns={footerColumns}
         customActions={actions}
         customBulkActions={customBulkActions}
+        customFilters={filters}
+        customFilterPlaceholder="status"
         withResourcefulActions
         withoutDefaultBulkActions
         bulkRoute="/api/v1/invoices/bulk"
