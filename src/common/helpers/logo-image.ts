@@ -124,25 +124,24 @@ export const compressImageFileForLogo = async (file: File): Promise<File> => {
 
   const image = await loadImageFromFile(file);
 
-  const needsResize =
-    image.naturalWidth > LOGO_MAX_DIMENSION ||
-    image.naturalHeight > LOGO_MAX_DIMENSION;
+  try {
+    const needsResize =
+      image.naturalWidth > LOGO_MAX_DIMENSION ||
+      image.naturalHeight > LOGO_MAX_DIMENSION;
 
-  URL.revokeObjectURL(image.src);
+    if (isWithinSize && !needsResize) {
+      return file;
+    }
 
-  if (isWithinSize && !needsResize) {
-    return file;
+    const { canvas } = drawImageToCanvas(image);
+
+    const preferredType: 'image/png' | 'image/jpeg' =
+      file.type === 'image/jpeg' ? 'image/jpeg' : 'image/png';
+
+    const compressedBlob = await compressCanvasToMaxSize(canvas, preferredType);
+
+    return blobToFile(compressedBlob, file.name);
+  } finally {
+    URL.revokeObjectURL(image.src);
   }
-
-  const reloadedImage = await loadImageFromFile(file);
-  const { canvas } = drawImageToCanvas(reloadedImage);
-
-  URL.revokeObjectURL(reloadedImage.src);
-
-  const preferredType: 'image/png' | 'image/jpeg' =
-    file.type === 'image/jpeg' ? 'image/jpeg' : 'image/png';
-
-  const compressedBlob = await compressCanvasToMaxSize(canvas, preferredType);
-
-  return blobToFile(compressedBlob, file.name);
 };
