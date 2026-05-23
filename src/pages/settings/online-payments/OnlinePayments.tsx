@@ -300,11 +300,17 @@ export function OnlinePayments() {
               customSelector
               withBlank
             >
-              {paymentTerms.map((type: PaymentTerm) => (
-                <option key={type.id} value={type.num_days.toString()}>
-                  {type.name}
-                </option>
-              ))}
+              {paymentTerms
+                .filter(
+                  (type: PaymentTerm, index, terms) =>
+                    terms.findIndex((t) => t.num_days === type.num_days) ===
+                    index
+                )
+                .map((type: PaymentTerm) => (
+                  <option key={type.id} value={type.num_days.toString()}>
+                    {type.name}
+                  </option>
+                ))}
             </SelectField>
           </Element>
         )}
@@ -366,11 +372,16 @@ export function OnlinePayments() {
             errorMessage={errors?.errors['settings.valid_until']}
             customSelector
           >
-            {paymentTerms?.map((type: PaymentTerm) => (
-              <option key={type.id} value={type.num_days.toString()}>
-                {type.name}
-              </option>
-            ))}
+            {paymentTerms
+              ?.filter(
+                (type: PaymentTerm, index, terms) =>
+                  terms.findIndex((t) => t.num_days === type.num_days) === index
+              )
+              .map((type: PaymentTerm) => (
+                <option key={type.id} value={type.num_days.toString()}>
+                  {type.name}
+                </option>
+              ))}
           </SelectField>
         </Element>
 

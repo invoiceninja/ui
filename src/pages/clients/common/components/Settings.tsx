@@ -117,13 +117,22 @@ export default function Settings() {
               withBlank
               customSelector
             >
-              {paymentTermsResponse.data.data.map(
-                (paymentTerm: PaymentTerm, index: number) => (
+              {paymentTermsResponse.data.data
+                .filter(
+                  (
+                    paymentTerm: PaymentTerm,
+                    index: number,
+                    terms: PaymentTerm[]
+                  ) =>
+                    terms.findIndex(
+                      (t) => t.num_days === paymentTerm.num_days
+                    ) === index
+                )
+                .map((paymentTerm: PaymentTerm, index: number) => (
                   <option key={index} value={paymentTerm.num_days.toString()}>
                     {paymentTerm.name}
                   </option>
-                )
-              )}
+                ))}
             </SelectField>
           </Element>
         )}
@@ -140,13 +149,22 @@ export default function Settings() {
               withBlank
               customSelector
             >
-              {paymentTermsResponse.data.data.map(
-                (paymentTerm: PaymentTerm, index: number) => (
+              {paymentTermsResponse.data.data
+                .filter(
+                  (
+                    paymentTerm: PaymentTerm,
+                    index: number,
+                    terms: PaymentTerm[]
+                  ) =>
+                    terms.findIndex(
+                      (t) => t.num_days === paymentTerm.num_days
+                    ) === index
+                )
+                .map((paymentTerm: PaymentTerm, index: number) => (
                   <option key={index} value={paymentTerm.num_days.toString()}>
                     {paymentTerm.name}
                   </option>
-                )
-              )}
+                ))}
             </SelectField>
           </Element>
         )}
