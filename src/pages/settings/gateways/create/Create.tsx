@@ -387,7 +387,7 @@ export function Create() {
           <>
             {tabIndex === 1 && (
               <button
-                style={{ color: '#0062FF' }}
+                style={{ color: accentColor }}
                 type="button"
                 onClick={() =>
                   $help('gateways', {
@@ -404,7 +404,7 @@ export function Create() {
 
             {tabIndex === 3 && (
               <button
-                style={{ color: '#0062FF' }}
+                style={{ color: accentColor }}
                 type="button"
                 onClick={() =>
                   $help('gateways', {

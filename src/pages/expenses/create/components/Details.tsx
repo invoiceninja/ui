@@ -38,6 +38,7 @@ import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 import { useColorScheme } from '$app/common/colors';
 import { ExternalLink } from '$app/components/icons/ExternalLink';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 
 export interface ExpenseCardProps {
   expense: Expense | undefined;
@@ -61,6 +62,7 @@ export function Details(props: Props) {
   const { expense, handleChange, taxInputType, pageType, errors } = props;
 
   const colors = useColorScheme();
+  const accentColor = useAccentColor();
   const company = useCurrentCompany();
 
   const { data: taxes } = useTaxRatesQuery({ status: ['active'] });
@@ -157,7 +159,7 @@ export function Details(props: Props) {
                     target="_blank"
                   >
                     <div>
-                      <ExternalLink color="#0062FF" size="1.1rem" />
+                      <ExternalLink color={accentColor} size="1.1rem" />
                     </div>
                   </Link>
                 )}
@@ -205,7 +207,7 @@ export function Details(props: Props) {
                     target="_blank"
                   >
                     <div>
-                      <ExternalLink color="#0062FF" size="1.1rem" />
+                      <ExternalLink color={accentColor} size="1.1rem" />
                     </div>
                   </Link>
                 )}
