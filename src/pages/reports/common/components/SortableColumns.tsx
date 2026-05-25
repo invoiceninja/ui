@@ -324,7 +324,7 @@ export function SortableColumns({ report, columns }: Props) {
 
   const colors = useColorScheme();
 
-  const { update } = usePreferences();
+  const { update, preferences } = usePreferences();
 
   const { data: persistedData, defaultColumns } = useColumns({
     report,
@@ -339,9 +339,13 @@ export function SortableColumns({ report, columns }: Props) {
 
   const syncToPreferences = useCallback(
     (newData: Record[][]) => {
+      if (Array.isArray(preferences.reports.columns)) {
+        update('preferences.reports.columns', {});
+      }
+
       update(`preferences.reports.columns.${report}`, [...newData]);
     },
-    [report, update]
+    [report, update, preferences.reports.columns]
   );
 
   const onDragEnd = useCallback(
