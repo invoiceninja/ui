@@ -184,6 +184,7 @@ export default function Details(props?: DocuninjaUserProps) {
 
                         <SignatureFontSelector
                           triggerButtonText={t('generate') as string}
+                          type="signature"
                           onSignatureCreated={(signatureImage) => {
                             setUser(
                               (user) =>
@@ -284,6 +285,7 @@ export default function Details(props?: DocuninjaUserProps) {
 
                       <SignatureFontSelector
                         triggerButtonText={t('generate') as string}
+                        type="signature"
                         onSignatureCreated={(signatureImage) => {
                           setUser(
                             (user) =>

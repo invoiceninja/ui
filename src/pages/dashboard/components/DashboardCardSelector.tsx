@@ -12,6 +12,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { cloneDeep, set } from 'lodash';
+import classNames from 'classnames';
 import {
   DragDropContext,
   Draggable,
@@ -30,6 +31,7 @@ import {
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useColorScheme } from '$app/common/colors';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -196,6 +198,7 @@ export function DashboardCardSelector() {
 
   const colors = useColorScheme();
   const currentUser = useCurrentUser();
+  const reactSettings = useReactSettings({ overwrite: false });
 
   const fieldsRef = useRef<string[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -396,7 +399,13 @@ export function DashboardCardSelector() {
 
                       return (
                         <div
-                          className="flex items-center justify-between rounded-md px-2 py-2 bg-gray-100"
+                          className={classNames(
+                            'flex items-center justify-between rounded-md px-2 py-2',
+                            {
+                              'bg-gray-100': !reactSettings.dark_mode,
+                              'bg-[#1f2e41]': reactSettings.dark_mode,
+                            }
+                          )}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                           ref={provided.innerRef}
@@ -423,7 +432,13 @@ export function DashboardCardSelector() {
                             >
                               {(provided) => (
                                 <div
-                                  className="flex items-center justify-between rounded-md px-2 py-2 bg-gray-100"
+                                  className={classNames(
+                                    'flex items-center justify-between rounded-md px-2 py-2',
+                                    {
+                                      'bg-gray-100': !reactSettings.dark_mode,
+                                      'bg-[#1f2e41]': reactSettings.dark_mode,
+                                    }
+                                  )}
                                   {...provided.draggableProps}
                                   ref={provided.innerRef}
                                 >

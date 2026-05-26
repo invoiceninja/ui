@@ -77,6 +77,10 @@ export function useDataTableUtilities(params: Params) {
         .toArray();
 
       queryKeys.forEach((queryKey) => {
+        if (queryKey === 'status') {
+          return;
+        }
+
         const currentQueryKey = queryKey || 'client_status';
         const selectedFiltersByKey: string[] = [];
 

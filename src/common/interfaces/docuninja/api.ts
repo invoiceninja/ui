@@ -247,6 +247,12 @@ export interface Settings {
   email_client_when_completed: boolean;
   force_des_signature: boolean;
   attach_audit_log_to_completed_email: boolean;
+  email_from_name?: string | null;
+  reply_to_email?: string | null;
+  reply_to_name?: string | null;
+  widget_show_label?: boolean;
+  widget_border_style?: 'hidden' | 'dotted' | 'solid';
+  widget_border_color?: string;
 }
 
 export interface DocumentFile {

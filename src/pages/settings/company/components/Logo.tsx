@@ -33,6 +33,10 @@ import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useC
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { CloudUpload } from '$app/components/icons/CloudUpload';
 import { useColorScheme } from '$app/common/colors';
+import { Button } from '$app/components/forms';
+import { MdCrop } from 'react-icons/md';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { compressImageFileForLogo } from '$app/common/helpers/logo-image';
 
 interface Props {
   isSettingsPage?: boolean;
@@ -46,9 +50,12 @@ export function Logo({ isSettingsPage = true }: Props) {
   const logo = useLogo();
   const colors = useColorScheme();
   const company = useCurrentCompany();
+  const companyChanges = useCompanyChanges();
 
   const [pendingImageSrc, setPendingImageSrc] = useState<string>('');
   const [cropModalVisible, setCropModalVisible] = useState<boolean>(false);
+  const [isLoadingCropSource, setIsLoadingCropSource] =
+    useState<boolean>(false);
 
   const {
     isGroupSettingsActive,
@@ -113,18 +120,32 @@ export function Logo({ isSettingsPage = true }: Props) {
     });
   };
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
 
-    if (!file) {
-      return;
-    }
+      if (!file) {
+        return;
+      }
 
-    const objectUrl = URL.createObjectURL(file);
+      let preparedFile: File;
 
-    setPendingImageSrc(objectUrl);
-    setCropModalVisible(true);
-  }, []);
+      try {
+        preparedFile = await compressImageFileForLogo(file);
+      } catch {
+        toast.error();
+        return;
+      }
+
+      const formData = new FormData();
+
+      formData.append('company_logo', preparedFile);
+      formData.append('_method', 'PUT');
+
+      uploadLogo(formData);
+    },
+    [uploadLogo]
+  );
 
   const handleCropComplete = useCallback(
     (croppedBlob: Blob): Promise<void> => {
@@ -151,6 +172,31 @@ export function Logo({ isSettingsPage = true }: Props) {
     setCropModalVisible(false);
   };
 
+  const handleOpenCropExistingLogo = async () => {
+    if (isLoadingCropSource) {
+      return;
+    }
+
+    setIsLoadingCropSource(true);
+    setCropModalVisible(true);
+
+    request(
+      'GET',
+      endpoint('/api/v1/companies/:id/logo', { id: company.id }),
+      {},
+      { responseType: 'blob' }
+    )
+      .then((response: AxiosResponse) => {
+        setPendingImageSrc(URL.createObjectURL(response.data as Blob));
+      })
+      .catch(() => {
+        setCropModalVisible(false);
+      })
+      .finally(() => {
+        setIsLoadingCropSource(false);
+      });
+  };
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     multiple: false,
@@ -165,6 +211,7 @@ export function Logo({ isSettingsPage = true }: Props) {
       <LogoCropModal
         visible={cropModalVisible}
         imageSrc={pendingImageSrc}
+        isLoading={isLoadingCropSource}
         onClose={handleCropModalClose}
         onCropComplete={handleCropComplete}
       />
@@ -215,7 +262,27 @@ export function Logo({ isSettingsPage = true }: Props) {
             </div>
           </Element>
 
-          <DeleteLogo />
+          <Element className="pb-3" pushContentToRight noVerticalPadding>
+            <div className="flex items-center space-x-3">
+              <Button
+                behavior="button"
+                type="secondary"
+                onClick={handleOpenCropExistingLogo}
+                disabled={
+                  !companyChanges?.settings?.company_logo || isLoadingCropSource
+                }
+                disableWithoutIcon
+              >
+                <div className="flex items-center space-x-2">
+                  <MdCrop fontSize={16} />
+
+                  <span className="text-sm">{t('crop_logo')}</span>
+                </div>
+              </Button>
+
+              <DeleteLogo isSettingsPage={false} />
+            </div>
+          </Element>
         </>
       ) : (
         <div className="flex flex-col space-y-5">
