@@ -73,7 +73,7 @@ export function Login() {
           toast.error('app_maintenance');
         } else {
           setMessage(
-            error.response?.data.message ?? (t('invalid_credentials') as string)
+            error.response.data.message ?? (t('error_refresh_page') as string)
           );
         }
       })
