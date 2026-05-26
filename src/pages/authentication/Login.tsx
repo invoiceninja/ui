@@ -63,13 +63,17 @@ export function Login() {
     })
       .then((response) => login(response))
       .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
-        if (error.response?.status === 422) {
+        if (!error.response) {
+          return;
+        }
+
+        if (error.response.status === 422) {
           setErrors(error.response.data.errors);
 
           if (error.response.data.message) {
             setMessage(error.response.data.message);
           }
-        } else if (error.response?.status === 503) {
+        } else if (error.response.status === 503) {
           toast.error('app_maintenance');
         } else {
           setMessage(
