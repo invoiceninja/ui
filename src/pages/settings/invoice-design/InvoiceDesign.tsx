@@ -16,7 +16,7 @@ import { Tabs } from '$app/components/Tabs';
 import { Default } from '$app/components/layouts/Default';
 import axios, { AxiosPromise } from 'axios';
 import { useAtomValue } from 'jotai';
-import { Outlet, useLocation, useParams } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { updatingRecordsAtom } from './common/atoms';
 import { useEffect, useState } from 'react';
 import {
@@ -57,16 +57,21 @@ export default function InvoiceDesign() {
   const { isClientSettingsActive, isGroupSettingsActive } =
     useCurrentSettingsLevel();
   const displaySaveButtonAndPreview =
-    !location.pathname.includes('custom_designs');
+    !location.pathname.includes('custom_designs') &&
+    !location.pathname.includes('builder');
 
   const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
   const activeSettingsValue = useAtomValue(activeSettingsAtom);
 
   const onSave = useHandleCompanySave();
 
+  const navigate = useNavigate();
+
   const showsMainTabs = location.pathname.includes('custom_designs')
     ? location.pathname.endsWith('/custom_designs')
-    : true;
+    : !location.pathname.includes('builder');
+
+  const isBuilderRoute = location.pathname.includes('builder');
 
   const ProBadge = () => (
     <div className="flex space-x-0.5 items-center text-xs py-1 px-2 bg-[#2176FF26] rounded">
@@ -160,8 +165,18 @@ export default function InvoiceDesign() {
     [company, updatingRecords, location, isFormBusy]
   );
 
+  const handleCancel = () => {
+    if (isBuilderRoute) {
+      navigate(route('/settings/invoice_design/custom_designs'));
+    }
+  };
+
   return (
-    <Default title={documentTitle} breadcrumbs={showsMainTabs ? pages : pages2}>
+    <Default 
+      title={documentTitle} 
+      breadcrumbs={showsMainTabs ? pages : pages2}
+      onCancelClick={isBuilderRoute ? handleCancel : undefined}
+    >
       <Tabs
         tabs={tabs}
         visible={showsMainTabs}

@@ -64,7 +64,7 @@ export const settingsRoutes = (
           element={
             import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' && isHosted() ? (
             // import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
-             
+             // Plan3 is the next iteration that include docuninja billing
               <Guard
                 guards={[owner()]}
                 component={<Settings.Plan2 />}

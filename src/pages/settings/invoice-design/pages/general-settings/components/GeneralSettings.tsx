@@ -34,8 +34,9 @@ import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { useColorScheme } from '$app/common/colors';
 import { Toggle as ToggleIcon } from '$app/components/icons/Toggle';
+import { FontSelect } from '$app/pages/settings/invoice-design/builder/components/properties/FontSelect';
 
-const fonts = [
+export const fonts = [
   { value: 'ABeeZee', label: 'ABeeZee' },
   { value: 'Abel', label: 'Abel' },
   { value: 'Abril_Fatface', label: 'Abril Fatface' },
@@ -1379,21 +1380,13 @@ export default function GeneralSettings() {
             />
           }
         >
-          <SelectField
+          <FontSelect
             id="settings.primary_font"
             value={company?.settings?.primary_font || 'roboto'}
-            onValueChange={(value) => handleChange('primary_font', value)}
+            onChange={(value) => handleChange('primary_font', value)}
             disabled={disableSettingsField('primary_font')}
             errorMessage={errors?.errors['settings.primary_font']}
-            customSelector
-            dismissable={false}
-          >
-            {fonts.map((font) => (
-              <option key={font.label} value={font.value}>
-                {font.label}
-              </option>
-            ))}
-          </SelectField>
+          />
         </Element>
 
         <Element
@@ -1451,21 +1444,13 @@ export default function GeneralSettings() {
             />
           }
         >
-          <SelectField
+          <FontSelect
             id="settings.secondary_font"
             value={company?.settings?.secondary_font || 'roboto'}
-            onValueChange={(value) => handleChange('secondary_font', value)}
+            onChange={(value) => handleChange('secondary_font', value)}
             disabled={disableSettingsField('secondary_font')}
             errorMessage={errors?.errors['settings.secondary_font']}
-            customSelector
-            dismissable={false}
-          >
-            {fonts.map((font) => (
-              <option key={font.label} value={font.value}>
-                {font.label}
-              </option>
-            ))}
-          </SelectField>
+          />
         </Element>
 
         <Element

@@ -1,0 +1,178 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
+import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ZoomIn, ZoomOut } from 'lucide-react';
+import { Modal } from '$app/components/Modal';
+import { Button } from '$app/components/forms';
+import { useColorScheme } from '$app/common/colors';
+import { Block } from '../types';
+import {
+  generateInvoiceHTML,
+  GeneratorDesignSettings,
+} from '../utils/html-generator';
+import { useSampleInvoiceData } from '../hooks/useSampleInvoiceData';
+
+interface PreviewModalProps {
+  blocks: Block[];
+  onClose: () => void;
+  designSettings?: GeneratorDesignSettings;
+}
+
+interface PageDimensions {
+  width: number;
+  height: number;
+}
+
+function getPreviewDimensions(pageSize: string = 'A4'): PageDimensions {
+  switch (pageSize) {
+    case 'letter':
+      return { width: 816, height: 1056 }; // 8.5 x 11 inches at 96dpi
+    case 'A4':
+    default:
+      return { width: 794, height: 1122 }; // A4 at 96dpi
+  }
+}
+
+export function PreviewModal({ blocks, onClose, designSettings }: PreviewModalProps) {
+  const [t] = useTranslation();
+  const [zoom, setZoom] = useState(80);
+  const colors = useColorScheme();
+  const sampleData = useSampleInvoiceData();
+  const html = generateInvoiceHTML(blocks, sampleData, designSettings);
+  const dimensions = getPreviewDimensions(designSettings?.page_size);
+
+  // React's controlled `srcDoc` prop sets the attribute, but browsers don't
+  // always re-parse the iframe document when the attribute changes after the
+  // first render — so property edits like padding / row-spacing can appear to
+  // not update. Imperatively writing `srcdoc` from an effect forces a fresh
+  // parse on every html change.
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (iframe) iframe.srcdoc = html;
+  }, [html]);
+
+  const handleDownloadHTML = () => {
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `invoice-preview-${Date.now()}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(html);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => {
+        printWindow.print();
+      }, 250);
+    }
+  };
+
+  return (
+    <Modal
+      visible={true}
+      onClose={onClose}
+      title={t('preview')}
+      size="large"
+      overflowVisible
+      enableClosingOnXMark
+    >
+      <div
+        className="flex flex-col"
+        style={{ minHeight: '600px', maxHeight: '80vh' }}
+      >
+        {/* Toolbar */}
+        <div
+          className="flex items-center justify-end pb-3 border-b"
+          style={{ borderColor: colors.$24 }}
+        >
+          <div className="flex items-center gap-4">
+            {/* Zoom Controls */}
+            <div className="flex items-center gap-2">
+              <Button
+                type="secondary"
+                behavior="button"
+                onClick={() => setZoom(Math.max(50, zoom - 10))}
+                className="p-2"
+              >
+                <ZoomOut className="w-4 h-4" />
+              </Button>
+              <span
+                className="text-sm font-medium min-w-[60px] text-center"
+                style={{ color: colors.$3 }}
+              >
+                {zoom}%
+              </span>
+              <Button
+                type="secondary"
+                behavior="button"
+                onClick={() => setZoom(Math.min(150, zoom + 10))}
+                className="p-2"
+              >
+                <ZoomIn className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <div className="h-6 w-px" style={{ backgroundColor: colors.$24 }} />
+          </div>
+        </div>
+
+        {/* Preview Content */}
+        <div
+          className="flex-1 overflow-auto py-6 -mx-5 px-5"
+          style={{ backgroundColor: colors.$23 }}
+        >
+          <div
+            className="mx-auto shadow-lg"
+            style={{
+              backgroundColor: colors.$1,
+              transform: `scale(${zoom / 100})`,
+              transformOrigin: 'top center',
+              transition: 'transform 0.2s ease',
+              width: 'fit-content',
+            }}
+          >
+            <iframe
+              ref={iframeRef}
+              srcDoc={html}
+              className="border-0 block"
+              style={{
+                width: `${dimensions.width}px`,
+                height: `${dimensions.height}px`,
+                minHeight: `${dimensions.height}px`,
+                backgroundColor: colors.$1,
+              }}
+              title={String(t('preview'))}
+              sandbox="allow-same-origin"
+            />
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div
+          className="py-3 border-t flex items-center justify-between text-sm -mx-5 px-5 -mb-5"
+          style={{ borderColor: colors.$24, color: colors.$17 }}
+        >
+
+        </div>
+      </div>
+    </Modal>
+  );
+}
