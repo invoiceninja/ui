@@ -43,7 +43,7 @@ client.interceptors.response.use(
   (error: AxiosError<ValidationBag>) => {
     const url = error.response?.config.url;
 
-    if (!error.response) {
+    if (error.code === 'ERR_NETWORK') {
       toast.error('server_not_reachable');
       return Promise.reject(error);
     }
