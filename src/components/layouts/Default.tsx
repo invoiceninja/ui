@@ -37,6 +37,7 @@ import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import { useAtomValue } from 'jotai';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { Notifications } from '../Notifications';
+import { RunningTaskChip } from '$app/pages/tasks/common/components/RunningTaskChip';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { Invoice } from '$app/common/interfaces/invoice';
 import toast from 'react-hot-toast';
@@ -183,6 +184,7 @@ export function Default(props: Props) {
             </div>
 
             <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
+              <RunningTaskChip />
               <Notifications />
 
               {shouldShowUnlockButton && (

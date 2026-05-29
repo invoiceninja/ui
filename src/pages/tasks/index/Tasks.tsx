@@ -17,7 +17,12 @@ import {
 } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { BsKanban } from 'react-icons/bs';
+import {
+  BsKanban,
+  BsCalendarDay,
+  BsCalendarWeek,
+  BsCalendarMonth,
+} from 'react-icons/bs';
 import {
   defaultColumns,
   useActions,
@@ -159,12 +164,32 @@ export default function Tasks() {
         }
         beforeFilter={
           (hasPermission('view_task') || hasPermission('edit_task')) && (
-            <Link to="/tasks/kanban">
-              <Inline>
-                <BsKanban size={20} />
-                <span>Kanban</span>
-              </Inline>
-            </Link>
+            <Inline>
+              <Link to="/tasks/kanban">
+                <Inline>
+                  <BsKanban size={20} />
+                  <span>{t('kanban')}</span>
+                </Inline>
+              </Link>
+              <Link to="/tasks/timesheet">
+                <Inline>
+                  <BsCalendarDay size={18} />
+                  <span>{t('timesheet')}</span>
+                </Inline>
+              </Link>
+              <Link to="/tasks/weekly">
+                <Inline>
+                  <BsCalendarWeek size={18} />
+                  <span>{t('weekly')}</span>
+                </Inline>
+              </Link>
+              <Link to="/tasks/calendar">
+                <Inline>
+                  <BsCalendarMonth size={18} />
+                  <span>{t('calendar')}</span>
+                </Inline>
+              </Link>
+            </Inline>
           )
         }
         linkToCreateGuards={[permission('create_task')]}
