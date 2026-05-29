@@ -63,6 +63,10 @@ export function Login() {
     })
       .then((response) => login(response))
       .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
+        if (error.code === 'ERR_NETWORK') {
+          return;
+        }
+
         if (error.response?.status === 422) {
           setErrors(error.response.data.errors);
 
@@ -73,7 +77,7 @@ export function Login() {
           toast.error('app_maintenance');
         } else {
           setMessage(
-            error.response?.data.message ?? (t('invalid_credentials') as string)
+            error.response?.data.message ?? (t('error_refresh_page') as string)
           );
         }
       })
