@@ -60,7 +60,7 @@ export const taskRoutes = (
       }
     />
     <Route
-      path="timesheet"
+      path="daily"
       element={
         <Guard
           guards={[

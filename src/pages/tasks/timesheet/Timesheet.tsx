@@ -22,8 +22,12 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { QuickLogTimeModal } from '../common/components/QuickLogTimeModal';
+import { TaskViewSwitcher } from '../common/components/TaskViewSwitcher';
+import {
+  TaskUserFilters,
+  useTaskUserFilters,
+} from '../common/components/TaskUserFilters';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -59,11 +63,10 @@ const entrySeconds = (start: number, stop: number) => {
 };
 
 export default function Timesheet() {
-  const { documentTitle } = useTitle('timesheet');
+  const { documentTitle } = useTitle('daily');
   const [t] = useTranslation();
   const colors = useColorScheme();
   const navigate = useNavigate();
-  const currentUser = useCurrentUser();
   const start = useStart();
   const stop = useStop();
 
@@ -73,28 +76,20 @@ export default function Timesheet() {
 
   const [quickLogVisible, setQuickLogVisible] = useState(false);
 
+  const userFilters = useTaskUserFilters();
+
   const { data, isLoading } = useTasksQuery({
-    endpoint: '/api/v1/tasks?per_page=500&sort=updated_at|desc',
+    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc${userFilters.queryString}`,
   });
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
-
-  const myTasks = useMemo(() => {
-    if (!currentUser) return allTasks;
-    return allTasks.filter(
-      (task) =>
-        task.assigned_user_id === currentUser.id ||
-        task.user_id === currentUser.id ||
-        (!task.assigned_user_id && task.user_id === currentUser.id)
-    );
-  }, [allTasks, currentUser]);
 
   const dayStart = dayjs(date, 'YYYY-MM-DD').startOf('day').unix();
   const dayEnd = dayjs(date, 'YYYY-MM-DD').endOf('day').unix();
 
   const entries: FlatEntry[] = useMemo(() => {
     const flat: FlatEntry[] = [];
-    myTasks.forEach((task) => {
+    allTasks.forEach((task) => {
       const logs = parseTimeLog(task.time_log) as TimeLogType[];
       logs.forEach(([s, e, desc, billable], idx) => {
         if (!s) return;
@@ -110,7 +105,7 @@ export default function Timesheet() {
       });
     });
     return flat.sort((a, b) => a.start - b.start);
-  }, [myTasks, dayStart, dayEnd]);
+  }, [allTasks, dayStart, dayEnd]);
 
   const totalSeconds = entries.reduce(
     (sum, e) => sum + entrySeconds(e.start, e.stop),
@@ -122,7 +117,10 @@ export default function Timesheet() {
     .reduce((sum, e) => sum + entrySeconds(e.start, e.stop), 0);
 
   const setDate = (next: string) => {
-    setSearchParams({ date: next });
+    const updated = new URLSearchParams(searchParams);
+    if (next) updated.set('date', next);
+    else updated.delete('date');
+    setSearchParams(updated);
   };
 
   const goPrev = () =>
@@ -141,7 +139,7 @@ export default function Timesheet() {
       .endOf('day')
       .unix();
 
-    const tasksToCopy = myTasks
+    const tasksToCopy = allTasks
       .map((task) => {
         const logs = parseTimeLog(task.time_log) as TimeLogType[];
         const yesterdayLogs = logs.filter(
@@ -187,8 +185,9 @@ export default function Timesheet() {
       title={documentTitle}
       breadcrumbs={[
         { name: t('tasks'), href: '/tasks' },
-        { name: t('timesheet'), href: '/tasks/timesheet' },
+        { name: t('daily'), href: '/tasks/daily' },
       ]}
+      topRight={<TaskViewSwitcher />}
     >
       <QuickLogTimeModal
         visible={quickLogVisible}
@@ -235,6 +234,8 @@ export default function Timesheet() {
             <Button type="secondary" onClick={goToday}>
               {t('today')}
             </Button>
+
+            <TaskUserFilters state={userFilters} />
           </div>
 
           <div className="flex items-center gap-2">

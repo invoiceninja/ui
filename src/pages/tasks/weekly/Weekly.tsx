@@ -29,21 +29,26 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { ChevronLeft } from '$app/components/icons/ChevronLeft';
 import { ChevronRight } from '$app/components/icons/ChevronRight';
 import { Plus } from '$app/components/icons/Plus';
 import { QuickLogTimeModal } from '../common/components/QuickLogTimeModal';
+import { TaskViewSwitcher } from '../common/components/TaskViewSwitcher';
+import {
+  TaskUserFilters,
+  useTaskUserFilters,
+} from '../common/components/TaskUserFilters';
 import { parseDurationToSeconds } from '../common/helpers';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
 import { Popover, Transition } from '@headlessui/react';
 import { createPortal } from 'react-dom';
 import { Message } from '$app/components/icons/Message';
 
-const FLUSH_DELAY_MS = 700;
+const FLUSH_DELAY_MS = 1800;
 
 interface CellEdit {
   duration?: string;
@@ -61,6 +66,30 @@ const formatHours = (seconds: number) => {
 
 const getWeekStart = (date: string) =>
   dayjs(date, 'YYYY-MM-DD').startOf('week');
+
+// Primary label: description, else project/client name, else task number.
+const taskPrimaryLabel = (task: Task): string => {
+  if (task.description) return task.description;
+  if (task.project?.name) return task.project.name;
+  if (task.client?.display_name) return task.client.display_name;
+  return `Task #${task.number || task.id.slice(0, 6)}`;
+};
+
+// Secondary line: "Client · Project" when both are present, else whichever
+// isn't already shown in the primary line. Empty string when nothing useful.
+const taskSecondaryLabel = (task: Task): string => {
+  const client = task.client?.display_name;
+  const project = task.project?.name;
+
+  if (task.description) {
+    if (client && project) return `${client} · ${project}`;
+    return project || client || '';
+  }
+
+  // Primary label was project name → fall back to client.
+  if (project) return client || '';
+  return '';
+};
 
 const sumSecondsForDay = (logs: TimeLogType[], day: dayjs.Dayjs) => {
   const dayStart = day.startOf('day').unix();
@@ -142,7 +171,6 @@ export default function Weekly() {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const navigate = useNavigate();
-  const currentUser = useCurrentUser();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const dateParam = searchParams.get('date');
@@ -163,8 +191,10 @@ export default function Weekly() {
     [weekStart]
   );
 
+  const userFilters = useTaskUserFilters();
+
   const { data, isLoading } = useTasksQuery({
-    endpoint: '/api/v1/tasks?per_page=500&sort=updated_at|desc',
+    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc&include=client,project${userFilters.queryString}`,
   });
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
@@ -191,16 +221,6 @@ export default function Weekly() {
     if (changed) rerender();
   }, [allTasks]);
 
-  const myTasks = useMemo(() => {
-    if (!currentUser) return allTasks;
-    return allTasks.filter(
-      (task) =>
-        task.assigned_user_id === currentUser.id ||
-        task.user_id === currentUser.id ||
-        (!task.assigned_user_id && task.user_id === currentUser.id)
-    );
-  }, [allTasks, currentUser]);
-
   const getLogsForTask = useCallback(
     (taskId: string, fallbackLog: string) =>
       optimisticLogsRef.current[taskId] ??
@@ -212,7 +232,7 @@ export default function Weekly() {
   const weekEndUnix = weekStart.add(7, 'day').startOf('day').unix();
 
   const rows = useMemo(() => {
-    const filtered = myTasks.filter((task) => {
+    const filtered = allTasks.filter((task) => {
       const logs = getLogsForTask(task.id, task.time_log);
       const hasEntryInWeek = logs.some(
         ([s]) => s && s >= weekStartUnix && s < weekEndUnix
@@ -231,9 +251,14 @@ export default function Weekly() {
       if (ca !== cb) return ca - cb;
       return a.id.localeCompare(b.id);
     });
-  }, [myTasks, weekStartUnix, weekEndUnix, pending, getLogsForTask]);
+  }, [allTasks, weekStartUnix, weekEndUnix, pending, getLogsForTask]);
 
-  const setDate = (next: string) => setSearchParams({ date: next });
+  const setDate = (next: string) => {
+    const updated = new URLSearchParams(searchParams);
+    if (next) updated.set('date', next);
+    else updated.delete('date');
+    setSearchParams(updated);
+  };
   const prevWeek = () =>
     setDate(weekStart.subtract(7, 'day').format('YYYY-MM-DD'));
   const nextWeek = () =>
@@ -313,6 +338,7 @@ export default function Weekly() {
         is_date_based: true,
       });
       toast.success('updated_task');
+      $refetch(['tasks']);
     } catch {
       toast.error();
       optimisticLogsRef.current[taskId] = parseTimeLog(
@@ -416,6 +442,7 @@ export default function Weekly() {
         { name: t('tasks'), href: '/tasks' },
         { name: t('weekly'), href: '/tasks/weekly' },
       ]}
+      topRight={<TaskViewSwitcher />}
     >
       <QuickLogTimeModal
         visible={quickLogVisible}
@@ -462,6 +489,8 @@ export default function Weekly() {
             <Button type="secondary" onClick={goToday}>
               {t('today')}
             </Button>
+
+            <TaskUserFilters state={userFilters} />
           </div>
 
           <Button onClick={() => setQuickLogVisible(true)}>
@@ -520,6 +549,7 @@ export default function Weekly() {
               {!isLoading &&
                 rows.map((task) => {
                   const logs = getLogsForTask(task.id, task.time_log);
+                  const taskIsRunning = isTaskRunning(task);
                   return (
                     <tr
                       key={task.id}
@@ -527,14 +557,43 @@ export default function Weekly() {
                       style={{ borderColor: colors.$5 }}
                     >
                       <td className="p-3">
-                        <button
-                          type="button"
-                          className="text-left hover:underline"
-                          onClick={() => navigate(`/tasks/${task.id}/edit`)}
-                          style={{ color: colors.$3 }}
-                        >
-                          {task.description || `#${task.number || ''}`}
-                        </button>
+                        <div className="flex items-start gap-2">
+                          <div className="min-w-0">
+                            <button
+                              type="button"
+                              className="text-left hover:underline block truncate max-w-[18rem]"
+                              onClick={() => navigate(`/tasks/${task.id}/edit`)}
+                              style={{ color: colors.$3 }}
+                              title={taskPrimaryLabel(task)}
+                            >
+                              {taskPrimaryLabel(task)}
+                            </button>
+                            {taskSecondaryLabel(task) && (
+                              <div
+                                className="text-xs truncate max-w-[18rem]"
+                                style={{ color: colors.$17 }}
+                              >
+                                {taskSecondaryLabel(task)}
+                              </div>
+                            )}
+                          </div>
+                          {taskIsRunning && (
+                            <span
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
+                              style={{
+                                backgroundColor: '#fee2e2',
+                                color: '#b91c1c',
+                              }}
+                              title="Stop the running timer to edit this row"
+                            >
+                              <span
+                                className="inline-block w-1.5 h-1.5 rounded-full animate-pulse"
+                                style={{ backgroundColor: '#dc2626' }}
+                              />
+                              {t('running')}
+                            </span>
+                          )}
+                        </div>
                       </td>
                       {days.map((d) => {
                         const dayKey = d.format('YYYY-MM-DD');
@@ -554,6 +613,7 @@ export default function Weekly() {
                                 Boolean(pendingEdit) ||
                                 flushing.current.has(task.id)
                               }
+                              disabled={taskIsRunning}
                               initialBillable={
                                 pendingEdit?.billable ??
                                 existingEntry?.[3] ??
@@ -614,6 +674,7 @@ interface WeeklyCellProps {
   dayKey: string;
   durationText: string;
   isPending: boolean;
+  disabled?: boolean;
   initialBillable: boolean;
   initialDescription: string;
   onEdit: (partial: CellEdit) => void;
@@ -622,6 +683,7 @@ interface WeeklyCellProps {
 function WeeklyCell({
   durationText,
   isPending,
+  disabled,
   initialBillable,
   initialDescription,
   onEdit,
@@ -676,13 +738,20 @@ function WeeklyCell({
         inputMode="decimal"
         data-weekly-cell="1"
         value={durationText}
-        onChange={(event) => onEdit({ duration: event.target.value })}
+        readOnly={disabled}
+        title={disabled ? 'Stop the running timer to edit' : undefined}
+        onChange={(event) => {
+          if (disabled) return;
+          onEdit({ duration: event.target.value });
+        }}
         placeholder="0"
         className="w-full text-center py-2 pl-2 pr-7 rounded-md text-sm border focus:outline-none focus:ring-2"
         style={{
           backgroundColor: colors.$1,
           color: isPending ? colors.$17 : colors.$3,
           borderColor: isPending ? colors.$17 : colors.$5,
+          opacity: disabled ? 0.6 : 1,
+          cursor: disabled ? 'not-allowed' : 'text',
         }}
       />
 
@@ -695,9 +764,15 @@ function WeeklyCell({
             <>
               <Popover.Button
                 ref={iconBtnRef}
-                className="p-1 rounded hover:opacity-80 focus:outline-none focus:ring-1"
+                disabled={disabled}
+                tabIndex={-1}
+                className="p-1 rounded hover:opacity-80 focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="note"
-                title="Note & billable"
+                title={
+                  disabled
+                    ? 'Stop the running timer to edit'
+                    : 'Note & billable'
+                }
               >
                 <Message
                   size="0.95rem"
@@ -784,8 +859,17 @@ function CellNotePanel({
 
   const doneRef = useRef<HTMLButtonElement>(null);
 
+  // Any Tab / Shift+Tab inside the popover dismisses it and advances focus
+  // to the next/previous cell input. Intra-popover tab navigation is opt-in
+  // via click — for keyboard users the popover behaves like a one-shot edit.
+  const handlePanelKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Tab') return;
+    event.preventDefault();
+    onTabAway(event.shiftKey ? 'prev' : 'next');
+  };
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" onKeyDown={handlePanelKeyDown}>
       <div>
         <label
           className="block text-xs mb-1"
@@ -800,13 +884,6 @@ function CellNotePanel({
           onChange={(event) => {
             setDescription(event.target.value);
             onEdit({ description: event.target.value });
-          }}
-          onKeyDown={(event) => {
-            // Shift+Tab from the first field jumps to the previous cell.
-            if (event.key === 'Tab' && event.shiftKey) {
-              event.preventDefault();
-              onTabAway('prev');
-            }
           }}
           className="w-full py-2 px-3 rounded-md text-sm border focus:outline-none focus:ring-0"
           style={{
@@ -832,13 +909,6 @@ function CellNotePanel({
           ref={doneRef}
           type="button"
           onClick={onDone}
-          onKeyDown={(event) => {
-            // Tab from the last field advances to the next cell.
-            if (event.key === 'Tab' && !event.shiftKey) {
-              event.preventDefault();
-              onTabAway('next');
-            }
-          }}
           className="text-sm px-3 py-1 rounded-md border"
           style={{ borderColor: colors.$5, color: colors.$3 }}
         >

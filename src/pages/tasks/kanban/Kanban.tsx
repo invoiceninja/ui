@@ -8,14 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useTaskStatusesQuery } from '$app/common/queries/task-statuses';
 import { useTasksQuery } from '$app/common/queries/tasks';
 import { Default } from '$app/components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BsTable } from 'react-icons/bs';
 import { calculateHours } from '../common/helpers/calculate-time';
 import collect from 'collect.js';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -36,6 +34,7 @@ import { arrayMoveImmutable } from 'array-move';
 import { Task } from '$app/common/interfaces/task';
 import { useAtom } from 'jotai';
 import { ViewSlider } from './components/ViewSlider';
+import { TaskViewSwitcher } from '../common/components/TaskViewSwitcher';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
 import {
   currentTaskAtom,
@@ -50,7 +49,6 @@ import { EditSlider } from './components/EditSlider';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '$app/components/cards';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
-import { Inline } from '$app/components/Inline';
 import { CreateTaskStatusModal } from '$app/pages/settings/task-statuses/components/CreateTaskStatusModal';
 import {
   CreateTaskModal,
@@ -336,14 +334,7 @@ export default function Kanban() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      navigationTopRight={
-        <Link to="/tasks">
-          <Inline>
-            <BsTable size={20} />
-            <span>{t('tasks')}</span>
-          </Inline>
-        </Link>
-      }
+      topRight={<TaskViewSwitcher />}
     >
       <Slider
         title={

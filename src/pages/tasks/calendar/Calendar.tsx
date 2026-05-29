@@ -22,11 +22,15 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import {
+  TaskUserFilters,
+  useTaskUserFilters,
+} from '../common/components/TaskUserFilters';
 import { ChevronLeft } from '$app/components/icons/ChevronLeft';
 import { ChevronRight } from '$app/components/icons/ChevronRight';
 import { Plus } from '$app/components/icons/Plus';
 import { QuickLogTimeModal } from '../common/components/QuickLogTimeModal';
+import { TaskViewSwitcher } from '../common/components/TaskViewSwitcher';
 
 const formatHours = (seconds: number) => {
   if (!seconds) return '';
@@ -39,7 +43,7 @@ export default function Calendar() {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const navigate = useNavigate();
-  const currentUser = useCurrentUser();
+  const userFilters = useTaskUserFilters();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const dateParam = searchParams.get('date');
@@ -59,25 +63,15 @@ export default function Calendar() {
   );
 
   const { data, isLoading } = useTasksQuery({
-    endpoint: '/api/v1/tasks?per_page=500&sort=updated_at|desc',
+    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc${userFilters.queryString}`,
   });
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
 
-  const myTasks = useMemo(() => {
-    if (!currentUser) return allTasks;
-    return allTasks.filter(
-      (task) =>
-        task.assigned_user_id === currentUser.id ||
-        task.user_id === currentUser.id ||
-        (!task.assigned_user_id && task.user_id === currentUser.id)
-    );
-  }, [allTasks, currentUser]);
-
   // dayKey → { total, billable }
   const dailyTotals = useMemo(() => {
     const out: Record<string, { total: number; billable: number }> = {};
-    myTasks.forEach((task) => {
+    allTasks.forEach((task) => {
       const logs = parseTimeLog(task.time_log) as TimeLogType[];
       logs.forEach(([s, e, , billable]) => {
         if (!s) return;
@@ -91,14 +85,19 @@ export default function Calendar() {
       });
     });
     return out;
-  }, [myTasks]);
+  }, [allTasks]);
 
   const monthTotalSeconds = cells.reduce((sum, day) => {
     if (day.month() !== monthAnchor.month()) return sum;
     return sum + (dailyTotals[day.format('YYYY-MM-DD')]?.total ?? 0);
   }, 0);
 
-  const setDate = (next: string) => setSearchParams({ date: next });
+  const setDate = (next: string) => {
+    const updated = new URLSearchParams(searchParams);
+    if (next) updated.set('date', next);
+    else updated.delete('date');
+    setSearchParams(updated);
+  };
   const prevMonth = () =>
     setDate(monthAnchor.subtract(1, 'month').format('YYYY-MM-DD'));
   const nextMonth = () =>
@@ -118,6 +117,7 @@ export default function Calendar() {
         { name: t('tasks'), href: '/tasks' },
         { name: t('calendar'), href: '/tasks/calendar' },
       ]}
+      topRight={<TaskViewSwitcher />}
     >
       <QuickLogTimeModal
         visible={quickLogVisible}
@@ -163,6 +163,8 @@ export default function Calendar() {
             <Button type="secondary" onClick={goToday}>
               {t('today')}
             </Button>
+
+            <TaskUserFilters state={userFilters} />
           </div>
 
           <Button
@@ -213,7 +215,7 @@ export default function Calendar() {
                     key={dayKey}
                     type="button"
                     onClick={() =>
-                      navigate(`/tasks/timesheet?date=${dayKey}`)
+                      navigate(`/tasks/daily?date=${dayKey}`)
                     }
                     className="text-left p-2 min-h-[5rem] border-b border-r last:border-r-0 hover:opacity-95 focus:outline-none focus:ring-2"
                     style={{

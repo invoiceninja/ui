@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputLabel, Link } from '$app/components/forms';
+import { Button, InputLabel } from '$app/components/forms';
 import { useTitle } from '$app/common/hooks/useTitle';
 import {
   DataTable,
@@ -17,12 +17,7 @@ import {
 } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import {
-  BsKanban,
-  BsCalendarDay,
-  BsCalendarWeek,
-  BsCalendarMonth,
-} from 'react-icons/bs';
+import { TaskViewSwitcher } from '../common/components/TaskViewSwitcher';
 import {
   defaultColumns,
   useActions,
@@ -32,7 +27,6 @@ import {
   useTaskFilters,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
-import { Inline } from '$app/components/Inline';
 import { permission } from '$app/common/guards/guards/permission';
 import { Task } from '$app/common/interfaces/task';
 import { useShowEditOption } from '../common/hooks/useShowEditOption';
@@ -114,6 +108,7 @@ export default function Tasks() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
+      topRight={<TaskViewSwitcher />}
       aboveMainContainer={<ExtensionBanner />}
     >
       <DataTable
@@ -161,36 +156,6 @@ export default function Tasks() {
               guards={[or(permission('create_task'), permission('edit_task'))]}
             />
           </div>
-        }
-        beforeFilter={
-          (hasPermission('view_task') || hasPermission('edit_task')) && (
-            <Inline>
-              <Link to="/tasks/kanban">
-                <Inline>
-                  <BsKanban size={20} />
-                  <span>{t('kanban')}</span>
-                </Inline>
-              </Link>
-              <Link to="/tasks/timesheet">
-                <Inline>
-                  <BsCalendarDay size={18} />
-                  <span>{t('timesheet')}</span>
-                </Inline>
-              </Link>
-              <Link to="/tasks/weekly">
-                <Inline>
-                  <BsCalendarWeek size={18} />
-                  <span>{t('weekly')}</span>
-                </Inline>
-              </Link>
-              <Link to="/tasks/calendar">
-                <Inline>
-                  <BsCalendarMonth size={18} />
-                  <span>{t('calendar')}</span>
-                </Inline>
-              </Link>
-            </Inline>
-          )
         }
         linkToCreateGuards={[permission('create_task')]}
         hideEditableOptions={!hasPermission('edit_task')}
