@@ -78,16 +78,13 @@ export function ConvertCalendarEventModal(props: Props) {
 
     setErrors(undefined);
 
-    const key = calendarEventKey(props.event);
-
     setTask({
       ...blank,
       description: buildDescription(props.event),
       time_log: buildTimeLog(props.event),
       date: dayjs(props.event.start).format('YYYY-MM-DD'),
       meta: {
-        calendar_event_ids: [key],
-        calendar_links: [props.event.html_link],
+        calendar_event_id: calendarEventKey(props.event),
       },
     });
   }, [props.event, blank]);

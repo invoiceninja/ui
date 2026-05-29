@@ -18,7 +18,7 @@ import {
   TimeLogType,
 } from '$app/pages/tasks/common/helpers/calculate-time';
 import dayjs from 'dayjs';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
@@ -67,17 +67,39 @@ export default function Calendar() {
   const [convertVisible, setConvertVisible] = useState(false);
 
   const user = useCurrentUser();
-  const calendarConnected = Boolean(
-    user?.referral_meta?.calendar?.connected
-  );
+  const calendarConnected = Boolean(user?.referral_meta?.calendar_connection);
+
+  // If we landed here as the OAuth popup (named when opened by
+  // CalendarConnectCta), ping the opener and close immediately so the parent
+  // window — not this popup — shows the connected calendar.
+  useEffect(() => {
+    if (
+      searchParams.get('calendar_connected') === '1' &&
+      window.name === 'calendar-oauth'
+    ) {
+      try {
+        window.opener?.postMessage(
+          { type: 'calendar:connected' },
+          window.location.origin
+        );
+      } catch {
+        // opener may be blocked by COOP; closing is enough
+      }
+      window.close();
+    }
+  }, [searchParams]);
 
   const cells = useMemo(
     () => Array.from({ length: totalDays }, (_, i) => gridStart.add(i, 'day')),
     [gridStart, totalDays]
   );
 
+  const windowStart = gridStart.format('YYYY-MM-DD');
+  const windowEnd = gridEnd.format('YYYY-MM-DD');
+  const dateRangeParam = `&date_range=calculated_start_date,${windowStart},${windowEnd}`;
+
   const { data, isLoading } = useTasksQuery({
-    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc${userFilters.queryString}`,
+    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc${userFilters.queryString}${dateRangeParam}`,
   });
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
@@ -104,22 +126,24 @@ export default function Calendar() {
   const linkedEventKeys = useMemo(() => {
     const s = new Set<string>();
     allTasks.forEach((task) => {
-      (task.meta?.calendar_event_ids ?? []).forEach((id) => s.add(id));
+      if (task.meta?.calendar_event_id) s.add(task.meta.calendar_event_id);
     });
     return s;
   }, [allTasks]);
 
-  // dayKey → { total, billable }
+  // dayKey → { total, billable } — bucketed by task.date, summing every log
+  // entry on that task.
   const dailyTotals = useMemo(() => {
     const out: Record<string, { total: number; billable: number }> = {};
     allTasks.forEach((task) => {
+      const key = task.date;
+      if (!key) return;
       const logs = parseTimeLog(task.time_log) as TimeLogType[];
       logs.forEach(([s, e, , billable]) => {
         if (!s) return;
         const finish = e || dayjs().unix();
         const seconds = Math.max(finish - s, 0);
         if (seconds <= 0) return;
-        const key = dayjs.unix(s).format('YYYY-MM-DD');
         if (!out[key]) out[key] = { total: 0, billable: 0 };
         out[key].total += seconds;
         if (billable !== false) out[key].billable += seconds;

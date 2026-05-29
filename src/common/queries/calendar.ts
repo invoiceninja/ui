@@ -31,11 +31,13 @@ export function useCalendarEventsQuery(params: CalendarEventsParams) {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/calendar/events?from=:from&to=:to', {
+        endpoint('/api/v1/calendar_connection/events?from=:from&to=:to', {
           from: params.from,
           to: params.to,
         })
-      ).then((response: { data: CalendarEventsResponse }) => response.data.data),
+      ).then(
+        (response: { data: CalendarEventsResponse }) => response.data.data
+      ),
     {
       enabled: params.enabled ?? true,
       staleTime: 60_000,
@@ -44,11 +46,13 @@ export function useCalendarEventsQuery(params: CalendarEventsParams) {
 }
 
 export function useConnectCalendar() {
-  return useMutation(
-    (provider: CalendarProvider) =>
-      request('POST', endpoint('/api/v1/calendar/oauth/start'), {
-        provider,
-      }).then((response: { data: { url: string } }) => response.data.url)
+  return useMutation((provider: CalendarProvider) =>
+    request(
+      'POST',
+      endpoint('/api/v1/calendar_connection/:provider/authorize', { provider })
+    ).then(
+      (response: { data: { data: { url: string } } }) => response.data.data.url
+    )
   );
 }
 
@@ -56,7 +60,7 @@ export function useDisconnectCalendar() {
   const queryClient = useQueryClient();
 
   return useMutation(
-    () => request('DELETE', endpoint('/api/v1/calendar/connection')),
+    () => request('DELETE', endpoint('/api/v1/calendar_connection')),
     {
       onSuccess: () => {
         queryClient.removeQueries(['calendar_events']);

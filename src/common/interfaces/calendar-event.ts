@@ -17,6 +17,7 @@ export interface CalendarEventAttendee {
 
 export interface CalendarEvent {
   provider: CalendarProvider;
+  calendar_id: string;
   id: string;
   summary: string;
   description?: string;
@@ -28,4 +29,4 @@ export interface CalendarEvent {
 }
 
 export const calendarEventKey = (event: CalendarEvent): string =>
-  `${event.provider}:${event.id}`;
+  `${event.provider}:${event.calendar_id}:${event.id}`;

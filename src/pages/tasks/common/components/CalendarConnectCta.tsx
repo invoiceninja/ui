@@ -19,7 +19,9 @@ import {
 import { CalendarProvider } from '$app/common/interfaces/user';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { useEffect, useRef } from 'react';
+import { Modal } from '$app/components/Modal';
+import { Button } from '$app/components/forms';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaGoogle, FaMicrosoft } from 'react-icons/fa';
 
@@ -32,7 +34,7 @@ export function CalendarConnectCta() {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const user = useCurrentUser();
-  const calendar = user?.referral_meta?.calendar;
+  const calendar = user?.referral_meta?.calendar_connection;
 
   const connect = useConnectCalendar();
   const disconnect = useDisconnectCalendar();
@@ -131,11 +133,14 @@ export function CalendarConnectCta() {
     });
   };
 
+  const [disconnectVisible, setDisconnectVisible] = useState(false);
+
   const handleDisconnect = () => {
     toast.processing();
     disconnect.mutate(undefined, {
       onSuccess: () => {
         toast.success('disconnect_calendar');
+        setDisconnectVisible(false);
       },
       onError: () => {
         toast.error();
@@ -143,26 +148,49 @@ export function CalendarConnectCta() {
     });
   };
 
-  if (calendar?.connected) {
+  if (calendar) {
     const Icon = calendar.provider === 'google' ? FaGoogle : FaMicrosoft;
     return (
-      <div
-        className="inline-flex items-center gap-2 px-2 py-1 rounded-md border text-xs"
-        style={{ borderColor: colors.$5, backgroundColor: colors.$1 }}
-      >
-        <Icon size={12} color={colors.$3} />
-        <span style={{ color: colors.$3 }}>{calendar.email}</span>
-        <button
-          type="button"
-          onClick={handleDisconnect}
-          disabled={disconnect.isLoading}
-          aria-label={t('disconnect_calendar') as string}
-          className="ml-1 leading-none"
-          style={{ color: colors.$17 }}
+      <>
+        <Modal
+          title={t('are_you_sure')}
+          visible={disconnectVisible}
+          onClose={() => setDisconnectVisible(false)}
         >
-          ×
-        </button>
-      </div>
+          <div className="flex flex-col space-y-6">
+            <span className="font-medium text-sm">
+              {t('disconnect_calendar_confirmation')}
+            </span>
+
+            <Button
+              behavior="button"
+              onClick={handleDisconnect}
+              disabled={disconnect.isLoading}
+              disableWithoutIcon
+            >
+              {t('continue')}
+            </Button>
+          </div>
+        </Modal>
+
+        <div
+          className="inline-flex items-center gap-2 px-2 py-1 rounded-md border text-xs"
+          style={{ borderColor: colors.$5, backgroundColor: colors.$1 }}
+        >
+          <Icon size={12} color={colors.$3} />
+          <span style={{ color: colors.$3 }}>{calendar.email}</span>
+          <button
+            type="button"
+            onClick={() => setDisconnectVisible(true)}
+            disabled={disconnect.isLoading}
+            aria-label={t('disconnect_calendar') as string}
+            className="ml-1 leading-none"
+            style={{ color: colors.$17 }}
+          >
+            ×
+          </button>
+        </div>
+      </>
     );
   }
 

@@ -14,8 +14,7 @@ import { TaskStatus } from './task-status';
 import { User } from './user';
 
 export interface TaskMeta {
-  calendar_event_ids?: string[];
-  calendar_links?: string[];
+  calendar_event_id?: string;
 }
 
 export interface Task {

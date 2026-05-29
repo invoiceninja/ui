@@ -190,8 +190,12 @@ export default function Weekly() {
 
   const userFilters = useTaskUserFilters();
 
+  const windowStart = weekStart.format('YYYY-MM-DD');
+  const windowEnd = weekStart.add(6, 'day').format('YYYY-MM-DD');
+  const dateRangeParam = `&date_range=calculated_start_date,${windowStart},${windowEnd}`;
+
   const { data, isLoading } = useTasksQuery({
-    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc&include=client,project${userFilters.queryString}`,
+    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc&include=client,project${userFilters.queryString}${dateRangeParam}`,
   });
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
@@ -225,22 +229,18 @@ export default function Weekly() {
     []
   );
 
-  const weekStartUnix = weekStart.startOf('day').unix();
-  const weekEndUnix = weekStart.add(7, 'day').startOf('day').unix();
+  const weekDayKeys = useMemo(
+    () => days.map((d) => d.format('YYYY-MM-DD')),
+    [days]
+  );
 
   const rows = useMemo(() => {
     const filtered = allTasks.filter((task) => {
-      const logs = getLogsForTask(task.id, task.time_log);
-      const hasEntryInWeek = logs.some(
-        ([s]) => s && s >= weekStartUnix && s < weekEndUnix
-      );
+      const taskDateInWeek = task.date && weekDayKeys.includes(task.date);
       const hasPendingInWeek = Object.keys(pending[task.id] ?? {}).some(
-        (dayKey) => {
-          const d = dayjs(dayKey, 'YYYY-MM-DD').unix();
-          return d >= weekStartUnix && d < weekEndUnix;
-        }
+        (dayKey) => weekDayKeys.includes(dayKey)
       );
-      return hasEntryInWeek || hasPendingInWeek;
+      return taskDateInWeek || hasPendingInWeek;
     });
     return filtered.sort((a, b) => {
       const ca = a.created_at || 0;
@@ -248,7 +248,7 @@ export default function Weekly() {
       if (ca !== cb) return ca - cb;
       return a.id.localeCompare(b.id);
     });
-  }, [allTasks, weekStartUnix, weekEndUnix, pending, getLogsForTask]);
+  }, [allTasks, weekDayKeys, pending]);
 
   const setDate = (next: string) => {
     const updated = new URLSearchParams(searchParams);

@@ -75,22 +75,21 @@ export default function Timesheet() {
 
   const userFilters = useTaskUserFilters();
 
+  const dateRangeParam = `&date_range=calculated_start_date,${date},${date}`;
+
   const { data, isLoading } = useTasksQuery({
-    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc${userFilters.queryString}`,
+    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc${userFilters.queryString}${dateRangeParam}`,
   });
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
 
-  const dayStart = dayjs(date, 'YYYY-MM-DD').startOf('day').unix();
-  const dayEnd = dayjs(date, 'YYYY-MM-DD').endOf('day').unix();
-
   const entries: FlatEntry[] = useMemo(() => {
     const flat: FlatEntry[] = [];
     allTasks.forEach((task) => {
+      if (task.date !== date) return;
       const logs = parseTimeLog(task.time_log) as TimeLogType[];
       logs.forEach(([s, e, desc, billable], idx) => {
         if (!s) return;
-        if (s < dayStart || s > dayEnd) return;
         flat.push({
           task,
           logIndex: idx,
@@ -102,7 +101,7 @@ export default function Timesheet() {
       });
     });
     return flat.sort((a, b) => a.start - b.start);
-  }, [allTasks, dayStart, dayEnd]);
+  }, [allTasks, date]);
 
   const totalSeconds = entries.reduce(
     (sum, e) => sum + entrySeconds(e.start, e.stop),
@@ -127,23 +126,16 @@ export default function Timesheet() {
   const goToday = () => setDate(dayjs().format('YYYY-MM-DD'));
 
   const duplicateYesterday = () => {
-    const yStart = dayjs(date, 'YYYY-MM-DD')
+    const yesterday = dayjs(date, 'YYYY-MM-DD')
       .subtract(1, 'day')
-      .startOf('day')
-      .unix();
-    const yEnd = dayjs(date, 'YYYY-MM-DD')
-      .subtract(1, 'day')
-      .endOf('day')
-      .unix();
+      .format('YYYY-MM-DD');
 
     const tasksToCopy = allTasks
-      .map((task) => {
-        const logs = parseTimeLog(task.time_log) as TimeLogType[];
-        const yesterdayLogs = logs.filter(
-          ([s]) => s && s >= yStart && s <= yEnd
-        );
-        return { task, logs: yesterdayLogs };
-      })
+      .filter((task) => task.date === yesterday)
+      .map((task) => ({
+        task,
+        logs: parseTimeLog(task.time_log) as TimeLogType[],
+      }))
       .filter((item) => item.logs.length > 0);
 
     if (tasksToCopy.length === 0) {

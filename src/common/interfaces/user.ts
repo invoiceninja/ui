@@ -13,21 +13,26 @@ import { Timestamps } from './timestamps';
 
 export type CalendarProvider = 'google' | 'microsoft';
 
+export interface CalendarSummary {
+  calendar_id: string;
+  name: string;
+  primary: boolean;
+  writable: boolean;
+}
+
 export interface CalendarConnection {
   provider: CalendarProvider;
-  connected: boolean;
+  provider_user_id: string;
   email: string;
-  connected_at: number;
-  expires_at?: number;
-  access_token?: string;
-  refresh_token?: string;
+  expires_at: number;
+  calendars: CalendarSummary[];
 }
 
 interface ReferralMeta {
   pro: number;
   free: number;
   enterprise: number;
-  calendar?: CalendarConnection;
+  calendar_connection?: CalendarConnection;
 }
 
 export interface User extends Timestamps {
