@@ -11,10 +11,23 @@
 import { CompanyUser } from './company-user';
 import { Timestamps } from './timestamps';
 
+export type CalendarProvider = 'google' | 'microsoft';
+
+export interface CalendarConnection {
+  provider: CalendarProvider;
+  connected: boolean;
+  email: string;
+  connected_at: number;
+  expires_at?: number;
+  access_token?: string;
+  refresh_token?: string;
+}
+
 interface ReferralMeta {
   pro: number;
   free: number;
   enterprise: number;
+  calendar?: CalendarConnection;
 }
 
 export interface User extends Timestamps {

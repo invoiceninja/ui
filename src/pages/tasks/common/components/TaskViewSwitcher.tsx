@@ -12,10 +12,6 @@ import { Link } from '$app/components/forms';
 import { useColorScheme } from '$app/common/colors';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useSearchParams } from 'react-router-dom';
-
-// Query params we should carry between task views so a chosen user filter
-// (or anything else URL-backed) survives the navigation.
-const PRESERVED_PARAMS = ['user_id', 'assigned_user_id'];
 import {
   BsCalendarDay,
   BsCalendarMonth,
@@ -24,6 +20,10 @@ import {
   BsListUl,
 } from 'react-icons/bs';
 import classNames from 'classnames';
+
+// Query params we should carry between task views so the chosen user filter
+// survives a switch from e.g. Daily to Weekly.
+const PRESERVED_PARAMS = ['user'];
 
 interface ViewItem {
   to: string;

@@ -13,6 +13,11 @@ import { Client } from './client';
 import { TaskStatus } from './task-status';
 import { User } from './user';
 
+export interface TaskMeta {
+  calendar_event_ids?: string[];
+  calendar_links?: string[];
+}
+
 export interface Task {
   id: string;
   user_id: string;
@@ -46,4 +51,5 @@ export interface Task {
   calculated_start_date: string;
   user: User;
   assigned_user: User;
+  meta?: TaskMeta;
 }

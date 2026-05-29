@@ -22,15 +22,21 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
-import {
-  TaskUserFilters,
-  useTaskUserFilters,
-} from '../common/components/TaskUserFilters';
+import { useTaskUserFilters } from '../common/components/TaskUserFilters';
 import { ChevronLeft } from '$app/components/icons/ChevronLeft';
 import { ChevronRight } from '$app/components/icons/ChevronRight';
 import { Plus } from '$app/components/icons/Plus';
 import { QuickLogTimeModal } from '../common/components/QuickLogTimeModal';
-import { TaskViewSwitcher } from '../common/components/TaskViewSwitcher';
+import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
+import { CalendarConnectCta } from '../common/components/CalendarConnectCta';
+import { ConvertCalendarEventModal } from '../common/components/ConvertCalendarEventModal';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useCalendarEventsQuery } from '$app/common/queries/calendar';
+import {
+  CalendarEvent,
+  calendarEventKey,
+} from '$app/common/interfaces/calendar-event';
+import { FaGoogle, FaMicrosoft } from 'react-icons/fa';
 
 const formatHours = (seconds: number) => {
   if (!seconds) return '';
@@ -57,6 +63,14 @@ export default function Calendar() {
   const [quickLogVisible, setQuickLogVisible] = useState(false);
   const [quickLogDate, setQuickLogDate] = useState<string>(referenceDate);
 
+  const [convertEvent, setConvertEvent] = useState<CalendarEvent | null>(null);
+  const [convertVisible, setConvertVisible] = useState(false);
+
+  const user = useCurrentUser();
+  const calendarConnected = Boolean(
+    user?.referral_meta?.calendar?.connected
+  );
+
   const cells = useMemo(
     () => Array.from({ length: totalDays }, (_, i) => gridStart.add(i, 'day')),
     [gridStart, totalDays]
@@ -67,6 +81,33 @@ export default function Calendar() {
   });
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
+
+  const { data: calendarEvents, isError: calendarEventsError } =
+    useCalendarEventsQuery({
+      from: gridStart.toISOString(),
+      to: gridEnd.endOf('day').toISOString(),
+      enabled: calendarConnected,
+    });
+
+  const dailyEvents = useMemo(() => {
+    const out: Record<string, CalendarEvent[]> = {};
+    (calendarEvents ?? []).forEach((ev) => {
+      const key = dayjs(ev.start).format('YYYY-MM-DD');
+      (out[key] ||= []).push(ev);
+    });
+    Object.values(out).forEach((list) =>
+      list.sort((a, b) => dayjs(a.start).valueOf() - dayjs(b.start).valueOf())
+    );
+    return out;
+  }, [calendarEvents]);
+
+  const linkedEventKeys = useMemo(() => {
+    const s = new Set<string>();
+    allTasks.forEach((task) => {
+      (task.meta?.calendar_event_ids ?? []).forEach((id) => s.add(id));
+    });
+    return s;
+  }, [allTasks]);
 
   // dayKey → { total, billable }
   const dailyTotals = useMemo(() => {
@@ -117,12 +158,23 @@ export default function Calendar() {
         { name: t('tasks'), href: '/tasks' },
         { name: t('calendar'), href: '/tasks/calendar' },
       ]}
-      topRight={<TaskViewSwitcher />}
+      topRight={<TaskHeaderControls />}
     >
       <QuickLogTimeModal
         visible={quickLogVisible}
         setVisible={setQuickLogVisible}
         defaults={{ date: quickLogDate }}
+      />
+
+      <ConvertCalendarEventModal
+        visible={convertVisible}
+        setVisible={setConvertVisible}
+        event={convertEvent}
+        alreadyLinked={
+          convertEvent
+            ? linkedEventKeys.has(calendarEventKey(convertEvent))
+            : false
+        }
       />
 
       <div className="px-4 md:px-6 pt-4 pb-8">
@@ -163,22 +215,37 @@ export default function Calendar() {
             <Button type="secondary" onClick={goToday}>
               {t('today')}
             </Button>
-
-            <TaskUserFilters state={userFilters} />
           </div>
 
-          <Button
-            onClick={() => {
-              setQuickLogDate(referenceDate);
-              setQuickLogVisible(true);
+          <div className="flex items-center gap-2">
+            <CalendarConnectCta />
+
+            <Button
+              onClick={() => {
+                setQuickLogDate(referenceDate);
+                setQuickLogVisible(true);
+              }}
+            >
+              <span className="inline-flex items-center gap-1">
+                <Plus size="0.9rem" color="#fff" />
+                {t('log_time')}
+              </span>
+            </Button>
+          </div>
+        </div>
+
+        {calendarEventsError && (
+          <div
+            className="mt-3 px-3 py-2 rounded-md text-xs"
+            style={{
+              backgroundColor: colors.$2,
+              color: colors.$17,
+              borderColor: colors.$5,
             }}
           >
-            <span className="inline-flex items-center gap-1">
-              <Plus size="0.9rem" color="#fff" />
-              {t('log_time')}
-            </span>
-          </Button>
-        </div>
+            {t('calendar_unavailable')}
+          </div>
+        )}
 
         <div
           className="mt-4 rounded-md border overflow-hidden"
@@ -209,15 +276,25 @@ export default function Calendar() {
                 const totals = dailyTotals[dayKey];
                 const total = totals?.total ?? 0;
                 const billable = totals?.billable ?? 0;
+                const events = dailyEvents[dayKey] ?? [];
+                const visibleEvents = events.slice(0, 3);
+                const overflowCount = events.length - visibleEvents.length;
+
+                const openDay = () => navigate(`/tasks/daily?date=${dayKey}`);
 
                 return (
-                  <button
+                  <div
                     key={dayKey}
-                    type="button"
-                    onClick={() =>
-                      navigate(`/tasks/daily?date=${dayKey}`)
-                    }
-                    className="text-left p-2 min-h-[5rem] border-b border-r last:border-r-0 hover:opacity-95 focus:outline-none focus:ring-2"
+                    role="button"
+                    tabIndex={0}
+                    onClick={openDay}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openDay();
+                      }
+                    }}
+                    className="text-left p-2 min-h-[5rem] border-b border-r last:border-r-0 hover:opacity-95 focus:outline-none focus:ring-2 cursor-pointer"
                     style={{
                       borderColor: colors.$5,
                       backgroundColor: isCurrentMonth ? colors.$1 : colors.$2,
@@ -268,7 +345,55 @@ export default function Calendar() {
                         )}
                       </div>
                     )}
-                  </button>
+
+                    {visibleEvents.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {visibleEvents.map((ev) => {
+                          const key = calendarEventKey(ev);
+                          const linked = linkedEventKeys.has(key);
+                          const ProviderIcon =
+                            ev.provider === 'google' ? FaGoogle : FaMicrosoft;
+                          return (
+                            <button
+                              key={key}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setConvertEvent(ev);
+                                setConvertVisible(true);
+                              }}
+                              className="w-full flex items-center gap-1 px-1 py-0.5 rounded text-[10px] truncate"
+                              style={{
+                                backgroundColor: colors.$2,
+                                color: linked ? colors.$17 : colors.$3,
+                                opacity: linked ? 0.7 : 1,
+                              }}
+                              title={ev.summary}
+                            >
+                              <ProviderIcon size={9} />
+                              {!ev.all_day && (
+                                <span className="font-mono">
+                                  {dayjs(ev.start).format('HH:mm')}
+                                </span>
+                              )}
+                              <span className="truncate flex-1 text-left">
+                                {ev.summary}
+                              </span>
+                              {linked && <span aria-hidden>✓</span>}
+                            </button>
+                          );
+                        })}
+                        {overflowCount > 0 && (
+                          <div
+                            className="text-[10px] text-right"
+                            style={{ color: colors.$17 }}
+                          >
+                            +{overflowCount} {t('more_count')}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>

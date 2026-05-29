@@ -23,11 +23,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { QuickLogTimeModal } from '../common/components/QuickLogTimeModal';
-import { TaskViewSwitcher } from '../common/components/TaskViewSwitcher';
-import {
-  TaskUserFilters,
-  useTaskUserFilters,
-} from '../common/components/TaskUserFilters';
+import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
+import { useTaskUserFilters } from '../common/components/TaskUserFilters';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -187,7 +184,7 @@ export default function Timesheet() {
         { name: t('tasks'), href: '/tasks' },
         { name: t('daily'), href: '/tasks/daily' },
       ]}
-      topRight={<TaskViewSwitcher />}
+      topRight={<TaskHeaderControls />}
     >
       <QuickLogTimeModal
         visible={quickLogVisible}
@@ -234,8 +231,6 @@ export default function Timesheet() {
             <Button type="secondary" onClick={goToday}>
               {t('today')}
             </Button>
-
-            <TaskUserFilters state={userFilters} />
           </div>
 
           <div className="flex items-center gap-2">

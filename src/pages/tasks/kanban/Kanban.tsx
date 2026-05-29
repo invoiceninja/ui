@@ -34,7 +34,7 @@ import { arrayMoveImmutable } from 'array-move';
 import { Task } from '$app/common/interfaces/task';
 import { useAtom } from 'jotai';
 import { ViewSlider } from './components/ViewSlider';
-import { TaskViewSwitcher } from '../common/components/TaskViewSwitcher';
+import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
 import {
   currentTaskAtom,
@@ -47,9 +47,8 @@ import { useStop } from '../common/hooks/useStop';
 import { Slider } from '$app/components/cards/Slider';
 import { EditSlider } from './components/EditSlider';
 import { useNavigate } from 'react-router-dom';
-import { Card } from '$app/components/cards';
-import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { CreateTaskStatusModal } from '$app/pages/settings/task-statuses/components/CreateTaskStatusModal';
+import { useTaskUserFilters } from '../common/components/TaskUserFilters';
 import {
   CreateTaskModal,
   TaskDetails,
@@ -118,17 +117,16 @@ export default function Kanban() {
   const entityAssigned = useEntityAssigned();
 
   const formatTimeLog = useFormatTimeLog();
+  const userFilters = useTaskUserFilters();
 
   const pages = [
     { name: t('tasks'), href: '/tasks' },
     { name: t('kanban'), href: '/tasks/kanban' },
   ];
 
-  const [apiEndpoint, setApiEndpoint] = useState(
-    '/api/v1/tasks?per_page=1000&status=active&without_deleted_clients=true'
-  );
+  const projectId = userFilters.projectId;
+  const apiEndpoint = `/api/v1/tasks?per_page=1000&status=active&without_deleted_clients=true${userFilters.queryString}`;
   const [board, setBoard] = useState<Board>();
-  const [projectId, setProjectId] = useState<string>();
   const [taskDetails, setTaskDetails] = useState<TaskDetails>();
   const [sliderType, setSliderType] = useState<SliderType>('view');
   const [isTaskModalOpened, setIsTaskModalOpened] = useState<boolean>(false);
@@ -315,26 +313,11 @@ export default function Kanban() {
     setCurrentTaskId(undefined);
   };
 
-  useEffect(() => {
-    projectId
-      ? setApiEndpoint(
-          route(
-            '/api/v1/tasks?project_tasks=:projectId&per_page=1000&status=active&without_deleted_clients=true',
-            {
-              projectId,
-            }
-          )
-        )
-      : setApiEndpoint(
-          '/api/v1/tasks?per_page=1000&status=active&without_deleted_clients=true'
-        );
-  }, [projectId]);
-
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      topRight={<TaskViewSwitcher />}
+      topRight={<TaskHeaderControls />}
     >
       <Slider
         title={
@@ -450,26 +433,6 @@ export default function Kanban() {
         {sliderType === 'view' && <ViewSlider />}
         {sliderType === 'edit' && <EditSlider />}
       </Slider>
-
-      <Card
-        className="w-full xl:w-2/5 rounded-sm shadow-sm"
-        style={{
-          borderColor: colors.$21,
-        }}
-      >
-        <div className="flex flex-col items-start md:flex-row md:items-center px-4 md:px-6 py-4 md:space-x-10 md:justify-between">
-          <span className="text-sm font-medium mb-1 md:mb-0">
-            {t('project')}
-          </span>
-
-          <ProjectSelector
-            value={projectId}
-            onChange={(project) => setProjectId(project.id)}
-            onClearButtonClick={() => setProjectId(undefined)}
-            clearButton
-          />
-        </div>
-      </Card>
 
       {board && (
         <div

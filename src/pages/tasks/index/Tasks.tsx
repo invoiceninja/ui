@@ -17,7 +17,7 @@ import {
 } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { TaskViewSwitcher } from '../common/components/TaskViewSwitcher';
+import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
 import {
   defaultColumns,
   useActions,
@@ -49,6 +49,7 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { ExtensionBanner } from '../common/components/ExtensionBanner';
 import { useFilterColumns } from '../common/hooks/useFilterColumns';
+import { useTaskUserFilters } from '../common/components/TaskUserFilters';
 import { emitter } from '$app';
 
 export default function Tasks() {
@@ -67,6 +68,7 @@ export default function Tasks() {
   const taskColumns = useAllTaskColumns();
   const filterColumns = useFilterColumns();
   const customBulkActions = useCustomBulkActions();
+  const userFilter = useTaskUserFilters();
 
   const [taskSlider, setTaskSlider] = useAtom(taskSliderAtom);
   const [sliderTaskId, setSliderTaskId] = useState<string>('');
@@ -108,14 +110,14 @@ export default function Tasks() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      topRight={<TaskViewSwitcher />}
+      topRight={<TaskHeaderControls />}
       aboveMainContainer={<ExtensionBanner />}
     >
       <DataTable
         resource="task"
         columns={columns}
         customActions={actions}
-        endpoint="/api/v1/tasks?include=status,client,project,user,assigned_user&without_deleted_clients=true&sort=id|desc"
+        endpoint={`/api/v1/tasks?include=status,client,project,user,assigned_user&without_deleted_clients=true&sort=id|desc${userFilter.queryString}`}
         bulkRoute="/api/v1/tasks/bulk"
         linkToCreate="/tasks/create"
         linkToEdit="/tasks/:id/edit"

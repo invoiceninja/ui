@@ -37,11 +37,8 @@ import { ChevronLeft } from '$app/components/icons/ChevronLeft';
 import { ChevronRight } from '$app/components/icons/ChevronRight';
 import { Plus } from '$app/components/icons/Plus';
 import { QuickLogTimeModal } from '../common/components/QuickLogTimeModal';
-import { TaskViewSwitcher } from '../common/components/TaskViewSwitcher';
-import {
-  TaskUserFilters,
-  useTaskUserFilters,
-} from '../common/components/TaskUserFilters';
+import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
+import { useTaskUserFilters } from '../common/components/TaskUserFilters';
 import { parseDurationToSeconds } from '../common/helpers';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
 import { Popover, Transition } from '@headlessui/react';
@@ -442,7 +439,7 @@ export default function Weekly() {
         { name: t('tasks'), href: '/tasks' },
         { name: t('weekly'), href: '/tasks/weekly' },
       ]}
-      topRight={<TaskViewSwitcher />}
+      topRight={<TaskHeaderControls />}
     >
       <QuickLogTimeModal
         visible={quickLogVisible}
@@ -489,8 +486,6 @@ export default function Weekly() {
             <Button type="secondary" onClick={goToday}>
               {t('today')}
             </Button>
-
-            <TaskUserFilters state={userFilters} />
           </div>
 
           <Button onClick={() => setQuickLogVisible(true)}>
