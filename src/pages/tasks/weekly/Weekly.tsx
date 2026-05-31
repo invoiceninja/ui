@@ -50,6 +50,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Popover, Transition } from '@headlessui/react';
 import { createPortal } from 'react-dom';
 import { Message } from '$app/components/icons/Message';
+import { useTaskDateDisplay } from '../common/hooks/useTaskDateDisplay';
 
 const FLUSH_DELAY_MS = 1800;
 
@@ -154,6 +155,8 @@ export default function Weekly() {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const navigate = useNavigate();
+  const { displayDate, displayDateRange, displayWeekday } =
+    useTaskDateDisplay();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const dateParam = searchParams.get('date');
@@ -486,8 +489,7 @@ export default function Weekly() {
 
             <div className="px-3 text-center">
               <div className="font-medium" style={{ color: colors.$3 }}>
-                {weekStart.format('MMM D')} –{' '}
-                {weekStart.add(6, 'day').format('MMM D, YYYY')}
+                {displayDateRange(weekStart, weekStart.add(6, 'day'))}
               </div>
               <div className="text-xs" style={{ color: colors.$17 }}>
                 {(grandTotalSeconds / 3600).toFixed(2)} {t('hours')}
@@ -530,8 +532,8 @@ export default function Weekly() {
                     key={d.format('YYYY-MM-DD')}
                     className="text-center p-3 min-w-[5rem]"
                   >
-                    <div>{d.format('ddd')}</div>
-                    <div className="text-xs font-normal">{d.format('M/D')}</div>
+                    <div>{displayWeekday(d)}</div>
+                    <div className="text-xs font-normal">{displayDate(d)}</div>
                   </th>
                 ))}
                 <th className="text-center p-3 min-w-[5rem]">{t('total')}</th>

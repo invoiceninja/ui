@@ -49,6 +49,7 @@ import { useStart } from '../common/hooks/useStart';
 import { useStop } from '../common/hooks/useStop';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
 import { TaskClock } from '../kanban/components/TaskClock';
+import { useTaskDateDisplay } from '../common/hooks/useTaskDateDisplay';
 
 interface FlatEntry {
   task: Task;
@@ -72,7 +73,7 @@ const entrySeconds = (start: number, stop: number) => {
   return Math.max(finish - start, 0);
 };
 
-export default function Timesheet() {
+export default function Daily() {
   const { documentTitle } = useTitle('daily');
   const [t] = useTranslation();
   const colors = useColorScheme();
@@ -80,6 +81,7 @@ export default function Timesheet() {
   const navigate = useNavigate();
   const start = useStart();
   const stop = useStop();
+  const { displayDate, displayTime } = useTaskDateDisplay();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const dateParam = searchParams.get('date');
@@ -283,7 +285,7 @@ export default function Timesheet() {
 
             <div className="px-3 min-w-[12rem] text-center">
               <div className="font-medium" style={{ color: colors.$3 }}>
-                {dayjs(date, 'YYYY-MM-DD').format('dddd, MMM D, YYYY')}
+                {displayDate(date)}
               </div>
               <div className="text-xs" style={{ color: colors.$17 }}>
                 {formatSeconds(totalSeconds)} {t('total')} ·{' '}
@@ -406,8 +408,8 @@ export default function Timesheet() {
                       className="text-xs mt-0.5"
                       style={{ color: colors.$17 }}
                     >
-                      {dayjs.unix(entry.start).format('h:mm A')}
-                      {entry.stop ? ` – ${dayjs.unix(entry.stop).format('h:mm A')}` : ` · ${t('running')}`}
+                      {displayTime(entry.start)}
+                      {entry.stop ? ` - ${displayTime(entry.stop)}` : ` · ${t('running')}`}
                       {entry.billable ? ` · ${t('billable')}` : ''}
                     </div>
                   </div>

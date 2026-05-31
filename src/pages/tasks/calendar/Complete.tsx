@@ -11,14 +11,9 @@
 import { useColorScheme } from '$app/common/colors';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import {
-  CompleteCalendarPayload,
   isCalendarProvider,
   useCompleteCalendarConnection,
 } from '$app/common/queries/calendar';
-import {
-  capturedOAuthHash,
-  capturedOAuthSearch,
-} from '$app/pages/tasks/calendar/strip-oauth-params';
 import { CalendarProvider } from '$app/common/interfaces/user';
 import { updateUser } from '$app/common/stores/slices/user';
 import { Spinner } from '$app/components/Spinner';
@@ -36,26 +31,14 @@ interface ParsedParams {
   status: string | null;
   provider: CalendarProvider | null;
   handoff: string | null;
-  // Legacy fallback while backend rolls over.
-  state: string | null;
-  code: string | null;
 }
 
-// OAuth params are stripped from window.location at app boot (see
-// src/index.tsx → strip-oauth-params.ts). Read the captured copy here, with a
-// runtime fallback to the live URL in case this page was reached without
-// going through the boot strip (e.g. hot reload during development).
 const readParams = (): ParsedParams => {
-  const liveSearch =
-    capturedOAuthSearch ??
-    window.location.search ??
-    '';
-  const liveHashQuery =
-    capturedOAuthHash ??
+  const search =
+    window.location.search ||
     (window.location.hash.includes('?')
       ? `?${window.location.hash.split('?').slice(1).join('?')}`
       : '');
-  const search = liveSearch || liveHashQuery;
 
   const params = new URLSearchParams(search);
   const rawProvider = params.get('provider');
@@ -63,8 +46,6 @@ const readParams = (): ParsedParams => {
     status: params.get('calendar_connection'),
     provider: isCalendarProvider(rawProvider) ? rawProvider : null,
     handoff: params.get('handoff'),
-    state: params.get('state'),
-    code: params.get('code'),
   };
 };
 
@@ -91,18 +72,16 @@ export default function Complete() {
   const redirectTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // StrictMode invokes effects twice in dev. We consume the handoff on the
-    // first run; a second run would re-POST and the backend would 410.
     if (ranRef.current) return;
     ranRef.current = true;
 
-    const { status, provider: parsedProvider, handoff, state, code } = readParams();
+    const { status, provider: parsedProvider, handoff } = readParams();
     setProvider(parsedProvider);
 
     // No params (reload, back-nav, or interceptor force-reload after success)
     // → there's nothing to complete. Silently bounce; the calendar page reads
     // the actual connection status from Redux.
-    if (!status && !handoff && !state && !code) {
+    if (!status && !handoff) {
       navigate('/tasks/calendar', { replace: true });
       return;
     }
@@ -121,21 +100,14 @@ export default function Complete() {
       return;
     }
 
-    const payload: CompleteCalendarPayload | null = handoff
-      ? { provider: parsedProvider, handoff }
-      : state && code
-      ? { provider: parsedProvider, state, code }
-      : null;
-
-    if (!payload) {
-      // Status said pending but we have no usable credentials — treat as
-      // expired handoff (most likely cause).
+    if (!handoff) {
+      // Status said pending but no handoff token — link expired or tampered.
       setPhase('expired');
       return;
     }
 
     complete
-      .mutateAsync(payload)
+      .mutateAsync({ provider: parsedProvider, handoff })
       .then(() => {
         if (user) {
           dispatch(
@@ -174,9 +146,6 @@ export default function Complete() {
   const goToCalendar = () =>
     navigate('/tasks/calendar', { replace: true });
 
-  // i18next returns the key string when a key is missing, never undefined,
-  // so `t('x') ?? 'fallback'` never fires. en.json owns all calendar keys;
-  // other locales fall back to en via i18next's fallbackLng config.
   const heading: Record<Phase, string> = {
     completing: t('connecting_calendar'),
     success: t('calendar_connected'),

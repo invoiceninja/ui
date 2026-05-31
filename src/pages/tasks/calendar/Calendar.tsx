@@ -40,6 +40,7 @@ import { FaGoogle, FaMicrosoft } from 'react-icons/fa';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import Tippy from '@tippyjs/react';
 import { taskCalendarLabel } from '../common/helpers/task-label';
+import { useTaskDateDisplay } from '../common/hooks/useTaskDateDisplay';
 
 const formatHours = (seconds: number) => {
   if (!seconds) return '';
@@ -57,6 +58,7 @@ export default function Calendar() {
   const colors = useColorScheme();
   const navigate = useNavigate();
   const userFilters = useTaskUserFilters();
+  const { displayDate, displayTime, displayWeekday } = useTaskDateDisplay();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const dateParam = searchParams.get('date');
@@ -198,8 +200,10 @@ export default function Calendar() {
 
   const weekdayLabels = useMemo(
     () =>
-      Array.from({ length: 7 }, (_, i) => gridStart.add(i, 'day').format('ddd')),
-    [gridStart]
+      Array.from({ length: 7 }, (_, i) =>
+        displayWeekday(gridStart.add(i, 'day'))
+      ),
+    [displayWeekday, gridStart]
   );
 
   return (
@@ -246,7 +250,7 @@ export default function Calendar() {
 
             <div className="px-3 text-center">
               <div className="font-medium" style={{ color: colors.$3 }}>
-                {monthAnchor.format('MMMM YYYY')}
+                {displayDate(monthAnchor)}
               </div>
               <div className="text-xs" style={{ color: colors.$17 }}>
                 {(monthTotalSeconds / 3600).toFixed(2)} {t('hours')}
@@ -330,8 +334,8 @@ export default function Calendar() {
             className="grid grid-cols-7 border-b text-center text-xs py-2"
             style={{ borderColor: colors.$5, color: colors.$17 }}
           >
-            {weekdayLabels.map((label) => (
-              <div key={label}>{label}</div>
+            {weekdayLabels.map((label, index) => (
+              <div key={`${index}-${label}`}>{label}</div>
             ))}
           </div>
 
@@ -344,10 +348,12 @@ export default function Calendar() {
             </div>
           ) : (
             <div className="grid grid-cols-7 auto-rows-fr">
-              {cells.map((day) => {
+              {(() => {
+                const today = dayjs();
+                return cells.map((day) => {
                 const dayKey = day.format('YYYY-MM-DD');
                 const isCurrentMonth = day.month() === monthAnchor.month();
-                const isToday = day.isSame(dayjs(), 'day');
+                const isToday = day.isSame(today, 'day');
                 const totals = dailyTotals[dayKey];
                 const total = totals?.total ?? 0;
                 const billable = totals?.billable ?? 0;
@@ -364,7 +370,7 @@ export default function Calendar() {
                   tooltipTasks.length > 0 ? (
                     <div className="text-left">
                       <div className="font-medium mb-1">
-                        {day.format('ddd, MMM D')}
+                        {displayDate(day)}
                       </div>
                       {tooltipTasks.map((task) => (
                         <div
@@ -420,7 +426,7 @@ export default function Calendar() {
                             : undefined
                         }
                       >
-                        {day.format('D')}
+                        {day.date()}
                       </span>
                       {total > 0 && (
                         <span
@@ -476,7 +482,7 @@ export default function Calendar() {
                               <ProviderIcon size={9} />
                               {!ev.all_day && (
                                 <span className="font-mono">
-                                  {dayjs(ev.start).format('HH:mm')}
+                                  {displayTime(ev.start)}
                                 </span>
                               )}
                               <span className="truncate flex-1 text-left">
@@ -512,7 +518,8 @@ export default function Calendar() {
                 ) : (
                   cell
                 );
-              })}
+              });
+              })()}
             </div>
           )}
         </div>

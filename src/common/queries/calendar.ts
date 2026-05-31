@@ -89,14 +89,9 @@ export function useConnectCalendar() {
   });
 }
 
-// Completion accepts either the new handoff token or, transitionally, the
-// legacy provider state + code pair. The handoff path is preferred when both
-// are present.
 export interface CompleteCalendarPayload {
   provider: CalendarProvider;
-  handoff?: string;
-  state?: string;
-  code?: string;
+  handoff: string;
 }
 
 export function useCompleteCalendarConnection() {
@@ -104,18 +99,6 @@ export function useCompleteCalendarConnection() {
     if (!isCalendarProvider(v.provider)) {
       return Promise.reject(
         new Error(`Unsupported calendar provider: ${String(v.provider)}`)
-      );
-    }
-
-    const body: Record<string, string> = {};
-    if (v.handoff) {
-      body.handoff = v.handoff;
-    } else if (v.state && v.code) {
-      body.state = v.state;
-      body.code = v.code;
-    } else {
-      return Promise.reject(
-        new Error('Missing handoff token (and no legacy state/code fallback)')
       );
     }
 
@@ -127,7 +110,7 @@ export function useCompleteCalendarConnection() {
       endpoint('/api/v1/calendar_connection/:provider/complete', {
         provider: v.provider,
       }),
-      body,
+      { handoff: v.handoff },
       { skipIntercept: true }
     );
   });
