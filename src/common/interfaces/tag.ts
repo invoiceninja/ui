@@ -9,8 +9,8 @@
  */
 
 export const TAG_ENTITY_TYPES = {
-  task: 'App\\Models\\Task',
-  project: 'App\\Models\\Project',
+  task: 'task',
+  project: 'project',
 } as const;
 
 export type TagEntityType =

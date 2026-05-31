@@ -24,6 +24,7 @@ const PROPERTIES_ALIASES = {
   income_billed: 'is_income_billed',
   products: 'product_key',
   client: 'client_id',
+  tags: 'tag_ids',
 };
 
 export function useTemplateParametersProperties(params: Params) {
