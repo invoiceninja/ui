@@ -14,6 +14,10 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { useTasksQuery } from '$app/common/queries/tasks';
 import { Task } from '$app/common/interfaces/task';
 import {
+  taskPrimaryLabel,
+  taskSecondaryLabel,
+} from '../common/helpers/task-label';
+import {
   parseTimeLog,
   TimeLogType,
 } from '$app/pages/tasks/common/helpers/calculate-time';
@@ -64,29 +68,9 @@ const formatHours = (seconds: number) => {
 const getWeekStart = (date: string) =>
   dayjs(date, 'YYYY-MM-DD').startOf('week');
 
-// Primary label: description, else project/client name, else task number.
-const taskPrimaryLabel = (task: Task): string => {
-  if (task.description) return task.description;
-  if (task.project?.name) return task.project.name;
-  if (task.client?.display_name) return task.client.display_name;
-  return `Task #${task.number || task.id.slice(0, 6)}`;
-};
-
-// Secondary line: "Client · Project" when both are present, else whichever
-// isn't already shown in the primary line. Empty string when nothing useful.
-const taskSecondaryLabel = (task: Task): string => {
-  const client = task.client?.display_name;
-  const project = task.project?.name;
-
-  if (task.description) {
-    if (client && project) return `${client} · ${project}`;
-    return project || client || '';
-  }
-
-  // Primary label was project name → fall back to client.
-  if (project) return client || '';
-  return '';
-};
+// Decoration is centralised in taskCalendarLabel (description + bracketed
+// project, falling back to client). The weekly row keeps a one-line layout
+// — no secondary line — to stay legible at narrow column widths.
 
 const sumSecondsForDay = (logs: TimeLogType[], day: dayjs.Dayjs) => {
   const dayStart = day.startOf('day').unix();
@@ -195,7 +179,7 @@ export default function Weekly() {
   const dateRangeParam = `&date_range=calculated_start_date,${windowStart},${windowEnd}`;
 
   const { data, isLoading } = useTasksQuery({
-    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc&include=client,project${userFilters.queryString}${dateRangeParam}`,
+    endpoint: `/api/v1/tasks?per_page=500&sort=date|asc&include=client,project${userFilters.queryString}${dateRangeParam}`,
   });
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
@@ -234,19 +218,16 @@ export default function Weekly() {
     [days]
   );
 
+  // Ordering is driven by the server-side `sort=date|asc` on the query
+  // above; we only filter to rows that have any activity (real or pending)
+  // inside the visible week. Order from the API is preserved as-is.
   const rows = useMemo(() => {
-    const filtered = allTasks.filter((task) => {
+    return allTasks.filter((task) => {
       const taskDateInWeek = task.date && weekDayKeys.includes(task.date);
       const hasPendingInWeek = Object.keys(pending[task.id] ?? {}).some(
         (dayKey) => weekDayKeys.includes(dayKey)
       );
       return taskDateInWeek || hasPendingInWeek;
-    });
-    return filtered.sort((a, b) => {
-      const ca = a.created_at || 0;
-      const cb = b.created_at || 0;
-      if (ca !== cb) return ca - cb;
-      return a.id.localeCompare(b.id);
     });
   }, [allTasks, weekDayKeys, pending]);
 
@@ -559,7 +540,7 @@ export default function Weekly() {
                               className="text-left hover:underline block truncate max-w-[18rem]"
                               onClick={() => navigate(`/tasks/${task.id}/edit`)}
                               style={{ color: colors.$3 }}
-                              title={taskPrimaryLabel(task)}
+                              title={taskPrimaryLabel(task, 200)}
                             >
                               {taskPrimaryLabel(task)}
                             </button>

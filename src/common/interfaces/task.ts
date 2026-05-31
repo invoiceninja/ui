@@ -15,6 +15,8 @@ import { User } from './user';
 
 export interface TaskMeta {
   calendar_event_id?: string;
+  calendar_id?: string;
+  calendar_provider?: string;
 }
 
 export interface Task {

@@ -10,23 +10,26 @@
 
 import { CalendarProvider } from './user';
 
-export interface CalendarEventAttendee {
-  email: string;
-  display_name?: string;
-}
-
 export interface CalendarEvent {
-  provider: CalendarProvider;
-  calendar_id: string;
   id: string;
-  summary: string;
+  provider: CalendarProvider;
+  provider_event_id: string;
+  calendar_id: string;
+  calendar_name?: string;
+  title: string;
   description?: string;
   start: string;
   end: string;
   all_day: boolean;
-  html_link: string;
-  attendees?: CalendarEventAttendee[];
+  status?: string;
+  url?: string;
+  updated?: string;
 }
 
+// Stable cross-source key for de-dup against task.meta.calendar_event_id.
+// We prefer the fully qualified backend id (which already encodes provider +
+// calendar + event), falling back to a constructed key if a backend ever
+// returns only the raw provider_event_id.
 export const calendarEventKey = (event: CalendarEvent): string =>
-  `${event.provider}:${event.calendar_id}:${event.id}`;
+  event.id ||
+  `${event.provider}:${event.calendar_id}:${event.provider_event_id}`;

@@ -38,6 +38,9 @@ import { documentsRoutes } from '$app/pages/documents/routes';
 import { CorpPassSuccess } from '$app/pages/settings/e-invoice/peppol/CorpPassSuccess';
 import { CorpPassFailed } from '$app/pages/settings/e-invoice/peppol/CorpPassFailed';
 const Dashboard = lazy(() => import('$app/pages/dashboard/Dashboard'));
+const CalendarConnectionComplete = lazy(
+  () => import('$app/pages/tasks/calendar/Complete')
+);
 const NotFound = lazy(() => import('$app/components/NotFound'));
 
 export const routes = (
@@ -72,6 +75,10 @@ export const routes = (
       {documentsRoutes}
       {settingsRoutes}
       {activityRoutes}
+      <Route
+        path="/calendar_connection/complete"
+        element={<CalendarConnectionComplete />}
+      />
       <Route
         path="/einvoice/registration/success"
         element={<CorpPassSuccess />}

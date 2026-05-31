@@ -44,17 +44,32 @@ interface Props {
 }
 
 const buildTimeLog = (event: CalendarEvent): string => {
-  if (event.all_day) return JSON.stringify([]);
+  // All-day events carry no clock times. Anchor a 1h placeholder at 09:00
+  // local on the event date so the task at least records the day it happened
+  // — the user can edit it after conversion.
+  if (event.all_day) {
+    const anchor = dayjs(event.start).startOf('day').hour(9);
+    return JSON.stringify([[anchor.unix(), anchor.add(1, 'hour').unix(), '', true]]);
+  }
+
   const start = dayjs(event.start).unix();
   const end = dayjs(event.end).unix();
+
+  // Provider returned the same instant for start and end (or a degenerate
+  // ordering) — pad to a 1h block from the start instead of saving a zero-
+  // length log entry that downstream views will treat as empty.
+  if (!end || end <= start) {
+    return JSON.stringify([[start, start + 3600, '', true]]);
+  }
+
   return JSON.stringify([[start, end, '', true]]);
 };
 
 const buildDescription = (event: CalendarEvent): string => {
   if (event.description) {
-    return `${event.summary}\n\n${event.description}`;
+    return `${event.title}\n\n${event.description}`;
   }
-  return event.summary;
+  return event.title;
 };
 
 export function ConvertCalendarEventModal(props: Props) {
@@ -84,7 +99,12 @@ export function ConvertCalendarEventModal(props: Props) {
       time_log: buildTimeLog(props.event),
       date: dayjs(props.event.start).format('YYYY-MM-DD'),
       meta: {
-        calendar_event_id: calendarEventKey(props.event),
+        // Backend uses this triple to dedupe: same calendar event can only
+        // be converted to one task.
+        calendar_event_id:
+          props.event.provider_event_id || calendarEventKey(props.event),
+        calendar_id: props.event.calendar_id,
+        calendar_provider: props.event.provider,
       },
     });
   }, [props.event, blank]);

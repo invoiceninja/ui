@@ -21,10 +21,6 @@ interface CalendarEventsParams {
   enabled?: boolean;
 }
 
-interface CalendarEventsResponse {
-  data: CalendarEvent[];
-}
-
 export function useCalendarEventsQuery(params: CalendarEventsParams) {
   return useQuery<CalendarEvent[]>(
     ['calendar_events', params.from, params.to],
@@ -35,9 +31,16 @@ export function useCalendarEventsQuery(params: CalendarEventsParams) {
           from: params.from,
           to: params.to,
         })
-      ).then(
-        (response: { data: CalendarEventsResponse }) => response.data.data
-      ),
+      ).then((response: { data: unknown }) => {
+        // API shape today: { data: { events: CalendarEvent[] } }
+        // Be defensive in case the wrapper changes.
+        const body = response.data;
+        const inner = (body as { data?: unknown })?.data ?? body;
+        const events =
+          (inner as { events?: unknown })?.events ??
+          (Array.isArray(inner) ? inner : null);
+        return Array.isArray(events) ? (events as CalendarEvent[]) : [];
+      }),
     {
       enabled: params.enabled ?? true,
       staleTime: 60_000,
@@ -45,14 +48,38 @@ export function useCalendarEventsQuery(params: CalendarEventsParams) {
   );
 }
 
+const CALENDAR_CONTEXTS: Record<CalendarProvider, string> = {
+  google: 'calendar_google',
+  microsoft: 'calendar_microsoft',
+};
+
 export function useConnectCalendar() {
-  return useMutation((provider: CalendarProvider) =>
-    request(
+  return useMutation(async (provider: CalendarProvider): Promise<string> => {
+    const response = await request(
       'POST',
-      endpoint('/api/v1/calendar_connection/:provider/authorize', { provider })
-    ).then(
-      (response: { data: { data: { url: string } } }) => response.data.data.url
-    )
+      endpoint('/api/v1/one_time_token'),
+      { context: CALENDAR_CONTEXTS[provider] }
+    );
+
+    const hash = (response.data as { hash: string }).hash;
+
+    return endpoint('/api/v1/calendar_connection/:provider/authorize/:hash', {
+      provider,
+      hash,
+    });
+  });
+}
+
+export function useCompleteCalendarConnection() {
+  return useMutation(
+    (v: { provider: CalendarProvider; state: string; code: string }) =>
+      request(
+        'POST',
+        endpoint('/api/v1/calendar_connection/:provider/complete', {
+          provider: v.provider,
+        }),
+        { state: v.state, code: v.code }
+      )
   );
 }
 

@@ -11,134 +11,67 @@
 import { useColorScheme } from '$app/common/colors';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { $refetch } from '$app/common/hooks/useRefetch';
 import {
   useConnectCalendar,
   useDisconnectCalendar,
 } from '$app/common/queries/calendar';
 import { CalendarProvider } from '$app/common/interfaces/user';
+import { updateUser } from '$app/common/stores/slices/user';
+import { useDispatch } from 'react-redux';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Modal } from '$app/components/Modal';
 import { Button } from '$app/components/forms';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaGoogle, FaMicrosoft } from 'react-icons/fa';
-
-// Cap the wait at 5 minutes — if the user wanders off without finishing, we
-// stop polling and tear down the watcher. They can click connect again.
-const POPUP_TIMEOUT_MS = 5 * 60 * 1000;
-const POPUP_POLL_MS = 500;
+import { FaCalendarCheck, FaGoogle, FaMicrosoft } from 'react-icons/fa';
 
 export function CalendarConnectCta() {
   const [t] = useTranslation();
   const colors = useColorScheme();
+  const dispatch = useDispatch();
   const user = useCurrentUser();
-  const calendar = user?.referral_meta?.calendar_connection;
+  const isConnected =
+    user?.referral_meta?.calendar_connection?.status === 'CONNECTED';
 
   const connect = useConnectCalendar();
   const disconnect = useDisconnectCalendar();
 
-  // Track the popup + watcher so unmount tears everything down cleanly.
-  const popupRef = useRef<Window | null>(null);
-  const watcherRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const teardown = () => {
-    if (watcherRef.current) {
-      clearInterval(watcherRef.current);
-      watcherRef.current = null;
-    }
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    popupRef.current = null;
-  };
-
-  useEffect(() => () => teardown(), []);
-
-  const finishConnect = (success: boolean) => {
-    teardown();
-    toast.dismiss();
-    if (success) {
-      $refetch(['users']);
-    }
-  };
-
-  useEffect(() => {
-    const onMessage = (event: MessageEvent) => {
-      // Forward-compat: backend may post a self-closing page once the
-      // callback finishes. Accept either same-origin or a known shape.
-      if (event.origin !== window.location.origin) return;
-      const data = event.data as { type?: string } | undefined;
-      if (data?.type === 'calendar:connected') {
-        finishConnect(true);
-      }
-    };
-    window.addEventListener('message', onMessage);
-    return () => window.removeEventListener('message', onMessage);
-  }, []);
+  const [disconnectVisible, setDisconnectVisible] = useState(false);
 
   const handleConnect = (provider: CalendarProvider) => {
-    // Open the popup synchronously inside the click handler so the browser's
-    // popup blocker doesn't kick in. We point it at about:blank first and
-    // navigate it once the API hands us the authorize URL.
-    const popup = window.open(
-      'about:blank',
-      'calendar-oauth',
-      'width=540,height=680,menubar=no,toolbar=no,location=no'
-    );
-
-    if (!popup) {
-      toast.error('popup_blocked');
-      return;
-    }
-
-    popupRef.current = popup;
     toast.processing();
 
     connect.mutate(provider, {
       onSuccess: (url) => {
-        if (!popupRef.current || popupRef.current.closed) {
-          toast.dismiss();
-          return;
-        }
-
-        popupRef.current.location.href = url;
-
-        // Fallback when the backend just redirects the popup back to the
-        // app (rather than posting a message): once the popup closes, assume
-        // the user finished and refetch.
-        watcherRef.current = setInterval(() => {
-          if (!popupRef.current || popupRef.current.closed) {
-            finishConnect(true);
-          }
-        }, POPUP_POLL_MS);
-
-        timeoutRef.current = setTimeout(() => {
-          if (popupRef.current && !popupRef.current.closed) {
-            popupRef.current.close();
-          }
-          finishConnect(false);
-        }, POPUP_TIMEOUT_MS);
+        // Top-level redirect: same tab, no popup. The backend's callback
+        // will land the user back on the app and the full bootstrap will
+        // pick up the new calendar_connection status from /api/v1/refresh.
+        window.location.href = url;
       },
       onError: () => {
-        if (popupRef.current && !popupRef.current.closed) {
-          popupRef.current.close();
-        }
-        teardown();
         toast.error();
       },
     });
   };
 
-  const [disconnectVisible, setDisconnectVisible] = useState(false);
-
   const handleDisconnect = () => {
     toast.processing();
     disconnect.mutate(undefined, {
       onSuccess: () => {
+        // Redux holds the current user; flip the status locally so the chip
+        // returns to the connect CTA immediately without waiting on refetch.
+        if (user) {
+          dispatch(
+            updateUser({
+              ...user,
+              referral_meta: {
+                ...(user.referral_meta ?? {}),
+                calendar_connection: { status: 'DISCONNECTED' },
+              },
+            })
+          );
+        }
         toast.success('disconnect_calendar');
         setDisconnectVisible(false);
       },
@@ -148,8 +81,7 @@ export function CalendarConnectCta() {
     });
   };
 
-  if (calendar) {
-    const Icon = calendar.provider === 'google' ? FaGoogle : FaMicrosoft;
+  if (isConnected) {
     return (
       <>
         <Modal
@@ -174,17 +106,21 @@ export function CalendarConnectCta() {
         </Modal>
 
         <div
-          className="inline-flex items-center gap-2 px-2 py-1 rounded-md border text-xs"
-          style={{ borderColor: colors.$5, backgroundColor: colors.$1 }}
+          className="inline-flex items-center gap-2 py-2 px-4 rounded-md border shadow-sm text-sm"
+          style={{
+            borderColor: colors.$24,
+            backgroundColor: colors.$1,
+            color: colors.$3,
+          }}
         >
-          <Icon size={12} color={colors.$3} />
-          <span style={{ color: colors.$3 }}>{calendar.email}</span>
+          <FaCalendarCheck size={14} color={colors.$3} />
+          <span>{t('calendar_connected')}</span>
           <button
             type="button"
             onClick={() => setDisconnectVisible(true)}
             disabled={disconnect.isLoading}
             aria-label={t('disconnect_calendar') as string}
-            className="ml-1 leading-none"
+            className="ml-1 leading-none text-base"
             style={{ color: colors.$17 }}
           >
             ×

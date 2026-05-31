@@ -14,6 +14,17 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { useTasksQuery } from '$app/common/queries/tasks';
 import { Task } from '$app/common/interfaces/task';
 import {
+  taskPrimaryLabel,
+  taskSecondaryLabel,
+} from '../common/helpers/task-label';
+import { Tooltip } from '$app/components/Tooltip';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import classNames from 'classnames';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import {
   parseTimeLog,
   TimeLogType,
 } from '$app/pages/tasks/common/helpers/calculate-time';
@@ -63,6 +74,7 @@ export default function Timesheet() {
   const { documentTitle } = useTitle('daily');
   const [t] = useTranslation();
   const colors = useColorScheme();
+  const reactSettings = useReactSettings();
   const navigate = useNavigate();
   const start = useStart();
   const stop = useStop();
@@ -125,13 +137,47 @@ export default function Timesheet() {
     setDate(dayjs(date, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD'));
   const goToday = () => setDate(dayjs().format('YYYY-MM-DD'));
 
-  const duplicateYesterday = () => {
+  const isToday = date === dayjs().format('YYYY-MM-DD');
+
+  // Tracks dates we've already duplicated *into* this mount, so the button
+  // can't be re-fired and double-create. Resets implicitly when the user
+  // hard-reloads or remounts the view.
+  const [duplicatedDates, setDuplicatedDates] = useState<Set<string>>(
+    () => new Set()
+  );
+  const [isDuplicating, setIsDuplicating] = useState(false);
+  const duplicateDisabled =
+    !isToday || isDuplicating || duplicatedDates.has(date);
+
+  const duplicateYesterday = async () => {
+    if (duplicateDisabled) return;
+    setIsDuplicating(true);
+
     const yesterday = dayjs(date, 'YYYY-MM-DD')
       .subtract(1, 'day')
       .format('YYYY-MM-DD');
 
-    const tasksToCopy = allTasks
-      .filter((task) => task.date === yesterday)
+    toast.processing();
+
+    // The page-level useTasksQuery is server-side filtered to `date` only, so
+    // allTasks never contains yesterday. Fetch yesterday on demand instead
+    // of widening the always-on query.
+    let yesterdayTasks: Task[] = [];
+    try {
+      const response = await request(
+        'GET',
+        endpoint(
+          `/api/v1/tasks?per_page=500&sort=updated_at|desc${userFilters.queryString}&date_range=calculated_start_date,${yesterday},${yesterday}`
+        )
+      );
+      yesterdayTasks = response.data?.data ?? [];
+    } catch {
+      toast.error();
+      setIsDuplicating(false);
+      return;
+    }
+
+    const tasksToCopy = yesterdayTasks
       .map((task) => ({
         task,
         logs: parseTimeLog(task.time_log) as TimeLogType[],
@@ -139,34 +185,52 @@ export default function Timesheet() {
       .filter((item) => item.logs.length > 0);
 
     if (tasksToCopy.length === 0) {
+      toast.dismiss();
       toast.error('no_entries_to_duplicate');
+      setIsDuplicating(false);
       return;
     }
 
-    toast.processing();
+    // Create a fresh task dated today for each of yesterday's tasks, carrying
+    // forward the relational metadata (client/project/rate/description) and
+    // the time entries shifted by 24h.
+    try {
+      await Promise.all(
+        tasksToCopy.map(({ task, logs }) => {
+          const shifted: TimeLogType[] = logs.map(
+            ([s, e, desc, billable]) => [
+              s + 86400,
+              e ? e + 86400 : 0,
+              desc,
+              billable,
+            ]
+          );
 
-    Promise.all(
-      tasksToCopy.map(({ task, logs }) => {
-        const existing = parseTimeLog(task.time_log) as TimeLogType[];
-        const shifted: TimeLogType[] = logs.map(([s, e, desc, billable]) => [
-          s + 86400,
-          e ? e + 86400 : 0,
-          desc,
-          billable,
-        ]);
-        const merged = [...existing, ...shifted];
-        return request(
-          'PUT',
-          endpoint('/api/v1/tasks/:id', { id: task.id }),
-          { ...task, time_log: JSON.stringify(merged) }
-        );
-      })
-    )
-      .then(() => {
-        toast.success('duplicated_entries');
-        $refetch(['tasks']);
-      })
-      .catch(() => toast.error());
+          return request('POST', endpoint('/api/v1/tasks'), {
+            client_id: task.client_id,
+            project_id: task.project_id,
+            assigned_user_id: task.assigned_user_id,
+            status_id: task.status_id,
+            description: task.description,
+            rate: task.rate,
+            custom_value1: task.custom_value1,
+            custom_value2: task.custom_value2,
+            custom_value3: task.custom_value3,
+            custom_value4: task.custom_value4,
+            is_date_based: task.is_date_based,
+            date,
+            time_log: JSON.stringify(shifted),
+          });
+        })
+      );
+      toast.success('duplicated_entries');
+      $refetch(['tasks']);
+      setDuplicatedDates((prev) => new Set(prev).add(date));
+    } catch {
+      toast.error();
+    } finally {
+      setIsDuplicating(false);
+    }
   };
 
   return (
@@ -226,9 +290,16 @@ export default function Timesheet() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button type="secondary" onClick={duplicateYesterday}>
-              {t('duplicate_yesterday')}
-            </Button>
+            {isToday && (
+              <Button
+                type="secondary"
+                onClick={duplicateYesterday}
+                disabled={duplicateDisabled}
+                disableWithoutIcon
+              >
+                {t('duplicate_yesterday')}
+              </Button>
+            )}
             <Button onClick={() => setQuickLogVisible(true)}>
               <span className="inline-flex items-center gap-1">
                 <Plus size="0.9rem" color="#fff" />
@@ -271,14 +342,49 @@ export default function Timesheet() {
                   onClick={() => navigate(`/tasks/${entry.task.id}/edit`)}
                 >
                   <div className="min-w-0 flex-1">
-                    <div
-                      className="text-sm truncate"
-                      style={{ color: colors.$3 }}
-                    >
-                      {entry.task.description ||
-                        entry.description ||
-                        `#${entry.task.number || ''}`}
-                    </div>
+                    {entry.task.description ? (
+                      <Tooltip
+                        width="auto"
+                        tooltipElement={
+                          <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+                            <article
+                              className={classNames('prose prose-sm', {
+                                'prose-invert': !reactSettings?.dark_mode,
+                              })}
+                              dangerouslySetInnerHTML={{
+                                __html: sanitizeHTML(entry.task.description),
+                              }}
+                            />
+                          </div>
+                        }
+                      >
+                        <span
+                          className="text-sm block truncate"
+                          style={{ color: colors.$3 }}
+                        >
+                          {taskPrimaryLabel(entry.task)}
+                        </span>
+                      </Tooltip>
+                    ) : (
+                      <div
+                        className="text-sm truncate"
+                        style={{ color: colors.$3 }}
+                      >
+                        {entry.description
+                          ? extractTextFromHTML(
+                              sanitizeHTML(entry.description)
+                            )
+                          : `#${entry.task.number || ''}`}
+                      </div>
+                    )}
+                    {taskSecondaryLabel(entry.task) && (
+                      <div
+                        className="text-xs truncate"
+                        style={{ color: colors.$17 }}
+                      >
+                        {taskSecondaryLabel(entry.task)}
+                      </div>
+                    )}
                     <div
                       className="text-xs mt-0.5"
                       style={{ color: colors.$17 }}

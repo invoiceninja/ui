@@ -18,7 +18,7 @@ import {
   TimeLogType,
 } from '$app/pages/tasks/common/helpers/calculate-time';
 import dayjs from 'dayjs';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
@@ -37,12 +37,19 @@ import {
   calendarEventKey,
 } from '$app/common/interfaces/calendar-event';
 import { FaGoogle, FaMicrosoft } from 'react-icons/fa';
+import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
+import Tippy from '@tippyjs/react';
+import { taskCalendarLabel } from '../common/helpers/task-label';
 
 const formatHours = (seconds: number) => {
   if (!seconds) return '';
   const hours = seconds / 3600;
   return hours.toFixed(2).replace(/\.00$/, '') + 'h';
 };
+
+// Cap on tasks shown in the per-day hover tooltip — keeps the popover from
+// running off-screen on busy days.
+const TASK_TOOLTIP_MAX = 5;
 
 export default function Calendar() {
   const { documentTitle } = useTitle('calendar');
@@ -67,27 +74,16 @@ export default function Calendar() {
   const [convertVisible, setConvertVisible] = useState(false);
 
   const user = useCurrentUser();
-  const calendarConnected = Boolean(user?.referral_meta?.calendar_connection);
+  const calendarConnected =
+    user?.referral_meta?.calendar_connection?.status === 'CONNECTED';
 
-  // If we landed here as the OAuth popup (named when opened by
-  // CalendarConnectCta), ping the opener and close immediately so the parent
-  // window — not this popup — shows the connected calendar.
-  useEffect(() => {
-    if (
-      searchParams.get('calendar_connected') === '1' &&
-      window.name === 'calendar-oauth'
-    ) {
-      try {
-        window.opener?.postMessage(
-          { type: 'calendar:connected' },
-          window.location.origin
-        );
-      } catch {
-        // opener may be blocked by COOP; closing is enough
-      }
-      window.close();
-    }
-  }, [searchParams]);
+  const hideEvents = searchParams.get('hide_events') === '1';
+  const toggleHideEvents = () => {
+    const updated = new URLSearchParams(searchParams);
+    if (hideEvents) updated.delete('hide_events');
+    else updated.set('hide_events', '1');
+    setSearchParams(updated);
+  };
 
   const cells = useMemo(
     () => Array.from({ length: totalDays }, (_, i) => gridStart.add(i, 'day')),
@@ -111,9 +107,28 @@ export default function Calendar() {
       enabled: calendarConnected,
     });
 
+  // Set of `calendar_id|provider_event_id` strings for every task already
+  // converted from a calendar event. Used to hide those events from the grid
+  // (Harvest-style: once it's a task, it disappears from the calendar feed).
+  const linkedEventKeys = useMemo(() => {
+    const s = new Set<string>();
+    allTasks.forEach((task) => {
+      const meta = task.meta;
+      if (!meta?.calendar_event_id) return;
+      const calendarId = meta.calendar_id || '';
+      s.add(`${calendarId}|${meta.calendar_event_id}`);
+    });
+    return s;
+  }, [allTasks]);
+
+  const linkKeyForEvent = (ev: CalendarEvent) =>
+    `${ev.calendar_id}|${ev.provider_event_id}`;
+
   const dailyEvents = useMemo(() => {
     const out: Record<string, CalendarEvent[]> = {};
     (calendarEvents ?? []).forEach((ev) => {
+      // Already converted into a task — hide it from the calendar entirely.
+      if (linkedEventKeys.has(linkKeyForEvent(ev))) return;
       const key = dayjs(ev.start).format('YYYY-MM-DD');
       (out[key] ||= []).push(ev);
     });
@@ -121,15 +136,30 @@ export default function Calendar() {
       list.sort((a, b) => dayjs(a.start).valueOf() - dayjs(b.start).valueOf())
     );
     return out;
-  }, [calendarEvents]);
+  }, [calendarEvents, linkedEventKeys]);
 
-  const linkedEventKeys = useMemo(() => {
-    const s = new Set<string>();
+  // dayKey → tasks landed on that day; used by the hover tooltip on each
+  // cell so users can scan task names without leaving the monthly view.
+  const tasksByDay = useMemo(() => {
+    const out: Record<string, Task[]> = {};
     allTasks.forEach((task) => {
-      if (task.meta?.calendar_event_id) s.add(task.meta.calendar_event_id);
+      const key = task.date;
+      if (!key) return;
+      (out[key] ||= []).push(task);
     });
-    return s;
+    return out;
   }, [allTasks]);
+
+  const taskSeconds = (task: Task): number => {
+    const logs = parseTimeLog(task.time_log) as TimeLogType[];
+    let total = 0;
+    logs.forEach(([s, e]) => {
+      if (!s) return;
+      const finish = e || dayjs().unix();
+      total += Math.max(finish - s, 0);
+    });
+    return total;
+  };
 
   // dayKey → { total, billable } — bucketed by task.date, summing every log
   // entry on that task.
@@ -196,7 +226,7 @@ export default function Calendar() {
         event={convertEvent}
         alreadyLinked={
           convertEvent
-            ? linkedEventKeys.has(calendarEventKey(convertEvent))
+            ? linkedEventKeys.has(linkKeyForEvent(convertEvent))
             : false
         }
       />
@@ -242,6 +272,30 @@ export default function Calendar() {
           </div>
 
           <div className="flex items-center gap-2">
+            {calendarConnected && (
+              <Tippy
+                duration={0}
+                content={hideEvents ? t('show_events') : t('hide_events')}
+                className="rounded-md text-xs p-2 bg-[#F2F2F2] text-black"
+              >
+                <Button
+                  type="secondary"
+                  onClick={toggleHideEvents}
+                  aria-label={
+                    (hideEvents
+                      ? t('show_events')
+                      : t('hide_events')) as string
+                  }
+                >
+                  {hideEvents ? (
+                    <AiFillEyeInvisible size={16} />
+                  ) : (
+                    <AiFillEye size={16} />
+                  )}
+                </Button>
+              </Tippy>
+            )}
+
             <CalendarConnectCta />
 
             <Button
@@ -300,13 +354,43 @@ export default function Calendar() {
                 const totals = dailyTotals[dayKey];
                 const total = totals?.total ?? 0;
                 const billable = totals?.billable ?? 0;
-                const events = dailyEvents[dayKey] ?? [];
+                const events = hideEvents ? [] : dailyEvents[dayKey] ?? [];
                 const visibleEvents = events.slice(0, 3);
                 const overflowCount = events.length - visibleEvents.length;
+                const dayTasks = tasksByDay[dayKey] ?? [];
+                const tooltipTasks = dayTasks.slice(0, TASK_TOOLTIP_MAX);
+                const tooltipOverflow = dayTasks.length - tooltipTasks.length;
 
                 const openDay = () => navigate(`/tasks/daily?date=${dayKey}`);
 
-                return (
+                const tooltipContent =
+                  tooltipTasks.length > 0 ? (
+                    <div className="text-left">
+                      <div className="font-medium mb-1">
+                        {day.format('ddd, MMM D')}
+                      </div>
+                      {tooltipTasks.map((task) => (
+                        <div
+                          key={task.id}
+                          className="flex items-baseline gap-2 truncate max-w-[18rem]"
+                        >
+                          <span className="truncate flex-1">
+                            {taskCalendarLabel(task)}
+                          </span>
+                          <span className="font-mono text-[10px] opacity-70">
+                            {formatHours(taskSeconds(task))}
+                          </span>
+                        </div>
+                      ))}
+                      {tooltipOverflow > 0 && (
+                        <div className="text-[10px] opacity-70 mt-1">
+                          +{tooltipOverflow} {t('more_count')}
+                        </div>
+                      )}
+                    </div>
+                  ) : null;
+
+                const cell = (
                   <div
                     key={dayKey}
                     role="button"
@@ -374,7 +458,6 @@ export default function Calendar() {
                       <div className="mt-2 space-y-1">
                         {visibleEvents.map((ev) => {
                           const key = calendarEventKey(ev);
-                          const linked = linkedEventKeys.has(key);
                           const ProviderIcon =
                             ev.provider === 'google' ? FaGoogle : FaMicrosoft;
                           return (
@@ -389,10 +472,9 @@ export default function Calendar() {
                               className="w-full flex items-center gap-1 px-1 py-0.5 rounded text-[10px] truncate"
                               style={{
                                 backgroundColor: colors.$2,
-                                color: linked ? colors.$17 : colors.$3,
-                                opacity: linked ? 0.7 : 1,
+                                color: colors.$3,
                               }}
-                              title={ev.summary}
+                              title={ev.title}
                             >
                               <ProviderIcon size={9} />
                               {!ev.all_day && (
@@ -401,9 +483,8 @@ export default function Calendar() {
                                 </span>
                               )}
                               <span className="truncate flex-1 text-left">
-                                {ev.summary}
+                                {ev.title}
                               </span>
-                              {linked && <span aria-hidden>✓</span>}
                             </button>
                           );
                         })}
@@ -418,6 +499,21 @@ export default function Calendar() {
                       </div>
                     )}
                   </div>
+                );
+
+                return tooltipContent ? (
+                  <Tippy
+                    key={dayKey}
+                    duration={0}
+                    delay={[200, 0]}
+                    placement="top"
+                    content={tooltipContent}
+                    className="rounded-md text-xs p-2 bg-[#F2F2F2] text-black shadow"
+                  >
+                    {cell}
+                  </Tippy>
+                ) : (
+                  cell
                 );
               })}
             </div>
