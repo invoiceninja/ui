@@ -12,6 +12,7 @@ import { Client } from './client';
 import { Expense } from './expense';
 import { Invoice } from './invoice';
 import { Quote } from './quote';
+import { Tag } from './tag';
 import { Task } from './task';
 import { User } from './user';
 
@@ -40,6 +41,8 @@ export interface Project {
   color: string;
   documents: any[];
   client?: Client;
+  tags?: Tag[];
+  project_tag_ids?: string[];
   tasks?: Task[];
   invoices?: Invoice[];
   expenses?: Expense[];

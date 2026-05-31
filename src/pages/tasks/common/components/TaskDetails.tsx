@@ -41,6 +41,8 @@ import { MediaPlay } from '$app/components/icons/MediaPlay';
 import { MediaPause } from '$app/components/icons/MediaPause';
 import { useMediaQuery } from 'react-responsive';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 dayjs.extend(duration);
 
@@ -306,6 +308,19 @@ export function TaskDetails(props: Props) {
             onClearButtonClick={() => handleChange('status_id', '')}
             readonly={props.taskModal}
             errorMessage={errors?.errors.status_id}
+          />
+
+          <TagPillSelector
+            label={t('tags')}
+            entityType={TAG_ENTITY_TYPES.task}
+            value={task.tags || []}
+            onChange={(tags) => handleChange('tags', tags)}
+            readonly={
+              page === 'edit' &&
+              !hasPermission('edit_task') &&
+              !entityAssigned(task)
+            }
+            errorMessage={errors?.errors.tags}
           />
 
           {task && company?.custom_fields?.task1 && (
