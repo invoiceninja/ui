@@ -45,6 +45,8 @@ import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
 import { useTaskUserFilters } from '../common/components/TaskUserFilters';
 import { parseDurationToSeconds } from '../common/helpers';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
+import { AxiosError } from 'axios';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Popover, Transition } from '@headlessui/react';
 import { createPortal } from 'react-dom';
 import { Message } from '$app/components/icons/Message';
@@ -179,7 +181,7 @@ export default function Weekly() {
   const dateRangeParam = `&date_range=calculated_start_date,${windowStart},${windowEnd}`;
 
   const { data, isLoading } = useTasksQuery({
-    endpoint: `/api/v1/tasks?per_page=500&sort=date|asc&include=client,project${userFilters.queryString}${dateRangeParam}`,
+    endpoint: `/api/v1/tasks?per_page=500&sort=date|asc&include=client,project&status=active&without_deleted_clients=true${userFilters.queryString}${dateRangeParam}`,
   });
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
@@ -317,11 +319,49 @@ export default function Weekly() {
       });
       toast.success('updated_task');
       $refetch(['tasks']);
-    } catch {
-      toast.error();
+    } catch (raw) {
+      const error = raw as AxiosError<ValidationBag>;
+      const status = error?.response?.status;
+      const data = error?.response?.data;
+
+      // Roll back optimistic state; the PUT didn't land.
       optimisticLogsRef.current[taskId] = parseTimeLog(
         task.time_log
       ) as TimeLogType[];
+
+      // Drop the snapshotted edits we just sent so they don't re-flush on
+      // an infinite loop. Anything typed after the snapshot stays.
+      const stillPendingForTask = {
+        ...(pendingRef.current[taskId] ?? {}),
+      };
+      for (const dayKey of dayKeys) {
+        if (
+          stillPendingForTask[dayKey] &&
+          JSON.stringify(stillPendingForTask[dayKey]) ===
+            JSON.stringify(snapshot[dayKey])
+        ) {
+          delete stillPendingForTask[dayKey];
+        }
+      }
+      const nextPendingAfterFail = { ...pendingRef.current };
+      if (Object.keys(stillPendingForTask).length === 0) {
+        delete nextPendingAfterFail[taskId];
+      } else {
+        nextPendingAfterFail[taskId] = stillPendingForTask;
+      }
+      pendingRef.current = nextPendingAfterFail;
+      setPending(nextPendingAfterFail);
+
+      if (status === 422 && data) {
+        // Do NOT dismiss first: the toast singleton reuses one id for
+        // processing → error. Dismissing kills the id and a subsequent
+        // toast.error against that same id is dropped by react-hot-toast.
+        const messages = Object.values(data.errors ?? {}).flat();
+        const combined = messages.length > 0 ? messages.join('\n') : data.message;
+        toast.error(combined || 'error_title');
+      } else {
+        toast.error();
+      }
     } finally {
       flushing.current.delete(taskId);
       rerender();
@@ -712,13 +752,45 @@ function WeeklyCell({
       <input
         type="text"
         inputMode="decimal"
+        // Cell only accepts decimal hours (1.5) or h:m / h:m:s (1:30, 1:30:00).
+        // Alpha and any other punctuation are rejected on input + on paste.
+        pattern="[0-9:.]*"
         data-weekly-cell="1"
         value={durationText}
         readOnly={disabled}
-        title={disabled ? 'Stop the running timer to edit' : undefined}
+        title={
+          disabled
+            ? 'Stop the running timer to edit'
+            : 'Decimal hours (1.5) or h:m (1:30)'
+        }
+        onKeyDown={(event) => {
+          if (disabled) return;
+          // Always allow control keys, navigation, and clipboard chords.
+          if (
+            event.key.length > 1 ||
+            event.ctrlKey ||
+            event.metaKey ||
+            event.altKey
+          ) {
+            return;
+          }
+          if (!/^[0-9:.]$/.test(event.key)) {
+            event.preventDefault();
+          }
+        }}
+        onPaste={(event) => {
+          if (disabled) return;
+          const pasted = event.clipboardData.getData('text');
+          if (!/^[0-9:.]*$/.test(pasted)) {
+            event.preventDefault();
+          }
+        }}
         onChange={(event) => {
           if (disabled) return;
-          onEdit({ duration: event.target.value });
+          // Defensive: even if a non-numeric char slips through (e.g. IME or
+          // browser autofill), strip it before flushing to pending state.
+          const cleaned = event.target.value.replace(/[^0-9:.]/g, '');
+          onEdit({ duration: cleaned });
         }}
         placeholder="0"
         className="w-full text-center py-2 pl-2 pr-7 rounded-md text-sm border focus:outline-none focus:ring-2"

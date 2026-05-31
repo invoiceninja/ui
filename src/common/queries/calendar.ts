@@ -53,15 +53,34 @@ const CALENDAR_CONTEXTS: Record<CalendarProvider, string> = {
   microsoft: 'calendar_microsoft',
 };
 
+export const CALENDAR_PROVIDERS = Object.keys(
+  CALENDAR_CONTEXTS
+) as CalendarProvider[];
+
+export function isCalendarProvider(value: unknown): value is CalendarProvider {
+  return (
+    typeof value === 'string' &&
+    (CALENDAR_PROVIDERS as string[]).includes(value)
+  );
+}
+
 export function useConnectCalendar() {
   return useMutation(async (provider: CalendarProvider): Promise<string> => {
+    if (!isCalendarProvider(provider)) {
+      throw new Error(`Unsupported calendar provider: ${String(provider)}`);
+    }
+
     const response = await request(
       'POST',
       endpoint('/api/v1/one_time_token'),
       { context: CALENDAR_CONTEXTS[provider] }
     );
 
-    const hash = (response.data as { hash: string }).hash;
+    const hash = (response.data as { hash?: unknown })?.hash;
+
+    if (typeof hash !== 'string' || hash.length === 0) {
+      throw new Error('Invalid one_time_token response: missing hash');
+    }
 
     return endpoint('/api/v1/calendar_connection/:provider/authorize/:hash', {
       provider,
@@ -70,17 +89,48 @@ export function useConnectCalendar() {
   });
 }
 
+// Completion accepts either the new handoff token or, transitionally, the
+// legacy provider state + code pair. The handoff path is preferred when both
+// are present.
+export interface CompleteCalendarPayload {
+  provider: CalendarProvider;
+  handoff?: string;
+  state?: string;
+  code?: string;
+}
+
 export function useCompleteCalendarConnection() {
-  return useMutation(
-    (v: { provider: CalendarProvider; state: string; code: string }) =>
-      request(
-        'POST',
-        endpoint('/api/v1/calendar_connection/:provider/complete', {
-          provider: v.provider,
-        }),
-        { state: v.state, code: v.code }
-      )
-  );
+  return useMutation((v: CompleteCalendarPayload) => {
+    if (!isCalendarProvider(v.provider)) {
+      return Promise.reject(
+        new Error(`Unsupported calendar provider: ${String(v.provider)}`)
+      );
+    }
+
+    const body: Record<string, string> = {};
+    if (v.handoff) {
+      body.handoff = v.handoff;
+    } else if (v.state && v.code) {
+      body.state = v.state;
+      body.code = v.code;
+    } else {
+      return Promise.reject(
+        new Error('Missing handoff token (and no legacy state/code fallback)')
+      );
+    }
+
+    // skipIntercept: Complete.tsx classifies the error itself (expired /
+    // mismatch / error phases). Without this the global interceptor double-
+    // toasts on 404/422/5xx alongside our themed phase card.
+    return request(
+      'POST',
+      endpoint('/api/v1/calendar_connection/:provider/complete', {
+        provider: v.provider,
+      }),
+      body,
+      { skipIntercept: true }
+    );
+  });
 }
 
 export function useDisconnectCalendar() {

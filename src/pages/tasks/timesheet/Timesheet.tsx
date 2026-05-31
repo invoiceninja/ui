@@ -13,6 +13,8 @@ import { Button } from '$app/components/forms';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useTasksQuery } from '$app/common/queries/tasks';
 import { Task } from '$app/common/interfaces/task';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { AxiosError } from 'axios';
 import {
   taskPrimaryLabel,
   taskSecondaryLabel,
@@ -90,7 +92,7 @@ export default function Timesheet() {
   const dateRangeParam = `&date_range=calculated_start_date,${date},${date}`;
 
   const { data, isLoading } = useTasksQuery({
-    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc${userFilters.queryString}${dateRangeParam}`,
+    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc&status=active&without_deleted_clients=true${userFilters.queryString}${dateRangeParam}`,
   });
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
@@ -167,7 +169,7 @@ export default function Timesheet() {
       const response = await request(
         'GET',
         endpoint(
-          `/api/v1/tasks?per_page=500&sort=updated_at|desc${userFilters.queryString}&date_range=calculated_start_date,${yesterday},${yesterday}`
+          `/api/v1/tasks?per_page=500&sort=updated_at|desc&status=active&without_deleted_clients=true${userFilters.queryString}&date_range=calculated_start_date,${yesterday},${yesterday}`
         )
       );
       yesterdayTasks = response.data?.data ?? [];
@@ -226,8 +228,23 @@ export default function Timesheet() {
       toast.success('duplicated_entries');
       $refetch(['tasks']);
       setDuplicatedDates((prev) => new Set(prev).add(date));
-    } catch {
-      toast.error();
+    } catch (raw) {
+      const error = raw as AxiosError<ValidationBag>;
+      const data = error?.response?.data;
+
+      if (error?.response?.status === 422 && data) {
+        // Don't dismiss before error: shared toast singleton reuses one id,
+        // and dismissing it first causes the subsequent error toast to be
+        // dropped by react-hot-toast.
+        const messages = Object.values(data.errors ?? {}).flat();
+        const combined = messages.length > 0 ? messages.join('\n') : data.message;
+        toast.error(combined || 'error_title');
+        // One or more POSTs may have succeeded before this rejected; pull
+        // the truth from the server so the UI matches reality.
+        $refetch(['tasks']);
+      } else {
+        toast.error();
+      }
     } finally {
       setIsDuplicating(false);
     }

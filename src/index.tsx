@@ -25,6 +25,11 @@ import en from './resources/lang/en/en.json';
 import { GoogleOAuth } from './components/GoogleOAuth';
 import mitt from 'mitt';
 import { Events } from './common/events';
+import { stripCalendarOAuthParamsFromLocation } from './pages/tasks/calendar/strip-oauth-params';
+
+// Run BEFORE Sentry.init() so the OAuth handoff/code never reaches Sentry's
+// BrowserTracing pageload transaction or any other on-boot observer.
+stripCalendarOAuthParamsFromLocation();
 
 import { loader } from '@monaco-editor/react';
 

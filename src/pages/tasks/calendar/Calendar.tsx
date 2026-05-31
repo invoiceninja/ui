@@ -95,7 +95,7 @@ export default function Calendar() {
   const dateRangeParam = `&date_range=calculated_start_date,${windowStart},${windowEnd}`;
 
   const { data, isLoading } = useTasksQuery({
-    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc${userFilters.queryString}${dateRangeParam}`,
+    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc&status=active&without_deleted_clients=true${userFilters.queryString}${dateRangeParam}`,
   });
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
@@ -242,7 +242,7 @@ export default function Calendar() {
               onClick={prevMonth}
               className="p-2 rounded-md border"
               style={{ borderColor: colors.$5 }}
-              aria-label="prev month"
+              aria-label={t('previous') as string}
             >
               <ChevronLeft size="1rem" color={colors.$3} />
             </button>
@@ -261,7 +261,7 @@ export default function Calendar() {
               onClick={nextMonth}
               className="p-2 rounded-md border"
               style={{ borderColor: colors.$5 }}
-              aria-label="next month"
+              aria-label={t('next') as string}
             >
               <ChevronRight size="1rem" color={colors.$3} />
             </button>

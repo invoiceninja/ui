@@ -34,6 +34,9 @@ import { TestingPage } from '$app/components/TestingPage';
 import { activityRoutes } from '$app/pages/activities/routes';
 import { Guard } from './guards/Guard';
 import { permission } from './guards/guards/permission';
+import { enabled } from './guards/guards/enabled';
+import { or } from './guards/guards/or';
+import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { documentsRoutes } from '$app/pages/documents/routes';
 import { CorpPassSuccess } from '$app/pages/settings/e-invoice/peppol/CorpPassSuccess';
 import { CorpPassFailed } from '$app/pages/settings/e-invoice/peppol/CorpPassFailed';
@@ -77,7 +80,15 @@ export const routes = (
       {activityRoutes}
       <Route
         path="/calendar_connection/complete"
-        element={<CalendarConnectionComplete />}
+        element={
+          <Guard
+            guards={[
+              enabled(ModuleBitmask.Tasks),
+              or(permission('view_task'), permission('edit_task')),
+            ]}
+            component={<CalendarConnectionComplete />}
+          />
+        }
       />
       <Route
         path="/einvoice/registration/success"

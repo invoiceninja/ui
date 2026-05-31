@@ -24,6 +24,8 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useBlankTaskQuery, useTasksQuery } from '$app/common/queries/tasks';
 import { Task } from '$app/common/interfaces/task';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { AxiosError } from 'axios';
 import {
   Dispatch,
   SetStateAction,
@@ -133,6 +135,18 @@ export function QuickLogTimeModal(props: Props) {
         $refetch(['tasks']);
         props.onCreated?.(response.data.data);
         props.setVisible(false);
+      })
+      .catch((raw: AxiosError<ValidationBag>) => {
+        const data = raw?.response?.data;
+        if (raw?.response?.status === 422 && data) {
+          // Don't dismiss before error: the shared toast singleton reuses
+          // one id, so dismiss + error against that same id drops the toast.
+          const messages = Object.values(data.errors ?? {}).flat();
+          const combined = messages.length > 0 ? messages.join('\n') : data.message;
+          toast.error(combined || 'error_title');
+        } else {
+          toast.error();
+        }
       })
       .finally(() => setIsBusy(false));
   };

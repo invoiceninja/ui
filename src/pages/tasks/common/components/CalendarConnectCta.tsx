@@ -40,6 +40,10 @@ export function CalendarConnectCta() {
   const [disconnectVisible, setDisconnectVisible] = useState(false);
 
   const handleConnect = (provider: CalendarProvider) => {
+    // Guard against double-click: the one_time_token is single-use, so a
+    // second mutation would waste the first hash and could race the redirect.
+    if (connect.isLoading) return;
+
     toast.processing();
 
     connect.mutate(provider, {
@@ -120,7 +124,7 @@ export function CalendarConnectCta() {
             onClick={() => setDisconnectVisible(true)}
             disabled={disconnect.isLoading}
             aria-label={t('disconnect_calendar') as string}
-            className="ml-1 leading-none text-base"
+            className="ml-1 p-1 leading-none text-base"
             style={{ color: colors.$17 }}
           >
             ×

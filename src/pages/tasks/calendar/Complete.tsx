@@ -8,53 +8,135 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { toast } from '$app/common/helpers/toast/toast';
+import { useColorScheme } from '$app/common/colors';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import {
+  CompleteCalendarPayload,
+  isCalendarProvider,
+  useCompleteCalendarConnection,
+} from '$app/common/queries/calendar';
+import {
+  capturedOAuthHash,
+  capturedOAuthSearch,
+} from '$app/pages/tasks/calendar/strip-oauth-params';
 import { CalendarProvider } from '$app/common/interfaces/user';
-import { useCompleteCalendarConnection } from '$app/common/queries/calendar';
 import { updateUser } from '$app/common/stores/slices/user';
 import { Spinner } from '$app/components/Spinner';
-import { useEffect, useRef } from 'react';
+import { Button } from '$app/components/forms';
+import { AxiosError } from 'axios';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { FaGoogle, FaMicrosoft } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+type Phase = 'completing' | 'success' | 'denied' | 'expired' | 'mismatch' | 'error';
+
+interface ParsedParams {
+  status: string | null;
+  provider: CalendarProvider | null;
+  handoff: string | null;
+  // Legacy fallback while backend rolls over.
+  state: string | null;
+  code: string | null;
+}
+
+// OAuth params are stripped from window.location at app boot (see
+// src/index.tsx → strip-oauth-params.ts). Read the captured copy here, with a
+// runtime fallback to the live URL in case this page was reached without
+// going through the boot strip (e.g. hot reload during development).
+const readParams = (): ParsedParams => {
+  const liveSearch =
+    capturedOAuthSearch ??
+    window.location.search ??
+    '';
+  const liveHashQuery =
+    capturedOAuthHash ??
+    (window.location.hash.includes('?')
+      ? `?${window.location.hash.split('?').slice(1).join('?')}`
+      : '');
+  const search = liveSearch || liveHashQuery;
+
+  const params = new URLSearchParams(search);
+  const rawProvider = params.get('provider');
+  return {
+    status: params.get('calendar_connection'),
+    provider: isCalendarProvider(rawProvider) ? rawProvider : null,
+    handoff: params.get('handoff'),
+    state: params.get('state'),
+    code: params.get('code'),
+  };
+};
+
+// Translate API error → coarse phase the UI can branch on.
+const classifyError = (error: unknown): Phase => {
+  const status =
+    (error as AxiosError | undefined)?.response?.status ?? undefined;
+  if (status === 404 || status === 410) return 'expired';
+  if (status === 422 || status === 400) return 'mismatch';
+  return 'error';
+};
+
 export default function Complete() {
+  const [t] = useTranslation();
+  const colors = useColorScheme();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useCurrentUser();
   const complete = useCompleteCalendarConnection();
+
+  const [phase, setPhase] = useState<Phase>('completing');
+  const [provider, setProvider] = useState<CalendarProvider | null>(null);
   const ranRef = useRef(false);
+  const redirectTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // StrictMode invokes effects twice in dev. We strip secrets from the URL
-    // on the first run, so a second run would see empty params and false-fail.
+    // StrictMode invokes effects twice in dev. We consume the handoff on the
+    // first run; a second run would re-POST and the backend would 410.
     if (ranRef.current) return;
     ranRef.current = true;
 
-    // BrowserRouter puts params in location.search; HashRouter puts them
-    // after the '?' inside location.hash (e.g. #/calendar_connection/complete?…).
-    const search =
-      window.location.search ||
-      (window.location.hash.includes('?')
-        ? `?${window.location.hash.split('?').slice(1).join('?')}`
-        : '');
-    const params = new URLSearchParams(search);
+    const { status, provider: parsedProvider, handoff, state, code } = readParams();
+    setProvider(parsedProvider);
 
-    const status = params.get('calendar_connection');
-    const provider = params.get('provider') as CalendarProvider | null;
-    const state = params.get('state');
-    const code = params.get('code');
+    // No params (reload, back-nav, or interceptor force-reload after success)
+    // → there's nothing to complete. Silently bounce; the calendar page reads
+    // the actual connection status from Redux.
+    if (!status && !handoff && !state && !code) {
+      navigate('/tasks/calendar', { replace: true });
+      return;
+    }
 
-    // Strip secrets from the URL before any await. Preserve the router mode
-    // by rewriting just the query side of whichever segment carried them.
-    const cleanPath = window.location.hash.startsWith('#/')
-      ? `${window.location.pathname}${window.location.hash.split('?')[0]}`
-      : `${window.location.pathname}`;
-    window.history.replaceState({}, '', cleanPath);
+    if (status === 'denied') {
+      setPhase('denied');
+      return;
+    }
+    if (status === 'failed') {
+      setPhase('error');
+      return;
+    }
 
-    const done = (ok: boolean) => {
-      if (ok) {
-        toast.success('connect_calendar');
+    if (!parsedProvider) {
+      setPhase('mismatch');
+      return;
+    }
+
+    const payload: CompleteCalendarPayload | null = handoff
+      ? { provider: parsedProvider, handoff }
+      : state && code
+      ? { provider: parsedProvider, state, code }
+      : null;
+
+    if (!payload) {
+      // Status said pending but we have no usable credentials — treat as
+      // expired handoff (most likely cause).
+      setPhase('expired');
+      return;
+    }
+
+    complete
+      .mutateAsync(payload)
+      .then(() => {
         if (user) {
           dispatch(
             updateUser({
@@ -66,28 +148,105 @@ export default function Complete() {
             })
           );
         }
-      } else {
-        toast.error();
+        setPhase('success');
+        // Brief beat so the user sees the success state before redirect.
+        redirectTimerRef.current = window.setTimeout(
+          () => navigate('/tasks/calendar', { replace: true }),
+          600
+        );
+      })
+      .catch((error) => setPhase(classifyError(error)));
+
+    return () => {
+      if (redirectTimerRef.current !== null) {
+        window.clearTimeout(redirectTimerRef.current);
       }
-      navigate('/tasks/calendar', { replace: true });
     };
-
-    if (
-      status === 'denied' ||
-      status === 'failed' ||
-      !provider ||
-      !state ||
-      !code
-    ) {
-      done(false);
-      return;
-    }
-
-    complete
-      .mutateAsync({ provider, state, code })
-      .then(() => done(true))
-      .catch(() => done(false));
   }, []);
 
-  return <Spinner />;
+  const ProviderIcon =
+    provider === 'microsoft'
+      ? FaMicrosoft
+      : provider === 'google'
+      ? FaGoogle
+      : null;
+
+  const goToCalendar = () =>
+    navigate('/tasks/calendar', { replace: true });
+
+  // i18next returns the key string when a key is missing, never undefined,
+  // so `t('x') ?? 'fallback'` never fires. en.json owns all calendar keys;
+  // other locales fall back to en via i18next's fallbackLng config.
+  const heading: Record<Phase, string> = {
+    completing: t('connecting_calendar'),
+    success: t('calendar_connected'),
+    denied: t('calendar_connection_denied'),
+    expired: t('calendar_handoff_expired'),
+    mismatch: t('calendar_handoff_invalid'),
+    error: t('calendar_connect_failed'),
+  };
+
+  const body: Record<Phase, string> = {
+    completing: t('processing'),
+    success: t('redirecting'),
+    denied: t('calendar_connection_denied_body'),
+    expired: t('calendar_handoff_expired_body'),
+    mismatch: t('calendar_handoff_invalid_body'),
+    error: t('calendar_connect_failed_body'),
+  };
+
+  return (
+    <div
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{ backgroundColor: colors.$2 }}
+    >
+      <div
+        role="status"
+        aria-live="polite"
+        className="flex flex-col items-center gap-4 py-10 px-8 rounded-lg border shadow-sm max-w-md text-center"
+        style={{ borderColor: colors.$24, backgroundColor: colors.$1 }}
+      >
+        {ProviderIcon && <ProviderIcon size={28} color={colors.$3} />}
+
+        {phase === 'completing' && <Spinner />}
+
+        {phase === 'success' && (
+          <div
+            className="text-3xl"
+            style={{ color: '#10b981' }}
+            aria-hidden
+          >
+            ✓
+          </div>
+        )}
+
+        {(phase === 'denied' ||
+          phase === 'expired' ||
+          phase === 'mismatch' ||
+          phase === 'error') && (
+          <div
+            className="text-3xl"
+            style={{ color: '#ef4444' }}
+            aria-hidden
+          >
+            !
+          </div>
+        )}
+
+        <h1 className="text-base font-medium" style={{ color: colors.$3 }}>
+          {heading[phase]}
+        </h1>
+
+        <p className="text-sm" style={{ color: colors.$17 }}>
+          {body[phase]}
+        </p>
+
+        {phase !== 'completing' && phase !== 'success' && (
+          <Button behavior="button" onClick={goToCalendar} disableWithoutIcon>
+            {t('back_to_calendar')}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
 }
