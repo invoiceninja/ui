@@ -43,8 +43,6 @@ export function CustomBlueprintStep({
   });
 
   function handleCreateBlueprint() {
-    if (!payload.name.trim()) return;
-
     setErrors(undefined);
 
     request('POST', docuNinjaEndpoint('/api/blueprints'), payload, {
