@@ -107,9 +107,6 @@ export default function Calendar() {
       enabled: calendarConnected,
     });
 
-  // Set of `calendar_id|provider_event_id` strings for every task already
-  // converted from a calendar event. Used to hide those events from the grid
-  // (Harvest-style: once it's a task, it disappears from the calendar feed).
   const linkedEventKeys = useMemo(() => {
     const s = new Set<string>();
     allTasks.forEach((task) => {
