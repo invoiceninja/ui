@@ -72,6 +72,7 @@ export interface Preferences {
   document_builder_tour_shown?: boolean;
   document_upload_tour_shown?: boolean;
   blueprint_builder_tour_shown?: boolean;
+  blueprint_use_template_tour_shown?: boolean;
 }
 
 export type ImportTemplates = Record<string, Record<string, (string | null)[]>>;
