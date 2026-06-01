@@ -54,10 +54,7 @@ export function ImportTemplate(props: Props) {
           delete importTemplates?.[entity];
           nextTemplates = importTemplates;
         } else {
-          // Write an empty object rather than `undefined`: a `set` to
-          // `undefined` leaves the key on the object, then JSON.stringify
-          // omits it on the wire, so the server never receives a "delete"
-          // signal and the template silently resurrects on next hydration.
+          // `undefined` is omitted on the wire; `{}` persists the delete.
           nextTemplates = {};
         }
       }

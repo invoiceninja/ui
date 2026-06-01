@@ -243,7 +243,6 @@ export function useUpdateDraftOrReactSettings() {
       const draft = getDefaultStore().get(userDetailsDraftAtom);
       if (draft === null) {
         if (import.meta.env.DEV) {
-          // eslint-disable-next-line no-console
           console.warn(
             `[useUpdateDraftOrReactSettings] dropping write to "${property}" - no UserDetails draft is active`
           );
@@ -337,7 +336,6 @@ export function useUpdateReactSettings() {
       setSettings((prev) => {
         if (prev === null) {
           if (import.meta.env.DEV) {
-            // eslint-disable-next-line no-console
             console.warn(
               `[useUpdateReactSettings] dropping write to "${property}" - atom not yet hydrated`
             );

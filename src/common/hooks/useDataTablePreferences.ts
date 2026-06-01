@@ -114,8 +114,7 @@ export function useDataTablePreferences(params: Params) {
 
     if (!user?.id) return;
 
-    // Legacy cleanup: prior versions used full URL paths as table_filters
-    // keys; strip those once before persisting.
+    // Strip legacy URL-shaped table filter keys before persisting.
     const tableFilters = { ...(reactSettings.table_filters ?? {}) };
     Object.keys(tableFilters).forEach((key) => {
       if (key.includes('/')) {
@@ -128,11 +127,7 @@ export function useDataTablePreferences(params: Params) {
 
   const { pathname } = useLocation();
 
-  // Track whether we've already applied saved preferences for this table
-  // mount so the effect can re-run safely once the atom hydrates from null
-  // without clobbering user edits made after the initial apply. Resets
-  // when `tableKey` changes so a parent that reuses the hook across table
-  // routes correctly applies the new table's preferences.
+  // Apply saved table preferences once per table key.
   const appliedRef = useRef<boolean>(false);
   useEffect(() => {
     appliedRef.current = false;
@@ -142,10 +137,7 @@ export function useDataTablePreferences(params: Params) {
   const isHydrated = rawAtom !== null;
 
   useEffect(() => {
-    // Hydration is synchronous (useLayoutEffect in useFetchReactSettings),
-    // so isHydrated is true by the time any table consumer's first
-    // effect fires. The check remains as a defence against an unmount race
-    // (logout while a table is mounted) where the atom is reset to null.
+    // Guards logout/unmount races where the atom has been reset to null.
     if (!isHydrated || appliedRef.current) return;
 
     if (!isInitialConfiguration && !customFilter) {

@@ -14,9 +14,7 @@ export function useHandleCollapseExpandSidebar() {
   const save = useSaveReactSettings();
 
   return (value: boolean) => {
-    // Fire-and-forget; swallow the rejection so a transient network error
-    // doesn't surface as an unhandled promise rejection. The optimistic
-    // atom write already updated the UI; convergence on next save / reload.
+    // Fire-and-forget; the optimistic atom write already updated the UI.
     save('show_mini_sidebar', value).catch(() => undefined);
   };
 }

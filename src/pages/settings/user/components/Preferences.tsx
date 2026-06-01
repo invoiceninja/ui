@@ -31,8 +31,6 @@ export function Preferences() {
   const reactSettings = useDraftOrCommittedReactSettings();
   const updateSettings = useUpdateDraftOrReactSettings();
 
-  // UserDetails owns an explicit page-level draft. These controls should not
-  // write to the committed global atom until the user presses Save.
   const handleChange = (property: string, value: string | number | boolean) => {
     updateSettings(property.replace(/^company_user\.react_settings\./, ''), value);
   };

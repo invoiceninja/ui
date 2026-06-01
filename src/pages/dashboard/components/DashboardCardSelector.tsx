@@ -213,12 +213,7 @@ export function DashboardCardSelector() {
     fieldsRef.current = fields;
   }, [fields]);
 
-  // Seed local draft on the modal-open transition, and only re-seed mid-open
-  // if the persisted value materially changed (e.g. cross-tab save).
-  // `isEqual` (not reference equality) is required because
-  // `useUpdateReactSettings` deep-clones the whole atom on every write —
-  // unrelated writes would otherwise churn this array reference and wipe
-  // in-progress edits.
+  // Avoid re-seeding on atom reference churn from unrelated settings writes.
   const lastSeededFieldsRef = useRef<string[] | undefined>(undefined);
   useEffect(() => {
     if (!manageOpen || !currentUser) {

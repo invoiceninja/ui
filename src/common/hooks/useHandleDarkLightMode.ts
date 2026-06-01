@@ -14,10 +14,7 @@ export function useHandleDarkLightMode() {
   const save = useSaveReactSettings();
 
   return (value: boolean) => {
-    // Fire-and-forget; swallow the rejection so a transient network error
-    // doesn't surface as an unhandled promise rejection. The optimistic
-    // atom write already flipped the UI; convergence happens on the next
-    // successful save or page reload.
+    // Fire-and-forget; the optimistic atom write already flipped the UI.
     save('dark_mode', value).catch(() => undefined);
   };
 }

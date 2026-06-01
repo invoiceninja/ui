@@ -70,12 +70,7 @@ export function DataTableColumnsPicker(props: Props) {
     getAvailableColumns(initialColumns)
   );
 
-  // Sync local state when the atom hydrates from `null` to populated, or
-  // when the saved columns change *materially* (another tab saved). Compare
-  // with `isEqual`, not reference equality, because `useUpdateReactSettings`
-  // deep-clones the whole atom on every write — an unrelated write (dark
-  // mode, sidebar collapse) churns the nested array reference and would
-  // otherwise wipe the user's in-progress column edits.
+  // Avoid re-seeding on atom reference churn from unrelated settings writes.
   const savedColumns =
     reactSettings?.react_table_columns?.[table as ReactTableColumns];
   const lastSyncedColumnsRef = useRef(savedColumns);
@@ -99,9 +94,7 @@ export function DataTableColumnsPicker(props: Props) {
   const onSave = () => {
     if (!currentUser?.id) return;
 
-    // Legacy data fix: prior versions stored `react_table_columns` as an
-    // array rather than a record keyed by entity. Normalize before merging
-    // the new entry so the local write doesn't blow up on `lodash.set`.
+    // Normalize legacy array-shaped table columns before writing this table.
     if (Array.isArray(reactSettings.react_table_columns)) {
       updateSettings('react_table_columns', {});
     }

@@ -64,12 +64,7 @@ export function CommonActionsPreferenceModal(props: Props) {
     Partial<Record<Entity, string[]>> | undefined
   >(reactSettings.common_actions);
 
-  // Sync local draft from the atom when it hydrates after mount (slow auth
-  // round-trip) or when the persisted value actually changes. `isEqual`
-  // (not reference equality) is required because `useUpdateReactSettings`
-  // deep-clones the whole atom on every write — unrelated writes (dark
-  // mode, sidebar collapse) would otherwise churn the reference and reset
-  // the user's in-progress edits.
+  // Avoid re-seeding on atom reference churn from unrelated settings writes.
   const lastHydratedActionsRef = useRef(reactSettings.common_actions);
   useEffect(() => {
     if (!isEqual(reactSettings.common_actions, lastHydratedActionsRef.current)) {

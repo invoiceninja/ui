@@ -32,9 +32,7 @@ export default function Dashboard() {
   const [t] = useTranslation();
   const enabled = useEnabled();
   const openFeedbackSlider = useOpenFeedbackSlider();
-  // The opener bails when the atom is null (otherwise default-zero
-  // timestamps would bypass do-not-ask-again). We want to fire it once
-  // *after* hydration, even if the dashboard mounted first.
+  // Try opening feedback once after settings hydrate.
   const isReactSettingsHydrated = useAtomValue(reactSettingsAtom) !== null;
   const feedbackTriedRef = useRef<boolean>(false);
 

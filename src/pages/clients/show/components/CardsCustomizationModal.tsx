@@ -112,10 +112,7 @@ export function CardsCustomizationModal() {
     }
   };
 
-  // Re-seed when persisted value materially changes. `isEqual` (not
-  // reference equality) is required because `useUpdateReactSettings`
-  // deep-clones the whole atom on every write — unrelated writes would
-  // otherwise churn this array reference and wipe in-progress drag edits.
+  // Avoid re-seeding on atom reference churn from unrelated settings writes.
   const lastSyncedCardsRef = useRef<ClientShowCard[] | undefined>();
   useEffect(() => {
     if (isEqual(reactSettings?.client_show_cards, lastSyncedCardsRef.current)) {

@@ -43,9 +43,7 @@ export function PriceIncreaseBanner() {
       dayjs().utc().unix()
     )
       .then(() => {
-        // Refresh the redux `companyUsers` mirror so the "any user already
-        // dismissed?" gate on next mount sees the updated value. The atom
-        // itself is already current — this is just for that ancillary check.
+        // Keep the redux `companyUsers` mirror in sync for the banner gate.
         refreshCompanyUsers();
       })
       .catch(() => undefined);
