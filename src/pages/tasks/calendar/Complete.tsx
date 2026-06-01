@@ -9,20 +9,18 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import {
   isCalendarProvider,
   useCompleteCalendarConnection,
 } from '$app/common/queries/calendar';
 import { CalendarProvider } from '$app/common/interfaces/user';
-import { updateUser } from '$app/common/stores/slices/user';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { Spinner } from '$app/components/Spinner';
 import { Button } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaGoogle, FaMicrosoft } from 'react-icons/fa';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 type Phase = 'completing' | 'success' | 'denied' | 'expired' | 'mismatch' | 'error';
@@ -62,8 +60,6 @@ export default function Complete() {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const user = useCurrentUser();
   const complete = useCompleteCalendarConnection();
 
   const [phase, setPhase] = useState<Phase>('completing');
@@ -109,17 +105,7 @@ export default function Complete() {
     complete
       .mutateAsync({ provider: parsedProvider, handoff })
       .then(() => {
-        if (user) {
-          dispatch(
-            updateUser({
-              ...user,
-              referral_meta: {
-                ...(user.referral_meta ?? {}),
-                calendar_connection: { status: 'CONNECTED' },
-              },
-            })
-          );
-        }
+        $refetch(['users']);
         setPhase('success');
         // Brief beat so the user sees the success state before redirect.
         redirectTimerRef.current = window.setTimeout(
