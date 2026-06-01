@@ -64,6 +64,7 @@ import {
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { serializeTagsPayload } from '$app/common/helpers/tags';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Assigned } from '$app/components/Assigned';
@@ -81,6 +82,7 @@ import classNames from 'classnames';
 import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'status',
@@ -125,6 +127,7 @@ export function useAllTaskColumns() {
     'updated_at',
     'user',
     'assigned_user',
+    'tags',
   ] as const;
 
   return taskColumns.map((column) => normalizeColumnName(column));
@@ -384,6 +387,12 @@ export function useTaskColumns() {
       format: (value, task) =>
         task?.assigned_user ? formatUserName(task?.assigned_user) : '',
     },
+    {
+      column: 'tags',
+      id: 'task_tag_ids',
+      label: t('tags'),
+      format: (value, task) => <TagPills tags={task.tags} />,
+    },
   ];
 
   const list: string[] =
@@ -400,13 +409,15 @@ export function useTaskColumns() {
 
 export function useSave() {
   return (task: Task) => {
-    request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task).then(
-      () => {
-        toast.success('updated_task');
+    request(
+      'PUT',
+      endpoint('/api/v1/tasks/:id', { id: task.id }),
+      serializeTagsPayload(task)
+    ).then(() => {
+      toast.success('updated_task');
 
-        $refetch(['tasks']);
-      }
-    );
+      $refetch(['tasks']);
+    });
   };
 }
 

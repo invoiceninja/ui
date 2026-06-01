@@ -31,6 +31,7 @@ export interface Parameters {
   vendors: string;
   categories: string;
   projects: string;
+  tag_ids?: string;
   report_keys: string[];
   include_deleted?: boolean;
   pdf_email_attachment?: boolean;
@@ -40,7 +41,7 @@ export interface Parameters {
   invoice_id?: string;
   schedule?: ScheduleParams[];
   template?: string; // This is the EMAIL template
-  template_id?: string;  // This is the REPORT template
+  template_id?: string; // This is the REPORT template
   group_by?: string;
 }
 
@@ -70,5 +71,4 @@ export interface Schedule {
   created_at: number;
   archived_at: number;
   remaining_cycles: number;
-
 }

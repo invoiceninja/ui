@@ -55,6 +55,16 @@ export const settingsRoutes = (
       <Route path="tax_settings" element={<Settings.TaxSettings />} />
       <Route path="product_settings" element={<Settings.ProductSettings />} />
       <Route path="task_settings" element={<Settings.TaskSettings />} />
+      <Route path="tags">
+        <Route element={<Settings.Tags />}>
+          <Route path="" element={<Settings.TaskTags />} />
+          <Route path="projects" element={<Settings.ProjectTags />} />
+        </Route>
+        <Route path="tasks/create" element={<Settings.CreateTaskTag />} />
+        <Route path="tasks/:id/edit" element={<Settings.EditTaskTag />} />
+        <Route path="projects/create" element={<Settings.CreateProjectTag />} />
+        <Route path="projects/:id/edit" element={<Settings.EditProjectTag />} />
+      </Route>
       <Route path="expense_settings" element={<Settings.ExpenseSettings />} />
       <Route path="workflow_settings" element={<Settings.WorkflowSettings />} />
       <Route path="import_export" element={<Settings.ImportExport />} />
@@ -62,9 +72,10 @@ export const settingsRoutes = (
         <Route
           path=""
           element={
-            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' && isHosted() ? (
-            // import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
-             
+            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
+            isHosted() ? (
+              // import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
+
               <Guard
                 guards={[owner()]}
                 component={<Settings.Plan2 />}
