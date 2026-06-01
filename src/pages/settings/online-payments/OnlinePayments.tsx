@@ -25,6 +25,10 @@ import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandle
 import { Gateways } from '../gateways/index/Gateways';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import {
+  isUniquePaymentTerm,
+  shouldPaymentTermBeVisible,
+} from '$app/common/helpers/payment-terms/payment-term-filters';
 import { useEffect, useState } from 'react';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
@@ -49,7 +53,7 @@ export function OnlinePayments() {
   const company = useInjectCompanyChanges();
   const { data: statics } = useStaticsQuery();
   const errors = useAtomValue(companySettingsErrorsAtom);
-  const { data: termsResponse } = usePaymentTermsQuery({ status: ['active'] });
+  const { data: termsResponse } = usePaymentTermsQuery({});
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
   const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
 
@@ -301,11 +305,13 @@ export function OnlinePayments() {
               withBlank
             >
               {paymentTerms
-                .filter(
-                  (type: PaymentTerm, index, terms) =>
-                    terms.findIndex((t) => t.num_days === type.num_days) ===
-                    index
+                .filter((type: PaymentTerm) =>
+                  shouldPaymentTermBeVisible(
+                    type,
+                    company?.settings?.payment_terms
+                  )
                 )
+                .filter(isUniquePaymentTerm)
                 .map((type: PaymentTerm) => (
                   <option key={type.id} value={type.num_days.toString()}>
                     {type.name}
@@ -373,10 +379,13 @@ export function OnlinePayments() {
             customSelector
           >
             {paymentTerms
-              ?.filter(
-                (type: PaymentTerm, index, terms) =>
-                  terms.findIndex((t) => t.num_days === type.num_days) === index
+              ?.filter((type: PaymentTerm) =>
+                shouldPaymentTermBeVisible(
+                  type,
+                  company?.settings?.valid_until
+                )
               )
+              .filter(isUniquePaymentTerm)
               .map((type: PaymentTerm) => (
                 <option key={type.id} value={type.num_days.toString()}>
                   {type.name}

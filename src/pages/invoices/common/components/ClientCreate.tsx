@@ -29,6 +29,10 @@ import { CountrySelector } from '$app/components/CountrySelector';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
+import {
+  isUniquePaymentTerm,
+  shouldPaymentTermBeVisible,
+} from '$app/common/helpers/payment-terms/payment-term-filters';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { GroupSettingsSelector } from '$app/components/GroupSettingsSelector';
 
@@ -61,9 +65,7 @@ export function ClientCreate({
     refetchOnWindowFocus: false,
   });
 
-  const { data: paymentTermsResponse } = usePaymentTermsQuery({
-    status: ['active'],
-  });
+  const { data: paymentTermsResponse } = usePaymentTermsQuery({});
 
   const handleChange = (property: keyof Client, value: string) => {
     setErrors(undefined);
@@ -374,16 +376,13 @@ export function ClientCreate({
                   customSelector
                 >
                   {paymentTermsResponse.data.data
-                    .filter(
-                      (
-                        paymentTerm: PaymentTerm,
-                        index: number,
-                        terms: PaymentTerm[]
-                      ) =>
-                        terms.findIndex(
-                          (t) => t.num_days === paymentTerm.num_days
-                        ) === index
+                    .filter((paymentTerm: PaymentTerm) =>
+                      shouldPaymentTermBeVisible(
+                        paymentTerm,
+                        client?.settings?.payment_terms
+                      )
                     )
+                    .filter(isUniquePaymentTerm)
                     .map((paymentTerm: PaymentTerm, index: number) => (
                       <option
                         key={index}
@@ -407,16 +406,13 @@ export function ClientCreate({
                   customSelector
                 >
                   {paymentTermsResponse.data.data
-                    .filter(
-                      (
-                        paymentTerm: PaymentTerm,
-                        index: number,
-                        terms: PaymentTerm[]
-                      ) =>
-                        terms.findIndex(
-                          (t) => t.num_days === paymentTerm.num_days
-                        ) === index
+                    .filter((paymentTerm: PaymentTerm) =>
+                      shouldPaymentTermBeVisible(
+                        paymentTerm,
+                        client?.settings?.valid_until
+                      )
                     )
+                    .filter(isUniquePaymentTerm)
                     .map((paymentTerm: PaymentTerm, index: number) => (
                       <option
                         key={index}

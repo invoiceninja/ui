@@ -22,6 +22,10 @@ import { Link } from '$app/components/forms';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import {
+  isUniquePaymentTerm,
+  shouldPaymentTermBeVisible,
+} from '$app/common/helpers/payment-terms/payment-term-filters';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { useStaticsQuery } from '$app/common/queries/statics';
@@ -39,9 +43,7 @@ export default function Settings() {
   const currencies = useCurrencies();
   const { data: statics } = useStaticsQuery();
 
-  const { data: paymentTermsResponse } = usePaymentTermsQuery({
-    status: ['active'],
-  });
+  const { data: paymentTermsResponse } = usePaymentTermsQuery({});
 
   const handleChange = (property: string, value: string | number | boolean) => {
     const $client = cloneDeep(client)!;
@@ -118,16 +120,13 @@ export default function Settings() {
               customSelector
             >
               {paymentTermsResponse.data.data
-                .filter(
-                  (
-                    paymentTerm: PaymentTerm,
-                    index: number,
-                    terms: PaymentTerm[]
-                  ) =>
-                    terms.findIndex(
-                      (t) => t.num_days === paymentTerm.num_days
-                    ) === index
+                .filter((paymentTerm: PaymentTerm) =>
+                  shouldPaymentTermBeVisible(
+                    paymentTerm,
+                    client?.settings?.payment_terms
+                  )
                 )
+                .filter(isUniquePaymentTerm)
                 .map((paymentTerm: PaymentTerm, index: number) => (
                   <option key={index} value={paymentTerm.num_days.toString()}>
                     {paymentTerm.name}
@@ -150,16 +149,13 @@ export default function Settings() {
               customSelector
             >
               {paymentTermsResponse.data.data
-                .filter(
-                  (
-                    paymentTerm: PaymentTerm,
-                    index: number,
-                    terms: PaymentTerm[]
-                  ) =>
-                    terms.findIndex(
-                      (t) => t.num_days === paymentTerm.num_days
-                    ) === index
+                .filter((paymentTerm: PaymentTerm) =>
+                  shouldPaymentTermBeVisible(
+                    paymentTerm,
+                    client?.settings?.valid_until
+                  )
                 )
+                .filter(isUniquePaymentTerm)
                 .map((paymentTerm: PaymentTerm, index: number) => (
                   <option key={index} value={paymentTerm.num_days.toString()}>
                     {paymentTerm.name}

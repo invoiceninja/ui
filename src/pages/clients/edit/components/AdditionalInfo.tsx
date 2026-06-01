@@ -29,6 +29,10 @@ import { CurrencySelector } from '$app/components/CurrencySelector';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
+import {
+  isUniquePaymentTerm,
+  shouldPaymentTermBeVisible,
+} from '$app/common/helpers/payment-terms/payment-term-filters';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -50,9 +54,7 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
-  const { data: paymentTermsResponse } = usePaymentTermsQuery({
-    status: ['active'],
-  });
+  const { data: paymentTermsResponse } = usePaymentTermsQuery({});
 
   const { data: statics } = useStaticsQuery();
   const { id } = useParams();
@@ -151,16 +153,13 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 customSelector
               >
                 {paymentTermsResponse.data.data
-                  .filter(
-                    (
-                      paymentTerm: PaymentTerm,
-                      index: number,
-                      terms: PaymentTerm[]
-                    ) =>
-                      terms.findIndex(
-                        (t) => t.num_days === paymentTerm.num_days
-                      ) === index
+                  .filter((paymentTerm: PaymentTerm) =>
+                    shouldPaymentTermBeVisible(
+                      paymentTerm,
+                      client?.settings?.payment_terms
+                    )
                   )
+                  .filter(isUniquePaymentTerm)
                   .map((paymentTerm: PaymentTerm, index: number) => (
                     <option key={index} value={paymentTerm.num_days.toString()}>
                       {paymentTerm.name}
@@ -183,16 +182,13 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 customSelector
               >
                 {paymentTermsResponse.data.data
-                  .filter(
-                    (
-                      paymentTerm: PaymentTerm,
-                      index: number,
-                      terms: PaymentTerm[]
-                    ) =>
-                      terms.findIndex(
-                        (t) => t.num_days === paymentTerm.num_days
-                      ) === index
+                  .filter((paymentTerm: PaymentTerm) =>
+                    shouldPaymentTermBeVisible(
+                      paymentTerm,
+                      client?.settings?.valid_until
+                    )
                   )
+                  .filter(isUniquePaymentTerm)
                   .map((paymentTerm: PaymentTerm, index: number) => (
                     <option key={index} value={paymentTerm.num_days.toString()}>
                       {paymentTerm.name}
