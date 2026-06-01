@@ -10,14 +10,14 @@
 
 import { Entity } from '$app/components/CommonActionsPreferenceModal';
 import { useEntityPageIdentifier } from './useEntityPageIdentifier';
-import { useCurrentUser } from './useCurrentUser';
+import { useReactSettings } from './useReactSettings';
 
 interface Params {
   commonActionsSection: boolean;
   entity: Entity;
 }
 export function useShowActionByPreferences(params: Params) {
-  const user = useCurrentUser();
+  const reactSettings = useReactSettings();
 
   const { commonActionsSection, entity } = params;
 
@@ -28,8 +28,7 @@ export function useShowActionByPreferences(params: Params) {
       return true;
     }
 
-    const commonActionsPreferences =
-      user?.company_user?.react_settings.common_actions;
+    const commonActionsPreferences = reactSettings.common_actions;
 
     if (!commonActionsSection && !commonActionsPreferences?.[entity]) {
       return true;

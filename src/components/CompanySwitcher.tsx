@@ -33,7 +33,7 @@ import { Plus } from './icons/Plus';
 import { Person } from './icons/Person';
 import { Exit } from './icons/Exit';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useColorScheme } from '$app/common/colors';
 import companySettings from '$app/common/constants/company-settings';
 
@@ -64,11 +64,9 @@ export function CompanySwitcher() {
   const { flushData } = useDocuNinjaActions();
 
   const currentUser = useCurrentUser();
-  const userChanges = useInjectUserChanges();
+  const reactSettings = useReactSettings();
 
-  const isMiniSidebar = Boolean(
-    userChanges?.company_user?.react_settings?.show_mini_sidebar
-  );
+  const isMiniSidebar = Boolean(reactSettings.show_mini_sidebar);
 
   const preventNavigation = usePreventNavigation();
 

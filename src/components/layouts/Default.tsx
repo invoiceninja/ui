@@ -33,7 +33,8 @@ import { ActivateCompany } from '../banners/ActivateCompany';
 import { VerifyPhone } from '../banners/VerifyPhone';
 import { useColorScheme } from '$app/common/colors';
 import { Search } from '$app/pages/dashboard/components/Search';
-import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useAtomValue } from 'jotai';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { Notifications } from '../Notifications';
@@ -74,12 +75,11 @@ export function Default(props: Props) {
 
   const preventNavigation = usePreventNavigation();
 
-  const user = useInjectUserChanges();
+  const user = useCurrentUser();
   const companyUser = useCurrentCompanyUser();
+  const reactSettings = useReactSettings();
 
-  const isMiniSidebar = Boolean(
-    user?.company_user?.react_settings.show_mini_sidebar
-  );
+  const isMiniSidebar = Boolean(reactSettings.show_mini_sidebar);
   const shouldShowUnlockButton =
     !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
 

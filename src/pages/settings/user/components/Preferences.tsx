@@ -10,14 +10,12 @@
 
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { Element } from '../../../../components/cards';
-import { updateChanges } from '$app/common/stores/slices/user';
 import {
   preferencesDefaults,
-  useReactSettings,
+  useDraftOrCommittedReactSettings,
+  useUpdateDraftOrReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { usePreferences } from '$app/common/hooks/usePreferences';
 import { get } from 'lodash';
 import { ReactNode } from 'react';
 import { StatusColorTheme } from './StatusColorTheme';
@@ -28,18 +26,13 @@ import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 export function Preferences() {
   const [t] = useTranslation();
-  const dispatch = useDispatch();
 
   const colors = useColorScheme();
-  const reactSettings = useReactSettings();
+  const reactSettings = useDraftOrCommittedReactSettings();
+  const updateSettings = useUpdateDraftOrReactSettings();
 
   const handleChange = (property: string, value: string | number | boolean) => {
-    dispatch(
-      updateChanges({
-        property: property,
-        value: value,
-      })
-    );
+    updateSettings(property.replace(/^company_user\.react_settings\./, ''), value);
   };
 
   return (
@@ -229,7 +222,8 @@ interface PreferenceCardProps {
 
 function PreferenceCard({ title, children, path }: PreferenceCardProps) {
   const colors = useColorScheme();
-  const { preferences } = usePreferences();
+  const reactSettings = useDraftOrCommittedReactSettings();
+  const preferences = reactSettings.preferences;
 
   if (
     JSON.stringify(get(preferencesDefaults, path)) ===
@@ -263,7 +257,9 @@ interface PreferenceProps {
 
 function Preference({ path }: PreferenceProps) {
   const colors = useColorScheme();
-  const { preferences, update } = usePreferences();
+  const reactSettings = useDraftOrCommittedReactSettings();
+  const updateSettings = useUpdateDraftOrReactSettings();
+  const preferences = reactSettings.preferences;
   const { t } = useTranslation();
 
   const translations = {
@@ -287,9 +283,7 @@ function Preference({ path }: PreferenceProps) {
       <div
         className="hover:opacity-75 cursor-pointer"
         onClick={() =>
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          update(`preferences.${path}`, get(preferencesDefaults, path))
+          updateSettings(`preferences.${path}`, get(preferencesDefaults, path))
         }
       >
         <CircleXMark
