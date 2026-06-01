@@ -29,7 +29,6 @@ import { useQuery, useQueryClient } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
-import { PaymentStatus } from '$app/pages/payments/common/components/PaymentStatus';
 import { InvoiceStatus } from './InvoiceStatus';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
@@ -40,7 +39,8 @@ import { MdInfo } from 'react-icons/md';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
-import { Payment, Paymentable } from '$app/common/interfaces/payment';
+import { InvoicePaymentAllocationBox } from './InvoicePaymentAllocationBox';
+import { getInvoicePaymentAllocationRows } from '../helpers/invoicePaymentAllocations';
 import { Tooltip } from '$app/components/Tooltip';
 import React, { useEffect, useState } from 'react';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
@@ -70,7 +70,6 @@ import { History } from '$app/components/icons/History';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { Icon } from '$app/components/icons/Icon';
 import { ChevronRight } from 'react-feather';
-import { dateUTC } from '$app/common/helpers/payment';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -94,14 +93,6 @@ const HistoryBox = styled.div`
 `;
 
 const ActivityBox = styled.div`
-  background-color: ${({ theme }) => theme.backgroundColor};
-
-  &:hover {
-    background-color: ${({ theme }) => theme.hoverBackgroundColor};
-  }
-`;
-
-const PaymentableBox = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
 
   &:hover {
@@ -234,7 +225,7 @@ export function InvoiceSlider() {
       request(
         'GET',
         endpoint(
-          `/api/v1/invoices/${invoice?.id}?include=payments,activities.history&reminder_schedule=true&show_schedule=true`
+          `/api/v1/invoices/${invoice?.id}?include=paymentables,payments,activities.history&reminder_schedule=true&show_schedule=true`
         )
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
@@ -242,6 +233,8 @@ export function InvoiceSlider() {
     enabled: invoice !== null && isVisible,
     staleTime: Infinity,
   });
+
+  const paymentAllocationRows = getInvoicePaymentAllocationRows(resource);
 
   const fetchEmailHistory = async () => {
     const response = await queryClient
@@ -530,68 +523,16 @@ export function InvoiceSlider() {
             </>
           ) : null}
 
-          {Boolean(resource?.payments?.length) && (
+          {invoice && Boolean(paymentAllocationRows.length) && (
             <div className="flex flex-col space-y-4 px-6 py-5">
-              {resource?.payments &&
-                resource.payments.map((payment: Payment) =>
-                  payment.paymentables
-                    .filter(
-                      (item) =>
-                        item.invoice_id === invoice?.id &&
-                        item.archived_at === 0
-                    )
-                    .map((paymentable: Paymentable) => (
-                      <PaymentableBox
-                        key={payment.id}
-                        className="flex flex-col items-start justify-center space-y-2 shadow-sm text-sm border p-5 w-full cursor-pointer rounded-md"
-                        onClick={() => {
-                          !disableNavigation('payment', payment) &&
-                            navigate(
-                              route('/payments/:id/edit', {
-                                id: payment.id,
-                              })
-                            );
-                        }}
-                        style={{
-                          borderColor: colors.$20,
-                        }}
-                        theme={{
-                          backgroundColor: colors.$1,
-                          hoverBackgroundColor: colors.$4,
-                        }}
-                      >
-                        <span
-                          className="font-medium"
-                          style={{ color: colors.$3 }}
-                        >
-                          {t('payment')} {payment.number}
-                        </span>
-
-                        <div
-                          className="inline-flex items-center space-x-1"
-                          style={{ color: colors.$17 }}
-                        >
-                          <span>
-                            {formatMoney(
-                              paymentable.amount,
-                              invoice?.client?.country_id,
-                              invoice?.client?.settings.currency_id
-                            )}
-                          </span>
-
-                          <span>-</span>
-
-                          <span>
-                            {dateUTC(paymentable.created_at, dateFormat)}
-                          </span>
-                        </div>
-
-                        <div>
-                          <PaymentStatus entity={payment} />
-                        </div>
-                      </PaymentableBox>
-                    ))
-                )}
+              {paymentAllocationRows.map((row) => (
+                <InvoicePaymentAllocationBox
+                  key={row.paymentable.id}
+                  row={row}
+                  invoice={invoice}
+                  dateFormat={dateFormat}
+                />
+              ))}
             </div>
           )}
 

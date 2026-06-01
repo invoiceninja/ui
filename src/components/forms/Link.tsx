@@ -16,6 +16,7 @@ import classNames from 'classnames';
 import { useAtomValue } from 'jotai';
 import { preventLeavingPageAtom } from '$app/common/hooks/useAddPreventNavigationEvents';
 import { ExternalLink } from '../icons/ExternalLink';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 
 interface Props extends CommonProps {
   to: string;
@@ -33,6 +34,8 @@ export function Link(props: Props) {
 
   const preventNavigation = usePreventNavigation();
 
+  const accentColor = useAccentColor();
+
   const {
     withoutDefaultStyling,
     setBaseFont,
@@ -41,7 +44,7 @@ export function Link(props: Props) {
   } = props;
 
   const css: React.CSSProperties = {
-    color: '#0062FF',
+    color: accentColor,
     ...props.style,
   };
 
@@ -62,7 +65,7 @@ export function Link(props: Props) {
       >
         {!withoutExternalIcon && (
           <div>
-            <ExternalLink size="1rem" color="#0062FF" />
+            <ExternalLink size="1rem" color={accentColor} />
           </div>
         )}
 
