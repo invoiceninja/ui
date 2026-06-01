@@ -23,6 +23,12 @@ export function useOpenFeedbackSlider() {
 
   const setIsFeedbackSliderVisible = useSetAtom(isFeedbackSliderVisible);
 
+  const reactSettingsRef = useRef(reactSettings);
+  reactSettingsRef.current = reactSettings;
+
+  const currentUserRef = useRef(currentUser);
+  currentUserRef.current = currentUser;
+
   // Track the pending setTimeout so it can be cancelled on unmount or on
   // identity change. Without this, navigating away within the 1s window
   // could flash the slider on a non-dashboard page and persist
@@ -46,25 +52,25 @@ export function useOpenFeedbackSlider() {
 
     // Bail until hydration. Anything else risks showing the slider to a
     // user who already opted out.
-    if (reactSettings === null) return;
-    if (!currentUser) return;
+    if (reactSettingsRef.current === null) return;
+    if (!currentUserRef.current) return;
 
     const isUserAccountOlderThan7Days =
-      dayjs().diff(dayjs.unix(currentUser.created_at), 'days') > 7;
+      dayjs().diff(dayjs.unix(currentUserRef.current.created_at), 'days') > 7;
 
     const isHiddenByDoNotAskAgain =
-      reactSettings.preferences?.feedback_slider_displayed_at === -1;
+      reactSettingsRef.current.preferences?.feedback_slider_displayed_at === -1;
 
     const canShowSliderAgain =
-      !reactSettings.preferences?.feedback_slider_displayed_at ||
+      !reactSettingsRef.current.preferences?.feedback_slider_displayed_at ||
       dayjs().diff(
-        dayjs.unix(reactSettings.preferences.feedback_slider_displayed_at),
+        dayjs.unix(reactSettingsRef.current.preferences.feedback_slider_displayed_at),
         'hours'
       ) > 48;
 
     if (
       !isHiddenByDoNotAskAgain &&
-      !reactSettings.preferences?.feedback_given_at &&
+      !reactSettingsRef.current.preferences?.feedback_given_at &&
       canShowSliderAgain &&
       isUserAccountOlderThan7Days
     ) {
@@ -81,5 +87,5 @@ export function useOpenFeedbackSlider() {
         setIsFeedbackSliderVisible(true);
       }, 1000);
     }
-  }, [reactSettings, currentUser, save, setIsFeedbackSliderVisible]);
+  }, [save, setIsFeedbackSliderVisible]);
 }
