@@ -21,31 +21,9 @@ import { AxiosError } from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaGoogle, FaMicrosoft } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 type Phase = 'completing' | 'success' | 'denied' | 'expired' | 'mismatch' | 'error';
-
-interface ParsedParams {
-  status: string | null;
-  provider: CalendarProvider | null;
-  handoff: string | null;
-}
-
-const readParams = (): ParsedParams => {
-  const search =
-    window.location.search ||
-    (window.location.hash.includes('?')
-      ? `?${window.location.hash.split('?').slice(1).join('?')}`
-      : '');
-
-  const params = new URLSearchParams(search);
-  const rawProvider = params.get('provider');
-  return {
-    status: params.get('calendar_connection'),
-    provider: isCalendarProvider(rawProvider) ? rawProvider : null,
-    handoff: params.get('handoff'),
-  };
-};
 
 // Translate API error → coarse phase the UI can branch on.
 const classifyError = (error: unknown): Phase => {
@@ -59,6 +37,7 @@ const classifyError = (error: unknown): Phase => {
 export default function Complete() {
   const [t] = useTranslation();
   const colors = useColorScheme();
+  const location = useLocation();
   const navigate = useNavigate();
   const complete = useCompleteCalendarConnection();
 
@@ -71,7 +50,17 @@ export default function Complete() {
     if (ranRef.current) return;
     ranRef.current = true;
 
-    const { status, provider: parsedProvider, handoff } = readParams();
+    const search =
+      location.search ||
+      (location.hash.includes('?')
+        ? `?${location.hash.split('?').slice(1).join('?')}`
+        : '');
+    const params = new URLSearchParams(search);
+    const rawProvider = params.get('provider');
+    const status = params.get('calendar_connection');
+    const handoff = params.get('handoff');
+    const parsedProvider = isCalendarProvider(rawProvider) ? rawProvider : null;
+
     setProvider(parsedProvider);
 
     // No params (reload, back-nav, or interceptor force-reload after success)
