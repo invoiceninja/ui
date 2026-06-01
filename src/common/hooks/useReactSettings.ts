@@ -71,6 +71,7 @@ export interface Preferences {
   price_increase_banner_dismissed_at?: number;
   document_builder_tour_shown?: boolean;
   document_upload_tour_shown?: boolean;
+  blueprint_builder_tour_shown?: boolean;
 }
 
 export type ImportTemplates = Record<string, Record<string, (string | null)[]>>;
