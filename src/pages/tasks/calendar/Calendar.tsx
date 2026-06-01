@@ -52,6 +52,17 @@ const formatHours = (seconds: number) => {
 // running off-screen on busy days.
 const TASK_TOOLTIP_MAX = 5;
 
+const taskSeconds = (task: Task): number => {
+  const logs = parseTimeLog(task.time_log) as TimeLogType[];
+  let total = 0;
+  logs.forEach(([s, e]) => {
+    if (!s) return;
+    const finish = e || dayjs().unix();
+    total += Math.max(finish - s, 0);
+  });
+  return total;
+};
+
 export default function Calendar() {
   const { documentTitle } = useTitle('calendar');
   const [t] = useTranslation();
@@ -148,17 +159,6 @@ export default function Calendar() {
     });
     return out;
   }, [allTasks]);
-
-  const taskSeconds = (task: Task): number => {
-    const logs = parseTimeLog(task.time_log) as TimeLogType[];
-    let total = 0;
-    logs.forEach(([s, e]) => {
-      if (!s) return;
-      const finish = e || dayjs().unix();
-      total += Math.max(finish - s, 0);
-    });
-    return total;
-  };
 
   // dayKey → { total, billable } — bucketed by task.date, summing every log
   // entry on that task.
