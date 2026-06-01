@@ -114,7 +114,7 @@ export function QuickLogTimeModal(props: Props) {
       return;
     }
 
-    const startUnix = dayjs(`${date} 09:00:00`, 'YYYY-MM-DD HH:mm:ss').unix();
+    const startUnix = dayjs(`${date} ${dayjs().format('HH:mm:ss')}`, 'YYYY-MM-DD HH:mm:ss').unix();
     const endUnix = startUnix + seconds;
 
     const payload: Task = {
