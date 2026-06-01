@@ -11,7 +11,7 @@
 import { NavigationItem } from './DesktopSidebar';
 import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
-import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import classNames from 'classnames';
 import { Link } from '$app/components/forms';
@@ -40,12 +40,10 @@ export function SidebarItem(props: Props) {
   const { item } = props;
 
   const colors = useColorScheme();
-  const user = useInjectUserChanges();
+  const reactSettings = useReactSettings();
   const themeColors = useThemeColorScheme();
 
-  const isMiniSidebar = Boolean(
-    user?.company_user?.react_settings.show_mini_sidebar
-  );
+  const isMiniSidebar = Boolean(reactSettings.show_mini_sidebar);
 
   const [areSubOptionsVisible, setAreSubOptionsVisible] =
     useState<boolean>(false);

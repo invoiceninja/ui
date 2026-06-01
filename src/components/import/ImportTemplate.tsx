@@ -11,18 +11,14 @@
 import { MdDelete } from 'react-icons/md';
 import { Element } from '../cards';
 import { Icon } from '../icons/Icon';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { CompanyUser } from '$app/common/interfaces/company-user';
-import { cloneDeep, set } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { toast } from '$app/common/helpers/toast/toast';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { resetChanges, updateUser } from '$app/common/stores/slices/user';
-import { User } from '$app/common/interfaces/user';
 import { useState } from 'react';
-import { useUserChanges } from '$app/common/hooks/useInjectUserChanges';
-import { useDispatch } from 'react-redux';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import {
+  useReactSettings,
+  useSaveReactSettings,
+} from '$app/common/hooks/useReactSettings';
 import classNames from 'classnames';
 
 interface Props {
@@ -31,64 +27,51 @@ interface Props {
   onDeletedTemplate: () => void;
 }
 export function ImportTemplate(props: Props) {
-  const dispatch = useDispatch();
-
   const { name, entity, onDeletedTemplate } = props;
 
-  const user = useUserChanges();
+  const currentUser = useCurrentUser();
+  const reactSettings = useReactSettings();
+  const saveSettings = useSaveReactSettings();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const handleDeleteTemplate = () => {
-    if (!isFormBusy) {
+    if (!isFormBusy && currentUser) {
+      const importTemplates = cloneDeep(reactSettings?.import_templates ?? {});
+
+      const numberOfTemplates = Object.keys(
+        importTemplates?.[entity] || {}
+      ).length;
+
+      let nextTemplates: typeof importTemplates;
+      if (numberOfTemplates > 1) {
+        delete importTemplates?.[entity][name];
+        nextTemplates = importTemplates;
+      } else {
+        const numberOfEntities = Object.keys(importTemplates || {}).length;
+
+        if (numberOfEntities > 1) {
+          delete importTemplates?.[entity];
+          nextTemplates = importTemplates;
+        } else {
+          // Write an empty object rather than `undefined`: a `set` to
+          // `undefined` leaves the key on the object, then JSON.stringify
+          // omits it on the wire, so the server never receives a "delete"
+          // signal and the template silently resurrects on next hydration.
+          nextTemplates = {};
+        }
+      }
+
       toast.processing();
       setIsFormBusy(true);
 
-      const updatedUser = cloneDeep(user) as User;
-
-      if (updatedUser) {
-        const numberOfTemplates = Object.keys(
-          updatedUser?.company_user?.react_settings?.import_templates?.[
-            entity
-          ] || {}
-        ).length;
-
-        if (numberOfTemplates > 1) {
-          delete updatedUser?.company_user?.react_settings?.import_templates?.[
-            entity
-          ][name];
-        } else {
-          const numberOfEntities = Object.keys(
-            updatedUser?.company_user?.react_settings?.import_templates || {}
-          ).length;
-
-          if (numberOfEntities > 1) {
-            delete updatedUser?.company_user?.react_settings
-              ?.import_templates?.[entity];
-          } else {
-            delete updatedUser?.company_user?.react_settings?.import_templates;
-          }
-        }
-
-        request(
-          'PUT',
-          endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
-          updatedUser
-        )
-          .then((response: GenericSingleResourceResponse<CompanyUser>) => {
-            toast.success('updated_settings');
-
-            set(updatedUser, 'company_user', response.data.data);
-
-            $refetch(['company_users']);
-
-            dispatch(updateUser(updatedUser));
-            dispatch(resetChanges());
-
-            onDeletedTemplate();
-          })
-          .finally(() => setIsFormBusy(false));
-      }
+      saveSettings('import_templates', nextTemplates)
+        .then(() => {
+          toast.success('updated_settings');
+          onDeletedTemplate();
+        })
+        .catch(() => toast.dismiss())
+        .finally(() => setIsFormBusy(false));
     }
   };
 

@@ -9,21 +9,20 @@
  */
 
 import { Dispatch, SetStateAction, useEffect, useRef } from 'react';
+import { useAtomValue } from 'jotai';
+import { reactSettingsAtom } from './useReactSettings';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useDataTablePreference } from './useDataTablePreference';
 import { PerPage } from '$app/components/DataTable';
-import { cloneDeep, isEqual, set } from 'lodash';
-import { User } from '../interfaces/user';
-import { $refetch } from './useRefetch';
-import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
-import { CompanyUser } from '../interfaces/company-user';
-import { endpoint } from '../helpers';
-import { request } from '../helpers/request';
-import { useDispatch } from 'react-redux';
-import { injectInChangesWithData, updateUser } from '../stores/slices/user';
+import { isEqual } from 'lodash';
 import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
 import { useCurrentUser } from './useCurrentUser';
 import { useLocation } from 'react-router-dom';
+import {
+  useReactSettings,
+  useSaveReactSettings,
+  useUpdateReactSettings,
+} from './useReactSettings';
 
 interface Params {
   apiEndpoint: URL;
@@ -46,9 +45,9 @@ interface Params {
 
 export function useDataTablePreferences(params: Params) {
   const user = useCurrentUser();
-  const dispatch = useDispatch();
-
-  const currentUserRef = useRef<User | undefined>();
+  const reactSettings = useReactSettings();
+  const updateSettings = useUpdateReactSettings();
+  const saveSettings = useSaveReactSettings();
 
   const {
     apiEndpoint,
@@ -72,20 +71,6 @@ export function useDataTablePreferences(params: Params) {
   const getPreference = useDataTablePreference({ tableKey });
   const storeSessionTableFilters = useStoreSessionTableFilters({ tableKey });
 
-  const handleUpdateUserPreferences = (updatedUser: User) => {
-    request(
-      'PUT',
-      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
-      updatedUser
-    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
-      set(updatedUser, 'company_user', response.data.data);
-
-      $refetch(['company_users']);
-
-      currentUserRef.current = updatedUser;
-    });
-  };
-
   const handleUpdateTableFilters = (
     filter: string,
     sortedBy: string | undefined,
@@ -98,8 +83,7 @@ export function useDataTablePreferences(params: Params) {
       return;
     }
 
-    const currentTableFilters =
-      user?.company_user?.react_settings.table_filters?.[tableKey];
+    const currentTableFilters = reactSettings.table_filters?.[tableKey];
 
     const defaultFilters = {
       ...(customFilters && { customFilter: [] }),
@@ -118,14 +102,6 @@ export function useDataTablePreferences(params: Params) {
       ...(!withoutStoringPage && { currentPage }),
     };
 
-    if (currentTableFilters && withoutStoringPerPage) {
-      delete currentTableFilters.perPage;
-    }
-
-    if (currentTableFilters && withoutStoringPage) {
-      delete currentTableFilters.currentPage;
-    }
-
     storeSessionTableFilters(filter, currentPage);
 
     if (isEqual(defaultFilters, cleanedUpFilters) && !currentTableFilters) {
@@ -136,36 +112,43 @@ export function useDataTablePreferences(params: Params) {
       return;
     }
 
-    const updatedUser = cloneDeep(user) as User;
+    if (!user?.id) return;
 
-    if (updatedUser) {
-      // @Todo: This is a temporary solution for creating the table_filters object. It can be removed after some time.
-      const tableFilters =
-        updatedUser.company_user?.react_settings.table_filters || {};
-
-      Object.keys(tableFilters).forEach((key) => {
-        if (key.includes('/')) {
-          delete tableFilters[key];
-        }
-      });
-
-      set(
-        updatedUser,
-        `company_user.react_settings.table_filters.${tableKey}`,
-        cleanedUpFilters
-      );
-
-      handleUpdateUserPreferences(updatedUser as User);
-    }
+    // Legacy cleanup: prior versions used full URL paths as table_filters
+    // keys; strip those once before persisting.
+    const tableFilters = { ...(reactSettings.table_filters ?? {}) };
+    Object.keys(tableFilters).forEach((key) => {
+      if (key.includes('/')) {
+        delete tableFilters[key];
+      }
+    });
+    updateSettings('table_filters', tableFilters);
+    saveSettings(`table_filters.${tableKey}`, cleanedUpFilters);
   };
 
   const { pathname } = useLocation();
 
+  // Track whether we've already applied saved preferences for this table
+  // mount so the effect can re-run safely once the atom hydrates from null
+  // without clobbering user edits made after the initial apply. Resets
+  // when `tableKey` changes so a parent that reuses the hook across table
+  // routes correctly applies the new table's preferences.
+  const appliedRef = useRef<boolean>(false);
   useEffect(() => {
-    if (!isInitialConfiguration && !customFilter) {
-      // We wanna set filter only if we're on parent invoices page.
-      // Skip setting filter on other pages like client invoices.
+    appliedRef.current = false;
+  }, [tableKey]);
 
+  const rawAtom = useAtomValue(reactSettingsAtom);
+  const isHydrated = rawAtom !== null;
+
+  useEffect(() => {
+    // Hydration is synchronous (useLayoutEffect in useFetchReactSettings),
+    // so isHydrated is true by the time any table consumer's first
+    // effect fires. The check remains as a defence against an unmount race
+    // (logout while a table is mounted) where the atom is reset to null.
+    if (!isHydrated || appliedRef.current) return;
+
+    if (!isInitialConfiguration && !customFilter) {
       if (tableKey !== 'invoices') {
         setFilter((getPreference('filter') as string) || '');
       }
@@ -202,17 +185,9 @@ export function useDataTablePreferences(params: Params) {
       }
 
       setArePreferencesApplied(true);
+      appliedRef.current = true;
     }
-  }, [isInitialConfiguration]);
-
-  useEffect(() => {
-    return () => {
-      if (currentUserRef.current) {
-        dispatch(updateUser(currentUserRef.current));
-        dispatch(injectInChangesWithData(currentUserRef.current));
-      }
-    };
-  }, []);
+  }, [isInitialConfiguration, isHydrated]);
 
   return { handleUpdateTableFilters };
 }

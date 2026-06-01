@@ -10,23 +10,14 @@
 
 import { useColorScheme } from '$app/common/colors';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { User } from '$app/common/interfaces/user';
 import { Button, SelectField } from '$app/components/forms';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
-import { set } from 'lodash';
 import { Gear } from '$app/components/icons/Gear';
 import { Modal } from '$app/components/Modal';
-import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
+import { cloneDeep, isEqual } from 'lodash';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { CompanyUser } from '$app/common/interfaces/company-user';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { resetChanges, updateUser } from '$app/common/stores/slices/user';
-import { useDispatch } from 'react-redux';
 import { toast } from '$app/common/helpers/toast/toast';
 import {
   DragDropContext,
@@ -36,6 +27,10 @@ import {
 } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
 import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
+import {
+  useReactSettings,
+  useSaveReactSettings,
+} from '$app/common/hooks/useReactSettings';
 
 const Box = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};
@@ -56,99 +51,90 @@ export type ClientShowCard =
   | 'public_notes'
   | 'private_notes';
 
-const ALL_CARDS: ClientShowCard[] = [
+const DEFAULT_CARDS: ClientShowCard[] = [
   'details',
   'address',
   'contacts',
   'standing',
+];
+
+const ALL_CARDS: ClientShowCard[] = [
+  ...DEFAULT_CARDS,
   'gateways',
   'public_notes',
   'private_notes',
 ];
 
+const normalizeCards = (cards: ClientShowCard[] | undefined) => {
+  return cloneDeep(
+    (cards ?? DEFAULT_CARDS).filter((card) => card !== 'email_history')
+  );
+};
+
 export function CardsCustomizationModal() {
   const [t] = useTranslation();
 
   const user = useCurrentUser();
+  const reactSettings = useReactSettings();
+  const saveSettings = useSaveReactSettings();
   const colors = useColorScheme();
-
-  const dispatch = useDispatch();
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-  const [currentCards, setCurrentCards] = useState<ClientShowCard[]>([]);
+  const [currentCards, setCurrentCards] = useState<ClientShowCard[]>(() =>
+    normalizeCards(reactSettings?.client_show_cards)
+  );
 
   const handleDelete = (card: ClientShowCard) => {
     setCurrentCards((current) => current.filter((c) => c !== card));
   };
 
   const handleClose = () => {
-    if (user?.company_user?.react_settings?.client_show_cards) {
-      setCurrentCards(
-        cloneDeep(user.company_user.react_settings.client_show_cards)
-      );
-    } else {
-      setCurrentCards(['details', 'address', 'contacts', 'standing']);
-    }
+    setCurrentCards(normalizeCards(reactSettings?.client_show_cards));
 
     setIsVisible(false);
   };
 
   const handleUpdateUserDetails = () => {
-    if (!isFormBusy) {
+    if (!isFormBusy && user) {
       toast.processing();
       setIsFormBusy(true);
 
-      const updatedUser = cloneDeep(user) as User;
-
-      set(
-        updatedUser,
-        'company_user.react_settings.client_show_cards',
-        currentCards
-      );
-
-      request(
-        'PUT',
-        endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
-        updatedUser
-      )
-        .then((response: GenericSingleResourceResponse<CompanyUser>) => {
-          set(updatedUser, 'company_user', response.data.data);
-
-          $refetch(['company_users']);
-
-          dispatch(updateUser(updatedUser));
-          dispatch(resetChanges());
-
+      saveSettings('client_show_cards', currentCards)
+        .then(() => {
           toast.success();
-
           setIsVisible(false);
         })
+        .catch(() => toast.dismiss())
         .finally(() => {
           setIsFormBusy(false);
         });
     }
   };
 
+  // Re-seed when persisted value materially changes. `isEqual` (not
+  // reference equality) is required because `useUpdateReactSettings`
+  // deep-clones the whole atom on every write — unrelated writes would
+  // otherwise churn this array reference and wipe in-progress drag edits.
+  const lastSyncedCardsRef = useRef<ClientShowCard[] | undefined>();
   useEffect(() => {
-    if (user?.company_user?.react_settings?.client_show_cards) {
-      setCurrentCards(
-        cloneDeep(
-          user.company_user.react_settings.client_show_cards.filter(
-            (card) => card !== 'email_history'
-          )
-        )
-      );
-    } else {
-      setCurrentCards(['details', 'address', 'contacts', 'standing']);
+    if (isEqual(reactSettings?.client_show_cards, lastSyncedCardsRef.current)) {
+      return;
     }
-  }, [user?.company_user?.react_settings?.client_show_cards]);
+
+    lastSyncedCardsRef.current = reactSettings?.client_show_cards;
+    setCurrentCards(normalizeCards(reactSettings?.client_show_cards));
+  }, [reactSettings?.client_show_cards]);
 
   const onDragEnd = (result: DropResult) => {
+    if (!result.destination) {
+      return;
+    }
+
     const filtered = arrayMoveImmutable(
       currentCards,
       result.source.index,
-      result.destination?.index as unknown as number
+      result.destination.index
     );
 
     setCurrentCards(filtered);

@@ -8,21 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Modal } from './Modal';
 import { Button, SelectField } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 import { useAllCommonActions } from '$app/common/hooks/useCommonActions';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { User } from '$app/common/interfaces/user';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { CompanyUser } from '$app/common/interfaces/company-user';
-import { cloneDeep, isEqual, set } from 'lodash';
-import { resetChanges, updateUser } from '$app/common/stores/slices/user';
-import { useDispatch } from 'react-redux';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { toast } from '$app/common/helpers/toast/toast';
+import { isEqual } from 'lodash';
+import {
+  useReactSettings,
+  useSaveReactSettings,
+} from '$app/common/hooks/useReactSettings';
 import {
   DragDropContext,
   Draggable,
@@ -57,15 +54,29 @@ export function CommonActionsPreferenceModal(props: Props) {
 
   const { entity, visible, setVisible } = props;
 
-  const dispatch = useDispatch();
-
   const user = useCurrentUser();
   const colors = useColorScheme();
   const commonActions = useAllCommonActions();
+  const reactSettings = useReactSettings();
+  const saveSettings = useSaveReactSettings();
 
   const [commonActionsPreferences, setCommonActionsPreferences] = useState<
     Partial<Record<Entity, string[]>> | undefined
-  >(user?.company_user?.react_settings?.common_actions);
+  >(reactSettings.common_actions);
+
+  // Sync local draft from the atom when it hydrates after mount (slow auth
+  // round-trip) or when the persisted value actually changes. `isEqual`
+  // (not reference equality) is required because `useUpdateReactSettings`
+  // deep-clones the whole atom on every write — unrelated writes (dark
+  // mode, sidebar collapse) would otherwise churn the reference and reset
+  // the user's in-progress edits.
+  const lastHydratedActionsRef = useRef(reactSettings.common_actions);
+  useEffect(() => {
+    if (!isEqual(reactSettings.common_actions, lastHydratedActionsRef.current)) {
+      lastHydratedActionsRef.current = reactSettings.common_actions;
+      setCommonActionsPreferences(reactSettings.common_actions);
+    }
+  }, [reactSettings.common_actions]);
 
   const [availableActions, setAvailableActions] = useState<CommonAction[]>([]);
 
@@ -74,10 +85,7 @@ export function CommonActionsPreferenceModal(props: Props) {
   const [selectedAction, setSelectedAction] = useState<string>('');
 
   const disableSaveButton = () => {
-    return isEqual(
-      user?.company_user?.react_settings.common_actions,
-      commonActionsPreferences
-    );
+    return isEqual(reactSettings.common_actions, commonActionsPreferences);
   };
 
   const getActionLabel = (actionKey: string) => {
@@ -87,26 +95,11 @@ export function CommonActionsPreferenceModal(props: Props) {
   };
 
   const handleUpdateUserDetails = () => {
-    const updatedUser = cloneDeep(user) as User;
-
-    set(
-      updatedUser,
-      'company_user.react_settings.common_actions',
-      commonActionsPreferences
-    );
-
-    request(
-      'PUT',
-      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
-      updatedUser
-    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
-      set(updatedUser, 'company_user', response.data.data);
-
-      $refetch(['company_users']);
-
-      dispatch(updateUser(updatedUser));
-      dispatch(resetChanges());
-    });
+    if (!user?.id) return;
+    toast.processing();
+    saveSettings('common_actions', commonActionsPreferences)
+      .then(() => toast.success('updated_settings'))
+      .catch(() => toast.dismiss());
   };
 
   const handleRemoveAction = (actionKey: string) => {
@@ -146,8 +139,7 @@ export function CommonActionsPreferenceModal(props: Props) {
       current
         ? {
             ...current,
-            [entity]:
-              user?.company_user?.react_settings.common_actions?.[entity] || [],
+            [entity]: reactSettings.common_actions?.[entity] || [],
           }
         : {
             [entity]: [],
@@ -199,9 +191,7 @@ export function CommonActionsPreferenceModal(props: Props) {
       visible={visible}
       onClose={() => {
         setVisible(false);
-        setCommonActionsPreferences(
-          user?.company_user?.react_settings.common_actions
-        );
+        setCommonActionsPreferences(reactSettings.common_actions);
       }}
       overflowVisible
     >

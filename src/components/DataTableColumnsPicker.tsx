@@ -8,18 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { CompanyUser } from '$app/common/interfaces/company-user';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { User } from '$app/common/interfaces/user';
-import { resetChanges, updateUser } from '$app/common/stores/slices/user';
-import { RootState } from '$app/common/stores/store';
-import { cloneDeep, set } from 'lodash';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
 import { Button, InputLabel, SelectField } from './forms';
 import { Inline } from './Inline';
 import { Modal } from './Modal';
@@ -33,9 +24,11 @@ import { arrayMoveImmutable } from 'array-move';
 import {
   ReactTableColumns,
   useReactSettings,
+  useSaveReactSettings,
+  useUpdateReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { isEqual } from 'lodash';
 import { createPortal } from 'react-dom';
 import { TableColumns } from './icons/TableColumns';
 import { useColorScheme } from '$app/common/colors';
@@ -49,70 +42,78 @@ interface Props {
 }
 
 export function DataTableColumnsPicker(props: Props) {
-  const currentUser = useSelector((state: RootState) => state.user.user) as
-    | User
-    | undefined;
+  const currentUser = useCurrentUser();
 
-  const dispatch = useDispatch();
+  const updateSettings = useUpdateReactSettings();
+  const saveSettings = useSaveReactSettings();
 
   const [t] = useTranslation();
   const { table, defaultColumns } = props;
 
-  useInjectUserChanges();
-
   const colors = useColorScheme();
   const reactSettings = useReactSettings();
 
-  const [filteredColumns, setFilteredColumns] = useState(props.columns);
-
-  const [currentColumns, setCurrentColumns] = useState<string[]>(
+  const initialColumns =
     reactSettings?.react_table_columns?.[table as ReactTableColumns] ||
-      defaultColumns
+    defaultColumns;
+
+  const getAvailableColumns = useCallback(
+    (selectedColumns: string[]) =>
+      props.columns.filter((column) => !selectedColumns.includes(column)),
+    [props.columns]
   );
+
+  const [currentColumns, setCurrentColumns] =
+    useState<string[]>(initialColumns);
+
+  const [filteredColumns, setFilteredColumns] = useState<string[]>(() =>
+    getAvailableColumns(initialColumns)
+  );
+
+  // Sync local state when the atom hydrates from `null` to populated, or
+  // when the saved columns change *materially* (another tab saved). Compare
+  // with `isEqual`, not reference equality, because `useUpdateReactSettings`
+  // deep-clones the whole atom on every write — an unrelated write (dark
+  // mode, sidebar collapse) churns the nested array reference and would
+  // otherwise wipe the user's in-progress column edits.
+  const savedColumns =
+    reactSettings?.react_table_columns?.[table as ReactTableColumns];
+  const lastSyncedColumnsRef = useRef(savedColumns);
+  useEffect(() => {
+    if (savedColumns && !isEqual(savedColumns, lastSyncedColumnsRef.current)) {
+      lastSyncedColumnsRef.current = savedColumns;
+      setCurrentColumns(savedColumns);
+    }
+  }, [savedColumns]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
-    setFilteredColumns((current) =>
-      current.filter((column) => !currentColumns.includes(column))
-    );
-  }, [currentColumns]);
+    setFilteredColumns(getAvailableColumns(currentColumns));
+  }, [currentColumns, getAvailableColumns]);
 
   const handleSelectChange = useCallback((value: string) => {
     value.length > 1 && setCurrentColumns((current) => [...current, value]);
   }, []);
 
   const onSave = () => {
-    const user = cloneDeep(currentUser) as User;
+    if (!currentUser?.id) return;
 
-    // Fix legacy data issue where react_table_columns was incorrectly stored as an array instead of an object. If you see this in 2 years, feel free to remove it.
-    if (Array.isArray(user.company_user?.react_settings.react_table_columns)) {
-      set(user, 'company_user.react_settings.react_table_columns', {});
+    // Legacy data fix: prior versions stored `react_table_columns` as an
+    // array rather than a record keyed by entity. Normalize before merging
+    // the new entry so the local write doesn't blow up on `lodash.set`.
+    if (Array.isArray(reactSettings.react_table_columns)) {
+      updateSettings('react_table_columns', {});
     }
-
-    set(
-      user,
-      `company_user.react_settings.react_table_columns.${table}`,
-      currentColumns
-    );
 
     toast.processing();
 
-    request(
-      'PUT',
-      endpoint('/api/v1/company_users/:id', { id: user.id }),
-      user
-    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
-      set(user, 'company_user', response.data.data);
-      setIsModalVisible(false);
-
-      $refetch(['company_users']);
-
-      dispatch(updateUser(user));
-      dispatch(resetChanges());
-
-      toast.success('saved_settings');
-    });
+    saveSettings(`react_table_columns.${table}`, currentColumns)
+      .then(() => {
+        setIsModalVisible(false);
+        toast.success('saved_settings');
+      })
+      .catch(() => toast.dismiss());
   };
 
   const handleDelete = (columnKey: string) => {
@@ -122,20 +123,18 @@ export function DataTableColumnsPicker(props: Props) {
 
     setCurrentColumns(updatedCurrentColumns);
 
-    const updatedFilteredColumns = props.columns.filter((column) =>
-      Boolean(
-        !updatedCurrentColumns.find((currentColumn) => currentColumn === column)
-      )
-    );
-
-    setFilteredColumns(updatedFilteredColumns);
+    setFilteredColumns(getAvailableColumns(updatedCurrentColumns));
   };
 
   const onDragEnd = (result: DropResult) => {
+    if (!result.destination) {
+      return;
+    }
+
     const sorted = arrayMoveImmutable(
       currentColumns,
       result.source.index,
-      result.destination?.index as unknown as number
+      result.destination.index
     );
 
     setCurrentColumns(sorted);
@@ -143,9 +142,8 @@ export function DataTableColumnsPicker(props: Props) {
 
   const handleReset = useCallback(() => {
     setCurrentColumns(defaultColumns);
-
-    setFilteredColumns(props.columns);
-  }, []);
+    setFilteredColumns(getAvailableColumns(defaultColumns));
+  }, [defaultColumns, getAvailableColumns]);
 
   return (
     <>

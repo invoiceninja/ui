@@ -16,7 +16,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useActions as useInvoiceActions } from './Actions';
 import { ResourceAction } from '$app/components/DataTable';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from '$app/components/Tooltip';
 import { Credit } from '$app/common/interfaces/credit';
@@ -41,7 +41,7 @@ export function CommonActions(props: Props) {
 
   const { resource, entity } = props;
 
-  const user = useCurrentUser();
+  const reactSettings = useReactSettings();
   const colors = useColorScheme();
 
   const quoteActions = useQuoteActions({ dropdown: false });
@@ -92,8 +92,7 @@ export function CommonActions(props: Props) {
   };
 
   useEffect(() => {
-    const currentActions =
-      user?.company_user?.react_settings?.common_actions?.[entity];
+    const currentActions = reactSettings.common_actions?.[entity];
 
     if (currentActions) {
       const selected = actions()
@@ -113,7 +112,7 @@ export function CommonActions(props: Props) {
 
       setSelectedActions(selected as ResourceAction<Resource>[]);
     }
-  }, [user, resource]);
+  }, [reactSettings, resource]);
 
   return (
     <>

@@ -122,7 +122,7 @@ export function Totals() {
   const [t] = useTranslation();
 
   const formatMoney = useFormatMoney();
-  const { Preferences, update } = usePreferences();
+  const { Preferences, update, preferences } = usePreferences();
 
   const colors = useColorScheme();
   const company = useCurrentCompany();
@@ -134,17 +134,12 @@ export function Totals() {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
 
-  const chartScale =
-    settings?.preferences?.dashboard_charts?.default_view || 'month';
-  const currency = settings?.preferences?.dashboard_charts?.currency || 1;
-  const dateRange =
-    settings?.preferences?.dashboard_charts?.range || 'this_month';
-  const includeDrafts =
-    settings?.preferences?.dashboard_charts?.include_drafts || false;
-  const customStartDate =
-    settings?.preferences?.dashboard_charts?.custom_start_date;
-  const customEndDate =
-    settings?.preferences?.dashboard_charts?.custom_end_date;
+  const chartScale = preferences.dashboard_charts.default_view || 'month';
+  const currency = preferences.dashboard_charts.currency || 1;
+  const dateRange = preferences.dashboard_charts.range || 'this_month';
+  const includeDrafts = preferences.dashboard_charts.include_drafts || false;
+  const customStartDate = preferences.dashboard_charts.custom_start_date;
+  const customEndDate = preferences.dashboard_charts.custom_end_date;
   const currentDashboardFields = settings?.dashboard_fields ?? [];
 
   const resolvedRange = useMemo(() => {

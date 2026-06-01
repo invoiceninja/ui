@@ -8,26 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useUpdateCompanyUser } from '$app/pages/settings/user/common/hooks/useUpdateCompanyUser';
-import { cloneDeep, set } from 'lodash';
-import { useHandleCurrentUserChangeProperty } from './useHandleCurrentUserChange';
-import { useInjectUserChanges } from './useInjectUserChanges';
+import { useSaveReactSettings } from './useReactSettings';
 
 export function useHandleDarkLightMode() {
-  const userChanges = useInjectUserChanges();
-
-  const updateCompanyUser = useUpdateCompanyUser();
-  const handleUserChange = useHandleCurrentUserChangeProperty();
+  const save = useSaveReactSettings();
 
   return (value: boolean) => {
-    handleUserChange('company_user.react_settings.dark_mode', value);
-
-    if (userChanges) {
-      const updatedUserChanges = cloneDeep(userChanges);
-
-      set(updatedUserChanges, 'company_user.react_settings.dark_mode', value);
-
-      updateCompanyUser(updatedUserChanges);
-    }
+    // Fire-and-forget; swallow the rejection so a transient network error
+    // doesn't surface as an unhandled promise rejection. The optimistic
+    // atom write already flipped the UI; convergence happens on the next
+    // successful save or page reload.
+    save('dark_mode', value).catch(() => undefined);
   };
 }

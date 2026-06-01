@@ -12,19 +12,14 @@ import { useTranslation } from 'react-i18next';
 import { Button, InputField } from '../forms';
 import { ImportMap } from './UploadImport';
 import { useState } from 'react';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { cloneDeep, isEqual, set } from 'lodash';
+import {
+  useReactSettings,
+  useSaveReactSettings,
+} from '$app/common/hooks/useReactSettings';
+import { cloneDeep, isEqual } from 'lodash';
 import { Modal } from '../Modal';
 import { toast } from '$app/common/helpers/toast/toast';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { resetChanges, updateUser } from '$app/common/stores/slices/user';
-import { useDispatch } from 'react-redux';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { CompanyUser } from '$app/common/interfaces/company-user';
-import { User } from '$app/common/interfaces/user';
-import { useUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useNavigate } from 'react-router-dom';
 
 interface Props {
@@ -34,13 +29,13 @@ interface Props {
 }
 export function ImportTemplateModal(props: Props) {
   const [t] = useTranslation();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { onImport, importMap, entity } = props;
 
-  const user = useUserChanges();
+  const currentUser = useCurrentUser();
   const reactSettings = useReactSettings();
+  const saveSettings = useSaveReactSettings();
 
   const [isSaveTemplateModalOpen, setIsSaveTemplateModalOpen] =
     useState<boolean>(false);
@@ -103,63 +98,42 @@ export function ImportTemplateModal(props: Props) {
   };
 
   const handleSaveTemplate = () => {
-    if (!isFormBusy && templateName) {
+    if (!isFormBusy && templateName && currentUser) {
+      const currentEntityImportTemplates = (cloneDeep(
+        reactSettings?.import_templates?.[props.entity]
+      ) || {}) as Record<string, Record<number, string>>;
+
+      const updatedEntityImportTemplates: Record<string, (string | null)[]> =
+        {};
+
+      if (!Array.isArray(currentEntityImportTemplates)) {
+        Object.entries(currentEntityImportTemplates).forEach(
+          ([key, value]) => {
+            if (!key || !value || !Array.isArray(value)) return;
+
+            updatedEntityImportTemplates[key] = value;
+          }
+        );
+      }
+
+      updatedEntityImportTemplates[templateName] = Object.values(
+        importMap.column_map?.[props.entity]?.mapping
+      ).map((column) => column || '') as string[];
+
       toast.processing();
       setIsFormBusy(true);
 
-      const updatedUser = cloneDeep(user) as User;
-
-      if (updatedUser) {
-        const currentEntityImportTemplates = (cloneDeep(
-          updatedUser.company_user?.react_settings.import_templates?.[
-            props.entity
-          ]
-        ) || {}) as Record<string, Record<number, string>>;
-
-        const updatedEntityImportTemplates: Record<string, (string | null)[]> =
-          {};
-
-        if (!Array.isArray(currentEntityImportTemplates)) {
-          Object.entries(currentEntityImportTemplates).forEach(
-            ([key, value]) => {
-              if (!key || !value || !Array.isArray(value)) return;
-
-              updatedEntityImportTemplates[key] = value;
-            }
-          );
-        }
-
-        updatedEntityImportTemplates[templateName] = Object.values(
-          importMap.column_map?.[props.entity]?.mapping
-        ).map((column) => column || '') as string[];
-
-        set(
-          updatedUser,
-          `company_user.react_settings.import_templates.${props.entity}`,
-          updatedEntityImportTemplates
-        );
-
-        request(
-          'PUT',
-          endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
-          updatedUser
-        )
-          .then((response: GenericSingleResourceResponse<CompanyUser>) => {
-            toast.success('updated_settings');
-
-            set(updatedUser, 'company_user', response.data.data);
-
-            $refetch(['company_users']);
-
-            dispatch(updateUser(updatedUser));
-            dispatch(resetChanges());
-
-            handleOnClose();
-
-            navigate(`/${entity}s`);
-          })
-          .finally(() => setIsFormBusy(false));
-      }
+      saveSettings(
+        `import_templates.${props.entity}`,
+        updatedEntityImportTemplates
+      )
+        .then(() => {
+          toast.success('updated_settings');
+          handleOnClose();
+          navigate(`/${entity}s`);
+        })
+        .catch(() => toast.dismiss())
+        .finally(() => setIsFormBusy(false));
     }
   };
 

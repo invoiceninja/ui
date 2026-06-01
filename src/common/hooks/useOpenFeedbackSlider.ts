@@ -1,87 +1,85 @@
 import { isFeedbackSliderVisible } from '$app/components/Feedback';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useCallback, useEffect, useRef } from 'react';
 import { useCurrentUser } from './useCurrentUser';
-import { useReactSettings } from './useReactSettings';
+import {
+  reactSettingsAtom,
+  useSaveReactSettings,
+} from './useReactSettings';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { request } from '../helpers/request';
-import { $refetch } from './useRefetch';
-import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
-import { CompanyUser } from '../interfaces/company-user';
-import { endpoint, isHosted } from '../helpers';
-import { cloneDeep, set } from 'lodash';
-import { resetChanges, updateUser } from '$app/common/stores/slices/user';
-import { useDispatch } from 'react-redux';
+import { isHosted } from '../helpers';
 
 dayjs.extend(utc);
 
 export function useOpenFeedbackSlider() {
-  const dispatch = useDispatch();
-
   const currentUser = useCurrentUser();
-  const reactSettings = useReactSettings();
+  // Subscribe to the raw atom so we can distinguish "not yet hydrated" from
+  // "hydrated with default-zero timestamps". Reading through
+  // `useReactSettings` would coalesce the null and bypass the
+  // do-not-ask-again opt-out for users whose preferences haven't loaded yet.
+  const reactSettings = useAtomValue(reactSettingsAtom);
+  const save = useSaveReactSettings();
 
   const setIsFeedbackSliderVisible = useSetAtom(isFeedbackSliderVisible);
 
-  const handleUpdateReactSettings = () => {
-    const currentUnixTime = dayjs().utc().unix();
+  // Track the pending setTimeout so it can be cancelled on unmount or on
+  // identity change. Without this, navigating away within the 1s window
+  // could flash the slider on a non-dashboard page and persist
+  // `feedback_slider_displayed_at` for a slider the user never saw.
+  const pendingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const updatedReactSettings = cloneDeep(reactSettings);
-
-    set(
-      updatedReactSettings,
-      'preferences.feedback_slider_displayed_at',
-      currentUnixTime
-    );
-
-    request(
-      'PUT',
-      endpoint('/api/v1/company_users/:id/preferences?include=company_user', {
-        id: currentUser?.id,
-      }),
-      {
-        react_settings: updatedReactSettings,
+  useEffect(() => {
+    return () => {
+      if (pendingTimeoutRef.current !== null) {
+        clearTimeout(pendingTimeoutRef.current);
+        pendingTimeoutRef.current = null;
       }
-    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
-      $refetch(['company_users']);
+    };
+  }, []);
 
-      dispatch(updateUser(response.data.data));
-      dispatch(resetChanges());
-    });
-  };
-
-  return () => {
+  return useCallback(() => {
     const isFeedbackFeatureDisabled =
       import.meta.env.VITE_DISABLE_FEEDBACK_FEATURE === 'true';
 
-    if (isHosted() && !isFeedbackFeatureDisabled) {
-      const isUserAccountOlderThan7Days =
-        currentUser &&
-        dayjs().diff(dayjs.unix(currentUser.created_at), 'days') > 7;
+    if (!isHosted() || isFeedbackFeatureDisabled) return;
 
-      const isHiddenByDoNotAskAgain =
-        reactSettings?.preferences.feedback_slider_displayed_at === -1;
+    // Bail until hydration. Anything else risks showing the slider to a
+    // user who already opted out.
+    if (reactSettings === null) return;
+    if (!currentUser) return;
 
-      const canShowSliderAgain =
-        !reactSettings?.preferences.feedback_slider_displayed_at ||
-        dayjs().diff(
-          dayjs.unix(reactSettings.preferences.feedback_slider_displayed_at),
-          'hours'
-        ) > 48;
+    const isUserAccountOlderThan7Days =
+      dayjs().diff(dayjs.unix(currentUser.created_at), 'days') > 7;
 
-      if (
-        !isHiddenByDoNotAskAgain &&
-        reactSettings &&
-        !reactSettings.preferences.feedback_given_at &&
-        canShowSliderAgain &&
-        isUserAccountOlderThan7Days
-      ) {
-        setTimeout(() => {
-          handleUpdateReactSettings();
+    const isHiddenByDoNotAskAgain =
+      reactSettings.preferences?.feedback_slider_displayed_at === -1;
 
-          setIsFeedbackSliderVisible(true);
-        }, 1000);
+    const canShowSliderAgain =
+      !reactSettings.preferences?.feedback_slider_displayed_at ||
+      dayjs().diff(
+        dayjs.unix(reactSettings.preferences.feedback_slider_displayed_at),
+        'hours'
+      ) > 48;
+
+    if (
+      !isHiddenByDoNotAskAgain &&
+      !reactSettings.preferences?.feedback_given_at &&
+      canShowSliderAgain &&
+      isUserAccountOlderThan7Days
+    ) {
+      // Cancel any prior pending schedule so we don't double-fire.
+      if (pendingTimeoutRef.current !== null) {
+        clearTimeout(pendingTimeoutRef.current);
       }
+      pendingTimeoutRef.current = setTimeout(() => {
+        pendingTimeoutRef.current = null;
+        save(
+          'preferences.feedback_slider_displayed_at',
+          dayjs().utc().unix()
+        );
+        setIsFeedbackSliderVisible(true);
+      }, 1000);
     }
-  };
+  }, [reactSettings, currentUser, save, setIsFeedbackSliderVisible]);
 }
