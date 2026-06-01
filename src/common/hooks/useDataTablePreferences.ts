@@ -179,7 +179,7 @@ export function useDataTablePreferences(params: Params) {
       setArePreferencesApplied(true);
       appliedRef.current = true;
     }
-  }, [isInitialConfiguration, isHydrated]);
+  }, [isInitialConfiguration, isHydrated, tableKey]);
 
   return { handleUpdateTableFilters };
 }
