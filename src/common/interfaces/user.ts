@@ -11,10 +11,22 @@
 import { CompanyUser } from './company-user';
 import { Timestamps } from './timestamps';
 
+export type CalendarProvider = 'google' | 'microsoft';
+
+export type CalendarConnectionStatus = 'CONNECTED' | 'DISCONNECTED';
+
+// API now returns only a connection status — provider/email/calendar
+// metadata is kept server-side. Use `status === 'CONNECTED'` to gate UI
+// that depends on a live calendar connection.
+export interface CalendarConnection {
+  status: CalendarConnectionStatus;
+}
+
 interface ReferralMeta {
   pro: number;
   free: number;
   enterprise: number;
+  calendar_connection?: CalendarConnection;
 }
 
 export interface User extends Timestamps {
