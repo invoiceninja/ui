@@ -40,7 +40,7 @@ const TemplateProperties = {
   payment_schedule: ['template', 'next_run', 'parameters'],
 };
 
-const NullableProperties = ['vendors', 'projects', 'categories'];
+const NullableProperties = ['vendors', 'projects', 'categories', 'tag_ids'];
 
 export function useFormatSchedulePayload(params: Params) {
   const { schedule } = params;

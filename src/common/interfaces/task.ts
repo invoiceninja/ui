@@ -11,6 +11,7 @@
 import { Project } from './project';
 import { Client } from './client';
 import { TaskStatus } from './task-status';
+import { Tag } from './tag';
 import { User } from './user';
 
 export interface TaskMeta {
@@ -46,6 +47,8 @@ export interface Task {
   updated_at: number;
   client?: Client;
   status?: TaskStatus;
+  tags?: Tag[];
+  task_tag_ids?: string[];
   project?: Project;
   documents: any[];
   date: string;

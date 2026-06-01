@@ -36,6 +36,7 @@ import {
 } from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { InputLabel } from '$app/components/forms';
+import { serializeTagsPayload } from '$app/common/helpers/tags';
 
 export default function Project() {
   const { documentTitle, setDocumentTitle } = useTitle('project');
@@ -98,7 +99,11 @@ export default function Project() {
     setErrors(undefined);
     setIsFormBusy(true);
 
-    request('PUT', endpoint('/api/v1/projects/:id', { id }), projectValue)
+    request(
+      'PUT',
+      endpoint('/api/v1/projects/:id', { id }),
+      serializeTagsPayload(projectValue!)
+    )
       .then(() => {
         toast.success('updated_project');
 

@@ -82,6 +82,14 @@ export default function Tasks() {
 
   const { data: taskResponse } = useTaskQuery({ id: sliderTaskId });
 
+  const currentFilterColumnsCount = useMemo(
+    () =>
+      filterColumns.filter(
+        (column) => (filterColumnsValues[column.column_id] || []).length > 0
+      ).length,
+    [filterColumns, filterColumnsValues]
+  );
+
   const currentDateRangeColumnsCount = useMemo(
     () =>
       dateRangeEntries.filter(
@@ -117,7 +125,7 @@ export default function Tasks() {
         resource="task"
         columns={columns}
         customActions={actions}
-        endpoint={`/api/v1/tasks?include=status,client,project,user,assigned_user&without_deleted_clients=true&sort=id|desc${userFilter.queryString}`}
+        endpoint={`/api/v1/tasks?include=status,client,project,user,assigned_user,tags&without_deleted_clients=true&sort=id|desc${userFilter.queryString}`}
         bulkRoute="/api/v1/tasks/bulk"
         linkToCreate="/tasks/create"
         linkToEdit="/tasks/:id/edit"
@@ -128,7 +136,7 @@ export default function Tasks() {
         withResourcefulActions
         rightSide={
           <div className="flex items-center space-x-2">
-            {(Object.keys(filterColumnsValues).length > 0 ||
+            {(currentFilterColumnsCount > 0 ||
               currentDateRangeColumnsCount > 0) && (
               <Button
                 type="secondary"
@@ -140,9 +148,7 @@ export default function Tasks() {
                 }}
               >
                 {t('clear_filters')} (
-                {Object.keys(filterColumnsValues).length +
-                  currentDateRangeColumnsCount}
-                )
+                {currentFilterColumnsCount + currentDateRangeColumnsCount})
               </Button>
             )}
 
