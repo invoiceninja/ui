@@ -169,8 +169,10 @@ export default function Weekly() {
   const [pending, setPending] = useState<PendingMap>({});
   const pendingRef = useRef<PendingMap>({});
 
-  const [, setTick] = useState(0);
-  const rerender = () => setTick((n) => n + 1);
+  const [optimisticLogs, setOptimisticLogs] = useState<
+    Record<string, TimeLogType[]>
+  >({});
+  const optimisticLogsRef = useRef<Record<string, TimeLogType[]>>({});
 
   const days = useMemo(
     () => Array.from({ length: 7 }, (_, i) => weekStart.add(i, 'day')),
@@ -189,34 +191,37 @@ export default function Weekly() {
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
 
-  // Optimistic per-task time_log used as the base for the next PUT and for
-  // display. Only adopt server state for a task while it has no in-flight
-  // or pending edits.
-  const optimisticLogsRef = useRef<Record<string, TimeLogType[]>>({});
   const flushing = useRef<Set<string>>(new Set());
   const flushTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
+  // Sync optimistic logs from server state. Only adopts server data when
+  // a task has no in-flight or pending edits.
   useEffect(() => {
     let changed = false;
+    const nextAll: Record<string, TimeLogType[]> = { ...optimisticLogs };
+
     allTasks.forEach((task) => {
       if (flushing.current.has(task.id)) return;
       if (pendingRef.current[task.id]) return;
+
       const next = parseTimeLog(task.time_log) as TimeLogType[];
       const prev = optimisticLogsRef.current[task.id];
+
       if (!prev || JSON.stringify(prev) !== JSON.stringify(next)) {
+        nextAll[task.id] = next;
         optimisticLogsRef.current[task.id] = next;
         changed = true;
       }
     });
-    if (changed) rerender();
+
+    if (changed) {
+      setOptimisticLogs(nextAll);
+    }
   }, [allTasks]);
 
-  const getLogsForTask = useCallback(
-    (taskId: string, fallbackLog: string) =>
-      optimisticLogsRef.current[taskId] ??
-      (parseTimeLog(fallbackLog) as TimeLogType[]),
-    []
-  );
+  const getLogsForTask = (taskId: string, fallbackLog: string) =>
+    optimisticLogs[taskId] ??
+    (parseTimeLog(fallbackLog) as TimeLogType[]);
 
   const weekDayKeys = useMemo(
     () => days.map((d) => d.format('YYYY-MM-DD')),
@@ -271,7 +276,9 @@ export default function Weekly() {
       return;
     }
 
-    let logs = getLogsForTask(taskId, task.time_log);
+    let logs =
+      optimisticLogsRef.current[taskId] ??
+      (parseTimeLog(task.time_log) as TimeLogType[]);
     let invalid = false;
 
     for (const dayKey of dayKeys) {
@@ -289,6 +296,7 @@ export default function Weekly() {
     }
 
     optimisticLogsRef.current[taskId] = logs;
+    setOptimisticLogs((prev) => ({ ...prev, [taskId]: logs }));
 
     // Drop snapshotted cells from pending. Newer edits that arrived during
     // this snapshot stay for the next flush.
@@ -327,10 +335,9 @@ export default function Weekly() {
       const status = error?.response?.status;
       const data = error?.response?.data;
 
-      // Roll back optimistic state; the PUT didn't land.
-      optimisticLogsRef.current[taskId] = parseTimeLog(
-        task.time_log
-      ) as TimeLogType[];
+      const rolledBack = parseTimeLog(task.time_log) as TimeLogType[];
+      optimisticLogsRef.current[taskId] = rolledBack;
+      setOptimisticLogs((prev) => ({ ...prev, [taskId]: rolledBack }));
 
       // Drop the snapshotted edits we just sent so they don't re-flush on
       // an infinite loop. Anything typed after the snapshot stays.
@@ -367,7 +374,6 @@ export default function Weekly() {
       }
     } finally {
       flushing.current.delete(taskId);
-      rerender();
       if (
         pendingRef.current[taskId] &&
         Object.keys(pendingRef.current[taskId]).length > 0
