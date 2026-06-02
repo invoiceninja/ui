@@ -31,8 +31,8 @@ import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
-import { useQueryClient } from 'react-query';
 import { History as HistoryIcon } from '$app/components/icons/History';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 const ScheduleBox = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};
@@ -58,7 +58,6 @@ function PaymentSchedule() {
   const { invoice } = context;
 
   const colors = useColorScheme();
-  const queryClient = useQueryClient();
 
   const formatMoney = useFormatMoney();
 
@@ -302,8 +301,7 @@ function PaymentSchedule() {
         })
         .finally(() => {
           setIsCreatingSchedule(false);
-          queryClient.invalidateQueries({ queryKey: ['/api/v1/invoices', invoice?.id] });
-          
+          $refetch(['invoices']);
         });
     }
   };
@@ -352,7 +350,7 @@ function PaymentSchedule() {
         })
         .finally(() => {
           setIsCreatingSchedule(false);
-          queryClient.invalidateQueries({ queryKey: ['/api/v1/invoices', invoice?.id] });
+          $refetch(['invoices']);
         });
     }
   };
@@ -395,6 +393,7 @@ function PaymentSchedule() {
         })
         .finally(() => {
           setIsRemovingSchedule(false);
+          $refetch(['invoices']);
         });
     }
   };
