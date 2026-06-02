@@ -25,6 +25,10 @@ import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandle
 import { Gateways } from '../gateways/index/Gateways';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import {
+  isUniquePaymentTerm,
+  shouldPaymentTermBeVisible,
+} from '$app/common/helpers/payment-terms/payment-term-filters';
 import { useEffect, useState } from 'react';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
@@ -300,11 +304,19 @@ export function OnlinePayments() {
               customSelector
               withBlank
             >
-              {paymentTerms.map((type: PaymentTerm) => (
-                <option key={type.id} value={type.num_days.toString()}>
-                  {type.name}
-                </option>
-              ))}
+              {paymentTerms
+                .filter((type: PaymentTerm) =>
+                  shouldPaymentTermBeVisible(
+                    type,
+                    company?.settings?.payment_terms
+                  )
+                )
+                .filter(isUniquePaymentTerm)
+                .map((type: PaymentTerm) => (
+                  <option key={type.id} value={type.num_days.toString()}>
+                    {type.name}
+                  </option>
+                ))}
             </SelectField>
           </Element>
         )}
@@ -366,11 +378,19 @@ export function OnlinePayments() {
             errorMessage={errors?.errors['settings.valid_until']}
             customSelector
           >
-            {paymentTerms?.map((type: PaymentTerm) => (
-              <option key={type.id} value={type.num_days.toString()}>
-                {type.name}
-              </option>
-            ))}
+            {paymentTerms
+              ?.filter((type: PaymentTerm) =>
+                shouldPaymentTermBeVisible(
+                  type,
+                  company?.settings?.valid_until
+                )
+              )
+              .filter(isUniquePaymentTerm)
+              .map((type: PaymentTerm) => (
+                <option key={type.id} value={type.num_days.toString()}>
+                  {type.name}
+                </option>
+              ))}
           </SelectField>
         </Element>
 

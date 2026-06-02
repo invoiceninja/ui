@@ -22,6 +22,10 @@ import { Link } from '$app/components/forms';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import {
+  isUniquePaymentTerm,
+  shouldPaymentTermBeVisible,
+} from '$app/common/helpers/payment-terms/payment-term-filters';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { useStaticsQuery } from '$app/common/queries/statics';
@@ -115,13 +119,19 @@ export default function Settings() {
               withBlank
               customSelector
             >
-              {paymentTermsResponse.data.data.map(
-                (paymentTerm: PaymentTerm, index: number) => (
+              {paymentTermsResponse.data.data
+                .filter((paymentTerm: PaymentTerm) =>
+                  shouldPaymentTermBeVisible(
+                    paymentTerm,
+                    client?.settings?.payment_terms
+                  )
+                )
+                .filter(isUniquePaymentTerm)
+                .map((paymentTerm: PaymentTerm, index: number) => (
                   <option key={index} value={paymentTerm.num_days.toString()}>
                     {paymentTerm.name}
                   </option>
-                )
-              )}
+                ))}
             </SelectField>
           </Element>
         )}
@@ -138,13 +148,19 @@ export default function Settings() {
               withBlank
               customSelector
             >
-              {paymentTermsResponse.data.data.map(
-                (paymentTerm: PaymentTerm, index: number) => (
+              {paymentTermsResponse.data.data
+                .filter((paymentTerm: PaymentTerm) =>
+                  shouldPaymentTermBeVisible(
+                    paymentTerm,
+                    client?.settings?.valid_until
+                  )
+                )
+                .filter(isUniquePaymentTerm)
+                .map((paymentTerm: PaymentTerm, index: number) => (
                   <option key={index} value={paymentTerm.num_days.toString()}>
                     {paymentTerm.name}
                   </option>
-                )
-              )}
+                ))}
             </SelectField>
           </Element>
         )}
