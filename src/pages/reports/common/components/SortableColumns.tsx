@@ -249,6 +249,7 @@ export function Column({
 interface Props {
   report: Identifier;
   columns: string[];
+  onColumnsChange?: () => void;
 }
 
 const positions = [
@@ -319,7 +320,7 @@ export function useColumns({ report, columns }: Props) {
   return { data, defaultColumns };
 }
 
-export function SortableColumns({ report, columns }: Props) {
+export function SortableColumns({ report, columns, onColumnsChange }: Props) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
@@ -344,8 +345,10 @@ export function SortableColumns({ report, columns }: Props) {
       }
 
       update(`preferences.reports.columns.${report}`, [...newData]);
+
+      onColumnsChange?.();
     },
-    [report, update, preferences.reports.columns]
+    [report, update, preferences.reports.columns, onColumnsChange]
   );
 
   const onDragEnd = useCallback(

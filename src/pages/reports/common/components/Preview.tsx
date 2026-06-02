@@ -66,6 +66,15 @@ export function usePreview() {
       return;
     }
 
+    const hasReplacements = preview.columns.some((column) =>
+      replacements.some((r) => r.identifier === column.identifier)
+    );
+
+    if (!hasReplacements) {
+      setProcessed(preview);
+      return;
+    }
+
     const copy = cloneDeep(preview);
 
     copy.rows.map((row) => {

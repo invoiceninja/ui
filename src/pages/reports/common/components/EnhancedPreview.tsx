@@ -11,7 +11,6 @@
 import { useColorScheme } from '$app/common/colors';
 import { Button, InputField } from '$app/components/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { cloneDeep } from 'lodash';
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -50,60 +49,61 @@ export function EnhancedPreview({
   const [sortTypeOverrides, setSortTypeOverrides] = useState<Record<string, SortType>>({});
   const [groupByColumn, setGroupByColumn] = useState<string | null>(null);
 
+  const activeFilters = useMemo(
+    () =>
+      Object.entries(filterValues)
+        .filter(([, value]) => value.trim() !== '')
+        .map(([column, value]) => ({ column, search: value.toLowerCase() })),
+    [filterValues]
+  );
+
   // Apply cumulative filters to the original data
   const filtered = useMemo(() => {
     // If no preview data, return empty structure
     if (!preview) {
       return { columns: [], rows: [] };
     }
-    
-    // Always start with the preview data
-    const copy = cloneDeep(preview);
-    
+
+    let rows = preview.rows;
+
     // Apply filters only if there are any active filters with values
-    const hasActiveFilters = Object.values(filterValues).some(value => value.trim() !== '');
-    
-    if (hasActiveFilters) {
-      copy.rows = copy.rows.filter((row) => {
+    if (activeFilters.length > 0) {
+      rows = rows.filter((row) =>
         // Row must match ALL filters
-        return Object.entries(filterValues).every(([column, value]) => {
-          if (!value || value.trim() === '') return true; // Skip empty filters
-          
+        activeFilters.every(({ column, search }) => {
           const cell = row.find((item) => item.identifier === column);
           if (!cell) return false;
-          
-          const searchValue = value.toLowerCase();
-          
-          if (typeof cell.display_value === 'number') {
-            return cell.display_value
-              .toString()
-              .toLowerCase()
-              .includes(searchValue);
+
+          const value = cell.display_value;
+
+          if (typeof value === 'number') {
+            return value.toString().toLowerCase().includes(search);
           }
-          
-          if (typeof cell.display_value === 'string') {
-            return cell.display_value.toLowerCase().includes(searchValue);
+
+          if (typeof value === 'string') {
+            return value.toLowerCase().includes(search);
           }
-          
-          if (typeof cell.display_value === 'object' && cell.display_value?.props?.children) {
-            const childContent = typeof cell.display_value.props.children === 'string' 
-              ? cell.display_value.props.children
-              : String(cell.display_value.props.children || '');
-            return childContent.toLowerCase().includes(searchValue);
+
+          if (typeof value === 'object' && value?.props?.children) {
+            const childContent =
+              typeof value.props.children === 'string'
+                ? value.props.children
+                : String(value.props.children || '');
+            return childContent.toLowerCase().includes(search);
           }
-          
+
           return false;
-        });
-      });
+        })
+      );
     }
-    
+
     // Apply sorting after filtering
     if (sortConfigs.length > 0) {
-      copy.rows = sortRows(copy.rows, sortConfigs);
+      rows = sortRows(rows, sortConfigs);
     }
-    
-    return copy;
-  }, [preview, filterValues, sortConfigs]); // Dependencies ensure re-computation when any change
+
+    return { columns: preview.columns, rows };
+  }, [preview, activeFilters, sortConfigs]); // Dependencies ensure re-computation when any change
   
   const columnTotals = useMemo(() => {
     const summable = new Set<string>();

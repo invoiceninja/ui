@@ -776,7 +776,10 @@ export default function Reports() {
             <Element leftSide={`${t('customize')} ${t('columns')}`}>
               <Toggle
                 checked={showCustomColumns}
-                onValueChange={(value) => setShowCustomColumns(Boolean(value))}
+                onValueChange={(value) => {
+                  setShowCustomColumns(Boolean(value));
+                  setPreview(null);
+                }}
               />
             </Element>
           )}
@@ -787,6 +790,7 @@ export default function Reports() {
         <SortableColumns
           report={report.identifier}
           columns={report.custom_columns}
+          onColumnsChange={() => setPreview(null)}
         />
       )}
 
