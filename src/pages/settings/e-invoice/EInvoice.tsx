@@ -574,6 +574,7 @@ export function EInvoice() {
 
       {company?.settings.e_invoice_type === 'PEPPOL' &&
       company?.settings.country_id === '250' &&
+      company?.legal_entity_id &&
       shouldShowPEPPOLOption() ? (
         <FranceReporting />
       ) : null}
