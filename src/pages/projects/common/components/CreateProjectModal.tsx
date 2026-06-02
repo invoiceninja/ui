@@ -32,6 +32,9 @@ import {
 import { useTranslation } from 'react-i18next';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { serializeTagsPayload } from '$app/common/helpers/tags';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
 
 interface Props {
   visible: boolean;
@@ -86,7 +89,11 @@ export function CreateProjectModal(props: Props) {
       setErrors(undefined);
       setIsFormBusy(true);
 
-      request('POST', endpoint('/api/v1/projects'), project)
+      request(
+        'POST',
+        endpoint('/api/v1/projects'),
+        serializeTagsPayload(project!)
+      )
         .then((response: GenericSingleResourceResponse<Project>) => {
           toast.success('created_project');
 
@@ -150,6 +157,15 @@ export function CreateProjectModal(props: Props) {
               onChange={(user) => handleChange('assigned_user_id', user.id)}
               onClearButtonClick={() => handleChange('assigned_user_id', '')}
               errorMessage={errors?.errors.assigned_user_id}
+            />
+
+            <TagPillSelector
+              className="col-span-2"
+              label={t('tags')}
+              entityType={TAG_ENTITY_TYPES.project}
+              value={project.tags || []}
+              onChange={(tags) => handleChange('tags', tags)}
+              errorMessage={errors?.errors.tags}
             />
 
             <InputField

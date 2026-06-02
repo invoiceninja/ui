@@ -20,6 +20,7 @@ type Field =
   | 'clients'
   | 'vendors'
   | 'projects'
+  | 'tags'
   | 'categories'
   | 'include_deleted'
   | 'client'
@@ -104,6 +105,7 @@ const ReportFields: Record<Identifier, Field[]> = {
     'include_deleted',
     'status',
     'client',
+    'tags',
     'template_id',
     'group_by',
   ],
@@ -125,10 +127,16 @@ const ReportFields: Record<Identifier, Field[]> = {
     'template_id',
     'group_by',
   ],
-  project: ['clients', 'projects', 'group_by'],
+  project: ['clients', 'projects', 'tags', 'group_by'],
   activity: ['activity_type_id', 'group_by'],
   contact: ['group_by'],
-  recurring_invoice: ['include_deleted', 'status', 'client', 'template_id', 'group_by'],
+  recurring_invoice: [
+    'include_deleted',
+    'status',
+    'client',
+    'template_id',
+    'group_by',
+  ],
   recurring_invoice_item: [
     'document_email_attachment',
     'product_key',
@@ -143,7 +151,12 @@ const ReportFields: Record<Identifier, Field[]> = {
   aged_receivable_summary_report: ['group_by'],
   client_balance_report: ['group_by'],
   client_sales_report: ['group_by'],
-  profitloss: ['is_expense_billed', 'is_income_billed', 'include_tax', 'group_by'],
+  profitloss: [
+    'is_expense_billed',
+    'is_income_billed',
+    'include_tax',
+    'group_by',
+  ],
   tax_summary_report: ['group_by'],
   tax_period_report: ['is_income_billed', 'group_by'],
   user_sales_report: ['group_by'],

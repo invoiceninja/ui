@@ -14,7 +14,17 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { cloneDeep } from 'lodash';
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { sortRows, SortConfig, SortType, detectSortType, groupRows } from '../utils/sortingUtils';
+import {
+  sortRows,
+  SortConfig,
+  SortType,
+  detectSortType,
+  groupRows,
+  parseNumericValue,
+  extractDisplayValue,
+} from '../utils/sortingUtils';
+import { isSummableColumn } from '../constants/columns';
+import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 // Import the preview types and hook from Preview.tsx
 import { usePreview } from './Preview';
 
@@ -33,6 +43,7 @@ export function EnhancedPreview({
 
   const preview = usePreview();
   const colors = useColorScheme();
+  const numericFormatter = useNumericFormatter();
 
   const [sortConfigs, setSortConfigs] = useState<SortConfig[]>([]);
   const [filterValues, setFilterValues] = useState<Record<string, string>>({});
@@ -94,6 +105,44 @@ export function EnhancedPreview({
     return copy;
   }, [preview, filterValues, sortConfigs]); // Dependencies ensure re-computation when any change
   
+  const columnTotals = useMemo(() => {
+    const summable = new Set<string>();
+    const sums: Record<string, number> = {};
+
+    if (!preview || filtered.columns.length === 0) {
+      return { sums, summable };
+    }
+
+    preview.columns.forEach((column) => {
+      if (isSummableColumn(column.identifier)) {
+        summable.add(column.identifier);
+        sums[column.identifier] = 0;
+      }
+    });
+
+    if (summable.size === 0) {
+      return { sums, summable };
+    }
+
+    filtered.rows.forEach((row) => {
+      row.forEach((cell) => {
+        if (!summable.has(cell.identifier)) {
+          return;
+        }
+
+        const value = extractDisplayValue(cell);
+
+        if (value === '' || value === null || value === undefined) {
+          return;
+        }
+
+        sums[cell.identifier] += parseNumericValue(value);
+      });
+    });
+
+    return { sums, summable };
+  }, [preview, filtered]);
+
   // Early return AFTER all hooks have been called
   if (!preview) {
     return null;
@@ -328,7 +377,32 @@ export function EnhancedPreview({
             ))}
           </Tr>
 
-          {enableGrouping && groupByColumn 
+          {columnTotals.summable.size > 0 && (
+            <Tr
+              className="border-b"
+              style={{ borderColor: colors.$20, backgroundColor: colors.$2 }}
+            >
+              {preview.columns.map((column, i) => {
+                const isSummable = columnTotals.summable.has(column.identifier);
+
+                return (
+                  <Td key={i}>
+                    {isSummable ? (
+                      <span className="font-semibold">
+                        {numericFormatter(
+                          columnTotals.sums[column.identifier].toString()
+                        )}
+                      </span>
+                    ) : (
+                      <span style={{ color: colors.$17 }}>—</span>
+                    )}
+                  </Td>
+                );
+              })}
+            </Tr>
+          )}
+
+          {enableGrouping && groupByColumn
             ? renderGroupedData()
             : renderNormalData()
           }

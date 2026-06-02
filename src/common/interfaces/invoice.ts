@@ -10,7 +10,7 @@
 import { EInvoiceType } from '$app/pages/settings';
 import { Client } from './client';
 import { InvoiceItem } from './invoice-item';
-import { Payment } from './payment';
+import { Payment, Paymentable } from './payment';
 import { Invitation } from './purchase-order';
 import { ScheduleItem } from './schedule';
 import { TaxInfo } from './tax-info';
@@ -82,6 +82,7 @@ export interface Invoice {
   client?: Client;
   activities?: Activity[];
   payments?: Payment[];
+  paymentables?: Paymentable[];
   reminder_schedule?: string;
   e_invoice?: EInvoiceType;
   is_locked?: boolean;

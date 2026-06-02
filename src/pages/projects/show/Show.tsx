@@ -59,6 +59,7 @@ import { ClientActionButtons } from '$app/pages/invoices/common/components/Clien
 import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
 import { ProjectPublicNotes } from './components/ProjectPublicNotes';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { useFilterColumns } from '$app/pages/tasks/common/hooks/useFilterColumns';
 
 dayjs.extend(duration);
 
@@ -101,6 +102,7 @@ export default function Show() {
 
   const filters = useTaskFilters();
   const taskColumns = useAllTaskColumns();
+  const filterColumns = useFilterColumns();
 
   const customBulkActions = useCustomBulkActions();
 
@@ -261,7 +263,7 @@ export default function Show() {
             resource="task"
             columns={columns}
             customActions={taskActions}
-            endpoint={`/api/v1/tasks?include=status,client,project,user,assigned_user&sort=id|desc&project_tasks=${project.id}&without_deleted_clients=true`}
+            endpoint={`/api/v1/tasks?include=status,client,project,user,assigned_user,tags&sort=id|desc&project_tasks=${project.id}&without_deleted_clients=true`}
             bulkRoute="/api/v1/tasks/bulk"
             linkToCreate={`/tasks/create?project=${id}&rate=${project.task_rate}`}
             linkToEdit="/tasks/:id/edit"
@@ -269,6 +271,7 @@ export default function Show() {
             customFilters={filters}
             customBulkActions={customBulkActions}
             customFilterPlaceholder="status"
+            filterColumns={filterColumns}
             withResourcefulActions
             rightSide={
               <DataTableColumnsPicker

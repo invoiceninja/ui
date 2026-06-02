@@ -13,6 +13,7 @@ import { date, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { Project } from '$app/common/interfaces/project';
 import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
@@ -56,6 +57,8 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { useTagsQuery } from '$app/common/queries/tags';
+import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'name',
@@ -97,6 +100,7 @@ export function useAllProjectColumns() {
     'number',
     'updated_at',
     'total_hours',
+    'tags',
   ] as const;
 
   return projectColumns.map((column) => normalizeColumnName(column));
@@ -311,6 +315,12 @@ export function useProjectColumns() {
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
     },
+    {
+      column: 'tags',
+      id: 'project_tag_ids',
+      label: t('tags'),
+      format: (value, project) => <TagPills tags={project.tags} />,
+    },
   ];
 
   const list: string[] =
@@ -323,6 +333,25 @@ export function useProjectColumns() {
         list.indexOf(normalizeColumnName(a.column)) -
         list.indexOf(normalizeColumnName(b.column))
     );
+}
+
+export function useProjectFilterColumns(params?: { enabled?: boolean }) {
+  const { data: tags } = useTagsQuery({
+    entityType: TAG_ENTITY_TYPES.project,
+    enabled: params?.enabled ?? true,
+  });
+
+  return [
+    {
+      column_id: 'project_tag_ids',
+      query_identifier: 'tag_ids',
+      options:
+        tags?.data.filter(isActiveTag).map((tag) => ({
+          label: tag.name,
+          value: tag.id,
+        })) || [],
+    },
+  ];
 }
 
 export function useActions() {

@@ -82,6 +82,12 @@ export function useSettingsRoutes() {
       enabled: isAdmin || isOwner || false,
     },
     {
+      name: t('tags'),
+      href: '/settings/tags',
+      current: location.pathname.startsWith('/settings/tags'),
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
+    },
+    {
       name: t('expense_settings'),
       href: '/settings/expense_settings',
       current:

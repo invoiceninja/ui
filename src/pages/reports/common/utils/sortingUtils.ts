@@ -82,7 +82,7 @@ function parseDateValue(value: string | number): number {
   return new Date(0).getTime();
 }
 
-function parseNumericValue(value: string | number): number {
+export function parseNumericValue(value: string | number): number {
   if (typeof value === 'number') return value;
   
   const cleaned = String(value)

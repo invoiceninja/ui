@@ -85,7 +85,7 @@ export const lightColorScheme = {
 };
 
 export function useColorScheme() {
-  const reactSettings = useReactSettings({ overwrite: false });
+  const reactSettings = useReactSettings();
 
   return reactSettings.dark_mode ? darkColorScheme : lightColorScheme;
 }

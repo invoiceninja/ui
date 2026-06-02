@@ -16,6 +16,7 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { Page } from '$app/components/Breadcrumbs';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import Toggle from '$app/components/forms/Toggle';
@@ -33,7 +34,6 @@ import { useQueryClient } from 'react-query';
 import { useAtom } from 'jotai';
 import {
   Cell,
-
   PreviewResponse,
   previewAtom,
 } from '../common/components/Preview';
@@ -49,6 +49,7 @@ import { useColorScheme } from '$app/common/colors';
 import { MultiClientSelector } from '../common/components/MultiClientSelector';
 import { MultiExpenseCategorySelector } from '../common/components/MultiExpenseCategorySelector';
 import { MultiProjectSelector } from '../common/components/MultiProjectSelector';
+import { MultiTagSelector } from '../common/components/MultiTagSelector';
 import { MultiVendorSelector } from '../common/components/MultiVendorSelector';
 import { useShowReportField } from '../common/hooks/useShowReportField';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
@@ -120,25 +121,29 @@ export const ranges: Range[] = [
  * - attachment; filename=filename.pdf
  * - attachment; filename*=UTF-8''filename.pdf
  */
-const extractFilenameFromHeader = (contentDisposition: string | undefined): string | null => {
+const extractFilenameFromHeader = (
+  contentDisposition: string | undefined
+): string | null => {
   if (!contentDisposition) {
     return null;
   }
 
   // Try to extract filename from Content-Disposition header
-  const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-  
+  const filenameMatch = contentDisposition.match(
+    /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+  );
+
   if (filenameMatch && filenameMatch[1]) {
     let filename = filenameMatch[1];
-    
+
     // Remove quotes if present
     filename = filename.replace(/^["']|["']$/g, '');
-    
+
     // Handle RFC 5987 encoded filenames (filename*=UTF-8''...)
     if (filename.startsWith("UTF-8''")) {
       filename = decodeURIComponent(filename.substring(7));
     }
-    
+
     return filename.trim();
   }
 
@@ -164,12 +169,20 @@ const download = (data: BlobPart, identifier: string, headers?: any) => {
   const fileType = isPDF ? 'pdf' : 'csv';
   const mimeType = isPDF ? 'application/pdf' : 'text/csv';
 
-  const contentDisposition = 
-    (typeof headers?.['content-disposition'] === 'string' ? headers['content-disposition'] : null) ||
-    (typeof headers?.['Content-Disposition'] === 'string' ? headers['Content-Disposition'] : null) ||
-    (Array.isArray(headers?.['content-disposition']) ? headers['content-disposition'][0] : null) ||
-    (Array.isArray(headers?.['Content-Disposition']) ? headers['Content-Disposition'][0] : null);
-  
+  const contentDisposition =
+    (typeof headers?.['content-disposition'] === 'string'
+      ? headers['content-disposition']
+      : null) ||
+    (typeof headers?.['Content-Disposition'] === 'string'
+      ? headers['Content-Disposition']
+      : null) ||
+    (Array.isArray(headers?.['content-disposition'])
+      ? headers['content-disposition'][0]
+      : null) ||
+    (Array.isArray(headers?.['Content-Disposition'])
+      ? headers['Content-Disposition'][0]
+      : null);
+
   const headerFilename = extractFilenameFromHeader(contentDisposition);
 
   const filename = headerFilename || `${identifier}.${fileType}`;
@@ -599,7 +612,9 @@ export default function Reports() {
                   handlePayloadChange('template_id', design.id)
                 }
                 clearButton
-                onClearButtonClick={() => handlePayloadChange('template_id', '')}
+                onClearButtonClick={() =>
+                  handlePayloadChange('template_id', '')
+                }
                 entity={report.identifier}
               />
             </Element>
@@ -638,6 +653,19 @@ export default function Reports() {
               onValueChange={(projectIds) =>
                 handlePayloadChange('projects', projectIds)
               }
+            />
+          )}
+
+          {showReportField('tags') && (
+            <MultiTagSelector
+              key={report.identifier}
+              entityType={
+                report.identifier === 'task'
+                  ? TAG_ENTITY_TYPES.task
+                  : TAG_ENTITY_TYPES.project
+              }
+              value={report.payload.tag_ids}
+              onValueChange={(tagIds) => handlePayloadChange('tag_ids', tagIds)}
             />
           )}
 
@@ -762,7 +790,9 @@ export default function Reports() {
         />
       )}
 
-      {preview && <EnhancedPreview enableMultiSort={true} enableNaturalSort={true} />}
+      {preview && (
+        <EnhancedPreview enableMultiSort={true} enableNaturalSort={true} />
+      )}
     </Default>
   );
 }

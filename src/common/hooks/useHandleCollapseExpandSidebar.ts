@@ -8,30 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useUpdateCompanyUser } from '$app/pages/settings/user/common/hooks/useUpdateCompanyUser';
-import { cloneDeep, set } from 'lodash';
-import { useHandleCurrentUserChangeProperty } from './useHandleCurrentUserChange';
-import { useInjectUserChanges } from './useInjectUserChanges';
+import { useSaveReactSettings } from './useReactSettings';
 
 export function useHandleCollapseExpandSidebar() {
-  const userChanges = useInjectUserChanges();
-
-  const updateCompanyUser = useUpdateCompanyUser();
-  const handleUserChange = useHandleCurrentUserChangeProperty();
+  const save = useSaveReactSettings();
 
   return (value: boolean) => {
-    handleUserChange('company_user.react_settings.show_mini_sidebar', value);
-
-    if (userChanges) {
-      const updatedUserChanges = cloneDeep(userChanges);
-
-      set(
-        updatedUserChanges,
-        'company_user.react_settings.show_mini_sidebar',
-        value
-      );
-
-      updateCompanyUser(updatedUserChanges);
-    }
+    // Fire-and-forget; the optimistic atom write already updated the UI.
+    save('show_mini_sidebar', value).catch(() => undefined);
   };
 }

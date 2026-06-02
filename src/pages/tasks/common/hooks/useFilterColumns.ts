@@ -1,13 +1,17 @@
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { User } from '$app/common/interfaces/user';
 import { useClientsQuery } from '$app/common/queries/clients';
 import { useProjectsQuery } from '$app/common/queries/projects';
+import { useTagsQuery } from '$app/common/queries/tags';
 import { useUsersQuery } from '$app/common/queries/users';
 import { FilterColumn } from '$app/components/DataTable';
+import { isActiveTag } from '$app/components/tags/TagPills';
 
 export function useFilterColumns() {
   const { data: users } = useUsersQuery();
   const { data: clients } = useClientsQuery({ status: ['active'] });
   const { data: projects } = useProjectsQuery({ status: ['active'] });
+  const { data: tags } = useTagsQuery({ entityType: TAG_ENTITY_TYPES.task });
 
   const filterColumns: FilterColumn[] = [
     {
@@ -38,6 +42,15 @@ export function useFilterColumns() {
         clients?.map((client) => ({
           label: client.display_name,
           value: client.id,
+        })) || [],
+    },
+    {
+      column_id: 'task_tag_ids',
+      query_identifier: 'tag_ids',
+      options:
+        tags?.data.filter(isActiveTag).map((tag) => ({
+          label: tag.name,
+          value: tag.id,
         })) || [],
     },
   ];

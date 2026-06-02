@@ -60,6 +60,7 @@ export function useScheduleReport() {
       clients: report.payload.clients ? report.payload.clients.split(',') : [],
       vendors: report.payload.vendors || '',
       projects: report.payload.projects || '',
+      tag_ids: report.payload.tag_ids || '',
       categories: report.payload.categories || '',
       report_keys: reportKeys,
       include_deleted: report.payload.include_deleted ?? false,
