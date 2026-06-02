@@ -97,6 +97,10 @@ export function Create() {
 
           $refetch(['task_schedulers']);
 
+          if (schedule.template === 'payment_schedule') {
+            $refetch(['invoices']);
+          }
+
           navigate(
             route('/settings/schedules/:id/edit', {
               id: response.data.data.id,
