@@ -20,7 +20,6 @@ import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { toast } from '../helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
-import { type Tag } from '../interfaces/tag';
 
 interface TaskParams {
   id?: string;
@@ -76,7 +75,7 @@ export function useTasksQuery(params: TasksParams) {
 
 interface Details {
   column?: string;
-  new_value?: string | number | boolean | Tag[];
+  new_value?: string | number | boolean;
 }
 
 export const useBulk = () => {

@@ -36,8 +36,6 @@ import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSele
 import { UserSelector } from '$app/components/users/UserSelector';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
-import { TagPillSelector } from '$app/components/tags/TagPillSelector';
-import { TAG_ENTITY_TYPES, type Tag } from '$app/common/interfaces/tag';
 
 interface Props {
   entity: 'client' | 'expense' | 'recurring_invoice' | 'task';
@@ -60,12 +58,15 @@ interface BulkUpdateField {
     | 'statusSelector'
     | 'userSelector'
     | 'projectSelector'
-    | 'clientSelector'
-    | 'tagSelector';
+    | 'clientSelector';
 }
 
-const tagColumnKeys = ['tags', 'tag_ids', 'task_tag_ids'];
-const isTagColumn = (column: string) => tagColumnKeys.includes(column);
+const excludedColumnKeys = [
+  'tags',
+  'tag_ids',
+  'task_tag_ids',
+  'project_tag_ids',
+];
 
 const bulkUpdateFieldsTypes: BulkUpdateField[] = [
   { key: 'private_notes', type: 'markdownEditor' },
@@ -89,12 +90,7 @@ const bulkUpdateFieldsTypes: BulkUpdateField[] = [
   { key: 'assigned_user_id', type: 'userSelector' },
   { key: 'project_id', type: 'projectSelector' },
   { key: 'client_id', type: 'clientSelector' },
-  { key: 'tags', type: 'tagSelector' },
-  { key: 'tag_ids', type: 'tagSelector' },
-  { key: 'task_tag_ids', type: 'tagSelector' },
 ];
-
-type BulkUpdateValue = string | number | boolean | Tag[];
 
 export function BulkUpdatesAction(props: Props) {
   const [t] = useTranslation();
@@ -112,8 +108,9 @@ export function BulkUpdatesAction(props: Props) {
   const bulkUpdatesColumns = useBulkUpdatesColumns();
 
   const [column, setColumn] = useState<string>('');
-  const [newColumnValue, setNewColumnValue] = useState<BulkUpdateValue>('');
-  const scalarColumnValue = Array.isArray(newColumnValue) ? '' : newColumnValue;
+  const [newColumnValue, setNewColumnValue] = useState<
+    string | number | boolean
+  >('');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const handleOnClose = () => {
@@ -126,10 +123,6 @@ export function BulkUpdatesAction(props: Props) {
       return 'textarea';
     }
 
-    if (isTagColumn(column)) {
-      return 'tagSelector';
-    }
-
     return bulkUpdateFieldsTypes.find(({ key }) => key === column)?.type || '';
   };
 
@@ -138,8 +131,6 @@ export function BulkUpdatesAction(props: Props) {
       setNewColumnValue('-1');
     } else if (column === 'uses_inclusive_taxes') {
       setNewColumnValue(false);
-    } else if (isTagColumn(column)) {
-      setNewColumnValue([]);
     } else {
       setNewColumnValue('');
     }
@@ -150,8 +141,8 @@ export function BulkUpdatesAction(props: Props) {
       return false;
     }
 
-    if (isTagColumn(columnKey)) {
-      return props.entity === 'task';
+    if (excludedColumnKeys.includes(columnKey)) {
+      return false;
     }
 
     if (columnKey.startsWith('custom_value')) {
@@ -183,10 +174,6 @@ export function BulkUpdatesAction(props: Props) {
   };
 
   const getColumnTranslation = (currentColumn: string) => {
-    if (isTagColumn(currentColumn)) {
-      return t('tags');
-    }
-
     if (currentColumn.startsWith('custom_value')) {
       return company.custom_fields[
         currentColumn.replace('custom_value', props.entity)
@@ -220,21 +207,21 @@ export function BulkUpdatesAction(props: Props) {
     if (props.entity === 'client') {
       bulkClients(resourceIds, 'bulk_update', {
         column,
-        newValue: newColumnValue as string | number | boolean,
+        newValue: newColumnValue,
       }).then(() => handleOnClose());
     }
 
     if (props.entity === 'expense') {
       bulkExpenses(resourceIds, 'bulk_update', {
         column,
-        new_value: newColumnValue as string | number | boolean,
+        new_value: newColumnValue,
       }).then(() => handleOnClose());
     }
 
     if (props.entity === 'recurring_invoice') {
       bulkRecurringInvoices(resourceIds, 'bulk_update', {
         column,
-        new_value: newColumnValue as string | number | boolean,
+        new_value: newColumnValue,
       }).then(() => handleOnClose());
     }
 
@@ -290,7 +277,7 @@ export function BulkUpdatesAction(props: Props) {
 
             {getFieldType() === 'taxSelector' && (
               <TaxRateSelector
-                defaultValue={scalarColumnValue}
+                defaultValue={newColumnValue}
                 onChange={(value) =>
                   value?.resource &&
                   setNewColumnValue(
@@ -313,7 +300,7 @@ export function BulkUpdatesAction(props: Props) {
 
             {getFieldType() === 'industrySelector' && (
               <SelectField
-                value={scalarColumnValue}
+                value={newColumnValue}
                 onValueChange={(value) => setNewColumnValue(value)}
                 withBlank
               >
@@ -329,7 +316,7 @@ export function BulkUpdatesAction(props: Props) {
 
             {getFieldType() === 'sizeSelector' && (
               <SelectField
-                value={scalarColumnValue}
+                value={newColumnValue}
                 onValueChange={(value) => setNewColumnValue(value)}
                 withBlank
               >
@@ -345,7 +332,7 @@ export function BulkUpdatesAction(props: Props) {
 
             {getFieldType() === 'remainingCyclesSelector' && (
               <SelectField
-                value={scalarColumnValue}
+                value={newColumnValue}
                 onValueChange={(value) => setNewColumnValue(value)}
               >
                 <option value="-1">{t('endless')}</option>
@@ -369,7 +356,7 @@ export function BulkUpdatesAction(props: Props) {
               company?.custom_fields?.[getCustomFieldKey()] && (
                 <CustomField
                   field={getCustomFieldKey()}
-                  defaultValue={scalarColumnValue}
+                  defaultValue={newColumnValue}
                   value={company.custom_fields[getCustomFieldKey()]}
                   onValueChange={(value) => setNewColumnValue(value)}
                   fieldOnly
@@ -424,14 +411,6 @@ export function BulkUpdatesAction(props: Props) {
                 onChange={(client) => setNewColumnValue(client.id)}
                 onClearButtonClick={() => setNewColumnValue('')}
                 withoutAction
-              />
-            )}
-
-            {getFieldType() === 'tagSelector' && props.entity === 'task' && (
-              <TagPillSelector
-                entityType={TAG_ENTITY_TYPES.task}
-                value={Array.isArray(newColumnValue) ? newColumnValue : []}
-                onChange={setNewColumnValue}
               />
             )}
           </div>
