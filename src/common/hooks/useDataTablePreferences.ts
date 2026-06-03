@@ -17,7 +17,6 @@ import { PerPage } from '$app/components/DataTable';
 import { isEqual } from 'lodash';
 import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
 import { useCurrentUser } from './useCurrentUser';
-import { useLocation } from 'react-router-dom';
 import {
   useReactSettings,
   useSaveReactSettings,
@@ -125,8 +124,6 @@ export function useDataTablePreferences(params: Params) {
     saveSettings(`table_filters.${tableKey}`, cleanedUpFilters);
   };
 
-  const { pathname } = useLocation();
-
   // Apply saved table preferences once per table key.
   const appliedRef = useRef<boolean>(false);
   useEffect(() => {
@@ -141,13 +138,7 @@ export function useDataTablePreferences(params: Params) {
     if (!isHydrated || appliedRef.current) return;
 
     if (!isInitialConfiguration && !customFilter) {
-      if (tableKey !== 'invoices') {
-        setFilter((getPreference('filter') as string) || '');
-      }
-
-      if (tableKey === 'invoices' && pathname.endsWith('/invoices')) {
-        setFilter((getPreference('filter') as string) || '');
-      }
+      setFilter((getPreference('filter') as string) || '');
 
       if (customFilters) {
         if ((getPreference('customFilter') as string[]).length) {

@@ -53,6 +53,7 @@ export default function Quotes() {
       linkToCreateGuards={[permission('create_quote')]}
       hideEditableOptions={!hasPermission('edit_quote')}
       withoutPageAsPreference
+      enableSavingFilterPreference
     />
   );
 }
