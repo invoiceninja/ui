@@ -7,10 +7,7 @@
 
 import { request as playwrightRequest } from '@playwright/test';
 
-import {
-  emailForCurrentAccount,
-  passwordForCurrentAccount,
-} from './accounts';
+import { emailForCurrentAccount, passwordForCurrentAccount } from './accounts';
 
 const ENTITY_ENDPOINTS = [
   'invoices',
@@ -35,6 +32,26 @@ const ENTITY_ENDPOINTS = [
 ] as const;
 
 export type EntityType = (typeof ENTITY_ENDPOINTS)[number];
+
+const RESET_PURGE_ENDPOINTS: EntityType[] = [
+  'invoices',
+  'recurring_invoices',
+  'quotes',
+  'credits',
+  'purchase_orders',
+  'expenses',
+  'recurring_expenses',
+  'payments',
+  'tasks',
+  'projects',
+  'vendors',
+  'clients',
+  'products',
+  'bank_transactions',
+  'task_schedulers',
+  'group_settings',
+  'expense_categories',
+];
 
 export interface ApiContext {
   baseUrl: string;
@@ -75,7 +92,9 @@ export async function createApiContext(
 
   if (!token) {
     throw new Error(
-      `Could not extract token from login response: ${JSON.stringify(body).slice(0, 200)}`
+      `Could not extract token from login response: ${JSON.stringify(
+        body
+      ).slice(0, 200)}`
     );
   }
 
@@ -183,7 +202,10 @@ export async function createEntityViaApi(
     const text = await response.text();
     await context.dispose();
     throw new Error(
-      `Failed to create ${entityType} (${response.status()}): ${text.slice(0, 300)}`
+      `Failed to create ${entityType} (${response.status()}): ${text.slice(
+        0,
+        300
+      )}`
     );
   }
 
@@ -261,9 +283,13 @@ export async function createExpenseCategoryViaApi(
   api: ApiContext,
   opts: { name: string }
 ): Promise<{ id: string; name: string }> {
-  const entity = await createEntityViaApi(api, 'expense_categories' as EntityType, {
-    name: opts.name,
-  });
+  const entity = await createEntityViaApi(
+    api,
+    'expense_categories' as EntityType,
+    {
+      name: opts.name,
+    }
+  );
   return { id: entity.id as string, name: entity.name as string };
 }
 
@@ -287,7 +313,7 @@ export async function createTaxRateViaApi(
  * Deletes in dependency order (invoices/payments first, then clients/vendors).
  */
 export async function purgeAllEntities(api: ApiContext): Promise<void> {
-  for (const entityType of ENTITY_ENDPOINTS) {
+  for (const entityType of RESET_PURGE_ENDPOINTS) {
     try {
       const ids = await fetchEntityIds(api, entityType);
       if (ids.length > 0) {
@@ -402,8 +428,7 @@ export async function restoreDeletedUsers(api: ApiContext): Promise<void> {
     .filter(
       (u) =>
         seedUserNames.some(
-          (name) =>
-            `${u.first_name} ${u.last_name}`.trim() === name
+          (name) => `${u.first_name} ${u.last_name}`.trim() === name
         ) && u.is_deleted
     )
     .map((u) => u.id);
@@ -462,7 +487,9 @@ export async function ensurePermissionUserExists(
     );
   }
 
-  console.log(`  Created missing user ${email} (${derivedFirst} ${derivedLast})`);
+  console.log(
+    `  Created missing user ${email} (${derivedFirst} ${derivedLast})`
+  );
   return userId;
 }
 

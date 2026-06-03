@@ -25,6 +25,7 @@ function positiveInt(value: string | undefined, fallback: number) {
  */
 export default defineConfig({
   testDir: './tests/e2e',
+  globalSetup: './tests/e2e/global-setup',
   /* Maximum time one test can run for. */
   timeout: 30000,
   expect: {

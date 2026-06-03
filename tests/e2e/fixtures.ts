@@ -15,6 +15,7 @@
 import { test as base } from '@playwright/test';
 import { config } from 'dotenv';
 import {
+  bulkAction,
   createApiContext,
   fetchEntityByName,
   getCompanySettings,
@@ -46,7 +47,10 @@ export function uniqueName(prefix: string): string {
  * Extract an entity ID from a Playwright page URL.
  * Matches patterns like /invoices/ABC123/edit or /settings/schedules/ABC123/edit
  */
-export function extractIdFromUrl(url: string, entityPath: string): string | null {
+export function extractIdFromUrl(
+  url: string,
+  entityPath: string
+): string | null {
   const regex = new RegExp(`${entityPath}/([^/]+?)(/edit)?$`);
   const match = url.match(regex);
   return match ? match[1] : null;
@@ -57,10 +61,32 @@ interface TrackedEntity {
   id: string;
 }
 
+const TRACKED_ENTITY_CLEANUP_ORDER: EntityType[] = [
+  'bank_transactions',
+  'invoices',
+  'recurring_invoices',
+  'quotes',
+  'credits',
+  'purchase_orders',
+  'expenses',
+  'recurring_expenses',
+  'payments',
+  'tasks',
+  'task_schedulers',
+  'projects',
+  'vendors',
+  'clients',
+  'products',
+  'group_settings',
+  'expense_categories',
+  'designs',
+  'tags',
+];
+
 export interface ApiFixture {
   context: ApiContext;
   /**
-   * Track an entity created by the test. Full cleanup happens in each spec via resetAccountBeforeAll().
+   * Track an entity created by the test. Tracked entities are cleaned up after the test.
    */
   trackEntity: (type: EntityType, id: string) => void;
   /**
@@ -84,12 +110,15 @@ export interface SettingsFixture {
   snapshot: () => Promise<void>;
 }
 
-export const test = base.extend<{
-  api: ApiFixture;
-  settingsGuard: SettingsFixture;
-}, {
-  account: TestAccount;
-}>({
+export const test = base.extend<
+  {
+    api: ApiFixture;
+    settingsGuard: SettingsFixture;
+  },
+  {
+    account: TestAccount;
+  }
+>({
   account: [
     async ({}, use, workerInfo) => {
       const account = accountForParallelIndex(workerInfo.parallelIndex);
@@ -147,6 +176,8 @@ export const test = base.extend<{
     };
 
     await use(fixture);
+
+    await cleanupTrackedEntities(context, tracked);
   },
 
   settingsGuard: async ({ account }, use) => {
@@ -186,6 +217,49 @@ export const test = base.extend<{
 });
 
 export const RESET_ACCOUNT_TIMEOUT = 180_000;
+
+async function cleanupTrackedEntities(
+  context: ApiContext,
+  tracked: TrackedEntity[]
+) {
+  if (tracked.length === 0) return;
+
+  const idsByType = new Map<EntityType, Set<string>>();
+
+  for (const { type, id } of tracked) {
+    if (!idsByType.has(type)) {
+      idsByType.set(type, new Set());
+    }
+
+    idsByType.get(type)?.add(id);
+  }
+
+  for (const type of TRACKED_ENTITY_CLEANUP_ORDER) {
+    const ids = idsByType.get(type);
+
+    if (!ids?.size) continue;
+
+    await cleanupTrackedEntityType(context, type, [...ids]);
+    idsByType.delete(type);
+  }
+
+  for (const [type, ids] of idsByType) {
+    await cleanupTrackedEntityType(context, type, [...ids]);
+  }
+}
+
+async function cleanupTrackedEntityType(
+  context: ApiContext,
+  type: EntityType,
+  ids: string[]
+) {
+  try {
+    await bulkAction(context, type, ids, 'archive');
+    await bulkAction(context, type, ids, 'delete');
+  } catch (error) {
+    console.warn(`  Failed to clean up tracked ${type}: ${error}`);
+  }
+}
 
 export function resetAccountBeforeAll(timeout = RESET_ACCOUNT_TIMEOUT) {
   test.beforeAll(async ({ account }, testInfo) => {
