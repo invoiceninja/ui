@@ -59,15 +59,13 @@ export function permissions(page: Page) {
     await page.locator('#filter').fill(resolvedEmail);
 
     const tableBody = page.locator('tbody').first();
+    const matchingRow = tableBody
+      .locator('tr')
+      .filter({ hasText: resolvedEmail })
+      .first();
 
-    // The filter input has a 300ms debounce before the API request fires.
-    // Wait well past it so the table reflects the filtered results before
-    // clicking — the link text is the user's name, not the email, so we
-    // cannot use hasText to distinguish filtered from unfiltered rows.
-    await page.waitForTimeout(500);
-
-    await tableBody.getByRole('link').first().waitFor({ state: 'visible', timeout: 10000 });
-    await tableBody.getByRole('link').first().click();
+    await matchingRow.waitFor({ state: 'visible', timeout: 10000 });
+    await matchingRow.getByRole('link').first().click();
 
     const passwordField = page.locator('#current_password');
     const permissionsButton = page.getByRole('button', { name: 'Permissions' });
