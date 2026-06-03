@@ -40,8 +40,11 @@ class Toast {
   }
 
   info(message: string, replaceable = {}, duration = 8000): Toast {
+    if (this.currentId) {
+      helper.dismiss(this.currentId);
+    }
+
     this.currentId = helper(trans(message, replaceable), {
-      id: this.currentId,
       duration,
       icon: React.createElement(MdInfoOutline, {
         size: 20,
