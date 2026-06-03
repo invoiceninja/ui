@@ -12,12 +12,6 @@ import { test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
-import { createApiContext, ensurePermissionUserExists } from './api-helpers';
-
-test.beforeAll(async () => {
-  const api = await createApiContext(process.env.VITE_API_URL!);
-  await ensurePermissionUserExists(api, 'tasks@example.com', 'Tasks', 'Example');
-});
 
 interface Params {
   permissions: Permission[];

@@ -8,13 +8,23 @@ import { config } from 'dotenv';
 config({ path: '.env.testing', override: true });
 config();
 
+const accountCount = positiveInt(
+  process.env.PLAYWRIGHT_ACCOUNT_COUNT || process.env.E2E_ACCOUNT_COUNT,
+  8
+);
+const workerCount = positiveInt(process.env.PLAYWRIGHT_WORKERS, accountCount);
+
+function positiveInt(value: string | undefined, fallback: number) {
+  const parsed = Number.parseInt(value || '', 10);
+
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
   testDir: './tests/e2e',
-  /* Reset API state before running the test suite. */
-  globalSetup: './tests/e2e/global-setup.ts',
   /* Maximum time one test can run for. */
   timeout: 30000,
   expect: {
@@ -24,14 +34,14 @@ export default defineConfig({
      */
     timeout: 5000,
   },
-  /* Tests share API state — run serially to prevent race conditions. */
+  /* Spec files run in parallel, while tests inside each spec file run serially. */
   fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 1,
-  /* Serial execution — tests share API state and permission users. */
-  workers: 1,
+  /* Default to one worker per configured account lane. */
+  workers: workerCount,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI ? 'github' : 'list',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */

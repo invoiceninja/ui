@@ -6,35 +6,11 @@
  */
 
 import { config } from 'dotenv';
-import {
-  createApiContext,
-  purgeAllEntities,
-  purgeSchedules,
-  purgeGroupSettings,
-  resetPermissionUser,
-  restoreDeletedUsers,
-  resetCompanySettings,
-  ensurePermissionUserExists,
-} from './api-helpers';
+import { getConfiguredTestAccounts } from './accounts';
+import { resetTestAccount } from './account-reset';
 
 config({ path: '.env.testing', override: true });
 config();
-
-const PERMISSION_EMAILS = [
-  'permissions@example.com',
-  'invoices@example.com',
-  'clients@example.com',
-  'products@example.com',
-  'projects@example.com',
-  'vendors@example.com',
-  'expenses@example.com',
-  'credits@example.com',
-  'tasks@example.com',
-  'quotes@example.com',
-  'payments@example.com',
-  'purchase_orders@example.com',
-  'bank_transactions@example.com',
-];
 
 async function globalSetup() {
   const apiUrl = process.env.VITE_API_URL;
@@ -49,30 +25,10 @@ async function globalSetup() {
   console.log(`  API URL: ${apiUrl}`);
 
   try {
-    const api = await createApiContext(apiUrl);
-
-    // 1. Reset company settings modified by tests
-    await resetCompanySettings(api);
-
-    // 2. Purge schedules and group settings
-    await purgeSchedules(api);
-    await purgeGroupSettings(api);
-
-    // 3. Restore any deleted seed users
-    await restoreDeletedUsers(api);
-
-    // 4. Ensure all permission users exist (create if missing from seed)
-    for (const email of PERMISSION_EMAILS) {
-      await ensurePermissionUserExists(api, email);
-    }
-
-    // 5. Reset permissions for all test users
-    for (const email of PERMISSION_EMAILS) {
-      await resetPermissionUser(api, email);
-    }
-
-    // 6. Purge all entities to get a clean state
-    await purgeAllEntities(api);
+    const accounts = getConfiguredTestAccounts(apiUrl);
+    await Promise.all(
+      accounts.map((account) => resetTestAccount(account, 'suite setup'))
+    );
 
     console.log('API state reset complete.\n');
   } catch (error) {

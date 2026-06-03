@@ -7,6 +7,11 @@
 
 import { request as playwrightRequest } from '@playwright/test';
 
+import {
+  emailForCurrentAccount,
+  passwordForCurrentAccount,
+} from './accounts';
+
 const ENTITY_ENDPOINTS = [
   'invoices',
   'recurring_invoices',
@@ -26,6 +31,7 @@ const ENTITY_ENDPOINTS = [
   'group_settings',
   'expense_categories',
   'designs',
+  'tags',
 ] as const;
 
 export type EntityType = (typeof ENTITY_ENDPOINTS)[number];
@@ -45,6 +51,8 @@ export async function createApiContext(
   email = 'user@example.com',
   password = 'password'
 ): Promise<ApiContext> {
+  const resolvedEmail = emailForCurrentAccount(email);
+  const resolvedPassword = passwordForCurrentAccount(password);
   const context = await playwrightRequest.newContext({ baseURL: apiUrl });
 
   const response = await context.post('/api/v1/login', {
@@ -52,7 +60,7 @@ export async function createApiContext(
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },
-    data: { email, password },
+    data: { email: resolvedEmail, password: resolvedPassword },
   });
 
   if (!response.ok()) {

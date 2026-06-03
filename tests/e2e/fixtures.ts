@@ -1,14 +1,14 @@
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
- * Custom Playwright fixtures that provide automatic API cleanup after each test.
+ * Custom Playwright fixtures that assign worker account lanes and provide API helpers.
  *
  * Usage in test files:
  *   import { test, expect, uniqueName } from '$tests/e2e/fixtures';
  *
  *   test('my test', async ({ page, api }) => {
  *     const name = uniqueName('my-entity');
- *     // Use api.createEntity() / api.trackEntity() for automatic cleanup
+ *     // Use api.createEntity() for API setup in the current worker account
  *   });
  */
 
@@ -16,13 +16,19 @@ import { test as base } from '@playwright/test';
 import { config } from 'dotenv';
 import {
   createApiContext,
-  bulkAction,
   fetchEntityByName,
   getCompanySettings,
   putCompanySettings,
   type ApiContext,
   type EntityType,
 } from './api-helpers';
+import {
+  accountForParallelIndex,
+  clearCurrentTestAccount,
+  setCurrentTestAccount,
+  type TestAccount,
+} from './accounts';
+import { resetTestAccount } from './account-reset';
 
 config({ path: '.env.testing', override: true });
 config();
@@ -54,15 +60,15 @@ interface TrackedEntity {
 export interface ApiFixture {
   context: ApiContext;
   /**
-   * Track an entity for automatic cleanup after the test.
+   * Track an entity created by the test. Full cleanup happens at worker startup only.
    */
   trackEntity: (type: EntityType, id: string) => void;
   /**
-   * Look up an entity by name via API and track it for cleanup.
+   * Look up an entity by name via API and track it for compatibility.
    */
   trackEntityByName: (type: EntityType, name: string) => Promise<void>;
   /**
-   * Create an entity via API and automatically track it for cleanup.
+   * Create an entity via API in the current worker account.
    */
   createEntity: (
     type: EntityType,
@@ -81,14 +87,28 @@ export interface SettingsFixture {
 export const test = base.extend<{
   api: ApiFixture;
   settingsGuard: SettingsFixture;
+}, {
+  account: TestAccount;
 }>({
-  api: async ({}, use) => {
-    const apiUrl = process.env.VITE_API_URL;
-    if (!apiUrl) {
-      throw new Error('VITE_API_URL must be set for API fixture');
-    }
+  account: [
+    async ({}, use, workerInfo) => {
+      const account = accountForParallelIndex(workerInfo.parallelIndex);
+      setCurrentTestAccount(account);
+      await resetTestAccount(account, 'worker startup');
 
-    const context = await createApiContext(apiUrl);
+      await use(account);
+
+      clearCurrentTestAccount();
+    },
+    { auto: true, scope: 'worker' },
+  ],
+
+  api: async ({ account }, use) => {
+    const context = await createApiContext(
+      account.apiUrl,
+      account.ownerEmail,
+      account.password
+    );
     const tracked: TrackedEntity[] = [];
 
     const fixture: ApiFixture = {
@@ -129,63 +149,20 @@ export const test = base.extend<{
     };
 
     await use(fixture);
-
-    // Cleanup: delete all tracked entities in reverse dependency order
-    const byType = new Map<EntityType, string[]>();
-    for (const { type, id } of tracked) {
-      if (!byType.has(type)) {
-        byType.set(type, []);
-      }
-      byType.get(type)!.push(id);
-    }
-
-    const deleteOrder: EntityType[] = [
-      'payments',
-      'invoices',
-      'recurring_invoices',
-      'quotes',
-      'credits',
-      'purchase_orders',
-      'expenses',
-      'recurring_expenses',
-      'tasks',
-      'projects',
-      'bank_transactions',
-      'task_schedulers',
-      'group_settings',
-      'designs',
-      'expense_categories',
-      'products',
-      'vendors',
-      'clients',
-    ];
-
-    for (const type of deleteOrder) {
-      const ids = byType.get(type);
-      if (ids && ids.length > 0) {
-        try {
-          await bulkAction(context, type, ids, 'archive');
-          await bulkAction(context, type, ids, 'delete');
-        } catch {
-          // Best effort cleanup
-        }
-      }
-    }
   },
 
-  settingsGuard: async ({}, use) => {
-    const apiUrl = process.env.VITE_API_URL;
-    if (!apiUrl) {
-      throw new Error('VITE_API_URL must be set for settings fixture');
-    }
-
+  settingsGuard: async ({ account }, use) => {
     let savedCompanyId: string | undefined;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let savedSettings: Record<string, any> | undefined;
 
     const fixture: SettingsFixture = {
       async snapshot() {
-        const api = await createApiContext(apiUrl);
+        const api = await createApiContext(
+          account.apiUrl,
+          account.ownerEmail,
+          account.password
+        );
         const { companyId, settings } = await getCompanySettings(api);
         savedCompanyId = companyId;
         savedSettings = { ...settings };
@@ -197,7 +174,11 @@ export const test = base.extend<{
     // Restore settings on teardown if a snapshot was taken
     if (savedCompanyId && savedSettings) {
       try {
-        const api = await createApiContext(apiUrl);
+        const api = await createApiContext(
+          account.apiUrl,
+          account.ownerEmail,
+          account.password
+        );
         await putCompanySettings(api, savedCompanyId, savedSettings);
       } catch {
         // Best effort

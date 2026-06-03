@@ -1,13 +1,18 @@
 import { login } from '$tests/e2e/helpers';
-import { test, expect } from '$tests/e2e/fixtures';
-import { createClientViaApi, createApiContext } from './api-helpers';
+import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { createClientViaApi } from './api-helpers';
 
-test.beforeAll(async () => {
-  const api = await createApiContext(process.env.VITE_API_URL!);
-
+test.beforeEach(async ({ api }) => {
   // The combobox tests need clients to exist for the /testing page combobox
-  await createClientViaApi(api, { name: 'test merge one' });
-  await createClientViaApi(api, { name: 'test merge two' });
+  const firstClient = await createClientViaApi(api.context, {
+    name: uniqueName('test merge one'),
+  });
+  const secondClient = await createClientViaApi(api.context, {
+    name: uniqueName('test merge two'),
+  });
+
+  api.trackEntity('clients', firstClient.id);
+  api.trackEntity('clients', secondClient.id);
 });
 
 test('ComboBox Async value selecting', async ({ page }) => {
