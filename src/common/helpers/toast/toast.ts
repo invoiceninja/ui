@@ -10,6 +10,8 @@
 
 import { trans } from '$app/common/helpers';
 import { t } from 'i18next';
+import React from 'react';
+import { MdInfoOutline } from 'react-icons/md';
 import { toast as helper } from 'react-hot-toast';
 
 class Toast {
@@ -33,6 +35,19 @@ class Toast {
 
   error(message = 'error_title'): Toast {
     this.currentId = helper.error(t(message), { id: this.currentId });
+
+    return this;
+  }
+
+  info(message: string, replaceable = {}, duration = 8000): Toast {
+    this.currentId = helper(trans(message, replaceable), {
+      id: this.currentId,
+      duration,
+      icon: React.createElement(MdInfoOutline, {
+        size: 20,
+        color: '#3b82f6',
+      }),
+    });
 
     return this;
   }
