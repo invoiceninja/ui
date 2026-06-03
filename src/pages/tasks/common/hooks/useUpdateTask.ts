@@ -17,7 +17,6 @@ import { isOverlapping } from '../helpers/is-overlapping';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { serializeTagsPayload } from '$app/common/helpers/tags';
 
 interface Params {
   isFormBusy: boolean;
@@ -38,11 +37,7 @@ export function useUpdateTask(params: Params) {
         return toast.error('task_errors');
       }
 
-      request(
-        'PUT',
-        endpoint('/api/v1/tasks/:id', { id: task.id }),
-        serializeTagsPayload(task)
-      )
+      request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task)
         .then(() => {
           toast.success('updated_task');
           $refetch(['tasks']);
