@@ -863,7 +863,7 @@ test('Second and Third Custom email sending template is displayed', async ({
     .getByRole('link', { name: 'Templates & Reminders', exact: true })
     .click();
 
-  await page.getByRole('combobox').first().waitFor({ state: 'visible', timeout: 5000 });
+  // await page.getByRole('combobox').first().waitFor({ state: 'visible', timeout: 5000 });
 
   const selectTemplate = async (name: string) => {
     const templateField = page.getByRole('combobox').first();
@@ -871,7 +871,10 @@ test('Second and Third Custom email sending template is displayed', async ({
     await page.getByText(name, { exact: true }).click();
   };
 
-  await selectTemplate('Second Custom');
+  // await selectTemplate('Second Custom');
+
+  await page.getByRole('button', { name: 'Custom' }).click();
+  await page.getByRole('button', { name: 'Second Custom' }).click();
 
   const secondSubject = uniqueName('second-custom');
   await page.locator('#subject').fill(secondSubject);
@@ -883,7 +886,11 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
 
-  await selectTemplate('Third Custom');
+  // await selectTemplate('Third Custom');
+
+
+  // await page.getByRole('button', { name: 'Custom' }).click();
+  await page.getByRole('button', { name: 'Third Custom' }).click();
 
   const thirdSubject = uniqueName('third-custom');
   await page.locator('#subject').fill(thirdSubject);
