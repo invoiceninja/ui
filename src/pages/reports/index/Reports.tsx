@@ -434,6 +434,8 @@ export default function Reports() {
     setErrors(undefined);
     setPreview(null);
 
+    toast.processing();
+
     const { client_id } = report.payload;
 
     let updatedPayload =
@@ -446,8 +448,8 @@ export default function Reports() {
 
     updatedPayload = { ...updatedPayload, report_keys: reportKeys };
 
-    request('POST', endpoint(report.preview), updatedPayload, {}).then(
-      (response) => {
+    request('POST', endpoint(report.preview), updatedPayload, {})
+      .then((response) => {
         const hash = response.data.message as string;
 
         queryClient
@@ -474,9 +476,23 @@ export default function Reports() {
             });
 
             toast.success();
+
+            requestAnimationFrame(() => {
+              document.getElementById('preview-table')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+              });
+            });
+          })
+          .catch((e) => {
+            console.error(e);
+
+            toast.info('report_too_large_to_preview');
           });
-      }
-    );
+      })
+      .catch(() => {
+        toast.dismiss();
+      });
   };
 
   useEffect(() => {
