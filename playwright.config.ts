@@ -107,8 +107,9 @@ export default defineConfig({
   // },
 
   webServer: {
-    command: 'npx vite --mode testing --port 4173',
+    command: 'npx vite build --mode testing && npx vite preview --port 4173',
     port: 4173,
     reuseExistingServer: true,
+    timeout: 180_000,
   },
 });
