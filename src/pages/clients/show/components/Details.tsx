@@ -14,7 +14,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Client } from '$app/common/interfaces/client';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
-import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetSettingWithLevel } from '$app/common/hooks/useGetSetting';
 import { route } from '$app/common/helpers/route';
 import { CustomFields, useCustomField } from '$app/components/CustomField';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
@@ -25,7 +25,6 @@ import { PaymentTermsBadge } from './PaymentTermsBadge';
 import { TaxDataModal } from './TaxDataModal';
 import { TaxExemptBadge } from './TaxExemptBadge';
 import { Settings } from '$app/common/interfaces/company.interface';
-import { useGroupSettingsQuery } from '$app/common/queries/group-settings';
 
 interface Props {
   client: Client;
@@ -39,8 +38,7 @@ export function Details(props: Props) {
   const colors = useColorScheme();
   const company = useCurrentCompany();
 
-  const getSetting = useGetSetting();
-  const { data: groupSettings } = useGroupSettingsQuery({ perPage: 1000 });
+  const getSettingWithLevel = useGetSettingWithLevel();
   const formatMoney = useFormatMoney();
   const customField = useCustomField();
   const formatCustomFieldValue = useFormatCustomFieldValue();
@@ -57,21 +55,7 @@ export function Details(props: Props) {
   };
 
   const getTestingSettingText = (propertyKey: keyof Settings) => {
-    const value = getSetting(client, propertyKey);
-    let level = 'Company';
-
-    if (client.settings[propertyKey] !== undefined) {
-      level = 'Client';
-    } else if (
-      client.group_settings?.settings[propertyKey] !== undefined ||
-      (client.group_settings_id &&
-        groupSettings?.some(
-          ({ id, settings }) =>
-            id === client.group_settings_id && settings[propertyKey] !== undefined
-        ))
-    ) {
-      level = 'Group';
-    }
+    const { value, level } = getSettingWithLevel(client, propertyKey);
 
     return level + ': ' + String(value);
   };
