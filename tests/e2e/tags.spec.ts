@@ -1,12 +1,14 @@
 import { login, logout, waitForTableData } from '$tests/e2e/helpers';
 import {
-  test,
+  resetAccountBeforeAll, test,
   expect,
   uniqueName,
   extractIdFromUrl,
 } from '$tests/e2e/fixtures';
 import { bulkAction, type EntityType } from '$tests/e2e/api-helpers';
 import { Page } from '@playwright/test';
+
+resetAccountBeforeAll();
 
 /**
  * Tags live under Settings → Tags and are split into two entity types,

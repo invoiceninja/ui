@@ -60,7 +60,7 @@ interface TrackedEntity {
 export interface ApiFixture {
   context: ApiContext;
   /**
-   * Track an entity created by the test. Full cleanup happens at worker startup only.
+   * Track an entity created by the test. Full cleanup happens in each spec via resetAccountBeforeAll().
    */
   trackEntity: (type: EntityType, id: string) => void;
   /**
@@ -94,8 +94,6 @@ export const test = base.extend<{
     async ({}, use, workerInfo) => {
       const account = accountForParallelIndex(workerInfo.parallelIndex);
       setCurrentTestAccount(account);
-      await resetTestAccount(account, 'worker startup');
-
       await use(account);
 
       clearCurrentTestAccount();
@@ -186,5 +184,14 @@ export const test = base.extend<{
     }
   },
 });
+
+export const RESET_ACCOUNT_TIMEOUT = 180_000;
+
+export function resetAccountBeforeAll(timeout = RESET_ACCOUNT_TIMEOUT) {
+  test.beforeAll(async ({ account }, testInfo) => {
+    test.setTimeout(timeout);
+    await resetTestAccount(account, 'before ' + testInfo.file);
+  });
+}
 
 export { expect } from '@playwright/test';

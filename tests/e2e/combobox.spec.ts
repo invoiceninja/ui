@@ -1,6 +1,8 @@
 import { login } from '$tests/e2e/helpers';
-import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { createClientViaApi } from './api-helpers';
+
+resetAccountBeforeAll();
 
 test.beforeEach(async ({ api }) => {
   // The combobox tests need clients to exist for the /testing page combobox
