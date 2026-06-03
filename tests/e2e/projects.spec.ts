@@ -741,7 +741,7 @@ test('Invoice Project displayed with admin permission', async ({
   await checkDropdownActions(
     page,
     customActions,
-    undefined,
+    'bulkActionsDropdown',
     'dataTable'
   );
 
@@ -801,7 +801,7 @@ test('Invoice Project displayed with creation permissions', async ({
   await checkDropdownActions(
     page,
     customActions,
-    undefined,
+    'bulkActionsDropdown',
     'dataTable'
   );
 

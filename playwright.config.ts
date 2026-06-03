@@ -99,10 +99,16 @@ export default defineConfig({
   /* Serve the production build for tests.
    * Build first with: npx vite build --mode testing
    * This ensures VITE_* vars are loaded from .env.testing */
+  // webServer: {
+  //   command: 'npx vite build --mode testing && npx vite preview',
+  //   port: 4173,
+  //   reuseExistingServer: true,
+  //   timeout: 180_000, // give the build ~3 min to settle
+  // },
+
   webServer: {
-    command: 'npx vite build --mode testing && npx vite preview',
+    command: 'npx vite --mode testing --port 4173',
     port: 4173,
     reuseExistingServer: true,
-    timeout: 180_000, // give the build ~3 min to settle
   },
 });
