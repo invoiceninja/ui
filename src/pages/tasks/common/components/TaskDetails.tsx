@@ -22,6 +22,7 @@ import { UserSelector } from '$app/components/users/UserSelector';
 import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
 import { TaskStatus as TaskStatusBadge } from './TaskStatus';
 import { useStart } from '../hooks/useStart';
+import { useResume, canResumeLastEntry } from '../hooks/useResume';
 import { useStop } from '../hooks/useStop';
 import { isTaskRunning } from '../helpers/calculate-entity-state';
 import { formatTime, TaskClock } from '../../kanban/components/TaskClock';
@@ -30,7 +31,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { route } from '$app/common/helpers/route';
 import { Icon } from '$app/components/icons/Icon';
-import { MdLaunch } from 'react-icons/md';
+import { MdLaunch, MdPlayCircle } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
@@ -66,6 +67,7 @@ export function TaskDetails(props: Props) {
 
   const stop = useStop();
   const start = useStart();
+  const resume = useResume();
 
   const calculation = calculateTime(task.time_log, {
     inSeconds: true,
@@ -110,8 +112,21 @@ export function TaskDetails(props: Props) {
                     color={colors.$1}
                     filledColor={colors.$1}
                   />
-
                   <span style={{ color: colors.$1 }}>{t('start')}</span>
+                </div>
+              </Button>
+            )}
+
+            {!isTaskRunning(task) && !task.invoice_id && canResumeLastEntry(task) && (
+              <Button
+                behavior="button"
+                onClick={() => resume(task)}
+                disableWithoutIcon
+                disabled={!hasPermission('edit_task') && !entityAssigned(task)}
+              >
+                <div className="flex items-center gap-2">
+                  <Icon element={MdPlayCircle} size={18} color={colors.$1} />
+                  <span style={{ color: colors.$1 }}>{t('resume')}</span>
                 </div>
               </Button>
             )}
@@ -129,7 +144,6 @@ export function TaskDetails(props: Props) {
                     filledColor={colors.$1}
                     size="1.1rem"
                   />
-
                   <span style={{ color: colors.$1 }}>{t('stop')}</span>
                 </div>
               </Button>
@@ -177,8 +191,23 @@ export function TaskDetails(props: Props) {
                       color={colors.$1}
                       filledColor={colors.$1}
                     />
-
                     <span style={{ color: colors.$1 }}>{t('start')}</span>
+                  </div>
+                </Button>
+              )}
+
+              {!isTaskRunning(task) && !task.invoice_id && canResumeLastEntry(task) && (
+                <Button
+                  behavior="button"
+                  onClick={() => resume(task)}
+                  disableWithoutIcon
+                  disabled={
+                    !hasPermission('edit_task') && !entityAssigned(task)
+                  }
+                >
+                  <div className="flex items-center gap-2">
+                    <Icon element={MdPlayCircle} size={18} color={colors.$1} />
+                    <span style={{ color: colors.$1 }}>{t('resume')}</span>
                   </div>
                 </Button>
               )}
@@ -198,7 +227,6 @@ export function TaskDetails(props: Props) {
                       filledColor={colors.$1}
                       size="1.1rem"
                     />
-
                     <span style={{ color: colors.$1 }}>{t('stop')}</span>
                   </div>
                 </Button>
