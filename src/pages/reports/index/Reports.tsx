@@ -21,7 +21,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   SortableColumns,
@@ -29,7 +29,6 @@ import {
 } from '../common/components/SortableColumns';
 import { Identifier, Payload, Report, useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
-import collect from 'collect.js';
 import { isCancelledError, useQueryClient } from 'react-query';
 import { useAtom } from 'jotai';
 import {
@@ -61,6 +60,7 @@ import { cloneDeep } from 'lodash';
 import { ActivitySelector } from '$app/components/layouts/ActivitySelector';
 import { TemplateSelector } from '../common/components/TemplateSelector';
 import { useGroupByOptions } from '../common/hooks/useGroupByOptions';
+import type { Record as ReportColumnRecord } from '$app/common/constants/exports/client-map';
 
 interface Range {
   identifier: string;
@@ -211,12 +211,15 @@ export default function Reports() {
   const queryClient = useQueryClient();
 
   const scheduleReport = useScheduleReport();
-  const { save, preferences } = usePreferences();
+  const { save, preferences, update } = usePreferences();
 
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
   const [errors, setErrors] = useState<ValidationBag>();
   const [showCustomColumns, setShowCustomColumns] = useState(false);
+  const customColumnsDraftsRef = useRef<
+    Partial<Record<Identifier, ReportColumnRecord[][]>>
+  >({});
 
   const [preview, setPreview] = useAtom(previewAtom);
 
@@ -273,6 +276,54 @@ export default function Reports() {
     }));
   };
 
+  const resolveReportColumnData = useCallback(() => {
+    if (!showCustomColumns) {
+      return null;
+    }
+
+    const customColumnsDraft =
+      customColumnsDraftsRef.current[report.identifier];
+
+    if (customColumnsDraft) {
+      return customColumnsDraft;
+    }
+
+    if (report.identifier in preferences.reports.columns) {
+      return preferences.reports.columns[report.identifier];
+    }
+
+    return null;
+  }, [preferences.reports.columns, report.identifier, showCustomColumns]);
+
+  const resolveReportKeys = useCallback(() => {
+    const columns = resolveReportColumnData();
+
+    return columns?.[reportColumn]?.map((record) => record.value) ?? [];
+  }, [resolveReportColumnData]);
+
+  const commitCustomColumnsDraft = useCallback(() => {
+    const customColumnsDraft =
+      customColumnsDraftsRef.current[report.identifier];
+
+    if (!showCustomColumns || !customColumnsDraft) {
+      return;
+    }
+
+    if (Array.isArray(preferences.reports.columns)) {
+      update('preferences.reports.columns', {});
+    }
+
+    update(
+      `preferences.reports.columns.${report.identifier}`,
+      customColumnsDraft.map((group) => [...group])
+    );
+  }, [
+    preferences.reports.columns,
+    report.identifier,
+    showCustomColumns,
+    update,
+  ]);
+
   const handleExport = () => {
     toast.processing();
 
@@ -286,15 +337,8 @@ export default function Reports() {
         ? { ...report.payload, client_id: client_id || null }
         : report.payload;
 
-    let reportKeys: string[] = [];
-
-    if (report.identifier in preferences.reports.columns && showCustomColumns) {
-      reportKeys = collect(
-        preferences.reports.columns[report.identifier][reportColumn]
-      )
-        .pluck('value')
-        .toArray() as string[];
-    }
+    const reportKeys = resolveReportKeys();
+    commitCustomColumnsDraft();
 
     updatedPayload = { ...updatedPayload, report_keys: reportKeys };
 
@@ -404,15 +448,8 @@ export default function Reports() {
         ? { ...report.payload, client_id: client_id || null }
         : report.payload;
 
-    let reportKeys: string[] = [];
-
-    if (report.identifier in preferences.reports.columns && showCustomColumns) {
-      reportKeys = collect(
-        preferences.reports.columns[report.identifier][reportColumn]
-      )
-        .pluck('value')
-        .toArray() as string[];
-    }
+    const reportKeys = resolveReportKeys();
+    commitCustomColumnsDraft();
 
     updatedPayload = { ...updatedPayload, report_keys: reportKeys };
 
@@ -500,7 +537,12 @@ export default function Reports() {
 
           <DropdownElement
             icon={<Icon element={MdSchedule} />}
-            onClick={() => scheduleReport(report, showCustomColumns)}
+            onClick={() => {
+              const reportKeys = resolveReportKeys();
+
+              commitCustomColumnsDraft();
+              scheduleReport(report, showCustomColumns, reportKeys);
+            }}
           >
             {t('schedule')}
           </DropdownElement>
@@ -801,7 +843,9 @@ export default function Reports() {
             <Element leftSide={`${t('customize')} ${t('columns')}`}>
               <Toggle
                 checked={showCustomColumns}
-                onValueChange={(value) => setShowCustomColumns(Boolean(value))}
+                onValueChange={(value) => {
+                  setShowCustomColumns(Boolean(value));
+                }}
               />
             </Element>
           )}
@@ -812,6 +856,12 @@ export default function Reports() {
         <SortableColumns
           report={report.identifier}
           columns={report.custom_columns}
+          draftColumns={
+            customColumnsDraftsRef.current[report.identifier] ?? null
+          }
+          onColumnsChange={(columns) => {
+            customColumnsDraftsRef.current[report.identifier] = columns;
+          }}
         />
       )}
 

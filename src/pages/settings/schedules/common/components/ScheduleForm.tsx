@@ -25,6 +25,7 @@ import { EmailReport } from './EmailReport';
 import { useColorScheme } from '$app/common/colors';
 import { InvoiceOutstandingTasks } from './InvoiceOutstandingTasks';
 import { PaymentSchedule } from './PaymentSchedule';
+import { useEntityNumber } from '../hooks/useEntityNumber';
 
 interface Props {
   schedule: Schedule;
@@ -56,15 +57,29 @@ export function ScheduleForm(props: Props) {
     template: schedule.template as Template,
   });
 
+  const entityNumber = useEntityNumber({
+    entity:
+      schedule.template === Templates.EMAIL_RECORD
+        ? schedule.parameters.entity
+        : undefined,
+    entityId:
+      schedule.template === Templates.EMAIL_RECORD
+        ? schedule.parameters.entity_id
+        : undefined,
+    enabled: Boolean(schedule && page === 'edit' && !schedule.name),
+  });
+
   const getTemplateNameValue = () => {
     if (page === 'create') {
       return '';
     }
 
     if (schedule.template === Templates.EMAIL_RECORD) {
-      return `${t(schedule.template as string)}: ${t(
+      const base = `${t(schedule.template as string)}: ${t(
         schedule.parameters.entity
       )}`;
+
+      return entityNumber ? `${base} #${entityNumber}` : base;
     }
 
     if (schedule.template === Templates.EMAIL_REPORT) {
