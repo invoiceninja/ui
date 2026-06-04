@@ -210,7 +210,7 @@ export class InvoiceItemSum {
     const group: TaxItem = {
       key: taxKey(name, rate),
       total,
-      name: formatTaxName(name, rate, this.precision),
+      name: formatTaxName(name, rate),
       tax_id: taxId,
       tax_rate: rate,
       base_amount: baseAmount,

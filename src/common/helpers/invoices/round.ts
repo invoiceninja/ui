@@ -63,10 +63,6 @@ export function taxKey(name: string, rate: number): string {
   return `${name}${rate}`.replace(/\s/g, '');
 }
 
-export function formatTaxName(
-  name: string,
-  rate: number,
-  precision = 2
-): string {
-  return `${name} ${parseFloat(rate.toFixed(precision))} %`;
+export function formatTaxName(name: string, rate: number): string {
+  return `${name} ${parseFloat(rate.toString())} %`;
 }

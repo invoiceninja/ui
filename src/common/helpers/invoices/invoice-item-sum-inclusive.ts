@@ -211,7 +211,7 @@ export class InvoiceItemSumInclusive {
     const group: TaxItem = {
       key: taxKey(name, rate),
       total,
-      name: formatTaxName(name, rate, this.precision),
+      name: formatTaxName(name, rate),
       tax_id: taxId,
       tax_rate: rate,
       base_amount:
@@ -395,7 +395,7 @@ export class InvoiceItemSumInclusive {
         this.groupTax(name, rate, taxComponent, surchargeTotal, taxId);
         this.customSurchargeNetMap.push({
           key: taxKey(name, rate),
-          name: formatTaxName(name, rate, this.precision),
+          name: formatTaxName(name, rate),
           total: netComponent,
           tax_id: taxId,
           tax_rate: rate,

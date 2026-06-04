@@ -149,7 +149,7 @@ export class InvoiceSum {
 
       calculatedTax += tax;
       this.totalTaxMap.push({
-        name: formatTaxName(name, rate, this.precision),
+        name: formatTaxName(name, rate),
         total: tax,
         tax_rate: rate,
         base_amount: this.total,
