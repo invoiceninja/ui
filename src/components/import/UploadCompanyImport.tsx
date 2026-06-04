@@ -164,11 +164,6 @@ export function UploadCompanyImport(props: Props) {
       return;
     }
 
-    if (isImportFileTypeZip && !importSettings && !importData) {
-      toast.error('settings_or_data');
-      return;
-    }
-
     toast.processing();
     setErrors(undefined);
 
@@ -424,7 +419,7 @@ export function UploadCompanyImport(props: Props) {
     // Early return if not a zip file
     const validZipTypes = ['application/zip', 'application/x-zip-compressed'];
     if (!validZipTypes.includes(file.type) && !file.name.endsWith('.zip')) {
-      toast.error('invalid_zip_file');
+      toast.error('company_backup_file_help');
       return null;
     }
 
@@ -451,7 +446,7 @@ export function UploadCompanyImport(props: Props) {
       return fileHash;
     } catch (error) {
       console.log('Chunk upload failed:', error);
-      toast.error('chunk_upload_failed');
+      toast.error('upload_failed');
       setUploadProgress(0);
       throw error;
     }
@@ -757,7 +752,7 @@ export function UploadCompanyImport(props: Props) {
               style={{ width: `${uploadProgress}%` }}
             ></div>
             <div className="text-sm text-gray-500 mt-1">
-              {Math.round(uploadProgress)}% {t('uploaded')}
+              {Math.round(uploadProgress)}% {t('uploading_files')}
             </div>
           </div>
         </div>

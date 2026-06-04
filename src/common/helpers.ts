@@ -20,6 +20,14 @@ export function isHosted(): boolean {
   return import.meta.env.VITE_IS_HOSTED === 'true';
 }
 
+export function isDevCalendarEnabled(): boolean {
+  return import.meta.env.DEV && import.meta.env.VITE_DEV_CALENDAR === 'true';
+}
+
+export function isCalendarConnectionAvailable(): boolean {
+  return isHosted() || isDevCalendarEnabled();
+}
+
 export function isSelfHosted(): boolean {
   return !isHosted();
 }

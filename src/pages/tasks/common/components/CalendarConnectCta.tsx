@@ -9,30 +9,47 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
+import {
+  isCalendarConnectionAvailable,
+  isDevCalendarEnabled,
+  isHosted,
+} from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
+import { route } from '$app/common/helpers/route';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useIsPaid } from '$app/common/hooks/usePaidOrSelfhost';
 import {
   useConnectCalendar,
   useDisconnectCalendar,
 } from '$app/common/queries/calendar';
-import { CalendarProvider } from '$app/common/interfaces/user';
+import type { CalendarProvider } from '$app/common/interfaces/user';
 import { updateUser } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Modal } from '$app/components/Modal';
-import { Button } from '$app/components/forms';
+import { Alert } from '$app/components/Alert';
+import { Button, Link } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaCalendarCheck, FaGoogle, FaMicrosoft } from 'react-icons/fa';
+import { MdInfoOutline } from 'react-icons/md';
 
 export function CalendarConnectCta() {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const dispatch = useDispatch();
   const user = useCurrentUser();
+  const hosted = isHosted();
+  const devCalendar = isDevCalendarEnabled();
+  const calendarConnectionAvailable = isCalendarConnectionAvailable();
+  const isPaid = useIsPaid();
   const isConnected =
     user?.referral_meta?.calendar_connection?.status === 'CONNECTED';
+  const canConnect =
+    calendarConnectionAvailable && !isConnected && (isPaid || devCalendar);
+  const showPlanAlert = hosted && !isConnected && !isPaid && !devCalendar;
 
   const connect = useConnectCalendar();
   const disconnect = useDisconnectCalendar();
@@ -40,6 +57,8 @@ export function CalendarConnectCta() {
   const [disconnectVisible, setDisconnectVisible] = useState(false);
 
   const handleConnect = (provider: CalendarProvider) => {
+    if (!canConnect) return;
+
     // Guard against double-click: the one_time_token is single-use, so a
     // second mutation would waste the first hash and could race the redirect.
     if (connect.isLoading) return;
@@ -85,6 +104,10 @@ export function CalendarConnectCta() {
     });
   };
 
+  if (!calendarConnectionAvailable) {
+    return null;
+  }
+
   if (isConnected) {
     return (
       <>
@@ -118,12 +141,13 @@ export function CalendarConnectCta() {
           }}
         >
           <FaCalendarCheck size={14} color={colors.$3} />
-          <span>{t('calendar_connected')}</span>
+          <span style={{ color: colors.$3 }}>{user?.referral_meta?.calendar_connection?.email ?? t('disconnect')}</span>
+
           <button
             type="button"
             onClick={() => setDisconnectVisible(true)}
             disabled={disconnect.isLoading}
-            aria-label={t('disconnect_calendar') as string}
+            aria-label={t('disconnect') as string}
             className="ml-1 p-1 leading-none text-base"
             style={{ color: colors.$17 }}
           >
@@ -131,6 +155,34 @@ export function CalendarConnectCta() {
           </button>
         </div>
       </>
+    );
+  }
+
+  if (showPlanAlert) {
+    return (
+      <div className="flex flex-col space-y-3">
+        <Alert type="warning" disableClosing>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Icon element={MdInfoOutline} size={20} />
+
+              <span>{t('start_free_trial_message')}</span>
+            </div>
+
+            {user?.company_user && (
+              <Link to={route('/settings/account_management')}>
+                {t('plan_change')}
+              </Link>
+            )}
+          </div>
+        </Alert>
+
+        <Dropdown
+          disabled
+          label={t('connect_calendar') as string}
+          labelButtonBorderColor={colors.$5}
+        />
+      </div>
     );
   }
 
@@ -143,13 +195,13 @@ export function CalendarConnectCta() {
         onClick={() => handleConnect('google')}
         icon={<FaGoogle size={14} />}
       >
-        {t('connect_google_calendar')}
+        {t('google')}
       </DropdownElement>
       <DropdownElement
         onClick={() => handleConnect('microsoft')}
         icon={<FaMicrosoft size={14} />}
       >
-        {t('connect_microsoft_calendar')}
+        {t('microsoft')}
       </DropdownElement>
     </Dropdown>
   );

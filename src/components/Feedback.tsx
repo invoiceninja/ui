@@ -77,7 +77,7 @@ export function Feedback() {
         .then(() => {
           handleUpdateReactSettings(isDoNotAskAgain);
 
-          toast.success('feedback_submitted');
+          toast.success('thank_you_for_feedback');
 
           setIsSubmitted(true);
 

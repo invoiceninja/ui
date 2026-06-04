@@ -106,12 +106,14 @@ export function TaskUserFilter({ state }: Props) {
 }
 
 export function TaskProjectFilter({ state }: Props) {
+  const [t] = useTranslation();
+
   return (
     <div className="w-56 shrink-0">
       <ComboboxAsync<Project>
         inputOptions={{
           value: state.projectId || null,
-          placeholder: 'Filter by project…',
+          placeholder: t('filter_by_project') ?? 'Filter by project…',
         }}
         endpoint={endpoint('/api/v1/projects?status=active')}
         entryOptions={{

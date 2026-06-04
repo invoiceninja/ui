@@ -20,6 +20,7 @@ export type CalendarConnectionStatus = 'CONNECTED' | 'DISCONNECTED';
 // that depends on a live calendar connection.
 export interface CalendarConnection {
   status: CalendarConnectionStatus;
+  email?: string;
 }
 
 interface ReferralMeta {

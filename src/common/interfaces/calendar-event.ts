@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CalendarProvider } from './user';
+import type { CalendarProvider } from './user';
 
 export interface CalendarEvent {
   id: string;
@@ -33,3 +33,16 @@ export interface CalendarEvent {
 export const calendarEventKey = (event: CalendarEvent): string =>
   event.id ||
   `${event.provider}:${event.calendar_id}:${event.provider_event_id}`;
+
+const CALENDAR_EVENT_DATE_TIME =
+  /^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2}(?::\d{2})?))?/;
+
+export const calendarEventDateKey = (
+  eventOrStart: CalendarEvent | string
+): string => {
+  const value =
+    typeof eventOrStart === 'string' ? eventOrStart : eventOrStart.start;
+  const match = value.match(CALENDAR_EVENT_DATE_TIME);
+
+  return match?.[1] || value;
+};
