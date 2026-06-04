@@ -29,17 +29,17 @@ export async function resetTestAccount(account: TestAccount, label?: string) {
   await purgeGroupSettings(api);
   await restoreDeletedUsers(api);
 
-  const permissionEmails = permissionBaseEmails.map((email) =>
-    accountEmail(email, account)
-  );
+  // const permissionEmails = permissionBaseEmails.map((email) =>
+  //   accountEmail(email, account)
+  // );
 
-  for (const email of permissionEmails) {
-    await ensurePermissionUserExists(api, email);
-  }
+  // for (const email of permissionEmails) {
+  //   await ensurePermissionUserExists(api, email);
+  // }
 
-  for (const email of permissionEmails) {
-    await resetPermissionUser(api, email);
-  }
+  // for (const email of permissionEmails) {
+  //   await resetPermissionUser(api, email);
+  // }
 
   await purgeAllEntities(api);
 }
