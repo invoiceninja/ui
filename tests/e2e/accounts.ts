@@ -23,6 +23,9 @@ const ACCOUNT_COUNT = parsePositiveInt(
     process.env.E2E_ACCOUNT_COUNT ||
     String(DEFAULT_ACCOUNT_COUNT)
 );
+const ACCOUNT_OFFSET = parseNonNegativeInt(
+  process.env.PLAYWRIGHT_ACCOUNT_OFFSET || '0'
+);
 
 export const permissionBaseEmails = [
   'permissions@example.com',
@@ -75,20 +78,27 @@ export function createTestAccount(
 
 export function accountForParallelIndex(parallelIndex: number) {
   const accounts = getConfiguredTestAccounts();
+  const accountIndex = ACCOUNT_OFFSET + parallelIndex;
 
-  if (parallelIndex >= accounts.length) {
+  if (accountIndex >= accounts.length) {
     throw new Error(
       'Playwright worker parallelIndex ' +
         parallelIndex +
+        ' with account offset ' +
+        ACCOUNT_OFFSET +
         ' needs account lane ' +
-        (parallelIndex + 1) +
+        (accountIndex + 1) +
         ', but only ' +
         accounts.length +
-        ' account lanes are configured. Lower PLAYWRIGHT_WORKERS or increase PLAYWRIGHT_ACCOUNT_COUNT.'
+        ' account lanes are configured. Lower PLAYWRIGHT_WORKERS/PLAYWRIGHT_SPEC_CONCURRENCY or increase PLAYWRIGHT_ACCOUNT_COUNT.'
     );
   }
 
-  return accounts[parallelIndex];
+  return accounts[accountIndex];
+}
+
+export function getAccountOffset() {
+  return ACCOUNT_OFFSET;
 }
 
 export function setCurrentTestAccount(account: TestAccount) {
@@ -145,6 +155,16 @@ function parsePositiveInt(value: string) {
 
   if (!Number.isFinite(parsed) || parsed < 1) {
     return DEFAULT_ACCOUNT_COUNT;
+  }
+
+  return parsed;
+}
+
+function parseNonNegativeInt(value: string) {
+  const parsed = Number.parseInt(value, 10);
+
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return 0;
   }
 
   return parsed;

@@ -45,6 +45,8 @@ export default defineConfig({
   workers: workerCount,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI ? 'github' : 'list',
+  /* Isolated spec processes write to their own output roots. */
+  outputDir: process.env.PLAYWRIGHT_OUTPUT_DIR || 'test-results/',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
@@ -104,16 +106,17 @@ export default defineConfig({
     // },
   ],
 
-  /* Folder for test artifacts such as screenshots, videos, traces, etc. */
-  // outputDir: 'test-results/',
-
-  /* Serve the production build for tests.
-   * Build first with: npx vite build --mode testing
-   * This ensures VITE_* vars are loaded from .env.testing */
-  webServer: {
-    command: 'npx vite build --mode testing && npx vite preview',
-    port: 4173,
-    reuseExistingServer: true,
-    timeout: 180_000, // give the build ~3 min to settle
-  },
+  ...(process.env.PLAYWRIGHT_SKIP_WEBSERVER === '1'
+    ? {}
+    : {
+        /* Serve the production build for tests.
+         * Build first with: npx vite build --mode testing
+         * This ensures VITE_* vars are loaded from .env.testing */
+        webServer: {
+          command: 'npx vite build --mode testing && npx vite preview',
+          port: 4173,
+          reuseExistingServer: true,
+          timeout: 180_000, // give the build ~3 min to settle
+        },
+      }),
 });
