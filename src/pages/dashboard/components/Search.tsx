@@ -438,7 +438,7 @@ export function Search$() {
               }}
             >
               <span className="mb-0.5" style={{ color: colors.$3 }}>
-                {t('docs')}
+                {t('view_documentation')}
               </span>
 
               <div>

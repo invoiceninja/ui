@@ -132,7 +132,7 @@ const applyCellEditToLogs = (
 };
 
 export default function Weekly() {
-  const { documentTitle } = useTitle('weekly');
+  const { documentTitle } = useTitle('freq_weekly');
   const [t] = useTranslation();
   const colors = useColorScheme();
   const navigate = useNavigate();
@@ -445,7 +445,7 @@ export default function Weekly() {
       title={documentTitle}
       breadcrumbs={[
         { name: t('tasks'), href: '/tasks' },
-        { name: t('weekly'), href: '/tasks/weekly' },
+        { name: t('freq_weekly'), href: '/tasks/weekly' },
       ]}
       topRight={<TaskHeaderControls />}
     >
