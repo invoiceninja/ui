@@ -50,39 +50,16 @@ export function useTotalVariables() {
         columns.push('$custom_surcharge4');
       }
 
-      // Replace $line_taxes and $total_taxes with $taxes at their positions
-      columns.forEach((column, index) => {
-        if (column === '$line_taxes' || column === '$total_taxes') {
-          columns[index] = '$taxes';
-        }
-      });
-
-      // Remove duplicates of $taxes that might have been created
-      const uniqueColumns = columns.filter(
-        (column, index, arr) =>
-          column !== '$taxes' || arr.indexOf(column) === index
-      );
-
-      setColumns(uniqueColumns);
+      setColumns(columns);
       return;
     }
 
     // We need to clone the product columns to local object,
     // because by default it's frozen.
     const variables: string[] = ['$subtotal'];
-    variables.push('$total');
 
-    // clone(company?.settings.pdf_variables.total_columns) || [];
-
-    // In case we have `$line_taxes` or `$total_taxes` we want to remove them
-    // if setting isn't enabled.
-
-    // const enabledTaxRates = company?.enabled_tax_rates || 0;
-
-    // if (enabledTaxRates <= 0) {
-    //   variables = variables.filter((variable) => variable !== '$total_taxes');
-    //   variables = variables.filter((variable) => variable !== '$line_taxes');
-    // }
+    variables.push('$discount');
+    variables.push('$net_subtotal');
 
     if (company?.custom_fields?.surcharge1) {
       variables.push('$custom_surcharge1');
@@ -100,10 +77,11 @@ export function useTotalVariables() {
       variables.push('$custom_surcharge4');
     }
 
-    variables.push('$discount');
+    variables.push('$total_taxes');
+    variables.push('$line_taxes');
+    variables.push('$total');
     variables.push('$paid_to_date');
     variables.push('$balance_due');
-    variables.push('$taxes');
 
     if (company?.enabled_tax_rates > 0) {
       variables.push('$tax1');

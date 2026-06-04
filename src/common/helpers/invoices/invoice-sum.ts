@@ -16,17 +16,25 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Credit } from '$app/common/interfaces/credit';
 import { Quote } from '$app/common/interfaces/quote';
-import { roundToPrecision } from './round';
+import {
+  formatTaxName,
+  percentageOf,
+  precisionOrDefault,
+  roundToPrecision,
+} from './round';
 
 export interface TaxItem {
   key?: string;
   name: string;
   total: number;
+  tax_id?: string;
+  tax_rate?: number;
+  base_amount?: number;
 }
 
 export class InvoiceSum {
   protected taxMap = collect<TaxItem>();
-  protected totalTaxMap: Record<string, unknown>[] = [];
+  protected totalTaxMap: TaxItem[] = [];
 
   public declare invoiceItems: InvoiceItemSum;
 
@@ -41,7 +49,15 @@ export class InvoiceSum {
     protected currency: Currency,
     protected eInvoiceType?: string
   ) {
-    this.invoiceItems = new InvoiceItemSum(this.invoice, this.currency, this.eInvoiceType);
+    this.invoiceItems = new InvoiceItemSum(
+      this.invoice,
+      this.currency,
+      this.eInvoiceType
+    );
+  }
+
+  protected get precision(): number {
+    return precisionOrDefault(this.currency?.precision);
   }
 
   public get isPeppol(): boolean {
@@ -55,14 +71,46 @@ export class InvoiceSum {
       .calculateCustomValues()
       .setTaxMap()
       .calculateTotals()
-      // .calculatePartial()
-      .calculateBalance();
+      .calculateBalance()
+      .calculatePartial();
 
     return this;
   }
 
   public getTaxMap() {
     return this.taxMap;
+  }
+
+  public getTotalTaxMap() {
+    return collect<TaxItem>(this.totalTaxMap);
+  }
+
+  public getSubTotal() {
+    return this.subTotal;
+  }
+
+  public getTotalDiscount() {
+    return this.totalDiscount;
+  }
+
+  public getTotalTaxes() {
+    return this.totalTaxes;
+  }
+
+  public getTotal() {
+    return this.total;
+  }
+
+  public getTotalSurcharges() {
+    return this.totalCustomValues;
+  }
+
+  public getSubtotalWithSurcharges() {
+    return this.getSubTotal() + this.getTotalSurcharges();
+  }
+
+  public getNetSubtotal() {
+    return this.getSubTotal() - this.getTotalDiscount();
   }
 
   protected calculateLineItems() {
@@ -82,86 +130,33 @@ export class InvoiceSum {
     return this;
   }
 
-  protected peppolSurchargeTaxes() {
-      const invoice_item = this.invoice.line_items[0];
-      const name = invoice_item?.tax_name1;
-      const rate = invoice_item?.tax_rate1 ?? 0;
-      const amount = this.invoice.custom_surcharge1+this.invoice.custom_surcharge2+this.invoice.custom_surcharge3+this.invoice.custom_surcharge4;
-      
-      if(rate > 0 && amount != 0){
-
-        const total = Math.round((((amount * rate) / 100) * 1000) / 10) / 100;
-
-        let group = {};
-
-        const key = name + rate.toString().replace(' ', ''); // 'Tax Rate' + '5' => 'TaxRate5'
-
-        group = { key, total, name: `${name} ${parseFloat(rate.toString())} %` }; // 'Tax Rate 5.00%'
-
-        this.invoiceItems.taxCollection.push(collect(group));
-      
-      }
-      
-      return this;
-  }
-
   protected calculateInvoiceTaxes() {
-
     let calculatedTax = 0;
+    this.totalTaxMap = [];
 
-    if (this.invoice.tax_name1.length >= 1) {
-      let tax = this.taxer(this.total, this.invoice.tax_rate1);
+    [
+      { name: this.invoice.tax_name1, rate: this.invoice.tax_rate1 },
+      { name: this.invoice.tax_name2, rate: this.invoice.tax_rate2 },
+      { name: this.invoice.tax_name3, rate: this.invoice.tax_rate3 },
+    ].forEach(({ name, rate }) => {
+      if (name.length <= 1) {
+        return;
+      }
 
-      tax += this.getSurchargeTaxTotalForKey(
-        this.invoice.tax_name1,
-        this.invoice.tax_rate1
-      );
+      const tax =
+        this.taxer(this.total, rate) +
+        this.getSurchargeTaxTotalForKey(name, rate);
 
-      // this.totalTaxes += tax;
       calculatedTax += tax;
       this.totalTaxMap.push({
-        name: `${this.invoice.tax_name1} ${parseFloat(
-          this.invoice.tax_rate1.toFixed(this.currency?.precision || 2)
-        )} %`,
+        name: formatTaxName(name, rate, this.precision),
+        total: tax,
+        tax_rate: rate,
+        base_amount: this.total,
       });
-    }
+    });
 
-    if (this.invoice.tax_name2.length >= 1) {
-      let tax = this.taxer(this.total, this.invoice.tax_rate2);
-
-      tax += this.getSurchargeTaxTotalForKey(
-        this.invoice.tax_name2,
-        this.invoice.tax_rate2
-      );
-
-      // this.totalTaxes += tax;
-      calculatedTax += tax;
-      this.totalTaxMap.push({
-        name: `${this.invoice.tax_name2} ${parseFloat(
-          this.invoice.tax_rate2.toFixed(this.currency?.precision || 2)
-        )} %`,
-      });
-    }
-
-    if (this.invoice.tax_name3.length >= 1) {
-      let tax = this.taxer(this.total, this.invoice.tax_rate3);
-
-      tax += this.getSurchargeTaxTotalForKey(
-        this.invoice.tax_name3,
-        this.invoice.tax_rate3
-      );
-
-      // this.totalTaxes += tax;
-      calculatedTax += tax;
-
-      this.totalTaxMap.push({
-        name: `${this.invoice.tax_name3} ${parseFloat(
-          this.invoice.tax_rate3.toFixed(this.currency?.precision || 2)
-        )} %`,
-      });
-    }
-
-    this.totalTaxes = roundToPrecision(calculatedTax, this.currency?.precision || 2);
+    this.totalTaxes = calculatedTax;
 
     return this;
   }
@@ -177,38 +172,31 @@ export class InvoiceSum {
     return this;
   }
 
-  protected getSurchargeTaxTotalForKey(taxName: string, rate: number) {
-    let taxComponent = 0;
+  protected getSurchargeTaxTotalForKey(_taxName: string, rate: number) {
+    return [
+      {
+        amount: this.invoice.custom_surcharge1,
+        taxable: this.invoice.custom_surcharge_tax1,
+      },
+      {
+        amount: this.invoice.custom_surcharge2,
+        taxable: this.invoice.custom_surcharge_tax2,
+      },
+      {
+        amount: this.invoice.custom_surcharge3,
+        taxable: this.invoice.custom_surcharge_tax3,
+      },
+      {
+        amount: this.invoice.custom_surcharge4,
+        taxable: this.invoice.custom_surcharge_tax4,
+      },
+    ].reduce((total, surcharge) => {
+      if (!surcharge.taxable) {
+        return total;
+      }
 
-    if (this.invoice.custom_surcharge_tax1) {
-      taxComponent += roundToPrecision(
-        this.invoice.custom_surcharge1 * (rate / 100),
-        this.currency?.precision || 2
-      );
-    }
-
-    if (this.invoice.custom_surcharge_tax2) {
-      taxComponent += roundToPrecision(
-        this.invoice.custom_surcharge2 * (rate / 100),
-        this.currency?.precision || 2
-      );
-    }
-
-    if (this.invoice.custom_surcharge_tax3) {
-      taxComponent += roundToPrecision(
-        this.invoice.custom_surcharge3 * (rate / 100),
-        this.currency?.precision || 2
-      );
-    }
-
-    if (this.invoice.custom_surcharge_tax4) {
-      taxComponent += roundToPrecision(
-        this.invoice.custom_surcharge4 * (rate / 100),
-        this.currency?.precision || 2
-      );
-    }
-
-    return taxComponent;
+      return total + percentageOf(surcharge.amount || 0, rate, 2);
+    }, 0);
   }
 
   protected setTaxMap() {
@@ -216,43 +204,44 @@ export class InvoiceSum {
       this.invoiceItems.calculateTaxesWithAmountDiscount();
       this.invoice.line_items = this.invoiceItems.lineItems;
     }
-    
-    if(this.invoice.tax_name1.length == 0 && this.invoice.custom_surcharge1 !=0 && this.invoice.custom_surcharge_tax1){
-      this.peppolSurchargeTaxes();
-    }
 
-    this.taxMap = collect();
+    this.taxMap = collect<TaxItem>();
 
-    let taxCollection = collect<TaxItem>();
-    taxCollection = this.invoiceItems.taxCollection.pluck('items');
+    const taxCollection = this.invoiceItems.taxCollection;
 
     const keys = taxCollection.pluck('key').unique();
 
     keys.map((key) => {
-      const taxName = taxCollection
-        .filter((item) => item.key === key)
-        .pluck('name')
-        .first();
+      const matchingTaxes = taxCollection.filter((item) => item.key === key);
+      const firstTax = matchingTaxes.first() as TaxItem | undefined;
 
-      const totalLineTax = taxCollection
-        .filter((item) => item.key === key)
-        .sum('total');
+      if (!firstTax) {
+        return;
+      }
+
+      const totalLineTax = roundToPrecision(
+        matchingTaxes.sum('total') as number,
+        this.precision
+      );
+      const baseAmount = matchingTaxes.sum('base_amount') as number;
 
       this.taxMap.push({
-        name: taxName as string,
-        total: totalLineTax as number,
+        key: key as string,
+        name: firstTax.name,
+        total: totalLineTax,
+        tax_id: firstTax.tax_id,
+        tax_rate: firstTax.tax_rate,
+        base_amount: roundToPrecision(baseAmount, 2),
       });
-    });
 
-    this.totalTaxes += this.invoiceItems.totalTaxes;
+      this.totalTaxes += totalLineTax;
+    });
 
     return this;
   }
 
   protected calculateTotals() {
     this.total += this.totalTaxes;
-
-    this.total = roundToPrecision(this.total, this.currency?.precision || 2);
 
     return this;
   }
@@ -265,15 +254,39 @@ export class InvoiceSum {
 
   protected setCalculatedAttributes() {
     this.invoice.amount = parseFloat(
-      NumberFormatter.formatValue(this.total, this.currency?.precision || 2)
+      NumberFormatter.formatValue(this.total, this.precision)
     );
 
-    this.invoice.balance =
-      parseFloat(
-        NumberFormatter.formatValue(this.total, this.currency?.precision || 2)
-      ) - (this.invoice.paid_to_date ?? 0);
+    const balance = this.shouldZeroBalance()
+      ? 0
+      : this.invoice.amount - (this.invoice.paid_to_date ?? 0);
 
-    this.invoice.total_taxes = this.totalTaxes;
+    this.invoice.balance = parseFloat(
+      NumberFormatter.formatValue(balance, this.precision)
+    );
+
+    this.invoice.total_taxes = parseFloat(
+      NumberFormatter.formatValue(this.totalTaxes, this.precision)
+    );
+
+    return this;
+  }
+
+  protected shouldZeroBalance() {
+    return (
+      this.invoice.entity_type === 'invoice' && this.invoice.status_id === '5'
+    );
+  }
+
+  protected calculatePartial() {
+    if (!this.invoice?.id && this.invoice.partial && this.invoice.balance) {
+      const roundedPartial = roundToPrecision(this.invoice.partial, 2);
+
+      this.invoice.partial = Math.max(
+        0,
+        Math.min(roundedPartial, this.invoice.balance)
+      );
+    }
 
     return this;
   }
@@ -293,16 +306,11 @@ export class InvoiceSum {
       return this.invoice.discount;
     }
 
-    return roundToPrecision(
-      amount * (this.invoice.discount / 100),
-      this.currency?.precision || 2
-    );
+    return percentageOf(amount, this.invoice.discount, 2);
   }
 
   protected taxer(amount: number, tax_rate: number) {
-    const taxAmount = amount * ((tax_rate ?? 0) / 100) + 0.000000000000004;
-
-    return roundToPrecision(taxAmount, this.currency?.precision || 2);
+    return percentageOf(amount, tax_rate ?? 0, 2);
   }
 
   protected valuer(customValue: number | undefined): number {
