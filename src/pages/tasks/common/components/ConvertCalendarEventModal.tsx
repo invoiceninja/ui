@@ -49,7 +49,9 @@ const buildTimeLog = (event: CalendarEvent): string => {
   // — the user can edit it after conversion.
   if (event.all_day) {
     const anchor = dayjs(event.start).startOf('day').hour(9);
-    return JSON.stringify([[anchor.unix(), anchor.add(1, 'hour').unix(), '', true]]);
+    return JSON.stringify([
+      [anchor.unix(), anchor.add(1, 'hour').unix(), '', true],
+    ]);
   }
 
   const start = dayjs(event.start).unix();

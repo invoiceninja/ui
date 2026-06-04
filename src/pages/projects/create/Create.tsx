@@ -35,7 +35,6 @@ import { CustomField } from '$app/components/CustomField';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
-import { serializeTagsPayload } from '$app/common/helpers/tags';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { TagPillSelector } from '$app/components/tags/TagPillSelector';
 
@@ -79,11 +78,7 @@ export default function Create() {
     setErrors(undefined);
     setIsFormBusy(true);
 
-    request(
-      'POST',
-      endpoint('/api/v1/projects'),
-      serializeTagsPayload(project!)
-    )
+    request('POST', endpoint('/api/v1/projects'), project)
       .then((response) => {
         toast.success('created_project');
 

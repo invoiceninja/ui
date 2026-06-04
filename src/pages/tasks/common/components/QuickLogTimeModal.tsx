@@ -26,13 +26,7 @@ import { useBlankTaskQuery, useTasksQuery } from '$app/common/queries/tasks';
 import { Task } from '$app/common/interfaces/task';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
-import {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { parseDurationToSeconds } from '../helpers';
@@ -114,7 +108,10 @@ export function QuickLogTimeModal(props: Props) {
       return;
     }
 
-    const startUnix = dayjs(`${date} ${dayjs().format('HH:mm:ss')}`, 'YYYY-MM-DD HH:mm:ss').unix();
+    const startUnix = dayjs(
+      `${date} ${dayjs().format('HH:mm:ss')}`,
+      'YYYY-MM-DD HH:mm:ss'
+    ).unix();
     const endUnix = startUnix + seconds;
 
     const payload: Task = {
@@ -142,7 +139,8 @@ export function QuickLogTimeModal(props: Props) {
           // Don't dismiss before error: the shared toast singleton reuses
           // one id, so dismiss + error against that same id drops the toast.
           const messages = Object.values(data.errors ?? {}).flat();
-          const combined = messages.length > 0 ? messages.join('\n') : data.message;
+          const combined =
+            messages.length > 0 ? messages.join('\n') : data.message;
           toast.error(combined || 'error_title');
         } else {
           toast.error();

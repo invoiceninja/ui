@@ -22,12 +22,7 @@ import {
   TimeLogType,
 } from '$app/pages/tasks/common/helpers/calculate-time';
 import dayjs from 'dayjs';
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
@@ -103,9 +98,7 @@ const applyCellEditToLogs = (
 
   const existing = findDayEntry(logs, day);
 
-  const remaining = logs.filter(
-    ([s]) => !(s && s >= dayStart && s <= dayEnd)
-  );
+  const remaining = logs.filter(([s]) => !(s && s >= dayStart && s <= dayEnd));
 
   let seconds: number;
   if (edit.duration !== undefined) {
@@ -120,21 +113,19 @@ const applyCellEditToLogs = (
   }
 
   const description =
-    edit.description !== undefined
-      ? edit.description
-      : existing?.[2] ?? '';
+    edit.description !== undefined ? edit.description : existing?.[2] ?? '';
 
   const billable =
-    edit.billable !== undefined
-      ? edit.billable
-      : existing?.[3] ?? true;
+    edit.billable !== undefined ? edit.billable : existing?.[3] ?? true;
 
   if (seconds <= 0 && !description) {
     return remaining;
   }
 
   const newStart =
-    existing && existing[0] ? existing[0] : day.startOf('day').add(9, 'hour').unix();
+    existing && existing[0]
+      ? existing[0]
+      : day.startOf('day').add(9, 'hour').unix();
 
   remaining.push([newStart, newStart + seconds, description, billable]);
   return remaining;
@@ -210,8 +201,7 @@ export default function Weekly() {
   }, [allTasks]);
 
   const getLogsForTask = (taskId: string, fallbackLog: string) =>
-    optimisticLogs[taskId] ??
-    (parseTimeLog(fallbackLog) as TimeLogType[]);
+    optimisticLogs[taskId] ?? (parseTimeLog(fallbackLog) as TimeLogType[]);
 
   const weekDayKeys = useMemo(
     () => days.map((d) => d.format('YYYY-MM-DD')),
@@ -239,8 +229,7 @@ export default function Weekly() {
   };
   const prevWeek = () =>
     setDate(weekStart.subtract(7, 'day').format('YYYY-MM-DD'));
-  const nextWeek = () =>
-    setDate(weekStart.add(7, 'day').format('YYYY-MM-DD'));
+  const nextWeek = () => setDate(weekStart.add(7, 'day').format('YYYY-MM-DD'));
   const goToday = () => setDate(today);
 
   const flushTask = async (taskId: string) => {
@@ -357,7 +346,8 @@ export default function Weekly() {
         // processing → error. Dismissing kills the id and a subsequent
         // toast.error against that same id is dropped by react-hot-toast.
         const messages = Object.values(data.errors ?? {}).flat();
-        const combined = messages.length > 0 ? messages.join('\n') : data.message;
+        const combined =
+          messages.length > 0 ? messages.join('\n') : data.message;
         toast.error(combined || 'error_title');
       } else {
         toast.error();
@@ -384,11 +374,7 @@ export default function Weekly() {
   };
 
   // Merge partial edit into pending and (re-)arm the debounce timer.
-  const mergeCellEdit = (
-    taskId: string,
-    dayKey: string,
-    partial: CellEdit
-  ) => {
+  const mergeCellEdit = (taskId: string, dayKey: string, partial: CellEdit) => {
     const nextForTask = {
       ...(pendingRef.current[taskId] ?? {}),
       [dayKey]: {
@@ -421,7 +407,9 @@ export default function Weekly() {
     const dayKey = day.format('YYYY-MM-DD');
     const pendingDuration = pending[taskId]?.[dayKey]?.duration;
     if (pendingDuration !== undefined) return pendingDuration;
-    return formatHours(sumSecondsForDay(getLogsForTask(taskId, fallbackLog), day));
+    return formatHours(
+      sumSecondsForDay(getLogsForTask(taskId, fallbackLog), day)
+    );
   };
 
   const cellSeconds = (
@@ -677,10 +665,7 @@ export default function Weekly() {
             </tbody>
           </table>
         </div>
-
       </div>
     </Default>
   );
 }
-
-
