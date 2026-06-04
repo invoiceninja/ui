@@ -32,7 +32,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { serializeTagsPayload } from '$app/common/helpers/tags';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { TagPillSelector } from '$app/components/tags/TagPillSelector';
 
@@ -89,11 +88,7 @@ export function CreateProjectModal(props: Props) {
       setErrors(undefined);
       setIsFormBusy(true);
 
-      request(
-        'POST',
-        endpoint('/api/v1/projects'),
-        serializeTagsPayload(project!)
-      )
+      request('POST', endpoint('/api/v1/projects'), project)
         .then((response: GenericSingleResourceResponse<Project>) => {
           toast.success('created_project');
 

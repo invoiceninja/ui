@@ -693,17 +693,19 @@ test('all custom actions in dropdown displayed with admin permission', async ({
   // Select the row checkbox (not header) to trigger bulk actions
   await page.locator('tbody [data-cy="dataTableCheckbox"]').first().click();
 
-  // Wait for the bulk Actions dropdown to appear in the header
-  const bulkActionsButton = page.locator('[data-cy="dataTable"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .first();
-  await bulkActionsButton.waitFor({ state: 'visible', timeout: 5000 });
+  const bulkActionsButton = page.locator('[data-cy="bulkActionsTrigger"]');
+  await expect(bulkActionsButton).toBeVisible({ timeout: 10000 });
   await bulkActionsButton.click();
 
   // Verify dropdown items are visible on the page
   for (const { label, visible } of customActions) {
     if (visible) {
-      await expect(page.getByText(label, { exact: true }).first()).toBeVisible({ timeout: 10000 });
+      await expect(
+        page
+          .locator('[data-cy="bulkActionsDropdown"]')
+          .getByText(label, { exact: true })
+          .first()
+      ).toBeVisible({ timeout: 10000 });
     }
   }
 
@@ -750,17 +752,19 @@ test('New Invoice and New Purchase Order displayed with creation permissions', a
   // Select the row checkbox (not header) to trigger bulk actions
   await page.locator('tbody [data-cy="dataTableCheckbox"]').first().click();
 
-  // Wait for the bulk Actions dropdown to appear in the header
-  const bulkActionsButton = page.locator('[data-cy="dataTable"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .first();
-  await bulkActionsButton.waitFor({ state: 'visible', timeout: 5000 });
+  const bulkActionsButton = page.locator('[data-cy="bulkActionsTrigger"]');
+  await expect(bulkActionsButton).toBeVisible({ timeout: 10000 });
   await bulkActionsButton.click();
 
   // Verify dropdown items are visible on the page
   for (const { label, visible } of customActions) {
     if (visible) {
-      await expect(page.getByText(label, { exact: true }).first()).toBeVisible({ timeout: 10000 });
+      await expect(
+        page
+          .locator('[data-cy="bulkActionsDropdown"]')
+          .getByText(label, { exact: true })
+          .first()
+      ).toBeVisible({ timeout: 10000 });
     }
   }
 

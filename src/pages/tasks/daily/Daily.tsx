@@ -201,14 +201,12 @@ export default function Daily() {
     try {
       await Promise.all(
         tasksToCopy.map(({ task, logs }) => {
-          const shifted: TimeLogType[] = logs.map(
-            ([s, e, desc, billable]) => [
-              s + 86400,
-              e ? e + 86400 : 0,
-              desc,
-              billable,
-            ]
-          );
+          const shifted: TimeLogType[] = logs.map(([s, e, desc, billable]) => [
+            s + 86400,
+            e ? e + 86400 : 0,
+            desc,
+            billable,
+          ]);
 
           return request('POST', endpoint('/api/v1/tasks'), {
             client_id: task.client_id,
@@ -224,6 +222,7 @@ export default function Daily() {
             is_date_based: task.is_date_based,
             date,
             time_log: JSON.stringify(shifted),
+            ...(task.tags && { tags: task.tags }),
           });
         })
       );
@@ -239,7 +238,8 @@ export default function Daily() {
         // and dismissing it first causes the subsequent error toast to be
         // dropped by react-hot-toast.
         const messages = Object.values(data.errors ?? {}).flat();
-        const combined = messages.length > 0 ? messages.join('\n') : data.message;
+        const combined =
+          messages.length > 0 ? messages.join('\n') : data.message;
         toast.error(combined || 'error_title');
         // One or more POSTs may have succeeded before this rejected; pull
         // the truth from the server so the UI matches reality.
@@ -333,7 +333,10 @@ export default function Daily() {
           style={{ borderColor: colors.$5, backgroundColor: colors.$1 }}
         >
           {isLoading && (
-            <div className="p-6 text-center text-sm" style={{ color: colors.$17 }}>
+            <div
+              className="p-6 text-center text-sm"
+              style={{ color: colors.$17 }}
+            >
               {t('loading')}
             </div>
           )}
@@ -390,9 +393,7 @@ export default function Daily() {
                         style={{ color: colors.$3 }}
                       >
                         {entry.description
-                          ? extractTextFromHTML(
-                              sanitizeHTML(entry.description)
-                            )
+                          ? extractTextFromHTML(sanitizeHTML(entry.description))
                           : `#${entry.task.number || ''}`}
                       </div>
                     )}
@@ -409,7 +410,9 @@ export default function Daily() {
                       style={{ color: colors.$17 }}
                     >
                       {displayTime(entry.start)}
-                      {entry.stop ? ` - ${displayTime(entry.stop)}` : ` · ${t('running')}`}
+                      {entry.stop
+                        ? ` - ${displayTime(entry.stop)}`
+                        : ` · ${t('running')}`}
                       {entry.billable ? ` · ${t('billable')}` : ''}
                     </div>
                   </div>
@@ -433,7 +436,10 @@ export default function Daily() {
                         {t('stop')}
                       </Button>
                     ) : (
-                      <Button type="secondary" onClick={() => start(entry.task)}>
+                      <Button
+                        type="secondary"
+                        onClick={() => start(entry.task)}
+                      >
                         {t('start')}
                       </Button>
                     )}

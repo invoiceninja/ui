@@ -64,7 +64,6 @@ import {
 import { useDocumentsBulk } from '$app/common/queries/documents';
 import { Dispatch, SetStateAction } from 'react';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { serializeTagsPayload } from '$app/common/helpers/tags';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Assigned } from '$app/components/Assigned';
@@ -409,15 +408,13 @@ export function useTaskColumns() {
 
 export function useSave() {
   return (task: Task) => {
-    request(
-      'PUT',
-      endpoint('/api/v1/tasks/:id', { id: task.id }),
-      serializeTagsPayload(task)
-    ).then(() => {
-      toast.success('updated_task');
+    request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task).then(
+      () => {
+        toast.success('updated_task');
 
-      $refetch(['tasks']);
-    });
+        $refetch(['tasks']);
+      }
+    );
   };
 }
 

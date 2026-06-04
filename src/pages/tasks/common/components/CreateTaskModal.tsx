@@ -29,7 +29,6 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { serializeTagsPayload } from '$app/common/helpers/tags';
 
 export interface TaskDetails {
   taskStatusId: string;
@@ -70,7 +69,7 @@ export function CreateTaskModal(props: Props) {
         return toast.error('task_errors');
       }
 
-      request('POST', endpoint('/api/v1/tasks'), serializeTagsPayload(task))
+      request('POST', endpoint('/api/v1/tasks'), task)
         .then(() => {
           toast.success('created_task');
 
