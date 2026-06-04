@@ -53,6 +53,7 @@ import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import Toggle from '$app/components/forms/Toggle';
 import { useColorScheme } from '$app/common/colors';
+import { ViewLineItem } from './ViewLineItem';
 import { ViewLineItemExpense } from './ViewLineItemExpense';
 import { ViewLineItemTask } from './ViewLineItemTask';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
@@ -558,6 +559,23 @@ export function InvoiceSlider() {
                     </React.Fragment>
                   )
               )}
+            </div>
+          )}
+
+          {Boolean(invoice?.line_items?.length) && (
+            <Divider withoutPadding borderColor={colors.$20} />
+          )}
+
+          {invoice && Boolean(invoice.line_items?.length) && (
+            <div className="flex flex-col space-y-3 px-6 py-5">
+              {invoice.line_items.map((lineItem, index) => (
+                <ViewLineItem
+                  key={index}
+                  lineItem={lineItem}
+                  client={invoice.client}
+                  fallbackHref={route('/invoices/:id/edit', { id: invoice.id })}
+                />
+              ))}
             </div>
           )}
         </div>
