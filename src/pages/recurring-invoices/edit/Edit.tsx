@@ -9,6 +9,7 @@
  */
 
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useScrollToLineItem } from '$app/common/hooks/useScrollToLineItem';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Spinner } from '$app/components/Spinner';
 import { useAtomValue } from 'jotai';
@@ -51,6 +52,8 @@ export default function Edit() {
   const context: RecurringInvoiceContext = useOutletContext();
 
   const { recurringInvoice, errors, client } = context;
+
+  useScrollToLineItem({ ready: Boolean(recurringInvoice && client) });
 
   const invoiceSum = useAtomValue(invoiceSumAtom);
 

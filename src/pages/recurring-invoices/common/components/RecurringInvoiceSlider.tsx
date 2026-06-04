@@ -406,7 +406,7 @@ export const RecurringInvoiceSlider = () => {
                     key={index}
                     lineItem={lineItem}
                     client={recurringInvoice.client}
-                    fallbackHref={route('/recurring_invoices/:id/edit', {
+                    editHref={route('/recurring_invoices/:id/edit', {
                       id: recurringInvoice.id,
                     })}
                   />

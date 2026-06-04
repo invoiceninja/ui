@@ -523,7 +523,7 @@ export function QuoteSlider() {
                   key={index}
                   lineItem={lineItem}
                   client={quote.client}
-                  fallbackHref={route('/quotes/:id/edit', { id: quote.id })}
+                  editHref={route('/quotes/:id/edit', { id: quote.id })}
                 />
               ))}
             </div>

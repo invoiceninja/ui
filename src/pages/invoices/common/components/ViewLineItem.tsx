@@ -9,12 +9,14 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { route } from '$app/common/helpers/route';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Client } from '$app/common/interfaces/client';
-import { InvoiceItem } from '$app/common/interfaces/invoice-item';
+import {
+  InvoiceItem,
+  InvoiceItemType,
+} from '$app/common/interfaces/invoice-item';
 import { Icon } from '$app/components/icons/Icon';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
@@ -31,70 +33,76 @@ const Box = styled.div`
 interface Props {
   lineItem: InvoiceItem;
   client: Client | undefined;
-  fallbackHref?: string;
+  editHref: string;
 }
 
 export function ViewLineItem(props: Props) {
-  const { lineItem, client, fallbackHref } = props;
+  const { lineItem, client, editHref } = props;
 
   const [t] = useTranslation();
   const colors = useColorScheme();
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
-  const hasPermission = useHasPermission();
 
-  const canViewTask =
-    Boolean(lineItem.task_id) &&
-    (hasPermission('view_task') || hasPermission('edit_task'));
+  const handleClick = useCallback(() => {
+    const params = new URLSearchParams();
 
-  const canViewExpense =
-    Boolean(lineItem.expense_id) &&
-    (hasPermission('view_expense') || hasPermission('edit_expense'));
-
-  const isClickable = canViewTask || canViewExpense || Boolean(fallbackHref);
-
-  const handleClick = () => {
-    if (canViewTask && lineItem.task_id) {
-      navigate(route('/tasks/:id/edit', { id: lineItem.task_id }));
-
-      return;
+    if (lineItem._id) {
+      params.set('line_item_id', lineItem._id);
     }
 
-    if (canViewExpense && lineItem.expense_id) {
-      navigate(route('/expenses/:id/edit', { id: lineItem.expense_id }));
-
-      return;
+    if (lineItem.type_id === InvoiceItemType.Task) {
+      params.set('table', 'tasks');
     }
 
-    if (fallbackHref) {
-      navigate(fallbackHref);
-    }
-  };
+    const query = params.toString();
 
-  const productLabel = lineItem.product_key?.trim() || t('item');
+    navigate(query ? `${editHref}?${query}` : editHref);
+  }, [editHref, lineItem._id, lineItem.type_id, navigate]);
 
-  const formattedCost = formatMoney(
-    lineItem.cost ?? 0,
-    client?.country_id,
-    client?.settings.currency_id
+  const productLabel = useMemo(
+    () => lineItem.product_key?.trim() || t('item'),
+    [lineItem.product_key, t]
   );
 
-  const formattedLineTotal = formatMoney(
-    lineItem.line_total ?? 0,
-    client?.country_id,
-    client?.settings.currency_id
+  const formattedCost = useMemo(
+    () =>
+      formatMoney(
+        lineItem.cost ?? 0,
+        client?.country_id,
+        client?.settings.currency_id
+      ),
+    [
+      formatMoney,
+      lineItem.cost,
+      client?.country_id,
+      client?.settings.currency_id,
+    ]
+  );
+
+  const formattedLineTotal = useMemo(
+    () =>
+      formatMoney(
+        lineItem.line_total ?? 0,
+        client?.country_id,
+        client?.settings.currency_id
+      ),
+    [
+      formatMoney,
+      lineItem.line_total,
+      client?.country_id,
+      client?.settings.currency_id,
+    ]
   );
 
   return (
     <Box
-      className={`flex items-center justify-between gap-3 p-4 rounded-md border ${
-        isClickable ? 'cursor-pointer' : ''
-      }`}
-      onClick={isClickable ? handleClick : undefined}
+      className="flex items-center justify-between gap-3 p-4 rounded-md border cursor-pointer"
+      onClick={handleClick}
       style={{ borderColor: colors.$20 }}
       theme={{
         backgroundColor: colors.$1,
-        hoverBackgroundColor: isClickable ? colors.$4 : colors.$1,
+        hoverBackgroundColor: colors.$4,
       }}
     >
       <div className="flex flex-col min-w-0 flex-1 space-y-0.5">
@@ -129,9 +137,7 @@ export function ViewLineItem(props: Props) {
           {formattedLineTotal}
         </span>
 
-        {isClickable ? (
-          <Icon element={ChevronRight} size={16} color={colors.$17} />
-        ) : null}
+        <Icon element={ChevronRight} size={16} color={colors.$17} />
       </div>
     </Box>
   );

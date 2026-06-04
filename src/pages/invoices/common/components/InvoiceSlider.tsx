@@ -573,7 +573,7 @@ export function InvoiceSlider() {
                   key={index}
                   lineItem={lineItem}
                   client={invoice.client}
-                  fallbackHref={route('/invoices/:id/edit', { id: invoice.id })}
+                  editHref={route('/invoices/:id/edit', { id: invoice.id })}
                 />
               ))}
             </div>
