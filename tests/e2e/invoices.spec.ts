@@ -352,6 +352,8 @@ test('can view and edit assigned invoice with create_invoice', async ({
     page.getByText('Successfully updated invoice', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
+  await page.waitForTimeout(1000);
+
   await page.locator('[data-cy="chevronDownButton"]').click();
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);

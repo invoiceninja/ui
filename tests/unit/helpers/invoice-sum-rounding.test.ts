@@ -10,6 +10,7 @@ import currencies from '../../helpers/data/currencies';
 
 const USD = currencies[0];
 const JPY = currencies.find((c: { code: string }) => c.code === 'JPY')!;
+const THREE_DECIMAL = { ...USD, id: 'test-3', code: 'TDP', precision: 3 };
 
 function makeInvoice(overrides: Partial<Invoice> = {}): Invoice {
   return {
@@ -117,7 +118,14 @@ describe('Exclusive tax rounding - round half up', () => {
   it('rounds line item tax correctly for values ending in 5', () => {
     // 10.25 * 10% = 1.025 -> should round to 1.03 (round half up), not 1.02
     const inv = makeInvoice({
-      line_items: [makeLineItem({ cost: 10.25, quantity: 1, tax_name1: 'GST', tax_rate1: 10 })],
+      line_items: [
+        makeLineItem({
+          cost: 10.25,
+          quantity: 1,
+          tax_name1: 'GST',
+          tax_rate1: 10,
+        }),
+      ],
     });
 
     const result = new InvoiceSum(inv, USD).build();
@@ -135,12 +143,12 @@ describe('Exclusive tax rounding - round half up', () => {
       tax_rate1: 10,
       tax_name2: 'VAT',
       tax_rate2: 7.5,
-      line_items: [makeLineItem({ cost: 20.50, quantity: 1 })],
+      line_items: [makeLineItem({ cost: 20.5, quantity: 1 })],
     });
 
     const result = new InvoiceSum(inv, USD).build();
 
-    expect(result.subTotal).toEqual(20.50);
+    expect(result.subTotal).toEqual(20.5);
     expect(result.invoice.amount).toEqual(24.09);
   });
 
@@ -163,7 +171,7 @@ describe('Exclusive tax rounding - round half up', () => {
     const inv = makeInvoice({
       tax_name1: 'GST',
       tax_rate1: 10,
-      custom_surcharge1: 7.50,
+      custom_surcharge1: 7.5,
       custom_surcharge_tax1: true,
       line_items: [makeLineItem({ cost: 100, quantity: 1 })],
     });
@@ -180,14 +188,24 @@ describe('Exclusive tax rounding - round half up', () => {
     // vs total: 2.30 * 10% = 0.23 (wrong if you sum first)
     const inv = makeInvoice({
       line_items: [
-        makeLineItem({ cost: 1.15, quantity: 1, tax_name1: 'GST', tax_rate1: 10 }),
-        makeLineItem({ cost: 1.15, quantity: 1, tax_name1: 'GST', tax_rate1: 10 }),
+        makeLineItem({
+          cost: 1.15,
+          quantity: 1,
+          tax_name1: 'GST',
+          tax_rate1: 10,
+        }),
+        makeLineItem({
+          cost: 1.15,
+          quantity: 1,
+          tax_name1: 'GST',
+          tax_rate1: 10,
+        }),
       ],
     });
 
     const result = new InvoiceSum(inv, USD).build();
 
-    expect(result.subTotal).toEqual(2.30);
+    expect(result.subTotal).toEqual(2.3);
     expect(result.totalTaxes).toEqual(0.24);
     expect(result.invoice.amount).toEqual(2.54);
   });
@@ -212,14 +230,21 @@ describe('Exclusive tax rounding - round half up', () => {
     const result = new InvoiceSum(inv, USD).build();
 
     expect(result.subTotal).toEqual(100);
-    expect(result.totalTaxes).toEqual(22.50);
-    expect(result.invoice.amount).toEqual(122.50);
+    expect(result.totalTaxes).toEqual(22.5);
+    expect(result.invoice.amount).toEqual(122.5);
   });
 
   it('handles negative line items correctly', () => {
     // -10.25 * 10% = -1.025 -> should round to -1.03
     const inv = makeInvoice({
-      line_items: [makeLineItem({ cost: -10.25, quantity: 1, tax_name1: 'GST', tax_rate1: 10 })],
+      line_items: [
+        makeLineItem({
+          cost: -10.25,
+          quantity: 1,
+          tax_name1: 'GST',
+          tax_rate1: 10,
+        }),
+      ],
     });
 
     const result = new InvoiceSum(inv, USD).build();
@@ -261,7 +286,7 @@ describe('Exclusive tax rounding - round half up', () => {
     const inv = makeInvoice({ line_items: items });
     const result = new InvoiceSum(inv, USD).build();
 
-    expect(result.subTotal).toEqual(9.90);
+    expect(result.subTotal).toEqual(9.9);
     // floating point accumulation: 10 * 0.10 results in 0.9999999999999999
     expect(result.invoice.amount).toEqual(10.9);
   });
@@ -272,7 +297,14 @@ describe('Inclusive tax rounding - round half up', () => {
     // 11 inclusive with 10% tax: tax = 11 - 11/1.1 = 11 - 10 = 1.00
     const inv = makeInvoice({
       uses_inclusive_taxes: true,
-      line_items: [makeLineItem({ cost: 11, quantity: 1, tax_name1: 'GST', tax_rate1: 10 })],
+      line_items: [
+        makeLineItem({
+          cost: 11,
+          quantity: 1,
+          tax_name1: 'GST',
+          tax_rate1: 10,
+        }),
+      ],
     });
 
     const result = new InvoiceSumInclusive(inv, USD).build();
@@ -321,7 +353,7 @@ describe('Inclusive tax rounding - round half up', () => {
       uses_inclusive_taxes: true,
       tax_name1: 'GST',
       tax_rate1: 10,
-      custom_surcharge1: 5.50,
+      custom_surcharge1: 5.5,
       custom_surcharge_tax1: true,
       line_items: [makeLineItem({ cost: 50, quantity: 1 })],
     });
@@ -348,9 +380,9 @@ describe('Zero-precision currency (JPY) rounding', () => {
     expect(result.invoice.amount).toEqual(1100);
   });
 
-  it('rounds fractional JPY amounts correctly', () => {
-    // 999 * 8% = 79.92
-    // Note: JPY precision is 0, but `0 || 2` falls back to 2 (pre-existing behavior)
+  it('keeps class totals at API precision before persisting JPY invoice fields', () => {
+    // 999 * 8% = 79.92. The API keeps the calculator total at 79.92,
+    // then writes invoice.total_taxes and amount using JPY precision.
     const inv = makeInvoice({
       tax_name1: 'Tax',
       tax_rate1: 8,
@@ -360,7 +392,70 @@ describe('Zero-precision currency (JPY) rounding', () => {
     const result = new InvoiceSum(inv, JPY).build();
 
     expect(result.totalTaxes).toEqual(79.92);
-    expect(result.invoice.amount).toEqual(1078.92);
+    expect(result.total).toEqual(1078.92);
+    expect(result.invoice.total_taxes).toEqual(80);
+    expect(result.invoice.amount).toEqual(1079);
+  });
+
+  it('rounds exclusive JPY line tax at the tax-map category boundary', () => {
+    const inv = makeInvoice({
+      line_items: [
+        makeLineItem({ cost: 4.95, tax_name1: 'Tax', tax_rate1: 10 }),
+        makeLineItem({ cost: 4.95, tax_name1: 'Tax', tax_rate1: 10 }),
+      ],
+    });
+
+    const result = new InvoiceSum(inv, JPY).build();
+
+    expect(result.subTotal).toEqual(10);
+    expect(result.getTaxMap().first()?.total).toEqual(1);
+    expect(result.totalTaxes).toEqual(1);
+    expect(result.invoice.total_taxes).toEqual(1);
+    expect(result.invoice.amount).toEqual(11);
+  });
+
+  it('keeps inclusive JPY line tax unrounded in invoice tax totals', () => {
+    const inv = makeInvoice({
+      uses_inclusive_taxes: true,
+      line_items: [makeLineItem({ cost: 10, tax_name1: 'Tax', tax_rate1: 10 })],
+    });
+
+    const result = new InvoiceSumInclusive(inv, JPY).build();
+    const item = result.invoice.line_items[0];
+
+    expect(result.subTotal).toEqual(10);
+    expect(item.tax_amount).toEqual(1);
+    expect(result.getTaxMap().first()?.total).toEqual(0.91);
+    expect(result.totalTaxes).toEqual(0.91);
+    expect(result.invoice.total_taxes).toEqual(0.91);
+    expect(result.invoice.amount).toEqual(10);
+  });
+
+  it('rounds inclusive JPY display tax per component while keeping tax-map totals at 2 decimals', () => {
+    const inv = makeInvoice({
+      uses_inclusive_taxes: true,
+      line_items: [
+        makeLineItem({
+          cost: 15,
+          tax_name1: 'Tax',
+          tax_rate1: 10,
+          tax_name2: 'Levy',
+          tax_rate2: 10,
+        }),
+      ],
+    });
+
+    const result = new InvoiceSumInclusive(inv, JPY).build();
+    const item = result.invoice.line_items[0];
+    const taxRows = result.getTaxMap();
+
+    expect(item.tax_amount).toEqual(2);
+    expect(item.net_cost).toEqual(13);
+    expect(taxRows.pluck('total').all()).toEqual([1.36, 1.36]);
+    expect(taxRows.pluck('base_amount').all()).toEqual([13.64, 13.64]);
+    expect(result.totalTaxes).toEqual(2.72);
+    expect(result.invoice.total_taxes).toEqual(2.72);
+    expect(result.invoice.amount).toEqual(15);
   });
 });
 
@@ -369,19 +464,33 @@ describe('toFixed vs roundToPrecision difference cases', () => {
     // This is the classic case where toFixed can fail
     // 23.45 * 10% = 2.345 -> should be 2.35
     const inv = makeInvoice({
-      line_items: [makeLineItem({ cost: 23.45, quantity: 1, tax_name1: 'Tax', tax_rate1: 10 })],
+      line_items: [
+        makeLineItem({
+          cost: 23.45,
+          quantity: 1,
+          tax_name1: 'Tax',
+          tax_rate1: 10,
+        }),
+      ],
     });
 
     const result = new InvoiceSum(inv, USD).build();
 
     expect(result.totalTaxes).toEqual(2.35);
-    expect(result.invoice.amount).toEqual(25.80);
+    expect(result.invoice.amount).toEqual(25.8);
   });
 
   it('correctly rounds 0.615 (toFixed gives 0.61 in some engines)', () => {
     // 12.30 * 5% = 0.615 -> should be 0.62
     const inv = makeInvoice({
-      line_items: [makeLineItem({ cost: 12.30, quantity: 1, tax_name1: 'Tax', tax_rate1: 5 })],
+      line_items: [
+        makeLineItem({
+          cost: 12.3,
+          quantity: 1,
+          tax_name1: 'Tax',
+          tax_rate1: 5,
+        }),
+      ],
     });
 
     const result = new InvoiceSum(inv, USD).build();
@@ -393,7 +502,14 @@ describe('toFixed vs roundToPrecision difference cases', () => {
   it('correctly rounds 1.255 (toFixed gives 1.25 in some engines)', () => {
     // 25.10 * 5% = 1.255 -> should be 1.26
     const inv = makeInvoice({
-      line_items: [makeLineItem({ cost: 25.10, quantity: 1, tax_name1: 'Tax', tax_rate1: 5 })],
+      line_items: [
+        makeLineItem({
+          cost: 25.1,
+          quantity: 1,
+          tax_name1: 'Tax',
+          tax_rate1: 5,
+        }),
+      ],
     });
 
     const result = new InvoiceSum(inv, USD).build();
@@ -402,19 +518,312 @@ describe('toFixed vs roundToPrecision difference cases', () => {
     expect(result.invoice.amount).toEqual(26.36);
   });
 
-  it('correctly rounds percentage discount at .5 boundary', () => {
-    // 33.50 * 15% discount = 5.025 in math, but 33.5 * 0.15 = 5.024999... in floating point
-    // roundToPrecision(5.024999..., 2) = 5.02 (correct for the actual float value)
+  it('correctly rounds invoice percentage discount at .5 boundary', () => {
+    // 33.50 * 15% discount = 5.025, matching PHP_ROUND_HALF_UP should round to 5.03
     const inv = makeInvoice({
       discount: 15,
       is_amount_discount: false,
-      line_items: [makeLineItem({ cost: 33.50, quantity: 1 })],
+      line_items: [makeLineItem({ cost: 33.5, quantity: 1 })],
     });
 
     const result = new InvoiceSum(inv, USD).build();
 
-    expect(result.totalDiscount).toEqual(5.02);
+    expect(result.totalDiscount).toEqual(5.03);
+    expect(result.invoice.amount).toEqual(28.47);
+  });
+
+  it('rounds exclusive line percentage discounts after subtracting the raw discount', () => {
+    // 33.50 - (33.50 * 15%) = 28.475 -> 28.48 at the line boundary.
+    const inv = makeInvoice({
+      line_items: [makeLineItem({ cost: 33.5, quantity: 1, discount: 15 })],
+    });
+
+    const result = new InvoiceSum(inv, USD).build();
+    const item = result.invoice.line_items[0];
+
+    expect(item.line_total).toEqual(28.48);
+    expect(result.subTotal).toEqual(28.48);
     expect(result.invoice.amount).toEqual(28.48);
+  });
+});
+
+describe('API parity invoice sum fields', () => {
+  it('calculates exclusive net subtotal after invoice discount', () => {
+    const inv = makeInvoice({
+      discount: 10,
+      is_amount_discount: false,
+      line_items: [makeLineItem({ cost: 100, quantity: 1 })],
+    });
+
+    const result = new InvoiceSum(inv, USD).build();
+
+    expect(result.subTotal).toEqual(100);
+    expect(result.totalDiscount).toEqual(10);
+    expect(result.getNetSubtotal()).toEqual(90);
+  });
+
+  it('calculates inclusive net subtotal after discount and extracted taxes', () => {
+    const inv = makeInvoice({
+      uses_inclusive_taxes: true,
+      discount: 10,
+      is_amount_discount: true,
+      tax_name1: 'GST',
+      tax_rate1: 10,
+      line_items: [makeLineItem({ cost: 110, quantity: 1 })],
+    });
+
+    const result = new InvoiceSumInclusive(inv, USD).build();
+
+    expect(result.subTotal).toEqual(110);
+    expect(result.totalDiscount).toEqual(10);
+    expect(result.totalTaxes).toEqual(9.09);
+    expect(result.getNetSubtotal()).toEqual(100);
+  });
+
+  it('keeps invoice-level taxes separate from line taxes', () => {
+    const inv = makeInvoice({
+      tax_name1: 'GST',
+      tax_rate1: 10,
+      line_items: [
+        makeLineItem({
+          cost: 100,
+          quantity: 1,
+          tax_name1: 'VAT',
+          tax_rate1: 5,
+        }),
+      ],
+    });
+
+    const result = new InvoiceSum(inv, USD).build();
+    const totalTax = result.getTotalTaxMap().first();
+    const lineTax = result.getTaxMap().first();
+
+    expect(result.getTotalTaxMap().count()).toEqual(1);
+    expect(result.getTaxMap().count()).toEqual(1);
+    expect(totalTax?.name).toEqual('GST 10 %');
+    expect(totalTax?.total).toEqual(10);
+    expect(lineTax?.name).toEqual('VAT 5 %');
+    expect(lineTax?.total).toEqual(5);
+    expect(result.totalTaxes).toEqual(15);
+  });
+
+  it('does not include non-taxable inclusive surcharges in invoice tax extraction', () => {
+    const inv = makeInvoice({
+      uses_inclusive_taxes: true,
+      tax_name1: 'GST',
+      tax_rate1: 10,
+      custom_surcharge1: 10,
+      custom_surcharge_tax1: false,
+      line_items: [makeLineItem({ cost: 100, quantity: 1 })],
+    });
+
+    const result = new InvoiceSumInclusive(inv, USD).build();
+
+    expect(result.invoice.amount).toEqual(110);
+    expect(result.totalTaxes).toEqual(9.09);
+    expect(result.getTotalTaxMap().first()?.total).toEqual(9.09);
+  });
+
+  it('includes taxable inclusive surcharges in invoice tax extraction', () => {
+    const inv = makeInvoice({
+      uses_inclusive_taxes: true,
+      tax_name1: 'GST',
+      tax_rate1: 10,
+      custom_surcharge1: 10,
+      custom_surcharge_tax1: true,
+      line_items: [makeLineItem({ cost: 100, quantity: 1 })],
+    });
+
+    const result = new InvoiceSumInclusive(inv, USD).build();
+
+    expect(result.invoice.amount).toEqual(110);
+    expect(result.totalTaxes).toEqual(10);
+    expect(result.getTotalTaxMap().first()?.total).toEqual(10);
+  });
+
+  it('writes calculated tax fields back to exclusive line items', () => {
+    const inv = makeInvoice({
+      line_items: [
+        makeLineItem({
+          cost: 100,
+          quantity: 1,
+          tax_name1: 'GST',
+          tax_rate1: 10,
+        }),
+      ],
+    });
+
+    const result = new InvoiceSum(inv, USD).build();
+    const item = result.invoice.line_items[0];
+
+    expect(item.tax_amount).toEqual(10);
+    expect(item.gross_line_total).toEqual(110);
+    expect(item.net_cost).toEqual(100);
+  });
+
+  it('writes extracted tax and net cost back to inclusive line items', () => {
+    const inv = makeInvoice({
+      uses_inclusive_taxes: true,
+      line_items: [
+        makeLineItem({
+          cost: 110,
+          quantity: 1,
+          tax_name1: 'GST',
+          tax_rate1: 10,
+        }),
+      ],
+    });
+
+    const result = new InvoiceSumInclusive(inv, USD).build();
+    const item = result.invoice.line_items[0];
+
+    expect(item.tax_amount).toEqual(10);
+    expect(item.gross_line_total).toEqual(110);
+    expect(item.net_cost).toEqual(100);
+  });
+
+  it('stores inclusive tax-map base amounts as net taxable amounts', () => {
+    const inv = makeInvoice({
+      uses_inclusive_taxes: true,
+      line_items: [
+        makeLineItem({
+          cost: 110,
+          tax_name1: 'GST',
+          tax_rate1: 10,
+        }),
+      ],
+    });
+
+    const result = new InvoiceSumInclusive(inv, USD).build();
+
+    expect(result.getTaxMap().first()?.total).toEqual(10);
+    expect(result.getTaxMap().first()?.base_amount).toEqual(100);
+  });
+
+  it('suppresses zero inclusive amount-discount tax rows after recalculation', () => {
+    const inv = makeInvoice({
+      uses_inclusive_taxes: true,
+      is_amount_discount: true,
+      discount: 0,
+      line_items: [
+        makeLineItem({
+          cost: 0.01,
+          tax_name1: 'GST',
+          tax_rate1: 10,
+        }),
+      ],
+    });
+
+    const result = new InvoiceSumInclusive(inv, USD).build();
+    const item = result.invoice.line_items[0];
+
+    expect(item.tax_amount).toEqual(0);
+    expect(item.net_cost).toEqual(0.01);
+    expect(result.getTaxMap().count()).toEqual(0);
+    expect(result.totalTaxes).toEqual(0);
+  });
+
+  it('rounds new partial amounts to 2 decimals before applying the balance cap', () => {
+    const exclusive = makeInvoice({
+      id: undefined,
+      partial: 10.555,
+      line_items: [makeLineItem({ cost: 100 })],
+    });
+    const inclusive = makeInvoice({
+      id: undefined,
+      uses_inclusive_taxes: true,
+      partial: 10.555,
+      line_items: [makeLineItem({ cost: 100 })],
+    });
+
+    const exclusiveResult = new InvoiceSum(exclusive, JPY).build();
+    const inclusiveResult = new InvoiceSumInclusive(inclusive, JPY).build();
+
+    expect(exclusiveResult.invoice.partial).toEqual(10.56);
+    expect(inclusiveResult.invoice.partial).toEqual(10.56);
+  });
+
+  it('formats inclusive invoice amounts from the API 2-decimal total before currency precision', () => {
+    const inv = makeInvoice({
+      uses_inclusive_taxes: true,
+      custom_surcharge1: 0.005,
+      line_items: [makeLineItem({ cost: 1.01 })],
+    });
+
+    const result = new InvoiceSumInclusive(inv, THREE_DECIMAL).build();
+
+    expect(result.total).toEqual(1.015);
+    expect(result.getTotal()).toEqual(1.02);
+    expect(result.invoice.amount).toEqual(1.02);
+  });
+
+  it('uses the API combined-rate net cost formula for inclusive amount discounts', () => {
+    const inv = makeInvoice({
+      uses_inclusive_taxes: true,
+      is_amount_discount: true,
+      discount: 0,
+      line_items: [
+        makeLineItem({
+          cost: 115,
+          quantity: 1,
+          tax_name1: 'GST',
+          tax_rate1: 10,
+          tax_name2: 'VAT',
+          tax_rate2: 5,
+        }),
+      ],
+    });
+
+    const result = new InvoiceSumInclusive(inv, USD).build();
+    const item = result.invoice.line_items[0];
+
+    expect(item.tax_amount).toEqual(15.93);
+    expect(item.net_cost).toEqual(100);
+    expect(result.getTaxMap().pluck('total').all()).toEqual([10.45, 5.48]);
+    expect(result.totalTaxes).toEqual(15.93);
+  });
+
+  it('keeps inclusive line totals at two decimals before JPY invoice rounding', () => {
+    const inv = makeInvoice({
+      uses_inclusive_taxes: true,
+      line_items: [makeLineItem({ cost: 33.5, quantity: 1, discount: 15 })],
+    });
+
+    const result = new InvoiceSumInclusive(inv, JPY).build();
+    const item = result.invoice.line_items[0];
+
+    expect(item.line_total).toEqual(28.5);
+    expect(result.subTotal).toEqual(28.5);
+    expect(result.getTotal()).toEqual(28.5);
+    expect(result.invoice.amount).toEqual(29);
+  });
+
+  it('handles amount-discount tax recalculation when subtotal is zero', () => {
+    const inv = makeInvoice({
+      is_amount_discount: true,
+      discount: 1,
+      line_items: [
+        makeLineItem({
+          cost: 10,
+          quantity: 1,
+          tax_name1: 'GST',
+          tax_rate1: 10,
+        }),
+        makeLineItem({
+          cost: -10,
+          quantity: 1,
+          tax_name1: 'GST',
+          tax_rate1: 10,
+        }),
+      ],
+    });
+
+    const result = new InvoiceSum(inv, USD).build();
+
+    expect(Number.isFinite(result.totalTaxes)).toBe(true);
+    expect(result.totalTaxes).toEqual(0);
+    expect(result.invoice.line_items[0].tax_amount).toEqual(1);
+    expect(result.invoice.line_items[1].tax_amount).toEqual(-1);
   });
 });
 
