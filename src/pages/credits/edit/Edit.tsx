@@ -47,7 +47,7 @@ export default function Edit() {
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
 
-  useScrollToLineItem({ ready: Boolean(credit && client) });
+  useScrollToLineItem(Boolean(credit && client));
 
   const {
     handleChange,

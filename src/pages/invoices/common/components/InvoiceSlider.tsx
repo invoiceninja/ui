@@ -572,6 +572,7 @@ export function InvoiceSlider() {
                 <ViewLineItem
                   key={index}
                   lineItem={lineItem}
+                  lineItemIndex={index}
                   client={invoice.client}
                   editHref={route('/invoices/:id/edit', { id: invoice.id })}
                 />

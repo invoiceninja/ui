@@ -32,12 +32,13 @@ const Box = styled.div`
 
 interface Props {
   lineItem: InvoiceItem;
+  lineItemIndex: number;
   client: Client | undefined;
   editHref: string;
 }
 
 export function ViewLineItem(props: Props) {
-  const { lineItem, client, editHref } = props;
+  const { lineItem, lineItemIndex, client, editHref } = props;
 
   const [t] = useTranslation();
   const colors = useColorScheme();
@@ -47,18 +48,14 @@ export function ViewLineItem(props: Props) {
   const handleClick = useCallback(() => {
     const params = new URLSearchParams();
 
-    if (lineItem._id) {
-      params.set('line_item_id', lineItem._id);
-    }
+    params.set('line_item', lineItemIndex.toString());
 
     if (lineItem.type_id === InvoiceItemType.Task) {
       params.set('table', 'tasks');
     }
 
-    const query = params.toString();
-
-    navigate(query ? `${editHref}?${query}` : editHref);
-  }, [editHref, lineItem._id, lineItem.type_id, navigate]);
+    navigate(`${editHref}?${params.toString()}`);
+  }, [editHref, lineItemIndex, lineItem.type_id, navigate]);
 
   const productLabel = useMemo(
     () => lineItem.product_key?.trim() || t('item'),

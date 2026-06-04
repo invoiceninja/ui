@@ -63,7 +63,7 @@ export default function Edit() {
   const productQuoteColumns = useProductQuoteColumns();
   const statusThemeColors = useStatusThemeColorScheme();
 
-  useScrollToLineItem({ ready: Boolean(quote && client) });
+  useScrollToLineItem(Boolean(quote && client));
   const {
     handleChange,
     handleInvitationChange,

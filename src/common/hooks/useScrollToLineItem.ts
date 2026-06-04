@@ -11,63 +11,24 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-interface Options {
-  ready: boolean;
-}
+export function useScrollToLineItem(ready: boolean) {
+  const [searchParams] = useSearchParams();
 
-export function useScrollToLineItem({ ready }: Options) {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const lineItemId = searchParams.get('line_item_id');
+  const lineItemIndex = searchParams.get('line_item');
 
   useEffect(() => {
-    if (!ready || !lineItemId) {
+    if (!ready || lineItemIndex === null) {
       return;
     }
 
-    const elementId = `line-item-${lineItemId}`;
-    let cancelled = false;
-    let attempts = 0;
-    let timeoutId: number | undefined;
-
-    const tryScroll = () => {
-      if (cancelled) {
-        return;
-      }
-
-      const element = document.getElementById(elementId);
+    const timeoutId = setTimeout(() => {
+      const element = document.getElementById(`line-item-${lineItemIndex}`);
 
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        setSearchParams(
-          (current) => {
-            const next = new URLSearchParams(current);
-            next.delete('line_item_id');
-            return next;
-          },
-          { replace: true }
-        );
-
-        return;
       }
+    }, 300);
 
-      if (attempts >= 20) {
-        return;
-      }
-
-      attempts += 1;
-      timeoutId = window.setTimeout(tryScroll, 100);
-    };
-
-    tryScroll();
-
-    return () => {
-      cancelled = true;
-
-      if (timeoutId !== undefined) {
-        window.clearTimeout(timeoutId);
-      }
-    };
-  }, [ready, lineItemId, setSearchParams]);
+    return () => clearTimeout(timeoutId);
+  }, [ready, lineItemIndex]);
 }

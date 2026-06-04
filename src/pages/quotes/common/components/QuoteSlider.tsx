@@ -522,6 +522,7 @@ export function QuoteSlider() {
                 <ViewLineItem
                   key={index}
                   lineItem={lineItem}
+                  lineItemIndex={index}
                   client={quote.client}
                   editHref={route('/quotes/:id/edit', { id: quote.id })}
                 />

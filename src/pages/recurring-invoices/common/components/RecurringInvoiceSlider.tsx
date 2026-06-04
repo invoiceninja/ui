@@ -405,6 +405,7 @@ export const RecurringInvoiceSlider = () => {
                   <ViewLineItem
                     key={index}
                     lineItem={lineItem}
+                    lineItemIndex={index}
                     client={recurringInvoice.client}
                     editHref={route('/recurring_invoices/:id/edit', {
                       id: recurringInvoice.id,

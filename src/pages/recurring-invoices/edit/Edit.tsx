@@ -53,7 +53,7 @@ export default function Edit() {
 
   const { recurringInvoice, errors, client } = context;
 
-  useScrollToLineItem({ ready: Boolean(recurringInvoice && client) });
+  useScrollToLineItem(Boolean(recurringInvoice && client));
 
   const invoiceSum = useAtomValue(invoiceSumAtom);
 
