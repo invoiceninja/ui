@@ -10,52 +10,48 @@
 
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 export function useTotalVariables() {
   const company = useCurrentCompany();
-  const [columns, setColumns] = useState<string[]>([]);
 
-  useEffect(() => {
+  return useMemo(() => {
     if (company?.settings.pdf_variables.total_columns.length > 0) {
-      let columns = cloneDeep(company?.settings.pdf_variables.total_columns);
+      const columns = cloneDeep(company.settings.pdf_variables.total_columns);
 
-      columns = columns.filter(
-        (variable) => !variable.includes('$custom_surcharge')
+      const filtered = columns.filter(
+        (variable: string) => !variable.includes('$custom_surcharge')
       );
 
-      if (company?.enabled_tax_rates > 0) {
-        columns.push('$tax1');
+      if (company.enabled_tax_rates > 0) {
+        filtered.push('$tax1');
       }
-      if (company?.enabled_tax_rates > 1) {
-        columns.push('$tax2');
+      if (company.enabled_tax_rates > 1) {
+        filtered.push('$tax2');
       }
-      if (company?.enabled_tax_rates > 2) {
-        columns.push('$tax3');
-      }
-
-      if (company?.custom_fields?.surcharge1) {
-        columns.push('$custom_surcharge1');
+      if (company.enabled_tax_rates > 2) {
+        filtered.push('$tax3');
       }
 
-      if (company?.custom_fields?.surcharge2) {
-        columns.push('$custom_surcharge2');
+      if (company.custom_fields?.surcharge1) {
+        filtered.push('$custom_surcharge1');
       }
 
-      if (company?.custom_fields?.surcharge3) {
-        columns.push('$custom_surcharge3');
+      if (company.custom_fields?.surcharge2) {
+        filtered.push('$custom_surcharge2');
       }
 
-      if (company?.custom_fields?.surcharge4) {
-        columns.push('$custom_surcharge4');
+      if (company.custom_fields?.surcharge3) {
+        filtered.push('$custom_surcharge3');
       }
 
-      setColumns(columns);
-      return;
+      if (company.custom_fields?.surcharge4) {
+        filtered.push('$custom_surcharge4');
+      }
+
+      return filtered;
     }
 
-    // We need to clone the product columns to local object,
-    // because by default it's frozen.
     const variables: string[] = ['$subtotal'];
 
     variables.push('$discount');
@@ -93,8 +89,6 @@ export function useTotalVariables() {
       variables.push('$tax3');
     }
 
-    setColumns(variables);
+    return variables;
   }, [company]);
-
-  return columns;
 }
