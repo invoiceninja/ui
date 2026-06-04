@@ -37,11 +37,15 @@ interface Props {
   editHref: string;
 }
 
-export function ViewLineItem(props: Props) {
-  const { lineItem, lineItemIndex, client, editHref } = props;
-
+export function ViewLineItem({
+  lineItem,
+  lineItemIndex,
+  client,
+  editHref,
+}: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
+
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
 
@@ -106,7 +110,6 @@ export function ViewLineItem(props: Props) {
         <span
           className="text-sm font-medium truncate"
           style={{ color: colors.$3 }}
-          title={lineItem.product_key}
         >
           {productLabel}
         </span>
@@ -116,11 +119,7 @@ export function ViewLineItem(props: Props) {
         </span>
 
         {lineItem.notes ? (
-          <span
-            className="text-xs truncate"
-            style={{ color: colors.$17 }}
-            title={lineItem.notes}
-          >
+          <span className="text-xs truncate" style={{ color: colors.$17 }}>
             {lineItem.notes}
           </span>
         ) : null}

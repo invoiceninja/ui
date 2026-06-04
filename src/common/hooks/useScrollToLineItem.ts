@@ -14,15 +14,15 @@ import { useSearchParams } from 'react-router-dom';
 export function useScrollToLineItem(ready: boolean) {
   const [searchParams] = useSearchParams();
 
-  const lineItemIndex = searchParams.get('line_item');
-
   useEffect(() => {
-    if (!ready || lineItemIndex === null) {
+    if (!ready || searchParams.get('line_item') === null) {
       return;
     }
 
     const timeoutId = setTimeout(() => {
-      const element = document.getElementById(`line-item-${lineItemIndex}`);
+      const element = document.getElementById(
+        `line-item-${searchParams.get('line_item')}`
+      );
 
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -30,5 +30,5 @@ export function useScrollToLineItem(ready: boolean) {
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [ready, lineItemIndex]);
+  }, [ready, searchParams]);
 }
