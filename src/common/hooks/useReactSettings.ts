@@ -77,6 +77,10 @@ export type ImportTemplates = Record<string, Record<string, (string | null)[]>>;
 
 type ColorTheme = Record<ThemeColorField, string>;
 
+export interface InvoiceEditorPreferences {
+  expanded_sections?: Record<string, boolean>;
+}
+
 export interface ReactSettings {
   show_pdf_preview: boolean;
   react_table_columns?: Record<ReactTableColumns, string[]>;
@@ -94,6 +98,7 @@ export interface ReactSettings {
   color_theme?: ColorTheme;
   client_show_cards?: ClientShowCard[];
   dashboard_fields?: string[];
+  invoice_editor?: InvoiceEditorPreferences;
 }
 
 export type ReactTableColumns =

@@ -9,6 +9,7 @@
  */
 
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useSimplifiedInvoiceEditor } from '$app/common/hooks/useSimplifiedInvoiceEditor';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
@@ -48,6 +49,7 @@ import { InputLabel, Link } from '$app/components/forms';
 import { Link as RouterLink } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { TasksTabLabel } from '../common/components/TasksTabLabel';
+import { SimplifiedInvoiceForm } from '../common/components/simplified/SimplifiedInvoiceForm';
 import { TaxDataBadge } from './components/TaxDataBadge';
 import { TaxExemptBadge } from '$app/pages/clients/show/components/TaxExemptBadge';
 import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
@@ -87,6 +89,7 @@ export default function Edit() {
   const taskColumns = useTaskColumns();
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
+  const useSimplifiedEditor = useSimplifiedInvoiceEditor();
 
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
@@ -104,6 +107,48 @@ export default function Edit() {
     useChangeTemplate();
 
   const statusThemeColors = useStatusThemeColorScheme();
+
+  if (useSimplifiedEditor) {
+    return (
+      <>
+        <SimplifiedInvoiceForm
+          mode="edit"
+          invoice={invoice}
+          client={client}
+          errors={errors}
+          invoiceSum={invoiceSum}
+          handleChange={handleChange}
+          handleInvitationChange={handleInvitationChange}
+          handleLineItemChange={handleLineItemChange}
+          handleLineItemPropertyChange={handleLineItemPropertyChange}
+          handleCreateLineItem={handleCreateLineItem}
+          handleDeleteLineItem={handleDeleteLineItem}
+          isDefaultTerms={isDefaultTerms}
+          isDefaultFooter={isDefaultFooter}
+          setIsDefaultTerms={setIsDefaultTerms}
+          setIsDefaultFooter={setIsDefaultFooter}
+          readonlyClient
+        />
+
+        {invoice ? (
+          <ChangeTemplateModal<IInvoice>
+            entity="invoice"
+            entities={[invoice]}
+            visible={changeTemplateVisible}
+            setVisible={setChangeTemplateVisible}
+            labelFn={(invoice) => (
+              <div className="flex flex-col space-y-1">
+                <InputLabel>{t('number')}</InputLabel>
+
+                <span>{invoice.number}</span>
+              </div>
+            )}
+            bulkUrl="/api/v1/invoices/bulk"
+          />
+        ) : null}
+      </>
+    );
+  }
 
   return (
     <>

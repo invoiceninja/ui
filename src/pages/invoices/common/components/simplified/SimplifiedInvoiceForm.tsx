@@ -1,0 +1,154 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { Client } from '$app/common/interfaces/client';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { InvoiceItem, InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { ChangeHandler } from '$app/pages/invoices/create/Create';
+import { Dispatch, SetStateAction } from 'react';
+import { InvoicePreview } from '../InvoicePreview';
+import { InvoiceTotals } from '../InvoiceTotals';
+import { SimplifiedClientCard } from './SimplifiedClientCard';
+import { SimplifiedInvoiceMeta } from './SimplifiedInvoiceMeta';
+import { SimplifiedItemsSection } from './SimplifiedItemsSection';
+import { SimplifiedNotesAdvanced } from './SimplifiedNotesAdvanced';
+import { SimplifiedTermsFooter } from './SimplifiedTermsFooter';
+
+interface Props {
+  mode: 'create' | 'edit';
+  invoice?: Invoice;
+  client?: Client;
+  errors: ValidationBag | undefined;
+  invoiceSum?: InvoiceSum | InvoiceSumInclusive;
+  handleChange: ChangeHandler;
+  handleInvitationChange: (contactId: string, value: boolean) => unknown;
+  handleLineItemChange: (index: number, lineItem: InvoiceItem) => unknown;
+  handleLineItemPropertyChange: (
+    key: keyof InvoiceItem,
+    value: unknown,
+    index: number
+  ) => unknown;
+  handleCreateLineItem: (type: InvoiceItemType) => unknown;
+  handleDeleteLineItem: (index: number) => unknown;
+  isDefaultTerms: boolean;
+  isDefaultFooter: boolean;
+  setIsDefaultTerms: Dispatch<SetStateAction<boolean>>;
+  setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
+  /** Edit mode disables client selection. */
+  readonlyClient?: boolean;
+  disableWithSpinner?: boolean;
+}
+
+export function SimplifiedInvoiceForm({
+  mode,
+  invoice,
+  errors,
+  invoiceSum,
+  handleChange,
+  handleInvitationChange,
+  handleLineItemChange,
+  handleLineItemPropertyChange,
+  handleCreateLineItem,
+  handleDeleteLineItem,
+  isDefaultTerms,
+  isDefaultFooter,
+  setIsDefaultTerms,
+  setIsDefaultFooter,
+  readonlyClient,
+  disableWithSpinner,
+}: Props) {
+  const reactSettings = useReactSettings();
+
+  const resetClientFields = () => {
+    handleChange('client_id', '');
+    handleChange('location_id', '');
+    handleChange('tax_name1', '');
+    handleChange('tax_rate1', 0);
+    handleChange('tax_name2', '');
+    handleChange('tax_rate2', 0);
+    handleChange('tax_name3', '');
+    handleChange('tax_rate3', 0);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-stretch">
+        <SimplifiedClientCard
+          invoice={invoice}
+          errors={errors}
+          onChange={(id) => handleChange('client_id', id)}
+          onLocationChange={(id) => handleChange('location_id', id)}
+          onClearButtonClick={resetClientFields}
+          onContactCheckboxChange={handleInvitationChange}
+          readonly={readonlyClient}
+          disableWithSpinner={disableWithSpinner}
+        />
+
+        <SimplifiedInvoiceMeta
+          invoice={invoice}
+          handleChange={handleChange}
+          errors={errors}
+        />
+      </div>
+
+      <SimplifiedItemsSection
+        invoice={invoice}
+        onLineItemChange={handleLineItemChange}
+        onLineItemPropertyChange={handleLineItemPropertyChange}
+        onCreateLineItem={handleCreateLineItem}
+        onDeleteLineItem={handleDeleteLineItem}
+        onSort={(items) => handleChange('line_items', items)}
+      />
+
+      <SimplifiedTermsFooter
+        invoice={invoice}
+        handleChange={handleChange}
+        isDefaultTerms={isDefaultTerms}
+        isDefaultFooter={isDefaultFooter}
+        setIsDefaultTerms={setIsDefaultTerms}
+        setIsDefaultFooter={setIsDefaultFooter}
+      />
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-stretch">
+        <SimplifiedNotesAdvanced invoice={invoice} handleChange={handleChange} />
+
+        {invoice && (
+          <InvoiceTotals
+            relationType="client_id"
+            resource={invoice}
+            invoiceSum={invoiceSum}
+            onChange={(property, value) =>
+              handleChange(property, value as string)
+            }
+          />
+        )}
+      </div>
+
+      {reactSettings?.show_pdf_preview && invoice && (
+        <div className="my-4">
+          <InvoicePreview
+            for={mode === 'create' ? 'create' : 'invoice'}
+            resource={invoice}
+            entity="invoice"
+            relationType="client_id"
+            endpoint="/api/v1/live_preview?entity=:entity"
+            observable={true}
+            initiallyVisible={false}
+            withRemoveLogoCTA={mode === 'edit'}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
