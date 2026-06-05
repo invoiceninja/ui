@@ -35,13 +35,10 @@ type Phase = 'completing' | 'failed';
 export function markCalendarConnected(user: User): User {
   return {
     ...user,
-    referral_meta: {
-      pro: 0,
-      free: 0,
-      enterprise: 0,
-      ...(user.referral_meta ?? {}),
+    settings: {
+      ...(user.settings ?? {}),
       calendar_connection: {
-        ...(user.referral_meta?.calendar_connection ?? {}),
+        ...(user.settings?.calendar_connection ?? {}),
         status: 'CONNECTED',
       },
     },

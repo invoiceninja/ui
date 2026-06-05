@@ -73,7 +73,7 @@ export default function Calendar() {
   const calendarConnectionAvailable = isCalendarConnectionAvailable();
   const calendarConnected =
     calendarConnectionAvailable &&
-    user?.referral_meta?.calendar_connection?.status === 'CONNECTED';
+    user?.settings?.calendar_connection?.status === 'CONNECTED';
 
   const hideEvents = searchParams.get('hide_events') === '1';
   const toggleHideEvents = () => {

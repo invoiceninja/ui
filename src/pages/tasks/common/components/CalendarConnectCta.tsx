@@ -46,7 +46,7 @@ export function CalendarConnectCta() {
   const calendarConnectionAvailable = isCalendarConnectionAvailable();
   const isPaid = useIsPaid();
   const isConnected =
-    user?.referral_meta?.calendar_connection?.status === 'CONNECTED';
+    user?.settings?.calendar_connection?.status === 'CONNECTED';
   const canConnect =
     calendarConnectionAvailable && !isConnected && (isPaid || devCalendar);
   const showPlanAlert = hosted && !isConnected && !isPaid && !devCalendar;
@@ -88,8 +88,8 @@ export function CalendarConnectCta() {
           dispatch(
             updateUser({
               ...user,
-              referral_meta: {
-                ...(user.referral_meta ?? {}),
+              settings: {
+                ...(user.settings ?? {}),
                 calendar_connection: { status: 'DISCONNECTED' },
               },
             })
@@ -141,7 +141,9 @@ export function CalendarConnectCta() {
           }}
         >
           <FaCalendarCheck size={14} color={colors.$3} />
-          <span style={{ color: colors.$3 }}>{user?.referral_meta?.calendar_connection?.email ?? t('disconnect')}</span>
+          <span style={{ color: colors.$3 }}>
+            {user?.settings?.calendar_connection?.email ?? t('disconnect')}
+          </span>
 
           <button
             type="button"
