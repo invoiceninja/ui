@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import dayjs from 'dayjs';
 import type { CalendarProvider } from './user';
 
 export interface CalendarEvent {
@@ -40,6 +41,18 @@ const CALENDAR_EVENT_DATE_TIME =
 export const calendarEventDateKey = (
   eventOrStart: CalendarEvent | string
 ): string => {
+  // Timed events are a UTC instant but are rendered — and logged onto tasks —
+  // in the browser's local timezone. Their calendar day must therefore be
+  // derived AFTER converting to local time, otherwise an event late in the UTC
+  // day lands on the wrong day for users with a positive offset (e.g.
+  // 2026-05-27T17:00Z is 2026-05-28 03:00 at UTC+10), splitting the day from
+  // the clock time displayed alongside it.
+  if (typeof eventOrStart !== 'string' && !eventOrStart.all_day) {
+    return dayjs(eventOrStart.start).format('YYYY-MM-DD');
+  }
+
+  // All-day events (and bare strings) carry a floating wall-clock date that
+  // must NOT be shifted by timezone — extract the date portion verbatim.
   const value =
     typeof eventOrStart === 'string' ? eventOrStart : eventOrStart.start;
   const match = value.match(CALENDAR_EVENT_DATE_TIME);

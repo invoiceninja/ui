@@ -95,7 +95,7 @@ export function CalendarConnectCta() {
             })
           );
         }
-        toast.success('disconnect_calendar');
+        toast.success('disconnected');
         setDisconnectVisible(false);
       },
       onError: () => {
