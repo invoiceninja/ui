@@ -48,8 +48,14 @@ const buildTimeLog = (event: CalendarEvent): string => {
   // All-day events carry no clock times. Anchor a 1h placeholder at 09:00
   // local on the event date so the task at least records the day it happened.
   // The user can edit it after conversion.
+  //
+  // Derive the date from calendarEventDateKey() — the same wall-clock
+  // YYYY-MM-DD used for the task's `date` field below. Parsing the raw
+  // provider string (e.g. Microsoft's midnight-UTC "...T00:00:00Z") through
+  // dayjs() would shift it into the browser timezone first, rolling the day
+  // backwards for users west of UTC and anchoring the task on the wrong date.
   if (event.all_day) {
-    const anchor = dayjs(event.start).startOf('day').hour(9);
+    const anchor = dayjs(calendarEventDateKey(event)).startOf('day').hour(9);
     return JSON.stringify([
       [anchor.unix(), anchor.add(1, 'hour').unix(), '', true],
     ]);

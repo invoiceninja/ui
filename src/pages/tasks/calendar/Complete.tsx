@@ -32,20 +32,28 @@ import { useLocation, useNavigate } from 'react-router-dom';
 // collapses into a single failure the user has to acknowledge.
 type Phase = 'completing' | 'failed';
 
-export function markCalendarConnected(user: User): User {
+export function markCalendarConnected(user: User, email?: string): User {
   return {
     ...user,
-    referral_meta: {
-      pro: 0,
-      free: 0,
-      enterprise: 0,
-      ...(user.referral_meta ?? {}),
+    settings: {
+      ...(user.settings ?? {}),
       calendar_connection: {
-        ...(user.referral_meta?.calendar_connection ?? {}),
+        ...(user.settings?.calendar_connection ?? {}),
         status: 'CONNECTED',
+        ...(email ? { email } : {}),
       },
     },
   };
+}
+
+function completeResponseEmail(response: unknown): string | undefined {
+  const email = (
+    response as {
+      data?: { data?: { calendar_connection?: { email?: unknown } } };
+    }
+  )?.data?.data?.calendar_connection?.email;
+
+  return typeof email === 'string' ? email : undefined;
 }
 
 export default function Complete() {
@@ -102,11 +110,15 @@ export default function Complete() {
 
     complete
       .mutateAsync({ provider: parsedProvider, handoff })
-      .then(() => {
+      .then((response) => {
         const currentUser = userRef.current;
 
         if (currentUser?.id) {
-          dispatch(updateUser(markCalendarConnected(currentUser)));
+          dispatch(
+            updateUser(
+              markCalendarConnected(currentUser, completeResponseEmail(response))
+            )
+          );
         }
 
         $refetch(['users']);

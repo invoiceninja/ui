@@ -75,7 +75,8 @@ export function Search$() {
                   label: record.name,
                   value: record.id,
                   resource: record,
-                  searchable: `${t(key)}: ${record.name}`,
+                  searchable: `${t(key)}: ${record.name} ${record.keywords ?? ''}`,
+                  // searchable: `${t(key)}: ${record.name}`,
                   eventType: 'external',
                 });
               });
