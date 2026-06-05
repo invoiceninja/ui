@@ -411,7 +411,7 @@ export function Actions(props: Props) {
             onValueChange={(value) =>
               props.onFilterChange && props.onFilterChange(value)
             }
-            debounceTimeout={300}
+            debounceTimeout={500}
             clearable
           />
         </div>
