@@ -22,6 +22,7 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankClientQuery } from '$app/common/queries/clients';
 import { ClientSelector as Selector } from '$app/components/clients/ClientSelector';
+import { CountrySelector } from '$app/components/CountrySelector';
 import {
   Button,
   Checkbox,
@@ -51,12 +52,24 @@ interface QuickClientDraft {
   first_name: string;
   last_name: string;
   email: string;
+  name: string;
+  phone: string;
+  address1: string;
+  city: string;
+  postal_code: string;
+  country_id: string;
 }
 
 const emptyDraft: QuickClientDraft = {
   first_name: '',
   last_name: '',
   email: '',
+  name: '',
+  phone: '',
+  address1: '',
+  city: '',
+  postal_code: '',
+  country_id: '',
 };
 
 function useClientsPreview(enabled: boolean) {
@@ -95,6 +108,11 @@ export function SimplifiedClientCard({
   const [createErrors, setCreateErrors] = useState<ValidationBag>();
   const [isSaving, setIsSaving] = useState(false);
   const [didApplyAutoMode, setDidApplyAutoMode] = useState(false);
+  const [showCreateMore, setShowCreateMore] = useState(false);
+  // Tri-state: undefined = still loading / unknown, true = at least one exists, false = zero.
+  const [hasAnyClient, setHasAnyClient] = useState<boolean | undefined>(
+    undefined
+  );
 
   const { data: blankClient } = useBlankClientQuery({
     refetchOnWindowFocus: false,
@@ -116,10 +134,10 @@ export function SimplifiedClientCard({
     }
     if (isPreviewLoading || !previewClients) return;
 
+    setHasAnyClient(previewClients.length > 0);
+
     if (previewClients.length === 0 && canCreateClient) {
       setMode('create');
-    } else if (previewClients.length === 1) {
-      onChange(previewClients[0].id);
     }
 
     setDidApplyAutoMode(true);
@@ -130,7 +148,6 @@ export function SimplifiedClientCard({
     isPreviewLoading,
     previewClients,
     canCreateClient,
-    onChange,
   ]);
 
   useEffect(() => {
@@ -162,6 +179,7 @@ export function SimplifiedClientCard({
     setMode('select');
     setDraft(emptyDraft);
     setCreateErrors(undefined);
+    setShowCreateMore(false);
   };
 
   const handleQuickCreate = () => {
@@ -178,6 +196,13 @@ export function SimplifiedClientCard({
     if (!blankClient) return;
 
     const payload = cloneDeep(blankClient) as Client;
+    payload.name = draft.name;
+    payload.phone = draft.phone;
+    payload.address1 = draft.address1;
+    payload.city = draft.city;
+    payload.postal_code = draft.postal_code;
+    payload.country_id = draft.country_id;
+
     const contact: Partial<ClientContact> = {
       first_name: draft.first_name,
       last_name: draft.last_name,
@@ -208,6 +233,7 @@ export function SimplifiedClientCard({
         );
 
         setDraft(emptyDraft);
+        setShowCreateMore(false);
         setMode('select');
         onChange(created.id);
       })
@@ -222,7 +248,7 @@ export function SimplifiedClientCard({
 
   return (
     <div
-      className="border rounded-md p-6 space-y-4 h-full flex flex-col"
+      className="border rounded-md p-6 space-y-4 self-start w-full"
       style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
     >
       <div className="flex items-center justify-between">
@@ -230,20 +256,25 @@ export function SimplifiedClientCard({
           {t('client')}
         </span>
 
-        {!invoice?.client_id && !readonly && canCreateClient && (
-          <Button
-            type="minimal"
-            behavior="button"
-            onClick={() =>
-              setMode((current) => (current === 'create' ? 'select' : 'create'))
-            }
-            disableWithoutIcon
-          >
-            <span className="text-xs font-semibold">
-              {mode === 'create' ? t('select') : `+ ${t('new_client')}`}
-            </span>
-          </Button>
-        )}
+        {!invoice?.client_id &&
+          !readonly &&
+          canCreateClient &&
+          hasAnyClient !== false && (
+            <Button
+              type="minimal"
+              behavior="button"
+              onClick={() =>
+                setMode((current) =>
+                  current === 'create' ? 'select' : 'create'
+                )
+              }
+              disableWithoutIcon
+            >
+              <span className="text-xs font-semibold">
+                {mode === 'create' ? t('select') : `+ ${t('new_client')}`}
+              </span>
+            </Button>
+          )}
       </div>
 
       {invoice?.client_id && client && (
@@ -346,6 +377,112 @@ export function SimplifiedClientCard({
               }
             />
           </div>
+
+          <div className="self-start">
+            <Button
+              type="minimal"
+              behavior="button"
+              onClick={() => setShowCreateMore((v) => !v)}
+              disableWithoutIcon
+            >
+              <span className="text-xs font-semibold">
+                {showCreateMore
+                  ? `− ${t('additional')}`
+                  : `+ ${t('additional')}`}
+              </span>
+            </Button>
+          </div>
+
+          {showCreateMore && (
+            <div className="space-y-3">
+              <div className="flex flex-col space-y-1.5">
+                <span className={labelClass} style={{ color: colors.$22 }}>
+                  {t('company_name')}
+                </span>
+
+                <InputField
+                  value={draft.name}
+                  onValueChange={(value) =>
+                    setDraft((d) => ({ ...d, name: value }))
+                  }
+                  errorMessage={createErrors?.errors.name}
+                />
+              </div>
+
+              <div className="flex flex-col space-y-1.5">
+                <span className={labelClass} style={{ color: colors.$22 }}>
+                  {t('phone')}
+                </span>
+
+                <InputField
+                  value={draft.phone}
+                  onValueChange={(value) =>
+                    setDraft((d) => ({ ...d, phone: value }))
+                  }
+                  errorMessage={createErrors?.errors.phone}
+                />
+              </div>
+
+              <div className="flex flex-col space-y-1.5">
+                <span className={labelClass} style={{ color: colors.$22 }}>
+                  {t('address1')}
+                </span>
+
+                <InputField
+                  value={draft.address1}
+                  onValueChange={(value) =>
+                    setDraft((d) => ({ ...d, address1: value }))
+                  }
+                  errorMessage={createErrors?.errors.address1}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="flex flex-col space-y-1.5">
+                  <span className={labelClass} style={{ color: colors.$22 }}>
+                    {t('city')}
+                  </span>
+
+                  <InputField
+                    value={draft.city}
+                    onValueChange={(value) =>
+                      setDraft((d) => ({ ...d, city: value }))
+                    }
+                    errorMessage={createErrors?.errors.city}
+                  />
+                </div>
+
+                <div className="flex flex-col space-y-1.5">
+                  <span className={labelClass} style={{ color: colors.$22 }}>
+                    {t('postal_code')}
+                  </span>
+
+                  <InputField
+                    value={draft.postal_code}
+                    onValueChange={(value) =>
+                      setDraft((d) => ({ ...d, postal_code: value }))
+                    }
+                    errorMessage={createErrors?.errors.postal_code}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col space-y-1.5">
+                <span className={labelClass} style={{ color: colors.$22 }}>
+                  {t('country')}
+                </span>
+
+                <CountrySelector
+                  value={draft.country_id}
+                  onChange={(value) =>
+                    setDraft((d) => ({ ...d, country_id: value }))
+                  }
+                  errorMessage={createErrors?.errors.country_id}
+                  dismissable
+                />
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center justify-end gap-x-2 pt-1">
             <Button

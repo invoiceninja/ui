@@ -20,10 +20,11 @@ import { Dispatch, SetStateAction } from 'react';
 import { InvoicePreview } from '../InvoicePreview';
 import { InvoiceTotals } from '../InvoiceTotals';
 import { SimplifiedClientCard } from './SimplifiedClientCard';
+import { SimplifiedFooterCard } from './SimplifiedFooterCard';
 import { SimplifiedInvoiceMeta } from './SimplifiedInvoiceMeta';
 import { SimplifiedItemsSection } from './SimplifiedItemsSection';
 import { SimplifiedNotesAdvanced } from './SimplifiedNotesAdvanced';
-import { SimplifiedTermsFooter } from './SimplifiedTermsFooter';
+import { SimplifiedTermsCard } from './SimplifiedTermsCard';
 
 interface Props {
   mode: 'create' | 'edit';
@@ -83,7 +84,7 @@ export function SimplifiedInvoiceForm({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-stretch">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
         <SimplifiedClientCard
           invoice={invoice}
           errors={errors}
@@ -111,17 +112,15 @@ export function SimplifiedInvoiceForm({
         onSort={(items) => handleChange('line_items', items)}
       />
 
-      <SimplifiedTermsFooter
-        invoice={invoice}
-        handleChange={handleChange}
-        isDefaultTerms={isDefaultTerms}
-        isDefaultFooter={isDefaultFooter}
-        setIsDefaultTerms={setIsDefaultTerms}
-        setIsDefaultFooter={setIsDefaultFooter}
-      />
-
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-stretch">
-        <SimplifiedNotesAdvanced invoice={invoice} handleChange={handleChange} />
+      <div className="grid grid-cols-12 gap-4 items-start">
+        <div className="col-span-12 xl:col-span-8">
+          <SimplifiedTermsCard
+            invoice={invoice}
+            handleChange={handleChange}
+            isDefaultTerms={isDefaultTerms}
+            setIsDefaultTerms={setIsDefaultTerms}
+          />
+        </div>
 
         {invoice && (
           <InvoiceTotals
@@ -133,6 +132,17 @@ export function SimplifiedInvoiceForm({
             }
           />
         )}
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
+        <SimplifiedFooterCard
+          invoice={invoice}
+          handleChange={handleChange}
+          isDefaultFooter={isDefaultFooter}
+          setIsDefaultFooter={setIsDefaultFooter}
+        />
+
+        <SimplifiedNotesAdvanced invoice={invoice} handleChange={handleChange} />
       </div>
 
       {reactSettings?.show_pdf_preview && invoice && (

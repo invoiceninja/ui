@@ -21,8 +21,6 @@ interface Props {
   section: InvoiceEditorSection;
   title: ReactNode;
   subtitle?: ReactNode;
-  /** Rendered inside the header when collapsed; useful to surface state without opening. */
-  collapsedHint?: ReactNode;
   /** If true and no stored preference exists, the section opens by default. */
   autoOpen?: boolean;
   children: ReactNode;
@@ -34,7 +32,6 @@ export function CollapsibleSection({
   section,
   title,
   subtitle,
-  collapsedHint,
   autoOpen,
   children,
   rightSlot,
@@ -48,7 +45,7 @@ export function CollapsibleSection({
   return (
     <div
       className={classNames(
-        'border rounded-md overflow-hidden flex flex-col h-full',
+        'border rounded-md overflow-hidden flex flex-col self-start w-full',
         className
       )}
       style={{
@@ -87,22 +84,13 @@ export function CollapsibleSection({
         </div>
       </button>
 
-      {expanded ? (
+      {expanded && (
         <div
-          className="border-t px-6 py-4 flex-1"
+          className="border-t px-6 py-4"
           style={{ borderColor: colors.$24 }}
         >
           {children}
         </div>
-      ) : (
-        collapsedHint && (
-          <div
-            className="border-t px-6 py-3 flex-1 flex items-center"
-            style={{ borderColor: colors.$24, color: colors.$22 }}
-          >
-            <span className="text-xs">{collapsedHint}</span>
-          </div>
-        )
       )}
     </div>
   );

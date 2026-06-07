@@ -52,7 +52,7 @@ export function SimplifiedInvoiceMeta({
 
   return (
     <div
-      className="border rounded-md p-6 space-y-5 h-full flex flex-col"
+      className="border rounded-md p-6 space-y-5 self-start w-full"
       style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
