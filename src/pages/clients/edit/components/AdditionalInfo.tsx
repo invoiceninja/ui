@@ -29,6 +29,10 @@ import { CurrencySelector } from '$app/components/CurrencySelector';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
+import {
+  isUniquePaymentTerm,
+  shouldPaymentTermBeVisible,
+} from '$app/common/helpers/payment-terms/payment-term-filters';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -148,13 +152,19 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 withBlank
                 customSelector
               >
-                {paymentTermsResponse.data.data.map(
-                  (paymentTerm: PaymentTerm, index: number) => (
+                {paymentTermsResponse.data.data
+                  .filter((paymentTerm: PaymentTerm) =>
+                    shouldPaymentTermBeVisible(
+                      paymentTerm,
+                      client?.settings?.payment_terms
+                    )
+                  )
+                  .filter(isUniquePaymentTerm)
+                  .map((paymentTerm: PaymentTerm, index: number) => (
                     <option key={index} value={paymentTerm.num_days.toString()}>
                       {paymentTerm.name}
                     </option>
-                  )
-                )}
+                  ))}
               </SelectField>
             </Element>
           )}
@@ -171,13 +181,19 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 withBlank
                 customSelector
               >
-                {paymentTermsResponse.data.data.map(
-                  (paymentTerm: PaymentTerm, index: number) => (
+                {paymentTermsResponse.data.data
+                  .filter((paymentTerm: PaymentTerm) =>
+                    shouldPaymentTermBeVisible(
+                      paymentTerm,
+                      client?.settings?.valid_until
+                    )
+                  )
+                  .filter(isUniquePaymentTerm)
+                  .map((paymentTerm: PaymentTerm, index: number) => (
                     <option key={index} value={paymentTerm.num_days.toString()}>
                       {paymentTerm.name}
                     </option>
-                  )
-                )}
+                  ))}
               </SelectField>
             </Element>
           )}

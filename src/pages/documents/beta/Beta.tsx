@@ -22,6 +22,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useEffect } from 'react';
 import { ValidationAlert } from '$app/components/ValidationAlert';
+import { routeWithOrigin } from '$app/common/helpers/route';
 
 export default function Beta() {
   const navigate = useNavigate();
@@ -153,7 +154,6 @@ function Join() {
   const [code, setCode] = useState('');
   const [errors, setErrors] = useState<ValidationBag | null>(null);
 
-  const navigate = useNavigate();
   const account = useCurrentAccount();
   const { isOwner } = useAdmin();
 
@@ -176,7 +176,7 @@ function Join() {
         );
 
         setTimeout(() => {
-          window.location.reload();
+          window.location.href = routeWithOrigin('/docuninja');
         }, 3000);
       })
       .catch((error: AxiosError<ValidationBag>) => {

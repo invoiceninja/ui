@@ -249,6 +249,8 @@ export function Column({
 interface Props {
   report: Identifier;
   columns: string[];
+  draftColumns?: Record[][] | null;
+  onColumnsChange?: (columns: Record[][]) => void;
 }
 
 const positions = [
@@ -319,29 +321,49 @@ export function useColumns({ report, columns }: Props) {
   return { data, defaultColumns };
 }
 
-export function SortableColumns({ report, columns }: Props) {
+export function SortableColumns({
+  report,
+  columns,
+  draftColumns,
+  onColumnsChange,
+}: Props) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
-
-  const { update } = usePreferences();
 
   const { data: persistedData, defaultColumns } = useColumns({
     report,
     columns,
   });
 
-  const [localData, setLocalData] = useState<Record[][]>(persistedData);
+  const [localData, setLocalData] = useState<Record[][]>(
+    draftColumns ?? persistedData
+  );
 
   useEffect(() => {
-    setLocalData(persistedData);
-  }, [report]);
+    setLocalData(draftColumns ?? persistedData);
+  }, [draftColumns, persistedData, report]);
 
-  const syncToPreferences = useCallback(
-    (newData: Record[][]) => {
-      update(`preferences.reports.columns.${report}`, [...newData]);
+  const cloneColumnData = useCallback(
+    (data: Record[][], indexes?: number[]) => {
+      const next = [...data];
+      const indexesToClone = indexes ?? data.map((_, index) => index);
+
+      Array.from(new Set(indexesToClone)).forEach((index) => {
+        next[index] = [...(data[index] ?? [])];
+      });
+
+      return next;
     },
-    [report, update]
+    []
+  );
+
+  const applyColumnChange = useCallback(
+    (newData: Record[][]) => {
+      setLocalData(newData);
+      onColumnsChange?.(newData);
+    },
+    [onColumnsChange]
   );
 
   const onDragEnd = useCallback(
@@ -352,69 +374,64 @@ export function SortableColumns({ report, columns }: Props) {
 
       try {
         const sourceIndex = parseInt(result.source.droppableId);
-        const destinationIndex = parseInt(result.destination!.droppableId);
-        const destinationIndexPosition = result.destination!.index;
+        const destinationIndex = parseInt(result.destination.droppableId);
+        const destinationIndexPosition = result.destination.index;
+        const newData = cloneColumnData(localData, [
+          sourceIndex,
+          destinationIndex,
+        ]);
+        const word = newData[sourceIndex]?.[result.source.index];
 
-        setLocalData((current) => {
-          const newData = [...current];
-          newData[sourceIndex] = [...current[sourceIndex]];
-          newData[destinationIndex] = [...current[destinationIndex]];
+        if (!word || !newData[destinationIndex]) {
+          return;
+        }
 
-          const word = newData[sourceIndex][result.source.index];
-          newData[sourceIndex].splice(result.source.index, 1);
-          newData[destinationIndex].splice(destinationIndexPosition, 0, word);
+        newData[sourceIndex].splice(result.source.index, 1);
+        newData[destinationIndex].splice(destinationIndexPosition, 0, word);
 
-          syncToPreferences(newData);
-          return newData;
-        });
+        applyColumnChange(newData);
       } catch (e) {
-        setLocalData(defaultColumns);
-        syncToPreferences(defaultColumns);
+        applyColumnChange(cloneColumnData(defaultColumns));
       }
     },
-    [defaultColumns, syncToPreferences]
+    [applyColumnChange, cloneColumnData, defaultColumns, localData]
   );
 
   const onRemove = useCallback(
     (record: Record) => {
       const index = positions.indexOf(record.map as (typeof positions)[number]);
 
-      setLocalData((current) => {
-        const newData = [...current];
-        newData[reportColumn] = [...current[reportColumn]];
-        newData[index] = [...current[index]];
+      if (index === -1) {
+        return;
+      }
 
-        newData[reportColumn] = newData[reportColumn].filter(
-          (r) => r.value !== record.value
-        );
+      const newData = cloneColumnData(localData, [reportColumn, index]);
 
-        newData[index].push(record);
+      newData[reportColumn] = newData[reportColumn].filter(
+        (r) => r.value !== record.value
+      );
 
-        syncToPreferences(newData);
-        return newData;
-      });
+      newData[index].push(record);
+
+      applyColumnChange(newData);
     },
-    [syncToPreferences]
+    [applyColumnChange, cloneColumnData, localData]
   );
 
   const onRemoveAll = useCallback(() => {
-    setLocalData(defaultColumns);
-    syncToPreferences(defaultColumns);
-  }, [defaultColumns, syncToPreferences]);
+    applyColumnChange(cloneColumnData(defaultColumns));
+  }, [applyColumnChange, cloneColumnData, defaultColumns]);
 
   const handleAddAll = useCallback(
     (index: number) => {
-      setLocalData((current) => {
-        const newData = [...current];
-        newData[reportColumn] = [...current[reportColumn]];
-        newData[index] = [...current[index]];
-        newData[reportColumn] = [...newData[reportColumn], ...newData[index]];
-        newData[index] = [];
-        syncToPreferences(newData);
-        return newData;
-      });
+      const newData = cloneColumnData(localData, [reportColumn, index]);
+
+      newData[reportColumn] = [...newData[reportColumn], ...newData[index]];
+      newData[index] = [];
+
+      applyColumnChange(newData);
     },
-    [syncToPreferences]
+    [applyColumnChange, cloneColumnData, localData]
   );
 
   const reportColumnsLabel = `${t('report')} ${t('columns')}`;

@@ -324,6 +324,8 @@ export interface Settings {
   e_invoice_type: string;
   default_expense_payment_type_id: string;
   enable_e_invoice: boolean;
+  france_reporting_enabled: boolean;
+  france_reporting_schedule: 'ten_day' | 'monthly';
   send_email_on_mark_paid: boolean;
   classification: string;
   payment_email_all_contacts: boolean;

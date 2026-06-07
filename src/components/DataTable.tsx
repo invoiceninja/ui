@@ -446,7 +446,19 @@ export function DataTable<T extends object>(props: Props<T>) {
       apiEndpoint.searchParams.set('sort', sort);
     }
 
-    apiEndpoint.searchParams.set('status', status as unknown as string);
+    const customStatusValues = (customFilters || [])
+      .filter(
+        (currentFilter) =>
+          currentFilter.queryKey === 'status' &&
+          customFilter?.includes(currentFilter.value)
+      )
+      .map((currentFilter) => currentFilter.value);
+
+    const mergedStatusValues = Array.from(
+      new Set([...(status as string[]), ...customStatusValues])
+    );
+
+    apiEndpoint.searchParams.set('status', mergedStatusValues.join(','));
 
     dateRangeColumns.forEach((dateRangeColumn) => {
       apiEndpoint.searchParams.delete(dateRangeColumn.queryParameterKey);

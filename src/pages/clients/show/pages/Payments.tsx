@@ -14,6 +14,7 @@ import { useParams } from 'react-router-dom';
 import { Payment } from '$app/common/interfaces/payment';
 import { usePaymentColumns } from '$app/pages/payments/common/hooks/usePaymentColumns';
 import { useActions } from '$app/pages/payments/common/hooks/useActions';
+import { usePaymentFilters } from '$app/pages/payments/common/hooks/usePaymentFilters';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { permission } from '$app/common/guards/guards/permission';
 import { getEntityState } from '$app/common/helpers';
@@ -26,6 +27,8 @@ export default function Payments() {
 
   const columns = usePaymentColumns();
 
+  const filters = usePaymentFilters();
+
   const actions = useActions();
 
   return (
@@ -37,6 +40,8 @@ export default function Payments() {
       )}
       columns={columns}
       customActions={actions}
+      customFilters={filters}
+      customFilterPlaceholder="status"
       withResourcefulActions
       bulkRoute="/api/v1/payments/bulk"
       linkToCreate={route('/payments/create?client=:id', { id })}

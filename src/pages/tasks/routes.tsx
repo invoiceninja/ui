@@ -24,6 +24,9 @@ const Create = lazy(() => import('$app/pages/tasks/create/Create'));
 const Task = lazy(() => import('$app/pages/tasks/Task'));
 const Edit = lazy(() => import('$app/pages/tasks/edit/Edit'));
 const Documents = lazy(() => import('$app/pages/tasks/documents/Documents'));
+const Daily = lazy(() => import('$app/pages/tasks/daily/Daily'));
+const Weekly = lazy(() => import('$app/pages/tasks/weekly/Weekly'));
+const Calendar = lazy(() => import('$app/pages/tasks/calendar/Calendar'));
 
 export const taskRoutes = (
   <Route path="/tasks">
@@ -53,6 +56,42 @@ export const taskRoutes = (
             or(permission('view_task'), permission('edit_task')),
           ]}
           component={<Kanban />}
+        />
+      }
+    />
+    <Route
+      path="daily"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.Tasks),
+            or(permission('view_task'), permission('edit_task')),
+          ]}
+          component={<Daily />}
+        />
+      }
+    />
+    <Route
+      path="weekly"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.Tasks),
+            or(permission('view_task'), permission('edit_task')),
+          ]}
+          component={<Weekly />}
+        />
+      }
+    />
+    <Route
+      path="calendar"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.Tasks),
+            or(permission('view_task'), permission('edit_task')),
+          ]}
+          component={<Calendar />}
         />
       }
     />

@@ -14,7 +14,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Client } from '$app/common/interfaces/client';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
-import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetSettingWithLevel } from '$app/common/hooks/useGetSetting';
 import { route } from '$app/common/helpers/route';
 import { CustomFields, useCustomField } from '$app/components/CustomField';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
@@ -24,6 +24,7 @@ import { CurrencyCodeBadge } from './CurrencyCodeBadge';
 import { PaymentTermsBadge } from './PaymentTermsBadge';
 import { TaxDataModal } from './TaxDataModal';
 import { TaxExemptBadge } from './TaxExemptBadge';
+import { Settings } from '$app/common/interfaces/company.interface';
 
 interface Props {
   client: Client;
@@ -37,7 +38,7 @@ export function Details(props: Props) {
   const colors = useColorScheme();
   const company = useCurrentCompany();
 
-  const getSetting = useGetSetting();
+  const getSettingWithLevel = useGetSettingWithLevel();
   const formatMoney = useFormatMoney();
   const customField = useCustomField();
   const formatCustomFieldValue = useFormatCustomFieldValue();
@@ -51,6 +52,12 @@ export function Details(props: Props) {
 
       return Boolean(label && value);
     });
+  };
+
+  const getTestingSettingText = (propertyKey: keyof Settings) => {
+    const { value, level } = getSettingWithLevel(client, propertyKey);
+
+    return level + ': ' + String(value);
   };
 
   return (
@@ -121,14 +128,16 @@ export function Details(props: Props) {
                   {t('group')}
                 </span>
 
-                <Link
-                  className="font-medium"
-                  to={route('/settings/group_settings/:id/edit', {
-                    id: client.group_settings_id,
-                  })}
-                >
-                  {client.group_settings?.name}
-                </Link>
+                <span data-cy="clientGroupSettingsName">
+                  <Link
+                    className="font-medium"
+                    to={route('/settings/group_settings/:id/edit', {
+                      id: client.group_settings_id,
+                    })}
+                  >
+                    {client.group_settings?.name}
+                  </Link>
+                </span>
               </div>
             )}
 
@@ -218,7 +227,7 @@ export function Details(props: Props) {
 
             {import.meta.env.VITE_IS_TEST === 'true' && (
               <span data-cy="settingsTestingSpan">
-                {getSetting(props.client, 'military_time')}
+                {getTestingSettingText('military_time')}
               </span>
             )}
 

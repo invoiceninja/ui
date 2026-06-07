@@ -62,6 +62,7 @@ import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/cust
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
+import { useCloneToCreditFromInvoice } from '../hooks/useCloneToCreditFromInvoice';
 import { useMarkPaid } from '../hooks/useMarkPaid';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 import { useShouldDisplayClientGatewaysAndAutoBill } from '$app/pages/clients/show/hooks/useShouldDisplayClientGatewaysAndAutoBill';
@@ -128,6 +129,7 @@ export function useActions(params?: Params) {
     confirmRectify,
   } = useRectifyInvoiceModal();
   const hasPermission = useHasPermission();
+  const cloneToCreditFromInvoice = useCloneToCreditFromInvoice();
   // const reverseInvoice = useReverseInvoice();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
   const downloadEInvoice = useDownloadEInvoice({ resource: 'invoice' });
@@ -574,6 +576,30 @@ export function useActions(params?: Params) {
           disablePreventNavigation
         >
           {t('rectify')}
+        </EntityActionElement>
+      ),
+    (invoice: Invoice) =>
+      company?.settings.e_invoice_type === 'PEPPOL' &&
+      hasPermission('create_credit') &&
+      !invoice.is_deleted &&
+      [
+        InvoiceStatus.Sent,
+        InvoiceStatus.Partial,
+        InvoiceStatus.Paid,
+      ].includes(invoice.status_id as InvoiceStatus) && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'credit_note',
+          })}
+          entity="invoice"
+          actionKey="credit_note"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('credit_note')}
+          onClick={() => cloneToCreditFromInvoice(invoice)}
+          icon={MdCreditScore}
+          disablePreventNavigation
+        >
+          {t('credit_note')}
         </EntityActionElement>
       ),
   ];

@@ -96,6 +96,10 @@ export const keys = {
     path: '/api/v1/task_statuses',
     dependencies: ['/api/v1/tasks'],
   },
+  tags: {
+    path: '/api/v1/tags',
+    dependencies: ['/api/v1/tasks', '/api/v1/projects'],
+  },
   tasks: {
     path: '/api/v1/tasks',
     dependencies: ['/api/v1/projects', '/api/v1/documents'],

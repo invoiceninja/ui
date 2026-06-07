@@ -29,6 +29,10 @@ import { CountrySelector } from '$app/components/CountrySelector';
 import { LanguageSelector } from '$app/components/LanguageSelector';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
+import {
+  isUniquePaymentTerm,
+  shouldPaymentTermBeVisible,
+} from '$app/common/helpers/payment-terms/payment-term-filters';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { GroupSettingsSelector } from '$app/components/GroupSettingsSelector';
 
@@ -129,7 +133,7 @@ export function ClientCreate({
       )
     ) {
       setErrors({
-        message: t('invalid_data //needs translation'),
+        message: t('please_enter_a_client_or_contact_name'),
         errors: { name: [t('please_enter_a_client_or_contact_name')] },
       });
       toast.error();
@@ -371,16 +375,22 @@ export function ClientCreate({
                   withBlank
                   customSelector
                 >
-                  {paymentTermsResponse.data.data.map(
-                    (paymentTerm: PaymentTerm, index: number) => (
+                  {paymentTermsResponse.data.data
+                    .filter((paymentTerm: PaymentTerm) =>
+                      shouldPaymentTermBeVisible(
+                        paymentTerm,
+                        client?.settings?.payment_terms
+                      )
+                    )
+                    .filter(isUniquePaymentTerm)
+                    .map((paymentTerm: PaymentTerm, index: number) => (
                       <option
                         key={index}
                         value={paymentTerm.num_days.toString()}
                       >
                         {paymentTerm.name}
                       </option>
-                    )
-                  )}
+                    ))}
                 </SelectField>
               )}
 
@@ -395,16 +405,22 @@ export function ClientCreate({
                   withBlank
                   customSelector
                 >
-                  {paymentTermsResponse.data.data.map(
-                    (paymentTerm: PaymentTerm, index: number) => (
+                  {paymentTermsResponse.data.data
+                    .filter((paymentTerm: PaymentTerm) =>
+                      shouldPaymentTermBeVisible(
+                        paymentTerm,
+                        client?.settings?.valid_until
+                      )
+                    )
+                    .filter(isUniquePaymentTerm)
+                    .map((paymentTerm: PaymentTerm, index: number) => (
                       <option
                         key={index}
                         value={paymentTerm.num_days.toString()}
                       >
                         {paymentTerm.name}
                       </option>
-                    )
-                  )}
+                    ))}
                 </SelectField>
               )}
 

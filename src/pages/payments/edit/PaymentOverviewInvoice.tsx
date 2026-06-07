@@ -19,6 +19,7 @@ import { useColorScheme } from '$app/common/colors';
 import { Credit } from '$app/common/interfaces/credit';
 import { ExternalLink } from '$app/components/icons/ExternalLink';
 import { dateUTC } from '$app/common/helpers/payment';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 
 interface Props {
   payment: Payment;
@@ -51,6 +52,7 @@ export function PaymentOverviewInvoice(props: Props) {
   const formatMoney = useFormatMoney();
 
   const colors = useColorScheme();
+  const accentColor = useAccentColor();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   return (
@@ -76,7 +78,7 @@ export function PaymentOverviewInvoice(props: Props) {
                   <span>{setLabel(props.payment, props.paymentable)}</span>
 
                   <div>
-                    <ExternalLink color="#0062FF" size="1.1rem" />
+                    <ExternalLink color={accentColor} size="1.1rem" />
                   </div>
                 </div>
               </Link>
@@ -136,7 +138,7 @@ export function PaymentOverviewInvoice(props: Props) {
                   </span>
 
                   <div>
-                    <ExternalLink color="#0062FF" size="1.1rem" />
+                    <ExternalLink color={accentColor} size="1.1rem" />
                   </div>
                 </div>
               </Link>

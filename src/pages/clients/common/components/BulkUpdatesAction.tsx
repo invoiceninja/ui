@@ -61,6 +61,13 @@ interface BulkUpdateField {
     | 'clientSelector';
 }
 
+const excludedColumnKeys = [
+  'tags',
+  'tag_ids',
+  'task_tag_ids',
+  'project_tag_ids',
+];
+
 const bulkUpdateFieldsTypes: BulkUpdateField[] = [
   { key: 'private_notes', type: 'markdownEditor' },
   { key: 'public_notes', type: 'markdownEditor' },
@@ -131,6 +138,10 @@ export function BulkUpdatesAction(props: Props) {
 
   const showColumn = (columnKey: string) => {
     if (columnKey.includes('rate')) {
+      return false;
+    }
+
+    if (excludedColumnKeys.includes(columnKey)) {
       return false;
     }
 

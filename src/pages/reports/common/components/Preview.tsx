@@ -15,7 +15,11 @@ import { atom, useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { compareValues, detectSortType, extractDisplayValue } from '../utils/sortingUtils';
+import {
+  compareValues,
+  detectSortType,
+  extractDisplayValue,
+} from '../utils/sortingUtils';
 
 export const previewAtom = atom<Preview | null>(null);
 
@@ -66,21 +70,31 @@ export function usePreview() {
       return;
     }
 
-    const copy = cloneDeep(preview);
+    const hasReplacements = preview.columns.some((column) =>
+      replacements.some((r) => r.identifier === column.identifier)
+    );
 
-    copy.rows.map((row) => {
-      row.map((cell) => {
-        const replacement = replacements.find(
-          (replacement) => replacement.identifier === cell.identifier
-        );
+    if (!hasReplacements) {
+      setProcessed(preview);
+      return;
+    }
 
-        if (replacement) {
-          cell.display_value = replacement.format(cell);
-        }
-      });
+    const replacementByIdentifier = new Map(
+      replacements.map((replacement) => [replacement.identifier, replacement])
+    );
+
+    setProcessed({
+      columns: preview.columns,
+      rows: preview.rows.map((row) =>
+        row.map((cell) => {
+          const replacement = replacementByIdentifier.get(cell.identifier);
+
+          return replacement
+            ? { ...cell, display_value: replacement.format(cell) }
+            : cell;
+        })
+      ),
     });
-
-    setProcessed(copy);
   }, [preview]);
 
   return processed;
@@ -139,8 +153,11 @@ export function Preview() {
 
     // Detect the sort type from the first non-empty cell in this column
     const sampleCell = copy.rows
-      .map(row => row.find(cell => cell.identifier === column))
-      .find(cell => cell && cell.display_value !== '' && cell.display_value !== null);
+      .map((row) => row.find((cell) => cell.identifier === column))
+      .find(
+        (cell) =>
+          cell && cell.display_value !== '' && cell.display_value !== null
+      );
 
     const sortType = sampleCell
       ? detectSortType(column, extractDisplayValue(sampleCell))

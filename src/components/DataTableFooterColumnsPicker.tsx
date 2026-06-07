@@ -15,21 +15,15 @@ import { Modal } from './Modal';
 import { Button } from './forms';
 import Toggle from './forms/Toggle';
 import { Element } from './cards';
-import { ReactTableColumns } from '$app/common/hooks/useReactSettings';
-import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { cloneDeep, set } from 'lodash';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { resetChanges, updateUser } from '$app/common/stores/slices/user';
-import { useDispatch } from 'react-redux';
-import { CompanyUser } from '$app/common/interfaces/company-user';
-import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import {
+  ReactTableColumns,
+  useReactSettings,
+  useSaveReactSettings,
+} from '$app/common/hooks/useReactSettings';
 import { toast } from '$app/common/helpers/toast/toast';
-import { User } from '$app/common/interfaces/user';
 import { TableColumns } from './icons/TableColumns';
 import { useColorScheme } from '$app/common/colors';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 
 interface Props {
   table: ReactTableColumns;
@@ -41,66 +35,55 @@ export function DataTableFooterColumnsPicker(props: Props) {
 
   const { table, columns } = props;
 
-  const dispatch = useDispatch();
-  const handleCurrentUserChangeProperty = useHandleCurrentUserChangeProperty();
+  const saveSettings = useSaveReactSettings();
+  const currentUser = useCurrentUser();
+  const reactSettings = useReactSettings();
 
   const colors = useColorScheme();
-  const userChanges = useInjectUserChanges();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [draftColumns, setDraftColumns] = useState<string[]>([]);
+
+  const savedColumns = reactSettings.table_footer_columns?.[table] || [];
+
+  const openModal = () => {
+    setDraftColumns(savedColumns);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setDraftColumns([]);
+    setIsModalOpen(false);
+  };
 
   const isColumnChecked = (columnKey: string) => {
-    return Boolean(
-      userChanges?.company_user?.react_settings?.table_footer_columns?.[
-        table
-      ]?.includes(columnKey)
-    );
+    return (isModalOpen ? draftColumns : savedColumns).includes(columnKey);
   };
 
   const handleChange = (columnKey: string, value: boolean) => {
-    let currentList =
-      userChanges?.company_user?.react_settings.table_footer_columns?.[table] ||
-      [];
+    setDraftColumns((current) => {
+      if (value) {
+        return current.includes(columnKey) ? current : [...current, columnKey];
+      }
 
-    if (value) {
-      currentList = [...currentList, columnKey];
-    } else {
-      currentList = currentList.filter((column) => column !== columnKey);
-    }
-
-    handleCurrentUserChangeProperty(
-      `company_user.react_settings.table_footer_columns.${table}`,
-      currentList as keyof typeof userChanges
-    );
+      return current.filter((column) => column !== columnKey);
+    });
   };
 
   const handleSave = () => {
-    const updatedUser = cloneDeep(userChanges) as User;
+    if (!currentUser?.id || isFormBusy) return;
 
-    if (updatedUser && !isFormBusy) {
-      toast.processing();
-      setIsFormBusy(true);
+    toast.processing();
+    setIsFormBusy(true);
 
-      request(
-        'PUT',
-        endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
-        updatedUser
-      )
-        .then((response: GenericSingleResourceResponse<CompanyUser>) => {
-          toast.success('updated_settings');
-
-          set(updatedUser, 'company_user', response.data.data);
-
-          $refetch(['company_users']);
-
-          dispatch(updateUser(userChanges));
-          dispatch(resetChanges());
-
-          setIsModalOpen(false);
-        })
-        .finally(() => setIsFormBusy(false));
-    }
+    saveSettings(`table_footer_columns.${table}`, draftColumns)
+      .then(() => {
+        toast.success('updated_settings');
+        closeModal();
+      })
+      .catch(() => toast.dismiss())
+      .finally(() => setIsFormBusy(false));
   };
 
   return (
@@ -108,7 +91,7 @@ export function DataTableFooterColumnsPicker(props: Props) {
       <Button
         className="shadow-sm"
         type="secondary"
-        onClick={() => setIsModalOpen(true)}
+        onClick={openModal}
       >
         <div className="flex items-center space-x-2">
           <TableColumns size="1.3rem" color={colors.$3} />
@@ -122,7 +105,7 @@ export function DataTableFooterColumnsPicker(props: Props) {
       <Modal
         title={t('footer')}
         visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={closeModal}
       >
         <div className="flex flex-col">
           {columns.map((column, index) => (
@@ -141,7 +124,7 @@ export function DataTableFooterColumnsPicker(props: Props) {
           ))}
         </div>
 
-        <Button behavior="button" onClick={handleSave}>
+        <Button behavior="button" onClick={handleSave} disabled={isFormBusy}>
           {t('save')}
         </Button>
       </Modal>

@@ -81,6 +81,7 @@ import classNames from 'classnames';
 import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'status',
@@ -125,6 +126,7 @@ export function useAllTaskColumns() {
     'updated_at',
     'user',
     'assigned_user',
+    'tags',
   ] as const;
 
   return taskColumns.map((column) => normalizeColumnName(column));
@@ -383,6 +385,12 @@ export function useTaskColumns() {
       label: t('assigned_user'),
       format: (value, task) =>
         task?.assigned_user ? formatUserName(task?.assigned_user) : '',
+    },
+    {
+      column: 'tags',
+      id: 'task_tag_ids',
+      label: t('tags'),
+      format: (value, task) => <TagPills tags={task.tags} />,
     },
   ];
 

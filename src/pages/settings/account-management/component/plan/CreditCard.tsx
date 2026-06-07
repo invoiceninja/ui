@@ -104,7 +104,7 @@ export function CreditCard({ gateway, onDelete }: CreditCardProps) {
 
       <div
         className="flex flex-col w-full lg:w-72 p-4 rounded border"
-        style={{ borderColor: gateway.is_default ? accentColor : colors.$11 }}
+        style={{ borderColor: gateway.is_default ? accentColor : colors.$1 }}
       >
         <div className="flex justify-between items-center">
           <img src={image()} alt={gateway.meta.brand} className="h-10" />

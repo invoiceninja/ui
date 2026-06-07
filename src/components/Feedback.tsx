@@ -13,14 +13,10 @@ import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { cloneDeep, set } from 'lodash';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { CompanyUser } from '$app/common/interfaces/company-user';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { resetChanges, updateUser } from '$app/common/stores/slices/user';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useDispatch } from 'react-redux';
+import {
+  useSaveReactSettings,
+  useUpdateReactSettings,
+} from '$app/common/hooks/useReactSettings';
 
 dayjs.extend(utc);
 
@@ -29,12 +25,10 @@ export const isFeedbackSliderVisible = atom<boolean>(false);
 export function Feedback() {
   const [t] = useTranslation();
 
-  const dispatch = useDispatch();
-
   const colors = useColorScheme();
-  const currentUser = useCurrentUser();
 
-  const reactSettings = useReactSettings();
+  const updateSettings = useUpdateReactSettings();
+  const saveSettings = useSaveReactSettings();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [feedbackValue, setFeedbackValue] = useState<string>('');
@@ -60,29 +54,11 @@ export function Feedback() {
   const handleUpdateReactSettings = (isDoNotAskAgain: boolean = false) => {
     const currentUnixTime = dayjs().utc().unix();
 
-    const updatedReactSettings = cloneDeep(reactSettings);
-
-    set(updatedReactSettings, 'preferences.feedback_given_at', currentUnixTime);
-    set(
-      updatedReactSettings,
+    updateSettings('preferences.feedback_given_at', currentUnixTime);
+    saveSettings(
       'preferences.feedback_slider_displayed_at',
       isDoNotAskAgain ? -1 : currentUnixTime
-    );
-
-    request(
-      'PUT',
-      endpoint('/api/v1/company_users/:id/preferences?include=company_user', {
-        id: currentUser?.id,
-      }),
-      {
-        react_settings: updatedReactSettings,
-      }
-    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
-      $refetch(['company_users']);
-
-      dispatch(updateUser(response.data.data));
-      dispatch(resetChanges());
-    });
+    ).catch(() => undefined);
   };
 
   const handleFeedbackSubmit = (
@@ -101,7 +77,7 @@ export function Feedback() {
         .then(() => {
           handleUpdateReactSettings(isDoNotAskAgain);
 
-          toast.success('feedback_submitted');
+          toast.success('thank_you_for_feedback');
 
           setIsSubmitted(true);
 
@@ -117,25 +93,9 @@ export function Feedback() {
   const handleDoNotAskAgain = () => {
     setIsVisible(false);
     setShowFeedbackModal(false);
-
-    const updatedReactSettings = cloneDeep(reactSettings);
-
-    set(updatedReactSettings, 'preferences.feedback_slider_displayed_at', -1);
-
-    request(
-      'PUT',
-      endpoint('/api/v1/company_users/:id/preferences?include=company_user', {
-        id: currentUser?.id,
-      }),
-      {
-        react_settings: updatedReactSettings,
-      }
-    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
-      $refetch(['company_users']);
-
-      dispatch(updateUser(response.data.data));
-      dispatch(resetChanges());
-    });
+    saveSettings('preferences.feedback_slider_displayed_at', -1).catch(
+      () => undefined
+    );
   };
 
   if (isSubmitted) {
