@@ -103,7 +103,7 @@ function EmailTemplates() {
         }
       )
         .then(() => {
-          toast.success('templates_updated');
+          toast.success('template_updated');
           $refetch(['docuninja_templates']);
           setErrors(null);
         })

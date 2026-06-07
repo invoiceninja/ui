@@ -16,10 +16,7 @@
  * falls back to parseFloat(toFixed()) since at that magnitude the fractional part
  * is already imprecise due to IEEE 754.
  */
-export function roundToPrecision(
-  value: number,
-  precision: number = 2
-): number {
+export function roundToPrecision(value: number, precision: number = 2): number {
   if (Math.abs(value) < 1e-10) return 0;
 
   const isNegative = value < 0;
@@ -41,4 +38,31 @@ export function roundToPrecision(
   }
 
   return value;
+}
+
+export function precisionOrDefault(precision?: number): number {
+  return precision ?? 2;
+}
+
+export function percentageOf(
+  amount: number,
+  percentage: number,
+  precision = 2
+): number {
+  return roundToPrecision(unroundedPercentageOf(amount, percentage), precision);
+}
+
+export function unroundedPercentageOf(
+  amount: number,
+  percentage: number
+): number {
+  return Number((amount * ((percentage ?? 0) / 100)).toPrecision(15));
+}
+
+export function taxKey(name: string, rate: number): string {
+  return `${name}${rate}`.replace(/\s/g, '');
+}
+
+export function formatTaxName(name: string, rate: number): string {
+  return `${name} ${parseFloat(rate.toString())} %`;
 }

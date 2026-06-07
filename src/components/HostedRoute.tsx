@@ -11,6 +11,10 @@
 import { Navigate, Outlet } from 'react-router';
 import { isHosted } from '../common/helpers';
 
-export function HostedRoute() {
-  return isHosted() ? <Outlet /> : <Navigate to="/" />;
+interface Props {
+  enabled?: boolean;
+}
+
+export function HostedRoute({ enabled = isHosted() }: Props = {}) {
+  return enabled ? <Outlet /> : <Navigate to="/" />;
 }

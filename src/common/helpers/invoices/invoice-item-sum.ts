@@ -13,10 +13,26 @@ import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Currency } from '$app/common/interfaces/currency';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import { roundToPrecision } from './round';
+import { Credit } from '$app/common/interfaces/credit';
+import { Quote } from '$app/common/interfaces/quote';
+import {
+  formatTaxName,
+  percentageOf,
+  precisionOrDefault,
+  unroundedPercentageOf,
+  roundToPrecision,
+  taxKey,
+} from './round';
+import type { TaxItem } from './invoice-sum';
+
+interface LineTaxDefinition {
+  name: string;
+  rate: number;
+  taxId: string;
+}
 
 export class InvoiceItemSum {
-  public taxCollection = collect();
+  public taxCollection = collect<TaxItem>();
 
   public lineItems: InvoiceItem[] = [];
   protected items = new Map();
@@ -27,10 +43,19 @@ export class InvoiceItemSum {
   public totalTaxes = 0;
 
   constructor(
-    protected invoice: Invoice | RecurringInvoice | PurchaseOrder,
+    protected invoice:
+      | Invoice
+      | RecurringInvoice
+      | PurchaseOrder
+      | Credit
+      | Quote,
     protected currency: Currency,
     protected eInvoiceType?: string
   ) {}
+
+  protected get precision(): number {
+    return precisionOrDefault(this.currency?.precision);
+  }
 
   public get isPeppol(): boolean {
     return this.eInvoiceType === 'PEPPOL';
@@ -41,7 +66,7 @@ export class InvoiceItemSum {
       return this.items;
     }
 
-    this.calculateLineItems();
+    this.calculateLineItems().addPeppolSurchargeTaxes();
 
     return this;
   }
@@ -63,19 +88,33 @@ export class InvoiceItemSum {
   }
 
   protected sumLineItem() {
-    this.item.line_total =
-      this.item.cost * this.item.quantity + 0.000000000000004;
+    this.item.line_total = roundToPrecision(
+      this.item.cost * this.item.quantity + 0.000000000000004,
+      2
+    );
 
     return this;
   }
 
   protected setDiscount() {
     if (this.invoice.is_amount_discount) {
-      this.item.line_total = roundToPrecision(this.item.line_total - this.item.discount, this.currency?.precision || 2);
-    } else {
-      const discount = this.item.line_total * (this.item.discount / 100);
+      const discount = roundToPrecision(this.item.discount, this.precision);
 
-      this.item.line_total = roundToPrecision(this.item.line_total - discount, this.currency?.precision || 2);
+      this.item.line_total = roundToPrecision(
+        this.item.line_total - discount,
+        2
+      );
+    } else {
+      const discount = unroundedPercentageOf(
+        this.item.line_total,
+        this.item.discount
+      );
+      const lineTotal = roundToPrecision(
+        this.item.line_total - discount,
+        this.precision
+      );
+
+      this.item.line_total = roundToPrecision(lineTotal, 2);
     }
 
     this.item.is_amount_discount = this.invoice.is_amount_discount;
@@ -88,7 +127,7 @@ export class InvoiceItemSum {
 
     const amount =
       this.item.line_total -
-      this.item.line_total * (this.invoice.discount / 100);
+      unroundedPercentageOf(this.item.line_total, this.invoice.discount);
 
     const itemTaxRateOneLocal = this.calculateAmountLineTax(
       this.item.tax_rate1,
@@ -97,11 +136,13 @@ export class InvoiceItemSum {
 
     itemTax += itemTaxRateOneLocal;
 
-    if (this.item.tax_name1.length >= 1) {
+    if (this.item.tax_name1.length > 1) {
       this.groupTax(
         this.item.tax_name1,
         this.item.tax_rate1,
-        itemTaxRateOneLocal
+        itemTaxRateOneLocal,
+        amount,
+        this.item.tax_id
       );
     }
 
@@ -114,11 +155,13 @@ export class InvoiceItemSum {
 
     itemTax += itemTaxRateTwoLocal;
 
-    if (this.item.tax_name2.length >= 1) {
+    if (this.item.tax_name2.length > 1) {
       this.groupTax(
         this.item.tax_name2,
         this.item.tax_rate2,
-        itemTaxRateTwoLocal
+        itemTaxRateTwoLocal,
+        amount,
+        this.item.tax_id
       );
     }
 
@@ -129,53 +172,69 @@ export class InvoiceItemSum {
 
     itemTax += itemTaxRateThreeLocal;
 
-    if (this.item.tax_name3.length >= 1) {
+    if (this.item.tax_name3.length > 1) {
       this.groupTax(
         this.item.tax_name3,
         this.item.tax_rate3,
-        itemTaxRateThreeLocal
+        itemTaxRateThreeLocal,
+        amount,
+        this.item.tax_id
       );
     }
 
-    this.item.gross_line_total =
-      this.item.line_total + (isNaN(itemTax) ? 0 : itemTax);
+    const taxAmount = isNaN(itemTax)
+      ? 0
+      : roundToPrecision(itemTax, this.precision);
 
-    this.totalTaxes += isNaN(itemTax) ? 0 : itemTax;
+    this.item.gross_line_total = roundToPrecision(
+      this.item.line_total + taxAmount,
+      this.precision
+    );
+    this.item.tax_amount = taxAmount;
+    this.item.net_cost = this.item.cost;
+
+    this.totalTaxes += taxAmount;
 
     return this;
   }
 
-  protected groupTax(name: string, rate: number, total: number) {
+  protected groupTax(
+    name: string,
+    rate: number,
+    total: number,
+    baseAmount = 0,
+    taxId = ''
+  ) {
     if (name.length === 0) return;
 
-    let group = {};
+    const group: TaxItem = {
+      key: taxKey(name, rate),
+      total,
+      name: formatTaxName(name, rate),
+      tax_id: taxId,
+      tax_rate: rate,
+      base_amount: baseAmount,
+    };
 
-    const key = name + rate.toString().replace(' ', ''); // 'Tax Rate' + '5' => 'TaxRate5'
-
-    group = { key, total, name: `${name} ${parseFloat(rate.toString())} %` }; // 'Tax Rate 5.00%'
-
-    this.taxCollection.push(collect(group));
+    this.taxCollection.push(group);
   }
 
   protected calculateAmountLineTax(rate: number, amount: number) {
-    const result = (amount * rate) / 100;
+    const result = Number((amount * ((rate ?? 0) / 100)).toPrecision(15));
 
     if (this.isPeppol) {
       return result;
     }
 
-    return roundToPrecision(result, this.currency?.precision || 2);
+    return roundToPrecision(result, 2);
   }
 
   protected push() {
     this.subTotal += roundToPrecision(
       this.item.line_total + 0.000000000000004,
-      this.currency?.precision || 2
+      this.precision
     );
-    this.subTotal = roundToPrecision(
-      this.subTotal,
-      this.currency?.precision || 2
-    );
+    this.subTotal = roundToPrecision(this.subTotal, this.precision);
 
     this.grossSubTotal += this.item.gross_line_total;
 
@@ -185,7 +244,7 @@ export class InvoiceItemSum {
   }
 
   public calculateTaxesWithAmountDiscount() {
-    this.taxCollection = collect();
+    this.taxCollection = collect<TaxItem>();
 
     this.totalTaxes = 0;
 
@@ -197,8 +256,10 @@ export class InvoiceItemSum {
 
         if (item.line_total != 0) {
           const amount =
-            this.item.line_total -
-            this.item.line_total * (this.invoice.discount / this.subTotal);
+            this.subTotal === 0
+              ? this.item.line_total
+              : this.item.line_total -
+                this.item.line_total * (this.invoice.discount / this.subTotal);
 
           const itemTaxRateOneTotal = this.calculateAmountLineTax(
             this.item.tax_rate1,
@@ -207,11 +268,13 @@ export class InvoiceItemSum {
 
           itemTax += itemTaxRateOneTotal;
 
-          if (itemTaxRateOneTotal !== 0) {
+          if (this.item.tax_name1.length > 1 || itemTaxRateOneTotal !== 0) {
             this.groupTax(
               this.item.tax_name1,
               this.item.tax_rate1,
-              itemTaxRateOneTotal
+              itemTaxRateOneTotal,
+              amount,
+              this.item.tax_id
             );
           }
 
@@ -224,11 +287,13 @@ export class InvoiceItemSum {
 
           itemTax += itemTaxRateTwoTotal;
 
-          if (itemTaxRateTwoTotal !== 0) {
+          if (this.item.tax_name2.length > 1 || itemTaxRateTwoTotal !== 0) {
             this.groupTax(
               this.item.tax_name2,
               this.item.tax_rate2,
-              itemTaxRateTwoTotal
+              itemTaxRateTwoTotal,
+              amount,
+              this.item.tax_id
             );
           }
 
@@ -241,21 +306,104 @@ export class InvoiceItemSum {
 
           itemTax += itemTaxRateThree;
 
-          if (itemTaxRateThree !== 0) {
+          if (this.item.tax_name3.length > 1 || itemTaxRateThree !== 0) {
             this.groupTax(
               this.item.tax_name3,
               this.item.tax_rate3,
-              itemTaxRateThree
+              itemTaxRateThree,
+              amount,
+              this.item.tax_id
             );
           }
 
-          this.item.gross_line_total =
-            this.item.line_total + (isNaN(itemTax) ? 0 : itemTax);
-          this.item.tax_amount = isNaN(itemTax) ? 0 : itemTax;
+          const taxAmount = isNaN(itemTax)
+            ? 0
+            : roundToPrecision(itemTax, this.precision);
+
+          this.item.gross_line_total = roundToPrecision(
+            this.item.line_total + taxAmount,
+            this.precision
+          );
+          this.item.tax_amount = taxAmount;
+          this.item.net_cost = this.item.cost;
         }
 
         this.lineItems[index] = this.item;
-        this.totalTaxes += isNaN(itemTax) ? 0 : itemTax;
+        this.totalTaxes += isNaN(itemTax)
+          ? 0
+          : roundToPrecision(itemTax, this.precision);
       });
+
+    this.addPeppolSurchargeTaxes();
+
+    return this;
+  }
+
+  protected addPeppolSurchargeTaxes() {
+    if (!this.isPeppol) {
+      return this;
+    }
+
+    const surchargeTotal = this.getSurchargeValues().reduce(
+      (sum, surcharge) => sum + surcharge,
+      0
+    );
+
+    if (surchargeTotal === 0) {
+      return this;
+    }
+
+    this.getUniqueLineTaxes().forEach(({ name, rate, taxId }) => {
+      const taxComponent = this.getSurchargeValues().reduce(
+        (sum, surcharge) => sum + percentageOf(surcharge, rate, 2),
+        0
+      );
+
+      if (taxComponent > 0) {
+        this.groupTax(name, rate, taxComponent, surchargeTotal, taxId);
+        this.totalTaxes += taxComponent;
+      }
+    });
+
+    return this;
+  }
+
+  protected getSurchargeValues() {
+    return [
+      this.invoice.custom_surcharge1,
+      this.invoice.custom_surcharge2,
+      this.invoice.custom_surcharge3,
+      this.invoice.custom_surcharge4,
+    ].map((surcharge) => surcharge || 0);
+  }
+
+  protected getUniqueLineTaxes() {
+    const definitions: LineTaxDefinition[] = [];
+
+    this.lineItems.forEach((item) => {
+      [
+        { name: item.tax_name1, rate: item.tax_rate1 },
+        { name: item.tax_name2, rate: item.tax_rate2 },
+        { name: item.tax_name3, rate: item.tax_rate3 },
+      ].forEach(({ name, rate }) => {
+        if (name.length > 1) {
+          definitions.push({ name, rate, taxId: item.tax_id });
+        }
+      });
+    });
+
+    const seen = new Set<string>();
+
+    return definitions.filter(({ name, rate }) => {
+      const key = taxKey(name, rate);
+
+      if (seen.has(key)) {
+        return false;
+      }
+
+      seen.add(key);
+
+      return true;
+    });
   }
 }

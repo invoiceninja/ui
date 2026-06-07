@@ -8,15 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isCalendarConnectionAvailable } from '$app/common/helpers';
 import { Default } from '$app/components/layouts/Default';
 import { Button } from '$app/components/forms';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useTasksQuery } from '$app/common/queries/tasks';
 import { Task } from '$app/common/interfaces/task';
-import {
-  parseTimeLog,
-  TimeLogType,
-} from '$app/pages/tasks/common/helpers/calculate-time';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,34 +31,20 @@ import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useCalendarEventsQuery } from '$app/common/queries/calendar';
 import {
   CalendarEvent,
+  calendarEventDateKey,
   calendarEventKey,
 } from '$app/common/interfaces/calendar-event';
-import { FaGoogle, FaMicrosoft } from 'react-icons/fa';
+import { FaGoogle, FaMicrosoft, FaTasks } from 'react-icons/fa';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import Tippy from '@tippyjs/react';
-import { taskCalendarLabel } from '../common/helpers/task-label';
+import {
+  taskCalendarLabel,
+  taskPrimaryLabel,
+  taskSecondaryLabel,
+} from '../common/helpers/task-label';
 import { useTaskDateDisplay } from '../common/hooks/useTaskDateDisplay';
 
-const formatHours = (seconds: number) => {
-  if (!seconds) return '';
-  const hours = seconds / 3600;
-  return hours.toFixed(2).replace(/\.00$/, '') + 'h';
-};
-
-// Cap on tasks shown in the per-day hover tooltip — keeps the popover from
-// running off-screen on busy days.
-const TASK_TOOLTIP_MAX = 5;
-
-const taskSeconds = (task: Task): number => {
-  const logs = parseTimeLog(task.time_log) as TimeLogType[];
-  let total = 0;
-  logs.forEach(([s, e]) => {
-    if (!s) return;
-    const finish = e || dayjs().unix();
-    total += Math.max(finish - s, 0);
-  });
-  return total;
-};
+const TASK_HINT_MAX = 3;
 
 export default function Calendar() {
   const { documentTitle } = useTitle('calendar');
@@ -87,8 +70,10 @@ export default function Calendar() {
   const [convertVisible, setConvertVisible] = useState(false);
 
   const user = useCurrentUser();
+  const calendarConnectionAvailable = isCalendarConnectionAvailable();
   const calendarConnected =
-    user?.referral_meta?.calendar_connection?.status === 'CONNECTED';
+    calendarConnectionAvailable &&
+    user?.settings?.calendar_connection?.status === 'CONNECTED';
 
   const hideEvents = searchParams.get('hide_events') === '1';
   const toggleHideEvents = () => {
@@ -137,9 +122,9 @@ export default function Calendar() {
   const dailyEvents = useMemo(() => {
     const out: Record<string, CalendarEvent[]> = {};
     (calendarEvents ?? []).forEach((ev) => {
-      // Already converted into a task — hide it from the calendar entirely.
+      // Already converted into a task, so hide it from the calendar entirely.
       if (linkedEventKeys.has(linkKeyForEvent(ev))) return;
-      const key = dayjs(ev.start).format('YYYY-MM-DD');
+      const key = calendarEventDateKey(ev);
       (out[key] ||= []).push(ev);
     });
     Object.values(out).forEach((list) =>
@@ -148,8 +133,8 @@ export default function Calendar() {
     return out;
   }, [calendarEvents, linkedEventKeys]);
 
-  // dayKey → tasks landed on that day; used by the hover tooltip on each
-  // cell so users can scan task names without leaving the monthly view.
+  // dayKey -> tasks anchored to that task date. These render as direct task
+  // links only; the month grid intentionally avoids time-total accounting.
   const tasksByDay = useMemo(() => {
     const out: Record<string, Task[]> = {};
     allTasks.forEach((task) => {
@@ -159,32 +144,6 @@ export default function Calendar() {
     });
     return out;
   }, [allTasks]);
-
-  // dayKey → { total, billable } — bucketed by task.date, summing every log
-  // entry on that task.
-  const dailyTotals = useMemo(() => {
-    const out: Record<string, { total: number; billable: number }> = {};
-    allTasks.forEach((task) => {
-      const key = task.date;
-      if (!key) return;
-      const logs = parseTimeLog(task.time_log) as TimeLogType[];
-      logs.forEach(([s, e, , billable]) => {
-        if (!s) return;
-        const finish = e || dayjs().unix();
-        const seconds = Math.max(finish - s, 0);
-        if (seconds <= 0) return;
-        if (!out[key]) out[key] = { total: 0, billable: 0 };
-        out[key].total += seconds;
-        if (billable !== false) out[key].billable += seconds;
-      });
-    });
-    return out;
-  }, [allTasks]);
-
-  const monthTotalSeconds = cells.reduce((sum, day) => {
-    if (day.month() !== monthAnchor.month()) return sum;
-    return sum + (dailyTotals[day.format('YYYY-MM-DD')]?.total ?? 0);
-  }, 0);
 
   const setDate = (next: string) => {
     const updated = new URLSearchParams(searchParams);
@@ -252,9 +211,6 @@ export default function Calendar() {
               <div className="font-medium" style={{ color: colors.$3 }}>
                 {displayDate(monthAnchor)}
               </div>
-              <div className="text-xs" style={{ color: colors.$17 }}>
-                {(monthTotalSeconds / 3600).toFixed(2)} {t('hours')}
-              </div>
             </div>
 
             <button
@@ -279,25 +235,27 @@ export default function Calendar() {
                 content={hideEvents ? t('show_events') : t('hide_events')}
                 className="rounded-md text-xs p-2 bg-[#F2F2F2] text-black"
               >
-                <Button
-                  type="secondary"
-                  onClick={toggleHideEvents}
-                  aria-label={
-                    (hideEvents
-                      ? t('show_events')
-                      : t('hide_events')) as string
-                  }
-                >
-                  {hideEvents ? (
-                    <AiFillEyeInvisible size={16} />
-                  ) : (
-                    <AiFillEye size={16} />
-                  )}
-                </Button>
+                <span className="inline-flex">
+                  <Button
+                    type="secondary"
+                    onClick={toggleHideEvents}
+                    aria-label={
+                      (hideEvents
+                        ? t('show_events')
+                        : t('hide_events')) as string
+                    }
+                  >
+                    {hideEvents ? (
+                      <AiFillEyeInvisible size={16} />
+                    ) : (
+                      <AiFillEye size={16} />
+                    )}
+                  </Button>
+                </span>
               </Tippy>
             )}
 
-            <CalendarConnectCta />
+            {calendarConnectionAvailable && <CalendarConnectCta />}
 
             <Button
               onClick={() => {
@@ -351,174 +309,233 @@ export default function Calendar() {
               {(() => {
                 const today = dayjs();
                 return cells.map((day) => {
-                const dayKey = day.format('YYYY-MM-DD');
-                const isCurrentMonth = day.month() === monthAnchor.month();
-                const isToday = day.isSame(today, 'day');
-                const totals = dailyTotals[dayKey];
-                const total = totals?.total ?? 0;
-                const billable = totals?.billable ?? 0;
-                const events = hideEvents ? [] : dailyEvents[dayKey] ?? [];
-                const visibleEvents = events.slice(0, 3);
-                const overflowCount = events.length - visibleEvents.length;
-                const dayTasks = tasksByDay[dayKey] ?? [];
-                const tooltipTasks = dayTasks.slice(0, TASK_TOOLTIP_MAX);
-                const tooltipOverflow = dayTasks.length - tooltipTasks.length;
+                  const dayKey = day.format('YYYY-MM-DD');
+                  const isCurrentMonth = day.month() === monthAnchor.month();
+                  const isToday = day.isSame(today, 'day');
+                  const events = hideEvents ? [] : dailyEvents[dayKey] ?? [];
+                  const visibleEvents = events.slice(0, 3);
+                  const overflowEvents = events.slice(visibleEvents.length);
+                  const overflowCount = overflowEvents.length;
+                  const dayTasks = tasksByDay[dayKey] ?? [];
+                  const visibleTaskHints = dayTasks.slice(0, TASK_HINT_MAX);
+                  const overflowTaskHints = dayTasks.slice(TASK_HINT_MAX);
 
-                const openDay = () => navigate(`/tasks/daily?date=${dayKey}`);
+                  const openDay = () => navigate(`/tasks/daily?date=${dayKey}`);
+                  const openTask = (task: Task) =>
+                    navigate(`/tasks/${task.id}/edit`);
 
-                const tooltipContent =
-                  tooltipTasks.length > 0 ? (
-                    <div className="text-left">
-                      <div className="font-medium mb-1">
-                        {displayDate(day)}
-                      </div>
-                      {tooltipTasks.map((task) => (
-                        <div
-                          key={task.id}
-                          className="flex items-baseline gap-2 truncate max-w-[18rem]"
-                        >
-                          <span className="truncate flex-1">
-                            {taskCalendarLabel(task)}
-                          </span>
-                          <span className="font-mono text-[10px] opacity-70">
-                            {formatHours(taskSeconds(task))}
-                          </span>
+                  const taskOverview = (task: Task) => {
+                    const secondary = taskSecondaryLabel(task);
+
+                    return (
+                      <div className="text-left max-w-[18rem]">
+                        <div className="font-medium truncate">
+                          {taskPrimaryLabel(task, 90)}
                         </div>
-                      ))}
-                      {tooltipOverflow > 0 && (
-                        <div className="text-[10px] opacity-70 mt-1">
-                          +{tooltipOverflow} {t('more_count')}
-                        </div>
-                      )}
-                    </div>
-                  ) : null;
-
-                const cell = (
-                  <div
-                    key={dayKey}
-                    role="button"
-                    tabIndex={0}
-                    onClick={openDay}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        openDay();
-                      }
-                    }}
-                    className="text-left p-2 min-h-[5rem] border-b border-r last:border-r-0 hover:opacity-95 focus:outline-none focus:ring-2 cursor-pointer"
-                    style={{
-                      borderColor: colors.$5,
-                      backgroundColor: isCurrentMonth ? colors.$1 : colors.$2,
-                      color: isCurrentMonth ? colors.$3 : colors.$17,
-                      opacity: isCurrentMonth ? 1 : 0.6,
-                    }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span
-                        className={
-                          isToday
-                            ? 'inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-semibold'
-                            : 'text-xs font-medium'
-                        }
-                        style={
-                          isToday
-                            ? { backgroundColor: '#2176FF', color: '#fff' }
-                            : undefined
-                        }
-                      >
-                        {day.date()}
-                      </span>
-                      {total > 0 && (
-                        <span
-                          className="text-[10px] font-mono"
-                          style={{ color: colors.$17 }}
-                        >
-                          {formatHours(total)}
-                        </span>
-                      )}
-                    </div>
-
-                    {total > 0 && (
-                      <div className="mt-2 text-xs space-y-0.5">
-                        <div
-                          className="font-mono"
-                          style={{ color: colors.$3 }}
-                        >
-                          {(total / 3600).toFixed(2)} {t('total')}
-                        </div>
-                        {billable !== total && (
-                          <div
-                            className="font-mono text-[10px]"
-                            style={{ color: colors.$17 }}
-                          >
-                            {(billable / 3600).toFixed(2)} {t('billable')}
+                        {secondary && (
+                          <div className="text-[10px] opacity-70 truncate mt-0.5">
+                            {secondary}
                           </div>
                         )}
+                        <div className="font-mono text-[10px] opacity-70 mt-1">
+                          #{task.number || task.id.slice(0, 6)}
+                        </div>
                       </div>
-                    )}
+                    );
+                  };
 
-                    {visibleEvents.length > 0 && (
-                      <div className="mt-2 space-y-1">
-                        {visibleEvents.map((ev) => {
-                          const key = calendarEventKey(ev);
+                  const eventOverflowTooltipContent =
+                    overflowEvents.length > 0 ? (
+                      <div className="text-left space-y-1">
+                        {overflowEvents.map((ev) => {
                           const ProviderIcon =
                             ev.provider === 'google' ? FaGoogle : FaMicrosoft;
+
                           return (
-                            <button
-                              key={key}
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setConvertEvent(ev);
-                                setConvertVisible(true);
-                              }}
-                              className="w-full flex items-center gap-1 px-1 py-0.5 rounded text-[10px] truncate"
-                              style={{
-                                backgroundColor: colors.$2,
-                                color: colors.$3,
-                              }}
-                              title={ev.title}
+                            <div
+                              key={calendarEventKey(ev)}
+                              className="flex items-center gap-2 max-w-[18rem]"
                             >
-                              <ProviderIcon size={9} />
+                              <ProviderIcon size={10} />
                               {!ev.all_day && (
-                                <span className="font-mono">
+                                <span className="font-mono text-[10px] opacity-70">
                                   {displayTime(ev.start)}
                                 </span>
                               )}
-                              <span className="truncate flex-1 text-left">
-                                {ev.title}
-                              </span>
-                            </button>
+                              <span className="truncate">{ev.title}</span>
+                            </div>
                           );
                         })}
-                        {overflowCount > 0 && (
-                          <div
-                            className="text-[10px] text-right"
-                            style={{ color: colors.$17 }}
-                          >
-                            +{overflowCount} {t('more_count')}
-                          </div>
-                        )}
                       </div>
-                    )}
-                  </div>
-                );
+                    ) : null;
 
-                return tooltipContent ? (
-                  <Tippy
-                    key={dayKey}
-                    duration={0}
-                    delay={[200, 0]}
-                    placement="top"
-                    content={tooltipContent}
-                    className="rounded-md text-xs p-2 bg-[#F2F2F2] text-black shadow"
-                  >
-                    {cell}
-                  </Tippy>
-                ) : (
-                  cell
-                );
-              });
+                  const cell = (
+                    <div
+                      key={dayKey}
+                      role="button"
+                      tabIndex={0}
+                      onClick={openDay}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          openDay();
+                        }
+                      }}
+                      className="text-left p-2 min-h-[5rem] border-b border-r last:border-r-0 hover:opacity-95 focus:outline-none focus:ring-2 cursor-pointer"
+                      style={{
+                        borderColor: colors.$5,
+                        backgroundColor: isCurrentMonth ? colors.$1 : colors.$2,
+                        color: isCurrentMonth ? colors.$3 : colors.$17,
+                        opacity: isCurrentMonth ? 1 : 0.6,
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span
+                          className={
+                            isToday
+                              ? 'inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-semibold'
+                              : 'text-xs font-medium'
+                          }
+                          style={
+                            isToday
+                              ? { backgroundColor: '#2176FF', color: '#fff' }
+                              : undefined
+                          }
+                        >
+                          {day.date()}
+                        </span>
+                      </div>
+
+                      {dayTasks.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {visibleTaskHints.map((task) => (
+                            <Tippy
+                              key={task.id}
+                              duration={0}
+                              delay={[200, 0]}
+                              placement="top"
+                              content={taskOverview(task)}
+                              className="rounded-md text-xs p-2 bg-[#F2F2F2] text-black shadow"
+                            >
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openTask(task);
+                                }}
+                                className="inline-flex h-5 w-5 items-center justify-center rounded border"
+                                style={{
+                                  borderColor: colors.$5,
+                                  backgroundColor: colors.$2,
+                                  color: colors.$3,
+                                }}
+                                aria-label={taskCalendarLabel(task)}
+                              >
+                                <FaTasks size={10} />
+                              </button>
+                            </Tippy>
+                          ))}
+
+                          {overflowTaskHints.length > 0 && (
+                            <Tippy
+                              duration={0}
+                              delay={[200, 0]}
+                              placement="top"
+                              interactive
+                              content={
+                                <div className="text-left space-y-1 max-w-[18rem]">
+                                  {overflowTaskHints.map((task) => (
+                                    <button
+                                      key={task.id}
+                                      type="button"
+                                      className="block w-full text-left truncate hover:underline"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        openTask(task);
+                                      }}
+                                    >
+                                      {taskPrimaryLabel(task, 90)}
+                                    </button>
+                                  ))}
+                                </div>
+                              }
+                              className="rounded-md text-xs p-2 bg-[#F2F2F2] text-black shadow"
+                            >
+                              <button
+                                type="button"
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded border px-1 text-[10px]"
+                                style={{
+                                  borderColor: colors.$5,
+                                  backgroundColor: colors.$2,
+                                  color: colors.$17,
+                                }}
+                                aria-label={t('more') as string}
+                              >
+                                +{overflowTaskHints.length}
+                              </button>
+                            </Tippy>
+                          )}
+                        </div>
+                      )}
+
+                      {visibleEvents.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          {visibleEvents.map((ev) => {
+                            const key = calendarEventKey(ev);
+                            const ProviderIcon =
+                              ev.provider === 'google' ? FaGoogle : FaMicrosoft;
+                            return (
+                              <button
+                                key={key}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setConvertEvent(ev);
+                                  setConvertVisible(true);
+                                }}
+                                className="w-full flex items-center gap-1 px-1 py-0.5 rounded text-[10px] truncate"
+                                style={{
+                                  backgroundColor: colors.$2,
+                                  color: colors.$3,
+                                }}
+                                title={ev.title}
+                              >
+                                <ProviderIcon size={9} />
+                                {!ev.all_day && (
+                                  <span className="font-mono">
+                                    {displayTime(ev.start)}
+                                  </span>
+                                )}
+                                <span className="truncate flex-1 text-left">
+                                  {ev.title}
+                                </span>
+                              </button>
+                            );
+                          })}
+                          {eventOverflowTooltipContent && (
+                            <Tippy
+                              duration={0}
+                              delay={[200, 0]}
+                              placement="top"
+                              content={eventOverflowTooltipContent}
+                              className="rounded-md text-xs p-2 bg-[#F2F2F2] text-black shadow"
+                            >
+                              <div
+                                className="text-[10px] text-right"
+                                style={{ color: colors.$17 }}
+                              >
+                                +{overflowCount} {t('more_count')}
+                              </div>
+                            </Tippy>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+
+                  return cell;
+                });
               })()}
             </div>
           )}
