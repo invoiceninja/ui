@@ -24,39 +24,21 @@ import { useQueryClient } from "react-query";
 import { useDocuNinjaActions } from "$app/common/hooks/useDocuNinjaActions";
 
 export interface ResponsePaymentIntent {
-    id: string;
+    requires_payment: boolean;
     client_secret: string;
-    amount: number;
-    currency: string;
-    upgraded: boolean;
 }
 
 interface ApiError {
     message: string;
 }
 
-export interface PaymentIntent {
-    id: string;
-    client_secret: string;
-    amount: number;
-    currency: string;
-    upgraded: boolean;
-}
-
 type PaymentSuccessResult =
     | StripePaymentIntent
-    | PaymentIntent
     | { status: "succeeded" };
 
 export interface PaymentProps {
     tokens: GatewayToken[];
-    num_users?: number;
     amount_string?: string;
-    amount_raw?: number;
-    plan?: string,
-    docuninja_users?: number,
-    term?: string,
-    hash?: string,
     onPaymentSuccess?: (result: PaymentSuccessResult) => void;
     onPaymentComplete?: () => void;
     onCancel?: () => void;
@@ -64,15 +46,15 @@ export interface PaymentProps {
 
 type PaymentMethod = "new_card" | string; // string will be gateway token id
 
+type PaymentUiState =
+    | "payment_intent_pending"
+    | "stripe_confirmation_pending"
+    | "finalizing_plan_change"
+    | "plan_change_failed";
+
 export function PaymentMethodForm({
     tokens,
-    num_users,
-    plan,
-    docuninja_users,
-    term,
-    hash,
     amount_string,
-    amount_raw,
     onPaymentSuccess,
     onPaymentComplete,
     onCancel,
@@ -86,11 +68,10 @@ export function PaymentMethodForm({
     const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("new_card");
     const [errors, setErrors] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [amount, setAmount] = useState<number>(0);
     const [intent, setIntent] = useState<{
-        intent: string;
         secret: string;
     } | null>(null);
+    const [paymentState, setPaymentState] = useState<PaymentUiState | null>(null);
 
     const [context, setContext] = useState<{
         stripe: Stripe;
@@ -125,28 +106,25 @@ export function PaymentMethodForm({
                         const elements = stripe.elements();
                         const card = elements.create("card");
                         card.mount("#card-element");
+                        isDestroyed.current = false;
                         setContext({ stripe, elements, card });
 
-                        // Only create payment intent for new cards
-                        request('POST', endpoint('/api/client/account_management/payment/intent'), {
-                            amount: amount_raw ?? 0,
-                            hash: hash
-                        })
+                        setPaymentState("payment_intent_pending");
+
+                        request('POST', endpoint('/api/client/account_management/payment/intent'), {})
                         .then((response: AxiosResponse<ResponsePaymentIntent>) => {
                             if (!mounted) return;
 
-                            if (response.data?.upgraded === true) {
-                                if (onPaymentSuccess) {
-                                    onPaymentSuccess(response.data);
-                                }
+                            if (!response.data?.requires_payment || !response.data?.client_secret) {
+                                setErrors("This plan change no longer requires payment. Please go back and confirm the plan change.");
+                                setPaymentState("plan_change_failed");
                                 return;
                             }
 
                             setIntent({
-                                intent: response.data.id,
                                 secret: response.data.client_secret,
                             });
-                            setAmount(response.data.amount);
+                            setPaymentState(null);
                         })
                         .catch((error: AxiosError<ApiError>) => {
                             if (!mounted) return;
@@ -154,6 +132,7 @@ export function PaymentMethodForm({
                                 error.response?.data?.message ||
                                 "Failed to initialize payment",
                             );
+                            setPaymentState("plan_change_failed");
                         });
                     });
                 });
@@ -172,10 +151,6 @@ export function PaymentMethodForm({
 
     const handleMethodChange = (method: PaymentMethod) => {
         setSelectedMethod(method);
-        if (method !== "new_card") {
-            // Set the amount directly for token payments
-            setAmount(amount_raw ?? 0);
-        }
     };
 
     const cleanupStripe = () => {
@@ -191,6 +166,7 @@ export function PaymentMethodForm({
             setContext(null);
             setIntent(null);
             setErrors(null);
+            setPaymentState(null);
         }
     };
 
@@ -202,6 +178,7 @@ export function PaymentMethodForm({
 
             setErrors(null);
             setIsSubmitting(true);
+            setPaymentState("stripe_confirmation_pending");
 
             context.stripe
                 .confirmCardPayment(intent.secret, {
@@ -213,6 +190,7 @@ export function PaymentMethodForm({
                     if (result.error) {
                         setErrors(result.error.message || "Payment failed");
                         setIsSubmitting(false);
+                        setPaymentState("plan_change_failed");
                         return;
                     }
 
@@ -220,20 +198,20 @@ export function PaymentMethodForm({
                         result.paymentIntent &&
                         result.paymentIntent.status === "succeeded"
                     ) {
+                        setPaymentState("finalizing_plan_change");
                         request('POST', endpoint('/api/client/account_management/v2/payment'), {
-                                payment_intent: result.paymentIntent.id,
-                                amount: amount_raw ?? 0,
-                                hash:hash
+                                payment_intent: result.paymentIntent.id
                             })
                             .then(() => {
                                 toast.success(t("payment_successful") as string);
+                                setIsSubmitting(false);
+                                setPaymentState(null);
                                 if (onPaymentSuccess) {
                                     onPaymentSuccess(result.paymentIntent);
                                 }
                                 if (onPaymentComplete) {
                                     onPaymentComplete();
                                 }
-                                setIsSubmitting(false);
                                 queryClient.invalidateQueries('/api/client/account_management/methods');
                                 // Invalidate DocuNinja login query to refresh account data
                                 queryClient.invalidateQueries('/api/docuninja/login');
@@ -245,30 +223,37 @@ export function PaymentMethodForm({
                                     error.response?.data?.message || "Failed to confirm payment",
                                 );
                                 setIsSubmitting(false);
+                                setPaymentState("plan_change_failed");
                             });
+                        return;
                     }
+
+                    setErrors("Payment was not completed");
+                    setIsSubmitting(false);
+                    setPaymentState("plan_change_failed");
                 })
                 .catch(() => {
                     setErrors("An unexpected error occurred");
                     setIsSubmitting(false);
+                    setPaymentState("plan_change_failed");
                 });
         } else {
             // Using existing payment method
             setIsSubmitting(true);
+            setPaymentState("finalizing_plan_change");
             request('POST', endpoint('/api/client/account_management/v2/payment/token'), {
-                    gateway_token_id: selectedMethod,
-                    amount: amount_raw ?? 0,
-                    hash: hash
+                    gateway_token_id: selectedMethod
                 })
                 .then(() => {
                     toast.success(t("payment_successful") as string);
+                    setIsSubmitting(false);
+                    setPaymentState(null);
                     if (onPaymentSuccess) {
                         onPaymentSuccess({ status: "succeeded" });
                     }
                     if (onPaymentComplete) {
                         onPaymentComplete();
                     }
-                    setIsSubmitting(false);
                     // Invalidate DocuNinja login query to refresh account data
                     queryClient.invalidateQueries('/api/docuninja/login');
                     // Force DocuNinja service to reinitialize
@@ -279,9 +264,13 @@ export function PaymentMethodForm({
                         error.response?.data?.message || "Failed to process payment",
                     );
                     setIsSubmitting(false);
+                    setPaymentState("plan_change_failed");
                 });
         }
     };
+
+    const isWaitingForIntent = selectedMethod === "new_card" && paymentState === "payment_intent_pending";
+    const isNewCardReady = selectedMethod !== "new_card" || Boolean(intent);
 
     return (
         <div className="pl-4 pr-4">
@@ -289,21 +278,9 @@ export function PaymentMethodForm({
                 <p className="text-sm text-gray-500">
                     {t("payment_amount")}
                 </p>
-                {selectedMethod === "new_card" ? (
-                    amount === 0 ? (
-                        <div className="flex items-center justify-center">
-                            <Spinner variant="dark" />
-                        </div>
-                    ) : (
-                        <p className="text-lg font-semibold">
-                            {amount_string}
-                        </p>
-                    )
-                ) : (
-                    <p className="text-lg font-semibold">
-                        {amount_string}
-                    </p>
-                )}
+                <p className="text-lg font-semibold">
+                    {amount_string}
+                </p>
             </div>
 
             {errors && (
@@ -411,9 +388,9 @@ export function PaymentMethodForm({
                 <Button
                     type="primary"
                     onClick={handleSubmit}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isWaitingForIntent || !isNewCardReady}
                 >
-                    {isSubmitting ? (
+                    {isSubmitting || isWaitingForIntent ? (
                         <div className="flex items-center space-x-2">
                             <Spinner variant="dark" />
                             <span>{t("processing")}</span>
