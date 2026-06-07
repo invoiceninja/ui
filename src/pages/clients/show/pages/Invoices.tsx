@@ -76,7 +76,6 @@ export default function Invoices() {
           Boolean(!verifactuEnabled) ||
           (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)
         }
-        enableSavingFilterPreference
       />
 
       <DeleteInvoicesConfirmationModal

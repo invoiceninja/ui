@@ -56,7 +56,6 @@ export default function Payments() {
         )
       }
       withoutPageAsPreference
-      enableSavingFilterPreference
     />
   );
 }

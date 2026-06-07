@@ -140,30 +140,37 @@ export function useDataTablePreferences(params: Params) {
     if (!isInitialConfiguration && !customFilter) {
       setFilter((getPreference('filter') as string) || '');
 
-      if (customFilters) {
-        if ((getPreference('customFilter') as string[]).length) {
-          setCustomFilter(getPreference('customFilter') as string[]);
+      if (enableSavingFilterPreference) {
+        if (customFilters) {
+          if ((getPreference('customFilter') as string[]).length) {
+            setCustomFilter(getPreference('customFilter') as string[]);
+          } else {
+            setCustomFilter([]);
+          }
         } else {
           setCustomFilter([]);
         }
+        if (!withoutStoringPerPage) {
+          setPerPage((getPreference('perPage') as PerPage) || '10');
+        }
+        if (!withoutStoringPage) {
+          setCurrentPage((getPreference('currentPage') as number) || 1);
+        }
+        setSort(
+          (getPreference('sort') as string) ||
+            apiEndpoint.searchParams.get('sort') ||
+            'id|asc'
+        );
+        setSortedBy((getPreference('sortedBy') as string) || undefined);
+        if ((getPreference('status') as string[]).length) {
+          setStatus(getPreference('status') as string[]);
+        } else {
+          setStatus(['active']);
+        }
       } else {
+        // Sub-tables stay on their defaults for the non-text filters.
         setCustomFilter([]);
-      }
-      if (!withoutStoringPerPage) {
-        setPerPage((getPreference('perPage') as PerPage) || '10');
-      }
-      if (!withoutStoringPage) {
-        setCurrentPage((getPreference('currentPage') as number) || 1);
-      }
-      setSort(
-        (getPreference('sort') as string) ||
-          apiEndpoint.searchParams.get('sort') ||
-          'id|asc'
-      );
-      setSortedBy((getPreference('sortedBy') as string) || undefined);
-      if ((getPreference('status') as string[]).length) {
-        setStatus(getPreference('status') as string[]);
-      } else {
+        setSort(apiEndpoint.searchParams.get('sort') || 'id|asc');
         setStatus(['active']);
       }
 
