@@ -40,6 +40,7 @@ interface Params {
   withoutStoringPerPage: boolean;
   enableSavingFilterPreference?: boolean;
   withoutStoringPage?: boolean;
+  withoutStoringFilters?: boolean;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -65,6 +66,7 @@ export function useDataTablePreferences(params: Params) {
     withoutStoringPerPage,
     enableSavingFilterPreference,
     withoutStoringPage,
+    withoutStoringFilters,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
@@ -142,35 +144,34 @@ export function useDataTablePreferences(params: Params) {
     if (!isInitialConfiguration && !customFilter) {
       setFilter((getPreference('filter') as string) || '');
 
-      if (enableSavingFilterPreference) {
-        if (customFilters) {
-          if ((getPreference('customFilter') as string[]).length) {
-            setCustomFilter(getPreference('customFilter') as string[]);
-          } else {
-            setCustomFilter([]);
-          }
+      if (customFilters && !withoutStoringFilters) {
+        if ((getPreference('customFilter') as string[]).length) {
+          setCustomFilter(getPreference('customFilter') as string[]);
         } else {
           setCustomFilter([]);
         }
-        if (!withoutStoringPerPage) {
-          setPerPage((getPreference('perPage') as PerPage) || '10');
-        }
-        if (!withoutStoringPage) {
-          setCurrentPage((getPreference('currentPage') as number) || 1);
-        }
-        setSort(
-          (getPreference('sort') as string) ||
-            apiEndpoint.searchParams.get('sort') ||
-            'id|asc'
-        );
-        setSortedBy((getPreference('sortedBy') as string) || undefined);
-        if ((getPreference('status') as string[]).length) {
-          setStatus(getPreference('status') as string[]);
-        } else {
-          setStatus(['active']);
-        }
       } else {
         setCustomFilter([]);
+      }
+      if (!withoutStoringPerPage) {
+        setPerPage((getPreference('perPage') as PerPage) || '10');
+      }
+      if (!withoutStoringPage) {
+        setCurrentPage((getPreference('currentPage') as number) || 1);
+      }
+      setSort(
+        (getPreference('sort') as string) ||
+          apiEndpoint.searchParams.get('sort') ||
+          'id|asc'
+      );
+      setSortedBy((getPreference('sortedBy') as string) || undefined);
+      if (
+        !withoutStoringFilters &&
+        (getPreference('status') as string[]).length
+      ) {
+        setStatus(getPreference('status') as string[]);
+      } else {
+        setStatus(['active']);
       }
 
       setArePreferencesApplied(true);
