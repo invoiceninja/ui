@@ -78,6 +78,10 @@ export function useDataTablePreferences(params: Params) {
     status: string[],
     perPage: PerPage
   ) => {
+    if (tableKey) {
+      storeSessionTableFilters(filter, currentPage);
+    }
+
     if (!customFilter || !tableKey || !enableSavingFilterPreference) {
       return;
     }
@@ -100,8 +104,6 @@ export function useDataTablePreferences(params: Params) {
       ...(!withoutStoringPerPage && { perPage }),
       ...(!withoutStoringPage && { currentPage }),
     };
-
-    storeSessionTableFilters(filter, currentPage);
 
     if (isEqual(defaultFilters, cleanedUpFilters) && !currentTableFilters) {
       return;
@@ -140,37 +142,30 @@ export function useDataTablePreferences(params: Params) {
     if (!isInitialConfiguration && !customFilter) {
       setFilter((getPreference('filter') as string) || '');
 
-      if (enableSavingFilterPreference) {
-        if (customFilters) {
-          if ((getPreference('customFilter') as string[]).length) {
-            setCustomFilter(getPreference('customFilter') as string[]);
-          } else {
-            setCustomFilter([]);
-          }
+      if (customFilters) {
+        if ((getPreference('customFilter') as string[]).length) {
+          setCustomFilter(getPreference('customFilter') as string[]);
         } else {
           setCustomFilter([]);
         }
-        if (!withoutStoringPerPage) {
-          setPerPage((getPreference('perPage') as PerPage) || '10');
-        }
-        if (!withoutStoringPage) {
-          setCurrentPage((getPreference('currentPage') as number) || 1);
-        }
-        setSort(
-          (getPreference('sort') as string) ||
-            apiEndpoint.searchParams.get('sort') ||
-            'id|asc'
-        );
-        setSortedBy((getPreference('sortedBy') as string) || undefined);
-        if ((getPreference('status') as string[]).length) {
-          setStatus(getPreference('status') as string[]);
-        } else {
-          setStatus(['active']);
-        }
       } else {
-        // Sub-tables stay on their defaults for the non-text filters.
         setCustomFilter([]);
-        setSort(apiEndpoint.searchParams.get('sort') || 'id|asc');
+      }
+      if (!withoutStoringPerPage) {
+        setPerPage((getPreference('perPage') as PerPage) || '10');
+      }
+      if (!withoutStoringPage) {
+        setCurrentPage((getPreference('currentPage') as number) || 1);
+      }
+      setSort(
+        (getPreference('sort') as string) ||
+          apiEndpoint.searchParams.get('sort') ||
+          'id|asc'
+      );
+      setSortedBy((getPreference('sortedBy') as string) || undefined);
+      if ((getPreference('status') as string[]).length) {
+        setStatus(getPreference('status') as string[]);
+      } else {
         setStatus(['active']);
       }
 

@@ -63,7 +63,6 @@ import { refetchByUrl } from '$app/common/hooks/useRefetch';
 import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
 import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
-import { useStoreSessionTableFilterText } from '$app/common/hooks/useStoreSessionTableFilters';
 import { DateRangePicker } from './datatables/DateRangePicker';
 import { emitter } from '$app';
 import { TFooter } from './tables/TFooter';
@@ -367,19 +366,6 @@ export function DataTable<T extends object>(props: Props<T>) {
     enableSavingFilterPreference,
   });
 
-  // Bubble text-input changes up to the shared session store regardless of
-  // whether the table opts into full preference persistence. This lets a
-  // sub-table (e.g. client overview Invoices) propagate a cleared/changed
-  // search back to the parent list view without pushing other filters down.
-  const storeSessionFilterText = useStoreSessionTableFilterText({
-    tableKey: `${props.resource}s`,
-  });
-
-  // Track the filter value immediately after preferences settle so we can
-  // distinguish a user edit from the initial sync. Without this we'd clobber
-  // a parent table's stored filter on every sub-table mount.
-  const baselineFilterRef = useRef<string | null>(null);
-
   const {
     defaultOptions,
     defaultCustomFilterOptions,
@@ -409,12 +395,6 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, [dateRangeEntries]);
 
   useEffect(() => {
-    if (arePreferencesApplied && baselineFilterRef.current === null) {
-      baselineFilterRef.current = filter;
-    }
-  }, [arePreferencesApplied, filter]);
-
-  useEffect(() => {
     const propsUrl = new URL(
       props.useDocuNinjaApi
         ? docuNinjaEndpoint(props.endpoint)
@@ -434,29 +414,18 @@ export function DataTable<T extends object>(props: Props<T>) {
     if (!isInitialConfiguration) {
       clearTimeout(companyUpdateTimeOut.current);
 
-      const currentTimeout = setTimeout(() => {
-        handleUpdateTableFilters(
-          filter,
-          sortedBy,
-          sort,
-          currentPage,
-          status,
-          perPage
-        );
-
-        // Tables without full preference persistence still bubble the text
-        // input up so the parent list view sees the latest search value -
-        // but only after the user actually edits the input. Comparing
-        // against the baseline avoids clobbering the parent's stored value
-        // on mount.
-        if (
-          !enableSavingFilterPreference &&
-          baselineFilterRef.current !== null &&
-          filter !== baselineFilterRef.current
-        ) {
-          storeSessionFilterText(filter);
-        }
-      }, 1500);
+      const currentTimeout = setTimeout(
+        () =>
+          handleUpdateTableFilters(
+            filter,
+            sortedBy,
+            sort,
+            currentPage,
+            status,
+            perPage
+          ),
+        1500
+      );
 
       companyUpdateTimeOut.current = currentTimeout;
     }

@@ -43,26 +43,3 @@ export function useStoreSessionTableFilters(params: Params) {
   };
 }
 
-export function useStoreSessionTableFilterText(params: Params) {
-  const { tableKey } = params;
-
-  const setDataTableFilters = useSetAtom(dataTableFiltersAtom);
-
-  return (filter: string) => {
-    if (!tableKey) {
-      return;
-    }
-
-    setDataTableFilters((current) => {
-      const existing = (current as SessionDataTableFilters)?.[tableKey] ?? {};
-
-      return {
-        ...current,
-        [tableKey]: {
-          ...existing,
-          filter,
-        },
-      };
-    });
-  };
-}
