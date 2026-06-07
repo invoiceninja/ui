@@ -32,6 +32,7 @@ interface Props {
   defaultVariables: { value: string; label: string }[];
   for: string;
   disabled?: boolean;
+  excludedVariables?: string[];
 }
 
 export function SortableVariableList(props: Props) {
@@ -39,7 +40,7 @@ export function SortableVariableList(props: Props) {
   const company = useCompanyChanges();
   const dispatch = useDispatch();
 
-  const { disabled } = props;
+  const { disabled, excludedVariables } = props;
 
   const colors = useColorScheme();
 
@@ -52,9 +53,13 @@ export function SortableVariableList(props: Props) {
     const variables = company?.settings?.pdf_variables?.[props.for] ?? [];
 
     setDefaultVariablesFiltered(
-      defaultVariables.filter((label) => !variables.includes(label.value))
+      defaultVariables.filter(
+        (label) =>
+          !variables.includes(label.value) &&
+          !excludedVariables?.includes(label.value)
+      )
     );
-  }, [company]);
+  }, [company, excludedVariables]);
 
   const resolveTranslation = (key: string) => {
     return defaultVariables.find((field) => field.value === key);
@@ -131,8 +136,11 @@ export function SortableVariableList(props: Props) {
           <Droppable droppableId={props.for} isDropDisabled={disabled}>
             {(provided) => (
               <div {...provided.droppableProps} ref={provided.innerRef}>
-                {company?.settings?.pdf_variables?.[props.for]?.map(
-                  (label: string, index: number) => (
+                {company?.settings?.pdf_variables?.[props.for]
+                  ?.filter(
+                    (label: string) => !excludedVariables?.includes(label)
+                  )
+                  ?.map((label: string, index: number) => (
                     <Draggable
                       key={label}
                       draggableId={label}
