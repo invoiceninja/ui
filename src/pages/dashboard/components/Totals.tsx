@@ -11,9 +11,12 @@
 import { SelectField } from '$app/components/forms';
 import { endpoint } from '$app/common/helpers';
 import { Chart } from '$app/pages/dashboard/components/Chart';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Spinner } from '$app/components/Spinner';
-import { DropdownDateRangePicker } from '../../../components/DropdownDateRangePicker';
+import {
+  DropdownDateRangePicker,
+  StyledRangePicker,
+} from '../../../components/DropdownDateRangePicker';
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { request } from '$app/common/helpers/request';
@@ -30,11 +33,15 @@ import { useColorScheme } from '$app/common/colors';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { useQuery } from 'react-query';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import styled from 'styled-components';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import Toggle from '$app/components/forms/Toggle';
 import { DashboardCardSelector } from './DashboardCardSelector';
 import { PreferenceCardsGrid } from './PreferenceCardsGrid';
+import { ConfigProvider } from 'antd';
+import { useAtomValue } from 'jotai';
+import { antdLocaleAtom } from '$app/components/DropdownDateRangePicker';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -115,29 +122,46 @@ export function Totals() {
   const [t] = useTranslation();
 
   const formatMoney = useFormatMoney();
-  const { Preferences, update } = usePreferences();
+  const { Preferences, update, preferences } = usePreferences();
 
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const settings = useReactSettings();
-  const currentUser = useCurrentUser();
+  const { dateFormat } = useCurrentCompanyDateFormats();
+  const antdLocale = useAtomValue(antdLocaleAtom);
 
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
 
-  const chartScale =
-    settings?.preferences?.dashboard_charts?.default_view || 'month';
-  const currency = settings?.preferences?.dashboard_charts?.currency || 1;
-  const dateRange =
-    settings?.preferences?.dashboard_charts?.range || 'this_month';
-  const includeDrafts =
-    settings?.preferences?.dashboard_charts?.include_drafts || false;
+  const chartScale = preferences.dashboard_charts?.default_view || 'month';
+  const currency = preferences.dashboard_charts?.currency || 1;
+  const dateRange = preferences.dashboard_charts?.range || 'this_month';
+  const includeDrafts = preferences.dashboard_charts?.include_drafts || false;
+  const customStartDate = preferences.dashboard_charts?.custom_start_date;
+  const customEndDate = preferences.dashboard_charts?.custom_end_date;
   const currentDashboardFields = settings?.dashboard_fields ?? [];
 
+  const resolvedRange = useMemo(() => {
+    if (dateRange === 'custom') {
+      return {
+        start: customStartDate || dayjs().startOf('month').format('YYYY-MM-DD'),
+        end: customEndDate || dayjs().endOf('month').format('YYYY-MM-DD'),
+      };
+    }
+
+    return {
+      start:
+        GLOBAL_DATE_RANGES[dateRange]?.start ||
+        GLOBAL_DATE_RANGES.this_month.start,
+      end:
+        GLOBAL_DATE_RANGES[dateRange]?.end || GLOBAL_DATE_RANGES.this_month.end,
+    };
+  }, [dateRange, customStartDate, customEndDate]);
+
   const [dates, setDates] = useState<{ start_date: string; end_date: string }>({
-    start_date: GLOBAL_DATE_RANGES[dateRange]?.start || '',
-    end_date: GLOBAL_DATE_RANGES[dateRange]?.end || '',
+    start_date: resolvedRange.start,
+    end_date: resolvedRange.end,
   });
 
   const [body, setBody] = useState<{
@@ -145,30 +169,38 @@ export function Totals() {
     end_date: string;
     date_range: string;
   }>({
-    start_date: GLOBAL_DATE_RANGES[dateRange]?.start || '',
-    end_date: GLOBAL_DATE_RANGES[dateRange]?.end || '',
+    start_date: resolvedRange.start,
+    end_date: resolvedRange.end,
     date_range: dateRange,
   });
 
   useEffect(() => {
-    setBody((current) => ({ ...current, date_range: dateRange }));
-  }, [settings?.preferences?.dashboard_charts?.range]);
-
-  const handleDateChange = (DateSet: string) => {
-    const [startDate, endDate] = DateSet.split(',');
-    if (new Date(startDate) > new Date(endDate)) {
+    if (dateRange === 'custom') {
       setBody({
-        start_date: endDate,
-        end_date: startDate,
+        start_date: resolvedRange.start,
+        end_date: resolvedRange.end,
         date_range: 'custom',
       });
     } else {
-      setBody({
-        start_date: startDate,
-        end_date: endDate,
-        date_range: 'custom',
-      });
+      setBody((current) => ({ ...current, date_range: dateRange }));
     }
+  }, [dateRange, customStartDate, customEndDate]);
+
+  const handleDateChange = (currentDataSet: string) => {
+    const [startDate, endDate] = currentDataSet.split(',');
+
+    const [normalizedStart, normalizedEnd] = dayjs(startDate).isAfter(endDate)
+      ? [endDate, startDate]
+      : [startDate, endDate];
+
+    setBody({
+      start_date: normalizedStart,
+      end_date: normalizedEnd,
+      date_range: 'custom',
+    });
+
+    update('preferences.dashboard_charts.custom_start_date', normalizedStart);
+    update('preferences.dashboard_charts.custom_end_date', normalizedEnd);
   };
 
   const totals = useQuery({
@@ -230,19 +262,30 @@ export function Totals() {
     }
   }, [chart.data]);
 
-  useEffect(() => {
-    return () => {
-      if (settings?.preferences?.dashboard_charts?.range === 'custom') {
-        const currentRange =
-          currentUser?.company_user?.react_settings?.preferences
-            ?.dashboard_charts?.range;
-        update(
-          'preferences.dashboard_charts.range',
-          currentRange || 'this_month'
-        );
-      }
-    };
-  }, []);
+  const handlePreferencesCustomRangeChange = (value: [string, string]) => {
+    dayjs.extend(customParseFormat);
+
+    if (!value[0] || !value[1]) {
+      return;
+    }
+
+    const unsupportedFormats = ['DD. MMM. YYYY', 'ddd MMM D, YYYY'];
+
+    const parsed = value.map((date) =>
+      dayjs(
+        date,
+        !unsupportedFormats.includes(dateFormat) ? dateFormat : undefined,
+        antdLocale?.locale
+      ).format('YYYY-MM-DD')
+    );
+
+    const [start, end] = dayjs(parsed[0]).isAfter(parsed[1])
+      ? [parsed[1], parsed[0]]
+      : [parsed[0], parsed[1]];
+
+    update('preferences.dashboard_charts.custom_start_date', start);
+    update('preferences.dashboard_charts.custom_end_date', end);
+  };
 
   return (
     <>
@@ -399,7 +442,49 @@ export function Totals() {
                 <option value="this_year">{t('this_year')}</option>
                 <option value="last_year">{t('last_year')}</option>
                 <option value={'last365_days'}>{`${t('last365_days')}`}</option>
+                <option value="custom">{t('custom_range')}</option>
               </SelectField>
+
+              {dateRange === 'custom' && (
+                <div
+                  className="flex flex-col space-y-2"
+                  style={
+                    {
+                      '--accent-color': colors.$3,
+                      '--active-state-bg': colors.$4,
+                      '--calendar-bg': colors.$2,
+                      '--input-text-color': colors.$3,
+                      '--picker-border-color': colors.$5,
+                      '--picker-bg': colors.$1,
+                    } as React.CSSProperties
+                  }
+                >
+                  <span
+                    className="text-sm"
+                    style={{ color: colors.$3, fontWeight: 500 }}
+                  >
+                    {t('custom_range')}
+                  </span>
+
+                  <ConfigProvider locale={antdLocale?.default}>
+                    <StyledRangePicker
+                      size="large"
+                      className="rounded-md"
+                      style={{ width: '100%' }}
+                      value={[
+                        dayjs(resolvedRange.start),
+                        dayjs(resolvedRange.end),
+                      ]}
+                      format={dateFormat}
+                      onChange={(_, dateString) =>
+                        handlePreferencesCustomRangeChange(dateString)
+                      }
+                      separator={<span style={{ color: colors.$4 }}>—</span>}
+                      allowClear={false}
+                    />
+                  </ConfigProvider>
+                </div>
+              )}
 
               <Toggle
                 label={t('include_drafts')}

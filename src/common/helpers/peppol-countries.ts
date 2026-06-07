@@ -15,6 +15,7 @@ export const PEPPOL_COUNTRIES = [
   '40',
   '56',
   '208',
+  '250',
   '276',
   '352',
   '372',

@@ -14,6 +14,7 @@ import { useParams } from 'react-router-dom';
 import {
   useActions,
   useRecurringInvoiceColumns,
+  useRecurringInvoiceFilters,
 } from '$app/pages/recurring-invoices/common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -26,6 +27,7 @@ export default function RecurringInvoices() {
 
   const actions = useActions();
   const columns = useRecurringInvoiceColumns();
+  const filters = useRecurringInvoiceFilters();
   const { footerColumns } = useFooterColumns();
 
   return (
@@ -40,6 +42,8 @@ export default function RecurringInvoices() {
       columns={columns}
       footerColumns={footerColumns}
       customActions={actions}
+      customFilters={filters}
+      customFilterPlaceholder="status"
       withResourcefulActions
       bulkRoute="/api/v1/recurring_invoices/bulk"
       linkToCreate={route('/recurring_invoices/create?client=:id', {

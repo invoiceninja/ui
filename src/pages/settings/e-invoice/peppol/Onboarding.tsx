@@ -383,6 +383,8 @@ function Form({ onContinue, businessType, isSingapore }: FormProps) {
   const account = useCurrentAccount();
   const user = useCurrentUser();
 
+  const isFrance = company?.settings?.country_id === '250';
+
   const [errors, setErrors] = useState<ValidationBag | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -512,11 +514,11 @@ function Form({ onContinue, businessType, isSingapore }: FormProps) {
               />
             ) : null}
 
-            {businessType === 'individual' ? (
+            {businessType === 'individual' || businessType === 'business' ? (
               <InputField
                 value={form.values.id_number}
                 onChange={form.handleChange}
-                label={t('id_number')}
+                label={isFrance ? 'SIRET' : t('id_number')}
                 id="id_number"
                 errorMessage={get(errors, 'errors.id_number')}
               />

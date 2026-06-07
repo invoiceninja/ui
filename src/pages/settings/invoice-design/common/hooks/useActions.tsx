@@ -64,7 +64,7 @@ export function useActions({ withoutExportAction = false }: Params = {}) {
         action: 'clone',
       })
         .then((response: GenericSingleResourceResponse<Design>) => {
-          toast.success('design_cloned');
+          toast.success('cloned_design');
 
           refetch(['designs']);
 

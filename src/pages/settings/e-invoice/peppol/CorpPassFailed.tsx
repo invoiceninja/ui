@@ -47,7 +47,7 @@ export function CorpPassFailed() {
           type="primary"
           onClick={() => navigate('/settings/e_invoice')}
         >
-          {t('try_again')}
+          {t('an_error_occurred_try_again')}
         </Button>
       </div>
     </div>

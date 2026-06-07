@@ -9,8 +9,13 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
+import {
+  LOGO_MAX_DIMENSION,
+  compressCanvasToMaxSize,
+} from '$app/common/helpers/logo-image';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
+import { Spinner } from '$app/components/Spinner';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactCrop, {
@@ -23,6 +28,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 interface Props {
   visible: boolean;
   imageSrc: string;
+  isLoading?: boolean;
   onClose: () => void;
   onCropComplete: (croppedBlob: Blob) => Promise<void>;
 }
@@ -33,47 +39,6 @@ const FULL_CROP: Crop = {
   y: 0,
   width: 100,
   height: 100,
-};
-
-const MAX_DIMENSION = 800;
-const MAX_BLOB_SIZE = 2 * 1024 * 1024;
-
-const canvasToBlob = (
-  canvas: HTMLCanvasElement,
-  type: string,
-  quality?: number
-): Promise<Blob> =>
-  new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) =>
-        blob
-          ? resolve(blob)
-          : reject(new Error('Converting canvas to blob failed')),
-      type,
-      quality
-    );
-  });
-
-const compressToMaxSize = async (canvas: HTMLCanvasElement): Promise<Blob> => {
-  const pngBlob = await canvasToBlob(canvas, 'image/png');
-
-  if (pngBlob.size <= MAX_BLOB_SIZE) {
-    return pngBlob;
-  }
-
-  let quality = 0.9;
-
-  while (quality >= 0.1) {
-    const jpegBlob = await canvasToBlob(canvas, 'image/jpeg', quality);
-
-    if (jpegBlob.size <= MAX_BLOB_SIZE) {
-      return jpegBlob;
-    }
-
-    quality -= 0.1;
-  }
-
-  return canvasToBlob(canvas, 'image/jpeg', 0.1);
 };
 
 const cropImageToBlob = async (
@@ -92,10 +57,10 @@ const cropImageToBlob = async (
 
   let outputHeight = sourceHeight;
 
-  if (outputWidth > MAX_DIMENSION || outputHeight > MAX_DIMENSION) {
+  if (outputWidth > LOGO_MAX_DIMENSION || outputHeight > LOGO_MAX_DIMENSION) {
     const ratio = Math.min(
-      MAX_DIMENSION / outputWidth,
-      MAX_DIMENSION / outputHeight
+      LOGO_MAX_DIMENSION / outputWidth,
+      LOGO_MAX_DIMENSION / outputHeight
     );
 
     outputWidth = Math.floor(outputWidth * ratio);
@@ -126,12 +91,13 @@ const cropImageToBlob = async (
     outputHeight
   );
 
-  return compressToMaxSize(canvas);
+  return compressCanvasToMaxSize(canvas);
 };
 
 export function LogoCropModal({
   visible,
   imageSrc,
+  isLoading = false,
   onClose,
   onCropComplete,
 }: Props) {
@@ -200,9 +166,15 @@ export function LogoCropModal({
       <div className="flex flex-col space-y-5">
         <div
           className="flex items-center justify-center w-full p-4 rounded-lg border"
-          style={{ backgroundColor: colors.$15, borderColor: colors.$24 }}
+          style={{
+            backgroundColor: colors.$15,
+            borderColor: colors.$24,
+            minHeight: '18rem',
+          }}
         >
-          {imageSrc && (
+          {isLoading || !imageSrc ? (
+            <Spinner />
+          ) : (
             <ReactCrop
               crop={crop}
               onChange={(c) => setCrop(c)}
@@ -225,7 +197,7 @@ export function LogoCropModal({
             behavior="button"
             type="secondary"
             onClick={handleReset}
-            disabled={isFormBusy}
+            disabled={isFormBusy || isLoading || !imageSrc}
             disableWithoutIcon
           >
             {t('reset')}
@@ -234,8 +206,8 @@ export function LogoCropModal({
           <Button
             behavior="button"
             onClick={handleConfirm}
-            disabled={isFormBusy || !completedCrop}
-            disableWithoutIcon={!completedCrop}
+            disabled={isFormBusy || isLoading || !completedCrop}
+            disableWithoutIcon={!completedCrop || isLoading}
           >
             {t('upload')}
           </Button>

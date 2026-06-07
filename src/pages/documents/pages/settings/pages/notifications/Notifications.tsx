@@ -240,7 +240,7 @@ function Notifications() {
             {t('attach_audit_log_to_completed_email')}
           </span>
           <span className="text-xs text-gray-500">
-            {t('attach_audit_log_to_completed_email_description')}
+            {t('attach_audit_log_to_completed_email_help')}
           </span>
         </div>
       }

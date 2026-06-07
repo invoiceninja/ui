@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useReactSettings } from './hooks/useReactSettings';
+import { useReactSettingsField } from './hooks/useReactSettings';
 
 // export const $1 = {
 //   name: 'invoiceninja.dark',
@@ -85,7 +85,7 @@ export const lightColorScheme = {
 };
 
 export function useColorScheme() {
-  const reactSettings = useReactSettings({ overwrite: false });
+  const darkMode = useReactSettingsField('dark_mode');
 
-  return reactSettings.dark_mode ? darkColorScheme : lightColorScheme;
+  return darkMode ? darkColorScheme : lightColorScheme;
 }

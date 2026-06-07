@@ -200,15 +200,21 @@ function SignatureSelectorDialog({
   input,
   content,
   useSignatureButton,
-}: SignatureSelectorDialogProps) {
+  type,
+}: SignatureSelectorDialogProps & { type?: string }) {
   const [t] = useTranslation();
+
+  const titles: Record<string, string> = {
+    signature: t('create_signature'),
+    initials: t('enter_initials'),
+  };
 
   return (
     <>
       <div className="mr-2">{trigger}</div>
 
       <Modal
-        title={t('create_signature')}
+        title={type ? titles[type] : t('create_signature')}
         visible={isOpen}
         onClose={onOpenChange}
         size="regular"
@@ -232,6 +238,7 @@ function SignatureInput({ value, onChange }: SignatureSelectorInputProps) {
       value={value}
       onValueChange={(value) => onChange(value)}
       placeholder={t('signature_name')}
+      changeOverride
     />
   );
 }

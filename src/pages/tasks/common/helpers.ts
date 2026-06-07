@@ -149,30 +149,60 @@ export function useHandleTaskDateChange() {
   };
 }
 
+// Parses a flexible duration input into seconds.
+// Accepts: "1.5" (decimal hours), "1:30" (h:m), "1:30:45" (h:m:s),
+// "1h30m", "90m", "45s", "1h", or a bare integer (treated as hours).
+// Returns null on unparsable input.
+export function parseDurationToSeconds(value: string): number | null {
+  const raw = (value ?? '').trim().toLowerCase();
+
+  if (!raw) {
+    return 0;
+  }
+
+  if (/^\d+(\.\d+)?$/.test(raw)) {
+    return Math.round(parseFloat(raw) * 3600);
+  }
+
+  if (/^[\d:.]+$/.test(raw) && raw.includes(':')) {
+    const parts = raw.split(':');
+    const h = parseFloat(parts[0] || '0') || 0;
+    const m = parseFloat(parts[1] || '0') || 0;
+    const s = parseFloat(parts[2] || '0') || 0;
+    return Math.round(h * 3600 + m * 60 + s);
+  }
+
+  const tokenRe = /(\d+(?:\.\d+)?)\s*([hms])/g;
+  let match;
+  let total = 0;
+  let matched = false;
+
+  while ((match = tokenRe.exec(raw)) !== null) {
+    matched = true;
+    const n = parseFloat(match[1]);
+    if (match[2] === 'h') total += n * 3600;
+    else if (match[2] === 'm') total += n * 60;
+    else total += n;
+  }
+
+  return matched ? Math.round(total) : null;
+}
+
 export function handleTaskDurationChange(
   log: string,
   value: string,
   start: number,
   index: number
 ) {
-  let date = dayjs.unix(start);
-  const parts = value.split(':');
-
-  if (parts[0]) {
-    date = date.add(parseFloat(parts[0]), 'hour');
-  }
-
-  if (parts[1]) {
-    date = date.add(parseFloat(parts[1]), 'minute');
-  }
-
-  if (parts[2]) {
-    date = date.add(parseFloat(parts[2]), 'second');
-  }
+  const seconds = parseDurationToSeconds(value);
 
   const logs = parseTimeLog(log);
 
-  logs[index][1] = date.unix();
+  if (seconds === null) {
+    return JSON.stringify(logs);
+  }
+
+  logs[index][1] = dayjs.unix(start).add(seconds, 'second').unix();
 
   return JSON.stringify(logs);
 }

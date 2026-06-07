@@ -13,6 +13,7 @@ import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
 import { useActions, useCreditColumns } from '$app/pages/credits/common/hooks';
 import { useCustomBulkActions } from '$app/pages/credits/common/hooks/useCustomBulkActions';
+import { useCreditsFilters } from '$app/pages/credits/common/hooks/useCreditsFilters';
 import { permission } from '$app/common/guards/guards/permission';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
@@ -22,6 +23,8 @@ export default function Credits() {
   const hasPermission = useHasPermission();
 
   const columns = useCreditColumns();
+
+  const filters = useCreditsFilters();
 
   const actions = useActions();
 
@@ -37,6 +40,8 @@ export default function Credits() {
       columns={columns}
       customActions={actions}
       customBulkActions={customBulkActions}
+      customFilters={filters}
+      customFilterPlaceholder="status"
       withResourcefulActions
       bulkRoute="/api/v1/credits/bulk"
       linkToCreate={route('/credits/create?client=:id', { id })}

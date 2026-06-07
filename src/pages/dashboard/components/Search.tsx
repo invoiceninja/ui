@@ -75,7 +75,8 @@ export function Search$() {
                   label: record.name,
                   value: record.id,
                   resource: record,
-                  searchable: `${t(key)}: ${record.name}`,
+                  searchable: `${t(key)}: ${record.name} ${record.keywords ?? ''}`,
+                  // searchable: `${t(key)}: ${record.name}`,
                   eventType: 'external',
                 });
               });
@@ -438,7 +439,7 @@ export function Search$() {
               }}
             >
               <span className="mb-0.5" style={{ color: colors.$3 }}>
-                {t('docs')}
+                {t('view_documentation')}
               </span>
 
               <div>

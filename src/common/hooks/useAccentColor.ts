@@ -21,5 +21,5 @@ export function useAccentColor() {
     userState.changes?.company_user?.settings?.accent_color ||
     user?.company_user?.settings?.accent_color ||
     colors.accent
-  );
+  ) as string;
 }

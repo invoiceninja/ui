@@ -12,7 +12,7 @@ import { useColorScheme } from '$app/common/colors';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Document } from '$app/common/interfaces/docuninja/api';
+import { Document, DocumentStatus } from '$app/common/interfaces/docuninja/api';
 import { Badge, BadgeVariant } from '$app/components/Badge';
 import { DataTableColumns } from '$app/components/DataTable';
 import { Link } from '$app/components/forms';
@@ -119,7 +119,13 @@ export function useTableColumns() {
       id: 'document',
       label: t('document'),
       format: (_, document) => (
-        <Link to={route('/docuninja/:id', { id: document.id })}>
+        <Link
+          to={
+            document.status_id === DocumentStatus.Draft && !document.invitations?.length
+              ? route('/docuninja/:id/builder', { id: document.id })
+              : route('/docuninja/:id', { id: document.id })
+          }
+        >
           <span className="truncate block max-w-xs">
             {document.description || t('untitled_document')}
           </span>

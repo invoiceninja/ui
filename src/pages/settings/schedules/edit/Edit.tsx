@@ -69,6 +69,10 @@ export function Edit() {
           toast.success('updated_schedule');
 
           $refetch(['task_schedulers']);
+
+          if (schedule.template === 'payment_schedule') {
+            $refetch(['invoices']);
+          }
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {

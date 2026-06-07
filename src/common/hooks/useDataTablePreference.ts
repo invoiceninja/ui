@@ -9,15 +9,14 @@
  */
 
 import { useAtomValue } from 'jotai';
-import { useUserChanges } from './useInjectUserChanges';
-import { TableFiltersPreference } from './useReactSettings';
+import { TableFiltersPreference, useReactSettings } from './useReactSettings';
 import { dataTableFiltersAtom } from './useStoreSessionTableFilters';
 
 interface Params {
   tableKey: string | undefined;
 }
 export function useDataTablePreference(params: Params) {
-  const user = useUserChanges();
+  const reactSettings = useReactSettings();
 
   const { tableKey } = params;
 
@@ -34,7 +33,7 @@ export function useDataTablePreference(params: Params) {
         : '';
     }
 
-    const tableFilters = user?.company_user?.react_settings.table_filters;
+    const tableFilters = reactSettings.table_filters;
 
     return tableFilters?.[tableKey]?.[filterKey]
       ? tableFilters[tableKey][filterKey]

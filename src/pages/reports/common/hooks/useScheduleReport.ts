@@ -28,10 +28,19 @@ export function useScheduleReport() {
 
   const setScheduleParameters = useSetAtom(scheduleParametersAtom);
 
-  return (report: Report, showCustomColumns: boolean) => {
+  return (
+    report: Report,
+    showCustomColumns: boolean,
+    customReportKeys?: string[]
+  ) => {
     let reportKeys: string[] = [];
 
-    if (report.identifier in preferences.reports.columns && showCustomColumns) {
+    if (showCustomColumns && customReportKeys) {
+      reportKeys = customReportKeys;
+    } else if (
+      showCustomColumns &&
+      report.identifier in preferences.reports.columns
+    ) {
       reportKeys = collect(
         preferences.reports.columns[report.identifier][reportColumn]
       )
@@ -60,6 +69,7 @@ export function useScheduleReport() {
       clients: report.payload.clients ? report.payload.clients.split(',') : [],
       vendors: report.payload.vendors || '',
       projects: report.payload.projects || '',
+      tag_ids: report.payload.tag_ids || '',
       categories: report.payload.categories || '',
       report_keys: reportKeys,
       include_deleted: report.payload.include_deleted ?? false,

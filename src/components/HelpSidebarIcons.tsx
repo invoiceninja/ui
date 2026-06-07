@@ -26,7 +26,7 @@ import Toggle from './forms/Toggle';
 import { Modal } from './Modal';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useColorScheme } from '$app/common/colors';
-import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import classNames from 'classnames';
 import { AboutModal } from './AboutModal';
 import { Icon } from './icons/Icon';
@@ -57,7 +57,7 @@ export function HelpSidebarIcons(props: Props) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
-  const user = useInjectUserChanges();
+  const user = useCurrentUser();
   const account = useCurrentAccount();
 
   const reactSettings = useReactSettings();
@@ -96,9 +96,7 @@ export function HelpSidebarIcons(props: Props) {
   const [isUpdateModalVisible, setIsUpdateModalVisible] =
     useState<boolean>(false);
 
-  const isMiniSidebar = Boolean(
-    user?.company_user?.react_settings.show_mini_sidebar
-  );
+  const isMiniSidebar = Boolean(reactSettings.show_mini_sidebar);
 
   const isUpdateAvailable =
     isSelfHosted() &&

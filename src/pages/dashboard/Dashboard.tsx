@@ -22,7 +22,9 @@ import { useEnabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '../settings';
 import { UpcomingRecurringInvoices } from './components/UpcomingRecurringInvoices';
 import { useOpenFeedbackSlider } from '$app/common/hooks/useOpenFeedbackSlider';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { useAtomValue } from 'jotai';
+import { reactSettingsAtom } from '$app/common/hooks/useReactSettings';
 
 export default function Dashboard() {
   useTitle('dashboard');
@@ -30,10 +32,15 @@ export default function Dashboard() {
   const [t] = useTranslation();
   const enabled = useEnabled();
   const openFeedbackSlider = useOpenFeedbackSlider();
+  // Try opening feedback once after settings hydrate.
+  const isReactSettingsHydrated = useAtomValue(reactSettingsAtom) !== null;
+  const feedbackTriedRef = useRef<boolean>(false);
 
   useEffect(() => {
+    if (!isReactSettingsHydrated || feedbackTriedRef.current) return;
+    feedbackTriedRef.current = true;
     openFeedbackSlider();
-  }, []);
+  }, [isReactSettingsHydrated, openFeedbackSlider]);
 
   return (
     <Default title={t('dashboard')} breadcrumbs={[]}>
