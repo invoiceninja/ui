@@ -266,7 +266,7 @@ function SignatorySelector({
 }
 
 function BlueprintBuilder() {
-  const [t] = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const { id } = useParams();
   const colors = useColorScheme();
@@ -527,22 +527,8 @@ function BlueprintBuilder() {
               },
             },
             translations: {
-              element: t('element') as string,
-              tips_and_notes: t('tips_and_notes') as string,
-              default_checkbox_label: t('default_checkbox_label') as string,
-              empty_checkbox_label: t('empty_checkbox_label') as string,
-              select_needs_two_options: t('select_needs_two_options') as string,
-              default_select_label: t('default_select_label') as string,
-              radio_needs_two_options: t('radio_needs_two_options') as string,
-              default_radio_group_label: t(
-                'default_radio_group_label'
-              ) as string,
-              multiselect_needs_two_options: t(
-                'multiselect_needs_two_options'
-              ) as string,
-              default_multiselect_label: t(
-                'default_multiselect_label'
-              ) as string,
+              ...i18n.getResourceBundle(i18n.language, 'translation'),
+              signature: 'Signature',
             },
           }}
         >
