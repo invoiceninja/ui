@@ -95,7 +95,7 @@ jobs:
           git clone --depth 1 https://${{secrets.commit_secret}}@github.com/invoiceninja/invoiceninja.git -b v5-develop
           cd invoiceninja
           composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
-          composer install
+          composer install --no-interaction --prefer-dist
           cp .env.ci .env
 
       - name: Prepare Laravel Application
@@ -119,7 +119,6 @@ jobs:
         with:
           repository: invoiceninja/ui
           ref: ${{ github.head_ref || github.ref_name }}
-          token: ${{ secrets.commit_secret }}
           path: ui
 
       - name: Prepare React FrontEnd
