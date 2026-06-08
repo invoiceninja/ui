@@ -130,7 +130,7 @@ jobs:
           npx playwright test --max-failures=1
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          VITE_API_URL: http://ninja.test:8000
+          VITE_API_URL: http://127.0.0.1:8000
           PLAYWRIGHT_BASE_URL: http://localhost:4173
           PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
           VITE_IS_TEST: true
