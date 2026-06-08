@@ -9,6 +9,7 @@
  */
 
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useScrollToLineItem } from '$app/common/hooks/useScrollToLineItem';
 import { useSimplifiedInvoiceEditor } from '$app/common/hooks/useSimplifiedInvoiceEditor';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Spinner } from '$app/components/Spinner';
@@ -89,6 +90,8 @@ export default function Edit() {
   const taskColumns = useTaskColumns();
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
+
+  useScrollToLineItem(Boolean(invoice && client));
   const useSimplifiedEditor = useSimplifiedInvoiceEditor();
 
   const [invoiceSum] = useAtom(invoiceSumAtom);

@@ -407,11 +407,6 @@ export function EnhancedPreview({
         </Tbody>
       </Table>
 
-      {enableMultiSort && (
-        <div className="mt-2 text-sm text-gray-600">
-          {t('tip')}: Click another column to add it to the sort order
-        </div>
-      )}
     </div>
   );
 }

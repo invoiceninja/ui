@@ -50,6 +50,7 @@ import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-his
 import { QuoteActivity } from '$app/common/interfaces/quote-activity';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
+import { ViewLineItem } from '$app/pages/invoices/common/components/ViewLineItem';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import Toggle from '$app/components/forms/Toggle';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
@@ -508,6 +509,24 @@ export function QuoteSlider() {
                   <InvoiceStatus entity={invoiceResponse} />
                 </div>
               </Box>
+            </div>
+          )}
+
+          {Boolean(quote?.line_items?.length) && (
+            <Divider withoutPadding borderColor={colors.$20} />
+          )}
+
+          {quote && Boolean(quote.line_items?.length) && (
+            <div className="flex flex-col space-y-3 px-6 py-5">
+              {quote.line_items.map((lineItem, index) => (
+                <ViewLineItem
+                  key={index}
+                  lineItem={lineItem}
+                  lineItemIndex={index}
+                  client={quote.client}
+                  editHref={route('/quotes/:id/edit', { id: quote.id })}
+                />
+              ))}
             </div>
           )}
         </div>

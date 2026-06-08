@@ -206,7 +206,7 @@ function SignatureSelectorDialog({
 
   const titles: Record<string, string> = {
     signature: t('create_signature'),
-    initials: t('create_initials'),
+    initials: t('enter_initials'),
   };
 
   return (

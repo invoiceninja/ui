@@ -257,7 +257,7 @@ export default function Daily() {
       title={documentTitle}
       breadcrumbs={[
         { name: t('tasks'), href: '/tasks' },
-        { name: t('daily'), href: '/tasks/daily' },
+        { name: t('freq_daily'), href: '/tasks/daily' },
       ]}
       topRight={<TaskHeaderControls />}
     >

@@ -1,5 +1,7 @@
 import { login, logout } from '$tests/e2e/helpers';
-import { test, expect } from '$tests/e2e/fixtures';
+import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
+
+resetAccountBeforeAll();
 
 test('Expense report (clients, vendors, project, expense_categories) fields are not visible', async ({
   page,

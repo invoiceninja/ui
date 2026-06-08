@@ -9,6 +9,7 @@
  */
 
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useScrollToLineItem } from '$app/common/hooks/useScrollToLineItem';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Spinner } from '$app/components/Spinner';
 import { ClientSelector } from '$app/pages/invoices/common/components/ClientSelector';
@@ -45,6 +46,8 @@ export default function Edit() {
   const colors = useColorScheme();
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
+
+  useScrollToLineItem(Boolean(credit && client));
 
   const {
     handleChange,

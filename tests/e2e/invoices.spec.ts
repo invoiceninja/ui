@@ -8,11 +8,13 @@ import {
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
-import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
 import dayjs from 'dayjs';
+
+resetAccountBeforeAll();
 
 interface Params {
   permissions: Permission[];
@@ -351,6 +353,8 @@ test('can view and edit assigned invoice with create_invoice', async ({
   await expect(
     page.getByText('Successfully updated invoice', { exact: true })
   ).toBeVisible({ timeout: 10000 });
+
+  await page.waitForTimeout(1000);
 
   await page.locator('[data-cy="chevronDownButton"]').click();
 

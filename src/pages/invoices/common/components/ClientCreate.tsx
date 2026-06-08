@@ -133,7 +133,7 @@ export function ClientCreate({
       )
     ) {
       setErrors({
-        message: t('invalid_data //needs translation'),
+        message: t('please_enter_a_client_or_contact_name'),
         errors: { name: [t('please_enter_a_client_or_contact_name')] },
       });
       toast.error();

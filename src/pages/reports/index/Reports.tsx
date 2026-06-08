@@ -29,7 +29,7 @@ import {
 } from '../common/components/SortableColumns';
 import { Identifier, Payload, Report, useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
-import { useQueryClient } from 'react-query';
+import { isCancelledError, useQueryClient } from 'react-query';
 import { useAtom } from 'jotai';
 import {
   Cell,
@@ -54,7 +54,6 @@ import { useShowReportField } from '../common/hooks/useShowReportField';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { ReportsPlanAlert } from '../common/components/ReportsPlanAlert';
-import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { extractTextFromHTML } from '$app/common/helpers/html-string';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { cloneDeep } from 'lodash';
@@ -68,6 +67,9 @@ interface Range {
   label: string;
   scheduleIdentifier: string;
 }
+
+const PREVIEW_POLL_RETRIES = 10;
+const PREVIEW_POLL_DELAY_MS = import.meta.env.DEV ? 1000 : 5000;
 
 export const ranges: Range[] = [
   { identifier: 'all', label: 'all', scheduleIdentifier: 'all' },
@@ -210,7 +212,6 @@ export default function Reports() {
 
   const scheduleReport = useScheduleReport();
   const { save, preferences, update } = usePreferences();
-  const numericFormatter = useNumericFormatter();
 
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
@@ -227,6 +228,8 @@ export default function Reports() {
 
   const handleReportChange = (identifier: Identifier) => {
     const report = reports.find((report) => report.identifier === identifier);
+
+    queryClient.cancelQueries(['reports']);
 
     setShowCustomColumns(false);
 
@@ -434,6 +437,10 @@ export default function Reports() {
     setErrors(undefined);
     setPreview(null);
 
+    queryClient.cancelQueries(['reports']);
+
+    toast.processing();
+
     const { client_id } = report.payload;
 
     let updatedPayload =
@@ -446,8 +453,8 @@ export default function Reports() {
 
     updatedPayload = { ...updatedPayload, report_keys: reportKeys };
 
-    request('POST', endpoint(report.preview), updatedPayload, {}).then(
-      (response) => {
+    request('POST', endpoint(report.preview), updatedPayload, {})
+      .then((response) => {
         const hash = response.data.message as string;
 
         queryClient
@@ -457,8 +464,8 @@ export default function Reports() {
               request('POST', endpoint(`/api/v1/reports/preview/${hash}`)).then(
                 (response) => response.data
               ),
-            retry: 10,
-            retryDelay: import.meta.env.DEV ? 1000 : 5000,
+            retry: PREVIEW_POLL_RETRIES,
+            retryDelay: PREVIEW_POLL_DELAY_MS,
           })
           .then((response) => {
             const { columns, ...rows } = response;
@@ -474,9 +481,27 @@ export default function Reports() {
             });
 
             toast.success();
+
+            setTimeout(() => {
+              document.getElementById('preview-table')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+            }, 100);
+          })
+          .catch((error) => {
+            if (isCancelledError(error)) {
+              return;
+            }
+
+            console.error(error);
+
+            toast.info('report_too_large_to_preview');
           });
-      }
-    );
+      })
+      .catch(() => {
+        toast.dismiss();
+      });
   };
 
   useEffect(() => {

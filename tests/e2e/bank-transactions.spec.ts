@@ -5,7 +5,7 @@ import {
   permissions,
   waitForTableData,
 } from '$tests/e2e/helpers';
-import { test, expect, uniqueName, extractIdFromUrl } from '$tests/e2e/fixtures';
+import { resetAccountBeforeAll, test, expect, uniqueName, extractIdFromUrl } from '$tests/e2e/fixtures';
 import { Page, request as playwrightRequest } from '@playwright/test';
 import { createExpenseCategory } from './expense-categories-helpers';
 import { createVendor } from './vendor-helpers';
@@ -16,6 +16,8 @@ import {
   createExpenseCategoryViaApi,
   type ApiContext,
 } from './api-helpers';
+
+resetAccountBeforeAll();
 
 async function ensureBankAccountExists(apiContext?: ApiContext): Promise<void> {
   const api = apiContext || await createApiContext(process.env.VITE_API_URL!);

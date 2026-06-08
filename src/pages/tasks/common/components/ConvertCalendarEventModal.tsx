@@ -15,6 +15,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import {
   CalendarEvent,
+  calendarEventDateKey,
   calendarEventKey,
 } from '$app/common/interfaces/calendar-event';
 import { Task } from '$app/common/interfaces/task';
@@ -45,10 +46,16 @@ interface Props {
 
 const buildTimeLog = (event: CalendarEvent): string => {
   // All-day events carry no clock times. Anchor a 1h placeholder at 09:00
-  // local on the event date so the task at least records the day it happened
-  // — the user can edit it after conversion.
+  // local on the event date so the task at least records the day it happened.
+  // The user can edit it after conversion.
+  //
+  // Derive the date from calendarEventDateKey() — the same wall-clock
+  // YYYY-MM-DD used for the task's `date` field below. Parsing the raw
+  // provider string (e.g. Microsoft's midnight-UTC "...T00:00:00Z") through
+  // dayjs() would shift it into the browser timezone first, rolling the day
+  // backwards for users west of UTC and anchoring the task on the wrong date.
   if (event.all_day) {
-    const anchor = dayjs(event.start).startOf('day').hour(9);
+    const anchor = dayjs(calendarEventDateKey(event)).startOf('day').hour(9);
     return JSON.stringify([
       [anchor.unix(), anchor.add(1, 'hour').unix(), '', true],
     ]);
@@ -58,7 +65,7 @@ const buildTimeLog = (event: CalendarEvent): string => {
   const end = dayjs(event.end).unix();
 
   // Provider returned the same instant for start and end (or a degenerate
-  // ordering) — pad to a 1h block from the start instead of saving a zero-
+  // ordering), so pad to a 1h block from the start instead of saving a zero-
   // length log entry that downstream views will treat as empty.
   if (!end || end <= start) {
     return JSON.stringify([[start, start + 3600, '', true]]);
@@ -99,7 +106,7 @@ export function ConvertCalendarEventModal(props: Props) {
       ...blank,
       description: buildDescription(props.event),
       time_log: buildTimeLog(props.event),
-      date: dayjs(props.event.start).format('YYYY-MM-DD'),
+      date: calendarEventDateKey(props.event),
       meta: {
         // Backend uses this triple to dedupe: same calendar event can only
         // be converted to one task.

@@ -1,10 +1,13 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
-import { test, expect } from '$tests/e2e/fixtures';
+import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
+import { emailForCurrentAccount } from '$tests/e2e/accounts';
 import {
   createApiContext,
   bulkAction,
   type EntityType,
 } from '$tests/e2e/api-helpers';
+
+resetAccountBeforeAll();
 
 /**
  * Helper: find a user by display name via API and return their ID.
@@ -113,11 +116,12 @@ test("Can't see owner of the account in the list of users", async ({
   await page.waitForURL('/settings/users');
 
   // Filter for the owner's email — should not be visible to non-owners
-  await page.locator('#filter').fill('user@example.com');
+  const ownerEmail = emailForCurrentAccount('user@example.com');
+  await page.locator('#filter').fill(ownerEmail);
 
   await page.locator('tbody').first().waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
 
-  await expect(page.getByText('user@example.com')).not.toBeVisible({ timeout: 10000 });
+  await expect(page.getByText(ownerEmail)).not.toBeVisible({ timeout: 10000 });
 
   await logout(page);
 });
