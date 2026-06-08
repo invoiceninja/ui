@@ -60,6 +60,8 @@ import { useMediaQuery } from 'react-responsive';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useActions } from '../common/hooks/useActions';
 import { EditBlueprintModal } from '../edit/components/EditBlueprintModal';
+import { useDriverTour } from '$app/common/hooks/useDriverTour';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
@@ -353,6 +355,46 @@ function BlueprintBuilder() {
       );
     };
   }, []);
+
+  const { preferences, update, save } = usePreferences();
+
+  useDriverTour({
+    show: !preferences.blueprint_builder_tour_shown,
+    steps: [
+      {
+        element: '.builder-rightSide',
+        popover: {
+          description: t('tour_signatory_selector') as string,
+          nextBtnText: t('tour_continue_select_signatory') as string,
+        },
+      },
+      {
+        element: '.builder-central',
+        popover: {
+          description: t('tour_document_canvas') as string,
+        },
+      },
+      {
+        element: '.builder-save-button',
+        popover: {
+          description: t('tour_save_document') as string,
+        },
+      },
+    ],
+    eventName: 'builder:loaded',
+    options: {
+      showProgress: true,
+      allowClose: false,
+      showButtons: ['next'],
+      disableActiveInteraction: true,
+      onDestroyed: () => {
+        if (!preferences.blueprint_builder_tour_shown) {
+          update('preferences.blueprint_builder_tour_shown', true);
+          save({ silent: true });
+        }
+      },
+    },
+  });
 
   const navigate = useNavigate();
 

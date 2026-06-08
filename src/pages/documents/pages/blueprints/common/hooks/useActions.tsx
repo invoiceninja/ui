@@ -105,7 +105,7 @@ export function useActions(params: UseActionsParams) {
           },
         }
       ).then((response: AxiosResponse<GenericSingleResponse<Document>>) =>
-        navigate(route('/docuninja/:id/builder', { id: response.data.data.id }))
+        navigate(route('/docuninja/:id/builder?from_template=true', { id: response.data.data.id }))
       );
     }
   };
@@ -123,7 +123,7 @@ export function useActions(params: UseActionsParams) {
           },
         }
       ).then((response: AxiosResponse<GenericSingleResponse<Document>>) =>
-        navigate(route('/docuninja/:id/builder', { id: response.data.data.id }))
+        navigate(route('/docuninja/:id/builder?from_template=true', { id: response.data.data.id }))
       );
 
   };
