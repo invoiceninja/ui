@@ -92,7 +92,7 @@ jobs:
 
       - name: Build ninja
         run: |
-          git clone --depth 1 https://${{secrets.commit_secret}}@github.com/invoiceninja/invoiceninja.git -b v5-develop
+          git clone --depth 1 https://${{secrets.commit_secret}}@github.com/turbo124/invoiceninja.git -b v5-develop
           cd invoiceninja
           composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
           composer install --no-interaction --prefer-dist
