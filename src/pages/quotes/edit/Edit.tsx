@@ -9,6 +9,7 @@
  */
 
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useScrollToLineItem } from '$app/common/hooks/useScrollToLineItem';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Spinner } from '$app/components/Spinner';
 import { ClientSelector } from '$app/pages/invoices/common/components/ClientSelector';
@@ -61,6 +62,8 @@ export default function Edit() {
   const productColumns = useProductColumns();
   const productQuoteColumns = useProductQuoteColumns();
   const statusThemeColors = useStatusThemeColorScheme();
+
+  useScrollToLineItem(Boolean(quote && client));
   const {
     handleChange,
     handleInvitationChange,
