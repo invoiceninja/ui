@@ -104,7 +104,7 @@ jobs:
           cd invoiceninja
           php artisan key:generate
           php artisan config:clear
-          php artisan ninja:post-update
+          # php artisan ninja:post-update
           php artisan optimize
           vendor/bin/snappdf download
           sudo find ./vendor/bin/ -type f -exec chmod +x {} \;
