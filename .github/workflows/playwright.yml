@@ -107,8 +107,6 @@ jobs:
           # php artisan ninja:post-update
           php artisan optimize
           vendor/bin/snappdf download
-          sudo find ./vendor/bin/ -type f -exec chmod +x {} \;
-          sudo find ./ -type d -exec chmod 755 {} \;
           php artisan migrate:fresh --seed
           php artisan db:seed --class=RandomDataSeeder
           php artisan serve --port=8000 &
