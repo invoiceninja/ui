@@ -7,7 +7,11 @@
 
 import { request as playwrightRequest } from '@playwright/test';
 
-import { emailForCurrentAccount, passwordForCurrentAccount } from './accounts';
+import {
+  baseEmailForAccount,
+  emailForCurrentAccount,
+  passwordForCurrentAccount,
+} from './accounts';
 
 const ENTITY_ENDPOINTS = [
   'invoices',
@@ -453,20 +457,43 @@ export async function ensurePermissionUserExists(
   const users = await fetchAllUsers(api);
   const existing = users.find((u) => u.email === email);
 
+  // Derive the expected display name from the base account email, not the suffixed lane email.
+  const localPart = baseEmailForAccount(email).split('@')[0];
+  const derivedFirst =
+    firstName || localPart.charAt(0).toUpperCase() + localPart.slice(1);
+  const derivedLast = lastName || 'Example';
+
   if (existing) {
     if (existing.is_deleted) {
       await bulkAction(api, 'users' as EntityType, [existing.id], 'restore');
       console.log(`  Restored deleted user ${email}`);
     }
+
+    if (
+      existing.first_name !== derivedFirst ||
+      existing.last_name !== derivedLast
+    ) {
+      const context = await apiRequest(api);
+      const response = await context.put(`/api/v1/users/${existing.id}`, {
+        headers: api.headers,
+        data: { ...existing, first_name: derivedFirst, last_name: derivedLast },
+      });
+
+      if (response.ok()) {
+        console.log(
+          `  Updated user name ${email} (${derivedFirst} ${derivedLast})`
+        );
+      } else {
+        console.warn(
+          `  Failed to update user name ${email}: ${response.status()}`
+        );
+      }
+
+      await context.dispose();
+    }
+
     return existing.id;
   }
-
-  // User doesn't exist — derive name from email if not provided
-  const localPart = email.split('@')[0];
-  const derivedFirst =
-    firstName || localPart.charAt(0).toUpperCase() + localPart.slice(1);
-  const derivedLast = lastName || 'Example';
-
   const context = await apiRequest(api);
   const response = await context.post('/api/v1/users', {
     headers: api.headers,

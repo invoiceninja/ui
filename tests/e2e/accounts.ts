@@ -140,6 +140,22 @@ export function accountEmail(email: string, account: TestAccount | number) {
   return `${localPart}${accountId}@${domain}`;
 }
 
+export function baseEmailForAccount(email: string) {
+  const [localPart, domain] = email.split('@');
+
+  if (!localPart || !domain) {
+    return email;
+  }
+
+  const baseLocalPart = localPart.replace(/\d+$/, '');
+
+  if (!accountBaseLocalParts.has(baseLocalPart)) {
+    return email;
+  }
+
+  return `${baseLocalPart}@${domain}`;
+}
+
 function requireApiUrl() {
   const apiUrl = process.env.VITE_API_URL;
 
