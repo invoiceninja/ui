@@ -124,6 +124,7 @@ export function ProductsTable(props: Props) {
                     <Tr
                       innerRef={provided.innerRef}
                       key={getLineItemIndex(lineItem)}
+                      id={`line-item-${getLineItemIndex(lineItem)}`}
                       tabIndex={index + 1}
                       {...provided.draggableProps}
                     >

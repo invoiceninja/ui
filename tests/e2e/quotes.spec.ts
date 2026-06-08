@@ -783,7 +783,7 @@ test('Convert to Invoice and Convert to Project displayed with admin permission'
   await checkDropdownActions(
     page,
     customActions,
-    undefined,
+    'bulkActionsDropdown',
     'dataTable'
   );
 
@@ -841,7 +841,7 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
   await checkDropdownActions(
     page,
     customActions,
-    undefined,
+    'bulkActionsDropdown',
     'dataTable'
   );
 

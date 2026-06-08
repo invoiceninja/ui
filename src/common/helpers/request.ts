@@ -88,7 +88,7 @@ client.interceptors.response.use(
     }
 
     if (error.response?.status === 404) {
-      toast.error('not_found');
+      toast.error('record_not_found');
       return;
     }
 

@@ -130,6 +130,7 @@ export function Create() {
           handleChange={handleChange}
           errors={errors}
           setErrors={setErrors}
+          page="create"
         />
       ) : (
         <Spinner />

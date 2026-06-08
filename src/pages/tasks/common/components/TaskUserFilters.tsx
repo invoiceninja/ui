@@ -13,7 +13,6 @@ import { User } from '$app/common/interfaces/user';
 import { Project } from '$app/common/interfaces/project';
 import { endpoint } from '$app/common/helpers';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
@@ -29,17 +28,16 @@ interface TaskUserFilterState {
 // URL-backed user + project filters for the task views (List, Kanban, Daily,
 // Weekly, Calendar). The user picker drives both `user_id` (creator) and
 // `assigned_user_id` (assignee); the project picker drives `project_tasks`.
-// Users without the `view_all` permission are server-side pinned to their own
-// id regardless of the URL value.
+// Users without the `view_all` permission have the picker hidden and emit no
+// user filter — the API already scopes results to what they may see.
 export function useTaskUserFilters(): TaskUserFilterState {
   const [searchParams, setSearchParams] = useSearchParams();
   const hasPermission = useHasPermission();
-  const currentUser = useCurrentUser();
 
   const canViewAll = hasPermission('view_all');
 
   const rawUser = searchParams.get('user') || '';
-  const userId = canViewAll ? rawUser : currentUser?.id || '';
+  const userId = canViewAll ? rawUser : '';
   const projectId = searchParams.get('project') || '';
 
   const setUserId = (id: string) => {
@@ -108,12 +106,14 @@ export function TaskUserFilter({ state }: Props) {
 }
 
 export function TaskProjectFilter({ state }: Props) {
+  const [t] = useTranslation();
+
   return (
     <div className="w-56 shrink-0">
       <ComboboxAsync<Project>
         inputOptions={{
           value: state.projectId || null,
-          placeholder: 'Filter by project…',
+          placeholder: t('filter_by_project') ?? 'Filter by project…',
         }}
         endpoint={endpoint('/api/v1/projects?status=active')}
         entryOptions={{

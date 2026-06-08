@@ -159,6 +159,7 @@ test('Prevent back browser button navigation', async ({ page }) => {
 
   await page.waitForURL('**/invoices/**/edit**');
 
+  
   await page
     .locator('[type="date"]')
     .first()
@@ -168,6 +169,22 @@ test('Prevent back browser button navigation', async ({ page }) => {
 
   // Wait for debounce (300ms) + React re-render to detect the change as unsaved
   await page.waitForTimeout(400);
+
+  await page
+    .locator('[type="date"]')
+    .nth(1)
+    .first()
+    .fill(dayjs().add(14, 'day').format('YYYY-MM-DD'));
+
+  await page.locator('[type="date"]').nth(1).first().blur();
+  await page.locator('[type="date"]').first().blur();
+
+  await page.locator('[data-cy="quickPopoverButton"]').click();
+  await page.waitForTimeout(400);
+
+  await page.getByText('Invoice', { exact: true }).click();
+  await page.waitForTimeout(400);
+
 
   await page.goBack();
 
@@ -206,6 +223,7 @@ test('Prevent account management navigation', async ({ page }) => {
 
   await page.waitForURL('**/invoices/**/edit**');
 
+
   await page
     .locator('[type="date"]')
     .first()
@@ -214,6 +232,18 @@ test('Prevent account management navigation', async ({ page }) => {
   await page.locator('[type="date"]').first().blur();
 
   // Wait for debounce (300ms) + React re-render to detect the change as unsaved
+  await page.waitForTimeout(400);
+
+  await page
+    .locator('[type="date"]')
+    .nth(1)
+    .first()
+    .fill(dayjs().add(14, 'day').format('YYYY-MM-DD'));
+
+  await page.locator('[type="date"]').nth(1).first().blur();
+  await page.locator('[type="date"]').first().blur();
+
+  await page.locator('[data-cy="quickPopoverButton"]').click();
   await page.waitForTimeout(400);
 
   await page.locator('[data-cy="companyDropdown"]').click();

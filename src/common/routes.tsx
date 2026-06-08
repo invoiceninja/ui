@@ -10,6 +10,8 @@
 
 import { Route, Routes } from 'react-router';
 import { PrivateRoute } from '../components/PrivateRoute';
+import { HostedRoute } from '../components/HostedRoute';
+import { isCalendarConnectionAvailable } from '$app/common/helpers';
 import { invoiceRoutes } from '$app/pages/invoices/routes';
 import { clientRoutes } from '$app/pages/clients/routes';
 import { productRoutes } from '$app/pages/products/routes';
@@ -79,17 +81,21 @@ export const routes = (
       {settingsRoutes}
       {activityRoutes}
       <Route
-        path="/calendar_connection/complete"
-        element={
-          <Guard
-            guards={[
-              enabled(ModuleBitmask.Tasks),
-              or(permission('view_task'), permission('edit_task')),
-            ]}
-            component={<CalendarConnectionComplete />}
-          />
-        }
-      />
+        element={<HostedRoute enabled={isCalendarConnectionAvailable()} />}
+      >
+        <Route
+          path="/calendar_connection/complete"
+          element={
+            <Guard
+              guards={[
+                enabled(ModuleBitmask.Tasks),
+                or(permission('view_task'), permission('edit_task')),
+              ]}
+              component={<CalendarConnectionComplete />}
+            />
+          }
+        />
+      </Route>
       <Route
         path="/einvoice/registration/success"
         element={<CorpPassSuccess />}

@@ -37,6 +37,7 @@ import {
 } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { RecurringInvoiceStatus } from './RecurringInvoiceStatus';
+import { ViewLineItem } from '$app/pages/invoices/common/components/ViewLineItem';
 import { RecurringInvoiceActivity } from '$app/common/interfaces/recurring-invoice-activity';
 import frequencies from '$app/common/constants/frequency';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -392,6 +393,27 @@ export const RecurringInvoiceSlider = () => {
               </Box>
             ) : null}
           </div>
+
+          {Boolean(recurringInvoice?.line_items?.length) && (
+            <Divider withoutPadding borderColor={colors.$20} />
+          )}
+
+          {recurringInvoice &&
+            Boolean(recurringInvoice.line_items?.length) && (
+              <div className="flex flex-col space-y-3 px-6 py-5">
+                {recurringInvoice.line_items.map((lineItem, index) => (
+                  <ViewLineItem
+                    key={index}
+                    lineItem={lineItem}
+                    lineItemIndex={index}
+                    client={recurringInvoice.client}
+                    editHref={route('/recurring_invoices/:id/edit', {
+                      id: recurringInvoice.id,
+                    })}
+                  />
+                ))}
+              </div>
+            )}
         </div>
 
         <div>

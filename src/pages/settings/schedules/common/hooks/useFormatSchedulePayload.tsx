@@ -17,14 +17,16 @@ interface Params {
 
 const TemplateProperties = {
   email_statement: [
+    'name',
     'template',
     'next_run',
     'frequency_id',
     'remaining_cycles',
     'parameters',
   ],
-  email_record: ['template', 'next_run', 'parameters', 'template'],
+  email_record: ['name', 'template', 'next_run', 'parameters', 'template'],
   email_report: [
+    'name',
     'template',
     'next_run',
     'frequency_id',
@@ -32,12 +34,13 @@ const TemplateProperties = {
     'parameters',
   ],
   invoice_outstanding_tasks: [
+    'name',
     'template',
     'next_run',
     'frequency_id',
     'parameters',
   ],
-  payment_schedule: ['template', 'next_run', 'parameters'],
+  payment_schedule: ['name', 'template', 'next_run', 'parameters'],
 };
 
 const NullableProperties = ['vendors', 'projects', 'categories', 'tag_ids'];

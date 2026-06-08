@@ -312,13 +312,14 @@ test('archiving payment with edit_payment', async ({ page, api }) => {
     const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
     if (createdId) api.trackEntity('payments', createdId);
 
-    const moreActionsButton = page
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
+    // const moreActionsButton = page
+    //   .getByRole('button')
+    //   .filter({ has: page.getByText('Actions') })
+    //   .first();
 
-    await moreActionsButton.click();
+    // await moreActionsButton.click();
 
+    await page.getByRole('button').nth(3).click();
     await page.getByText('Archive').click();
 
     await expect(page.getByText('Successfully archived payment')).toBeVisible({ timeout: 10000 });

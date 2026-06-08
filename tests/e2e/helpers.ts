@@ -166,15 +166,25 @@ export async function checkDropdownActions(
   withOutOpening?: boolean
 ) {
   if (!withOutOpening) {
-    await page
-      .locator(`[data-cy=${containerId || 'topNavbar'}]`)
-      .getByRole('button', { name: 'Actions', exact: true })
-      .first()
-      .click();
+    const container = page.locator(`[data-cy=${containerId || 'topNavbar'}]`);
+
+    if (containerId === 'dataTable') {
+      const bulkActionsTrigger = container.locator('[data-cy="bulkActionsTrigger"]');
+
+      await expect(bulkActionsTrigger).toBeVisible({ timeout: 10000 });
+      await bulkActionsTrigger.click();
+    } else {
+      await container
+        .getByRole('button', { name: 'Actions', exact: true })
+        .first()
+        .click();
+    }
   }
 
   const dropDown = dropdownId
     ? page.locator(`[data-cy=${dropdownId}]`)
+    : containerId === 'dataTable'
+    ? page.locator('[data-cy="bulkActionsDropdown"]')
     : page.locator('[data-tippy-root]:visible');
   await dropDown.waitFor({ state: 'visible', timeout: 5000 });
 

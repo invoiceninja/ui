@@ -769,10 +769,8 @@ test('Create expense bulk action', async ({ page, api }) => {
     .click();
   await page.locator('[data-cy="dataTableCheckbox"]').last().click();
 
-  await page
-    .getByRole('button', { name: 'Actions', exact: true })
-    .first()
-    .click();
+  await expect(page.locator('[data-cy="bulkActionsTrigger"]')).toBeVisible({ timeout: 10000 });
+  await page.locator('[data-cy="bulkActionsTrigger"]').click();
 
   await page
     .getByRole('button', { name: 'Create Expense', exact: true })

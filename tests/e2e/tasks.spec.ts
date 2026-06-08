@@ -692,12 +692,7 @@ test('Invoice Task displayed with admin permission', async ({ page, api }) => {
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  // Wait for bulk actions button to appear after checkbox selection
-  await page
-    .locator('[data-cy="dataTable"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .first()
-    .waitFor({ state: 'visible', timeout: 5000 });
+  await expect(page.locator('[data-cy="bulkActionsTrigger"]')).toBeVisible({ timeout: 10000 });
 
   await checkDropdownActions(
     page,
@@ -750,12 +745,7 @@ test('Invoice Task displayed with creation permissions', async ({
   await waitForTableData(page);
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  // Wait for bulk actions button to appear after checkbox selection
-  await page
-    .locator('[data-cy="dataTable"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .first()
-    .waitFor({ state: 'visible', timeout: 5000 });
+  await expect(page.locator('[data-cy="bulkActionsTrigger"]')).toBeVisible({ timeout: 10000 });
 
   await checkDropdownActions(
     page,

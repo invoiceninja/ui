@@ -48,17 +48,17 @@ export function TaskViewSwitcher() {
     { to: '/tasks', label: t('list'), icon: <BsListUl size={16} /> },
     {
       to: '/tasks/daily',
-      label: t('daily'),
+      label: t('freq_daily'),
       icon: <BsCalendarDay size={16} />,
     },
     {
       to: '/tasks/weekly',
-      label: t('weekly'),
+      label: t('freq_weekly'),
       icon: <BsCalendarWeek size={16} />,
     },
     {
       to: '/tasks/calendar',
-      label: t('monthly'),
+      label: t('freq_monthly'),
       icon: <BsCalendarMonth size={16} />,
     },
     { to: '/tasks/kanban', label: t('kanban'), icon: <BsKanban size={16} /> },

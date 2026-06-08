@@ -21,7 +21,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   SortableColumns,
@@ -29,8 +29,7 @@ import {
 } from '../common/components/SortableColumns';
 import { Identifier, Payload, Report, useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
-import collect from 'collect.js';
-import { useQueryClient } from 'react-query';
+import { isCancelledError, useQueryClient } from 'react-query';
 import { useAtom } from 'jotai';
 import {
   Cell,
@@ -55,19 +54,22 @@ import { useShowReportField } from '../common/hooks/useShowReportField';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { ReportsPlanAlert } from '../common/components/ReportsPlanAlert';
-import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { extractTextFromHTML } from '$app/common/helpers/html-string';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { cloneDeep } from 'lodash';
 import { ActivitySelector } from '$app/components/layouts/ActivitySelector';
 import { TemplateSelector } from '../common/components/TemplateSelector';
 import { useGroupByOptions } from '../common/hooks/useGroupByOptions';
+import type { Record as ReportColumnRecord } from '$app/common/constants/exports/client-map';
 
 interface Range {
   identifier: string;
   label: string;
   scheduleIdentifier: string;
 }
+
+const PREVIEW_POLL_RETRIES = 10;
+const PREVIEW_POLL_DELAY_MS = import.meta.env.DEV ? 1000 : 5000;
 
 export const ranges: Range[] = [
   { identifier: 'all', label: 'all', scheduleIdentifier: 'all' },
@@ -209,13 +211,15 @@ export default function Reports() {
   const queryClient = useQueryClient();
 
   const scheduleReport = useScheduleReport();
-  const { save, preferences } = usePreferences();
-  const numericFormatter = useNumericFormatter();
+  const { save, preferences, update } = usePreferences();
 
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
   const [errors, setErrors] = useState<ValidationBag>();
   const [showCustomColumns, setShowCustomColumns] = useState(false);
+  const customColumnsDraftsRef = useRef<
+    Partial<Record<Identifier, ReportColumnRecord[][]>>
+  >({});
 
   const [preview, setPreview] = useAtom(previewAtom);
 
@@ -224,6 +228,8 @@ export default function Reports() {
 
   const handleReportChange = (identifier: Identifier) => {
     const report = reports.find((report) => report.identifier === identifier);
+
+    queryClient.cancelQueries(['reports']);
 
     setShowCustomColumns(false);
 
@@ -270,6 +276,54 @@ export default function Reports() {
     }));
   };
 
+  const resolveReportColumnData = useCallback(() => {
+    if (!showCustomColumns) {
+      return null;
+    }
+
+    const customColumnsDraft =
+      customColumnsDraftsRef.current[report.identifier];
+
+    if (customColumnsDraft) {
+      return customColumnsDraft;
+    }
+
+    if (report.identifier in preferences.reports.columns) {
+      return preferences.reports.columns[report.identifier];
+    }
+
+    return null;
+  }, [preferences.reports.columns, report.identifier, showCustomColumns]);
+
+  const resolveReportKeys = useCallback(() => {
+    const columns = resolveReportColumnData();
+
+    return columns?.[reportColumn]?.map((record) => record.value) ?? [];
+  }, [resolveReportColumnData]);
+
+  const commitCustomColumnsDraft = useCallback(() => {
+    const customColumnsDraft =
+      customColumnsDraftsRef.current[report.identifier];
+
+    if (!showCustomColumns || !customColumnsDraft) {
+      return;
+    }
+
+    if (Array.isArray(preferences.reports.columns)) {
+      update('preferences.reports.columns', {});
+    }
+
+    update(
+      `preferences.reports.columns.${report.identifier}`,
+      customColumnsDraft.map((group) => [...group])
+    );
+  }, [
+    preferences.reports.columns,
+    report.identifier,
+    showCustomColumns,
+    update,
+  ]);
+
   const handleExport = () => {
     toast.processing();
 
@@ -283,15 +337,8 @@ export default function Reports() {
         ? { ...report.payload, client_id: client_id || null }
         : report.payload;
 
-    let reportKeys: string[] = [];
-
-    if (report.identifier in preferences.reports.columns && showCustomColumns) {
-      reportKeys = collect(
-        preferences.reports.columns[report.identifier][reportColumn]
-      )
-        .pluck('value')
-        .toArray() as string[];
-    }
+    const reportKeys = resolveReportKeys();
+    commitCustomColumnsDraft();
 
     updatedPayload = { ...updatedPayload, report_keys: reportKeys };
 
@@ -390,6 +437,10 @@ export default function Reports() {
     setErrors(undefined);
     setPreview(null);
 
+    queryClient.cancelQueries(['reports']);
+
+    toast.processing();
+
     const { client_id } = report.payload;
 
     let updatedPayload =
@@ -397,20 +448,13 @@ export default function Reports() {
         ? { ...report.payload, client_id: client_id || null }
         : report.payload;
 
-    let reportKeys: string[] = [];
-
-    if (report.identifier in preferences.reports.columns && showCustomColumns) {
-      reportKeys = collect(
-        preferences.reports.columns[report.identifier][reportColumn]
-      )
-        .pluck('value')
-        .toArray() as string[];
-    }
+    const reportKeys = resolveReportKeys();
+    commitCustomColumnsDraft();
 
     updatedPayload = { ...updatedPayload, report_keys: reportKeys };
 
-    request('POST', endpoint(report.preview), updatedPayload, {}).then(
-      (response) => {
+    request('POST', endpoint(report.preview), updatedPayload, {})
+      .then((response) => {
         const hash = response.data.message as string;
 
         queryClient
@@ -420,8 +464,8 @@ export default function Reports() {
               request('POST', endpoint(`/api/v1/reports/preview/${hash}`)).then(
                 (response) => response.data
               ),
-            retry: 10,
-            retryDelay: import.meta.env.DEV ? 1000 : 5000,
+            retry: PREVIEW_POLL_RETRIES,
+            retryDelay: PREVIEW_POLL_DELAY_MS,
           })
           .then((response) => {
             const { columns, ...rows } = response;
@@ -437,9 +481,27 @@ export default function Reports() {
             });
 
             toast.success();
+
+            setTimeout(() => {
+              document.getElementById('preview-table')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+            }, 100);
+          })
+          .catch((error) => {
+            if (isCancelledError(error)) {
+              return;
+            }
+
+            console.error(error);
+
+            toast.info('report_too_large_to_preview');
           });
-      }
-    );
+      })
+      .catch(() => {
+        toast.dismiss();
+      });
   };
 
   useEffect(() => {
@@ -475,7 +537,12 @@ export default function Reports() {
 
           <DropdownElement
             icon={<Icon element={MdSchedule} />}
-            onClick={() => scheduleReport(report, showCustomColumns)}
+            onClick={() => {
+              const reportKeys = resolveReportKeys();
+
+              commitCustomColumnsDraft();
+              scheduleReport(report, showCustomColumns, reportKeys);
+            }}
           >
             {t('schedule')}
           </DropdownElement>
@@ -776,7 +843,9 @@ export default function Reports() {
             <Element leftSide={`${t('customize')} ${t('columns')}`}>
               <Toggle
                 checked={showCustomColumns}
-                onValueChange={(value) => setShowCustomColumns(Boolean(value))}
+                onValueChange={(value) => {
+                  setShowCustomColumns(Boolean(value));
+                }}
               />
             </Element>
           )}
@@ -787,6 +856,12 @@ export default function Reports() {
         <SortableColumns
           report={report.identifier}
           columns={report.custom_columns}
+          draftColumns={
+            customColumnsDraftsRef.current[report.identifier] ?? null
+          }
+          onColumnsChange={(columns) => {
+            customColumnsDraftsRef.current[report.identifier] = columns;
+          }}
         />
       )}
 

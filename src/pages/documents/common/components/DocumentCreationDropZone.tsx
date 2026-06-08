@@ -140,7 +140,7 @@ export function DocumentCreationDropZone({ onSelectFiles }: Props) {
           case 'too-many-files':
             return t('too_many_files');
           default:
-            return t('file_upload_error', { fileName });
+            return t('upload_failed', { fileName });
         }
       });
       rejectionErrors.push(...errors);

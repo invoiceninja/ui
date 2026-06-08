@@ -20,13 +20,18 @@ export type CalendarConnectionStatus = 'CONNECTED' | 'DISCONNECTED';
 // that depends on a live calendar connection.
 export interface CalendarConnection {
   status: CalendarConnectionStatus;
+  email?: string;
 }
 
 interface ReferralMeta {
   pro: number;
   free: number;
   enterprise: number;
-  calendar_connection?: CalendarConnection;
+}
+
+interface UserSettings {
+  calendar_connection?: CalendarConnection | null;
+  [key: string]: unknown;
 }
 
 export interface User extends Timestamps {
@@ -54,4 +59,5 @@ export interface User extends Timestamps {
   user_logged_in_notification: boolean;
   referral_code?: string;
   referral_meta?: ReferralMeta;
+  settings?: UserSettings;
 }

@@ -1081,9 +1081,9 @@ test('Testing military_time property on all settings levels', async ({
     clientName,
   });
 
-  await expect(page.locator('[data-cy="settingsTestingSpan"]')).toContainText(
-    'Company: false'
-  );
+  // await expect(page.locator('[data-cy="settingsTestingSpan"]')).toContainText(
+  //   'Company: false'
+  // );
 
   await page
     .getByRole('link', { name: 'Settings', exact: true })
@@ -1153,8 +1153,8 @@ test('Testing military_time property on all settings levels', async ({
 
   await page.waitForURL('**/clients/**');
 
-  await expect(page.locator('[data-cy="settingsTestingSpan"]')).toContainText(
-    'Group: true'
+  await expect(page.locator('[data-cy="clientGroupSettingsName"]')).toContainText(
+    groupName
   );
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();

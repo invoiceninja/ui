@@ -17,12 +17,17 @@ import { TaxItem } from './invoice-sum';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Currency } from '$app/common/interfaces/currency';
 import { NumberFormatter } from '../number-formatter';
-import { roundToPrecision } from './round';
+import {
+  formatTaxName,
+  percentageOf,
+  precisionOrDefault,
+  roundToPrecision,
+} from './round';
 
 export class InvoiceSumInclusive {
   protected taxMap = collect<TaxItem>();
   public declare invoiceItems: InvoiceItemSumInclusive;
-  protected totalTaxMap: Record<string, unknown>[] = [];
+  protected totalTaxMap: TaxItem[] = [];
 
   public totalDiscount = 0;
   public total = 0;
@@ -35,7 +40,15 @@ export class InvoiceSumInclusive {
     protected currency: Currency,
     protected eInvoiceType?: string
   ) {
-    this.invoiceItems = new InvoiceItemSumInclusive(this.invoice, this.eInvoiceType);
+    this.invoiceItems = new InvoiceItemSumInclusive(
+      this.invoice,
+      this.currency,
+      this.eInvoiceType
+    );
+  }
+
+  protected get precision(): number {
+    return precisionOrDefault(this.currency?.precision);
   }
 
   public get isPeppol(): boolean {
@@ -45,12 +58,12 @@ export class InvoiceSumInclusive {
   public build() {
     this.calculateLineItems()
       .calculateDiscount()
-      .calculateCustomValues()
       .calculateInvoiceTaxes()
+      .calculateCustomValues()
       .setTaxMap()
       .calculateTotals()
-      // .calculatePartial();
-      .calculateBalance();
+      .calculateBalance()
+      .calculatePartial();
 
     return this;
   }
@@ -74,56 +87,82 @@ export class InvoiceSumInclusive {
 
   protected calculateInvoiceTaxes() {
     let amount = this.total;
+    this.totalTaxMap = [];
 
     if (this.invoice.discount > 0 && this.invoice.is_amount_discount) {
-      amount = this.subTotal - this.invoice.discount;
+      amount = roundToPrecision(this.subTotal - this.invoice.discount, 2);
     }
 
     if (this.invoice.discount > 0 && !this.invoice.is_amount_discount) {
-      amount = this.subTotal - this.subTotal * (this.invoice.discount / 100);
+      amount = roundToPrecision(
+        this.subTotal - this.subTotal * (this.invoice.discount / 100),
+        2
+      );
     }
 
-    if (this.invoice.tax_rate1 > 0) {
-      const tax = this.calcInclusiveLineTax(amount, this.invoice.tax_rate1);
+    amount += this.getTaxableSurchargeTotal();
+
+    [
+      { name: this.invoice.tax_name1, rate: this.invoice.tax_rate1 },
+      { name: this.invoice.tax_name2, rate: this.invoice.tax_rate2 },
+      { name: this.invoice.tax_name3, rate: this.invoice.tax_rate3 },
+    ].forEach(({ name, rate }) => {
+      if (name.length <= 1 || rate <= 0) {
+        return;
+      }
+
+      const tax = this.calcInclusiveLineTax(amount, rate);
 
       this.totalTaxes += tax;
-
       this.totalTaxMap.push({
-        name: `${this.invoice.tax_name1} ${parseFloat(
-          this.invoice.tax_rate1.toFixed(this.currency?.precision || 2)
-        )} %`,
+        name: formatTaxName(name, rate),
+        total: tax,
+        tax_rate: rate,
+        base_amount: amount - tax,
       });
-    }
-
-    if (this.invoice.tax_rate2 > 0) {
-      const tax = this.calcInclusiveLineTax(amount, this.invoice.tax_rate2);
-
-      this.totalTaxes += tax;
-
-      this.totalTaxMap.push({
-        name: `${this.invoice.tax_name2} ${parseFloat(
-          this.invoice.tax_rate2.toFixed(this.currency?.precision || 2)
-        )} %`,
-      });
-    }
-
-    if (this.invoice.tax_rate3 > 0) {
-      const tax = this.calcInclusiveLineTax(amount, this.invoice.tax_rate3);
-
-      this.totalTaxes += tax;
-
-      this.totalTaxMap.push({
-        name: `${this.invoice.tax_name3} ${parseFloat(
-          this.invoice.tax_rate3.toFixed(this.currency?.precision || 2)
-        )} %`,
-      });
-    }
+    });
 
     return this;
   }
 
   public getTaxMap() {
     return this.taxMap;
+  }
+
+  public getTotalTaxMap() {
+    return collect<TaxItem>(this.totalTaxMap);
+  }
+
+  public getSubTotal() {
+    return roundToPrecision(this.subTotal ?? 0, 2);
+  }
+
+  public getTotalDiscount() {
+    return roundToPrecision(this.totalDiscount ?? 0, 2);
+  }
+
+  public getTotalTaxes() {
+    return this.totalTaxes;
+  }
+
+  public getTotal() {
+    return roundToPrecision(this.total ?? 0, 2);
+  }
+
+  public getTotalSurcharges() {
+    return this.totalCustomValues;
+  }
+
+  public getSubtotalWithSurcharges() {
+    return this.getSubTotal() + this.getTotalSurcharges();
+  }
+
+  public getTotalNetSurcharges() {
+    return this.invoiceItems.getCustomSurchargeNetMap().sum('total') as number;
+  }
+
+  public getNetSubtotal() {
+    return this.getSubTotal() - this.getTotalDiscount();
   }
 
   protected calculateCustomValues() {
@@ -137,38 +176,35 @@ export class InvoiceSumInclusive {
     return this;
   }
 
-  protected getSurchargeTaxTotalForKey(taxName: string, rate: number) {
-    let taxComponent = 0;
+  protected getTaxableSurchargeTotal() {
+    return [
+      {
+        amount: this.invoice.custom_surcharge1,
+        taxable: this.invoice.custom_surcharge_tax1,
+      },
+      {
+        amount: this.invoice.custom_surcharge2,
+        taxable: this.invoice.custom_surcharge_tax2,
+      },
+      {
+        amount: this.invoice.custom_surcharge3,
+        taxable: this.invoice.custom_surcharge_tax3,
+      },
+      {
+        amount: this.invoice.custom_surcharge4,
+        taxable: this.invoice.custom_surcharge_tax4,
+      },
+    ].reduce((total, surcharge) => {
+      if (
+        !surcharge.taxable ||
+        typeof surcharge.amount !== 'number' ||
+        surcharge.amount <= 0
+      ) {
+        return total;
+      }
 
-    if (this.invoice.custom_surcharge_tax1) {
-      taxComponent += roundToPrecision(
-        this.invoice.custom_surcharge1 * (rate / 100),
-        this.currency?.precision || 2
-      );
-    }
-
-    if (this.invoice.custom_surcharge_tax2) {
-      taxComponent += roundToPrecision(
-        this.invoice.custom_surcharge2 * (rate / 100),
-        this.currency?.precision || 2
-      );
-    }
-
-    if (this.invoice.custom_surcharge_tax3) {
-      taxComponent += roundToPrecision(
-        this.invoice.custom_surcharge3 * (rate / 100),
-        this.currency?.precision || 2
-      );
-    }
-
-    if (this.invoice.custom_surcharge_tax4) {
-      taxComponent += roundToPrecision(
-        this.invoice.custom_surcharge4 * (rate / 100),
-        this.currency?.precision || 2
-      );
-    }
-
-    return taxComponent;
+      return total + surcharge.amount;
+    }, 0);
   }
 
   protected setTaxMap() {
@@ -177,40 +213,39 @@ export class InvoiceSumInclusive {
       this.invoice.line_items = this.invoiceItems.lineItems;
     }
 
-    this.taxMap = collect();
+    this.taxMap = collect<TaxItem>();
 
-    let taxCollection = collect<TaxItem>();
-    taxCollection = this.invoiceItems.taxCollection.pluck('items');
+    const taxCollection = this.invoiceItems.taxCollection;
 
     const keys = taxCollection.pluck('key').unique();
 
     keys.map((key) => {
-      const taxName = taxCollection
-        .filter((item) => item.key === key)
-        .pluck('name')
-        .first();
+      const matchingTaxes = taxCollection.filter((item) => item.key === key);
+      const firstTax = matchingTaxes.first() as TaxItem | undefined;
 
-      const totalLineTax = taxCollection
-        .filter((item) => item.key === key)
-        .sum('total');
+      if (!firstTax) {
+        return;
+      }
+
+      const totalLineTax = matchingTaxes.sum('total') as number;
+      const baseAmount = matchingTaxes.sum('base_amount') as number;
 
       this.taxMap.push({
-        name: taxName as string,
-        total: totalLineTax as number,
+        key: key as string,
+        name: firstTax.name,
+        total: totalLineTax,
+        tax_id: firstTax.tax_id,
+        tax_rate: firstTax.tax_rate,
+        base_amount: roundToPrecision(baseAmount, 2),
       });
 
-      this.totalTaxes += totalLineTax as number;
+      this.totalTaxes += totalLineTax;
     });
 
     return this;
   }
 
   protected calculateTotals() {
-    this.totalTaxes = roundToPrecision(
-      this.totalTaxes,
-      this.currency?.precision || 2
-    );
-
     return this;
   }
 
@@ -222,29 +257,40 @@ export class InvoiceSumInclusive {
 
   protected setCalculatedAttributes() {
     this.invoice.amount = parseFloat(
-      NumberFormatter.formatValue(this.total, this.currency?.precision || 2)
+      NumberFormatter.formatValue(this.getTotal(), this.precision)
     );
 
-    this.invoice.balance =
-      parseFloat(
-        NumberFormatter.formatValue(this.total, this.currency?.precision || 2)
-      ) - (this.invoice.paid_to_date ?? 0);
+    const balance = this.shouldZeroBalance()
+      ? 0
+      : this.invoice.amount - (this.invoice.paid_to_date ?? 0);
+
+    this.invoice.balance = parseFloat(
+      NumberFormatter.formatValue(balance, this.precision)
+    );
 
     this.invoice.total_taxes = this.totalTaxes;
 
     return this;
   }
 
-  // protected calculatePartial() {
-  //   if (!this.invoice?.id && this.invoice.partial && this.invoice.balance) {
-  //     this.invoice.partial = Math.max(
-  //       0,
-  //       Math.min(this.invoice.partial, this.invoice.balance)
-  //     ); // Needs formatting (with rounding 2)
-  //   }
+  protected shouldZeroBalance() {
+    return (
+      this.invoice.entity_type === 'invoice' && this.invoice.status_id === '5'
+    );
+  }
 
-  //   return this;
-  // }
+  protected calculatePartial() {
+    if (!this.invoice?.id && this.invoice.partial && this.invoice.balance) {
+      const roundedPartial = roundToPrecision(this.invoice.partial, 2);
+
+      this.invoice.partial = Math.max(
+        0,
+        Math.min(roundedPartial, this.invoice.balance)
+      );
+    }
+
+    return this;
+  }
 
   public getBalanceDue() {
     return this.invoice.partial && this.invoice.partial > 0
@@ -261,17 +307,7 @@ export class InvoiceSumInclusive {
       return this.invoice.discount;
     }
 
-    return roundToPrecision(
-      amount * (this.invoice.discount / 100),
-      this.currency?.precision || 2
-    );
-  }
-
-  protected taxer(amount: number, tax_rate: number) {
-    return roundToPrecision(
-      amount * ((tax_rate ?? 0) / 100),
-      this.currency?.precision || 2
-    );
+    return percentageOf(amount, this.invoice.discount, 2);
   }
 
   protected valuer(customValue: number | undefined): number {
@@ -285,6 +321,10 @@ export class InvoiceSumInclusive {
   }
 
   protected calcInclusiveLineTax(amount: number, rate: number) {
-    return amount - amount / (1 + rate / 100);
+    if (!rate) {
+      return 0;
+    }
+
+    return roundToPrecision(amount - amount / (1 + rate / 100), 2);
   }
 }

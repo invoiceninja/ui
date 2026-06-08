@@ -31,7 +31,6 @@ import { TaskTable } from '../common/components/TaskTable';
 import { isOverlapping } from '../common/helpers/is-overlapping';
 import { useStart } from '../common/hooks/useStart';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { serializeTagsPayload } from '$app/common/helpers/tags';
 
 export default function Create() {
   const [t] = useTranslation();
@@ -124,7 +123,7 @@ export default function Create() {
 
     setIsFormBusy(true);
 
-    request('POST', endpoint('/api/v1/tasks'), serializeTagsPayload(task))
+    request('POST', endpoint('/api/v1/tasks'), task)
       .then((response) => {
         company?.auto_start_tasks && start(response.data.data);
 

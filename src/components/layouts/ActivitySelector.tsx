@@ -248,10 +248,10 @@ export function useActivityLabels(): Record<ActivityType, string> {
         [ACTIVITY_TYPES.MERGE_CLIENT]: t('merge_client'),
         [ACTIVITY_TYPES.MERGE_VENDOR]: t('merge_vendor'),
         [ACTIVITY_TYPES.PURGE_CLIENT]: t('purge_client'),
-        [ACTIVITY_TYPES.VERIFACTU_INVOICE_SENT]: t('verifactu_invoice_sent'),
+        [ACTIVITY_TYPES.VERIFACTU_INVOICE_SENT]: t('verifactu_invoice_send_success'),
         [ACTIVITY_TYPES.VERIFACTU_INVOICE_SENT_FAILURE]: t('verifactu_invoice_sent_failure'),
-        [ACTIVITY_TYPES.VERIFACTU_CANCELLATION_SENT]: t('verifactu_cancellation_sent'),
-        [ACTIVITY_TYPES.VERIFACTU_CANCELLATION_SENT_FAILURE]: t('verifactu_cancellation_sent_failure'),
+        [ACTIVITY_TYPES.VERIFACTU_CANCELLATION_SENT]: t('verifactu_cancellation_send_success'),
+        [ACTIVITY_TYPES.VERIFACTU_CANCELLATION_SENT_FAILURE]: t('verifactu_cancellation_send_failure'),
         [ACTIVITY_TYPES.QUOTE_REJECTED]: t('quote_rejected'),
     };
 }
