@@ -8,12 +8,14 @@ import {
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
-import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createExpenseCategory } from './expense-categories-helpers';
 import { createTaxRate } from './taxes-helpers';
 import { getCompanySettings, putCompanySettings } from './api-helpers';
+
+resetAccountBeforeAll();
 
 interface Params {
   permissions: Permission[];

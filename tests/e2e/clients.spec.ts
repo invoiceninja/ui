@@ -8,9 +8,11 @@ import {
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
-import { test, expect, uniqueName, type ApiFixture } from '$tests/e2e/fixtures';
+import { resetAccountBeforeAll, test, expect, uniqueName, type ApiFixture } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
 import { createApiContext, fetchEntityIds } from './api-helpers';
+
+resetAccountBeforeAll();
 
 interface ModalAction {
   label: string;

@@ -5,9 +5,11 @@ import {
   permissions,
   waitForTableData,
 } from '$tests/e2e/helpers';
-import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
 import { createClient } from './client-helpers';
+
+resetAccountBeforeAll();
 
 interface CreateParams {
   page: Page;

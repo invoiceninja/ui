@@ -1,28 +1,35 @@
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
- * Custom Playwright fixtures that provide automatic API cleanup after each test.
+ * Custom Playwright fixtures that assign worker account lanes and provide API helpers.
  *
  * Usage in test files:
  *   import { test, expect, uniqueName } from '$tests/e2e/fixtures';
  *
  *   test('my test', async ({ page, api }) => {
  *     const name = uniqueName('my-entity');
- *     // Use api.createEntity() / api.trackEntity() for automatic cleanup
+ *     // Use api.createEntity() for API setup in the current worker account
  *   });
  */
 
 import { test as base } from '@playwright/test';
 import { config } from 'dotenv';
 import {
-  createApiContext,
   bulkAction,
+  createApiContext,
   fetchEntityByName,
   getCompanySettings,
   putCompanySettings,
   type ApiContext,
   type EntityType,
 } from './api-helpers';
+import {
+  accountForParallelIndex,
+  clearCurrentTestAccount,
+  setCurrentTestAccount,
+  type TestAccount,
+} from './accounts';
+import { resetTestAccount } from './account-reset';
 
 config({ path: '.env.testing', override: true });
 config();
@@ -40,7 +47,10 @@ export function uniqueName(prefix: string): string {
  * Extract an entity ID from a Playwright page URL.
  * Matches patterns like /invoices/ABC123/edit or /settings/schedules/ABC123/edit
  */
-export function extractIdFromUrl(url: string, entityPath: string): string | null {
+export function extractIdFromUrl(
+  url: string,
+  entityPath: string
+): string | null {
   const regex = new RegExp(`${entityPath}/([^/]+?)(/edit)?$`);
   const match = url.match(regex);
   return match ? match[1] : null;
@@ -51,18 +61,40 @@ interface TrackedEntity {
   id: string;
 }
 
+const TRACKED_ENTITY_CLEANUP_ORDER: EntityType[] = [
+  'bank_transactions',
+  'invoices',
+  'recurring_invoices',
+  'quotes',
+  'credits',
+  'purchase_orders',
+  'expenses',
+  'recurring_expenses',
+  'payments',
+  'tasks',
+  'task_schedulers',
+  'projects',
+  'vendors',
+  'clients',
+  'products',
+  'group_settings',
+  'expense_categories',
+  'designs',
+  'tags',
+];
+
 export interface ApiFixture {
   context: ApiContext;
   /**
-   * Track an entity for automatic cleanup after the test.
+   * Track an entity created by the test. Tracked entities are cleaned up after the test.
    */
   trackEntity: (type: EntityType, id: string) => void;
   /**
-   * Look up an entity by name via API and track it for cleanup.
+   * Look up an entity by name via API and track it for compatibility.
    */
   trackEntityByName: (type: EntityType, name: string) => Promise<void>;
   /**
-   * Create an entity via API and automatically track it for cleanup.
+   * Create an entity via API in the current worker account.
    */
   createEntity: (
     type: EntityType,
@@ -78,17 +110,32 @@ export interface SettingsFixture {
   snapshot: () => Promise<void>;
 }
 
-export const test = base.extend<{
-  api: ApiFixture;
-  settingsGuard: SettingsFixture;
-}>({
-  api: async ({}, use) => {
-    const apiUrl = process.env.VITE_API_URL;
-    if (!apiUrl) {
-      throw new Error('VITE_API_URL must be set for API fixture');
-    }
+export const test = base.extend<
+  {
+    api: ApiFixture;
+    settingsGuard: SettingsFixture;
+  },
+  {
+    account: TestAccount;
+  }
+>({
+  account: [
+    async ({}, use, workerInfo) => {
+      const account = accountForParallelIndex(workerInfo.parallelIndex);
+      setCurrentTestAccount(account);
+      await use(account);
 
-    const context = await createApiContext(apiUrl);
+      clearCurrentTestAccount();
+    },
+    { auto: true, scope: 'worker' },
+  ],
+
+  api: async ({ account }, use) => {
+    const context = await createApiContext(
+      account.apiUrl,
+      account.ownerEmail,
+      account.password
+    );
     const tracked: TrackedEntity[] = [];
 
     const fixture: ApiFixture = {
@@ -130,62 +177,21 @@ export const test = base.extend<{
 
     await use(fixture);
 
-    // Cleanup: delete all tracked entities in reverse dependency order
-    const byType = new Map<EntityType, string[]>();
-    for (const { type, id } of tracked) {
-      if (!byType.has(type)) {
-        byType.set(type, []);
-      }
-      byType.get(type)!.push(id);
-    }
-
-    const deleteOrder: EntityType[] = [
-      'payments',
-      'invoices',
-      'recurring_invoices',
-      'quotes',
-      'credits',
-      'purchase_orders',
-      'expenses',
-      'recurring_expenses',
-      'tasks',
-      'projects',
-      'bank_transactions',
-      'task_schedulers',
-      'group_settings',
-      'designs',
-      'expense_categories',
-      'products',
-      'vendors',
-      'clients',
-    ];
-
-    for (const type of deleteOrder) {
-      const ids = byType.get(type);
-      if (ids && ids.length > 0) {
-        try {
-          await bulkAction(context, type, ids, 'archive');
-          await bulkAction(context, type, ids, 'delete');
-        } catch {
-          // Best effort cleanup
-        }
-      }
-    }
+    await cleanupTrackedEntities(context, tracked);
   },
 
-  settingsGuard: async ({}, use) => {
-    const apiUrl = process.env.VITE_API_URL;
-    if (!apiUrl) {
-      throw new Error('VITE_API_URL must be set for settings fixture');
-    }
-
+  settingsGuard: async ({ account }, use) => {
     let savedCompanyId: string | undefined;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let savedSettings: Record<string, any> | undefined;
 
     const fixture: SettingsFixture = {
       async snapshot() {
-        const api = await createApiContext(apiUrl);
+        const api = await createApiContext(
+          account.apiUrl,
+          account.ownerEmail,
+          account.password
+        );
         const { companyId, settings } = await getCompanySettings(api);
         savedCompanyId = companyId;
         savedSettings = { ...settings };
@@ -197,7 +203,11 @@ export const test = base.extend<{
     // Restore settings on teardown if a snapshot was taken
     if (savedCompanyId && savedSettings) {
       try {
-        const api = await createApiContext(apiUrl);
+        const api = await createApiContext(
+          account.apiUrl,
+          account.ownerEmail,
+          account.password
+        );
         await putCompanySettings(api, savedCompanyId, savedSettings);
       } catch {
         // Best effort
@@ -205,5 +215,57 @@ export const test = base.extend<{
     }
   },
 });
+
+export const RESET_ACCOUNT_TIMEOUT = 180_000;
+
+async function cleanupTrackedEntities(
+  context: ApiContext,
+  tracked: TrackedEntity[]
+) {
+  if (tracked.length === 0) return;
+
+  const idsByType = new Map<EntityType, Set<string>>();
+
+  for (const { type, id } of tracked) {
+    if (!idsByType.has(type)) {
+      idsByType.set(type, new Set());
+    }
+
+    idsByType.get(type)?.add(id);
+  }
+
+  for (const type of TRACKED_ENTITY_CLEANUP_ORDER) {
+    const ids = idsByType.get(type);
+
+    if (!ids?.size) continue;
+
+    await cleanupTrackedEntityType(context, type, [...ids]);
+    idsByType.delete(type);
+  }
+
+  for (const [type, ids] of idsByType) {
+    await cleanupTrackedEntityType(context, type, [...ids]);
+  }
+}
+
+async function cleanupTrackedEntityType(
+  context: ApiContext,
+  type: EntityType,
+  ids: string[]
+) {
+  try {
+    await bulkAction(context, type, ids, 'archive');
+    await bulkAction(context, type, ids, 'delete');
+  } catch (error) {
+    console.warn(`  Failed to clean up tracked ${type}: ${error}`);
+  }
+}
+
+export function resetAccountBeforeAll(timeout = RESET_ACCOUNT_TIMEOUT) {
+  test.beforeAll(async ({ account }, testInfo) => {
+    test.setTimeout(timeout);
+    await resetTestAccount(account, 'before ' + testInfo.file);
+  });
+}
 
 export { expect } from '@playwright/test';

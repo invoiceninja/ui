@@ -1,5 +1,7 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
-import { test, expect } from '$tests/e2e/fixtures';
+import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
+
+resetAccountBeforeAll();
 
 test("Can't view dashboard without permission", async ({ page }) => {
   test.setTimeout(60000); 
