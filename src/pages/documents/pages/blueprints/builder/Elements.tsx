@@ -24,15 +24,23 @@ import { Modal } from '$app/components/Modal';
 import { get } from 'lodash';
 import { formatLabel } from './formatLabel';
 
-export function SignatorySwap(props: SignatorySwapProps) {
+export function SignatorySwap({ trigger, ...props }: SignatorySwapProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [t] = useTranslation();
 
   return (
-    <div className="flex items-center justify-center">
-      <button type="button" onClick={() => setIsOpen(true)}>
-        <IoMdSwap size={16} />
-      </button>
+    <>
+      {trigger ? (
+        <div className="cursor-pointer" onClick={() => setIsOpen(true)}>
+          {trigger}
+        </div>
+      ) : (
+        <div className="flex items-center justify-center">
+          <button type="button" onClick={() => setIsOpen(true)}>
+            <IoMdSwap size={16} />
+          </button>
+        </div>
+      )}
 
       <Modal
         visible={isOpen}
@@ -43,7 +51,7 @@ export function SignatorySwap(props: SignatorySwapProps) {
       >
         <SignatorySelector {...props} isSwapModal />
       </Modal>
-    </div>
+    </>
   );
 }
 
