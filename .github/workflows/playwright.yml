@@ -106,7 +106,7 @@ jobs:
           php artisan config:clear
           # php artisan ninja:post-update
           php artisan optimize
-          vendor/bin/snappdf download
+          # vendor/bin/snappdf download
           php artisan migrate:fresh --seed
           php artisan db:seed --class=RandomDataSeeder
           php artisan serve --port=8000 &
