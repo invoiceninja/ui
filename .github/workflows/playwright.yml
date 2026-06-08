@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - develop
+      - 2026_06_08_playwright_coverage
   pull_request:
     branches:
       - develop
