@@ -121,7 +121,7 @@ jobs:
           ref: ${{ github.head_ref || github.ref_name }}
           path: ui
 
-      - name: Prepare React FrontEnd
+      - name: Prepare React FrontEnd + Run Tests
         run: |
           cd ui
           cp .env.example .env

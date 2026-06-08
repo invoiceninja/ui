@@ -62,7 +62,7 @@ npm run test:e2e:parallel -- --project=firefox --concurrency=2
 npm run test:e2e:parallel -- tests/e2e/clients.spec.ts -- --headed
 ```
 
-The runner builds with `vite build --mode testing`, starts or reuses Vite preview on port `4173`, and prefixes output per isolated spec lane. Because `package.json` now exposes this runner, `scripts/playwright-spec-orchestrator.mjs` should be committed with the test changes.
+The runner builds with `vite build --mode testing --outDir dist-testing`, starts or reuses Vite preview on port `4173`, and prefixes output per isolated spec lane. Set `PLAYWRIGHT_VITE_OUT_DIR` to override the test build directory. Because `package.json` now exposes this runner, `scripts/playwright-spec-orchestrator.mjs` should be committed with the test changes.
 
 ## Test Idempotency
 
