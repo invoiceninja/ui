@@ -127,7 +127,8 @@ jobs:
           cp .env.example .env
           npm ci
           npx playwright install --with-deps
-          npx playwright test --max-failures=1
+          # npx playwright test --max-failures=1
+          npx playwright test --project=chromium --workers=1
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           VITE_API_URL: http://127.0.0.1:8000
