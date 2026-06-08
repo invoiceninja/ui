@@ -34,7 +34,7 @@ jobs:
       CACHE_DRIVER: redis
       QUEUE_CONNECTION: redis
       SESSION_DRIVER: redis
-      NINJA_ENVIRONMENT: hosted
+      NINJA_ENVIRONMENT: selfhost
       MULTI_DB_ENABLED: false
       NINJA_LICENSE: ${{ secrets.ninja_license }}
       TRAVIS: true
