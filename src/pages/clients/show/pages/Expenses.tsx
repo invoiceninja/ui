@@ -51,6 +51,7 @@ export default function Expenses() {
       linkToCreateGuards={[permission('create_expense')]}
       hideEditableOptions={!hasPermission('edit_expense')}
       withoutPageAsPreference
+      withoutStoringFilters
     />
   );
 }
