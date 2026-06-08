@@ -104,10 +104,12 @@ jobs:
           cd invoiceninja
           php artisan key:generate
           php artisan config:clear
-          # php artisan ninja:post-update
+          php artisan ninja:post-update
           php artisan optimize
-          # vendor/bin/snappdf download
-          php artisan migrate:fresh --seed
+          vendor/bin/snappdf download
+          sudo find ./vendor/bin/ -type f -exec chmod +x {} \;
+          sudo find ./ -type d -exec chmod 755 {} \;
+          php artisan migrate --seed
           php artisan db:seed --class=RandomDataSeeder
           php artisan serve --port=8000 &
 

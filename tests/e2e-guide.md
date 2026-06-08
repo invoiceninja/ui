@@ -16,33 +16,53 @@ php artisan db:seed --class=RandomDataSeeder
 ```
 
 ## Running
-- Build React app (Playwright uses production build):
+
+Playwright uses the production Vite build from `.env.testing`.
+
+Serial run:
 
 ```bash
-npm run build
+npm run test:e2e
 ```
 
-Running tests:
+Equivalent direct command:
 
-```
+```bash
 npx playwright test --workers=1
 ```
 
-> Don't forget `--workers=1` to prevent race conditions and tests possibly randomly failing.
+> Keep `--workers=1` for direct Playwright runs. The tests share seeded backend state, permission users, and company settings, so in-process workers can race each other.
 
-This will run tests using Chromium & Firefox.
+For local development, run Chromium only:
 
-For local development testing, you'll most likely want to test only in Chrome:
-
-```
+```bash
 npx playwright test --project=chromium --workers=1
 ```
 
-To run tests in headed mode:
+For headed debugging:
 
-```
+```bash
 npx playwright test --project=chromium --workers=1 --headed
 ```
+
+### Isolated Parallel Run
+
+The isolated parallel runner executes multiple spec files at the same time while keeping each spec process on one Playwright worker:
+
+```bash
+npm run test:e2e:parallel
+```
+
+Useful variants:
+
+```bash
+npm run test:e2e:parallel -- --concurrency=4
+npm run test:e2e:parallel -- tests/e2e/clients.spec.ts
+npm run test:e2e:parallel -- --project=firefox --concurrency=2
+npm run test:e2e:parallel -- tests/e2e/clients.spec.ts -- --headed
+```
+
+The runner builds with `vite build --mode testing`, starts or reuses Vite preview on port `4173`, and prefixes output per isolated spec lane. Because `package.json` now exposes this runner, `scripts/playwright-spec-orchestrator.mjs` should be committed with the test changes.
 
 ## Test Idempotency
 
