@@ -130,6 +130,8 @@
     "lint": "eslint src --max-warnings=0",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test --workers=1",
+    "test:e2e:parallel": "node scripts/playwright-spec-orchestrator.mjs",
     "test:e2e:isolated": "node scripts/playwright-spec-orchestrator.mjs",
     "prepare": "husky install",
     "preview": "vite build && vite preview"

@@ -13,6 +13,7 @@ const accountCount = positiveInt(
   8
 );
 const workerCount = positiveInt(process.env.PLAYWRIGHT_WORKERS, accountCount);
+const viteTestOutDir = process.env.PLAYWRIGHT_VITE_OUT_DIR || 'dist-testing';
 
 function positiveInt(value: string | undefined, fallback: number) {
   const parsed = Number.parseInt(value || '', 10);
@@ -110,10 +111,14 @@ export default defineConfig({
     ? {}
     : {
         /* Serve the production build for tests.
-         * Build first with: npx vite build --mode testing
-         * This ensures VITE_* vars are loaded from .env.testing */
+         * Build first with: npx vite build --mode testing --outDir dist-testing
+         * This ensures VITE_* vars are loaded from .env.testing without replacing dist. */
         webServer: {
-          command: 'npx vite build --mode testing && npx vite preview',
+          command:
+            'npx vite build --mode testing --outDir ' +
+            viteTestOutDir +
+            ' && npx vite preview --outDir ' +
+            viteTestOutDir,
           port: 4173,
           reuseExistingServer: true,
           timeout: 180_000, // give the build ~3 min to settle
