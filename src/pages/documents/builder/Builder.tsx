@@ -32,7 +32,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
 import {
   SignatorySelector,
@@ -130,6 +130,8 @@ function Builder() {
   const colors = useColorScheme();
 
   const docuninjaAccount = useAtomValue(docuNinjaAtom);
+
+  const navigate = useNavigate();
 
   const [entity, setEntity] = useState<Document | null>(null);
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
@@ -259,6 +261,12 @@ function Builder() {
       setIsDocumentSaving(false);
     };
 
+    const handleSingleSignatorySent = () => {
+      toast.success('document_queued_for_sending');
+
+      navigate('/docuninja');
+    };
+
     window.addEventListener(
       'refetch.docuninja.document',
       refetchDocuninjaDocument
@@ -279,6 +287,11 @@ function Builder() {
     window.addEventListener(
       'builder:document.updated',
       refetchDocuninjaDocument
+    );
+
+    window.addEventListener(
+      'builder:single-signatory-sent',
+      handleSingleSignatorySent
     );
 
     return () => {
@@ -302,6 +315,11 @@ function Builder() {
       window.removeEventListener(
         'builder:document.updated',
         refetchDocuninjaDocument
+      );
+
+      window.removeEventListener(
+        'builder:single-signatory-sent',
+        handleSingleSignatorySent
       );
     };
   }, []);
