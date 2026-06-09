@@ -264,9 +264,10 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             description: 'Add E-Signatures to your plan',
             features: [
                 'Capture E-Signatures',
-                'Intgrates with existing workflows',
+                'Integrates with existing workflows',
                 'Unlimited Signature requests',
                 'API Access',
+                '$6 per user'
             ]
         }])
     ];
