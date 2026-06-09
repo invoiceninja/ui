@@ -4,7 +4,6 @@ import {
   test,
   expect,
   uniqueName,
-  extractIdFromUrl,
   type ApiFixture,
 } from '$tests/e2e/fixtures';
 import { request as playwrightRequest, type Locator, type Page } from '@playwright/test';
@@ -431,10 +430,14 @@ async function cleanupEndpoint(
 
 async function parseEntity<T>(response: { json: () => Promise<unknown> }) {
   const body = (await response.json()) as {
-    data?: { data?: T } | T;
+    data?: unknown;
   };
 
-  if (body.data && 'data' in body.data) {
+  if (
+    body.data &&
+    typeof body.data === 'object' &&
+    'data' in body.data
+  ) {
     return body.data.data as T;
   }
 
