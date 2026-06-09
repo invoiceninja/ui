@@ -184,15 +184,31 @@ async function configureExpenseTaxRates(page: Page) {
     .locator('xpath=ancestor::div[contains(@class, "sm:grid")][1]');
 
   await expect(expenseTaxRatesField).toBeVisible({ timeout: 10000 });
+
+  const alreadyOneTaxRate = await expenseTaxRatesField
+    .getByText(/^(One Tax Rate|one_tax_rate)$/)
+    .isVisible({ timeout: 1000 })
+    .catch(() => false);
+
+  if (alreadyOneTaxRate) {
+    return;
+  }
+
   await selectReactOptionByText(page, expenseTaxRatesField, 'One Tax Rate');
+
+  const updateResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/v1/companies/') &&
+      response.request().method() === 'PUT',
+    { timeout: 10000 }
+  );
+
   await save(page);
 
-  await Promise.race([
-    page
-      .getByText('Successfully updated settings', { exact: true })
-      .waitFor({ state: 'visible', timeout: 5000 }),
-    page.waitForTimeout(1000),
-  ]).catch(() => {});
+  expect((await updateResponse).ok()).toBeTruthy();
+  await expect(
+    page.getByText('Successfully updated settings', { exact: true })
+  ).toBeVisible({ timeout: 10000 });
 }
 
 test('payment terms can be created, edited, and used by a client', async ({
