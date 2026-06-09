@@ -10,7 +10,9 @@
 
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useColorScheme } from '$app/common/colors';
+import { docuNinjaEndpoint } from '$app/common/helpers';
 import { route, routeWithOrigin } from '$app/common/helpers/route';
+import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Page } from '$app/components/Breadcrumbs';
@@ -26,6 +28,7 @@ import {
   Document,
   SendDialogButtonProps,
   SendDialogProps,
+  useBuilderStore,
 } from '@docuninja/builder2.0';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
@@ -134,6 +137,8 @@ function Builder() {
   const navigate = useNavigate();
 
   const [entity, setEntity] = useState<Document | null>(null);
+
+  useBuilderStore((state) => state.rectangles);
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
   const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
 
@@ -196,24 +201,83 @@ function Builder() {
   };
 
   const handleSend = () => {
-    window.dispatchEvent(new CustomEvent('builder:open.send.confirmation'));
+    if (!hasRealSignatories() || !entity?.id) {
+      return;
+    }
+
+    toast.processing();
+    setIsDocumentSaving(true);
+
+    const onSaveSuccess = () => {
+      window.removeEventListener(
+        'builder:document.successfully.saved',
+        onSaveSuccess,
+      );
+      window.removeEventListener('builder:save.error', onSaveError);
+
+      setIsDocumentSaving(false);
+      setIsDocumentSending(true);
+
+      request(
+        'POST',
+        docuNinjaEndpoint(`/api/documents/${entity.id}/send`),
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+          },
+        },
+      )
+        .then(() => {
+          setIsDocumentSending(false);
+
+          window.dispatchEvent(
+            new CustomEvent('builder:document.sent', {
+              detail: { documentId: entity.id },
+            }),
+          );
+
+          toast.success('document_queued_for_sending');
+          $refetch(['docuninja_documents', 'docuninja_document_timeline']);
+        })
+        .catch(() => {
+          setIsDocumentSending(false);
+          toast.error('something_went_wrong');
+
+          window.dispatchEvent(new CustomEvent('builder:send.error'));
+        });
+    };
+
+    const onSaveError = () => {
+      window.removeEventListener(
+        'builder:document.successfully.saved',
+        onSaveSuccess,
+      );
+      window.removeEventListener('builder:save.error', onSaveError);
+
+      setIsDocumentSaving(false);
+    };
+
+    window.addEventListener('builder:document.successfully.saved', onSaveSuccess);
+    window.addEventListener('builder:save.error', onSaveError);
+    window.dispatchEvent(new CustomEvent('builder:save'));
   };
 
   const doesDocumentHaveSignatories = () => {
-    const rectangles =
-      entity?.files?.flatMap((file) => file.metadata?.rectangles ?? []) ?? [];
+    const storeState = useBuilderStore.getState();
+    const rectangles = Object.values(storeState.rectangles).flat();
 
     return rectangles.length > 0;
   };
 
   const hasRealSignatories = () => {
-    const rectangles =
-      entity?.files?.flatMap((file) => file.metadata?.rectangles ?? []) ?? [];
+    const storeState = useBuilderStore.getState();
+    const rectangles = Object.values(storeState.rectangles).flat();
 
     return rectangles.every(
       (rectangle: any) =>
         rectangle.signatory_id &&
-        !rectangle.signatory_id.startsWith('blueprint|')
+        !rectangle.signatory_id.startsWith('blueprint')
     );
   };
 
@@ -261,6 +325,14 @@ function Builder() {
       setIsDocumentSaving(false);
     };
 
+    const handleDocumentSent = () => {
+      setIsDocumentSending(false);
+    };
+
+    const handleSendError = () => {
+      setIsDocumentSending(false);
+    };
+
     const handleSingleSignatorySent = () => {
       toast.success('document_queued_for_sending');
 
@@ -294,6 +366,9 @@ function Builder() {
       handleSingleSignatorySent
     );
 
+    window.addEventListener('builder:document.sent', handleDocumentSent);
+    window.addEventListener('builder:send.error', handleSendError);
+
     return () => {
       window.removeEventListener(
         'refetch.docuninja.document',
@@ -320,6 +395,16 @@ function Builder() {
       window.removeEventListener(
         'builder:single-signatory-sent',
         handleSingleSignatorySent
+      );
+
+      window.removeEventListener(
+        'builder:document.sent',
+        handleDocumentSent
+      );
+
+      window.removeEventListener(
+        'builder:send.error',
+        handleSendError
       );
     };
   }, []);
@@ -387,7 +472,7 @@ function Builder() {
             disableWithoutIcon
             className="builder-save-button"
           >
-            {t('save')}
+            {t('save_for_later')}
           </Button>
         </div>
       }
