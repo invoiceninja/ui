@@ -2,7 +2,6 @@ on:
   push:
     branches:
       - develop
-      - 2026_06_08_playwright_coverage
   pull_request:
     branches:
       - develop
@@ -41,7 +40,7 @@ jobs:
       MAIL_MAILER: log
       VITE_IS_TEST: true
       VITE_ROUTER: browser
-      VITE_API_URL: http://ninja.test:8000
+      VITE_API_URL: http://127.0.0.1:8000
 
     services:
       mariadb:
@@ -92,7 +91,7 @@ jobs:
 
       - name: Build ninja
         run: |
-          git clone --depth 1 https://${{secrets.commit_secret}}@github.com/turbo124/invoiceninja.git -b v5-develop
+          git clone --depth 1 https://${{secrets.commit_secret}}@github.com/invoiceninja/invoiceninja.git -b v5-develop
           cd invoiceninja
           composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
           composer install --no-interaction --prefer-dist
@@ -117,7 +116,7 @@ jobs:
       - name: Checkout React FrontEnd
         uses: actions/checkout@v4
         with:
-          repository: turbo124/ui-1
+          repository: invoiceninja/ui
           ref: ${{ github.head_ref || github.ref_name }}
           path: ui
 
