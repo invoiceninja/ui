@@ -355,14 +355,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
         } else {
             const planType = planValue as 'pro' | 'enterprise';
             if (selectedMainPlan === planType) {
-                // Deselecting current plan
-                setSelectedMainPlan(null);
-                // Only deselect DocuNinja if user doesn't have existing DocuNinja users
-                const hasExistingDocuNinjaUsers = (account?.docuninja_num_users || 0) > 0;
-                if (!hasExistingDocuNinjaUsers) {
-                    setDocuNinjaSelected(false);
-                    setDocuNinjaUsers(account?.docuninja_num_users);
-                }
+                return;
             } else {
                 // Selecting new plan
                 setSelectedMainPlan(planType);
@@ -394,6 +387,9 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
         }
         return false;
     };
+
+    const isSelectedMainPlan = (planValue: string) =>
+        planValue !== 'docuninja' && selectedMainPlan === planValue;
 
     const handleEnterpriseUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newValue = parseInt(event.target.value);
@@ -548,12 +544,19 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                             className={`border-2 rounded-lg p-4 transition-all duration-200 ${isPlanSelected(plan.value)
                                                     ? isPlanPermanentlySelected(plan.value)
                                                         ? 'border-green-500 bg-green-50 shadow-md ring-2 ring-green-200 cursor-default'
+                                                        : isSelectedMainPlan(plan.value)
+                                                        ? 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200 cursor-default'
                                                         : 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200 cursor-pointer'
                                                     : isPlanDisabled(plan.value)
                                                         ? 'border-gray-200 bg-gray-100 cursor-not-allowed opacity-60'
                                                         : 'border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50 hover:shadow-sm cursor-pointer'
                                                 }`}
-                                            onClick={() => !isPlanDisabled(plan.value) && !isPlanPermanentlySelected(plan.value) && handlePlanToggle(plan.value)}
+                                            onClick={() =>
+                                                !isPlanDisabled(plan.value) &&
+                                                !isPlanPermanentlySelected(plan.value) &&
+                                                !isSelectedMainPlan(plan.value) &&
+                                                handlePlanToggle(plan.value)
+                                            }
                                         >
                                             <div className="flex items-center justify-between mb-2">
                                                 <h4 className="text-lg font-semibold">{plan.label}</h4>
