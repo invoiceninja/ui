@@ -88,7 +88,8 @@ export default function Create() {
           });
 
           navigate(
-            route('/docuninja/:id/builder', { id: response.data.data.id })
+            route('/docuninja/:id/builder', { id: response.data.data.id }) +
+              '?pendingFiles=true'
           );
         })
         .catch((error: AxiosError<ValidationBag>) => {
