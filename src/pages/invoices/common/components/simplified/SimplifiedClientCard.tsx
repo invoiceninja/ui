@@ -386,9 +386,7 @@ export function SimplifiedClientCard({
               disableWithoutIcon
             >
               <span className="text-xs font-semibold">
-                {showCreateMore
-                  ? `− ${t('additional')}`
-                  : `+ ${t('additional')}`}
+                {showCreateMore ? `− ${t('less')}` : `+ ${t('more')}`}
               </span>
             </Button>
           </div>

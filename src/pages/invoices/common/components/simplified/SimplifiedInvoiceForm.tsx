@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
@@ -17,12 +18,14 @@ import { InvoiceItem, InvoiceItemType } from '$app/common/interfaces/invoice-ite
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ChangeHandler } from '$app/pages/invoices/create/Create';
 import { Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
 import { InvoicePreview } from '../InvoicePreview';
 import { InvoiceTotals } from '../InvoiceTotals';
 import { SimplifiedClientCard } from './SimplifiedClientCard';
 import { SimplifiedFooterCard } from './SimplifiedFooterCard';
 import { SimplifiedInvoiceMeta } from './SimplifiedInvoiceMeta';
 import { SimplifiedItemsSection } from './SimplifiedItemsSection';
+import { SimplifiedLinkBox } from './SimplifiedLinkBox';
 import { SimplifiedNotesAdvanced } from './SimplifiedNotesAdvanced';
 import { SimplifiedTermsCard } from './SimplifiedTermsCard';
 
@@ -69,7 +72,9 @@ export function SimplifiedInvoiceForm({
   readonlyClient,
   disableWithSpinner,
 }: Props) {
+  const [t] = useTranslation();
   const reactSettings = useReactSettings();
+  const { isAdmin, isOwner } = useAdmin();
 
   const resetClientFields = () => {
     handleChange('client_id', '');
@@ -97,6 +102,7 @@ export function SimplifiedInvoiceForm({
         />
 
         <SimplifiedInvoiceMeta
+          mode={mode}
           invoice={invoice}
           handleChange={handleChange}
           errors={errors}
@@ -144,6 +150,13 @@ export function SimplifiedInvoiceForm({
 
         <SimplifiedNotesAdvanced invoice={invoice} handleChange={handleChange} />
       </div>
+
+      {(isAdmin || isOwner) && (
+        <SimplifiedLinkBox
+          to="/settings/custom_fields/invoices"
+          label={t('custom_fields')}
+        />
+      )}
 
       {reactSettings?.show_pdf_preview && invoice && (
         <div className="my-4">
