@@ -4,7 +4,7 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
+  apiPermissions,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -17,6 +17,7 @@ import {
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
+import { assignEntityToUser } from './api-helpers';
 
 resetAccountBeforeAll();
 
@@ -125,8 +126,8 @@ const createTask = async (params: CreateParams) => {
   });
 };
 
-test("can't view tasks without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
+test("can't view tasks without permission", async ({ page, api }) => {
+  const { clear, save } = apiPermissions(api.context);
 
   await login(page);
   await clear('tasks@example.com');
@@ -143,7 +144,7 @@ test("can't view tasks without permission", async ({ page }) => {
 });
 
 test('can view task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('tasks@example.com');
@@ -176,7 +177,7 @@ test('can view task', async ({ page, api }) => {
 });
 
 test('can edit task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useTasksActions({
     permissions: ['edit_task', 'view_client'],
@@ -226,7 +227,7 @@ test('can edit task', async ({ page, api }) => {
 });
 
 test('can create a task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useTasksActions({
     permissions: ['create_task'],
@@ -267,7 +268,7 @@ test('can view and edit assigned task with create_task', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useTasksActions({
     permissions: ['create_task'],
@@ -281,7 +282,13 @@ test('can view and edit assigned task with create_task', async ({
   await createTask({ page, assignTo: 'Tasks Example' });
 
   const id = page.url().match(/tasks\/([^/]+)/)?.[1];
-  if (id) api.trackEntity('tasks', id);
+
+  if (!id) {
+    throw new Error('Failed to extract task id');
+  }
+
+  api.trackEntity('tasks', id);
+  await assignEntityToUser(api.context, 'tasks', id, 'tasks@example.com');
 
   await logout(page);
 
@@ -317,7 +324,7 @@ test('can view and edit assigned task with create_task', async ({
 });
 
 test('deleting task with edit_task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('tasks@example.com');
@@ -370,7 +377,7 @@ test('deleting task with edit_task', async ({ page, api }) => {
 });
 
 test('archiving task withe edit_task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('tasks@example.com');
@@ -427,7 +434,7 @@ test('archiving task withe edit_task', async ({ page, api }) => {
 });
 
 test('task documents preview with edit_task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('tasks@example.com');
@@ -478,7 +485,7 @@ test('task documents preview with edit_task', async ({ page, api }) => {
 });
 
 test('task documents uploading with edit_task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('tasks@example.com');
@@ -541,7 +548,7 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useTasksActions({
     permissions: ['admin'],
@@ -573,7 +580,7 @@ test('invoice_task and clone action displayed with creation permissions', async 
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useTasksActions({
     permissions: ['create_invoice', 'create_task'],
@@ -602,7 +609,7 @@ test('invoice_task and clone action displayed with creation permissions', async 
 });
 
 test('cloning task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('tasks@example.com');
@@ -662,7 +669,7 @@ test('cloning task', async ({ page, api }) => {
 
 test('Invoice Task displayed with admin permission', async ({ page, api }) => {
   test.setTimeout(60000); // 2 minutes for this test only
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const customActions = useCustomTaskActions({
     permissions: ['admin'],
@@ -710,7 +717,7 @@ test('Invoice Task displayed with creation permissions', async ({
 }) => {
   test.setTimeout(60000); // 2 minutes for this test only
 
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const customActions = useCustomTaskActions({
     permissions: ['create_invoice'],

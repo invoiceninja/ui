@@ -1,16 +1,14 @@
-import { login, logout, permissions } from '$tests/e2e/helpers';
+import { apiPermissions, login, logout } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
 
 resetAccountBeforeAll();
 
-test("Can't view dashboard without permission", async ({ page }) => {
-  test.setTimeout(60000); 
-  const { clear, save } = permissions(page);
+test("Can't view dashboard without permission", async ({ page, api }) => {
+  test.setTimeout(60000);
+  const { clear, save } = apiPermissions(api.context);
 
-  await login(page);
   await clear();
   await save();
-  await logout(page);
 
   await login(page, 'permissions@example.com', 'password');
 
@@ -21,15 +19,13 @@ test("Can't view dashboard without permission", async ({ page }) => {
   await logout(page);
 });
 
-test('Can view dashboard with permission', async ({ page }) => {
-  test.setTimeout(60000); 
-  const { clear, save, set } = permissions(page);
+test('Can view dashboard with permission', async ({ page, api }) => {
+  test.setTimeout(60000);
+  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
   await clear();
   await set('view_dashboard');
   await save();
-  await logout(page);
 
   await login(page, 'permissions@example.com', 'password');
 

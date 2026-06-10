@@ -4,13 +4,13 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
+  apiPermissions,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect, uniqueName, type ApiFixture } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
-import { createApiContext, fetchEntityIds } from './api-helpers';
+import { createApiContext, fetchEntityIds, fetchUserIdByEmail } from './api-helpers';
 
 resetAccountBeforeAll();
 
@@ -206,8 +206,8 @@ const checkEditPage = async (page: Page) => {
 
 };
 
-test("can't view clients without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
+test("can't view clients without permission", async ({ page, api }) => {
+  const { clear, save } = apiPermissions(api.context);
 
   await login(page);
   await clear('clients@example.com');
@@ -224,7 +224,7 @@ test("can't view clients without permission", async ({ page }) => {
 });
 
 test('can view client', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('test view client');
 
@@ -255,7 +255,7 @@ test('can view client', async ({ page, api }) => {
 });
 
 test('can edit client', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useClientActions({
     permissions: ['edit_client'],
@@ -310,7 +310,7 @@ test('can edit client', async ({ page, api }) => {
 });
 
 test('can create a client', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useClientActions({
     permissions: ['create_client'],
@@ -374,7 +374,7 @@ test('can view and edit assigned client with create_client', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useClientActions({
     permissions: ['create_client'],
@@ -382,19 +382,27 @@ test('can view and edit assigned client with create_client', async ({
 
   const clientName = uniqueName('test assigned client');
 
-  await login(page);
   await clear('clients@example.com');
   await set('create_client');
   await save();
 
-  await createClient({
-    page,
-    api,
-    clientName,
-    assignTo: 'Clients Example',
-  });
+  const assignedUserId = await fetchUserIdByEmail(api.context, 'clients@example.com');
 
-  await logout(page);
+  if (!assignedUserId) {
+    throw new Error('Could not find clients@example.com user for assignment');
+  }
+
+  await api.createEntity('clients', {
+    name: clientName,
+    assigned_user_id: assignedUserId,
+    contacts: [
+      {
+        first_name: 'First Name',
+        last_name: 'Last Name',
+        email: 'first@example.com',
+      },
+    ],
+  });
 
   await login(page, 'clients@example.com', 'password');
 
@@ -434,7 +442,7 @@ test('can view and edit assigned client with create_client', async ({
 });
 
 test('deleting client with edit_client', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('clients@example.com');
@@ -480,7 +488,7 @@ test('deleting client with edit_client', async ({ page, api }) => {
 });
 
 test('archiving client withe edit_client', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('clients@example.com');
@@ -527,7 +535,7 @@ test('archiving client withe edit_client', async ({ page, api }) => {
 });
 
 test("can't purge client without admin permission", async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useClientActions({
     permissions: ['create_client'],
@@ -565,7 +573,7 @@ test("can't purge client without admin permission", async ({ page, api }) => {
 });
 
 test('can purge client with admin permission', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('test purge client');
 
@@ -614,7 +622,7 @@ test('can purge client with admin permission', async ({ page, api }) => {
 });
 
 test('client documents preview with edit_client', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('clients@example.com');
@@ -665,7 +673,7 @@ test('client documents preview with edit_client', async ({ page, api }) => {
 });
 
 test('client documents uploading with edit_client', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('clients@example.com');
@@ -728,7 +736,7 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useClientActions({
     permissions: ['admin'],
@@ -765,7 +773,7 @@ test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with crea
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useClientActions({
     permissions: [
@@ -810,7 +818,7 @@ test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with crea
 });
 
 test('View Statement action opens the statement page', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
   const clientName = uniqueName('test statement client');
 
   await login(page);
@@ -843,7 +851,7 @@ test('View Statement action opens the statement page', async ({ page, api }) => 
 });
 
 test('Settings action opens company settings in client context', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
   const clientName = uniqueName('test settings action client');
 
   await login(page);
@@ -879,7 +887,7 @@ test('New Resource action routes to Invoice create for selected client', async (
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
   const clientName = uniqueName('test new resource route client');
 
   await login(page);
@@ -919,7 +927,7 @@ test('New Resource action routes to Invoice create for selected client', async (
 });
 
 test('Clone action creates a new client from overview', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
   const clientName = uniqueName('test clone client');
 
   await login(page);
@@ -960,7 +968,7 @@ test('Clone action creates a new client from overview', async ({ page, api }) =>
 });
 
 test('Add Comment action saves and displays a client comment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
   const clientName = uniqueName('test comment client');
   const comment = uniqueName('client-comment');
 

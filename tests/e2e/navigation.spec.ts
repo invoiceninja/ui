@@ -1,4 +1,4 @@
-import { login, logout, permissions } from '$tests/e2e/helpers';
+import { login, logout, apiPermissions } from '$tests/e2e/helpers';
 import { createInvoice } from '$tests/helpers/invoice';
 import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
 import dayjs from 'dayjs';
@@ -6,9 +6,9 @@ import dayjs from 'dayjs';
 resetAccountBeforeAll();
 
 test('Can not add a company and navigate to account management', async ({
-  page,
+  page, api,
 }) => {
-  const { clear, save } = permissions(page);
+  const { clear, save } = apiPermissions(api.context);
 
   await login(page);
   await clear();

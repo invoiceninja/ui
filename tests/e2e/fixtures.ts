@@ -18,8 +18,8 @@ import {
   bulkAction,
   createApiContext,
   fetchEntityByName,
-  getCompanySettings,
-  putCompanySettings,
+  getCompany,
+  putCompany,
   type ApiContext,
   type EntityType,
 } from './api-helpers';
@@ -30,6 +30,7 @@ import {
   type TestAccount,
 } from './accounts';
 import { resetTestAccount } from './account-reset';
+import { purgeCompanyDataViaDangerZone } from './company-purge';
 
 config({ path: '.env.testing', override: true });
 config();
@@ -120,6 +121,7 @@ export const test = base.extend<
   }
 >({
   account: [
+    // eslint-disable-next-line no-empty-pattern
     async ({}, use, workerInfo) => {
       const account = accountForParallelIndex(workerInfo.parallelIndex);
       setCurrentTestAccount(account);
@@ -182,8 +184,7 @@ export const test = base.extend<
 
   settingsGuard: async ({ account }, use) => {
     let savedCompanyId: string | undefined;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let savedSettings: Record<string, any> | undefined;
+    let savedCompany: Record<string, any> | undefined;
 
     const fixture: SettingsFixture = {
       async snapshot() {
@@ -192,23 +193,23 @@ export const test = base.extend<
           account.ownerEmail,
           account.password
         );
-        const { companyId, settings } = await getCompanySettings(api);
+        const { companyId, company } = await getCompany(api);
         savedCompanyId = companyId;
-        savedSettings = { ...settings };
+        savedCompany = JSON.parse(JSON.stringify(company));
       },
     };
 
     await use(fixture);
 
     // Restore settings on teardown if a snapshot was taken
-    if (savedCompanyId && savedSettings) {
+    if (savedCompanyId && savedCompany) {
       try {
         const api = await createApiContext(
           account.apiUrl,
           account.ownerEmail,
           account.password
         );
-        await putCompanySettings(api, savedCompanyId, savedSettings);
+        await putCompany(api, savedCompanyId, savedCompany);
       } catch {
         // Best effort
       }
@@ -262,9 +263,10 @@ async function cleanupTrackedEntityType(
 }
 
 export function resetAccountBeforeAll(timeout = RESET_ACCOUNT_TIMEOUT) {
-  test.beforeAll(async ({ account }, testInfo) => {
+  test.beforeAll(async ({ account, browser }, testInfo) => {
     test.setTimeout(timeout);
     await resetTestAccount(account, 'before ' + testInfo.file);
+    await purgeCompanyDataViaDangerZone(browser, account);
   });
 }
 

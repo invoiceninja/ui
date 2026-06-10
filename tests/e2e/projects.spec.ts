@@ -4,7 +4,7 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
+  apiPermissions,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -12,6 +12,7 @@ import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixt
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
+import { assignEntityToUser } from './api-helpers';
 
 resetAccountBeforeAll();
 
@@ -143,8 +144,8 @@ const createProject = async (params: CreateParams) => {
   await expect(page.getByText('Successfully created project')).toBeVisible({ timeout: 10000 });
 };
 
-test("can't view projects without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
+test("can't view projects without permission", async ({ page, api }) => {
+  const { clear, save } = apiPermissions(api.context);
 
   await login(page);
   await clear('projects@example.com');
@@ -161,7 +162,7 @@ test("can't view projects without permission", async ({ page }) => {
 });
 
 test('can view project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const projectName = uniqueName('view-project');
 
@@ -197,7 +198,7 @@ test('can view project', async ({ page, api }) => {
 });
 
 test('can edit project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useProjectsActions({
     permissions: ['edit_project', 'view_client'],
@@ -254,7 +255,7 @@ test('can edit project', async ({ page, api }) => {
 });
 
 test('can create a project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useProjectsActions({
     permissions: ['create_project'],
@@ -300,7 +301,7 @@ test('can view and edit assigned project with create_project', async ({
 }) => {
   test.setTimeout(45000); 
 
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useProjectsActions({
     permissions: ['create_project'],
@@ -320,7 +321,13 @@ test('can view and edit assigned project with create_project', async ({
   });
 
   const id = page.url().match(/projects\/([^/]+)/)?.[1];
-  if (id) api.trackEntity('projects', id);
+
+  if (!id) {
+    throw new Error('Failed to extract project id');
+  }
+
+  api.trackEntity('projects', id);
+  await assignEntityToUser(api.context, 'projects', id, 'projects@example.com');
 
   await logout(page);
 
@@ -363,7 +370,7 @@ test('can view and edit assigned project with create_project', async ({
 });
 
 test('deleting project with edit_project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const projectName = uniqueName('delete-project');
 
@@ -410,7 +417,7 @@ test('deleting project with edit_project', async ({ page, api }) => {
 });
 
 test('archiving project with edit_project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const projectName = uniqueName('archive-project');
 
@@ -466,7 +473,7 @@ test('archiving project with edit_project', async ({ page, api }) => {
 });
 
 test('project documents preview with edit_project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const projectName = uniqueName('docpreview-project');
 
@@ -516,7 +523,7 @@ test('project documents preview with edit_project', async ({ page, api }) => {
 });
 
 test('project documents uploading with edit_project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const projectName = uniqueName('docupload-project');
 
@@ -578,7 +585,7 @@ test('Invoice project and clone action in dropdown displayed with admin permissi
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useProjectsActions({
     permissions: ['admin'],
@@ -614,7 +621,7 @@ test('Invoice project and clone action displayed with creation permissions', asy
 }) => {
   test.setTimeout(45000); 
 
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useProjectsActions({
     permissions: ['create_project', 'create_invoice'],
@@ -645,7 +652,7 @@ test('Invoice project and clone action displayed with creation permissions', asy
 });
 
 test('cloning project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const projectName = uniqueName('clone-project');
 
@@ -708,7 +715,7 @@ test('Invoice Project displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const customActions = useCustomQuoteActions({
     permissions: ['admin'],
@@ -756,7 +763,7 @@ test('Invoice Project displayed with creation permissions', async ({
 }) => {
   test.setTimeout(45000); 
 
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const customActions = useCustomQuoteActions({
     permissions: [

@@ -2,7 +2,7 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
+  apiPermissions,
   waitForTableData,
 } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
@@ -93,8 +93,8 @@ const checkEditPage = async (
   }
 };
 
-test("can't view payments without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
+test("can't view payments without permission", async ({ page, api }) => {
+  const { clear, save } = apiPermissions(api.context);
 
   await login(page);
   await clear('payments@example.com');
@@ -111,7 +111,7 @@ test("can't view payments without permission", async ({ page }) => {
 });
 
 test('can view payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('pay-client');
 
@@ -150,7 +150,7 @@ test('can view payment', async ({ page, api }) => {
 });
 
 test('can edit payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('pay-client');
 
@@ -197,7 +197,7 @@ test('can edit payment', async ({ page, api }) => {
 });
 
 test('can create a payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('pay-client');
 
@@ -234,7 +234,7 @@ test('can create a payment', async ({ page, api }) => {
 });
 
 test('deleting payment with edit_payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('pay-client');
 
@@ -283,7 +283,7 @@ test('deleting payment with edit_payment', async ({ page, api }) => {
 });
 
 test('archiving payment with edit_payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('pay-client');
 
@@ -342,7 +342,7 @@ test('archiving payment with edit_payment', async ({ page, api }) => {
 });
 
 test('payment documents preview with edit_payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('pay-client');
 
@@ -393,7 +393,7 @@ test('payment documents preview with edit_payment', async ({ page, api }) => {
 });
 
 test('payment documents uploading with edit_payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('pay-client');
 

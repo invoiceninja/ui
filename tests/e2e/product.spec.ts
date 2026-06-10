@@ -4,7 +4,7 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
+  apiPermissions,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -144,8 +144,8 @@ const checkEditPage = async (
   }
 };
 
-test("can't view products without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
+test("can't view products without permission", async ({ page, api }) => {
+  const { clear, save } = apiPermissions(api.context);
 
   await login(page);
   await clear('products@example.com');
@@ -162,7 +162,7 @@ test("can't view products without permission", async ({ page }) => {
 });
 
 test('can view product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const productName = uniqueName('test-view-product');
 
@@ -201,7 +201,7 @@ test('can view product', async ({ page, api }) => {
 });
 
 test('can edit product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const productName = uniqueName('test-edit-product');
 
@@ -256,7 +256,7 @@ test('can edit product', async ({ page, api }) => {
 });
 
 test('can create a product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const productName = uniqueName('test-create-product');
 
@@ -300,7 +300,7 @@ test('can create a product', async ({ page, api }) => {
 });
 
 test('deleting product with edit_product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('products@example.com');
@@ -351,7 +351,7 @@ test('deleting product with edit_product', async ({ page, api }) => {
 });
 
 test('archiving product withe edit_product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('products@example.com');
@@ -403,7 +403,7 @@ test('archiving product withe edit_product', async ({ page, api }) => {
 });
 
 test('product documents preview with edit_product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('products@example.com');
@@ -455,7 +455,7 @@ test('product documents preview with edit_product', async ({ page, api }) => {
 });
 
 test('product documents uploading with edit_product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('products@example.com');
@@ -519,7 +519,7 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const productName = uniqueName('test-dropdown-product');
 
@@ -553,7 +553,7 @@ test('New Invoice, New Purchase Order, and Clone displayed with creation permiss
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const productName = uniqueName('test-actions-product');
 
@@ -588,7 +588,7 @@ test('New Invoice, New Purchase Order, and Clone displayed with creation permiss
 });
 
 test('cloning product with edit_product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('products@example.com');
@@ -664,7 +664,7 @@ test('all custom actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const productName = uniqueName('test-bulk-actions-product');
 
@@ -718,7 +718,7 @@ test('New Invoice and New Purchase Order displayed with creation permissions', a
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const productName = uniqueName('test-bulk-actions-product');
 

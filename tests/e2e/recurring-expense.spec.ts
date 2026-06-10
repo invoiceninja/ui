@@ -4,13 +4,14 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
+  apiPermissions,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
+import { assignEntityToUser } from './api-helpers';
 
 resetAccountBeforeAll();
 
@@ -106,8 +107,8 @@ const createRecurringExpense = async (params: CreateParams) => {
   }
 };
 
-test("can't view recurring expenses without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
+test("can't view recurring expenses without permission", async ({ page, api }) => {
+  const { clear, save } = apiPermissions(api.context);
 
   await login(page);
   await clear('expenses@example.com');
@@ -125,7 +126,7 @@ test("can't view recurring expenses without permission", async ({ page }) => {
 
 test('can view recurring expense', async ({ page, api }) => {
   test.setTimeout(60000); 
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('expenses@example.com');
@@ -159,7 +160,7 @@ test('can view recurring expense', async ({ page, api }) => {
 });
 
 test('can edit recurring expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useRecurringExpensesActions({
     permissions: ['edit_recurring_expense'],
@@ -216,7 +217,7 @@ test('can edit recurring expense', async ({ page, api }) => {
 });
 
 test('can create a recurring expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useRecurringExpensesActions({
     permissions: ['create_recurring_expense'],
@@ -264,7 +265,7 @@ test('can view and edit assigned recurring expense with create_recurring_expense
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useRecurringExpensesActions({
     permissions: ['create_recurring_expense'],
@@ -283,7 +284,13 @@ test('can view and edit assigned recurring expense with create_recurring_expense
 
   await page.waitForURL('**/recurring_expenses/**/edit');
   const createdId = page.url().match(/recurring_expenses\/([^/]+)/)?.[1];
-  if (createdId) api.trackEntity('recurring_expenses', createdId);
+
+  if (!createdId) {
+    throw new Error('Failed to extract recurring expense id');
+  }
+
+  api.trackEntity('recurring_expenses', createdId);
+  await assignEntityToUser(api.context, 'recurring_expenses', createdId, 'expenses@example.com');
 
   await logout(page);
 
@@ -328,7 +335,7 @@ test('deleting recurring expense with edit_recurring_expense', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('expenses@example.com');
@@ -379,7 +386,7 @@ test('archiving recurring expense with edit_recurring_expense', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('expenses@example.com');
@@ -434,7 +441,7 @@ test('recurring expense documents preview with edit_recurring_expense', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('expenses@example.com');
@@ -489,7 +496,7 @@ test('recurring expense documents uploading with edit_recurring_expense', async 
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('expenses@example.com');
@@ -553,7 +560,7 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useRecurringExpensesActions({
     permissions: ['admin'],
@@ -592,7 +599,7 @@ test('all clone actions displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useRecurringExpensesActions({
     permissions: ['create_expense', 'create_recurring_expense'],
@@ -628,7 +635,7 @@ test('all clone actions displayed with creation permissions', async ({
 });
 
 test('cloning recurring expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('expenses@example.com');

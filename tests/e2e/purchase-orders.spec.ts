@@ -4,7 +4,7 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
+  apiPermissions,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -142,8 +142,8 @@ const createPurchaseOrder = async (params: CreateParams) => {
   ).toBeVisible({ timeout: 10000 });
 };
 
-test("can't view purchase_orders without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
+test("can't view purchase_orders without permission", async ({ page, api }) => {
+  const { clear, save } = apiPermissions(api.context);
 
   await login(page);
   await clear('purchase_orders@example.com');
@@ -160,7 +160,7 @@ test("can't view purchase_orders without permission", async ({ page }) => {
 });
 
 test('can view purchase_order', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('po-vendor');
 
@@ -196,7 +196,7 @@ test('can view purchase_order', async ({ page, api }) => {
 });
 
 test('can edit purchase_order', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('po-vendor');
 
@@ -255,7 +255,7 @@ test('can edit purchase_order', async ({ page, api }) => {
 });
 
 test('can create a purchase_order', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('po-vendor');
 
@@ -305,7 +305,7 @@ test('can view and edit own purchase_order with create_purchase_order', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('po-vendor');
 
@@ -372,7 +372,7 @@ test('deleting purchase_order with edit_purchase_order', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('po-vendor');
 
@@ -429,7 +429,7 @@ test('archiving purchase_order with edit_purchase_order', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('po-vendor');
 
@@ -495,7 +495,7 @@ test('purchase_order documents preview with edit_purchase_order', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('po-vendor');
 
@@ -555,7 +555,7 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('po-vendor');
 
@@ -626,7 +626,7 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('po-vendor');
 
@@ -667,7 +667,7 @@ test('all clone actions displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('po-vendor');
 
@@ -718,7 +718,7 @@ test('all clone actions displayed with creation permissions', async ({
 });
 
 test('cloning purchase_order', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('po-vendor');
 
