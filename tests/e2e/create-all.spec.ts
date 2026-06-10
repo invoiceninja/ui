@@ -1,11 +1,9 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
-import { test, expect } from '$tests/e2e/fixtures';
-import { chromium } from '@playwright/test';
+import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
 
-test.beforeAll(async () => {
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
+resetAccountBeforeAll();
 
+test.beforeEach(async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -13,11 +11,9 @@ test.beforeAll(async () => {
   await set('create_all');
   await save();
   await logout(page);
-});
 
-test.beforeEach(
-  async ({ page }) => await login(page, 'permissions@example.com', 'password')
-);
+  await login(page, 'permissions@example.com', 'password');
+});
 
 test('can create a client', async ({ page }) => {
   await page.getByRole('link', { name: 'Clients', exact: true }).click();

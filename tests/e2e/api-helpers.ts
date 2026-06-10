@@ -7,6 +7,12 @@
 
 import { request as playwrightRequest } from '@playwright/test';
 
+import {
+  baseEmailForAccount,
+  emailForCurrentAccount,
+  passwordForCurrentAccount,
+} from './accounts';
+
 const ENTITY_ENDPOINTS = [
   'invoices',
   'recurring_invoices',
@@ -26,9 +32,30 @@ const ENTITY_ENDPOINTS = [
   'group_settings',
   'expense_categories',
   'designs',
+  'tags',
 ] as const;
 
 export type EntityType = (typeof ENTITY_ENDPOINTS)[number];
+
+const RESET_PURGE_ENDPOINTS: EntityType[] = [
+  'invoices',
+  'recurring_invoices',
+  'quotes',
+  'credits',
+  'purchase_orders',
+  'expenses',
+  'recurring_expenses',
+  'payments',
+  'tasks',
+  'projects',
+  'vendors',
+  'clients',
+  'products',
+  'bank_transactions',
+  'task_schedulers',
+  'group_settings',
+  'expense_categories',
+];
 
 export interface ApiContext {
   baseUrl: string;
@@ -45,6 +72,8 @@ export async function createApiContext(
   email = 'user@example.com',
   password = 'password'
 ): Promise<ApiContext> {
+  const resolvedEmail = emailForCurrentAccount(email);
+  const resolvedPassword = passwordForCurrentAccount(password);
   const context = await playwrightRequest.newContext({ baseURL: apiUrl });
 
   const response = await context.post('/api/v1/login', {
@@ -52,7 +81,7 @@ export async function createApiContext(
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },
-    data: { email, password },
+    data: { email: resolvedEmail, password: resolvedPassword },
   });
 
   if (!response.ok()) {
@@ -67,7 +96,9 @@ export async function createApiContext(
 
   if (!token) {
     throw new Error(
-      `Could not extract token from login response: ${JSON.stringify(body).slice(0, 200)}`
+      `Could not extract token from login response: ${JSON.stringify(
+        body
+      ).slice(0, 200)}`
     );
   }
 
@@ -175,7 +206,10 @@ export async function createEntityViaApi(
     const text = await response.text();
     await context.dispose();
     throw new Error(
-      `Failed to create ${entityType} (${response.status()}): ${text.slice(0, 300)}`
+      `Failed to create ${entityType} (${response.status()}): ${text.slice(
+        0,
+        300
+      )}`
     );
   }
 
@@ -253,9 +287,13 @@ export async function createExpenseCategoryViaApi(
   api: ApiContext,
   opts: { name: string }
 ): Promise<{ id: string; name: string }> {
-  const entity = await createEntityViaApi(api, 'expense_categories' as EntityType, {
-    name: opts.name,
-  });
+  const entity = await createEntityViaApi(
+    api,
+    'expense_categories' as EntityType,
+    {
+      name: opts.name,
+    }
+  );
   return { id: entity.id as string, name: entity.name as string };
 }
 
@@ -279,7 +317,7 @@ export async function createTaxRateViaApi(
  * Deletes in dependency order (invoices/payments first, then clients/vendors).
  */
 export async function purgeAllEntities(api: ApiContext): Promise<void> {
-  for (const entityType of ENTITY_ENDPOINTS) {
+  for (const entityType of RESET_PURGE_ENDPOINTS) {
     try {
       const ids = await fetchEntityIds(api, entityType);
       if (ids.length > 0) {
@@ -394,8 +432,7 @@ export async function restoreDeletedUsers(api: ApiContext): Promise<void> {
     .filter(
       (u) =>
         seedUserNames.some(
-          (name) =>
-            `${u.first_name} ${u.last_name}`.trim() === name
+          (name) => `${u.first_name} ${u.last_name}`.trim() === name
         ) && u.is_deleted
     )
     .map((u) => u.id);
@@ -420,20 +457,43 @@ export async function ensurePermissionUserExists(
   const users = await fetchAllUsers(api);
   const existing = users.find((u) => u.email === email);
 
+  // Derive the expected display name from the base account email, not the suffixed lane email.
+  const localPart = baseEmailForAccount(email).split('@')[0];
+  const derivedFirst =
+    firstName || localPart.charAt(0).toUpperCase() + localPart.slice(1);
+  const derivedLast = lastName || 'Example';
+
   if (existing) {
     if (existing.is_deleted) {
       await bulkAction(api, 'users' as EntityType, [existing.id], 'restore');
       console.log(`  Restored deleted user ${email}`);
     }
+
+    if (
+      existing.first_name !== derivedFirst ||
+      existing.last_name !== derivedLast
+    ) {
+      const context = await apiRequest(api);
+      const response = await context.put(`/api/v1/users/${existing.id}`, {
+        headers: api.headers,
+        data: { ...existing, first_name: derivedFirst, last_name: derivedLast },
+      });
+
+      if (response.ok()) {
+        console.log(
+          `  Updated user name ${email} (${derivedFirst} ${derivedLast})`
+        );
+      } else {
+        console.warn(
+          `  Failed to update user name ${email}: ${response.status()}`
+        );
+      }
+
+      await context.dispose();
+    }
+
     return existing.id;
   }
-
-  // User doesn't exist — derive name from email if not provided
-  const localPart = email.split('@')[0];
-  const derivedFirst =
-    firstName || localPart.charAt(0).toUpperCase() + localPart.slice(1);
-  const derivedLast = lastName || 'Example';
-
   const context = await apiRequest(api);
   const response = await context.post('/api/v1/users', {
     headers: api.headers,
@@ -454,7 +514,9 @@ export async function ensurePermissionUserExists(
     );
   }
 
-  console.log(`  Created missing user ${email} (${derivedFirst} ${derivedLast})`);
+  console.log(
+    `  Created missing user ${email} (${derivedFirst} ${derivedLast})`
+  );
   return userId;
 }
 

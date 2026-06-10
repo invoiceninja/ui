@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^3.28.1",
-    "@docuninja/builder2.0": "^0.0.93",
+    "@docuninja/builder2.0": "^0.0.95",
     "@emotion/styled": "^11.14.0",
     "@excalidraw/excalidraw": "^0.18.0",
     "@fontsource/alex-brush": "^5.2.6",
@@ -130,6 +130,9 @@
     "lint": "eslint src --max-warnings=0",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test --workers=1",
+    "test:e2e:parallel": "node scripts/playwright-spec-orchestrator.mjs",
+    "test:e2e:isolated": "node scripts/playwright-spec-orchestrator.mjs",
     "prepare": "husky install",
     "preview": "vite build && vite preview"
   },

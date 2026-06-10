@@ -8,10 +8,12 @@ import {
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
-import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
+
+resetAccountBeforeAll();
 
 interface Params {
   permissions: Permission[];

@@ -2,6 +2,10 @@ import { Permissions as TPermissions } from '$app/common/hooks/permissions/useHa
 import { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 import { Action } from './clients.spec';
+import {
+  emailForCurrentAccount,
+  passwordForCurrentAccount,
+} from './accounts';
 
 type AdminPermission = 'admin';
 
@@ -26,6 +30,9 @@ export async function login(
   email = 'user@example.com',
   password = 'password'
 ) {
+  const resolvedEmail = emailForCurrentAccount(email);
+  const resolvedPassword = passwordForCurrentAccount(password);
+
   // Only navigate to /login when not already there. logout() already lands on
   // /login with the form ready, so a redundant goto() would cause a needless
   // full-page reload that can race with ongoing page initialisation.
@@ -34,8 +41,8 @@ export async function login(
   }
 
   await page.locator('input[name="email"]').waitFor({ state: 'visible', timeout: 10000 });
-  await page.locator('input[name="email"]').fill(email);
-  await page.getByLabel('Password').fill(password);
+  await page.locator('input[name="email"]').fill(resolvedEmail);
+  await page.getByLabel('Password').fill(resolvedPassword);
   await page.getByLabel('Password').press('Enter');
 
   await expect(page.locator('[data-cy="navigationBar"]')).toBeVisible({ timeout: 10000 });
@@ -43,23 +50,22 @@ export async function login(
 
 export function permissions(page: Page) {
   const clear = async (email = 'permissions@example.com') => {
+    const resolvedEmail = emailForCurrentAccount(email);
     await page
       .locator('[data-cy="navigationBar"]')
       .getByRole('link', { name: 'Settings' })
       .click();
     await page.getByRole('link', { name: 'User Management' }).click();
-    await page.locator('#filter').fill(email);
+    await page.locator('#filter').fill(resolvedEmail);
 
     const tableBody = page.locator('tbody').first();
+    const matchingRow = tableBody
+      .locator('tr')
+      .filter({ hasText: resolvedEmail })
+      .first();
 
-    // The filter input has a 300ms debounce before the API request fires.
-    // Wait well past it so the table reflects the filtered results before
-    // clicking — the link text is the user's name, not the email, so we
-    // cannot use hasText to distinguish filtered from unfiltered rows.
-    await page.waitForTimeout(500);
-
-    await tableBody.getByRole('link').first().waitFor({ state: 'visible', timeout: 10000 });
-    await tableBody.getByRole('link').first().click();
+    await matchingRow.waitFor({ state: 'visible', timeout: 10000 });
+    await matchingRow.getByRole('link').first().click();
 
     const passwordField = page.locator('#current_password');
     const permissionsButton = page.getByRole('button', { name: 'Permissions' });

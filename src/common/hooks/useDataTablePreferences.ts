@@ -17,7 +17,6 @@ import { PerPage } from '$app/components/DataTable';
 import { isEqual } from 'lodash';
 import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
 import { useCurrentUser } from './useCurrentUser';
-import { useLocation } from 'react-router-dom';
 import {
   useReactSettings,
   useSaveReactSettings,
@@ -41,6 +40,7 @@ interface Params {
   withoutStoringPerPage: boolean;
   enableSavingFilterPreference?: boolean;
   withoutStoringPage?: boolean;
+  withoutStoringFilters?: boolean;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -66,6 +66,7 @@ export function useDataTablePreferences(params: Params) {
     withoutStoringPerPage,
     enableSavingFilterPreference,
     withoutStoringPage,
+    withoutStoringFilters,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
@@ -79,6 +80,10 @@ export function useDataTablePreferences(params: Params) {
     status: string[],
     perPage: PerPage
   ) => {
+    if (tableKey) {
+      storeSessionTableFilters(filter, currentPage);
+    }
+
     if (!customFilter || !tableKey || !enableSavingFilterPreference) {
       return;
     }
@@ -102,8 +107,6 @@ export function useDataTablePreferences(params: Params) {
       ...(!withoutStoringPage && { currentPage }),
     };
 
-    storeSessionTableFilters(filter, currentPage);
-
     if (isEqual(defaultFilters, cleanedUpFilters) && !currentTableFilters) {
       return;
     }
@@ -125,8 +128,6 @@ export function useDataTablePreferences(params: Params) {
     saveSettings(`table_filters.${tableKey}`, cleanedUpFilters);
   };
 
-  const { pathname } = useLocation();
-
   // Apply saved table preferences once per table key.
   const appliedRef = useRef<boolean>(false);
   useEffect(() => {
@@ -141,15 +142,9 @@ export function useDataTablePreferences(params: Params) {
     if (!isHydrated || appliedRef.current) return;
 
     if (!isInitialConfiguration && !customFilter) {
-      if (tableKey !== 'invoices') {
-        setFilter((getPreference('filter') as string) || '');
-      }
+      setFilter((getPreference('filter') as string) || '');
 
-      if (tableKey === 'invoices' && pathname.endsWith('/invoices')) {
-        setFilter((getPreference('filter') as string) || '');
-      }
-
-      if (customFilters) {
+      if (customFilters && !withoutStoringFilters) {
         if ((getPreference('customFilter') as string[]).length) {
           setCustomFilter(getPreference('customFilter') as string[]);
         } else {
@@ -170,7 +165,10 @@ export function useDataTablePreferences(params: Params) {
           'id|asc'
       );
       setSortedBy((getPreference('sortedBy') as string) || undefined);
-      if ((getPreference('status') as string[]).length) {
+      if (
+        !withoutStoringFilters &&
+        (getPreference('status') as string[]).length
+      ) {
         setStatus(getPreference('status') as string[]);
       } else {
         setStatus(['active']);
