@@ -34,6 +34,7 @@ interface Props {
   invoice?: Invoice;
   client?: Client;
   errors: ValidationBag | undefined;
+  clientCreationErrors?: ValidationBag;
   invoiceSum?: InvoiceSum | InvoiceSumInclusive;
   handleChange: ChangeHandler;
   handleInvitationChange: (contactId: string, value: boolean) => unknown;
@@ -58,6 +59,7 @@ export function SimplifiedInvoiceForm({
   mode,
   invoice,
   errors,
+  clientCreationErrors,
   invoiceSum,
   handleChange,
   handleInvitationChange,
@@ -93,6 +95,7 @@ export function SimplifiedInvoiceForm({
         <SimplifiedClientCard
           invoice={invoice}
           errors={errors}
+          clientCreationErrors={clientCreationErrors}
           onChange={(id) => handleChange('client_id', id)}
           onLocationChange={(id) => handleChange('location_id', id)}
           onClearButtonClick={resetClientFields}

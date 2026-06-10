@@ -11,9 +11,17 @@
 import dayjs from 'dayjs';
 import { SIMPLIFIED_INVOICE_EDITOR_CUTOFF } from '../constants/feature-cutoffs';
 import { useCurrentCompanyUser } from './useCurrentCompanyUser';
+import { useReactSettings } from './useReactSettings';
 
 export function useSimplifiedInvoiceEditor(): boolean {
   const companyUser = useCurrentCompanyUser();
+  const reactSettings = useReactSettings();
+
+  // User-controlled opt-out wins over the cutoff: a new-account user can still
+  // choose to use the classic editor from their preferences.
+  if (reactSettings.preferences.use_legacy_invoice_editor) {
+    return false;
+  }
 
   if (companyUser?.created_at) {
     return true;

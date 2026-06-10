@@ -53,6 +53,7 @@ export default function CreatePage() {
     isDefaultTerms,
     setIsDefaultFooter,
     setIsDefaultTerms,
+    clientCreationErrors,
   } = context;
 
   const taskColumns = useTaskColumns();
@@ -90,6 +91,7 @@ export default function CreatePage() {
         invoice={invoice}
         client={client}
         errors={errors}
+        clientCreationErrors={clientCreationErrors}
         invoiceSum={invoiceSum}
         handleChange={handleChange}
         handleInvitationChange={handleInvitationChange}

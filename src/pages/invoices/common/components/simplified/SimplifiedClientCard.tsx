@@ -11,33 +11,29 @@
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
-import { ClientContact } from '$app/common/interfaces/client-contact';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useBlankClientQuery } from '$app/common/queries/clients';
 import { ClientSelector as Selector } from '$app/components/clients/ClientSelector';
 import { CountrySelector } from '$app/components/CountrySelector';
-import {
-  Button,
-  Checkbox,
-  InputField,
-  SelectField,
-} from '$app/components/forms';
-import { AxiosError } from 'axios';
-import { cloneDeep } from 'lodash';
+import { Button, Checkbox, InputField, SelectField } from '$app/components/forms';
+import { useAtom } from 'jotai';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
+import {
+  clientDraftAtom,
+  emptyClientDraft,
+} from '../../atoms/client-draft';
 
 interface Props {
   invoice?: Invoice;
   errors: ValidationBag | undefined;
+  /** Errors surfaced from a failed inline client POST during the save flow. */
+  clientCreationErrors?: ValidationBag;
   onChange: (id: string) => void;
   onLocationChange?: (id: string) => void;
   onClearButtonClick: () => void;
@@ -47,30 +43,6 @@ interface Props {
 }
 
 type Mode = 'select' | 'create';
-
-interface QuickClientDraft {
-  first_name: string;
-  last_name: string;
-  email: string;
-  name: string;
-  phone: string;
-  address1: string;
-  city: string;
-  postal_code: string;
-  country_id: string;
-}
-
-const emptyDraft: QuickClientDraft = {
-  first_name: '',
-  last_name: '',
-  email: '',
-  name: '',
-  phone: '',
-  address1: '',
-  city: '',
-  postal_code: '',
-  country_id: '',
-};
 
 function useClientsPreview(enabled: boolean) {
   return useQuery(
@@ -89,6 +61,7 @@ function useClientsPreview(enabled: boolean) {
 export function SimplifiedClientCard({
   invoice,
   errors,
+  clientCreationErrors,
   onChange,
   onLocationChange,
   onClearButtonClick,
@@ -104,9 +77,6 @@ export function SimplifiedClientCard({
 
   const [client, setClient] = useState<Client>();
   const [mode, setMode] = useState<Mode>('select');
-  const [draft, setDraft] = useState<QuickClientDraft>(emptyDraft);
-  const [createErrors, setCreateErrors] = useState<ValidationBag>();
-  const [isSaving, setIsSaving] = useState(false);
   const [didApplyAutoMode, setDidApplyAutoMode] = useState(false);
   const [showCreateMore, setShowCreateMore] = useState(false);
   // Tri-state: undefined = still loading / unknown, true = at least one exists, false = zero.
@@ -114,9 +84,11 @@ export function SimplifiedClientCard({
     undefined
   );
 
-  const { data: blankClient } = useBlankClientQuery({
-    refetchOnWindowFocus: false,
-  });
+  const [draft, setDraft] = useAtom(clientDraftAtom);
+  const createErrors = clientCreationErrors;
+
+  const updateDraft = (patch: Partial<typeof emptyClientDraft>) =>
+    setDraft((current) => ({ ...(current ?? emptyClientDraft), ...patch }));
 
   // Light prefetch — only when no client is selected and we still have a chance
   // to either auto-select the only client or auto-open the create form.
@@ -138,6 +110,7 @@ export function SimplifiedClientCard({
 
     if (previewClients.length === 0 && canCreateClient) {
       setMode('create');
+      setDraft((current) => current ?? { ...emptyClientDraft });
     }
 
     setDidApplyAutoMode(true);
@@ -168,6 +141,9 @@ export function SimplifiedClientCard({
     }
   }, [invoice?.client_id]);
 
+  // Clear draft on unmount so the atom never leaks across editor sessions.
+  useEffect(() => () => setDraft(null), [setDraft]);
+
   const isContactChecked = (contactId: string) =>
     Boolean(
       invoice?.invitations?.find((i) => i.client_contact_id === contactId)
@@ -175,75 +151,11 @@ export function SimplifiedClientCard({
 
   const labelClass = 'text-xs font-medium uppercase tracking-wide';
 
-  const cancelCreate = () => {
-    setMode('select');
-    setDraft(emptyDraft);
-    setCreateErrors(undefined);
+  // Drop the draft when the user explicitly leaves create mode (Select toggle
+  // or selecting an existing client). Also wipes the parent save flow.
+  const dropDraft = () => {
+    setDraft(null);
     setShowCreateMore(false);
-  };
-
-  const handleQuickCreate = () => {
-    if (isSaving) return;
-
-    if (!draft.first_name && !draft.last_name && !draft.email) {
-      setCreateErrors({
-        message: '',
-        errors: { name: [t('please_enter_a_client_or_contact_name')] },
-      });
-      return;
-    }
-
-    if (!blankClient) return;
-
-    const payload = cloneDeep(blankClient) as Client;
-    payload.name = draft.name;
-    payload.phone = draft.phone;
-    payload.address1 = draft.address1;
-    payload.city = draft.city;
-    payload.postal_code = draft.postal_code;
-    payload.country_id = draft.country_id;
-
-    const contact: Partial<ClientContact> = {
-      first_name: draft.first_name,
-      last_name: draft.last_name,
-      email: draft.email,
-      send_email: true,
-      cc_only: false,
-    };
-    (payload as unknown as { contacts: Partial<ClientContact>[] }).contacts = [
-      contact,
-    ];
-
-    setIsSaving(true);
-    setCreateErrors(undefined);
-    toast.processing();
-
-    request('POST', endpoint('/api/v1/clients'), payload)
-      .then((response) => {
-        toast.success('created_client');
-
-        const created = response.data.data as Client;
-
-        $refetch(['clients']);
-
-        window.dispatchEvent(
-          new CustomEvent('invalidate.combobox.queries', {
-            detail: { url: endpoint('/api/v1/clients') },
-          })
-        );
-
-        setDraft(emptyDraft);
-        setShowCreateMore(false);
-        setMode('select');
-        onChange(created.id);
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 422) {
-          setCreateErrors(error.response.data);
-          toast.dismiss();
-        }
-      })
-      .finally(() => setIsSaving(false));
   };
 
   return (
@@ -263,11 +175,16 @@ export function SimplifiedClientCard({
             <Button
               type="minimal"
               behavior="button"
-              onClick={() =>
-                setMode((current) =>
-                  current === 'create' ? 'select' : 'create'
-                )
-              }
+              onClick={() => {
+                setMode((current) => {
+                  if (current === 'create') {
+                    dropDraft();
+                    return 'select';
+                  }
+                  setDraft((c) => c ?? { ...emptyClientDraft });
+                  return 'create';
+                });
+              }}
               disableWithoutIcon
             >
               <span className="text-xs font-semibold">
@@ -313,7 +230,10 @@ export function SimplifiedClientCard({
       {!invoice?.client_id && mode === 'select' && (
         <Selector
           inputLabel=""
-          onChange={(c) => onChange(c.id)}
+          onChange={(c) => {
+            dropDraft();
+            onChange(c.id);
+          }}
           value={invoice?.client_id}
           readonly={readonly || !invoice}
           clearButton={Boolean(invoice?.client_id)}
@@ -328,181 +248,148 @@ export function SimplifiedClientCard({
         />
       )}
 
-      {!invoice?.client_id && mode === 'create' && (
-        <div className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="flex flex-col space-y-1.5">
-              <span className={labelClass} style={{ color: colors.$22 }}>
-                {t('first_name')}
-              </span>
+      {!invoice?.client_id && mode === 'create' && (() => {
+        const draftValue = draft ?? emptyClientDraft;
+        return (
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="flex flex-col space-y-1.5">
+                <span className={labelClass} style={{ color: colors.$22 }}>
+                  {t('first_name')}
+                </span>
 
-              <InputField
-                value={draft.first_name}
-                onValueChange={(value) =>
-                  setDraft((d) => ({ ...d, first_name: value }))
-                }
-                errorMessage={createErrors?.errors['contacts.0.first_name']}
-              />
+                <InputField
+                  value={draftValue.first_name}
+                  onValueChange={(value) => updateDraft({ first_name: value })}
+                  errorMessage={createErrors?.errors['contacts.0.first_name']}
+                />
+              </div>
+
+              <div className="flex flex-col space-y-1.5">
+                <span className={labelClass} style={{ color: colors.$22 }}>
+                  {t('last_name')}
+                </span>
+
+                <InputField
+                  value={draftValue.last_name}
+                  onValueChange={(value) => updateDraft({ last_name: value })}
+                  errorMessage={createErrors?.errors['contacts.0.last_name']}
+                />
+              </div>
             </div>
 
             <div className="flex flex-col space-y-1.5">
               <span className={labelClass} style={{ color: colors.$22 }}>
-                {t('last_name')}
+                {t('email')}
               </span>
 
               <InputField
-                value={draft.last_name}
-                onValueChange={(value) =>
-                  setDraft((d) => ({ ...d, last_name: value }))
+                type="email"
+                value={draftValue.email}
+                onValueChange={(value) => updateDraft({ email: value })}
+                errorMessage={
+                  createErrors?.errors['contacts.0.email'] ||
+                  createErrors?.errors.name?.[0]
                 }
-                errorMessage={createErrors?.errors['contacts.0.last_name']}
               />
             </div>
-          </div>
 
-          <div className="flex flex-col space-y-1.5">
-            <span className={labelClass} style={{ color: colors.$22 }}>
-              {t('email')}
-            </span>
-
-            <InputField
-              type="email"
-              value={draft.email}
-              onValueChange={(value) =>
-                setDraft((d) => ({ ...d, email: value }))
-              }
-              errorMessage={
-                createErrors?.errors['contacts.0.email'] ||
-                createErrors?.errors.name?.[0]
-              }
-            />
-          </div>
-
-          <div className="self-start">
-            <Button
-              type="minimal"
-              behavior="button"
-              onClick={() => setShowCreateMore((v) => !v)}
-              disableWithoutIcon
-            >
-              <span className="text-xs font-semibold">
-                {showCreateMore ? `− ${t('less')}` : `+ ${t('more')}`}
-              </span>
-            </Button>
-          </div>
-
-          {showCreateMore && (
-            <div className="space-y-3">
-              <div className="flex flex-col space-y-1.5">
-                <span className={labelClass} style={{ color: colors.$22 }}>
-                  {t('company_name')}
+            <div className="self-start">
+              <Button
+                type="minimal"
+                behavior="button"
+                onClick={() => setShowCreateMore((v) => !v)}
+                disableWithoutIcon
+              >
+                <span className="text-xs font-semibold">
+                  {showCreateMore ? `− ${t('less')}` : `+ ${t('more')}`}
                 </span>
+              </Button>
+            </div>
 
-                <InputField
-                  value={draft.name}
-                  onValueChange={(value) =>
-                    setDraft((d) => ({ ...d, name: value }))
-                  }
-                  errorMessage={createErrors?.errors.name}
-                />
-              </div>
-
-              <div className="flex flex-col space-y-1.5">
-                <span className={labelClass} style={{ color: colors.$22 }}>
-                  {t('phone')}
-                </span>
-
-                <InputField
-                  value={draft.phone}
-                  onValueChange={(value) =>
-                    setDraft((d) => ({ ...d, phone: value }))
-                  }
-                  errorMessage={createErrors?.errors.phone}
-                />
-              </div>
-
-              <div className="flex flex-col space-y-1.5">
-                <span className={labelClass} style={{ color: colors.$22 }}>
-                  {t('address1')}
-                </span>
-
-                <InputField
-                  value={draft.address1}
-                  onValueChange={(value) =>
-                    setDraft((d) => ({ ...d, address1: value }))
-                  }
-                  errorMessage={createErrors?.errors.address1}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {showCreateMore && (
+              <div className="space-y-3">
                 <div className="flex flex-col space-y-1.5">
                   <span className={labelClass} style={{ color: colors.$22 }}>
-                    {t('city')}
+                    {t('company_name')}
                   </span>
 
                   <InputField
-                    value={draft.city}
-                    onValueChange={(value) =>
-                      setDraft((d) => ({ ...d, city: value }))
-                    }
-                    errorMessage={createErrors?.errors.city}
+                    value={draftValue.name}
+                    onValueChange={(value) => updateDraft({ name: value })}
+                    errorMessage={createErrors?.errors.name}
                   />
                 </div>
 
                 <div className="flex flex-col space-y-1.5">
                   <span className={labelClass} style={{ color: colors.$22 }}>
-                    {t('postal_code')}
+                    {t('phone')}
                   </span>
 
                   <InputField
-                    value={draft.postal_code}
-                    onValueChange={(value) =>
-                      setDraft((d) => ({ ...d, postal_code: value }))
-                    }
-                    errorMessage={createErrors?.errors.postal_code}
+                    value={draftValue.phone}
+                    onValueChange={(value) => updateDraft({ phone: value })}
+                    errorMessage={createErrors?.errors.phone}
+                  />
+                </div>
+
+                <div className="flex flex-col space-y-1.5">
+                  <span className={labelClass} style={{ color: colors.$22 }}>
+                    {t('address1')}
+                  </span>
+
+                  <InputField
+                    value={draftValue.address1}
+                    onValueChange={(value) => updateDraft({ address1: value })}
+                    errorMessage={createErrors?.errors.address1}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="flex flex-col space-y-1.5">
+                    <span className={labelClass} style={{ color: colors.$22 }}>
+                      {t('city')}
+                    </span>
+
+                    <InputField
+                      value={draftValue.city}
+                      onValueChange={(value) => updateDraft({ city: value })}
+                      errorMessage={createErrors?.errors.city}
+                    />
+                  </div>
+
+                  <div className="flex flex-col space-y-1.5">
+                    <span className={labelClass} style={{ color: colors.$22 }}>
+                      {t('postal_code')}
+                    </span>
+
+                    <InputField
+                      value={draftValue.postal_code}
+                      onValueChange={(value) =>
+                        updateDraft({ postal_code: value })
+                      }
+                      errorMessage={createErrors?.errors.postal_code}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col space-y-1.5">
+                  <span className={labelClass} style={{ color: colors.$22 }}>
+                    {t('country')}
+                  </span>
+
+                  <CountrySelector
+                    value={draftValue.country_id}
+                    onChange={(value) => updateDraft({ country_id: value })}
+                    errorMessage={createErrors?.errors.country_id}
+                    dismissable
                   />
                 </div>
               </div>
-
-              <div className="flex flex-col space-y-1.5">
-                <span className={labelClass} style={{ color: colors.$22 }}>
-                  {t('country')}
-                </span>
-
-                <CountrySelector
-                  value={draft.country_id}
-                  onChange={(value) =>
-                    setDraft((d) => ({ ...d, country_id: value }))
-                  }
-                  errorMessage={createErrors?.errors.country_id}
-                  dismissable
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="flex items-center justify-end gap-x-2 pt-1">
-            <Button
-              type="secondary"
-              behavior="button"
-              onClick={cancelCreate}
-              disabled={isSaving}
-            >
-              {t('cancel')}
-            </Button>
-
-            <Button
-              behavior="button"
-              onClick={handleQuickCreate}
-              disabled={isSaving}
-              disableWithoutIcon
-            >
-              {t('create')}
-            </Button>
+            )}
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {Boolean(client?.locations?.length) &&
         onLocationChange &&
