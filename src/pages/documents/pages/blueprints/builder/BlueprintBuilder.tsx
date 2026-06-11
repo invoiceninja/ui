@@ -415,7 +415,7 @@ function BlueprintBuilder() {
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
             document: id as string,
             events: {
-              onMessage: (message) => toast.error(message),
+              onMessage: (message) => toast.info(message),
               onMessageDismiss: () => null,
             },
             components: {
