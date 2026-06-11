@@ -91,6 +91,26 @@ export const settingsRoutes = (
           path="overview"
           element={<Settings.AccountManagementOverview />}
         />
+        <Route
+          path="users"
+          element={
+            <Guard
+              guards={[owner()]}
+              component={<Settings.AccountUsers />}
+              type="subPage"
+            />
+          }
+        />
+        <Route
+          path="billing_history"
+          element={
+            <Guard
+              guards={[owner()]}
+              component={<Settings.BillingHistory />}
+              type="subPage"
+            />
+          }
+        />
         <Route path="enabled_modules" element={<Settings.EnabledModules />} />
         <Route path="integrations" element={<Settings.Integrations />} />
         <Route
