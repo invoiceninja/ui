@@ -24,9 +24,7 @@ import {
 } from '../utils/sortingUtils';
 import { isSummableColumn } from '../constants/columns';
 import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
-// Import the preview types and hook from Preview.tsx
-import { PreviewCell, usePreview } from './Preview';
-import { resolveCellWidth } from '../constants/column-widths';
+import { PreviewCell, useColumnSizingMap, usePreview } from './Preview';
 
 interface EnhancedPreviewProps {
   enableMultiSort?: boolean;
@@ -60,19 +58,15 @@ export function EnhancedPreview({
     [filterValues]
   );
 
-  // Apply cumulative filters to the original data
   const filtered = useMemo(() => {
-    // If no preview data, return empty structure
     if (!preview) {
       return { columns: [], rows: [] };
     }
 
     let rows = preview.rows;
 
-    // Apply filters only if there are any active filters with values
     if (activeFilters.length > 0) {
       rows = rows.filter((row) =>
-        // Row must match ALL filters
         activeFilters.every(({ column, search }) => {
           const cell = row.find((item) => item.identifier === column);
           if (!cell) return false;
@@ -100,26 +94,14 @@ export function EnhancedPreview({
       );
     }
 
-    // Apply sorting after filtering
     if (sortConfigs.length > 0) {
       rows = sortRows(rows, sortConfigs);
     }
 
     return { columns: preview.columns, rows };
-  }, [preview, activeFilters, sortConfigs]); // Dependencies ensure re-computation when any change
+  }, [preview, activeFilters, sortConfigs]);
 
-  const columnWidths = useMemo(() => {
-    if (!preview) {
-      return new Map<string, ReturnType<typeof resolveCellWidth>>();
-    }
-
-    return new Map(
-      preview.columns.map((column) => [
-        column.identifier,
-        resolveCellWidth(column.identifier, column.display_value),
-      ])
-    );
-  }, [preview]);
+  const columnSizing = useColumnSizingMap(preview);
 
   const columnTotals = useMemo(() => {
     const summable = new Set<string>();
@@ -159,7 +141,6 @@ export function EnhancedPreview({
     return { sums, summable };
   }, [preview, filtered]);
 
-  // Early return AFTER all hooks have been called
   if (!preview) {
     return null;
   }
@@ -179,7 +160,6 @@ export function EnhancedPreview({
     );
     const direction = existingConfig?.direction === 'asc' ? 'desc' : 'asc';
 
-    // Detect sort type based on first non-empty value
     const dataToSort = filtered;
     const firstRow = dataToSort.rows.find((row) => {
       const cell = row.find((c) => c.identifier === column);
@@ -216,7 +196,6 @@ export function EnhancedPreview({
     setSortConfigs([]);
   };
 
-  // Use filtered data if any filters are applied, otherwise use preview
   const data = filtered;
 
   const downloadCsv = () => {
@@ -285,7 +264,7 @@ export function EnhancedPreview({
               <PreviewCell
                 key={j}
                 cell={cell}
-                sizing={columnWidths.get(cell.identifier)}
+                sizing={columnSizing.get(cell.identifier)}
               />
             ))}
           </Tr>
@@ -303,7 +282,7 @@ export function EnhancedPreview({
           <PreviewCell
             key={j}
             cell={cell}
-            sizing={columnWidths.get(cell.identifier)}
+            sizing={columnSizing.get(cell.identifier)}
           />
         ))}
       </Tr>
@@ -348,15 +327,13 @@ export function EnhancedPreview({
             const sortIndex = sortConfig
               ? sortConfigs.indexOf(sortConfig) + 1
               : null;
-            const sizing = columnWidths.get(column.identifier);
 
             return (
               <Th
                 key={i}
                 style={{
                   borderBottom: `1px solid ${colors.$20}`,
-                  width: sizing?.width,
-                  minWidth: sizing?.minWidth,
+                  ...columnSizing.get(column.identifier)?.style,
                 }}
                 isCurrentlyUsed={!!sortConfig}
                 onClick={() => handleSort(column.identifier)}
@@ -392,25 +369,15 @@ export function EnhancedPreview({
 
         <Tbody>
           <Tr className="border-b" style={{ borderColor: colors.$20 }}>
-            {preview.columns.map((column, i) => {
-              const sizing = columnWidths.get(column.identifier);
-
-              return (
-                <Td
-                  key={i}
-                  style={{
-                    width: sizing?.width,
-                    minWidth: sizing?.minWidth,
-                  }}
-                >
-                  <InputField
-                    value={filterValues[column.identifier] || ''}
-                    onValueChange={(value) => filter(column.identifier, value)}
-                    changeOverride
-                  />
-                </Td>
-              );
-            })}
+            {preview.columns.map((column, i) => (
+              <Td key={i} style={columnSizing.get(column.identifier)?.style}>
+                <InputField
+                  value={filterValues[column.identifier] || ''}
+                  onValueChange={(value) => filter(column.identifier, value)}
+                  changeOverride
+                />
+              </Td>
+            ))}
           </Tr>
 
           {columnTotals.summable.size > 0 && (
@@ -420,15 +387,11 @@ export function EnhancedPreview({
             >
               {preview.columns.map((column, i) => {
                 const isSummable = columnTotals.summable.has(column.identifier);
-                const sizing = columnWidths.get(column.identifier);
 
                 return (
                   <Td
                     key={i}
-                    style={{
-                      width: sizing?.width,
-                      minWidth: sizing?.minWidth,
-                    }}
+                    style={columnSizing.get(column.identifier)?.style}
                   >
                     {isSummable ? (
                       <span className="font-semibold">

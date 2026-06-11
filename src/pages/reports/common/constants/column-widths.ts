@@ -8,22 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-/**
- * Default widths for report preview columns.
- *
- * Matched by suffix on the column identifier (e.g. `invoice.number` and
- * `credit.number` both match `.number`). Defining widths by suffix avoids
- * duplicating identical data shapes across entities.
- *
- * `minWidth` guarantees the column never shrinks below the header text + the
- * sort indicator chevrons. `truncate` marks free-text columns (notes,
- * descriptions, terms, ...) whose cells should be ellipsised with a tooltip.
- */
+import { CSSProperties } from 'react';
 
 export interface ColumnWidth {
   suffix: string;
   width: number;
   truncate?: boolean;
+}
+
+export interface ResolvedCellSizing {
+  width: number;
+  minWidth: number;
+  truncate: boolean;
+  style: CSSProperties;
 }
 
 const HEADER_MIN_WIDTH = 90;
@@ -44,18 +41,18 @@ export const columnWidths: ColumnWidth[] = [
   { suffix: '.vat_number', width: SMALL },
   { suffix: '.transaction_reference', width: LARGE },
 
-  { suffix: '.name', width: LARGE, truncate: true },
-  { suffix: '.first_name', width: MEDIUM, truncate: true },
-  { suffix: '.last_name', width: MEDIUM, truncate: true },
-  { suffix: '.user', width: MEDIUM, truncate: true },
-  { suffix: '.user_id', width: MEDIUM, truncate: true },
-  { suffix: '.assigned_user', width: MEDIUM, truncate: true },
-  { suffix: '.assigned_user_id', width: MEDIUM, truncate: true },
+  { suffix: '.name', width: LARGE },
+  { suffix: '.first_name', width: MEDIUM },
+  { suffix: '.last_name', width: MEDIUM },
+  { suffix: '.user', width: MEDIUM },
+  { suffix: '.user_id', width: MEDIUM },
+  { suffix: '.assigned_user', width: MEDIUM },
+  { suffix: '.assigned_user_id', width: MEDIUM },
   { suffix: '.recurring_id', width: SMALL },
 
-  { suffix: '.email', width: LARGE, truncate: true },
+  { suffix: '.email', width: LARGE },
   { suffix: '.phone', width: MEDIUM },
-  { suffix: '.website', width: LARGE, truncate: true },
+  { suffix: '.website', width: LARGE },
 
   { suffix: '.amount', width: SMALL },
   { suffix: '.foreign_amount', width: SMALL },
@@ -92,10 +89,10 @@ export const columnWidths: ColumnWidth[] = [
   { suffix: '.custom_surcharge2', width: SMALL },
   { suffix: '.custom_surcharge3', width: SMALL },
   { suffix: '.custom_surcharge4', width: SMALL },
-  { suffix: '.custom_value1', width: MEDIUM, truncate: true },
-  { suffix: '.custom_value2', width: MEDIUM, truncate: true },
-  { suffix: '.custom_value3', width: MEDIUM, truncate: true },
-  { suffix: '.custom_value4', width: MEDIUM, truncate: true },
+  { suffix: '.custom_value1', width: MEDIUM },
+  { suffix: '.custom_value2', width: MEDIUM },
+  { suffix: '.custom_value3', width: MEDIUM },
+  { suffix: '.custom_value4', width: MEDIUM },
 
   { suffix: '.date', width: SMALL },
   { suffix: '.due_date', width: SMALL },
@@ -109,7 +106,7 @@ export const columnWidths: ColumnWidth[] = [
   { suffix: '.duration', width: SMALL },
   { suffix: '.duration_words', width: MEDIUM },
   { suffix: '.time_log_duration_words', width: MEDIUM },
-  { suffix: '.time_log', width: LARGE, truncate: true },
+  { suffix: '.time_log', width: LARGE },
 
   { suffix: '.status', width: SMALL },
   { suffix: '.status_id', width: SMALL },
@@ -133,20 +130,20 @@ export const columnWidths: ColumnWidth[] = [
   { suffix: '.industry_id', width: MEDIUM },
   { suffix: '.size_id', width: SMALL },
   { suffix: '.type_id', width: SMALL },
-  { suffix: '.category', width: MEDIUM, truncate: true },
+  { suffix: '.category', width: MEDIUM },
   { suffix: '.invoice_id', width: SMALL },
-  { suffix: '.project_id', width: MEDIUM, truncate: true },
-  { suffix: '.product_key', width: MEDIUM, truncate: true },
-  { suffix: '.tags', width: LARGE, truncate: true },
+  { suffix: '.project_id', width: MEDIUM },
+  { suffix: '.product_key', width: MEDIUM },
+  { suffix: '.tags', width: LARGE },
 
-  { suffix: '.address1', width: LARGE, truncate: true },
-  { suffix: '.address2', width: LARGE, truncate: true },
-  { suffix: '.shipping_address1', width: LARGE, truncate: true },
-  { suffix: '.shipping_address2', width: LARGE, truncate: true },
-  { suffix: '.city', width: MEDIUM, truncate: true },
-  { suffix: '.shipping_city', width: MEDIUM, truncate: true },
-  { suffix: '.state', width: MEDIUM, truncate: true },
-  { suffix: '.shipping_state', width: MEDIUM, truncate: true },
+  { suffix: '.address1', width: LARGE },
+  { suffix: '.address2', width: LARGE },
+  { suffix: '.shipping_address1', width: LARGE },
+  { suffix: '.shipping_address2', width: LARGE },
+  { suffix: '.city', width: MEDIUM },
+  { suffix: '.shipping_city', width: MEDIUM },
+  { suffix: '.state', width: MEDIUM },
+  { suffix: '.shipping_state', width: MEDIUM },
   { suffix: '.postal_code', width: SMALL },
   { suffix: '.shipping_postal_code', width: SMALL },
 
@@ -164,6 +161,8 @@ const widthByExactSuffix = new Map(
   columnWidths.map((column) => [column.suffix, column])
 );
 
+const FALLBACK_COLUMN: ColumnWidth = { suffix: '', width: FALLBACK_WIDTH };
+
 export function resolveColumnWidth(identifier: string): ColumnWidth {
   const exact = widthByExactSuffix.get(`.${identifier.split('.').pop() ?? ''}`);
 
@@ -175,7 +174,7 @@ export function resolveColumnWidth(identifier: string): ColumnWidth {
     .filter((column) => identifier.endsWith(column.suffix))
     .sort((a, b) => b.suffix.length - a.suffix.length)[0];
 
-  return longest ?? { suffix: '', width: FALLBACK_WIDTH };
+  return longest ?? FALLBACK_COLUMN;
 }
 
 export function resolveMinColumnWidth(displayValue: string): number {
@@ -185,16 +184,18 @@ export function resolveMinColumnWidth(displayValue: string): number {
   return Math.max(HEADER_MIN_WIDTH, labelWidth + chrome);
 }
 
-export function resolveCellWidth(
+export function resolveCellSizing(
   identifier: string,
   displayValue: string
-): { width: number; minWidth: number; truncate: boolean } {
+): ResolvedCellSizing {
   const column = resolveColumnWidth(identifier);
   const minWidth = resolveMinColumnWidth(displayValue);
+  const width = Math.max(column.width, minWidth);
 
   return {
-    width: Math.max(column.width, minWidth),
+    width,
     minWidth,
-    truncate: column.truncate ?? false,
+    truncate: column.truncate === true,
+    style: { width, minWidth },
   };
 }
