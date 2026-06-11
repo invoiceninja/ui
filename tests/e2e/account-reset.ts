@@ -16,7 +16,9 @@ import {
 
 export async function resetTestAccount(account: TestAccount, label?: string) {
   const suffix = label ? ` (${label})` : '';
-  console.log(`  Reset account lane ${account.id}${suffix}: ${account.ownerEmail}`);
+  console.log(
+    `  Reset account lane ${account.id}${suffix}: ${account.ownerEmail}`
+  );
 
   const api = await createApiContext(
     account.apiUrl,
@@ -29,17 +31,11 @@ export async function resetTestAccount(account: TestAccount, label?: string) {
   await purgeGroupSettings(api);
   await restoreDeletedUsers(api);
 
-  // const permissionEmails = permissionBaseEmails.map((email) =>
-  //   accountEmail(email, account)
-  // );
-
-  // for (const email of permissionEmails) {
-  //   await ensurePermissionUserExists(api, email);
-  // }
-
-  // for (const email of permissionEmails) {
-  //   await resetPermissionUser(api, email);
-  // }
+  for (const email of permissionBaseEmails) {
+    const scopedEmail = accountEmail(email, account);
+    await ensurePermissionUserExists(api, scopedEmail);
+    await resetPermissionUser(api, scopedEmail);
+  }
 
   await purgeAllEntities(api);
 }
