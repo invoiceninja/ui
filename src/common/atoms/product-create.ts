@@ -10,8 +10,4 @@
 
 import { atom } from 'jotai';
 
-// Controls visibility of the inline ProductCreate modal rendered by ProductSelector.
-// Exposed as an atom so external flows (e.g. the simplified invoice editor's
-// "first add_item click" onboarding) can open the modal without holding a ref
-// to the selector.
 export const productCreateModalAtom = atom<boolean>(false);

@@ -32,7 +32,6 @@ import {
 interface Props {
   invoice?: Invoice;
   errors: ValidationBag | undefined;
-  /** Errors surfaced from a failed inline client POST during the save flow. */
   clientCreationErrors?: ValidationBag;
   onChange: (id: string) => void;
   onLocationChange?: (id: string) => void;
@@ -79,7 +78,6 @@ export function SimplifiedClientCard({
   const [mode, setMode] = useState<Mode>('select');
   const [didApplyAutoMode, setDidApplyAutoMode] = useState(false);
   const [showCreateMore, setShowCreateMore] = useState(false);
-  // Tri-state: undefined = still loading / unknown, true = at least one exists, false = zero.
   const [hasAnyClient, setHasAnyClient] = useState<boolean | undefined>(
     undefined
   );
@@ -90,14 +88,11 @@ export function SimplifiedClientCard({
   const updateDraft = (patch: Partial<typeof emptyClientDraft>) =>
     setDraft((current) => ({ ...(current ?? emptyClientDraft), ...patch }));
 
-  // Light prefetch — only when no client is selected and we still have a chance
-  // to either auto-select the only client or auto-open the create form.
   const shouldPreview = !invoice?.client_id && !readonly && !didApplyAutoMode;
 
   const { data: previewClients, isLoading: isPreviewLoading } =
     useClientsPreview(shouldPreview);
 
-  // Auto-mode application: runs once per editor session after preview loads.
   useEffect(() => {
     if (didApplyAutoMode || readonly) return;
     if (invoice?.client_id) {
@@ -133,15 +128,12 @@ export function SimplifiedClientCard({
       clientResolver
         .find(invoice.client_id)
         .then((c) => setClient(c))
-        .catch(() => {
-          // Silently ignore view_client permission errors.
-        });
+        .catch(() => undefined);
     } else {
       setClient(undefined);
     }
   }, [invoice?.client_id]);
 
-  // Clear draft on unmount so the atom never leaks across editor sessions.
   useEffect(() => () => setDraft(null), [setDraft]);
 
   const isContactChecked = (contactId: string) =>
@@ -151,8 +143,6 @@ export function SimplifiedClientCard({
 
   const labelClass = 'text-xs font-medium uppercase tracking-wide';
 
-  // Drop the draft when the user explicitly leaves create mode (Select toggle
-  // or selecting an existing client). Also wipes the parent save flow.
   const dropDraft = () => {
     setDraft(null);
     setShowCreateMore(false);

@@ -21,7 +21,6 @@ interface Props {
   section: InvoiceEditorSection;
   title: ReactNode;
   subtitle?: ReactNode;
-  /** If true and no stored preference exists, the section opens by default. */
   autoOpen?: boolean;
   children: ReactNode;
   rightSlot?: ReactNode;

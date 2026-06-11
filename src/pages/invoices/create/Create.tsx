@@ -121,10 +121,6 @@ export default function Create() {
     setIsFormBusy,
   });
 
-  // Wraps the underlying invoice save. If the user is in inline "new client"
-  // mode and has typed at least one field but never picked an existing client,
-  // we create the client first, splice its id and invitations into the invoice,
-  // then proceed to the normal invoice save.
   const saveWithClientFlow = useCallback(
     async (target: Invoice) => {
       if (target.client_id || !isClientDraftDirty(clientDraft)) {
@@ -159,7 +155,6 @@ export default function Create() {
         setInvoice(next);
         setClientDraft(null);
         setIsFormBusy(false);
-        // Hand off to the regular invoice save (which manages its own busy/toast).
         return save(next);
       } catch (error) {
         setIsFormBusy(false);

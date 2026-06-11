@@ -9,8 +9,10 @@
  */
 
 import { productCreateModalAtom } from '$app/common/atoms/product-create';
+import { useColorScheme } from '$app/common/colors';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItem, InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { Sparkle } from '$app/components/icons/Sparkle';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
 import { useSetAtom } from 'jotai';
@@ -46,16 +48,13 @@ export function SimplifiedItemsSection({
 }: Props) {
   const [t] = useTranslation();
   const [searchParams] = useSearchParams();
+  const colors = useColorScheme();
 
   const productColumns = useProductColumns();
   const taskColumns = useTaskColumns();
 
   const openProductCreateModal = useSetAtom(productCreateModalAtom);
 
-  // First time the user ever clicks "Add item" we surface the ProductCreate modal
-  // so they understand they have a product catalog — but still add the line item
-  // underneath so the click isn't a no-op. We persist a flag in localStorage so
-  // this only happens once per browser, even across new invoices.
   const handleAddProductClick = () => {
     try {
       const prompted = window.localStorage.getItem(FIRST_PRODUCT_PROMPT_KEY);
@@ -64,7 +63,7 @@ export function SimplifiedItemsSection({
         openProductCreateModal(true);
       }
     } catch {
-      // localStorage unavailable (private mode, quota) — fall through to default add.
+      /* empty */
     }
 
     onCreateLineItem(InvoiceItemType.Product);
@@ -80,7 +79,24 @@ export function SimplifiedItemsSection({
         }
       }}
     >
-      <div>
+      <div className="space-y-3">
+        <div
+          className="flex items-start gap-x-2 px-3 py-2 rounded-md border text-xs"
+          style={{
+            backgroundColor: colors.$2,
+            borderColor: colors.$24,
+            color: colors.$22,
+          }}
+        >
+          <span className="mt-0.5">
+            <Sparkle size="0.9rem" color={colors.$22} />
+          </span>
+
+          <span>
+            {t('inline_product_create_hint')}
+          </span>
+        </div>
+
         {invoice ? (
           <ProductsTable
             type="product"

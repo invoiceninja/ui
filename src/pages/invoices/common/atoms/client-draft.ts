@@ -34,10 +34,6 @@ export const emptyClientDraft: SimplifiedClientDraft = {
   country_id: '',
 };
 
-// Holds the in-flight client form values from SimplifiedClientCard. Populated only
-// when the user is actively in the inline "new client" mode and has not yet been
-// linked to an existing client. The invoice save handler flushes this into a
-// POST /api/v1/clients call before creating the invoice.
 export const clientDraftAtom = atom<SimplifiedClientDraft | null>(null);
 
 export function isClientDraftDirty(draft: SimplifiedClientDraft | null): boolean {

@@ -20,7 +20,7 @@ import { ChangeHandler } from '$app/pages/invoices/create/Create';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InvoicePreview } from '../InvoicePreview';
-import { InvoiceTotals } from '../InvoiceTotals';
+import { JumpToPreviewButton } from './JumpToPreviewButton';
 import { SimplifiedClientCard } from './SimplifiedClientCard';
 import { SimplifiedFooterCard } from './SimplifiedFooterCard';
 import { SimplifiedInvoiceMeta } from './SimplifiedInvoiceMeta';
@@ -28,6 +28,10 @@ import { SimplifiedItemsSection } from './SimplifiedItemsSection';
 import { SimplifiedLinkBox } from './SimplifiedLinkBox';
 import { SimplifiedNotesAdvanced } from './SimplifiedNotesAdvanced';
 import { SimplifiedTermsCard } from './SimplifiedTermsCard';
+import { SimplifiedTotalsCard } from './SimplifiedTotalsCard';
+
+const PDF_PREVIEW_ANCHOR_ID = 'invoice-pdf-preview';
+const TOTALS_ANCHOR_ID = 'invoice-totals-card';
 
 interface Props {
   mode: 'create' | 'edit';
@@ -50,7 +54,6 @@ interface Props {
   isDefaultFooter: boolean;
   setIsDefaultTerms: Dispatch<SetStateAction<boolean>>;
   setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
-  /** Edit mode disables client selection. */
   readonlyClient?: boolean;
   disableWithSpinner?: boolean;
 }
@@ -132,14 +135,19 @@ export function SimplifiedInvoiceForm({
         </div>
 
         {invoice && (
-          <InvoiceTotals
-            relationType="client_id"
-            resource={invoice}
-            invoiceSum={invoiceSum}
-            onChange={(property, value) =>
-              handleChange(property, value as string)
-            }
-          />
+          <div
+            id={TOTALS_ANCHOR_ID}
+            className="col-span-12 xl:col-span-4 scroll-mt-24"
+          >
+            <SimplifiedTotalsCard
+              relationType="client_id"
+              resource={invoice}
+              invoiceSum={invoiceSum}
+              onChange={(property, value) =>
+                handleChange(property, value as string)
+              }
+            />
+          </div>
         )}
       </div>
 
@@ -162,7 +170,7 @@ export function SimplifiedInvoiceForm({
       )}
 
       {reactSettings?.show_pdf_preview && invoice && (
-        <div className="my-4">
+        <div id={PDF_PREVIEW_ANCHOR_ID} className="my-4 scroll-mt-24">
           <InvoicePreview
             for={mode === 'create' ? 'create' : 'invoice'}
             resource={invoice}
@@ -175,6 +183,13 @@ export function SimplifiedInvoiceForm({
           />
         </div>
       )}
+
+      <JumpToPreviewButton
+        targetId={PDF_PREVIEW_ANCHOR_ID}
+        enabled={Boolean(
+          reactSettings?.show_pdf_preview && invoice && invoice.client_id
+        )}
+      />
     </div>
   );
 }

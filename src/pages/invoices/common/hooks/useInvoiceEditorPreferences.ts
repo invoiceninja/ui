@@ -25,6 +25,8 @@ interface UseInvoiceEditorPreferences {
   isExpanded: (section: InvoiceEditorSection, autoOpen?: boolean) => boolean;
   setExpanded: (section: InvoiceEditorSection, value: boolean) => void;
   toggle: (section: InvoiceEditorSection, autoOpen?: boolean) => void;
+  isPromoted: (section: InvoiceEditorSection) => boolean;
+  promote: (section: InvoiceEditorSection) => void;
 }
 
 export function useInvoiceEditorPreferences(): UseInvoiceEditorPreferences {
@@ -32,6 +34,7 @@ export function useInvoiceEditorPreferences(): UseInvoiceEditorPreferences {
   const save = useSaveReactSettings();
 
   const stored = reactSettings.invoice_editor?.expanded_sections ?? {};
+  const promoted = reactSettings.invoice_editor?.promoted_sections ?? {};
 
   const isExpanded = useCallback(
     (section: InvoiceEditorSection, autoOpen?: boolean) => {
@@ -58,5 +61,18 @@ export function useInvoiceEditorPreferences(): UseInvoiceEditorPreferences {
     [isExpanded, setExpanded]
   );
 
-  return { isExpanded, setExpanded, toggle };
+  const isPromoted = useCallback(
+    (section: InvoiceEditorSection) => Boolean(promoted[section]),
+    [promoted]
+  );
+
+  const promote = useCallback(
+    (section: InvoiceEditorSection) => {
+      if (promoted[section]) return;
+      save(`invoice_editor.promoted_sections.${section}`, true);
+    },
+    [promoted, save]
+  );
+
+  return { isExpanded, setExpanded, toggle, isPromoted, promote };
 }

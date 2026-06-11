@@ -12,8 +12,9 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { TabGroup } from '$app/components/TabGroup';
 import { ChangeHandler } from '$app/pages/invoices/create/Create';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useInvoiceEditorPreferences } from '../../hooks/useInvoiceEditorPreferences';
 import { CollapsibleSection } from './CollapsibleSection';
 import { SimplifiedCard } from './SimplifiedCard';
 
@@ -24,8 +25,16 @@ interface Props {
 
 export function SimplifiedNotesAdvanced({ invoice, handleChange }: Props) {
   const [t] = useTranslation();
+  const { isPromoted, promote } = useInvoiceEditorPreferences();
 
   const hasAny = Boolean(invoice?.public_notes || invoice?.private_notes);
+  const isNotesPromoted = isPromoted('notes');
+
+  useEffect(() => {
+    if (hasAny && !isNotesPromoted) {
+      promote('notes');
+    }
+  }, [hasAny, isNotesPromoted, promote]);
 
   const body: ReactNode = (
     <TabGroup
@@ -48,8 +57,7 @@ export function SimplifiedNotesAdvanced({ invoice, handleChange }: Props) {
     </TabGroup>
   );
 
-  // Once any notes are populated, becomes a permanent plain card (like Terms).
-  if (hasAny) {
+  if (hasAny || isNotesPromoted) {
     return <SimplifiedCard title={t('notes')}>{body}</SimplifiedCard>;
   }
 

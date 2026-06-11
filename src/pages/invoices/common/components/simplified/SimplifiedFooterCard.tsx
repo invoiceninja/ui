@@ -13,8 +13,9 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import Toggle from '$app/components/forms/Toggle';
 import { ChangeHandler } from '$app/pages/invoices/create/Create';
-import { Dispatch, ReactNode, SetStateAction } from 'react';
+import { Dispatch, ReactNode, SetStateAction, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useInvoiceEditorPreferences } from '../../hooks/useInvoiceEditorPreferences';
 import { CollapsibleSection } from './CollapsibleSection';
 import { SimplifiedCard } from './SimplifiedCard';
 
@@ -33,8 +34,16 @@ export function SimplifiedFooterCard({
 }: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
+  const { isPromoted, promote } = useInvoiceEditorPreferences();
 
   const hasFooter = Boolean(invoice?.footer);
+  const isFooterPromoted = isPromoted('footer');
+
+  useEffect(() => {
+    if (hasFooter && !isFooterPromoted) {
+      promote('footer');
+    }
+  }, [hasFooter, isFooterPromoted, promote]);
 
   const body: ReactNode = (
     <>
@@ -56,9 +65,7 @@ export function SimplifiedFooterCard({
     </>
   );
 
-  // Once a value has been entered, the section becomes a permanent plain card
-  // (mirroring Terms) — no longer collapsible.
-  if (hasFooter) {
+  if (hasFooter || isFooterPromoted) {
     return <SimplifiedCard title={t('footer')}>{body}</SimplifiedCard>;
   }
 

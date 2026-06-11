@@ -80,6 +80,7 @@ type ColorTheme = Record<ThemeColorField, string>;
 
 export interface InvoiceEditorPreferences {
   expanded_sections?: Record<string, boolean>;
+  promoted_sections?: Record<string, boolean>;
 }
 
 export interface ReactSettings {
