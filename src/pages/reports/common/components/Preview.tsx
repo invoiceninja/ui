@@ -11,15 +11,17 @@
 import { useColorScheme } from '$app/common/colors';
 import { Button, InputField, Link } from '$app/components/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
+import { Tooltip } from '$app/components/Tooltip';
 import { atom, useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   compareValues,
   detectSortType,
   extractDisplayValue,
 } from '../utils/sortingUtils';
+import { resolveCellWidth } from '../constants/column-widths';
 
 export const previewAtom = atom<Preview | null>(null);
 
@@ -108,6 +110,19 @@ export function Preview() {
 
   const [sorts, setSorts] = useState<Record<string, string>>();
   const [filtered, setFiltered] = useState<Preview | null>(null);
+
+  const columnWidths = useMemo(() => {
+    if (!preview) {
+      return new Map<string, ReturnType<typeof resolveCellWidth>>();
+    }
+
+    return new Map(
+      preview.columns.map((column) => [
+        column.identifier,
+        resolveCellWidth(column.identifier, column.display_value),
+      ])
+    );
+  }, [preview]);
 
   if (!preview) {
     return null;
@@ -223,7 +238,7 @@ export function Preview() {
 
   if (preview) {
     return (
-      <div id="preview-table my-4">
+      <div id="preview-table" className="my-4">
         <div className="flex justify-end">
           <Button behavior="button" onClick={downloadCsv}>
             {t('download')} {t('csv_file')}
@@ -232,16 +247,24 @@ export function Preview() {
 
         <Table>
           <Thead>
-            {preview.columns.map((column, i) => (
-              <Th
-                key={i}
-                style={{ borderBottom: `1px solid ${colors.$20}` }}
-                isCurrentlyUsed={Boolean(sorts?.[column.identifier])}
-                onColumnClick={() => sort(column.identifier)}
-              >
-                {column.display_value}
-              </Th>
-            ))}
+            {preview.columns.map((column, i) => {
+              const sizing = columnWidths.get(column.identifier);
+
+              return (
+                <Th
+                  key={i}
+                  style={{
+                    borderBottom: `1px solid ${colors.$20}`,
+                    width: sizing?.width,
+                    minWidth: sizing?.minWidth,
+                  }}
+                  isCurrentlyUsed={Boolean(sorts?.[column.identifier])}
+                  onColumnClick={() => sort(column.identifier)}
+                >
+                  {column.display_value}
+                </Th>
+              );
+            })}
           </Thead>
 
           <Tbody>
@@ -251,14 +274,26 @@ export function Preview() {
                 borderColor: colors.$20,
               }}
             >
-              {preview.columns.map((column, i) => (
-                <Td key={i}>
-                  <InputField
-                    onValueChange={(value) => filter(column.identifier, value)}
-                    changeOverride
-                  />
-                </Td>
-              ))}
+              {preview.columns.map((column, i) => {
+                const sizing = columnWidths.get(column.identifier);
+
+                return (
+                  <Td
+                    key={i}
+                    style={{
+                      width: sizing?.width,
+                      minWidth: sizing?.minWidth,
+                    }}
+                  >
+                    <InputField
+                      onValueChange={(value) =>
+                        filter(column.identifier, value)
+                      }
+                      changeOverride
+                    />
+                  </Td>
+                );
+              })}
             </Tr>
 
             {data.map((row, i) => (
@@ -269,8 +304,12 @@ export function Preview() {
                   borderColor: colors.$20,
                 }}
               >
-                {row.map((cell, i) => (
-                  <Td key={i}>{cell.display_value}</Td>
+                {row.map((cell, j) => (
+                  <PreviewCell
+                    key={j}
+                    cell={cell}
+                    sizing={columnWidths.get(cell.identifier)}
+                  />
                 ))}
               </Tr>
             ))}
@@ -281,4 +320,41 @@ export function Preview() {
   }
 
   return null;
+}
+
+interface PreviewCellProps {
+  cell: Cell;
+  sizing: ReturnType<typeof resolveCellWidth> | undefined;
+}
+
+export function PreviewCell({ cell, sizing }: PreviewCellProps) {
+  const tdStyle = sizing
+    ? { width: sizing.width, minWidth: sizing.minWidth }
+    : undefined;
+
+  const value = cell.display_value;
+  const tooltipText = typeof value === 'string' ? value : null;
+  const shouldTruncate =
+    sizing?.truncate &&
+    tooltipText !== null &&
+    tooltipText.trim().length > 0;
+
+  if (shouldTruncate) {
+    return (
+      <Td style={tdStyle}>
+        <div style={{ maxWidth: sizing!.width }}>
+          <Tooltip
+            message={tooltipText}
+            size="regular"
+            placement="top"
+            truncate
+          >
+            <span>{value}</span>
+          </Tooltip>
+        </div>
+      </Td>
+    );
+  }
+
+  return <Td style={tdStyle}>{value}</Td>;
 }

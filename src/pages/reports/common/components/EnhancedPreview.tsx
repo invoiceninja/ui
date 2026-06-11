@@ -25,7 +25,8 @@ import {
 import { isSummableColumn } from '../constants/columns';
 import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 // Import the preview types and hook from Preview.tsx
-import { usePreview } from './Preview';
+import { PreviewCell, usePreview } from './Preview';
+import { resolveCellWidth } from '../constants/column-widths';
 
 interface EnhancedPreviewProps {
   enableMultiSort?: boolean;
@@ -106,6 +107,19 @@ export function EnhancedPreview({
 
     return { columns: preview.columns, rows };
   }, [preview, activeFilters, sortConfigs]); // Dependencies ensure re-computation when any change
+
+  const columnWidths = useMemo(() => {
+    if (!preview) {
+      return new Map<string, ReturnType<typeof resolveCellWidth>>();
+    }
+
+    return new Map(
+      preview.columns.map((column) => [
+        column.identifier,
+        resolveCellWidth(column.identifier, column.display_value),
+      ])
+    );
+  }, [preview]);
 
   const columnTotals = useMemo(() => {
     const summable = new Set<string>();
@@ -268,7 +282,11 @@ export function EnhancedPreview({
             style={{ borderColor: colors.$20 }}
           >
             {row.map((cell, j) => (
-              <Td key={j}>{cell.display_value}</Td>
+              <PreviewCell
+                key={j}
+                cell={cell}
+                sizing={columnWidths.get(cell.identifier)}
+              />
             ))}
           </Tr>
         );
@@ -282,7 +300,11 @@ export function EnhancedPreview({
     return data.rows.map((row, i) => (
       <Tr key={i} className="border-b" style={{ borderColor: colors.$20 }}>
         {row.map((cell, j) => (
-          <Td key={j}>{cell.display_value}</Td>
+          <PreviewCell
+            key={j}
+            cell={cell}
+            sizing={columnWidths.get(cell.identifier)}
+          />
         ))}
       </Tr>
     ));
@@ -326,11 +348,16 @@ export function EnhancedPreview({
             const sortIndex = sortConfig
               ? sortConfigs.indexOf(sortConfig) + 1
               : null;
+            const sizing = columnWidths.get(column.identifier);
 
             return (
               <Th
                 key={i}
-                style={{ borderBottom: `1px solid ${colors.$20}` }}
+                style={{
+                  borderBottom: `1px solid ${colors.$20}`,
+                  width: sizing?.width,
+                  minWidth: sizing?.minWidth,
+                }}
                 isCurrentlyUsed={!!sortConfig}
                 onClick={() => handleSort(column.identifier)}
               >
@@ -365,15 +392,25 @@ export function EnhancedPreview({
 
         <Tbody>
           <Tr className="border-b" style={{ borderColor: colors.$20 }}>
-            {preview.columns.map((column, i) => (
-              <Td key={i}>
-                <InputField
-                  value={filterValues[column.identifier] || ''}
-                  onValueChange={(value) => filter(column.identifier, value)}
-                  changeOverride
-                />
-              </Td>
-            ))}
+            {preview.columns.map((column, i) => {
+              const sizing = columnWidths.get(column.identifier);
+
+              return (
+                <Td
+                  key={i}
+                  style={{
+                    width: sizing?.width,
+                    minWidth: sizing?.minWidth,
+                  }}
+                >
+                  <InputField
+                    value={filterValues[column.identifier] || ''}
+                    onValueChange={(value) => filter(column.identifier, value)}
+                    changeOverride
+                  />
+                </Td>
+              );
+            })}
           </Tr>
 
           {columnTotals.summable.size > 0 && (
@@ -383,9 +420,16 @@ export function EnhancedPreview({
             >
               {preview.columns.map((column, i) => {
                 const isSummable = columnTotals.summable.has(column.identifier);
+                const sizing = columnWidths.get(column.identifier);
 
                 return (
-                  <Td key={i}>
+                  <Td
+                    key={i}
+                    style={{
+                      width: sizing?.width,
+                      minWidth: sizing?.minWidth,
+                    }}
+                  >
                     {isSummable ? (
                       <span className="font-semibold">
                         {numericFormatter(
