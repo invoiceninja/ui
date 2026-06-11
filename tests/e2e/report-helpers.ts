@@ -1,4 +1,4 @@
-import { expect, type Locator, type Page } from '@playwright/test';
+import { expect, type Locator, type Page, type Route } from '@playwright/test';
 import type { ApiFixture } from './fixtures';
 
 export type ReportField =
@@ -21,6 +21,7 @@ export type ReportField =
   | 'vendors';
 
 export interface ReportCase {
+  customColumnSourceIds?: string[];
   identifier: string;
   label: string;
   scheduleIdentifier?: string;
@@ -40,8 +41,19 @@ export interface ReportScheduleVariation {
   statusOptions?: string[];
 }
 
-interface AppliedReportScheduleVariation extends ReportScheduleVariation {
+export interface AppliedReportScheduleVariation
+  extends ReportScheduleVariation {
   groupByText?: string;
+}
+
+interface ScheduleSaveAssertions {
+  report: ReportCase;
+  variation?: AppliedReportScheduleVariation;
+}
+
+interface SchedulePayload {
+  parameters?: Record<string, unknown>;
+  template?: string;
 }
 
 export const REPORT_CASES: ReportCase[] = [
@@ -55,6 +67,7 @@ export const REPORT_CASES: ReportCase[] = [
   {
     identifier: 'client',
     label: 'Client',
+    customColumnSourceIds: ['0'],
     supportsPreview: true,
     reportFields: [
       'document_email_attachment',
@@ -72,6 +85,7 @@ export const REPORT_CASES: ReportCase[] = [
   {
     identifier: 'contact',
     label: 'Contact',
+    customColumnSourceIds: ['10'],
     scheduleSaveSupported: false,
     supportsPreview: true,
     reportFields: ['group_by'],
@@ -80,6 +94,7 @@ export const REPORT_CASES: ReportCase[] = [
   {
     identifier: 'credit',
     label: 'Credit',
+    customColumnSourceIds: ['0', '2', '4'],
     supportsPreview: true,
     reportFields: [
       'document_email_attachment',
@@ -110,6 +125,7 @@ export const REPORT_CASES: ReportCase[] = [
   {
     identifier: 'expense',
     label: 'Expense',
+    customColumnSourceIds: ['8', '0', '5'],
     supportsPreview: true,
     reportFields: [
       'document_email_attachment',
@@ -137,6 +153,7 @@ export const REPORT_CASES: ReportCase[] = [
   {
     identifier: 'invoice',
     label: 'Invoice',
+    customColumnSourceIds: ['0', '1', '4'],
     supportsPreview: true,
     reportFields: [
       'document_email_attachment',
@@ -160,6 +177,7 @@ export const REPORT_CASES: ReportCase[] = [
   {
     identifier: 'invoice_item',
     label: 'Invoice Item',
+    customColumnSourceIds: ['0', '1', '4'],
     supportsPreview: true,
     reportFields: [
       'document_email_attachment',
@@ -183,6 +201,7 @@ export const REPORT_CASES: ReportCase[] = [
   {
     identifier: 'purchase_order',
     label: 'Purchase Order',
+    customColumnSourceIds: ['5', '6'],
     supportsPreview: true,
     reportFields: [
       'document_email_attachment',
@@ -204,6 +223,7 @@ export const REPORT_CASES: ReportCase[] = [
   {
     identifier: 'purchase_order_item',
     label: 'Purchase Order Item',
+    customColumnSourceIds: ['5', '6'],
     supportsPreview: true,
     reportFields: [
       'document_email_attachment',
@@ -224,6 +244,7 @@ export const REPORT_CASES: ReportCase[] = [
   {
     identifier: 'quote',
     label: 'Quote',
+    customColumnSourceIds: ['0', '3'],
     supportsPreview: true,
     reportFields: [
       'document_email_attachment',
@@ -247,6 +268,7 @@ export const REPORT_CASES: ReportCase[] = [
   {
     identifier: 'quote_item',
     label: 'Quote Item',
+    customColumnSourceIds: ['0', '3'],
     supportsPreview: true,
     reportFields: [
       'document_email_attachment',
@@ -269,6 +291,7 @@ export const REPORT_CASES: ReportCase[] = [
   {
     identifier: 'recurring_invoice',
     label: 'Recurring Invoice',
+    customColumnSourceIds: ['9', '0'],
     supportsPreview: true,
     reportFields: [
       'include_deleted',
@@ -288,6 +311,7 @@ export const REPORT_CASES: ReportCase[] = [
   {
     identifier: 'recurring_invoice_item',
     label: 'Recurring Invoice Item',
+    customColumnSourceIds: ['0', '9'],
     scheduleSaveSupported: false,
     supportsPreview: true,
     reportFields: [
@@ -304,6 +328,7 @@ export const REPORT_CASES: ReportCase[] = [
   {
     identifier: 'payment',
     label: 'Payment',
+    customColumnSourceIds: ['0', '1', '4'],
     supportsPreview: true,
     reportFields: [
       'document_email_attachment',
@@ -337,6 +362,7 @@ export const REPORT_CASES: ReportCase[] = [
   {
     identifier: 'task',
     label: 'Task',
+    customColumnSourceIds: ['7', '0', '1'],
     supportsPreview: true,
     reportFields: [
       'document_email_attachment',
@@ -360,6 +386,7 @@ export const REPORT_CASES: ReportCase[] = [
   {
     identifier: 'vendor',
     label: 'Vendor',
+    customColumnSourceIds: ['5'],
     supportsPreview: true,
     reportFields: ['document_email_attachment', 'template_id', 'group_by'],
     scheduleFields: ['document_email_attachment', 'template_id', 'group_by'],
@@ -438,6 +465,10 @@ export const REPORT_CASES: ReportCase[] = [
     scheduleFields: ['clients', 'projects', 'tags'],
   },
 ];
+
+export const CUSTOM_COLUMN_REPORT_CASES = REPORT_CASES.filter(
+  (report) => report.customColumnSourceIds?.length
+);
 
 export function getCustomSelectByLabel(page: Page, labelText: string): Locator {
   return getElementByLabel(page, labelText).locator('dd').first();
@@ -651,11 +682,34 @@ export async function scheduleCurrentReport(page: Page) {
   });
 }
 
-export async function saveScheduleAndTrack(page: Page, api: ApiFixture) {
+export async function saveScheduleAndTrack(
+  page: Page,
+  api: ApiFixture,
+  assertions?: ScheduleSaveAssertions
+) {
+  const saveResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/v1/task_schedulers') &&
+      response.request().method() === 'POST',
+    { timeout: 30000 }
+  );
+
   await page
     .locator('[data-cy="topNavbar"]')
     .getByRole('button', { name: 'Save', exact: true })
     .click();
+
+  const response = await saveResponse;
+  const requestPayload = response.request().postDataJSON() as SchedulePayload;
+  const responseBody = (await response.json()) as {
+    data?: SchedulePayload;
+  };
+
+  expect(response.ok()).toBeTruthy();
+
+  if (assertions) {
+    expectSavedSchedulePayload(requestPayload, responseBody.data, assertions);
+  }
 
   await page.waitForURL('**/settings/schedules/**/edit', { timeout: 30000 });
 
@@ -670,6 +724,147 @@ export async function saveScheduleAndTrack(page: Page, api: ApiFixture) {
   ).toBeVisible({
     timeout: 10000,
   });
+}
+
+export async function populateAndReorderCustomColumns(
+  page: Page,
+  report: ReportCase
+) {
+  if (!report.customColumnSourceIds?.length) {
+    throw new Error(`${report.label} does not expose custom columns`);
+  }
+
+  await setLabeledToggle(page, 'Customize Columns', true);
+
+  const sortableColumns = page.locator('[data-cy="sortable-columns"]');
+  await expect(sortableColumns).toBeVisible({ timeout: 10000 });
+
+  const sourceColumnId = report.customColumnSourceIds[0];
+  const addAllButton = sortableColumns.locator(
+    `[data-cy="report-column-add-all-${sourceColumnId}"]`
+  );
+
+  await addAllButton.scrollIntoViewIfNeeded();
+  await addAllButton.click();
+
+  const reportColumn = page.locator('[data-cy="report-column-11"]');
+  await reportColumn.scrollIntoViewIfNeeded();
+
+  const items = reportColumn.locator('[data-cy="report-column-item"]');
+  await expect(items.nth(1)).toBeVisible({ timeout: 10000 });
+
+  const before = await getReportColumnValues(page);
+  await moveFirstReportColumnItemDown(page, before);
+
+  const after = await getReportColumnValues(page);
+
+  expect(after.length).toBe(before.length);
+  expect(after[0]).toBe(before[1]);
+  expect(after[1]).toBe(before[0]);
+
+  return after;
+}
+
+export async function exportCurrentReportAndExpectReportKeys(
+  page: Page,
+  expectedReportKeys: string[]
+) {
+  await setLabeledToggle(page, 'Send Email', true);
+
+  const reportsRoute = '**/api/v1/reports/**';
+  const routeHandler = async (route: Route) => {
+    const request = route.request();
+
+    if (
+      request.method() === 'POST' &&
+      !request.url().includes('/reports/preview/')
+    ) {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'queued' }),
+      });
+      return;
+    }
+
+    await route.continue();
+  };
+
+  await page.route(reportsRoute, routeHandler);
+
+  try {
+    const exportRequest = page.waitForRequest(
+      (request) =>
+        request.method() === 'POST' &&
+        request.url().includes('/api/v1/reports/') &&
+        !request.url().includes('/reports/preview/'),
+      { timeout: 30000 }
+    );
+
+    await page
+      .locator('[data-cy="topNavbar"]')
+      .getByRole('button', { name: 'Export', exact: true })
+      .click();
+
+    const request = await exportRequest;
+    const payload = request.postDataJSON() as Record<string, unknown>;
+
+    expect(payload.send_email).toBe(true);
+    expect(payload.report_keys).toEqual(expectedReportKeys);
+  } finally {
+    await page.unroute(reportsRoute, routeHandler);
+  }
+}
+
+function expectSavedSchedulePayload(
+  requestPayload: SchedulePayload,
+  responsePayload: SchedulePayload | undefined,
+  assertions: ScheduleSaveAssertions
+) {
+  const requestParameters = requestPayload.parameters || {};
+  const responseParameters = responsePayload?.parameters || {};
+  const expectedReportName =
+    assertions.report.scheduleIdentifier || assertions.report.identifier;
+
+  expect(requestPayload.template).toBe('email_report');
+  expect(requestParameters.report_name).toBe(expectedReportName);
+  expect(responseParameters.report_name).toBe(expectedReportName);
+
+  if (!assertions.variation) {
+    return;
+  }
+
+  const variation = assertions.variation;
+  const expectedDateRange = RANGE_PAYLOAD_VALUES[variation.range];
+
+  expect(requestParameters.date_range).toBe(expectedDateRange);
+  expect(responseParameters.date_range).toBe(expectedDateRange);
+
+  if (variation.range === 'Custom') {
+    expect(requestParameters.start_date).toBe(variation.startDate);
+    expect(requestParameters.end_date).toBe(variation.endDate);
+    expect(responseParameters.start_date).toBe(variation.startDate);
+    expect(responseParameters.end_date).toBe(variation.endDate);
+  }
+
+  for (const field of variation.checkedFields || []) {
+    const parameter = TOGGLE_FIELD_PARAMETERS[field];
+
+    if (parameter) {
+      expect(requestParameters[parameter]).toBeTruthy();
+      expect(responseParameters[parameter]).toBeTruthy();
+    }
+  }
+
+  if (variation.statusOptions?.length) {
+    expect(String(requestParameters.status || '')).not.toBe('');
+    expect(responseParameters.status).toBe(requestParameters.status);
+  }
+
+  if (variation.groupByText) {
+    expect(String(requestParameters.group_by || '')).not.toBe('');
+    expect(responseParameters.group_by).toBe(requestParameters.group_by);
+  }
 }
 
 async function openCustomSelect(page: Page, labelText: string) {
@@ -722,6 +917,21 @@ async function openMultiSelect(page: Page, selectorId: string) {
 
 async function setToggle(page: Page, field: ReportField, checked: boolean) {
   const toggle = getToggleLocator(page, field);
+  await setToggleLocator(toggle, checked);
+}
+
+async function setLabeledToggle(
+  page: Page,
+  labelText: string,
+  checked: boolean
+) {
+  await setToggleLocator(
+    getElementByLabel(page, labelText).getByRole('switch'),
+    checked
+  );
+}
+
+async function setToggleLocator(toggle: Locator, checked: boolean) {
   const isChecked = (await toggle.getAttribute('aria-checked')) === 'true';
 
   if (isChecked !== checked) {
@@ -733,6 +943,61 @@ async function setToggle(page: Page, field: ReportField, checked: boolean) {
   } else {
     await expect(toggle).not.toBeChecked({ timeout: 10000 });
   }
+}
+
+async function getReportColumnValues(page: Page) {
+  return page
+    .locator('[data-cy="report-column-11"] [data-cy="report-column-item"]')
+    .evaluateAll((items) =>
+      items.map((item) => item.getAttribute('data-report-column-value') || '')
+    );
+}
+
+async function moveFirstReportColumnItemDown(page: Page, before: string[]) {
+  const item = page
+    .locator('[data-cy="report-column-11"] [data-cy="report-column-item"]')
+    .first();
+
+  await item.focus();
+  await page.keyboard.press('Space');
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Space');
+
+  try {
+    await expect
+      .poll(() => getReportColumnValues(page), { timeout: 5000 })
+      .toEqual([before[1], before[0], ...before.slice(2)]);
+  } catch {
+    await page.keyboard.press('Escape').catch(() => {});
+    await dragFirstReportColumnItemDownWithMouse(page);
+    await expect
+      .poll(() => getReportColumnValues(page), { timeout: 10000 })
+      .toEqual([before[1], before[0], ...before.slice(2)]);
+  }
+}
+
+async function dragFirstReportColumnItemDownWithMouse(page: Page) {
+  const items = page.locator(
+    '[data-cy="report-column-11"] [data-cy="report-column-item"]'
+  );
+  const sourceBox = await items.nth(0).boundingBox();
+  const targetBox = await items.nth(1).boundingBox();
+
+  if (!sourceBox || !targetBox) {
+    throw new Error('Unable to resolve report column drag targets');
+  }
+
+  await page.mouse.move(
+    sourceBox.x + sourceBox.width / 2,
+    sourceBox.y + sourceBox.height / 2
+  );
+  await page.mouse.down();
+  await page.mouse.move(
+    targetBox.x + targetBox.width / 2,
+    targetBox.y + targetBox.height * 0.8,
+    { steps: 12 }
+  );
+  await page.mouse.up();
 }
 
 async function selectFirstGroupByOption(page: Page) {
@@ -841,6 +1106,20 @@ const TOGGLE_VARIATION_FIELDS: ReportField[] = [
   'income_billed',
   'pdf_email_attachment',
 ];
+
+const TOGGLE_FIELD_PARAMETERS: Partial<Record<ReportField, string>> = {
+  document_email_attachment: 'document_email_attachment',
+  expense_billed: 'is_expense_billed',
+  include_deleted: 'include_deleted',
+  include_tax: 'include_tax',
+  income_billed: 'is_income_billed',
+  pdf_email_attachment: 'pdf_email_attachment',
+};
+
+const RANGE_PAYLOAD_VALUES: Record<string, string> = {
+  Custom: 'custom',
+  'Last 7 Days': 'last7_days',
+};
 
 const GROUP_BY_VARIATION_REPORTS = new Set<string>([
   'client',

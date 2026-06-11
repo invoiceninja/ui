@@ -63,6 +63,7 @@ interface Props extends CommonProps {
   defaultCustomFilterOptions?: SelectOption[];
   filter: string;
   withoutStatusFilter?: boolean;
+  withoutFilter?: boolean;
   customFilter: string[] | undefined;
   beforeFilterInput?: ReactNode;
 }
@@ -401,20 +402,22 @@ export function Actions(props: Props) {
 
         {props.beforeFilterInput}
 
-        <div className="relative">
-          <InputField
-            id="filter"
-            className="shadow-sm"
-            changeOverride={true}
-            placeholder={t('filter')}
-            value={props.filter}
-            onValueChange={(value) =>
-              props.onFilterChange && props.onFilterChange(value)
-            }
-            debounceTimeout={500}
-            clearable
-          />
-        </div>
+        {!props.withoutFilter && (
+          <div className="relative">
+            <InputField
+              id="filter"
+              className="shadow-sm"
+              changeOverride={true}
+              placeholder={t('filter')}
+              value={props.filter}
+              onValueChange={(value) =>
+                props.onFilterChange && props.onFilterChange(value)
+              }
+              debounceTimeout={500}
+              clearable
+            />
+          </div>
+        )}
 
         {props.options &&
           props.defaultOptions &&

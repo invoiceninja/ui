@@ -38,7 +38,7 @@ test('all reports create editable email report schedules with baseline and varie
         return;
       }
 
-      await saveScheduleAndTrack(page, api);
+      await saveScheduleAndTrack(page, api, { report });
       await expectScheduleFields(page, report);
     });
 
@@ -63,7 +63,10 @@ test('all reports create editable email report schedules with baseline and varie
           return;
         }
 
-        await saveScheduleAndTrack(page, api);
+        await saveScheduleAndTrack(page, api, {
+          report,
+          variation: appliedVariation,
+        });
         await expectScheduleFields(page, report);
         await expectScheduleVariation(page, appliedVariation);
       });

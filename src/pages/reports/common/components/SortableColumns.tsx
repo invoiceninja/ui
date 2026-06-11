@@ -130,6 +130,7 @@ export function Column({
             <span style={{ color: colors.$3 }}>{label}</span>
 
             <div
+              data-cy={`report-column-reset-${droppableId}`}
               className="flex items-center space-x-1 cursor-pointer"
               onClick={onReset}
             >
@@ -147,7 +148,11 @@ export function Column({
             <span style={{ color: colors.$3 }}>{label}</span>
 
             {onAddAll && (
-              <button type="button" onClick={onAddAll}>
+              <button
+                type="button"
+                onClick={onAddAll}
+                data-cy={`report-column-add-all-${droppableId}`}
+              >
                 <DoubleChevronRight size="0.85rem" color={colors.$3} />
               </button>
             )}
@@ -168,6 +173,8 @@ export function Column({
               {...provided.dragHandleProps}
             >
               <div
+                data-cy="report-column-item"
+                data-report-column-value={record.value}
                 className="p-2 flex border justify-between items-center cursor-grab text-sm shadow-sm"
                 style={{
                   color: colors.$3,
@@ -186,6 +193,7 @@ export function Column({
             className="w-80 flex-column"
             ref={provided.innerRef}
             {...provided.droppableProps}
+            data-cy={`report-column-${droppableId}`}
           >
             <div
               className="overflow-y-scroll h-96 mt-2 border rounded-md"
@@ -202,6 +210,8 @@ export function Column({
                   >
                     {(provided) => (
                       <div
+                        data-cy="report-column-item"
+                        data-report-column-value={record.value}
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
@@ -218,6 +228,7 @@ export function Column({
 
                           {droppableId === reportColumn.toString() && (
                             <button
+                              data-cy="report-column-remove"
                               style={{
                                 color: colors.$3,
                                 colorScheme: colors.$0,
@@ -438,6 +449,7 @@ export function SortableColumns({
 
   return (
     <div
+      data-cy="sortable-columns"
       className="overflow-x-auto border rounded-md w-full my-6 shadow-sm"
       style={{ borderColor: colors.$24 }}
     >

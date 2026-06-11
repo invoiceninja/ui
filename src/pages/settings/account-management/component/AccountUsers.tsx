@@ -20,15 +20,13 @@ import { useTranslation } from 'react-i18next';
 import { MdExpandLess, MdExpandMore } from 'react-icons/md';
 import { useQuery } from 'react-query';
 
-const ACCOUNT_USERS_ENDPOINT = '/api/client/account_management/users';
+const ACCOUNT_USERS_ENDPOINT = '/api/client/account_management/v2/users';
 
 interface AccountCompany {
   id: string;
   name: string;
-  permissions: string | string[] | null;
+  permissions: string;
   status: string;
-  is_owner?: boolean;
-  is_admin?: boolean;
 }
 
 interface AccountUser {
@@ -39,165 +37,15 @@ interface AccountUser {
   companies: AccountCompany[];
 }
 
+interface AccountUsersResponse {
+  users: AccountUser[];
+}
+
 const permissionActions = ['create', 'view', 'edit'];
 const specialPermissions = ['view_dashboard', 'view_reports', 'disable_emails'];
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
-
-function asString(value: unknown) {
-  return typeof value === 'string' || typeof value === 'number'
-    ? String(value)
-    : '';
-}
-
-function getNestedCompanyName(value: Record<string, unknown>) {
-  const company = value.company;
-
-  if (!isRecord(company)) {
-    return '';
-  }
-
-  const settings = company.settings;
-
-  return (
-    (isRecord(settings) && asString(settings.name)) ||
-    asString(company.name) ||
-    ''
-  );
-}
-
-function normalizeCompany(value: unknown): AccountCompany | null {
-  if (!isRecord(value)) {
-    return null;
-  }
-
-  const pivot = isRecord(value.pivot) ? value.pivot : undefined;
-  const companyUser = isRecord(value.company_user) ? value.company_user : pivot;
-
-  const permissions =
-    value.permissions ??
-    companyUser?.permissions ??
-    (companyUser?.is_owner ? 'Owner' : companyUser?.is_admin ? 'Admin' : '');
-
-  const id =
-    asString(value.id) ||
-    asString(value.company_id) ||
-    asString(companyUser?.company_id);
-
-  const name =
-    asString(value.name) ||
-    getNestedCompanyName(value) ||
-    asString(value.company_name);
-
-  return {
-    id,
-    name,
-    permissions: Array.isArray(permissions)
-      ? permissions.map(asString).filter(Boolean)
-      : asString(permissions),
-    status: asString(value.status) || asString(companyUser?.status),
-    is_owner: Boolean(value.is_owner || companyUser?.is_owner),
-    is_admin: Boolean(value.is_admin || companyUser?.is_admin),
-  };
-}
-
-function normalizeUser(value: unknown): AccountUser | null {
-  if (!isRecord(value)) {
-    return null;
-  }
-
-  const companies: AccountCompany[] = [];
-
-  if (Array.isArray(value.companies)) {
-    value.companies.forEach((company) => {
-      const normalizedCompany = normalizeCompany(company);
-
-      if (normalizedCompany) {
-        companies.push(normalizedCompany);
-      }
-    });
-  }
-
-  if (isRecord(value.company_user)) {
-    const normalizedCompany = normalizeCompany(value.company_user);
-
-    if (normalizedCompany) {
-      companies.push(normalizedCompany);
-    }
-  }
-
-  if (Array.isArray(value.company_users)) {
-    value.company_users.forEach((companyUser) => {
-      const normalizedCompany = normalizeCompany(companyUser);
-
-      if (normalizedCompany) {
-        companies.push(normalizedCompany);
-      }
-    });
-  }
-
-  const seen = new Set<string>();
-  const uniqueCompanies = companies.filter((company) => {
-    const key = company.id || company.name;
-
-    if (!key || seen.has(key)) {
-      return false;
-    }
-
-    seen.add(key);
-
-    return true;
-  });
-
-  const firstName = asString(value.first_name);
-  const lastName = asString(value.last_name);
-
-  return {
-    id: asString(value.id),
-    name:
-      asString(value.name) ||
-      `${firstName} ${lastName}`.trim() ||
-      asString(value.email),
-    email: asString(value.email),
-    status: asString(value.status),
-    companies: uniqueCompanies,
-  };
-}
-
-function resolveUsers(payload: unknown): AccountUser[] {
-  if (Array.isArray(payload)) {
-    return payload.map(normalizeUser).filter(Boolean) as AccountUser[];
-  }
-
-  if (!isRecord(payload)) {
-    return [];
-  }
-
-  if (Array.isArray(payload.data)) {
-    return payload.data.map(normalizeUser).filter(Boolean) as AccountUser[];
-  }
-
-  if (Array.isArray(payload.users)) {
-    return payload.users.map(normalizeUser).filter(Boolean) as AccountUser[];
-  }
-
-  if (isRecord(payload.data) && Array.isArray(payload.data.data)) {
-    return payload.data.data
-      .map(normalizeUser)
-      .filter(Boolean) as AccountUser[];
-  }
-
-  return [];
-}
-
-function normalizePermissions(permissions?: string | string[] | null) {
-  if (Array.isArray(permissions)) {
-    return permissions.filter(Boolean);
-  }
-
-  return (permissions || '')
+function getPermissionTokens(permissions: string) {
+  return permissions
     .split(',')
     .map((permission) => permission.trim())
     .filter(Boolean);
@@ -215,6 +63,15 @@ export function AccountUsers() {
   const customLabel = String(t('custom'));
   const noAccessLabel = 'No access';
   const noCompanyAccessLabel = 'No company access';
+  const statusVariants = useMemo<Record<string, BadgeVariant>>(
+    () => ({
+      active: 'primary',
+      inactive: 'red',
+      [String(t('active')).toLowerCase()]: 'primary',
+      [String(t('inactive')).toLowerCase()]: 'red',
+    }),
+    [t]
+  );
 
   const [expandedUserId, setExpandedUserId] = useState<string>();
 
@@ -225,8 +82,8 @@ export function AccountUsers() {
   } = useQuery(
     ['account_management', 'users'],
     () =>
-      request('POST', endpoint(ACCOUNT_USERS_ENDPOINT)).then((response) =>
-        resolveUsers(response.data)
+      request('POST', endpoint(ACCOUNT_USERS_ENDPOINT)).then(
+        (response) => (response.data as AccountUsersResponse).users
       ),
     { staleTime: Infinity }
   );
@@ -246,26 +103,8 @@ export function AccountUsers() {
       .map((label) => label.toLowerCase())
       .includes(value.toLowerCase());
 
-  const getStatusVariant = (status: string): BadgeVariant => {
-    const normalizedStatus = status.toLowerCase();
-
-    if (
-      normalizedStatus.includes('inactive') ||
-      normalizedStatus.includes('deleted')
-    ) {
-      return 'red';
-    }
-
-    if (normalizedStatus.includes('active')) {
-      return 'primary';
-    }
-
-    if (normalizedStatus.includes('pending')) {
-      return 'yellow';
-    }
-
-    return 'generic';
-  };
+  const getStatusVariant = (status: string): BadgeVariant =>
+    statusVariants[status.toLowerCase()] ?? 'generic';
 
   const getPermissionVariant = (summary: string): BadgeVariant => {
     if (isOwnerPermission(summary)) {
@@ -320,15 +159,7 @@ export function AccountUsers() {
   };
 
   const getPermissionLabels = (company: AccountCompany) => {
-    if (company.is_owner) {
-      return [ownerLabel];
-    }
-
-    if (company.is_admin) {
-      return [adminLabel];
-    }
-
-    const permissions = normalizePermissions(company.permissions);
+    const permissions = getPermissionTokens(company.permissions);
 
     if (!permissions.length) {
       return [noAccessLabel];
@@ -380,10 +211,10 @@ export function AccountUsers() {
 
     return (
       <div className="space-y-3 px-4 py-4">
-        {user.companies.map((company, index) => {
+        {user.companies.map((company) => {
           return (
             <div
-              key={`${company.id || company.name || index}`}
+              key={company.id}
               className="rounded-md border px-4 py-4"
               style={{ borderColor: colors.$20 }}
             >
