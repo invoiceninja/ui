@@ -10,7 +10,6 @@
 
 import { Product } from '$app/common/interfaces/product';
 import { ProductCreate } from '$app/pages/invoices/common/components/ProductCreate';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { endpoint, trans } from '$app/common/helpers';
@@ -19,6 +18,8 @@ import classNames from 'classnames';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useColorScheme } from '$app/common/colors';
 import { ErrorMessage } from '../ErrorMessage';
+import { useAtom } from 'jotai';
+import { productCreateModalAtom } from '$app/common/atoms/product-create';
 
 interface Props {
   defaultValue?: string | number | boolean;
@@ -40,7 +41,7 @@ interface Props {
 export function ProductSelector(props: Props) {
   const [t] = useTranslation();
 
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useAtom(productCreateModalAtom);
 
   const colors = useColorScheme();
   const currentCompany = useCurrentCompany();
