@@ -324,6 +324,10 @@ function BlueprintBuilder() {
       setIsDocumentSaving(false);
     };
 
+    const handleSaveError = () => {
+      setIsDocumentSaving(false);
+    };
+
     window.addEventListener('refetch.blueprints', refetchDocuninjaDocument);
 
     window.addEventListener(
@@ -335,6 +339,8 @@ function BlueprintBuilder() {
       'builder:document.finalize.save',
       handleFinalizeDocumentSave
     );
+
+    window.addEventListener('builder:save.error', handleSaveError);
 
     return () => {
       window.removeEventListener(
@@ -351,6 +357,8 @@ function BlueprintBuilder() {
         'builder:document.finalize.save',
         handleFinalizeDocumentSave
       );
+
+      window.removeEventListener('builder:save.error', handleSaveError);
     };
   }, []);
 
@@ -407,7 +415,7 @@ function BlueprintBuilder() {
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
             document: id as string,
             events: {
-              onMessage: () => null,
+              onMessage: (message) => toast.error(message),
               onMessageDismiss: () => null,
             },
             components: {
