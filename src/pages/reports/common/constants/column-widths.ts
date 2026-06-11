@@ -178,14 +178,6 @@ export function resolveColumnWidth(identifier: string): ColumnWidth {
   return longest ?? { suffix: '', width: FALLBACK_WIDTH };
 }
 
-/**
- * Minimum width that still fits the header text + the sort chevron icons.
- *
- * Approximates the header label width using an average glyph advance of ~7.5px
- * for the table's `text-sm` font, plus padding (`px-4` ⇒ 32px), plus ~24px for
- * the sort indicator. Floored at HEADER_MIN_WIDTH so very short labels still
- * receive a sensible click target.
- */
 export function resolveMinColumnWidth(displayValue: string): number {
   const labelWidth = Math.ceil(displayValue.length * 7.5);
   const chrome = 32 + 24;
