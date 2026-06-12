@@ -26,6 +26,9 @@ interface AccountCompany {
   id: string;
   name: string;
   permissions: string;
+  is_owner: boolean;
+  is_admin: boolean;
+  is_locked: boolean;
   status: string;
 }
 
@@ -62,6 +65,15 @@ export function AccountUsers() {
       ),
     { staleTime: Infinity }
   );
+  const getPermissionsDisplay = (company: AccountCompany) => {
+    if (company.is_owner) {
+      return 'owner';
+    }
+    if (company.is_admin) {
+      return 'admin';
+    }
+    return company.permissions.trim() || noAccessLabel;
+  };
 
   const renderFieldLabel = (label: string) => (
     <div
@@ -72,17 +84,20 @@ export function AccountUsers() {
     </div>
   );
 
-  const renderStatusBadge = (status: string) =>
-    status ? (
-      <Badge>{status}</Badge>
-    ) : (
-      <span className="text-sm" style={{ color: colors.$17 }}>
-        {t('unknown')}
-      </span>
-    );
+  const renderStatusBadge = (status: string) => (
+    <div>
+      {status ? (
+        <Badge>{status}</Badge>
+      ) : (
+        <span className="text-sm" style={{ color: colors.$17 }}>
+          {t('unknown')}
+        </span>
+      )}
+    </div>
+  );
 
   const renderPermissionBadges = (company: AccountCompany) => {
-    const permissions = company.permissions || noAccessLabel;
+    const permissions = getPermissionsDisplay(company);
 
     return (
       <div className="flex flex-wrap gap-2">
@@ -224,9 +239,7 @@ export function AccountUsers() {
                     </div>
                   </Td>
 
-                  <Td>
-                    {user.status && <Badge>{user.status}</Badge>}
-                  </Td>
+                  <Td>{user.status && <Badge>{user.status}</Badge>}</Td>
                 </Tr>
 
                 {expanded && (

@@ -130,7 +130,6 @@ interface StyleOptions {
   disableThUppercase?: boolean;
   descIcon?: ReactNode;
   ascIcon?: ReactNode;
-  withoutSortIcons?: boolean;
   withoutTdPadding?: boolean;
 }
 
@@ -144,8 +143,6 @@ export interface FilterColumn {
   options: FilterOption[];
   column_id: string;
 }
-
-type PropPath = string | string[];
 
 interface Props<T> extends CommonProps {
   resource: string;
@@ -208,9 +205,8 @@ interface Props<T> extends CommonProps {
   withoutBottomPadding?: boolean;
   useDocuNinjaApi?: boolean;
   endpointHeaders?: Record<string, string>;
-  dataPropPath?: PropPath;
-  totalPagesPropPath?: PropPath;
-  totalRecordsPropPath?: PropPath;
+  totalPagesPropPath?: string;
+  totalRecordsPropPath?: string;
   withoutActionBulkPayloadPropertyForDeleteAction?: boolean;
   withoutIdsBulkPayloadPropertyForDeleteAction?: boolean;
   useDeleteMethod?: boolean;
@@ -219,9 +215,6 @@ interface Props<T> extends CommonProps {
   disabledCreateButton?: boolean;
   filterParameterKey?: 'filter' | 'search';
   enableSavingLatestDataForNavigation?: boolean;
-  withoutFilter?: boolean;
-  withoutStatusQueryParameter?: boolean;
-  clientSidePagination?: boolean;
 }
 
 export type ResourceAction<T> = (resource: T) => ReactElement;
@@ -231,34 +224,6 @@ export type PerPage = '10' | '50' | '100';
 export const dateRangeAtom = atom<DateRangeEntry[]>([]);
 export const dataTableSelectedAtom = atom<Record<string, string[]>>({});
 export const filterColumnsValuesAtom = atom<Record<string, string[]>>({});
-
-const DEFAULT_DATA_PROP_PATH: PropPath = 'data.data.data';
-const DEFAULT_TOTAL_PAGES_PROP_PATH: PropPath = [
-  'data.data.meta.pagination.total_pages',
-  'data.meta.pagination.total_pages',
-];
-const DEFAULT_TOTAL_RECORDS_PROP_PATH: PropPath = [
-  'data.data.meta.pagination.total',
-  'data.meta.pagination.total',
-];
-
-function getFirstDefined(source: unknown, paths: PropPath): unknown {
-  const pathsToCheck = Array.isArray(paths) ? paths : [paths];
-
-  for (const path of pathsToCheck) {
-    const value = get(source, path);
-
-    if (value !== undefined) {
-      return value;
-    }
-  }
-}
-
-function asNumber(value: unknown, fallback: number) {
-  const parsed = Number(value);
-
-  return Number.isFinite(parsed) ? parsed : fallback;
-}
 
 function DataTableCheckbox({
   resourceId,
@@ -350,10 +315,6 @@ export function DataTable<T extends object>(props: Props<T>) {
     disabledCreateButton = false,
     filterParameterKey = 'filter',
     enableSavingLatestDataForNavigation = false,
-    dataPropPath = DEFAULT_DATA_PROP_PATH,
-    withoutFilter = false,
-    withoutStatusQueryParameter = false,
-    clientSidePagination = false,
   } = props;
 
   const companyUpdateTimeOut = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -475,14 +436,10 @@ export function DataTable<T extends object>(props: Props<T>) {
 
     apiEndpoint.searchParams.set('per_page', perPage);
     apiEndpoint.searchParams.set('page', currentPage.toString());
-    if (withoutFilter) {
-      apiEndpoint.searchParams.delete(filterParameterKey);
-    } else {
-      apiEndpoint.searchParams.set(
-        filterParameterKey,
-        filter.length ? normalizeNumericCommas(filter) : filter
-      );
-    }
+    apiEndpoint.searchParams.set(
+      filterParameterKey,
+      filter.length ? normalizeNumericCommas(filter) : filter
+    );
 
     handleChangingCustomFilters();
 
@@ -505,11 +462,7 @@ export function DataTable<T extends object>(props: Props<T>) {
       new Set([...(status as string[]), ...customStatusValues])
     );
 
-    if (withoutStatusQueryParameter) {
-      apiEndpoint.searchParams.delete('status');
-    } else {
-      apiEndpoint.searchParams.set('status', mergedStatusValues.join(','));
-    }
+    apiEndpoint.searchParams.set('status', mergedStatusValues.join(','));
 
     dateRangeColumns.forEach((dateRangeColumn) => {
       apiEndpoint.searchParams.delete(dateRangeColumn.queryParameterKey);
@@ -570,8 +523,6 @@ export function DataTable<T extends object>(props: Props<T>) {
     filterColumns,
     filterColumnsValues,
     props.endpoint,
-    withoutFilter,
-    withoutStatusQueryParameter,
   ]);
 
   useEffect(() => {
@@ -632,68 +583,6 @@ export function DataTable<T extends object>(props: Props<T>) {
       staleTime: props.staleTime ?? Infinity,
       enabled: !disableQuery && arePreferencesApplied,
     }
-  );
-
-  const rawDataResources = useMemo<T[]>(() => {
-    if (!data) {
-      return [];
-    }
-
-    const resources = getFirstDefined(data, dataPropPath);
-
-    return Array.isArray(resources) ? resources : [];
-  }, [data, dataPropPath]);
-
-  const totalPagesMetadata = useMemo(
-    () =>
-      data
-        ? getFirstDefined(
-            data,
-            totalPagesPropPath ?? DEFAULT_TOTAL_PAGES_PROP_PATH
-          )
-        : undefined,
-    [data, totalPagesPropPath]
-  );
-
-  const totalRecordsMetadata = useMemo(
-    () =>
-      data
-        ? getFirstDefined(
-            data,
-            totalRecordsPropPath ?? DEFAULT_TOTAL_RECORDS_PROP_PATH
-          )
-        : undefined,
-    [data, totalRecordsPropPath]
-  );
-
-  const useClientSidePagination =
-    clientSidePagination &&
-    totalPagesMetadata === undefined &&
-    totalRecordsMetadata === undefined;
-
-  const dataResources = useMemo<T[]>(() => {
-    if (!useClientSidePagination) {
-      return rawDataResources;
-    }
-
-    const start = (currentPage - 1) * Number(perPage);
-
-    return rawDataResources.slice(start, start + Number(perPage));
-  }, [currentPage, perPage, rawDataResources, useClientSidePagination]);
-
-  const totalRecords = asNumber(
-    totalRecordsMetadata,
-    useClientSidePagination ? rawDataResources.length : dataResources.length
-  );
-
-  const totalPages = Math.max(
-    1,
-    asNumber(
-      totalPagesMetadata,
-      useClientSidePagination
-        ? Math.ceil(rawDataResources.length / Number(perPage))
-        : 1
-    )
   );
 
   useEffect(() => {
@@ -904,11 +793,11 @@ export function DataTable<T extends object>(props: Props<T>) {
   useDebounce(
     () => {
       if (data && !isFetching) {
-        setCurrentData(dataResources);
+        setCurrentData(data.data.data);
       }
     },
     10,
-    [data, dataResources, isFetching]
+    [data, isFetching]
   );
 
   useEffect(() => {
@@ -1053,7 +942,6 @@ export function DataTable<T extends object>(props: Props<T>) {
           }
           beforeFilter={props.beforeFilter}
           withoutStatusFilter={props.withoutStatusFilter}
-          withoutFilter={withoutFilter}
           beforeFilterInput={beforeFilterInput}
         >
           {Boolean(
@@ -1196,7 +1084,6 @@ export function DataTable<T extends object>(props: Props<T>) {
                     disableUppercase={styleOptions?.disableThUppercase}
                     descIcon={styleOptions?.descIcon}
                     ascIcon={styleOptions?.ascIcon}
-                    withoutSortIcons={styleOptions?.withoutSortIcons}
                   >
                     <div className="flex items-center space-x-3">
                       {dateRangeColumns.some(
@@ -1254,7 +1141,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                 areRowsRendered || !currentData.length ? 'default' : 'progress',
             }}
           >
-            {(isLoading || !isEqual(currentData, dataResources)) &&
+            {(isLoading || !isEqual(currentData, data?.data?.data)) &&
               !isError && (
                 <MemoizedTr
                   className="border-b"
@@ -1283,7 +1170,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
             {!isLoading &&
               currentData?.length === 0 &&
-              isEqual(currentData, dataResources) && (
+              isEqual(currentData, data?.data?.data) && (
                 <MemoizedTr
                   className="border-b"
                   style={{
@@ -1300,7 +1187,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                 </MemoizedTr>
               )}
 
-            {isEqual(currentData, dataResources) &&
+            {isEqual(currentData, data?.data?.data) &&
               currentData.map((resource: any, rowIndex: number) => (
                 <MemoizedTr
                   key={rowIndex}
@@ -1482,8 +1369,16 @@ export function DataTable<T extends object>(props: Props<T>) {
           currentPage={currentPage}
           onPageChange={setCurrentPage}
           onRowsChange={setPerPage}
-          totalPages={totalPages}
-          totalRecords={totalRecords}
+          totalPages={
+            totalPagesPropPath
+              ? get(data, totalPagesPropPath)
+              : data.data.meta.pagination.total_pages
+          }
+          totalRecords={
+            totalRecordsPropPath
+              ? get(data, totalRecordsPropPath)
+              : data.data.meta.pagination.total
+          }
         />
       )}
     </div>

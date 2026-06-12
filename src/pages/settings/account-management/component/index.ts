@@ -10,8 +10,6 @@
 export * from './EnabledModules';
 export * from './Integrations';
 export * from './Licence';
-export * from './AccountUsers';
-export * from './BillingHistory';
 export { Overview as AccountManagementOverview } from './Overview';
 export * from './Plan';
 export * from './SecuritySettings';
