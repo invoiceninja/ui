@@ -21,9 +21,9 @@ import {
 } from 'react-icons/bs';
 import classNames from 'classnames';
 
-// Query params we should carry between task views so the chosen user filter
+// Query params we should carry between task views so the chosen context
 // survives a switch from e.g. Daily to Weekly.
-const PRESERVED_PARAMS = ['user'];
+const PRESERVED_PARAMS = ['date', 'user', 'project'];
 
 interface ViewItem {
   to: string;
