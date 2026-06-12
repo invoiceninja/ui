@@ -8,8 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CSSProperties } from 'react';
-
 export interface ColumnWidth {
   suffix: string;
   width: number;
@@ -20,7 +18,6 @@ export interface ResolvedCellSizing {
   width: number;
   minWidth: number;
   truncate: boolean;
-  style: CSSProperties;
 }
 
 const HEADER_MIN_WIDTH = 90;
@@ -196,6 +193,5 @@ export function resolveCellSizing(
     width,
     minWidth,
     truncate: column.truncate === true,
-    style: { width, minWidth },
   };
 }

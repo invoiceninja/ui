@@ -10,8 +10,8 @@
 
 import { useColorScheme } from '$app/common/colors';
 import { Button, InputField } from '$app/components/forms';
-import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { useState, useMemo } from 'react';
+import { MemoizedTr, Table, Tbody, Td, Thead, Tr } from '$app/components/tables';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   sortRows,
@@ -24,7 +24,15 @@ import {
 } from '../utils/sortingUtils';
 import { isSummableColumn } from '../constants/columns';
 import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
-import { PreviewCell, useColumnSizingMap, usePreview } from './Preview';
+import {
+  ColumnGroup,
+  PreviewCell,
+  PreviewTd,
+  PreviewTh,
+  useColumnSizingMap,
+  usePreview,
+  useResizeOverrideLifecycle,
+} from './Preview';
 
 interface EnhancedPreviewProps {
   enableMultiSort?: boolean;
@@ -45,9 +53,7 @@ export function EnhancedPreview({
 
   const [sortConfigs, setSortConfigs] = useState<SortConfig[]>([]);
   const [filterValues, setFilterValues] = useState<Record<string, string>>({});
-  const [sortTypeOverrides, setSortTypeOverrides] = useState<
-    Record<string, SortType>
-  >({});
+  const [sortTypeOverrides] = useState<Record<string, SortType>>({});
   const [groupByColumn, setGroupByColumn] = useState<string | null>(null);
 
   const activeFilters = useMemo(
@@ -102,6 +108,7 @@ export function EnhancedPreview({
   }, [preview, activeFilters, sortConfigs]);
 
   const columnSizing = useColumnSizingMap(preview);
+  useResizeOverrideLifecycle(columnSizing);
 
   const columnTotals = useMemo(() => {
     const summable = new Set<string>();
@@ -146,10 +153,7 @@ export function EnhancedPreview({
   }
 
   const filter = (column: string, value: string) => {
-    setFilterValues((prev) => ({
-      ...prev,
-      [column]: value,
-    }));
+    setFilterValues((prev) => ({ ...prev, [column]: value }));
   };
 
   const handleSort = (column: string) => {
@@ -160,8 +164,7 @@ export function EnhancedPreview({
     );
     const direction = existingConfig?.direction === 'asc' ? 'desc' : 'asc';
 
-    const dataToSort = filtered;
-    const firstRow = dataToSort.rows.find((row) => {
+    const firstRow = filtered.rows.find((row) => {
       const cell = row.find((c) => c.identifier === column);
       return cell && cell.display_value !== '' && cell.display_value !== null;
     });
@@ -188,8 +191,7 @@ export function EnhancedPreview({
   };
 
   const removeSortColumn = (column: string) => {
-    const newConfigs = sortConfigs.filter((config) => config.column !== column);
-    setSortConfigs(newConfigs);
+    setSortConfigs((prev) => prev.filter((config) => config.column !== column));
   };
 
   const clearAllSorts = () => {
@@ -207,9 +209,7 @@ export function EnhancedPreview({
       preview.columns.map((column) => column.display_value).join(','),
     ];
 
-    const dataToExport = data.rows;
-
-    dataToExport.map((row) => {
+    data.rows.map((row) => {
       rows.push(
         row
           .map((cell) => {
@@ -221,7 +221,7 @@ export function EnhancedPreview({
             if (displayStr === 'false') {
               return 'No';
             }
-
+          
             return `"${displayStr || ''}"`;
           })
           .join(',')
@@ -255,10 +255,11 @@ export function EnhancedPreview({
 
       rows.forEach((row, i) => {
         elements.push(
-          <Tr
+          <MemoizedTr
             key={`${groupName}-${i}`}
             className="border-b"
             style={{ borderColor: colors.$20 }}
+            memoValue={row}
           >
             {row.map((cell, j) => (
               <PreviewCell
@@ -267,7 +268,7 @@ export function EnhancedPreview({
                 sizing={columnSizing.get(cell.identifier)}
               />
             ))}
-          </Tr>
+          </MemoizedTr>
         );
       });
     });
@@ -277,7 +278,12 @@ export function EnhancedPreview({
 
   const renderNormalData = () => {
     return data.rows.map((row, i) => (
-      <Tr key={i} className="border-b" style={{ borderColor: colors.$20 }}>
+      <MemoizedTr
+        key={i}
+        className="border-b"
+        style={{ borderColor: colors.$20 }}
+        memoValue={row}
+      >
         {row.map((cell, j) => (
           <PreviewCell
             key={j}
@@ -285,7 +291,7 @@ export function EnhancedPreview({
             sizing={columnSizing.get(cell.identifier)}
           />
         ))}
-      </Tr>
+      </MemoizedTr>
     ));
   };
 
@@ -318,102 +324,101 @@ export function EnhancedPreview({
         </Button>
       </div>
 
-      <Table>
-        <Thead>
-          {preview.columns.map((column, i) => {
-            const sortConfig = sortConfigs.find(
-              (config) => config.column === column.identifier
-            );
-            const sortIndex = sortConfig
-              ? sortConfigs.indexOf(sortConfig) + 1
-              : null;
+      <Table resizable="report-preview">
+        <ColumnGroup columns={preview.columns}>
+          <Thead>
+            {preview.columns.map((column, i) => {
+              const sortConfig = sortConfigs.find(
+                (config) => config.column === column.identifier
+              );
+              const sortIndex = sortConfig
+                ? sortConfigs.indexOf(sortConfig) + 1
+                : null;
 
-            return (
-              <Th
-                key={i}
-                style={{
-                  borderBottom: `1px solid ${colors.$20}`,
-                  ...columnSizing.get(column.identifier)?.style,
-                }}
-                isCurrentlyUsed={!!sortConfig}
-                onClick={() => handleSort(column.identifier)}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span>{column.display_value}</span>
-                  {sortConfig && (
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs">
-                        {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                      </span>
-                      {enableMultiSort && sortConfigs.length > 1 && (
-                        <span className="text-xs bg-gray-200 rounded px-1">
-                          {sortIndex}
+              return (
+                <PreviewTh
+                  key={i}
+                  identifier={column.identifier}
+                  isCurrentlyUsed={!!sortConfig}
+                  onSortClick={() => handleSort(column.identifier)}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span>{column.display_value}</span>
+                    {sortConfig && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs">
+                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
                         </span>
-                      )}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeSortColumn(column.identifier);
-                        }}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </Th>
-            );
-          })}
-        </Thead>
-
-        <Tbody>
-          <Tr className="border-b" style={{ borderColor: colors.$20 }}>
-            {preview.columns.map((column, i) => (
-              <Td key={i} style={columnSizing.get(column.identifier)?.style}>
-                <InputField
-                  value={filterValues[column.identifier] || ''}
-                  onValueChange={(value) => filter(column.identifier, value)}
-                  changeOverride
-                />
-              </Td>
-            ))}
-          </Tr>
-
-          {columnTotals.summable.size > 0 && (
-            <Tr
-              className="border-b"
-              style={{ borderColor: colors.$20, backgroundColor: colors.$2 }}
-            >
-              {preview.columns.map((column, i) => {
-                const isSummable = columnTotals.summable.has(column.identifier);
-
-                return (
-                  <Td
-                    key={i}
-                    style={columnSizing.get(column.identifier)?.style}
-                  >
-                    {isSummable ? (
-                      <span className="font-semibold">
-                        {numericFormatter(
-                          columnTotals.sums[column.identifier].toString()
+                        {enableMultiSort && sortConfigs.length > 1 && (
+                          <span className="text-xs bg-gray-200 rounded px-1">
+                            {sortIndex}
+                          </span>
                         )}
-                      </span>
-                    ) : (
-                      <span style={{ color: colors.$17 }}>—</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeSortColumn(column.identifier);
+                          }}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          ×
+                        </button>
+                      </div>
                     )}
-                  </Td>
-                );
-              })}
+                  </div>
+                </PreviewTh>
+              );
+            })}
+          </Thead>
+
+          <Tbody>
+            <Tr className="border-b" style={{ borderColor: colors.$20 }}>
+              {preview.columns.map((column, i) => (
+                <PreviewTd key={i}>
+                  <InputField
+                    value={filterValues[column.identifier] || ''}
+                    onValueChange={(value) =>
+                      filter(column.identifier, value)
+                    }
+                    changeOverride
+                  />
+                </PreviewTd>
+              ))}
             </Tr>
-          )}
 
-          {enableGrouping && groupByColumn
-            ? renderGroupedData()
-            : renderNormalData()}
-        </Tbody>
+            {columnTotals.summable.size > 0 && (
+              <Tr
+                className="border-b"
+                style={{ borderColor: colors.$20, backgroundColor: colors.$2 }}
+              >
+                {preview.columns.map((column, i) => {
+                  const isSummable = columnTotals.summable.has(
+                    column.identifier
+                  );
+
+                  return (
+                    <PreviewTd key={i}>
+                      {isSummable ? (
+                        <span className="font-semibold">
+                          {numericFormatter(
+                            columnTotals.sums[column.identifier].toString()
+                          )}
+                        </span>
+                      ) : (
+                        <span style={{ color: colors.$17 }}>—</span>
+                      )}
+                    </PreviewTd>
+                  );
+                })}
+              </Tr>
+            )}
+
+            {enableGrouping && groupByColumn
+              ? renderGroupedData()
+              : renderNormalData()}
+          </Tbody>
+        </ColumnGroup>
       </Table>
-
     </div>
   );
 }
