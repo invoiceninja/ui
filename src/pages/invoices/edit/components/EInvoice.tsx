@@ -288,7 +288,7 @@ export default function EInvoice() {
         </Card>
       ) : null}
 
-      {isInvoiceEditable(invoice) && (
+      {displayEInvoiceAndStatusCard && isInvoiceEditable(invoice) && (
         <Card title={t('status')}>
           <div className="px-6 text-sm">
             <div
