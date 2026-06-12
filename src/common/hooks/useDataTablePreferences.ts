@@ -81,7 +81,7 @@ export function useDataTablePreferences(params: Params) {
     perPage: PerPage
   ) => {
     if (tableKey) {
-      storeSessionTableFilters(filter, currentPage);
+      storeSessionTableFilters(filter, currentPage, withoutStoringPage);
     }
 
     if (!customFilter || !tableKey || !enableSavingFilterPreference) {
