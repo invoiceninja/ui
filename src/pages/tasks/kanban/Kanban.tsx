@@ -36,6 +36,7 @@ import { useAtom } from 'jotai';
 import { ViewSlider } from './components/ViewSlider';
 import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
+import { shouldShowStartTaskButton } from '../common/helpers/task';
 import {
   currentTaskAtom,
   currentTaskIdAtom,
@@ -373,7 +374,7 @@ export default function Kanban() {
             </button> */}
 
             {currentTask &&
-              !isTaskRunning(currentTask) &&
+              shouldShowStartTaskButton(currentTask) &&
               (hasPermission('edit_task') || entityAssigned(currentTask)) && (
                 <Box
                   className="flex justify-center items-center text-sm p-4 space-x-2 w-full cursor-pointer focus:outline-none focus:ring-0"
@@ -611,7 +612,7 @@ export default function Kanban() {
                                         </button>
                                       )}
 
-                                    {!isTaskRunning(card.task) &&
+                                    {shouldShowStartTaskButton(card.task) &&
                                       (hasPermission('edit_task') ||
                                         entityAssigned(currentTask)) && (
                                         <button
@@ -743,7 +744,9 @@ export default function Kanban() {
                                                 </button>
                                               )}
 
-                                            {!isTaskRunning(card.task) &&
+                                            {shouldShowStartTaskButton(
+                                              card.task
+                                            ) &&
                                               (hasPermission('edit_task') ||
                                                 entityAssigned(
                                                   currentTask
