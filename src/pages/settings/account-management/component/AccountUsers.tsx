@@ -11,11 +11,11 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useColorScheme } from '$app/common/colors';
-import { Badge, BadgeVariant } from '$app/components/Badge';
+import { Badge } from '$app/components/Badge';
 import { Icon } from '$app/components/icons/Icon';
 import { Spinner } from '$app/components/Spinner';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdExpandLess, MdExpandMore } from 'react-icons/md';
 import { useQuery } from 'react-query';
@@ -41,37 +41,12 @@ interface AccountUsersResponse {
   users: AccountUser[];
 }
 
-const permissionActions = ['create', 'view', 'edit'];
-const specialPermissions = ['view_dashboard', 'view_reports', 'disable_emails'];
-
-function getPermissionTokens(permissions: string) {
-  return permissions
-    .split(',')
-    .map((permission) => permission.trim())
-    .filter(Boolean);
-}
-
 export function AccountUsers() {
   const [t] = useTranslation();
   const colors = useColorScheme();
 
-  const ownerLabel =
-    String(t('owner')) === 'owner' ? 'Owner' : String(t('owner'));
-  const adminLabel =
-    String(t('admin')) === 'admin' ? 'Admin' : String(t('admin'));
-  const administratorLabel = String(t('administrator'));
-  const customLabel = String(t('custom'));
   const noAccessLabel = 'No access';
   const noCompanyAccessLabel = 'No company access';
-  const statusVariants = useMemo<Record<string, BadgeVariant>>(
-    () => ({
-      active: 'primary',
-      inactive: 'red',
-      [String(t('active')).toLowerCase()]: 'primary',
-      [String(t('inactive')).toLowerCase()]: 'red',
-    }),
-    [t]
-  );
 
   const [expandedUserId, setExpandedUserId] = useState<string>();
 
@@ -88,86 +63,6 @@ export function AccountUsers() {
     { staleTime: Infinity }
   );
 
-  const sortedUsers = useMemo(
-    () =>
-      [...users].sort((first, second) => first.name.localeCompare(second.name)),
-    [users]
-  );
-
-  const isOwnerPermission = (value: string) =>
-    [ownerLabel, 'owner'].includes(value.toLowerCase()) ||
-    value.toLowerCase() === ownerLabel.toLowerCase();
-
-  const isAdminPermission = (value: string) =>
-    [adminLabel, administratorLabel, 'admin', 'administrator']
-      .map((label) => label.toLowerCase())
-      .includes(value.toLowerCase());
-
-  const getStatusVariant = (status: string): BadgeVariant =>
-    statusVariants[status.toLowerCase()] ?? 'generic';
-
-  const getPermissionVariant = (summary: string): BadgeVariant => {
-    if (isOwnerPermission(summary)) {
-      return 'purple';
-    }
-
-    if (isAdminPermission(summary)) {
-      return 'primary';
-    }
-
-    if (summary.toLowerCase() === customLabel.toLowerCase()) {
-      return 'blue';
-    }
-
-    return 'generic';
-  };
-
-  const humanizePermission = (permission: string) =>
-    permission
-      .replace(/_/g, ' ')
-      .replace(/\b\w/g, (character) => character.toUpperCase());
-
-  const formatPermission = (permission: string) => {
-    if (isOwnerPermission(permission)) {
-      return ownerLabel;
-    }
-
-    if (isAdminPermission(permission)) {
-      return adminLabel;
-    }
-
-    if (specialPermissions.includes(permission)) {
-      const translatedPermission = String(t(permission));
-
-      return translatedPermission === permission
-        ? humanizePermission(permission)
-        : translatedPermission;
-    }
-
-    const [action, ...moduleParts] = permission.split('_');
-    const module = moduleParts.join('_');
-
-    if (permissionActions.includes(action) && module) {
-      return `${String(t(action))} ${String(t(module))}`;
-    }
-
-    const translatedPermission = String(t(permission));
-
-    return translatedPermission === permission
-      ? humanizePermission(permission)
-      : translatedPermission;
-  };
-
-  const getPermissionLabels = (company: AccountCompany) => {
-    const permissions = getPermissionTokens(company.permissions);
-
-    if (!permissions.length) {
-      return [noAccessLabel];
-    }
-
-    return permissions.map(formatPermission);
-  };
-
   const renderFieldLabel = (label: string) => (
     <div
       className="text-xs font-medium uppercase tracking-wide"
@@ -179,7 +74,7 @@ export function AccountUsers() {
 
   const renderStatusBadge = (status: string) =>
     status ? (
-      <Badge variant={getStatusVariant(status)}>{status}</Badge>
+      <Badge>{status}</Badge>
     ) : (
       <span className="text-sm" style={{ color: colors.$17 }}>
         {t('unknown')}
@@ -187,15 +82,11 @@ export function AccountUsers() {
     );
 
   const renderPermissionBadges = (company: AccountCompany) => {
-    const permissions = getPermissionLabels(company);
+    const permissions = company.permissions || noAccessLabel;
 
     return (
       <div className="flex flex-wrap gap-2">
-        {permissions.map((permission) => (
-          <Badge key={permission} variant={getPermissionVariant(permission)}>
-            {permission}
-          </Badge>
-        ))}
+        <Badge>{permissions}</Badge>
       </div>
     );
   };
@@ -272,7 +163,7 @@ export function AccountUsers() {
         </Thead>
 
         <Tbody>
-          {!sortedUsers.length && (
+          {!users.length && (
             <Tr>
               <Td colSpan={3}>
                 <div className="flex items-center justify-center py-10">
@@ -284,7 +175,7 @@ export function AccountUsers() {
             </Tr>
           )}
 
-          {sortedUsers.map((user) => {
+          {users.map((user) => {
             const expanded = expandedUserId === user.id;
             const detailsId = `account-user-companies-${user.id}`;
 
@@ -334,11 +225,7 @@ export function AccountUsers() {
                   </Td>
 
                   <Td>
-                    {user.status && (
-                      <Badge variant={getStatusVariant(user.status)}>
-                        {user.status}
-                      </Badge>
-                    )}
+                    {user.status && <Badge>{user.status}</Badge>}
                   </Td>
                 </Tr>
 

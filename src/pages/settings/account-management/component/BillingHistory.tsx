@@ -9,18 +9,13 @@
  */
 
 import { endpoint } from '$app/common/helpers';
-import invoiceStatus from '$app/common/constants/invoice-status';
 import {
   downloadBlob,
   downloadUrl,
   extractFilenameFromHeaders,
 } from '$app/common/helpers/download';
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useDateTime } from '$app/common/hooks/useDateTime';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { Badge, BadgeVariant } from '$app/components/Badge';
 import {
   CustomBulkAction,
   DataTable,
@@ -42,80 +37,14 @@ const BILLING_INVOICE_PAY_ENDPOINT =
 
 interface BillingInvoice {
   id: string;
-  number?: string;
-  invoice_number?: string;
-  date?: string | number | null;
-  invoice_date?: string | number | null;
-  created_at?: string | number | null;
-  amount?: string | number;
-  total?: string | number;
-  currency_id?: string;
-  status?: string | number;
-  status_id?: string | number;
-  payable?: boolean;
-}
-
-function formatStatus(status: string) {
-  return status
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (character) => character.toUpperCase());
-}
-
-function getInvoiceNumber(invoice: BillingInvoice) {
-  return invoice.invoice_number || invoice.number || invoice.id;
-}
-
-function getInvoiceDate(invoice: BillingInvoice) {
-  return invoice.invoice_date || invoice.date || invoice.created_at || '';
-}
-
-function getInvoiceStatus(invoice: BillingInvoice) {
-  const status = String(invoice.status || invoice.status_id || 'unknown');
-
-  return (
-    invoiceStatus[status as keyof typeof invoiceStatus] ?? status.toLowerCase()
-  );
-}
-
-function getInvoiceAmount(invoice: BillingInvoice) {
-  return invoice.total ?? invoice.amount ?? 0;
-}
-
-function canPayInvoice(invoice: BillingInvoice) {
-  const status = String(invoice.status_id ?? invoice.status);
-  const normalizedStatus = getInvoiceStatus(invoice);
-
-  return (
-    [InvoiceStatus.Sent, InvoiceStatus.Partial].includes(
-      status as InvoiceStatus
-    ) ||
-    ['sent', 'partial'].includes(normalizedStatus) ||
-    invoice.payable === true
-  );
-}
-
-function getStatusVariant(status: string): BadgeVariant {
-  if (
-    ['paid', 'active', 'complete', 'completed', 'succeeded'].includes(status)
-  ) {
-    return 'primary';
-  }
-
-  if (['open', 'pending', 'draft', 'sent'].includes(status)) {
-    return 'yellow';
-  }
-
-  if (['failed', 'past_due', 'unpaid'].includes(status)) {
-    return 'red';
-  }
-
-  if (
-    ['refunded', 'void', 'voided', 'cancelled', 'canceled'].includes(status)
-  ) {
-    return 'generic';
-  }
-
-  return 'blue';
+  amount: string;
+  balance: string;
+  number: string;
+  date: string;
+  due_date: string;
+  status: string;
+  payable: boolean;
+  download: string;
 }
 
 function getFallbackFilename(contentType: string, invoiceCount: number) {
@@ -187,8 +116,6 @@ async function downloadInvoices(invoiceIds: string[]) {
 
 export function BillingHistory() {
   const [t] = useTranslation();
-  const formatDate = useDateTime({ formatOnlyDate: true });
-  const formatMoney = useFormatMoney();
   const queryClient = useQueryClient();
   const [payingInvoiceId, setPayingInvoiceId] = useState<string>();
 
@@ -225,16 +152,12 @@ export function BillingHistory() {
 
   const columns = useMemo<DataTableColumns<BillingInvoice>>(
     () => [
-      {
-        id: 'number',
-        label: t('invoice_number'),
-        format: (_field, invoice) => getInvoiceNumber(invoice),
-      },
+      { id: 'number', label: t('invoice_number') },
       {
         id: 'pay',
         label: '',
         format: (_field, invoice) =>
-          canPayInvoice(invoice) ? (
+          invoice.payable ? (
             <Button
               behavior="button"
               type="secondary"
@@ -250,42 +173,13 @@ export function BillingHistory() {
             </Button>
           ) : null,
       },
-      {
-        id: 'date',
-        label: t('invoice_date'),
-        format: (_field, invoice) => {
-          const invoiceDate = getInvoiceDate(invoice);
-
-          return invoiceDate ? formatDate(invoiceDate) : '';
-        },
-      },
-      {
-        id: 'amount',
-        label: t('amount'),
-        format: (_field, invoice) =>
-          formatMoney(
-            getInvoiceAmount(invoice),
-            undefined,
-            invoice.currency_id,
-            2,
-            true
-          ),
-      },
-      {
-        id: 'status',
-        label: t('status'),
-        format: (_field, invoice) => {
-          const status = getInvoiceStatus(invoice);
-
-          return (
-            <Badge variant={getStatusVariant(status)}>
-              {formatStatus(status)}
-            </Badge>
-          );
-        },
-      },
+      { id: 'date', label: t('invoice_date') },
+      { id: 'due_date', label: t('due_date') },
+      { id: 'amount', label: t('amount') },
+      { id: 'balance', label: t('balance') },
+      { id: 'status', label: t('status') },
     ],
-    [formatDate, formatMoney, handlePayInvoice, payingInvoiceId, t]
+    [handlePayInvoice, payingInvoiceId, t]
   );
 
   const customBulkActions = useMemo<CustomBulkAction<BillingInvoice>[]>(
@@ -312,6 +206,7 @@ export function BillingHistory() {
         methodType="POST"
         columns={columns}
         customBulkActions={customBulkActions}
+        styleOptions={{ withoutSortIcons: true }}
         dataPropPath={['data.invoices', 'data.data.invoices', 'data.data.data']}
         withoutDefaultBulkActions
         withoutFilter

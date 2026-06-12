@@ -36,6 +36,7 @@ interface Props extends CommonProps {
   ascIcon?: ReactNode;
   withoutHorizontalPadding?: boolean;
   sortKey?: string;
+  withoutSortIcons?: boolean;
 }
 
 const defaultProps: Props = {
@@ -123,59 +124,61 @@ export function Th$(props: Props) {
               {props.children}
             </span>
 
-            <div
-              className={classNames('flex items-center bg-opacity-25', {
-                hidden: currentWidth === -1 ? false : currentWidth < 50,
-              })}
-            >
-              {props.useOnlyCurrentSortDirectionIcon ? (
-                <>
-                  {props.isCurrentlyUsed && (
-                    <>{order === 'desc' ? props.descIcon : props.ascIcon}</>
-                  )}
-                </>
-              ) : (
-                <>
-                  {props.isCurrentlyUsed ? (
-                    <div className="flex flex-col items-center justify-center -space-y-1">
-                      <div>
-                        <ChevronUp
-                          size="0.7rem"
-                          strokeWidth="3"
-                          color={order === 'asc' ? colors.$3 : colors.$17}
-                        />
-                      </div>
+            {!props.withoutSortIcons && (
+              <div
+                className={classNames('flex items-center bg-opacity-25', {
+                  hidden: currentWidth === -1 ? false : currentWidth < 50,
+                })}
+              >
+                {props.useOnlyCurrentSortDirectionIcon ? (
+                  <>
+                    {props.isCurrentlyUsed && (
+                      <>{order === 'desc' ? props.descIcon : props.ascIcon}</>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {props.isCurrentlyUsed ? (
+                      <div className="flex flex-col items-center justify-center -space-y-1">
+                        <div>
+                          <ChevronUp
+                            size="0.7rem"
+                            strokeWidth="3"
+                            color={order === 'asc' ? colors.$3 : colors.$17}
+                          />
+                        </div>
 
-                      <div>
-                        <ChevronDown
-                          size="0.7rem"
-                          strokeWidth="3"
-                          color={order === 'desc' ? colors.$3 : colors.$17}
-                        />
+                        <div>
+                          <ChevronDown
+                            size="0.7rem"
+                            strokeWidth="3"
+                            color={order === 'desc' ? colors.$3 : colors.$17}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center -space-y-1">
-                      <div>
-                        <ChevronUp
-                          size="0.7rem"
-                          color={colors.$17}
-                          strokeWidth="3"
-                        />
-                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center -space-y-1">
+                        <div>
+                          <ChevronUp
+                            size="0.7rem"
+                            color={colors.$17}
+                            strokeWidth="3"
+                          />
+                        </div>
 
-                      <div>
-                        <ChevronDown
-                          size="0.7rem"
-                          color={colors.$17}
-                          strokeWidth="3"
-                        />
+                        <div>
+                          <ChevronDown
+                            size="0.7rem"
+                            color={colors.$17}
+                            strokeWidth="3"
+                          />
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
           </div>
         ) : (
           <span>{props.children}</span>

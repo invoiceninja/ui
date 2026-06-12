@@ -130,6 +130,7 @@ interface StyleOptions {
   disableThUppercase?: boolean;
   descIcon?: ReactNode;
   ascIcon?: ReactNode;
+  withoutSortIcons?: boolean;
   withoutTdPadding?: boolean;
 }
 
@@ -1195,6 +1196,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                     disableUppercase={styleOptions?.disableThUppercase}
                     descIcon={styleOptions?.descIcon}
                     ascIcon={styleOptions?.ascIcon}
+                    withoutSortIcons={styleOptions?.withoutSortIcons}
                   >
                     <div className="flex items-center space-x-3">
                       {dateRangeColumns.some(
