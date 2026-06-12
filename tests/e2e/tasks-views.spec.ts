@@ -88,6 +88,23 @@ async function selectAsyncOptionByText(
   await option.click();
 }
 
+test('task date context persists when switching date-based task views', async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto('/tasks/calendar?date=' + TASK_DATE);
+  await page.waitForURL('**/tasks/calendar?date=' + TASK_DATE);
+
+  await page.getByRole('link', { name: 'Weekly', exact: true }).click();
+  await page.waitForURL('**/tasks/weekly?date=' + TASK_DATE);
+
+  await page.getByRole('link', { name: 'Daily', exact: true }).click();
+  await page.waitForURL('**/tasks/daily?date=' + TASK_DATE);
+
+  await page.getByRole('link', { name: 'Monthly', exact: true }).click();
+  await page.waitForURL('**/tasks/calendar?date=' + TASK_DATE);
+});
+
 test('daily task view can quick-log time from the date view', async ({
   page,
   api,
