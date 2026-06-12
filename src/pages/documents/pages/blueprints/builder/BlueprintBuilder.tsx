@@ -51,8 +51,9 @@ import {
   SendDialogButtonProps,
   SendDialogProps,
   SignatorySelectorProps,
-  CreateBlueprintSignatoryProps,
+  CreateBlueprintSignatoryProps
 } from '@docuninja/builder2.0';
+import { SignatorySwap } from './Elements';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
@@ -451,7 +452,7 @@ function BlueprintBuilder() {
                 },
               },
               signatorySelector: SignatorySelector,
-              signatorySwap: () => null,
+              signatorySwap: SignatorySwap,
               uninvite: {
                 dialog: UninviteDialog,
                 button: UninviteButton,
