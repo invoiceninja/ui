@@ -10,7 +10,7 @@
 
 import { useColorScheme } from '$app/common/colors';
 import { Button, InputField } from '$app/components/forms';
-import { MemoizedTr, Table, Tbody, Td, Thead, Tr } from '$app/components/tables';
+import { Table, Tbody, Td, Thead, Tr } from '$app/components/tables';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -24,15 +24,7 @@ import {
 } from '../utils/sortingUtils';
 import { isSummableColumn } from '../constants/columns';
 import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
-import {
-  ColumnGroup,
-  PreviewCell,
-  PreviewTd,
-  PreviewTh,
-  useColumnSizingMap,
-  usePreview,
-  useResizeOverrideLifecycle,
-} from './Preview';
+import { ColumnGroup, PreviewTh, usePreview } from './Preview';
 
 interface EnhancedPreviewProps {
   enableMultiSort?: boolean;
@@ -106,9 +98,6 @@ export function EnhancedPreview({
 
     return { columns: preview.columns, rows };
   }, [preview, activeFilters, sortConfigs]);
-
-  const columnSizing = useColumnSizingMap(preview);
-  useResizeOverrideLifecycle(columnSizing);
 
   const columnTotals = useMemo(() => {
     const summable = new Set<string>();
@@ -201,7 +190,7 @@ export function EnhancedPreview({
   const data = filtered;
 
   const downloadCsv = () => {
-    if (!data || !data.rows || data.rows.length === 0) {
+    if (!data || data.rows.length === 0) {
       return;
     }
 
@@ -214,14 +203,8 @@ export function EnhancedPreview({
         row
           .map((cell) => {
             const displayStr = String(cell.display_value || '');
-            if (displayStr === 'true') {
-              return 'Yes';
-            }
-
-            if (displayStr === 'false') {
-              return 'No';
-            }
-          
+            if (displayStr === 'true') return 'Yes';
+            if (displayStr === 'false') return 'No';
             return `"${displayStr || ''}"`;
           })
           .join(',')
@@ -255,20 +238,15 @@ export function EnhancedPreview({
 
       rows.forEach((row, i) => {
         elements.push(
-          <MemoizedTr
+          <Tr
             key={`${groupName}-${i}`}
             className="border-b"
             style={{ borderColor: colors.$20 }}
-            memoValue={row}
           >
             {row.map((cell, j) => (
-              <PreviewCell
-                key={j}
-                cell={cell}
-                sizing={columnSizing.get(cell.identifier)}
-              />
+              <Td key={j}>{cell.display_value}</Td>
             ))}
-          </MemoizedTr>
+          </Tr>
         );
       });
     });
@@ -278,20 +256,11 @@ export function EnhancedPreview({
 
   const renderNormalData = () => {
     return data.rows.map((row, i) => (
-      <MemoizedTr
-        key={i}
-        className="border-b"
-        style={{ borderColor: colors.$20 }}
-        memoValue={row}
-      >
+      <Tr key={i} className="border-b" style={{ borderColor: colors.$20 }}>
         {row.map((cell, j) => (
-          <PreviewCell
-            key={j}
-            cell={cell}
-            sizing={columnSizing.get(cell.identifier)}
-          />
+          <Td key={j}>{cell.display_value}</Td>
         ))}
-      </MemoizedTr>
+      </Tr>
     ));
   };
 
@@ -374,15 +343,13 @@ export function EnhancedPreview({
           <Tbody>
             <Tr className="border-b" style={{ borderColor: colors.$20 }}>
               {preview.columns.map((column, i) => (
-                <PreviewTd key={i}>
+                <Td key={i}>
                   <InputField
                     value={filterValues[column.identifier] || ''}
-                    onValueChange={(value) =>
-                      filter(column.identifier, value)
-                    }
+                    onValueChange={(value) => filter(column.identifier, value)}
                     changeOverride
                   />
-                </PreviewTd>
+                </Td>
               ))}
             </Tr>
 
@@ -392,12 +359,10 @@ export function EnhancedPreview({
                 style={{ borderColor: colors.$20, backgroundColor: colors.$2 }}
               >
                 {preview.columns.map((column, i) => {
-                  const isSummable = columnTotals.summable.has(
-                    column.identifier
-                  );
+                  const isSummable = columnTotals.summable.has(column.identifier);
 
                   return (
-                    <PreviewTd key={i}>
+                    <Td key={i}>
                       {isSummable ? (
                         <span className="font-semibold">
                           {numericFormatter(
@@ -407,7 +372,7 @@ export function EnhancedPreview({
                       ) : (
                         <span style={{ color: colors.$17 }}>—</span>
                       )}
-                    </PreviewTd>
+                    </Td>
                   );
                 })}
               </Tr>

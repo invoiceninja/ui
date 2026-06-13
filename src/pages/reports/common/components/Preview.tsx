@@ -10,10 +10,9 @@
 
 import { useColorScheme } from '$app/common/colors';
 import { Button, InputField, Link } from '$app/components/forms';
-import { MemoizedTr, Table, Tbody, Thead, Tr } from '$app/components/tables';
-import { Tooltip } from '$app/components/Tooltip';
+import { Table, Tbody, Td, Thead, Tr } from '$app/components/tables';
 import { currentWidthAtom } from '$app/common/hooks/useResizeColumn';
-import { atom, getDefaultStore, useAtom, useSetAtom } from 'jotai';
+import { atom, getDefaultStore, useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import React, {
   memo,
@@ -30,10 +29,6 @@ import {
   detectSortType,
   extractDisplayValue,
 } from '../utils/sortingUtils';
-import {
-  ResolvedCellSizing,
-  resolveCellSizing,
-} from '../constants/column-widths';
 
 export const previewAtom = atom<Preview | null>(null);
 
@@ -118,76 +113,8 @@ export function usePreview() {
   return processed;
 }
 
-export function useColumnSizingMap(
-  preview: Preview | null
-): Map<string, ResolvedCellSizing> {
-  return useMemo(() => {
-    if (!preview) {
-      return new Map();
-    }
-
-    return new Map(
-      preview.columns.map((column) => [
-        column.identifier,
-        resolveCellSizing(column.identifier, column.display_value),
-      ])
-    );
-  }, [preview]);
-}
-
 export function resizeKey(identifier: string) {
   return `${RESIZE_KEY_PREFIX}${identifier}`;
-}
-
-export function useResizeOverrideLifecycle(
-  columnSizing: Map<string, ResolvedCellSizing>
-) {
-  const setWidths = useSetAtom(currentWidthAtom);
-
-  useLayoutEffect(() => {
-    if (columnSizing.size === 0) {
-      return;
-    }
-
-    setWidths((prev) => {
-      const next = { ...prev };
-      let mutated = false;
-
-      columnSizing.forEach((sizing, identifier) => {
-        const key = resizeKey(identifier);
-        const existing = prev[key];
-
-        if (typeof existing === 'number' && existing > 0) {
-          return;
-        }
-
-        next[key] = Math.max(sizing.width, sizing.minWidth);
-        mutated = true;
-      });
-
-      return mutated ? next : prev;
-    });
-  }, [columnSizing, setWidths]);
-
-  useEffect(() => {
-    return () => {
-      setWidths((prev) => {
-        const next: Record<string, number> = {};
-        let mutated = false;
-
-        for (const key of Object.keys(prev)) {
-          if (key.startsWith(RESIZE_KEY_PREFIX)) {
-            mutated = true;
-            continue;
-          }
-
-          next[key] = prev[key];
-        }
-
-        return mutated ? next : prev;
-      });
-    };
-  }, [setWidths]);
 }
 
 type GetColElement = (identifier: string) => HTMLTableColElement | null;
@@ -252,49 +179,6 @@ export function ColumnGroup({ columns, children }: ColumnGroupProps) {
     </ColumnGroupContext.Provider>
   );
 }
-
-interface PreviewTdProps {
-  children?: React.ReactNode;
-}
-
-export const PreviewTd = memo(function PreviewTd({ children }: PreviewTdProps) {
-  return (
-    <td className="text-sm px-2 lg:px-2.5 xl:px-4 py-2 overflow-hidden whitespace-nowrap text-ellipsis">
-      {children}
-    </td>
-  );
-});
-
-interface PreviewCellProps {
-  cell: Cell;
-  sizing: ResolvedCellSizing | undefined;
-}
-
-export const PreviewCell = memo(function PreviewCell({
-  cell,
-  sizing,
-}: PreviewCellProps) {
-  if (
-    sizing?.truncate &&
-    typeof cell.display_value === 'string' &&
-    cell.display_value.trim().length > 0
-  ) {
-    return (
-      <PreviewTd>
-        <Tooltip
-          message={cell.display_value}
-          size="regular"
-          placement="top"
-          truncate
-        >
-          <span>{cell.display_value}</span>
-        </Tooltip>
-      </PreviewTd>
-    );
-  }
-
-  return <PreviewTd>{cell.display_value}</PreviewTd>;
-});
 
 interface PreviewThProps {
   identifier: string;
@@ -461,9 +345,6 @@ export function Preview() {
   const [sorts, setSorts] = useState<Record<string, string>>();
   const [filtered, setFiltered] = useState<Preview | null>(null);
 
-  const columnSizing = useColumnSizingMap(preview);
-  useResizeOverrideLifecycle(columnSizing);
-
   if (!preview) {
     return null;
   }
@@ -598,32 +479,27 @@ export function Preview() {
           <Tbody>
             <Tr className="border-b" style={{ borderColor: colors.$20 }}>
               {preview.columns.map((column, i) => (
-                <PreviewTd key={i}>
+                <Td key={i}>
                   <InputField
                     onValueChange={(value) =>
                       filter(column.identifier, value)
                     }
                     changeOverride
                   />
-                </PreviewTd>
+                </Td>
               ))}
             </Tr>
 
             {data.map((row, i) => (
-              <MemoizedTr
+              <Tr
                 key={i}
                 className="border-b"
                 style={{ borderColor: colors.$20 }}
-                memoValue={row}
               >
                 {row.map((cell, j) => (
-                  <PreviewCell
-                    key={j}
-                    cell={cell}
-                    sizing={columnSizing.get(cell.identifier)}
-                  />
+                  <Td key={j}>{cell.display_value}</Td>
                 ))}
-              </MemoizedTr>
+              </Tr>
             ))}
           </Tbody>
         </ColumnGroup>
