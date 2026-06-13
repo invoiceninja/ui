@@ -11,6 +11,7 @@
 import { useColorScheme } from '$app/common/colors';
 import { Button, InputField, Link } from '$app/components/forms';
 import { Table, Tbody, Td, Thead, Tr } from '$app/components/tables';
+import { Tooltip } from '$app/components/Tooltip';
 import { currentWidthAtom } from '$app/common/hooks/useResizeColumn';
 import { atom, getDefaultStore, useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
@@ -29,12 +30,15 @@ import {
   detectSortType,
   extractDisplayValue,
 } from '../utils/sortingUtils';
+import {
+  isTruncatedColumn,
+  resolveMinColumnWidth,
+} from '../constants/column-widths';
 
 export const previewAtom = atom<Preview | null>(null);
 
 const RESIZE_KEY_PREFIX = 'report-preview.';
 const RESIZE_HANDLE_THRESHOLD = 15;
-const RESIZE_MIN_WIDTH = 40;
 
 export interface PreviewResponse {
   columns: Column[];
@@ -142,7 +146,9 @@ export function ColumnGroup({ columns, children }: ColumnGroupProps) {
         const w = widths[resizeKey(column.identifier)];
         const el = colRefs.current[column.identifier];
 
-        if (!el) return;
+        if (!el) {
+          return;
+        }
 
         if (typeof w === 'number' && w > 0) {
           el.style.width = `${w}px`;
@@ -209,19 +215,24 @@ export const PreviewTh = memo(function PreviewTh({
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
-      if (e.button !== 0 || !thRef.current) return;
+      if (e.button !== 0 || !thRef.current) {
+        return;
+      }
 
       const rect = thRef.current.getBoundingClientRect();
       const clickPosition = e.clientX - rect.left;
       const inResizeZone = clickPosition > rect.width - RESIZE_HANDLE_THRESHOLD;
 
-      if (!inResizeZone) return;
+      if (!inResizeZone) {
+        return;
+      }
 
       e.preventDefault();
       e.stopPropagation();
 
       const colEl = getColEl?.(identifier);
       const startWidth = colEl?.offsetWidth ?? rect.width;
+      const minWidth = resolveMinColumnWidth(identifier);
 
       dragRef.current = {
         startX: e.clientX,
@@ -237,20 +248,29 @@ export const PreviewTh = memo(function PreviewTh({
 
       const onMove = (event: MouseEvent) => {
         const drag = dragRef.current;
-        if (!drag) return;
+
+        if (!drag) {
+          return;
+        }
 
         const dx = event.clientX - drag.startX;
-        const next = Math.max(RESIZE_MIN_WIDTH, drag.startWidth + dx);
+        const next = Math.max(minWidth, drag.startWidth + dx);
         drag.latestWidth = next;
         drag.moved = true;
 
-        if (drag.rafId !== null) return;
+        if (drag.rafId !== null) {
+          return;
+        }
 
         drag.rafId = requestAnimationFrame(() => {
-          if (!dragRef.current) return;
+          if (!dragRef.current) {
+            return;
+          }
+
           dragRef.current.rafId = null;
 
           const el = getColEl?.(identifier);
+
           if (el) {
             el.style.width = `${dragRef.current.latestWidth}px`;
             el.style.minWidth = `${dragRef.current.latestWidth}px`;
@@ -334,6 +354,35 @@ export const PreviewTh = memo(function PreviewTh({
       />
     </th>
   );
+});
+
+interface PreviewCellProps {
+  cell: Cell;
+}
+
+export const PreviewCell = memo(function PreviewCell({
+  cell,
+}: PreviewCellProps) {
+  if (
+    isTruncatedColumn(cell.identifier) &&
+    typeof cell.display_value === 'string' &&
+    cell.display_value.trim().length > 0
+  ) {
+    return (
+      <Td>
+        <Tooltip
+          message={cell.display_value}
+          size="regular"
+          placement="top"
+          truncate
+        >
+          <span>{cell.display_value}</span>
+        </Tooltip>
+      </Td>
+    );
+  }
+
+  return <Td>{cell.display_value}</Td>;
 });
 
 export function Preview() {
@@ -497,7 +546,7 @@ export function Preview() {
                 style={{ borderColor: colors.$20 }}
               >
                 {row.map((cell, j) => (
-                  <Td key={j}>{cell.display_value}</Td>
+                  <PreviewCell key={j} cell={cell} />
                 ))}
               </Tr>
             ))}

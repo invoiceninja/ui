@@ -8,190 +8,166 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export interface ColumnWidth {
-  suffix: string;
-  width: number;
-  truncate?: boolean;
-}
+const SMALL_MIN_WIDTH = 90;
+const MEDIUM_MIN_WIDTH = 140;
+const LARGE_MIN_WIDTH = 200;
+const NOTES_MIN_WIDTH = 280;
 
-export interface ResolvedCellSizing {
-  width: number;
-  minWidth: number;
-  truncate: boolean;
-}
-
-const HEADER_MIN_WIDTH = 90;
-
-const NARROW = 90;
-const SMALL = 120;
-const MEDIUM = 160;
-const LARGE = 220;
-const XLARGE = 280;
-const NOTES = 320;
-
-const FALLBACK_WIDTH = MEDIUM;
-
-export const columnWidths: ColumnWidth[] = [
-  { suffix: '.number', width: SMALL },
-  { suffix: '.po_number', width: SMALL },
-  { suffix: '.id_number', width: SMALL },
-  { suffix: '.vat_number', width: SMALL },
-  { suffix: '.transaction_reference', width: LARGE },
-
-  { suffix: '.name', width: LARGE },
-  { suffix: '.first_name', width: MEDIUM },
-  { suffix: '.last_name', width: MEDIUM },
-  { suffix: '.user', width: MEDIUM },
-  { suffix: '.user_id', width: MEDIUM },
-  { suffix: '.assigned_user', width: MEDIUM },
-  { suffix: '.assigned_user_id', width: MEDIUM },
-  { suffix: '.recurring_id', width: SMALL },
-
-  { suffix: '.email', width: LARGE },
-  { suffix: '.phone', width: MEDIUM },
-  { suffix: '.website', width: LARGE },
-
-  { suffix: '.amount', width: SMALL },
-  { suffix: '.foreign_amount', width: SMALL },
-  { suffix: '.balance', width: SMALL },
-  { suffix: '.subtotal', width: SMALL },
-  { suffix: '.paid_to_date', width: SMALL },
-  { suffix: '.credit_balance', width: SMALL },
-  { suffix: '.payment_balance', width: SMALL },
-  { suffix: '.discount', width: SMALL },
-  { suffix: '.partial', width: SMALL },
-  { suffix: '.refunded', width: SMALL },
-  { suffix: '.applied', width: SMALL },
-  { suffix: '.cost', width: SMALL },
-  { suffix: '.price', width: SMALL },
-  { suffix: '.rate', width: SMALL },
-  { suffix: '.quantity', width: NARROW },
-  { suffix: '.in_stock_quantity', width: NARROW },
-  { suffix: '.exchange_rate', width: SMALL },
-
-  { suffix: '.total_taxes', width: SMALL },
-  { suffix: '.tax_amount', width: SMALL },
-  { suffix: '.tax_amount1', width: SMALL },
-  { suffix: '.tax_amount2', width: SMALL },
-  { suffix: '.tax_amount3', width: SMALL },
-  { suffix: '.tax_rate1', width: NARROW },
-  { suffix: '.tax_rate2', width: NARROW },
-  { suffix: '.tax_rate3', width: NARROW },
-  { suffix: '.tax_name1', width: MEDIUM },
-  { suffix: '.tax_name2', width: MEDIUM },
-  { suffix: '.tax_name3', width: MEDIUM },
-  { suffix: '.tax_id', width: SMALL },
-
-  { suffix: '.custom_surcharge1', width: SMALL },
-  { suffix: '.custom_surcharge2', width: SMALL },
-  { suffix: '.custom_surcharge3', width: SMALL },
-  { suffix: '.custom_surcharge4', width: SMALL },
-  { suffix: '.custom_value1', width: MEDIUM },
-  { suffix: '.custom_value2', width: MEDIUM },
-  { suffix: '.custom_value3', width: MEDIUM },
-  { suffix: '.custom_value4', width: MEDIUM },
-
-  { suffix: '.date', width: SMALL },
-  { suffix: '.due_date', width: SMALL },
-  { suffix: '.partial_due_date', width: SMALL },
-  { suffix: '.payment_date', width: SMALL },
-  { suffix: '.start_date', width: SMALL },
-  { suffix: '.end_date', width: SMALL },
-  { suffix: '.next_send_date', width: SMALL },
-  { suffix: '.start_time', width: SMALL },
-  { suffix: '.end_time', width: SMALL },
-  { suffix: '.duration', width: SMALL },
-  { suffix: '.duration_words', width: MEDIUM },
-  { suffix: '.time_log_duration_words', width: MEDIUM },
-  { suffix: '.time_log', width: LARGE },
-
-  { suffix: '.status', width: SMALL },
-  { suffix: '.status_id', width: SMALL },
-  { suffix: '.classification', width: MEDIUM },
-  { suffix: '.method', width: MEDIUM },
-  { suffix: '.payment_type_id', width: MEDIUM },
-  { suffix: '.payment_terms', width: MEDIUM },
-  { suffix: '.frequency_id', width: MEDIUM },
-  { suffix: '.remaining_cycles', width: NARROW },
-  { suffix: '.auto_bill', width: NARROW },
-  { suffix: '.auto_bill_enabled', width: NARROW },
-  { suffix: '.uses_inclusive_taxes', width: NARROW },
-  { suffix: '.is_amount_discount', width: NARROW },
-  { suffix: '.billable', width: NARROW },
-
-  { suffix: '.currency', width: SMALL },
-  { suffix: '.currency_id', width: SMALL },
-  { suffix: '.invoice_currency_id', width: SMALL },
-  { suffix: '.country_id', width: MEDIUM },
-  { suffix: '.shipping_country_id', width: MEDIUM },
-  { suffix: '.industry_id', width: MEDIUM },
-  { suffix: '.size_id', width: SMALL },
-  { suffix: '.type_id', width: SMALL },
-  { suffix: '.category', width: MEDIUM },
-  { suffix: '.invoice_id', width: SMALL },
-  { suffix: '.project_id', width: MEDIUM },
-  { suffix: '.product_key', width: MEDIUM },
-  { suffix: '.tags', width: LARGE },
-
-  { suffix: '.address1', width: LARGE },
-  { suffix: '.address2', width: LARGE },
-  { suffix: '.shipping_address1', width: LARGE },
-  { suffix: '.shipping_address2', width: LARGE },
-  { suffix: '.city', width: MEDIUM },
-  { suffix: '.shipping_city', width: MEDIUM },
-  { suffix: '.state', width: MEDIUM },
-  { suffix: '.shipping_state', width: MEDIUM },
-  { suffix: '.postal_code', width: SMALL },
-  { suffix: '.shipping_postal_code', width: SMALL },
-
-  { suffix: '.public_notes', width: NOTES, truncate: true },
-  { suffix: '.private_notes', width: NOTES, truncate: true },
-  { suffix: '.notes', width: NOTES, truncate: true },
-  { suffix: '.item_notes', width: NOTES, truncate: true },
-  { suffix: '.description', width: NOTES, truncate: true },
-  { suffix: '.terms', width: XLARGE, truncate: true },
-  { suffix: '.footer', width: XLARGE, truncate: true },
-  { suffix: '.reminder_schedule', width: XLARGE, truncate: true },
+export const smallWidthColumns = [
+  '.number',
+  '.po_number',
+  '.id_number',
+  '.vat_number',
+  '.amount',
+  '.foreign_amount',
+  '.balance',
+  '.subtotal',
+  '.paid_to_date',
+  '.credit_balance',
+  '.payment_balance',
+  '.discount',
+  '.partial',
+  '.refunded',
+  '.applied',
+  '.cost',
+  '.price',
+  '.rate',
+  '.quantity',
+  '.in_stock_quantity',
+  '.exchange_rate',
+  '.total_taxes',
+  '.tax_amount',
+  '.tax_amount1',
+  '.tax_amount2',
+  '.tax_amount3',
+  '.tax_rate1',
+  '.tax_rate2',
+  '.tax_rate3',
+  '.tax_id',
+  '.custom_surcharge1',
+  '.custom_surcharge2',
+  '.custom_surcharge3',
+  '.custom_surcharge4',
+  '.date',
+  '.due_date',
+  '.partial_due_date',
+  '.payment_date',
+  '.start_date',
+  '.end_date',
+  '.next_send_date',
+  '.start_time',
+  '.end_time',
+  '.duration',
+  '.status',
+  '.status_id',
+  '.currency',
+  '.currency_id',
+  '.invoice_currency_id',
+  '.size_id',
+  '.type_id',
+  '.invoice_id',
+  '.recurring_id',
+  '.postal_code',
+  '.shipping_postal_code',
+  '.remaining_cycles',
+  '.auto_bill',
+  '.auto_bill_enabled',
+  '.uses_inclusive_taxes',
+  '.is_amount_discount',
+  '.billable',
 ];
 
-const widthByExactSuffix = new Map(
-  columnWidths.map((column) => [column.suffix, column])
-);
+export const mediumWidthColumns = [
+  '.first_name',
+  '.last_name',
+  '.user',
+  '.user_id',
+  '.assigned_user',
+  '.assigned_user_id',
+  '.phone',
+  '.tax_name1',
+  '.tax_name2',
+  '.tax_name3',
+  '.custom_value1',
+  '.custom_value2',
+  '.custom_value3',
+  '.custom_value4',
+  '.duration_words',
+  '.time_log_duration_words',
+  '.classification',
+  '.method',
+  '.payment_type_id',
+  '.payment_terms',
+  '.frequency_id',
+  '.country_id',
+  '.shipping_country_id',
+  '.industry_id',
+  '.category',
+  '.project_id',
+  '.product_key',
+  '.city',
+  '.shipping_city',
+  '.state',
+  '.shipping_state',
+];
 
-const FALLBACK_COLUMN: ColumnWidth = { suffix: '', width: FALLBACK_WIDTH };
+export const largeWidthColumns = [
+  '.name',
+  '.email',
+  '.website',
+  '.transaction_reference',
+  '.time_log',
+  '.tags',
+  '.address1',
+  '.address2',
+  '.shipping_address1',
+  '.shipping_address2',
+];
 
-export function resolveColumnWidth(identifier: string): ColumnWidth {
-  const exact = widthByExactSuffix.get(`.${identifier.split('.').pop() ?? ''}`);
+export const notesWidthColumns = [
+  '.public_notes',
+  '.private_notes',
+  '.notes',
+  '.item_notes',
+  '.description',
+  '.terms',
+  '.footer',
+  '.reminder_schedule',
+];
 
-  if (exact) {
-    return exact;
+export const truncatedColumns = [
+  '.public_notes',
+  '.private_notes',
+  '.notes',
+  '.item_notes',
+  '.description',
+  '.terms',
+  '.footer',
+  '.reminder_schedule',
+];
+
+const matchesSuffix = (identifier: string, suffixes: string[]) =>
+  suffixes.some((suffix) => identifier.endsWith(suffix));
+
+export const resolveMinColumnWidth = (identifier: string): number => {
+  if (matchesSuffix(identifier, notesWidthColumns)) {
+    return NOTES_MIN_WIDTH;
   }
 
-  const longest = columnWidths
-    .filter((column) => identifier.endsWith(column.suffix))
-    .sort((a, b) => b.suffix.length - a.suffix.length)[0];
+  if (matchesSuffix(identifier, largeWidthColumns)) {
+    return LARGE_MIN_WIDTH;
+  }
 
-  return longest ?? FALLBACK_COLUMN;
-}
+  if (matchesSuffix(identifier, mediumWidthColumns)) {
+    return MEDIUM_MIN_WIDTH;
+  }
 
-export function resolveMinColumnWidth(displayValue: string): number {
-  const labelWidth = Math.ceil(displayValue.length * 7.5);
-  const chrome = 32 + 24;
+  if (matchesSuffix(identifier, smallWidthColumns)) {
+    return SMALL_MIN_WIDTH;
+  }
 
-  return Math.max(HEADER_MIN_WIDTH, labelWidth + chrome);
-}
+  return MEDIUM_MIN_WIDTH;
+};
 
-export function resolveCellSizing(
-  identifier: string,
-  displayValue: string
-): ResolvedCellSizing {
-  const column = resolveColumnWidth(identifier);
-  const minWidth = resolveMinColumnWidth(displayValue);
-  const width = Math.max(column.width, minWidth);
-
-  return {
-    width,
-    minWidth,
-    truncate: column.truncate === true,
-  };
-}
+export const isTruncatedColumn = (identifier: string): boolean =>
+  matchesSuffix(identifier, truncatedColumns);

@@ -24,7 +24,7 @@ import {
 } from '../utils/sortingUtils';
 import { isSummableColumn } from '../constants/columns';
 import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
-import { ColumnGroup, PreviewTh, usePreview } from './Preview';
+import { ColumnGroup, PreviewCell, PreviewTh, usePreview } from './Preview';
 
 interface EnhancedPreviewProps {
   enableMultiSort?: boolean;
@@ -67,7 +67,10 @@ export function EnhancedPreview({
       rows = rows.filter((row) =>
         activeFilters.every(({ column, search }) => {
           const cell = row.find((item) => item.identifier === column);
-          if (!cell) return false;
+
+          if (!cell) {
+            return false;
+          }
 
           const value = cell.display_value;
 
@@ -203,8 +206,15 @@ export function EnhancedPreview({
         row
           .map((cell) => {
             const displayStr = String(cell.display_value || '');
-            if (displayStr === 'true') return 'Yes';
-            if (displayStr === 'false') return 'No';
+
+            if (displayStr === 'true') {
+              return 'Yes';
+            }
+
+            if (displayStr === 'false') {
+              return 'No';
+            }
+
             return `"${displayStr || ''}"`;
           })
           .join(',')
@@ -222,7 +232,9 @@ export function EnhancedPreview({
   };
 
   const renderGroupedData = () => {
-    if (!groupByColumn) return renderNormalData();
+    if (!groupByColumn) {
+      return renderNormalData();
+    }
 
     const groups = groupRows(data.rows, groupByColumn);
     const elements: JSX.Element[] = [];
@@ -244,7 +256,7 @@ export function EnhancedPreview({
             style={{ borderColor: colors.$20 }}
           >
             {row.map((cell, j) => (
-              <Td key={j}>{cell.display_value}</Td>
+              <PreviewCell key={j} cell={cell} />
             ))}
           </Tr>
         );
