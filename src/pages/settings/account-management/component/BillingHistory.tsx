@@ -19,6 +19,8 @@ import {
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { StatusBadge } from '$app/components/StatusBadge';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button, Checkbox } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Spinner } from '$app/components/Spinner';
@@ -292,17 +294,20 @@ export function BillingHistory() {
 
   return (
     <div className="px-4 pb-6 sm:px-6">
-      <div className="mb-3 flex justify-end">
-        <Button
-          behavior="button"
-          type="secondary"
+      <div className="mb-3 flex justify-start">
+        <Dropdown
+          label={t('more_actions')}
           disabled={!selectedInvoiceIds.length || isDownloading}
-          disableWithoutIcon={!isDownloading}
-          onClick={handleDownloadSelected}
+          cypressRef="bulkActionsDropdown"
+          triggerCypressRef="bulkActionsTrigger"
         >
-          <Icon element={MdDownload} />
-          <span>{t('download_pdf')}</span>
-        </Button>
+          <DropdownElement
+            onClick={handleDownloadSelected}
+            icon={<Icon element={MdDownload} />}
+          >
+            {t('download_pdf')}
+          </DropdownElement>
+        </Dropdown>
       </div>
 
       <Table withoutPadding>

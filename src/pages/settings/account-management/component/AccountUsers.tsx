@@ -239,7 +239,7 @@ export function AccountUsers() {
                     </div>
                   </Td>
 
-                  <Td>{user.status && <Badge>{user.status}</Badge>}</Td>
+                  <Td>{user.status && <Badge>{t(user.status)}</Badge>}</Td>
                 </Tr>
 
                 {expanded && (
