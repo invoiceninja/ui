@@ -31,11 +31,13 @@ export function shouldShowStartTaskButton(task: Task) {
     return true;
   }
 
-  const lastLog = logs[logs.length - 1];
-  const lastStop = lastLog[1];
   const currentUtcUnix = dayjs.utc().unix();
 
-  if (lastStop > currentUtcUnix) {
+  const hasFutureTimeLog = logs.some(
+    ([start, stop]) => start > currentUtcUnix || stop > currentUtcUnix
+  );
+
+  if (hasFutureTimeLog) {
     return false;
   }
 
