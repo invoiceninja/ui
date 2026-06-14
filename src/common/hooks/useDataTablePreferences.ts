@@ -26,6 +26,7 @@ import {
 interface Params {
   apiEndpoint: URL;
   customFilters?: SelectOption[];
+  defaultCustomFilterValues?: string[];
   tableKey: string | undefined;
   isInitialConfiguration: boolean;
   customFilter: string[] | undefined;
@@ -52,6 +53,7 @@ export function useDataTablePreferences(params: Params) {
   const {
     apiEndpoint,
     customFilters,
+    defaultCustomFilterValues,
     tableKey,
     isInitialConfiguration,
     customFilter,
@@ -89,9 +91,13 @@ export function useDataTablePreferences(params: Params) {
     }
 
     const currentTableFilters = reactSettings.table_filters?.[tableKey];
+    const defaultCustomFilter = defaultCustomFilterValues ?? [];
+    const currentCustomFilter = customFilter.length
+      ? customFilter
+      : defaultCustomFilter;
 
     const defaultFilters = {
-      ...(customFilters && { customFilter: [] }),
+      ...(customFilters && { customFilter: defaultCustomFilter }),
       sort: apiEndpoint.searchParams.get('sort') || 'id|asc',
       status: ['active'],
       ...(!withoutStoringPerPage && { perPage: '10' }),
@@ -100,14 +106,27 @@ export function useDataTablePreferences(params: Params) {
 
     const cleanedUpFilters = {
       ...(sortedBy && { sortedBy }),
-      ...(customFilters && { customFilter }),
+      ...(customFilters && { customFilter: currentCustomFilter }),
       sort,
       status,
       ...(!withoutStoringPerPage && { perPage }),
       ...(!withoutStoringPage && { currentPage }),
     };
 
-    if (isEqual(defaultFilters, cleanedUpFilters) && !currentTableFilters) {
+    if (isEqual(defaultFilters, cleanedUpFilters)) {
+      if (currentTableFilters && user?.id) {
+        const tableFilters = { ...(reactSettings.table_filters ?? {}) };
+
+        Object.keys(tableFilters).forEach((key) => {
+          if (key.includes('/')) {
+            delete tableFilters[key];
+          }
+        });
+
+        delete tableFilters[tableKey];
+        saveSettings('table_filters', tableFilters);
+      }
+
       return;
     }
 
@@ -141,14 +160,18 @@ export function useDataTablePreferences(params: Params) {
     // Guards logout/unmount races where the atom has been reset to null.
     if (!isHydrated || appliedRef.current) return;
 
-    if (!isInitialConfiguration && !customFilter) {
+    if (!isInitialConfiguration) {
       setFilter((getPreference('filter') as string) || '');
 
-      if (customFilters && !withoutStoringFilters) {
-        if ((getPreference('customFilter') as string[]).length) {
-          setCustomFilter(getPreference('customFilter') as string[]);
+      if (customFilters) {
+        const preferenceCustomFilters = withoutStoringFilters
+          ? []
+          : (getPreference('customFilter') as string[]);
+
+        if (preferenceCustomFilters.length) {
+          setCustomFilter(preferenceCustomFilters);
         } else {
-          setCustomFilter([]);
+          setCustomFilter(defaultCustomFilterValues ?? []);
         }
       } else {
         setCustomFilter([]);

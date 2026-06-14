@@ -157,6 +157,7 @@ interface Props<T> extends CommonProps {
   customBulkActions?: CustomBulkAction<T>[];
   customFilters?: SelectOption[];
   customFilterPlaceholder?: string;
+  defaultCustomFilterValues?: string[];
   withoutActions?: boolean;
   withoutPagination?: boolean;
   rightSide?: ReactNode;
@@ -282,6 +283,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   const {
     styleOptions,
     customFilters,
+    defaultCustomFilterValues,
     onBulkActionCall,
     hideEditableOptions = false,
     dateRangeColumns = [],
@@ -321,7 +323,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const [filter, setFilter] = useState<string>('');
   const [customFilter, setCustomFilter] = useState<string[] | undefined>(
-    undefined
+    defaultCustomFilterValues
   );
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<PerPage>(
@@ -349,20 +351,41 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
   const [selectedResources, setSelectedResources] = useState<T[]>([]);
 
+  const setStatusIfChanged = useCallback<
+    Dispatch<SetStateAction<string[]>>
+  >((value) => {
+    setStatus((current) => {
+      const next = value instanceof Function ? value(current) : value;
+
+      return isEqual(current, next) ? current : next;
+    });
+  }, []);
+
+  const setCustomFilterIfChanged = useCallback<
+    Dispatch<SetStateAction<string[] | undefined>>
+  >((value) => {
+    setCustomFilter((current) => {
+      const next = value instanceof Function ? value(current) : value;
+
+      return isEqual(current ?? [], next ?? []) ? current : next;
+    });
+  }, []);
+
   const { handleUpdateTableFilters } = useDataTablePreferences({
     apiEndpoint,
     isInitialConfiguration,
     customFilter,
     setCurrentPage,
-    setCustomFilter,
+    setCustomFilter: setCustomFilterIfChanged,
     setFilter,
     setPerPage,
     setSort,
     setSortedBy,
-    setStatus,
+    setStatus: setStatusIfChanged,
     setArePreferencesApplied,
     tableKey: `${props.resource}s`,
     customFilters,
+    defaultCustomFilterValues,
     withoutStoringPerPage: withoutPerPageAsPreference,
     withoutStoringPage: withoutPageAsPreference,
     withoutStoringFilters,
@@ -379,6 +402,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     tableKey: `${props.resource}s`,
     customFilter,
     customFilters,
+    defaultCustomFilterValues,
     withoutStoringFilters,
   });
 
@@ -913,10 +937,10 @@ export function DataTable<T extends object>(props: Props<T>) {
           options={options}
           defaultOptions={defaultOptions}
           defaultCustomFilterOptions={defaultCustomFilterOptions}
-          onStatusChange={setStatus}
+          onStatusChange={setStatusIfChanged}
           customFilters={props.customFilters}
           customFilterPlaceholder={props.customFilterPlaceholder}
-          onCustomFilterChange={setCustomFilter}
+          onCustomFilterChange={setCustomFilterIfChanged}
           customFilter={customFilter}
           rightSide={
             <>

@@ -4,7 +4,7 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
+  apiPermissions,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -12,6 +12,7 @@ import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixt
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
+import { assignEntityToUser } from './api-helpers';
 
 resetAccountBeforeAll();
 
@@ -206,7 +207,7 @@ const createQuote = async (params: CreateParams) => {
 };
 
 test("can't view quotes without permission", async ({ page, api }) => {
-  const { clear, save } = permissions(page);
+  const { clear, save } = apiPermissions(api.context);
 
   await login(page);
   await clear('quotes@example.com');
@@ -223,7 +224,7 @@ test("can't view quotes without permission", async ({ page, api }) => {
 });
 
 test('can view quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('quotes@example.com');
@@ -257,7 +258,7 @@ test('can view quote', async ({ page, api }) => {
 });
 
 test('can edit quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useQuotesActions({
     permissions: ['edit_quote', 'view_client'],
@@ -308,7 +309,7 @@ test('can edit quote', async ({ page, api }) => {
 });
 
 test('can create a quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useQuotesActions({
     permissions: ['create_quote'],
@@ -346,7 +347,7 @@ test('can view and edit assigned quote with create_quote', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useQuotesActions({
     permissions: ['create_quote'],
@@ -361,7 +362,13 @@ test('can view and edit assigned quote with create_quote', async ({
   await createQuote({ page, assignTo: 'Quotes Example', clientName });
 
   const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
-  if (quoteId) api.trackEntity('quotes', quoteId);
+
+  if (!quoteId) {
+    throw new Error('Failed to extract quote id');
+  }
+
+  api.trackEntity('quotes', quoteId);
+  await assignEntityToUser(api.context, 'quotes', quoteId, 'quotes@example.com');
 
   await logout(page);
 
@@ -393,7 +400,7 @@ test('can view and edit assigned quote with create_quote', async ({
 });
 
 test('deleting quote with edit_quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('quotes@example.com');
@@ -443,7 +450,7 @@ test('deleting quote with edit_quote', async ({ page, api }) => {
 });
 
 test('archiving quote withe edit_quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('quotes@example.com');
@@ -498,7 +505,7 @@ test('archiving quote withe edit_quote', async ({ page, api }) => {
 });
 
 test('quote documents preview with edit_quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('quotes@example.com');
@@ -547,7 +554,7 @@ test('quote documents preview with edit_quote', async ({ page, api }) => {
 });
 
 test('quote documents uploading with edit_quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('quotes@example.com');
@@ -611,7 +618,7 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useQuotesActions({
     permissions: ['admin'],
@@ -640,7 +647,7 @@ test('convert_to_invoice, convert_to_project and all clone actions displayed wit
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useQuotesActions({
     permissions: [
@@ -679,7 +686,7 @@ test('convert_to_invoice, convert_to_project and all clone actions displayed wit
 });
 
 test('cloning quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('quotes@example.com');
@@ -749,7 +756,7 @@ test('Convert to Invoice and Convert to Project displayed with admin permission'
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const customActions = useCustomQuoteActions({
     permissions: ['admin'],
@@ -794,7 +801,7 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const customActions = useCustomQuoteActions({
     permissions: [

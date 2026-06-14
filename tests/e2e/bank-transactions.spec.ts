@@ -2,7 +2,7 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
+  apiPermissions,
   waitForTableData,
 } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect, uniqueName, extractIdFromUrl } from '$tests/e2e/fixtures';
@@ -156,8 +156,8 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/');
 });
 
-test("can't view transactions without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
+test("can't view transactions without permission", async ({ page, api }) => {
+  const { clear, save } = apiPermissions(api.context);
 
   await login(page);
   await clear('bank_transactions@example.com');
@@ -174,7 +174,7 @@ test("can't view transactions without permission", async ({ page }) => {
 });
 
 test('can view transaction', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('bank_transactions@example.com');
@@ -207,7 +207,7 @@ test('can view transaction', async ({ page, api }) => {
 });
 
 test('can edit transaction', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('bank_transactions@example.com');
@@ -253,7 +253,7 @@ test('can edit transaction', async ({ page, api }) => {
 });
 
 test('can create a transaction', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('bank_transactions@example.com');
@@ -289,7 +289,7 @@ test('can create a transaction', async ({ page, api }) => {
 
 // @todothis test is broken because the toast shows successfully deleted invoice
 // test('deleting transaction with edit_bank_transaction', async ({ page, api }) => {
-//   const { clear, save, set } = permissions(page);
+//   const { clear, save, set } = apiPermissions(api.context);
 
 //   await login(page);
 //   await clear('bank_transactions@example.com');
@@ -348,7 +348,7 @@ test('can create a transaction', async ({ page, api }) => {
 
 //@todo wrong toast string!
 // test('archiving transaction withe edit_bank_transaction', async ({ page, api }) => {
-//   const { clear, save, set } = permissions(page);
+//   const { clear, save, set } = apiPermissions(api.context);
 
 //   await login(page);
 //   await clear('bank_transactions@example.com');
@@ -410,7 +410,7 @@ test('archiving transaction with edit_bank_transaction removes it from active li
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
   const notes = uniqueName('txn-archive');
 
   await login(page);
@@ -452,7 +452,7 @@ test('restoring an archived transaction returns it to active list', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
   const notes = uniqueName('txn-restore');
 
   await login(page);
@@ -498,7 +498,7 @@ test('deleting transaction with edit_bank_transaction removes it from active lis
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
   const notes = uniqueName('txn-delete');
 
   await login(page);
@@ -537,7 +537,7 @@ test('link withdrawal on list to existing expense via match slider', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
   const marker = uniqueName('tx-match');
   const matchAmount = 77.77;
   const amountStr = String(matchAmount);
@@ -630,7 +630,7 @@ test('link credit transaction on list to existing payment via match slider', asy
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
   const marker = uniqueName('tx-match-credit');
   const matchAmount = 66.66;
   const amountStr = String(matchAmount);

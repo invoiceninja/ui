@@ -9,15 +9,27 @@
  */
 
 import { isDemo, isHosted } from '$app/common/helpers';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 
 export function useAccountManagementTabs() {
   const [t] = useTranslation();
+  const { isOwner } = useAdmin();
 
   let tabs: Tab[] = [
     { name: t('plan'), href: '/settings/account_management' },
     { name: t('overview'), href: '/settings/account_management/overview' },
+    {
+      name: t('users'),
+      href: '/settings/account_management/users',
+      enabled: isOwner,
+    },
+    {
+      name: 'Billing History',
+      href: '/settings/account_management/billing_history',
+      enabled: isOwner,
+    },
     {
       name: t('enabled_modules'),
       href: '/settings/account_management/enabled_modules',

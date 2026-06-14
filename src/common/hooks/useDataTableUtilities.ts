@@ -18,6 +18,7 @@ interface Params {
   isInitialConfiguration: boolean;
   tableKey: string | undefined;
   customFilters?: SelectOption[];
+  defaultCustomFilterValues?: string[];
   customFilter?: string[] | undefined;
   withoutStoringFilters?: boolean;
 }
@@ -28,6 +29,7 @@ export function useDataTableUtilities(params: Params) {
     isInitialConfiguration,
     tableKey,
     customFilters,
+    defaultCustomFilterValues,
     apiEndpoint,
     customFilter,
     withoutStoringFilters,
@@ -63,7 +65,7 @@ export function useDataTableUtilities(params: Params) {
 
       const currentStatuses = preferenceCustomFilters?.length
         ? preferenceCustomFilters
-        : [];
+        : defaultCustomFilterValues ?? [];
 
       return (
         customFilters.filter(({ value }) =>
@@ -89,6 +91,13 @@ export function useDataTableUtilities(params: Params) {
 
         const currentQueryKey = queryKey || 'client_status';
         const selectedFiltersByKey: string[] = [];
+        const defaultFiltersByKey = (defaultCustomFilterValues ?? []).filter(
+          (value) =>
+            customFilters.some(
+              (filter) =>
+                (filter.queryKey || null) === queryKey && filter.value === value
+            )
+        );
 
         customFilters.forEach((filter, index) => {
           const customFilterQueryKey = filter.queryKey || null;
@@ -101,10 +110,18 @@ export function useDataTableUtilities(params: Params) {
           }
 
           if (index === customFilters.length - 1) {
-            apiEndpoint.searchParams.set(
-              currentQueryKey,
-              selectedFiltersByKey.join(',')
-            );
+            const filterValues = selectedFiltersByKey.length
+              ? selectedFiltersByKey
+              : defaultFiltersByKey;
+
+            if (filterValues.length) {
+              apiEndpoint.searchParams.set(
+                currentQueryKey,
+                filterValues.join(',')
+              );
+            } else {
+              apiEndpoint.searchParams.delete(currentQueryKey);
+            }
           }
         });
       });

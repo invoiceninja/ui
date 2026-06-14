@@ -1,10 +1,10 @@
-import { login, permissions } from '$tests/e2e/helpers';
+import { login, apiPermissions } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
 
 resetAccountBeforeAll();
 
 test('test appropriate invalidation of clients', async ({ page, api }) => {
-  const { clear, save } = permissions(page);
+  const { clear, save } = apiPermissions(api.context);
   const clientName = uniqueName('inv-client');
 
   await login(page);
