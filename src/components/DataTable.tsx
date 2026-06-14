@@ -351,17 +351,37 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
   const [selectedResources, setSelectedResources] = useState<T[]>([]);
 
+  const setStatusIfChanged = useCallback<
+    Dispatch<SetStateAction<string[]>>
+  >((value) => {
+    setStatus((current) => {
+      const next = value instanceof Function ? value(current) : value;
+
+      return isEqual(current, next) ? current : next;
+    });
+  }, []);
+
+  const setCustomFilterIfChanged = useCallback<
+    Dispatch<SetStateAction<string[] | undefined>>
+  >((value) => {
+    setCustomFilter((current) => {
+      const next = value instanceof Function ? value(current) : value;
+
+      return isEqual(current ?? [], next ?? []) ? current : next;
+    });
+  }, []);
+
   const { handleUpdateTableFilters } = useDataTablePreferences({
     apiEndpoint,
     isInitialConfiguration,
     customFilter,
     setCurrentPage,
-    setCustomFilter,
+    setCustomFilter: setCustomFilterIfChanged,
     setFilter,
     setPerPage,
     setSort,
     setSortedBy,
-    setStatus,
+    setStatus: setStatusIfChanged,
     setArePreferencesApplied,
     tableKey: `${props.resource}s`,
     customFilters,
@@ -917,10 +937,10 @@ export function DataTable<T extends object>(props: Props<T>) {
           options={options}
           defaultOptions={defaultOptions}
           defaultCustomFilterOptions={defaultCustomFilterOptions}
-          onStatusChange={setStatus}
+          onStatusChange={setStatusIfChanged}
           customFilters={props.customFilters}
           customFilterPlaceholder={props.customFilterPlaceholder}
-          onCustomFilterChange={setCustomFilter}
+          onCustomFilterChange={setCustomFilterIfChanged}
           customFilter={customFilter}
           rightSide={
             <>
