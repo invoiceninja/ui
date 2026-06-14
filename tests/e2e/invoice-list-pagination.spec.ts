@@ -1,5 +1,10 @@
 import { login, waitForTableData } from '$tests/e2e/helpers';
-import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
+import {
+  resetAccountBeforeAll,
+  test,
+  expect,
+  uniqueName,
+} from '$tests/e2e/fixtures';
 import type { Page } from '@playwright/test';
 
 resetAccountBeforeAll();
@@ -27,6 +32,7 @@ test('preserves invoice list page after navigating back from an invoice', async 
     await api.createEntity('invoices', {
       client_id: client.id,
       number: uniqueName(`pagination-invoice-${index}`),
+      status_id: '1',
       date: '2026-06-14',
       line_items: [lineItem(index)],
     });
@@ -43,7 +49,9 @@ test('preserves invoice list page after navigating back from an invoice', async 
 
   const pageInput = getPageInput(page);
   await expect(pageInput).toHaveValue('1');
-  await expect(page.locator('[data-cy="dataTable"]').getByText('/ 2')).toBeVisible();
+  await expect(
+    page.locator('[data-cy="dataTable"]').getByText('/ 2')
+  ).toBeVisible();
 
   await goToPage(page, 2);
   await expect(pageInput).toHaveValue('2');
@@ -69,7 +77,9 @@ test('preserves invoice list page after navigating back from an invoice', async 
 function getPageInput(page: Page) {
   return page
     .locator('[data-cy="dataTable"]')
-    .locator('xpath=.//span[normalize-space()="/ 2"]/preceding-sibling::input[1]');
+    .locator(
+      'xpath=.//span[normalize-space()="/ 2"]/preceding-sibling::input[1]'
+    );
 }
 
 async function goToPage(page: Page, pageNumber: number) {
