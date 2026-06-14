@@ -157,6 +157,7 @@ interface Props<T> extends CommonProps {
   customBulkActions?: CustomBulkAction<T>[];
   customFilters?: SelectOption[];
   customFilterPlaceholder?: string;
+  defaultCustomFilterValues?: string[];
   withoutActions?: boolean;
   withoutPagination?: boolean;
   rightSide?: ReactNode;
@@ -282,6 +283,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   const {
     styleOptions,
     customFilters,
+    defaultCustomFilterValues,
     onBulkActionCall,
     hideEditableOptions = false,
     dateRangeColumns = [],
@@ -321,7 +323,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const [filter, setFilter] = useState<string>('');
   const [customFilter, setCustomFilter] = useState<string[] | undefined>(
-    undefined
+    defaultCustomFilterValues
   );
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<PerPage>(
@@ -363,6 +365,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     setArePreferencesApplied,
     tableKey: `${props.resource}s`,
     customFilters,
+    defaultCustomFilterValues,
     withoutStoringPerPage: withoutPerPageAsPreference,
     withoutStoringPage: withoutPageAsPreference,
     withoutStoringFilters,
@@ -379,6 +382,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     tableKey: `${props.resource}s`,
     customFilter,
     customFilters,
+    defaultCustomFilterValues,
     withoutStoringFilters,
   });
 

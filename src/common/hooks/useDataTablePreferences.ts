@@ -26,6 +26,7 @@ import {
 interface Params {
   apiEndpoint: URL;
   customFilters?: SelectOption[];
+  defaultCustomFilterValues?: string[];
   tableKey: string | undefined;
   isInitialConfiguration: boolean;
   customFilter: string[] | undefined;
@@ -52,6 +53,7 @@ export function useDataTablePreferences(params: Params) {
   const {
     apiEndpoint,
     customFilters,
+    defaultCustomFilterValues,
     tableKey,
     isInitialConfiguration,
     customFilter,
@@ -91,7 +93,7 @@ export function useDataTablePreferences(params: Params) {
     const currentTableFilters = reactSettings.table_filters?.[tableKey];
 
     const defaultFilters = {
-      ...(customFilters && { customFilter: [] }),
+      ...(customFilters && { customFilter: defaultCustomFilterValues ?? [] }),
       sort: apiEndpoint.searchParams.get('sort') || 'id|asc',
       status: ['active'],
       ...(!withoutStoringPerPage && { perPage: '10' }),
@@ -141,14 +143,18 @@ export function useDataTablePreferences(params: Params) {
     // Guards logout/unmount races where the atom has been reset to null.
     if (!isHydrated || appliedRef.current) return;
 
-    if (!isInitialConfiguration && !customFilter) {
+    if (!isInitialConfiguration) {
       setFilter((getPreference('filter') as string) || '');
 
-      if (customFilters && !withoutStoringFilters) {
-        if ((getPreference('customFilter') as string[]).length) {
-          setCustomFilter(getPreference('customFilter') as string[]);
+      if (customFilters) {
+        const preferenceCustomFilters = withoutStoringFilters
+          ? []
+          : (getPreference('customFilter') as string[]);
+
+        if (preferenceCustomFilters.length) {
+          setCustomFilter(preferenceCustomFilters);
         } else {
-          setCustomFilter([]);
+          setCustomFilter(defaultCustomFilterValues ?? []);
         }
       } else {
         setCustomFilter([]);
