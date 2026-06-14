@@ -24,6 +24,7 @@ import { TaskStatus as TaskStatusBadge } from './TaskStatus';
 import { useStart } from '../hooks/useStart';
 import { useStop } from '../hooks/useStop';
 import { isTaskRunning } from '../helpers/calculate-entity-state';
+import { shouldShowStartTaskButton } from '../helpers/task';
 import { formatTime, TaskClock } from '../../kanban/components/TaskClock';
 import { calculateTime } from '../helpers/calculate-time';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -99,7 +100,7 @@ export function TaskDetails(props: Props) {
               </span>
             )}
 
-            {!isTaskRunning(task) && !task.invoice_id && (
+            {shouldShowStartTaskButton(task) && (
               <Button
                 behavior="button"
                 onClick={() => start(task)}
@@ -164,7 +165,7 @@ export function TaskDetails(props: Props) {
                 </span>
               )}
 
-              {!isTaskRunning(task) && !task.invoice_id && (
+              {shouldShowStartTaskButton(task) && (
                 <Button
                   behavior="button"
                   onClick={() => start(task)}
