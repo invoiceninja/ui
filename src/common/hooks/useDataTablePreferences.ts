@@ -91,9 +91,13 @@ export function useDataTablePreferences(params: Params) {
     }
 
     const currentTableFilters = reactSettings.table_filters?.[tableKey];
+    const defaultCustomFilter = defaultCustomFilterValues ?? [];
+    const currentCustomFilter = customFilter.length
+      ? customFilter
+      : defaultCustomFilter;
 
     const defaultFilters = {
-      ...(customFilters && { customFilter: defaultCustomFilterValues ?? [] }),
+      ...(customFilters && { customFilter: defaultCustomFilter }),
       sort: apiEndpoint.searchParams.get('sort') || 'id|asc',
       status: ['active'],
       ...(!withoutStoringPerPage && { perPage: '10' }),
@@ -102,14 +106,27 @@ export function useDataTablePreferences(params: Params) {
 
     const cleanedUpFilters = {
       ...(sortedBy && { sortedBy }),
-      ...(customFilters && { customFilter }),
+      ...(customFilters && { customFilter: currentCustomFilter }),
       sort,
       status,
       ...(!withoutStoringPerPage && { perPage }),
       ...(!withoutStoringPage && { currentPage }),
     };
 
-    if (isEqual(defaultFilters, cleanedUpFilters) && !currentTableFilters) {
+    if (isEqual(defaultFilters, cleanedUpFilters)) {
+      if (currentTableFilters && user?.id) {
+        const tableFilters = { ...(reactSettings.table_filters ?? {}) };
+
+        Object.keys(tableFilters).forEach((key) => {
+          if (key.includes('/')) {
+            delete tableFilters[key];
+          }
+        });
+
+        delete tableFilters[tableKey];
+        saveSettings('table_filters', tableFilters);
+      }
+
       return;
     }
 
