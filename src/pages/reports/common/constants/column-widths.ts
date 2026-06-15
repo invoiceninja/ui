@@ -146,8 +146,9 @@ export const truncatedColumns = [
   '.reminder_schedule',
 ];
 
-const matchesSuffix = (identifier: string, suffixes: string[]) =>
-  suffixes.some((suffix) => identifier.endsWith(suffix));
+const matchesSuffix = (identifier: string, suffixes: string[]) => {
+  return suffixes.some((suffix) => identifier.endsWith(suffix)) ?? false;
+};
 
 export const resolveMinColumnWidth = (identifier: string): number => {
   if (matchesSuffix(identifier, notesWidthColumns)) {
@@ -169,5 +170,6 @@ export const resolveMinColumnWidth = (identifier: string): number => {
   return MEDIUM_MIN_WIDTH;
 };
 
-export const isTruncatedColumn = (identifier: string): boolean =>
-  matchesSuffix(identifier, truncatedColumns);
+export const isTruncatedColumn = (identifier: string): boolean => {
+  return matchesSuffix(identifier, truncatedColumns);
+};

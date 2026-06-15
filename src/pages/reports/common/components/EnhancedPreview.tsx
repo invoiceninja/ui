@@ -105,7 +105,7 @@ export function EnhancedPreview({
     }
 
     return { columns: preview.columns, rows };
-  }, [preview, activeFilters, sortConfigs]);
+  }, [preview, activeFilters, sortConfigs]); // Dependencies ensure re-computation when any change
 
   const columnTotals = useMemo(() => {
     const summable = new Set<string>();
@@ -201,7 +201,7 @@ export function EnhancedPreview({
   const data = filtered;
 
   const downloadCsv = () => {
-    if (!data || data.rows.length === 0) {
+    if (!data ||!data.rows|| data.rows.length === 0) {
       return;
     }
 

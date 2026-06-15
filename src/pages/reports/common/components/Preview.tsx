@@ -18,6 +18,7 @@ import { cloneDeep } from 'lodash';
 import React, {
   memo,
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -200,7 +201,7 @@ export const PreviewTh = memo(function PreviewTh({
   children,
 }: PreviewThProps) {
   const colors = useColorScheme();
-  const getColEl = React.useContext(ColumnGroupContext);
+  const getColEl = useContext(ColumnGroupContext);
   const thRef = useRef<HTMLTableCellElement>(null);
   const [isResizing, setIsResizing] = useState(false);
   const suppressNextClickRef = useRef(false);
@@ -436,6 +437,7 @@ export function Preview() {
 
     const copy = cloneDeep(preview);
 
+    // Detect the sort type from the first non-empty cell in this column
     const sampleCell = copy.rows
       .map((row) => row.find((cell) => cell.identifier === column))
       .find(
