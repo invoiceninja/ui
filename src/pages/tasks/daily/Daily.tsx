@@ -48,6 +48,7 @@ import { Plus } from '$app/components/icons/Plus';
 import { useStart } from '../common/hooks/useStart';
 import { useStop } from '../common/hooks/useStop';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
+import { shouldShowStartTaskButton } from '../common/helpers/task';
 import { TaskClock } from '../kanban/components/TaskClock';
 import { useTaskDateDisplay } from '../common/hooks/useTaskDateDisplay';
 
@@ -436,12 +437,14 @@ export default function Daily() {
                         {t('stop')}
                       </Button>
                     ) : (
-                      <Button
-                        type="secondary"
-                        onClick={() => start(entry.task)}
-                      >
-                        {t('start')}
-                      </Button>
+                      shouldShowStartTaskButton(entry.task) && (
+                        <Button
+                          type="secondary"
+                          onClick={() => start(entry.task)}
+                        >
+                          {t('start')}
+                        </Button>
+                      )
                     )}
                   </div>
                 </div>
