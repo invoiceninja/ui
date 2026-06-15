@@ -56,15 +56,19 @@ export function EnhancedPreview({
     [filterValues]
   );
 
+  // Apply cumulative filters to the original data
   const filtered = useMemo(() => {
+    // If no preview data, return empty structure
     if (!preview) {
       return { columns: [], rows: [] };
     }
 
     let rows = preview.rows;
 
+    // Apply filters only if there are any active filters with values
     if (activeFilters.length > 0) {
       rows = rows.filter((row) =>
+        // Row must match ALL filters
         activeFilters.every(({ column, search }) => {
           const cell = row.find((item) => item.identifier === column);
 
@@ -95,6 +99,7 @@ export function EnhancedPreview({
       );
     }
 
+    // Apply sorting after filtering
     if (sortConfigs.length > 0) {
       rows = sortRows(rows, sortConfigs);
     }
@@ -140,6 +145,7 @@ export function EnhancedPreview({
     return { sums, summable };
   }, [preview, filtered]);
 
+  // Early return AFTER all hooks have been called
   if (!preview) {
     return null;
   }
@@ -156,6 +162,7 @@ export function EnhancedPreview({
     );
     const direction = existingConfig?.direction === 'asc' ? 'desc' : 'asc';
 
+    // Detect sort type based on first non-empty value
     const firstRow = filtered.rows.find((row) => {
       const cell = row.find((c) => c.identifier === column);
       return cell && cell.display_value !== '' && cell.display_value !== null;
@@ -190,6 +197,7 @@ export function EnhancedPreview({
     setSortConfigs([]);
   };
 
+  // Use filtered data if any filters are applied, otherwise use preview
   const data = filtered;
 
   const downloadCsv = () => {
@@ -371,7 +379,9 @@ export function EnhancedPreview({
                 style={{ borderColor: colors.$20, backgroundColor: colors.$2 }}
               >
                 {preview.columns.map((column, i) => {
-                  const isSummable = columnTotals.summable.has(column.identifier);
+                  const isSummable = columnTotals.summable.has(
+                    column.identifier
+                  );
 
                   return (
                     <Td key={i}>
