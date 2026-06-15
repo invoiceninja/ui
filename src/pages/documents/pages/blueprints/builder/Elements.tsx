@@ -14,12 +14,14 @@ import {
 } from '@docuninja/builder2.0';
 import { useTranslation } from 'react-i18next';
 import { IoMdSwap } from 'react-icons/io';
-import { useClientsQuery } from '$app/common/queries/clients';
 import collect from 'collect.js';
 import { Client } from '$app/common/interfaces/client';
-import { InputLabel, SelectField } from '$app/components/forms';
+import { Combobox, Entry } from '$app/components/forms/Combobox';
+import { InputLabel } from '$app/components/forms';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useEffect, useState } from 'react';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Modal } from '$app/components/Modal';
 import { get } from 'lodash';
 import { formatLabel } from './formatLabel';
@@ -60,101 +62,157 @@ export function SignatorySelector({
 }: SignatorySelector) {
   const [t] = useTranslation();
   const [pendingSelect, setPendingSelect] = useState<string>();
+  const [clients, setClients] = useState<Client[]>([]);
+  const [, setIsFetching] = useState(false);
 
-  const { data: clients, refetch } = useClientsQuery({ status: ['active'] });
+  const lastSearchRef = useRef('');
 
-  const handleSelect = (v: string | undefined) => {
-    if (!v) {
+  const existing = useMemo(
+    () => collect(signatories).pluck('id').toArray(),
+    [signatories]
+  );
+
+  const existingKeys = useMemo(
+    () =>
+      collect(signatories)
+        .filter((s) => s.metadata !== undefined)
+        .map((s) => s.metadata?.contact_key)
+        .toArray(),
+    [signatories]
+  );
+
+  useEffect(() => {
+    fetchClients('');
+  }, []);
+
+  const fetchClients = async (filter: string) => {
+    setIsFetching(true);
+
+    try {
+      const response = await request(
+        'GET',
+        endpoint(
+          `/api/v1/clients?per_page=500&status=active&filter=${filter}`
+        )
+      );
+
+      setClients(response.data.data);
+    } catch {
+      //
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  const entries: Entry[] = useMemo(() => {
+    const clientEntries: Entry[] = clients
+      .filter(
+        (client) =>
+          client.contacts.length > 0 &&
+          client.contacts[0].contact_key.length > 0
+      )
+      .filter(
+        (client) => !existingKeys.includes(client.contacts[0].contact_key)
+      )
+      .map((client) => ({
+        id: client.id,
+        label: formatLabel(
+          client.contacts[0].first_name,
+          client.contacts[0].last_name,
+          client.contacts[0].email,
+          client.name
+        ),
+        value: `contact|${client.contacts[0].contact_key}`,
+        resource: client,
+        eventType: 'internal' as const,
+        searchable: [client.name, client.contacts[0].email || '']
+          .filter(Boolean)
+          .join(' '),
+      }))
+      .filter((client) => !existing.includes(client.value));
+
+    const userEntries: Entry[] = collect(results)
+      .filter((user: any) => user.type === 'user')
+      .map((user: any) => ({
+        ...user,
+        id: user.value,
+        value: `user|${user.value}`,
+        eventType: 'internal' as const,
+        searchable: user.label,
+      }))
+      .filter((user: any) => !existing.includes(user.value))
+      .all();
+
+    return [...clientEntries, ...userEntries];
+  }, [clients, results, existing, existingKeys]);
+
+  const handleSearch = (query: string) => {
+    if (query === lastSearchRef.current) {
       return;
     }
 
-    if (v.startsWith('user')) {
-      // In this case we're working with users directly from DocuNinja.
+    lastSearchRef.current = query;
 
-      const [, value] = v.split('|');
+    fetchClients(query);
+  };
 
-      const user = collect(results).firstWhere(
-        'value',
-        value
-      ) as SignatorySelectorProps['results'][number];
+  const handleChange = (entry: Entry) => {
+    const value = entry.value?.toString() || '';
 
-      if (user) {
-        onSelect(value, 'user', user.entity);
-      }
-
-      return;
-    }
-
-    if (v === 'create') {
+    if (value === 'create') {
       setCreateDialogOpen(true);
 
       return;
     }
 
-    // In this case we're handling Invoice Ninja clients.
+    if (value.startsWith('user|')) {
+      const id = value.replace('user|', '');
 
-    const [, value] = v.split('|');
+      const user = collect(results).firstWhere(
+        'value',
+        id
+      ) as SignatorySelectorProps['results'][number];
 
-    let entity = clients?.find(
-      (client) => client.contacts?.[0]?.contact_key === value
-    );
+      if (user) {
+        onSelect(id, 'user', user.entity);
+      }
 
-    if (!entity) {
-      entity = results.find((r: any) => r.value === value) as unknown as any;
-    }
-
-    if (!entity) {
       return;
     }
 
-    const contact = transformToContact(entity as Client);
+    if (value.startsWith('contact|')) {
+      const contactKey = value.replace('contact|', '');
 
-    if (!contact) {
-      return;
+      let entity = clients?.find(
+        (client) => client.contacts?.[0]?.contact_key === contactKey
+      );
+
+      if (!entity) {
+        entity = results.find(
+          (r: any) => r.value === contactKey
+        ) as unknown as any;
+      }
+
+      if (!entity) {
+        return;
+      }
+
+      const contact = transformToContact(entity as Client);
+
+      if (!contact) {
+        return;
+      }
+
+      const transformed = transformToPayload(entity, contactKey);
+
+      onSelect(
+        `contact|${transformed.contact_key}`,
+        'contact',
+        contact as any,
+        transformed
+      );
     }
-
-    const transformed = transformToPayload(entity, value);
-
-    onSelect(
-      `contact|${transformed.contact_key}`,
-      'contact',
-      contact as any,
-      transformed
-    );
   };
-
-  const existing = collect(signatories).pluck('id').toArray();
-
-  const existingKeys = collect(signatories)
-    .filter((s) => s.metadata !== undefined)
-    .map((s) => s.metadata?.contact_key)
-    .toArray();
-
-  const list = collect(clients)
-    .filter(
-      (client) =>
-        client.contacts.length > 0 && client.contacts[0].contact_key.length > 0
-    )
-    .filter((client) => !existingKeys.includes(client.contacts[0].contact_key))
-    .map((client) => ({
-      label: formatLabel(
-        client.contacts[0].first_name,
-        client.contacts[0].last_name,
-        client.contacts[0].email,
-        client.name
-      ),
-      value: `contact|${client.contacts[0].contact_key}`,
-    }))
-    .filter((client) => !existing.includes(client.value))
-    .toArray() as { label: string; value: string }[];
-
-  const users = collect(results)
-    .filter((user) => user.type === 'user')
-    .map((user) => ({
-      ...user,
-      value: `user|${user.value}`,
-    }))
-    .all();
 
   useEffect(() => {
     const handler = (data: Event) => {
@@ -162,7 +220,8 @@ export function SignatorySelector({
       const id = `contact|${key}`;
 
       setPendingSelect(id);
-      refetch();
+      lastSearchRef.current = '';
+      fetchClients('');
     };
 
     window.addEventListener('builder:signatory-created', handler);
@@ -173,43 +232,42 @@ export function SignatorySelector({
 
   useEffect(() => {
     if (pendingSelect) {
-      handleSelect(pendingSelect);
+      const entry = entries.find((e) => e.value === pendingSelect);
+
+      if (entry) {
+        handleChange(entry);
+      }
+
       setPendingSelect(undefined);
     }
-  }, [clients]);
+  }, [entries, pendingSelect]);
 
   return (
     <div className="space-y-3">
       <InputLabel className="mt-3">{t('select_user_or_client')}</InputLabel>
 
-      <SelectField
-        placeholder={t('select_user_or_client')}
-        onValueChange={handleSelect}
-        customSelector
-        clearAfterSelection
-        className="-mt-2"
-        menuPosition={isSwapModal ? undefined : 'fixed'}
-      >
-        <option value="create">
-          <b>&mdash; {t('create_client')} &mdash;</b>
-        </option>
-
-        {list.map((client) => (
-          <option key={client.value} value={client.value}>
-            {client.label}
-          </option>
-        ))}
-
-        <option disabled>
-          <b>&mdash; {t('users')} &mdash;</b>
-        </option>
-
-        {users.map((user) => (
-          <option key={user.value} value={user.value}>
-            {user.label}
-          </option>
-        ))}
-      </SelectField>
+      <Combobox
+        inputOptions={{
+          value: null,
+          placeholder: t('select_user_or_client'),
+        }}
+        entries={entries}
+        entryOptions={{
+          id: 'id',
+          label: 'label',
+          value: 'value',
+          searchable: 'searchable',
+        }}
+        onChange={handleChange}
+        onEmptyValues={handleSearch}
+        clearInputAfterSelection
+        action={{
+          label: t('create_client'),
+          visible: true,
+          onClick: () => setCreateDialogOpen(true),
+        }}
+        withShadow
+      />
     </div>
   );
 }
