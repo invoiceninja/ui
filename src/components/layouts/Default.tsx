@@ -46,6 +46,7 @@ import classNames from 'classnames';
 import { Feedback } from '../Feedback';
 import { PriceIncreaseBanner } from '../banners/PriceIncrease';
 import { useNavigation } from './common/navigation';
+import { AccountPlanExpired } from '../banners/AccountPlanExpired';
 
 export interface SaveOption {
   label: string;
@@ -134,6 +135,7 @@ export function Default(props: Props) {
         <VerifyEmail />
         <VerifyPhone />
         <EInvoiceCredits />
+        <AccountPlanExpired />
 
         {/* This component is only created for December 2025 if you see it in 2026 you can remove and delete it */}
         <PriceIncreaseBanner />
