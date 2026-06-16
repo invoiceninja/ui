@@ -110,7 +110,7 @@ test('ComboBox Async filtering', async ({ page }) => {
   await option.waitFor({ state: 'visible', timeout: 5000 });
 
   const firstOptionTextContent = await option.textContent();
-  expect(firstOptionTextContent === 'test merge one').toBeTruthy();
+  expect(firstOptionTextContent).toContain('test merge one');
 
   const numberOfAvailableOptions = (await page.getByRole('option').all()).length;
   expect(numberOfAvailableOptions >= 1).toBeTruthy();

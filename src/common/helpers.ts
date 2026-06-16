@@ -34,7 +34,7 @@ export function isSelfHosted(): boolean {
 
 export function apiEndpoint(): string {
   if (isHosted()) {
-    return 'https://invoicing.co';
+    return import.meta.env.VITE_HOSTED_API_URL || 'https://invoicing.co';
   }
 
   return (
@@ -69,7 +69,7 @@ export function classNames(...classes: any) {
 }
 
 export function date(date: number | string, format: string) {
-  if (date === 0 || date === '' || date === undefined) {
+  if (!date) {
     return '';
   }
 

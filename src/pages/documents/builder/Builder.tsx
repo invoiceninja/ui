@@ -35,7 +35,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
 import {
   SignatorySelector,
@@ -129,6 +129,8 @@ function Builder() {
   const { t, i18n } = useTranslation();
 
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const isFromTemplate = searchParams.get('from_template') === 'true';
 
   const colors = useColorScheme();
 
@@ -147,7 +149,7 @@ function Builder() {
   const { preferences, update, save } = usePreferences();
 
   useDriverTour({
-    show: !preferences.document_builder_tour_shown,
+    show: Boolean(!isFromTemplate && !preferences.document_builder_tour_shown),
     steps: [
       {
         element: '.builder-rightSide',
@@ -178,6 +180,44 @@ function Builder() {
       onDestroyed: () => {
         if (!preferences.document_builder_tour_shown) {
           update('preferences.document_builder_tour_shown', true);
+          save({ silent: true });
+        }
+      },
+    },
+  });
+
+  useDriverTour({
+    show: Boolean(isFromTemplate && !preferences.blueprint_use_template_tour_shown),
+    steps: [
+      {
+        element: '.builder-rightSide',
+        popover: {
+          description: t('tour_template_signatory_swap') as string,
+          nextBtnText: t('tour_continue_select_signatory') as string,
+        },
+      },
+      {
+        element: '.builder-save-button',
+        popover: {
+          description: t('tour_template_save_document') as string,
+        },
+      },
+      {
+        element: '.builder-send-button',
+        popover: {
+          description: t('tour_template_send_document') as string,
+        },
+      },
+    ],
+    eventName: 'builder:loaded',
+    options: {
+      showProgress: true,
+      allowClose: false,
+      showButtons: ['next'],
+      disableActiveInteraction: true,
+      onDestroyed: () => {
+        if (!preferences.blueprint_use_template_tour_shown) {
+          update('preferences.blueprint_use_template_tour_shown', true);
           save({ silent: true });
         }
       },
@@ -457,6 +497,7 @@ function Builder() {
                 isDocumentSaving || isDocumentSending || !hasRealSignatories()
               }
               disableWithoutIcon
+              className="builder-send-button"
             >
               <div>
                 <Icon element={MdSend} />
