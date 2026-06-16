@@ -32,12 +32,14 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useSave } from './hooks/useSave';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
 import { useAtom } from 'jotai';
 import { paymentAtom } from '../common/atoms';
 import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { Banner } from '$app/components/Banner';
 import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
 import { ErrorMessage } from '$app/components/ErrorMessage';
 import { DataTable } from '$app/components/DataTable';
 import { useApplyInvoiceTableColumns } from '../common/hooks/useApplyInvoiceTableColumns';
@@ -96,6 +98,8 @@ export default function Create() {
     invoices: '',
     credits: '',
   });
+
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string>('');
 
   const { data: blankPayment } = useBlankPaymentQuery();
 
@@ -197,13 +201,13 @@ export default function Create() {
       (searchParams.get('client') === payment?.client_id ||
         !searchParams.get('client'))
     ) {
+      const withInvoice = searchParams.get('invoice') || selectedInvoiceId;
+
       setInitialEndpoints({
         invoices: `/api/v1/invoices?include=client&payable=${
           payment?.client_id
         }&per_page=100&sort=date|desc&per_page=1000${
-          searchParams.get('invoice')
-            ? `&with=${searchParams.get('invoice')}`
-            : ''
+          withInvoice ? `&with=${withInvoice}` : ''
         }`,
         credits: `/api/v1/credits?include=client&client_id=${
           payment?.client_id
@@ -214,7 +218,7 @@ export default function Create() {
         }`,
       });
     }
-  }, [payment?.client_id, searchParams]);
+  }, [payment?.client_id, searchParams, selectedInvoiceId]);
 
   useEffect(() => {
     return () => {
@@ -238,6 +242,17 @@ export default function Create() {
   };
 
   const onSubmit = useSave({ setErrors, setIsFormBusy, isFormBusy });
+
+  const action = searchParams.get('action');
+
+  const isPrefilledFlow =
+    searchParams.has('invoice') || action === 'enter' || action === 'apply';
+
+  const invoiceSelectorEndpoint = endpoint(
+    `/api/v1/invoices?include=client&filter_deleted_clients=true&payable=${
+      payment?.client_id ?? ''
+    }&sort=date|desc`
+  );
 
   return (
     <Default
@@ -268,6 +283,8 @@ export default function Create() {
                   credits: '',
                 });
 
+                setSelectedInvoiceId('');
+
                 setTimeout(() => {
                   handleChange('client_id', client?.id as string);
                   handleChange(
@@ -279,6 +296,7 @@ export default function Create() {
                 }, 25);
               }}
               onClearButtonClick={() => {
+                setSelectedInvoiceId('');
                 handleChange('client_id', '');
                 handleChange('currency_id', '');
                 handleChange('invoices', []);
@@ -287,14 +305,70 @@ export default function Create() {
               errorMessage={errors?.errors.client_id}
               defaultValue={payment?.client_id}
               value={payment?.client_id}
-              readonly={
-                searchParams.has('invoice') ||
-                searchParams.get('action') === 'enter' ||
-                searchParams.get('action') === 'apply'
-              }
+              readonly={isPrefilledFlow}
               initiallyVisible={!payment?.client_id}
             />
           </Element>
+
+          {!isPrefilledFlow && (
+            <>
+              <div className="flex items-center px-5 sm:px-6 py-1">
+                <div
+                  className="flex-1 border-b"
+                  style={{ borderColor: colors.$21 }}
+                />
+                <span
+                  className="px-4 text-xs font-medium uppercase"
+                  style={{ color: colors.$22, opacity: 0.8 }}
+                >
+                  {t('or')}
+                </span>
+                <div
+                  className="flex-1 border-b"
+                  style={{ borderColor: colors.$21 }}
+                />
+              </div>
+
+              <Element leftSide={t('invoice')}>
+                <InvoiceSelector
+                  value={selectedInvoiceId}
+                  endpoint={invoiceSelectorEndpoint}
+                  onChange={(invoice) => {
+                    setInitialEndpoints({
+                      invoices: '',
+                      credits: '',
+                    });
+
+                    setSelectedInvoiceId(invoice.id);
+
+                    setTimeout(() => {
+                      handleChange('client_id', invoice.client_id);
+                      handleChange(
+                        'currency_id',
+                        invoice.client?.settings.currency_id || '1'
+                      );
+                      handleChange('credits', []);
+                      handleChange('invoices', [
+                        {
+                          _id: v4(),
+                          invoice_id: invoice.id,
+                          amount:
+                            invoice.balance > 0
+                              ? invoice.balance
+                              : invoice.amount,
+                        },
+                      ]);
+                    }, 25);
+                  }}
+                  onClearButtonClick={() => {
+                    setSelectedInvoiceId('');
+                    handleChange('invoices', []);
+                  }}
+                  clearButton={Boolean(selectedInvoiceId)}
+                />
+              </Element>
+            </>
+          )}
 
           <Element
             leftSide={t('amount_received')}
@@ -358,6 +432,8 @@ export default function Create() {
                 preSelected={
                   searchParams.get('invoice')
                     ? [searchParams.get('invoice') as string]
+                    : selectedInvoiceId
+                    ? [selectedInvoiceId]
                     : []
                 }
                 emptyState={
