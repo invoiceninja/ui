@@ -41,6 +41,7 @@ interface Params {
   enableSavingFilterPreference?: boolean;
   withoutStoringPage?: boolean;
   withoutStoringFilters?: boolean;
+  withoutStoringPreferences?: boolean;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -67,6 +68,7 @@ export function useDataTablePreferences(params: Params) {
     enableSavingFilterPreference,
     withoutStoringPage,
     withoutStoringFilters,
+    withoutStoringPreferences,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
@@ -80,6 +82,10 @@ export function useDataTablePreferences(params: Params) {
     status: string[],
     perPage: PerPage
   ) => {
+    if (withoutStoringPreferences) {
+      return;
+    }
+
     if (tableKey) {
       storeSessionTableFilters(filter, currentPage, withoutStoringPage);
     }
@@ -138,6 +144,12 @@ export function useDataTablePreferences(params: Params) {
   useEffect(() => {
     // Guards logout/unmount races where the atom has been reset to null.
     if (!isHydrated || appliedRef.current) return;
+
+    if (withoutStoringPreferences) {
+      setArePreferencesApplied(true);
+      appliedRef.current = true;
+      return;
+    }
 
     if (!isInitialConfiguration && !customFilter) {
       setFilter((getPreference('filter') as string) || '');
