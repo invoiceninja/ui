@@ -200,7 +200,7 @@ export default function SignatoryMapping() {
     )
       .then((response: AxiosResponse<GenericSingleResponse<Document>>) => {
         toast.success('document_created');
-        navigate(route('/docuninja/:id/builder', { id: response.data.data.id }));
+        navigate(route('/docuninja/:id/builder?from_template=true', { id: response.data.data.id }));
       })
       .catch((error) => {
         toast.error('error_refresh_page');
@@ -272,9 +272,7 @@ export default function SignatoryMapping() {
               return (
                 <div
                   key={signatoryId}
-                  className={classNames(
-                    'border-t border-dashed'
-                  )}
+                  className={classNames('border-t border-dashed')}
                   style={{ borderColor: colors.$24 }}
                 >
                   <div className="space-y-1">

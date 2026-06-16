@@ -102,6 +102,7 @@ export function UpcomingQuotes() {
           withoutPagination
           withoutPadding
           withoutPerPageAsPreference
+          withoutStoringPreferences
           styleOptions={{
             withoutBottomBorder: true,
             withoutTopBorder: true,
