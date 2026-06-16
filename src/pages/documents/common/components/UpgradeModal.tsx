@@ -674,6 +674,19 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                         )}
                                                     </div>
                                                 </div>
+                                                {selectedMainPlan === 'enterprise' && (
+                                                    <div className="flex justify-between">
+                                                        <span>InvoiceNinja {t('users')}:</span>
+                                                        <span className="font-medium">{enterpriseUsers}</span>
+                                                    </div>
+                                                )}
+                                                {docuNinjaSelected && docuNinjaUsers > 0 && (
+                                                    <div className="flex justify-between">
+                                                        <span>DocuNinja {t('users')}:</span>
+                                                        <span className="font-medium">{docuNinjaUsers}</span>
+                                                    </div>
+                                                )}
+                                                {pricing.credit_raw > 0 && (
                                                 <div className="flex justify-between">
                                                     <span>{t('credit')}:</span>
                                                     <div className="flex items-center space-x-2">
@@ -683,6 +696,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                         )}
                                                     </div>
                                                 </div>
+                                                )}
                                                 <div className="flex justify-between">
                                                     <span>{t('balance')}:</span>
                                                     <div className="flex items-center space-x-2">
@@ -692,6 +706,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                         )}
                                                     </div>
                                                 </div>
+                                                
                                             </div>
                                         </>
                                     ) : (
