@@ -19,7 +19,6 @@ interface Params {
   tableKey: string | undefined;
   customFilters?: SelectOption[];
   customFilter?: string[] | undefined;
-  withoutStoringFilters?: boolean;
   withoutStoringPreferences?: boolean;
 }
 export function useDataTableUtilities(params: Params) {
@@ -31,7 +30,6 @@ export function useDataTableUtilities(params: Params) {
     customFilters,
     apiEndpoint,
     customFilter,
-    withoutStoringFilters,
     withoutStoringPreferences,
   } = params;
 
@@ -39,10 +37,9 @@ export function useDataTableUtilities(params: Params) {
 
   const getDefaultOptions = () => {
     if (!isInitialConfiguration) {
-      const preferenceStatuses =
-        withoutStoringFilters || withoutStoringPreferences
-          ? []
-          : (getPreference('status') as string[]);
+      const preferenceStatuses = withoutStoringPreferences
+        ? []
+        : (getPreference('status') as string[]);
 
       const currentStatuses = preferenceStatuses?.length
         ? preferenceStatuses
@@ -60,10 +57,9 @@ export function useDataTableUtilities(params: Params) {
 
   const getDefaultCustomFilterOptions = () => {
     if (!isInitialConfiguration && customFilters) {
-      const preferenceCustomFilters =
-        withoutStoringFilters || withoutStoringPreferences
-          ? []
-          : (getPreference('customFilter') as string[]);
+      const preferenceCustomFilters = withoutStoringPreferences
+        ? []
+        : (getPreference('customFilter') as string[]);
 
       const currentStatuses = preferenceCustomFilters?.length
         ? preferenceCustomFilters

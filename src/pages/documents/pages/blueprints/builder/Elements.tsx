@@ -14,15 +14,11 @@ import {
 } from '@docuninja/builder2.0';
 import { useTranslation } from 'react-i18next';
 import { IoMdSwap } from 'react-icons/io';
-import { useClientsQuery } from '$app/common/queries/clients';
-import collect from 'collect.js';
 import { Client } from '$app/common/interfaces/client';
-import { InputLabel, SelectField } from '$app/components/forms';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Modal } from '$app/components/Modal';
-import { get } from 'lodash';
-import { formatLabel } from './formatLabel';
+import { AsyncSignatorySelector } from '$app/pages/documents/common/components/AsyncSignatorySelector';
 
 export function SignatorySwap(props: SignatorySwapProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -56,161 +52,17 @@ export function SignatorySelector({
   onSelect,
   setCreateDialogOpen,
   signatories,
-  isSwapModal = false,
 }: SignatorySelector) {
-  const [t] = useTranslation();
-  const [pendingSelect, setPendingSelect] = useState<string>();
-
-  const { data: clients, refetch } = useClientsQuery({ status: ['active'] });
-
-  const handleSelect = (v: string | undefined) => {
-    if (!v) {
-      return;
-    }
-
-    if (v.startsWith('user')) {
-      // In this case we're working with users directly from DocuNinja.
-
-      const [, value] = v.split('|');
-
-      const user = collect(results).firstWhere(
-        'value',
-        value
-      ) as SignatorySelectorProps['results'][number];
-
-      if (user) {
-        onSelect(value, 'user', user.entity);
-      }
-
-      return;
-    }
-
-    if (v === 'create') {
-      setCreateDialogOpen(true);
-
-      return;
-    }
-
-    // In this case we're handling Invoice Ninja clients.
-
-    const [, value] = v.split('|');
-
-    let entity = clients?.find(
-      (client) => client.contacts?.[0]?.contact_key === value
-    );
-
-    if (!entity) {
-      entity = results.find((r: any) => r.value === value) as unknown as any;
-    }
-
-    if (!entity) {
-      return;
-    }
-
-    const contact = transformToContact(entity as Client);
-
-    if (!contact) {
-      return;
-    }
-
-    const transformed = transformToPayload(entity, value);
-
-    onSelect(
-      `contact|${transformed.contact_key}`,
-      'contact',
-      contact as any,
-      transformed
-    );
-  };
-
-  const existing = collect(signatories).pluck('id').toArray();
-
-  const existingKeys = collect(signatories)
-    .filter((s) => s.metadata !== undefined)
-    .map((s) => s.metadata?.contact_key)
-    .toArray();
-
-  const list = collect(clients)
-    .filter(
-      (client) =>
-        client.contacts.length > 0 && client.contacts[0].contact_key.length > 0
-    )
-    .filter((client) => !existingKeys.includes(client.contacts[0].contact_key))
-    .map((client) => ({
-      label: formatLabel(
-        client.contacts[0].first_name,
-        client.contacts[0].last_name,
-        client.contacts[0].email,
-        client.name
-      ),
-      value: `contact|${client.contacts[0].contact_key}`,
-    }))
-    .filter((client) => !existing.includes(client.value))
-    .toArray() as { label: string; value: string }[];
-
-  const users = collect(results)
-    .filter((user) => user.type === 'user')
-    .map((user) => ({
-      ...user,
-      value: `user|${user.value}`,
-    }))
-    .all();
-
-  useEffect(() => {
-    const handler = (data: Event) => {
-      const key = get(data, 'detail.data.contacts.0.contact_key');
-      const id = `contact|${key}`;
-
-      setPendingSelect(id);
-      refetch();
-    };
-
-    window.addEventListener('builder:signatory-created', handler);
-
-    return () =>
-      window.removeEventListener('builder:signatory-created', handler);
-  }, []);
-
-  useEffect(() => {
-    if (pendingSelect) {
-      handleSelect(pendingSelect);
-      setPendingSelect(undefined);
-    }
-  }, [clients]);
-
   return (
-    <div className="space-y-3">
-      <InputLabel className="mt-3">{t('select_user_or_client')}</InputLabel>
-
-      <SelectField
-        placeholder={t('select_user_or_client')}
-        onValueChange={handleSelect}
-        customSelector
-        clearAfterSelection
-        className="-mt-2"
-        menuPosition={isSwapModal ? undefined : 'fixed'}
-      >
-        <option value="create">
-          <b>&mdash; {t('create_client')} &mdash;</b>
-        </option>
-
-        {list.map((client) => (
-          <option key={client.value} value={client.value}>
-            {client.label}
-          </option>
-        ))}
-
-        <option disabled>
-          <b>&mdash; {t('users')} &mdash;</b>
-        </option>
-
-        {users.map((user) => (
-          <option key={user.value} value={user.value}>
-            {user.label}
-          </option>
-        ))}
-      </SelectField>
-    </div>
+    <AsyncSignatorySelector
+      results={results}
+      onSelect={onSelect}
+      setCreateDialogOpen={setCreateDialogOpen}
+      signatories={signatories}
+      valuePrefix="contact"
+      transformContact={transformToContact}
+      transformPayload={transformToPayload}
+    />
   );
 }
 
