@@ -147,7 +147,7 @@ export const truncatedColumns = [
 ];
 
 const matchesSuffix = (identifier: string, suffixes: string[]) => {
-  return suffixes.some((suffix) => identifier.endsWith(suffix)) ?? false;
+  return suffixes.some((suffix) => identifier.endsWith(suffix));
 };
 
 export const resolveMinColumnWidth = (identifier: string): number => {

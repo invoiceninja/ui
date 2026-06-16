@@ -155,8 +155,9 @@ export function ColumnGroup({ columns, children }: ColumnGroupProps) {
           el.style.width = `${w}px`;
           el.style.minWidth = `${w}px`;
         } else {
-          el.style.width = '';
-          el.style.minWidth = '';
+          const defaultWidth = resolveMinColumnWidth(column.identifier);
+          el.style.width = `${defaultWidth}px`;
+          el.style.minWidth = `${defaultWidth}px`;
         }
       });
     };

@@ -16,7 +16,6 @@ import { useTranslation } from 'react-i18next';
 import {
   sortRows,
   SortConfig,
-  SortType,
   detectSortType,
   groupRows,
   parseNumericValue,
@@ -45,7 +44,6 @@ export function EnhancedPreview({
 
   const [sortConfigs, setSortConfigs] = useState<SortConfig[]>([]);
   const [filterValues, setFilterValues] = useState<Record<string, string>>({});
-  const [sortTypeOverrides] = useState<Record<string, SortType>>({});
   const [groupByColumn, setGroupByColumn] = useState<string | null>(null);
 
   const activeFilters = useMemo(
@@ -169,10 +167,9 @@ export function EnhancedPreview({
     });
 
     const firstCell = firstRow?.find((c) => c.identifier === column);
-    const detectedType = firstCell
+    const sortType = firstCell
       ? detectSortType(column, String(firstCell.display_value))
       : 'case-insensitive';
-    const sortType = sortTypeOverrides[column] || detectedType;
 
     if (enableMultiSort) {
       if (existingConfig) {
