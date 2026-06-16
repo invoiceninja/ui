@@ -7,11 +7,10 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { Document } from '$app/common/interfaces/docuninja/api';
 import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useClientsQuery } from '$app/common/queries/clients';
 import { useBlueprintQuery } from '$app/common/queries/docuninja/blueprints';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
 import { ResourceActions } from '$app/components/ResourceActions';
@@ -60,6 +59,7 @@ import { useMediaQuery } from 'react-responsive';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useActions } from '../common/hooks/useActions';
 import { EditBlueprintModal } from '../edit/components/EditBlueprintModal';
+import { AsyncSignatorySelector } from '$app/pages/documents/common/components/AsyncSignatorySelector';
 import { useDriverTour } from '$app/common/hooks/useDriverTour';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 
@@ -203,67 +203,13 @@ function SignatorySelector({
   value,
   setCreateDialogOpen,
 }: SignatorySelectorProps) {
-  const [t] = useTranslation();
-
-  const { data: clients } = useClientsQuery({ status: ['active'] });
-
-  const handleSelect = (v: string | undefined) => {
-    if (!v) {
-      return;
-    }
-
-    if (v === 'create') {
-      setCreateDialogOpen(true);
-
-      return;
-    }
-
-    const [type, value] = v.split('|');
-    let entity = clients?.find(
-      (client) => client.contacts?.[0]?.contact_key === value
-    );
-
-    if (!entity) {
-      entity = results.find((r: any) => r.value === value) as unknown as any;
-    }
-
-    if (!entity) {
-      return;
-    }
-
-    onSelect(value, type as 'user', entity as any);
-  };
-
   return (
-    <SelectField
-      placeholder={t('select_user_or_client')}
-      value={value}
-      onValueChange={handleSelect}
-      customSelector
-      menuPosition="fixed"
-    >
-      <option value="create">{t('create_client_or_user')}</option>
-
-      {clients
-        ?.filter(
-          (client) =>
-            client.contacts.length > 0 && client.contacts[0].contact_key
-        )
-        .map((client) => (
-          <option
-            value={`client|${client.contacts[0].contact_key}`}
-            key={client.id}
-          >
-            {client.name}
-          </option>
-        ))}
-
-      {results.map((result: any) => (
-        <option value={`${result.type}|${result.value}`} key={result.id}>
-          {result.label}
-        </option>
-      ))}
-    </SelectField>
+    <AsyncSignatorySelector
+      results={results}
+      onSelect={onSelect}
+      setCreateDialogOpen={setCreateDialogOpen}
+      valuePrefix="client"
+    />
   );
 }
 
