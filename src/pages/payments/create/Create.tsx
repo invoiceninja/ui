@@ -27,7 +27,7 @@ import { CustomField } from '$app/components/CustomField';
 
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useSave } from './hooks/useSave';
@@ -243,15 +243,22 @@ export default function Create() {
 
   const onSubmit = useSave({ setErrors, setIsFormBusy, isFormBusy });
 
-  const action = searchParams.get('action');
+  const isPrefilledFlow = useMemo(() => {
+    const action = searchParams.get('action');
 
-  const isPrefilledFlow =
-    searchParams.has('invoice') || action === 'enter' || action === 'apply';
+    return (
+      searchParams.has('invoice') || action === 'enter' || action === 'apply'
+    );
+  }, [searchParams]);
 
-  const invoiceSelectorEndpoint = endpoint(
-    `/api/v1/invoices?include=client&filter_deleted_clients=true&payable=${
-      payment?.client_id ?? ''
-    }&sort=date|desc`
+  const invoiceSelectorEndpoint = useMemo(
+    () =>
+      endpoint(
+        `/api/v1/invoices?include=client&filter_deleted_clients=true&payable=${
+          payment?.client_id ?? ''
+        }&sort=date|desc`
+      ),
+    [payment?.client_id]
   );
 
   return (
