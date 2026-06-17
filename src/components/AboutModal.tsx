@@ -126,7 +126,7 @@ export function AboutModal(props: Props) {
 
       request('GET', endpoint('/api/v1/last_error'))
         .then((response) => {
-          setLastError(response.data?.message ?? '');
+          setLastError(response.data?.last_error ?? '');
         })
         .catch(() => setLastError(''));
     }
@@ -358,7 +358,7 @@ export function AboutModal(props: Props) {
             <div className="flex justify-between items-center py-1 px-3">
               <div className="flex flex-col">
                 <span className="font-medium text-base mb-1">
-                  {t('last_error')}
+                  {t('recent_errors')}
                 </span>
                 <span className="break-all">{lastError}</span>
               </div>
