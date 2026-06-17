@@ -143,6 +143,7 @@ function Builder() {
   useBuilderStore((state) => state.rectangles);
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
   const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
+  const [hasBeenSent, setHasBeenSent] = useState<boolean>(false);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
@@ -270,6 +271,7 @@ function Builder() {
       )
         .then(() => {
           setIsDocumentSending(false);
+          setHasBeenSent(true);
 
           window.dispatchEvent(
             new CustomEvent('builder:document.sent', {
@@ -494,7 +496,7 @@ function Builder() {
               behavior="button"
               onClick={handleSend}
               disabled={
-                isDocumentSaving || isDocumentSending || !hasRealSignatories()
+                isDocumentSaving || isDocumentSending || hasBeenSent || !hasRealSignatories()
               }
               disableWithoutIcon
               className="builder-send-button"
