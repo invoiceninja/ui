@@ -36,6 +36,9 @@ import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useColorScheme } from '$app/common/colors';
 import companySettings from '$app/common/constants/company-settings';
+import { Tooltip } from './Tooltip';
+
+const COMPANY_NAME_TRUNCATE_THRESHOLD = 22;
 
 const SwitcherDiv = styled.div`
   &:hover {
@@ -146,10 +149,10 @@ export function CompanySwitcher() {
         className="relative inline-block text-left w-full"
         data-cy="companyDropdown"
       >
-        <Menu.Button className="flex items-center justify-start space-x-3 w-full">
-          <div className="flex items-center space-x-3 p-1.5 rounded-md hover:bg-gray-700">
+        <Menu.Button className="flex items-center justify-start w-full">
+          <div className="flex items-center space-x-3 p-1.5 rounded-md hover:bg-gray-700 w-full min-w-0">
             <img
-              className="rounded-full border overflow-hidden aspect-square object-cover"
+              className="rounded-full border overflow-hidden aspect-square object-cover flex-shrink-0"
               src={logo}
               alt="Company logo"
               style={{
@@ -158,11 +161,27 @@ export function CompanySwitcher() {
               }}
             />
 
-            <span className="text-sm text-start w-36 truncate text-gray-200">
-              {companyName}
-            </span>
+            {companyName.length > COMPANY_NAME_TRUNCATE_THRESHOLD ? (
+              <Tooltip
+                message={companyName}
+                placement="right"
+                width="auto"
+                withoutArrow
+                withoutWrapping
+                appendToBody
+                className="flex-1 min-w-0"
+              >
+                <span className="block text-sm text-start truncate text-gray-200">
+                  {companyName}
+                </span>
+              </Tooltip>
+            ) : (
+              <span className="flex-1 min-w-0 block text-sm text-start truncate text-gray-200">
+                {companyName}
+              </span>
+            )}
 
-            <ExpandCollapseChevron color="#e5e7eb" />
+            <ExpandCollapseChevron color="#e5e7eb" className="flex-shrink-0" />
           </div>
         </Menu.Button>
 
@@ -233,10 +252,33 @@ export function CompanySwitcher() {
                             }}
                           />
 
-                          <div className="w-36 truncate text-sm">
-                            {record.company.settings.name ||
-                              t('untitled_company')}
-                          </div>
+                          {(() => {
+                            const name =
+                              record.company.settings.name ||
+                              t('untitled_company');
+
+                            const nameLabel = (
+                              <div className="w-36 truncate text-sm">
+                                {name}
+                              </div>
+                            );
+
+                            return name.length >
+                              COMPANY_NAME_TRUNCATE_THRESHOLD ? (
+                              <Tooltip
+                                message={name}
+                                placement="right"
+                                width="auto"
+                                withoutArrow
+                                withoutWrapping
+                                appendToBody
+                              >
+                                {nameLabel}
+                              </Tooltip>
+                            ) : (
+                              nameLabel
+                            );
+                          })()}
                         </div>
 
                         {state.currentIndex === index && (
