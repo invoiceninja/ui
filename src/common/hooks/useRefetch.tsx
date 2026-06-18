@@ -152,6 +152,7 @@ export const keys = {
       '/api/v1/payments',
       '/api/v1/expenses',
       '/api/v1/tasks',
+      '/api/v1/users/docuninja-eligible',
     ],
   },
   company_users: {
