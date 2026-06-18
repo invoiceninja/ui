@@ -254,9 +254,11 @@ export default function Create() {
   const invoiceSelectorEndpoint = useMemo(
     () =>
       endpoint(
-        `/api/v1/invoices?include=client&filter_deleted_clients=true&payable=${
-          payment?.client_id ?? ''
-        }&sort=date|desc`
+        `/api/v1/invoices?include=client&filter_deleted_clients=true&sort=date|desc${
+          payment?.client_id
+            ? `&payable=${payment.client_id}`
+            : '&client_status=unpaid,partial'
+        }`
       ),
     [payment?.client_id]
   );
