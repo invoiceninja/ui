@@ -27,6 +27,9 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { File } from 'react-feather';
 import collect from 'collect.js';
 import { useEffect } from 'react';
+import { useResolvedShortcuts } from '$app/common/hooks/useReactSettings';
+import { formatBinding } from '$app/common/helpers/keyboard-shortcuts';
+import { ShortcutId } from '$app/common/constants/keyboard-shortcuts';
 
 const $cache = atom<NavigationItem[] | null>(null);
 const $navigationLanguage = atom<string | null>(null);
@@ -40,6 +43,13 @@ export function useNavigation() {
 
   const [cache, setCache] = useAtom($cache);
   const [cachedLanguage, setCachedLanguage] = useAtom($navigationLanguage);
+
+  const shortcutBindings = useResolvedShortcuts();
+
+  const tooltipFor = (id: ShortcutId): string | undefined => {
+    const binding = shortcutBindings[id];
+    return binding ? formatBinding(binding) : undefined;
+  };
 
   const initialNavigation: NavigationItem[] = [
     {
@@ -61,7 +71,7 @@ export function useNavigation() {
         to: '/clients/create',
         label: t('new_client'),
         visible: hasPermission('create_client'),
-        tooltipLabel: 'Ctrl + Shift + C',
+        tooltipLabel: tooltipFor('create_client'),
       },
     },
     {
@@ -77,7 +87,7 @@ export function useNavigation() {
         to: '/products/create',
         label: t('new_product'),
         visible: hasPermission('create_product'),
-        tooltipLabel: 'Ctrl + Shift + K',
+        tooltipLabel: tooltipFor('create_product'),
       },
     },
     {
@@ -94,7 +104,7 @@ export function useNavigation() {
         to: '/invoices/create',
         label: t('new_invoice'),
         visible: hasPermission('create_invoice'),
-        tooltipLabel: 'Ctrl + Shift + I',
+        tooltipLabel: tooltipFor('create_invoice'),
       },
     },
     {
@@ -111,7 +121,7 @@ export function useNavigation() {
         to: '/recurring_invoices/create',
         label: t('new_recurring_invoice'),
         visible: hasPermission('create_recurring_invoice'),
-        tooltipLabel: 'Ctrl + Shift + R',
+        tooltipLabel: tooltipFor('create_recurring_invoice'),
       },
     },
     {
@@ -127,7 +137,7 @@ export function useNavigation() {
         to: '/payments/create',
         label: t('new_payment'),
         visible: hasPermission('create_payment'),
-        tooltipLabel: 'Ctrl + Shift + P',
+        tooltipLabel: tooltipFor('create_payment'),
       },
     },
     {
@@ -144,7 +154,7 @@ export function useNavigation() {
         to: '/quotes/create',
         label: t('new_quote'),
         visible: hasPermission('create_quote'),
-        tooltipLabel: 'Ctrl + Shift + Q',
+        tooltipLabel: tooltipFor('create_quote'),
       },
     },
     {
@@ -161,7 +171,7 @@ export function useNavigation() {
         to: '/credits/create',
         label: t('new_credit'),
         visible: hasPermission('create_credit'),
-        tooltipLabel: 'Ctrl + Shift + D',
+        tooltipLabel: tooltipFor('create_credit'),
       },
     },
     {
@@ -178,7 +188,7 @@ export function useNavigation() {
         to: '/projects/create',
         label: t('new_project'),
         visible: hasPermission('create_project'),
-        tooltipLabel: 'Ctrl + Shift + J',
+        tooltipLabel: tooltipFor('create_project'),
       },
     },
     {
@@ -195,7 +205,7 @@ export function useNavigation() {
         to: '/tasks/create',
         label: t('new_task'),
         visible: hasPermission('create_task'),
-        tooltipLabel: 'Ctrl + Shift + T',
+        tooltipLabel: tooltipFor('create_task'),
       },
     },
     {
@@ -212,7 +222,7 @@ export function useNavigation() {
         to: '/vendors/create',
         label: t('new_vendor'),
         visible: hasPermission('create_vendor'),
-        tooltipLabel: 'Ctrl + Shift + V',
+        tooltipLabel: tooltipFor('create_vendor'),
       },
     },
     {
@@ -229,7 +239,7 @@ export function useNavigation() {
         to: '/purchase_orders/create',
         label: t('new_purchase_order'),
         visible: hasPermission('create_purchase_order'),
-        tooltipLabel: 'Ctrl + Shift + O',
+        tooltipLabel: tooltipFor('create_purchase_order'),
       },
     },
     {
@@ -246,7 +256,7 @@ export function useNavigation() {
         to: '/expenses/create',
         label: t('new_expense'),
         visible: hasPermission('create_expense'),
-        tooltipLabel: 'Ctrl + Shift + E',
+        tooltipLabel: tooltipFor('create_expense'),
       },
     },
     {
@@ -263,7 +273,7 @@ export function useNavigation() {
         to: '/recurring_expenses/create',
         label: t('new_recurring_expense'),
         visible: hasPermission('create_recurring_expense'),
-        tooltipLabel: 'Ctrl + Shift + X',
+        tooltipLabel: tooltipFor('create_recurring_expense'),
       },
     },
     {
@@ -280,7 +290,7 @@ export function useNavigation() {
         to: '/transactions/create',
         label: t('new_transaction'),
         visible: hasPermission('create_bank_transaction'),
-        tooltipLabel: 'Ctrl + Shift + A',
+        tooltipLabel: tooltipFor('create_transaction'),
       },
     },
     {
@@ -298,7 +308,7 @@ export function useNavigation() {
         to: '/docuninja/create',
         label: t('new_document'),
         visible: import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
-        tooltipLabel: 'Ctrl + Shift + N',
+        tooltipLabel: tooltipFor('create_document'),
       },
       visible: import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
       subOptions: [

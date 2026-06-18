@@ -9,6 +9,8 @@
  */
 
 import { useEffect, useCallback } from 'react';
+import { useResolvedShortcuts } from './useReactSettings';
+import { eventMatchesBinding } from '../helpers/keyboard-shortcuts';
 
 interface UseSaveKeyboardShortcutOptions {
   isEnabled: boolean;
@@ -19,13 +21,15 @@ export function useSaveKeyboardShortcut({
   isEnabled,
   onSave,
 }: UseSaveKeyboardShortcutOptions) {
+  const bindings = useResolvedShortcuts();
+
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+      const binding = bindings.save;
+
+      if (binding && eventMatchesBinding(event, binding)) {
         event.preventDefault();
         if (isEnabled) {
-          // Blur the active element to trigger any pending onBlur events
-          // (e.g., NumberInputField only calls onValueChange on blur)
           if (
             document.activeElement &&
             document.activeElement !== document.body
@@ -36,7 +40,7 @@ export function useSaveKeyboardShortcut({
         }
       }
     },
-    [isEnabled, onSave]
+    [isEnabled, onSave, bindings.save]
   );
 
   useEffect(() => {

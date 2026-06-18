@@ -22,6 +22,8 @@ import {
   isNavigationModalVisibleAtom,
   usePreventNavigation,
 } from '$app/common/hooks/usePreventNavigation';
+import { useResolvedShortcuts } from '$app/common/hooks/useReactSettings';
+import { eventMatchesBinding } from '$app/common/helpers/keyboard-shortcuts';
 import { debounce } from 'lodash';
 import { InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
@@ -56,6 +58,10 @@ export function Search$() {
 
   const isNavigationModalVisible = useAtomValue(isNavigationModalVisibleAtom);
 
+  const shortcutBindings = useResolvedShortcuts();
+  const searchBindingRef = useRef<string | null>(shortcutBindings.search);
+  searchBindingRef.current = shortcutBindings.search;
+
   const { data, refetch, isFetching } = useQuery(
     ['/api/v1/search'],
     () => {
@@ -75,7 +81,9 @@ export function Search$() {
                   label: record.name,
                   value: record.id,
                   resource: record,
-                  searchable: `${t(key)}: ${record.name} ${record.keywords ?? ''}`,
+                  searchable: `${t(key)}: ${record.name} ${
+                    record.keywords ?? ''
+                  }`,
                   // searchable: `${t(key)}: ${record.name}`,
                   eventType: 'external',
                 });
@@ -154,7 +162,9 @@ export function Search$() {
   };
 
   const handleOpenModalByKeyDown = (event: KeyboardEvent) => {
-    if (event.ctrlKey && event.key === 'k') {
+    const binding = searchBindingRef.current;
+
+    if (binding && eventMatchesBinding(event, binding)) {
       event.preventDefault();
 
       setIsModalOpen((current) => !current);
