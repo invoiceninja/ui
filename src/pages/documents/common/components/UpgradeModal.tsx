@@ -14,6 +14,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { useQuery } from 'react-query';
 import { GatewayToken } from '$app/common/interfaces/client';
+import { canActivateUpgradeButton } from '../helpers';
 
 interface Props {
     visible: boolean;
@@ -727,7 +728,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                         type="primary"
                                         behavior="button"
                                         onClick={handleContinueToPayment}
-                                        disabled={!pricing || isLoading}
+                                        disabled={!canActivateUpgradeButton(pricing, isLoading)}
                                     >
                                         {isLoading && billingUiState === 'finalizing_plan_change'
                                             ? t('processing')
