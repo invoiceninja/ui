@@ -19,6 +19,20 @@ import {
 import { authenticate } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
 import { useQueryClient } from 'react-query';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+
+export interface UserState {
+  has_two_factor: boolean;
+}
+
+export function useCheckUserState() {
+  return (email: string) => {
+    return request('POST', endpoint('/api/v1/login/check'), { email }).then(
+      (response: AxiosResponse<UserState>) => response.data
+    );
+  };
+}
 
 export function useLogin() {
   const dispatch = useDispatch();

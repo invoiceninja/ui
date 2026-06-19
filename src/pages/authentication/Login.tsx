@@ -22,7 +22,7 @@ import { Header } from './components/Header';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { request } from '$app/common/helpers/request';
 import { SignInProviders } from './components/SignInProviders';
-import { useLogin } from './common/hooks';
+import { useCheckUserState, useLogin } from './common/hooks';
 import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Disable2faModal } from './components/Disable2faModal';
@@ -31,6 +31,8 @@ import { version } from '$app/common/helpers/version';
 import { toast } from '$app/common/helpers/toast/toast';
 import classNames from 'classnames';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+
+type Step = 'email' | 'credentials';
 
 export function Login() {
   useTitle('login');
@@ -42,12 +44,55 @@ export function Login() {
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [t] = useTranslation();
 
+  const [step, setStep] = useState<Step>('email');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [oneTimePassword, setOneTimePassword] = useState<string>('');
+  const [hasTwoFactor, setHasTwoFactor] = useState<boolean>(false);
+
   const [isDisable2faModalOpen, setIsDisable2faModalOpen] =
     useState<boolean>(false);
 
   const login = useLogin();
+  const checkUserState = useCheckUserState();
 
-  function handleSubmit(form: HTMLFormElement) {
+  function handleContinue() {
+    setMessage(undefined);
+    setErrors(undefined);
+
+    if (!email) {
+      setErrors({ email: [t('email_is_invalid') as string] });
+      return;
+    }
+
+    setIsFormBusy(true);
+
+    checkUserState(email)
+      .then((state) => {
+        setHasTwoFactor(Boolean(state.has_two_factor));
+        setStep('credentials');
+      })
+      .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
+        if (error.code === 'ERR_NETWORK') {
+          return;
+        }
+
+        if (error.response?.status === 422) {
+          setErrors(error.response.data.errors);
+
+          if (error.response.data.message) {
+            setMessage(error.response.data.message);
+          }
+        } else {
+          setMessage(
+            error.response?.data.message ?? (t('error_refresh_page') as string)
+          );
+        }
+      })
+      .finally(() => setIsFormBusy(false));
+  }
+
+  function handleLogin(form: HTMLFormElement) {
     const formData = new FormData(form);
 
     setMessage(undefined);
@@ -84,7 +129,18 @@ export function Login() {
       .finally(() => setIsFormBusy(false));
   }
 
+  function handleBackToEmail() {
+    setMessage(undefined);
+    setErrors(undefined);
+    setPassword('');
+    setOneTimePassword('');
+    setHasTwoFactor(false);
+    setStep('email');
+  }
+
   const colors = useColorScheme();
+
+  const isEmailStep = step === 'email';
 
   return (
     <div className="h-screen">
@@ -101,85 +157,126 @@ export function Login() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              handleSubmit(e.currentTarget);
+
+              if (isEmailStep) {
+                handleContinue();
+              } else {
+                handleLogin(e.currentTarget);
+              }
             }}
             className="my-6 space-y-4"
           >
-            <InputField
-              type="email"
-              autoComplete="username"
-              label={t('email_address')}
-              errorMessage={errors?.email}
-              name="email"
-            />
-
-            <InputField
-              type="password"
-              autoComplete="current-password"
-              label={t('password')}
-              id="password"
-              errorMessage={errors?.password}
-              name="password"
-            />
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between gap-x-3">
-                <InputLabel className="truncate">
-                  {`2FA - ${t('one_time_password')}`}
-                </InputLabel>
-
-                <Link className="truncate" to="/recover_password">
-                  {t('forgot_password')}
-                </Link>
-              </div>
+            <div className={classNames({ hidden: !isEmailStep })}>
+              <InputField
+                type="email"
+                autoComplete="username"
+                label={t('email_address')}
+                errorMessage={errors?.email}
+                name="email"
+                value={email}
+                onValueChange={(value) => setEmail(value)}
+                changeOverride
+              />
             </div>
 
-            <InputField
-              type="text"
-              autoComplete="one-time-code"
-              id="one_time_password"
-              placeholder={t('plaid_optional')}
-              errorMessage={errors?.one_time_password}
-              name="one_time_password"
-            />
+            {!isEmailStep && (
+              <>
+                <div
+                  className="flex items-center justify-between rounded px-3 py-2 border"
+                  style={{ borderColor: colors.$5 }}
+                >
+                  <span
+                    className="truncate text-sm"
+                    style={{ color: colors.$3 }}
+                  >
+                    {email}
+                  </span>
 
-            <div className="space-y-2">
-              <div
-                className={classNames(
-                  'flex flex-col lg:flex-row items-center',
-                  {
-                    'justify-between': isSelfHosted(),
-                    'justify-end': isHosted(),
-                  }
-                )}
-              >
-                {isSelfHosted() && <InputLabel>{t('secret')}</InputLabel>}
-
-                {isHosted() && (
                   <div
-                    className="text-sm hover:underline cursor-pointer"
-                    onClick={() => setIsDisable2faModalOpen(true)}
+                    className="text-sm hover:underline cursor-pointer shrink-0 ml-3"
+                    onClick={handleBackToEmail}
                     style={{ color: accentColor }}
                   >
-                    {t('disable_2fa')}
+                    {t('change')}
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
 
-            {isSelfHosted() && (
-              <InputField
-                type="password"
-                autoComplete="on"
-                placeholder={t('plaid_optional')}
-                name="secret"
-              />
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-x-3">
+                    <InputLabel className="truncate">
+                      {t('password')}
+                    </InputLabel>
+
+                    <Link className="truncate" to="/recover_password">
+                      {t('forgot_password')}
+                    </Link>
+                  </div>
+                </div>
+
+                <InputField
+                  type="password"
+                  autoComplete="current-password"
+                  id="password"
+                  errorMessage={errors?.password}
+                  name="password"
+                  value={password}
+                  onValueChange={(value) => setPassword(value)}
+                  changeOverride
+                />
+
+                {hasTwoFactor && (
+                  <InputField
+                    type="text"
+                    autoComplete="one-time-code"
+                    label={`2FA - ${t('one_time_password')}`}
+                    id="one_time_password"
+                    errorMessage={errors?.one_time_password}
+                    name="one_time_password"
+                    value={oneTimePassword}
+                    onValueChange={(value) => setOneTimePassword(value)}
+                    changeOverride
+                  />
+                )}
+
+                <div className="space-y-2">
+                  <div
+                    className={classNames(
+                      'flex flex-col lg:flex-row items-center',
+                      {
+                        'justify-between': isSelfHosted(),
+                        'justify-end': isHosted(),
+                      }
+                    )}
+                  >
+                    {isSelfHosted() && <InputLabel>{t('secret')}</InputLabel>}
+
+                    {isHosted() && (
+                      <div
+                        className="text-sm hover:underline cursor-pointer"
+                        onClick={() => setIsDisable2faModalOpen(true)}
+                        style={{ color: accentColor }}
+                      >
+                        {t('disable_2fa')}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {isSelfHosted() && (
+                  <InputField
+                    type="password"
+                    autoComplete="on"
+                    placeholder={t('plaid_optional')}
+                    name="secret"
+                  />
+                )}
+              </>
             )}
 
             <ErrorMessage className="mt-4">{message}</ErrorMessage>
 
             <Button disabled={isFormBusy} className="mt-4" variant="block">
-              {t('login')}
+              {isEmailStep ? t('continue') : t('login')}
             </Button>
           </form>
 
@@ -190,7 +287,7 @@ export function Login() {
 
         {isHosted() && (
           <>
-            <SignInProviders />
+            {isEmailStep && <SignInProviders />}
 
             <div className="mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
               <HostedLinks />
