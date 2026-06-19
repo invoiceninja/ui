@@ -21,14 +21,17 @@ import {
   ShortcutDefinition,
 } from '$app/common/constants/keyboard-shortcuts';
 import {
-  bindingFromEvent,
   formatBinding,
+  formatRecorderPreview,
 } from '$app/common/helpers/keyboard-shortcuts';
+import { useShortcutRecorder } from '$app/common/hooks/useShortcutRecorder';
 import { useState } from 'react';
 import { Refresh } from '$app/components/icons/Refresh';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 type Overrides = Record<string, KeyboardShortcutOverride | null>;
+
+const DEFAULT_SELECTED_ID = 'create_invoice';
 
 export function KeyboardShortcuts() {
   const [t] = useTranslation();
@@ -40,7 +43,7 @@ export function KeyboardShortcuts() {
   const overrides = (reactSettings.preferences.keyboard_shortcuts ??
     {}) as Overrides;
 
-  const [recordingId, setRecordingId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string>(DEFAULT_SELECTED_ID);
 
   const bindingFor = (definition: ShortcutDefinition): string | null => {
     if (Object.prototype.hasOwnProperty.call(overrides, definition.id)) {
@@ -54,7 +57,7 @@ export function KeyboardShortcuts() {
   const isCustomized = (definition: ShortcutDefinition): boolean =>
     Object.prototype.hasOwnProperty.call(overrides, definition.id);
 
-  const conflicts = (() => {
+  const conflictsByBinding = (() => {
     const byBinding: Record<string, string[]> = {};
 
     for (const definition of keyboardShortcuts) {
@@ -103,30 +106,12 @@ export function KeyboardShortcuts() {
     writeOverrides(next);
   };
 
-  const handleRecord = (
-    definition: ShortcutDefinition,
-    event: React.KeyboardEvent<HTMLButtonElement>
-  ) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (event.key === 'Escape') {
-      setRecordingId(null);
-      return;
-    }
-
-    const binding = bindingFromEvent(event);
-
-    if (!binding) {
-      return;
-    }
-
-    setBinding(definition, binding);
-    setRecordingId(null);
-  };
+  const selectedDefinition =
+    keyboardShortcuts.find((definition) => definition.id === selectedId) ??
+    keyboardShortcuts[0];
 
   return (
-    <div className="px-4 sm:px-6 pt-4 space-y-6">
+    <div className="px-4 sm:px-6 pt-4 space-y-4">
       <div>
         <div className="text-lg font-medium">{t('keyboard_shortcuts')}</div>
         <div className="text-sm" style={{ color: colors.$17 }}>
@@ -134,123 +119,189 @@ export function KeyboardShortcuts() {
         </div>
       </div>
 
-      {keyboardShortcutGroups.map((group) => (
-        <div key={group.labelKey} className="space-y-1">
-          <div
-            className="text-xs uppercase tracking-wide font-medium pb-1"
-            style={{ color: colors.$17 }}
-          >
-            {t(group.labelKey)}
-          </div>
-
-          {group.shortcuts.map((definition) => {
-            const binding = bindingFor(definition);
-            const isRecording = recordingId === definition.id;
-            const hasConflict = conflicts.has(definition.id);
-
-            return (
+      <div
+        className="flex rounded-md border overflow-hidden"
+        style={{ borderColor: colors.$20 }}
+      >
+        <div
+          className="w-1/2 max-h-96 overflow-y-auto border-r"
+          style={{ borderColor: colors.$20 }}
+        >
+          {keyboardShortcutGroups.map((group) => (
+            <div key={group.labelKey}>
               <div
-                key={definition.id}
-                className="flex items-center justify-between py-2 border-b"
-                style={{ borderColor: colors.$20 }}
+                className="text-xs uppercase tracking-wide font-medium px-4 py-2 sticky top-0"
+                style={{ color: colors.$17, backgroundColor: colors.$2 }}
               >
-                <div className="text-sm font-medium">
-                  {t(definition.labelKey)}
-                </div>
+                {t(group.labelKey)}
+              </div>
 
-                <div className="flex items-center gap-3">
+              {group.shortcuts.map((definition) => {
+                const isSelected = definition.id === selectedId;
+                const hasConflict = conflictsByBinding.has(definition.id);
+
+                return (
                   <button
+                    key={definition.id}
                     type="button"
-                    autoFocus={isRecording}
-                    onClick={() =>
-                      setRecordingId(isRecording ? null : definition.id)
-                    }
-                    onKeyDown={(event) =>
-                      isRecording ? handleRecord(definition, event) : undefined
-                    }
-                    onBlur={() => isRecording && setRecordingId(null)}
-                    className="min-w-[9rem] text-center text-sm rounded px-3 py-1.5 border transition-colors"
+                    onClick={() => setSelectedId(definition.id)}
+                    className="w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors"
                     style={{
                       color: colors.$3,
-                      borderColor: isRecording
-                        ? colors.$8
-                        : hasConflict
-                        ? '#ef4444'
-                        : colors.$5,
-                      backgroundColor: colors.$1,
+                      backgroundColor: isSelected ? colors.$5 : 'transparent',
+                      fontWeight: isSelected ? 600 : 400,
                     }}
-                    title={
-                      hasConflict
-                        ? (t('shortcut_conflict') as string)
-                        : undefined
-                    }
                   >
-                    {isRecording
-                      ? t('press_keys')
-                      : binding === null
-                      ? t('disabled')
-                      : formatBinding(binding)}
+                    <span>{t(definition.labelKey)}</span>
+
+                    {hasConflict && (
+                      <span
+                        className="ml-2 h-2 w-2 rounded-full shrink-0"
+                        style={{ backgroundColor: '#ef4444' }}
+                        title={t('shortcut_conflict') as string}
+                      />
+                    )}
                   </button>
-
-                  <ResetButton
-                    visible={isCustomized(definition)}
-                    onClick={() => resetBinding(definition)}
-                    title={t('reset')}
-                  />
-
-                  <DisableButton
-                    visible={binding !== null}
-                    onClick={() => disableBinding(definition)}
-                    title={t('disable')}
-                  />
-                </div>
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          ))}
         </div>
-      ))}
+
+        <div className="w-1/2 p-6 flex items-center justify-center">
+          <ShortcutDetail
+            key={selectedDefinition.id}
+            definition={selectedDefinition}
+            binding={bindingFor(selectedDefinition)}
+            isCustomized={isCustomized(selectedDefinition)}
+            hasConflict={conflictsByBinding.has(selectedDefinition.id)}
+            onCommit={(keys) => setBinding(selectedDefinition, keys)}
+            onReset={() => resetBinding(selectedDefinition)}
+            onDisable={() => disableBinding(selectedDefinition)}
+          />
+        </div>
+      </div>
     </div>
   );
 }
 
-interface IconButtonProps {
-  visible: boolean;
-  onClick: () => void;
-  title: string;
+interface ShortcutDetailProps {
+  definition: ShortcutDefinition;
+  binding: string | null;
+  isCustomized: boolean;
+  hasConflict: boolean;
+  onCommit: (keys: string) => void;
+  onReset: () => void;
+  onDisable: () => void;
 }
 
-function ResetButton({ visible, onClick, title }: IconButtonProps) {
+function ShortcutDetail({
+  definition,
+  binding,
+  isCustomized,
+  hasConflict,
+  onCommit,
+  onReset,
+  onDisable,
+}: ShortcutDetailProps) {
+  const [t] = useTranslation();
   const colors = useColorScheme();
 
+  const recorder = useShortcutRecorder({ onCommit });
+
+  const label = recorder.isRecording
+    ? formatRecorderPreview(recorder.preview) || t('press_keys')
+    : binding === null
+    ? t('disabled')
+    : formatBinding(binding);
+
   return (
-    <span
-      className="cursor-pointer hover:opacity-75"
-      style={{ visibility: visible ? 'visible' : 'hidden' }}
-      onClick={visible ? onClick : undefined}
-      title={title}
-    >
-      <Refresh size="1.1rem" color={colors.$17} />
-    </span>
+    <div className="w-full flex flex-col items-center gap-4">
+      <div className="text-sm font-medium" style={{ color: colors.$17 }}>
+        {t(definition.labelKey)}
+      </div>
+
+      <button
+        type="button"
+        onClick={() =>
+          recorder.isRecording ? recorder.stop() : recorder.start()
+        }
+        className="min-w-[12rem] text-center text-base rounded px-4 py-3 border transition-colors"
+        style={{
+          color: colors.$3,
+          borderColor: recorder.isRecording
+            ? colors.$8
+            : hasConflict
+            ? '#ef4444'
+            : colors.$5,
+          backgroundColor: colors.$1,
+        }}
+        title={hasConflict ? (t('shortcut_conflict') as string) : undefined}
+      >
+        {label}
+      </button>
+
+      <div className="text-xs text-center" style={{ color: colors.$17 }}>
+        {recorder.isRecording
+          ? t('shortcut_recording_help')
+          : t('shortcut_click_to_edit')}
+      </div>
+
+      <div className="flex items-center gap-4 pt-1">
+        <DetailAction
+          visible={isCustomized}
+          onClick={onReset}
+          label={t('reset')}
+        >
+          <Refresh size="1rem" color={colors.$17} />
+        </DetailAction>
+
+        <DetailAction
+          visible={binding !== null}
+          onClick={onDisable}
+          label={t('disable')}
+        >
+          <CircleXMark
+            color={colors.$16}
+            hoverColor={colors.$3}
+            borderColor={colors.$5}
+            hoverBorderColor={colors.$17}
+            size="1.3rem"
+          />
+        </DetailAction>
+      </div>
+    </div>
   );
 }
 
-function DisableButton({ visible, onClick, title }: IconButtonProps) {
+interface DetailActionProps {
+  visible: boolean;
+  onClick: () => void;
+  label: string;
+  children: React.ReactNode;
+}
+
+function DetailAction({
+  visible,
+  onClick,
+  label,
+  children,
+}: DetailActionProps) {
   const colors = useColorScheme();
 
+  if (!visible) {
+    return null;
+  }
+
   return (
-    <span
-      className="cursor-pointer hover:opacity-75"
-      style={{ visibility: visible ? 'visible' : 'hidden' }}
-      onClick={visible ? onClick : undefined}
-      title={title}
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex items-center gap-1.5 text-xs hover:opacity-75"
+      style={{ color: colors.$17 }}
     >
-      <CircleXMark
-        color={colors.$16}
-        hoverColor={colors.$3}
-        borderColor={colors.$5}
-        hoverBorderColor={colors.$17}
-        size="1.4rem"
-      />
-    </span>
+      {children}
+      <span>{label}</span>
+    </button>
   );
 }

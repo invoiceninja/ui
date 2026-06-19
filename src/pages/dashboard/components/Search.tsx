@@ -24,6 +24,8 @@ import {
 } from '$app/common/hooks/usePreventNavigation';
 import { useResolvedShortcuts } from '$app/common/hooks/useReactSettings';
 import { eventMatchesBinding } from '$app/common/helpers/keyboard-shortcuts';
+import { isShortcutRecordingActive } from '$app/common/hooks/useShortcutRecorder';
+import { getHeldKeys } from '$app/common/hooks/useHeldKeys';
 import { debounce } from 'lodash';
 import { InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
@@ -162,9 +164,13 @@ export function Search$() {
   };
 
   const handleOpenModalByKeyDown = (event: KeyboardEvent) => {
+    if (isShortcutRecordingActive()) {
+      return;
+    }
+
     const binding = searchBindingRef.current;
 
-    if (binding && eventMatchesBinding(event, binding)) {
+    if (binding && eventMatchesBinding(event, binding, getHeldKeys())) {
       event.preventDefault();
 
       setIsModalOpen((current) => !current);

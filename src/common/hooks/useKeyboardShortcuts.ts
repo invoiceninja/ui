@@ -13,6 +13,12 @@ import { usePreventNavigation } from './usePreventNavigation';
 import { useResolvedShortcuts } from './useReactSettings';
 import { keyboardShortcuts } from '../constants/keyboard-shortcuts';
 import { eventMatchesBinding } from '../helpers/keyboard-shortcuts';
+import { isShortcutRecordingActive } from './useShortcutRecorder';
+import {
+  getHeldKeys,
+  startTrackingHeldKeys,
+  stopTrackingHeldKeys,
+} from './useHeldKeys';
 
 export function useKeyboardShortcuts() {
   const preventNavigation = usePreventNavigation();
@@ -20,9 +26,11 @@ export function useKeyboardShortcuts() {
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      if (!event.ctrlKey && !event.metaKey && !event.altKey) {
+      if (isShortcutRecordingActive()) {
         return;
       }
+
+      const heldKeys = getHeldKeys();
 
       for (const definition of keyboardShortcuts) {
         if (definition.action.type !== 'navigate') {
@@ -35,7 +43,7 @@ export function useKeyboardShortcuts() {
           continue;
         }
 
-        if (eventMatchesBinding(event, binding)) {
+        if (eventMatchesBinding(event, binding, heldKeys)) {
           event.preventDefault();
           event.stopPropagation();
           preventNavigation({ url: definition.action.to });
@@ -47,7 +55,12 @@ export function useKeyboardShortcuts() {
   );
 
   useEffect(() => {
+    startTrackingHeldKeys();
     document.addEventListener('keydown', handleKeyDown, true);
-    return () => document.removeEventListener('keydown', handleKeyDown, true);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown, true);
+      stopTrackingHeldKeys();
+    };
   }, [handleKeyDown]);
 }

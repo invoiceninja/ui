@@ -11,6 +11,8 @@
 import { useEffect, useCallback } from 'react';
 import { useResolvedShortcuts } from './useReactSettings';
 import { eventMatchesBinding } from '../helpers/keyboard-shortcuts';
+import { isShortcutRecordingActive } from './useShortcutRecorder';
+import { getHeldKeys } from './useHeldKeys';
 
 interface UseSaveKeyboardShortcutOptions {
   isEnabled: boolean;
@@ -25,9 +27,13 @@ export function useSaveKeyboardShortcut({
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
+      if (isShortcutRecordingActive()) {
+        return;
+      }
+
       const binding = bindings.save;
 
-      if (binding && eventMatchesBinding(event, binding)) {
+      if (binding && eventMatchesBinding(event, binding, getHeldKeys())) {
         event.preventDefault();
         if (isEnabled) {
           if (
