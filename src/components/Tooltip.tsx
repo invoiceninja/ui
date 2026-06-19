@@ -29,6 +29,7 @@ interface Props {
   withoutWrapping?: boolean;
   centerVertically?: boolean;
   childrenWrapperClassName?: string;
+  appendToBody?: boolean;
 }
 
 export function Tooltip(props: Props) {
@@ -43,6 +44,7 @@ export function Tooltip(props: Props) {
     disabled,
     withoutWrapping,
     childrenWrapperClassName,
+    appendToBody,
   } = props;
 
   const parentChildrenElement = useRef<HTMLDivElement>(null);
@@ -79,6 +81,7 @@ export function Tooltip(props: Props) {
       <Tippy
         placement={placement || 'top-start'}
         interactive={true}
+        appendTo={appendToBody ? () => document.body : 'parent'}
         render={() => (
           <div
             className="flex flex-col items-center"

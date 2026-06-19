@@ -11,11 +11,13 @@
 interface Props {
   color?: string;
   size?: string;
+  className?: string;
 }
 
 export function ExpandCollapseChevron({
   color = '#FFFFFF',
   size = '1.3rem',
+  className,
 }: Props) {
   return (
     <svg
@@ -23,6 +25,7 @@ export function ExpandCollapseChevron({
       xmlnsXlink="http://www.w3.org/1999/xlink"
       x="0px"
       y="0px"
+      className={className}
       style={{ width: size, height: size }}
       viewBox="0 0 20 20"
     >
