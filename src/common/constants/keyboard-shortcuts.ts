@@ -157,7 +157,7 @@ export interface KeyboardShortcutOverride {
 
 export function resolveShortcutBindings(
   overrides: Record<string, KeyboardShortcutOverride | null> | undefined
-): Record<string, string | null> {
+) {
   const resolved: Record<string, string | null> = {};
 
   for (const definition of keyboardShortcuts) {

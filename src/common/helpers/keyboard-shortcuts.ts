@@ -21,7 +21,7 @@ const MODIFIER_KEYS = new Set([
 
 const MODIFIER_ORDER = ['mod', 'alt', 'shift'];
 
-function isMac(): boolean {
+function isMac() {
   if (typeof navigator === 'undefined') {
     return false;
   }
@@ -31,19 +31,19 @@ function isMac(): boolean {
   );
 }
 
-function hasMod(event: KeyboardEvent | React.KeyboardEvent): boolean {
+function hasMod(event: KeyboardEvent | React.KeyboardEvent) {
   return isMac() ? event.metaKey : event.ctrlKey;
 }
 
-function hasSecondaryCtrl(event: KeyboardEvent | React.KeyboardEvent): boolean {
+function hasSecondaryCtrl(event: KeyboardEvent | React.KeyboardEvent) {
   return isMac() ? event.ctrlKey : event.metaKey;
 }
 
-export function isModifierKey(key: string): boolean {
+export function isModifierKey(key: string) {
   return MODIFIER_KEYS.has(key);
 }
 
-export function normalizeKey(key: string): string {
+export function normalizeKey(key: string) {
   if (key === ' ') {
     return 'space';
   }
@@ -51,7 +51,7 @@ export function normalizeKey(key: string): string {
   return key.toLowerCase();
 }
 
-function modifierParts(event: KeyboardEvent | React.KeyboardEvent): string[] {
+function modifierParts(event: KeyboardEvent | React.KeyboardEvent) {
   const parts: string[] = [];
 
   if (hasMod(event) || hasSecondaryCtrl(event)) {
@@ -69,7 +69,7 @@ function modifierParts(event: KeyboardEvent | React.KeyboardEvent): string[] {
   return parts;
 }
 
-export function buildBinding(modifiers: string[], keys: string[]): string {
+export function buildBinding(modifiers: string[], keys: string[]) {
   const orderedModifiers = MODIFIER_ORDER.filter((modifier) =>
     modifiers.includes(modifier)
   );
@@ -81,7 +81,7 @@ export function buildBinding(modifiers: string[], keys: string[]): string {
 export function bindingFromState(
   event: KeyboardEvent | React.KeyboardEvent,
   keys: string[]
-): string | null {
+) {
   const modifiers = modifierParts(event);
 
   if (!modifiers.length && !keys.length) {
@@ -91,10 +91,7 @@ export function bindingFromState(
   return buildBinding(modifiers, keys);
 }
 
-function splitBinding(binding: string): {
-  modifiers: string[];
-  keys: string[];
-} {
+function splitBinding(binding: string) {
   const modifiers: string[] = [];
   const keys: string[] = [];
 
@@ -113,7 +110,7 @@ export function eventMatchesBinding(
   event: KeyboardEvent | React.KeyboardEvent,
   binding: string,
   heldKeys?: string[]
-): boolean {
+) {
   if (!binding) {
     return false;
   }
@@ -160,7 +157,7 @@ const PRINTABLE_KEY_LABELS: Record<string, string> = {
   tab: 'Tab',
 };
 
-function formatModifiers(parts: string[]): string[] {
+function formatModifiers(parts: string[]) {
   const mac = isMac();
   const labels: string[] = [];
 
@@ -181,14 +178,14 @@ function formatModifiers(parts: string[]): string[] {
   return labels;
 }
 
-function formatKey(key: string): string {
+function formatKey(key: string) {
   return (
     PRINTABLE_KEY_LABELS[key] ??
     (key.length === 1 ? key.toUpperCase() : capitalize(key))
   );
 }
 
-export function formatBinding(binding: string | null | undefined): string {
+export function formatBinding(binding: string | null | undefined) {
   if (!binding) {
     return '';
   }
@@ -204,9 +201,7 @@ export function formatBinding(binding: string | null | undefined): string {
   return labels.join(' + ');
 }
 
-export function formatRecorderPreview(
-  binding: string | null | undefined
-): string {
+export function formatRecorderPreview(binding: string | null | undefined) {
   if (!binding) {
     return '';
   }
@@ -220,6 +215,6 @@ export function formatRecorderPreview(
   return formatBinding(binding);
 }
 
-function capitalize(value: string): string {
+function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }

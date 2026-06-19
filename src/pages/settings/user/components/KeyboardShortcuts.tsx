@@ -58,9 +58,9 @@ export function KeyboardShortcuts() {
         ),
       }))
       .filter((group) => group.shortcuts.length > 0);
-  }, [searchQuery, t]);
+  }, [searchQuery]);
 
-  const bindingFor = (definition: ShortcutDefinition): string | null => {
+  const bindingFor = (definition: ShortcutDefinition) => {
     if (Object.prototype.hasOwnProperty.call(overrides, definition.id)) {
       const override = overrides[definition.id];
       return override === null ? null : override.keys;
@@ -69,7 +69,7 @@ export function KeyboardShortcuts() {
     return definition.defaultBinding;
   };
 
-  const isCustomized = (definition: ShortcutDefinition): boolean =>
+  const isCustomized = (definition: ShortcutDefinition) =>
     Object.prototype.hasOwnProperty.call(overrides, definition.id);
 
   const conflictsByBinding = (() => {
@@ -247,11 +247,17 @@ function ShortcutDetail({
 
   const recorder = useShortcutRecorder({ onCommit });
 
-  const label = recorder.isRecording
-    ? formatRecorderPreview(recorder.preview) || t('press_keys')
-    : binding === null
-    ? t('disabled')
-    : formatBinding(binding);
+  const label = useMemo(() => {
+    if (recorder.isRecording) {
+      return formatRecorderPreview(recorder.preview) || t('press_keys');
+    }
+
+    if (binding === null) {
+      return t('disabled');
+    }
+
+    return formatBinding(binding);
+  }, [recorder.isRecording, recorder.preview, binding]);
 
   return (
     <div className="w-full flex flex-col items-center gap-4">

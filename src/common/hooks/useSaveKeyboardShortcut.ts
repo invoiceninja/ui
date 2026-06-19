@@ -36,6 +36,8 @@ export function useSaveKeyboardShortcut({
       if (binding && eventMatchesBinding(event, binding, getHeldKeys())) {
         event.preventDefault();
         if (isEnabled) {
+          // Blur the active element to trigger any pending onBlur events
+          // (e.g., NumberInputField only calls onValueChange on blur)
           if (
             document.activeElement &&
             document.activeElement !== document.body

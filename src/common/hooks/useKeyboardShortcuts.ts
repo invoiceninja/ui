@@ -14,15 +14,13 @@ import { useResolvedShortcuts } from './useReactSettings';
 import { keyboardShortcuts } from '../constants/keyboard-shortcuts';
 import { eventMatchesBinding } from '../helpers/keyboard-shortcuts';
 import { isShortcutRecordingActive } from './useShortcutRecorder';
-import {
-  getHeldKeys,
-  startTrackingHeldKeys,
-  stopTrackingHeldKeys,
-} from './useHeldKeys';
+import { getHeldKeys, useTrackHeldKeys } from './useHeldKeys';
 
 export function useKeyboardShortcuts() {
   const preventNavigation = usePreventNavigation();
   const bindings = useResolvedShortcuts();
+
+  useTrackHeldKeys();
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -55,12 +53,7 @@ export function useKeyboardShortcuts() {
   );
 
   useEffect(() => {
-    startTrackingHeldKeys();
     document.addEventListener('keydown', handleKeyDown, true);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown, true);
-      stopTrackingHeldKeys();
-    };
+    return () => document.removeEventListener('keydown', handleKeyDown, true);
   }, [handleKeyDown]);
 }

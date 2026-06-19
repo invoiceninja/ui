@@ -216,7 +216,7 @@ const resolvedShortcutsAtom = atom((get) => {
   return resolveShortcutBindings(settings.preferences?.keyboard_shortcuts);
 });
 
-export function useResolvedShortcuts(): Record<string, string | null> {
+export function useResolvedShortcuts() {
   return useAtomValue(resolvedShortcutsAtom);
 }
 

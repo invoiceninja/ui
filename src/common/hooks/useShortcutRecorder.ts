@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { atom, getDefaultStore } from 'jotai';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   bindingFromState,
@@ -17,10 +18,10 @@ import {
 
 const COMMIT_DELAY_MS = 500;
 
-let recordingActive = false;
+const recordingActiveAtom = atom<boolean>(false);
 
-export function isShortcutRecordingActive(): boolean {
-  return recordingActive;
+export function isShortcutRecordingActive() {
+  return getDefaultStore().get(recordingActiveAtom);
 }
 
 interface UseShortcutRecorderOptions {
@@ -28,17 +29,10 @@ interface UseShortcutRecorderOptions {
   onCancel?: () => void;
 }
 
-interface UseShortcutRecorderResult {
-  isRecording: boolean;
-  preview: string | null;
-  start: () => void;
-  stop: () => void;
-}
-
 export function useShortcutRecorder({
   onCommit,
   onCancel,
-}: UseShortcutRecorderOptions): UseShortcutRecorderResult {
+}: UseShortcutRecorderOptions) {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -80,7 +74,8 @@ export function useShortcutRecorder({
       return;
     }
 
-    recordingActive = true;
+    const store = getDefaultStore();
+    store.set(recordingActiveAtom, true);
 
     const handleKeyDown = (event: KeyboardEvent) => {
       event.preventDefault();
@@ -161,7 +156,7 @@ export function useShortcutRecorder({
     window.addEventListener('blur', handleBlur);
 
     return () => {
-      recordingActive = false;
+      store.set(recordingActiveAtom, false);
       document.removeEventListener('keydown', handleKeyDown, true);
       document.removeEventListener('keyup', handleKeyUp, true);
       window.removeEventListener('blur', handleBlur);
