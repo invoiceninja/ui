@@ -145,12 +145,6 @@ export const keyboardShortcutGroups: ShortcutGroup[] = [
   { labelKey: 'general_settings', shortcuts: generalShortcuts },
 ];
 
-export const keyboardShortcutsById: Record<ShortcutId, ShortcutDefinition> =
-  keyboardShortcuts.reduce((map, shortcut) => {
-    map[shortcut.id] = shortcut;
-    return map;
-  }, {} as Record<ShortcutId, ShortcutDefinition>);
-
 export interface KeyboardShortcutOverride {
   keys: string;
 }

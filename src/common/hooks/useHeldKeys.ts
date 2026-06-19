@@ -29,9 +29,9 @@ export function useTrackHeldKeys() {
 
       const key = normalizeKey(event.key);
 
-      store.set(heldKeysAtom, (held) =>
-        held.includes(key) ? held : [...held, key]
-      );
+      store.set(heldKeysAtom, (held) => {
+        return held.includes(key) ? held : [...held, key];
+      });
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
@@ -41,7 +41,11 @@ export function useTrackHeldKeys() {
 
       const key = normalizeKey(event.key);
 
-      store.set(heldKeysAtom, (held) => held.filter((value) => value !== key));
+      store.set(heldKeysAtom, (held) => {
+        return held.filter((value) => {
+          return value !== key;
+        });
+      });
     };
 
     const handleBlur = () => {

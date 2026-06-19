@@ -51,13 +51,17 @@ export function KeyboardShortcuts() {
     const query = searchQuery.trim().toLowerCase();
 
     return keyboardShortcutGroups
-      .map((group) => ({
-        ...group,
-        shortcuts: group.shortcuts.filter((definition) =>
-          t(definition.labelKey).toLowerCase().includes(query)
-        ),
-      }))
-      .filter((group) => group.shortcuts.length > 0);
+      .map((group) => {
+        return {
+          ...group,
+          shortcuts: group.shortcuts.filter((definition) => {
+            return t(definition.labelKey).toLowerCase().includes(query);
+          }),
+        };
+      })
+      .filter((group) => {
+        return group.shortcuts.length > 0;
+      });
   }, [searchQuery]);
 
   const bindingFor = (definition: ShortcutDefinition) => {
@@ -69,8 +73,9 @@ export function KeyboardShortcuts() {
     return definition.defaultBinding;
   };
 
-  const isCustomized = (definition: ShortcutDefinition) =>
-    Object.prototype.hasOwnProperty.call(overrides, definition.id);
+  const isCustomized = (definition: ShortcutDefinition) => {
+    return Object.prototype.hasOwnProperty.call(overrides, definition.id);
+  };
 
   const conflictsByBinding = (() => {
     const byBinding: Record<string, string[]> = {};
@@ -87,7 +92,9 @@ export function KeyboardShortcuts() {
     const conflicting = new Set<string>();
     for (const ids of Object.values(byBinding)) {
       if (ids.length > 1) {
-        ids.forEach((id) => conflicting.add(id));
+        ids.forEach((id) => {
+          conflicting.add(id);
+        });
       }
     }
 
@@ -122,8 +129,9 @@ export function KeyboardShortcuts() {
   };
 
   const selectedDefinition =
-    keyboardShortcuts.find((definition) => definition.id === selectedId) ??
-    keyboardShortcuts[0];
+    keyboardShortcuts.find((definition) => {
+      return definition.id === selectedId;
+    }) ?? keyboardShortcuts[0];
 
   return (
     <div className="px-4 sm:px-6 pt-4 space-y-4">
@@ -155,45 +163,49 @@ export function KeyboardShortcuts() {
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            {filteredGroups.map((group) => (
-              <div key={group.labelKey}>
-                <div
-                  className="text-xs uppercase tracking-wide font-medium px-4 py-2 sticky top-0"
-                  style={{ color: colors.$17, backgroundColor: colors.$2 }}
-                >
-                  {t(group.labelKey)}
+            {filteredGroups.map((group) => {
+              return (
+                <div key={group.labelKey}>
+                  <div
+                    className="text-xs uppercase tracking-wide font-medium px-4 py-2 sticky top-0"
+                    style={{ color: colors.$17, backgroundColor: colors.$2 }}
+                  >
+                    {t(group.labelKey)}
+                  </div>
+
+                  {group.shortcuts.map((definition) => {
+                    const isSelected = definition.id === selectedId;
+                    const hasConflict = conflictsByBinding.has(definition.id);
+
+                    return (
+                      <button
+                        key={definition.id}
+                        type="button"
+                        onClick={() => setSelectedId(definition.id)}
+                        className="w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors"
+                        style={{
+                          color: colors.$3,
+                          backgroundColor: isSelected
+                            ? colors.$5
+                            : 'transparent',
+                          fontWeight: isSelected ? 600 : 400,
+                        }}
+                      >
+                        <span>{t(definition.labelKey)}</span>
+
+                        {hasConflict && (
+                          <span
+                            className="ml-2 h-2 w-2 rounded-full shrink-0"
+                            style={{ backgroundColor: '#ef4444' }}
+                            title={t('shortcut_conflict') as string}
+                          />
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
-
-                {group.shortcuts.map((definition) => {
-                  const isSelected = definition.id === selectedId;
-                  const hasConflict = conflictsByBinding.has(definition.id);
-
-                  return (
-                    <button
-                      key={definition.id}
-                      type="button"
-                      onClick={() => setSelectedId(definition.id)}
-                      className="w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors"
-                      style={{
-                        color: colors.$3,
-                        backgroundColor: isSelected ? colors.$5 : 'transparent',
-                        fontWeight: isSelected ? 600 : 400,
-                      }}
-                    >
-                      <span>{t(definition.labelKey)}</span>
-
-                      {hasConflict && (
-                        <span
-                          className="ml-2 h-2 w-2 rounded-full shrink-0"
-                          style={{ backgroundColor: '#ef4444' }}
-                          title={t('shortcut_conflict') as string}
-                        />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            ))}
+              );
+            })}
 
             {filteredGroups.length === 0 && (
               <div

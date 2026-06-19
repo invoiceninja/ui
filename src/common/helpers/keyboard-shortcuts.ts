@@ -73,7 +73,9 @@ export function buildBinding(modifiers: string[], keys: string[]) {
   const orderedModifiers = MODIFIER_ORDER.filter((modifier) =>
     modifiers.includes(modifier)
   );
-  const orderedKeys = keys.filter((key, index) => keys.indexOf(key) === index);
+  const orderedKeys = keys.filter((key, index) => {
+    return keys.indexOf(key) === index;
+  });
 
   return [...orderedModifiers, ...orderedKeys].join('+');
 }
@@ -142,7 +144,9 @@ export function eventMatchesBinding(
     return false;
   }
 
-  return keys.every((key, index) => pressed[index] === key);
+  return keys.every((key, index) => {
+    return pressed[index] === key;
+  });
 }
 
 const PRINTABLE_KEY_LABELS: Record<string, string> = {

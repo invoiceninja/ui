@@ -125,9 +125,9 @@ export function useShortcutRecorder({
 
       if (!isModifierKey(event.key)) {
         const key = normalizeKey(event.key);
-        heldKeysRef.current = heldKeysRef.current.filter(
-          (held) => held !== key
-        );
+        heldKeysRef.current = heldKeysRef.current.filter((held) => {
+          return held !== key;
+        });
       }
 
       const stillHeld =
