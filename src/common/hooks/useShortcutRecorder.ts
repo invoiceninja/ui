@@ -15,6 +15,8 @@ import {
   normalizeKey,
 } from '../helpers/keyboard-shortcuts';
 
+const COMMIT_DELAY_MS = 500;
+
 let recordingActive = false;
 
 export function isShortcutRecordingActive(): boolean {
@@ -41,18 +43,27 @@ export function useShortcutRecorder({
   const [preview, setPreview] = useState<string | null>(null);
 
   const bestBindingRef = useRef<string | null>(null);
-  const heldKeysRef = useRef<Set<string>>(new Set());
+  const heldKeysRef = useRef<string[]>([]);
+  const commitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const onCommitRef = useRef(onCommit);
   const onCancelRef = useRef(onCancel);
   onCommitRef.current = onCommit;
   onCancelRef.current = onCancel;
 
-  const reset = useCallback(() => {
-    bestBindingRef.current = null;
-    heldKeysRef.current = new Set();
-    setPreview(null);
+  const clearCommitTimer = useCallback(() => {
+    if (commitTimerRef.current !== null) {
+      clearTimeout(commitTimerRef.current);
+      commitTimerRef.current = null;
+    }
   }, []);
+
+  const reset = useCallback(() => {
+    clearCommitTimer();
+    bestBindingRef.current = null;
+    heldKeysRef.current = [];
+    setPreview(null);
+  }, [clearCommitTimer]);
 
   const stop = useCallback(() => {
     setIsRecording(false);
@@ -81,14 +92,20 @@ export function useShortcutRecorder({
         return;
       }
 
+      clearCommitTimer();
+
       if (!isModifierKey(event.key)) {
-        heldKeysRef.current.add(normalizeKey(event.key));
+        const key = normalizeKey(event.key);
+
+        if (!heldKeysRef.current.includes(key)) {
+          heldKeysRef.current.push(key);
+        }
       }
 
-      const binding = bindingFromState(event, [...heldKeysRef.current]);
+      const binding = bindingFromState(event, heldKeysRef.current);
 
       if (binding) {
-        if (heldKeysRef.current.size > 0) {
+        if (heldKeysRef.current.length > 0) {
           bestBindingRef.current = binding;
         }
 
@@ -101,13 +118,21 @@ export function useShortcutRecorder({
       event.stopPropagation();
 
       if (bestBindingRef.current) {
-        onCommitRef.current(bestBindingRef.current);
-        stop();
+        const binding = bestBindingRef.current;
+
+        clearCommitTimer();
+        commitTimerRef.current = setTimeout(() => {
+          onCommitRef.current(binding);
+          stop();
+        }, COMMIT_DELAY_MS);
         return;
       }
 
       if (!isModifierKey(event.key)) {
-        heldKeysRef.current.delete(normalizeKey(event.key));
+        const key = normalizeKey(event.key);
+        heldKeysRef.current = heldKeysRef.current.filter(
+          (held) => held !== key
+        );
       }
 
       const stillHeld =
@@ -115,7 +140,7 @@ export function useShortcutRecorder({
         event.metaKey ||
         event.altKey ||
         event.shiftKey ||
-        heldKeysRef.current.size > 0;
+        heldKeysRef.current.length > 0;
 
       if (!stillHeld) {
         onCancelRef.current?.();
@@ -123,7 +148,7 @@ export function useShortcutRecorder({
         return;
       }
 
-      setPreview(bindingFromState(event, [...heldKeysRef.current]));
+      setPreview(bindingFromState(event, heldKeysRef.current));
     };
 
     const handleBlur = () => {

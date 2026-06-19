@@ -70,12 +70,12 @@ function modifierParts(event: KeyboardEvent | React.KeyboardEvent): string[] {
 }
 
 export function buildBinding(modifiers: string[], keys: string[]): string {
-  const sortedModifiers = MODIFIER_ORDER.filter((modifier) =>
+  const orderedModifiers = MODIFIER_ORDER.filter((modifier) =>
     modifiers.includes(modifier)
   );
-  const sortedKeys = [...new Set(keys)].sort();
+  const orderedKeys = keys.filter((key, index) => keys.indexOf(key) === index);
 
-  return [...sortedModifiers, ...sortedKeys].join('+');
+  return [...orderedModifiers, ...orderedKeys].join('+');
 }
 
 export function bindingFromState(
@@ -92,17 +92,17 @@ export function bindingFromState(
 }
 
 function splitBinding(binding: string): {
-  modifiers: Set<string>;
-  keys: Set<string>;
+  modifiers: string[];
+  keys: string[];
 } {
-  const modifiers = new Set<string>();
-  const keys = new Set<string>();
+  const modifiers: string[] = [];
+  const keys: string[] = [];
 
   for (const part of binding.toLowerCase().split('+')) {
     if (MODIFIER_ORDER.includes(part)) {
-      modifiers.add(part);
+      modifiers.push(part);
     } else {
-      keys.add(part);
+      keys.push(part);
     }
   }
 
@@ -112,7 +112,7 @@ function splitBinding(binding: string): {
 export function eventMatchesBinding(
   event: KeyboardEvent | React.KeyboardEvent,
   binding: string,
-  heldKeys?: Set<string>
+  heldKeys?: string[]
 ): boolean {
   if (!binding) {
     return false;
@@ -120,32 +120,32 @@ export function eventMatchesBinding(
 
   const { modifiers, keys } = splitBinding(binding);
 
-  if ((hasMod(event) || hasSecondaryCtrl(event)) !== modifiers.has('mod')) {
+  if (
+    (hasMod(event) || hasSecondaryCtrl(event)) !== modifiers.includes('mod')
+  ) {
     return false;
   }
 
-  if (event.altKey !== modifiers.has('alt')) {
+  if (event.altKey !== modifiers.includes('alt')) {
     return false;
   }
 
-  if (event.shiftKey !== modifiers.has('shift')) {
+  if (event.shiftKey !== modifiers.includes('shift')) {
     return false;
   }
 
-  const pressed = new Set<string>(heldKeys ?? []);
-  pressed.add(normalizeKey(event.key));
+  const pressed = [...(heldKeys ?? [])];
+  const current = normalizeKey(event.key);
 
-  if (pressed.size !== keys.size) {
+  if (!pressed.includes(current)) {
+    pressed.push(current);
+  }
+
+  if (pressed.length !== keys.length) {
     return false;
   }
 
-  for (const key of keys) {
-    if (!pressed.has(key)) {
-      return false;
-    }
-  }
-
-  return true;
+  return keys.every((key, index) => pressed[index] === key);
 }
 
 const PRINTABLE_KEY_LABELS: Record<string, string> = {
@@ -195,9 +195,9 @@ export function formatBinding(binding: string | null | undefined): string {
 
   const { modifiers, keys } = splitBinding(binding);
 
-  const labels = formatModifiers([...modifiers]);
+  const labels = formatModifiers(modifiers);
 
-  for (const key of [...keys].sort()) {
+  for (const key of keys) {
     labels.push(formatKey(key));
   }
 
@@ -213,7 +213,7 @@ export function formatRecorderPreview(
 
   const { keys } = splitBinding(binding);
 
-  if (keys.size === 0) {
+  if (keys.length === 0) {
     return [...formatBinding(binding).split(' + '), '…'].join(' + ');
   }
 

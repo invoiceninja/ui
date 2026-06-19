@@ -25,13 +25,14 @@ import {
   formatRecorderPreview,
 } from '$app/common/helpers/keyboard-shortcuts';
 import { useShortcutRecorder } from '$app/common/hooks/useShortcutRecorder';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Refresh } from '$app/components/icons/Refresh';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
+import { InputField } from '$app/components/forms';
 
 type Overrides = Record<string, KeyboardShortcutOverride | null>;
 
-const DEFAULT_SELECTED_ID = 'create_invoice';
+const DEFAULT_SELECTED_ID = 'create_client';
 
 export function KeyboardShortcuts() {
   const [t] = useTranslation();
@@ -44,6 +45,20 @@ export function KeyboardShortcuts() {
     {}) as Overrides;
 
   const [selectedId, setSelectedId] = useState<string>(DEFAULT_SELECTED_ID);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
+  const filteredGroups = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    return keyboardShortcutGroups
+      .map((group) => ({
+        ...group,
+        shortcuts: group.shortcuts.filter((definition) =>
+          t(definition.labelKey).toLowerCase().includes(query)
+        ),
+      }))
+      .filter((group) => group.shortcuts.length > 0);
+  }, [searchQuery, t]);
 
   const bindingFor = (definition: ShortcutDefinition): string | null => {
     if (Object.prototype.hasOwnProperty.call(overrides, definition.id)) {
@@ -120,55 +135,78 @@ export function KeyboardShortcuts() {
       </div>
 
       <div
-        className="flex rounded-md border overflow-hidden"
+        className="flex h-96 rounded-md border overflow-hidden"
         style={{ borderColor: colors.$20 }}
       >
         <div
-          className="w-1/2 max-h-96 overflow-y-auto border-r"
+          className="w-1/2 flex flex-col border-r"
           style={{ borderColor: colors.$20 }}
         >
-          {keyboardShortcutGroups.map((group) => (
-            <div key={group.labelKey}>
-              <div
-                className="text-xs uppercase tracking-wide font-medium px-4 py-2 sticky top-0"
-                style={{ color: colors.$17, backgroundColor: colors.$2 }}
-              >
-                {t(group.labelKey)}
+          <div
+            className="p-3 border-b"
+            style={{ borderColor: colors.$20, backgroundColor: colors.$2 }}
+          >
+            <InputField
+              value={searchQuery}
+              onValueChange={(value) => setSearchQuery(value)}
+              placeholder={t('search')}
+              changeOverride
+            />
+          </div>
+
+          <div className="flex-1 overflow-y-auto">
+            {filteredGroups.map((group) => (
+              <div key={group.labelKey}>
+                <div
+                  className="text-xs uppercase tracking-wide font-medium px-4 py-2 sticky top-0"
+                  style={{ color: colors.$17, backgroundColor: colors.$2 }}
+                >
+                  {t(group.labelKey)}
+                </div>
+
+                {group.shortcuts.map((definition) => {
+                  const isSelected = definition.id === selectedId;
+                  const hasConflict = conflictsByBinding.has(definition.id);
+
+                  return (
+                    <button
+                      key={definition.id}
+                      type="button"
+                      onClick={() => setSelectedId(definition.id)}
+                      className="w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors"
+                      style={{
+                        color: colors.$3,
+                        backgroundColor: isSelected ? colors.$5 : 'transparent',
+                        fontWeight: isSelected ? 600 : 400,
+                      }}
+                    >
+                      <span>{t(definition.labelKey)}</span>
+
+                      {hasConflict && (
+                        <span
+                          className="ml-2 h-2 w-2 rounded-full shrink-0"
+                          style={{ backgroundColor: '#ef4444' }}
+                          title={t('shortcut_conflict') as string}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
+            ))}
 
-              {group.shortcuts.map((definition) => {
-                const isSelected = definition.id === selectedId;
-                const hasConflict = conflictsByBinding.has(definition.id);
-
-                return (
-                  <button
-                    key={definition.id}
-                    type="button"
-                    onClick={() => setSelectedId(definition.id)}
-                    className="w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors"
-                    style={{
-                      color: colors.$3,
-                      backgroundColor: isSelected ? colors.$5 : 'transparent',
-                      fontWeight: isSelected ? 600 : 400,
-                    }}
-                  >
-                    <span>{t(definition.labelKey)}</span>
-
-                    {hasConflict && (
-                      <span
-                        className="ml-2 h-2 w-2 rounded-full shrink-0"
-                        style={{ backgroundColor: '#ef4444' }}
-                        title={t('shortcut_conflict') as string}
-                      />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          ))}
+            {filteredGroups.length === 0 && (
+              <div
+                className="px-4 py-6 text-sm text-center"
+                style={{ color: colors.$17 }}
+              >
+                {t('no_records_found')}
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="w-1/2 p-6 flex items-center justify-center">
+        <div className="w-1/2 p-6 flex items-center justify-center overflow-y-auto">
           <ShortcutDetail
             key={selectedDefinition.id}
             definition={selectedDefinition}

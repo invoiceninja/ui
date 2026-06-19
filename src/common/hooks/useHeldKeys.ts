@@ -10,26 +10,31 @@
 
 import { isModifierKey, normalizeKey } from '../helpers/keyboard-shortcuts';
 
-const heldKeys = new Set<string>();
+let heldKeys: string[] = [];
 let listenerCount = 0;
 
 function handleKeyDown(event: KeyboardEvent) {
   if (!isModifierKey(event.key)) {
-    heldKeys.add(normalizeKey(event.key));
+    const key = normalizeKey(event.key);
+
+    if (!heldKeys.includes(key)) {
+      heldKeys.push(key);
+    }
   }
 }
 
 function handleKeyUp(event: KeyboardEvent) {
   if (!isModifierKey(event.key)) {
-    heldKeys.delete(normalizeKey(event.key));
+    const key = normalizeKey(event.key);
+    heldKeys = heldKeys.filter((held) => held !== key);
   }
 }
 
 function handleBlur() {
-  heldKeys.clear();
+  heldKeys = [];
 }
 
-export function getHeldKeys(): Set<string> {
+export function getHeldKeys(): string[] {
   return heldKeys;
 }
 
@@ -48,7 +53,7 @@ export function stopTrackingHeldKeys(): void {
 
   if (listenerCount <= 0) {
     listenerCount = 0;
-    heldKeys.clear();
+    heldKeys = [];
     document.removeEventListener('keydown', handleKeyDown, true);
     document.removeEventListener('keyup', handleKeyUp, true);
     window.removeEventListener('blur', handleBlur);
