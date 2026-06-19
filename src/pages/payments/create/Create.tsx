@@ -255,9 +255,7 @@ export default function Create() {
     () =>
       endpoint(
         `/api/v1/invoices?include=client&filter_deleted_clients=true&sort=date|desc${
-          payment?.client_id
-            ? `&payable=${payment.client_id}`
-            : '&client_status=unpaid,partial'
+          payment?.client_id ? `&payable=${payment.client_id}` : '&payable=true'
         }`
       ),
     [payment?.client_id]
