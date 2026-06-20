@@ -118,6 +118,16 @@ export function KeyboardShortcuts() {
     writeOverrides({ ...overrides, [definition.id]: null });
   };
 
+  const disableAllBindings = () => {
+    const next: Overrides = { ...overrides };
+
+    for (const definition of keyboardShortcuts) {
+      next[definition.id] = null;
+    }
+
+    writeOverrides(next);
+  };
+
   const resetBinding = (definition: ShortcutDefinition) => {
     if (!isCustomized(definition)) {
       return;
@@ -135,11 +145,22 @@ export function KeyboardShortcuts() {
 
   return (
     <div className="px-4 sm:px-6 pt-4 space-y-4">
-      <div>
-        <div className="text-lg font-medium">{t('keyboard_shortcuts')}</div>
-        <div className="text-sm" style={{ color: colors.$17 }}>
-          {t('keyboard_shortcuts_help')}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className="text-lg font-medium">{t('keyboard_shortcuts')}</div>
+          <div className="text-sm" style={{ color: colors.$17 }}>
+            {t('keyboard_shortcuts_help')}
+          </div>
         </div>
+
+        <button
+          type="button"
+          onClick={disableAllBindings}
+          className="shrink-0 text-sm rounded px-3 py-1.5 border hover:opacity-75 transition-colors"
+          style={{ color: colors.$3, borderColor: colors.$5 }}
+        >
+          {t('disable_all')}
+        </button>
       </div>
 
       <div
@@ -175,14 +196,14 @@ export function KeyboardShortcuts() {
 
                   {group.shortcuts.map((definition) => {
                     const isSelected = definition.id === selectedId;
-                    const hasConflict = conflictsByBinding.has(definition.id);
+                    const hasShortcut = bindingFor(definition) !== null;
 
                     return (
                       <button
                         key={definition.id}
                         type="button"
                         onClick={() => setSelectedId(definition.id)}
-                        className="w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors"
+                        className="w-full text-left px-4 py-2.5 text-sm flex items-center transition-colors"
                         style={{
                           color: colors.$3,
                           backgroundColor: isSelected
@@ -191,15 +212,23 @@ export function KeyboardShortcuts() {
                           fontWeight: isSelected ? 600 : 400,
                         }}
                       >
-                        <span>{t(definition.labelKey)}</span>
+                        <span
+                          className="mr-2 h-2 w-2 rounded-full shrink-0"
+                          style={{
+                            backgroundColor: hasShortcut
+                              ? '#22c55e'
+                              : '#ef4444',
+                          }}
+                          title={
+                            hasShortcut
+                              ? (t('shortcut_set') as string)
+                              : (t('no_shortcut_set') as string)
+                          }
+                        />
 
-                        {hasConflict && (
-                          <span
-                            className="ml-2 h-2 w-2 rounded-full shrink-0"
-                            style={{ backgroundColor: '#ef4444' }}
-                            title={t('shortcut_conflict') as string}
-                          />
-                        )}
+                        <span className="truncate">
+                          {t(definition.labelKey)}
+                        </span>
                       </button>
                     );
                   })}
