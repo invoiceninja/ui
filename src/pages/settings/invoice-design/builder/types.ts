@@ -126,8 +126,8 @@ export interface SpacerBlockPropertiesHint {
 
 /**
  * Per-cell typography. Used for label and value cells in the row-based
- * blocks (invoice-details, total). All fields are optional and fall back
- * to block-level defaults when unset.
+ * blocks (invoice-details, total). All fields are optional. Totals use
+ * these as the canonical typography settings for each row/cell.
  */
 export interface CellTypography {
   fontSize?: string;
@@ -155,16 +155,9 @@ export interface TotalItem {
 
 export interface TotalBlockPropertiesHint {
   items?: TotalItem[];
-  fontSize?: string;
   align?: string;
   labelAlign?: 'left' | 'center' | 'right';
   valueAlign?: 'left' | 'center' | 'right';
-  labelColor?: string;
-  amountColor?: string;
-  totalFontSize?: string;
-  totalFontWeight?: string;
-  totalColor?: string;
-  balanceColor?: string;
   spacing?: string;
   labelPadding?: string;
   valuePadding?: string;
