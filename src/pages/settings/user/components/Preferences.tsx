@@ -23,7 +23,6 @@ import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
 import { Divider } from '$app/components/cards/Divider';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
-import { KeyboardShortcuts } from './KeyboardShortcuts';
 
 export function Preferences() {
   const [t] = useTranslation();
@@ -197,16 +196,6 @@ export function Preferences() {
       </Element>
 
       <StatusColorTheme />
-
-      <div className="px-4 sm:px-6 pt-4">
-        <Divider
-          className="border-dashed"
-          withoutPadding
-          borderColor={colors.$20}
-        />
-      </div>
-
-      <KeyboardShortcuts />
 
       <PreferenceCard
         title={`${t('dashboard')} ${t('charts')}`}

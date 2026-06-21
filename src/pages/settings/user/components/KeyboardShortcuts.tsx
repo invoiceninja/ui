@@ -128,6 +128,12 @@ export function KeyboardShortcuts() {
     writeOverrides(next);
   };
 
+  const resetAllBindings = () => {
+    writeOverrides({});
+  };
+
+  const hasAnyOverride = Object.keys(overrides).length > 0;
+
   const resetBinding = (definition: ShortcutDefinition) => {
     if (!isCustomized(definition)) {
       return;
@@ -145,22 +151,32 @@ export function KeyboardShortcuts() {
 
   return (
     <div className="px-4 sm:px-6 pt-4 space-y-4">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <div className="text-lg font-medium">{t('keyboard_shortcuts')}</div>
-          <div className="text-sm" style={{ color: colors.$17 }}>
-            {t('keyboard_shortcuts_help')}
-          </div>
+      <div className="flex items-center justify-between gap-4">
+        <div className="text-sm" style={{ color: colors.$17 }}>
+          {t('keyboard_shortcuts_help')}
         </div>
 
-        <button
-          type="button"
-          onClick={disableAllBindings}
-          className="shrink-0 text-sm rounded px-3 py-1.5 border hover:opacity-75 transition-colors"
-          style={{ color: colors.$3, borderColor: colors.$5 }}
-        >
-          {t('disable_all')}
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          {hasAnyOverride && (
+            <button
+              type="button"
+              onClick={resetAllBindings}
+              className="text-sm rounded px-3 py-1.5 border hover:opacity-75 transition-colors"
+              style={{ color: colors.$3, borderColor: colors.$5 }}
+            >
+              {t('reset_all')}
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={disableAllBindings}
+            className="text-sm rounded px-3 py-1.5 border hover:opacity-75 transition-colors"
+            style={{ color: colors.$3, borderColor: colors.$5 }}
+          >
+            {t('disable_all')}
+          </button>
+        </div>
       </div>
 
       <div
