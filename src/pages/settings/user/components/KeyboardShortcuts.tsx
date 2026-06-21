@@ -342,12 +342,6 @@ function ShortcutDetail({
         {label}
       </button>
 
-      <div className="text-xs text-center" style={{ color: colors.$17 }}>
-        {recorder.isRecording
-          ? t('shortcut_recording_help')
-          : t('shortcut_click_to_edit')}
-      </div>
-
       <div className="flex items-center gap-4 pt-1">
         <DetailAction
           visible={isCustomized}
