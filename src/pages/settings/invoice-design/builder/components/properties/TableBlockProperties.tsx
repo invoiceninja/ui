@@ -19,10 +19,7 @@ import {
   SectionDivider,
   RangeSliderInput,
 } from './PropertyInputs';
-import {
-  DesignerPxNumberInput,
-  mergePxOrOmit,
-} from './DesignerPxNumberInput';
+import { DesignerPxNumberInput, mergePxOrOmit } from './DesignerPxNumberInput';
 import { useColorScheme } from '$app/common/colors';
 import type { TableRegionBordersHint } from '../../types';
 import {
@@ -469,11 +466,10 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       <SectionDivider label={String(t('typography'))} />
 
-      {/* Font Size */}
       <DesignerPxNumberInput
         label={String(t('font_size'))}
         value={block.properties.fontSize}
-        placeholder="12"
+        placeholder={String(t('use_default') || 'Default')}
         max={999}
         resettable
         onChange={(px) =>
@@ -489,7 +485,6 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
       />
 
       <SectionDivider label={String(t('header'))} />
-
 
       <div className="grid grid-cols-2 gap-3">
         {/* Header Background */}
@@ -511,7 +506,6 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       <SectionDivider label={String(t('row'))} />
 
-
       {/* Alternate Rows */}
       <CheckboxInput
         id="alternateRows"
@@ -521,23 +515,23 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
       />
 
       <div className="grid grid-cols-2 gap-3">
-      {block.properties.alternateRows && (
-        <ColorInput
-          label={String(t('background'))}
-          value={block.properties.alternateRowBg}
-          onChange={(value) => updateProperty('alternateRowBg', value)}
-          defaultValue="#F9FAFB"
-        />
-      )}
+        {block.properties.alternateRows && (
+          <ColorInput
+            label={String(t('background'))}
+            value={block.properties.alternateRowBg}
+            onChange={(value) => updateProperty('alternateRowBg', value)}
+            defaultValue="#F9FAFB"
+          />
+        )}
 
-      {/* Row Text Color */}
-      <ColorInput
-        label={String(t('text_color'))}
-        value={block.properties.rowColor}
-        onChange={(value) => updateProperty('rowColor', value)}
-        defaultValue={DEFAULT_VALUE_TEXT_COLOR}
-      />
-</div>
+        {/* Row Text Color */}
+        <ColorInput
+          label={String(t('text_color'))}
+          value={block.properties.rowColor}
+          onChange={(value) => updateProperty('rowColor', value)}
+          defaultValue={DEFAULT_VALUE_TEXT_COLOR}
+        />
+      </div>
       <SectionDivider label={String(t('borders'))} />
 
       <CheckboxInput
@@ -549,9 +543,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
 
       {block.properties.showBorders && (
         <div className="space-y-4">
-          {(
-            ['headerBorders', 'rowBorders'] as const
-          ).map((regionKey, idx) => {
+          {(['headerBorders', 'rowBorders'] as const).map((regionKey, idx) => {
             const label =
               regionKey === 'headerBorders'
                 ? String(t('header'))

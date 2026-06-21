@@ -238,11 +238,9 @@ export function ReorderableFieldList({
                   <DesignerPxNumberInput
                     label={String(t('font_size'))}
                     value={field.fontSize}
-                    placeholder="12"
+                    placeholder={String(t('use_default') || 'Default')}
                     resettable
-                    onChange={(px) =>
-                      updateField(index, { fontSize: px })
-                    }
+                    onChange={(px) => updateField(index, { fontSize: px })}
                   />
 
                   <FontStyleInput

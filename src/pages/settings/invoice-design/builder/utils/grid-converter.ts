@@ -13,8 +13,8 @@
  */
 export const GRID_CONFIG = {
   cols: 12,
-  rowHeight: 60, // pixels
+  rowHeight: 10, // pixels
   canvasWidth: 794, // pixels (210mm at 96dpi)
-  margin: [10, 16] as [number, number], // [horizontal, vertical] in pixels - vertical is 1rem (16px)
+  margin: [10, 4] as [number, number], // [horizontal, vertical] in pixels
   containerPadding: [30, 30] as [number, number], // [horizontal, vertical] in pixels
 };

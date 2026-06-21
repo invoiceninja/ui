@@ -13,7 +13,6 @@ import { useMemo, useCallback, useState } from 'react';
 import { Type, ChevronUp, ChevronDown } from 'lucide-react';
 import { PropertyEditorProps, FieldConfig } from '../../types';
 import {
-  FontSizeInput,
   AlignmentInput,
   ColorInput,
   LineHeightInput,
@@ -22,11 +21,7 @@ import {
   CheckboxInput,
   FontStyleInput,
 } from './PropertyInputs';
-import {
-  DesignerPxNumberInput,
-  mergePxOrOmit,
-  pxValueToDisplay,
-} from './DesignerPxNumberInput';
+import { DesignerPxNumberInput, mergePxOrOmit } from './DesignerPxNumberInput';
 import { ReorderableFieldList, FieldDefinition } from './ReorderableFieldList';
 import { useColorScheme } from '$app/common/colors';
 import { DEFAULT_VALUE_TEXT_COLOR } from '../../constants/design-colors';
@@ -183,7 +178,9 @@ export function InfoBlockProperties({
                   onClick={() => setIsHeaderExpanded(!isHeaderExpanded)}
                   className="p-1.5 rounded transition-colors"
                   style={{
-                    backgroundColor: isHeaderExpanded ? colors.$25 : 'transparent',
+                    backgroundColor: isHeaderExpanded
+                      ? colors.$25
+                      : 'transparent',
                     color: isHeaderExpanded ? colors.$3 : colors.$17,
                   }}
                   title={String(t('typography'))}
@@ -210,9 +207,7 @@ export function InfoBlockProperties({
                   <DesignerPxNumberInput
                     label={String(t('font_size'))}
                     value={block.properties.titleFontSize}
-                    placeholder={
-                      pxValueToDisplay(block.properties.fontSize) || '12'
-                    }
+                    placeholder={String(t('use_default') || 'Default')}
                     resettable
                     onChange={(px) =>
                       onChange({
@@ -231,10 +226,16 @@ export function InfoBlockProperties({
                     fontWeight={block.properties.titleFontWeight || 'bold'}
                     fontStyle={block.properties.titleFontStyle || 'normal'}
                     onFontWeightChange={(value) =>
-                      updateProperty('titleFontWeight', value === 'bold' ? 'bold' : undefined)
+                      updateProperty(
+                        'titleFontWeight',
+                        value === 'bold' ? 'bold' : undefined
+                      )
                     }
                     onFontStyleChange={(value) =>
-                      updateProperty('titleFontStyle', value === 'italic' ? 'italic' : undefined)
+                      updateProperty(
+                        'titleFontStyle',
+                        value === 'italic' ? 'italic' : undefined
+                      )
                     }
                   />
 
@@ -249,10 +250,13 @@ export function InfoBlockProperties({
 
                   <AlignmentInput
                     label={String(t('alignment'))}
-                    value={block.properties.titleAlign || block.properties.align || 'left'}
+                    value={
+                      block.properties.titleAlign ||
+                      block.properties.align ||
+                      'left'
+                    }
                     onChange={(value) => updateProperty('titleAlign', value)}
                   />
-
                 </div>
               )}
             </div>
@@ -272,14 +276,6 @@ export function InfoBlockProperties({
       <SectionDivider label={String(t('typography'))} />
 
       <div className="space-y-4">
-        <FontSizeInput
-          label={String(t('font_size'))}
-          value={block.properties.fontSize}
-          onChange={(value: string | undefined) =>
-            updateProperty('fontSize', value)
-          }
-        />
-
         <LineHeightInput
           value={block.properties.lineHeight}
           onChange={(value: string) => updateProperty('lineHeight', value)}

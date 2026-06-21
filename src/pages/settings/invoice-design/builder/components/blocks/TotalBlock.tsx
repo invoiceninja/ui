@@ -15,7 +15,10 @@ import {
   replaceVariables,
 } from '../../utils/variable-replacer';
 import { Block } from '../../types';
-import { DEFAULT_VALUE_TEXT_COLOR } from '../../constants/design-colors';
+import {
+  DEFAULT_LABEL_TEXT_COLOR,
+  DEFAULT_VALUE_TEXT_COLOR,
+} from '../../constants/design-colors';
 import { useLabelMapping } from '../../utils/label-variables';
 
 interface TotalBlockProps {
@@ -25,17 +28,10 @@ interface TotalBlockProps {
 export const TotalBlock = memo(function TotalBlock({ block }: TotalBlockProps) {
   const [t] = useTranslation();
   const labelMapping = useLabelMapping();
-  
+
   const {
     items,
-    fontSize,
     align,
-    labelColor,
-    amountColor,
-    totalFontSize,
-    totalFontWeight,
-    totalColor,
-    balanceColor,
     spacing,
     labelPadding,
     valuePadding,
@@ -55,78 +51,87 @@ export const TotalBlock = memo(function TotalBlock({ block }: TotalBlockProps) {
     <table style={tableStyle}>
       <tbody>
         {items.map(
-            (
-              item: {
-                show: boolean;
-                isTotal?: boolean;
+          (
+            item: {
+              show: boolean;
+              isTotal?: boolean;
                 isBalance?: boolean;
                 field: string;
                 label: string;
+                labelStyle?: {
+                  fontSize?: string;
+                  fontWeight?: string;
+                  fontStyle?: string;
+                  color?: string;
+                };
+                valueStyle?: {
+                  fontSize?: string;
+                  fontWeight?: string;
+                  fontStyle?: string;
+                  color?: string;
+                };
                 fontSize?: string;
                 fontWeight?: string;
                 color?: string;
-                fontStyle?: string;
-                amountColor?: string;
-              },
-              index: number
-            ) => {
-              const isTotal = item.isTotal;
-              const isBalance = item.isBalance;
-              const displayValue = replaceVariables(
-                item.field,
-                SAMPLE_INVOICE_DATA
-              );
+              fontStyle?: string;
+              amountColor?: string;
+            },
+            index: number
+          ) => {
+            const displayValue = replaceVariables(
+              item.field,
+              SAMPLE_INVOICE_DATA
+            );
 
-              const itemFontSize =
-                item.fontSize || (isTotal ? totalFontSize : fontSize);
-              const itemFontWeight =
-                item.fontWeight || (isTotal ? totalFontWeight : 'normal');
-              const itemColor = item.color || labelColor;
+            const labelStyle = item.labelStyle;
+            const valueStyle = item.valueStyle;
+            const labelFontSize = labelStyle?.fontSize || item.fontSize;
+            const valueFontSize = valueStyle?.fontSize || item.fontSize;
+            const labelFontWeight = labelStyle?.fontWeight || item.fontWeight;
+            const valueFontWeight = valueStyle?.fontWeight || item.fontWeight;
+            const labelFontStyle = labelStyle?.fontStyle || item.fontStyle;
+            const valueFontStyle = valueStyle?.fontStyle || item.fontStyle;
+            const labelColor =
+              labelStyle?.color || item.color || DEFAULT_LABEL_TEXT_COLOR;
+            const valueColor =
+              valueStyle?.color || item.amountColor || DEFAULT_VALUE_TEXT_COLOR;
 
-              return (
-                <tr
-                  key={index}
+            return (
+              <tr key={index}>
+                <td
                   style={{
-                    fontSize: itemFontSize,
-                    fontWeight: itemFontWeight,
+                    color: labelColor,
+                    fontSize: labelFontSize,
+                    fontWeight: labelFontWeight,
+                    fontStyle: labelFontStyle,
+                    paddingBottom: spacing,
+                    padding: labelPadding || undefined,
+                    paddingRight: gap,
+                    textAlign: 'right',
+                    whiteSpace: 'nowrap',
                   }}
                 >
-                  <td
-                    style={{
-                      color: itemColor,
-                      paddingBottom: spacing,
-                      padding: labelPadding || undefined,
-                      paddingRight: gap,
-                      textAlign: 'right',
-                      whiteSpace: 'nowrap',
-                      fontStyle: item.fontStyle || undefined,
-                    }}
-                  >
-                    {labelMapping.getDisplayLabel(item.label)}:
-                  </td>
-                  <td
-                    style={{
-                      color:
-                        item.amountColor ||
-                        (isBalance
-                          ? balanceColor
-                          : isTotal
-                            ? totalColor
-                            : amountColor) ||
-                        DEFAULT_VALUE_TEXT_COLOR,
-                      paddingBottom: spacing,
-                      padding: valuePadding || undefined,
-                      textAlign: 'right',
-                      whiteSpace: 'nowrap',
-                      ...(valueMinWidth ? { minWidth: valueMinWidth } : {}),
-                    }}
-                  >
-                    {displayValue}
-                  </td>
-                </tr>
-              );
-            }
-          )}
+                  {labelMapping.getDisplayLabel(item.label)}:
+                </td>
+                <td
+                  style={{
+                    color: valueColor,
+                    fontSize: valueFontSize,
+                    fontWeight: valueFontWeight,
+                    fontStyle: valueFontStyle,
+                    paddingBottom: spacing,
+                    padding: valuePadding || undefined,
+                    textAlign: 'right',
+                    whiteSpace: 'nowrap',
+                    ...(valueMinWidth ? { minWidth: valueMinWidth } : {}),
+                  }}
+                >
+                  {displayValue}
+                </td>
+              </tr>
+            );
+          }
+        )}
       </tbody>
     </table>
   );

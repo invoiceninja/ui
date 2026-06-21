@@ -65,7 +65,10 @@ export const TableBlock = memo(function TableBlock({ block }: TableBlockProps) {
     <div className="w-full h-full overflow-auto">
       <table
         className="w-full"
-        style={{ fontSize, borderCollapse: 'collapse' }}
+        style={{
+          borderCollapse: 'collapse',
+          fontSize: fontSize || undefined,
+        }}
       >
         <thead>
           <tr

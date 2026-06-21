@@ -14,15 +14,10 @@ import { ChevronUp, ChevronDown, Type, Trash2 } from 'lucide-react';
 import { PropertyEditorProps } from '../../types';
 import {
   AlignmentInput,
-  ColorInput,
-  FontSizeInput,
   SectionDivider,
   CheckboxInput,
 } from './PropertyInputs';
-import {
-  DesignerPxNumberInput,
-  mergePxOrOmit,
-} from './DesignerPxNumberInput';
+import { DesignerPxNumberInput, mergePxOrOmit } from './DesignerPxNumberInput';
 import { CellTypographyEditor } from './CellTypographyEditor';
 import { useColorScheme } from '$app/common/colors';
 import { useLabelMapping } from '../../utils/label-variables';
@@ -39,7 +34,13 @@ const AVAILABLE_TOTAL_ITEMS = [
   { label: '$custom_surcharge3_label', field: '$custom_surcharge3' },
   { label: '$custom_surcharge4_label', field: '$custom_surcharge4' },
   { label: '$taxes_label', field: '$taxes' },
-  { label: '$total_label', field: '$total', isTotal: true },
+  {
+    label: '$total_label',
+    field: '$total',
+    isTotal: true,
+    labelStyle: { fontWeight: 'bold' },
+    valueStyle: { fontWeight: 'bold' },
+  },
   { label: '$paid_to_date_label', field: '$paid_to_date' },
   { label: '$balance_due_label', field: '$balance_due', isBalance: true },
 ];
@@ -160,13 +161,9 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                     className="p-0.5 rounded transition-colors"
                     style={{
                       color:
-                        index >= items.length - 1
-                          ? colors.$24
-                          : colors.$16,
+                        index >= items.length - 1 ? colors.$24 : colors.$16,
                       cursor:
-                        index >= items.length - 1
-                          ? 'not-allowed'
-                          : 'pointer',
+                        index >= items.length - 1 ? 'not-allowed' : 'pointer',
                     }}
                     title={String(t('move_down'))}
                   >
@@ -174,9 +171,7 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                       className="w-4 h-4"
                       style={{
                         color:
-                          index >= items.length - 1
-                            ? colors.$24
-                            : colors.$16,
+                          index >= items.length - 1 ? colors.$24 : colors.$16,
                       }}
                     />
                   </button>
@@ -233,14 +228,7 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                     onChange={(next) =>
                       updateItemTypography(index, 'labelStyle', next)
                     }
-                    fontSizePlaceholder={block.properties.fontSize || '13px'}
-                    colorDefault={
-                      item.isTotal
-                        ? block.properties.totalColor || DEFAULT_VALUE_TEXT_COLOR
-                        : item.isBalance
-                          ? block.properties.balanceColor || DEFAULT_VALUE_TEXT_COLOR
-                          : block.properties.labelColor || DEFAULT_LABEL_TEXT_COLOR
-                    }
+                    colorDefault={DEFAULT_LABEL_TEXT_COLOR}
                   />
 
                   <CellTypographyEditor
@@ -249,14 +237,7 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
                     onChange={(next) =>
                       updateItemTypography(index, 'valueStyle', next)
                     }
-                    fontSizePlaceholder={block.properties.fontSize || '13px'}
-                    colorDefault={
-                      item.isTotal
-                        ? block.properties.totalColor || DEFAULT_VALUE_TEXT_COLOR
-                        : item.isBalance
-                          ? block.properties.balanceColor || DEFAULT_VALUE_TEXT_COLOR
-                          : block.properties.amountColor || DEFAULT_VALUE_TEXT_COLOR
-                    }
+                    colorDefault={DEFAULT_VALUE_TEXT_COLOR}
                   />
                 </div>
               )}
@@ -308,52 +289,13 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
         )}
       </div>
 
-      <SectionDivider label={String(t('typography'))} />
-
-      {/* Global Font Size */}
-      <FontSizeInput
-        label={String(t('font_size'))}
-        value={block.properties.fontSize}
-        onChange={(value) => updateProperty('fontSize', value)}
-      />
+      <SectionDivider label={String(t('layout'))} />
 
       {/* Block-level alignment (drives table position within the block) */}
       <AlignmentInput
         label={String(t('alignment'))}
         value={block.properties.align}
         onChange={(value) => updateProperty('align', value)}
-      />
-
-      {/* Text Color (default value color, mirrors InvoiceDetails) */}
-      <ColorInput
-        label={String(t('value'))}
-        value={block.properties.amountColor}
-        onChange={(value) => updateProperty('amountColor', value)}
-        defaultValue={DEFAULT_VALUE_TEXT_COLOR}
-      />
-
-      {/* Label Color */}
-      <ColorInput
-        label={String(t('label'))}
-        value={block.properties.labelColor}
-        onChange={(value) => updateProperty('labelColor', value)}
-        defaultValue={DEFAULT_LABEL_TEXT_COLOR}
-      />
-
-      {/* Total Row Color — used when item.isTotal is true */}
-      <ColorInput
-        label={String(t('total_color'))}
-        value={block.properties.totalColor}
-        onChange={(value) => updateProperty('totalColor', value)}
-        defaultValue={DEFAULT_VALUE_TEXT_COLOR}
-      />
-
-      {/* Balance Row Color — used when item.isBalance is true */}
-      <ColorInput
-        label={String(t('balance_color'))}
-        value={block.properties.balanceColor}
-        onChange={(value) => updateProperty('balanceColor', value)}
-        defaultValue={DEFAULT_VALUE_TEXT_COLOR}
       />
 
       <SectionDivider label={String(t('columns'))} />
@@ -474,9 +416,9 @@ export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
       <SectionDivider label={String(t('page_break') || 'Page Break')} />
 
       <CheckboxInput
-        label={
-          String(t('keep_together') || 'Force page break before this block')
-        }
+        label={String(
+          t('keep_together') || 'Force page break before this block'
+        )}
         checked={Boolean(block.properties.keepTogether)}
         onChange={(value) => updateProperty('keepTogether', value)}
       />

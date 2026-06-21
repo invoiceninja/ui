@@ -36,6 +36,10 @@ export function CellTypographyEditor({
   const colors = useColorScheme();
 
   const v = value || {};
+  const defaultFontSizePlaceholder = String(t('use_default') || 'Default');
+  const resolvedFontSizePlaceholder = fontSizePlaceholder
+    ? pxValueToDisplay(fontSizePlaceholder) || defaultFontSizePlaceholder
+    : defaultFontSizePlaceholder;
 
   const set = (key: keyof CellTypography, next: string | undefined) => {
     const merged: CellTypography = { ...v, [key]: next || undefined };
@@ -62,11 +66,7 @@ export function CellTypographyEditor({
       <DesignerPxNumberInput
         label={String(t('font_size'))}
         value={v.fontSize}
-        placeholder={
-          fontSizePlaceholder
-            ? pxValueToDisplay(fontSizePlaceholder) || '12'
-            : '12'
-        }
+        placeholder={resolvedFontSizePlaceholder}
         resettable
         onChange={(px) => set('fontSize', px)}
       />

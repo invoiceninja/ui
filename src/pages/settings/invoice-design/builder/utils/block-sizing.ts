@@ -17,9 +17,7 @@ import type {
 import { GRID_CONFIG } from './grid-converter';
 import { SAMPLE_INVOICE_DATA, replaceVariables } from './variable-replacer';
 
-const EDITOR_TOPBAR_HEIGHT = 28;
 const EDITOR_CONTENT_PADDING_X = 24;
-const EDITOR_CONTENT_PADDING_Y = 24;
 const SIZE_BUFFER = 4;
 const AVERAGE_CHARACTER_WIDTH = 0.55;
 
@@ -142,9 +140,9 @@ function wrappedLineCount(
 function textContentSize(
   text: string,
   properties: BlockProperties,
-  fallbackFontSize = 12
+  inheritedFontSize: number
 ): ContentSize {
-  const fontSize = parseCssNumber(properties.fontSize, fallbackFontSize);
+  const fontSize = parseCssNumber(properties.fontSize, inheritedFontSize);
   const lineHeight = lineHeightPixels(properties.lineHeight, fontSize);
   const lines = String(text || ' ').split('\n');
   const width = Math.max(...lines.map((line) => textWidth(line, fontSize)));
@@ -174,15 +172,14 @@ function visibleFieldLines(
   return fieldConfigs.reduce<string[]>((lines, config) => {
     const value = replaceVariables(config.variable, SAMPLE_INVOICE_DATA);
 
-    if (
-      config.hideIfEmpty !== false &&
-      (!value || value.trim() === '')
-    ) {
+    if (config.hideIfEmpty !== false && (!value || value.trim() === '')) {
       return lines;
     }
 
     lines.push(
-      `${includeLabels ? config.prefix || '' : ''}${value}${config.suffix || ''}`
+      `${includeLabels ? config.prefix || '' : ''}${value}${
+        config.suffix || ''
+      }`
     );
 
     return lines;
@@ -191,6 +188,7 @@ function visibleFieldLines(
 
 function fieldContentSize(
   properties: BlockProperties,
+  inheritedFontSize: number,
   options: { title?: string; includeLabels?: boolean } = {}
 ): ContentSize {
   const fieldConfigs = Array.isArray(properties.fieldConfigs)
@@ -212,11 +210,18 @@ function fieldContentSize(
     lines.unshift(options.title);
   }
 
-  return textContentSize(lines.join('\n') || ' ', properties);
+  return textContentSize(
+    lines.join('\n') || ' ',
+    properties,
+    inheritedFontSize
+  );
 }
 
-function tableContentSize(properties: BlockProperties): ContentSize {
-  const fontSize = parseCssNumber(properties.fontSize, 12);
+function tableContentSize(
+  properties: BlockProperties,
+  inheritedFontSize: number
+): ContentSize {
+  const fontSize = parseCssNumber(properties.fontSize, inheritedFontSize);
   const padding = parseCssNumber(properties.padding, 8);
   const rowHeight = fontSize * 1.2 + padding * 2;
   const rowCount = Math.max(1, SAMPLE_INVOICE_DATA.line_items.length);
@@ -228,36 +233,51 @@ function tableContentSize(properties: BlockProperties): ContentSize {
   };
 }
 
-function totalContentSize(properties: BlockProperties): ContentSize {
+function totalContentSize(
+  properties: BlockProperties,
+  inheritedFontSize: number
+): ContentSize {
   const items = Array.isArray(properties.items) ? properties.items : [];
   const visibleItems = items.filter(
     (item: { show?: boolean }) => item.show !== false
   );
   const rows = visibleItems.length || 1;
-  const fontSize = parseCssNumber(properties.fontSize, 13);
-  const totalFontSize = parseCssNumber(properties.totalFontSize, fontSize);
   const spacing = parseCssNumber(properties.spacing, 8);
   const gap = parseCssNumber(properties.labelValueGap, 20);
   let width = 160;
   let height = 0;
 
   visibleItems.forEach(
-    (item: { label?: string; field?: string; isTotal?: boolean }) => {
-      const itemFontSize = item.isTotal ? totalFontSize : fontSize;
+    (item: {
+      label?: string;
+      field?: string;
+      fontSize?: string;
+      labelStyle?: { fontSize?: string };
+      valueStyle?: { fontSize?: string };
+    }) => {
+      const labelFontSize = parseCssNumber(
+        item.labelStyle?.fontSize || item.fontSize,
+        inheritedFontSize
+      );
+      const valueFontSize = parseCssNumber(
+        item.valueStyle?.fontSize || item.fontSize,
+        inheritedFontSize
+      );
+      const rowFontSize = Math.max(labelFontSize, valueFontSize);
       const label = `${item.label || ''}:`;
       const value = replaceVariables(item.field || '', SAMPLE_INVOICE_DATA);
 
       width = Math.max(
         width,
-        textWidth(label, itemFontSize) + gap + textWidth(value, itemFontSize)
+        textWidth(label, labelFontSize) + gap + textWidth(value, valueFontSize)
       );
-      height += itemFontSize * 1.2 + spacing;
+      height += rowFontSize * 1.2 + spacing;
     }
   );
 
   return {
     width,
-    height: height || rows * (fontSize * 1.2 + spacing),
+    height: height || rows * (inheritedFontSize * 1.2 + spacing),
   };
 }
 
@@ -279,14 +299,15 @@ function imageContentSize(
 
 function blockContentSize(
   type: BlockType,
-  properties: BlockProperties
+  properties: BlockProperties,
+  inheritedFontSize: number
 ): ContentSize {
   switch (type) {
     case 'text':
       return textContentSize(
         replaceVariables(properties.content || 'Text', SAMPLE_INVOICE_DATA),
         properties,
-        14
+        inheritedFontSize
       );
     case 'public-notes':
     case 'footer':
@@ -294,24 +315,24 @@ function blockContentSize(
       return textContentSize(
         replaceVariables(properties.content || ' ', SAMPLE_INVOICE_DATA),
         properties,
-        12
+        inheritedFontSize
       );
     case 'company-info':
-      return fieldContentSize(properties);
+      return fieldContentSize(properties, inheritedFontSize);
     case 'client-info':
     case 'client-shipping-info':
-      return fieldContentSize(properties, {
+      return fieldContentSize(properties, inheritedFontSize, {
         title: properties.showTitle ? properties.title : undefined,
       });
     case 'invoice-details':
-      return fieldContentSize(properties, {
+      return fieldContentSize(properties, inheritedFontSize, {
         includeLabels: properties.showLabels !== false,
       });
     case 'table':
     case 'tasks-table':
-      return tableContentSize(properties);
+      return tableContentSize(properties, inheritedFontSize);
     case 'total':
-      return totalContentSize(properties);
+      return totalContentSize(properties, inheritedFontSize);
     case 'logo':
     case 'image':
       return imageContentSize(type, properties);
@@ -338,7 +359,7 @@ function blockContentSize(
       return { width: size, height: size };
     }
     case 'signature': {
-      const fontSize = parseCssNumber(properties.fontSize, 12);
+      const fontSize = parseCssNumber(properties.fontSize, inheritedFontSize);
       const labelWidth = textWidth(properties.label || '', fontSize);
       const dateWidth = properties.showDate
         ? textWidth('Date: ________________', fontSize)
@@ -364,12 +385,15 @@ function blockContentSize(
 export function getContentConstrainedGridSize(
   definition: Pick<BlockDefinition, 'type' | 'defaultProperties'> & {
     defaultSize?: Partial<GridSize>;
-  }
+  },
+  options: { inheritedFontSize?: number } = {}
 ): GridSize {
+  const inheritedFontSize = options.inheritedFontSize || 16;
   const fallbackSize = FALLBACK_GRID_SIZES[definition.type];
   const contentSize = blockContentSize(
     definition.type,
-    definition.defaultProperties
+    definition.defaultProperties,
+    inheritedFontSize
   );
   const defaultWidth = parseCssNumber(
     definition.defaultSize?.w,
@@ -378,14 +402,7 @@ export function getContentConstrainedGridSize(
   const width = contentSize.fullWidth
     ? GRID_CONFIG.cols
     : clamp(defaultWidth, 1, GRID_CONFIG.cols);
-  // The builder chrome lives inside the grid item, so initial rows need room
-  // for both the invoice content and the editable widget frame.
-  const height = gridHeightForPixels(
-    contentSize.height +
-      EDITOR_TOPBAR_HEIGHT +
-      EDITOR_CONTENT_PADDING_Y +
-      SIZE_BUFFER
-  );
+  const height = gridHeightForPixels(contentSize.height + SIZE_BUFFER);
 
   return {
     w: clamp(width, 1, GRID_CONFIG.cols),

@@ -1,55 +1,65 @@
 /**
  * Invoice Builder Drag & Drop Styles
- * Provides Grafana-like visual feedback for drag-drop operations
+ * Provides visual feedback for GridStack-powered drag-drop operations.
  */
 
-/* Dropping placeholder - the ghost element shown during drag */
-.react-grid-item.react-grid-placeholder {
+.invoice-gridstack-page {
+  overflow: visible;
+}
+
+.invoice-gridstack-stage {
+  position: relative;
+  box-sizing: border-box;
+  min-height: inherit;
+}
+
+.invoice-gridstack-grid {
+  width: 100%;
+  min-width: 0;
+}
+
+.invoice-gridstack-grid.grid-stack {
+  min-height: 1000px;
+}
+
+.invoice-gridstack-empty-state {
+  position: absolute;
+  inset: 30px;
+  min-height: 297mm;
+}
+
+.invoice-gridstack-grid > .grid-stack-item {
+  box-sizing: border-box;
+  will-change: left, top, width, height;
+}
+
+.invoice-gridstack-grid > .grid-stack-item > .grid-stack-item-content {
+  overflow: visible !important;
+  border-radius: 8px;
+}
+
+.invoice-gridstack-grid
+  > .grid-stack-item.ui-draggable-dragging
+  > .grid-stack-item-content,
+.invoice-gridstack-grid
+  > .grid-stack-item.ui-resizable-resizing
+  > .grid-stack-item-content {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+  opacity: 0.85;
+}
+
+.invoice-gridstack-grid > .grid-stack-placeholder > .placeholder-content {
   background: rgba(59, 130, 246, 0.15) !important;
   border: 2px dashed rgba(59, 130, 246, 0.5) !important;
   border-radius: 8px !important;
   opacity: 1 !important;
-  transition: all 200ms ease !important;
-  z-index: 2 !important;
 }
 
-/* Grid item being dragged */
-.react-grid-item.react-draggable-dragging {
-  transition: none !important;
-  z-index: 100 !important;
-  opacity: 0.8 !important;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-              0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-}
-
-/* Grid item during drop animation */
-.react-grid-item.dropping {
-  transition: all 200ms ease !important;
-}
-
-/* Hide resize handles during drag */
-.react-grid-item.react-draggable-dragging .react-resizable-handle {
+.invoice-gridstack-grid.is-dragging .grid-stack-item > .ui-resizable-handle {
   display: none !important;
 }
 
-/* Smooth transitions for grid items */
-.react-grid-item {
-  transition: transform 200ms ease, width 200ms ease, height 200ms ease;
-  box-sizing: border-box !important;
-}
-
-/* Prevent transition when actively dragging to avoid lag */
-.react-grid-item.react-draggable-dragging,
-.react-grid-item.resizing {
-  transition: none !important;
-}
-
-/* Ensure proper positioning during layout changes */
-.react-grid-item {
-  will-change: transform, width, height;
-}
-
-/* Visual feedback for drop target canvas */
 .canvas-drop-target {
   position: relative;
 }
@@ -70,54 +80,81 @@
   border-radius: 4px;
 }
 
-/* Resize handle styling */
-.react-resizable-handle {
+.invoice-gridstack-grid .ui-resizable-handle {
   opacity: 0;
   transition: opacity 150ms ease;
 }
 
-.react-grid-item:hover .react-resizable-handle,
-.react-grid-item.selected .react-resizable-handle {
+.invoice-gridstack-grid .grid-stack-item:hover > .ui-resizable-handle,
+.invoice-gridstack-grid .grid-stack-item.selected > .ui-resizable-handle {
   opacity: 1;
 }
 
-/* Improve resize handle visibility */
-.react-resizable-handle-se {
-  bottom: 2px !important;
-  right: 2px !important;
-  width: 20px !important;
-  height: 20px !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6'%3E%3Cpath d='M 6 0 L 6 6 L 0 6' fill='none' stroke='%233b82f6' stroke-width='1.5'/%3E%3C/svg%3E") !important;
+.invoice-gridstack-grid > .grid-stack-item > .ui-resizable-se {
+  bottom: 4px !important;
+  right: 4px !important;
+  width: 18px !important;
+  height: 18px !important;
+  transform: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M15 5 5 15M15 10l-5 5M15 15h.01' fill='none' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") !important;
   background-position: bottom right !important;
   background-repeat: no-repeat !important;
+  background-size: 14px 14px !important;
   cursor: nwse-resize !important;
 }
 
-/* Ensure grid items have no background */
-.react-grid-item {
-  background: transparent !important;
-}
-
-/* Block wrapper should use flexbox for proper layout */
-.react-grid-item > .block-wrapper {
-  display: flex !important;
-  flex-direction: column !important;
+.invoice-gridstack-grid .block-wrapper {
+  position: relative !important;
+  display: block !important;
   width: 100% !important;
   height: 100% !important;
   box-sizing: border-box !important;
   min-width: 0 !important;
   min-height: 0 !important;
+  overflow: visible !important;
   background: transparent !important;
 }
 
-/* Top bar should not shrink */
-.react-grid-item > .block-wrapper > .block-topbar {
-  flex-shrink: 0 !important;
+.invoice-gridstack-grid .block-topbar {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 0 !important;
+  z-index: 20 !important;
+  transform: translateY(-100%) !important;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
+  transition: opacity 150ms ease;
 }
 
-/* Content should fill remaining space */
-.react-grid-item > .block-wrapper > .block-content {
-  flex: 1 !important;
+.invoice-gridstack-grid .grid-stack-item:hover .block-topbar,
+.invoice-gridstack-grid .grid-stack-item.selected .block-topbar {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.invoice-gridstack-grid .block-content {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
   min-height: 0 !important;
   overflow: hidden !important;
+}
+
+.invoice-gridstack-grid .block-content-measure {
+  width: 100%;
+  min-width: 0;
+}
+
+.invoice-gridstack-grid .block-wrapper--grow-to-content .block-content .h-full {
+  height: auto !important;
+}
+
+.invoice-gridstack-grid
+  .block-wrapper--grow-to-content
+  .block-content
+  .overflow-auto {
+  max-height: 100% !important;
+  overflow: auto !important;
 }

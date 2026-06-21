@@ -41,6 +41,46 @@ interface GeneratorGlobals {
   showPaidStamp: boolean;
 }
 
+export interface GeneratorPageDimensions {
+  width: number;
+  height: number;
+  widthMm: number;
+  heightMm: number;
+}
+
+const PAGE_SIZE_DIMENSIONS: Record<
+  string,
+  { widthMm: number; heightMm: number }
+> = {
+  A3: { widthMm: 297, heightMm: 420 },
+  A4: { widthMm: 210, heightMm: 297 },
+  A5: { widthMm: 148, heightMm: 210 },
+  B4: { widthMm: 250, heightMm: 353 },
+  B5: { widthMm: 176, heightMm: 250 },
+  'JIS-B4': { widthMm: 257, heightMm: 364 },
+  'JIS-B5': { widthMm: 182, heightMm: 257 },
+  letter: { widthMm: 215.9, heightMm: 279.4 },
+  legal: { widthMm: 215.9, heightMm: 355.6 },
+  ledger: { widthMm: 279.4, heightMm: 431.8 },
+};
+
+export function getGeneratorPageDimensions(
+  pageSize: string = 'A4',
+  layout: string = 'portrait'
+): GeneratorPageDimensions {
+  const dims = PAGE_SIZE_DIMENSIONS[pageSize] || PAGE_SIZE_DIMENSIONS.A4;
+  const isLandscape = layout === 'landscape';
+  const widthMm = isLandscape ? dims.heightMm : dims.widthMm;
+  const heightMm = isLandscape ? dims.widthMm : dims.heightMm;
+
+  return {
+    width: Math.round(widthMm * 3.7795),
+    height: Math.round(heightMm * 3.7795),
+    widthMm,
+    heightMm,
+  };
+}
+
 /** First defined wins; treats empty string as defined-but-blank → next falls back. */
 function pick<T>(...values: (T | undefined | null | '')[]): T {
   for (const v of values) {
@@ -54,13 +94,18 @@ function pick<T>(...values: (T | undefined | null | '')[]): T {
  * silently dropped by the browser. Multi-token shorthands (e.g. "4px 8px") and
  * already-unitful values pass through unchanged.
  */
-export function ensurePx(value: string | number | undefined | null): string | undefined {
+export function ensurePx(
+  value: string | number | undefined | null
+): string | undefined {
   if (value === undefined || value === null || value === '') return undefined;
   const s = String(value).trim();
   if (s === '') return undefined;
   // Multi-token shorthand: normalize each token independently.
   if (/\s/.test(s)) {
-    return s.split(/\s+/).map((t) => ensurePx(t) ?? t).join(' ');
+    return s
+      .split(/\s+/)
+      .map((t) => ensurePx(t) ?? t)
+      .join(' ');
   }
   // Bare number (positive or negative, optional decimal) → append px.
   if (/^-?\d+(\.\d+)?$/.test(s)) return `${s}px`;
@@ -83,9 +128,7 @@ function groupBlocksByRow(blocks: Block[]): Map<number, Block[]> {
 }
 
 /**
- * Calculate row heights based on grid dimensions (matching react-grid-layout).
- * Subtracts 52px of designer chrome (28px toolbar + 24px p-3 padding) so the
- * PDF content area matches the designer's usable content area.
+ * Calculate row heights based on builder grid dimensions.
  */
 function calculateRowHeights(rows: Map<number, Block[]>): Map<number, number> {
   const rowHeights = new Map<number, number>();
@@ -97,8 +140,7 @@ function calculateRowHeights(rows: Map<number, Block[]>): Map<number, number> {
         Math.max(
           0,
           block.gridPosition.h * rowHeight +
-            (block.gridPosition.h - 1) * margin[1] -
-            52
+            (block.gridPosition.h - 1) * margin[1]
         )
       )
     );
@@ -111,7 +153,7 @@ function calculateRowHeights(rows: Map<number, Block[]>): Map<number, number> {
 
 /**
  * Calculate top positions for each row based on grid coordinates.
- * Matches react-grid-layout positioning exactly.
+ * Matches builder grid positioning exactly.
  */
 function calculateRowPositions(
   rowHeights: Map<number, number>,
@@ -172,7 +214,7 @@ export function generateInvoiceHTML(
   // Layout/height calculations always need a concrete data shape.
   // Variable substitution is gated on previewData — when absent, tokens stay literal.
   const layoutData = previewData || SAMPLE_INVOICE_DATA;
-  
+
   const fallbackStack = `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
   const primaryFontName = (designSettings?.primary_font || 'Roboto').replace(
     /_/g,
@@ -190,6 +232,8 @@ export function generateInvoiceHTML(
   const primaryColor = '#000000';
   const secondaryColor = designSettings?.secondary_color || '#6B7280';
   const pageSize = designSettings?.page_size || 'A4';
+  const pageLayout = designSettings?.page_layout || 'portrait';
+  const pageDimensions = getGeneratorPageDimensions(pageSize, pageLayout);
 
   const globals: GeneratorGlobals = {
     fontSize: `${fontSize}px`,
@@ -261,7 +305,8 @@ export function generateInvoiceHTML(
         rowHeights,
         rowPositions,
         globals,
-        effectivePadding
+        effectivePadding,
+        pageDimensions.width
       )
     )
     .join('\n');
@@ -274,10 +319,7 @@ export function generateInvoiceHTML(
       ...blocks.map((block) => {
         const { y, h } = block.gridPosition;
         const top = effectivePadding.top + y * (rowHeight + margin[1]);
-        const gridHeight = Math.max(
-          0,
-          h * rowHeight + (h - 1) * margin[1] - 52
-        );
+        const gridHeight = Math.max(0, h * rowHeight + (h - 1) * margin[1]);
         return top + gridHeight;
       })
     );
@@ -288,14 +330,14 @@ export function generateInvoiceHTML(
   // Add bottom inset
   maxBottom += effectivePadding.bottom;
 
-  // Ensure minimum A4 height
-  const containerHeight = Math.max(maxBottom || 1122, 1122);
+  // Ensure the document is at least one configured page tall.
+  const containerHeight = Math.max(
+    maxBottom || pageDimensions.height,
+    pageDimensions.height
+  );
 
-  const canvasWidth = GRID_CONFIG.canvasWidth;
-
-  const pageSizeCss = pageSize === 'letter' ? 'letter' : 'A4';
   const showPageNumbering = designSettings?.page_numbering;
-  
+
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -305,7 +347,7 @@ export function generateInvoiceHTML(
   <title>Invoice ${layoutData.invoice.number}</title>
   <style>
     @page {
-      size: ${pageSizeCss};
+      size: ${pageDimensions.widthMm}mm ${pageDimensions.heightMm}mm;
       /* Always zero — the user's pageMargin is already stacked into the visible
          .invoice-container padding via effectivePadding. Adding it here too
          would double-apply the gutter at PDF render time. */
@@ -321,7 +363,7 @@ export function generateInvoiceHTML(
     html, body {
       margin: 0;
       padding: 0;
-      width: ${canvasWidth}px;
+      width: ${pageDimensions.width}px;
       height: ${containerHeight}px;
       overflow: hidden; /* Prevent scrollbars */
       font-family: ${globals.fontFamilyPrimary};
@@ -336,11 +378,13 @@ export function generateInvoiceHTML(
     }
 
     .invoice-container {
-      width: ${canvasWidth}px;
+      width: 100%;
       height: ${containerHeight}px;
       background: white;
       margin: 0;
-      padding: ${effectivePadding.top}px ${effectivePadding.right}px ${effectivePadding.bottom}px ${effectivePadding.left}px;
+      padding: ${effectivePadding.top}px ${effectivePadding.right}px ${
+    effectivePadding.bottom
+  }px ${effectivePadding.left}px;
       position: relative;
       overflow: hidden; /* Prevent any visual artifacts from extending beyond container */
       box-sizing: border-box; /* Include padding in width calculation */
@@ -438,7 +482,7 @@ export function generateInvoiceHTML(
 
 /**
  * Render a single block to HTML with grid-based positioning and sizing.
- * Matches react-grid-layout coordinates exactly.
+ * Matches builder grid coordinates exactly.
  */
 function renderBlockWithRowHeight(
   block: Block,
@@ -447,13 +491,19 @@ function renderBlockWithRowHeight(
   rowHeights: Map<number, number>,
   rowPositions: Map<number, number>,
   globals: GeneratorGlobals,
-  effectivePadding: { top: number; right: number; bottom: number; left: number }
+  effectivePadding: {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  },
+  canvasWidth: number
 ): string {
   const content = renderBlockContent(block, previewData, layoutData, globals);
 
   // Calculate absolute pixel positions based on grid coordinates
   const { x, y, w, h } = block.gridPosition;
-  const { cols, canvasWidth, margin, rowHeight } = GRID_CONFIG;
+  const { cols, margin, rowHeight } = GRID_CONFIG;
 
   // Calculate column width using per-template horizontal padding so the grid
   // shrinks/grows with the user's padding settings.
@@ -470,18 +520,15 @@ function renderBlockWithRowHeight(
   // Get row-based position (direct grid coordinate calculation)
   const top = rowPositions.get(y) || effectivePadding.top;
 
-  // Use the block's own grid height minus 52px of editor chrome
-  // (28px toolbar + 24px p-3 padding) so the PDF matches the designer.
-  const gridHeight = Math.max(
-    0,
-    h * rowHeight + (h - 1) * margin[1] - 52
-  );
+  const gridHeight = Math.max(0, h * rowHeight + (h - 1) * margin[1]);
 
   // Ensure blocks never exceed container bounds
   const maxLeft = effectivePadding.left;
   const maxRight = canvasWidth - effectivePadding.right;
   const constrainedLeft = Math.max(maxLeft, Math.min(left, maxRight - width));
   const constrainedWidth = Math.min(width, maxRight - constrainedLeft);
+  const constrainedLeftPercent = (constrainedLeft / canvasWidth) * 100;
+  const constrainedWidthPercent = (constrainedWidth / canvasWidth) * 100;
 
   // Use min-height so content can grow if taller than the grid cell
   const heightStyle = `min-height: ${gridHeight}px;`;
@@ -495,19 +542,17 @@ function renderBlockWithRowHeight(
     const keepTogether = (block.properties as { keepTogether?: boolean })
       .keepTogether;
     if (keepTogether === true) {
-      pageBreakStyle =
-        'page-break-before: always; break-before: page;';
+      pageBreakStyle = 'page-break-before: always; break-before: page;';
     } else if (keepTogether === false) {
-      pageBreakStyle =
-        'page-break-inside: avoid; break-inside: avoid;';
+      pageBreakStyle = 'page-break-inside: avoid; break-inside: avoid;';
     }
   }
 
   const styles = `
     position: absolute;
-    left: ${constrainedLeft}px;
+    left: ${constrainedLeftPercent.toFixed(6)}%;
     top: ${top}px;
-    width: ${constrainedWidth}px;
+    width: ${constrainedWidthPercent.toFixed(6)}%;
     ${heightStyle}
     ${pageBreakStyle}
     box-sizing: border-box;
@@ -544,6 +589,7 @@ function renderBlockContent(
     case 'invoice-details':
       return renderInvoiceDetailsBlock(block, previewData, globals);
     case 'table':
+    case 'tasks-table':
       return renderTableBlock(block, previewData, layoutData, globals);
     case 'total':
       return renderTotalBlock(block, previewData, globals);
@@ -569,10 +615,11 @@ function renderTextBlock(
     block.properties;
   const replacedContent = replaceVariables(content, data);
   const paddingCss = padding ? `padding: ${padding};` : '';
+  const fontSizeCss = fontSize ? `font-size: ${fontSize};` : '';
 
   return `
     <div style="
-      font-size: ${pick(fontSize, globals.fontSize)};
+      ${fontSizeCss}
       font-weight: ${fontWeight || 'normal'};
       color: ${pick(color, DEFAULT_VALUE_TEXT_COLOR, globals.primaryColor)};
       text-align: ${align || 'left'};
@@ -587,10 +634,7 @@ function renderTextBlock(
   `;
 }
 
-function renderImageBlock(
-  block: Block,
-  data: InvoiceData | undefined
-): string {
+function renderImageBlock(block: Block, data: InvoiceData | undefined): string {
   const { source, align, maxWidth, objectFit } = block.properties;
   const resolvedSource = replaceVariables(source, data);
 
@@ -609,8 +653,8 @@ function renderImageBlock(
       <img src="${escapeHtml(
         resolvedSource
       )}" style="max-width: ${maxWidth}; max-height: 100%; object-fit: ${objectFit};" alt="${
-        block.type
-      }" />
+    block.type
+  }" />
     </div>
   `;
 }
@@ -620,11 +664,52 @@ function renderCompanyInfoBlock(
   data: InvoiceData | undefined,
   globals: GeneratorGlobals
 ): string {
-  const { fieldConfigs, content, fontSize, lineHeight, align, color, padding } =
-    block.properties;
-  const blockFontSize = pick(fontSize, globals.fontSize);
-  const blockColor = pick(color, DEFAULT_VALUE_TEXT_COLOR, globals.primaryColor);
+  const {
+    fieldConfigs,
+    content,
+    fontSize,
+    lineHeight,
+    align,
+    color,
+    padding,
+    showTitle,
+    title,
+    titleFontSize,
+    titleFontWeight,
+    titleFontStyle,
+    titleColor,
+    titleAlign,
+    titlePrefix,
+    titleSuffix,
+  } = block.properties;
+  const blockFontSize = fontSize;
+  const blockFontSizeStyle = blockFontSize
+    ? `font-size: ${blockFontSize};`
+    : '';
+  const blockColor = pick(
+    color,
+    DEFAULT_VALUE_TEXT_COLOR,
+    globals.primaryColor
+  );
   const paddingStyle = padding ? `padding: ${padding};` : '';
+  const titleFontSizeStyle = titleFontSize
+    ? `font-size:${titleFontSize};`
+    : blockFontSizeStyle;
+  const titleFontStyleCss = titleFontStyle
+    ? `font-style:${titleFontStyle};`
+    : '';
+  const titleTextColor = pick(titleColor, blockColor);
+  const titleTextAlign = titleAlign || align || 'left';
+  const titleText = `${titlePrefix || ''}${title || ''}${titleSuffix || ''}`;
+  const titleHtml = showTitle
+    ? `<div style="font-family:${
+        globals.fontFamilySecondary
+      };${titleFontSizeStyle}font-weight:${
+        titleFontWeight || 'bold'
+      };${titleFontStyleCss}color:${titleTextColor};text-align:${titleTextAlign};margin-bottom:8px;">${escapeHtml(
+        titleText
+      )}</div>`
+    : '';
 
   if (fieldConfigs && Array.isArray(fieldConfigs) && fieldConfigs.length > 0) {
     const fieldsHtml = fieldConfigs
@@ -648,17 +733,21 @@ function renderCompanyInfoBlock(
             return '';
           }
 
-          const fieldFontSize = pick(config.fontSize, blockFontSize);
+          const fieldFontSizeStyle = config.fontSize
+            ? `font-size: ${config.fontSize};`
+            : '';
           const fieldColor = pick(config.color, blockColor);
 
           return `
           <div style="
-            font-size: ${fieldFontSize};
+            ${fieldFontSizeStyle}
             font-weight: ${config.fontWeight || 'normal'};
             color: ${fieldColor};
             font-style: ${config.fontStyle || 'normal'};
           ">
-            ${escapeHtml(config.prefix || '')}${escapeHtml(resolvedValue)}${escapeHtml(config.suffix || '')}
+            ${escapeHtml(config.prefix || '')}${escapeHtml(
+            resolvedValue
+          )}${escapeHtml(config.suffix || '')}
           </div>
         `;
         }
@@ -672,12 +761,13 @@ function renderCompanyInfoBlock(
 
     return `
       <div style="
-        font-size: ${blockFontSize};
+        ${blockFontSizeStyle}
         line-height: ${lineHeight || '1.5'};
         text-align: ${align || 'left'};
         color: ${blockColor};
         ${paddingStyle}
       ">
+        ${titleHtml}
         ${fieldsHtml}
       </div>
     `;
@@ -687,13 +777,14 @@ function renderCompanyInfoBlock(
 
   return `
     <div style="
-      font-size: ${blockFontSize};
+      ${blockFontSizeStyle}
       line-height: ${lineHeight || '1.5'};
       text-align: ${align || 'left'};
       color: ${blockColor};
       white-space: pre-line;
       ${paddingStyle}
     ">
+      ${titleHtml}
       ${escapeHtml(replacedContent)}
     </div>
   `;
@@ -714,10 +805,23 @@ function renderClientInfoBlock(
     padding,
     showTitle,
     title,
+    titleFontSize,
     titleFontWeight,
+    titleFontStyle,
+    titleColor,
+    titleAlign,
+    titlePrefix,
+    titleSuffix,
   } = block.properties;
-  const blockFontSize = pick(fontSize, globals.fontSize);
-  const blockColor = pick(color, DEFAULT_VALUE_TEXT_COLOR, globals.primaryColor);
+  const blockFontSize = fontSize;
+  const blockFontSizeStyle = blockFontSize
+    ? `font-size:${blockFontSize};`
+    : '';
+  const blockColor = pick(
+    color,
+    DEFAULT_VALUE_TEXT_COLOR,
+    globals.primaryColor
+  );
   const paddingStyle = padding ? `padding:${padding};` : '';
 
   let contentHtml = '';
@@ -749,10 +853,18 @@ function renderClientInfoBlock(
             return '';
           }
 
-          const fieldFontSize = pick(config.fontSize, blockFontSize);
+          const fieldFontSizeStyle = config.fontSize
+            ? `font-size:${config.fontSize};`
+            : '';
           const fieldColor = pick(config.color, blockColor);
 
-          return `<div style="font-size:${fieldFontSize};font-weight:${config.fontWeight || 'normal'};color:${fieldColor};font-style:${config.fontStyle || 'normal'};">${escapeHtml(config.prefix || '')}${escapeHtml(resolvedValue)}${escapeHtml(config.suffix || '')}</div>`;
+          return `<div style="${fieldFontSizeStyle}font-weight:${
+            config.fontWeight || 'normal'
+          };color:${fieldColor};font-style:${
+            config.fontStyle || 'normal'
+          };">${escapeHtml(config.prefix || '')}${escapeHtml(
+            resolvedValue
+          )}${escapeHtml(config.suffix || '')}</div>`;
         }
       )
       .filter(Boolean)
@@ -768,15 +880,34 @@ function renderClientInfoBlock(
   // as breaks. With per-field divs, each div is its own line box and pre-line
   // would render the inter-element whitespace as extra blank lines.
   const whiteSpaceRule = useFieldConfigs ? '' : 'white-space: pre-line;';
+  const titleFontSizeStyle = titleFontSize
+    ? `font-size:${titleFontSize};`
+    : blockFontSizeStyle;
+  const titleFontStyleCss = titleFontStyle
+    ? `font-style:${titleFontStyle};`
+    : '';
+  const titleTextColor = pick(titleColor, blockColor);
+  const titleTextAlign = titleAlign || align || 'left';
+  const titleText = `${titlePrefix || ''}${title || ''}${titleSuffix || ''}`;
 
   return `
     <div style="${paddingStyle}">
       ${
         showTitle
-          ? `<div style="font-family:${globals.fontFamilySecondary};font-size:${blockFontSize};font-weight:${titleFontWeight || 'bold'};color:${blockColor};margin-bottom:8px;">${escapeHtml(title)}</div>`
+          ? `<div style="font-family:${
+              globals.fontFamilySecondary
+            };${titleFontSizeStyle}font-weight:${
+              titleFontWeight || 'bold'
+            };${titleFontStyleCss}color:${titleTextColor};text-align:${titleTextAlign};margin-bottom:8px;">${escapeHtml(
+              titleText
+            )}</div>`
           : ''
       }
-      <div style="font-size:${blockFontSize};line-height:${lineHeight || '1.5'};text-align:${align || 'left'};color:${blockColor};${whiteSpaceRule}">${contentHtml}</div>
+      <div style="${blockFontSizeStyle}line-height:${
+    lineHeight || '1.5'
+  };text-align:${
+    align || 'left'
+  };color:${blockColor};${whiteSpaceRule}">${contentHtml}</div>
     </div>
   `;
 }
@@ -803,8 +934,11 @@ function renderInvoiceDetailsBlock(
     rowSpacing,
     valueMinWidth,
   } = block.properties;
-  const blockFontSize = pick(fontSize, globals.fontSize);
-  const blockColor = pick(color, DEFAULT_VALUE_TEXT_COLOR, globals.primaryColor);
+  const blockColor = pick(
+    color,
+    DEFAULT_VALUE_TEXT_COLOR,
+    globals.primaryColor
+  );
   const blockLabelColor = pick(
     labelColor,
     DEFAULT_LABEL_TEXT_COLOR,
@@ -822,8 +956,9 @@ function renderInvoiceDetailsBlock(
     tableAlign === 'right'
       ? 'margin-left:auto;'
       : tableAlign === 'center'
-        ? 'margin-left:auto;margin-right:auto;'
-        : '';
+      ? 'margin-left:auto;margin-right:auto;'
+      : '';
+  const tableFontSizeCss = fontSize ? `font-size:${fontSize};` : '';
 
   const colLabelAlign = labelAlign || 'right';
   const colValueAlign = valueAlign || 'right';
@@ -835,9 +970,15 @@ function renderInvoiceDetailsBlock(
   const labelPadCss = labelPadValue
     ? `padding:${labelPadValue};padding-right:${gap};`
     : `padding:0;padding-right:${gap};`;
-  const valuePadCss = valuePadValue ? `padding:${valuePadValue};` : 'padding:0;';
-  const rowSpacingCss = rowSpacingValue ? `padding-bottom:${rowSpacingValue};` : '';
-  const valueMinWidthCss = valueMinWidthValue ? `min-width:${valueMinWidthValue};` : '';
+  const valuePadCss = valuePadValue
+    ? `padding:${valuePadValue};`
+    : 'padding:0;';
+  const rowSpacingCss = rowSpacingValue
+    ? `padding-bottom:${rowSpacingValue};`
+    : '';
+  const valueMinWidthCss = valueMinWidthValue
+    ? `min-width:${valueMinWidthValue};`
+    : '';
 
   const rowsHtml =
     fieldConfigs
@@ -851,16 +992,16 @@ function renderInvoiceDetailsBlock(
           return '';
         }
 
-        // Resolve per-cell typography. Prefer new labelStyle/valueStyle;
-        // fall back to legacy flat fields, then block defaults.
+        // Resolve per-cell typography. Font sizes only emit when explicitly
+        // configured so "Use default" inherits document-level CSS.
         const ls = field.labelStyle;
         const vs = field.valueStyle;
-        const labelFontSize = pick(ls?.fontSize, field.fontSize, blockFontSize);
+        const labelFontSize = pick(ls?.fontSize, field.fontSize);
         const labelFontWeight = ls?.fontWeight || field.fontWeight || 'normal';
         const labelFontStyle = ls?.fontStyle || field.fontStyle || 'normal';
         const labelTextColor = pick(ls?.color, field.color, blockLabelColor);
 
-        const valueFontSize = pick(vs?.fontSize, field.fontSize, blockFontSize);
+        const valueFontSize = pick(vs?.fontSize, field.fontSize);
         const valueFontWeight = vs?.fontWeight || field.fontWeight || 'normal';
         const valueFontStyle = vs?.fontStyle || field.fontStyle || 'normal';
         const valueTextColor = pick(vs?.color, field.color, blockColor);
@@ -874,22 +1015,32 @@ function renderInvoiceDetailsBlock(
           : labelSource;
         const valueText = `${displayValue}${field.suffix || ''}`;
 
-        const labelCellBase = `font-size:${labelFontSize};font-weight:${labelFontWeight};font-style:${labelFontStyle};`;
-        const valueCellBase = `font-size:${valueFontSize};font-weight:${valueFontWeight};font-style:${valueFontStyle};`;
+        const labelCellBase = `${
+          labelFontSize ? `font-size:${labelFontSize};` : ''
+        }font-weight:${labelFontWeight};font-style:${labelFontStyle};`;
+        const valueCellBase = `${
+          valueFontSize ? `font-size:${valueFontSize};` : ''
+        }font-weight:${valueFontWeight};font-style:${valueFontStyle};`;
 
         const labelCell =
           showLabels !== false
-            ? `<td style="${labelCellBase}color:${labelTextColor};${labelPadCss}${rowSpacingCss}white-space:nowrap;text-align:${colLabelAlign};">${escapeHtml(labelText)}</td>`
+            ? `<td style="${labelCellBase}color:${labelTextColor};${labelPadCss}${rowSpacingCss}white-space:nowrap;text-align:${colLabelAlign};">${escapeHtml(
+                labelText
+              )}</td>`
             : '';
 
-        return `<tr>${labelCell}<td style="${valueCellBase}color:${valueTextColor};${valuePadCss}${rowSpacingCss}${valueMinWidthCss}text-align:${colValueAlign};">${escapeHtml(valueText)}</td></tr>`;
+        return `<tr>${labelCell}<td style="${valueCellBase}color:${valueTextColor};${valuePadCss}${rowSpacingCss}${valueMinWidthCss}text-align:${colValueAlign};">${escapeHtml(
+          valueText
+        )}</td></tr>`;
       })
       .filter(Boolean)
       .join('') || '';
 
   return `
     <div style="${paddingStyle}">
-      <table style="border-collapse:collapse;width:${tableWidth};${tableMargin}font-size:${blockFontSize};line-height:${lineHeight || '1.5'};color:${blockColor};">
+      <table style="border-collapse:collapse;width:${tableWidth};${tableMargin}${tableFontSizeCss}line-height:${
+    lineHeight || '1.5'
+  };color:${blockColor};">
         <tbody>${rowsHtml}</tbody>
       </table>
     </div>
@@ -914,7 +1065,7 @@ function renderTableBlock(
     alternateRows,
     rowColor,
   } = block.properties;
-  const tableFontSize = pick(fontSize, globals.fontSize);
+  const tableFontSizeStyle = fontSize ? `font-size: ${fontSize};` : '';
   const resolvedRowTextColor = pick(rowColor, DEFAULT_VALUE_TEXT_COLOR);
 
   const borderResolved = resolveTableBorderProps(block.properties);
@@ -989,7 +1140,7 @@ function renderTableBlock(
 
   return `
     <div style="width: 100%; height: 100%; overflow: auto;">
-      <table style="width: 100%; border-collapse: collapse; font-size: ${tableFontSize};">
+      <table style="width: 100%; border-collapse: collapse; ${tableFontSizeStyle}">
         ${headerHTML}
         ${rowsHTML}
       </table>
@@ -1004,16 +1155,9 @@ function renderTotalBlock(
 ): string {
   const {
     items,
-    fontSize,
     align,
     labelAlign,
     valueAlign,
-    labelColor,
-    amountColor,
-    totalFontSize,
-    totalFontWeight,
-    totalColor,
-    balanceColor,
     spacing,
     padding,
     labelPadding,
@@ -1021,18 +1165,7 @@ function renderTotalBlock(
     labelValueGap,
     valueMinWidth,
   } = block.properties;
-  const totalsFontSize = pick(fontSize, globals.fontSize);
   const blockPaddingStyle = padding ? `padding:${padding};` : '';
-  const totalsLabelColor = pick(
-    labelColor,
-    DEFAULT_LABEL_TEXT_COLOR,
-    globals.primaryColor
-  );
-  const totalsAmountColor = pick(
-    amountColor,
-    DEFAULT_VALUE_TEXT_COLOR,
-    globals.primaryColor
-  );
   const colLabelAlign = labelAlign || 'right';
   const colValueAlign = valueAlign || 'right';
 
@@ -1041,8 +1174,8 @@ function renderTotalBlock(
     align === 'right'
       ? 'margin-left: auto;'
       : align === 'center'
-        ? 'margin: 0 auto;'
-        : '';
+      ? 'margin: 0 auto;'
+      : '';
   const gap = ensurePx(labelValueGap) || '20px';
   const labelPaddingPx = ensurePx(labelPadding);
   const valuePaddingPx = ensurePx(valuePadding);
@@ -1054,74 +1187,71 @@ function renderTotalBlock(
   html += '<tbody>';
 
   items.forEach(
-      (item: {
-        show: boolean;
-        isTotal?: boolean;
-        isBalance?: boolean;
-        field: string;
-        label: string;
-        labelStyle?: { fontSize?: string; fontWeight?: string; fontStyle?: string; color?: string };
-        valueStyle?: { fontSize?: string; fontWeight?: string; fontStyle?: string; color?: string };
-        // Legacy flat fields - read-only fallback
+    (item: {
+      show: boolean;
+      isTotal?: boolean;
+      isBalance?: boolean;
+      field: string;
+      label: string;
+      labelStyle?: {
         fontSize?: string;
         fontWeight?: string;
-        color?: string;
         fontStyle?: string;
-        amountColor?: string;
-      }) => {
-        const isTotal = item.isTotal;
-        const isBalance = item.isBalance;
-        const value = replaceVariables(item.field, data);
+        color?: string;
+      };
+      valueStyle?: {
+        fontSize?: string;
+        fontWeight?: string;
+        fontStyle?: string;
+        color?: string;
+      };
+      // Legacy flat fields - read-only fallback
+      fontSize?: string;
+      fontWeight?: string;
+      color?: string;
+      fontStyle?: string;
+      amountColor?: string;
+    }) => {
+      const value = replaceVariables(item.field, data);
 
-        // Per-cell typography. Prefer new label/valueStyle; fall back to
-        // legacy flat fields, then row-type defaults.
-        const ls = item.labelStyle;
-        const vs = item.valueStyle;
-        const rowDefaultFontSize = isTotal ? totalFontSize : totalsFontSize;
-        const rowDefaultFontWeight = isTotal ? totalFontWeight : 'normal';
-        const rowDefaultValueColor = isBalance
-          ? pick(balanceColor, DEFAULT_VALUE_TEXT_COLOR)
-          : isTotal
-            ? pick(totalColor, DEFAULT_VALUE_TEXT_COLOR)
-            : totalsAmountColor;
-        const rowDefaultLabelColor = isTotal
-          ? pick(totalColor, totalsLabelColor)
-          : isBalance
-            ? pick(balanceColor, totalsLabelColor)
-            : totalsLabelColor;
+      // Per-cell typography only. Legacy flat fields are read as item-level
+      // fallbacks, but block-level totals typography is intentionally ignored.
+      const ls = item.labelStyle;
+      const vs = item.valueStyle;
 
-        const labelFontSize = pick(ls?.fontSize, item.fontSize, rowDefaultFontSize);
-        const labelFontWeight = ls?.fontWeight || item.fontWeight || rowDefaultFontWeight;
-        const labelFontStyle = ls?.fontStyle || item.fontStyle || 'normal';
-        const labelTextColor = ls?.color || item.color || rowDefaultLabelColor;
+      const labelFontSize = pick(ls?.fontSize, item.fontSize);
+      const labelFontWeight = ls?.fontWeight || item.fontWeight || 'normal';
+      const labelFontStyle = ls?.fontStyle || item.fontStyle || 'normal';
+      const labelTextColor = ls?.color || item.color || DEFAULT_LABEL_TEXT_COLOR;
 
-        const valueFontSize = pick(vs?.fontSize, item.fontSize, rowDefaultFontSize);
-        const valueFontWeight = vs?.fontWeight || item.fontWeight || rowDefaultFontWeight;
-        const valueFontStyle = vs?.fontStyle || item.fontStyle || 'normal';
-        const valueTextColor = vs?.color || item.amountColor || rowDefaultValueColor;
+      const valueFontSize = pick(vs?.fontSize, item.fontSize);
+      const valueFontWeight = vs?.fontWeight || item.fontWeight || 'normal';
+      const valueFontStyle = vs?.fontStyle || item.fontStyle || 'normal';
+      const valueTextColor =
+        vs?.color || item.amountColor || DEFAULT_VALUE_TEXT_COLOR;
 
-        // Build label cell padding (user padding + gap on right)
-        const labelPaddingStyle = labelPaddingPx
-          ? `padding: ${labelPaddingPx}; padding-right: ${gap};`
-          : `padding-right: ${gap}; padding-bottom: ${spacingPx || '0px'};`;
+      // Build label cell padding (user padding + gap on right)
+      const labelPaddingStyle = labelPaddingPx
+        ? `padding: ${labelPaddingPx}; padding-right: ${gap};`
+        : `padding-right: ${gap}; padding-bottom: ${spacingPx || '0px'};`;
 
-        // Build value cell padding
-        const valuePaddingStyle = valuePaddingPx
-          ? `padding: ${valuePaddingPx};`
-          : `padding-bottom: ${spacingPx || '0px'};`;
+      // Build value cell padding
+      const valuePaddingStyle = valuePaddingPx
+        ? `padding: ${valuePaddingPx};`
+        : `padding-bottom: ${spacingPx || '0px'};`;
 
-        // Handle label variables - replace with friendly labels for preview
-        let displayLabel = item.label;
-        if (data) {
-          // Preview mode: replace label variables with display labels using translations
-          displayLabel = getSampleLabelValue(item.label, t);
-        }
-        // Save mode (no data): keep label variables for backend replacement
+      // Handle label variables - replace with friendly labels for preview
+      let displayLabel = item.label;
+      if (data) {
+        // Preview mode: replace label variables with display labels using translations
+        displayLabel = getSampleLabelValue(item.label, t);
+      }
+      // Save mode (no data): keep label variables for backend replacement
 
-        html += `
+      html += `
         <tr>
           <td style="
-            font-size: ${labelFontSize};
+            ${labelFontSize ? `font-size: ${labelFontSize};` : ''}
             font-weight: ${labelFontWeight};
             font-style: ${labelFontStyle};
             color: ${labelTextColor};
@@ -1130,7 +1260,7 @@ function renderTotalBlock(
             white-space: nowrap;
           ">${escapeHtml(displayLabel)}:</td>
           <td style="
-            font-size: ${valueFontSize};
+            ${valueFontSize ? `font-size: ${valueFontSize};` : ''}
             font-weight: ${valueFontWeight};
             font-style: ${valueFontStyle};
             color: ${valueTextColor};
@@ -1141,8 +1271,8 @@ function renderTotalBlock(
           ">${value}</td>
         </tr>
       `;
-      }
-    );
+    }
+  );
 
   html += '</tbody></table></div>';
 
@@ -1154,7 +1284,7 @@ function renderTotalBlock(
       </div>
     `;
   }
-  
+
   return html;
 }
 
@@ -1201,13 +1331,10 @@ function renderQRCodeBlock(
   `;
 }
 
-function renderSignatureBlock(
-  block: Block,
-  globals: GeneratorGlobals
-): string {
+function renderSignatureBlock(block: Block, globals: GeneratorGlobals): string {
   const { label, showLine, showDate, align, fontSize, color } =
     block.properties;
-  const sigFontSize = pick(fontSize, globals.fontSize);
+  const sigFontSizeStyle = fontSize ? `font-size: ${fontSize};` : '';
   const sigColor = pick(color, DEFAULT_VALUE_TEXT_COLOR, globals.primaryColor);
 
   return `
@@ -1225,13 +1352,13 @@ function renderSignatureBlock(
       `
           : ''
       }
-      <div style="font-size: ${sigFontSize}; color: ${sigColor};">
+      <div style="${sigFontSizeStyle} color: ${sigColor};">
         ${escapeHtml(label)}
       </div>
       ${
         showDate
           ? `
-        <div style="font-size: ${sigFontSize}; color: ${sigColor}; margin-top: 4px;">
+        <div style="${sigFontSizeStyle} color: ${sigColor}; margin-top: 4px;">
           Date: ________________
         </div>
       `

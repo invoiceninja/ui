@@ -13,17 +13,13 @@ import { useState, useMemo } from 'react';
 import { ChevronUp, ChevronDown, Trash2, Type } from 'lucide-react';
 import { PropertyEditorProps, FieldConfig } from '../../types';
 import {
-  FontSizeInput,
   AlignmentInput,
   ColorInput,
   TextInput,
   CheckboxInput,
   SectionDivider,
 } from './PropertyInputs';
-import {
-  DesignerPxNumberInput,
-  mergePxOrOmit,
-} from './DesignerPxNumberInput';
+import { DesignerPxNumberInput, mergePxOrOmit } from './DesignerPxNumberInput';
 import { CellTypographyEditor } from './CellTypographyEditor';
 import { useCustomField } from '$app/components/CustomField';
 import { useColorScheme } from '$app/common/colors';
@@ -328,7 +324,6 @@ export function InvoiceDetailsBlockProperties({
                     onChange={(next) =>
                       updateFieldTypography(index, 'labelStyle', next)
                     }
-                    fontSizePlaceholder={block.properties.fontSize || '12px'}
                     colorDefault={
                       block.properties.labelColor ||
                       block.properties.color ||
@@ -342,7 +337,6 @@ export function InvoiceDetailsBlockProperties({
                     onChange={(next) =>
                       updateFieldTypography(index, 'valueStyle', next)
                     }
-                    fontSizePlaceholder={block.properties.fontSize || '12px'}
                     colorDefault={
                       block.properties.color || DEFAULT_VALUE_TEXT_COLOR
                     }
@@ -354,7 +348,7 @@ export function InvoiceDetailsBlockProperties({
                     onChange={(value) =>
                       updateFieldTypography(index, 'prefix', value)
                     }
-                   />
+                  />
 
                   <TextInput
                     label={String(t('suffix'))}
@@ -432,13 +426,6 @@ export function InvoiceDetailsBlockProperties({
       </div>
 
       <SectionDivider label={String(t('typography'))} />
-
-      {/* Global Font Size */}
-      <FontSizeInput
-        label={String(t('font_size'))}
-        value={block.properties.fontSize}
-        onChange={(value) => updateProperty('fontSize', value)}
-      />
 
       {/* Alignment */}
       <AlignmentInput

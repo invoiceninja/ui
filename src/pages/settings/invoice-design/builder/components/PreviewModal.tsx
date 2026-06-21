@@ -18,6 +18,7 @@ import { Block } from '../types';
 import {
   generateInvoiceHTML,
   GeneratorDesignSettings,
+  getGeneratorPageDimensions,
 } from '../utils/html-generator';
 import { useSampleInvoiceData } from '../hooks/useSampleInvoiceData';
 
@@ -27,28 +28,20 @@ interface PreviewModalProps {
   designSettings?: GeneratorDesignSettings;
 }
 
-interface PageDimensions {
-  width: number;
-  height: number;
-}
-
-function getPreviewDimensions(pageSize: string = 'A4'): PageDimensions {
-  switch (pageSize) {
-    case 'letter':
-      return { width: 816, height: 1056 }; // 8.5 x 11 inches at 96dpi
-    case 'A4':
-    default:
-      return { width: 794, height: 1122 }; // A4 at 96dpi
-  }
-}
-
-export function PreviewModal({ blocks, onClose, designSettings }: PreviewModalProps) {
+export function PreviewModal({
+  blocks,
+  onClose,
+  designSettings,
+}: PreviewModalProps) {
   const [t] = useTranslation();
   const [zoom, setZoom] = useState(80);
   const colors = useColorScheme();
   const sampleData = useSampleInvoiceData();
   const html = generateInvoiceHTML(blocks, sampleData, designSettings);
-  const dimensions = getPreviewDimensions(designSettings?.page_size);
+  const dimensions = getGeneratorPageDimensions(
+    designSettings?.page_size,
+    designSettings?.page_layout
+  );
 
   // React's controlled `srcDoc` prop sets the attribute, but browsers don't
   // always re-parse the iframe document when the attribute changes after the
@@ -169,9 +162,7 @@ export function PreviewModal({ blocks, onClose, designSettings }: PreviewModalPr
         <div
           className="py-3 border-t flex items-center justify-between text-sm -mx-5 px-5 -mb-5"
           style={{ borderColor: colors.$24, color: colors.$17 }}
-        >
-
-        </div>
+        ></div>
       </div>
     </Modal>
   );

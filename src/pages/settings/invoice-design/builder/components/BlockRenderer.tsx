@@ -14,7 +14,10 @@ import { Block, FieldConfig } from '../types';
 import { useBlockLabel } from '../block-library';
 import { InvoiceData, replaceVariables } from '../utils/variable-replacer';
 import { useSampleInvoiceData } from '../hooks/useSampleInvoiceData';
-import { replaceLabelVariables, getSampleLabelValue } from '../utils/label-variables';
+import {
+  replaceLabelVariables,
+  getSampleLabelValue,
+} from '../utils/label-variables';
 import { ensurePx } from '../utils/html-generator';
 import {
   resolveTableBorderProps,
@@ -162,10 +165,7 @@ function TextBlockRenderer({ block }: BlockRendererProps) {
   const sampleData = useSampleInvoiceData();
   const { content, fontSize, fontWeight, color, align, lineHeight } =
     block.properties;
-  const displayContent = replaceVariables(
-    content || t('text'),
-    sampleData
-  );
+  const displayContent = replaceVariables(content || t('text'), sampleData);
 
   return (
     <div
@@ -257,13 +257,15 @@ function CompanyInfoRenderer({ block }: BlockRendererProps) {
             marginBottom: '8px',
           }}
         >
-          {titlePrefix}{title}{titleSuffix}
+          {titlePrefix}
+          {title}
+          {titleSuffix}
         </div>
       )}
 
       {fieldConfigs?.length > 0 ? (
         renderFieldConfigs(fieldConfigs, sampleData, {
-          fontSize,
+          fontSize: fontSize || undefined,
           lineHeight,
           textAlign: align,
           color,
@@ -319,13 +321,15 @@ function ClientInfoRenderer({ block }: BlockRendererProps) {
             marginBottom: '8px',
           }}
         >
-          {titlePrefix}{title}{titleSuffix}
+          {titlePrefix}
+          {title}
+          {titleSuffix}
         </div>
       )}
 
       {fieldConfigs?.length > 0 ? (
         renderFieldConfigs(fieldConfigs, sampleData, {
-          fontSize,
+          fontSize: fontSize || undefined,
           lineHeight,
           textAlign: align,
           color,
@@ -371,7 +375,8 @@ function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
   // Match server-side rendering: two-column table (label | value). When the
   // block is right-aligned, the table itself shrinks to fit-content and is
   // pushed to the right edge with margin-left:auto.
-  const tableAlign = align === 'right' ? 'right' : align === 'center' ? 'center' : 'left';
+  const tableAlign =
+    align === 'right' ? 'right' : align === 'center' ? 'center' : 'left';
   const colLabelAlign = (labelAlign as 'left' | 'center' | 'right') || 'right';
   const colValueAlign = (valueAlign as 'left' | 'center' | 'right') || 'right';
   const gap = ensurePx(labelValueGap) || '12px';
@@ -387,9 +392,14 @@ function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
         style={{
           borderCollapse: 'collapse',
           width: tableAlign === 'left' ? '100%' : 'auto',
-          marginLeft: tableAlign === 'right' ? 'auto' : tableAlign === 'center' ? 'auto' : undefined,
+          marginLeft:
+            tableAlign === 'right'
+              ? 'auto'
+              : tableAlign === 'center'
+              ? 'auto'
+              : undefined,
           marginRight: tableAlign === 'center' ? 'auto' : undefined,
-          fontSize,
+          fontSize: fontSize || undefined,
           lineHeight,
           color,
         }}
@@ -407,7 +417,7 @@ function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
 
             const ls = field.labelStyle;
             const vs = field.valueStyle;
-            const labelFontSize = ls?.fontSize || field.fontSize || fontSize;
+            const labelFontSize = ls?.fontSize || field.fontSize;
             const labelFontWeight = ls?.fontWeight || field.fontWeight;
             const labelFontStyle = ls?.fontStyle || field.fontStyle;
             const labelTextColor =
@@ -416,14 +426,11 @@ function InvoiceDetailsRenderer({ block }: BlockRendererProps) {
               labelColor ||
               DEFAULT_LABEL_TEXT_COLOR;
 
-            const valueFontSize = vs?.fontSize || field.fontSize || fontSize;
+            const valueFontSize = vs?.fontSize || field.fontSize;
             const valueFontWeight = vs?.fontWeight || field.fontWeight;
             const valueFontStyle = vs?.fontStyle || field.fontStyle;
             const valueTextColor =
-              vs?.color ||
-              field.color ||
-              color ||
-              DEFAULT_VALUE_TEXT_COLOR;
+              vs?.color || field.color || color || DEFAULT_VALUE_TEXT_COLOR;
 
             // Label source: explicit `field.label` resolves via label
             // variables; fall back to prefix with trailing ":\s*" stripped so
@@ -615,7 +622,10 @@ function TableBlockRenderer({ block }: BlockRendererProps) {
     <div className="w-full h-full overflow-auto">
       <table
         className="w-full"
-        style={{ fontSize, borderCollapse: 'collapse' }}
+        style={{
+          borderCollapse: 'collapse',
+          fontSize: fontSize || undefined,
+        }}
       >
         <thead>
           <tr
@@ -700,16 +710,9 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
   const sampleData = useSampleInvoiceData();
   const {
     items,
-    fontSize,
     align,
     labelAlign,
     valueAlign,
-    labelColor,
-    amountColor,
-    totalFontSize,
-    totalFontWeight,
-    totalColor,
-    balanceColor,
     spacing,
     padding,
     labelPadding,
@@ -736,9 +739,9 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
 
   return (
     <div style={{ padding: blockPaddingPx }}>
-    <table style={tableStyle}>
-      <tbody>
-        {items.map(
+      <table style={tableStyle}>
+        <tbody>
+          {items.map(
             (
               item: {
                 show: boolean;
@@ -746,8 +749,18 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
                 isBalance?: boolean;
                 field: string;
                 label: string;
-                labelStyle?: { fontSize?: string; fontWeight?: string; fontStyle?: string; color?: string };
-                valueStyle?: { fontSize?: string; fontWeight?: string; fontStyle?: string; color?: string };
+                labelStyle?: {
+                  fontSize?: string;
+                  fontWeight?: string;
+                  fontStyle?: string;
+                  color?: string;
+                };
+                valueStyle?: {
+                  fontSize?: string;
+                  fontWeight?: string;
+                  fontStyle?: string;
+                  color?: string;
+                };
                 fontSize?: string;
                 fontWeight?: string;
                 color?: string;
@@ -756,35 +769,22 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
               },
               index: number
             ) => {
-              const isTotal = item.isTotal;
-              const isBalance = item.isBalance;
               const displayValue = replaceVariables(item.field, sampleData);
 
               const ls = item.labelStyle;
               const vs = item.valueStyle;
-              const rowDefaultFontSize = isTotal ? totalFontSize : fontSize;
-              const rowDefaultFontWeight = isTotal ? totalFontWeight : 'normal';
-              const rowDefaultValueColor =
-                (isBalance
-                  ? balanceColor
-                  : isTotal
-                    ? totalColor
-                    : amountColor) || DEFAULT_VALUE_TEXT_COLOR;
 
-              const labelFontSize = ls?.fontSize || item.fontSize || rowDefaultFontSize;
-              const labelFontWeight = ls?.fontWeight || item.fontWeight || rowDefaultFontWeight;
+              const labelFontSize = ls?.fontSize || item.fontSize;
+              const labelFontWeight = ls?.fontWeight || item.fontWeight;
               const labelFontStyle = ls?.fontStyle || item.fontStyle;
               const labelTextColor =
-                ls?.color ||
-                item.color ||
-                labelColor ||
-                DEFAULT_LABEL_TEXT_COLOR;
+                ls?.color || item.color || DEFAULT_LABEL_TEXT_COLOR;
 
-              const valueFontSize = vs?.fontSize || item.fontSize || rowDefaultFontSize;
-              const valueFontWeight = vs?.fontWeight || item.fontWeight || rowDefaultFontWeight;
+              const valueFontSize = vs?.fontSize || item.fontSize;
+              const valueFontWeight = vs?.fontWeight || item.fontWeight;
               const valueFontStyle = vs?.fontStyle || item.fontStyle;
               const valueTextColor =
-                vs?.color || item.amountColor || rowDefaultValueColor;
+                vs?.color || item.amountColor || DEFAULT_VALUE_TEXT_COLOR;
 
               return (
                 <tr key={index}>
@@ -822,8 +822,8 @@ function TotalBlockRenderer({ block }: BlockRendererProps) {
               );
             }
           )}
-      </tbody>
-    </table>
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -911,7 +911,6 @@ function SignatureBlockRenderer({ block }: BlockRendererProps) {
           }}
         />
       )}
-      
     </div>
   );
 }
