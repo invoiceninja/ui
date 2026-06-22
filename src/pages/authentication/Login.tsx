@@ -143,9 +143,10 @@ export function Login() {
   const isEmailStep = step === 'email';
 
   return (
-    <div className="h-screen">
+    <div className="min-h-screen flex flex-col items-center justify-center py-8">
       <Header />
-      <div className="flex flex-col items-center">
+
+      <div className="flex flex-col items-center w-full">
         <div
           className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border"
           style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
@@ -280,19 +281,40 @@ export function Login() {
             </Button>
           </form>
 
+          {isHosted() && isEmailStep && (
+            <div className="mb-6 space-y-6">
+              <div className="flex items-center gap-3">
+                <div
+                  className="h-px flex-1"
+                  style={{ backgroundColor: colors.$5 }}
+                />
+
+                <span
+                  className="text-xs uppercase tracking-wide"
+                  style={{ color: colors.$17 }}
+                >
+                  {t('or')}
+                </span>
+
+                <div
+                  className="h-px flex-1"
+                  style={{ backgroundColor: colors.$5 }}
+                />
+              </div>
+
+              <SignInProviders />
+            </div>
+          )}
+
           <div className="flex justify-center">
             {isHosted() && <Link to="/register">{t('register_label')}</Link>}
           </div>
         </div>
 
         {isHosted() && (
-          <>
-            {isEmailStep && <SignInProviders />}
-
-            <div className="mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
-              <HostedLinks />
-            </div>
-          </>
+          <div className="mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
+            <HostedLinks />
+          </div>
         )}
 
         <p className="mt-4 text-xs">{version}</p>
