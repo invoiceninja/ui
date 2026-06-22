@@ -30,7 +30,7 @@ export function useUsersForDocuNinjaQuery() {
   return useQuery(
     ['/api/v1/users/docuninja-eligible'],
     () => request('GET', endpoint('/api/v1/users?hideOwnerUsers=true&showAccountUsers=true&status=active&sort=id|desc')),
-    { staleTime: Infinity, refetchOnMount: 'always' }
+    { staleTime: Infinity }
   );
 }
 

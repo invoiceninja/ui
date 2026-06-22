@@ -116,7 +116,7 @@ export function PaymentMethodForm({
                             if (!mounted) return;
 
                             if (!response.data?.requires_payment || !response.data?.client_secret) {
-                                setErrors("This plan change no longer requires payment. Please go back and confirm the plan change.");
+                                setErrors(t("no_payment_required") as string);
                                 setPaymentState("plan_change_failed");
                                 return;
                             }
@@ -130,7 +130,7 @@ export function PaymentMethodForm({
                             if (!mounted) return;
                             setErrors(
                                 error.response?.data?.message ||
-                                "Failed to initialize payment",
+                                t("payment_failed"),
                             );
                             setPaymentState("plan_change_failed");
                         });
