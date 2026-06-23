@@ -66,14 +66,6 @@ interface BillingHistoryResponse {
   data?: BillingInvoice[] | { invoices?: BillingInvoice[] };
 }
 
-interface ErrorResponse {
-  message?: string;
-}
-
-interface BillingInvoicePaymentIntent extends ResponsePaymentIntent {
-  payment_hash: string;
-}
-
 function extractBillingInvoices(payload: BillingHistoryResponse) {
   if (Array.isArray(payload.invoices)) {
     return payload.invoices;
@@ -169,12 +161,7 @@ export function BillingHistory() {
   const colors = useColorScheme();
   const queryClient = useQueryClient();
   const account = useCurrentAccount();
-  const [payingInvoiceId, setPayingInvoiceId] = useState<string>();
-  const [paymentInvoice, setPaymentInvoice] = useState<BillingInvoice | null>(
-    null
-  );
-  const [invoicePaymentIntent, setInvoicePaymentIntent] =
-    useState<BillingInvoicePaymentIntent | null>(null);
+  const [payingInvoice, setPayingInvoice] = useState<BillingInvoice | null>(null);
   const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<string[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
   const [detailInvoice, setDetailInvoice] = useState<BillingInvoice | null>(null);
@@ -194,11 +181,7 @@ export function BillingHistory() {
 
   const { data: paymentMethods = [], isLoading: isPaymentMethodsLoading } =
     useQuery(
-      [
-        '/api/client/account_management/methods',
-        account?.id,
-        'billing_history',
-      ],
+      ['/api/client/account_management/methods', account?.id],
       () =>
         request(
           'POST',
@@ -211,9 +194,7 @@ export function BillingHistory() {
           (response: AxiosResponse<GenericManyResponse<GatewayToken>>) =>
             response.data.data
         ),
-      {
-        enabled: Boolean(account) && Boolean(paymentInvoice),
-      }
+      { enabled: Boolean(account) }
     );
 
   const selectableInvoiceIds = useMemo(
@@ -237,56 +218,33 @@ export function BillingHistory() {
   }, [selectableInvoiceIds]);
 
   const handlePayInvoice = useCallback(
-    async (invoice: BillingInvoice) => {
-      if (payingInvoiceId) {
-        return;
-      }
-
-      setPayingInvoiceId(invoice.id);
-      toast.processing();
-
-      try {
-        const response = await request(
-          'POST',
-          endpoint(BILLING_INVOICE_PAYMENT_INTENT_ENDPOINT),
-          { id: invoice.id }
-        );
-
-        const paymentIntent = response.data as BillingInvoicePaymentIntent;
-
-        if (!paymentIntent.requires_payment) {
-          toast.success(response.data?.message || 'success');
-          await queryClient.invalidateQueries(BILLING_HISTORY_QUERY_KEY);
-
-          return;
-        }
-
-        if (!paymentIntent.client_secret) {
-          toast.error('payment_failed');
-
-          return;
-        }
-
-        setPaymentInvoice(invoice);
-        setInvoicePaymentIntent(paymentIntent);
-        toast.dismiss();
-      } catch (error) {
-        toast.error(getErrorMessage(error));
-      } finally {
-        setPayingInvoiceId(undefined);
-      }
+    (invoice: BillingInvoice) => {
+      setPayingInvoice(invoice);
     },
-    [payingInvoiceId, queryClient]
+    []
   );
 
   const handleClosePaymentModal = useCallback(() => {
-    setPaymentInvoice(null);
-    setInvoicePaymentIntent(null);
+    setPayingInvoice(null);
   }, []);
 
+  const handleCreatePaymentIntent = useCallback(async () => {
+    if (!payingInvoice) {
+      throw new Error('Missing invoice');
+    }
+
+    const response = await request(
+      'POST',
+      endpoint(BILLING_INVOICE_PAYMENT_INTENT_ENDPOINT),
+      { id: payingInvoice.id }
+    );
+
+    return response.data as ResponsePaymentIntent;
+  }, [payingInvoice]);
+
   const handleFinalizeInvoicePayment = useCallback(
-    async (paymentIntent: StripePaymentIntent) => {
-      if (!paymentInvoice) {
+    async (stripePaymentIntent: StripePaymentIntent) => {
+      if (!payingInvoice) {
         throw new Error('Missing invoice');
       }
 
@@ -294,14 +252,14 @@ export function BillingHistory() {
         'POST',
         endpoint(BILLING_INVOICE_PAYMENT_RESPONSE_ENDPOINT),
         {
-          id: paymentInvoice.id,
-          payment_intent: paymentIntent.id,
+          id: payingInvoice.id,
+          payment_intent: stripePaymentIntent.id,
         }
       );
 
       await queryClient.invalidateQueries(BILLING_HISTORY_QUERY_KEY);
     },
-    [paymentInvoice, queryClient]
+    [payingInvoice, queryClient]
   );
 
   const handleInvoiceSelection = useCallback(
@@ -449,9 +407,7 @@ export function BillingHistory() {
                       behavior="button"
                       type="secondary"
                       className="!px-3 !py-1.5"
-                      disabled={Boolean(payingInvoiceId)}
-                      disableWithoutIcon={payingInvoiceId !== invoice.id}
-                      onClick={() => handlePayInvoice(invoice)}
+                      onClick={() => setPayingInvoice(invoice)}
                     >
                       {t('pay_now')}
                     </Button>
@@ -515,11 +471,9 @@ export function BillingHistory() {
                 <Button
                   behavior="button"
                   type="primary"
-                  disableWithoutIcon={payingInvoiceId !== detailInvoice.id}
-                  disabled={Boolean(payingInvoiceId)}
                   onClick={() => {
                     setDetailInvoice(null);
-                    handlePayInvoice(detailInvoice);
+                    setPayingInvoice(detailInvoice);
                   }}
                 >
                   {t('pay_now')}
@@ -531,21 +485,21 @@ export function BillingHistory() {
       </Modal>
 
       <Modal
-        visible={Boolean(paymentInvoice && invoicePaymentIntent)}
+        visible={Boolean(payingInvoice)}
         onClose={handleClosePaymentModal}
         title={t('pay_now')}
         size="regular"
-        disableClosing={Boolean(paymentInvoice)}
+        disableClosing={Boolean(payingInvoice)}
       >
         {isPaymentMethodsLoading ? (
           <div className="flex justify-center px-6 py-10">
             <Spinner />
           </div>
-        ) : paymentInvoice && invoicePaymentIntent ? (
+        ) : payingInvoice ? (
           <PaymentMethodForm
             tokens={paymentMethods}
-            amount_string={paymentInvoice.balance || paymentInvoice.amount}
-            paymentIntent={invoicePaymentIntent}
+            amount_string={payingInvoice.balance || payingInvoice.amount}
+            onCreatePaymentIntent={handleCreatePaymentIntent}
             onFinalizeStripePayment={handleFinalizeInvoicePayment}
             onPaymentComplete={handleClosePaymentModal}
             onCancel={handleClosePaymentModal}
