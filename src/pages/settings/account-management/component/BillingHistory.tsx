@@ -18,6 +18,10 @@ import {
 } from '$app/common/helpers/download';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { GatewayToken } from '$app/common/interfaces/client';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { Modal } from '$app/components/Modal';
 import { StatusBadge } from '$app/components/StatusBadge';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
@@ -29,13 +33,20 @@ import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdDownload } from 'react-icons/md';
 import { useQuery, useQueryClient } from 'react-query';
-import type { AxiosError } from 'axios';
+import type { AxiosError, AxiosResponse } from 'axios';
+import type { PaymentIntent as StripePaymentIntent } from '@stripe/stripe-js';
+import {
+  PaymentMethodForm,
+  ResponsePaymentIntent,
+} from './plan/PaymentMethodForm';
 
 const BILLING_HISTORY_ENDPOINT = '/api/client/account_management/invoices';
 const BILLING_INVOICE_DOWNLOAD_ENDPOINT =
   '/api/client/account_management/invoices/download';
-const BILLING_INVOICE_PAY_ENDPOINT =
-  '/api/client/account_management/invoices/pay';
+const BILLING_INVOICE_PAYMENT_INTENT_ENDPOINT =
+  '/api/client/account_management/invoices/payment/intent';
+const BILLING_INVOICE_PAYMENT_RESPONSE_ENDPOINT =
+  '/api/client/account_management/invoices/payment/response';
 const BILLING_HISTORY_QUERY_KEY = ['account_management', 'billing_history'];
 
 interface BillingInvoice {
@@ -57,6 +68,10 @@ interface BillingHistoryResponse {
 
 interface ErrorResponse {
   message?: string;
+}
+
+interface BillingInvoicePaymentIntent extends ResponsePaymentIntent {
+  payment_hash: string;
 }
 
 function extractBillingInvoices(payload: BillingHistoryResponse) {
@@ -153,7 +168,13 @@ export function BillingHistory() {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const queryClient = useQueryClient();
+  const account = useCurrentAccount();
   const [payingInvoiceId, setPayingInvoiceId] = useState<string>();
+  const [paymentInvoice, setPaymentInvoice] = useState<BillingInvoice | null>(
+    null
+  );
+  const [invoicePaymentIntent, setInvoicePaymentIntent] =
+    useState<BillingInvoicePaymentIntent | null>(null);
   const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<string[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -169,6 +190,30 @@ export function BillingHistory() {
       ),
     { staleTime: Infinity }
   );
+
+  const { data: paymentMethods = [], isLoading: isPaymentMethodsLoading } =
+    useQuery(
+      [
+        '/api/client/account_management/methods',
+        account?.id,
+        'billing_history',
+      ],
+      () =>
+        request(
+          'POST',
+          endpoint('/api/client/account_management/methods'),
+          {
+            account_key: account?.key,
+          },
+          { skipIntercept: true }
+        ).then(
+          (response: AxiosResponse<GenericManyResponse<GatewayToken>>) =>
+            response.data.data
+        ),
+      {
+        enabled: Boolean(account) && Boolean(paymentInvoice),
+      }
+    );
 
   const selectableInvoiceIds = useMemo(
     () => invoices.map((invoice) => invoice.id).filter(Boolean),
@@ -202,16 +247,28 @@ export function BillingHistory() {
       try {
         const response = await request(
           'POST',
-          endpoint(BILLING_INVOICE_PAY_ENDPOINT),
+          endpoint(BILLING_INVOICE_PAYMENT_INTENT_ENDPOINT),
           { id: invoice.id }
         );
 
-        if (response) {
+        const paymentIntent = response.data as BillingInvoicePaymentIntent;
+
+        if (!paymentIntent.requires_payment) {
           toast.success(response.data?.message || 'success');
           await queryClient.invalidateQueries(BILLING_HISTORY_QUERY_KEY);
-        } else {
-          toast.dismiss();
+
+          return;
         }
+
+        if (!paymentIntent.client_secret) {
+          toast.error('payment_failed');
+
+          return;
+        }
+
+        setPaymentInvoice(invoice);
+        setInvoicePaymentIntent(paymentIntent);
+        toast.dismiss();
       } catch (error) {
         toast.error(getErrorMessage(error));
       } finally {
@@ -219,6 +276,31 @@ export function BillingHistory() {
       }
     },
     [payingInvoiceId, queryClient]
+  );
+
+  const handleClosePaymentModal = useCallback(() => {
+    setPaymentInvoice(null);
+    setInvoicePaymentIntent(null);
+  }, []);
+
+  const handleFinalizeInvoicePayment = useCallback(
+    async (paymentIntent: StripePaymentIntent) => {
+      if (!paymentInvoice) {
+        throw new Error('Missing invoice');
+      }
+
+      await request(
+        'POST',
+        endpoint(BILLING_INVOICE_PAYMENT_RESPONSE_ENDPOINT),
+        {
+          id: paymentInvoice.id,
+          payment_intent: paymentIntent.id,
+        }
+      );
+
+      await queryClient.invalidateQueries(BILLING_HISTORY_QUERY_KEY);
+    },
+    [paymentInvoice, queryClient]
   );
 
   const handleInvoiceSelection = useCallback(
@@ -370,6 +452,29 @@ export function BillingHistory() {
           ))}
         </Tbody>
       </Table>
+
+      <Modal
+        visible={Boolean(paymentInvoice && invoicePaymentIntent)}
+        onClose={handleClosePaymentModal}
+        title={t('pay_now')}
+        size="regular"
+        disableClosing={Boolean(paymentInvoice)}
+      >
+        {isPaymentMethodsLoading ? (
+          <div className="flex justify-center px-6 py-10">
+            <Spinner />
+          </div>
+        ) : paymentInvoice && invoicePaymentIntent ? (
+          <PaymentMethodForm
+            tokens={paymentMethods}
+            amount_string={paymentInvoice.balance || paymentInvoice.amount}
+            paymentIntent={invoicePaymentIntent}
+            onFinalizeStripePayment={handleFinalizeInvoicePayment}
+            onPaymentComplete={handleClosePaymentModal}
+            onCancel={handleClosePaymentModal}
+          />
+        ) : null}
+      </Modal>
     </div>
   );
 }
