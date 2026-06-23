@@ -20,7 +20,7 @@ import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { useFormik } from 'formik';
 import { useState } from 'react';
-import { Check, Trash2 } from 'react-feather';
+import { Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import visa from '/gateway-card-images/visa.png?url';
@@ -115,11 +115,10 @@ export function CreditCard({ gateway, onDelete }: CreditCardProps) {
             ) : (
               <button
                 type="button"
-                className="p-1 rounded-full cursor-pointer"
+                className="px-2 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded cursor-pointer whitespace-nowrap"
                 onClick={() => setDefaultPopupVisible(true)}
-                style={{ backgroundColor: colors.$1 }}
               >
-                <Check size={18} />
+                ✓ {t('default_payment_method_label')}
               </button>
             )}
 
