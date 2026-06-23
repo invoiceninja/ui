@@ -22,7 +22,7 @@ import { Header } from './components/Header';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { request } from '$app/common/helpers/request';
 import { SignInProviders } from './components/SignInProviders';
-import { useCheckUserState, useLogin } from './common/hooks';
+import { LoginMethod, useLogin, useLoginPrecheck } from './common/hooks';
 import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Disable2faModal } from './components/Disable2faModal';
@@ -31,6 +31,11 @@ import { version } from '$app/common/helpers/version';
 import { toast } from '$app/common/helpers/toast/toast';
 import classNames from 'classnames';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { useWebAuthnSupport } from '$app/common/hooks/useWebAuthnSupport';
+import {
+  authenticatePasskey,
+  PublicKeyCredentialRequestOptionsJSON,
+} from '$app/common/helpers/passkeys';
 
 type Step = 'email' | 'credentials';
 
@@ -38,6 +43,7 @@ export function Login() {
   useTitle('login');
 
   const accentColor = useAccentColor();
+  const colors = useColorScheme();
 
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [errors, setErrors] = useState<LoginValidation | undefined>(undefined);
@@ -48,13 +54,21 @@ export function Login() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [oneTimePassword, setOneTimePassword] = useState<string>('');
-  const [hasTwoFactor, setHasTwoFactor] = useState<boolean>(false);
+  const [methods, setMethods] = useState<LoginMethod[]>([]);
 
   const [isDisable2faModalOpen, setIsDisable2faModalOpen] =
     useState<boolean>(false);
 
   const login = useLogin();
-  const checkUserState = useCheckUserState();
+  const loginPrecheck = useLoginPrecheck();
+  const isWebAuthnSupported = useWebAuthnSupport();
+
+  const isEmailStep = step === 'email';
+  const showTwoFactor = methods.includes('totp');
+  const showPassword =
+    methods.length === 0 ||
+    methods.includes('password') ||
+    !isWebAuthnSupported;
 
   function handleContinue() {
     setMessage(undefined);
@@ -67,9 +81,9 @@ export function Login() {
 
     setIsFormBusy(true);
 
-    checkUserState(email)
-      .then((state) => {
-        setHasTwoFactor(Boolean(state.has_two_factor));
+    loginPrecheck(email)
+      .then((response) => {
+        setMethods(response.methods ?? []);
         setStep('credentials');
       })
       .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
@@ -129,18 +143,83 @@ export function Login() {
       .finally(() => setIsFormBusy(false));
   }
 
+  async function handlePasskeyLogin() {
+    if (!email) {
+      setErrors({ email: [t('provide_email') as string] });
+      return;
+    }
+
+    setMessage(undefined);
+    setErrors(undefined);
+    setIsFormBusy(true);
+
+    try {
+      const optionsResponse = await request(
+        'POST',
+        endpoint('/api/v1/passkeys/login/options'),
+        { email }
+      );
+
+      const publicKey = optionsResponse.data.data
+        .publicKey as PublicKeyCredentialRequestOptionsJSON | null;
+      const challengeToken = optionsResponse.data.data.challenge_token;
+
+      if (!publicKey || !publicKey.allowCredentials?.length) {
+        setMessage(t('no_passkeys_registered') as string);
+        return;
+      }
+
+      const assertion = await authenticatePasskey(publicKey);
+
+      const response = await request('POST', endpoint('/api/v1/login'), {
+        email,
+        passkey_challenge_token: challengeToken,
+        passkey_authentication: {
+          id: assertion.id,
+          rawId: assertion.rawId,
+          type: assertion.type,
+          ...assertion.response,
+        },
+      });
+
+      login(response);
+    } catch (error) {
+      const axiosError = error as AxiosError<
+        GenericValidationBag<LoginValidation>
+      >;
+
+      if (axiosError.response?.status === 422) {
+        setErrors(axiosError.response.data.errors);
+
+        if (axiosError.response.data.message) {
+          setMessage(axiosError.response.data.message);
+        }
+      } else if (axiosError.response?.status === 503) {
+        toast.error('app_maintenance');
+      } else if (axiosError.response) {
+        setMessage(
+          axiosError.response.data?.message ??
+            (t('invalid_credentials') as string)
+        );
+      } else if (
+        !(error instanceof DOMException) ||
+        (error.name !== 'NotAllowedError' && error.name !== 'AbortError')
+      ) {
+        setMessage(t('error_refresh_page') as string);
+      }
+    } finally {
+      setIsFormBusy(false);
+    }
+  }
+
   function handleBackToEmail() {
     setMessage(undefined);
     setErrors(undefined);
     setPassword('');
     setOneTimePassword('');
-    setHasTwoFactor(false);
+    setMethods([]);
     setStep('email');
   }
-
-  const colors = useColorScheme();
-
-  const isEmailStep = step === 'email';
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center py-8">
@@ -202,30 +281,34 @@ export function Login() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-x-3">
-                    <InputLabel className="truncate">
-                      {t('password')}
-                    </InputLabel>
+                {showPassword && (
+                  <>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between gap-x-3">
+                        <InputLabel className="truncate">
+                          {t('password')}
+                        </InputLabel>
 
-                    <Link className="truncate" to="/recover_password">
-                      {t('forgot_password')}
-                    </Link>
-                  </div>
-                </div>
+                        <Link className="truncate" to="/recover_password">
+                          {t('forgot_password')}
+                        </Link>
+                      </div>
+                    </div>
 
-                <InputField
-                  type="password"
-                  autoComplete="current-password"
-                  id="password"
-                  errorMessage={errors?.password}
-                  name="password"
-                  value={password}
-                  onValueChange={(value) => setPassword(value)}
-                  changeOverride
-                />
+                    <InputField
+                      type="password"
+                      autoComplete="current-password"
+                      id="password"
+                      errorMessage={errors?.password}
+                      name="password"
+                      value={password}
+                      onValueChange={(value) => setPassword(value)}
+                      changeOverride
+                    />
+                  </>
+                )}
 
-                {hasTwoFactor && (
+                {showTwoFactor && (
                   <InputField
                     type="text"
                     autoComplete="one-time-code"
@@ -239,29 +322,31 @@ export function Login() {
                   />
                 )}
 
-                <div className="space-y-2">
-                  <div
-                    className={classNames(
-                      'flex flex-col lg:flex-row items-center',
-                      {
-                        'justify-between': isSelfHosted(),
-                        'justify-end': isHosted(),
-                      }
-                    )}
-                  >
-                    {isSelfHosted() && <InputLabel>{t('secret')}</InputLabel>}
+                {(isSelfHosted() || showTwoFactor) && (
+                  <div className="space-y-2">
+                    <div
+                      className={classNames(
+                        'flex flex-col lg:flex-row items-center',
+                        {
+                          'justify-between': isSelfHosted(),
+                          'justify-end': isHosted(),
+                        }
+                      )}
+                    >
+                      {isSelfHosted() && <InputLabel>{t('secret')}</InputLabel>}
 
-                    {isHosted() && (
-                      <div
-                        className="text-sm hover:underline cursor-pointer"
-                        onClick={() => setIsDisable2faModalOpen(true)}
-                        style={{ color: accentColor }}
-                      >
-                        {t('disable_2fa')}
-                      </div>
-                    )}
+                      {isHosted() && showTwoFactor && (
+                        <div
+                          className="text-sm hover:underline cursor-pointer"
+                          onClick={() => setIsDisable2faModalOpen(true)}
+                          style={{ color: accentColor }}
+                        >
+                          {t('disable_2fa')}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {isSelfHosted() && (
                   <InputField
@@ -276,31 +361,32 @@ export function Login() {
 
             <ErrorMessage className="mt-4">{message}</ErrorMessage>
 
-            <Button disabled={isFormBusy} className="mt-4" variant="block">
-              {isEmailStep ? t('continue') : t('login')}
-            </Button>
+            {(isEmailStep || showPassword) && (
+              <Button disabled={isFormBusy} className="mt-4" variant="block">
+                {isEmailStep ? t('continue') : t('login')}
+              </Button>
+            )}
+
+            {!isEmailStep && isWebAuthnSupported && (
+              <div className="space-y-4">
+                {showPassword && <OrDivider />}
+
+                <Button
+                  behavior="button"
+                  type={showPassword ? 'secondary' : 'primary'}
+                  disabled={isFormBusy}
+                  variant="block"
+                  onClick={handlePasskeyLogin}
+                >
+                  {t('login_with_passkey')}
+                </Button>
+              </div>
+            )}
           </form>
 
           {isHosted() && isEmailStep && (
             <div className="mb-6 space-y-6">
-              <div className="flex items-center gap-3">
-                <div
-                  className="h-px flex-1"
-                  style={{ backgroundColor: colors.$5 }}
-                />
-
-                <span
-                  className="text-xs uppercase tracking-wide"
-                  style={{ color: colors.$17 }}
-                >
-                  {t('or')}
-                </span>
-
-                <div
-                  className="h-px flex-1"
-                  style={{ backgroundColor: colors.$5 }}
-                />
-              </div>
+              <OrDivider />
 
               <SignInProviders />
             </div>
@@ -324,6 +410,26 @@ export function Login() {
         visible={isDisable2faModalOpen}
         setVisible={setIsDisable2faModalOpen}
       />
+    </div>
+  );
+}
+
+function OrDivider() {
+  const [t] = useTranslation();
+  const colors = useColorScheme();
+
+  return (
+    <div className="flex items-center gap-3">
+      <div className="h-px flex-1" style={{ backgroundColor: colors.$5 }} />
+
+      <span
+        className="text-xs uppercase tracking-wide"
+        style={{ color: colors.$17 }}
+      >
+        {t('or')}
+      </span>
+
+      <div className="h-px flex-1" style={{ backgroundColor: colors.$5 }} />
     </div>
   );
 }

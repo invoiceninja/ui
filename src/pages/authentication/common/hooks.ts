@@ -22,14 +22,16 @@ import { useQueryClient } from 'react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 
-export interface UserState {
-  has_two_factor: boolean;
+export type LoginMethod = 'password' | 'totp' | 'passkey';
+
+export interface LoginPrecheck {
+  methods?: LoginMethod[];
 }
 
-export function useCheckUserState() {
+export function useLoginPrecheck() {
   return (email: string) => {
-    return request('POST', endpoint('/api/v1/login/check'), { email }).then(
-      (response: AxiosResponse<UserState>) => response.data
+    return request('POST', endpoint('/api/v1/login/precheck'), { email }).then(
+      (response: AxiosResponse<LoginPrecheck>) => response.data
     );
   };
 }

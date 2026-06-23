@@ -14,13 +14,17 @@ import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
 import { TwoFactorAuthenticationModals } from '../common/components/TwoFactorAuthenticationModals';
 import { useState } from 'react';
+import { PasskeyAuthenticationModal } from '../common/components/PasskeyAuthenticationModal';
+import { useWebAuthnSupport } from '$app/common/hooks/useWebAuthnSupport';
 
 export function TwoFactorAuthentication() {
   const [t] = useTranslation();
 
   const user = useCurrentUser();
+  const isWebAuthnSupported = useWebAuthnSupport();
 
   const [isDisableModalOpen, setIsDisableModalOpen] = useState<boolean>(false);
+  const [isPasskeyModalOpen, setIsPasskeyModalOpen] = useState<boolean>(false);
 
   const [checkVerification, setCheckVerification] = useState<boolean>(false);
 
@@ -31,6 +35,11 @@ export function TwoFactorAuthentication() {
         setCheckVerification={setCheckVerification}
         isDisableModalOpen={isDisableModalOpen}
         setIsDisableModalOpen={setIsDisableModalOpen}
+      />
+
+      <PasskeyAuthenticationModal
+        visible={isPasskeyModalOpen}
+        setVisible={setIsPasskeyModalOpen}
       />
 
       <>
@@ -55,6 +64,20 @@ export function TwoFactorAuthentication() {
             </Button>
           )}
         </Element>
+
+        {(isWebAuthnSupported || user?.passkey_enabled) && (
+          <Element leftSide={t('passkey')}>
+            <Button
+              behavior="button"
+              type="minimal"
+              onClick={() => setIsPasskeyModalOpen(true)}
+            >
+              {user?.passkey_enabled
+                ? `${t('manage')} (${user.passkey_count ?? 0})`
+                : t('enable')}
+            </Button>
+          </Element>
+        )}
       </>
     </>
   );
