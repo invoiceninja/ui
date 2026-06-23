@@ -29,7 +29,7 @@ import { Button, Checkbox } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Spinner } from '$app/components/Spinner';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdDownload } from 'react-icons/md';
 import { useQuery, useQueryClient } from 'react-query';
@@ -177,6 +177,7 @@ export function BillingHistory() {
     useState<BillingInvoicePaymentIntent | null>(null);
   const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<string[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [detailInvoice, setDetailInvoice] = useState<BillingInvoice | null>(null);
 
   const {
     data: invoices = [],
@@ -357,22 +358,15 @@ export function BillingHistory() {
     );
   }
 
-  const renderPayButton = (invoice: BillingInvoice) =>
-    invoice.payable ? (
-      <Button
-        behavior="button"
-        type="secondary"
-        className="!px-3 !py-1.5"
-        disabled={Boolean(payingInvoiceId)}
-        disableWithoutIcon={payingInvoiceId !== invoice.id}
-        onClick={(event: MouseEvent<HTMLButtonElement>) => {
-          event.stopPropagation();
-          handlePayInvoice(invoice);
-        }}
-      >
-        {t('pay_now')}
-      </Button>
-    ) : null;
+  const renderViewButton = (invoice: BillingInvoice) => (
+    <Button
+      type="minimal"
+      behavior="button"
+      onClick={() => setDetailInvoice(invoice)}
+    >
+      {t('view_details')}
+    </Button>
+  );
 
   return (
     <div className="px-4 pb-6 sm:px-6">
@@ -447,11 +441,94 @@ export function BillingHistory() {
               <Td>
                 <StatusBadge for={invoiceStatus} code={invoice.status} />
               </Td>
-              <Td>{renderPayButton(invoice)}</Td>
+              <Td>
+                <div className="flex items-center gap-2">
+                  {renderViewButton(invoice)}
+                  {invoice.payable && (
+                    <Button
+                      behavior="button"
+                      type="secondary"
+                      className="!px-3 !py-1.5"
+                      disabled={Boolean(payingInvoiceId)}
+                      disableWithoutIcon={payingInvoiceId !== invoice.id}
+                      onClick={() => handlePayInvoice(invoice)}
+                    >
+                      {t('pay_now')}
+                    </Button>
+                  )}
+                </div>
+              </Td>
             </Tr>
           ))}
         </Tbody>
       </Table>
+
+      <Modal
+        title={detailInvoice ? `${t('invoice')} ${detailInvoice.number}` : ''}
+        visible={Boolean(detailInvoice)}
+        onClose={() => setDetailInvoice(null)}
+        size="regular"
+      >
+        {detailInvoice && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
+                  {t('invoice_number')}
+                </div>
+                <div className="text-sm font-medium">{detailInvoice.number}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
+                  {t('status')}
+                </div>
+                <StatusBadge for={invoiceStatus} code={detailInvoice.status} />
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
+                  {t('invoice_date')}
+                </div>
+                <div className="text-sm">{detailInvoice.date}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
+                  {t('due_date')}
+                </div>
+                <div className="text-sm">{detailInvoice.due_date}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
+                  {t('amount')}
+                </div>
+                <div className="text-sm font-medium">{detailInvoice.amount}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
+                  {t('balance')}
+                </div>
+                <div className="text-sm font-medium">{detailInvoice.balance}</div>
+              </div>
+            </div>
+
+            {detailInvoice.payable && (
+              <div className="flex justify-end pt-4 border-t" style={{ borderColor: colors.$20 }}>
+                <Button
+                  behavior="button"
+                  type="primary"
+                  disableWithoutIcon={payingInvoiceId !== detailInvoice.id}
+                  disabled={Boolean(payingInvoiceId)}
+                  onClick={() => {
+                    setDetailInvoice(null);
+                    handlePayInvoice(detailInvoice);
+                  }}
+                >
+                  {t('pay_now')}
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
 
       <Modal
         visible={Boolean(paymentInvoice && invoicePaymentIntent)}
