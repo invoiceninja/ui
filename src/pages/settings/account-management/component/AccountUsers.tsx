@@ -12,12 +12,12 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useColorScheme } from '$app/common/colors';
 import { Badge } from '$app/components/Badge';
-import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { Fragment, useState } from 'react';
+import { Button } from '$app/components/forms';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdExpandLess, MdExpandMore } from 'react-icons/md';
 import { useQuery } from 'react-query';
 
 const ACCOUNT_USERS_ENDPOINT = '/api/client/account_management/v2/users';
@@ -49,9 +49,8 @@ export function AccountUsers() {
   const colors = useColorScheme();
 
   const noAccessLabel = 'No access';
-  const noCompanyAccessLabel = 'No company access';
 
-  const [expandedUserId, setExpandedUserId] = useState<string>();
+  const [selectedUser, setSelectedUser] = useState<AccountUser | null>(null);
 
   const {
     data: users = [],
@@ -65,89 +64,6 @@ export function AccountUsers() {
       ),
     { staleTime: Infinity }
   );
-  const getPermissionsDisplay = (company: AccountCompany) => {
-    if (company.is_owner) {
-      return 'owner';
-    }
-    if (company.is_admin) {
-      return 'admin';
-    }
-    return company.permissions.trim() || noAccessLabel;
-  };
-
-  const renderFieldLabel = (label: string) => (
-    <div
-      className="text-xs font-medium uppercase tracking-wide"
-      style={{ color: colors.$17 }}
-    >
-      {label}
-    </div>
-  );
-
-  const renderStatusBadge = (status: string) => (
-    <div>
-      {status ? (
-        <Badge>{status}</Badge>
-      ) : (
-        <span className="text-sm" style={{ color: colors.$17 }}>
-          {t('unknown')}
-        </span>
-      )}
-    </div>
-  );
-
-  const renderPermissionBadges = (company: AccountCompany) => {
-    const permissions = getPermissionsDisplay(company);
-
-    return (
-      <div className="flex flex-wrap gap-2">
-        <Badge>{permissions}</Badge>
-      </div>
-    );
-  };
-
-  const renderCompanyDetails = (user: AccountUser) => {
-    if (!user.companies.length) {
-      return (
-        <div className="px-4 py-5 text-sm" style={{ color: colors.$17 }}>
-          {noCompanyAccessLabel}
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-3 px-4 py-4">
-        {user.companies.map((company) => {
-          return (
-            <div
-              key={company.id}
-              className="rounded-md border px-4 py-4"
-              style={{ borderColor: colors.$20 }}
-            >
-              <div className="grid gap-4 md:grid-cols-[minmax(0,1.5fr)_10rem_minmax(0,2fr)]">
-                <div className="min-w-0 space-y-1">
-                  {renderFieldLabel(String(t('company')))}
-                  <div className="truncate text-sm font-medium">
-                    {company.name || t('unknown')}
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  {renderFieldLabel(String(t('status')))}
-                  {renderStatusBadge(company.status)}
-                </div>
-
-                <div className="min-w-0 space-y-1">
-                  {renderFieldLabel(String(t('permissions')))}
-                  {renderPermissionBadges(company)}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
 
   if (isLoading) {
     return (
@@ -172,15 +88,17 @@ export function AccountUsers() {
     <div className="px-4 pb-6 sm:px-6">
       <Table withoutPadding>
         <Thead>
-          <Th className="w-10"></Th>
           <Th>{t('user')}</Th>
+          <Th>{t('email')}</Th>
           <Th>{t('status')}</Th>
+          <Th>{t('companies')}</Th>
+          <Th></Th>
         </Thead>
 
         <Tbody>
           {!users.length && (
             <Tr>
-              <Td colSpan={3}>
+              <Td colSpan={5}>
                 <div className="flex items-center justify-center py-10">
                   <span className="text-sm" style={{ color: colors.$17 }}>
                     {t('no_records_found')}
@@ -190,75 +108,130 @@ export function AccountUsers() {
             </Tr>
           )}
 
-          {users.map((user) => {
-            const expanded = expandedUserId === user.id;
-            const detailsId = `account-user-companies-${user.id}`;
+          {users.map((user) => (
+            <Tr
+              key={user.id}
+              className="border-b"
+              style={{ borderColor: colors.$20 }}
+              withoutBackgroundColor
+            >
+              <Td>
+                <div className="truncate font-medium">{user.name}</div>
+              </Td>
 
-            return (
-              <Fragment key={user.id}>
-                <Tr
-                  className="border-b"
-                  style={{ borderColor: colors.$20 }}
-                  withoutBackgroundColor
+              <Td>
+                <div
+                  className="truncate text-sm"
+                  style={{ color: colors.$17 }}
                 >
-                  <Td>
-                    <button
-                      type="button"
-                      className="flex h-8 w-8 items-center justify-center rounded-md border"
-                      style={{
-                        borderColor: colors.$24,
-                        backgroundColor: colors.$1,
-                      }}
-                      aria-expanded={expanded}
-                      aria-controls={detailsId}
-                      aria-label={`${expanded ? 'Collapse' : 'Expand'} ${
-                        user.name
-                      }`}
-                      onClick={() =>
-                        setExpandedUserId((current) =>
-                          current === user.id ? undefined : user.id
-                        )
-                      }
-                    >
-                      <Icon
-                        element={expanded ? MdExpandLess : MdExpandMore}
-                        size={20}
-                      />
-                    </button>
-                  </Td>
+                  {user.email}
+                </div>
+              </Td>
 
-                  <Td>
-                    <div className="min-w-0">
-                      <div className="truncate font-medium">{user.name}</div>
-                      <div
-                        className="truncate text-xs"
-                        style={{ color: colors.$17 }}
-                      >
-                        {user.email}
-                      </div>
-                    </div>
-                  </Td>
+              <Td>{user.status && <Badge>{t(user.status)}</Badge>}</Td>
 
-                  <Td>{user.status && <Badge>{t(user.status)}</Badge>}</Td>
-                </Tr>
+              <Td>
+                <span className="text-sm" style={{ color: colors.$17 }}>
+                  {user.companies.length}
+                </span>
+              </Td>
 
-                {expanded && (
-                  <Tr
-                    id={detailsId}
-                    className="border-b"
-                    style={{ borderColor: colors.$20 }}
-                    withoutBackgroundColor
-                  >
-                    <Td colSpan={3} withoutPadding>
-                      {renderCompanyDetails(user)}
-                    </Td>
-                  </Tr>
-                )}
-              </Fragment>
-            );
-          })}
+              <Td>
+                <Button
+                  type="minimal"
+                  behavior="button"
+                  onClick={() => setSelectedUser(user)}
+                >
+                  {t('view_details')}
+                </Button>
+              </Td>
+            </Tr>
+          ))}
         </Tbody>
       </Table>
+
+      <Modal
+        title={selectedUser?.name || ''}
+        visible={Boolean(selectedUser)}
+        onClose={() => setSelectedUser(null)}
+        size="regular"
+      >
+        {selectedUser && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-4 pb-4 border-b" style={{ borderColor: colors.$20 }}>
+              <div>
+                <div className="text-sm font-medium">{selectedUser.name}</div>
+                <div className="text-sm" style={{ color: colors.$17 }}>
+                  {selectedUser.email}
+                </div>
+              </div>
+              {selectedUser.status && <Badge>{t(selectedUser.status)}</Badge>}
+            </div>
+
+            {!selectedUser.companies.length && (
+              <div className="text-sm" style={{ color: colors.$17 }}>
+                No company access
+              </div>
+            )}
+
+            {selectedUser.companies.map((company) => (
+              <div
+                key={company.id}
+                className="rounded-md border px-4 py-4"
+                style={{ borderColor: colors.$20 }}
+              >
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="space-y-1">
+                    <div
+                      className="text-xs font-medium uppercase tracking-wide"
+                      style={{ color: colors.$17 }}
+                    >
+                      {t('company')}
+                    </div>
+                    <div className="truncate text-sm font-medium">
+                      {company.name || t('unknown')}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div
+                      className="text-xs font-medium uppercase tracking-wide"
+                      style={{ color: colors.$17 }}
+                    >
+                      {t('status')}
+                    </div>
+                    <div>
+                      {company.status ? (
+                        <Badge>{company.status}</Badge>
+                      ) : (
+                        <span className="text-sm" style={{ color: colors.$17 }}>
+                          {t('unknown')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div
+                      className="text-xs font-medium uppercase tracking-wide"
+                      style={{ color: colors.$17 }}
+                    >
+                      {t('permissions')}
+                    </div>
+                    <Badge>
+                      {company.is_owner
+                        ? 'owner'
+                        : company.is_admin
+                          ? 'admin'
+                          : company.permissions.trim() || noAccessLabel}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
