@@ -21,7 +21,7 @@ import {
 import { authenticate } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
 import { useQueryClient } from 'react-query';
-import { ReactNode, useLayoutEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from '$app/common/helpers/toast/toast';
 import { PublicClientApplication } from '@azure/msal-browser';
@@ -108,21 +108,10 @@ export function SignInProviders() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState<number>(0);
 
-  useLayoutEffect(() => {
-    const element = containerRef.current;
-
-    if (!element) {
-      return;
+  useEffect(() => {
+    if (containerRef.current) {
+      setWidth(containerRef.current.offsetWidth);
     }
-
-    const update = () => setWidth(element.offsetWidth);
-
-    update();
-
-    const observer = new ResizeObserver(update);
-    observer.observe(element);
-
-    return () => observer.disconnect();
   }, []);
 
   return (

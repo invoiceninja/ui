@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { endpoint, isHosted, isSelfHosted } from '../../common/helpers';
 import { AxiosError } from 'axios';
 import { LoginValidation } from './common/ValidationInterface';
@@ -36,6 +36,7 @@ import {
   authenticatePasskey,
   PublicKeyCredentialRequestOptionsJSON,
 } from '$app/common/helpers/passkeys';
+import { OrDivider } from './components/OrDivider';
 
 type Step = 'email' | 'credentials';
 
@@ -64,13 +65,18 @@ export function Login() {
   const isWebAuthnSupported = useWebAuthnSupport();
 
   const isEmailStep = step === 'email';
-  const showTwoFactor = methods.includes('totp');
-  const showPassword =
-    methods.length === 0 ||
-    methods.includes('password') ||
-    !isWebAuthnSupported;
 
-  function handleContinue() {
+  const showTwoFactor = useMemo(() => methods.includes('totp'), [methods]);
+
+  const showPassword = useMemo(
+    () =>
+      methods.length === 0 ||
+      methods.includes('password') ||
+      !isWebAuthnSupported,
+    [methods, isWebAuthnSupported]
+  );
+
+  const handleContinue = () => {
     setMessage(undefined);
     setErrors(undefined);
 
@@ -104,9 +110,9 @@ export function Login() {
         }
       })
       .finally(() => setIsFormBusy(false));
-  }
+  };
 
-  function handleLogin(form: HTMLFormElement) {
+  const handleLogin = (form: HTMLFormElement) => {
     const formData = new FormData(form);
 
     setMessage(undefined);
@@ -141,9 +147,9 @@ export function Login() {
         }
       })
       .finally(() => setIsFormBusy(false));
-  }
+  };
 
-  async function handlePasskeyLogin() {
+  const handlePasskeyLogin = async () => {
     if (!email) {
       setErrors({ email: [t('provide_email') as string] });
       return;
@@ -210,16 +216,16 @@ export function Login() {
     } finally {
       setIsFormBusy(false);
     }
-  }
+  };
 
-  function handleBackToEmail() {
+  const handleBackToEmail = () => {
     setMessage(undefined);
     setErrors(undefined);
     setPassword('');
     setOneTimePassword('');
     setMethods([]);
     setStep('email');
-  }
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center py-8">
@@ -410,26 +416,6 @@ export function Login() {
         visible={isDisable2faModalOpen}
         setVisible={setIsDisable2faModalOpen}
       />
-    </div>
-  );
-}
-
-function OrDivider() {
-  const [t] = useTranslation();
-  const colors = useColorScheme();
-
-  return (
-    <div className="flex items-center gap-3">
-      <div className="h-px flex-1" style={{ backgroundColor: colors.$5 }} />
-
-      <span
-        className="text-xs uppercase tracking-wide"
-        style={{ color: colors.$17 }}
-      >
-        {t('or')}
-      </span>
-
-      <div className="h-px flex-1" style={{ backgroundColor: colors.$5 }} />
     </div>
   );
 }
