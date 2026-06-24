@@ -27,7 +27,7 @@ import { CustomField } from '$app/components/CustomField';
 
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useSave } from './hooks/useSave';
@@ -71,6 +71,8 @@ export default function Create() {
   const [t] = useTranslation();
   const [searchParams] = useSearchParams();
 
+  const hasCapturedPreSelection = useRef<boolean>(false);
+
   const pages = [
     { name: t('payments'), href: '/payments' },
     { name: t('new_payment'), href: '/payments/create' },
@@ -100,17 +102,7 @@ export default function Create() {
   });
 
   const [preSelectedInvoiceIds, setPreSelectedInvoiceIds] = useState<string[]>(
-    () => {
-      if (searchParams.has('invoice')) {
-        return [searchParams.get('invoice') as string];
-      }
-
-      if (searchParams.get('action') === 'enter') {
-        return payment?.invoices.map(({ invoice_id }) => invoice_id) ?? [];
-      }
-
-      return [];
-    }
+    []
   );
 
   const { data: blankPayment } = useBlankPaymentQuery();
@@ -206,6 +198,28 @@ export default function Create() {
       );
     }
   }, [blankPayment]);
+
+  useEffect(() => {
+    if (hasCapturedPreSelection.current) {
+      return;
+    }
+
+    if (searchParams.has('invoice')) {
+      hasCapturedPreSelection.current = true;
+
+      setPreSelectedInvoiceIds([searchParams.get('invoice') as string]);
+
+      return;
+    }
+
+    if (searchParams.get('action') === 'enter' && payment?.invoices.length) {
+      hasCapturedPreSelection.current = true;
+
+      setPreSelectedInvoiceIds(
+        payment.invoices.map((invoice) => invoice.invoice_id)
+      );
+    }
+  }, [payment?.invoices, searchParams]);
 
   useEffect(() => {
     if (
@@ -329,65 +343,59 @@ export default function Create() {
             />
           </Element>
 
-          {!isPrefilledFlow && (
-            <>
-              <div className="flex items-center px-5 sm:px-6 py-1">
-                <div
-                  className="flex-1 border-b"
-                  style={{ borderColor: colors.$21 }}
-                />
-                <span
-                  className="px-4 text-xs font-medium uppercase"
-                  style={{ color: colors.$22, opacity: 0.8 }}
-                >
-                  {t('or')}
-                </span>
-                <div
-                  className="flex-1 border-b"
-                  style={{ borderColor: colors.$21 }}
-                />
-              </div>
+          <div className="flex items-center px-5 sm:px-6 py-1">
+            <div
+              className="flex-1 border-b"
+              style={{ borderColor: colors.$21 }}
+            />
+            <span
+              className="px-4 text-xs font-medium uppercase"
+              style={{ color: colors.$22, opacity: 0.8 }}
+            >
+              {t('or')}
+            </span>
+            <div
+              className="flex-1 border-b"
+              style={{ borderColor: colors.$21 }}
+            />
+          </div>
 
-              <Element leftSide={t('invoice')}>
-                <InvoiceSelector
-                  value={preSelectedInvoiceIds[0] ?? ''}
-                  endpoint={invoiceSelectorEndpoint}
-                  onChange={(invoice) => {
-                    setInitialEndpoints({
-                      invoices: '',
-                      credits: '',
-                    });
+          <Element leftSide={t('invoice')}>
+            <InvoiceSelector
+              value={preSelectedInvoiceIds[0] ?? ''}
+              endpoint={invoiceSelectorEndpoint}
+              onChange={(invoice) => {
+                setInitialEndpoints({
+                  invoices: '',
+                  credits: '',
+                });
 
-                    setPreSelectedInvoiceIds([invoice.id]);
+                setPreSelectedInvoiceIds([invoice.id]);
 
-                    setTimeout(() => {
-                      handleChange('client_id', invoice.client_id);
-                      handleChange(
-                        'currency_id',
-                        invoice.client?.settings.currency_id || '1'
-                      );
-                      handleChange('credits', []);
-                      handleChange('invoices', [
-                        {
-                          _id: v4(),
-                          invoice_id: invoice.id,
-                          amount:
-                            invoice.balance > 0
-                              ? invoice.balance
-                              : invoice.amount,
-                        },
-                      ]);
-                    }, 25);
-                  }}
-                  onClearButtonClick={() => {
-                    setPreSelectedInvoiceIds([]);
-                    handleChange('invoices', []);
-                  }}
-                  clearButton={Boolean(preSelectedInvoiceIds.length)}
-                />
-              </Element>
-            </>
-          )}
+                setTimeout(() => {
+                  handleChange('client_id', invoice.client_id);
+                  handleChange(
+                    'currency_id',
+                    invoice.client?.settings.currency_id || '1'
+                  );
+                  handleChange('credits', []);
+                  handleChange('invoices', [
+                    {
+                      _id: v4(),
+                      invoice_id: invoice.id,
+                      amount:
+                        invoice.balance > 0 ? invoice.balance : invoice.amount,
+                    },
+                  ]);
+                }, 25);
+              }}
+              onClearButtonClick={() => {
+                setPreSelectedInvoiceIds([]);
+                handleChange('invoices', []);
+              }}
+              clearButton={Boolean(preSelectedInvoiceIds.length)}
+            />
+          </Element>
 
           <Element
             leftSide={t('amount_received')}
