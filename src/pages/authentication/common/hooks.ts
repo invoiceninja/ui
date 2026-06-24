@@ -26,6 +26,7 @@ export type LoginMethod = 'password' | 'totp' | 'passkey';
 
 export interface LoginPrecheck {
   methods?: LoginMethod[];
+  secret_required?: boolean;
 }
 
 export function useLoginPrecheck() {

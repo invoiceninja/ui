@@ -56,6 +56,7 @@ export function Login() {
   const [password, setPassword] = useState<string>('');
   const [oneTimePassword, setOneTimePassword] = useState<string>('');
   const [methods, setMethods] = useState<LoginMethod[]>([]);
+  const [secretRequired, setSecretRequired] = useState<boolean>(false);
 
   const [isDisable2faModalOpen, setIsDisable2faModalOpen] =
     useState<boolean>(false);
@@ -78,6 +79,8 @@ export function Login() {
     );
   }, [methods, isWebAuthnSupported]);
 
+  const showSecret = isSelfHosted() && secretRequired;
+
   const handleContinue = () => {
     setMessage(undefined);
     setErrors(undefined);
@@ -92,6 +95,7 @@ export function Login() {
     loginPrecheck(email)
       .then((response) => {
         setMethods(response.methods ?? []);
+        setSecretRequired(response.secret_required ?? false);
         setStep('credentials');
       })
       .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
@@ -218,6 +222,7 @@ export function Login() {
     setPassword('');
     setOneTimePassword('');
     setMethods([]);
+    setSecretRequired(false);
     setStep('email');
   };
 
@@ -322,18 +327,18 @@ export function Login() {
                   />
                 )}
 
-                {(isSelfHosted() || showTwoFactor) && (
+                {(showSecret || showTwoFactor) && (
                   <div className="space-y-2">
                     <div
                       className={classNames(
                         'flex flex-col lg:flex-row items-center',
                         {
-                          'justify-between': isSelfHosted(),
+                          'justify-between': showSecret,
                           'justify-end': isHosted(),
                         }
                       )}
                     >
-                      {isSelfHosted() && <InputLabel>{t('secret')}</InputLabel>}
+                      {showSecret && <InputLabel>{t('secret')}</InputLabel>}
 
                       {isHosted() && showTwoFactor && (
                         <div
@@ -348,7 +353,7 @@ export function Login() {
                   </div>
                 )}
 
-                {isSelfHosted() && (
+                {showSecret && (
                   <InputField
                     type="password"
                     autoComplete="on"
