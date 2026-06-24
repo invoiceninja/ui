@@ -29,7 +29,7 @@ import { Button, Checkbox } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Spinner } from '$app/components/Spinner';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdDownload } from 'react-icons/md';
 import { useQuery, useQueryClient } from 'react-query';
@@ -64,6 +64,14 @@ interface BillingInvoice {
 interface BillingHistoryResponse {
   invoices?: BillingInvoice[];
   data?: BillingInvoice[] | { invoices?: BillingInvoice[] };
+}
+
+interface ErrorResponse {
+  message?: string;
+}
+
+interface BillingInvoicePaymentIntent extends ResponsePaymentIntent {
+  payment_hash: string;
 }
 
 function extractBillingInvoices(payload: BillingHistoryResponse) {
@@ -161,10 +169,14 @@ export function BillingHistory() {
   const colors = useColorScheme();
   const queryClient = useQueryClient();
   const account = useCurrentAccount();
-  const [payingInvoice, setPayingInvoice] = useState<BillingInvoice | null>(null);
+  const [payingInvoiceId, setPayingInvoiceId] = useState<string>();
+  const [paymentInvoice, setPaymentInvoice] = useState<BillingInvoice | null>(
+    null
+  );
+  const [invoicePaymentIntent, setInvoicePaymentIntent] =
+    useState<BillingInvoicePaymentIntent | null>(null);
   const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<string[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [detailInvoice, setDetailInvoice] = useState<BillingInvoice | null>(null);
 
   const {
     data: invoices = [],
@@ -181,7 +193,11 @@ export function BillingHistory() {
 
   const { data: paymentMethods = [], isLoading: isPaymentMethodsLoading } =
     useQuery(
-      ['/api/client/account_management/methods', account?.id],
+      [
+        '/api/client/account_management/methods',
+        account?.id,
+        'billing_history',
+      ],
       () =>
         request(
           'POST',
@@ -194,7 +210,9 @@ export function BillingHistory() {
           (response: AxiosResponse<GenericManyResponse<GatewayToken>>) =>
             response.data.data
         ),
-      { enabled: Boolean(account) }
+      {
+        enabled: Boolean(account) && Boolean(paymentInvoice),
+      }
     );
 
   const selectableInvoiceIds = useMemo(
@@ -218,33 +236,56 @@ export function BillingHistory() {
   }, [selectableInvoiceIds]);
 
   const handlePayInvoice = useCallback(
-    (invoice: BillingInvoice) => {
-      setPayingInvoice(invoice);
+    async (invoice: BillingInvoice) => {
+      if (payingInvoiceId) {
+        return;
+      }
+
+      setPayingInvoiceId(invoice.id);
+      toast.processing();
+
+      try {
+        const response = await request(
+          'POST',
+          endpoint(BILLING_INVOICE_PAYMENT_INTENT_ENDPOINT),
+          { id: invoice.id }
+        );
+
+        const paymentIntent = response.data as BillingInvoicePaymentIntent;
+
+        if (!paymentIntent.requires_payment) {
+          toast.success(response.data?.message || 'success');
+          await queryClient.invalidateQueries(BILLING_HISTORY_QUERY_KEY);
+
+          return;
+        }
+
+        if (!paymentIntent.client_secret) {
+          toast.error('payment_failed');
+
+          return;
+        }
+
+        setPaymentInvoice(invoice);
+        setInvoicePaymentIntent(paymentIntent);
+        toast.dismiss();
+      } catch (error) {
+        toast.error(getErrorMessage(error));
+      } finally {
+        setPayingInvoiceId(undefined);
+      }
     },
-    []
+    [payingInvoiceId, queryClient]
   );
 
   const handleClosePaymentModal = useCallback(() => {
-    setPayingInvoice(null);
+    setPaymentInvoice(null);
+    setInvoicePaymentIntent(null);
   }, []);
 
-  const handleCreatePaymentIntent = useCallback(async () => {
-    if (!payingInvoice) {
-      throw new Error('Missing invoice');
-    }
-
-    const response = await request(
-      'POST',
-      endpoint(BILLING_INVOICE_PAYMENT_INTENT_ENDPOINT),
-      { id: payingInvoice.id }
-    );
-
-    return response.data as ResponsePaymentIntent;
-  }, [payingInvoice]);
-
   const handleFinalizeInvoicePayment = useCallback(
-    async (stripePaymentIntent: StripePaymentIntent) => {
-      if (!payingInvoice) {
+    async (paymentIntent: StripePaymentIntent) => {
+      if (!paymentInvoice) {
         throw new Error('Missing invoice');
       }
 
@@ -252,14 +293,14 @@ export function BillingHistory() {
         'POST',
         endpoint(BILLING_INVOICE_PAYMENT_RESPONSE_ENDPOINT),
         {
-          id: payingInvoice.id,
-          payment_intent: stripePaymentIntent.id,
+          id: paymentInvoice.id,
+          payment_intent: paymentIntent.id,
         }
       );
 
       await queryClient.invalidateQueries(BILLING_HISTORY_QUERY_KEY);
     },
-    [payingInvoice, queryClient]
+    [paymentInvoice, queryClient]
   );
 
   const handleInvoiceSelection = useCallback(
@@ -316,15 +357,22 @@ export function BillingHistory() {
     );
   }
 
-  const renderViewButton = (invoice: BillingInvoice) => (
-    <Button
-      type="minimal"
-      behavior="button"
-      onClick={() => setDetailInvoice(invoice)}
-    >
-      {t('view_details')}
-    </Button>
-  );
+  const renderPayButton = (invoice: BillingInvoice) =>
+    invoice.payable ? (
+      <Button
+        behavior="button"
+        type="secondary"
+        className="!px-3 !py-1.5"
+        disabled={Boolean(payingInvoiceId)}
+        disableWithoutIcon={payingInvoiceId !== invoice.id}
+        onClick={(event: MouseEvent<HTMLButtonElement>) => {
+          event.stopPropagation();
+          handlePayInvoice(invoice);
+        }}
+      >
+        {t('pay_now')}
+      </Button>
+    ) : null;
 
   return (
     <div className="px-4 pb-6 sm:px-6">
@@ -399,107 +447,28 @@ export function BillingHistory() {
               <Td>
                 <StatusBadge for={invoiceStatus} code={invoice.status} />
               </Td>
-              <Td>
-                <div className="flex items-center gap-2">
-                  {renderViewButton(invoice)}
-                  {invoice.payable && (
-                    <Button
-                      behavior="button"
-                      type="secondary"
-                      className="!px-3 !py-1.5"
-                      onClick={() => setPayingInvoice(invoice)}
-                    >
-                      {t('pay_now')}
-                    </Button>
-                  )}
-                </div>
-              </Td>
+              <Td>{renderPayButton(invoice)}</Td>
             </Tr>
           ))}
         </Tbody>
       </Table>
 
       <Modal
-        title={detailInvoice ? `${t('invoice')} ${detailInvoice.number}` : ''}
-        visible={Boolean(detailInvoice)}
-        onClose={() => setDetailInvoice(null)}
-        size="regular"
-      >
-        {detailInvoice && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
-                  {t('invoice_number')}
-                </div>
-                <div className="text-sm font-medium">{detailInvoice.number}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
-                  {t('status')}
-                </div>
-                <StatusBadge for={invoiceStatus} code={detailInvoice.status} />
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
-                  {t('invoice_date')}
-                </div>
-                <div className="text-sm">{detailInvoice.date}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
-                  {t('due_date')}
-                </div>
-                <div className="text-sm">{detailInvoice.due_date}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
-                  {t('amount')}
-                </div>
-                <div className="text-sm font-medium">{detailInvoice.amount}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
-                  {t('balance')}
-                </div>
-                <div className="text-sm font-medium">{detailInvoice.balance}</div>
-              </div>
-            </div>
-
-            {detailInvoice.payable && (
-              <div className="flex justify-end pt-4 border-t" style={{ borderColor: colors.$20 }}>
-                <Button
-                  behavior="button"
-                  type="primary"
-                  onClick={() => {
-                    setDetailInvoice(null);
-                    setPayingInvoice(detailInvoice);
-                  }}
-                >
-                  {t('pay_now')}
-                </Button>
-              </div>
-            )}
-          </div>
-        )}
-      </Modal>
-
-      <Modal
-        visible={Boolean(payingInvoice)}
+        visible={Boolean(paymentInvoice && invoicePaymentIntent)}
         onClose={handleClosePaymentModal}
         title={t('pay_now')}
         size="regular"
-        disableClosing={Boolean(payingInvoice)}
+        disableClosing={Boolean(paymentInvoice)}
       >
         {isPaymentMethodsLoading ? (
           <div className="flex justify-center px-6 py-10">
             <Spinner />
           </div>
-        ) : payingInvoice ? (
+        ) : paymentInvoice && invoicePaymentIntent ? (
           <PaymentMethodForm
             tokens={paymentMethods}
-            amount_string={payingInvoice.balance || payingInvoice.amount}
-            onCreatePaymentIntent={handleCreatePaymentIntent}
+            amount_string={paymentInvoice.balance || paymentInvoice.amount}
+            paymentIntent={invoicePaymentIntent}
             onFinalizeStripePayment={handleFinalizeInvoicePayment}
             onPaymentComplete={handleClosePaymentModal}
             onCancel={handleClosePaymentModal}
