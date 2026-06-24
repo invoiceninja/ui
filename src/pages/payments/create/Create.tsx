@@ -27,7 +27,7 @@ import { CustomField } from '$app/components/CustomField';
 
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useSave } from './hooks/useSave';
@@ -71,8 +71,6 @@ export default function Create() {
   const [t] = useTranslation();
   const [searchParams] = useSearchParams();
 
-  const hasCapturedPreSelection = useRef<boolean>(false);
-
   const pages = [
     { name: t('payments'), href: '/payments' },
     { name: t('new_payment'), href: '/payments/create' },
@@ -101,10 +99,18 @@ export default function Create() {
     credits: '',
   });
 
-  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string>('');
-
   const [preSelectedInvoiceIds, setPreSelectedInvoiceIds] = useState<string[]>(
-    []
+    () => {
+      if (searchParams.has('invoice')) {
+        return [searchParams.get('invoice') as string];
+      }
+
+      if (searchParams.get('action') === 'enter') {
+        return payment?.invoices.map(({ invoice_id }) => invoice_id) ?? [];
+      }
+
+      return [];
+    }
   );
 
   const { data: blankPayment } = useBlankPaymentQuery();
@@ -202,40 +208,18 @@ export default function Create() {
   }, [blankPayment]);
 
   useEffect(() => {
-    if (hasCapturedPreSelection.current) {
-      return;
-    }
-
-    if (searchParams.has('invoice')) {
-      hasCapturedPreSelection.current = true;
-
-      setPreSelectedInvoiceIds([searchParams.get('invoice') as string]);
-
-      return;
-    }
-
-    if (payment?.invoices.length) {
-      hasCapturedPreSelection.current = true;
-
-      setPreSelectedInvoiceIds(
-        payment.invoices.map((invoice) => invoice.invoice_id)
-      );
-    }
-  }, [payment?.invoices, searchParams]);
-
-  useEffect(() => {
     if (
       payment?.client_id &&
       (searchParams.get('client') === payment?.client_id ||
         !searchParams.get('client'))
     ) {
-      const withInvoice = searchParams.get('invoice') || selectedInvoiceId;
+      const withInvoices = preSelectedInvoiceIds.join(',');
 
       setInitialEndpoints({
         invoices: `/api/v1/invoices?include=client&payable=${
           payment?.client_id
         }&per_page=100&sort=date|desc&per_page=1000${
-          withInvoice ? `&with=${withInvoice}` : ''
+          withInvoices ? `&with=${withInvoices}` : ''
         }`,
         credits: `/api/v1/credits?include=client&client_id=${
           payment?.client_id
@@ -246,12 +230,7 @@ export default function Create() {
         }`,
       });
     }
-  }, [
-    payment?.client_id,
-    searchParams,
-    preSelectedInvoiceIds,
-    selectedInvoiceId,
-  ]);
+  }, [payment?.client_id, searchParams, preSelectedInvoiceIds]);
 
   useEffect(() => {
     return () => {
@@ -323,7 +302,7 @@ export default function Create() {
                   credits: '',
                 });
 
-                setSelectedInvoiceId('');
+                setPreSelectedInvoiceIds([]);
 
                 setTimeout(() => {
                   handleChange('client_id', client?.id as string);
@@ -336,7 +315,7 @@ export default function Create() {
                 }, 25);
               }}
               onClearButtonClick={() => {
-                setSelectedInvoiceId('');
+                setPreSelectedInvoiceIds([]);
                 handleChange('client_id', '');
                 handleChange('currency_id', '');
                 handleChange('invoices', []);
@@ -371,7 +350,7 @@ export default function Create() {
 
               <Element leftSide={t('invoice')}>
                 <InvoiceSelector
-                  value={selectedInvoiceId}
+                  value={preSelectedInvoiceIds[0] ?? ''}
                   endpoint={invoiceSelectorEndpoint}
                   onChange={(invoice) => {
                     setInitialEndpoints({
@@ -379,7 +358,7 @@ export default function Create() {
                       credits: '',
                     });
 
-                    setSelectedInvoiceId(invoice.id);
+                    setPreSelectedInvoiceIds([invoice.id]);
 
                     setTimeout(() => {
                       handleChange('client_id', invoice.client_id);
@@ -401,10 +380,10 @@ export default function Create() {
                     }, 25);
                   }}
                   onClearButtonClick={() => {
-                    setSelectedInvoiceId('');
+                    setPreSelectedInvoiceIds([]);
                     handleChange('invoices', []);
                   }}
-                  clearButton={Boolean(selectedInvoiceId)}
+                  clearButton={Boolean(preSelectedInvoiceIds.length)}
                 />
               </Element>
             </>
@@ -469,13 +448,7 @@ export default function Create() {
                 withoutPagination
                 withoutStatusFilter
                 withoutAllBulkActions
-                preSelected={
-                  searchParams.get('invoice')
-                    ? [searchParams.get('invoice') as string]
-                    : selectedInvoiceId
-                    ? [selectedInvoiceId]
-                    : []
-                }
+                preSelected={preSelectedInvoiceIds}
                 emptyState={
                   <div className="flex items-center justify-center pt-2">
                     <span className="text-sm" style={{ color: colors.$17 }}>
