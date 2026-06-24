@@ -190,6 +190,9 @@ export function AccountUsers() {
                     </div>
                     <div className="truncate text-sm font-medium">
                       {company.name || t('unknown')}
+                      {company.is_locked && (
+                        <Badge variant="red" className="ml-2">{t('locked')}</Badge>
+                      )}
                     </div>
                   </div>
 
