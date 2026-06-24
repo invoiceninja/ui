@@ -190,7 +190,8 @@ interface Props<T> extends CommonProps {
   footerColumns?: FooterColumns;
   withoutPerPageAsPreference?: boolean;
   withoutPageAsPreference?: boolean;
-  withoutStoringFilters?: boolean;
+  withoutStoringSearchFilter?: boolean;
+  withoutStoringPreferences?: boolean;
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
   enableSavingFilterPreference?: boolean;
@@ -301,7 +302,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     totalRecordsPropPath,
     onDeleteBulkAction,
     withoutPageAsPreference = false,
-    withoutStoringFilters = false,
+    withoutStoringSearchFilter = false,
+    withoutStoringPreferences = false,
     filterColumns,
     onSelectedResourcesChange,
     preSelected = [],
@@ -325,7 +327,9 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [customFilter, setCustomFilter] = useState<string[] | undefined>(
     defaultCustomFilterValues
   );
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(
+    Number(apiEndpoint.searchParams.get('page')) || 1
+  );
   const [perPage, setPerPage] = useState<PerPage>(
     (apiEndpoint.searchParams.get('per_page') as PerPage) || '10'
   );
@@ -333,7 +337,9 @@ export function DataTable<T extends object>(props: Props<T>) {
     apiEndpoint.searchParams.get('sort') || 'id|asc'
   );
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
-  const [status, setStatus] = useState<string[]>(['active']);
+  const [status, setStatus] = useState<string[]>(
+    apiEndpoint.searchParams.get('status')?.split(',') || ['active']
+  );
   const [dateRangeEntries, setDateRangeEntries] = useAtom(dateRangeAtom);
   const [dateRangeQueryParameter, setDateRangeQueryParameter] =
     useState<string>('');
@@ -388,7 +394,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     defaultCustomFilterValues,
     withoutStoringPerPage: withoutPerPageAsPreference,
     withoutStoringPage: withoutPageAsPreference,
-    withoutStoringFilters,
+    withoutStoringSearchFilter,
+    withoutStoringPreferences,
     enableSavingFilterPreference,
   });
 
@@ -402,8 +409,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     tableKey: `${props.resource}s`,
     customFilter,
     customFilters,
-    defaultCustomFilterValues,
-    withoutStoringFilters,
+    withoutStoringPreferences,
   });
 
   const normalizeNumericCommas = (value: string): string => {

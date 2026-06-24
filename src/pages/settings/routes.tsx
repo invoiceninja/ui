@@ -32,6 +32,10 @@ export const settingsRoutes = (
       />
       <Route path="custom_fields" element={<Settings.UserCustomFields />} />
       <Route path="preferences" element={<Settings.Preferences />} />
+      <Route
+        path="keyboard_shortcuts"
+        element={<Settings.KeyboardShortcuts />}
+      />
     </Route>
 
     <Route element={<Guard guards={[admin()]} component={<Outlet />} />}>

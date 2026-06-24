@@ -44,6 +44,7 @@ import {
   isTaskRunning,
 } from './helpers/calculate-entity-state';
 import { calculateHours } from './helpers/calculate-time';
+import { shouldShowStartTaskButton } from './helpers/task';
 import { useInvoiceTask } from './hooks/useInvoiceTask';
 import { useStart } from './hooks/useStart';
 import { useStop } from './hooks/useStop';
@@ -522,8 +523,7 @@ export function useActions(params?: Params) {
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
     (task: Task) =>
-      !isTaskRunning(task) &&
-      !task.invoice_id && (
+      shouldShowStartTaskButton(task) && (
         <DropdownElement
           onClick={() => start(task)}
           icon={<Icon element={MdNotStarted} />}
@@ -641,9 +641,7 @@ export const useCustomBulkActions = () => {
   };
 
   const showStartAction = (selectedTasks: Task[]) => {
-    return selectedTasks.every(
-      (task) => !isTaskRunning(task) && !task.invoice_id
-    );
+    return selectedTasks.every((task) => shouldShowStartTaskButton(task));
   };
 
   const showStopAction = (selectedTasks: Task[]) => {

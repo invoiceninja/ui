@@ -22,6 +22,13 @@ import {
   isNavigationModalVisibleAtom,
   usePreventNavigation,
 } from '$app/common/hooks/usePreventNavigation';
+import { useResolvedShortcuts } from '$app/common/hooks/useReactSettings';
+import {
+  eventMatchesBinding,
+  formatBinding,
+} from '$app/common/helpers/keyboard-shortcuts';
+import { isShortcutRecordingActive } from '$app/common/hooks/useShortcutRecorder';
+import { getHeldKeys } from '$app/common/hooks/useHeldKeys';
 import { debounce } from 'lodash';
 import { InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
@@ -56,6 +63,10 @@ export function Search$() {
 
   const isNavigationModalVisible = useAtomValue(isNavigationModalVisibleAtom);
 
+  const shortcutBindings = useResolvedShortcuts();
+  const searchBindingRef = useRef<string | null>(shortcutBindings.search);
+  searchBindingRef.current = shortcutBindings.search;
+
   const { data, refetch, isFetching } = useQuery(
     ['/api/v1/search'],
     () => {
@@ -75,7 +86,9 @@ export function Search$() {
                   label: record.name,
                   value: record.id,
                   resource: record,
-                  searchable: `${t(key)}: ${record.name} ${record.keywords ?? ''}`,
+                  searchable: `${t(key)}: ${record.name} ${
+                    record.keywords ?? ''
+                  }`,
                   // searchable: `${t(key)}: ${record.name}`,
                   eventType: 'external',
                 });
@@ -154,7 +167,13 @@ export function Search$() {
   };
 
   const handleOpenModalByKeyDown = (event: KeyboardEvent) => {
-    if (event.ctrlKey && event.key === 'k') {
+    if (isShortcutRecordingActive()) {
+      return;
+    }
+
+    const binding = searchBindingRef.current;
+
+    if (binding && eventMatchesBinding(event, binding, getHeldKeys())) {
       event.preventDefault();
 
       setIsModalOpen((current) => !current);
@@ -324,14 +343,16 @@ export function Search$() {
           </p>
         </div>
 
-        <div
-          className="flex items-center border px-1.5 py-0.5"
-          style={{ borderColor: colors.$5, borderRadius: '0.25rem' }}
-        >
-          <p className="text-sm" style={{ color: colors.$17 }}>
-            Ctrl+K
-          </p>
-        </div>
+        {shortcutBindings.search && (
+          <div
+            className="flex items-center border px-1.5 py-0.5"
+            style={{ borderColor: colors.$5, borderRadius: '0.25rem' }}
+          >
+            <p className="text-sm" style={{ color: colors.$17 }}>
+              {formatBinding(shortcutBindings.search)}
+            </p>
+          </div>
+        )}
       </div>
 
       <Modal

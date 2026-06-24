@@ -41,7 +41,8 @@ interface Params {
   withoutStoringPerPage: boolean;
   enableSavingFilterPreference?: boolean;
   withoutStoringPage?: boolean;
-  withoutStoringFilters?: boolean;
+  withoutStoringSearchFilter?: boolean;
+  withoutStoringPreferences?: boolean;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -68,7 +69,8 @@ export function useDataTablePreferences(params: Params) {
     withoutStoringPerPage,
     enableSavingFilterPreference,
     withoutStoringPage,
-    withoutStoringFilters,
+    withoutStoringSearchFilter,
+    withoutStoringPreferences,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
@@ -82,8 +84,12 @@ export function useDataTablePreferences(params: Params) {
     status: string[],
     perPage: PerPage
   ) => {
-    if (tableKey) {
-      storeSessionTableFilters(filter, currentPage);
+    if (withoutStoringPreferences) {
+      return;
+    }
+
+    if (tableKey && !withoutStoringSearchFilter) {
+      storeSessionTableFilters(filter, currentPage, withoutStoringPage);
     }
 
     if (!customFilter || !tableKey || !enableSavingFilterPreference) {
@@ -101,7 +107,6 @@ export function useDataTablePreferences(params: Params) {
       sort: apiEndpoint.searchParams.get('sort') || 'id|asc',
       status: ['active'],
       ...(!withoutStoringPerPage && { perPage: '10' }),
-      ...(!withoutStoringPage && { currentPage: 1 }),
     };
 
     const cleanedUpFilters = {
@@ -110,7 +115,6 @@ export function useDataTablePreferences(params: Params) {
       sort,
       status,
       ...(!withoutStoringPerPage && { perPage }),
-      ...(!withoutStoringPage && { currentPage }),
     };
 
     if (isEqual(defaultFilters, cleanedUpFilters)) {
@@ -160,16 +164,20 @@ export function useDataTablePreferences(params: Params) {
     // Guards logout/unmount races where the atom has been reset to null.
     if (!isHydrated || appliedRef.current) return;
 
-    if (!isInitialConfiguration) {
-      setFilter((getPreference('filter') as string) || '');
+    if (withoutStoringPreferences) {
+      setArePreferencesApplied(true);
+      appliedRef.current = true;
+      return;
+    }
+
+    if (!isInitialConfiguration && !customFilter) {
+      if (!withoutStoringSearchFilter) {
+        setFilter((getPreference('filter') as string) || '');
+      }
 
       if (customFilters) {
-        const preferenceCustomFilters = withoutStoringFilters
-          ? []
-          : (getPreference('customFilter') as string[]);
-
-        if (preferenceCustomFilters.length) {
-          setCustomFilter(preferenceCustomFilters);
+        if ((getPreference('customFilter') as string[]).length) {
+          setCustomFilter(getPreference('customFilter') as string[]);
         } else {
           setCustomFilter(defaultCustomFilterValues ?? []);
         }
@@ -188,10 +196,7 @@ export function useDataTablePreferences(params: Params) {
           'id|asc'
       );
       setSortedBy((getPreference('sortedBy') as string) || undefined);
-      if (
-        !withoutStoringFilters &&
-        (getPreference('status') as string[]).length
-      ) {
+      if ((getPreference('status') as string[]).length) {
         setStatus(getPreference('status') as string[]);
       } else {
         setStatus(['active']);

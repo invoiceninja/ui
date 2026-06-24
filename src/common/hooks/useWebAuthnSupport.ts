@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export {
-  AccentColor,
-  Details as UserDetailsComponent,
-  Notifications,
-  Password,
-  TwoFactorAuthentication,
-  Connect,
-  CustomFields as UserCustomFields,
-  Preferences,
-  KeyboardShortcuts,
-} from '././components/index';
-export { UserDetails } from './UserDetails';
+import { useState } from 'react';
+
+export function useWebAuthnSupport() {
+  const [isSupported] = useState<boolean>(() => {
+    return (
+      typeof window !== 'undefined' &&
+      typeof window.PublicKeyCredential !== 'undefined'
+    );
+  });
+
+  return isSupported;
+}
