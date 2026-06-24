@@ -1,6 +1,6 @@
 import { endpoint } from '$app/common/helpers';
 import { wait } from '$app/common/helpers/wait';
-import { GatewayToken } from '$app/common/interfaces/client';
+import type { GatewayToken as ClientGatewayToken } from '$app/common/interfaces/client';
 import { request } from '$app/common/helpers/request';
 import { RadioGroup } from '@headlessui/react';
 import { Alert } from '$app/components/Alert';
@@ -36,7 +36,7 @@ interface ApiError {
 type PaymentSuccessResult = StripePaymentIntent | { status: 'succeeded' };
 
 export interface PaymentProps {
-  tokens: GatewayToken[];
+  tokens: ClientGatewayToken[];
   amount_string?: string;
   paymentIntent?: ResponsePaymentIntent | null;
   onCreatePaymentIntent?: () => Promise<ResponsePaymentIntent>;
@@ -60,8 +60,8 @@ function getApiErrorMessage(error: unknown, fallback: string) {
   return (error as AxiosError<ApiError>).response?.data?.message || fallback;
 }
 
-function getTokenPaymentMethod(token: GatewayToken) {
-  return token.token || token.id;
+function getStripePaymentMethodId(token: ClientGatewayToken) {
+  return token.token;
 }
 
 export function PaymentMethodForm({
@@ -98,9 +98,6 @@ export function PaymentMethodForm({
   } | null>(null);
 
   const externalIntentSecret = paymentIntent?.client_secret;
-  const shouldConfirmSavedTokenWithStripe = Boolean(
-    externalIntentSecret && onFinalizeStripePayment
-  );
 
   useEffect(() => {
     setSelectedMethod((current) => {
@@ -136,6 +133,38 @@ export function PaymentMethodForm({
     ).then((response: AxiosResponse<ResponsePaymentIntent>) => response.data);
   };
 
+  const resolvePaymentIntent = async () => {
+    if (intent?.secret) {
+      return intent;
+    }
+
+    setPaymentState('payment_intent_pending');
+
+    try {
+      const response = await createIntent();
+
+      if (!response?.requires_payment || !response?.client_secret) {
+        setErrors(t('no_payment_required') as string);
+        setPaymentState('payment_failed');
+        return null;
+      }
+
+      const resolvedIntent = { secret: response.client_secret };
+
+      setIntent(resolvedIntent);
+      setPaymentState(null);
+
+      return resolvedIntent;
+    } catch (error) {
+      setErrors(
+        getApiErrorMessage(error, t('payment_failed') as string) ||
+          (t('payment_failed') as string)
+      );
+      setPaymentState('payment_failed');
+      return null;
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
 
@@ -159,39 +188,7 @@ export function PaymentMethodForm({
 
             if (externalIntentSecret) {
               setIntent({ secret: externalIntentSecret });
-              return;
             }
-
-            setPaymentState('payment_intent_pending');
-
-            createIntent()
-              .then((response) => {
-                if (!mounted) {
-                  return;
-                }
-
-                if (!response?.requires_payment || !response?.client_secret) {
-                  setErrors(t('no_payment_required') as string);
-                  setPaymentState('payment_failed');
-                  return;
-                }
-
-                setIntent({
-                  secret: response.client_secret,
-                });
-                setPaymentState(null);
-              })
-              .catch((error: AxiosError<ApiError>) => {
-                if (!mounted) {
-                  return;
-                }
-
-                setErrors(
-                  error.response?.data?.message ||
-                    (t('payment_failed') as string)
-                );
-                setPaymentState('payment_failed');
-              });
           });
         });
       }
@@ -296,16 +293,23 @@ export function PaymentMethodForm({
   };
 
   const confirmNewCardPayment = async () => {
-    if (!context || !intent) {
+    const resolvedIntent = await resolvePaymentIntent();
+
+    if (!context || !resolvedIntent) {
       setIsSubmitting(false);
       return;
     }
 
-    const result = await context.stripe.confirmCardPayment(intent.secret, {
-      payment_method: {
-        card: context.card,
-      },
-    });
+    setPaymentState('stripe_confirmation_pending');
+
+    const result = await context.stripe.confirmCardPayment(
+      resolvedIntent.secret,
+      {
+        payment_method: {
+          card: context.card,
+        },
+      }
+    );
 
     if (result.error) {
       setErrors(result.error.message || 'Payment failed');
@@ -324,11 +328,22 @@ export function PaymentMethodForm({
     setPaymentState('payment_failed');
   };
 
-  const confirmSavedTokenPaymentWithStripe = async (token: GatewayToken) => {
-    if (!intent) {
+  const confirmSavedTokenPaymentWithStripe = async (
+    token: ClientGatewayToken
+  ) => {
+    const paymentMethodId = getStripePaymentMethodId(token);
+
+    if (!paymentMethodId) {
       setErrors(t('payment_failed') as string);
       setIsSubmitting(false);
       setPaymentState('payment_failed');
+      return;
+    }
+
+    const resolvedIntent = await resolvePaymentIntent();
+
+    if (!resolvedIntent) {
+      setIsSubmitting(false);
       return;
     }
 
@@ -343,8 +358,10 @@ export function PaymentMethodForm({
       return;
     }
 
-    const result = await stripe.confirmCardPayment(intent.secret, {
-      payment_method: getTokenPaymentMethod(token),
+    setPaymentState('stripe_confirmation_pending');
+
+    const result = await stripe.confirmCardPayment(resolvedIntent.secret, {
+      payment_method: paymentMethodId,
     });
 
     if (result.error) {
@@ -364,27 +381,6 @@ export function PaymentMethodForm({
     setPaymentState('payment_failed');
   };
 
-  const processStoredTokenPayment = async (token: GatewayToken) => {
-    try {
-      await request(
-        'POST',
-        endpoint('/api/client/account_management/v2/payment/token'),
-        {
-          gateway_token_id: token.id,
-        }
-      );
-
-      handleSuccessfulPayment({ status: 'succeeded' });
-    } catch (error) {
-      setErrors(
-        getApiErrorMessage(error, 'Failed to process payment') ||
-          'Failed to process payment'
-      );
-      setIsSubmitting(false);
-      setPaymentState('payment_failed');
-    }
-  };
-
   const handleSubmit = async () => {
     setErrors(null);
     setIsSubmitting(true);
@@ -396,7 +392,6 @@ export function PaymentMethodForm({
       }
 
       if (selectedMethod === 'new_card') {
-        setPaymentState('stripe_confirmation_pending');
         await confirmNewCardPayment();
         return;
       }
@@ -410,14 +405,7 @@ export function PaymentMethodForm({
         return;
       }
 
-      if (shouldConfirmSavedTokenWithStripe) {
-        setPaymentState('stripe_confirmation_pending');
-        await confirmSavedTokenPaymentWithStripe(token);
-        return;
-      }
-
-      setPaymentState('finalizing_payment');
-      await processStoredTokenPayment(token);
+      await confirmSavedTokenPaymentWithStripe(token);
     } catch {
       setErrors('An unexpected error occurred');
       setIsSubmitting(false);
@@ -425,15 +413,8 @@ export function PaymentMethodForm({
     }
   };
 
-  const isWaitingForIntent =
-    selectedMethod === 'new_card' && paymentState === 'payment_intent_pending';
-  const isNewCardReady =
-    selectedMethod !== 'new_card' || (Boolean(intent) && Boolean(context));
-  const isSavedTokenReady =
-    !shouldConfirmSavedTokenWithStripe ||
-    selectedMethod === 'new_card' ||
-    Boolean(intent);
-  const isPaymentReady = isNewCardReady && isSavedTokenReady;
+  const isWaitingForIntent = paymentState === 'payment_intent_pending';
+  const isPaymentReady = selectedMethod !== 'new_card' || Boolean(context);
 
   return (
     <div className="pl-4 pr-4">
@@ -450,7 +431,7 @@ export function PaymentMethodForm({
             Payment Method
           </RadioGroup.Label>
           <div className="space-y-2">
-            {tokens?.map((token: GatewayToken) => (
+            {tokens?.map((token: ClientGatewayToken) => (
               <RadioGroup.Option key={token.id} value={token.id}>
                 {({ active, checked }) => (
                   <div
