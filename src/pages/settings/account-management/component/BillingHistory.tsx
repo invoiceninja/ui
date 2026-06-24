@@ -177,6 +177,7 @@ export function BillingHistory() {
     useState<BillingInvoicePaymentIntent | null>(null);
   const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<string[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [detailInvoice, setDetailInvoice] = useState<BillingInvoice | null>(null);
 
   const {
     data: invoices = [],
@@ -374,6 +375,16 @@ export function BillingHistory() {
       </Button>
     ) : null;
 
+  const renderViewButton = (invoice: BillingInvoice) => (
+    <Button
+      type="minimal"
+      behavior="button"
+      onClick={() => setDetailInvoice(invoice)}
+    >
+      {t('view_details')}
+    </Button>
+  );
+
   return (
     <div className="px-4 pb-6 sm:px-6">
       <div className="mb-3 flex justify-start">
@@ -413,7 +424,7 @@ export function BillingHistory() {
         <Tbody>
           {!invoices.length && (
             <Tr>
-              <Td colSpan={8}>
+              <Td colSpan={9}>
                 <div className="flex items-center justify-center py-10">
                   <span className="text-sm" style={{ color: colors.$17 }}>
                     {t('no_records_found')}
@@ -447,11 +458,89 @@ export function BillingHistory() {
               <Td>
                 <StatusBadge for={invoiceStatus} code={invoice.status} />
               </Td>
-              <Td>{renderPayButton(invoice)}</Td>
+              <Td>
+                <div className="flex items-center gap-2">
+                  {renderViewButton(invoice)}
+                  {renderPayButton(invoice)}
+                </div>
+              </Td>
             </Tr>
           ))}
         </Tbody>
       </Table>
+
+      <Modal
+        title={detailInvoice ? `${t('invoice')} ${detailInvoice.number}` : ''}
+        visible={Boolean(detailInvoice)}
+        onClose={() => setDetailInvoice(null)}
+        size="regular"
+      >
+        {detailInvoice && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
+                  {t('invoice_number')}
+                </div>
+                <div className="text-sm font-medium">{detailInvoice.number}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
+                  {t('status')}
+                </div>
+                <StatusBadge for={invoiceStatus} code={detailInvoice.status} />
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
+                  {t('invoice_date')}
+                </div>
+                <div className="text-sm">{detailInvoice.date}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
+                  {t('due_date')}
+                </div>
+                <div className="text-sm">{detailInvoice.due_date}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
+                  {t('amount')}
+                </div>
+                <div className="text-sm font-medium">{detailInvoice.amount}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.$17 }}>
+                  {t('balance')}
+                </div>
+                <div className="text-sm font-medium">{detailInvoice.balance}</div>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-4 border-t gap-2" style={{ borderColor: colors.$20 }}>
+              <Button
+                behavior="button"
+                type="minimal"
+                onClick={() => downloadInvoices([detailInvoice.id])}
+              >
+                {t('download_pdf')}
+              </Button>
+
+              {detailInvoice.payable && (
+                <Button
+                  behavior="button"
+                  type="primary"
+                  onClick={() => {
+                    setDetailInvoice(null);
+                    handlePayInvoice(detailInvoice);
+                  }}
+                >
+                  {t('pay_now')}
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+      </Modal>
 
       <Modal
         visible={Boolean(paymentInvoice && invoicePaymentIntent)}
