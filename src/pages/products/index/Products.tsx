@@ -11,13 +11,14 @@
 import { useTranslation } from 'react-i18next';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
-import { DataTable } from '$app/components/DataTable';
+import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import {
   defaultColumns,
   useActions,
   useAllProductColumns,
   useProductColumns,
+  useProductFilterColumns,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
@@ -26,6 +27,9 @@ import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useAtom } from 'jotai';
+import { useEffect } from 'react';
 
 export default function Products() {
   useTitle('products');
@@ -42,20 +46,50 @@ export default function Products() {
 
   const actions = useActions();
 
+  const reactSettings = useReactSettings();
+
   const customBulkActions = useCustomBulkActions();
+
+  const selectedColumns =
+    reactSettings?.react_table_columns?.product || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useProductFilterColumns({
+    enabled: shouldShowTagFilter,
+  });
+
+  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
+    filterColumnsValuesAtom
+  );
+
+  useEffect(() => {
+    if (!shouldShowTagFilter && filterColumnsValues.product_tag_ids?.length) {
+      setFilterColumnsValues((current) => {
+        const { product_tag_ids, ...rest } = current;
+
+        return rest;
+      });
+    }
+  }, [
+    shouldShowTagFilter,
+    filterColumnsValues.product_tag_ids,
+    setFilterColumnsValues,
+  ]);
 
   return (
     <Default title={t('products')} breadcrumbs={pages} docsLink="en/products">
       <DataTable
         resource="product"
         columns={columns}
-        endpoint="/api/v1/products?include=company&sort=id|desc"
+        endpoint={`/api/v1/products?include=company${
+          shouldShowTagFilter ? ',tags' : ''
+        }&sort=id|desc${shouldShowTagFilter ? '' : '&tag_ids='}`}
         bulkRoute="/api/v1/products/bulk"
         linkToCreate="/products/create"
         linkToEdit="/products/:id/edit"
         withResourcefulActions
         customActions={actions}
         customBulkActions={customBulkActions}
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         rightSide={
           <div className="flex items-center space-x-2">
             <DataTableColumnsPicker

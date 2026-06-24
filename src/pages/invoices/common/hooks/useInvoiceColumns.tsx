@@ -44,6 +44,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { Classification, PEPPOL_COUNTRIES, PEPPOL_CLASSIFICATIONS } from '$app/common/helpers/peppol-countries';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { useTagsQuery } from '$app/common/queries/tags';
+import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -124,6 +127,7 @@ export function useAllInvoiceColumns() {
     'created_at',
     'updated_at',
     'project',
+    'tags',
   ] as const;
 
   return invoiceColumns.map((column) => normalizeColumnName(column));
@@ -642,6 +646,12 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('last_updated'),
       format: (value) => date(value, dateFormat),
     },
+    {
+      column: 'tags',
+      id: 'invoice_tag_ids',
+      label: t('tags'),
+      format: (value, invoice) => <TagPills tags={invoice.tags} />,
+    },
   ];
 
   const list: string[] =
@@ -654,4 +664,23 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
         list.indexOf(normalizeColumnName(a.column)) -
         list.indexOf(normalizeColumnName(b.column))
     );
+}
+
+export function useInvoiceFilterColumns(params?: { enabled?: boolean }) {
+  const { data: tags } = useTagsQuery({
+    entityType: TAG_ENTITY_TYPES.invoice,
+    enabled: params?.enabled ?? true,
+  });
+
+  return [
+    {
+      column_id: 'invoice_tag_ids',
+      query_identifier: 'tag_ids',
+      options:
+        tags?.data.filter(isActiveTag).map((tag) => ({
+          label: tag.name,
+          value: tag.id,
+        })) || [],
+    },
+  ];
 }

@@ -31,6 +31,9 @@ import {
 } from '$app/common/helpers/html-string';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { useTagsQuery } from '$app/common/queries/tags';
+import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'number',
@@ -75,6 +78,7 @@ export function useAllVendorColumns() {
     'updated_at',
     'vat_number',
     'website',
+    'tags',
   ] as const;
 
   return vendorColumns.map((column) => normalizeColumnName(column));
@@ -292,6 +296,12 @@ export function useVendorColumns() {
       label: t('website'),
       format: (value) => <CopyToClipboard text={value.toString()} />,
     },
+    {
+      column: 'tags',
+      id: 'vendor_tag_ids',
+      label: t('tags'),
+      format: (value, vendor) => <TagPills tags={vendor.tags} />,
+    },
   ];
 
   const list: string[] =
@@ -304,4 +314,23 @@ export function useVendorColumns() {
         list.indexOf(normalizeColumnName(a.column)) -
         list.indexOf(normalizeColumnName(b.column))
     );
+}
+
+export function useVendorFilterColumns(params?: { enabled?: boolean }) {
+  const { data: tags } = useTagsQuery({
+    entityType: TAG_ENTITY_TYPES.vendor,
+    enabled: params?.enabled ?? true,
+  });
+
+  return [
+    {
+      column_id: 'vendor_tag_ids',
+      query_identifier: 'tag_ids',
+      options:
+        tags?.data.filter(isActiveTag).map((tag) => ({
+          label: tag.name,
+          value: tag.id,
+        })) || [],
+    },
+  ];
 }

@@ -11,6 +11,18 @@
 export const TAG_ENTITY_TYPES = {
   task: 'task',
   project: 'project',
+  invoice: 'invoice',
+  quote: 'quote',
+  credit: 'credit',
+  expense: 'expense',
+  recurring_invoice: 'recurring_invoice',
+  recurring_expense: 'recurring_expense',
+  client: 'client',
+  vendor: 'vendor',
+  payment: 'payment',
+  purchase_order: 'purchase_order',
+  product: 'product',
+  bank_transaction: 'bank_transaction',
 } as const;
 
 export type TagEntityType =

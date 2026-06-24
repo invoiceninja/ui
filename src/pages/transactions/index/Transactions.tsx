@@ -9,12 +9,15 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
-import { DataTable } from '$app/components/DataTable';
+import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useTransactionColumns } from '../common/hooks/useTransactionColumns';
+import { useTransactionFilterColumns } from '../common/hooks/useTransactionFilterColumns';
 import { ImportButton } from '$app/components/import/ImportButton';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useAtom } from 'jotai';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { Details } from '../components/Details';
 import { Slider } from '$app/components/cards/Slider';
 import { Transaction } from '$app/common/interfaces/transactions';
@@ -58,12 +61,41 @@ export default function Transactions() {
   const colors = useColorScheme();
   const filters = useTransactionFilters();
   const columns = useTransactionColumns();
+  const reactSettings = useReactSettings();
   const customBulkActions = useCustomBulkActions();
   const transactionColumns = useAllTransactionColumns();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const selectedColumns =
+    reactSettings?.react_table_columns?.transaction || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useTransactionFilterColumns({
+    enabled: shouldShowTagFilter,
+  });
+
+  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
+    filterColumnsValuesAtom
+  );
+
   const [sliderTitle, setSliderTitle] = useState<string>();
   const [transactionId, setTransactionId] = useState<string>('');
+
+  useEffect(() => {
+    if (
+      !shouldShowTagFilter &&
+      filterColumnsValues.bank_transaction_tag_ids?.length
+    ) {
+      setFilterColumnsValues((current) => {
+        const { bank_transaction_tag_ids, ...rest } = current;
+
+        return rest;
+      });
+    }
+  }, [
+    shouldShowTagFilter,
+    filterColumnsValues.bank_transaction_tag_ids,
+    setFilterColumnsValues,
+  ]);
 
   const getSelectedTransaction = (transaction: Transaction) => {
     setTransactionId(transaction.id);
@@ -100,7 +132,9 @@ export default function Transactions() {
       >
         <DataTable
           resource="transaction"
-          endpoint="/api/v1/bank_transactions?sort=id|desc&active_banks=true"
+          endpoint={`/api/v1/bank_transactions?sort=id|desc&active_banks=true${
+            shouldShowTagFilter ? '&include=tags' : ''
+          }${shouldShowTagFilter ? '' : '&tag_ids='}`}
           bulkRoute="/api/v1/bank_transactions/bulk"
           columns={columns}
           linkToCreate="/transactions/create"
@@ -110,6 +144,7 @@ export default function Transactions() {
           customFilters={filters}
           customBulkActions={customBulkActions}
           customFilterPlaceholder="status"
+          filterColumns={shouldShowTagFilter ? filterColumns : undefined}
           rightSide={
             <div className="flex items-center space-x-2">
               {((isHosted() && (proPlan() || enterprisePlan())) ||

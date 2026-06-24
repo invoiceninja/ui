@@ -35,7 +35,7 @@ export function useHandleChange(params: Params) {
 
     if (property === 'currency_id') {
       const resolvedCurrencySeparator = resolveCurrencySeparator(
-        value.toString()
+        (value ?? '').toString()
       );
 
       if (resolvedCurrencySeparator) {

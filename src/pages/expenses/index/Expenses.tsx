@@ -9,7 +9,7 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
-import { DataTable } from '$app/components/DataTable';
+import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
@@ -17,6 +17,7 @@ import {
   useActions,
   useAllExpenseColumns,
   useExpenseColumns,
+  useExpenseFilterColumns,
   useExpenseFilters,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
@@ -32,6 +33,9 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Expense } from '$app/common/interfaces/expense';
 import { InputLabel } from '$app/components/forms';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useAtom } from 'jotai';
+import { useEffect } from 'react';
 
 export default function Expenses() {
   useTitle('expenses');
@@ -44,8 +48,34 @@ export default function Expenses() {
   const actions = useActions();
   const filters = useExpenseFilters();
   const columns = useExpenseColumns();
+  const reactSettings = useReactSettings();
   const expenseColumns = useAllExpenseColumns();
   const customBulkActions = useCustomBulkActions();
+
+  const selectedColumns =
+    reactSettings?.react_table_columns?.expense || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useExpenseFilterColumns({
+    enabled: shouldShowTagFilter,
+  });
+
+  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
+    filterColumnsValuesAtom
+  );
+
+  useEffect(() => {
+    if (!shouldShowTagFilter && filterColumnsValues.expense_tag_ids?.length) {
+      setFilterColumnsValues((current) => {
+        const { expense_tag_ids, ...rest } = current;
+
+        return rest;
+      });
+    }
+  }, [
+    shouldShowTagFilter,
+    filterColumnsValues.expense_tag_ids,
+    setFilterColumnsValues,
+  ]);
 
   const {
     changeTemplateVisible,
@@ -57,7 +87,11 @@ export default function Expenses() {
     <Default title={t('expenses')} breadcrumbs={pages} docsLink="en/expenses">
       <DataTable
         resource="expense"
-        endpoint="/api/v1/expenses?include=client,vendor,category,project&without_deleted_clients=true&without_deleted_vendors=true&sort=id|desc"
+        endpoint={`/api/v1/expenses?include=client,vendor,category,project${
+          shouldShowTagFilter ? ',tags' : ''
+        }&without_deleted_clients=true&without_deleted_vendors=true&sort=id|desc${
+          shouldShowTagFilter ? '' : '&tag_ids='
+        }`}
         columns={columns}
         bulkRoute="/api/v1/expenses/bulk"
         linkToCreate="/expenses/create"
@@ -66,6 +100,7 @@ export default function Expenses() {
         customFilters={filters}
         customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         withResourcefulActions
         rightSide={
           <div className="flex items-center space-x-2">

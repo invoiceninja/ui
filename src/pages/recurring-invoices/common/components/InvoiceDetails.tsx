@@ -21,6 +21,8 @@ import dayjs from 'dayjs';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -105,6 +107,15 @@ export function InvoiceDetails(props: Props) {
               </option>
             ))}
           </SelectField>
+        </Element>
+
+        <Element leftSide={t('tags')}>
+          <TagPillSelector
+            entityType={TAG_ENTITY_TYPES.recurring_invoice}
+            value={recurringInvoice?.tags || []}
+            onChange={(tags) => handleChange('tags', tags)}
+            errorMessage={props.errors?.errors.tags}
+          />
         </Element>
 
         {recurringInvoice && company?.custom_fields?.invoice1 && (

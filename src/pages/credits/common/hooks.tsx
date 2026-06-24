@@ -98,6 +98,9 @@ import classNames from 'classnames';
 import { Dispatch, SetStateAction } from 'react';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { useTagsQuery } from '$app/common/queries/tags';
+import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -773,6 +776,7 @@ export function useAllCreditColumns() {
     'tax_amount',
     'updated_at',
     'valid_until',
+    'tags',
     // 'vendor', @Todo: Need to fetch the relationship
   ] as const;
 
@@ -1101,6 +1105,12 @@ export function useCreditColumns() {
       label: t('valid_until'),
       format: (value) => date(value, dateFormat),
     },
+    {
+      column: 'tags',
+      id: 'credit_tag_ids',
+      label: t('tags'),
+      format: (value, credit) => <TagPills tags={credit.tags} />,
+    },
   ];
 
   const list: string[] =
@@ -1113,4 +1123,23 @@ export function useCreditColumns() {
         list.indexOf(normalizeColumnName(a.column)) -
         list.indexOf(normalizeColumnName(b.column))
     );
+}
+
+export function useCreditFilterColumns(params?: { enabled?: boolean }) {
+  const { data: tags } = useTagsQuery({
+    entityType: TAG_ENTITY_TYPES.credit,
+    enabled: params?.enabled ?? true,
+  });
+
+  return [
+    {
+      column_id: 'credit_tag_ids',
+      query_identifier: 'tag_ids',
+      options:
+        tags?.data.filter(isActiveTag).map((tag) => ({
+          label: tag.name,
+          value: tag.id,
+        })) || [],
+    },
+  ];
 }

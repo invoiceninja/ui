@@ -13,6 +13,7 @@ import { Client } from './client';
 import { Activity } from './invoice';
 import { InvoiceItem } from './invoice-item';
 import { ScheduleItem } from './schedule';
+import { Tag } from './tag';
 
 export interface RecurringInvoice {
   id: string;
@@ -84,5 +85,7 @@ export interface RecurringInvoice {
   location_id: string;
   e_invoice?: EInvoiceType;
   schedule?: ScheduleItem[]
+  tags?: Tag[];
+  recurring_invoice_tag_ids?: string[];
 }
 

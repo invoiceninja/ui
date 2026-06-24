@@ -9,7 +9,7 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
-import { DataTable } from '$app/components/DataTable';
+import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +18,7 @@ import {
   useActions,
   useAllCreditColumns,
   useCreditColumns,
+  useCreditFilterColumns,
 } from '../common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
@@ -32,6 +33,9 @@ import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { InputLabel } from '$app/components/forms';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useAtom } from 'jotai';
+import { useEffect } from 'react';
 
 export default function Credits() {
   useTitle('credits');
@@ -44,15 +48,41 @@ export default function Credits() {
   const actions = useActions();
   const columns = useCreditColumns();
   const filters = useCreditsFilters();
+  const reactSettings = useReactSettings();
   const creditColumns = useAllCreditColumns();
   const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
+
+  const selectedColumns =
+    reactSettings?.react_table_columns?.credit || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useCreditFilterColumns({
+    enabled: shouldShowTagFilter,
+  });
+
+  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
+    filterColumnsValuesAtom
+  );
 
   const {
     changeTemplateVisible,
     setChangeTemplateVisible,
     changeTemplateResources,
   } = useChangeTemplate();
+
+  useEffect(() => {
+    if (!shouldShowTagFilter && filterColumnsValues.credit_tag_ids?.length) {
+      setFilterColumnsValues((current) => {
+        const { credit_tag_ids, ...rest } = current;
+
+        return rest;
+      });
+    }
+  }, [
+    shouldShowTagFilter,
+    filterColumnsValues.credit_tag_ids,
+    setFilterColumnsValues,
+  ]);
 
   useSocketEvent({
     on: [
@@ -66,7 +96,11 @@ export default function Credits() {
     <Default title={t('credits')} breadcrumbs={pages} docsLink="en/credits/">
       <DataTable
         resource="credit"
-        endpoint="/api/v1/credits?include=client&without_deleted_clients=true&sort=id|desc"
+        endpoint={`/api/v1/credits?include=client${
+          shouldShowTagFilter ? ',tags' : ''
+        }&without_deleted_clients=true&sort=id|desc${
+          shouldShowTagFilter ? '' : '&tag_ids='
+        }`}
         bulkRoute="/api/v1/credits/bulk"
         columns={columns}
         linkToCreate="/credits/create"
@@ -75,6 +109,7 @@ export default function Credits() {
         customBulkActions={customBulkActions}
         customFilters={filters}
         customFilterPlaceholder="status"
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         withResourcefulActions
         rightSide={
           <DataTableColumnsPicker

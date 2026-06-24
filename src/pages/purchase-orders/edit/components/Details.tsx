@@ -19,6 +19,8 @@ import { CustomField } from '$app/components/CustomField';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 export interface PurchaseOrderCardProps {
   purchaseOrder: PurchaseOrder;
@@ -85,6 +87,16 @@ export function Details(props: PurchaseOrderCardProps) {
             />
           </Element>
         )}
+
+        <Element leftSide={t('tags')}>
+          <TagPillSelector
+            entityType={TAG_ENTITY_TYPES.purchase_order}
+            value={purchaseOrder?.tags || []}
+            onChange={(tags) => handleChange('tags', tags)}
+            errorMessage={errors?.errors.tags}
+          />
+        </Element>
+
         {purchaseOrder && company?.custom_fields?.invoice1 && (
           <CustomField
             field="invoice1"

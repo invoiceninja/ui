@@ -67,6 +67,9 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import dayjs from 'dayjs';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { useTagsQuery } from '$app/common/queries/tags';
+import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'status',
@@ -128,6 +131,7 @@ export function useAllRecurringExpenseColumns() {
     'frequency',
     'remaining_cycles',
     'next_send_date',
+    'tags',
   ] as const;
 
   return recurringExpenseColumns.map((column) => normalizeColumnName(column));
@@ -448,6 +452,14 @@ export function useRecurringExpenseColumns() {
         return <span>{value}</span>;
       },
     },
+    {
+      column: 'tags',
+      id: 'recurring_expense_tag_ids',
+      label: t('tags'),
+      format: (value, recurringExpense) => (
+        <TagPills tags={recurringExpense.tags} />
+      ),
+    },
   ];
 
   const list: string[] =
@@ -629,4 +641,25 @@ export function useHandleChange(params: HandleChangeRecurringExpenseParams) {
         recurringExpense && { ...recurringExpense, [property]: value }
     );
   };
+}
+
+export function useRecurringExpenseFilterColumns(params?: {
+  enabled?: boolean;
+}) {
+  const { data: tags } = useTagsQuery({
+    entityType: TAG_ENTITY_TYPES.recurring_expense,
+    enabled: params?.enabled ?? true,
+  });
+
+  return [
+    {
+      column_id: 'recurring_expense_tag_ids',
+      query_identifier: 'tag_ids',
+      options:
+        tags?.data.filter(isActiveTag).map((tag) => ({
+          label: tag.name,
+          value: tag.id,
+        })) || [],
+    },
+  ];
 }
