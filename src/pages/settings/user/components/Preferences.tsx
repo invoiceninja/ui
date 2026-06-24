@@ -32,7 +32,10 @@ export function Preferences() {
   const updateSettings = useUpdateDraftOrReactSettings();
 
   const handleChange = (property: string, value: string | number | boolean) => {
-    updateSettings(property.replace(/^company_user\.react_settings\./, ''), value);
+    updateSettings(
+      property.replace(/^company_user\.react_settings\./, ''),
+      value
+    );
   };
 
   return (

@@ -17,5 +17,6 @@ export {
   Connect,
   CustomFields as UserCustomFields,
   Preferences,
+  KeyboardShortcuts,
 } from '././components/index';
 export { UserDetails } from './UserDetails';
