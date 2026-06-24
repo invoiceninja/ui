@@ -23,7 +23,10 @@ import {
   usePreventNavigation,
 } from '$app/common/hooks/usePreventNavigation';
 import { useResolvedShortcuts } from '$app/common/hooks/useReactSettings';
-import { eventMatchesBinding } from '$app/common/helpers/keyboard-shortcuts';
+import {
+  eventMatchesBinding,
+  formatBinding,
+} from '$app/common/helpers/keyboard-shortcuts';
 import { isShortcutRecordingActive } from '$app/common/hooks/useShortcutRecorder';
 import { getHeldKeys } from '$app/common/hooks/useHeldKeys';
 import { debounce } from 'lodash';
@@ -340,14 +343,16 @@ export function Search$() {
           </p>
         </div>
 
-        <div
-          className="flex items-center border px-1.5 py-0.5"
-          style={{ borderColor: colors.$5, borderRadius: '0.25rem' }}
-        >
-          <p className="text-sm" style={{ color: colors.$17 }}>
-            Ctrl+K
-          </p>
-        </div>
+        {shortcutBindings.search && (
+          <div
+            className="flex items-center border px-1.5 py-0.5"
+            style={{ borderColor: colors.$5, borderRadius: '0.25rem' }}
+          >
+            <p className="text-sm" style={{ color: colors.$17 }}>
+              {formatBinding(shortcutBindings.search)}
+            </p>
+          </div>
+        )}
       </div>
 
       <Modal
