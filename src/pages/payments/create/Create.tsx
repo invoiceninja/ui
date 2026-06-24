@@ -27,7 +27,7 @@ import { CustomField } from '$app/components/CustomField';
 
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useSave } from './hooks/useSave';
@@ -71,6 +71,8 @@ export default function Create() {
   const [t] = useTranslation();
   const [searchParams] = useSearchParams();
 
+  const hasCapturedPreSelection = useRef<boolean>(false);
+
   const pages = [
     { name: t('payments'), href: '/payments' },
     { name: t('new_payment'), href: '/payments/create' },
@@ -100,6 +102,10 @@ export default function Create() {
   });
 
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string>('');
+
+  const [preSelectedInvoiceIds, setPreSelectedInvoiceIds] = useState<string[]>(
+    []
+  );
 
   const { data: blankPayment } = useBlankPaymentQuery();
 
@@ -196,6 +202,28 @@ export default function Create() {
   }, [blankPayment]);
 
   useEffect(() => {
+    if (hasCapturedPreSelection.current) {
+      return;
+    }
+
+    if (searchParams.has('invoice')) {
+      hasCapturedPreSelection.current = true;
+
+      setPreSelectedInvoiceIds([searchParams.get('invoice') as string]);
+
+      return;
+    }
+
+    if (payment?.invoices.length) {
+      hasCapturedPreSelection.current = true;
+
+      setPreSelectedInvoiceIds(
+        payment.invoices.map((invoice) => invoice.invoice_id)
+      );
+    }
+  }, [payment?.invoices, searchParams]);
+
+  useEffect(() => {
     if (
       payment?.client_id &&
       (searchParams.get('client') === payment?.client_id ||
@@ -218,7 +246,12 @@ export default function Create() {
         }`,
       });
     }
-  }, [payment?.client_id, searchParams, selectedInvoiceId]);
+  }, [
+    payment?.client_id,
+    searchParams,
+    preSelectedInvoiceIds,
+    selectedInvoiceId,
+  ]);
 
   useEffect(() => {
     return () => {
