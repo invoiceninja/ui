@@ -11,11 +11,12 @@
 import { useState } from 'react';
 
 export function useWebAuthnSupport() {
-  const [isSupported] = useState<boolean>(
-    () =>
+  const [isSupported] = useState<boolean>(() => {
+    return (
       typeof window !== 'undefined' &&
       typeof window.PublicKeyCredential !== 'undefined'
-  );
+    );
+  });
 
   return isSupported;
 }

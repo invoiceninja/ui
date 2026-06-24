@@ -66,15 +66,17 @@ export function Login() {
 
   const isEmailStep = step === 'email';
 
-  const showTwoFactor = useMemo(() => methods.includes('totp'), [methods]);
+  const showTwoFactor = useMemo(() => {
+    return methods.includes('totp');
+  }, [methods]);
 
-  const showPassword = useMemo(
-    () =>
+  const showPassword = useMemo(() => {
+    return (
       methods.length === 0 ||
       methods.includes('password') ||
-      !isWebAuthnSupported,
-    [methods, isWebAuthnSupported]
-  );
+      !isWebAuthnSupported
+    );
+  }, [methods, isWebAuthnSupported]);
 
   const handleContinue = () => {
     setMessage(undefined);
@@ -93,10 +95,6 @@ export function Login() {
         setStep('credentials');
       })
       .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
-        if (error.code === 'ERR_NETWORK') {
-          return;
-        }
-
         if (error.response?.status === 422) {
           setErrors(error.response.data.errors);
 
@@ -128,10 +126,6 @@ export function Login() {
     })
       .then((response) => login(response))
       .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
-        if (error.code === 'ERR_NETWORK') {
-          return;
-        }
-
         if (error.response?.status === 422) {
           setErrors(error.response.data.errors);
 

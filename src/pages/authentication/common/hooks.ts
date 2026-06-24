@@ -31,7 +31,9 @@ export interface LoginPrecheck {
 export function useLoginPrecheck() {
   return (email: string) => {
     return request('POST', endpoint('/api/v1/login/precheck'), { email }).then(
-      (response: AxiosResponse<{ data: LoginPrecheck }>) => response.data.data
+      (response: AxiosResponse<{ data: LoginPrecheck }>) => {
+        return response.data.data;
+      }
     );
   };
 }
