@@ -72,6 +72,7 @@ export default function Create() {
   const [searchParams] = useSearchParams();
 
   const hasCapturedPreSelection = useRef<boolean>(false);
+  const hasInvoiceTableSelection = useRef<boolean>(false);
 
   const pages = [
     { name: t('payments'), href: '/payments' },
@@ -316,6 +317,7 @@ export default function Create() {
                   credits: '',
                 });
 
+                hasInvoiceTableSelection.current = false;
                 setPreSelectedInvoiceIds([]);
 
                 setTimeout(() => {
@@ -370,6 +372,7 @@ export default function Create() {
                   credits: '',
                 });
 
+                hasInvoiceTableSelection.current = false;
                 setPreSelectedInvoiceIds([invoice.id]);
 
                 setTimeout(() => {
@@ -443,11 +446,19 @@ export default function Create() {
                       });
                     });
 
+                    hasInvoiceTableSelection.current = true;
+
                     setPayment(
                       (current) =>
                         current && { ...current, invoices: newInvoices }
                     );
                   } else {
+                    if (hasInvoiceTableSelection.current) {
+                      setPreSelectedInvoiceIds([]);
+                    }
+
+                    hasInvoiceTableSelection.current = false;
+
                     setPayment(
                       (current) => current && { ...current, invoices: [] }
                     );
