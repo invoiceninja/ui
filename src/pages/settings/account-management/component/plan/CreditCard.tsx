@@ -118,7 +118,7 @@ export function CreditCard({ gateway, onDelete }: CreditCardProps) {
                 className="px-2 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded cursor-pointer whitespace-nowrap"
                 onClick={() => setDefaultPopupVisible(true)}
               >
-                ✓ {t('default_payment_method_label')}
+                ✓ {t('save_as_default')}
               </button>
             )}
 
@@ -141,7 +141,7 @@ export function CreditCard({ gateway, onDelete }: CreditCardProps) {
         </div>
 
         <div className="flex items-center justify-between text-sm">
-          <p>Valid through</p>
+          <p>{t('expiry_date')}</p>
           <p>
             {gateway.meta.exp_month}/{gateway.meta.exp_year}
           </p>

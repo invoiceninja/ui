@@ -43,8 +43,13 @@ export async function login(
 
   await page.locator('input[name="email"]').waitFor({ state: 'visible', timeout: 10000 });
   await page.locator('input[name="email"]').fill(resolvedEmail);
-  await page.getByLabel('Password').fill(resolvedPassword);
-  await page.getByLabel('Password').press('Enter');
+
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+
+  const passwordInput = page.locator('input[name="password"]');
+  await passwordInput.waitFor({ state: 'visible', timeout: 10000 });
+  await passwordInput.fill(resolvedPassword);
+  await passwordInput.press('Enter');
 
   await expect(page.locator('[data-cy="navigationBar"]')).toBeVisible({ timeout: 10000 });
 }

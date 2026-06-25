@@ -75,8 +75,13 @@ async function loginAsAccountOwner(page: Page, account: TestAccount) {
     .locator('input[name="email"]')
     .waitFor({ state: 'visible', timeout: 10_000 });
   await page.locator('input[name="email"]').fill(account.ownerEmail);
-  await page.getByLabel('Password').fill(account.password);
-  await page.getByLabel('Password').press('Enter');
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+
+  const passwordInput = page.locator('input[name="password"]');
+  await passwordInput.waitFor({ state: 'visible', timeout: 10_000 });
+  await passwordInput.fill(account.password);
+  await passwordInput.press('Enter');
+
   await expect(page.locator('[data-cy="navigationBar"]')).toBeVisible({
     timeout: 10_000,
   });
