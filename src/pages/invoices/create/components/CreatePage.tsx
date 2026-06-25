@@ -9,6 +9,7 @@
  */
 
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useSimplifiedInvoiceEditor } from '$app/common/hooks/useSimplifiedInvoiceEditor';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Spinner } from '$app/components/Spinner';
@@ -24,6 +25,7 @@ import { useInvoiceUtilities } from '../hooks/useInvoiceUtilities';
 import { InvoiceFooter } from '../../common/components/InvoiceFooter';
 import { InvoiceTotals } from '../../common/components/InvoiceTotals';
 import { InvoicePreview } from '../../common/components/InvoicePreview';
+import { SimplifiedInvoiceForm } from '../../common/components/simplified/SimplifiedInvoiceForm';
 import { CreateInvoiceContext } from '../Create';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
@@ -51,11 +53,13 @@ export default function CreatePage() {
     isDefaultTerms,
     setIsDefaultFooter,
     setIsDefaultTerms,
+    clientCreationErrors,
   } = context;
 
   const taskColumns = useTaskColumns();
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
+  const useSimplifiedEditor = useSimplifiedInvoiceEditor();
 
   const {
     handleChange,
@@ -79,6 +83,31 @@ export default function CreatePage() {
 
     return true;
   };
+
+  if (useSimplifiedEditor) {
+    return (
+      <SimplifiedInvoiceForm
+        mode="create"
+        invoice={invoice}
+        client={client}
+        errors={errors}
+        clientCreationErrors={clientCreationErrors}
+        invoiceSum={invoiceSum}
+        handleChange={handleChange}
+        handleInvitationChange={handleInvitationChange}
+        handleLineItemChange={handleLineItemChange}
+        handleLineItemPropertyChange={handleLineItemPropertyChange}
+        handleCreateLineItem={handleCreateLineItem}
+        handleDeleteLineItem={handleDeleteLineItem}
+        isDefaultTerms={isDefaultTerms}
+        isDefaultFooter={isDefaultFooter}
+        setIsDefaultTerms={setIsDefaultTerms}
+        setIsDefaultFooter={setIsDefaultFooter}
+        readonlyClient={searchParams.get('project') === 'true'}
+        disableWithSpinner={searchParams.get('action') === 'create'}
+      />
+    );
+  }
 
   return (
     <>
