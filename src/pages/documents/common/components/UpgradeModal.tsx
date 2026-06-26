@@ -394,6 +394,11 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
 
     const handleEnterpriseUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newValue = parseInt(event.target.value);
+
+        if (selectedMainPlan !== 'enterprise') {
+            setSelectedMainPlan('enterprise');
+        }
+
         setEnterpriseUsers(newValue);
         // If DocuNinja users exceed new enterprise users, reset it
         if (docuNinjaUsers > newValue) {
@@ -665,10 +670,10 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                     {pricing ? (
                                         <>
                                         
-                                            <div className="mt-2 space-y-2">
-                                                <div className="flex justify-between">
-                                                    <span><h3 className="font-medium">{pricing.description}</h3></span>
-                                                    <div className="flex items-center space-x-2">
+                                            <div className="ml-auto w-full max-w-md space-y-2 text-sm">
+                                                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                                    <h3 className="font-medium text-right">{pricing.description}</h3>
+                                                    <div className="flex min-w-[5rem] items-center justify-end space-x-2">
                                                         <span className="font-medium">{pricing.price}</span>
                                                         {isLoading && (
                                                             <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
@@ -676,31 +681,31 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                                     </div>
                                                 </div>
                                                 {selectedMainPlan === 'enterprise' && (
-                                                    <div className="flex justify-between">
-                                                        <span>InvoiceNinja {t('users')}:</span>
-                                                        <span className="font-medium">{enterpriseUsers}</span>
+                                                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                                        <span className="text-right">InvoiceNinja {t('users')}:</span>
+                                                        <span className="min-w-[5rem] text-right font-medium">{enterpriseUsers}</span>
                                                     </div>
                                                 )}
                                                 {docuNinjaSelected && docuNinjaUsers > 0 && (
-                                                    <div className="flex justify-between">
-                                                        <span>DocuNinja {t('users')}:</span>
-                                                        <span className="font-medium">{docuNinjaUsers}</span>
+                                                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                                        <span className="text-right">DocuNinja {t('users')}:</span>
+                                                        <span className="min-w-[5rem] text-right font-medium">{docuNinjaUsers}</span>
                                                     </div>
                                                 )}
                                                 {pricing.credit_raw > 0 && (
-                                                <div className="flex justify-between">
-                                                    <span>{t('credit')}:</span>
-                                                    <div className="flex items-center space-x-2">
-                                                        <span className="font-medium">{pricing.credit}</span>
-                                                        {isLoading && (
-                                                            <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
-                                                        )}
+                                                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                                        <span className="text-right">{t('credit')}:</span>
+                                                        <div className="flex min-w-[5rem] items-center justify-end space-x-2">
+                                                            <span className="font-medium">{pricing.credit}</span>
+                                                            {isLoading && (
+                                                                <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                </div>
                                                 )}
-                                                <div className="flex justify-between">
-                                                    <span>{t('balance')}:</span>
-                                                    <div className="flex items-center space-x-2">
+                                                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                                    <span className="text-right">{t('balance')}:</span>
+                                                    <div className="flex min-w-[5rem] items-center justify-end space-x-2">
                                                         <span className="font-medium">{pricing.pro_rata}</span>
                                                         {isLoading && (
                                                             <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
@@ -759,10 +764,10 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                         {t('change')}
                                     </Button>
                                 </div>
-                                <div className="mt-2 space-y-1">
-                                    <div className="flex justify-between text-sm">
-                                        <span>{t('plan')}:</span>
-                                        <span className="capitalize">
+                                <div className="ml-auto mt-2 w-full max-w-md space-y-1 text-sm">
+                                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                        <span className="text-right">{t('plan')}:</span>
+                                        <span className="min-w-[5rem] text-right capitalize">
                                             {hasExistingPlan && docuNinjaSelected && !selectedMainPlan
                                                 ? `DocuNinja (${account?.plan} add-on)`
                                                 : selectedMainPlan === account?.plan
@@ -772,24 +777,24 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                         </span>
                                     </div>
                                     {selectedMainPlan === 'enterprise' && (
-                                        <div className="flex justify-between text-sm">
-                                            <span>{t('users')}:</span>
-                                            <span>{enterpriseUsers}</span>
+                                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                            <span className="text-right">{t('users')}:</span>
+                                            <span className="min-w-[5rem] text-right">{enterpriseUsers}</span>
                                         </div>
                                     )}
 
-                                    <div className="flex justify-between text-sm">
-                                        <span>{t('plan_term')}:</span>
-                                        <span>{isYearly ? t('plan_term_yearly') : t('plan_term_monthly')}</span>
+                                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                        <span className="text-right">{t('plan_term')}:</span>
+                                        <span className="min-w-[5rem] text-right">{isYearly ? t('plan_term_yearly') : t('plan_term_monthly')}</span>
                                     </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span>DocuNinja {t('users')}:</span>
-                                        <span>{docuNinjaSelected ? docuNinjaUsers : 0}</span>
+                                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                        <span className="text-right">DocuNinja {t('users')}:</span>
+                                        <span className="min-w-[5rem] text-right">{docuNinjaSelected ? docuNinjaUsers : 0}</span>
                                     </div>
                                     {pricing && (
-                                        <div className="flex justify-between text-sm font-medium pt-2 border-t">
-                                            <span>{t('total')}:</span>
-                                            <span>{pricing.pro_rata}</span>
+                                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 border-t pt-2 font-medium">
+                                            <span className="text-right">{t('total')}:</span>
+                                            <span className="min-w-[5rem] text-right">{pricing.pro_rata}</span>
                                         </div>
                                     )}
                                 </div>
