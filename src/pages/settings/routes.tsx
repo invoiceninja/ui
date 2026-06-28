@@ -63,11 +63,92 @@ export const settingsRoutes = (
         <Route element={<Settings.Tags />}>
           <Route path="" element={<Settings.TaskTags />} />
           <Route path="projects" element={<Settings.ProjectTags />} />
+          <Route path="invoices" element={<Settings.InvoiceTags />} />
+          <Route path="quotes" element={<Settings.QuoteTags />} />
+          <Route path="credits" element={<Settings.CreditTags />} />
+          <Route path="expenses" element={<Settings.ExpenseTags />} />
+          <Route path="transactions" element={<Settings.TransactionTags />} />
+          <Route
+            path="recurring_invoices"
+            element={<Settings.RecurringInvoiceTags />}
+          />
+          <Route
+            path="recurring_expenses"
+            element={<Settings.RecurringExpenseTags />}
+          />
+          <Route path="clients" element={<Settings.ClientTags />} />
+          <Route path="vendors" element={<Settings.VendorTags />} />
+          <Route path="payments" element={<Settings.PaymentTags />} />
+          <Route
+            path="purchase_orders"
+            element={<Settings.PurchaseOrderTags />}
+          />
+          <Route path="products" element={<Settings.ProductTags />} />
         </Route>
         <Route path="tasks/create" element={<Settings.CreateTaskTag />} />
         <Route path="tasks/:id/edit" element={<Settings.EditTaskTag />} />
         <Route path="projects/create" element={<Settings.CreateProjectTag />} />
         <Route path="projects/:id/edit" element={<Settings.EditProjectTag />} />
+        <Route path="invoices/create" element={<Settings.CreateInvoiceTag />} />
+        <Route
+          path="invoices/:id/edit"
+          element={<Settings.EditInvoiceTag />}
+        />
+        <Route path="quotes/create" element={<Settings.CreateQuoteTag />} />
+        <Route path="quotes/:id/edit" element={<Settings.EditQuoteTag />} />
+        <Route path="credits/create" element={<Settings.CreateCreditTag />} />
+        <Route path="credits/:id/edit" element={<Settings.EditCreditTag />} />
+        <Route path="expenses/create" element={<Settings.CreateExpenseTag />} />
+        <Route
+          path="expenses/:id/edit"
+          element={<Settings.EditExpenseTag />}
+        />
+        <Route
+          path="transactions/create"
+          element={<Settings.CreateTransactionTag />}
+        />
+        <Route
+          path="transactions/:id/edit"
+          element={<Settings.EditTransactionTag />}
+        />
+        <Route
+          path="recurring_invoices/create"
+          element={<Settings.CreateRecurringInvoiceTag />}
+        />
+        <Route
+          path="recurring_invoices/:id/edit"
+          element={<Settings.EditRecurringInvoiceTag />}
+        />
+        <Route
+          path="recurring_expenses/create"
+          element={<Settings.CreateRecurringExpenseTag />}
+        />
+        <Route
+          path="recurring_expenses/:id/edit"
+          element={<Settings.EditRecurringExpenseTag />}
+        />
+        <Route path="clients/create" element={<Settings.CreateClientTag />} />
+        <Route path="clients/:id/edit" element={<Settings.EditClientTag />} />
+        <Route path="vendors/create" element={<Settings.CreateVendorTag />} />
+        <Route path="vendors/:id/edit" element={<Settings.EditVendorTag />} />
+        <Route path="payments/create" element={<Settings.CreatePaymentTag />} />
+        <Route
+          path="payments/:id/edit"
+          element={<Settings.EditPaymentTag />}
+        />
+        <Route
+          path="purchase_orders/create"
+          element={<Settings.CreatePurchaseOrderTag />}
+        />
+        <Route
+          path="purchase_orders/:id/edit"
+          element={<Settings.EditPurchaseOrderTag />}
+        />
+        <Route path="products/create" element={<Settings.CreateProductTag />} />
+        <Route
+          path="products/:id/edit"
+          element={<Settings.EditProductTag />}
+        />
       </Route>
       <Route path="expense_settings" element={<Settings.ExpenseSettings />} />
       <Route path="workflow_settings" element={<Settings.WorkflowSettings />} />

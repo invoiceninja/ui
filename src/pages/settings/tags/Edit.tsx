@@ -193,3 +193,123 @@ export function EditProjectTag() {
     />
   );
 }
+
+export function EditInvoiceTag() {
+  return (
+    <Edit
+      editRoute="/settings/tags/invoices/:id/edit"
+      indexRoute="/settings/tags/invoices"
+      titleKey="invoice_tags"
+    />
+  );
+}
+
+export function EditQuoteTag() {
+  return (
+    <Edit
+      editRoute="/settings/tags/quotes/:id/edit"
+      indexRoute="/settings/tags/quotes"
+      titleKey="quote_tags"
+    />
+  );
+}
+
+export function EditCreditTag() {
+  return (
+    <Edit
+      editRoute="/settings/tags/credits/:id/edit"
+      indexRoute="/settings/tags/credits"
+      titleKey="credit_tags"
+    />
+  );
+}
+
+export function EditExpenseTag() {
+  return (
+    <Edit
+      editRoute="/settings/tags/expenses/:id/edit"
+      indexRoute="/settings/tags/expenses"
+      titleKey="expense_tags"
+    />
+  );
+}
+
+export function EditTransactionTag() {
+  return (
+    <Edit
+      editRoute="/settings/tags/transactions/:id/edit"
+      indexRoute="/settings/tags/transactions"
+      titleKey="transaction_tags"
+    />
+  );
+}
+
+export function EditRecurringInvoiceTag() {
+  return (
+    <Edit
+      editRoute="/settings/tags/recurring_invoices/:id/edit"
+      indexRoute="/settings/tags/recurring_invoices"
+      titleKey="recurring_invoice_tags"
+    />
+  );
+}
+
+export function EditRecurringExpenseTag() {
+  return (
+    <Edit
+      editRoute="/settings/tags/recurring_expenses/:id/edit"
+      indexRoute="/settings/tags/recurring_expenses"
+      titleKey="recurring_expense_tags"
+    />
+  );
+}
+
+export function EditClientTag() {
+  return (
+    <Edit
+      editRoute="/settings/tags/clients/:id/edit"
+      indexRoute="/settings/tags/clients"
+      titleKey="client_tags"
+    />
+  );
+}
+
+export function EditVendorTag() {
+  return (
+    <Edit
+      editRoute="/settings/tags/vendors/:id/edit"
+      indexRoute="/settings/tags/vendors"
+      titleKey="vendor_tags"
+    />
+  );
+}
+
+export function EditPaymentTag() {
+  return (
+    <Edit
+      editRoute="/settings/tags/payments/:id/edit"
+      indexRoute="/settings/tags/payments"
+      titleKey="payment_tags"
+    />
+  );
+}
+
+export function EditPurchaseOrderTag() {
+  return (
+    <Edit
+      editRoute="/settings/tags/purchase_orders/:id/edit"
+      indexRoute="/settings/tags/purchase_orders"
+      titleKey="purchase_order_tags"
+    />
+  );
+}
+
+export function EditProductTag() {
+  return (
+    <Edit
+      editRoute="/settings/tags/products/:id/edit"
+      indexRoute="/settings/tags/products"
+      titleKey="product_tags"
+    />
+  );
+}

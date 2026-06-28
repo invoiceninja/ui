@@ -187,3 +187,147 @@ export function CreateProjectTag() {
     />
   );
 }
+
+export function CreateInvoiceTag() {
+  return (
+    <Create
+      entityType={TAG_ENTITY_TYPES.invoice}
+      createRoute="/settings/tags/invoices/create"
+      editRoute="/settings/tags/invoices/:id/edit"
+      indexRoute="/settings/tags/invoices"
+      titleKey="invoice_tags"
+    />
+  );
+}
+
+export function CreateQuoteTag() {
+  return (
+    <Create
+      entityType={TAG_ENTITY_TYPES.quote}
+      createRoute="/settings/tags/quotes/create"
+      editRoute="/settings/tags/quotes/:id/edit"
+      indexRoute="/settings/tags/quotes"
+      titleKey="quote_tags"
+    />
+  );
+}
+
+export function CreateCreditTag() {
+  return (
+    <Create
+      entityType={TAG_ENTITY_TYPES.credit}
+      createRoute="/settings/tags/credits/create"
+      editRoute="/settings/tags/credits/:id/edit"
+      indexRoute="/settings/tags/credits"
+      titleKey="credit_tags"
+    />
+  );
+}
+
+export function CreateExpenseTag() {
+  return (
+    <Create
+      entityType={TAG_ENTITY_TYPES.expense}
+      createRoute="/settings/tags/expenses/create"
+      editRoute="/settings/tags/expenses/:id/edit"
+      indexRoute="/settings/tags/expenses"
+      titleKey="expense_tags"
+    />
+  );
+}
+
+export function CreateTransactionTag() {
+  return (
+    <Create
+      entityType={TAG_ENTITY_TYPES.bank_transaction}
+      createRoute="/settings/tags/transactions/create"
+      editRoute="/settings/tags/transactions/:id/edit"
+      indexRoute="/settings/tags/transactions"
+      titleKey="transaction_tags"
+    />
+  );
+}
+
+export function CreateRecurringInvoiceTag() {
+  return (
+    <Create
+      entityType={TAG_ENTITY_TYPES.recurring_invoice}
+      createRoute="/settings/tags/recurring_invoices/create"
+      editRoute="/settings/tags/recurring_invoices/:id/edit"
+      indexRoute="/settings/tags/recurring_invoices"
+      titleKey="recurring_invoice_tags"
+    />
+  );
+}
+
+export function CreateRecurringExpenseTag() {
+  return (
+    <Create
+      entityType={TAG_ENTITY_TYPES.recurring_expense}
+      createRoute="/settings/tags/recurring_expenses/create"
+      editRoute="/settings/tags/recurring_expenses/:id/edit"
+      indexRoute="/settings/tags/recurring_expenses"
+      titleKey="recurring_expense_tags"
+    />
+  );
+}
+
+export function CreateClientTag() {
+  return (
+    <Create
+      entityType={TAG_ENTITY_TYPES.client}
+      createRoute="/settings/tags/clients/create"
+      editRoute="/settings/tags/clients/:id/edit"
+      indexRoute="/settings/tags/clients"
+      titleKey="client_tags"
+    />
+  );
+}
+
+export function CreateVendorTag() {
+  return (
+    <Create
+      entityType={TAG_ENTITY_TYPES.vendor}
+      createRoute="/settings/tags/vendors/create"
+      editRoute="/settings/tags/vendors/:id/edit"
+      indexRoute="/settings/tags/vendors"
+      titleKey="vendor_tags"
+    />
+  );
+}
+
+export function CreatePaymentTag() {
+  return (
+    <Create
+      entityType={TAG_ENTITY_TYPES.payment}
+      createRoute="/settings/tags/payments/create"
+      editRoute="/settings/tags/payments/:id/edit"
+      indexRoute="/settings/tags/payments"
+      titleKey="payment_tags"
+    />
+  );
+}
+
+export function CreatePurchaseOrderTag() {
+  return (
+    <Create
+      entityType={TAG_ENTITY_TYPES.purchase_order}
+      createRoute="/settings/tags/purchase_orders/create"
+      editRoute="/settings/tags/purchase_orders/:id/edit"
+      indexRoute="/settings/tags/purchase_orders"
+      titleKey="purchase_order_tags"
+    />
+  );
+}
+
+export function CreateProductTag() {
+  return (
+    <Create
+      entityType={TAG_ENTITY_TYPES.product}
+      createRoute="/settings/tags/products/create"
+      editRoute="/settings/tags/products/:id/edit"
+      indexRoute="/settings/tags/products"
+      titleKey="product_tags"
+    />
+  );
+}
