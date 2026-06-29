@@ -31,6 +31,13 @@ import { PerPage } from '$app/components/DataTable';
 import { ThemeColorField } from '$app/pages/settings/user/components/StatusColorTheme';
 import { ClientShowCard } from '$app/pages/clients/show/components/CardsCustomizationModal';
 import { useCurrentUser } from './useCurrentUser';
+import {
+  KeyboardShortcutOverride,
+  resolveShortcutBindings,
+} from '../constants/keyboard-shortcuts';
+
+export type { KeyboardShortcutOverride };
+export { resolveShortcutBindings };
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
 
@@ -61,6 +68,7 @@ export interface Preferences {
   reports: {
     columns: Record<string, ClientMapRecord[][]>;
   };
+  keyboard_shortcuts?: Record<string, KeyboardShortcutOverride | null>;
   auto_expand_product_table_notes: boolean;
   enable_public_notifications: boolean | null;
   use_system_fonts: boolean;
@@ -201,6 +209,15 @@ export function useReactSettings() {
   return useAtomValue(reactSettingsWithDefaultsAtom);
 }
 
+const resolvedShortcutsAtom = atom((get) => {
+  const settings = withDefaults(get(reactSettingsAtom));
+  return resolveShortcutBindings(settings.preferences?.keyboard_shortcuts);
+});
+
+export function useResolvedShortcuts() {
+  return useAtomValue(resolvedShortcutsAtom);
+}
+
 // Focused subscription for primitives that should ignore unrelated writes.
 export function useReactSettingsField<K extends keyof ReactSettings>(
   key: K
@@ -281,7 +298,9 @@ export function useUserDetailsDraft() {
       commit: async (): Promise<unknown> => {
         const draft = getDefaultStore().get(userDetailsDraftAtom);
         if (draft === null) return undefined;
-        const dirtyPaths = getDefaultStore().get(userDetailsDraftDirtyPathsAtom);
+        const dirtyPaths = getDefaultStore().get(
+          userDetailsDraftDirtyPathsAtom
+        );
         if (dirtyPaths.length === 0) {
           setDraft(null);
           setDirtyPaths([]);
@@ -438,9 +457,11 @@ export function useFetchReactSettings(): void {
       {}) as ReactSettings;
 
     // Fold legacy table columns into the new location without writing an empty key.
-    const legacyTableColumns = (user.company_user?.settings as
-      | { react_table_columns?: Record<ReactTableColumns, string[]> }
-      | undefined)?.react_table_columns;
+    const legacyTableColumns = (
+      user.company_user?.settings as
+        | { react_table_columns?: Record<ReactTableColumns, string[]> }
+        | undefined
+    )?.react_table_columns;
 
     const mergedTableColumns = {
       ...(legacyTableColumns ?? {}),

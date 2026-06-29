@@ -46,6 +46,10 @@ export function useUserDetailsTabs() {
       name: t('preferences'),
       href: '/settings/user_details/preferences',
     },
+    {
+      name: t('keyboard_shortcuts'),
+      href: '/settings/user_details/keyboard_shortcuts',
+    },
   ];
 
   return tabs;
