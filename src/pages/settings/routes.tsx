@@ -61,7 +61,7 @@ export const settingsRoutes = (
       <Route path="task_settings" element={<Settings.TaskSettings />} />
       <Route path="tags">
         <Route element={<Settings.Tags />}>
-          <Route path="" element={<Settings.TaskTags />} />
+          <Route path="" element={<Settings.ClientTags />} />
           <Route path="projects" element={<Settings.ProjectTags />} />
           <Route path="invoices" element={<Settings.InvoiceTags />} />
           <Route path="quotes" element={<Settings.QuoteTags />} />
@@ -76,7 +76,7 @@ export const settingsRoutes = (
             path="recurring_expenses"
             element={<Settings.RecurringExpenseTags />}
           />
-          <Route path="clients" element={<Settings.ClientTags />} />
+          <Route path="tasks" element={<Settings.TaskTags />} />
           <Route path="vendors" element={<Settings.VendorTags />} />
           <Route path="payments" element={<Settings.PaymentTags />} />
           <Route

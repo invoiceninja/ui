@@ -170,7 +170,7 @@ export function CreateTaskTag() {
       entityType={TAG_ENTITY_TYPES.task}
       createRoute="/settings/tags/tasks/create"
       editRoute="/settings/tags/tasks/:id/edit"
-      indexRoute="/settings/tags"
+      indexRoute="/settings/tags/tasks"
       titleKey="task_tags"
     />
   );
@@ -278,7 +278,7 @@ export function CreateClientTag() {
       entityType={TAG_ENTITY_TYPES.client}
       createRoute="/settings/tags/clients/create"
       editRoute="/settings/tags/clients/:id/edit"
-      indexRoute="/settings/tags/clients"
+      indexRoute="/settings/tags"
       titleKey="client_tags"
     />
   );

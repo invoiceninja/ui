@@ -178,7 +178,7 @@ export function EditTaskTag() {
   return (
     <Edit
       editRoute="/settings/tags/tasks/:id/edit"
-      indexRoute="/settings/tags"
+      indexRoute="/settings/tags/tasks"
       titleKey="task_tags"
     />
   );
@@ -268,7 +268,7 @@ export function EditClientTag() {
   return (
     <Edit
       editRoute="/settings/tags/clients/:id/edit"
-      indexRoute="/settings/tags/clients"
+      indexRoute="/settings/tags"
       titleKey="client_tags"
     />
   );

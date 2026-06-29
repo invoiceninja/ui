@@ -77,7 +77,7 @@ export function Tags() {
   ];
 
   const tabs = [
-    { name: t('clients'), href: '/settings/tags/clients' },
+    { name: t('clients'), href: '/settings/tags' },
     { name: t('products'), href: '/settings/tags/products' },
     { name: t('invoices'), href: '/settings/tags/invoices' },
     { name: t('recurring_invoices'), href: '/settings/tags/recurring_invoices' },
@@ -85,7 +85,7 @@ export function Tags() {
     { name: t('quotes'), href: '/settings/tags/quotes' },
     { name: t('credits'), href: '/settings/tags/credits' },
     { name: t('projects'), href: '/settings/tags/projects' },
-    { name: t('tasks'), href: '/settings/tags' },
+    { name: t('tasks'), href: '/settings/tags/tasks' },
     { name: t('vendors'), href: '/settings/tags/vendors' },
     { name: t('purchase_orders'), href: '/settings/tags/purchase_orders' },
     { name: t('expenses'), href: '/settings/tags/expenses' },
