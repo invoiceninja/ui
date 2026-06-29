@@ -124,6 +124,7 @@ export function useAllInvoiceColumns() {
     'created_at',
     'updated_at',
     'project',
+    'recurring_invoice',
   ] as const;
 
   return invoiceColumns.map((column) => normalizeColumnName(column));
@@ -339,6 +340,22 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
           {invoice?.project?.name ?? ''}
         </DynamicLink>
       ),
+    },
+    {
+      column: 'recurring_invoice',
+      id: 'recurring_id',
+      label: t('recurring_invoice'),
+      format: (value, invoice) =>
+        invoice.recurring_id ? (
+          <DynamicLink
+            to={route('/recurring_invoices/:id/edit', {
+              id: invoice.recurring_id,
+            })}
+            renderSpan={disableNavigation('recurring_invoice', undefined)}
+          >
+            {t('recurring_invoice')}
+          </DynamicLink>
+        ) : null,
     },
     {
       column: 'balance',
