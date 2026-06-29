@@ -50,7 +50,7 @@ export default function Credits() {
       linkToCreateGuards={[permission('create_credit')]}
       hideEditableOptions={!hasPermission('edit_credit')}
       withoutPageAsPreference
-      withoutStoringSearchFilter
+      withoutStoringStatusPreferences
     />
   );
 }
