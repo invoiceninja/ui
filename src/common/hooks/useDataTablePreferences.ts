@@ -40,8 +40,8 @@ interface Params {
   withoutStoringPerPage: boolean;
   enableSavingFilterPreference?: boolean;
   withoutStoringPage?: boolean;
-  withoutStoringSearchFilter?: boolean;
   withoutStoringPreferences?: boolean;
+  withoutStoringStatusPreferences?: boolean;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -67,8 +67,8 @@ export function useDataTablePreferences(params: Params) {
     withoutStoringPerPage,
     enableSavingFilterPreference,
     withoutStoringPage,
-    withoutStoringSearchFilter,
     withoutStoringPreferences,
+    withoutStoringStatusPreferences,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
@@ -82,11 +82,11 @@ export function useDataTablePreferences(params: Params) {
     status: string[],
     perPage: PerPage
   ) => {
-    if (withoutStoringPreferences) {
+    if (withoutStoringPreferences || withoutStoringStatusPreferences) {
       return;
     }
 
-    if (tableKey && !withoutStoringSearchFilter) {
+    if (tableKey) {
       storeSessionTableFilters(filter, currentPage, withoutStoringPage);
     }
 
@@ -151,10 +151,16 @@ export function useDataTablePreferences(params: Params) {
       return;
     }
 
+    if (withoutStoringStatusPreferences) {
+      setFilter((getPreference('filter') as string) || '');
+      setCustomFilter([]);
+      setArePreferencesApplied(true);
+      appliedRef.current = true;
+      return;
+    }
+
     if (!isInitialConfiguration && !customFilter) {
-      if (!withoutStoringSearchFilter) {
-        setFilter((getPreference('filter') as string) || '');
-      }
+      setFilter((getPreference('filter') as string) || '');
 
       if (customFilters) {
         if ((getPreference('customFilter') as string[]).length) {
