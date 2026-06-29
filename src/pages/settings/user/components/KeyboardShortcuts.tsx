@@ -26,7 +26,6 @@ import {
 } from '$app/common/helpers/keyboard-shortcuts';
 import { useShortcutRecorder } from '$app/common/hooks/useShortcutRecorder';
 import { useMemo, useState } from 'react';
-import { Refresh } from '$app/components/icons/Refresh';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
 import { InputField } from '$app/components/forms';
 
@@ -65,16 +64,8 @@ export function KeyboardShortcuts() {
   }, [searchQuery]);
 
   const bindingFor = (definition: ShortcutDefinition) => {
-    if (Object.prototype.hasOwnProperty.call(overrides, definition.id)) {
-      const override = overrides[definition.id];
-      return override === null ? null : override.keys;
-    }
-
-    return definition.defaultBinding;
-  };
-
-  const isCustomized = (definition: ShortcutDefinition) => {
-    return Object.prototype.hasOwnProperty.call(overrides, definition.id);
+    const override = overrides[definition.id];
+    return override ? override.keys : null;
   };
 
   const conflictsByBinding = (() => {
@@ -106,43 +97,22 @@ export function KeyboardShortcuts() {
   };
 
   const setBinding = (definition: ShortcutDefinition, keys: string) => {
-    if (keys === definition.defaultBinding) {
-      resetBinding(definition);
-      return;
-    }
-
     writeOverrides({ ...overrides, [definition.id]: { keys } });
   };
 
   const disableBinding = (definition: ShortcutDefinition) => {
-    writeOverrides({ ...overrides, [definition.id]: null });
-  };
-
-  const disableAllBindings = () => {
-    const next: Overrides = { ...overrides };
-
-    for (const definition of keyboardShortcuts) {
-      next[definition.id] = null;
-    }
-
-    writeOverrides(next);
-  };
-
-  const resetAllBindings = () => {
-    writeOverrides({});
-  };
-
-  const hasAnyOverride = Object.keys(overrides).length > 0;
-
-  const resetBinding = (definition: ShortcutDefinition) => {
-    if (!isCustomized(definition)) {
-      return;
-    }
-
     const next = { ...overrides };
     delete next[definition.id];
     writeOverrides(next);
   };
+
+  const disableAllBindings = () => {
+    writeOverrides({});
+  };
+
+  const hasAnyEnabled = keyboardShortcuts.some((definition) => {
+    return bindingFor(definition) !== null;
+  });
 
   const selectedDefinition =
     keyboardShortcuts.find((definition) => {
@@ -156,27 +126,16 @@ export function KeyboardShortcuts() {
           {t('keyboard_shortcuts_help')}
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          {hasAnyOverride && (
-            <button
-              type="button"
-              onClick={resetAllBindings}
-              className="text-sm rounded px-3 py-1.5 border hover:opacity-75 transition-colors"
-              style={{ color: colors.$3, borderColor: colors.$5 }}
-            >
-              {t('reset_all')}
-            </button>
-          )}
-
+        {hasAnyEnabled && (
           <button
             type="button"
             onClick={disableAllBindings}
-            className="text-sm rounded px-3 py-1.5 border hover:opacity-75 transition-colors"
+            className="shrink-0 text-sm rounded px-3 py-1.5 border hover:opacity-75 transition-colors"
             style={{ color: colors.$3, borderColor: colors.$5 }}
           >
             {t('disable_all')}
           </button>
-        </div>
+        )}
       </div>
 
       <div
@@ -268,10 +227,8 @@ export function KeyboardShortcuts() {
             key={selectedDefinition.id}
             definition={selectedDefinition}
             binding={bindingFor(selectedDefinition)}
-            isCustomized={isCustomized(selectedDefinition)}
             hasConflict={conflictsByBinding.has(selectedDefinition.id)}
             onCommit={(keys) => setBinding(selectedDefinition, keys)}
-            onReset={() => resetBinding(selectedDefinition)}
             onDisable={() => disableBinding(selectedDefinition)}
           />
         </div>
@@ -283,20 +240,16 @@ export function KeyboardShortcuts() {
 interface ShortcutDetailProps {
   definition: ShortcutDefinition;
   binding: string | null;
-  isCustomized: boolean;
   hasConflict: boolean;
   onCommit: (keys: string) => void;
-  onReset: () => void;
   onDisable: () => void;
 }
 
 function ShortcutDetail({
   definition,
   binding,
-  isCustomized,
   hasConflict,
   onCommit,
-  onReset,
   onDisable,
 }: ShortcutDetailProps) {
   const [t] = useTranslation();
@@ -304,20 +257,20 @@ function ShortcutDetail({
 
   const recorder = useShortcutRecorder({ onCommit });
 
-  const label = useMemo(() => {
+  const buttonLabel = useMemo(() => {
     if (recorder.isRecording) {
       return formatRecorderPreview(recorder.preview) || t('press_keys');
     }
 
     if (binding === null) {
-      return t('disabled');
+      return t('enable');
     }
 
     return formatBinding(binding);
   }, [recorder.isRecording, recorder.preview, binding]);
 
   return (
-    <div className="w-full flex flex-col items-center gap-4">
+    <div className="w-full flex flex-col items-center gap-3">
       <div className="text-sm font-medium" style={{ color: colors.$17 }}>
         {t(definition.labelKey)}
       </div>
@@ -339,31 +292,33 @@ function ShortcutDetail({
         }}
         title={hasConflict ? (t('shortcut_conflict') as string) : undefined}
       >
-        {label}
+        {buttonLabel}
       </button>
 
-      <div className="flex items-center gap-4 pt-1">
-        <DetailAction
-          visible={isCustomized}
-          onClick={onReset}
-          label={t('reset')}
-        >
-          <Refresh size="1rem" color={colors.$17} />
-        </DetailAction>
-
-        <DetailAction
-          visible={binding !== null}
-          onClick={onDisable}
-          label={t('disable')}
-        >
-          <CircleXMark
-            color={colors.$16}
-            hoverColor={colors.$3}
-            borderColor={colors.$5}
-            hoverBorderColor={colors.$17}
-            size="1.3rem"
-          />
-        </DetailAction>
+      <div className="min-h-[1.5rem] flex items-center">
+        {!recorder.isRecording &&
+          (binding === null ? (
+            <span
+              className="text-xs flex items-center gap-1.5"
+              style={{ color: colors.$17 }}
+            >
+              <span
+                className="h-2 w-2 rounded-full"
+                style={{ backgroundColor: '#ef4444' }}
+              />
+              {t('disabled')}
+            </span>
+          ) : (
+            <DetailAction visible onClick={onDisable} label={t('disable')}>
+              <CircleXMark
+                color={colors.$16}
+                hoverColor={colors.$3}
+                borderColor={colors.$5}
+                hoverBorderColor={colors.$17}
+                size="1.3rem"
+              />
+            </DetailAction>
+          ))}
       </div>
     </div>
   );

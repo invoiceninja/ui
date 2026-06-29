@@ -27,17 +27,19 @@ import { CustomField } from '$app/components/CustomField';
 
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useSave } from './hooks/useSave';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
 import { useAtom } from 'jotai';
 import { paymentAtom } from '../common/atoms';
 import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { Banner } from '$app/components/Banner';
 import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
 import { ErrorMessage } from '$app/components/ErrorMessage';
 import { DataTable } from '$app/components/DataTable';
 import { useApplyInvoiceTableColumns } from '../common/hooks/useApplyInvoiceTableColumns';
@@ -70,6 +72,7 @@ export default function Create() {
   const [searchParams] = useSearchParams();
 
   const hasCapturedPreSelection = useRef<boolean>(false);
+  const hasInvoiceTableSelection = useRef<boolean>(false);
 
   const pages = [
     { name: t('payments'), href: '/payments' },
@@ -210,7 +213,7 @@ export default function Create() {
       return;
     }
 
-    if (payment?.invoices.length) {
+    if (searchParams.get('action') === 'enter' && payment?.invoices.length) {
       hasCapturedPreSelection.current = true;
 
       setPreSelectedInvoiceIds(
@@ -267,6 +270,24 @@ export default function Create() {
 
   const onSubmit = useSave({ setErrors, setIsFormBusy, isFormBusy });
 
+  const isPrefilledFlow = useMemo(() => {
+    const action = searchParams.get('action');
+
+    return (
+      searchParams.has('invoice') || action === 'enter' || action === 'apply'
+    );
+  }, [searchParams]);
+
+  const invoiceSelectorEndpoint = useMemo(
+    () =>
+      endpoint(
+        `/api/v1/invoices?include=client&filter_deleted_clients=true&sort=date|desc${
+          payment?.client_id ? `&payable=${payment.client_id}` : '&payable=true'
+        }`
+      ),
+    [payment?.client_id]
+  );
+
   return (
     <Default
       title={documentTitle}
@@ -296,6 +317,9 @@ export default function Create() {
                   credits: '',
                 });
 
+                hasInvoiceTableSelection.current = false;
+                setPreSelectedInvoiceIds([]);
+
                 setTimeout(() => {
                   handleChange('client_id', client?.id as string);
                   handleChange(
@@ -307,6 +331,7 @@ export default function Create() {
                 }, 25);
               }}
               onClearButtonClick={() => {
+                setPreSelectedInvoiceIds([]);
                 handleChange('client_id', '');
                 handleChange('currency_id', '');
                 handleChange('invoices', []);
@@ -315,12 +340,63 @@ export default function Create() {
               errorMessage={errors?.errors.client_id}
               defaultValue={payment?.client_id}
               value={payment?.client_id}
-              readonly={
-                searchParams.has('invoice') ||
-                searchParams.get('action') === 'enter' ||
-                searchParams.get('action') === 'apply'
-              }
+              readonly={isPrefilledFlow}
               initiallyVisible={!payment?.client_id}
+            />
+          </Element>
+
+          <div className="flex items-center px-5 sm:px-6 py-1">
+            <div
+              className="flex-1 border-b"
+              style={{ borderColor: colors.$21 }}
+            />
+            <span
+              className="px-4 text-xs font-medium uppercase"
+              style={{ color: colors.$22, opacity: 0.8 }}
+            >
+              {t('or')}
+            </span>
+            <div
+              className="flex-1 border-b"
+              style={{ borderColor: colors.$21 }}
+            />
+          </div>
+
+          <Element leftSide={t('invoice')}>
+            <InvoiceSelector
+              value={preSelectedInvoiceIds[0] ?? ''}
+              endpoint={invoiceSelectorEndpoint}
+              onChange={(invoice) => {
+                setInitialEndpoints({
+                  invoices: '',
+                  credits: '',
+                });
+
+                hasInvoiceTableSelection.current = false;
+                setPreSelectedInvoiceIds([invoice.id]);
+
+                setTimeout(() => {
+                  handleChange('client_id', invoice.client_id);
+                  handleChange(
+                    'currency_id',
+                    invoice.client?.settings.currency_id || '1'
+                  );
+                  handleChange('credits', []);
+                  handleChange('invoices', [
+                    {
+                      _id: v4(),
+                      invoice_id: invoice.id,
+                      amount:
+                        invoice.balance > 0 ? invoice.balance : invoice.amount,
+                    },
+                  ]);
+                }, 25);
+              }}
+              onClearButtonClick={() => {
+                setPreSelectedInvoiceIds([]);
+                handleChange('invoices', []);
+              }}
+              clearButton={Boolean(preSelectedInvoiceIds.length)}
             />
           </Element>
 
@@ -370,11 +446,19 @@ export default function Create() {
                       });
                     });
 
+                    hasInvoiceTableSelection.current = true;
+
                     setPayment(
                       (current) =>
                         current && { ...current, invoices: newInvoices }
                     );
                   } else {
+                    if (hasInvoiceTableSelection.current) {
+                      setPreSelectedInvoiceIds([]);
+                    }
+
+                    hasInvoiceTableSelection.current = false;
+
                     setPayment(
                       (current) => current && { ...current, invoices: [] }
                     );

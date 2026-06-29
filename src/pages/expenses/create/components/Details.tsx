@@ -147,6 +147,18 @@ export function Details(props: Props) {
           </>
         )}
 
+        {expense && pageType === 'edit' && expense.transaction_id && (
+          <Element leftSide={t('transaction')}>
+            <LinkBase
+              to={route('/transactions/:id/edit', {
+                id: expense.transaction_id,
+              })}
+            >
+              {t('view')}
+            </LinkBase>
+          </Element>
+        )}
+
         {expense && (
           <Element
             leftSide={

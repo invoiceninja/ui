@@ -11,12 +11,14 @@
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
 import { Client } from '$app/common/interfaces/client';
+import { ClientContact } from '$app/common/interfaces/client-contact';
 import { Vendor } from '$app/common/interfaces/vendor';
 
 import {
   MailerResource,
   MailerResourceType,
 } from '$app/pages/invoices/email/components/Mailer';
+import { UserUnsubscribedTooltip } from '$app/pages/clients/common/components/UserUnsubscribedTooltip';
 import { useEffect, useState } from 'react';
 
 interface Props {
@@ -66,10 +68,16 @@ export function Contact(props: Props) {
               )
             )
             .map((contact, index) => (
-              <p key={index}>
-                {contact.first_name} {contact.last_name} &#183;
-                <span className="font-semibold"> {contact.email}</span>
-              </p>
+              <div key={index} className="flex items-center space-x-2">
+                <p>
+                  {contact.first_name} {contact.last_name} &#183;
+                  <span className="font-semibold"> {contact.email}</span>
+                </p>
+
+                {(contact as ClientContact).is_locked && (
+                  <UserUnsubscribedTooltip size={20} />
+                )}
+              </div>
             ))}
         </div>
       )}

@@ -273,6 +273,7 @@ export function useAllExpenseColumns() {
     'tax_rate1',
     'tax_rate2',
     'tax_rate3',
+    'transaction',
     'transaction_reference',
     'updated_at',
     'tags',
@@ -583,6 +584,20 @@ export function useExpenseColumns() {
       id: 'tax_rate3',
       label: t('tax_rate3'),
       format: (value) => formatNumber(value),
+    },
+    {
+      column: 'transaction',
+      id: 'transaction_id',
+      label: t('transaction'),
+      format: (value, expense) =>
+        expense.transaction_id && (
+          <DynamicLink
+            to={route('/transactions/:id/edit', { id: value.toString() })}
+            renderSpan={disableNavigation('bank_transaction', null)}
+          >
+            {t('view')}
+          </DynamicLink>
+        ),
     },
     {
       column: 'transaction_reference',

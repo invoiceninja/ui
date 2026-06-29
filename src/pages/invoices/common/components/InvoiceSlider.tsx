@@ -357,6 +357,24 @@ export function InvoiceSlider() {
               {invoice ? date(invoice.due_date, dateFormat) : null}
             </Element>
 
+            {invoice && invoice.recurring_id ? (
+              <Element
+                className="border-b border-dashed"
+                leftSide={t('recurring_invoice')}
+                pushContentToRight
+                noExternalPadding
+                style={{ borderColor: colors.$20 }}
+              >
+                <Link
+                  to={route('/recurring_invoices/:id/edit', {
+                    id: invoice.recurring_id,
+                  })}
+                >
+                  {t('view')}
+                </Link>
+              </Element>
+            ) : null}
+
             <Element
               leftSide={t('status')}
               pushContentToRight
