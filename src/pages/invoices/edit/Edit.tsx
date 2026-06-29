@@ -153,6 +153,25 @@ export default function Edit() {
               </div>
             )}
 
+            {invoice && invoice.recurring_id && (
+              <div className="flex items-center space-x-9">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('recurring_invoice')}
+                </span>
+
+                <Link
+                  to={route('/recurring_invoices/:id/edit', {
+                    id: invoice.recurring_id,
+                  })}
+                >
+                  {t('view')}
+                </Link>
+              </div>
+            )}
+
             {invoice &&
               invoice.sync?.dn_completed &&
               invoice.sync?.invitations[0]?.dn_id && (
