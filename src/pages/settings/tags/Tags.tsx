@@ -21,6 +21,20 @@ import { Settings } from '$app/components/layouts/Settings';
 import { Tabs } from '$app/components/Tabs';
 import { Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Card, Element } from '$app/components/cards';
+import Toggle from '$app/components/forms/Toggle';
+import { useColorScheme } from '$app/common/colors';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
+import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
+import { useAtomValue } from 'jotai';
 
 interface TableProps {
   entityType: TagEntityType;
@@ -71,6 +85,16 @@ export function Tags() {
   useTitle('tags');
 
   const [t] = useTranslation();
+
+  const colors = useColorScheme();
+  const company = useInjectCompanyChanges();
+  const disableSettingsField = useDisableSettingsField();
+  const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
+
+  const onSave = useHandleCompanySave();
+  const onCancel = useDiscardChanges();
+  const handleChangeProperty = useHandleCurrentCompanyChangeProperty();
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('tags'), href: '/settings/tags' },
@@ -82,8 +106,44 @@ export function Tags() {
   ];
 
   return (
-    <Settings title={t('tags')} breadcrumbs={pages}>
+    <Settings
+      title={t('tags')}
+      breadcrumbs={pages}
+      onSaveClick={onSave}
+      onCancelClick={onCancel}
+      disableSaveButton={isFormBusy}
+    >
       <div className="space-y-4">
+        <Card
+          title={t('settings')}
+          className="shadow-sm"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+        >
+          <Element
+            leftSide={
+              <PropertyCheckbox
+                propertyKey="global_tag_inheritance"
+                labelElement={
+                  <SettingsLabel
+                    label={t('global_tag_inheritance')}
+                    helpLabel={t('global_tag_inheritance_help')}
+                  />
+                }
+                defaultValue={false}
+              />
+            }
+          >
+            <Toggle
+              checked={Boolean(company?.settings?.global_tag_inheritance)}
+              onChange={(value) =>
+                handleChangeProperty('settings.global_tag_inheritance', value)
+              }
+              disabled={disableSettingsField('global_tag_inheritance')}
+            />
+          </Element>
+        </Card>
+
         <Tabs tabs={tabs} fullRightPadding withHorizontalPaddingOnSmallScreen />
 
         <Outlet />
