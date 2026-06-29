@@ -54,7 +54,7 @@ export default function RecurringInvoices() {
       linkToCreateGuards={[permission('create_recurring_invoice')]}
       hideEditableOptions={!hasPermission('edit_recurring_invoice')}
       withoutPageAsPreference
-      withoutStoringSearchFilter
+      withoutStoringStatusPreferences
     />
   );
 }

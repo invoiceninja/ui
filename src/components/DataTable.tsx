@@ -189,8 +189,8 @@ interface Props<T> extends CommonProps {
   footerColumns?: FooterColumns;
   withoutPerPageAsPreference?: boolean;
   withoutPageAsPreference?: boolean;
-  withoutStoringSearchFilter?: boolean;
   withoutStoringPreferences?: boolean;
+  withoutStoringStatusPreferences?: boolean;
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
   enableSavingFilterPreference?: boolean;
@@ -300,8 +300,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     totalRecordsPropPath,
     onDeleteBulkAction,
     withoutPageAsPreference = false,
-    withoutStoringSearchFilter = false,
     withoutStoringPreferences = false,
+    withoutStoringStatusPreferences = false,
     filterColumns,
     onSelectedResourcesChange,
     preSelected = [],
@@ -371,8 +371,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     customFilters,
     withoutStoringPerPage: withoutPerPageAsPreference,
     withoutStoringPage: withoutPageAsPreference,
-    withoutStoringSearchFilter,
     withoutStoringPreferences,
+    withoutStoringStatusPreferences,
     enableSavingFilterPreference,
   });
 
@@ -387,6 +387,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     customFilter,
     customFilters,
     withoutStoringPreferences,
+    withoutStoringStatusPreferences,
   });
 
   const normalizeNumericCommas = (value: string): string => {
