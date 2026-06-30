@@ -1,6 +1,7 @@
 import { login, logout, waitForTableData } from '$tests/e2e/helpers';
 import {
-  resetAccountBeforeAll, test,
+  resetAccountBeforeAll,
+  test,
   expect,
   uniqueName,
   extractIdFromUrl,
@@ -11,11 +12,9 @@ import { Page } from '@playwright/test';
 resetAccountBeforeAll();
 
 /**
- * Tags live under Settings → Tags and are split into two entity types,
- * surfaced as tabs: "Tasks" (/settings/tags) and "Projects"
- * (/settings/tags/projects). Each tab is a resourceful DataTable backed by
- * /api/v1/tags, so they share the standard create / edit / bulk-action
- * patterns used across the app.
+ * Tags live under Settings -> Tags in one resourceful DataTable backed by
+ * /api/v1/tags. The table can be narrowed to global, task, or project tags
+ * with the Type dropdown, which sends the entity_types query parameter.
  *
  * Tags are admin/owner-only (the blank-tag query is gated behind isAdmin), so
  * these tests run as the default owner account.
@@ -25,7 +24,45 @@ resetAccountBeforeAll();
 // the same approach api-helpers uses for tax_rates / expense_categories.
 const TAGS = 'tags' as EntityType;
 
-type TagType = 'tasks' | 'projects';
+type TagType = 'global' | 'tasks' | 'projects';
+
+const TAG_ENTITY_TYPE_VALUES = [
+  'global',
+  'bank_transaction',
+  'client',
+  'credit',
+  'expense',
+  'invoice',
+  'payment',
+  'product',
+  'project',
+  'purchase_order',
+  'quote',
+  'recurring_expense',
+  'recurring_invoice',
+  'task',
+  'transaction',
+  'vendor',
+];
+
+const TAG_ENTITY_TYPE_LABELS = [
+  'Global',
+  'Bank Transaction',
+  'Client',
+  'Credit',
+  'Expense',
+  'Invoice',
+  'Payment',
+  'Product',
+  'Project',
+  'Purchase Order',
+  'Quote',
+  'Recurring Expense',
+  'Recurring Invoice',
+  'Task',
+  'Transaction',
+  'Vendor',
+];
 
 // Tag ids created during the active test, cleaned up in afterEach. Tags are not
 // covered by the api fixture's automatic teardown order, so we sweep them here.
@@ -47,7 +84,7 @@ test.afterEach(async ({ api }) => {
   }
 });
 
-const navigateToTags = async (page: Page, type: TagType = 'tasks') => {
+const navigateToTags = async (page: Page) => {
   await page
     .locator('[data-cy="navigationBar"]')
     .getByRole('link', { name: 'Settings', exact: true })
@@ -56,16 +93,6 @@ const navigateToTags = async (page: Page, type: TagType = 'tasks') => {
   await page.getByRole('link', { name: 'Tags', exact: true }).click();
 
   await page.waitForURL('**/settings/tags');
-
-  if (type === 'projects') {
-    // Scope to the tag-type Tabs — a "Projects" link also exists in the main
-    // navigation sidebar, which would otherwise match.
-    await page
-      .getByLabel('Tabs')
-      .getByRole('link', { name: 'Projects', exact: true })
-      .click();
-    await page.waitForURL('**/settings/tags/projects');
-  }
 };
 
 interface CreateParams {
@@ -80,13 +107,26 @@ interface CreateParams {
 const createTag = async (params: CreateParams) => {
   const { page, name, type = 'tasks' } = params;
 
-  await navigateToTags(page, type);
+  await navigateToTags(page);
 
-  await page.getByRole('main').getByRole('link', { name: 'New Tag' }).click();
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Tag', exact: true })
+    .click();
 
-  await page.waitForURL(`**/settings/tags/${type}/create`);
+  await page.waitForURL('**/settings/tags/create');
 
-  const nameInput = page.getByRole('main').getByRole('textbox').first();
+  if (type !== 'global') {
+    await page.getByRole('main').getByRole('combobox').click();
+    await page
+      .getByRole('option', {
+        name: type === 'projects' ? 'Project' : 'Task',
+        exact: true,
+      })
+      .click();
+  }
+
+  const nameInput = page.locator('#name');
   await nameInput.waitFor({ state: 'visible', timeout: 5000 });
   await nameInput.click();
   await nameInput.fill(name);
@@ -97,7 +137,7 @@ const createTag = async (params: CreateParams) => {
     timeout: 10000,
   });
 
-  await page.waitForURL(`**/settings/tags/${type}/**/edit`);
+  await page.waitForURL('**/settings/tags/**/edit');
 };
 
 /**
@@ -112,11 +152,41 @@ const selectTagRow = async (page: Page, name: string) => {
   // #filter debounces (~300ms) before the request fires.
   await page.waitForTimeout(600);
 
-  const checkbox = page
-    .locator('tbody [data-cy="dataTableCheckbox"]')
-    .first();
+  const checkbox = page.locator('tbody [data-cy="dataTableCheckbox"]').first();
   await checkbox.waitFor({ state: 'visible', timeout: 10000 });
   await checkbox.click();
+};
+
+const applyTagTypeFilter = async (
+  page: Page,
+  type: 'task' | 'project' | 'all'
+) => {
+  await page.getByText('Type:', { exact: true }).click();
+
+  const selectedLabel =
+    type === 'project' ? 'Project' : type === 'task' ? 'Task' : undefined;
+
+  if (type === 'project') {
+    for (const label of TAG_ENTITY_TYPE_LABELS.filter(
+      (currentLabel) => currentLabel !== selectedLabel
+    )) {
+      await page.getByRole('option', { name: label, exact: true }).click();
+    }
+  } else if (type === 'task') {
+    for (const label of TAG_ENTITY_TYPE_LABELS.filter(
+      (currentLabel) => currentLabel !== selectedLabel
+    )) {
+      await page.getByRole('option', { name: label, exact: true }).click();
+    }
+  } else {
+    for (const label of TAG_ENTITY_TYPE_LABELS.filter(
+      (currentLabel) => currentLabel !== 'Project'
+    )) {
+      await page.getByRole('option', { name: label, exact: true }).click();
+    }
+  }
+
+  await page.getByRole('button', { name: 'Apply', exact: true }).click();
 };
 
 /**
@@ -151,13 +221,11 @@ test('can create a task tag', async ({ page, api }) => {
 
   await createTag({ page, name });
 
-  const tagId = extractIdFromUrl(page.url(), 'tasks');
+  const tagId = extractIdFromUrl(page.url(), 'tags');
   if (tagId) createdTagIds.push(tagId);
 
   // The edit page renders the saved name and an active status badge.
-  await expect(page.getByRole('main').getByRole('textbox').first()).toHaveValue(
-    name
-  );
+  await expect(page.locator('#name')).toHaveValue(name);
   await expect(page.getByText('Active', { exact: true })).toBeVisible({
     timeout: 10000,
   });
@@ -172,12 +240,10 @@ test('can create a project tag', async ({ page, api }) => {
 
   await createTag({ page, name, type: 'projects' });
 
-  const tagId = extractIdFromUrl(page.url(), 'projects');
+  const tagId = extractIdFromUrl(page.url(), 'tags');
   if (tagId) createdTagIds.push(tagId);
 
-  await expect(page.getByRole('main').getByRole('textbox').first()).toHaveValue(
-    name
-  );
+  await expect(page.locator('#name')).toHaveValue(name);
 
   await logout(page);
 });
@@ -194,7 +260,7 @@ test('can view a task tag from the list', async ({ page, api }) => {
   });
   if (tag.id) createdTagIds.push(tag.id as string);
 
-  await navigateToTags(page, 'tasks');
+  await navigateToTags(page);
 
   await waitForTableData(page);
 
@@ -204,11 +270,65 @@ test('can view a task tag from the list', async ({ page, api }) => {
   // The name cell links through to the edit page.
   await page.getByRole('link', { name, exact: true }).first().click();
 
-  await page.waitForURL(`**/settings/tags/tasks/${tag.id}/edit`);
+  await page.waitForURL(`**/settings/tags/${tag.id}/edit`);
 
-  await expect(page.getByRole('main').getByRole('textbox').first()).toHaveValue(
-    name
-  );
+  await expect(page.locator('#name')).toHaveValue(name);
+
+  await logout(page);
+});
+
+test('can filter tags by entity type', async ({ page, api }) => {
+  await login(page);
+
+  const taskName = uniqueName('filter-task-tag');
+  const projectName = uniqueName('filter-project-tag');
+
+  const taskTag = await api.createEntity(TAGS, {
+    name: taskName,
+    entity_type: 'task',
+    color: '#2196F3',
+  });
+  const projectTag = await api.createEntity(TAGS, {
+    name: projectName,
+    entity_type: 'project',
+    color: '#93C5FD',
+  });
+
+  if (taskTag.id) createdTagIds.push(taskTag.id as string);
+  if (projectTag.id) createdTagIds.push(projectTag.id as string);
+
+  await navigateToTags(page);
+  await waitForTableData(page);
+
+  const filteredRequest = page.waitForResponse((response) => {
+    const url = new URL(response.url());
+
+    return (
+      url.pathname.endsWith('/api/v1/tags') &&
+      url.searchParams.get('entity_types') === 'project'
+    );
+  });
+
+  await applyTagTypeFilter(page, 'project');
+  await filteredRequest;
+
+  await expect(page.getByRole('link', { name: projectName })).toBeVisible({
+    timeout: 10000,
+  });
+  await expect(page.getByRole('link', { name: taskName })).not.toBeVisible();
+
+  const resetRequest = page.waitForResponse((response) => {
+    const url = new URL(response.url());
+
+    return (
+      url.pathname.endsWith('/api/v1/tags') &&
+      url.searchParams.get('entity_types') === TAG_ENTITY_TYPE_VALUES.join(',')
+    );
+  });
+
+  await applyTagTypeFilter(page, 'all');
+  await resetRequest;
+  await page.waitForTimeout(1700);
 
   await logout(page);
 });
@@ -220,12 +340,33 @@ test('can edit a task tag', async ({ page, api }) => {
 
   await createTag({ page, name });
 
-  const tagId = extractIdFromUrl(page.url(), 'tasks');
-  if (tagId) createdTagIds.push(tagId);
+  const tagId = extractIdFromUrl(page.url(), 'tags');
+  if (tagId) {
+    createdTagIds.push(tagId);
+
+    await page.goto(`/settings/tags/tasks/${tagId}/edit`);
+    await page.waitForURL(`**/settings/tags/tasks/${tagId}/edit`);
+  }
+
+  const breadcrumbs = page.getByRole('navigation', { name: 'Breadcrumb' });
+  await expect(
+    breadcrumbs.getByRole('link', { name: 'Tags', exact: true })
+  ).toBeVisible();
+  await expect(
+    breadcrumbs.getByRole('link', { name: 'Task Tags', exact: true })
+  ).toHaveCount(0);
+  await expect(
+    breadcrumbs.getByRole('link', { name: 'Edit Tag', exact: true })
+  ).toBeVisible();
+
+  const editForm = page.locator('form').filter({ has: page.locator('#name') });
+  const entityTypeSelect = editForm.locator('#entity_type');
+  await expect(entityTypeSelect).toBeDisabled();
+  await expect(entityTypeSelect).toHaveValue('task');
 
   const updatedName = `${name}-updated`;
 
-  const nameInput = page.getByRole('main').getByRole('textbox').first();
+  const nameInput = page.locator('#name');
   await nameInput.click();
   await nameInput.fill(updatedName);
 
@@ -247,7 +388,7 @@ test('can delete a task tag from the edit page', async ({ page, api }) => {
 
   await createTag({ page, name });
 
-  const tagId = extractIdFromUrl(page.url(), 'tasks');
+  const tagId = extractIdFromUrl(page.url(), 'tags');
   if (tagId) createdTagIds.push(tagId);
 
   await page.getByRole('button', { name: 'Actions', exact: true }).click();
@@ -274,7 +415,7 @@ test('can archive and restore a task tag from the edit page', async ({
 
   await createTag({ page, name });
 
-  const tagId = extractIdFromUrl(page.url(), 'tasks');
+  const tagId = extractIdFromUrl(page.url(), 'tags');
   if (tagId) createdTagIds.push(tagId);
 
   // Archive
@@ -323,10 +464,13 @@ test('bulk actions dropdown shows archive and delete for active tags', async ({
 
   const name = uniqueName('bulk-actions-tag');
 
-  const { id: createdId } = await api.createEntity(TAGS, { name, entity_type: 'task' });
+  const { id: createdId } = await api.createEntity(TAGS, {
+    name,
+    entity_type: 'task',
+  });
   if (createdId) createdTagIds.push(createdId as string);
 
-  await navigateToTags(page, 'tasks');
+  await navigateToTags(page);
 
   await selectTagRow(page, name);
 
@@ -352,10 +496,13 @@ test('can bulk archive tags', async ({ page, api }) => {
 
   const name = uniqueName('bulk-archive-tag');
 
-  const { id: createdId } = await api.createEntity(TAGS, { name, entity_type: 'task' });
+  const { id: createdId } = await api.createEntity(TAGS, {
+    name,
+    entity_type: 'task',
+  });
   if (createdId) createdTagIds.push(createdId as string);
 
-  await navigateToTags(page, 'tasks');
+  await navigateToTags(page);
 
   await selectTagRow(page, name);
 
@@ -373,10 +520,13 @@ test('can bulk delete tags', async ({ page, api }) => {
 
   const name = uniqueName('bulk-delete-tag');
 
-  const { id: createdId } = await api.createEntity(TAGS, { name, entity_type: 'task' });
+  const { id: createdId } = await api.createEntity(TAGS, {
+    name,
+    entity_type: 'task',
+  });
   if (createdId) createdTagIds.push(createdId as string);
 
-  await navigateToTags(page, 'tasks');
+  await navigateToTags(page);
 
   await selectTagRow(page, name);
 

@@ -26,6 +26,7 @@ import {
 interface Params {
   apiEndpoint: URL;
   customFilters?: SelectOption[];
+  defaultCustomFilterValues?: string[];
   tableKey: string | undefined;
   isInitialConfiguration: boolean;
   customFilter: string[] | undefined;
@@ -40,8 +41,8 @@ interface Params {
   withoutStoringPerPage: boolean;
   enableSavingFilterPreference?: boolean;
   withoutStoringPage?: boolean;
+  withoutStoringSearchFilter?: boolean;
   withoutStoringPreferences?: boolean;
-  withoutStoringStatusPreferences?: boolean;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -53,6 +54,7 @@ export function useDataTablePreferences(params: Params) {
   const {
     apiEndpoint,
     customFilters,
+    defaultCustomFilterValues,
     tableKey,
     isInitialConfiguration,
     customFilter,
@@ -67,8 +69,8 @@ export function useDataTablePreferences(params: Params) {
     withoutStoringPerPage,
     enableSavingFilterPreference,
     withoutStoringPage,
+    withoutStoringSearchFilter,
     withoutStoringPreferences,
-    withoutStoringStatusPreferences,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
@@ -82,11 +84,11 @@ export function useDataTablePreferences(params: Params) {
     status: string[],
     perPage: PerPage
   ) => {
-    if (withoutStoringPreferences || withoutStoringStatusPreferences) {
+    if (withoutStoringPreferences) {
       return;
     }
 
-    if (tableKey) {
+    if (tableKey && !withoutStoringSearchFilter) {
       storeSessionTableFilters(filter, currentPage, withoutStoringPage);
     }
 
@@ -95,9 +97,13 @@ export function useDataTablePreferences(params: Params) {
     }
 
     const currentTableFilters = reactSettings.table_filters?.[tableKey];
+    const defaultCustomFilter = defaultCustomFilterValues ?? [];
+    const currentCustomFilter = customFilter.length
+      ? customFilter
+      : defaultCustomFilter;
 
     const defaultFilters = {
-      ...(customFilters && { customFilter: [] }),
+      ...(customFilters && { customFilter: defaultCustomFilter }),
       sort: apiEndpoint.searchParams.get('sort') || 'id|asc',
       status: ['active'],
       ...(!withoutStoringPerPage && { perPage: '10' }),
@@ -105,13 +111,26 @@ export function useDataTablePreferences(params: Params) {
 
     const cleanedUpFilters = {
       ...(sortedBy && { sortedBy }),
-      ...(customFilters && { customFilter }),
+      ...(customFilters && { customFilter: currentCustomFilter }),
       sort,
       status,
       ...(!withoutStoringPerPage && { perPage }),
     };
 
-    if (isEqual(defaultFilters, cleanedUpFilters) && !currentTableFilters) {
+    if (isEqual(defaultFilters, cleanedUpFilters)) {
+      if (currentTableFilters && user?.id) {
+        const tableFilters = { ...(reactSettings.table_filters ?? {}) };
+
+        Object.keys(tableFilters).forEach((key) => {
+          if (key.includes('/')) {
+            delete tableFilters[key];
+          }
+        });
+
+        delete tableFilters[tableKey];
+        saveSettings('table_filters', tableFilters);
+      }
+
       return;
     }
 
@@ -151,22 +170,16 @@ export function useDataTablePreferences(params: Params) {
       return;
     }
 
-    if (withoutStoringStatusPreferences) {
-      setFilter((getPreference('filter') as string) || '');
-      setCustomFilter([]);
-      setArePreferencesApplied(true);
-      appliedRef.current = true;
-      return;
-    }
-
-    if (!isInitialConfiguration && !customFilter) {
-      setFilter((getPreference('filter') as string) || '');
+    if (!isInitialConfiguration) {
+      if (!withoutStoringSearchFilter) {
+        setFilter((getPreference('filter') as string) || '');
+      }
 
       if (customFilters) {
         if ((getPreference('customFilter') as string[]).length) {
           setCustomFilter(getPreference('customFilter') as string[]);
         } else {
-          setCustomFilter([]);
+          setCustomFilter(defaultCustomFilterValues ?? []);
         }
       } else {
         setCustomFilter([]);

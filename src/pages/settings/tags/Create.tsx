@@ -9,10 +9,11 @@
  */
 
 import { ButtonOption, Card, CardContainer } from '$app/components/cards';
-import { InputField, InputLabel } from '$app/components/forms';
+import { InputField, InputLabel, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import {
   TAG_ENTITY_TYPES,
+  TAG_ENTITY_TYPE_OPTIONS,
   Tag,
   TagEntityType,
 } from '$app/common/interfaces/tag';
@@ -37,11 +38,7 @@ import { useHandleChange } from './common/hooks';
 import { useColorScheme } from '$app/common/colors';
 
 interface Props {
-  entityType: TagEntityType;
-  createRoute: string;
-  editRoute: string;
-  indexRoute: string;
-  titleKey: string;
+  initialEntityType?: TagEntityType;
 }
 
 function Create(props: Props) {
@@ -51,15 +48,15 @@ function Create(props: Props) {
   const navigate = useNavigate();
   const colors = useColorScheme();
   const accentColor = useAccentColor();
+  const initialEntityType = props.initialEntityType ?? TAG_ENTITY_TYPES.global;
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('tags'), href: '/settings/tags' },
-    { name: t(props.titleKey), href: props.indexRoute },
-    { name: t('new_tag'), href: props.createRoute },
+    { name: t('new_tag'), href: '/settings/tags/create' },
   ];
 
-  const { data: blankTag } = useBlankTagQuery(props.entityType);
+  const { data: blankTag } = useBlankTagQuery(initialEntityType);
 
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -72,7 +69,11 @@ function Create(props: Props) {
 
   const resetTag = () => {
     if (blankTag) {
-      setTag({ ...blankTag, color: randomTagColor() });
+      setTag({
+        ...blankTag,
+        entity_type: initialEntityType,
+        color: randomTagColor(),
+      });
     }
   };
 
@@ -88,7 +89,11 @@ function Create(props: Props) {
       setErrors(undefined);
       setIsFormBusy(true);
 
-      request('POST', endpoint('/api/v1/tags'), tag)
+      const payload = tag
+        ? { ...tag, entity_type: tag.entity_type || TAG_ENTITY_TYPES.global }
+        : tag;
+
+      request('POST', endpoint('/api/v1/tags'), payload)
         .then((response) => {
           toast.success('created_tag');
 
@@ -96,7 +101,7 @@ function Create(props: Props) {
 
           if (actionType === 'save') {
             navigate(
-              route(props.editRoute, {
+              route('/settings/tags/:id/edit', {
                 id: response.data.data.id,
               })
             );
@@ -116,13 +121,13 @@ function Create(props: Props) {
 
   useEffect(() => {
     resetTag();
-  }, [blankTag]);
+  }, [blankTag, initialEntityType]);
 
   const saveOptions: ButtonOption[] = [
     {
       onClick: (event: FormEvent<HTMLFormElement>) =>
         handleSave(event, 'create'),
-      text: `${t('save')} / ${t('create')}`,
+      text: t('save') + ' / ' + t('create'),
       icon: <Icon element={BiPlusCircle} />,
     },
   ];
@@ -143,12 +148,32 @@ function Create(props: Props) {
       >
         <CardContainer>
           <InputField
+            id="name"
             required
             label={t('name')}
             value={tag?.name}
             onValueChange={(value) => handleChange('name', value)}
             errorMessage={errors?.errors.name}
           />
+
+          <SelectField
+            id="entity_type"
+            required
+            label={t('type')}
+            value={tag?.entity_type || TAG_ENTITY_TYPES.global}
+            onValueChange={(value) =>
+              handleChange('entity_type', value as TagEntityType)
+            }
+            errorMessage={errors?.errors.entity_type}
+            customSelector
+            dismissable={false}
+          >
+            {TAG_ENTITY_TYPE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {t(option.labelKey)}
+              </option>
+            ))}
+          </SelectField>
 
           <div>
             <InputLabel className="mb-1">{t('color')}</InputLabel>
@@ -164,26 +189,14 @@ function Create(props: Props) {
   );
 }
 
+export function CreateTag() {
+  return <Create />;
+}
+
 export function CreateTaskTag() {
-  return (
-    <Create
-      entityType={TAG_ENTITY_TYPES.task}
-      createRoute="/settings/tags/tasks/create"
-      editRoute="/settings/tags/tasks/:id/edit"
-      indexRoute="/settings/tags"
-      titleKey="task_tags"
-    />
-  );
+  return <Create initialEntityType={TAG_ENTITY_TYPES.task} />;
 }
 
 export function CreateProjectTag() {
-  return (
-    <Create
-      entityType={TAG_ENTITY_TYPES.project}
-      createRoute="/settings/tags/projects/create"
-      editRoute="/settings/tags/projects/:id/edit"
-      indexRoute="/settings/tags/projects"
-      titleKey="project_tags"
-    />
-  );
+  return <Create initialEntityType={TAG_ENTITY_TYPES.project} />;
 }
