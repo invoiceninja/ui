@@ -170,7 +170,7 @@ export function useDataTablePreferences(params: Params) {
       return;
     }
 
-    if (!isInitialConfiguration && !customFilter) {
+    if (!isInitialConfiguration) {
       if (!withoutStoringSearchFilter) {
         setFilter((getPreference('filter') as string) || '');
       }
