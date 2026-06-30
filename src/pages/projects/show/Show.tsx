@@ -58,8 +58,9 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
 import { ProjectPublicNotes } from './components/ProjectPublicNotes';
-import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { useFilterColumns } from '$app/pages/tasks/common/hooks/useFilterColumns';
+import { ProjectAnalytics } from './components/ProjectAnalytics';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 
 dayjs.extend(duration);
 
@@ -256,6 +257,8 @@ export default function Show() {
           </div>
         </InfoCard>
       </div>
+
+      <ProjectAnalytics project={project} />
 
       {enabled(ModuleBitmask.Tasks) && (
         <div className="my-4">

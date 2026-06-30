@@ -17,6 +17,7 @@ export const keys = {
       '/api/v1/clients',
       '/api/v1/charts/totals_v2',
       '/api/v1/charts/chart_summary_v2',
+      '/api/v1/charts/project_burnup',
       '/api/v1/activities/entity',
       '/api/v1/activities',
       '/api/v1/documents',
@@ -65,6 +66,7 @@ export const keys = {
     dependencies: [
       '/api/v1/charts/totals_v2',
       '/api/v1/charts/chart_summary_v2',
+      '/api/v1/charts/project_burnup',
       '/api/v1/documents',
     ],
   },
@@ -80,6 +82,7 @@ export const keys = {
       '/api/v1/clients',
       '/api/v1/charts/totals_v2',
       '/api/v1/charts/chart_summary_v2',
+      '/api/v1/charts/project_burnup',
       '/api/v1/activities',
       '/api/v1/documents',
     ],
@@ -102,7 +105,11 @@ export const keys = {
   },
   tasks: {
     path: '/api/v1/tasks',
-    dependencies: ['/api/v1/projects', '/api/v1/documents'],
+    dependencies: [
+      '/api/v1/projects',
+      '/api/v1/documents',
+      '/api/v1/charts/project_burnup',
+    ],
   },
   tax_rates: {
     path: '/api/v1/tax_rates',
@@ -184,7 +191,11 @@ export const keys = {
   },
   projects: {
     path: '/api/v1/projects',
-    dependencies: ['/api/v1/tasks', '/api/v1/documents'],
+    dependencies: [
+      '/api/v1/tasks',
+      '/api/v1/documents',
+      '/api/v1/charts/project_burnup',
+    ],
   },
   quotes: {
     path: '/api/v1/quotes',
