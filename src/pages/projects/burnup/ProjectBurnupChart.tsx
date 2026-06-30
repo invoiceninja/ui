@@ -91,7 +91,7 @@ export function ProjectBurnupChart(props: Props) {
   const currencyId = project.client?.settings.currency_id;
 
   const translateMetric = (metric: ProjectBurnupMetricDefinition) =>
-    t(metric.translationKey, { defaultValue: metric.defaultLabel });
+    t(metric.translationKey);
 
   const formatHours = (value: number | string) =>
     new Intl.NumberFormat(undefined, {
@@ -197,8 +197,8 @@ export function ProjectBurnupChart(props: Props) {
           stroke={colors.$3}
           label={xAxisLabel(
             data.bucket_type === 'daily'
-              ? t('date', { defaultValue: 'Date' })
-              : t('period', { defaultValue: 'Period' }),
+              ? t('date')
+              : t('period'),
             colors.$17
           )}
           tickFormatter={(value) =>
@@ -216,7 +216,7 @@ export function ProjectBurnupChart(props: Props) {
           tick={{ fontSize: 12 }}
           stroke={colors.$3}
           tickFormatter={formatHours}
-          label={yAxisLabel(t('hours', { defaultValue: 'Hours' }), colors.$17)}
+          label={yAxisLabel(t('hours'), colors.$17)}
           width={64}
         />
 
@@ -227,7 +227,7 @@ export function ProjectBurnupChart(props: Props) {
           stroke={colors.$3}
           tickFormatter={formatMoneyValue}
           label={yAxisLabel(
-            t('amount', { defaultValue: 'Amount' }),
+            t('amount'),
             colors.$17,
             'insideRight'
           )}

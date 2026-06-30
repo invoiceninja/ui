@@ -48,11 +48,10 @@ interface Props {
 const BUCKET_OPTIONS: {
   value: ProjectBurnupBucketType;
   translationKey: string;
-  defaultLabel: string;
 }[] = [
-  { value: 'daily', translationKey: 'daily', defaultLabel: 'Daily' },
-  { value: 'weekly', translationKey: 'weekly', defaultLabel: 'Weekly' },
-  { value: 'monthly', translationKey: 'monthly', defaultLabel: 'Monthly' },
+  { value: 'daily', translationKey: 'daily' },
+  { value: 'weekly', translationKey: 'weekly' },
+  { value: 'monthly', translationKey: 'monthly' },
 ];
 
 export default function Burnup(props: Props) {
@@ -123,7 +122,7 @@ export default function Burnup(props: Props) {
   };
 
   const translateMetric = (metric: ProjectBurnupMetricDefinition) =>
-    t(metric.translationKey, { defaultValue: metric.defaultLabel });
+    t(metric.translationKey);
 
   const renderMetricGroup = (
     title: string,
@@ -158,7 +157,7 @@ export default function Burnup(props: Props) {
 
   return (
     <Card
-      title={t('project_burnup', { defaultValue: 'Project burn-up' })}
+      title={t('project_burnup')}
       className="shadow-sm"
       style={{ borderColor: colors.$24 }}
       headerStyle={{ borderColor: colors.$20 }}
@@ -172,7 +171,7 @@ export default function Burnup(props: Props) {
               style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
             >
               <span className="font-medium">
-                {t('project_range', { defaultValue: 'Project range' })}:{' '}
+                {t('project_range')}:{' '}
               </span>
 
               <span>
@@ -202,9 +201,7 @@ export default function Burnup(props: Props) {
                     }}
                     onClick={() => setBucketType(bucket.value)}
                   >
-                    {t(bucket.translationKey, {
-                      defaultValue: bucket.defaultLabel,
-                    })}
+                    {t(bucket.translationKey)}
                   </button>
                 );
               })}
@@ -222,12 +219,12 @@ export default function Burnup(props: Props) {
 
         <div className="grid gap-6 xl:grid-cols-2">
           {renderMetricGroup(
-            t('hours', { defaultValue: 'Hours' }),
+            t('hours'),
             PROJECT_BURNUP_METRICS.filter((metric) => metric.axis === 'hours')
           )}
 
           {renderMetricGroup(
-            t('money', { defaultValue: 'Money' }),
+            t('money'),
             PROJECT_BURNUP_METRICS.filter((metric) => metric.axis === 'money')
           )}
         </div>

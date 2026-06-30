@@ -145,7 +145,7 @@ export default function Show() {
     >
       <ProjectAnalytics
         project={project}
-        overviewContent={
+        overviewContent={(forecastCard) => (
           <div className="space-y-4">
             <div className="grid grid-cols-12 gap-4 lg:space-y-0">
               <InfoCard
@@ -248,6 +248,8 @@ export default function Show() {
                 </div>
               </InfoCard>
 
+              {forecastCard}
+
               <ProjectPrivateNotes project={project} />
               <ProjectPublicNotes project={project} />
             </div>
@@ -281,7 +283,7 @@ export default function Show() {
               </div>
             )}
           </div>
-        }
+        )}
       />
 
       <ChangeTemplateModal<Project>

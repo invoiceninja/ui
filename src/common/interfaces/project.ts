@@ -48,4 +48,5 @@ export interface Project {
   expenses?: Expense[];
   quotes?: Quote[];
   current_hours: number;
+  budgeted_amount: number;
 }

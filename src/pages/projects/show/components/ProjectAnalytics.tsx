@@ -46,10 +46,7 @@ import {
 
 type NumberLike = number | string | null | undefined;
 
-type TranslateFn = (
-  key: string,
-  options?: { defaultValue?: string }
-) => string;
+type TranslateFn = (key: string) => string;
 
 type ProjectRow = {
   project_id?: NumberLike;
@@ -231,9 +228,13 @@ type StatCardProps = {
   accent: string;
 };
 
+type ProjectAnalyticsOverviewContent =
+  | ReactNode
+  | ((forecastCard: ReactNode) => ReactNode);
+
 interface ProjectAnalyticsProps {
   project: Project;
-  overviewContent?: ReactNode;
+  overviewContent?: ProjectAnalyticsOverviewContent;
 }
 
 const MONEY_FIELDS = new Set([
@@ -279,49 +280,40 @@ const PERCENT_FIELDS = new Set([
   'health_score',
 ]);
 
-// Chart series labels resolve through i18n. Every chart carries its own
-// axis (Amount / Hours / %), so series labels are the bare metric name —
-// the redundant "amount"/"value"/"hours" unit suffix is dropped. Contexts
-// without an axis (e.g. the forecast key-value table) keep the fuller label.
-const FIELD_LABELS: Record<string, { key: string; defaultValue: string }> = {
-  actual_amount: { key: 'actual', defaultValue: 'Actual' },
-  average_daily_velocity: {
-    key: 'daily_velocity',
-    defaultValue: 'Daily velocity',
-  },
-  billable_hours: { key: 'billable', defaultValue: 'Billable' },
-  billable_value: { key: 'billable', defaultValue: 'Billable' },
-  budget_utilization: { key: 'budget_used', defaultValue: 'Budget used' },
-  budgeted_amount: { key: 'budgeted', defaultValue: 'Budgeted' },
-  cumulative_actual_amount: { key: 'total', defaultValue: 'Total' },
-  cumulative_expense_amount: { key: 'expenses', defaultValue: 'Expenses' },
-  cumulative_labor_value: { key: 'labor', defaultValue: 'Labor' },
-  estimated_hours: { key: 'estimated', defaultValue: 'Estimated' },
-  expense_amount: { key: 'expense', defaultValue: 'Expense' },
-  expense_count: { key: 'count', defaultValue: 'Count' },
-  health_score: { key: 'health', defaultValue: 'Health' },
-  hours: { key: 'logged', defaultValue: 'Logged' },
-  invoice_progress: {
-    key: 'invoice_progress',
-    defaultValue: 'Invoice progress',
-  },
-  invoiced_amount: { key: 'invoiced', defaultValue: 'Invoiced' },
-  labor_value: { key: 'labor', defaultValue: 'Labor' },
-  logged_hours: { key: 'logged', defaultValue: 'Logged' },
-  margin_ratio: { key: 'margin_percentage', defaultValue: 'Margin %' },
-  net_margin: { key: 'net_margin', defaultValue: 'Net margin' },
-  outstanding_amount: { key: 'outstanding', defaultValue: 'Outstanding' },
-  paid_amount: { key: 'paid', defaultValue: 'Paid' },
-  paid_progress: { key: 'paid_progress', defaultValue: 'Paid progress' },
-  remaining_hours: { key: 'remaining', defaultValue: 'Remaining' },
-  schedule_variance_days: {
-    key: 'schedule_variance',
-    defaultValue: 'Schedule variance',
-  },
-  task_value: { key: 'task_value', defaultValue: 'Task value' },
-  unbilled_amount: { key: 'unbilled', defaultValue: 'Unbilled' },
-  unbilled_hours: { key: 'unbilled_hours', defaultValue: 'Unbilled hours' },
-  work_value: { key: 'earned', defaultValue: 'Earned' },
+// Chart-series field -> i18n key. Every chart carries its own axis
+// (Amount / Hours / %), so series labels are the bare metric name —
+// the redundant unit suffix is dropped. No fallback text is supplied, so a
+// missing translation surfaces the key itself rather than English text.
+const FIELD_LABELS: Record<string, string> = {
+  actual_amount: 'actual',
+  average_daily_velocity: 'daily_velocity',
+  billable_hours: 'billable',
+  billable_value: 'billable',
+  budget_utilization: 'budget_used',
+  budgeted_amount: 'budgeted',
+  cumulative_actual_amount: 'total',
+  cumulative_expense_amount: 'expenses',
+  cumulative_labor_value: 'labor',
+  estimated_hours: 'estimated',
+  expense_amount: 'expense',
+  expense_count: 'count',
+  health_score: 'health',
+  hours: 'logged',
+  invoice_progress: 'invoice_progress',
+  invoiced_amount: 'invoiced',
+  labor_value: 'labor',
+  logged_hours: 'logged',
+  margin_ratio: 'margin_percentage',
+  net_margin: 'net_margin',
+  outstanding_amount: 'outstanding',
+  paid_amount: 'paid',
+  paid_progress: 'paid_progress',
+  remaining_hours: 'remaining',
+  schedule_variance_days: 'days_ahead',
+  task_value: 'task_value',
+  unbilled_amount: 'unbilled',
+  unbilled_hours: 'unbilled_hours',
+  work_value: 'earned',
 };
 
 const CHART_COLORS = [
@@ -488,84 +480,81 @@ export function ProjectAnalytics({
     Boolean(projectAnalytics?.timeDistribution.length) ||
     Boolean(projectAnalytics?.velocityTrend.length) ||
     Boolean(projectAnalytics?.expenseBreakdown.length) ||
-    Boolean(projectAnalytics?.cumulativeSpend.length) ||
-    Boolean(projectAnalytics?.recentActivity.length);
+    Boolean(projectAnalytics?.cumulativeSpend.length);
 
   const statCards = [
     {
-      label: t('budgeted', { defaultValue: 'Budgeted' }),
+      label: t('budgeted'),
       value: formatFieldValue(
         'budgeted_amount',
         projectAnalytics?.budgetSummary?.budgeted_amount ??
           projectAnalytics?.budgetVsActual?.budgeted_amount
       ),
-      detail: t('planned_value', { defaultValue: 'Planned value' }),
+      detail: t('planned_value'),
       accent: CHART_COLORS[0],
     },
     {
-      label: t('actual', { defaultValue: 'Actual' }),
+      label: t('actual'),
       value: formatFieldValue(
         'actual_amount',
         projectAnalytics?.budgetSummary?.actual_amount ??
           projectAnalytics?.budgetVsActual?.actual_amount
       ),
-      detail: t('labor_and_expenses', { defaultValue: 'Labor and expenses' }),
+      detail: t('labor_and_expenses'),
       accent: CHART_COLORS[1],
     },
     {
-      label: t('invoiced', { defaultValue: 'Invoiced' }),
+      label: t('invoiced'),
       value: formatFieldValue(
         'invoiced_amount',
         projectAnalytics?.invoiceProgress?.invoiced_amount ??
           projectAnalytics?.budgetSummary?.invoiced_amount
       ),
-      detail: t('sent_to_client', { defaultValue: 'Sent to client' }),
+      detail: t('sent_to_client'),
       accent: CHART_COLORS[2],
     },
     {
-      label: t('paid', { defaultValue: 'Paid' }),
+      label: t('paid'),
       value: formatFieldValue(
         'paid_amount',
         projectAnalytics?.invoiceProgress?.paid_amount ??
           projectAnalytics?.budgetSummary?.paid_amount
       ),
-      detail: t('collected', { defaultValue: 'Collected' }),
+      detail: t('collected'),
       accent: CHART_COLORS[3],
     },
     {
-      label: t('outstanding', { defaultValue: 'Outstanding' }),
+      label: t('outstanding'),
       value: formatFieldValue(
         'outstanding_amount',
         projectAnalytics?.invoiceProgress?.outstanding_amount ??
           projectAnalytics?.budgetSummary?.outstanding_amount
       ),
-      detail: t('remaining_invoice_balance', {
-        defaultValue: 'Remaining invoice balance',
-      }),
+      detail: t('remaining_invoice_balance'),
       accent: CHART_COLORS[4],
     },
     {
-      label: t('health', { defaultValue: 'Health' }),
+      label: t('health'),
       value: formatFieldValue(
         'health_score',
         projectAnalytics?.projectHealth?.health_score
       ),
       detail:
         projectAnalytics?.projectHealth?.health_status ||
-        t('status', { defaultValue: 'Status' }),
+        t('status'),
       accent: CHART_COLORS[5],
     },
     {
-      label: t('logged', { defaultValue: 'Logged' }),
+      label: t('logged'),
       value: formatFieldValue(
         'logged_hours',
         projectAnalytics?.estimatedVsLogged?.logged_hours
       ),
-      detail: t('tracked_time', { defaultValue: 'Tracked time' }),
+      detail: t('tracked_time'),
       accent: CHART_COLORS[0],
     },
     {
-      label: t('unbilled', { defaultValue: 'Unbilled' }),
+      label: t('unbilled'),
       value: formatFieldValue(
         'unbilled_amount',
         projectAnalytics?.unbilledHours?.unbilled_amount
@@ -586,7 +575,7 @@ export function ProjectAnalytics({
           style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
         >
           <Toggle
-            label={t('include_drafts', { defaultValue: 'Include drafts' })}
+            label={t('include_drafts')}
             checked={includeDrafts}
             onValueChange={setIncludeDrafts}
           />
@@ -611,9 +600,7 @@ export function ProjectAnalytics({
             color: colors.$22,
           }}
         >
-          {t('no_project_analytics_data', {
-            defaultValue: 'No analytics data is available for this project yet.',
-          })}
+          {t('no_project_analytics_data')}
         </div>
       )}
 
@@ -629,12 +616,11 @@ export function ProjectAnalytics({
 
           <TabGroup
             tabs={[
-              t('overview', { defaultValue: 'Overview' }),
-              t('financials', { defaultValue: 'Financials' }),
-              t('time', { defaultValue: 'Time' }),
-              t('spend', { defaultValue: 'Spend' }),
-              t('activity', { defaultValue: 'Activity' }),
-              t('burn_up', { defaultValue: 'Burn-up' }),
+              t('overview'),
+              t('profit'),
+              t('time'),
+              t('expenses'),
+              t('burn_up'),
             ]}
             withoutVerticalMargin
             childrenClassName="mt-4"
@@ -642,21 +628,30 @@ export function ProjectAnalytics({
             onTabChange={setActiveTabIndex}
           >
             <div className="space-y-4">
-              {activeTabIndex === 0 && overviewContent}
+              {activeTabIndex === 0 &&
+                renderOverviewContent(
+                  overviewContent,
+                  <AnalyticsCard
+                    title={t('forecast')}
+                    className="col-span-12 xl:col-span-6"
+                    height={240}
+                  >
+                    <ForecastSummary
+                      forecast={projectAnalytics.forecastCompletion}
+                      formatter={formatFieldValue}
+                      dateFormat={dateFormat}
+                    />
+                  </AnalyticsCard>
+                )}
             </div>
 
             <div className="grid grid-cols-12 gap-4">
               {activeTabIndex === 1 && (
+                <>
                 <AnalyticsCard
-                  title={t('profitability_and_margin', {
-                    defaultValue: 'Profitability and margin',
-                  })}
-                  description={t('profitability_and_margin_help', {
-                    defaultValue:
-                      'Compares invoiced totals, expenses, and net margin, with margin percentage on the right axis.',
-                  })}
-                  className="col-span-12 xl:col-span-8"
-                  height={240}
+                  title={t('profit')}
+                  className="col-span-12 xl:col-span-6"
+                  height={320}
                 >
                   <ResponsiveChart>
                     <ComposedChart
@@ -682,7 +677,7 @@ export function ProjectAnalytics({
                         tick={axisTick(colors.$22)}
                         tickFormatter={formatCompact}
                         label={yAxisLabel(
-                          t('amount', { defaultValue: 'Amount' }),
+                          t('amount'),
                           colors.$22
                         )}
                       />
@@ -693,7 +688,7 @@ export function ProjectAnalytics({
                         tick={axisTick(colors.$22)}
                         tickFormatter={(value) => `${toNumber(value) * 100}%`}
                         label={yAxisLabel(
-                          t('margin_percentage', { defaultValue: 'Margin %' }),
+                          t('margin_percentage'),
                           colors.$22,
                           'insideRight'
                         )}
@@ -729,21 +724,9 @@ export function ProjectAnalytics({
                     </ComposedChart>
                   </ResponsiveChart>
                 </AnalyticsCard>
-              )}
-            </div>
 
-            <div className="space-y-4">
-              {activeTabIndex === 2 && (
-                <>
-              <div className="grid grid-cols-12 gap-4">
                 <AnalyticsCard
-                  title={t('budget_vs_actual', {
-                    defaultValue: 'Budget vs actual',
-                  })}
-                  description={t('budget_vs_actual_help', {
-                    defaultValue:
-                      'Compares the planned project value with actual labor and expense value.',
-                  })}
+                  title={t('budget_vs_actual')}
                   className="col-span-12 xl:col-span-6"
                 >
                   <ResponsiveChart>
@@ -761,15 +744,12 @@ export function ProjectAnalytics({
                       margin={{ top: 8, right: 16, left: 42, bottom: 26 }}
                     >
                       <ChartGrid />
-                      <XAxis
-                        dataKey="project_name"
-                        tick={false}
-                      />
+                      <XAxis dataKey="project_name" tick={false} />
                       <YAxis
                         tick={axisTick(colors.$22)}
                         tickFormatter={formatCompact}
                         label={yAxisLabel(
-                          t('amount', { defaultValue: 'Amount' }),
+                          t('amount'),
                           colors.$22
                         )}
                       />
@@ -800,13 +780,75 @@ export function ProjectAnalytics({
                 </AnalyticsCard>
 
                 <AnalyticsCard
-                  title={t('estimated_vs_logged_hours', {
-                    defaultValue: 'Estimated vs logged hours',
-                  })}
-                  description={t('estimated_vs_logged_hours_help', {
-                    defaultValue:
-                      'Compares estimated, logged, billable, and remaining project hours.',
-                  })}
+                  title={t('invoice_and_payment_progress')}
+                  description={t('invoice_and_payment_progress_help')}
+                  className="col-span-12 xl:col-span-6"
+                >
+                  <ResponsiveChart>
+                    <BarChart
+                      data={singleProjectData(
+                        projectAnalytics.invoiceProgress,
+                        project.name,
+                        [
+                          'work_value',
+                          'invoiced_amount',
+                          'paid_amount',
+                          'outstanding_amount',
+                          'unbilled_amount',
+                        ]
+                      )}
+                      margin={{ top: 8, right: 16, left: 42, bottom: 26 }}
+                    >
+                      <ChartGrid />
+                      <XAxis dataKey="project_name" tick={false} />
+                      <YAxis
+                        tick={axisTick(colors.$22)}
+                        tickFormatter={formatCompact}
+                        label={yAxisLabel(
+                          t('amount'),
+                          colors.$22
+                        )}
+                      />
+                      <Tooltip {...chartTooltipProps(formatFieldValue, true)} />
+                      <Legend />
+                      <Bar
+                        dataKey="work_value"
+                        name={fieldLabel('work_value')}
+                        fill={CHART_COLORS[0]}
+                      />
+                      <Bar
+                        dataKey="invoiced_amount"
+                        name={fieldLabel('invoiced_amount')}
+                        fill={CHART_COLORS[2]}
+                      />
+                      <Bar
+                        dataKey="paid_amount"
+                        name={fieldLabel('paid_amount')}
+                        fill={CHART_COLORS[1]}
+                      />
+                      <Bar
+                        dataKey="outstanding_amount"
+                        name={fieldLabel('outstanding_amount')}
+                        fill={CHART_COLORS[3]}
+                      />
+                      <Bar
+                        dataKey="unbilled_amount"
+                        name={fieldLabel('unbilled_amount')}
+                        fill={CHART_COLORS[5]}
+                      />
+                    </BarChart>
+                  </ResponsiveChart>
+                </AnalyticsCard>
+                </>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              {activeTabIndex === 2 && (
+                <>
+              <div className="grid grid-cols-12 gap-4">
+                <AnalyticsCard
+                  title={t('estimated_vs_actual')}
                   className="col-span-12 xl:col-span-6"
                 >
                   <ResponsiveChart>
@@ -816,10 +858,10 @@ export function ProjectAnalytics({
                         projectAnalytics.estimatedVsLogged,
                         project.name,
                         [
-                          'estimated_hours',
-                          'logged_hours',
-                          'billable_hours',
-                          'remaining_hours',
+                          'estimated',
+                          'logged',
+                          'billable',
+                          'remaining',
                         ]
                       )}
                       margin={{ top: 8, right: 16, left: 16, bottom: 26 }}
@@ -829,10 +871,6 @@ export function ProjectAnalytics({
                         type="number"
                         tick={axisTick(colors.$22)}
                         tickFormatter={formatCompact}
-                        label={xAxisLabel(
-                          t('hours', { defaultValue: 'Hours' }),
-                          colors.$22
-                        )}
                       />
                       <YAxis
                         type="category"
@@ -867,82 +905,7 @@ export function ProjectAnalytics({
                 </AnalyticsCard>
 
               <AnalyticsCard
-                title={t('invoice_and_payment_progress', {
-                  defaultValue: 'Invoice and payment progress',
-                })}
-                description={t('invoice_and_payment_progress_help', {
-                  defaultValue:
-                    'Shows earned work value against invoiced, paid, outstanding, and unbilled amounts.',
-                })}
-                className="col-span-12 xl:col-span-6"
-              >
-                <ResponsiveChart>
-                  <BarChart
-                    data={singleProjectData(
-                      projectAnalytics.invoiceProgress,
-                      project.name,
-                      [
-                        'work_value',
-                        'invoiced_amount',
-                        'paid_amount',
-                        'outstanding_amount',
-                        'unbilled_amount',
-                      ]
-                    )}
-                    margin={{ top: 8, right: 16, left: 42, bottom: 26 }}
-                  >
-                    <ChartGrid />
-                    <XAxis
-                      dataKey="project_name"
-                      tick={false}
-                    />
-                    <YAxis
-                      tick={axisTick(colors.$22)}
-                      tickFormatter={formatCompact}
-                      label={yAxisLabel(
-                        t('amount', { defaultValue: 'Amount' }),
-                        colors.$22
-                      )}
-                    />
-                    <Tooltip {...chartTooltipProps(formatFieldValue, true)} />
-                    <Legend />
-                    <Bar
-                      dataKey="work_value"
-                      name={fieldLabel('work_value')}
-                      fill={CHART_COLORS[0]}
-                    />
-                    <Bar
-                      dataKey="invoiced_amount"
-                      name={fieldLabel('invoiced_amount')}
-                      fill={CHART_COLORS[2]}
-                    />
-                    <Bar
-                      dataKey="paid_amount"
-                      name={fieldLabel('paid_amount')}
-                      fill={CHART_COLORS[1]}
-                    />
-                    <Bar
-                      dataKey="outstanding_amount"
-                      name={fieldLabel('outstanding_amount')}
-                      fill={CHART_COLORS[3]}
-                    />
-                    <Bar
-                      dataKey="unbilled_amount"
-                      name={fieldLabel('unbilled_amount')}
-                      fill={CHART_COLORS[5]}
-                    />
-                  </BarChart>
-                </ResponsiveChart>
-              </AnalyticsCard>
-
-              <AnalyticsCard
-                title={t('project_health_and_schedule_variance', {
-                  defaultValue: 'Project health and schedule variance',
-                })}
-                description={t('project_health_and_schedule_variance_help', {
-                  defaultValue:
-                    'Shows project health score and schedule variance from the forecast.',
-                })}
+                title={t('health_check')}
                 className="col-span-12 xl:col-span-6"
               >
                 <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
@@ -966,7 +929,7 @@ export function ProjectAnalytics({
                           tick={axisTick(colors.$22)}
                           tickFormatter={(value) => `${value}%`}
                           label={yAxisLabel(
-                            t('health_score', { defaultValue: 'Health score' }),
+                            t('health_score'),
                             colors.$22
                           )}
                         />
@@ -999,9 +962,7 @@ export function ProjectAnalytics({
                         <YAxis
                           tick={axisTick(colors.$22)}
                           label={yAxisLabel(
-                            t('days_variance', {
-                              defaultValue: 'Days variance',
-                            }),
+                            t('days_ahead'),
                             colors.$22
                           )}
                         />
@@ -1020,14 +981,8 @@ export function ProjectAnalytics({
               </AnalyticsCard>
 
               <AnalyticsCard
-                title={t('forecast_completion', {
-                  defaultValue: 'Forecast completion',
-                })}
-                description={t('forecast_completion_help', {
-                  defaultValue:
-                    'Summarizes projected completion timing from current project velocity.',
-                })}
-                className="col-span-12 xl:col-span-4"
+                title={t('forecast')}
+                className="col-span-12 xl:col-span-6"
                 height={240}
               >
                 <ForecastSummary
@@ -1040,13 +995,7 @@ export function ProjectAnalytics({
 
             <div className="grid grid-cols-12 gap-4">
               <AnalyticsCard
-                title={t('team_time_contribution', {
-                  defaultValue: 'Team time contribution',
-                })}
-                description={t('team_time_contribution_help', {
-                  defaultValue:
-                    'Shows logged and billable hours by team member.',
-                })}
+                title={t('team_distribution')}
                 className="col-span-12 xl:col-span-6"
               >
                 <ResponsiveChart>
@@ -1065,17 +1014,12 @@ export function ProjectAnalytics({
                       angle={-25}
                       textAnchor="end"
                       height={54}
-                      label={xAxisLabel(
-                        t('team_member', { defaultValue: 'Team member' }),
-                        colors.$22,
-                        -12
-                      )}
                     />
                     <YAxis
                       tick={axisTick(colors.$22)}
                       tickFormatter={formatCompact}
                       label={yAxisLabel(
-                        t('hours', { defaultValue: 'Hours' }),
+                        t('hours'),
                         colors.$22
                       )}
                     />
@@ -1096,13 +1040,7 @@ export function ProjectAnalytics({
               </AnalyticsCard>
 
               <AnalyticsCard
-                title={t('task_time_distribution', {
-                  defaultValue: 'Task time distribution',
-                })}
-                description={t('task_time_distribution_help', {
-                  defaultValue:
-                    'Shows logged and billable hours by task or work item.',
-                })}
+                title={t('task_distribution')}
                 className="col-span-12 xl:col-span-6"
                 height={taskTimeDistributionHeight}
               >
@@ -1118,7 +1056,7 @@ export function ProjectAnalytics({
                       tick={axisTick(colors.$22)}
                       tickFormatter={formatCompact}
                       label={xAxisLabel(
-                        t('hours', { defaultValue: 'Hours' }),
+                        t('hours'),
                         colors.$22
                       )}
                     />
@@ -1152,13 +1090,7 @@ export function ProjectAnalytics({
               </AnalyticsCard>
 
               <AnalyticsCard
-                title={t('time_velocity_trend', {
-                  defaultValue: 'Time velocity trend',
-                })}
-                description={t('time_velocity_trend_help', {
-                  defaultValue:
-                    'Shows tracked and billable hours over each reporting period.',
-                })}
+                title={t('task_velocity')}
                 className="col-span-12 xl:col-span-6"
               >
                 <ResponsiveChart>
@@ -1174,16 +1106,12 @@ export function ProjectAnalytics({
                     <XAxis
                       dataKey="period"
                       tick={axisTick(colors.$22)}
-                      label={xAxisLabel(
-                        t('period', { defaultValue: 'Period' }),
-                        colors.$22
-                      )}
                     />
                     <YAxis
                       tick={axisTick(colors.$22)}
                       tickFormatter={formatCompact}
                       label={yAxisLabel(
-                        t('hours', { defaultValue: 'Hours' }),
+                        t('hours'),
                         colors.$22
                       )}
                     />
@@ -1217,12 +1145,7 @@ export function ProjectAnalytics({
               {activeTabIndex === 3 && (
                 <>
               <AnalyticsCard
-                title={t('expense_breakdown_by_category', {
-                  defaultValue: 'Expense breakdown by category',
-                })}
-                description={t('expense_breakdown_by_category_help', {
-                  defaultValue: 'Shows project expenses grouped by category.',
-                })}
+                title={t('expenses')}
                 className="col-span-12 xl:col-span-6"
               >
                 {projectAnalytics.expenseBreakdown.length <= 6 ? (
@@ -1232,6 +1155,8 @@ export function ProjectAnalytics({
                         data={expenseBreakdownData}
                         dataKey="expense_amount"
                         nameKey="category_name"
+                        cx="34%"
+                        cy="50%"
                         innerRadius={54}
                         outerRadius={92}
                         paddingAngle={2}
@@ -1251,7 +1176,35 @@ export function ProjectAnalytics({
                           showPercent: true,
                         })}
                       />
-                      <Legend />
+                      <Legend
+                        align="right"
+                        iconType="circle"
+                        layout="vertical"
+                        verticalAlign="middle"
+                        wrapperStyle={{
+                          color: colors.$22,
+                          fontSize: 12,
+                          lineHeight: '18px',
+                          maxWidth: 168,
+                          paddingLeft: 12,
+                          right: 8,
+                        }}
+                        formatter={(value) => (
+                          <span
+                            style={{
+                              color: colors.$22,
+                              display: 'inline-block',
+                              maxWidth: 132,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              verticalAlign: 'middle',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {cleanTooltipText(value) || '-'}
+                          </span>
+                        )}
+                      />
                     </PieChart>
                   </ResponsiveChart>
                 ) : (
@@ -1268,9 +1221,7 @@ export function ProjectAnalytics({
                         textAnchor="end"
                         height={54}
                         label={xAxisLabel(
-                          t('expense_category', {
-                            defaultValue: 'Expense category',
-                          }),
+                          t('expense_category'),
                           colors.$22,
                           -12
                         )}
@@ -1279,7 +1230,7 @@ export function ProjectAnalytics({
                         tick={axisTick(colors.$22)}
                         tickFormatter={formatCompact}
                         label={yAxisLabel(
-                          t('amount', { defaultValue: 'Amount' }),
+                          t('amount'),
                           colors.$22
                         )}
                       />
@@ -1296,13 +1247,7 @@ export function ProjectAnalytics({
               </AnalyticsCard>
 
               <AnalyticsCard
-                title={t('cumulative_spend_over_time', {
-                  defaultValue: 'Cumulative spend over time',
-                })}
-                description={t('cumulative_spend_over_time_help', {
-                  defaultValue:
-                    'Shows cumulative labor, expense, and total project spend over time.',
-                })}
+                title={`${t('expenses')} / ${t('time')}`}
                 className="col-span-12 xl:col-span-8"
               >
                 <ResponsiveChart>
@@ -1319,7 +1264,7 @@ export function ProjectAnalytics({
                       dataKey="period"
                       tick={axisTick(colors.$22)}
                       label={xAxisLabel(
-                        t('period', { defaultValue: 'Period' }),
+                        t('period'),
                         colors.$22
                       )}
                     />
@@ -1327,7 +1272,7 @@ export function ProjectAnalytics({
                       tick={axisTick(colors.$22)}
                       tickFormatter={formatCompact}
                       label={yAxisLabel(
-                        t('amount', { defaultValue: 'Amount' }),
+                        t('amount'),
                         colors.$22
                       )}
                     />
@@ -1364,29 +1309,8 @@ export function ProjectAnalytics({
               )}
             </div>
 
-            <div className="grid grid-cols-12 gap-4">
-              {activeTabIndex === 4 && (
-                <AnalyticsCard
-                  title={t('recent_project_activity', {
-                    defaultValue: 'Recent project activity',
-                  })}
-                  description={t('recent_project_activity_help', {
-                    defaultValue:
-                      'Lists recent project activity and the related amount.',
-                  })}
-                  className="col-span-12 xl:col-span-4"
-                >
-                  <RecentActivityTable
-                    rows={projectAnalytics.recentActivity}
-                    formatter={formatFieldValue}
-                    dateFormat={dateFormat}
-                  />
-                </AnalyticsCard>
-              )}
-            </div>
-
             <div>
-              {activeTabIndex === 5 && (
+              {activeTabIndex === 4 && (
                 <Burnup
                   project={project}
                   includeDrafts={includeDrafts}
@@ -1464,6 +1388,22 @@ function ResponsiveChart({ children }: { children: ReactElement }) {
         {children}
       </ResponsiveContainer>
     </div>
+  );
+}
+
+function renderOverviewContent(
+  overviewContent: ProjectAnalyticsOverviewContent | undefined,
+  forecastCard: ReactNode
+) {
+  if (typeof overviewContent === 'function') {
+    return overviewContent(forecastCard);
+  }
+
+  return (
+    <>
+      {overviewContent}
+      {forecastCard}
+    </>
   );
 }
 
@@ -1570,14 +1510,13 @@ function ForecastSummary({
   formatter: Formatter;
   dateFormat: string;
 }) {
-  const [t] = useTranslation();
+  const [tFn] = useTranslation();
+  const t = tFn as TranslateFn;
 
   if (!forecast) {
     return (
       <EmptyState>
-        {t('no_forecast_data', {
-          defaultValue: 'No forecast data is available.',
-        })}
+        {t('no_forecast_data')}
       </EmptyState>
     );
   }
@@ -1591,11 +1530,11 @@ function ForecastSummary({
       ),
     },
     {
-      label: t('remaining_hours', { defaultValue: 'Remaining hours' }),
+      label: t('remaining_hours'),
       value: formatter('remaining_hours', forecast.remaining_hours),
     },
     {
-      label: t('forecast_finish', { defaultValue: 'Forecast finish' }),
+      label: t('forecast_finish'),
       value: forecast.forecast_finish_date
         ? formatDate(forecast.forecast_finish_date, dateFormat)
         : '-',
@@ -1627,9 +1566,7 @@ function RecentActivityTable({
   if (!rows.length) {
     return (
       <EmptyState>
-        {t('no_recent_activity', {
-          defaultValue: 'No recent activity is available.',
-        })}
+        {t('no_recent_activity')}
       </EmptyState>
     );
   }
@@ -1640,13 +1577,13 @@ function RecentActivityTable({
         <thead>
           <tr style={{ color: colors.$22 }}>
             <th className="py-2 pr-3 font-medium">
-              {t('date', { defaultValue: 'Date' })}
+              {t('date')}
             </th>
             <th className="py-2 pr-3 font-medium">
-              {t('activity', { defaultValue: 'Activity' })}
+              {t('activity')}
             </th>
             <th className="py-2 text-right font-medium">
-              {t('amount', { defaultValue: 'Amount' })}
+              {t('amount')}
             </th>
           </tr>
         </thead>
@@ -1761,7 +1698,7 @@ function normalizeTaskDistributionRows(
   rows: TaskDistributionRow[] | undefined,
   t: TranslateFn
 ): ChartDatum[] {
-  const taskLabel = t('task', { defaultValue: 'Task' });
+  const taskLabel = t('task');
 
   return normalizeRows(rows, [
     'logged_hours',
@@ -1817,11 +1754,9 @@ function formatPercent(value: number) {
 }
 
 function resolveFieldLabel(t: TranslateFn, key: string) {
-  const def = FIELD_LABELS[key];
+  const translationKey = FIELD_LABELS[key];
 
-  return def
-    ? t(def.key, { defaultValue: def.defaultValue })
-    : key.replace(/_/g, ' ');
+  return translationKey ? t(translationKey) : key.replace(/_/g, ' ');
 }
 
 function resolveTooltipLabel(
