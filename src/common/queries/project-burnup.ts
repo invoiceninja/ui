@@ -25,14 +25,14 @@ export function useProjectBurnupQuery(
   options?: QueryOptions
 ) {
   return useQuery<ProjectBurnupResponse>({
-    queryKey: ['/api/v1/charts/project_burnup', payload],
+    queryKey: ['/api/v1/charts/project_burnup/:id', payload.project_id],
     queryFn: () =>
       request(
         'POST',
-        endpoint('/api/v1/charts/project_burnup'),
+        endpoint('/api/v1/charts/project_burnup/:id', { id: payload.project_id }),
         payload
       ).then((response) => response.data),
     staleTime: Infinity,
-    enabled: options?.enabled ?? true,
+    enabled: options?.enabled ?? !!payload.project_id,
   });
 }

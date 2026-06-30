@@ -24,6 +24,7 @@ import { TabGroup } from '$app/components/TabGroup';
 import Burnup from '$app/pages/projects/burnup/Burnup';
 import classNames from 'classnames';
 import { ReactElement, ReactNode, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import {
   Bar,
@@ -44,6 +45,11 @@ import {
 } from 'recharts';
 
 type NumberLike = number | string | null | undefined;
+
+type TranslateFn = (
+  key: string,
+  options?: { defaultValue?: string }
+) => string;
 
 type ProjectRow = {
   project_id?: NumberLike;
@@ -186,11 +192,21 @@ type ChartDatum = Record<string, unknown>;
 
 type Formatter = (dataKey: string, value: unknown) => ReactNode;
 
+type ChartTooltipOptions = {
+  itemOnly?: boolean;
+  labelKey?: string;
+  nameKey?: string;
+  percentTotal?: number;
+  showPercent?: boolean;
+};
+
 type ChartTooltipPayloadItem = {
   color?: string;
   dataKey?: string | number;
   fill?: string;
   name?: string | number;
+  payload?: ChartDatum;
+  percent?: unknown;
   value?: unknown;
 };
 
@@ -263,36 +279,49 @@ const PERCENT_FIELDS = new Set([
   'health_score',
 ]);
 
-const FIELD_LABELS: Record<string, string> = {
-  actual_amount: 'Actual project value',
-  average_daily_velocity: 'Daily velocity',
-  billable_hours: 'Billable hours',
-  billable_value: 'Billable value',
-  budget_utilization: 'Budget used',
-  budgeted_amount: 'Budgeted project value',
-  cumulative_actual_amount: 'Actual spend',
-  cumulative_expense_amount: 'Expenses',
-  cumulative_labor_value: 'Labor',
-  estimated_hours: 'Estimated hours',
-  expense_amount: 'Expense amount',
-  expense_count: 'Expense count',
-  health_score: 'Health score',
-  hours: 'Logged hours',
-  invoice_progress: 'Invoice progress',
-  invoiced_amount: 'Invoiced amount',
-  labor_value: 'Labor value',
-  logged_hours: 'Logged hours',
-  margin_ratio: 'Margin %',
-  net_margin: 'Net margin',
-  outstanding_amount: 'Outstanding amount',
-  paid_amount: 'Paid amount',
-  paid_progress: 'Paid progress',
-  remaining_hours: 'Remaining hours',
-  schedule_variance_days: 'Schedule variance',
-  task_value: 'Task value',
-  unbilled_amount: 'Unbilled amount',
-  unbilled_hours: 'Unbilled hours',
-  work_value: 'Work value',
+// Chart series labels resolve through i18n. Every chart carries its own
+// axis (Amount / Hours / %), so series labels are the bare metric name —
+// the redundant "amount"/"value"/"hours" unit suffix is dropped. Contexts
+// without an axis (e.g. the forecast key-value table) keep the fuller label.
+const FIELD_LABELS: Record<string, { key: string; defaultValue: string }> = {
+  actual_amount: { key: 'actual', defaultValue: 'Actual' },
+  average_daily_velocity: {
+    key: 'daily_velocity',
+    defaultValue: 'Daily velocity',
+  },
+  billable_hours: { key: 'billable', defaultValue: 'Billable' },
+  billable_value: { key: 'billable', defaultValue: 'Billable' },
+  budget_utilization: { key: 'budget_used', defaultValue: 'Budget used' },
+  budgeted_amount: { key: 'budgeted', defaultValue: 'Budgeted' },
+  cumulative_actual_amount: { key: 'total', defaultValue: 'Total' },
+  cumulative_expense_amount: { key: 'expenses', defaultValue: 'Expenses' },
+  cumulative_labor_value: { key: 'labor', defaultValue: 'Labor' },
+  estimated_hours: { key: 'estimated', defaultValue: 'Estimated' },
+  expense_amount: { key: 'expense', defaultValue: 'Expense' },
+  expense_count: { key: 'count', defaultValue: 'Count' },
+  health_score: { key: 'health', defaultValue: 'Health' },
+  hours: { key: 'logged', defaultValue: 'Logged' },
+  invoice_progress: {
+    key: 'invoice_progress',
+    defaultValue: 'Invoice progress',
+  },
+  invoiced_amount: { key: 'invoiced', defaultValue: 'Invoiced' },
+  labor_value: { key: 'labor', defaultValue: 'Labor' },
+  logged_hours: { key: 'logged', defaultValue: 'Logged' },
+  margin_ratio: { key: 'margin_percentage', defaultValue: 'Margin %' },
+  net_margin: { key: 'net_margin', defaultValue: 'Net margin' },
+  outstanding_amount: { key: 'outstanding', defaultValue: 'Outstanding' },
+  paid_amount: { key: 'paid', defaultValue: 'Paid' },
+  paid_progress: { key: 'paid_progress', defaultValue: 'Paid progress' },
+  remaining_hours: { key: 'remaining', defaultValue: 'Remaining' },
+  schedule_variance_days: {
+    key: 'schedule_variance',
+    defaultValue: 'Schedule variance',
+  },
+  task_value: { key: 'task_value', defaultValue: 'Task value' },
+  unbilled_amount: { key: 'unbilled', defaultValue: 'Unbilled' },
+  unbilled_hours: { key: 'unbilled_hours', defaultValue: 'Unbilled hours' },
+  work_value: { key: 'earned', defaultValue: 'Earned' },
 };
 
 const CHART_COLORS = [
@@ -311,29 +340,27 @@ export function ProjectAnalytics({
   project,
   overviewContent,
 }: ProjectAnalyticsProps) {
+  const [tFn] = useTranslation();
+  const t = tFn as TranslateFn;
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const formatNumber = useFormatNumber();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const [includeDrafts, setIncludeDrafts] = useState(false);
-  const [hoveredBarDataKey, setHoveredBarDataKey] = useState<string | null>(
-    null
-  );
+  const fieldLabel = (key: string) => resolveFieldLabel(t, key);
 
-  const barHoverProps = (dataKey: string) => ({
-    onMouseEnter: () => setHoveredBarDataKey(dataKey),
-    onMouseLeave: () => setHoveredBarDataKey(null),
-  });
+  const [includeDrafts, setIncludeDrafts] = useState(false);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
 
   const analytics = useQuery<ProjectAnalyticsResponse>({
-    queryKey: ['/api/v1/charts/project_analytics', includeDrafts],
+    queryKey: ['/api/v1/charts/project_analytics/:id', project.id, includeDrafts],
     queryFn: () =>
-      request('POST', endpoint('/api/v1/charts/project_analytics'), {
+      request('POST', endpoint('/api/v1/charts/project_analytics/:id', { id: project.id }), {
         include_drafts: includeDrafts,
       }).then((response) => response.data),
     staleTime: Infinity,
+    enabled: !!project.id,
   });
 
   const currencyId =
@@ -424,6 +451,30 @@ export function ProjectAnalytics({
     };
   }, [analytics.data, project.id]);
 
+  const timeDistributionData = useMemo(
+    () => normalizeTaskDistributionRows(projectAnalytics?.timeDistribution, t),
+    [projectAnalytics?.timeDistribution, t]
+  );
+
+  const expenseBreakdownData = useMemo(
+    () =>
+      normalizeRows(projectAnalytics?.expenseBreakdown, [
+        'expense_amount',
+        'expense_count',
+      ]),
+    [projectAnalytics?.expenseBreakdown]
+  );
+
+  const expenseBreakdownTotal = useMemo(
+    () => sumChartValues(expenseBreakdownData, 'expense_amount'),
+    [expenseBreakdownData]
+  );
+
+  const taskTimeDistributionHeight = Math.max(
+    320,
+    Math.min(560, timeDistributionData.length * 34 + 96)
+  );
+
   const hasAnyProjectData =
     Boolean(projectAnalytics?.budgetVsActual) ||
     Boolean(projectAnalytics?.estimatedVsLogged) ||
@@ -442,75 +493,79 @@ export function ProjectAnalytics({
 
   const statCards = [
     {
-      label: 'Budgeted',
+      label: t('budgeted', { defaultValue: 'Budgeted' }),
       value: formatFieldValue(
         'budgeted_amount',
         projectAnalytics?.budgetSummary?.budgeted_amount ??
           projectAnalytics?.budgetVsActual?.budgeted_amount
       ),
-      detail: 'planned value',
+      detail: t('planned_value', { defaultValue: 'Planned value' }),
       accent: CHART_COLORS[0],
     },
     {
-      label: 'Actual',
+      label: t('actual', { defaultValue: 'Actual' }),
       value: formatFieldValue(
         'actual_amount',
         projectAnalytics?.budgetSummary?.actual_amount ??
           projectAnalytics?.budgetVsActual?.actual_amount
       ),
-      detail: 'labor and expenses',
+      detail: t('labor_and_expenses', { defaultValue: 'Labor and expenses' }),
       accent: CHART_COLORS[1],
     },
     {
-      label: 'Invoiced',
+      label: t('invoiced', { defaultValue: 'Invoiced' }),
       value: formatFieldValue(
         'invoiced_amount',
         projectAnalytics?.invoiceProgress?.invoiced_amount ??
           projectAnalytics?.budgetSummary?.invoiced_amount
       ),
-      detail: 'sent to client',
+      detail: t('sent_to_client', { defaultValue: 'Sent to client' }),
       accent: CHART_COLORS[2],
     },
     {
-      label: 'Paid',
+      label: t('paid', { defaultValue: 'Paid' }),
       value: formatFieldValue(
         'paid_amount',
         projectAnalytics?.invoiceProgress?.paid_amount ??
           projectAnalytics?.budgetSummary?.paid_amount
       ),
-      detail: 'collected',
+      detail: t('collected', { defaultValue: 'Collected' }),
       accent: CHART_COLORS[3],
     },
     {
-      label: 'Outstanding',
+      label: t('outstanding', { defaultValue: 'Outstanding' }),
       value: formatFieldValue(
         'outstanding_amount',
         projectAnalytics?.invoiceProgress?.outstanding_amount ??
           projectAnalytics?.budgetSummary?.outstanding_amount
       ),
-      detail: 'remaining invoice balance',
+      detail: t('remaining_invoice_balance', {
+        defaultValue: 'Remaining invoice balance',
+      }),
       accent: CHART_COLORS[4],
     },
     {
-      label: 'Health',
+      label: t('health', { defaultValue: 'Health' }),
       value: formatFieldValue(
         'health_score',
         projectAnalytics?.projectHealth?.health_score
       ),
-      detail: projectAnalytics?.projectHealth?.health_status || 'status',
+      detail:
+        projectAnalytics?.projectHealth?.health_status ||
+        t('status', { defaultValue: 'Status' }),
       accent: CHART_COLORS[5],
     },
     {
-      label: 'Logged',
+      label: t('logged', { defaultValue: 'Logged' }),
       value: formatFieldValue(
         'logged_hours',
         projectAnalytics?.estimatedVsLogged?.logged_hours
       ),
-      detail: 'tracked time',
+      detail: t('tracked_time', { defaultValue: 'Tracked time' }),
       accent: CHART_COLORS[0],
     },
     {
-      label: 'Unbilled',
+      label: t('unbilled', { defaultValue: 'Unbilled' }),
       value: formatFieldValue(
         'unbilled_amount',
         projectAnalytics?.unbilledHours?.unbilled_amount
@@ -531,7 +586,7 @@ export function ProjectAnalytics({
           style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
         >
           <Toggle
-            label="Include drafts"
+            label={t('include_drafts', { defaultValue: 'Include drafts' })}
             checked={includeDrafts}
             onValueChange={setIncludeDrafts}
           />
@@ -556,7 +611,9 @@ export function ProjectAnalytics({
             color: colors.$22,
           }}
         >
-          No analytics data is available for this project yet.
+          {t('no_project_analytics_data', {
+            defaultValue: 'No analytics data is available for this project yet.',
+          })}
         </div>
       )}
 
@@ -572,109 +629,121 @@ export function ProjectAnalytics({
 
           <TabGroup
             tabs={[
-              'Overview',
-              'Financials',
-              'Time',
-              'Spend',
-              'Activity',
-              'Burn-up',
+              t('overview', { defaultValue: 'Overview' }),
+              t('financials', { defaultValue: 'Financials' }),
+              t('time', { defaultValue: 'Time' }),
+              t('spend', { defaultValue: 'Spend' }),
+              t('activity', { defaultValue: 'Activity' }),
+              t('burn_up', { defaultValue: 'Burn-up' }),
             ]}
             withoutVerticalMargin
             childrenClassName="mt-4"
+            defaultTabIndex={activeTabIndex}
+            onTabChange={setActiveTabIndex}
           >
             <div className="space-y-4">
-              {overviewContent}
+              {activeTabIndex === 0 && overviewContent}
             </div>
 
             <div className="grid grid-cols-12 gap-4">
-              <AnalyticsCard
-                title="Profitability and margin"
-                description="Compares invoiced amount, expenses, and net margin, with margin percentage on the right axis."
-                className="col-span-12 xl:col-span-8"
-                height={240}
-              >
-                <ResponsiveChart>
-                  <ComposedChart
-                    data={singleProjectData(
-                      projectAnalytics.profitability,
-                      project.name,
-                      [
-                        'invoiced_amount',
-                        'expense_amount',
-                        'net_margin',
-                        'margin_ratio',
-                      ]
-                    )}
-                    margin={{ top: 8, right: 48, left: 42, bottom: 26 }}
-                  >
-                    <ChartGrid />
-                    <XAxis
-                      dataKey="project_name"
-                      tick={false}
-                      label={xAxisLabel('Project', colors.$22)}
-                    />
-                    <YAxis
-                      yAxisId="amount"
-                      tick={axisTick(colors.$22)}
-                      tickFormatter={formatCompact}
-                      label={yAxisLabel('Amount', colors.$22)}
-                    />
-                    <YAxis
-                      yAxisId="ratio"
-                      orientation="right"
-                      domain={[0, 1]}
-                      tick={axisTick(colors.$22)}
-                      tickFormatter={(value) => `${toNumber(value) * 100}%`}
-                      label={yAxisLabel(
-                        'Margin %',
-                        colors.$22,
-                        'insideRight'
+              {activeTabIndex === 1 && (
+                <AnalyticsCard
+                  title={t('profitability_and_margin', {
+                    defaultValue: 'Profitability and margin',
+                  })}
+                  description={t('profitability_and_margin_help', {
+                    defaultValue:
+                      'Compares invoiced totals, expenses, and net margin, with margin percentage on the right axis.',
+                  })}
+                  className="col-span-12 xl:col-span-8"
+                  height={240}
+                >
+                  <ResponsiveChart>
+                    <ComposedChart
+                      data={singleProjectData(
+                        projectAnalytics.profitability,
+                        project.name,
+                        [
+                          'invoiced_amount',
+                          'expense_amount',
+                          'net_margin',
+                          'margin_ratio',
+                        ]
                       )}
-                    />
-                    <ChartTooltip
-                      formatter={formatFieldValue}
-                      highlightedDataKey={hoveredBarDataKey}
-                    />
-                    <Legend />
-                    <Bar
-                      {...barHoverProps('invoiced_amount')}
-                      yAxisId="amount"
-                      dataKey="invoiced_amount"
-                      name={FIELD_LABELS.invoiced_amount}
-                      fill={CHART_COLORS[0]}
-                    />
-                    <Bar
-                      {...barHoverProps('expense_amount')}
-                      yAxisId="amount"
-                      dataKey="expense_amount"
-                      name={FIELD_LABELS.expense_amount}
-                      fill={CHART_COLORS[2]}
-                    />
-                    <Bar
-                      {...barHoverProps('net_margin')}
-                      yAxisId="amount"
-                      dataKey="net_margin"
-                      name={FIELD_LABELS.net_margin}
-                      fill={CHART_COLORS[1]}
-                    />
-                    <Line
-                      yAxisId="ratio"
-                      type="monotone"
-                      dataKey="margin_ratio"
-                      name={FIELD_LABELS.margin_ratio}
-                      stroke={CHART_COLORS[3]}
-                      strokeWidth={2}
-                    />
-                  </ComposedChart>
-                </ResponsiveChart>
-              </AnalyticsCard>
+                      margin={{ top: 8, right: 48, left: 42, bottom: 26 }}
+                    >
+                      <ChartGrid />
+                      <XAxis
+                        dataKey="project_name"
+                        tick={false}
+                      />
+                      <YAxis
+                        yAxisId="amount"
+                        tick={axisTick(colors.$22)}
+                        tickFormatter={formatCompact}
+                        label={yAxisLabel(
+                          t('amount', { defaultValue: 'Amount' }),
+                          colors.$22
+                        )}
+                      />
+                      <YAxis
+                        yAxisId="ratio"
+                        orientation="right"
+                        domain={[0, 1]}
+                        tick={axisTick(colors.$22)}
+                        tickFormatter={(value) => `${toNumber(value) * 100}%`}
+                        label={yAxisLabel(
+                          t('margin_percentage', { defaultValue: 'Margin %' }),
+                          colors.$22,
+                          'insideRight'
+                        )}
+                      />
+                      <Tooltip {...chartTooltipProps(formatFieldValue)} />
+                      <Legend />
+                      <Bar
+                        yAxisId="amount"
+                        dataKey="invoiced_amount"
+                        name={fieldLabel('invoiced_amount')}
+                        fill={CHART_COLORS[0]}
+                      />
+                      <Bar
+                        yAxisId="amount"
+                        dataKey="expense_amount"
+                        name={fieldLabel('expense_amount')}
+                        fill={CHART_COLORS[2]}
+                      />
+                      <Bar
+                        yAxisId="amount"
+                        dataKey="net_margin"
+                        name={fieldLabel('net_margin')}
+                        fill={CHART_COLORS[1]}
+                      />
+                      <Line
+                        yAxisId="ratio"
+                        type="monotone"
+                        dataKey="margin_ratio"
+                        name={fieldLabel('margin_ratio')}
+                        stroke={CHART_COLORS[3]}
+                        strokeWidth={2}
+                      />
+                    </ComposedChart>
+                  </ResponsiveChart>
+                </AnalyticsCard>
+              )}
             </div>
 
             <div className="space-y-4">
+              {activeTabIndex === 2 && (
+                <>
               <div className="grid grid-cols-12 gap-4">
                 <AnalyticsCard
-                  title="Budget vs actual value"
-                  description="Compares the planned project value with actual labor and expense value."
+                  title={t('budget_vs_actual', {
+                    defaultValue: 'Budget vs actual',
+                  })}
+                  description={t('budget_vs_actual_help', {
+                    defaultValue:
+                      'Compares the planned project value with actual labor and expense value.',
+                  })}
                   className="col-span-12 xl:col-span-6"
                 >
                   <ResponsiveChart>
@@ -695,40 +764,35 @@ export function ProjectAnalytics({
                       <XAxis
                         dataKey="project_name"
                         tick={false}
-                        label={xAxisLabel('Project', colors.$22)}
                       />
                       <YAxis
                         tick={axisTick(colors.$22)}
                         tickFormatter={formatCompact}
-                        label={yAxisLabel('Amount', colors.$22)}
+                        label={yAxisLabel(
+                          t('amount', { defaultValue: 'Amount' }),
+                          colors.$22
+                        )}
                       />
-                      <ChartTooltip
-                        formatter={formatFieldValue}
-                        highlightedDataKey={hoveredBarDataKey}
-                      />
+                      <Tooltip {...chartTooltipProps(formatFieldValue, true)} />
                       <Legend />
                       <Bar
-                        {...barHoverProps('budgeted_amount')}
                         dataKey="budgeted_amount"
-                        name={FIELD_LABELS.budgeted_amount}
+                        name={fieldLabel('budgeted_amount')}
                         fill={CHART_COLORS[0]}
                       />
                       <Bar
-                        {...barHoverProps('actual_amount')}
                         dataKey="actual_amount"
-                        name={FIELD_LABELS.actual_amount}
+                        name={fieldLabel('actual_amount')}
                         fill={CHART_COLORS[1]}
                       />
                       <Bar
-                        {...barHoverProps('labor_value')}
                         dataKey="labor_value"
-                        name={FIELD_LABELS.labor_value}
+                        name={fieldLabel('labor_value')}
                         fill={CHART_COLORS[4]}
                       />
                       <Bar
-                        {...barHoverProps('expense_amount')}
                         dataKey="expense_amount"
-                        name={FIELD_LABELS.expense_amount}
+                        name={fieldLabel('expense_amount')}
                         fill={CHART_COLORS[2]}
                       />
                     </BarChart>
@@ -736,8 +800,13 @@ export function ProjectAnalytics({
                 </AnalyticsCard>
 
                 <AnalyticsCard
-                  title="Estimated vs logged hours"
-                  description="Compares estimated, logged, billable, and remaining project hours."
+                  title={t('estimated_vs_logged_hours', {
+                    defaultValue: 'Estimated vs logged hours',
+                  })}
+                  description={t('estimated_vs_logged_hours_help', {
+                    defaultValue:
+                      'Compares estimated, logged, billable, and remaining project hours.',
+                  })}
                   className="col-span-12 xl:col-span-6"
                 >
                   <ResponsiveChart>
@@ -760,42 +829,37 @@ export function ProjectAnalytics({
                         type="number"
                         tick={axisTick(colors.$22)}
                         tickFormatter={formatCompact}
-                        label={xAxisLabel('Hours', colors.$22)}
+                        label={xAxisLabel(
+                          t('hours', { defaultValue: 'Hours' }),
+                          colors.$22
+                        )}
                       />
                       <YAxis
                         type="category"
                         dataKey="project_name"
                         tick={false}
                         width={12}
-                        label={yAxisLabel('Project', colors.$22)}
                       />
-                      <ChartTooltip
-                        formatter={formatFieldValue}
-                        highlightedDataKey={hoveredBarDataKey}
-                      />
+                      <Tooltip {...chartTooltipProps(formatFieldValue, true)} />
                       <Legend />
                       <Bar
-                        {...barHoverProps('estimated_hours')}
                         dataKey="estimated_hours"
-                        name={FIELD_LABELS.estimated_hours}
+                        name={fieldLabel('estimated_hours')}
                         fill={CHART_COLORS[0]}
                       />
                       <Bar
-                        {...barHoverProps('logged_hours')}
                         dataKey="logged_hours"
-                        name={FIELD_LABELS.logged_hours}
+                        name={fieldLabel('logged_hours')}
                         fill={CHART_COLORS[1]}
                       />
                       <Bar
-                        {...barHoverProps('billable_hours')}
                         dataKey="billable_hours"
-                        name={FIELD_LABELS.billable_hours}
+                        name={fieldLabel('billable_hours')}
                         fill={CHART_COLORS[4]}
                       />
                       <Bar
-                        {...barHoverProps('remaining_hours')}
                         dataKey="remaining_hours"
-                        name={FIELD_LABELS.remaining_hours}
+                        name={fieldLabel('remaining_hours')}
                         fill={CHART_COLORS[2]}
                       />
                     </BarChart>
@@ -803,8 +867,13 @@ export function ProjectAnalytics({
                 </AnalyticsCard>
 
               <AnalyticsCard
-                title="Invoice and payment progress"
-                description="Shows earned work value against invoiced, paid, outstanding, and unbilled amounts."
+                title={t('invoice_and_payment_progress', {
+                  defaultValue: 'Invoice and payment progress',
+                })}
+                description={t('invoice_and_payment_progress_help', {
+                  defaultValue:
+                    'Shows earned work value against invoiced, paid, outstanding, and unbilled amounts.',
+                })}
                 className="col-span-12 xl:col-span-6"
               >
                 <ResponsiveChart>
@@ -826,46 +895,40 @@ export function ProjectAnalytics({
                     <XAxis
                       dataKey="project_name"
                       tick={false}
-                      label={xAxisLabel('Project', colors.$22)}
                     />
                     <YAxis
                       tick={axisTick(colors.$22)}
                       tickFormatter={formatCompact}
-                      label={yAxisLabel('Amount', colors.$22)}
+                      label={yAxisLabel(
+                        t('amount', { defaultValue: 'Amount' }),
+                        colors.$22
+                      )}
                     />
-                    <ChartTooltip
-                      formatter={formatFieldValue}
-                      highlightedDataKey={hoveredBarDataKey}
-                    />
+                    <Tooltip {...chartTooltipProps(formatFieldValue, true)} />
                     <Legend />
                     <Bar
-                      {...barHoverProps('work_value')}
                       dataKey="work_value"
-                      name={FIELD_LABELS.work_value}
+                      name={fieldLabel('work_value')}
                       fill={CHART_COLORS[0]}
                     />
                     <Bar
-                      {...barHoverProps('invoiced_amount')}
                       dataKey="invoiced_amount"
-                      name={FIELD_LABELS.invoiced_amount}
+                      name={fieldLabel('invoiced_amount')}
                       fill={CHART_COLORS[2]}
                     />
                     <Bar
-                      {...barHoverProps('paid_amount')}
                       dataKey="paid_amount"
-                      name={FIELD_LABELS.paid_amount}
+                      name={fieldLabel('paid_amount')}
                       fill={CHART_COLORS[1]}
                     />
                     <Bar
-                      {...barHoverProps('outstanding_amount')}
                       dataKey="outstanding_amount"
-                      name={FIELD_LABELS.outstanding_amount}
+                      name={fieldLabel('outstanding_amount')}
                       fill={CHART_COLORS[3]}
                     />
                     <Bar
-                      {...barHoverProps('unbilled_amount')}
                       dataKey="unbilled_amount"
-                      name={FIELD_LABELS.unbilled_amount}
+                      name={fieldLabel('unbilled_amount')}
                       fill={CHART_COLORS[5]}
                     />
                   </BarChart>
@@ -873,8 +936,13 @@ export function ProjectAnalytics({
               </AnalyticsCard>
 
               <AnalyticsCard
-                title="Project health and schedule variance"
-                description="Shows project health score and schedule variance from the forecast."
+                title={t('project_health_and_schedule_variance', {
+                  defaultValue: 'Project health and schedule variance',
+                })}
+                description={t('project_health_and_schedule_variance_help', {
+                  defaultValue:
+                    'Shows project health score and schedule variance from the forecast.',
+                })}
                 className="col-span-12 xl:col-span-6"
               >
                 <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
@@ -892,23 +960,21 @@ export function ProjectAnalytics({
                         <XAxis
                           dataKey="project_name"
                           tick={false}
-                          label={xAxisLabel('Project', colors.$22)}
                         />
                         <YAxis
                           domain={[0, 100]}
                           tick={axisTick(colors.$22)}
                           tickFormatter={(value) => `${value}%`}
-                          label={yAxisLabel('Health score', colors.$22)}
+                          label={yAxisLabel(
+                            t('health_score', { defaultValue: 'Health score' }),
+                            colors.$22
+                          )}
                         />
-                        <ChartTooltip
-                          formatter={formatFieldValue}
-                          highlightedDataKey={hoveredBarDataKey}
-                        />
+                        <Tooltip {...chartTooltipProps(formatFieldValue, true)} />
                         <Legend />
                         <Bar
-                          {...barHoverProps('health_score')}
                           dataKey="health_score"
-                          name={FIELD_LABELS.health_score}
+                          name={fieldLabel('health_score')}
                           fill={CHART_COLORS[1]}
                         />
                       </BarChart>
@@ -929,22 +995,22 @@ export function ProjectAnalytics({
                         <XAxis
                           dataKey="project_name"
                           tick={false}
-                          label={xAxisLabel('Project', colors.$22)}
                         />
                         <YAxis
                           tick={axisTick(colors.$22)}
-                          label={yAxisLabel('Days variance', colors.$22)}
+                          label={yAxisLabel(
+                            t('days_variance', {
+                              defaultValue: 'Days variance',
+                            }),
+                            colors.$22
+                          )}
                         />
                         <ReferenceLine y={0} stroke={colors.$22} />
-                        <ChartTooltip
-                          formatter={formatFieldValue}
-                          highlightedDataKey={hoveredBarDataKey}
-                        />
+                        <Tooltip {...chartTooltipProps(formatFieldValue, true)} />
                         <Legend />
                         <Bar
-                          {...barHoverProps('schedule_variance_days')}
                           dataKey="schedule_variance_days"
-                          name={FIELD_LABELS.schedule_variance_days}
+                          name={fieldLabel('schedule_variance_days')}
                           fill={CHART_COLORS[2]}
                         />
                       </BarChart>
@@ -954,8 +1020,13 @@ export function ProjectAnalytics({
               </AnalyticsCard>
 
               <AnalyticsCard
-                title="Forecast completion"
-                description="Summarizes projected completion timing from current project velocity."
+                title={t('forecast_completion', {
+                  defaultValue: 'Forecast completion',
+                })}
+                description={t('forecast_completion_help', {
+                  defaultValue:
+                    'Summarizes projected completion timing from current project velocity.',
+                })}
                 className="col-span-12 xl:col-span-4"
                 height={240}
               >
@@ -969,8 +1040,13 @@ export function ProjectAnalytics({
 
             <div className="grid grid-cols-12 gap-4">
               <AnalyticsCard
-                title="Team time contribution"
-                description="Shows logged and billable hours by team member."
+                title={t('team_time_contribution', {
+                  defaultValue: 'Team time contribution',
+                })}
+                description={t('team_time_contribution_help', {
+                  defaultValue:
+                    'Shows logged and billable hours by team member.',
+                })}
                 className="col-span-12 xl:col-span-6"
               >
                 <ResponsiveChart>
@@ -989,28 +1065,30 @@ export function ProjectAnalytics({
                       angle={-25}
                       textAnchor="end"
                       height={54}
-                      label={xAxisLabel('Team member', colors.$22, -12)}
+                      label={xAxisLabel(
+                        t('team_member', { defaultValue: 'Team member' }),
+                        colors.$22,
+                        -12
+                      )}
                     />
                     <YAxis
                       tick={axisTick(colors.$22)}
                       tickFormatter={formatCompact}
-                      label={yAxisLabel('Hours', colors.$22)}
+                      label={yAxisLabel(
+                        t('hours', { defaultValue: 'Hours' }),
+                        colors.$22
+                      )}
                     />
-                    <ChartTooltip
-                      formatter={formatFieldValue}
-                      highlightedDataKey={hoveredBarDataKey}
-                    />
+                    <Tooltip {...chartTooltipProps(formatFieldValue, true)} />
                     <Legend />
                     <Bar
-                      {...barHoverProps('logged_hours')}
                       dataKey="logged_hours"
-                      name={FIELD_LABELS.logged_hours}
+                      name={fieldLabel('logged_hours')}
                       fill={CHART_COLORS[0]}
                     />
                     <Bar
-                      {...barHoverProps('billable_hours')}
                       dataKey="billable_hours"
-                      name={FIELD_LABELS.billable_hours}
+                      name={fieldLabel('billable_hours')}
                       fill={CHART_COLORS[1]}
                     />
                   </BarChart>
@@ -1018,49 +1096,55 @@ export function ProjectAnalytics({
               </AnalyticsCard>
 
               <AnalyticsCard
-                title="Task time distribution"
-                description="Shows logged and billable hours by task or work item."
+                title={t('task_time_distribution', {
+                  defaultValue: 'Task time distribution',
+                })}
+                description={t('task_time_distribution_help', {
+                  defaultValue:
+                    'Shows logged and billable hours by task or work item.',
+                })}
                 className="col-span-12 xl:col-span-6"
+                height={taskTimeDistributionHeight}
               >
                 <ResponsiveChart>
                   <BarChart
                     layout="vertical"
-                    data={normalizeRows(projectAnalytics.timeDistribution, [
-                      'logged_hours',
-                      'billable_hours',
-                      'billable_value',
-                    ])}
-                    margin={{ top: 8, right: 16, left: 52, bottom: 26 }}
+                    data={timeDistributionData}
+                    margin={{ top: 8, right: 16, left: 8, bottom: 26 }}
                   >
                     <ChartGrid />
                     <XAxis
                       type="number"
                       tick={axisTick(colors.$22)}
                       tickFormatter={formatCompact}
-                      label={xAxisLabel('Hours', colors.$22)}
+                      label={xAxisLabel(
+                        t('hours', { defaultValue: 'Hours' }),
+                        colors.$22
+                      )}
                     />
                     <YAxis
                       type="category"
                       dataKey="description"
                       tick={axisTick(colors.$22)}
-                      width={120}
-                      label={yAxisLabel('Task', colors.$22)}
+                      tickFormatter={(value) => truncateAxisTick(value, 24)}
+                      interval={0}
+                      width={156}
                     />
-                    <ChartTooltip
-                      formatter={formatFieldValue}
-                      highlightedDataKey={hoveredBarDataKey}
+                    <Tooltip
+                      {...chartTooltipProps(formatFieldValue, {
+                        itemOnly: true,
+                        labelKey: 'description',
+                      })}
                     />
                     <Legend />
                     <Bar
-                      {...barHoverProps('logged_hours')}
                       dataKey="logged_hours"
-                      name={FIELD_LABELS.logged_hours}
+                      name={fieldLabel('logged_hours')}
                       fill={CHART_COLORS[0]}
                     />
                     <Bar
-                      {...barHoverProps('billable_hours')}
                       dataKey="billable_hours"
-                      name={FIELD_LABELS.billable_hours}
+                      name={fieldLabel('billable_hours')}
                       fill={CHART_COLORS[1]}
                     />
                   </BarChart>
@@ -1068,8 +1152,13 @@ export function ProjectAnalytics({
               </AnalyticsCard>
 
               <AnalyticsCard
-                title="Time velocity trend"
-                description="Shows tracked and billable hours over each reporting period."
+                title={t('time_velocity_trend', {
+                  defaultValue: 'Time velocity trend',
+                })}
+                description={t('time_velocity_trend_help', {
+                  defaultValue:
+                    'Shows tracked and billable hours over each reporting period.',
+                })}
                 className="col-span-12 xl:col-span-6"
               >
                 <ResponsiveChart>
@@ -1085,19 +1174,25 @@ export function ProjectAnalytics({
                     <XAxis
                       dataKey="period"
                       tick={axisTick(colors.$22)}
-                      label={xAxisLabel('Period', colors.$22)}
+                      label={xAxisLabel(
+                        t('period', { defaultValue: 'Period' }),
+                        colors.$22
+                      )}
                     />
                     <YAxis
                       tick={axisTick(colors.$22)}
                       tickFormatter={formatCompact}
-                      label={yAxisLabel('Hours', colors.$22)}
+                      label={yAxisLabel(
+                        t('hours', { defaultValue: 'Hours' }),
+                        colors.$22
+                      )}
                     />
-                    <ChartTooltip formatter={formatFieldValue} />
+                    <Tooltip {...chartTooltipProps(formatFieldValue)} />
                     <Legend />
                     <Line
                       type="monotone"
                       dataKey="hours"
-                      name="Hours"
+                      name={fieldLabel('hours')}
                       stroke={CHART_COLORS[0]}
                       strokeWidth={2}
                       dot={false}
@@ -1105,7 +1200,7 @@ export function ProjectAnalytics({
                     <Line
                       type="monotone"
                       dataKey="billable_hours"
-                      name={FIELD_LABELS.billable_hours}
+                      name={fieldLabel('billable_hours')}
                       stroke={CHART_COLORS[1]}
                       strokeWidth={2}
                       dot={false}
@@ -1114,48 +1209,55 @@ export function ProjectAnalytics({
                 </ResponsiveChart>
               </AnalyticsCard>
             </div>
+                </>
+              )}
             </div>
 
             <div className="grid grid-cols-12 gap-4">
+              {activeTabIndex === 3 && (
+                <>
               <AnalyticsCard
-                title="Expense breakdown by category"
-                description="Shows project expenses grouped by category."
+                title={t('expense_breakdown_by_category', {
+                  defaultValue: 'Expense breakdown by category',
+                })}
+                description={t('expense_breakdown_by_category_help', {
+                  defaultValue: 'Shows project expenses grouped by category.',
+                })}
                 className="col-span-12 xl:col-span-6"
               >
                 {projectAnalytics.expenseBreakdown.length <= 6 ? (
                   <ResponsiveChart>
                     <PieChart>
                       <Pie
-                        data={normalizeRows(projectAnalytics.expenseBreakdown, [
-                          'expense_amount',
-                          'expense_count',
-                        ])}
+                        data={expenseBreakdownData}
                         dataKey="expense_amount"
                         nameKey="category_name"
                         innerRadius={54}
                         outerRadius={92}
                         paddingAngle={2}
                       >
-                        {projectAnalytics.expenseBreakdown.map(
-                          (entry, index) => (
-                            <Cell
-                              key={entry.category_name ?? index}
-                              fill={CHART_COLORS[index % CHART_COLORS.length]}
-                            />
-                          )
-                        )}
+                        {expenseBreakdownData.map((entry, index) => (
+                          <Cell
+                            key={String(entry.category_name ?? index)}
+                            fill={CHART_COLORS[index % CHART_COLORS.length]}
+                          />
+                        ))}
                       </Pie>
-                      <ChartTooltip formatter={formatFieldValue} />
+                      <Tooltip
+                        {...chartTooltipProps(formatFieldValue, {
+                          labelKey: 'category_name',
+                          nameKey: 'category_name',
+                          percentTotal: expenseBreakdownTotal,
+                          showPercent: true,
+                        })}
+                      />
                       <Legend />
                     </PieChart>
                   </ResponsiveChart>
                 ) : (
                   <ResponsiveChart>
                     <BarChart
-                      data={normalizeRows(projectAnalytics.expenseBreakdown, [
-                        'expense_amount',
-                        'expense_count',
-                      ])}
+                      data={expenseBreakdownData}
                       margin={{ top: 8, right: 16, left: 42, bottom: 48 }}
                     >
                       <ChartGrid />
@@ -1165,22 +1267,27 @@ export function ProjectAnalytics({
                         angle={-25}
                         textAnchor="end"
                         height={54}
-                        label={xAxisLabel('Expense category', colors.$22, -12)}
+                        label={xAxisLabel(
+                          t('expense_category', {
+                            defaultValue: 'Expense category',
+                          }),
+                          colors.$22,
+                          -12
+                        )}
                       />
                       <YAxis
                         tick={axisTick(colors.$22)}
                         tickFormatter={formatCompact}
-                        label={yAxisLabel('Amount', colors.$22)}
+                        label={yAxisLabel(
+                          t('amount', { defaultValue: 'Amount' }),
+                          colors.$22
+                        )}
                       />
-                      <ChartTooltip
-                        formatter={formatFieldValue}
-                        highlightedDataKey={hoveredBarDataKey}
-                      />
+                      <Tooltip {...chartTooltipProps(formatFieldValue, true)} />
                       <Legend />
                       <Bar
-                        {...barHoverProps('expense_amount')}
                         dataKey="expense_amount"
-                        name={FIELD_LABELS.expense_amount}
+                        name={fieldLabel('expense_amount')}
                         fill={CHART_COLORS[2]}
                       />
                     </BarChart>
@@ -1189,8 +1296,13 @@ export function ProjectAnalytics({
               </AnalyticsCard>
 
               <AnalyticsCard
-                title="Cumulative spend over time"
-                description="Shows cumulative labor, expense, and total project spend over time."
+                title={t('cumulative_spend_over_time', {
+                  defaultValue: 'Cumulative spend over time',
+                })}
+                description={t('cumulative_spend_over_time_help', {
+                  defaultValue:
+                    'Shows cumulative labor, expense, and total project spend over time.',
+                })}
                 className="col-span-12 xl:col-span-8"
               >
                 <ResponsiveChart>
@@ -1206,19 +1318,25 @@ export function ProjectAnalytics({
                     <XAxis
                       dataKey="period"
                       tick={axisTick(colors.$22)}
-                      label={xAxisLabel('Period', colors.$22)}
+                      label={xAxisLabel(
+                        t('period', { defaultValue: 'Period' }),
+                        colors.$22
+                      )}
                     />
                     <YAxis
                       tick={axisTick(colors.$22)}
                       tickFormatter={formatCompact}
-                      label={yAxisLabel('Amount', colors.$22)}
+                      label={yAxisLabel(
+                        t('amount', { defaultValue: 'Amount' }),
+                        colors.$22
+                      )}
                     />
-                    <ChartTooltip formatter={formatFieldValue} />
+                    <Tooltip {...chartTooltipProps(formatFieldValue)} />
                     <Legend />
                     <Line
                       type="monotone"
                       dataKey="cumulative_labor_value"
-                      name={FIELD_LABELS.cumulative_labor_value}
+                      name={fieldLabel('cumulative_labor_value')}
                       stroke={CHART_COLORS[0]}
                       strokeWidth={2}
                       dot={false}
@@ -1226,7 +1344,7 @@ export function ProjectAnalytics({
                     <Line
                       type="monotone"
                       dataKey="cumulative_expense_amount"
-                      name={FIELD_LABELS.cumulative_expense_amount}
+                      name={fieldLabel('cumulative_expense_amount')}
                       stroke={CHART_COLORS[2]}
                       strokeWidth={2}
                       dot={false}
@@ -1234,7 +1352,7 @@ export function ProjectAnalytics({
                     <Line
                       type="monotone"
                       dataKey="cumulative_actual_amount"
-                      name={FIELD_LABELS.cumulative_actual_amount}
+                      name={fieldLabel('cumulative_actual_amount')}
                       stroke={CHART_COLORS[1]}
                       strokeWidth={2}
                       dot={false}
@@ -1242,31 +1360,43 @@ export function ProjectAnalytics({
                   </LineChart>
                 </ResponsiveChart>
               </AnalyticsCard>
+                </>
+              )}
             </div>
 
             <div className="grid grid-cols-12 gap-4">
-              <AnalyticsCard
-                title="Recent project activity"
-                description="Lists recent project activity and the related amount."
-                className="col-span-12 xl:col-span-4"
-              >
-                <RecentActivityTable
-                  rows={projectAnalytics.recentActivity}
-                  formatter={formatFieldValue}
-                  dateFormat={dateFormat}
-                />
-              </AnalyticsCard>
+              {activeTabIndex === 4 && (
+                <AnalyticsCard
+                  title={t('recent_project_activity', {
+                    defaultValue: 'Recent project activity',
+                  })}
+                  description={t('recent_project_activity_help', {
+                    defaultValue:
+                      'Lists recent project activity and the related amount.',
+                  })}
+                  className="col-span-12 xl:col-span-4"
+                >
+                  <RecentActivityTable
+                    rows={projectAnalytics.recentActivity}
+                    formatter={formatFieldValue}
+                    dateFormat={dateFormat}
+                  />
+                </AnalyticsCard>
+              )}
             </div>
 
             <div>
-              <Burnup
-                project={project}
-                includeDrafts={includeDrafts}
-                onIncludeDraftsChange={setIncludeDrafts}
-                showIncludeDraftsToggle={false}
-              />
+              {activeTabIndex === 5 && (
+                <Burnup
+                  project={project}
+                  includeDrafts={includeDrafts}
+                  onIncludeDraftsChange={setIncludeDrafts}
+                  showIncludeDraftsToggle={false}
+                />
+              )}
             </div>
           </TabGroup>
+
         </>
       )}
     </section>
@@ -1318,18 +1448,18 @@ function StatCard({ label, value, detail, accent }: StatCardProps) {
 
       <div className="mt-2 truncate text-lg font-semibold">{value}</div>
 
-      {detail && (
+      {/* {detail && (
         <div className="mt-1 truncate text-xs" style={{ color: colors.$22 }}>
           {detail}
         </div>
-      )}
+      )} */}
     </div>
   );
 }
 
 function ResponsiveChart({ children }: { children: ReactElement }) {
   return (
-    <div className="h-full min-h-[240px] w-full">
+    <div className="h-full min-h-[240px] min-w-0 w-full">
       <ResponsiveContainer width="100%" height="100%">
         {children}
       </ResponsiveContainer>
@@ -1341,74 +1471,93 @@ function ChartGrid() {
   return <CartesianGrid strokeDasharray="3 3" vertical={false} />;
 }
 
-function ChartTooltip({
+function chartTooltipProps(
+  formatter: Formatter,
+  options: boolean | ChartTooltipOptions = false
+) {
+  const tooltipOptions =
+    typeof options === 'boolean' ? { itemOnly: options } : options;
+
+  return {
+    content: (
+      <ChartTooltipContent formatter={formatter} options={tooltipOptions} />
+    ),
+    cursor: { fill: 'transparent' },
+    wrapperStyle: { outline: 'none' },
+    ...(tooltipOptions.itemOnly && { shared: false }),
+  };
+}
+
+function ChartTooltipContent({
+  active,
   formatter,
-  highlightedDataKey,
-}: {
+  label,
+  options,
+  payload,
+}: ChartTooltipContentProps & {
   formatter: Formatter;
-  highlightedDataKey?: string | null;
+  options?: ChartTooltipOptions;
 }) {
+  const [t] = useTranslation();
   const colors = useColorScheme();
 
-  const Content = ({ active, label, payload }: ChartTooltipContentProps) => {
-    if (!active || !payload?.length) {
-      return null;
-    }
+  if (!active || !payload?.length) {
+    return null;
+  }
 
-    const filteredPayload = highlightedDataKey
-      ? payload.filter((item) => String(item.dataKey) === highlightedDataKey)
-      : payload;
-    const displayPayload = filteredPayload.length ? filteredPayload : payload;
-
-    return (
-      <div
-        className="rounded-md border p-3 text-sm shadow-lg"
-        style={{
-          backgroundColor: colors.$1,
-          borderColor: colors.$24,
-          color: colors.$3,
-        }}
-      >
-        {label !== undefined && (
-          <div className="mb-2 font-medium" style={{ color: colors.$3 }}>
-            {label}
-          </div>
-        )}
-
-        <div className="space-y-1">
-          {displayPayload.map((item, index) => {
-            const dataKey = String(item.dataKey ?? item.name ?? index);
-            const swatchColor = item.color || item.fill || colors.$22;
-
-            return (
-              <div
-                key={`${dataKey}-${index}`}
-                className="flex items-center justify-between gap-6"
-              >
-                <div className="flex min-w-0 items-center gap-2">
-                  <span
-                    className="h-2.5 w-2.5 flex-shrink-0 rounded-sm"
-                    style={{ backgroundColor: swatchColor }}
-                  />
-                  <span className="truncate">{labelFor(dataKey)}</span>
-                </div>
-
-                <span className="whitespace-nowrap font-medium">
-                  {formatter(dataKey, item.value)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
+  const displayLabel = resolveTooltipLabel(label, payload, options);
 
   return (
-    <Tooltip
-      content={<Content />}
-      wrapperStyle={{ outline: 'none' }}
-    />
+    <div
+      className="rounded-md border p-3 text-sm shadow-lg"
+      style={{
+        backgroundColor: colors.$1,
+        borderColor: colors.$24,
+        color: colors.$3,
+      }}
+    >
+      {displayLabel && (
+        <div className="mb-2 font-medium" style={{ color: colors.$3 }}>
+          {displayLabel}
+        </div>
+      )}
+
+      <div className="space-y-1">
+        {payload.map((item, index) => {
+          const dataKey = String(item.dataKey ?? item.name ?? index);
+          const percent = options?.showPercent
+            ? resolveTooltipPercent(item, options.percentTotal)
+            : null;
+          const swatchColor = item.color || item.fill || colors.$22;
+          const itemLabel = resolveTooltipItemLabel(t, item, dataKey, options);
+
+          return (
+            <div
+              key={`${dataKey}-${index}`}
+              className="flex items-center justify-between gap-6"
+            >
+              <div className="flex min-w-0 items-center gap-2">
+                <span
+                  className="h-2.5 w-2.5 flex-shrink-0 rounded-sm"
+                  style={{ backgroundColor: swatchColor }}
+                />
+                <span className="truncate">{itemLabel}</span>
+              </div>
+
+              <span className="whitespace-nowrap font-medium">
+                {formatter(dataKey, item.value)}
+                {percent !== null && (
+                  <span style={{ color: colors.$22 }}>
+                    {' '}
+                    ({formatPercent(percent)})
+                  </span>
+                )}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -1421,30 +1570,38 @@ function ForecastSummary({
   formatter: Formatter;
   dateFormat: string;
 }) {
+  const [t] = useTranslation();
+
   if (!forecast) {
-    return <EmptyState>No forecast data is available.</EmptyState>;
+    return (
+      <EmptyState>
+        {t('no_forecast_data', {
+          defaultValue: 'No forecast data is available.',
+        })}
+      </EmptyState>
+    );
   }
 
   const rows = [
     {
-      label: FIELD_LABELS.average_daily_velocity,
+      label: resolveFieldLabel(t, 'average_daily_velocity'),
       value: formatter(
         'average_daily_velocity',
         forecast.average_daily_velocity
       ),
     },
     {
-      label: FIELD_LABELS.remaining_hours,
+      label: t('remaining_hours', { defaultValue: 'Remaining hours' }),
       value: formatter('remaining_hours', forecast.remaining_hours),
     },
     {
-      label: 'Forecast finish',
+      label: t('forecast_finish', { defaultValue: 'Forecast finish' }),
       value: forecast.forecast_finish_date
         ? formatDate(forecast.forecast_finish_date, dateFormat)
         : '-',
     },
     {
-      label: FIELD_LABELS.schedule_variance_days,
+      label: resolveFieldLabel(t, 'schedule_variance_days'),
       value: formatter(
         'schedule_variance_days',
         forecast.schedule_variance_days
@@ -1464,10 +1621,17 @@ function RecentActivityTable({
   formatter: Formatter;
   dateFormat: string;
 }) {
+  const [t] = useTranslation();
   const colors = useColorScheme();
 
   if (!rows.length) {
-    return <EmptyState>No recent activity is available.</EmptyState>;
+    return (
+      <EmptyState>
+        {t('no_recent_activity', {
+          defaultValue: 'No recent activity is available.',
+        })}
+      </EmptyState>
+    );
   }
 
   return (
@@ -1475,9 +1639,15 @@ function RecentActivityTable({
       <table className="w-full text-left text-sm">
         <thead>
           <tr style={{ color: colors.$22 }}>
-            <th className="py-2 pr-3 font-medium">Date</th>
-            <th className="py-2 pr-3 font-medium">Activity</th>
-            <th className="py-2 text-right font-medium">Amount</th>
+            <th className="py-2 pr-3 font-medium">
+              {t('date', { defaultValue: 'Date' })}
+            </th>
+            <th className="py-2 pr-3 font-medium">
+              {t('activity', { defaultValue: 'Activity' })}
+            </th>
+            <th className="py-2 text-right font-medium">
+              {t('amount', { defaultValue: 'Amount' })}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -1587,6 +1757,23 @@ function singleProjectData<T extends ProjectRow>(
   );
 }
 
+function normalizeTaskDistributionRows(
+  rows: TaskDistributionRow[] | undefined,
+  t: TranslateFn
+): ChartDatum[] {
+  const taskLabel = t('task', { defaultValue: 'Task' });
+
+  return normalizeRows(rows, [
+    'logged_hours',
+    'billable_hours',
+    'billable_value',
+  ]).map((row, index) => ({
+    ...row,
+    description:
+      cleanTooltipText(row.description) || `${taskLabel} ${index + 1}`,
+  }));
+}
+
 function normalizeRows<T extends ChartDatum>(
   rows: T[] | undefined,
   numericKeys: string[]
@@ -1612,6 +1799,10 @@ function toNumber(value: unknown) {
   return Number.isFinite(number) ? number : 0;
 }
 
+function sumChartValues(rows: ChartDatum[], key: string) {
+  return rows.reduce((total, row) => total + toNumber(row[key]), 0);
+}
+
 function formatCompact(value: unknown) {
   return new Intl.NumberFormat(undefined, {
     notation: 'compact',
@@ -1619,8 +1810,102 @@ function formatCompact(value: unknown) {
   }).format(toNumber(value));
 }
 
-function labelFor(key: string) {
-  return FIELD_LABELS[key] || key.replace(/_/g, ' ');
+function formatPercent(value: number) {
+  return new Intl.NumberFormat(undefined, {
+    maximumFractionDigits: 1,
+  }).format(value * 100) + '%';
+}
+
+function resolveFieldLabel(t: TranslateFn, key: string) {
+  const def = FIELD_LABELS[key];
+
+  return def
+    ? t(def.key, { defaultValue: def.defaultValue })
+    : key.replace(/_/g, ' ');
+}
+
+function resolveTooltipLabel(
+  label: string | number | undefined,
+  payload: ChartTooltipPayloadItem[],
+  options?: ChartTooltipOptions
+) {
+  const labelFromPayload = options?.labelKey
+    ? readPayloadValue(payload[0], options.labelKey)
+    : undefined;
+
+  return cleanTooltipText(labelFromPayload) || cleanTooltipText(label);
+}
+
+function resolveTooltipItemLabel(
+  t: TranslateFn,
+  item: ChartTooltipPayloadItem,
+  dataKey: string,
+  options?: ChartTooltipOptions
+) {
+  const nameFromPayload = options?.nameKey
+    ? readPayloadValue(item, options.nameKey)
+    : undefined;
+
+  return (
+    cleanTooltipText(nameFromPayload) ||
+    cleanTooltipText(item.name) ||
+    resolveFieldLabel(t, dataKey)
+  );
+}
+
+function resolveTooltipPercent(
+  item: ChartTooltipPayloadItem,
+  total: number | undefined
+) {
+  const payloadPercent = toFiniteNumber(item.percent);
+
+  if (payloadPercent !== null) {
+    return payloadPercent;
+  }
+
+  if (!total) {
+    return null;
+  }
+
+  return toNumber(item.value) / total;
+}
+
+function readPayloadValue(item: ChartTooltipPayloadItem, key: string) {
+  if (item.payload?.[key] !== undefined) {
+    return item.payload[key];
+  }
+
+  const nestedPayload = item.payload?.payload;
+
+  if (isChartDatum(nestedPayload) && nestedPayload[key] !== undefined) {
+    return nestedPayload[key];
+  }
+
+  return undefined;
+}
+
+function cleanTooltipText(value: unknown) {
+  const text = String(value ?? '').trim();
+
+  return text || undefined;
+}
+
+function truncateAxisTick(value: unknown, maxLength: number) {
+  const text = cleanTooltipText(value) || '-';
+
+  return text.length > maxLength
+    ? `${text.slice(0, Math.max(0, maxLength - 1))}...`
+    : text;
+}
+
+function toFiniteNumber(value: unknown) {
+  const number = Number(value);
+
+  return Number.isFinite(number) ? number : null;
+}
+
+function isChartDatum(value: unknown): value is ChartDatum {
+  return Boolean(value) && typeof value === 'object';
 }
 
 function axisTick(fill: string) {

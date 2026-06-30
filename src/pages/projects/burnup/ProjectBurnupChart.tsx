@@ -196,7 +196,9 @@ export function ProjectBurnupChart(props: Props) {
           tick={{ fontSize: 12 }}
           stroke={colors.$3}
           label={xAxisLabel(
-            data.bucket_type === 'daily' ? 'Date' : 'Period',
+            data.bucket_type === 'daily'
+              ? t('date', { defaultValue: 'Date' })
+              : t('period', { defaultValue: 'Period' }),
             colors.$17
           )}
           tickFormatter={(value) =>
@@ -214,7 +216,7 @@ export function ProjectBurnupChart(props: Props) {
           tick={{ fontSize: 12 }}
           stroke={colors.$3}
           tickFormatter={formatHours}
-          label={yAxisLabel('Hours', colors.$17)}
+          label={yAxisLabel(t('hours', { defaultValue: 'Hours' }), colors.$17)}
           width={64}
         />
 
@@ -224,7 +226,11 @@ export function ProjectBurnupChart(props: Props) {
           tick={{ fontSize: 12 }}
           stroke={colors.$3}
           tickFormatter={formatMoneyValue}
-          label={yAxisLabel('Amount', colors.$17, 'insideRight')}
+          label={yAxisLabel(
+            t('amount', { defaultValue: 'Amount' }),
+            colors.$17,
+            'insideRight'
+          )}
           width={92}
         />
 
