@@ -25,14 +25,14 @@ export const PROJECT_BURNUP_METRICS: ProjectBurnupMetricDefinition[] = [
   {
     key: 'cumulative_logged_hours',
     axis: 'hours',
-    translationKey: 'logged_hours',
+    translationKey: 'logged',
     stroke: '#2563eb',
     strokeWidth: 2.5,
   },
   {
     key: 'cumulative_billable_hours',
     axis: 'hours',
-    translationKey: 'billable_hours',
+    translationKey: 'billable',
     stroke: '#0f766e',
     strokeDasharray: '6 4',
   },
@@ -46,14 +46,14 @@ export const PROJECT_BURNUP_METRICS: ProjectBurnupMetricDefinition[] = [
   {
     key: 'ideal_hours',
     axis: 'hours',
-    translationKey: 'ideal_hours',
+    translationKey: 'target',
     stroke: '#7c3aed',
     strokeDasharray: '8 5',
   },
   {
     key: 'cumulative_task_value',
     axis: 'money',
-    translationKey: 'task_value',
+    translationKey: 'billable',
     stroke: '#0891b2',
   },
   {
@@ -74,7 +74,7 @@ export const PROJECT_BURNUP_METRICS: ProjectBurnupMetricDefinition[] = [
   {
     key: 'cumulative_outstanding_amount',
     axis: 'money',
-    translationKey: 'outstanding_amount',
+    translationKey: 'outstanding',
     stroke: '#dc2626',
   },
   {
@@ -87,30 +87,30 @@ export const PROJECT_BURNUP_METRICS: ProjectBurnupMetricDefinition[] = [
   {
     key: 'cumulative_net_invoiced_amount',
     axis: 'money',
-    translationKey: 'net_invoiced_amount',
+    translationKey: 'invoiced',
     stroke: '#f59e0b',
     strokeDasharray: '6 3',
   },
   {
     key: 'cumulative_net_paid_amount',
     axis: 'money',
-    translationKey: 'net_paid_amount',
-    stroke: '#059669',
+    translationKey: 'total_revenue',
+    stroke: '#65a30d',
     strokeWidth: 2.5,
   },
   {
     key: 'budgeted_amount',
     axis: 'money',
     translationKey: 'budgeted_amount',
-    stroke: '#475569',
+    stroke: '#4f46e5',
     strokeDasharray: '3 4',
   },
   {
     key: 'ideal_amount',
     axis: 'money',
-    translationKey: 'ideal_amount',
-    stroke: '#9333ea',
-    strokeDasharray: '8 5',
+    translationKey: 'target',
+    stroke: '#db2777',
+    strokeDasharray: '2 5',
   },
 ];
 

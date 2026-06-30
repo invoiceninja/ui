@@ -16,7 +16,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { Project } from '$app/common/interfaces/project';
-import { Badge } from '$app/components/Badge';
+import { Badge, BadgeVariant } from '$app/components/Badge';
 import { Card } from '$app/components/cards';
 import Toggle from '$app/components/forms/Toggle';
 import { Spinner } from '$app/components/Spinner';
@@ -37,7 +37,6 @@ import {
   LineChart,
   Pie,
   PieChart,
-  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -93,9 +92,20 @@ type ForecastCompletion = ProjectRow & {
   schedule_variance_days?: NumberLike;
 };
 
+type ProjectHealthIndicators = {
+  budget_utilization?: NumberLike;
+  schedule_variance_days?: NumberLike;
+  margin_ratio?: NumberLike;
+  unbilled_ratio?: NumberLike;
+  outstanding_ratio?: NumberLike;
+};
+
 type ProjectHealth = ProjectRow & {
+  score?: NumberLike;
+  status?: string;
   health_score?: NumberLike;
   health_status?: string;
+  indicators?: ProjectHealthIndicators;
 };
 
 type TeamContributionRow = {
@@ -272,12 +282,15 @@ const RATIO_FIELDS = new Set([
   'invoice_progress',
   'paid_progress',
   'margin_ratio',
+  'outstanding_ratio',
+  'unbilled_ratio',
 ]);
 
 const PERCENT_FIELDS = new Set([
   'completion_percentage',
   'ideal_progress_percentage',
   'health_score',
+  'score',
 ]);
 
 // Chart-series field -> i18n key. Every chart carries its own axis
@@ -285,35 +298,38 @@ const PERCENT_FIELDS = new Set([
 // the redundant unit suffix is dropped. No fallback text is supplied, so a
 // missing translation surfaces the key itself rather than English text.
 const FIELD_LABELS: Record<string, string> = {
-  actual_amount: 'actual',
+  actual_amount: 'actual_spend',
   average_daily_velocity: 'daily_velocity',
   billable_hours: 'billable',
   billable_value: 'billable',
   budget_utilization: 'budget_used',
-  budgeted_amount: 'budgeted',
+  budgeted_amount: 'budgeted_amount',
   cumulative_actual_amount: 'total',
   cumulative_expense_amount: 'expenses',
-  cumulative_labor_value: 'labor',
-  estimated_hours: 'estimated',
+  cumulative_labor_value: 'tasks',
+  estimated_hours: 'budgeted',
   expense_amount: 'expense',
   expense_count: 'count',
   health_score: 'health',
+  score: 'health_score',
   hours: 'logged',
   invoice_progress: 'invoice_progress',
   invoiced_amount: 'invoiced',
-  labor_value: 'labor',
+  labor_value: 'tasks',
   logged_hours: 'logged',
-  margin_ratio: 'margin_percentage',
-  net_margin: 'net_margin',
+  margin_ratio: 'margin',
+  net_margin: 'margin',
   outstanding_amount: 'outstanding',
+  outstanding_ratio: 'outstanding',
   paid_amount: 'paid',
   paid_progress: 'paid_progress',
   remaining_hours: 'remaining',
   schedule_variance_days: 'days_ahead',
   task_value: 'task_value',
-  unbilled_amount: 'unbilled',
+  unbilled_amount: 'billable',
   unbilled_hours: 'unbilled_hours',
-  work_value: 'earned',
+  unbilled_ratio: 'unbilled',
+  work_value: 'total',
 };
 
 const CHART_COLORS = [
@@ -484,7 +500,7 @@ export function ProjectAnalytics({
 
   const statCards = [
     {
-      label: t('budgeted'),
+      label: t('budgeted_amount'),
       value: formatFieldValue(
         'budgeted_amount',
         projectAnalytics?.budgetSummary?.budgeted_amount ??
@@ -494,7 +510,7 @@ export function ProjectAnalytics({
       accent: CHART_COLORS[0],
     },
     {
-      label: t('actual'),
+      label: t('actual_spend'),
       value: formatFieldValue(
         'actual_amount',
         projectAnalytics?.budgetSummary?.actual_amount ??
@@ -534,13 +550,25 @@ export function ProjectAnalytics({
       accent: CHART_COLORS[4],
     },
     {
+      label: t('billable'),
+      value: formatFieldValue(
+        'unbilled_amount',
+        projectAnalytics?.unbilledHours?.unbilled_amount
+      ),
+      detail: formatFieldValue(
+        'unbilled_hours',
+        projectAnalytics?.unbilledHours?.unbilled_hours
+      ),
+      accent: CHART_COLORS[2],
+    },
+    {
       label: t('health'),
       value: formatFieldValue(
         'health_score',
-        projectAnalytics?.projectHealth?.health_score
+        resolveProjectHealthScore(projectAnalytics?.projectHealth)
       ),
       detail:
-        projectAnalytics?.projectHealth?.health_status ||
+        resolveProjectHealthStatus(projectAnalytics?.projectHealth) ||
         t('status'),
       accent: CHART_COLORS[5],
     },
@@ -552,18 +580,6 @@ export function ProjectAnalytics({
       ),
       detail: t('tracked_time'),
       accent: CHART_COLORS[0],
-    },
-    {
-      label: t('unbilled'),
-      value: formatFieldValue(
-        'unbilled_amount',
-        projectAnalytics?.unbilledHours?.unbilled_amount
-      ),
-      detail: formatFieldValue(
-        'unbilled_hours',
-        projectAnalytics?.unbilledHours?.unbilled_hours
-      ),
-      accent: CHART_COLORS[2],
     },
   ];
 
@@ -633,7 +649,7 @@ export function ProjectAnalytics({
                   overviewContent,
                   <AnalyticsCard
                     title={t('forecast')}
-                    className="col-span-12 xl:col-span-6"
+                    className="col-span-12 xl:col-span-3"
                     height={240}
                   >
                     <ForecastSummary
@@ -688,7 +704,7 @@ export function ProjectAnalytics({
                         tick={axisTick(colors.$22)}
                         tickFormatter={(value) => `${toNumber(value) * 100}%`}
                         label={yAxisLabel(
-                          t('margin_percentage'),
+                          t('margin'),
                           colors.$22,
                           'insideRight'
                         )}
@@ -780,8 +796,7 @@ export function ProjectAnalytics({
                 </AnalyticsCard>
 
                 <AnalyticsCard
-                  title={t('invoice_and_payment_progress')}
-                  description={t('invoice_and_payment_progress_help')}
+                  title={t('Revenue')}
                   className="col-span-12 xl:col-span-6"
                 >
                   <ResponsiveChart>
@@ -848,7 +863,7 @@ export function ProjectAnalytics({
                 <>
               <div className="grid grid-cols-12 gap-4">
                 <AnalyticsCard
-                  title={t('estimated_vs_actual')}
+                  title={t('hours')}
                   className="col-span-12 xl:col-span-6"
                 >
                   <ResponsiveChart>
@@ -908,89 +923,12 @@ export function ProjectAnalytics({
                 title={t('health_check')}
                 className="col-span-12 xl:col-span-6"
               >
-                <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
-                  <div className="min-h-[240px]">
-                    <ResponsiveChart>
-                      <BarChart
-                        data={singleProjectData(
-                          projectAnalytics.projectHealth,
-                          project.name,
-                          ['health_score']
-                        )}
-                        margin={{ top: 8, right: 16, left: 42, bottom: 26 }}
-                      >
-                        <ChartGrid />
-                        <XAxis
-                          dataKey="project_name"
-                          tick={false}
-                        />
-                        <YAxis
-                          domain={[0, 100]}
-                          tick={axisTick(colors.$22)}
-                          tickFormatter={(value) => `${value}%`}
-                          label={yAxisLabel(
-                            t('health_score'),
-                            colors.$22
-                          )}
-                        />
-                        <Tooltip {...chartTooltipProps(formatFieldValue, true)} />
-                        <Legend />
-                        <Bar
-                          dataKey="health_score"
-                          name={fieldLabel('health_score')}
-                          fill={CHART_COLORS[1]}
-                        />
-                      </BarChart>
-                    </ResponsiveChart>
-                  </div>
-
-                  <div className="min-h-[240px]">
-                    <ResponsiveChart>
-                      <BarChart
-                        data={singleProjectData(
-                          projectAnalytics.timelineVariance,
-                          project.name,
-                          ['schedule_variance_days']
-                        )}
-                        margin={{ top: 8, right: 16, left: 42, bottom: 26 }}
-                      >
-                        <ChartGrid />
-                        <XAxis
-                          dataKey="project_name"
-                          tick={false}
-                        />
-                        <YAxis
-                          tick={axisTick(colors.$22)}
-                          label={yAxisLabel(
-                            t('days_ahead'),
-                            colors.$22
-                          )}
-                        />
-                        <ReferenceLine y={0} stroke={colors.$22} />
-                        <Tooltip {...chartTooltipProps(formatFieldValue, true)} />
-                        <Legend />
-                        <Bar
-                          dataKey="schedule_variance_days"
-                          name={fieldLabel('schedule_variance_days')}
-                          fill={CHART_COLORS[2]}
-                        />
-                      </BarChart>
-                    </ResponsiveChart>
-                  </div>
-                </div>
-              </AnalyticsCard>
-
-              <AnalyticsCard
-                title={t('forecast')}
-                className="col-span-12 xl:col-span-6"
-                height={240}
-              >
-                <ForecastSummary
-                  forecast={projectAnalytics.forecastCompletion}
+                <ProjectHealthSummary
+                  health={projectAnalytics.projectHealth}
                   formatter={formatFieldValue}
-                  dateFormat={dateFormat}
                 />
               </AnalyticsCard>
+
               </div>
 
             <div className="grid grid-cols-12 gap-4">
@@ -1248,7 +1186,7 @@ export function ProjectAnalytics({
 
               <AnalyticsCard
                 title={`${t('expenses')} / ${t('time')}`}
-                className="col-span-12 xl:col-span-8"
+                className="col-span-12 xl:col-span-6"
               >
                 <ResponsiveChart>
                   <LineChart
@@ -1263,10 +1201,6 @@ export function ProjectAnalytics({
                     <XAxis
                       dataKey="period"
                       tick={axisTick(colors.$22)}
-                      label={xAxisLabel(
-                        t('period'),
-                        colors.$22
-                      )}
                     />
                     <YAxis
                       tick={axisTick(colors.$22)}
@@ -1551,6 +1485,87 @@ function ForecastSummary({
   return <MetricTable rows={rows} />;
 }
 
+function ProjectHealthSummary({
+  health,
+  formatter,
+}: {
+  health?: ProjectHealth;
+  formatter: Formatter;
+}) {
+  const [tFn] = useTranslation();
+  const t = tFn as TranslateFn;
+  const colors = useColorScheme();
+  const score = resolveProjectHealthScore(health);
+  const status = resolveProjectHealthStatus(health);
+  const indicatorRows = resolveProjectHealthIndicatorRows(health);
+
+  if (!health) {
+    return (
+      <EmptyState>
+        {t('no_project_health_data')}
+      </EmptyState>
+    );
+  }
+
+  return (
+    <div className="flex h-full flex-col gap-4">
+      <div
+        className="rounded-md border p-3"
+        style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+
+            <div className="mt-1 text-2xl font-semibold">
+              {hasValue(score) ? formatter('score', score) : '-'}
+            </div>
+          </div>
+
+          {status && <Badge variant={status as BadgeVariant}>{status}</Badge>}
+        </div>
+      </div>
+
+      {indicatorRows.length ? (
+        <div className="space-y-3 text-sm">
+          {indicatorRows.map((row) => (
+            <div key={row.key} className="space-y-1">
+              <div className="flex items-center justify-between gap-4">
+                <span style={{ color: colors.$22 }}>
+                  {resolveFieldLabel(t, row.key)}
+                </span>
+                <span className="font-medium">
+                  {formatter(row.key, row.value)}
+                </span>
+              </div>
+
+              {(row.showBar || row.showStrip) && (
+                <div
+                  className="h-2 rounded-full"
+                  style={{ backgroundColor: colors.$20 }}
+                >
+                  <div
+                    className="h-2 rounded-full"
+                    style={{
+                      backgroundColor: row.color,
+                      width: row.showStrip
+                        ? '100%'
+                        : `${ratioBarWidth(row.value)}%`,
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <EmptyState>
+          {t('no_project_health_indicators')}
+        </EmptyState>
+      )}
+    </div>
+  );
+}
+
 function RecentActivityTable({
   rows,
   formatter,
@@ -1650,6 +1665,59 @@ function EmptyState({ children }: { children: ReactNode }) {
   );
 }
 
+function resolveProjectHealthScore(health?: ProjectHealth) {
+  return health?.score ?? health?.health_score;
+}
+
+function resolveProjectHealthStatus(health?: ProjectHealth) {
+  return health?.status ?? health?.health_status;
+}
+
+function resolveProjectHealthIndicatorRows(health?: ProjectHealth) {
+  const indicators = health?.indicators;
+
+  if (!indicators) {
+    return [];
+  }
+
+  return [
+    {
+      key: 'budget_utilization',
+      value: indicators.budget_utilization,
+      color: CHART_COLORS[0],
+      showBar: true,
+    },
+    {
+      key: 'schedule_variance_days',
+      value: indicators.schedule_variance_days,
+      color:
+        toNumber(indicators.schedule_variance_days) < 0
+          ? CHART_COLORS[3]
+          : CHART_COLORS[1],
+      showBar: false,
+      showStrip: true,
+    },
+    {
+      key: 'margin_ratio',
+      value: indicators.margin_ratio,
+      color: CHART_COLORS[1],
+      showBar: true,
+    },
+    {
+      key: 'unbilled_ratio',
+      value: indicators.unbilled_ratio,
+      color: CHART_COLORS[4],
+      showBar: true,
+    },
+    {
+      key: 'outstanding_ratio',
+      value: indicators.outstanding_ratio,
+      color: CHART_COLORS[3],
+      showBar: true,
+    },
+  ].filter((row) => hasValue(row.value));
+}
+
 function findProjectRow<T extends ProjectRow>(
   rows: T[] | undefined,
   projectId: string
@@ -1734,6 +1802,14 @@ function toNumber(value: unknown) {
   const number = Number(value);
 
   return Number.isFinite(number) ? number : 0;
+}
+
+function hasValue(value: unknown) {
+  return value !== undefined && value !== null && value !== '';
+}
+
+function ratioBarWidth(value: unknown) {
+  return Math.max(0, Math.min(100, toNumber(value) * 100));
 }
 
 function sumChartValues(rows: ChartDatum[], key: string) {

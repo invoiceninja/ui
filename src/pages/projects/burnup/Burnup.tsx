@@ -49,9 +49,9 @@ const BUCKET_OPTIONS: {
   value: ProjectBurnupBucketType;
   translationKey: string;
 }[] = [
-  { value: 'daily', translationKey: 'daily' },
-  { value: 'weekly', translationKey: 'weekly' },
-  { value: 'monthly', translationKey: 'monthly' },
+  { value: 'daily', translationKey: 'freq_daily' },
+  { value: 'weekly', translationKey: 'freq_weekly' },
+  { value: 'monthly', translationKey: 'freq_monthly' },
 ];
 
 export default function Burnup(props: Props) {
@@ -157,7 +157,7 @@ export default function Burnup(props: Props) {
 
   return (
     <Card
-      title={t('project_burnup')}
+      title={t('burn_up')}
       className="shadow-sm"
       style={{ borderColor: colors.$24 }}
       headerStyle={{ borderColor: colors.$20 }}
@@ -171,7 +171,7 @@ export default function Burnup(props: Props) {
               style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
             >
               <span className="font-medium">
-                {t('project_range')}:{' '}
+                {t('range')}:{' '}
               </span>
 
               <span>

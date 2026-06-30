@@ -213,7 +213,7 @@ export default function Show() {
                     </div>
                   </div>
 
-                  <div>
+                  <div className="flex flex-col items-start gap-1">
                     {project?.invoices?.map(
                       (invoice: Invoice, index: number) => (
                         <Link
