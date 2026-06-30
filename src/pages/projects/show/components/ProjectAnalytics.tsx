@@ -186,9 +186,24 @@ type ChartDatum = Record<string, unknown>;
 
 type Formatter = (dataKey: string, value: unknown) => ReactNode;
 
+type ChartTooltipPayloadItem = {
+  color?: string;
+  dataKey?: string | number;
+  fill?: string;
+  name?: string | number;
+  value?: unknown;
+};
+
+type ChartTooltipContentProps = {
+  active?: boolean;
+  label?: string | number;
+  payload?: ChartTooltipPayloadItem[];
+};
+
 type AnalyticsCardProps = {
   title: string;
   children: ReactNode;
+  description?: string;
   className?: string;
   height?: number;
 };
@@ -199,6 +214,11 @@ type StatCardProps = {
   detail?: ReactNode;
   accent: string;
 };
+
+interface ProjectAnalyticsProps {
+  project: Project;
+  overviewContent?: ReactNode;
+}
 
 const MONEY_FIELDS = new Set([
   'budgeted_amount',
@@ -244,32 +264,33 @@ const PERCENT_FIELDS = new Set([
 ]);
 
 const FIELD_LABELS: Record<string, string> = {
-  actual_amount: 'Actual',
+  actual_amount: 'Actual project value',
   average_daily_velocity: 'Daily velocity',
   billable_hours: 'Billable hours',
   billable_value: 'Billable value',
   budget_utilization: 'Budget used',
-  budgeted_amount: 'Budgeted',
+  budgeted_amount: 'Budgeted project value',
   cumulative_actual_amount: 'Actual spend',
   cumulative_expense_amount: 'Expenses',
   cumulative_labor_value: 'Labor',
   estimated_hours: 'Estimated hours',
-  expense_amount: 'Expenses',
+  expense_amount: 'Expense amount',
   expense_count: 'Expense count',
   health_score: 'Health score',
+  hours: 'Logged hours',
   invoice_progress: 'Invoice progress',
-  invoiced_amount: 'Invoiced',
-  labor_value: 'Labor',
+  invoiced_amount: 'Invoiced amount',
+  labor_value: 'Labor value',
   logged_hours: 'Logged hours',
-  margin_ratio: 'Margin ratio',
+  margin_ratio: 'Margin %',
   net_margin: 'Net margin',
-  outstanding_amount: 'Outstanding',
-  paid_amount: 'Paid',
+  outstanding_amount: 'Outstanding amount',
+  paid_amount: 'Paid amount',
   paid_progress: 'Paid progress',
   remaining_hours: 'Remaining hours',
   schedule_variance_days: 'Schedule variance',
   task_value: 'Task value',
-  unbilled_amount: 'Unbilled',
+  unbilled_amount: 'Unbilled amount',
   unbilled_hours: 'Unbilled hours',
   work_value: 'Work value',
 };
@@ -286,7 +307,10 @@ const CHART_COLORS = [
 
 const KEY_FIELDS = ['project_id', 'project_name'];
 
-export function ProjectAnalytics({ project }: { project: Project }) {
+export function ProjectAnalytics({
+  project,
+  overviewContent,
+}: ProjectAnalyticsProps) {
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
@@ -294,6 +318,14 @@ export function ProjectAnalytics({ project }: { project: Project }) {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const [includeDrafts, setIncludeDrafts] = useState(false);
+  const [hoveredBarDataKey, setHoveredBarDataKey] = useState<string | null>(
+    null
+  );
+
+  const barHoverProps = (dataKey: string) => ({
+    onMouseEnter: () => setHoveredBarDataKey(dataKey),
+    onMouseLeave: () => setHoveredBarDataKey(null),
+  });
 
   const analytics = useQuery<ProjectAnalyticsResponse>({
     queryKey: ['/api/v1/charts/project_analytics', includeDrafts],
@@ -391,10 +423,6 @@ export function ProjectAnalytics({ project }: { project: Project }) {
       ),
     };
   }, [analytics.data, project.id]);
-
-  const generatedAt = analytics.data?.metadata.generated_at
-    ? formatDate(analytics.data.metadata.generated_at, dateFormat)
-    : null;
 
   const hasAnyProjectData =
     Boolean(projectAnalytics?.budgetVsActual) ||
@@ -497,19 +525,7 @@ export function ProjectAnalytics({ project }: { project: Project }) {
 
   return (
     <section className="my-4 space-y-4">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h2 className="text-lg font-medium" style={{ color: colors.$3 }}>
-            Project analytics
-          </h2>
-
-          {generatedAt && (
-            <div className="mt-1 text-sm" style={{ color: colors.$22 }}>
-              Generated {generatedAt}
-            </div>
-          )}
-        </div>
-
+      <div className="flex justify-end">
         <div
           className="flex items-center justify-start rounded-md border px-3 py-2 md:justify-center"
           style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
@@ -566,244 +582,14 @@ export function ProjectAnalytics({ project }: { project: Project }) {
             withoutVerticalMargin
             childrenClassName="mt-4"
           >
-            <div className="grid grid-cols-12 gap-4">
-              <AnalyticsCard
-                title="Budget vs actual"
-                className="col-span-12 xl:col-span-6"
-              >
-                <ResponsiveChart>
-                  <BarChart
-                    data={singleProjectData(
-                      projectAnalytics.budgetVsActual,
-                      project.name,
-                      [
-                        'budgeted_amount',
-                        'actual_amount',
-                        'labor_value',
-                        'expense_amount',
-                      ]
-                    )}
-                    margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
-                  >
-                    <ChartGrid />
-                    <XAxis dataKey="project_name" tick={false} />
-                    <YAxis
-                      tick={axisTick(colors.$22)}
-                      tickFormatter={formatCompact}
-                    />
-                    <ChartTooltip formatter={formatFieldValue} />
-                    <Legend />
-                    <Bar
-                      dataKey="budgeted_amount"
-                      name={FIELD_LABELS.budgeted_amount}
-                      fill={CHART_COLORS[0]}
-                    />
-                    <Bar
-                      dataKey="actual_amount"
-                      name={FIELD_LABELS.actual_amount}
-                      fill={CHART_COLORS[1]}
-                    />
-                    <Bar
-                      dataKey="labor_value"
-                      name={FIELD_LABELS.labor_value}
-                      fill={CHART_COLORS[4]}
-                    />
-                    <Bar
-                      dataKey="expense_amount"
-                      name={FIELD_LABELS.expense_amount}
-                      fill={CHART_COLORS[2]}
-                    />
-                  </BarChart>
-                </ResponsiveChart>
-              </AnalyticsCard>
-
-              <AnalyticsCard
-                title="Estimated vs logged"
-                className="col-span-12 xl:col-span-6"
-              >
-                <ResponsiveChart>
-                  <BarChart
-                    layout="vertical"
-                    data={singleProjectData(
-                      projectAnalytics.estimatedVsLogged,
-                      project.name,
-                      [
-                        'estimated_hours',
-                        'logged_hours',
-                        'billable_hours',
-                        'remaining_hours',
-                      ]
-                    )}
-                    margin={{ top: 8, right: 16, left: 16, bottom: 0 }}
-                  >
-                    <ChartGrid />
-                    <XAxis
-                      type="number"
-                      tick={axisTick(colors.$22)}
-                      tickFormatter={formatCompact}
-                    />
-                    <YAxis
-                      type="category"
-                      dataKey="project_name"
-                      tick={false}
-                      width={12}
-                    />
-                    <ChartTooltip formatter={formatFieldValue} />
-                    <Legend />
-                    <Bar
-                      dataKey="estimated_hours"
-                      name={FIELD_LABELS.estimated_hours}
-                      fill={CHART_COLORS[0]}
-                    />
-                    <Bar
-                      dataKey="logged_hours"
-                      name={FIELD_LABELS.logged_hours}
-                      fill={CHART_COLORS[1]}
-                    />
-                    <Bar
-                      dataKey="billable_hours"
-                      name={FIELD_LABELS.billable_hours}
-                      fill={CHART_COLORS[4]}
-                    />
-                    <Bar
-                      dataKey="remaining_hours"
-                      name={FIELD_LABELS.remaining_hours}
-                      fill={CHART_COLORS[2]}
-                    />
-                  </BarChart>
-                </ResponsiveChart>
-              </AnalyticsCard>
-
-              <AnalyticsCard
-                title="Invoice progress"
-                className="col-span-12 xl:col-span-6"
-              >
-                <ResponsiveChart>
-                  <BarChart
-                    data={singleProjectData(
-                      projectAnalytics.invoiceProgress,
-                      project.name,
-                      [
-                        'work_value',
-                        'invoiced_amount',
-                        'paid_amount',
-                        'outstanding_amount',
-                        'unbilled_amount',
-                      ]
-                    )}
-                    margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
-                  >
-                    <ChartGrid />
-                    <XAxis dataKey="project_name" tick={false} />
-                    <YAxis
-                      tick={axisTick(colors.$22)}
-                      tickFormatter={formatCompact}
-                    />
-                    <ChartTooltip formatter={formatFieldValue} />
-                    <Legend />
-                    <Bar
-                      dataKey="work_value"
-                      name={FIELD_LABELS.work_value}
-                      fill={CHART_COLORS[0]}
-                    />
-                    <Bar
-                      dataKey="invoiced_amount"
-                      name={FIELD_LABELS.invoiced_amount}
-                      fill={CHART_COLORS[2]}
-                    />
-                    <Bar
-                      dataKey="paid_amount"
-                      name={FIELD_LABELS.paid_amount}
-                      fill={CHART_COLORS[1]}
-                    />
-                    <Bar
-                      dataKey="outstanding_amount"
-                      name={FIELD_LABELS.outstanding_amount}
-                      fill={CHART_COLORS[3]}
-                    />
-                    <Bar
-                      dataKey="unbilled_amount"
-                      name={FIELD_LABELS.unbilled_amount}
-                      fill={CHART_COLORS[5]}
-                    />
-                  </BarChart>
-                </ResponsiveChart>
-              </AnalyticsCard>
-
-              <AnalyticsCard
-                title="Health and schedule"
-                className="col-span-12 xl:col-span-6"
-              >
-                <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
-                  <div className="min-h-[240px]">
-                    <ResponsiveChart>
-                      <BarChart
-                        data={singleProjectData(
-                          projectAnalytics.projectHealth,
-                          project.name,
-                          ['health_score']
-                        )}
-                        margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
-                      >
-                        <ChartGrid />
-                        <XAxis dataKey="project_name" tick={false} />
-                        <YAxis
-                          domain={[0, 100]}
-                          tick={axisTick(colors.$22)}
-                          tickFormatter={(value) => `${value}%`}
-                        />
-                        <ChartTooltip formatter={formatFieldValue} />
-                        <Bar
-                          dataKey="health_score"
-                          name={FIELD_LABELS.health_score}
-                          fill={CHART_COLORS[1]}
-                        />
-                      </BarChart>
-                    </ResponsiveChart>
-                  </div>
-
-                  <div className="min-h-[240px]">
-                    <ResponsiveChart>
-                      <BarChart
-                        data={singleProjectData(
-                          projectAnalytics.timelineVariance,
-                          project.name,
-                          ['schedule_variance_days']
-                        )}
-                        margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
-                      >
-                        <ChartGrid />
-                        <XAxis dataKey="project_name" tick={false} />
-                        <YAxis tick={axisTick(colors.$22)} />
-                        <ReferenceLine y={0} stroke={colors.$22} />
-                        <ChartTooltip formatter={formatFieldValue} />
-                        <Bar
-                          dataKey="schedule_variance_days"
-                          name={FIELD_LABELS.schedule_variance_days}
-                          fill={CHART_COLORS[2]}
-                        />
-                      </BarChart>
-                    </ResponsiveChart>
-                  </div>
-                </div>
-              </AnalyticsCard>
-
-              <AnalyticsCard
-                title="Forecast completion"
-                className="col-span-12 xl:col-span-4"
-                height={240}
-              >
-                <ForecastSummary
-                  forecast={projectAnalytics.forecastCompletion}
-                  formatter={formatFieldValue}
-                  dateFormat={dateFormat}
-                />
-              </AnalyticsCard>
+            <div className="space-y-4">
+              {overviewContent}
             </div>
 
             <div className="grid grid-cols-12 gap-4">
               <AnalyticsCard
-                title="Profitability"
+                title="Profitability and margin"
+                description="Compares invoiced amount, expenses, and net margin, with margin percentage on the right axis."
                 className="col-span-12 xl:col-span-8"
                 height={240}
               >
@@ -819,14 +605,19 @@ export function ProjectAnalytics({ project }: { project: Project }) {
                         'margin_ratio',
                       ]
                     )}
-                    margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
+                    margin={{ top: 8, right: 48, left: 42, bottom: 26 }}
                   >
                     <ChartGrid />
-                    <XAxis dataKey="project_name" tick={false} />
+                    <XAxis
+                      dataKey="project_name"
+                      tick={false}
+                      label={xAxisLabel('Project', colors.$22)}
+                    />
                     <YAxis
                       yAxisId="amount"
                       tick={axisTick(colors.$22)}
                       tickFormatter={formatCompact}
+                      label={yAxisLabel('Amount', colors.$22)}
                     />
                     <YAxis
                       yAxisId="ratio"
@@ -834,22 +625,33 @@ export function ProjectAnalytics({ project }: { project: Project }) {
                       domain={[0, 1]}
                       tick={axisTick(colors.$22)}
                       tickFormatter={(value) => `${toNumber(value) * 100}%`}
+                      label={yAxisLabel(
+                        'Margin %',
+                        colors.$22,
+                        'insideRight'
+                      )}
                     />
-                    <ChartTooltip formatter={formatFieldValue} />
+                    <ChartTooltip
+                      formatter={formatFieldValue}
+                      highlightedDataKey={hoveredBarDataKey}
+                    />
                     <Legend />
                     <Bar
+                      {...barHoverProps('invoiced_amount')}
                       yAxisId="amount"
                       dataKey="invoiced_amount"
                       name={FIELD_LABELS.invoiced_amount}
                       fill={CHART_COLORS[0]}
                     />
                     <Bar
+                      {...barHoverProps('expense_amount')}
                       yAxisId="amount"
                       dataKey="expense_amount"
                       name={FIELD_LABELS.expense_amount}
                       fill={CHART_COLORS[2]}
                     />
                     <Bar
+                      {...barHoverProps('net_margin')}
                       yAxisId="amount"
                       dataKey="net_margin"
                       name={FIELD_LABELS.net_margin}
@@ -868,9 +670,307 @@ export function ProjectAnalytics({ project }: { project: Project }) {
               </AnalyticsCard>
             </div>
 
+            <div className="space-y-4">
+              <div className="grid grid-cols-12 gap-4">
+                <AnalyticsCard
+                  title="Budget vs actual value"
+                  description="Compares the planned project value with actual labor and expense value."
+                  className="col-span-12 xl:col-span-6"
+                >
+                  <ResponsiveChart>
+                    <BarChart
+                      data={singleProjectData(
+                        projectAnalytics.budgetVsActual,
+                        project.name,
+                        [
+                          'budgeted_amount',
+                          'actual_amount',
+                          'labor_value',
+                          'expense_amount',
+                        ]
+                      )}
+                      margin={{ top: 8, right: 16, left: 42, bottom: 26 }}
+                    >
+                      <ChartGrid />
+                      <XAxis
+                        dataKey="project_name"
+                        tick={false}
+                        label={xAxisLabel('Project', colors.$22)}
+                      />
+                      <YAxis
+                        tick={axisTick(colors.$22)}
+                        tickFormatter={formatCompact}
+                        label={yAxisLabel('Amount', colors.$22)}
+                      />
+                      <ChartTooltip
+                        formatter={formatFieldValue}
+                        highlightedDataKey={hoveredBarDataKey}
+                      />
+                      <Legend />
+                      <Bar
+                        {...barHoverProps('budgeted_amount')}
+                        dataKey="budgeted_amount"
+                        name={FIELD_LABELS.budgeted_amount}
+                        fill={CHART_COLORS[0]}
+                      />
+                      <Bar
+                        {...barHoverProps('actual_amount')}
+                        dataKey="actual_amount"
+                        name={FIELD_LABELS.actual_amount}
+                        fill={CHART_COLORS[1]}
+                      />
+                      <Bar
+                        {...barHoverProps('labor_value')}
+                        dataKey="labor_value"
+                        name={FIELD_LABELS.labor_value}
+                        fill={CHART_COLORS[4]}
+                      />
+                      <Bar
+                        {...barHoverProps('expense_amount')}
+                        dataKey="expense_amount"
+                        name={FIELD_LABELS.expense_amount}
+                        fill={CHART_COLORS[2]}
+                      />
+                    </BarChart>
+                  </ResponsiveChart>
+                </AnalyticsCard>
+
+                <AnalyticsCard
+                  title="Estimated vs logged hours"
+                  description="Compares estimated, logged, billable, and remaining project hours."
+                  className="col-span-12 xl:col-span-6"
+                >
+                  <ResponsiveChart>
+                    <BarChart
+                      layout="vertical"
+                      data={singleProjectData(
+                        projectAnalytics.estimatedVsLogged,
+                        project.name,
+                        [
+                          'estimated_hours',
+                          'logged_hours',
+                          'billable_hours',
+                          'remaining_hours',
+                        ]
+                      )}
+                      margin={{ top: 8, right: 16, left: 16, bottom: 26 }}
+                    >
+                      <ChartGrid />
+                      <XAxis
+                        type="number"
+                        tick={axisTick(colors.$22)}
+                        tickFormatter={formatCompact}
+                        label={xAxisLabel('Hours', colors.$22)}
+                      />
+                      <YAxis
+                        type="category"
+                        dataKey="project_name"
+                        tick={false}
+                        width={12}
+                        label={yAxisLabel('Project', colors.$22)}
+                      />
+                      <ChartTooltip
+                        formatter={formatFieldValue}
+                        highlightedDataKey={hoveredBarDataKey}
+                      />
+                      <Legend />
+                      <Bar
+                        {...barHoverProps('estimated_hours')}
+                        dataKey="estimated_hours"
+                        name={FIELD_LABELS.estimated_hours}
+                        fill={CHART_COLORS[0]}
+                      />
+                      <Bar
+                        {...barHoverProps('logged_hours')}
+                        dataKey="logged_hours"
+                        name={FIELD_LABELS.logged_hours}
+                        fill={CHART_COLORS[1]}
+                      />
+                      <Bar
+                        {...barHoverProps('billable_hours')}
+                        dataKey="billable_hours"
+                        name={FIELD_LABELS.billable_hours}
+                        fill={CHART_COLORS[4]}
+                      />
+                      <Bar
+                        {...barHoverProps('remaining_hours')}
+                        dataKey="remaining_hours"
+                        name={FIELD_LABELS.remaining_hours}
+                        fill={CHART_COLORS[2]}
+                      />
+                    </BarChart>
+                  </ResponsiveChart>
+                </AnalyticsCard>
+
+              <AnalyticsCard
+                title="Invoice and payment progress"
+                description="Shows earned work value against invoiced, paid, outstanding, and unbilled amounts."
+                className="col-span-12 xl:col-span-6"
+              >
+                <ResponsiveChart>
+                  <BarChart
+                    data={singleProjectData(
+                      projectAnalytics.invoiceProgress,
+                      project.name,
+                      [
+                        'work_value',
+                        'invoiced_amount',
+                        'paid_amount',
+                        'outstanding_amount',
+                        'unbilled_amount',
+                      ]
+                    )}
+                    margin={{ top: 8, right: 16, left: 42, bottom: 26 }}
+                  >
+                    <ChartGrid />
+                    <XAxis
+                      dataKey="project_name"
+                      tick={false}
+                      label={xAxisLabel('Project', colors.$22)}
+                    />
+                    <YAxis
+                      tick={axisTick(colors.$22)}
+                      tickFormatter={formatCompact}
+                      label={yAxisLabel('Amount', colors.$22)}
+                    />
+                    <ChartTooltip
+                      formatter={formatFieldValue}
+                      highlightedDataKey={hoveredBarDataKey}
+                    />
+                    <Legend />
+                    <Bar
+                      {...barHoverProps('work_value')}
+                      dataKey="work_value"
+                      name={FIELD_LABELS.work_value}
+                      fill={CHART_COLORS[0]}
+                    />
+                    <Bar
+                      {...barHoverProps('invoiced_amount')}
+                      dataKey="invoiced_amount"
+                      name={FIELD_LABELS.invoiced_amount}
+                      fill={CHART_COLORS[2]}
+                    />
+                    <Bar
+                      {...barHoverProps('paid_amount')}
+                      dataKey="paid_amount"
+                      name={FIELD_LABELS.paid_amount}
+                      fill={CHART_COLORS[1]}
+                    />
+                    <Bar
+                      {...barHoverProps('outstanding_amount')}
+                      dataKey="outstanding_amount"
+                      name={FIELD_LABELS.outstanding_amount}
+                      fill={CHART_COLORS[3]}
+                    />
+                    <Bar
+                      {...barHoverProps('unbilled_amount')}
+                      dataKey="unbilled_amount"
+                      name={FIELD_LABELS.unbilled_amount}
+                      fill={CHART_COLORS[5]}
+                    />
+                  </BarChart>
+                </ResponsiveChart>
+              </AnalyticsCard>
+
+              <AnalyticsCard
+                title="Project health and schedule variance"
+                description="Shows project health score and schedule variance from the forecast."
+                className="col-span-12 xl:col-span-6"
+              >
+                <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
+                  <div className="min-h-[240px]">
+                    <ResponsiveChart>
+                      <BarChart
+                        data={singleProjectData(
+                          projectAnalytics.projectHealth,
+                          project.name,
+                          ['health_score']
+                        )}
+                        margin={{ top: 8, right: 16, left: 42, bottom: 26 }}
+                      >
+                        <ChartGrid />
+                        <XAxis
+                          dataKey="project_name"
+                          tick={false}
+                          label={xAxisLabel('Project', colors.$22)}
+                        />
+                        <YAxis
+                          domain={[0, 100]}
+                          tick={axisTick(colors.$22)}
+                          tickFormatter={(value) => `${value}%`}
+                          label={yAxisLabel('Health score', colors.$22)}
+                        />
+                        <ChartTooltip
+                          formatter={formatFieldValue}
+                          highlightedDataKey={hoveredBarDataKey}
+                        />
+                        <Legend />
+                        <Bar
+                          {...barHoverProps('health_score')}
+                          dataKey="health_score"
+                          name={FIELD_LABELS.health_score}
+                          fill={CHART_COLORS[1]}
+                        />
+                      </BarChart>
+                    </ResponsiveChart>
+                  </div>
+
+                  <div className="min-h-[240px]">
+                    <ResponsiveChart>
+                      <BarChart
+                        data={singleProjectData(
+                          projectAnalytics.timelineVariance,
+                          project.name,
+                          ['schedule_variance_days']
+                        )}
+                        margin={{ top: 8, right: 16, left: 42, bottom: 26 }}
+                      >
+                        <ChartGrid />
+                        <XAxis
+                          dataKey="project_name"
+                          tick={false}
+                          label={xAxisLabel('Project', colors.$22)}
+                        />
+                        <YAxis
+                          tick={axisTick(colors.$22)}
+                          label={yAxisLabel('Days variance', colors.$22)}
+                        />
+                        <ReferenceLine y={0} stroke={colors.$22} />
+                        <ChartTooltip
+                          formatter={formatFieldValue}
+                          highlightedDataKey={hoveredBarDataKey}
+                        />
+                        <Legend />
+                        <Bar
+                          {...barHoverProps('schedule_variance_days')}
+                          dataKey="schedule_variance_days"
+                          name={FIELD_LABELS.schedule_variance_days}
+                          fill={CHART_COLORS[2]}
+                        />
+                      </BarChart>
+                    </ResponsiveChart>
+                  </div>
+                </div>
+              </AnalyticsCard>
+
+              <AnalyticsCard
+                title="Forecast completion"
+                description="Summarizes projected completion timing from current project velocity."
+                className="col-span-12 xl:col-span-4"
+                height={240}
+              >
+                <ForecastSummary
+                  forecast={projectAnalytics.forecastCompletion}
+                  formatter={formatFieldValue}
+                  dateFormat={dateFormat}
+                />
+              </AnalyticsCard>
+              </div>
+
             <div className="grid grid-cols-12 gap-4">
               <AnalyticsCard
-                title="Team contribution"
+                title="Team time contribution"
+                description="Shows logged and billable hours by team member."
                 className="col-span-12 xl:col-span-6"
               >
                 <ResponsiveChart>
@@ -880,7 +980,7 @@ export function ProjectAnalytics({ project }: { project: Project }) {
                       'billable_hours',
                       'billable_value',
                     ])}
-                    margin={{ top: 8, right: 16, left: 0, bottom: 36 }}
+                    margin={{ top: 8, right: 16, left: 42, bottom: 48 }}
                   >
                     <ChartGrid />
                     <XAxis
@@ -889,19 +989,26 @@ export function ProjectAnalytics({ project }: { project: Project }) {
                       angle={-25}
                       textAnchor="end"
                       height={54}
+                      label={xAxisLabel('Team member', colors.$22, -12)}
                     />
                     <YAxis
                       tick={axisTick(colors.$22)}
                       tickFormatter={formatCompact}
+                      label={yAxisLabel('Hours', colors.$22)}
                     />
-                    <ChartTooltip formatter={formatFieldValue} />
+                    <ChartTooltip
+                      formatter={formatFieldValue}
+                      highlightedDataKey={hoveredBarDataKey}
+                    />
                     <Legend />
                     <Bar
+                      {...barHoverProps('logged_hours')}
                       dataKey="logged_hours"
                       name={FIELD_LABELS.logged_hours}
                       fill={CHART_COLORS[0]}
                     />
                     <Bar
+                      {...barHoverProps('billable_hours')}
                       dataKey="billable_hours"
                       name={FIELD_LABELS.billable_hours}
                       fill={CHART_COLORS[1]}
@@ -911,7 +1018,8 @@ export function ProjectAnalytics({ project }: { project: Project }) {
               </AnalyticsCard>
 
               <AnalyticsCard
-                title="Time distribution"
+                title="Task time distribution"
+                description="Shows logged and billable hours by task or work item."
                 className="col-span-12 xl:col-span-6"
               >
                 <ResponsiveChart>
@@ -922,28 +1030,35 @@ export function ProjectAnalytics({ project }: { project: Project }) {
                       'billable_hours',
                       'billable_value',
                     ])}
-                    margin={{ top: 8, right: 16, left: 40, bottom: 0 }}
+                    margin={{ top: 8, right: 16, left: 52, bottom: 26 }}
                   >
                     <ChartGrid />
                     <XAxis
                       type="number"
                       tick={axisTick(colors.$22)}
                       tickFormatter={formatCompact}
+                      label={xAxisLabel('Hours', colors.$22)}
                     />
                     <YAxis
                       type="category"
                       dataKey="description"
                       tick={axisTick(colors.$22)}
                       width={120}
+                      label={yAxisLabel('Task', colors.$22)}
                     />
-                    <ChartTooltip formatter={formatFieldValue} />
+                    <ChartTooltip
+                      formatter={formatFieldValue}
+                      highlightedDataKey={hoveredBarDataKey}
+                    />
                     <Legend />
                     <Bar
+                      {...barHoverProps('logged_hours')}
                       dataKey="logged_hours"
                       name={FIELD_LABELS.logged_hours}
                       fill={CHART_COLORS[0]}
                     />
                     <Bar
+                      {...barHoverProps('billable_hours')}
                       dataKey="billable_hours"
                       name={FIELD_LABELS.billable_hours}
                       fill={CHART_COLORS[1]}
@@ -953,7 +1068,8 @@ export function ProjectAnalytics({ project }: { project: Project }) {
               </AnalyticsCard>
 
               <AnalyticsCard
-                title="Velocity trend"
+                title="Time velocity trend"
+                description="Shows tracked and billable hours over each reporting period."
                 className="col-span-12 xl:col-span-6"
               >
                 <ResponsiveChart>
@@ -963,13 +1079,18 @@ export function ProjectAnalytics({ project }: { project: Project }) {
                       'billable_hours',
                       'task_value',
                     ])}
-                    margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
+                    margin={{ top: 8, right: 16, left: 42, bottom: 26 }}
                   >
                     <ChartGrid />
-                    <XAxis dataKey="period" tick={axisTick(colors.$22)} />
+                    <XAxis
+                      dataKey="period"
+                      tick={axisTick(colors.$22)}
+                      label={xAxisLabel('Period', colors.$22)}
+                    />
                     <YAxis
                       tick={axisTick(colors.$22)}
                       tickFormatter={formatCompact}
+                      label={yAxisLabel('Hours', colors.$22)}
                     />
                     <ChartTooltip formatter={formatFieldValue} />
                     <Legend />
@@ -993,10 +1114,12 @@ export function ProjectAnalytics({ project }: { project: Project }) {
                 </ResponsiveChart>
               </AnalyticsCard>
             </div>
+            </div>
 
             <div className="grid grid-cols-12 gap-4">
               <AnalyticsCard
-                title="Expense breakdown"
+                title="Expense breakdown by category"
+                description="Shows project expenses grouped by category."
                 className="col-span-12 xl:col-span-6"
               >
                 {projectAnalytics.expenseBreakdown.length <= 6 ? (
@@ -1033,7 +1156,7 @@ export function ProjectAnalytics({ project }: { project: Project }) {
                         'expense_amount',
                         'expense_count',
                       ])}
-                      margin={{ top: 8, right: 16, left: 0, bottom: 36 }}
+                      margin={{ top: 8, right: 16, left: 42, bottom: 48 }}
                     >
                       <ChartGrid />
                       <XAxis
@@ -1042,13 +1165,20 @@ export function ProjectAnalytics({ project }: { project: Project }) {
                         angle={-25}
                         textAnchor="end"
                         height={54}
+                        label={xAxisLabel('Expense category', colors.$22, -12)}
                       />
                       <YAxis
                         tick={axisTick(colors.$22)}
                         tickFormatter={formatCompact}
+                        label={yAxisLabel('Amount', colors.$22)}
                       />
-                      <ChartTooltip formatter={formatFieldValue} />
+                      <ChartTooltip
+                        formatter={formatFieldValue}
+                        highlightedDataKey={hoveredBarDataKey}
+                      />
+                      <Legend />
                       <Bar
+                        {...barHoverProps('expense_amount')}
                         dataKey="expense_amount"
                         name={FIELD_LABELS.expense_amount}
                         fill={CHART_COLORS[2]}
@@ -1059,7 +1189,8 @@ export function ProjectAnalytics({ project }: { project: Project }) {
               </AnalyticsCard>
 
               <AnalyticsCard
-                title="Cumulative spend"
+                title="Cumulative spend over time"
+                description="Shows cumulative labor, expense, and total project spend over time."
                 className="col-span-12 xl:col-span-8"
               >
                 <ResponsiveChart>
@@ -1069,13 +1200,18 @@ export function ProjectAnalytics({ project }: { project: Project }) {
                       'cumulative_expense_amount',
                       'cumulative_actual_amount',
                     ])}
-                    margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
+                    margin={{ top: 8, right: 16, left: 42, bottom: 26 }}
                   >
                     <ChartGrid />
-                    <XAxis dataKey="period" tick={axisTick(colors.$22)} />
+                    <XAxis
+                      dataKey="period"
+                      tick={axisTick(colors.$22)}
+                      label={xAxisLabel('Period', colors.$22)}
+                    />
                     <YAxis
                       tick={axisTick(colors.$22)}
                       tickFormatter={formatCompact}
+                      label={yAxisLabel('Amount', colors.$22)}
                     />
                     <ChartTooltip formatter={formatFieldValue} />
                     <Legend />
@@ -1110,7 +1246,8 @@ export function ProjectAnalytics({ project }: { project: Project }) {
 
             <div className="grid grid-cols-12 gap-4">
               <AnalyticsCard
-                title="Recent activity"
+                title="Recent project activity"
+                description="Lists recent project activity and the related amount."
                 className="col-span-12 xl:col-span-4"
               >
                 <RecentActivityTable
@@ -1121,12 +1258,14 @@ export function ProjectAnalytics({ project }: { project: Project }) {
               </AnalyticsCard>
             </div>
 
-            <Burnup
-              project={project}
-              includeDrafts={includeDrafts}
-              onIncludeDraftsChange={setIncludeDrafts}
-              showIncludeDraftsToggle={false}
-            />
+            <div>
+              <Burnup
+                project={project}
+                includeDrafts={includeDrafts}
+                onIncludeDraftsChange={setIncludeDrafts}
+                showIncludeDraftsToggle={false}
+              />
+            </div>
           </TabGroup>
         </>
       )}
@@ -1137,6 +1276,7 @@ export function ProjectAnalytics({ project }: { project: Project }) {
 function AnalyticsCard({
   title,
   children,
+  description,
   className,
   height = 320,
 }: AnalyticsCardProps) {
@@ -1145,6 +1285,7 @@ function AnalyticsCard({
   return (
     <Card
       title={title}
+      description={description}
       className={classNames('shadow-sm', className)}
       headerClassName="px-3 sm:px-4 py-3"
       childrenClassName="px-4 pb-4"
@@ -1200,22 +1341,72 @@ function ChartGrid() {
   return <CartesianGrid strokeDasharray="3 3" vertical={false} />;
 }
 
-function ChartTooltip({ formatter }: { formatter: Formatter }) {
+function ChartTooltip({
+  formatter,
+  highlightedDataKey,
+}: {
+  formatter: Formatter;
+  highlightedDataKey?: string | null;
+}) {
   const colors = useColorScheme();
+
+  const Content = ({ active, label, payload }: ChartTooltipContentProps) => {
+    if (!active || !payload?.length) {
+      return null;
+    }
+
+    const filteredPayload = highlightedDataKey
+      ? payload.filter((item) => String(item.dataKey) === highlightedDataKey)
+      : payload;
+    const displayPayload = filteredPayload.length ? filteredPayload : payload;
+
+    return (
+      <div
+        className="rounded-md border p-3 text-sm shadow-lg"
+        style={{
+          backgroundColor: colors.$1,
+          borderColor: colors.$24,
+          color: colors.$3,
+        }}
+      >
+        {label !== undefined && (
+          <div className="mb-2 font-medium" style={{ color: colors.$3 }}>
+            {label}
+          </div>
+        )}
+
+        <div className="space-y-1">
+          {displayPayload.map((item, index) => {
+            const dataKey = String(item.dataKey ?? item.name ?? index);
+            const swatchColor = item.color || item.fill || colors.$22;
+
+            return (
+              <div
+                key={`${dataKey}-${index}`}
+                className="flex items-center justify-between gap-6"
+              >
+                <div className="flex min-w-0 items-center gap-2">
+                  <span
+                    className="h-2.5 w-2.5 flex-shrink-0 rounded-sm"
+                    style={{ backgroundColor: swatchColor }}
+                  />
+                  <span className="truncate">{labelFor(dataKey)}</span>
+                </div>
+
+                <span className="whitespace-nowrap font-medium">
+                  {formatter(dataKey, item.value)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <Tooltip
-      formatter={(value, name, item) => {
-        const dataKey = String(item?.dataKey ?? name);
-
-        return [formatter(dataKey, value), labelFor(dataKey)];
-      }}
-      contentStyle={{
-        backgroundColor: colors.$1,
-        borderColor: colors.$24,
-        color: colors.$3,
-      }}
-      labelStyle={{ color: colors.$3 }}
+      content={<Content />}
       wrapperStyle={{ outline: 'none' }}
     />
   );
@@ -1434,4 +1625,26 @@ function labelFor(key: string) {
 
 function axisTick(fill: string) {
   return { fill, fontSize: 12 };
+}
+
+function xAxisLabel(value: string, fill: string, offset = -6) {
+  return {
+    value,
+    position: 'insideBottom',
+    offset,
+    style: { fill, fontSize: 12 },
+  };
+}
+
+function yAxisLabel(
+  value: string,
+  fill: string,
+  position: 'insideLeft' | 'insideRight' = 'insideLeft'
+) {
+  return {
+    value,
+    angle: position === 'insideRight' ? 90 : -90,
+    position,
+    style: { textAnchor: 'middle', fill, fontSize: 12 },
+  };
 }

@@ -14,6 +14,12 @@ import type {
 } from '$app/common/interfaces/project-burnup';
 import dayjs from 'dayjs';
 
+interface ProjectBurnupDateRangeParams {
+  createdAt?: number | null;
+  dueDate?: string | null;
+  today?: string;
+}
+
 export function resolveBurnupMarkerDate(
   markerDate: string | null | undefined,
   series: ProjectBurnupSeriesRow[]
@@ -67,4 +73,29 @@ export function formatBurnupXAxisTick(
   }
 
   return dayjs(row.date).format(dateFormat);
+}
+
+export function resolveProjectBurnupDateRange(
+  params: ProjectBurnupDateRangeParams
+) {
+  const today = dayjs(params.today).isValid()
+    ? dayjs(params.today).startOf('day')
+    : dayjs().startOf('day');
+
+  const createdAt =
+    typeof params.createdAt === 'number' && params.createdAt > 0
+      ? dayjs.unix(params.createdAt).startOf('day')
+      : today;
+
+  const dueDate = params.dueDate ? dayjs(params.dueDate).startOf('day') : null;
+
+  const dueOrToday = dueDate?.isValid() ? dueDate : today;
+  const endDate = dueOrToday.isBefore(today, 'day') ? today : dueOrToday;
+
+  const startDate = createdAt.isAfter(endDate, 'day') ? endDate : createdAt;
+
+  return {
+    start: startDate.format('YYYY-MM-DD'),
+    end: endDate.format('YYYY-MM-DD'),
+  };
 }

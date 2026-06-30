@@ -185,7 +185,7 @@ export function ProjectBurnupChart(props: Props) {
     <ResponsiveContainer width="100%" height={420}>
       <ComposedChart
         data={data.series}
-        margin={{ top: 24, right: 18, left: 18, bottom: 12 }}
+        margin={{ top: 24, right: 56, left: 46, bottom: 34 }}
       >
         <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
@@ -195,6 +195,10 @@ export function ProjectBurnupChart(props: Props) {
           minTickGap={24}
           tick={{ fontSize: 12 }}
           stroke={colors.$3}
+          label={xAxisLabel(
+            data.bucket_type === 'daily' ? 'Date' : 'Period',
+            colors.$17
+          )}
           tickFormatter={(value) =>
             formatBurnupXAxisTick(
               value,
@@ -210,6 +214,7 @@ export function ProjectBurnupChart(props: Props) {
           tick={{ fontSize: 12 }}
           stroke={colors.$3}
           tickFormatter={formatHours}
+          label={yAxisLabel('Hours', colors.$17)}
           width={64}
         />
 
@@ -219,6 +224,7 @@ export function ProjectBurnupChart(props: Props) {
           tick={{ fontSize: 12 }}
           stroke={colors.$3}
           tickFormatter={formatMoneyValue}
+          label={yAxisLabel('Amount', colors.$17, 'insideRight')}
           width={92}
         />
 
@@ -232,6 +238,7 @@ export function ProjectBurnupChart(props: Props) {
         {dueDateMarker && (
           <ReferenceLine
             x={dueDateMarker}
+            yAxisId="hours"
             stroke="#dc2626"
             strokeDasharray="5 4"
             label={{
@@ -264,4 +271,26 @@ export function ProjectBurnupChart(props: Props) {
       </ComposedChart>
     </ResponsiveContainer>
   );
+}
+
+function xAxisLabel(value: string, fill: string) {
+  return {
+    value,
+    position: 'insideBottom',
+    offset: -10,
+    style: { fill, fontSize: 12 },
+  };
+}
+
+function yAxisLabel(
+  value: string,
+  fill: string,
+  position: 'insideLeft' | 'insideRight' = 'insideLeft'
+) {
+  return {
+    value,
+    angle: position === 'insideRight' ? 90 : -90,
+    position,
+    style: { textAnchor: 'middle', fill, fontSize: 12 },
+  };
 }
