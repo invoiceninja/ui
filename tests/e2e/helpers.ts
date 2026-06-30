@@ -6,6 +6,7 @@ import {
   emailForCurrentAccount,
   passwordForCurrentAccount,
 } from './accounts';
+import { setUserPermissions, type ApiContext } from './api-helpers';
 
 type AdminPermission = 'admin';
 
@@ -42,8 +43,13 @@ export async function login(
 
   await page.locator('input[name="email"]').waitFor({ state: 'visible', timeout: 10000 });
   await page.locator('input[name="email"]').fill(resolvedEmail);
-  await page.getByLabel('Password').fill(resolvedPassword);
-  await page.getByLabel('Password').press('Enter');
+
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+
+  const passwordInput = page.locator('input[name="password"]');
+  await passwordInput.waitFor({ state: 'visible', timeout: 10000 });
+  await passwordInput.fill(resolvedPassword);
+  await passwordInput.press('Enter');
 
   await expect(page.locator('[data-cy="navigationBar"]')).toBeVisible({ timeout: 10000 });
 }
@@ -113,6 +119,26 @@ export function permissions(page: Page) {
 
       await page.check(`[data-cy=${updatedPermission}]`);
     }
+  };
+
+  return { clear, save, set };
+}
+
+export function apiPermissions(api: ApiContext) {
+  let email = 'permissions@example.com';
+  let selectedPermissions: Permission[] = [];
+
+  const clear = async (targetEmail = 'permissions@example.com') => {
+    email = targetEmail;
+    selectedPermissions = [];
+  };
+
+  const save = async () => {
+    await setUserPermissions(api, email, selectedPermissions);
+  };
+
+  const set = async (...permissions: Permission[]) => {
+    selectedPermissions = [...selectedPermissions, ...permissions];
   };
 
   return { clear, save, set };
@@ -189,11 +215,23 @@ export async function checkDropdownActions(
   await dropDown.waitFor({ state: 'visible', timeout: 5000 });
 
   for (const { label, visible, modal } of actions) {
+    const buttonAction = dropDown
+      .getByRole('button', { name: label, exact: true })
+      .first();
+    const linkAction = dropDown
+      .getByRole('link', { name: label, exact: true })
+      .first();
+    const action = (await buttonAction.count())
+      ? buttonAction
+      : (await linkAction.count())
+      ? linkAction
+      : dropDown.getByText(label).first();
+
     if (visible) {
-      await expect(dropDown.getByText(label).first()).toBeVisible({ timeout: 10000 });
+      await expect(action).toBeVisible({ timeout: 10000 });
 
       if (modal) {
-        await dropDown.getByText(label).first().click();
+        await action.click();
 
         const modalDialog = page.getByRole('dialog');
         await modalDialog.waitFor({ state: 'visible', timeout: 5000 });

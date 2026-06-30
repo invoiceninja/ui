@@ -6,6 +6,7 @@
  */
 
 import { request as playwrightRequest } from '@playwright/test';
+import type { Permissions as AppPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 import {
   baseEmailForAccount,
@@ -218,6 +219,54 @@ export async function createEntityViaApi(
   return body.data;
 }
 
+export async function updateEntityViaApi(
+  api: ApiContext,
+  entityType: EntityType,
+  id: string,
+  data: Record<string, unknown>
+): Promise<Record<string, unknown>> {
+  const context = await apiRequest(api);
+
+  const response = await context.put('/api/v1/' + entityType + '/' + id, {
+    headers: api.headers,
+    data,
+  });
+
+  if (!response.ok()) {
+    const text = await response.text();
+    await context.dispose();
+    throw new Error(
+      'Failed to update ' +
+        entityType +
+        ' ' +
+        id +
+        ' (' +
+        response.status() +
+        '): ' +
+        text.slice(0, 300)
+    );
+  }
+
+  const body = await response.json();
+  await context.dispose();
+  return body.data;
+}
+
+export async function assignEntityToUser(
+  api: ApiContext,
+  entityType: EntityType,
+  id: string,
+  email: string
+): Promise<void> {
+  const userId = await fetchUserIdByEmail(api, email);
+
+  if (!userId) {
+    throw new Error('Could not find user ' + email + ' for assignment');
+  }
+
+  await updateEntityViaApi(api, entityType, id, { assigned_user_id: userId });
+}
+
 // ---------------------------------------------------------------------------
 // Typed creation helpers
 // ---------------------------------------------------------------------------
@@ -367,9 +416,15 @@ interface ApiUser {
   last_name: string;
   email: string;
   is_deleted: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  company_user?: {
+    is_admin?: boolean;
+    permissions?: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
 }
+
+export type UserPermission = AppPermission | 'admin';
 
 async function fetchAllUsers(api: ApiContext): Promise<ApiUser[]> {
   const context = await apiRequest(api);
@@ -386,6 +441,111 @@ async function fetchAllUsers(api: ApiContext): Promise<ApiUser[]> {
   const body = await response.json();
   await context.dispose();
   return body.data || [];
+}
+
+export async function fetchUserIdByEmail(
+  api: ApiContext,
+  email: string
+): Promise<string | null> {
+  const resolvedEmail = emailForCurrentAccount(email);
+  const users = await fetchAllUsers(api);
+
+  return users.find((user) => user.email === resolvedEmail)?.id || null;
+}
+
+async function fetchUser(api: ApiContext, id: string): Promise<ApiUser> {
+  const context = await apiRequest(api);
+  const response = await context.get(
+    '/api/v1/users/' + id + '?include=company_user',
+    { headers: api.headers }
+  );
+
+  if (!response.ok()) {
+    const text = await response.text();
+    await context.dispose();
+    throw new Error(
+      'Failed to fetch user ' +
+        id +
+        ' (' +
+        response.status() +
+        '): ' +
+        text.slice(0, 300)
+    );
+  }
+
+  const body = await response.json();
+  await context.dispose();
+
+  if (!body.data) {
+    throw new Error('Failed to fetch user ' + id + ': empty response');
+  }
+
+  return body.data;
+}
+
+export async function setUserPermissions(
+  api: ApiContext,
+  email: string,
+  permissions: UserPermission[]
+): Promise<void> {
+  const resolvedEmail = emailForCurrentAccount(email);
+  const users = await fetchAllUsers(api);
+  const listUser = users.find((user) => user.email === resolvedEmail);
+
+  if (!listUser) {
+    throw new Error(
+      'Could not find user ' + resolvedEmail + ' to update permissions'
+    );
+  }
+
+  const user = await fetchUser(api, listUser.id);
+
+  if (!user.company_user) {
+    throw new Error(
+      'Could not update permissions for ' +
+        resolvedEmail +
+        ': missing company_user'
+    );
+  }
+
+  const uniquePermissions = Array.from(new Set(permissions));
+  const isAdmin = uniquePermissions.includes('admin');
+  const permissionString = isAdmin
+    ? ''
+    : uniquePermissions
+        .filter((permission) => permission !== 'admin')
+        .join(',');
+
+  const context = await apiRequest(api);
+  const response = await context.put(
+    '/api/v1/users/' + user.id + '?include=company_user',
+    {
+      headers: api.headers,
+      data: {
+        ...user,
+        company_user: {
+          ...user.company_user,
+          is_admin: isAdmin,
+          permissions: permissionString,
+        },
+      },
+    }
+  );
+
+  if (!response.ok()) {
+    const text = await response.text();
+    await context.dispose();
+    throw new Error(
+      'Failed to update permissions for ' +
+        resolvedEmail +
+        ' (' +
+        response.status() +
+        '): ' +
+        text.slice(0, 300)
+    );
+  }
+
+  await context.dispose();
 }
 
 /**
@@ -526,13 +686,14 @@ export async function ensurePermissionUserExists(
 
 export interface CompanySettings {
   companyId: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   settings: Record<string, any>;
 }
 
-export async function getCompanySettings(
-  api: ApiContext
-): Promise<CompanySettings> {
+export interface CompanyData extends CompanySettings {
+  company: Record<string, any>;
+}
+
+export async function getCompany(api: ApiContext): Promise<CompanyData> {
   const context = await apiRequest(api);
   const response = await context.get('/api/v1/companies', {
     headers: api.headers,
@@ -553,14 +714,48 @@ export async function getCompanySettings(
 
   return {
     companyId: company.id,
+    company,
     settings: company.settings || {},
   };
+}
+
+export async function getCompanySettings(
+  api: ApiContext
+): Promise<CompanySettings> {
+  const { companyId, settings } = await getCompany(api);
+
+  return { companyId, settings };
+}
+
+export async function putCompany(
+  api: ApiContext,
+  companyId: string,
+  company: Record<string, any>
+): Promise<void> {
+  const context = await apiRequest(api);
+
+  const response = await context.put('/api/v1/companies/' + companyId, {
+    headers: api.headers,
+    data: company,
+  });
+
+  if (!response.ok()) {
+    const text = await response.text();
+    await context.dispose();
+    throw new Error(
+      'Failed to update company (' +
+        response.status() +
+        '): ' +
+        text.slice(0, 300)
+    );
+  }
+
+  await context.dispose();
 }
 
 export async function putCompanySettings(
   api: ApiContext,
   companyId: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   settings: Record<string, any>
 ): Promise<void> {
   const context = await apiRequest(api);
@@ -582,19 +777,20 @@ export async function putCompanySettings(
  */
 export async function resetCompanySettings(api: ApiContext): Promise<void> {
   try {
-    const { companyId, settings } = await getCompanySettings(api);
+    const { companyId, company, settings } = await getCompany(api);
 
-    const resetSettings = {
-      ...settings,
+    await putCompany(api, companyId, {
+      ...company,
       enabled_expense_tax_rates: 0,
-      should_be_invoiced: false,
+      mark_expenses_invoiceable: false,
       mark_expenses_paid: false,
       convert_expense_currency: false,
-      add_documents_to_invoice: false,
-      military_time: false,
-    };
-
-    await putCompanySettings(api, companyId, resetSettings);
+      invoice_expense_documents: false,
+      settings: {
+        ...settings,
+        military_time: false,
+      },
+    });
     console.log('  Reset company settings');
   } catch (e) {
     console.warn(`  Failed to reset company settings: ${e}`);

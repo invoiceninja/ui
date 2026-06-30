@@ -4,16 +4,21 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
+  apiPermissions,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
-import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
+import {
+  resetAccountBeforeAll,
+  test,
+  expect,
+  uniqueName,
+} from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createExpenseCategory } from './expense-categories-helpers';
 import { createTaxRate } from './taxes-helpers';
-import { getCompanySettings, putCompanySettings } from './api-helpers';
+import { getCompany, putCompany, assignEntityToUser } from './api-helpers';
 
 resetAccountBeforeAll();
 
@@ -96,8 +101,12 @@ const createExpense = async (params: CreateParams) => {
     await option.click();
   }
 
-  await page.locator('section').filter({ hasText: 'Public Notes' }).getByRole('textbox').fill('Public Notes');
-  
+  await page
+    .locator('section')
+    .filter({ hasText: 'Public Notes' })
+    .getByRole('textbox')
+    .fill('Public Notes');
+
   await page
     .locator('[data-cy="topNavbar"]')
     .getByRole('button', { name: 'Save', exact: true })
@@ -105,7 +114,9 @@ const createExpense = async (params: CreateParams) => {
 
   // await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully created expense')).toBeVisible({
+    timeout: 10000,
+  });
 
   if (returnCreditNumber) {
     await page.waitForURL('**/expenses/**/edit');
@@ -114,8 +125,8 @@ const createExpense = async (params: CreateParams) => {
   }
 };
 
-test("can't view expenses without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
+test("can't view expenses without permission", async ({ page, api }) => {
+  const { clear, save } = apiPermissions(api.context);
 
   await login(page);
   await clear('expenses@example.com');
@@ -132,7 +143,7 @@ test("can't view expenses without permission", async ({ page }) => {
 });
 
 test('can view expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('expenses@example.com');
@@ -166,7 +177,7 @@ test('can view expense', async ({ page, api }) => {
 });
 
 test('can edit expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useExpensesActions({
     permissions: ['edit_expense'],
@@ -217,7 +228,7 @@ test('can edit expense', async ({ page, api }) => {
 });
 
 test('can create a expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useExpensesActions({
     permissions: ['create_expense'],
@@ -259,7 +270,7 @@ test('can view and edit assigned expense with create_expense', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useExpensesActions({
     permissions: ['create_expense'],
@@ -278,7 +289,18 @@ test('can view and edit assigned expense with create_expense', async ({
 
   await page.waitForURL('**/expenses/**/edit');
   const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
-  if (createdId) api.trackEntity('expenses', createdId);
+
+  if (!createdId) {
+    throw new Error('Failed to extract expense id');
+  }
+
+  api.trackEntity('expenses', createdId);
+  await assignEntityToUser(
+    api.context,
+    'expenses',
+    createdId,
+    'expenses@example.com'
+  );
 
   await logout(page);
 
@@ -312,7 +334,7 @@ test('can view and edit assigned expense with create_expense', async ({
 });
 
 test('deleting expense with edit_expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('expenses@example.com');
@@ -352,11 +374,13 @@ test('deleting expense with edit_expense', async ({ page, api }) => {
     await page.getByText('Delete').click();
   }
 
-  await expect(page.getByText('Successfully deleted expense')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully deleted expense')).toBeVisible({
+    timeout: 10000,
+  });
 });
 
 test('archiving expense with edit_expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('expenses@example.com');
@@ -400,11 +424,13 @@ test('archiving expense with edit_expense', async ({ page, api }) => {
     await page.getByText('Archive').click();
   }
 
-  await expect(page.getByText('Successfully archived expense')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully archived expense')).toBeVisible({
+    timeout: 10000,
+  });
 });
 
 test('expense documents preview with edit_expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('expenses@example.com');
@@ -450,11 +476,13 @@ test('expense documents preview with edit_expense', async ({ page, api }) => {
 
   await page.waitForURL('**/expenses/**/documents');
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 });
 
 test('expense documents uploading with edit_expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('expenses@example.com');
@@ -505,7 +533,9 @@ test('expense documents uploading with edit_expense', async ({ page, api }) => {
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({
+    timeout: 10000,
+  });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
@@ -516,7 +546,7 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useExpensesActions({
     permissions: ['admin'],
@@ -549,7 +579,7 @@ test('all clone actions displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useExpensesActions({
     permissions: ['create_expense', 'create_recurring_expense'],
@@ -579,7 +609,7 @@ test('all clone actions displayed with creation permissions', async ({
 });
 
 test('cloning expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('expenses@example.com');
@@ -624,7 +654,9 @@ test('cloning expense', async ({ page, api }) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully created expense')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page.waitForURL('**/expenses/**/edit');
 
@@ -663,17 +695,24 @@ test('Expense categories endpoint contains sort but not with parameter', async (
   await catInput.click();
   await catInput.pressSequentially(expenseCategoryName, { delay: 50 });
 
-  await page.waitForResponse((resp) =>
-    resp.url().includes('/api/v1/expense_categories') && resp.url().includes('filter=') && resp.status() === 200
+  await page.waitForResponse(
+    (resp) =>
+      resp.url().includes('/api/v1/expense_categories') &&
+      resp.url().includes('filter=') &&
+      resp.status() === 200
   );
 
-  const catOption = page.getByRole('option', { name: expenseCategoryName }).first();
+  const catOption = page
+    .getByRole('option', { name: expenseCategoryName })
+    .first();
   await catOption.waitFor({ state: 'visible', timeout: 5000 });
   await catOption.click();
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully created expense')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page.waitForURL('**/expenses/**/edit');
 
@@ -721,17 +760,24 @@ test('Expense categories endpoint contains with but not sort parameter', async (
     .nth(3)
     .pressSequentially(expenseCategoryName, { delay: 50 });
 
-  await page.waitForResponse((resp) =>
-    resp.url().includes('/api/v1/expense_categories') && resp.url().includes('filter=') && resp.status() === 200
+  await page.waitForResponse(
+    (resp) =>
+      resp.url().includes('/api/v1/expense_categories') &&
+      resp.url().includes('filter=') &&
+      resp.status() === 200
   );
 
-  const catOption2 = page.getByRole('option', { name: expenseCategoryName }).first();
+  const catOption2 = page
+    .getByRole('option', { name: expenseCategoryName })
+    .first();
   await catOption2.waitFor({ state: 'visible', timeout: 5000 });
   await catOption2.click();
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully created expense')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page.waitForURL('**/expenses/**/edit');
 
@@ -772,7 +818,9 @@ test('Checking should_be_invoiced expense settings value on expense creation pag
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({
+      timeout: 10000,
+    });
   }
 
   await page
@@ -814,7 +862,9 @@ test('Checking mark_paid expense settings value on expense creation page', async
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({
+      timeout: 10000,
+    });
   }
 
   await page
@@ -854,7 +904,9 @@ test('Checking convert_currency expense settings value on expense creation page'
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({
+      timeout: 10000,
+    });
   }
 
   await page
@@ -896,7 +948,9 @@ test('Checking add_documents_to_invoice expense settings value on expense creati
 
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Successfully updated settings')).toBeVisible({
+      timeout: 10000,
+    });
   }
 
   await page
@@ -916,7 +970,11 @@ test('Checking add_documents_to_invoice expense settings value on expense creati
   await logout(page);
 });
 
-test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) => {
+test('Checking the gross amount by rate', async ({
+  page,
+  api,
+  settingsGuard,
+}) => {
   const taxRate10Name = uniqueName('tax-rate-10');
   const taxRate20Name = uniqueName('tax-rate-20');
 
@@ -929,9 +987,12 @@ test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) =
   await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
 
   // Enable two expense tax rates via API and reload so the app picks up the change
-  const { companyId, settings } = await getCompanySettings(api.context);
-  if (settings.enabled_expense_tax_rates !== 2) {
-    await putCompanySettings(api.context, companyId, { ...settings, enabled_expense_tax_rates: 2 });
+  const { companyId, company } = await getCompany(api.context);
+  if (company.enabled_expense_tax_rates !== 2) {
+    await putCompany(api.context, companyId, {
+      ...company,
+      enabled_expense_tax_rates: 2,
+    });
   }
 
   await page.reload({ waitUntil: 'networkidle' });
@@ -967,7 +1028,9 @@ test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) =
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully created expense')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page.waitForURL('**/expenses/**/edit');
 
@@ -989,7 +1052,6 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
   api,
   settingsGuard,
 }) => {
-
   test.setTimeout(60000); // 2 minutes for this test only
 
   const taxRate10Name = uniqueName('tax-rate-10-incl');
@@ -1004,12 +1066,17 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
   await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
 
   // Enable two expense tax rates via API and reload so the app picks up the change
-  const { companyId: companyId2, settings: settings2 } = await getCompanySettings(api.context);
-  if (settings2.enabled_expense_tax_rates !== 2) {
-    await putCompanySettings(api.context, companyId2, { ...settings2, enabled_expense_tax_rates: 2 });
+  const { companyId: companyId2, company: company2 } = await getCompany(
+    api.context
+  );
+  if (company2.enabled_expense_tax_rates !== 2) {
+    await putCompany(api.context, companyId2, {
+      ...company2,
+      enabled_expense_tax_rates: 2,
+    });
   }
 
-  // await page.reload({ waitUntil: 'networkidle' });
+  await page.reload({ waitUntil: 'networkidle' });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -1047,7 +1114,9 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully created expense')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page.waitForURL('**/expenses/**/edit');
 
@@ -1059,12 +1128,18 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
     .getByRole('link', { name: 'Expenses', exact: true })
     .click();
 
-  await expect(page.getByText('$ 12,222.00').first()).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('$ 12,222.00').first()).toBeVisible({
+    timeout: 10000,
+  });
 
   await logout(page);
 });
 
-test('Checking the gross amount by amount', async ({ page, api, settingsGuard }) => {
+test('Checking the gross amount by amount', async ({
+  page,
+  api,
+  settingsGuard,
+}) => {
   const taxRate10Name = uniqueName('tax-rate-10-amt');
   const taxRate20Name = uniqueName('tax-rate-20-amt');
 
@@ -1077,9 +1152,14 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
   await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
 
   // Enable two expense tax rates via API and reload so the app picks up the change
-  const { companyId: companyId3, settings: settings3 } = await getCompanySettings(api.context);
-  if (settings3.enabled_expense_tax_rates !== 2) {
-    await putCompanySettings(api.context, companyId3, { ...settings3, enabled_expense_tax_rates: 2 });
+  const { companyId: companyId3, company: company3 } = await getCompany(
+    api.context
+  );
+  if (company3.enabled_expense_tax_rates !== 2) {
+    await putCompany(api.context, companyId3, {
+      ...company3,
+      enabled_expense_tax_rates: 2,
+    });
   }
 
   await page.reload({ waitUntil: 'networkidle' });
@@ -1107,13 +1187,21 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
   await page.locator('[data-cy="taxNameByAmount1"]').fill(taxName1);
   // NumberInputField's NumericFormat doesn't render data-cy
   // From the name input, go up to its section, then to the sibling section's input
-  await page.locator('[data-cy="taxNameByAmount1"]').locator('xpath=ancestor::section/following-sibling::section//input').fill('100');
+  await page
+    .locator('[data-cy="taxNameByAmount1"]')
+    .locator('xpath=ancestor::section/following-sibling::section//input')
+    .fill('100');
   await page.locator('[data-cy="taxNameByAmount2"]').fill(taxName2);
-  await page.locator('[data-cy="taxNameByAmount2"]').locator('xpath=ancestor::section/following-sibling::section//input').fill('200');
+  await page
+    .locator('[data-cy="taxNameByAmount2"]')
+    .locator('xpath=ancestor::section/following-sibling::section//input')
+    .fill('200');
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully created expense')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page.waitForURL('**/expenses/**/edit');
 
@@ -1134,8 +1222,9 @@ test('The new_expense_category action is not shown on the badge dropdown', async
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
-  const { createExpenseCategoryViaApi, createEntityViaApi, createApiContext } = await import('./api-helpers');
+  const { clear, save, set } = apiPermissions(api.context);
+  const { createExpenseCategoryViaApi, createEntityViaApi, createApiContext } =
+    await import('./api-helpers');
 
   // Step 1: Give create_expense + edit_expense so the user can create data
   await login(page);
@@ -1145,8 +1234,14 @@ test('The new_expense_category action is not shown on the badge dropdown', async
   await logout(page);
 
   // Step 2: Create category + expense as expenses@example.com via API
-  const userApiCtx = await createApiContext(process.env.VITE_API_URL!, 'expenses@example.com', 'password');
-  const category = await createExpenseCategoryViaApi(userApiCtx, { name: uniqueName('badge-cat') });
+  const userApiCtx = await createApiContext(
+    process.env.VITE_API_URL!,
+    'expenses@example.com',
+    'password'
+  );
+  const category = await createExpenseCategoryViaApi(userApiCtx, {
+    name: uniqueName('badge-cat'),
+  });
   const expense = await createEntityViaApi(userApiCtx, 'expenses', {
     category_id: category.id,
     amount: 100,
@@ -1184,7 +1279,9 @@ test('The new_expense_category action is not shown on the badge dropdown', async
     await columnInput.click();
     await columnInput.pressSequentially('Category', { delay: 50 });
 
-    const categoryOption = page.getByRole('option', { name: 'Category' }).first();
+    const categoryOption = page
+      .getByRole('option', { name: 'Category' })
+      .first();
     const optionExists = await categoryOption.isVisible().catch(() => false);
 
     if (optionExists) {
@@ -1202,7 +1299,11 @@ test('The new_expense_category action is not shown on the badge dropdown', async
   }
 
   // Click the chevron arrow inside the badge to open the dropdown
-  await page.locator('[data-cy="expenseCategoryBadge"]').first().locator('svg').click();
+  await page
+    .locator('[data-cy="expenseCategoryBadge"]')
+    .first()
+    .locator('svg')
+    .click();
 
   // With only edit_expense (no create_expense), "Create New" should NOT be visible
   await expect(
@@ -1216,8 +1317,9 @@ test('The new_expense_category action is shown on the badge dropdown', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
-  const { createExpenseCategoryViaApi, createEntityViaApi, createApiContext } = await import('./api-helpers');
+  const { clear, save, set } = apiPermissions(api.context);
+  const { createExpenseCategoryViaApi, createEntityViaApi, createApiContext } =
+    await import('./api-helpers');
 
   // Step 1: Give admin so the user can create and see everything
   await login(page);
@@ -1227,8 +1329,14 @@ test('The new_expense_category action is shown on the badge dropdown', async ({
   await logout(page);
 
   // Step 2: Create category + expense as expenses@example.com via API
-  const userApiCtx = await createApiContext(process.env.VITE_API_URL!, 'expenses@example.com', 'password');
-  const category = await createExpenseCategoryViaApi(userApiCtx, { name: uniqueName('badge-cat') });
+  const userApiCtx = await createApiContext(
+    process.env.VITE_API_URL!,
+    'expenses@example.com',
+    'password'
+  );
+  const category = await createExpenseCategoryViaApi(userApiCtx, {
+    name: uniqueName('badge-cat'),
+  });
   const expense = await createEntityViaApi(userApiCtx, 'expenses', {
     category_id: category.id,
     amount: 100,
@@ -1245,7 +1353,11 @@ test('The new_expense_category action is shown on the badge dropdown', async ({
   await waitForTableData(page);
 
   // Click the chevron arrow inside the badge to open the dropdown
-  await page.locator('[data-cy="expenseCategoryBadge"]').first().locator('svg').click();
+  await page
+    .locator('[data-cy="expenseCategoryBadge"]')
+    .first()
+    .locator('svg')
+    .click();
 
   await expect(
     page.getByText('Create New', { exact: true }).first()
@@ -1258,8 +1370,9 @@ test('The new_expense_category action is shown on the badge dropdown with only c
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
-  const { createExpenseCategoryViaApi, createEntityViaApi, createApiContext } = await import('./api-helpers');
+  const { clear, save, set } = apiPermissions(api.context);
+  const { createExpenseCategoryViaApi, createEntityViaApi, createApiContext } =
+    await import('./api-helpers');
 
   // Step 1: Give create_expense so the user can create data
   await login(page);
@@ -1269,8 +1382,14 @@ test('The new_expense_category action is shown on the badge dropdown with only c
   await logout(page);
 
   // Step 2: Create category + expense as expenses@example.com via API
-  const userApiCtx = await createApiContext(process.env.VITE_API_URL!, 'expenses@example.com', 'password');
-  const category = await createExpenseCategoryViaApi(userApiCtx, { name: uniqueName('badge-cat') });
+  const userApiCtx = await createApiContext(
+    process.env.VITE_API_URL!,
+    'expenses@example.com',
+    'password'
+  );
+  const category = await createExpenseCategoryViaApi(userApiCtx, {
+    name: uniqueName('badge-cat'),
+  });
   const expense = await createEntityViaApi(userApiCtx, 'expenses', {
     category_id: category.id,
     amount: 100,
@@ -1287,7 +1406,11 @@ test('The new_expense_category action is shown on the badge dropdown with only c
   await waitForTableData(page);
 
   // Click the chevron arrow inside the badge to open the dropdown
-  await page.locator('[data-cy="expenseCategoryBadge"]').first().locator('svg').click();
+  await page
+    .locator('[data-cy="expenseCategoryBadge"]')
+    .first()
+    .locator('svg')
+    .click();
 
   await expect(
     page.getByText('Create New', { exact: true }).first()
@@ -1315,7 +1438,9 @@ test('Creating expense with Save / Create button', async ({ page, api }) => {
 
   await page.getByRole('button', { name: 'Save / Create' }).click();
 
-  await expect(page.getByText('Successfully created expense')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully created expense')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page.waitForURL('**/expenses/create');
 

@@ -10,3 +10,5 @@
 
 export * from './AccountManagement';
 export * from './component/index';
+export * from './component/AccountUsers';
+export * from './component/BillingHistory';

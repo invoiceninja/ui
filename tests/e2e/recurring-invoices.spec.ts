@@ -4,7 +4,7 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
+  apiPermissions,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -12,6 +12,7 @@ import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixt
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
+import { assignEntityToUser } from './api-helpers';
 
 resetAccountBeforeAll();
 
@@ -162,8 +163,8 @@ const createRecurringInvoice = async (params: CreateParams) => {
   ).toBeVisible({ timeout: 10000 });
 };
 
-test("can't view recurring invoices without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
+test("can't view recurring invoices without permission", async ({ page, api }) => {
+  const { clear, save } = apiPermissions(api.context);
 
   await login(page);
   await clear('invoices@example.com');
@@ -180,7 +181,7 @@ test("can't view recurring invoices without permission", async ({ page }) => {
 });
 
 test('can view recurring invoice', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -216,7 +217,7 @@ test('can view recurring invoice', async ({ page, api }) => {
 });
 
 test('can edit recurring invoice', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -275,7 +276,7 @@ test('can edit recurring invoice', async ({ page, api }) => {
 });
 
 test('can create a recurring invoice', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -325,7 +326,7 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -346,7 +347,13 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
 
   await page.waitForURL('**/recurring_invoices/**/edit');
   const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
-  if (createdId) api.trackEntity('recurring_invoices', createdId);
+
+  if (!createdId) {
+    throw new Error('Failed to extract recurring invoice id');
+  }
+
+  api.trackEntity('recurring_invoices', createdId);
+  await assignEntityToUser(api.context, 'recurring_invoices', createdId, 'invoices@example.com');
 
   await logout(page);
 
@@ -388,7 +395,7 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
 });
 
 test('deleting invoice with edit_recurring_invoice', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -451,7 +458,7 @@ test('archiving invoice withe edit_recurring_invoice', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -518,7 +525,7 @@ test('invoice documents preview with edit_recurring_invoice', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -579,7 +586,7 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -651,7 +658,7 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -692,7 +699,7 @@ test('all clone actions displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -745,7 +752,7 @@ test('all clone actions displayed with creation permissions', async ({
 });
 
 test('cloning recurring invoice', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -819,7 +826,7 @@ test('cloning recurring invoice', async ({ page, api }) => {
 
 test('recurring invoice creation and start stop sequence', async ({ page, api }) => {
 
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
   await login(page, 'user@example.com', 'password');
   await page.getByRole('link', { name: 'Recurring Invoices' }).click();
   await page.getByRole('link', { name: 'New Recurring Invoice' }).click();

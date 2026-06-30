@@ -1,11 +1,7 @@
 import {
   createApiContext,
   ensurePermissionUserExists,
-  purgeAllEntities,
-  purgeGroupSettings,
-  purgeSchedules,
   resetCompanySettings,
-  resetPermissionUser,
   restoreDeletedUsers,
 } from './api-helpers';
 import {
@@ -27,15 +23,10 @@ export async function resetTestAccount(account: TestAccount, label?: string) {
   );
 
   await resetCompanySettings(api);
-  await purgeSchedules(api);
-  await purgeGroupSettings(api);
   await restoreDeletedUsers(api);
 
   for (const email of permissionBaseEmails) {
     const scopedEmail = accountEmail(email, account);
     await ensurePermissionUserExists(api, scopedEmail);
-    await resetPermissionUser(api, scopedEmail);
   }
-
-  await purgeAllEntities(api);
 }

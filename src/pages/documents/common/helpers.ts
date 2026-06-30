@@ -20,3 +20,10 @@ export function getDocumentNameFromFile(file: File, fallback = 'Untitled documen
   const name = file.name.replace(/\.[^/.]+$/, '').trim();
   return name ? normalizeName(name) : fallback;
 }
+
+export function canActivateUpgradeButton(
+  pricing: { pro_rata_raw: number } | null,
+  isLoading: boolean
+): boolean {
+  return Boolean(pricing && !isLoading && pricing.pro_rata_raw > 0);
+}

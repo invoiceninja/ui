@@ -1,10 +1,10 @@
-import { login, logout, permissions } from '$tests/e2e/helpers';
+import { login, logout, apiPermissions } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
 
 resetAccountBeforeAll();
 
-test.beforeEach(async ({ page }) => {
-  const { clear, save, set } = permissions(page);
+test.beforeEach(async ({ page, api }) => {
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear();

@@ -2,11 +2,12 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
+  apiPermissions,
   waitForTableData,
 } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
+import { assignEntityToUser } from './api-helpers';
 
 resetAccountBeforeAll();
 
@@ -144,8 +145,8 @@ const checkEditPage = async (page: Page) => {
   ).toBeVisible({ timeout: 10000 });
 };
 
-test("can't view vendors without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
+test("can't view vendors without permission", async ({ page, api }) => {
+  const { clear, save } = apiPermissions(api.context);
 
   await login(page);
   await clear('vendors@example.com');
@@ -162,7 +163,7 @@ test("can't view vendors without permission", async ({ page }) => {
 });
 
 test('can view vendor', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('view-vendor');
 
@@ -196,7 +197,7 @@ test('can view vendor', async ({ page, api }) => {
 });
 
 test('can edit vendor', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('edit-vendor');
 
@@ -246,7 +247,7 @@ test('can edit vendor', async ({ page, api }) => {
 });
 
 test('can create a vendor', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('create-vendor');
 
@@ -304,7 +305,7 @@ test('can view and edit assigned vendor with create_vendor', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('assigned-vendor');
 
@@ -320,7 +321,13 @@ test('can view and edit assigned vendor with create_vendor', async ({
   });
 
   const assignedVendorId = page.url().match(/vendors\/([^/]+)/)?.[1];
-  if (assignedVendorId) api.trackEntity('vendors', assignedVendorId);
+
+  if (!assignedVendorId) {
+    throw new Error('Failed to extract vendor id');
+  }
+
+  api.trackEntity('vendors', assignedVendorId);
+  await assignEntityToUser(api.context, 'vendors', assignedVendorId, 'vendors@example.com');
 
   await logout(page);
 
@@ -358,7 +365,7 @@ test('can view and edit assigned vendor with create_vendor', async ({
 });
 
 test('deleting vendor with edit_vendor', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('delete-vendor');
 
@@ -409,7 +416,7 @@ test('deleting vendor with edit_vendor', async ({ page, api }) => {
 });
 
 test('archiving vendor withe edit_vendor', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('archive-vendor');
 
@@ -460,7 +467,7 @@ test('archiving vendor withe edit_vendor', async ({ page, api }) => {
 });
 
 test('vendor documents preview with view_vendor', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('docpreview-vendor');
 
@@ -507,7 +514,7 @@ test('vendor documents preview with view_vendor', async ({ page, api }) => {
 });
 
 test('vendor documents uploading with edit_vendor', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const vendorName = uniqueName('docupload-vendor');
 

@@ -4,7 +4,7 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
+  apiPermissions,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -12,6 +12,7 @@ import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixt
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
+import { assignEntityToUser } from './api-helpers';
 
 resetAccountBeforeAll();
 
@@ -195,7 +196,7 @@ const createCredit = async (params: CreateParams) => {
 };
 
 test("can't view credits without permission", async ({ page, api }) => {
-  const { clear, save } = permissions(page);
+  const { clear, save } = apiPermissions(api.context);
 
   await login(page);
   await clear('credits@example.com');
@@ -212,7 +213,7 @@ test("can't view credits without permission", async ({ page, api }) => {
 });
 
 test('can view credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('credits@example.com');
@@ -246,7 +247,7 @@ test('can view credit', async ({ page, api }) => {
 });
 
 test('can edit credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useCreditsActions({
     permissions: ['edit_credit', 'view_client'],
@@ -297,7 +298,7 @@ test('can edit credit', async ({ page, api }) => {
 });
 
 test('can create a credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useCreditsActions({
     permissions: ['create_credit'],
@@ -339,7 +340,7 @@ test('can view and edit assigned credit with create_credit', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useCreditsActions({
     permissions: ['create_credit'],
@@ -359,7 +360,13 @@ test('can view and edit assigned credit with create_credit', async ({
   });
 
   const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
-  if (creditId) api.trackEntity('credits', creditId);
+
+  if (!creditId) {
+    throw new Error('Failed to extract credit id');
+  }
+
+  api.trackEntity('credits', creditId);
+  await assignEntityToUser(api.context, 'credits', creditId, 'credits@example.com');
 
   await logout(page);
 
@@ -393,7 +400,7 @@ test('can view and edit assigned credit with create_credit', async ({
 });
 
 test('deleting credit with edit_credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('credits@example.com');
@@ -439,7 +446,7 @@ test('deleting credit with edit_credit', async ({ page, api }) => {
 });
 
 test('archiving credit withe edit_credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('credits@example.com');
@@ -490,7 +497,7 @@ test('archiving credit withe edit_credit', async ({ page, api }) => {
 });
 
 test('credit documents preview with edit_credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('credits@example.com');
@@ -540,7 +547,7 @@ test('credit documents preview with edit_credit', async ({ page, api }) => {
 });
 
 test('credit documents uploading with edit_credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('credits@example.com');
@@ -602,7 +609,7 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useCreditsActions({
     permissions: ['admin'],
@@ -635,7 +642,7 @@ test('all clone actions displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useCreditsActions({
     permissions: [
@@ -678,7 +685,7 @@ test('all clone actions displayed with creation permissions', async ({
 });
 
 test('cloning credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
+  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
   await clear('credits@example.com');
