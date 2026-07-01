@@ -220,6 +220,7 @@ export function SelectWithApplyButton(props: any) {
               className={classNames('w-1/2 rounded-md text-sm font-medium', {
                 border: reactSettings?.dark_mode,
               })}
+              type="button"
               onClick={handleReset}
               theme={{
                 textColor: colors.$3,
@@ -231,6 +232,7 @@ export function SelectWithApplyButton(props: any) {
 
             <Button
               className="w-1/2 rounded-md font-medium"
+              behavior="button"
               onClick={handleApply}
             >
               {t('apply')}
