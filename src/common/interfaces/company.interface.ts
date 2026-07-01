@@ -353,6 +353,7 @@ export interface Settings {
   e_invoice_forward_email: string;
   e_expense_forward_email: string;
   skip_automatic_email_with_peppol: boolean;
+  global_tag_inheritance: boolean;
 }
 
 export interface TaxData {
