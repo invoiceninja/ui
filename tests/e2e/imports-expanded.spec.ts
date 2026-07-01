@@ -10,6 +10,20 @@ import { request as playwrightRequest, type Page } from '@playwright/test';
 
 resetAccountBeforeAll();
 
+/**
+ * Recurring invoices require a start / next-send date in the future, otherwise
+ * the import is rejected and nothing is created. Compute a date one month ahead
+ * so the test keeps passing regardless of when it runs.
+ */
+function dateMonthsFromNow(months: number): string {
+  const date = new Date();
+  date.setMonth(date.getMonth() + months);
+
+  return date.toISOString().split('T')[0];
+}
+
+const FUTURE_START_DATE = dateMonthsFromNow(1);
+
 type ImportEntityType =
   | 'invoices'
   | 'recurring_invoices'
@@ -130,7 +144,7 @@ test('imports invoices, quotes, and recurring invoices from mapped CSV files', a
       'Client,Start Date,Frequency,Item,Description,Unit Cost,Quantity,Public Notes',
       [
         recurringClient.name,
-        '2026-06-09',
+        FUTURE_START_DATE,
         '5',
         uniqueName('recurring-item'),
         'Imported recurring invoice line',

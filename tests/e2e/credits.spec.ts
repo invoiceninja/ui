@@ -329,6 +329,8 @@ test('can create a credit', async ({ page, api }) => {
     page.getByText('Successfully updated credit', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
+  await page.waitForTimeout(800);
+
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 
   await checkDropdownActions(page, actions, 'creditActionDropdown', '', true);
@@ -391,6 +393,8 @@ test('can view and edit assigned credit with create_credit', async ({
   await expect(
     page.getByText('Successfully updated credit', { exact: true })
   ).toBeVisible({ timeout: 10000 });
+
+  await page.waitForTimeout(800);
 
   await page.locator('[data-cy="chevronDownButton"]').first().click();
 

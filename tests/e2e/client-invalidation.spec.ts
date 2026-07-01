@@ -71,9 +71,8 @@ test('test appropriate invalidation of clients', async ({ page, api }) => {
 
   await page.getByRole('link', { name: 'View', exact: true }).click();
 
-  // await page.getByRole('button', { name: 'Discard Changes' }).click();
-  // await page.getByRole('link', { name: 'View Client' }).click();
-  
+  await page.waitForTimeout(800);
+
   await expect(
     page.getByText('Paid to Date$')
       .filter({ hasText: /^Paid to Date\$ 0\.00$/ })
