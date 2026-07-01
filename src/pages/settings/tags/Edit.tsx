@@ -10,7 +10,7 @@
 
 import { Badge } from '$app/components/Badge';
 import { Card, CardContainer, Element } from '$app/components/cards';
-import { InputField, InputLabel } from '$app/components/forms';
+import { InputField, InputLabel, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -18,7 +18,11 @@ import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { Tag } from '$app/common/interfaces/tag';
+import {
+  resolveTagEntityType,
+  Tag,
+  TAG_ENTITY_TYPE_OPTIONS,
+} from '$app/common/interfaces/tag';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTagQuery } from '$app/common/queries/tags';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
@@ -33,8 +37,6 @@ import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   editRoute: string;
-  indexRoute: string;
-  titleKey: string;
 }
 
 function Edit(props: Props) {
@@ -48,7 +50,6 @@ function Edit(props: Props) {
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('tags'), href: '/settings/tags' },
-    { name: t(props.titleKey), href: props.indexRoute },
     {
       name: t('edit_tag'),
       href: route(props.editRoute, { id }),
@@ -152,12 +153,26 @@ function Edit(props: Props) {
 
           <CardContainer>
             <InputField
+              id="name"
               required
               label={t('name')}
               value={tag.name}
               onValueChange={(value) => handleChange('name', value)}
               errorMessage={errors?.errors?.name}
             />
+
+            <SelectField
+              id="entity_type"
+              label={t('type')}
+              value={resolveTagEntityType(tag.entity_type)}
+              disabled
+            >
+              {TAG_ENTITY_TYPE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {t(option.labelKey)}
+                </option>
+              ))}
+            </SelectField>
 
             <div>
               <InputLabel className="mb-1">{t('color')}</InputLabel>
@@ -174,6 +189,10 @@ function Edit(props: Props) {
   );
 }
 
+export function EditTag() {
+  return <Edit editRoute="/settings/tags/:id/edit" />;
+}
+
 export function EditTaskTag() {
   return (
     <Edit
@@ -185,13 +204,7 @@ export function EditTaskTag() {
 }
 
 export function EditProjectTag() {
-  return (
-    <Edit
-      editRoute="/settings/tags/projects/:id/edit"
-      indexRoute="/settings/tags/projects"
-      titleKey="project_tags"
-    />
-  );
+  return <Edit editRoute="/settings/tags/projects/:id/edit" />;
 }
 
 export function EditInvoiceTag() {

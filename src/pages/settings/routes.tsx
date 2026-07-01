@@ -10,7 +10,7 @@
 
 import { Guard } from '$app/common/guards/Guard';
 import { admin, owner } from '$app/common/guards/guards/admin';
-import { Outlet, Route } from 'react-router-dom';
+import { Navigate, Outlet, Route } from 'react-router-dom';
 import { plan } from '$app/common/guards/guards/plan';
 import * as Settings from './index';
 import { isDemo } from '$app/common/helpers';
@@ -87,22 +87,19 @@ export const settingsRoutes = (
         </Route>
         <Route path="tasks/create" element={<Settings.CreateTaskTag />} />
         <Route path="tasks/:id/edit" element={<Settings.EditTaskTag />} />
-        <Route path="projects/create" element={<Settings.CreateProjectTag />} />
+        <Route
+          path="projects/create"
+          element={<Navigate to="/settings/tags/create" replace />}
+        />
         <Route path="projects/:id/edit" element={<Settings.EditProjectTag />} />
         <Route path="invoices/create" element={<Settings.CreateInvoiceTag />} />
-        <Route
-          path="invoices/:id/edit"
-          element={<Settings.EditInvoiceTag />}
-        />
+        <Route path="invoices/:id/edit" element={<Settings.EditInvoiceTag />} />
         <Route path="quotes/create" element={<Settings.CreateQuoteTag />} />
         <Route path="quotes/:id/edit" element={<Settings.EditQuoteTag />} />
         <Route path="credits/create" element={<Settings.CreateCreditTag />} />
         <Route path="credits/:id/edit" element={<Settings.EditCreditTag />} />
         <Route path="expenses/create" element={<Settings.CreateExpenseTag />} />
-        <Route
-          path="expenses/:id/edit"
-          element={<Settings.EditExpenseTag />}
-        />
+        <Route path="expenses/:id/edit" element={<Settings.EditExpenseTag />} />
         <Route
           path="transactions/create"
           element={<Settings.CreateTransactionTag />}
@@ -132,10 +129,7 @@ export const settingsRoutes = (
         <Route path="vendors/create" element={<Settings.CreateVendorTag />} />
         <Route path="vendors/:id/edit" element={<Settings.EditVendorTag />} />
         <Route path="payments/create" element={<Settings.CreatePaymentTag />} />
-        <Route
-          path="payments/:id/edit"
-          element={<Settings.EditPaymentTag />}
-        />
+        <Route path="payments/:id/edit" element={<Settings.EditPaymentTag />} />
         <Route
           path="purchase_orders/create"
           element={<Settings.CreatePurchaseOrderTag />}
@@ -145,10 +139,7 @@ export const settingsRoutes = (
           element={<Settings.EditPurchaseOrderTag />}
         />
         <Route path="products/create" element={<Settings.CreateProductTag />} />
-        <Route
-          path="products/:id/edit"
-          element={<Settings.EditProductTag />}
-        />
+        <Route path="products/:id/edit" element={<Settings.EditProductTag />} />
       </Route>
       <Route path="expense_settings" element={<Settings.ExpenseSettings />} />
       <Route path="workflow_settings" element={<Settings.WorkflowSettings />} />

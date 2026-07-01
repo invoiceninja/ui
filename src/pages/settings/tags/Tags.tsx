@@ -10,33 +10,78 @@
 
 import {
   TAG_ENTITY_TYPES,
+  TAG_ENTITY_TYPE_OPTIONS,
+  TAG_ENTITY_TYPE_VALUES,
   Tag,
   TagEntityType,
+  resolveTagEntityType,
 } from '$app/common/interfaces/tag';
+import { Badge } from '$app/components/Badge';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { SelectOption } from '$app/components/datatables/Actions';
+import { Icon } from '$app/components/icons/Icon';
 import { route } from '$app/common/helpers/route';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { DataTable, DataTableColumns } from '$app/components/DataTable';
 import { Link } from '$app/components/forms';
 import { Settings } from '$app/components/layouts/Settings';
-import { Tabs } from '$app/components/Tabs';
-import { Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { MdEdit } from 'react-icons/md';
 
-interface TableProps {
-  entityType: TagEntityType;
-  createRoute: string;
-  editRoute: string;
-}
-
-function TagTable(props: TableProps) {
+function TagsTable() {
   const [t] = useTranslation();
+
+  const getEditRoute = () => '/settings/tags/:id/edit';
+
+  const getEntityTypeLabel = (entityType: string) => {
+    return t(resolveTagEntityType(entityType));
+  };
+
+  const getEntityTypeBadgeVariant = (entityType: string) => {
+    const resolvedEntityType = resolveTagEntityType(entityType);
+
+    if (resolvedEntityType === TAG_ENTITY_TYPES.project) {
+      return 'light-blue';
+    }
+
+    if (resolvedEntityType === TAG_ENTITY_TYPES.task) {
+      return 'generic';
+    }
+
+    return 'teal';
+  };
+
+  const getEntityTypeFilterColor = (entityType: TagEntityType) => {
+    if (entityType === TAG_ENTITY_TYPES.global) {
+      return '#0D9488';
+    }
+
+    if (entityType === TAG_ENTITY_TYPES.project) {
+      return '#93C5FD';
+    }
+
+    if (entityType === TAG_ENTITY_TYPES.task) {
+      return '#6B7280';
+    }
+
+    return '#64748B';
+  };
 
   const columns: DataTableColumns<Tag> = [
     {
       id: 'name',
       label: t('name'),
       format: (value, tag) => (
-        <Link to={route(props.editRoute, { id: tag.id })}>{value}</Link>
+        <Link to={route(getEditRoute(), { id: tag.id })}>{value}</Link>
+      ),
+    },
+    {
+      id: 'entity_type',
+      label: t('type'),
+      format: (value) => (
+        <Badge variant={getEntityTypeBadgeVariant(value as string)}>
+          {getEntityTypeLabel(value as string)}
+        </Badge>
       ),
     },
     {
@@ -51,16 +96,36 @@ function TagTable(props: TableProps) {
     },
   ];
 
+  const filters: SelectOption[] = TAG_ENTITY_TYPE_OPTIONS.map(
+    ({ labelKey, value }) => ({
+      label: t(labelKey),
+      value,
+      color: 'white',
+      backgroundColor: getEntityTypeFilterColor(value),
+      queryKey: 'entity_types',
+    })
+  );
+
   return (
     <DataTable
       resource="tag"
       columns={columns}
-      endpoint={`/api/v1/tags?entity_type=${encodeURIComponent(
-        props.entityType
-      )}&sort=name|asc`}
+      endpoint="/api/v1/tags?sort=name|asc"
       bulkRoute="/api/v1/tags/bulk"
-      linkToCreate={props.createRoute}
-      linkToEdit={props.editRoute}
+      customActions={[
+        (tag: Tag) => (
+          <DropdownElement
+            to={route(getEditRoute(), { id: tag.id })}
+            icon={<Icon element={MdEdit} />}
+          >
+            {t('edit')}
+          </DropdownElement>
+        ),
+      ]}
+      customFilters={filters}
+      defaultCustomFilterValues={TAG_ENTITY_TYPE_VALUES}
+      customFilterPlaceholder="type"
+      linkToCreate="/settings/tags/create"
       withResourcefulActions
       enableSavingFilterPreference
     />
@@ -80,7 +145,10 @@ export function Tags() {
     { name: t('clients'), href: '/settings/tags' },
     { name: t('products'), href: '/settings/tags/products' },
     { name: t('invoices'), href: '/settings/tags/invoices' },
-    { name: t('recurring_invoices'), href: '/settings/tags/recurring_invoices' },
+    {
+      name: t('recurring_invoices'),
+      href: '/settings/tags/recurring_invoices',
+    },
     { name: t('payments'), href: '/settings/tags/payments' },
     { name: t('quotes'), href: '/settings/tags/quotes' },
     { name: t('credits'), href: '/settings/tags/credits' },
@@ -89,17 +157,16 @@ export function Tags() {
     { name: t('vendors'), href: '/settings/tags/vendors' },
     { name: t('purchase_orders'), href: '/settings/tags/purchase_orders' },
     { name: t('expenses'), href: '/settings/tags/expenses' },
-    { name: t('recurring_expenses'), href: '/settings/tags/recurring_expenses' },
+    {
+      name: t('recurring_expenses'),
+      href: '/settings/tags/recurring_expenses',
+    },
     { name: t('transactions'), href: '/settings/tags/transactions' },
   ];
 
   return (
     <Settings title={t('tags')} breadcrumbs={pages}>
-      <div className="space-y-4">
-        <Tabs tabs={tabs} fullRightPadding withHorizontalPaddingOnSmallScreen />
-
-        <Outlet />
-      </div>
+      <TagsTable />
     </Settings>
   );
 }
