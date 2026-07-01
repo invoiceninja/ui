@@ -70,6 +70,7 @@ import { History } from '$app/components/icons/History';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { ChevronRight } from 'react-feather';
 import { Icon } from '$app/components/icons/Icon';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -306,6 +307,12 @@ export function QuoteSlider() {
             >
               {quote ? <QuoteStatus entity={quote} /> : null}
             </Element>
+
+            {Boolean(quote?.tags?.length) && (
+              <Element leftSide={t('tags')}>
+                <TagPills tags={quote.tags} />
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />

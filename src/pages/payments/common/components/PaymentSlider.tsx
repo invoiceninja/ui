@@ -41,6 +41,7 @@ import { useColorScheme } from '$app/common/colors';
 import { useNavigate } from 'react-router-dom';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { useGenerateActivityElement } from '../hooks/useGenerateActivityElement';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const paymentSliderAtom = atom<Payment | null>(null);
 export const paymentSliderVisibilityAtom = atom(false);
@@ -183,6 +184,12 @@ export function PaymentSlider() {
             >
               {payment ? <PaymentStatus entity={payment} /> : null}
             </Element>
+
+            {Boolean(payment?.tags?.length) && (
+              <Element leftSide={t('tags')}>
+                <TagPills tags={payment.tags} />
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />

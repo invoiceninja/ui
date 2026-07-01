@@ -137,7 +137,7 @@ export function TransactionForm(props: Props) {
 
       <Element leftSide={t('tags')}>
         <TagPillSelector
-          entityType={TAG_ENTITY_TYPES.bank_transaction}
+          entityType={TAG_ENTITY_TYPES.bankTransaction}
           value={props.transaction.tags || []}
           onChange={(tags) => props.handleChange('tags', tags)}
           errorMessage={props.errors?.errors.tags}

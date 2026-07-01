@@ -228,7 +228,7 @@ export function Details(props: Props) {
         {recurringExpense && (
           <Element leftSide={t('tags')}>
             <TagPillSelector
-              entityType={TAG_ENTITY_TYPES.recurring_expense}
+              entityType={TAG_ENTITY_TYPES.recurringExpense}
               value={recurringExpense.tags || []}
               onChange={(tags) => handleChange('tags', tags)}
               errorMessage={errors?.errors.tags}

@@ -50,6 +50,7 @@ import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const taskSliderAtom = atom<Task | null>(null);
 export const taskSliderVisibilityAtom = atom(false);
@@ -217,6 +218,12 @@ export function TaskSlider() {
             >
               {task ? <TaskStatus entity={task} withoutDropdown /> : null}
             </Element>
+
+            {Boolean(task?.tags?.length) && (
+              <Element leftSide={t('tags')}>
+                <TagPills tags={task.tags} />
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />

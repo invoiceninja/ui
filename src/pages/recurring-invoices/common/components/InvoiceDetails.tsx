@@ -111,7 +111,7 @@ export function InvoiceDetails(props: Props) {
 
         <Element leftSide={t('tags')}>
           <TagPillSelector
-            entityType={TAG_ENTITY_TYPES.recurring_invoice}
+            entityType={TAG_ENTITY_TYPES.recurringInvoice}
             value={recurringInvoice?.tags || []}
             onChange={(tags) => handleChange('tags', tags)}
             errorMessage={props.errors?.errors.tags}

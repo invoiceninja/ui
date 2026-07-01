@@ -14,7 +14,7 @@ import { isActiveTag } from '$app/components/tags/TagPills';
 
 export function useTransactionFilterColumns(params?: { enabled?: boolean }) {
   const { data: tags } = useTagsQuery({
-    entityType: TAG_ENTITY_TYPES.bank_transaction,
+    entityType: TAG_ENTITY_TYPES.bankTransaction,
     enabled: params?.enabled ?? true,
   });
 

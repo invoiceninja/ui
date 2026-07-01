@@ -90,7 +90,7 @@ export function Details(props: PurchaseOrderCardProps) {
 
         <Element leftSide={t('tags')}>
           <TagPillSelector
-            entityType={TAG_ENTITY_TYPES.purchase_order}
+            entityType={TAG_ENTITY_TYPES.purchaseOrder}
             value={purchaseOrder?.tags || []}
             onChange={(tags) => handleChange('tags', tags)}
             errorMessage={errors?.errors.tags}

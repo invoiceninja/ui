@@ -952,7 +952,7 @@ export function useRecurringInvoiceFilterColumns(params?: {
   enabled?: boolean;
 }) {
   const { data: tags } = useTagsQuery({
-    entityType: TAG_ENTITY_TYPES.recurring_invoice,
+    entityType: TAG_ENTITY_TYPES.recurringInvoice,
     enabled: params?.enabled ?? true,
   });
 

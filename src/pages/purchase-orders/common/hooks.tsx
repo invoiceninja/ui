@@ -415,7 +415,7 @@ export function usePurchaseOrderColumns() {
 
 export function usePurchaseOrderFilterColumns(params?: { enabled?: boolean }) {
   const { data: tags } = useTagsQuery({
-    entityType: TAG_ENTITY_TYPES.purchase_order,
+    entityType: TAG_ENTITY_TYPES.purchaseOrder,
     enabled: params?.enabled ?? true,
   });
 

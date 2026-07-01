@@ -647,7 +647,7 @@ export function useRecurringExpenseFilterColumns(params?: {
   enabled?: boolean;
 }) {
   const { data: tags } = useTagsQuery({
-    entityType: TAG_ENTITY_TYPES.recurring_expense,
+    entityType: TAG_ENTITY_TYPES.recurringExpense,
     enabled: params?.enabled ?? true,
   });
 
