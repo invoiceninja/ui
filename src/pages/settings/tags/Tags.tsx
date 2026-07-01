@@ -204,9 +204,7 @@ export function Tags() {
           </Element>
         </Card>
 
-        <Tabs tabs={tabs} fullRightPadding withHorizontalPaddingOnSmallScreen />
-
-        <Outlet />
+        <TagsTable />
       </div>
     </Settings>
   );
