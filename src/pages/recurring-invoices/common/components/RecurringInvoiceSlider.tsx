@@ -320,7 +320,7 @@ export const RecurringInvoiceSlider = () => {
               ) : null}
             </Element>
 
-            {Boolean(recurringInvoice?.tags?.length) && (
+            {recurringInvoice && Boolean(recurringInvoice.tags?.length) && (
               <Element
                 className="border-b border-dashed"
                 leftSide={t('tags')}

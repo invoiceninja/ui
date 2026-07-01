@@ -118,7 +118,7 @@ export default function Vendor() {
                 </span>
 
                 <div>
-                  <TagPills tags={vendor.tags} />
+                  <TagPills tags={vendor?.tags} />
                 </div>
               </div>
             )}

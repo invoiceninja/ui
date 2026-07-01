@@ -165,7 +165,7 @@ export function Details(props: Props) {
 
         {Boolean(transaction?.tags?.length) && (
           <Element leftSide={t('tags')}>
-            <TagPills tags={transaction.tags} />
+            <TagPills tags={transaction?.tags} />
           </Element>
         )}
 

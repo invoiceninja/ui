@@ -386,7 +386,7 @@ export function InvoiceSlider() {
 
             {Boolean(invoice?.tags?.length) && (
               <Element leftSide={t('tags')} pushContentToRight noExternalPadding>
-                <TagPills tags={invoice.tags} />
+                <TagPills tags={invoice?.tags} />
               </Element>
             )}
           </div>

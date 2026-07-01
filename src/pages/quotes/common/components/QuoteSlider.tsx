@@ -309,8 +309,12 @@ export function QuoteSlider() {
             </Element>
 
             {Boolean(quote?.tags?.length) && (
-              <Element leftSide={t('tags')}>
-                <TagPills tags={quote.tags} />
+              <Element
+                leftSide={t('tags')}
+                pushContentToRight
+                noExternalPadding
+              >
+                <TagPills tags={quote?.tags} />
               </Element>
             )}
           </div>

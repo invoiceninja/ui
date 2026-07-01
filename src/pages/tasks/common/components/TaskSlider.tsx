@@ -221,7 +221,7 @@ export function TaskSlider() {
 
             {Boolean(task?.tags?.length) && (
               <Element leftSide={t('tags')}>
-                <TagPills tags={task.tags} />
+                <TagPills tags={task?.tags} />
               </Element>
             )}
           </div>

@@ -187,7 +187,7 @@ export function PaymentSlider() {
 
             {Boolean(payment?.tags?.length) && (
               <Element leftSide={t('tags')}>
-                <TagPills tags={payment.tags} />
+                <TagPills tags={payment?.tags} />
               </Element>
             )}
           </div>
