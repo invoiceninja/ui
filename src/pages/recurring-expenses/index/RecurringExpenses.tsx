@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { useTitle } from '$app/common/hooks/useTitle';
-import { DataTable } from '$app/components/DataTable';
+import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
@@ -17,10 +17,14 @@ import {
   useActions,
   useAllRecurringExpenseColumns,
   useRecurringExpenseColumns,
+  useRecurringExpenseFilterColumns,
 } from '../common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useAtom } from 'jotai';
+import { useEffect } from 'react';
 
 export default function RecurringExpenses() {
   useTitle('recurring_expenses');
@@ -37,9 +41,39 @@ export default function RecurringExpenses() {
 
   const actions = useActions();
 
+  const reactSettings = useReactSettings();
+
   const recurringExpenseColumns = useAllRecurringExpenseColumns();
 
   const customBulkActions = useCustomBulkActions();
+
+  const selectedColumns =
+    reactSettings?.react_table_columns?.recurringExpense || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useRecurringExpenseFilterColumns({
+    enabled: shouldShowTagFilter,
+  });
+
+  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
+    filterColumnsValuesAtom
+  );
+
+  useEffect(() => {
+    if (
+      !shouldShowTagFilter &&
+      filterColumnsValues.recurring_expense_tag_ids?.length
+    ) {
+      setFilterColumnsValues((current) => {
+        const { recurring_expense_tag_ids, ...rest } = current;
+
+        return rest;
+      });
+    }
+  }, [
+    shouldShowTagFilter,
+    filterColumnsValues.recurring_expense_tag_ids,
+    setFilterColumnsValues,
+  ]);
 
   return (
     <Default
@@ -49,13 +83,18 @@ export default function RecurringExpenses() {
     >
       <DataTable
         resource="recurring_expense"
-        endpoint="/api/v1/recurring_expenses?include=client,vendor&sort=id|desc&without_deleted_clients=true&without_deleted_vendors=true"
+        endpoint={`/api/v1/recurring_expenses?include=client,vendor${
+          shouldShowTagFilter ? ',tags' : ''
+        }&sort=id|desc&without_deleted_clients=true&without_deleted_vendors=true${
+          shouldShowTagFilter ? '' : '&tag_ids='
+        }`}
         columns={columns}
         bulkRoute="/api/v1/recurring_expenses/bulk"
         linkToCreate="/recurring_expenses/create"
         linkToEdit="/recurring_expenses/:id/edit"
         customActions={actions}
         customBulkActions={customBulkActions}
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         withResourcefulActions
         rightSide={
           <DataTableColumnsPicker

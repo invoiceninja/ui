@@ -10,13 +10,14 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
-import { DataTable } from '$app/components/DataTable';
+import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
   useAllVendorColumns,
   useVendorColumns,
+  useVendorFilterColumns,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
@@ -26,6 +27,9 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { or } from '$app/common/guards/guards/or';
 import { Guard } from '$app/common/guards/Guard';
 import { useActions } from '../common/hooks/useActions';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useAtom } from 'jotai';
+import { useEffect } from 'react';
 
 export default function Vendors() {
   const { documentTitle } = useTitle('vendors');
@@ -38,21 +42,50 @@ export default function Vendors() {
 
   const actions = useActions();
   const columns = useVendorColumns();
+  const reactSettings = useReactSettings();
   const vendorColumns = useAllVendorColumns();
   const customBulkActions = useCustomBulkActions();
+
+  const selectedColumns =
+    reactSettings?.react_table_columns?.vendor || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useVendorFilterColumns({
+    enabled: shouldShowTagFilter,
+  });
+
+  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
+    filterColumnsValuesAtom
+  );
+
+  useEffect(() => {
+    if (!shouldShowTagFilter && filterColumnsValues.vendor_tag_ids?.length) {
+      setFilterColumnsValues((current) => {
+        const { vendor_tag_ids, ...rest } = current;
+
+        return rest;
+      });
+    }
+  }, [
+    shouldShowTagFilter,
+    filterColumnsValues.vendor_tag_ids,
+    setFilterColumnsValues,
+  ]);
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
         resource="vendor"
         columns={columns}
-        endpoint="/api/v1/vendors?sort=id|desc"
+        endpoint={`/api/v1/vendors?sort=id|desc${
+          shouldShowTagFilter ? '&include=tags' : '&tag_ids='
+        }`}
         bulkRoute="/api/v1/vendors/bulk"
         linkToCreate="/vendors/create"
         linkToEdit="/vendors/:id/edit"
         withResourcefulActions
         customActions={actions}
         customBulkActions={customBulkActions}
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         rightSide={
           <div className="flex items-center space-x-2">
             <DataTableColumnsPicker

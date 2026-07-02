@@ -11,6 +11,7 @@
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { TabGroup } from '$app/components/TabGroup';
 import { Element } from '$app/components/cards';
+import classNames from 'classnames';
 import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
 import { atom, useAtom } from 'jotai';
@@ -50,6 +51,7 @@ import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const taskSliderAtom = atom<Task | null>(null);
 export const taskSliderVisibilityAtom = atom(false);
@@ -211,12 +213,22 @@ export function TaskSlider() {
             </Element>
 
             <Element
+              className={classNames({
+                'border-b border-dashed': Boolean(task?.tags?.length),
+              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {task ? <TaskStatus entity={task} withoutDropdown /> : null}
             </Element>
+
+            {Boolean(task?.tags?.length) && (
+              <Element leftSide={t('tags')} pushContentToRight noExternalPadding>
+                <TagPills tags={task?.tags} />
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />

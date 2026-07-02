@@ -10,7 +10,7 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
-import { DataTable } from '$app/components/DataTable';
+import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,7 @@ import {
   useActions,
   useAllPurchaseOrderColumns,
   usePurchaseOrderColumns,
+  usePurchaseOrderFilterColumns,
   usePurchaseOrderFilters,
 } from '../common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
@@ -34,6 +35,9 @@ import { InputLabel } from '$app/components/forms';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { ImportButton } from '$app/components/import/ImportButton';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useAtom } from 'jotai';
+import { useEffect } from 'react';
 
 export default function PurchaseOrders() {
   const { documentTitle } = useTitle('purchase_orders');
@@ -47,11 +51,40 @@ export default function PurchaseOrders() {
   ];
 
   const actions = useActions();
+  const reactSettings = useReactSettings();
   const filters = usePurchaseOrderFilters();
   const columns = usePurchaseOrderColumns();
   const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
   const purchaseOrderColumns = useAllPurchaseOrderColumns();
+
+  const selectedColumns =
+    reactSettings?.react_table_columns?.purchaseOrder || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = usePurchaseOrderFilterColumns({
+    enabled: shouldShowTagFilter,
+  });
+
+  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
+    filterColumnsValuesAtom
+  );
+
+  useEffect(() => {
+    if (
+      !shouldShowTagFilter &&
+      filterColumnsValues.purchase_order_tag_ids?.length
+    ) {
+      setFilterColumnsValues((current) => {
+        const { purchase_order_tag_ids, ...rest } = current;
+
+        return rest;
+      });
+    }
+  }, [
+    shouldShowTagFilter,
+    filterColumnsValues.purchase_order_tag_ids,
+    setFilterColumnsValues,
+  ]);
 
   const {
     changeTemplateVisible,
@@ -63,7 +96,11 @@ export default function PurchaseOrders() {
     <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
         resource="purchase_order"
-        endpoint="/api/v1/purchase_orders?include=vendor,expense&without_deleted_vendors=true&sort=id|desc"
+        endpoint={`/api/v1/purchase_orders?include=vendor,expense${
+          shouldShowTagFilter ? ',tags' : ''
+        }&without_deleted_vendors=true&sort=id|desc${
+          shouldShowTagFilter ? '' : '&tag_ids='
+        }`}
         bulkRoute="/api/v1/purchase_orders/bulk"
         linkToCreate="/purchase_orders/create"
         linkToEdit="/purchase_orders/:id/edit"
@@ -72,6 +109,7 @@ export default function PurchaseOrders() {
         customBulkActions={customBulkActions}
         customFilters={filters}
         customFilterPlaceholder="status"
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         withResourcefulActions
         rightSide={
           <div className="flex items-center space-x-2">

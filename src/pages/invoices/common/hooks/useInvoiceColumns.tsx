@@ -43,7 +43,14 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useNavigate } from 'react-router-dom';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
-import { Classification, PEPPOL_COUNTRIES, PEPPOL_CLASSIFICATIONS } from '$app/common/helpers/peppol-countries';
+import {
+  Classification,
+  PEPPOL_COUNTRIES,
+  PEPPOL_CLASSIFICATIONS,
+} from '$app/common/helpers/peppol-countries';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { useTagsQuery } from '$app/common/queries/tags';
+import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -124,6 +131,7 @@ export function useAllInvoiceColumns() {
     'created_at',
     'updated_at',
     'project',
+    'tags',
     'recurring_invoice',
   ] as const;
 
@@ -163,11 +171,15 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
     if (reactSettings?.preferences?.hide_peppol_sent_status) {
       return false;
     }
-    
+
     return (
-      currentCompany.settings.e_invoice_type === 'PEPPOL' && 
+      currentCompany.settings.e_invoice_type === 'PEPPOL' &&
       PEPPOL_COUNTRIES.includes(currentInvoice.client?.country_id || '') &&
-      PEPPOL_CLASSIFICATIONS[currentInvoice.client?.country_id as keyof typeof PEPPOL_CLASSIFICATIONS]?.includes((currentInvoice.client?.classification || 'business') as Classification)
+      PEPPOL_CLASSIFICATIONS[
+        currentInvoice.client?.country_id as keyof typeof PEPPOL_CLASSIFICATIONS
+      ]?.includes(
+        (currentInvoice.client?.classification || 'business') as Classification
+      )
     );
   };
 
@@ -182,9 +194,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   };
 
   const peppolSendingSuccess = (currentInvoice: Invoice) => {
-    return (
-      isPeppolEnabled(currentInvoice) && currentInvoice.backup?.guid
-    );
+    return isPeppolEnabled(currentInvoice) && currentInvoice.backup?.guid;
   };
 
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
@@ -194,7 +204,6 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('status'),
       format: (_value, invoice) => (
         <div className="flex items-center gap-x-2">
-
           <InvoiceStatus entity={invoice} />
 
           {peppolSendingFailed(invoice) && (
@@ -206,27 +215,27 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
               }}
             >
               <Tooltip
-                message={
-                  t('peppol_sending_failed') as string
-                }
+                message={t('peppol_sending_failed') as string}
                 width="auto"
                 placement="top"
               >
                 <MdWarning color="red" size={20} />
-              </Tooltip>        
+              </Tooltip>
             </button>
           )}
 
           {peppolSendingSuccess(invoice) && (
             <Tooltip
-              message={
-                t('peppol_sending_success') as string
-              }
+              message={t('peppol_sending_success') as string}
               width="auto"
               placement="top"
             >
-              <MdSend color="#22c55e" size={18} style={{ transform: 'rotate(-45deg)' }} />
-            </Tooltip>   
+              <MdSend
+                color="#22c55e"
+                size={18}
+                style={{ transform: 'rotate(-45deg)' }}
+              />
+            </Tooltip>
           )}
 
           {['R1', 'R2'].includes(invoice.backup?.document_type ?? '') && (
@@ -659,6 +668,12 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('last_updated'),
       format: (value) => date(value, dateFormat),
     },
+    {
+      column: 'tags',
+      id: 'invoice_tag_ids',
+      label: t('tags'),
+      format: (value, invoice) => <TagPills tags={invoice.tags} />,
+    },
   ];
 
   const list: string[] =
@@ -671,4 +686,23 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
         list.indexOf(normalizeColumnName(a.column)) -
         list.indexOf(normalizeColumnName(b.column))
     );
+}
+
+export function useInvoiceFilterColumns(params?: { enabled?: boolean }) {
+  const { data: tags } = useTagsQuery({
+    entityType: TAG_ENTITY_TYPES.invoice,
+    enabled: params?.enabled ?? true,
+  });
+
+  return [
+    {
+      column_id: 'invoice_tag_ids',
+      query_identifier: 'tag_ids',
+      options:
+        tags?.data.filter(isActiveTag).map((tag) => ({
+          label: tag.name,
+          value: tag.id,
+        })) || [],
+    },
+  ];
 }

@@ -10,7 +10,7 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
-import { DataTable } from '$app/components/DataTable';
+import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { ImportButton } from '$app/components/import/ImportButton';
@@ -20,6 +20,7 @@ import {
   useActions,
   useAllRecurringInvoiceColumns,
   useRecurringInvoiceColumns,
+  useRecurringInvoiceFilterColumns,
   useRecurringInvoiceFilters,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
@@ -69,6 +70,17 @@ export default function RecurringInvoices() {
   const { footerColumns, allFooterColumns } = useFooterColumns();
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
 
+  const selectedColumns =
+    reactSettings?.react_table_columns?.recurringInvoice || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useRecurringInvoiceFilterColumns({
+    enabled: shouldShowTagFilter,
+  });
+
+  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
+    filterColumnsValuesAtom
+  );
+
   const [recurringInvoiceSlider, setRecurringInvoiceSlider] = useAtom(
     recurringInvoiceSliderAtom
   );
@@ -87,6 +99,23 @@ export default function RecurringInvoices() {
     return () => setRecurringInvoiceSliderVisibility(false);
   }, []);
 
+  useEffect(() => {
+    if (
+      !shouldShowTagFilter &&
+      filterColumnsValues.recurring_invoice_tag_ids?.length
+    ) {
+      setFilterColumnsValues((current) => {
+        const { recurring_invoice_tag_ids, ...rest } = current;
+
+        return rest;
+      });
+    }
+  }, [
+    shouldShowTagFilter,
+    filterColumnsValues.recurring_invoice_tag_ids,
+    setFilterColumnsValues,
+  ]);
+
   return (
     <Default
       title={t('recurring_invoices')}
@@ -97,7 +126,11 @@ export default function RecurringInvoices() {
         resource="recurring_invoice"
         columns={columns}
         footerColumns={footerColumns}
-        endpoint="/api/v1/recurring_invoices?include=client&without_deleted_clients=true&sort=id|desc"
+        endpoint={`/api/v1/recurring_invoices?include=client${
+          shouldShowTagFilter ? ',tags' : ''
+        }&without_deleted_clients=true&sort=id|desc${
+          shouldShowTagFilter ? '' : '&tag_ids='
+        }`}
         linkToCreate="/recurring_invoices/create"
         linkToEdit="/recurring_invoices/:id/edit"
         bulkRoute="/api/v1/recurring_invoices/bulk"
@@ -105,6 +138,7 @@ export default function RecurringInvoices() {
         customFilters={filters}
         customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         withResourcefulActions
         rightSide={
           <div className="flex items-center space-x-2">

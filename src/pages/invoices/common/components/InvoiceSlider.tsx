@@ -71,6 +71,7 @@ import { History } from '$app/components/icons/History';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { Icon } from '$app/components/icons/Icon';
 import { ChevronRight } from 'react-feather';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -376,12 +377,22 @@ export function InvoiceSlider() {
             ) : null}
 
             <Element
+              className={classNames({
+                'border-b border-dashed': Boolean(invoice?.tags?.length),
+              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {invoice ? <InvoiceStatus entity={invoice} /> : null}
             </Element>
+
+            {Boolean(invoice?.tags?.length) && (
+              <Element leftSide={t('tags')} pushContentToRight noExternalPadding>
+                <TagPills tags={invoice?.tags} />
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />

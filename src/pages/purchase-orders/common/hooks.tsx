@@ -75,6 +75,9 @@ import { EntityActionElement } from '$app/components/EntityActionElement';
 import { Dispatch, SetStateAction } from 'react';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { useTagsQuery } from '$app/common/queries/tags';
+import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -193,6 +196,7 @@ export function useAllPurchaseOrderColumns() {
     'documents',
     'entity_state',
     'exchange_rate',
+    'tags',
   ] as const;
 
   return purchaseOrderColumns.map((column) => normalizeColumnName(column));
@@ -387,6 +391,14 @@ export function usePurchaseOrderColumns() {
         label: t('exchange_rate'),
         format: (value) => formatNumber(value),
       },
+      {
+        column: 'tags',
+        id: 'purchase_order_tag_ids',
+        label: t('tags'),
+        format: (value, purchaseOrder) => (
+          <TagPills tags={purchaseOrder.tags} />
+        ),
+      },
     ];
 
   const list: string[] =
@@ -399,6 +411,25 @@ export function usePurchaseOrderColumns() {
         list.indexOf(normalizeColumnName(a.column)) -
         list.indexOf(normalizeColumnName(b.column))
     );
+}
+
+export function usePurchaseOrderFilterColumns(params?: { enabled?: boolean }) {
+  const { data: tags } = useTagsQuery({
+    entityType: TAG_ENTITY_TYPES.purchaseOrder,
+    enabled: params?.enabled ?? true,
+  });
+
+  return [
+    {
+      column_id: 'purchase_order_tag_ids',
+      query_identifier: 'tag_ids',
+      options:
+        tags?.data.filter(isActiveTag).map((tag) => ({
+          label: tag.name,
+          value: tag.id,
+        })) || [],
+    },
+  ];
 }
 
 export function usePurchaseOrderFilters() {

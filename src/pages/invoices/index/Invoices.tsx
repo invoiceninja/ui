@@ -9,7 +9,7 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
-import { DataTable } from '$app/components/DataTable';
+import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useActions } from '../edit/components/Actions';
@@ -17,6 +17,7 @@ import {
   defaultColumns,
   useAllInvoiceColumns,
   useInvoiceColumns,
+  useInvoiceFilterColumns,
 } from '../common/hooks/useInvoiceColumns';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useInvoiceFilters } from '../common/hooks/useInvoiceFilters';
@@ -82,6 +83,17 @@ export default function Invoices() {
   const { footerColumns, allFooterColumns } = useFooterColumns();
   const verifactuEnabled = useCompanyVerifactu();
 
+  const selectedColumns =
+    reactSettings?.react_table_columns?.invoice || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useInvoiceFilterColumns({
+    enabled: shouldShowTagFilter,
+  });
+
+  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
+    filterColumnsValuesAtom
+  );
+
   useEffect(() => {
     if (invoiceResponse && invoiceSliderVisibility) {
       setInvoiceSlider(invoiceResponse);
@@ -91,6 +103,20 @@ export default function Invoices() {
   useEffect(() => {
     return () => setInvoiceSliderVisibility(false);
   }, []);
+
+  useEffect(() => {
+    if (!shouldShowTagFilter && filterColumnsValues.invoice_tag_ids?.length) {
+      setFilterColumnsValues((current) => {
+        const { invoice_tag_ids, ...rest } = current;
+
+        return rest;
+      });
+    }
+  }, [
+    shouldShowTagFilter,
+    filterColumnsValues.invoice_tag_ids,
+    setFilterColumnsValues,
+  ]);
 
   const {
     changeTemplateVisible,
@@ -102,7 +128,11 @@ export default function Invoices() {
     <Default title={documentTitle} breadcrumbs={pages} docsLink="en/invoices">
       <DataTable
         resource="invoice"
-        endpoint="/api/v1/invoices?include=client.group_settings,project&without_deleted_clients=true&sort=id|desc"
+        endpoint={`/api/v1/invoices?include=client.group_settings,project${
+          shouldShowTagFilter ? ',tags' : ''
+        }&without_deleted_clients=true&sort=id|desc${
+          shouldShowTagFilter ? '' : '&tag_ids='
+        }`}
         columns={columns}
         footerColumns={footerColumns}
         bulkRoute="/api/v1/invoices/bulk"
@@ -115,6 +145,7 @@ export default function Invoices() {
         customBulkActions={customBulkActions}
         customFilters={filters}
         customFilterPlaceholder="status"
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         rightSide={
           <div className="flex items-center space-x-2">
             {Boolean(reactSettings.show_table_footer) && (

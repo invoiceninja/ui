@@ -103,6 +103,9 @@ import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { ConvertOptionsModal } from './components/ConvertOptionsModal';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { useTagsQuery } from '$app/common/queries/tags';
+import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -792,6 +795,7 @@ export function useAllQuoteColumns() {
     'public_notes',
     'tax_amount',
     'updated_at',
+    'tags',
     // 'vendor', @Todo: Need to resolve relationship
   ] as const;
 
@@ -1167,6 +1171,12 @@ export function useQuoteColumns() {
       label: t('last_updated'),
       format: (value) => date(value, dateFormat),
     },
+    {
+      column: 'tags',
+      id: 'quote_tag_ids',
+      label: t('tags'),
+      format: (value, quote) => <TagPills tags={quote.tags} />,
+    },
   ];
 
   const list: string[] =
@@ -1179,6 +1189,25 @@ export function useQuoteColumns() {
         list.indexOf(normalizeColumnName(a.column)) -
         list.indexOf(normalizeColumnName(b.column))
     );
+}
+
+export function useQuoteFilterColumns(params?: { enabled?: boolean }) {
+  const { data: tags } = useTagsQuery({
+    entityType: TAG_ENTITY_TYPES.quote,
+    enabled: params?.enabled ?? true,
+  });
+
+  return [
+    {
+      column_id: 'quote_tag_ids',
+      query_identifier: 'tag_ids',
+      options:
+        tags?.data.filter(isActiveTag).map((tag) => ({
+          label: tag.name,
+          value: tag.id,
+        })) || [],
+    },
+  ];
 }
 
 export function useQuoteFilters() {

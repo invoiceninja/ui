@@ -10,13 +10,14 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
-import { DataTable } from '$app/components/DataTable';
+import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
   useAllPaymentColumns,
   usePaymentColumns,
+  usePaymentFilterColumns,
 } from '../common/hooks/usePaymentColumns';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useActions } from '../common/hooks/useActions';
@@ -46,6 +47,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { Guard } from '$app/common/guards/Guard';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { InputLabel } from '$app/components/forms';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export default function Payments() {
   useTitle('payments');
@@ -58,10 +60,22 @@ export default function Payments() {
   const actions = useActions();
   const filters = usePaymentFilters();
   const columns = usePaymentColumns();
+  const reactSettings = useReactSettings();
   const paymentColumns = useAllPaymentColumns();
   const customBulkActions = useCustomBulkActions();
 
   const pages: Page[] = [{ name: t('payments'), href: '/payments' }];
+
+  const selectedColumns =
+    reactSettings?.react_table_columns?.payment || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = usePaymentFilterColumns({
+    enabled: shouldShowTagFilter,
+  });
+
+  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
+    filterColumnsValuesAtom
+  );
 
   const [sliderPaymentId, setSliderPaymentId] = useState<string>('');
   const [paymentSlider, setPaymentSlider] = useAtom(paymentSliderAtom);
@@ -84,6 +98,20 @@ export default function Payments() {
     return () => setPaymentSliderVisibility(false);
   }, []);
 
+  useEffect(() => {
+    if (!shouldShowTagFilter && filterColumnsValues.payment_tag_ids?.length) {
+      setFilterColumnsValues((current) => {
+        const { payment_tag_ids, ...rest } = current;
+
+        return rest;
+      });
+    }
+  }, [
+    shouldShowTagFilter,
+    filterColumnsValues.payment_tag_ids,
+    setFilterColumnsValues,
+  ]);
+
   const {
     changeTemplateVisible,
     setChangeTemplateVisible,
@@ -100,7 +128,11 @@ export default function Payments() {
       <DataTable
         resource="payment"
         columns={columns}
-        endpoint="/api/v1/payments?include=client,invoices&without_deleted_clients=true&sort=id|desc"
+        endpoint={`/api/v1/payments?include=client,invoices${
+          shouldShowTagFilter ? ',tags' : ''
+        }&without_deleted_clients=true&sort=id|desc${
+          shouldShowTagFilter ? '' : '&tag_ids='
+        }`}
         linkToCreate="/payments/create"
         bulkRoute="/api/v1/payments/bulk"
         linkToEdit="/payments/:id/edit"
@@ -109,6 +141,7 @@ export default function Payments() {
         customFilters={filters}
         customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         showRestore={(resource: Payment) => !resource.is_deleted}
         rightSide={
           <div className="flex items-center space-x-2">
