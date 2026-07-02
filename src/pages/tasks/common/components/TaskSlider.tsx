@@ -11,6 +11,7 @@
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { TabGroup } from '$app/components/TabGroup';
 import { Element } from '$app/components/cards';
+import classNames from 'classnames';
 import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
 import { atom, useAtom } from 'jotai';
@@ -212,15 +213,19 @@ export function TaskSlider() {
             </Element>
 
             <Element
+              className={classNames({
+                'border-b border-dashed': Boolean(task?.tags?.length),
+              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {task ? <TaskStatus entity={task} withoutDropdown /> : null}
             </Element>
 
             {Boolean(task?.tags?.length) && (
-              <Element leftSide={t('tags')}>
+              <Element leftSide={t('tags')} pushContentToRight noExternalPadding>
                 <TagPills tags={task?.tags} />
               </Element>
             )}

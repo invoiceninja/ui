@@ -301,9 +301,13 @@ export function QuoteSlider() {
             </Element>
 
             <Element
+              className={classNames({
+                'border-b border-dashed': Boolean(quote?.tags?.length),
+              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {quote ? <QuoteStatus entity={quote} /> : null}
             </Element>

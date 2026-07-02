@@ -377,9 +377,13 @@ export function InvoiceSlider() {
             ) : null}
 
             <Element
+              className={classNames({
+                'border-b border-dashed': Boolean(invoice?.tags?.length),
+              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {invoice ? <InvoiceStatus entity={invoice} /> : null}
             </Element>
