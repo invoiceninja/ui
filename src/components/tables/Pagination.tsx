@@ -19,6 +19,11 @@ import { DoubleChevronLeft } from '../icons/DoubleChevronLeft';
 import { ChevronRight } from '../icons/ChevronRight';
 import { DoubleChevronRight } from '../icons/DoubleChevronRight';
 import styled from 'styled-components';
+import {
+  PageNavigationAction,
+  resolvePageNavigation,
+} from '$app/common/helpers/pagination';
+import { PaginationMeta } from '$app/common/interfaces/generic-many-response';
 
 const PaginationButton = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};
@@ -48,6 +53,8 @@ interface Props extends CommonProps {
   currentPerPage?: PerPage;
   onRowsChange: (rows: PerPage) => any;
   totalRecords?: number;
+  pagination?: PaginationMeta;
+  requestUrl?: string;
 }
 
 const defaultProps: Props = {
@@ -73,10 +80,19 @@ export function Pagination(props: Props) {
     setPageInputValue(String(props.currentPage));
   }, [props.currentPage]);
 
-  const goToPage = (pageNumber: number) => {
-    if (pageNumber >= 1 && pageNumber <= props.totalPages) {
-      props.onPageChange(pageNumber);
+  const navigate = (action: PageNavigationAction) => {
+    const target = resolvePageNavigation(action, {
+      currentPage: props.currentPage,
+      totalPages: props.totalPages,
+      pagination: props.pagination,
+      requestUrl: props.requestUrl,
+    });
+
+    if (target) {
+      props.onPageChange(target.page);
     }
+
+    return target;
   };
 
   const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,13 +110,9 @@ export function Pagination(props: Props) {
   const handlePageInputBlur = () => {
     const pageNumber = parseInt(pageInputValue, 10);
 
-    if (
-      !isNaN(pageNumber) &&
-      pageNumber >= 1 &&
-      pageNumber <= props.totalPages
-    ) {
-      goToPage(pageNumber);
-    } else {
+    const target = !isNaN(pageNumber) ? navigate(pageNumber) : null;
+
+    if (!target) {
       setPageInputValue(String(props.currentPage));
     }
   };
@@ -131,7 +143,7 @@ export function Pagination(props: Props) {
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            onClick={() => goToPage(1)}
+            onClick={() => navigate('first')}
           >
             <DoubleChevronLeft size="0.9rem" color={colors.$3} />
           </PaginationButton>
@@ -143,7 +155,7 @@ export function Pagination(props: Props) {
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            onClick={() => goToPage(props.currentPage - 1)}
+            onClick={() => navigate('previous')}
           >
             <ChevronLeft size="0.9rem" color={colors.$3} />
           </PaginationButton>
@@ -176,7 +188,7 @@ export function Pagination(props: Props) {
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            onClick={() => goToPage(props.currentPage + 1)}
+            onClick={() => navigate('next')}
           >
             <ChevronRight size="0.9rem" color={colors.$3} />
           </PaginationButton>
@@ -188,7 +200,7 @@ export function Pagination(props: Props) {
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            onClick={() => goToPage(props.totalPages)}
+            onClick={() => navigate('last')}
           >
             <DoubleChevronRight size="0.9rem" color={colors.$3} />
           </PaginationButton>
