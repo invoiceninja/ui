@@ -377,6 +377,9 @@ export function DataTable<T extends object>(props: Props<T>) {
     });
   }, []);
 
+  const withoutStoringPreferencesEffective =
+    withoutStoringPreferences || reactSettings.persist_table_filters === false;
+
   const { handleUpdateTableFilters } = useDataTablePreferences({
     apiEndpoint,
     isInitialConfiguration,
@@ -395,7 +398,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutStoringPerPage: withoutPerPageAsPreference,
     withoutStoringPage: withoutPageAsPreference,
     withoutStoringSearchFilter,
-    withoutStoringPreferences,
+    withoutStoringPreferences: withoutStoringPreferencesEffective,
     enableSavingFilterPreference,
   });
 
@@ -409,7 +412,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     tableKey: `${props.resource}s`,
     customFilter,
     customFilters,
-    withoutStoringPreferences,
+    withoutStoringPreferences: withoutStoringPreferencesEffective,
   });
 
   const normalizeNumericCommas = (value: string): string => {
