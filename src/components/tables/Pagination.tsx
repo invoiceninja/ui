@@ -20,17 +20,21 @@ import { ChevronRight } from '../icons/ChevronRight';
 import { DoubleChevronRight } from '../icons/DoubleChevronRight';
 import styled from 'styled-components';
 import {
+  getPageNavigationState,
   PageNavigationAction,
   resolvePageNavigation,
 } from '$app/common/helpers/pagination';
 import { PaginationMeta } from '$app/common/interfaces/generic-many-response';
 
-const PaginationButton = styled.div`
+const PaginationButton = styled.div<{ $disabled?: boolean }>`
   background-color: ${(props) => props.theme.backgroundColor};
   border-color: ${(props) => props.theme.borderColor};
+  opacity: ${(props) => (props.$disabled ? 0.5 : 1)};
+  cursor: ${(props) => (props.$disabled ? 'not-allowed' : 'pointer')};
 
   &:hover {
-    background-color: ${(props) => props.theme.hoverColor};
+    background-color: ${(props) =>
+      props.$disabled ? props.theme.backgroundColor : props.theme.hoverColor};
   }
 `;
 
@@ -95,6 +99,13 @@ export function Pagination(props: Props) {
     return target;
   };
 
+  const { canPrevious, canNext } = getPageNavigationState({
+    currentPage: props.currentPage,
+    totalPages: props.totalPages,
+    pagination: props.pagination,
+    requestUrl: props.requestUrl,
+  });
+
   const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
@@ -137,25 +148,27 @@ export function Pagination(props: Props) {
       >
         <div className="flex items-center">
           <PaginationButton
-            className="p-2 sm:p-[0.725rem] border rounded-l-md shadow-sm cursor-pointer"
+            className="p-2 sm:p-[0.725rem] border rounded-l-md shadow-sm"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            onClick={() => navigate('first')}
+            $disabled={!canPrevious}
+            onClick={() => canPrevious && navigate('first')}
           >
             <DoubleChevronLeft size="0.9rem" color={colors.$3} />
           </PaginationButton>
 
           <PaginationButton
-            className="p-2 sm:p-[0.725rem] border-b border-t border-r rounded-r-md shadow-sm cursor-pointer"
+            className="p-2 sm:p-[0.725rem] border-b border-t border-r rounded-r-md shadow-sm"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            onClick={() => navigate('previous')}
+            $disabled={!canPrevious}
+            onClick={() => canPrevious && navigate('previous')}
           >
             <ChevronLeft size="0.9rem" color={colors.$3} />
           </PaginationButton>
@@ -182,25 +195,27 @@ export function Pagination(props: Props) {
 
         <div className="flex">
           <PaginationButton
-            className="p-2 sm:p-[0.725rem] border-t border-b border-l rounded-l-md shadow-sm cursor-pointer"
+            className="p-2 sm:p-[0.725rem] border-t border-b border-l rounded-l-md shadow-sm"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            onClick={() => navigate('next')}
+            $disabled={!canNext}
+            onClick={() => canNext && navigate('next')}
           >
             <ChevronRight size="0.9rem" color={colors.$3} />
           </PaginationButton>
 
           <PaginationButton
-            className="p-2 sm:p-[0.725rem] border rounded-r-md shadow-sm cursor-pointer"
+            className="p-2 sm:p-[0.725rem] border rounded-r-md shadow-sm"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            onClick={() => navigate('last')}
+            $disabled={!canNext}
+            onClick={() => canNext && navigate('last')}
           >
             <DoubleChevronRight size="0.9rem" color={colors.$3} />
           </PaginationButton>

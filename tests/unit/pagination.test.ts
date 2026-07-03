@@ -10,6 +10,7 @@
 
 import { describe, test, expect } from 'vitest';
 import {
+  getPageNavigationState,
   getPaginationLinks,
   getPageParameter,
   replacePageParameter,
@@ -224,5 +225,65 @@ describe('resolvePageNavigation', () => {
         pagination: undefined,
       })
     ).toEqual({ page: 1, url: null });
+  });
+});
+
+describe('getPageNavigationState', () => {
+  test('both directions available in the middle of the range', () => {
+    expect(
+      getPageNavigationState({
+        currentPage: 2,
+        totalPages: 26,
+        pagination,
+      })
+    ).toEqual({ canPrevious: true, canNext: true });
+  });
+
+  test('on the first page the api omits the previous link', () => {
+    expect(
+      getPageNavigationState({
+        currentPage: 1,
+        totalPages: 26,
+        pagination: { ...pagination, links: { next: nextLink } },
+      })
+    ).toEqual({ canPrevious: false, canNext: true });
+  });
+
+  test('on the last page the api omits the next link', () => {
+    expect(
+      getPageNavigationState({
+        currentPage: 26,
+        totalPages: 26,
+        pagination: { ...pagination, links: { previous: previousLink } },
+      })
+    ).toEqual({ canPrevious: true, canNext: false });
+  });
+
+  test('falls back to page bounds for backends without link support', () => {
+    expect(
+      getPageNavigationState({
+        currentPage: 1,
+        totalPages: 26,
+        pagination: legacyPagination,
+      })
+    ).toEqual({ canPrevious: false, canNext: true });
+
+    expect(
+      getPageNavigationState({
+        currentPage: 26,
+        totalPages: 26,
+        pagination: legacyPagination,
+      })
+    ).toEqual({ canPrevious: true, canNext: false });
+  });
+
+  test('a single page disables both directions', () => {
+    expect(
+      getPageNavigationState({
+        currentPage: 1,
+        totalPages: 1,
+        pagination: undefined,
+      })
+    ).toEqual({ canPrevious: false, canNext: false });
   });
 });

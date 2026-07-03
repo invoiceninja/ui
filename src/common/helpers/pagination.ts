@@ -32,7 +32,13 @@ export interface PageNavigationContext {
   requestUrl?: string;
 }
 
-const FALLBACK_BASE = 'http://localhost';
+export interface PageNavigationState {
+  canPrevious: boolean;
+  canNext: boolean;
+}
+
+const URL_BASE =
+  typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
 
 export function getPaginationLinks(
   pagination?: Partial<PaginationMeta> | null
@@ -55,7 +61,7 @@ export function getPaginationLinks(
 
 export function getPageParameter(url: string): number | null {
   try {
-    const page = Number(new URL(url, FALLBACK_BASE).searchParams.get('page'));
+    const page = Number(new URL(url, URL_BASE).searchParams.get('page'));
 
     return Number.isInteger(page) && page > 0 ? page : null;
   } catch {
@@ -65,7 +71,7 @@ export function getPageParameter(url: string): number | null {
 
 export function replacePageParameter(url: string, page: number): string | null {
   try {
-    const target = new URL(url, FALLBACK_BASE);
+    const target = new URL(url, URL_BASE);
 
     target.searchParams.set('page', page.toString());
 
@@ -117,5 +123,14 @@ export function resolvePageNavigation(
   return {
     page,
     url: requestUrl ? replacePageParameter(requestUrl, page) : null,
+  };
+}
+
+export function getPageNavigationState(
+  context: PageNavigationContext
+): PageNavigationState {
+  return {
+    canPrevious: resolvePageNavigation('previous', context) !== null,
+    canNext: resolvePageNavigation('next', context) !== null,
   };
 }
