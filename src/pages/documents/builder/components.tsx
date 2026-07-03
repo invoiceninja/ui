@@ -315,9 +315,22 @@ export function RectangleSettingsButton({
   onClick,
   label,
   id,
+  variant,
+  icon,
 }: RectangleSettingsDialogButtonProps) {
+  const buttonTypes = {
+    primary: 'primary',
+    danger: 'secondary',
+  }
+
   return (
-    <Button behavior="button" onClick={onClick} id={id} type="secondary">
+    <Button
+      behavior="button"
+      onClick={onClick}
+      id={id}
+      type={buttonTypes[variant as keyof typeof Button]}
+    >
+      {icon && <span style={{ display: 'inline-flex', marginRight: '0.375rem' }}>{icon}</span>}
       {label}
     </Button>
   );
