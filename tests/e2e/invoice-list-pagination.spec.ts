@@ -112,35 +112,29 @@ test('navigates the invoice list with the pagination controls', async ({
 
   const pageInput = getPageInput(page);
 
-  // 15 invoices at the default 10 per page produce two pages.
   await expect(pageInput).toHaveValue('1');
   await expect(
     page.locator('[data-cy="dataTable"]').getByText('/ 2')
   ).toBeVisible();
 
-  // First page: the backward controls are disabled, the forward ones enabled.
   await expectControlDisabled(page, 'paginationFirstPage', true);
   await expectControlDisabled(page, 'paginationPreviousPage', true);
   await expectControlDisabled(page, 'paginationNextPage', false);
   await expectControlDisabled(page, 'paginationLastPage', false);
 
-  // Next advances one page and issues a real request for the second page.
   const nextResponse = waitForInvoicesPage(page, 2);
   await paginationControl(page, 'paginationNextPage').click();
   await nextResponse;
   await expect(pageInput).toHaveValue('2');
 
-  // Last page: the forward controls are disabled, the backward ones enabled.
   await expectControlDisabled(page, 'paginationNextPage', true);
   await expectControlDisabled(page, 'paginationLastPage', true);
   await expectControlDisabled(page, 'paginationPreviousPage', false);
   await expectControlDisabled(page, 'paginationFirstPage', false);
 
-  // Previous steps back to the first page.
   await paginationControl(page, 'paginationPreviousPage').click();
   await expect(pageInput).toHaveValue('1');
 
-  // Last jumps to the final page; first jumps back to the start.
   await paginationControl(page, 'paginationLastPage').click();
   await expect(pageInput).toHaveValue('2');
 
