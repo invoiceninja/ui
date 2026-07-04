@@ -1410,7 +1410,6 @@ export function DataTable<T extends object>(props: Props<T>) {
               : data.data.meta.pagination.total
           }
           pagination={data.data.meta?.pagination}
-          requestUrl={apiEndpoint.href}
         />
       )}
     </div>

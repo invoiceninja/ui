@@ -58,7 +58,6 @@ interface Props extends CommonProps {
   onRowsChange: (rows: PerPage) => any;
   totalRecords?: number;
   pagination?: PaginationMeta;
-  requestUrl?: string;
 }
 
 const defaultProps: Props = {
@@ -85,25 +84,23 @@ export function Pagination(props: Props) {
   }, [props.currentPage]);
 
   const navigate = (action: PageNavigationAction) => {
-    const target = resolvePageNavigation(action, {
+    const page = resolvePageNavigation(action, {
       currentPage: props.currentPage,
       totalPages: props.totalPages,
       pagination: props.pagination,
-      requestUrl: props.requestUrl,
     });
 
-    if (target) {
-      props.onPageChange(target.page);
+    if (page !== null) {
+      props.onPageChange(page);
     }
 
-    return target;
+    return page;
   };
 
   const { canPrevious, canNext } = getPageNavigationState({
     currentPage: props.currentPage,
     totalPages: props.totalPages,
     pagination: props.pagination,
-    requestUrl: props.requestUrl,
   });
 
   const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,9 +118,9 @@ export function Pagination(props: Props) {
   const handlePageInputBlur = () => {
     const pageNumber = parseInt(pageInputValue, 10);
 
-    const target = !isNaN(pageNumber) ? navigate(pageNumber) : null;
+    const page = !isNaN(pageNumber) ? navigate(pageNumber) : null;
 
-    if (!target) {
+    if (page === null) {
       setPageInputValue(String(props.currentPage));
     }
   };
@@ -155,6 +152,8 @@ export function Pagination(props: Props) {
               borderColor: colors.$24,
             }}
             $disabled={!canPrevious}
+            aria-disabled={!canPrevious}
+            data-cy="paginationFirstPage"
             onClick={() => canPrevious && navigate('first')}
           >
             <DoubleChevronLeft size="0.9rem" color={colors.$3} />
@@ -168,6 +167,8 @@ export function Pagination(props: Props) {
               borderColor: colors.$24,
             }}
             $disabled={!canPrevious}
+            aria-disabled={!canPrevious}
+            data-cy="paginationPreviousPage"
             onClick={() => canPrevious && navigate('previous')}
           >
             <ChevronLeft size="0.9rem" color={colors.$3} />
@@ -202,6 +203,8 @@ export function Pagination(props: Props) {
               borderColor: colors.$24,
             }}
             $disabled={!canNext}
+            aria-disabled={!canNext}
+            data-cy="paginationNextPage"
             onClick={() => canNext && navigate('next')}
           >
             <ChevronRight size="0.9rem" color={colors.$3} />
@@ -215,6 +218,8 @@ export function Pagination(props: Props) {
               borderColor: colors.$24,
             }}
             $disabled={!canNext}
+            aria-disabled={!canNext}
+            data-cy="paginationLastPage"
             onClick={() => canNext && navigate('last')}
           >
             <DoubleChevronRight size="0.9rem" color={colors.$3} />

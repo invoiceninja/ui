@@ -13,7 +13,6 @@ import {
   getPageNavigationState,
   getPaginationLinks,
   getPageParameter,
-  replacePageParameter,
   resolvePageNavigation,
 } from '$app/common/helpers/pagination';
 import { PaginationMeta } from '$app/common/interfaces/generic-many-response';
@@ -91,45 +90,16 @@ describe('getPageParameter', () => {
   });
 });
 
-describe('replacePageParameter', () => {
-  test('replaces the page keeping every other query parameter', () => {
-    const url = replacePageParameter(nextLink, 26);
-
-    expect(url).toContain('page=26');
-    expect(url).toContain('per_page=2');
-    expect(url).toContain('balance=gt%3A10');
-    expect(getPageParameter(url as string)).toEqual(26);
-  });
-
-  test('adds the page when it is missing', () => {
-    expect(
-      replacePageParameter('https://invoicing.co/api/v1/invoices', 5)
-    ).toEqual('https://invoicing.co/api/v1/invoices?page=5');
-  });
-
-  test('returns null for invalid urls', () => {
-    expect(replacePageParameter('http://', 5)).toBeNull();
-  });
-});
-
 describe('resolvePageNavigation', () => {
   const context = {
     currentPage: 2,
     totalPages: 26,
     pagination,
-    requestUrl: nextLink.replace('page=3', 'page=2'),
   };
 
   test('next and previous are driven by the api links', () => {
-    expect(resolvePageNavigation('next', context)).toEqual({
-      page: 3,
-      url: nextLink,
-    });
-
-    expect(resolvePageNavigation('previous', context)).toEqual({
-      page: 1,
-      url: previousLink,
-    });
+    expect(resolvePageNavigation('next', context)).toEqual(3);
+    expect(resolvePageNavigation('previous', context)).toEqual(1);
   });
 
   test('a missing link direction means the page does not exist', () => {
@@ -151,28 +121,15 @@ describe('resolvePageNavigation', () => {
   test('falls back to arithmetic for backends without link support', () => {
     const legacyContext = { ...context, pagination: legacyPagination };
 
-    expect(resolvePageNavigation('next', legacyContext)).toEqual({
-      page: 3,
-      url: expect.stringContaining('page=3'),
-    });
-
-    expect(resolvePageNavigation('previous', legacyContext)).toEqual({
-      page: 1,
-      url: expect.stringContaining('page=1'),
-    });
+    expect(resolvePageNavigation('next', legacyContext)).toEqual(3);
+    expect(resolvePageNavigation('previous', legacyContext)).toEqual(1);
 
     expect(
-      resolvePageNavigation('next', {
-        ...legacyContext,
-        currentPage: 26,
-      })
+      resolvePageNavigation('next', { ...legacyContext, currentPage: 26 })
     ).toBeNull();
 
     expect(
-      resolvePageNavigation('previous', {
-        ...legacyContext,
-        currentPage: 1,
-      })
+      resolvePageNavigation('previous', { ...legacyContext, currentPage: 1 })
     ).toBeNull();
   });
 
@@ -185,36 +142,19 @@ describe('resolvePageNavigation', () => {
           links: { next: 'https://invoicing.co/api/v1/invoices' },
         },
       })
-    ).toEqual({ page: 3, url: expect.stringContaining('page=3') });
+    ).toEqual(3);
   });
 
-  test('first and last replace the page of the current request url', () => {
-    expect(resolvePageNavigation('first', context)).toEqual({
-      page: 1,
-      url: expect.stringContaining('page=1'),
-    });
-
-    const last = resolvePageNavigation('last', context);
-
-    expect(last).toEqual({ page: 26, url: expect.stringContaining('page=26') });
-    expect(last?.url).toContain('balance=gt%3A10');
+  test('first and last resolve to the range bounds', () => {
+    expect(resolvePageNavigation('first', context)).toEqual(1);
+    expect(resolvePageNavigation('last', context)).toEqual(26);
   });
 
   test('explicit pages are clamped to the available range', () => {
-    expect(resolvePageNavigation(13, context)).toEqual({
-      page: 13,
-      url: expect.stringContaining('page=13'),
-    });
-
+    expect(resolvePageNavigation(13, context)).toEqual(13);
     expect(resolvePageNavigation(0, context)).toBeNull();
     expect(resolvePageNavigation(27, context)).toBeNull();
     expect(resolvePageNavigation(1.5, context)).toBeNull();
-  });
-
-  test('resolves the page even without a request url', () => {
-    expect(
-      resolvePageNavigation('last', { ...context, requestUrl: undefined })
-    ).toEqual({ page: 26, url: null });
   });
 
   test('treats an empty result set as a single page', () => {
@@ -224,7 +164,7 @@ describe('resolvePageNavigation', () => {
         totalPages: 0,
         pagination: undefined,
       })
-    ).toEqual({ page: 1, url: null });
+    ).toEqual(1);
   });
 });
 

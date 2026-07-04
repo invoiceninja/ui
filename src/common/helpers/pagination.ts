@@ -20,16 +20,10 @@ export type PageNavigationAction =
   | 'last'
   | number;
 
-export interface PageNavigationTarget {
-  page: number;
-  url: string | null;
-}
-
 export interface PageNavigationContext {
   currentPage: number;
   totalPages: number;
   pagination?: Partial<PaginationMeta> | null;
-  requestUrl?: string;
 }
 
 export interface PageNavigationState {
@@ -69,23 +63,11 @@ export function getPageParameter(url: string): number | null {
   }
 }
 
-export function replacePageParameter(url: string, page: number): string | null {
-  try {
-    const target = new URL(url, URL_BASE);
-
-    target.searchParams.set('page', page.toString());
-
-    return target.href;
-  } catch {
-    return null;
-  }
-}
-
 export function resolvePageNavigation(
   action: PageNavigationAction,
   context: PageNavigationContext
-): PageNavigationTarget | null {
-  const { currentPage, requestUrl } = context;
+): number | null {
+  const { currentPage } = context;
   const totalPages = Math.max(context.totalPages, 1);
 
   if (action === 'previous' || action === 'next') {
@@ -96,7 +78,7 @@ export function resolvePageNavigation(
       const page = getPageParameter(link);
 
       if (page !== null) {
-        return { page, url: link };
+        return page;
       }
     } else if (links) {
       return null;
@@ -104,26 +86,12 @@ export function resolvePageNavigation(
 
     const page = action === 'next' ? currentPage + 1 : currentPage - 1;
 
-    if (page < 1 || page > totalPages) {
-      return null;
-    }
-
-    return {
-      page,
-      url: requestUrl ? replacePageParameter(requestUrl, page) : null,
-    };
+    return page < 1 || page > totalPages ? null : page;
   }
 
   const page = action === 'first' ? 1 : action === 'last' ? totalPages : action;
 
-  if (!Number.isInteger(page) || page < 1 || page > totalPages) {
-    return null;
-  }
-
-  return {
-    page,
-    url: requestUrl ? replacePageParameter(requestUrl, page) : null,
-  };
+  return !Number.isInteger(page) || page < 1 || page > totalPages ? null : page;
 }
 
 export function getPageNavigationState(
