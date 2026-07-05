@@ -15,6 +15,7 @@ import { Route } from 'react-router-dom';
 import { Demo } from './Demo';
 import { Login } from './Login';
 import { Logout } from './Logout';
+import { OidcCallback } from './OidcCallback';
 import { RecoverPassword } from './RecoverPassword';
 import { Register } from './Register';
 
@@ -23,6 +24,7 @@ export const authenticationRoutes = (
     <Route element={<PublicRoute />}>
       <Route path="/login" element={<Login />} />
       <Route path="/recover_password" element={<RecoverPassword />} />
+      <Route path="/oauth-callback" element={<OidcCallback />} />
       <Route element={<HostedRoute />}>
         <Route path="/register" element={<Register />} />
       </Route>
