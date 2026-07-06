@@ -177,10 +177,13 @@ async function expectControlDisabled(
   dataCy: string,
   disabled: boolean
 ) {
-  await expect(paginationControl(page, dataCy)).toHaveAttribute(
-    'aria-disabled',
-    disabled ? 'true' : 'false'
-  );
+  const control = paginationControl(page, dataCy);
+
+  if (disabled) {
+    await expect(control).toBeDisabled();
+  } else {
+    await expect(control).toBeEnabled();
+  }
 }
 
 async function expectStoredInvoicePage(page: Page, pageNumber: number) {

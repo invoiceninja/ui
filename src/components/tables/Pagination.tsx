@@ -26,15 +26,18 @@ import {
 } from '$app/common/helpers/pagination';
 import { PaginationMeta } from '$app/common/interfaces/generic-many-response';
 
-const PaginationButton = styled.div<{ $disabled?: boolean }>`
+const PaginationButton = styled.button`
   background-color: ${(props) => props.theme.backgroundColor};
   border-color: ${(props) => props.theme.borderColor};
-  opacity: ${(props) => (props.$disabled ? 0.5 : 1)};
-  cursor: ${(props) => (props.$disabled ? 'not-allowed' : 'pointer')};
+  cursor: pointer;
 
-  &:hover {
-    background-color: ${(props) =>
-      props.$disabled ? props.theme.backgroundColor : props.theme.hoverColor};
+  &:hover:not(:disabled) {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
@@ -145,31 +148,31 @@ export function Pagination(props: Props) {
       >
         <div className="flex items-center">
           <PaginationButton
+            type="button"
             className="p-2 sm:p-[0.725rem] border rounded-l-md shadow-sm"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            $disabled={!canPrevious}
-            aria-disabled={!canPrevious}
+            disabled={!canPrevious}
             data-cy="paginationFirstPage"
-            onClick={() => canPrevious && navigate('first')}
+            onClick={() => navigate('first')}
           >
             <DoubleChevronLeft size="0.9rem" color={colors.$3} />
           </PaginationButton>
 
           <PaginationButton
+            type="button"
             className="p-2 sm:p-[0.725rem] border-b border-t border-r rounded-r-md shadow-sm"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            $disabled={!canPrevious}
-            aria-disabled={!canPrevious}
+            disabled={!canPrevious}
             data-cy="paginationPreviousPage"
-            onClick={() => canPrevious && navigate('previous')}
+            onClick={() => navigate('previous')}
           >
             <ChevronLeft size="0.9rem" color={colors.$3} />
           </PaginationButton>
@@ -196,31 +199,31 @@ export function Pagination(props: Props) {
 
         <div className="flex">
           <PaginationButton
+            type="button"
             className="p-2 sm:p-[0.725rem] border-t border-b border-l rounded-l-md shadow-sm"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            $disabled={!canNext}
-            aria-disabled={!canNext}
+            disabled={!canNext}
             data-cy="paginationNextPage"
-            onClick={() => canNext && navigate('next')}
+            onClick={() => navigate('next')}
           >
             <ChevronRight size="0.9rem" color={colors.$3} />
           </PaginationButton>
 
           <PaginationButton
+            type="button"
             className="p-2 sm:p-[0.725rem] border rounded-r-md shadow-sm"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            $disabled={!canNext}
-            aria-disabled={!canNext}
+            disabled={!canNext}
             data-cy="paginationLastPage"
-            onClick={() => canNext && navigate('last')}
+            onClick={() => navigate('last')}
           >
             <DoubleChevronRight size="0.9rem" color={colors.$3} />
           </PaginationButton>
