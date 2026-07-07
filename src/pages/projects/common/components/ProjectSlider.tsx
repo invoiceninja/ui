@@ -25,6 +25,11 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useColorScheme } from '$app/common/colors';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Divider } from '$app/components/cards/Divider';
+import { Icon } from '$app/components/icons/Icon';
+import { MdEdit } from 'react-icons/md';
+import { route } from '$app/common/helpers/route';
 import { Project } from '$app/common/interfaces/project';
 import { useActions } from '../hooks';
 
@@ -60,7 +65,18 @@ export function ProjectSlider() {
           <ResourceActions
             label={t('actions')}
             resource={project}
-            actions={actions}
+            actions={[
+              (resource: Project) => (
+                <DropdownElement
+                  to={route('/projects/:id/edit', { id: resource.id })}
+                  icon={<Icon element={MdEdit} />}
+                >
+                  {t('edit')}
+                </DropdownElement>
+              ),
+              () => <Divider withoutPadding />,
+              ...actions,
+            ]}
           />
         ) : null
       }

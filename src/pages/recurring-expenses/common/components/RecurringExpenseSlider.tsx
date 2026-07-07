@@ -23,6 +23,11 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useColorScheme } from '$app/common/colors';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Divider } from '$app/components/cards/Divider';
+import { Icon } from '$app/components/icons/Icon';
+import { MdEdit } from 'react-icons/md';
+import { route } from '$app/common/helpers/route';
 import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { RecurringExpenseStatus } from './RecurringExpenseStatus';
 import { useActions } from '../hooks';
@@ -65,7 +70,20 @@ export function RecurringExpenseSlider() {
           <ResourceActions
             label={t('actions')}
             resource={recurringExpense}
-            actions={actions}
+            actions={[
+              (resource: RecurringExpense) => (
+                <DropdownElement
+                  to={route('/recurring_expenses/:id/edit', {
+                    id: resource.id,
+                  })}
+                  icon={<Icon element={MdEdit} />}
+                >
+                  {t('edit')}
+                </DropdownElement>
+              ),
+              () => <Divider withoutPadding />,
+              ...actions,
+            ]}
           />
         ) : null
       }

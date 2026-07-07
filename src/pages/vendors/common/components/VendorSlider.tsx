@@ -22,6 +22,11 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useColorScheme } from '$app/common/colors';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Divider } from '$app/components/cards/Divider';
+import { Icon } from '$app/components/icons/Icon';
+import { MdEdit } from 'react-icons/md';
+import { route } from '$app/common/helpers/route';
 import { Vendor } from '$app/common/interfaces/vendor';
 import { useActions } from '../hooks/useActions';
 
@@ -53,7 +58,18 @@ export function VendorSlider() {
           <ResourceActions
             label={t('actions')}
             resource={vendor}
-            actions={actions}
+            actions={[
+              (resource: Vendor) => (
+                <DropdownElement
+                  to={route('/vendors/:id/edit', { id: resource.id })}
+                  icon={<Icon element={MdEdit} />}
+                >
+                  {t('edit')}
+                </DropdownElement>
+              ),
+              () => <Divider withoutPadding />,
+              ...actions,
+            ]}
           />
         ) : null
       }

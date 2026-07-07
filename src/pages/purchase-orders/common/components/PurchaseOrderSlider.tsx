@@ -24,6 +24,11 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useColorScheme } from '$app/common/colors';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Divider } from '$app/components/cards/Divider';
+import { Icon } from '$app/components/icons/Icon';
+import { MdEdit } from 'react-icons/md';
+import { route } from '$app/common/helpers/route';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { PurchaseOrderStatus } from './PurchaseOrderStatus';
 import { useActions } from '../hooks';
@@ -62,7 +67,18 @@ export function PurchaseOrderSlider() {
           <ResourceActions
             label={t('actions')}
             resource={purchaseOrder}
-            actions={actions}
+            actions={[
+              (resource: PurchaseOrder) => (
+                <DropdownElement
+                  to={route('/purchase_orders/:id/edit', { id: resource.id })}
+                  icon={<Icon element={MdEdit} />}
+                >
+                  {t('edit')}
+                </DropdownElement>
+              ),
+              () => <Divider withoutPadding />,
+              ...actions,
+            ]}
           />
         ) : null
       }

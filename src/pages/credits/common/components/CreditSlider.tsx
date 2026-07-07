@@ -24,6 +24,11 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useColorScheme } from '$app/common/colors';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Divider } from '$app/components/cards/Divider';
+import { Icon } from '$app/components/icons/Icon';
+import { MdEdit } from 'react-icons/md';
+import { route } from '$app/common/helpers/route';
 import { Credit } from '$app/common/interfaces/credit';
 import { CreditStatus } from './CreditStatus';
 import { useActions } from '../hooks';
@@ -58,7 +63,18 @@ export function CreditSlider() {
           <ResourceActions
             label={t('actions')}
             resource={credit}
-            actions={actions}
+            actions={[
+              (resource: Credit) => (
+                <DropdownElement
+                  to={route('/credits/:id/edit', { id: resource.id })}
+                  icon={<Icon element={MdEdit} />}
+                >
+                  {t('edit')}
+                </DropdownElement>
+              ),
+              () => <Divider withoutPadding />,
+              ...actions,
+            ]}
           />
         ) : null
       }

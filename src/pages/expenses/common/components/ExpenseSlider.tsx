@@ -24,6 +24,11 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useColorScheme } from '$app/common/colors';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Divider } from '$app/components/cards/Divider';
+import { Icon } from '$app/components/icons/Icon';
+import { MdEdit } from 'react-icons/md';
+import { route } from '$app/common/helpers/route';
 import { Expense } from '$app/common/interfaces/expense';
 import { ExpenseStatus } from './ExpenseStatus';
 import { useActions } from '../hooks';
@@ -61,7 +66,18 @@ export function ExpenseSlider() {
           <ResourceActions
             label={t('actions')}
             resource={expense}
-            actions={actions}
+            actions={[
+              (resource: Expense) => (
+                <DropdownElement
+                  to={route('/expenses/:id/edit', { id: resource.id })}
+                  icon={<Icon element={MdEdit} />}
+                >
+                  {t('edit')}
+                </DropdownElement>
+              ),
+              () => <Divider withoutPadding />,
+              ...actions,
+            ]}
           />
         ) : null
       }
