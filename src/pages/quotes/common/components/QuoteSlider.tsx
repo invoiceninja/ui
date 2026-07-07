@@ -70,6 +70,10 @@ import { History } from '$app/components/icons/History';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { ChevronRight } from 'react-feather';
 import { Icon } from '$app/components/icons/Icon';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -218,7 +222,7 @@ export function QuoteSlider() {
 
   return (
     <Slider
-      size="regular"
+      size="large"
       visible={isVisible}
       onClose={() => {
         setIsSliderVisible(false);
@@ -238,8 +242,24 @@ export function QuoteSlider() {
       withoutHeaderBorder
     >
       <TabGroup
-        tabs={[t('overview'), t('history'), t('activity'), t('email_history')]}
+        tabs={[
+          t('overview'),
+          t('history'),
+          t('activity'),
+          t('email_history'),
+          t('documents'),
+        ]}
         width="full"
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 4) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={quote?.documents?.length}
+                textCenter
+              />
+            );
+          }
+        }}
         withHorizontalPadding
         horizontalPaddingWidth="1.5rem"
       >
@@ -716,6 +736,27 @@ export function QuoteSlider() {
               withAllBorders
             />
           ))}
+        </div>
+
+        <div className="px-4">
+          <Upload
+            endpoint={endpoint('/api/v1/quotes/:id/upload', {
+              id: quote?.id,
+            })}
+            onSuccess={() => $refetch(['quotes'])}
+            widgetOnly
+            disableUpload={
+              !hasPermission('edit_quote') && !entityAssigned(quote)
+            }
+          />
+
+          <DocumentsTable
+            documents={quote?.documents || []}
+            onDocumentDelete={() => $refetch(['quotes'])}
+            disableEditableOptions={
+              !entityAssigned(quote, true) && !hasPermission('edit_quote')
+            }
+          />
         </div>
       </TabGroup>
     </Slider>
