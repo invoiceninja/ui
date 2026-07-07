@@ -34,6 +34,15 @@ import { InputLabel } from '$app/components/forms';
 import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { ImportButton } from '$app/components/import/ImportButton';
+import {
+  PurchaseOrderSlider,
+  purchaseOrderSliderAtom,
+  purchaseOrderSliderVisibilityAtom,
+} from '../common/components/PurchaseOrderSlider';
+import { useAtom } from 'jotai';
+import { usePurchaseOrderQuery } from '$app/common/queries/purchase-orders';
+import { useEffect, useState } from 'react';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export default function PurchaseOrders() {
   const { documentTitle } = useTitle('purchase_orders');
@@ -52,6 +61,29 @@ export default function PurchaseOrders() {
   const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
   const purchaseOrderColumns = useAllPurchaseOrderColumns();
+  const disableNavigation = useDisableNavigation();
+
+  const [sliderPurchaseOrderId, setSliderPurchaseOrderId] =
+    useState<string>('');
+  const [purchaseOrderSlider, setPurchaseOrderSlider] = useAtom(
+    purchaseOrderSliderAtom
+  );
+  const [purchaseOrderSliderVisibility, setPurchaseOrderSliderVisibility] =
+    useAtom(purchaseOrderSliderVisibilityAtom);
+
+  const { data: purchaseOrderResponse } = usePurchaseOrderQuery({
+    id: sliderPurchaseOrderId,
+  });
+
+  useEffect(() => {
+    if (purchaseOrderResponse && purchaseOrderSliderVisibility) {
+      setPurchaseOrderSlider(purchaseOrderResponse);
+    }
+  }, [purchaseOrderResponse, purchaseOrderSliderVisibility]);
+
+  useEffect(() => {
+    return () => setPurchaseOrderSliderVisibility(false);
+  }, []);
 
   const {
     changeTemplateVisible,
@@ -96,9 +128,17 @@ export default function PurchaseOrders() {
         dateRangeColumns={dateRangeColumns}
         linkToCreateGuards={[permission('create_purchase_order')]}
         hideEditableOptions={!hasPermission('edit_purchase_order')}
+        onTableRowClick={(purchaseOrder) => {
+          setSliderPurchaseOrderId(purchaseOrder.id);
+          setPurchaseOrderSliderVisibility(true);
+        }}
         enableSavingFilterPreference
         enableSavingLatestDataForNavigation
       />
+
+      {!disableNavigation('purchase_order', purchaseOrderSlider) && (
+        <PurchaseOrderSlider />
+      )}
 
       <ChangeTemplateModal<PurchaseOrder>
         entity="purchase_order"
