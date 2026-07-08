@@ -8,13 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Menu, Transition } from '@headlessui/react';
+import Tippy from '@tippyjs/react/headless';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
 import { authenticate } from '$app/common/stores/slices/user';
 import { RootState } from '$app/common/stores/store';
-import { Fragment, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLogo } from '$app/common/hooks/useLogo';
 import { useCompanyName } from '$app/common/hooks/useLogo';
@@ -35,16 +34,33 @@ import { Exit } from './icons/Exit';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useColorScheme } from '$app/common/colors';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import companySettings from '$app/common/constants/company-settings';
-import { Tooltip } from './Tooltip';
-
-const COMPANY_NAME_TRUNCATE_THRESHOLD = 22;
 
 const SwitcherDiv = styled.div`
   &:hover {
     background-color: ${(props) => props.theme.hoverColor};
   }
 `;
+
+const Panel = styled.div`
+  transform-origin: left center;
+  animation: companySwitcherIn 100ms ease-out;
+
+  @keyframes companySwitcherIn {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+`;
+
+const COMPANY_ROW_HEIGHT = '4rem';
+const ACTION_ROW_HEIGHT = '2.75rem';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
@@ -60,8 +76,8 @@ export function CompanySwitcher() {
   const logo = useLogo({ fallbackSmallLogo: true });
   const location = useLocation();
   const colors = useColorScheme();
+  const accentColor = useAccentColor();
   const companyName = useCompanyName();
-  const queryClient = useQueryClient();
   const { isAdmin, isOwner } = useAdmin();
   const currentCompany = useCurrentCompany();
   const { flushData } = useDocuNinjaActions();
@@ -71,8 +87,14 @@ export function CompanySwitcher() {
 
   const isMiniSidebar = Boolean(reactSettings.show_mini_sidebar);
 
+  const isDarkMode = colors.$0 === 'dark';
+  const panelBackground = isDarkMode
+    ? 'rgba(30, 30, 33, 0.82)'
+    : 'rgba(255, 255, 255, 0.82)';
+
   const preventNavigation = usePreventNavigation();
 
+  const [visible, setVisible] = useState<boolean>(false);
   const [shouldShowAddCompany, setShouldShowAddCompany] =
     useState<boolean>(false);
   const [isCompanyCreateModalOpened, setIsCompanyCreateModalOpened] =
@@ -121,21 +143,6 @@ export function CompanySwitcher() {
     }
   }, [currentCompany]);
 
-  if (isMiniSidebar) {
-    return (
-      <>
-        <img
-          className="rounded-full border overflow-hidden aspect-square object-cover"
-          src={logo}
-          alt="Company logo"
-          style={{
-            borderColor: '#e5e7eb',
-            width: '1.66rem',
-          }}
-        />
-      </>
-    );
-  }
 
   return (
     <>
@@ -144,93 +151,79 @@ export function CompanySwitcher() {
         setIsModalOpen={setIsCompanyCreateModalOpened}
       />
 
-      <Menu
-        as="div"
-        className="relative inline-block text-left w-full"
-        data-cy="companyDropdown"
-      >
-        <Menu.Button className="flex items-center justify-start w-full">
-          <div className="flex items-center space-x-3 p-1.5 rounded-md hover:bg-gray-700 w-full min-w-0">
-            <img
-              className="rounded-full border overflow-hidden aspect-square object-cover flex-shrink-0"
-              src={logo}
-              alt="Company logo"
-              style={{
-                borderColor: '#e5e7eb',
-                width: '1.65rem',
-              }}
-            />
-
-            {companyName.length > COMPANY_NAME_TRUNCATE_THRESHOLD ? (
-              <Tooltip
-                message={companyName}
-                placement="right"
-                width="auto"
-                withoutArrow
-                withoutWrapping
-                appendToBody
-                className="flex-1 min-w-0"
-              >
-                <span className="block text-sm text-start truncate text-gray-200">
-                  {companyName}
-                </span>
-              </Tooltip>
-            ) : (
-              <span className="flex-1 min-w-0 block text-sm text-start truncate text-gray-200">
-                {companyName}
-              </span>
-            )}
-
-            <ExpandCollapseChevron color="#e5e7eb" className="flex-shrink-0" />
-          </div>
-        </Menu.Button>
-
-        <Transition
-          as={Fragment}
-          enter="transition ease-out duration-100"
-          enterFrom="transform opacity-0 scale-95"
-          enterTo="transform opacity-100 scale-100"
-          leave="transition ease-in duration-75"
-          leaveFrom="transform opacity-100 scale-100"
-          leaveTo="transform opacity-0 scale-95"
-        >
-          <Menu.Items
-            className="origin-top-right absolute left-0 mt-2 rounded shadow-lg border"
+      <Tippy
+        placement="right-start"
+        visible={visible}
+        onClickOutside={() => setVisible(false)}
+        interactive
+        appendTo={() => document.body}
+        offset={[0, 24]}
+        popperOptions={{
+          modifiers: [
+            {
+              name: 'flip',
+              options: {
+                fallbackPlacements: ['bottom-start', 'left-start'],
+              },
+            },
+          ],
+        }}
+        render={(attrs) => (
+          <Panel
+            {...attrs}
+            className="border text-left overflow-hidden"
+            onMouseDown={(event) => event.stopPropagation()}
             style={{
-              backgroundColor: colors.$1,
-              width: '14.5rem',
-              borderColor: colors.$4,
+              backgroundColor: panelBackground,
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              color: colors.$3,
+              borderColor: colors.$24,
+              borderRadius: '0.85rem',
+              boxShadow:
+                '0 16px 40px -12px rgba(0, 0, 0, 0.4), 0 6px 16px -8px rgba(0, 0, 0, 0.3)',
+              width: '20rem',
+              zIndex: 50,
             }}
           >
-            <div className="border-b" style={{ borderColor: colors.$4 }}>
-              <Menu.Item>
-                <div className="px-3 pb-1.5 pt-2">
-                  <p className="text-xs text-gray-500">{t('signed_in_as')}</p>
+            <div
+              className="px-3 py-2.5 border-b"
+              style={{ borderColor: colors.$21 }}
+            >
+              <p className="text-xs" style={{ color: colors.$17 }}>
+                {t('signed_in_as')}
+              </p>
 
-                  <p className="font-medium truncate text-sm">
-                    {currentUser?.email}
-                  </p>
-                </div>
-              </Menu.Item>
+              <p className="font-medium truncate text-sm">
+                {currentUser?.email}
+              </p>
             </div>
 
-            <div
-              className="flex flex-col pb-1 pt-2 border-b"
-              style={{ borderColor: colors.$4 }}
-            >
-              {state?.api?.length >= 1 &&
-                state?.api?.map((record: any, index: number) => (
-                  <Menu.Item key={index}>
-                    <div className="px-1 space-y-0.5">
-                      {index === 0 && (
-                        <p className="pl-2 text-xs text-gray-500">
-                          {t('company')}
-                        </p>
-                      )}
+            <div className="border-b" style={{ borderColor: colors.$21 }}>
+              <p className="px-3 pt-2 text-xs" style={{ color: colors.$17 }}>
+                {t('company')}
+              </p>
 
+              <div
+                className="flex flex-col gap-1 p-1.5 overflow-y-auto"
+                style={{ maxHeight: '21rem' }}
+              >
+                {state?.api?.length >= 1 &&
+                  state?.api?.map((record: any, index: number) => {
+                    const isActive = state.currentIndex === index;
+
+                    const name =
+                      record.company.settings.name || t('untitled_company');
+
+                    return (
                       <SwitcherDiv
-                        className="flex items-center px-2 justify-between py-1.5 rounded-md cursor-pointer"
-                        theme={{ hoverColor: colors.$5 }}
+                        key={index}
+                        className="flex items-center justify-between px-2 rounded-lg cursor-pointer"
+                        theme={{ hoverColor: colors.$20 }}
+                        style={{
+                          height: COMPANY_ROW_HEIGHT,
+                          ...(isActive ? { backgroundColor: colors.$5 } : {}),
+                        }}
                         onClick={() =>
                           preventNavigation({
                             fn: () => switchCompany(index),
@@ -238,9 +231,9 @@ export function CompanySwitcher() {
                           })
                         }
                       >
-                        <div className="flex items-center space-x-2 flex-1">
+                        <div className="flex items-center space-x-2.5 flex-1 min-w-0">
                           <img
-                            className="rounded-full border overflow-hidden aspect-square object-cover"
+                            className="rounded-full border overflow-hidden aspect-square object-cover flex-shrink-0"
                             src={
                               record.company.settings.company_logo ||
                               companySettings.smallLogo
@@ -248,106 +241,134 @@ export function CompanySwitcher() {
                             alt="Company logo"
                             style={{
                               borderColor: colors.$5,
-                              width: '1.5rem',
+                              width: '2rem',
                             }}
                           />
 
-                          {(() => {
-                            const name =
-                              record.company.settings.name ||
-                              t('untitled_company');
+                          <div className="flex flex-col min-w-0 leading-tight">
+                            <span
+                              className="block truncate text-sm"
+                              style={{ color: colors.$3 }}
+                            >
+                              {name}
+                            </span>
 
-                            const nameLabel = (
-                              <div className="w-36 truncate text-sm">
-                                {name}
-                              </div>
-                            );
-
-                            return name.length >
-                              COMPANY_NAME_TRUNCATE_THRESHOLD ? (
-                              <Tooltip
-                                message={name}
-                                placement="right"
-                                width="auto"
-                                withoutArrow
-                                withoutWrapping
-                                appendToBody
+                            {isActive && (
+                              <span
+                                className="text-xs"
+                                style={{ color: colors.$17 }}
                               >
-                                {nameLabel}
-                              </Tooltip>
-                            ) : (
-                              nameLabel
-                            );
-                          })()}
+                                {t('active')}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
-                        {state.currentIndex === index && (
-                          <Check color={colors.$3} />
-                        )}
+                        {isActive && <Check color={accentColor} />}
                       </SwitcherDiv>
-                    </div>
-                  </Menu.Item>
-                ))}
+                    );
+                  })}
+              </div>
             </div>
 
-            <div className="py-1">
+            <div className="flex flex-col gap-1 p-1.5">
               {shouldShowAddCompany && canUserAddCompany && isOwner && (
-                <Menu.Item>
-                  <div className="px-1">
-                    <SwitcherDiv
-                      className="flex items-center pl-3 space-x-3 py-2 rounded-md cursor-pointer"
-                      theme={{ hoverColor: colors.$5 }}
-                      onClick={() => setIsCompanyCreateModalOpened(true)}
-                    >
-                      <Plus />
+                <SwitcherDiv
+                  className="flex items-center space-x-3 px-3 rounded-lg cursor-pointer"
+                  theme={{ hoverColor: colors.$20 }}
+                  style={{ height: ACTION_ROW_HEIGHT }}
+                  onClick={() => {
+                    setVisible(false);
+                    setIsCompanyCreateModalOpened(true);
+                  }}
+                >
+                  <Plus />
 
-                      <span className="text-sm">{t('add_company')}</span>
-                    </SwitcherDiv>
-                  </div>
-                </Menu.Item>
+                  <span className="text-sm">{t('add_company')}</span>
+                </SwitcherDiv>
               )}
 
               {(isAdmin || isOwner) && (
-                <Menu.Item>
-                  <div className="px-1">
-                    <SwitcherDiv
-                      className="flex items-center space-x-3 pl-3 py-2 rounded-md cursor-pointer"
-                      theme={{ hoverColor: colors.$5 }}
-                      onClick={() =>
-                        preventNavigation({
-                          url: '/settings/account_management',
-                        })
-                      }
-                    >
-                      <Person />
+                <SwitcherDiv
+                  className="flex items-center space-x-3 px-3 rounded-lg cursor-pointer"
+                  theme={{ hoverColor: colors.$20 }}
+                  style={{ height: ACTION_ROW_HEIGHT }}
+                  onClick={() => {
+                    setVisible(false);
+                    preventNavigation({
+                      url: '/settings/account_management',
+                    });
+                  }}
+                >
+                  <Person />
 
-                      <span className="text-sm">{t('account_management')}</span>
-                    </SwitcherDiv>
-                  </div>
-                </Menu.Item>
+                  <span className="text-sm">{t('account_management')}</span>
+                </SwitcherDiv>
               )}
 
-              <Menu.Item>
-                <div className="pl-1.5 pr-1">
-                  <SwitcherDiv
-                    className="flex items-center space-x-3 pl-3 py-2 rounded-md cursor-pointer"
-                    theme={{ hoverColor: colors.$5 }}
-                    onClick={() =>
-                      preventNavigation({
-                        url: '/logout',
-                      })
-                    }
-                  >
-                    <Exit />
+              <SwitcherDiv
+                className="flex items-center space-x-3 px-3 rounded-lg cursor-pointer"
+                theme={{ hoverColor: colors.$20 }}
+                style={{ height: ACTION_ROW_HEIGHT }}
+                onClick={() => {
+                  setVisible(false);
+                  preventNavigation({
+                    url: '/logout',
+                  });
+                }}
+              >
+                <Exit />
 
-                    <span className="text-sm">{t('logout')}</span>
-                  </SwitcherDiv>
-                </div>
-              </Menu.Item>
+                <span className="text-sm">{t('logout')}</span>
+              </SwitcherDiv>
             </div>
-          </Menu.Items>
-        </Transition>
-      </Menu>
+          </Panel>
+        )}
+      >
+        <button
+          type="button"
+          data-cy="companyDropdown"
+          onClick={() => setVisible((current) => !current)}
+          className={
+            isMiniSidebar
+              ? 'flex items-center justify-center'
+              : 'flex items-center justify-start w-full'
+          }
+        >
+          {isMiniSidebar ? (
+            <img
+              className="rounded-full border overflow-hidden aspect-square object-cover"
+              src={logo}
+              alt="Company logo"
+              style={{
+                borderColor: '#e5e7eb',
+                width: '1.66rem',
+              }}
+            />
+          ) : (
+            <div className="flex items-center space-x-3 p-1.5 rounded-md hover:bg-gray-700 w-full min-w-0">
+              <img
+                className="rounded-full border overflow-hidden aspect-square object-cover flex-shrink-0"
+                src={logo}
+                alt="Company logo"
+                style={{
+                  borderColor: '#e5e7eb',
+                  width: '1.65rem',
+                }}
+              />
+
+              <span className="flex-1 min-w-0 block text-sm text-start truncate text-gray-200">
+                {companyName}
+              </span>
+
+              <ExpandCollapseChevron
+                color="#e5e7eb"
+                className="flex-shrink-0"
+              />
+            </div>
+          )}
+        </button>
+      </Tippy>
     </>
   );
 }
