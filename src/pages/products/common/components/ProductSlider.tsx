@@ -9,11 +9,10 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { date, endpoint } from '$app/common/helpers';
+import { endpoint } from '$app/common/helpers';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
@@ -29,6 +28,7 @@ import { DocumentsTable } from '$app/components/DocumentsTable';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { InputLabel } from '$app/components/forms';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
 import { useTaxCategories } from '$app/components/tax-rates/TaxCategorySelector';
 import { Upload } from '$app/pages/settings/company/documents/components';
@@ -47,7 +47,6 @@ export function ProductSlider() {
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const reactSettings = useReactSettings();
-  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
   const formatNumber = useFormatNumber();
@@ -176,19 +175,6 @@ export function ProductSlider() {
         }))
     : [];
 
-  const metaRows = product
-    ? [
-        {
-          label: t('created_at'),
-          value: date(product.created_at, dateFormat),
-        },
-        {
-          label: t('updated_at'),
-          value: date(product.updated_at, dateFormat),
-        },
-      ]
-    : [];
-
   const renderRows = (rows: { label: string; value: ReactNode }[]) => (
     <div className="px-6">
       {rows.map((row, index) => (
@@ -230,121 +216,119 @@ export function ProductSlider() {
       withoutActionContainer
       withoutHeaderBorder
     >
-      <TabGroup
-        tabs={[t('overview'), t('documents')]}
-        width="full"
-        withHorizontalPadding
-        horizontalPaddingWidth="1.5rem"
-        formatTabLabel={(tabIndex) => {
-          if (tabIndex === 1) {
-            return (
-              <DocumentsTabLabel
-                numberOfDocuments={product?.documents?.length}
-                textCenter
-              />
-            );
-          }
-        }}
-      >
-        <div className="space-y-4 pb-4">
-          {Boolean(stats.length) && (
-            <div className="grid grid-cols-2 gap-3 px-6 pt-4">
-              {stats.map((stat, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col space-y-1 rounded-md border p-4"
-                  style={{ borderColor: colors.$20 }}
-                >
-                  <span
-                    className="text-xs font-medium uppercase tracking-wide"
-                    style={{ color: colors.$17 }}
-                  >
-                    {stat.label}
-                  </span>
-
-                  <span
-                    className="text-lg font-medium"
-                    style={{ color: colors.$3 }}
-                  >
-                    {stat.value}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {Boolean(product?.notes) && (
-            <>
-              <Divider withoutPadding borderColor={colors.$20} />
-
-              <div className="flex flex-col px-6">
-                <InputLabel className="mb-2">{t('notes')}</InputLabel>
-
-                <article
-                  className={classNames(
-                    'prose prose-sm max-w-none break-words',
-                    {
-                      'prose-invert': reactSettings?.dark_mode,
-                    }
-                  )}
-                  dangerouslySetInnerHTML={{
-                    __html: sanitizeHTML(product?.notes ?? ''),
-                  }}
+      {product ? (
+        <TabGroup
+          tabs={[t('overview'), t('documents')]}
+          width="full"
+          withHorizontalPadding
+          horizontalPaddingWidth="1.5rem"
+          formatTabLabel={(tabIndex) => {
+            if (tabIndex === 1) {
+              return (
+                <DocumentsTabLabel
+                  numberOfDocuments={product.documents?.length}
+                  textCenter
                 />
+              );
+            }
+          }}
+        >
+          <div className="space-y-4 pb-4">
+            {Boolean(stats.length) && (
+              <div className="grid grid-cols-2 gap-3 px-6 pt-4">
+                {stats.map((stat, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col space-y-1 rounded-md border p-4"
+                    style={{ borderColor: colors.$20 }}
+                  >
+                    <span
+                      className="text-xs font-medium uppercase tracking-wide"
+                      style={{ color: colors.$17 }}
+                    >
+                      {stat.label}
+                    </span>
+
+                    <span
+                      className="text-lg font-medium"
+                      style={{ color: colors.$3 }}
+                    >
+                      {stat.value}
+                    </span>
+                  </div>
+                ))}
               </div>
-            </>
-          )}
+            )}
 
-          {Boolean(inventoryRows.length) && (
-            <>
-              <Divider withoutPadding borderColor={colors.$20} />
+            {Boolean(product.notes) && (
+              <>
+                <Divider withoutPadding borderColor={colors.$20} />
 
-              {renderRows(inventoryRows)}
-            </>
-          )}
+                <div className="flex flex-col px-6">
+                  <InputLabel className="mb-2">{t('notes')}</InputLabel>
 
-          {Boolean(taxRows.length) && (
-            <>
-              <Divider withoutPadding borderColor={colors.$20} />
+                  <article
+                    className={classNames(
+                      'prose prose-sm max-w-none break-words',
+                      {
+                        'prose-invert': reactSettings?.dark_mode,
+                      }
+                    )}
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHTML(product.notes ?? ''),
+                    }}
+                  />
+                </div>
+              </>
+            )}
 
-              {renderRows(taxRows)}
-            </>
-          )}
+            {Boolean(inventoryRows.length) && (
+              <>
+                <Divider withoutPadding borderColor={colors.$20} />
 
-          {Boolean(customFieldRows.length) && (
-            <>
-              <Divider withoutPadding borderColor={colors.$20} />
+                {renderRows(inventoryRows)}
+              </>
+            )}
 
-              {renderRows(customFieldRows)}
-            </>
-          )}
+            {Boolean(taxRows.length) && (
+              <>
+                <Divider withoutPadding borderColor={colors.$20} />
 
-          {Boolean(metaRows.length) && (
-            <>
-              <Divider withoutPadding borderColor={colors.$20} />
+                {renderRows(taxRows)}
+              </>
+            )}
 
-              {renderRows(metaRows)}
-            </>
-          )}
+            {Boolean(customFieldRows.length) && (
+              <>
+                <Divider withoutPadding borderColor={colors.$20} />
+
+                {renderRows(customFieldRows)}
+              </>
+            )}
+          </div>
+
+          <div className="px-4 pt-4">
+            <Upload
+              endpoint={endpoint('/api/v1/products/:id/upload', {
+                id: product.id,
+              })}
+              onSuccess={onDocumentsSuccess}
+              widgetOnly
+              disableUpload={!canEdit}
+            />
+
+            <DocumentsTable
+              documents={product.documents || []}
+              onDocumentDelete={onDocumentsSuccess}
+              disableEditableOptions={!canEdit}
+            />
+          </div>
+        </TabGroup>
+      ) : (
+        <div className="flex flex-1 items-center justify-center py-12">
+          <Spinner />
         </div>
-
-        <div className="px-4 pt-4">
-          <Upload
-            endpoint={endpoint('/api/v1/products/:id/upload', {
-              id: product?.id,
-            })}
-            onSuccess={onDocumentsSuccess}
-            widgetOnly
-            disableUpload={!canEdit}
-          />
-
-          <DocumentsTable
-            documents={product?.documents || []}
-            onDocumentDelete={onDocumentsSuccess}
-            disableEditableOptions={!canEdit}
-          />
-        </div>
-      </TabGroup>
+      )}
     </Slider>
   );
 }

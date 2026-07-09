@@ -63,6 +63,12 @@ export default function Products() {
   const { data: productResponse } = useProductQuery({ id: sliderProductId });
 
   useEffect(() => {
+    if (sliderProductId) {
+      setProductSlider(null);
+    }
+  }, [sliderProductId]);
+
+  useEffect(() => {
     if (productResponse && productSliderVisibility) {
       setProductSlider(productResponse.data.data);
     }
