@@ -166,7 +166,7 @@
     "@types/react-datepicker": "^4.19.6",
     "@types/react-dom": "^18.3.5",
     "@types/uuid": "^11.0.0",
-    "@vitejs/plugin-react": "^5.2.0",
+    "@vitejs/plugin-react": "^6.0.3",
     "autoprefixer": "^10.4.21",
     "concurrently": "^10.0.3",
     "globals": "^16.0.0",
@@ -174,8 +174,7 @@
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
     "typescript": "^7.0.2",
-    "vite": "^7.3.6",
-    "vite-tsconfig-paths": "^6.1.1",
+    "vite": "^8.1.4",
     "vitest": "^4.1.10"
   },
   "engines": {
