@@ -10,7 +10,6 @@
 
 import { Link } from '$app/components/forms';
 import { route } from '$app/common/helpers/route';
-import { useCountries } from '$app/common/hooks/useCountries';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useVendorQuery } from '$app/common/queries/vendor';
 import { Page } from '$app/components/Breadcrumbs';
@@ -32,13 +31,12 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { Tooltip } from '$app/components/Tooltip';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import { FormattedAddress } from '$app/components/FormattedAddress';
 
 export default function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
   const { id } = useParams();
   const { data: vendor } = useVendorQuery({ id });
-
-  const countries = useCountries();
 
   const actions = useActions();
 
@@ -191,51 +189,13 @@ export default function Vendor() {
           withoutPadding
         >
           <div className="flex flex-col pt-1 h-44 overflow-y-auto">
-            {vendor?.address1 && (
-              <span
+            {vendor && (
+              <FormattedAddress
+                address={vendor}
                 className="break-all text-sm font-medium"
                 style={{ color: colors.$3 }}
-              >
-                {vendor.address1}
-              </span>
+              />
             )}
-
-            {vendor?.address2 && (
-              <span
-                className="break-all text-sm font-medium"
-                style={{ color: colors.$3 }}
-              >
-                {vendor.address2}
-              </span>
-            )}
-
-            {(vendor?.city || vendor?.state || vendor?.postal_code) && (
-              <span
-                className="break-all text-sm font-medium"
-                style={{ color: colors.$3 }}
-              >
-                {vendor.city && vendor.city}
-                {vendor.city && vendor.state && ', '}
-                {vendor.state}
-                {(vendor.city || vendor.state) && vendor.postal_code && ' '}
-                {vendor.postal_code}
-              </span>
-            )}
-
-            {vendor?.country_id &&
-              countries.find((country) => country.id === vendor.country_id)
-                ?.name && (
-                <span
-                  className="break-all text-sm font-medium"
-                  style={{ color: colors.$3 }}
-                >
-                  {
-                    countries.find(
-                      (country) => country.id === vendor.country_id
-                    )?.name
-                  }
-                </span>
-              )}
           </div>
         </InfoCard>
 

@@ -17,7 +17,6 @@ import { useOutletContext, useParams } from 'react-router-dom';
 import { Location } from '$app/common/interfaces/location';
 import { useBlankLocationQuery } from '$app/common/queries/locations';
 import { LocationModal } from './LocationModal';
-import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import styled from 'styled-components';
 import classNames from 'classnames';
 import { Trash } from '$app/components/icons/Trash';
@@ -40,6 +39,7 @@ import {
   TaxDataModal,
   TaxDataPayload,
 } from '../../show/components/TaxDataModal';
+import { FormattedAddress } from '$app/components/FormattedAddress';
 
 const StyledIconBox = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};
@@ -69,7 +69,6 @@ export default function Locations() {
   const colors = useColorScheme();
 
   const customField = useCustomField();
-  const resolveCountry = useResolveCountry();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const context: ClientContext = useOutletContext();
@@ -174,37 +173,12 @@ export default function Locations() {
                     {currentLocation.name}
                   </span>
 
+                  <FormattedAddress
+                    address={currentLocation}
+                    className="text-sm mb-2"
+                  />
+
                   <div className="flex flex-col space-y-1 text-sm">
-                    <div>
-                      <span style={{ color: colors.$16 }}>
-                        {t('address')}:{' '}
-                      </span>
-                      {currentLocation.address1}
-                      {currentLocation.address1 &&
-                        currentLocation.address2 &&
-                        `, ${currentLocation.address2}`}
-                    </div>
-
-                    <div>
-                      <span style={{ color: colors.$16 }}>{t('city')}: </span>
-                      {currentLocation.city || ''}
-                      {currentLocation.state &&
-                        `${currentLocation.city ? ', ' : ''}${
-                          currentLocation.state
-                        }`}
-                      {currentLocation.postal_code &&
-                        `${currentLocation.state ? ' ' : ''}${
-                          currentLocation.postal_code
-                        }`}
-                    </div>
-
-                    <div>
-                      <span style={{ color: colors.$16 }}>
-                        {t('country')}:{' '}
-                      </span>
-                      {resolveCountry(currentLocation.country_id)?.name}
-                    </div>
-
                     <div>
                       <span style={{ color: colors.$16 }}>
                         {t('shipping')}:{' '}
