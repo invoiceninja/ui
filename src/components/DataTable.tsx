@@ -357,15 +357,16 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
   const [selectedResources, setSelectedResources] = useState<T[]>([]);
 
-  const setStatusIfChanged = useCallback<
-    Dispatch<SetStateAction<string[]>>
-  >((value) => {
-    setStatus((current) => {
-      const next = value instanceof Function ? value(current) : value;
+  const setStatusIfChanged = useCallback<Dispatch<SetStateAction<string[]>>>(
+    (value) => {
+      setStatus((current) => {
+        const next = value instanceof Function ? value(current) : value;
 
-      return isEqual(current, next) ? current : next;
-    });
-  }, []);
+        return isEqual(current, next) ? current : next;
+      });
+    },
+    []
+  );
 
   const setCustomFilterIfChanged = useCallback<
     Dispatch<SetStateAction<string[] | undefined>>
@@ -655,7 +656,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     const route =
       useDeleteMethod && action === 'delete'
         ? deleteBulkRoute
-        : props.bulkRoute ?? `${props.endpoint}/bulk`;
+        : (props.bulkRoute ?? `${props.endpoint}/bulk`);
 
     const updatedIds = { ids: id ? [id] : Array.from(selected) };
 
@@ -1412,6 +1413,7 @@ export function DataTable<T extends object>(props: Props<T>) {
               ? get(data, totalRecordsPropPath)
               : data.data.meta.pagination.total
           }
+          pagination={data.data.meta?.pagination}
         />
       )}
     </div>

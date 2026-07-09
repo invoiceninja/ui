@@ -113,10 +113,10 @@ const applyCellEditToLogs = (
   }
 
   const description =
-    edit.description !== undefined ? edit.description : existing?.[2] ?? '';
+    edit.description !== undefined ? edit.description : (existing?.[2] ?? '');
 
   const billable =
-    edit.billable !== undefined ? edit.billable : existing?.[3] ?? true;
+    edit.billable !== undefined ? edit.billable : (existing?.[3] ?? true);
 
   if (seconds <= 0 && !description) {
     return remaining;

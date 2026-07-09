@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 
 export function useTableColumns() {
   const [t] = useTranslation();
-  
+
   const getBadge = (blueprint: Blueprint) => {
     let variant: BadgeVariant;
     let label: string;
@@ -33,25 +33,19 @@ export function useTableColumns() {
       label = t('active');
     }
 
-    return (
-      <Badge variant={variant}>
-        {label}
-      </Badge>
-    )
-  }
+    return <Badge variant={variant}>{label}</Badge>;
+  };
 
   const blueprintType = (blueprint: Blueprint) => {
     let label = '';
 
-    if(blueprint.design_hash?.length && blueprint.design_hash.length > 0){
+    if (blueprint.design_hash?.length && blueprint.design_hash.length > 0) {
       const entity = blueprint.document?.metadata?.entity_type ?? 'ninja';
       label = `${t(entity)} ${t('design')}`;
-    }
-    else
-      label = t('custom');
+    } else label = t('custom');
 
     return label;
-  }
+  };
 
   const columns: DataTableColumns<Blueprint> = [
     {
@@ -77,9 +71,7 @@ export function useTableColumns() {
     {
       id: 'type',
       label: t('type'),
-      format: (field, blueprint) => (
-        blueprintType(blueprint)
-      ),
+      format: (field, blueprint) => blueprintType(blueprint),
     },
   ];
 

@@ -14,19 +14,32 @@ import { useAtom } from 'jotai';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 
 export type DocuNinjaPermission = {
-  model: 'documents' | 'templates' | 'blueprints' | 'clients' | 'users' | 'settings';
-  action: 'view' | 'create' | 'edit' | 'delete' | 'requires_approval' | 'export' | 'import';
+  model:
+    | 'documents'
+    | 'templates'
+    | 'blueprints'
+    | 'clients'
+    | 'users'
+    | 'settings';
+  action:
+    | 'view'
+    | 'create'
+    | 'edit'
+    | 'delete'
+    | 'requires_approval'
+    | 'export'
+    | 'import';
 };
 
 function getPermissionId(action: string): number {
   const permissionMap = {
-    'view': 1,
-    'edit': 2,
-    'delete': 3,
-    'create': 4,
-    'requires_approval': 5,
-    'export': 6,
-    'import': 7,
+    view: 1,
+    edit: 2,
+    delete: 3,
+    create: 4,
+    requires_approval: 5,
+    export: 6,
+    import: 7,
   };
   return permissionMap[action as keyof typeof permissionMap] || 0;
 }
@@ -39,7 +52,7 @@ export function useDocuNinjaAdmin(): boolean {
   }
 
   const { company_user } = data;
-  
+
   // Admin/owner has all permissions
   if (company_user.is_admin || company_user.is_owner) {
     return true;
@@ -51,16 +64,17 @@ export function useDocuNinjaAdmin(): boolean {
 export function useDocuNinjaPaidUser(): boolean {
   const [data] = useAtom(docuNinjaAtom);
   if (!data) return false;
-  
-  return data?.account.plan !== 'free' && 
-         new Date(data.account.plan_expires ?? '') > new Date();
+
+  return (
+    data?.account.plan !== 'free' &&
+    new Date(data.account.plan_expires ?? '') > new Date()
+  );
 }
 
 export function useDocuNinjaPermission(model: string, action: string): boolean {
   const [data] = useAtom(docuNinjaAtom);
   return checkPermission(data, model, action);
 }
-
 
 // Core permission checking logic
 function checkPermission(
@@ -71,11 +85,11 @@ function checkPermission(
   if (!data?.company_user) {
     return false;
   }
-  
+
   const permissions = data.permissions || [];
 
   const { company_user } = data;
-  
+
   // Admin/owner has all permissions
   if (company_user.is_admin || company_user.is_owner) {
     return true;
@@ -87,12 +101,13 @@ function checkPermission(
   }
 
   const requestedPermissionId = getPermissionId(action);
-  
+
   // Check for exact permission match
-  const hasExactPermission = permissions.some((p: any) =>
-    p.model === model && 
-    p.permission_id === requestedPermissionId &&
-    p.permissionable_id === null
+  const hasExactPermission = permissions.some(
+    (p: any) =>
+      p.model === model &&
+      p.permission_id === requestedPermissionId &&
+      p.permissionable_id === null
   );
 
   if (hasExactPermission) {
@@ -101,29 +116,35 @@ function checkPermission(
 
   // Check for hierarchical permissions (EDIT/CREATE includes VIEW)
   if (action === 'view') {
-    const hasEditPermission = permissions.some((p: any) =>
-      p.model === model && 
-      p.permission_id === getPermissionId('edit') &&
-      p.permissionable_id === null
+    const hasEditPermission = permissions.some(
+      (p: any) =>
+        p.model === model &&
+        p.permission_id === getPermissionId('edit') &&
+        p.permissionable_id === null
     );
-    
-    const hasCreatePermission = permissions.some((p: any) =>
-      p.model === model && 
-      p.permission_id === getPermissionId('create') &&
-      p.permissionable_id === null
+
+    const hasCreatePermission = permissions.some(
+      (p: any) =>
+        p.model === model &&
+        p.permission_id === getPermissionId('create') &&
+        p.permissionable_id === null
     );
-    
+
     return hasEditPermission || hasCreatePermission;
   }
 
   return false;
 }
 
-export function docuNinjaPermission(permission: DocuNinjaPermission): DocuNinjaGuard {
+export function docuNinjaPermission(
+  permission: DocuNinjaPermission
+): DocuNinjaGuard {
   return ({ docuData }: { docuData?: DocuNinjaData; queryClient: any }) => {
     // Use provided docuData or return false if not available
     const data = docuData || undefined;
-    return Promise.resolve(checkPermission(data, permission.model, permission.action));
+    return Promise.resolve(
+      checkPermission(data, permission.model, permission.action)
+    );
   };
 }
 
@@ -136,7 +157,7 @@ export function docuNinjaAdmin(): DocuNinjaGuard {
     }
 
     const { company_user } = data;
-    
+
     // Admin/owner has all permissions
     if (company_user.is_admin || company_user.is_owner) {
       return Promise.resolve(true);
@@ -149,13 +170,13 @@ export function docuNinjaAdmin(): DocuNinjaGuard {
 export function docuNinjaOwner(): DocuNinjaGuard {
   return ({ docuData }: { docuData?: DocuNinjaData; queryClient: any }) => {
     const data = docuData || undefined;
-    
+
     if (!data?.company_user) {
       return Promise.resolve(false);
     }
 
     const { company_user } = data;
-    
+
     // Only owner has access (not admin)
     if (company_user.is_owner) {
       return Promise.resolve(true);
