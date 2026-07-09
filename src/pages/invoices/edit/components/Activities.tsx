@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 import { date, endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
-import { AxiosResponse } from 'axios';
-import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
-import { useParams } from 'react-router-dom';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Card } from '$app/components/cards';
+import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { Spinner } from '$app/components/Spinner';
 import { useGenerateActivityElement } from '../../common/components/InvoiceSlider';
-import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
-import { useColorScheme } from '$app/common/colors';
-import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
-import styled from 'styled-components';
-import classNames from 'classnames';
 
 const ActivityBox = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};

@@ -8,35 +8,35 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useMemo, useState } from 'react';
-import { endpoint, isHosted, isSelfHosted } from '../../common/helpers';
 import { AxiosError } from 'axios';
-import { LoginValidation } from './common/ValidationInterface';
-import { useTranslation } from 'react-i18next';
-import { InputField } from '../../components/forms/InputField';
-import { Button } from '../../components/forms/Button';
-import { Link } from '../../components/forms/Link';
-import { InputLabel } from '../../components/forms/InputLabel';
-import { HostedLinks } from './components/HostedLinks';
-import { Header } from './components/Header';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { request } from '$app/common/helpers/request';
-import { SignInProviders } from './components/SignInProviders';
-import { LoginMethod, useLogin, useLoginPrecheck } from './common/hooks';
-import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { Disable2faModal } from './components/Disable2faModal';
-import { useColorScheme } from '$app/common/colors';
-import { version } from '$app/common/helpers/version';
-import { toast } from '$app/common/helpers/toast/toast';
 import classNames from 'classnames';
-import { ErrorMessage } from '$app/components/ErrorMessage';
-import { useWebAuthnSupport } from '$app/common/hooks/useWebAuthnSupport';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import {
   authenticatePasskey,
   PublicKeyCredentialRequestOptionsJSON,
 } from '$app/common/helpers/passkeys';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { version } from '$app/common/helpers/version';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { useWebAuthnSupport } from '$app/common/hooks/useWebAuthnSupport';
+import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
+import { ErrorMessage } from '$app/components/ErrorMessage';
+import { endpoint, isHosted, isSelfHosted } from '../../common/helpers';
+import { Button } from '../../components/forms/Button';
+import { InputField } from '../../components/forms/InputField';
+import { InputLabel } from '../../components/forms/InputLabel';
+import { Link } from '../../components/forms/Link';
+import { LoginMethod, useLogin, useLoginPrecheck } from './common/hooks';
+import { LoginValidation } from './common/ValidationInterface';
+import { Disable2faModal } from './components/Disable2faModal';
+import { Header } from './components/Header';
+import { HostedLinks } from './components/HostedLinks';
 import { OrDivider } from './components/OrDivider';
+import { SignInProviders } from './components/SignInProviders';
 
 type Step = 'email' | 'credentials';
 

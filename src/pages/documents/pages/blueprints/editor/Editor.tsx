@@ -1,13 +1,13 @@
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Default } from '$app/components/layouts/Default';
-import { GrapeJSEditor } from '../create/components/GrapeJSEditor';
+import { route } from '$app/common/helpers/route';
 import {
+  useBlueprintQuery,
   useCreateBlueprint,
   useUpdateBlueprint,
-  useBlueprintQuery,
 } from '$app/common/queries/docuninja/blueprints';
-import { route } from '$app/common/helpers/route';
-import { useState, useEffect } from 'react';
+import { Default } from '$app/components/layouts/Default';
+import { GrapeJSEditor } from '../create/components/GrapeJSEditor';
 
 export default function BlueprintEditor() {
   const location = useLocation();

@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { getEntityState } from '$app/common/helpers';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
-import { Icon } from '$app/components/icons/Icon';
 import { MdArchive, MdComment, MdDelete, MdRestore } from 'react-icons/md';
 import { EntityState } from '$app/common/enums/entity-state';
-import { useBulkAction } from '$app/common/queries/vendor';
-import { Vendor } from '$app/common/interfaces/vendor';
+import { getEntityState } from '$app/common/helpers';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { useBulkAction } from '$app/common/queries/vendor';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { MergeVendorsAction } from '../components/MergeVendorsAction';
 

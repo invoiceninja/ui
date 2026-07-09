@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import CommonProps from '$app/common/interfaces/common-props.interface';
 import { ReactNode } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import CommonProps from '$app/common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   to: string;

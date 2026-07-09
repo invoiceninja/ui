@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction } from 'react';
 import { Design, Parts } from '$app/common/interfaces/design';
 import { PreviewPayload } from '../../../CustomDesign';
-import { Dispatch, SetStateAction } from 'react';
 
 interface Params {
   payload: PreviewPayload;

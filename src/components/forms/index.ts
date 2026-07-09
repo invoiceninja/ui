@@ -15,5 +15,5 @@ export * from './InputLabel';
 export * from './Link';
 export * from './Radio';
 export * from './SelectField';
-export * from './Toggle';
 export * from './Textarea';
+export * from './Toggle';

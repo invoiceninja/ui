@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useOutletContext } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Card } from '$app/components/cards';
 import { Spinner } from '$app/components/Spinner';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
-import { useOutletContext } from 'react-router-dom';
 import { Details } from '../../edit/components/Details';
 import { Footer } from '../../edit/components/Footer';
 import { VendorSelector } from '../../edit/components/VendorSelector';
-import { Card } from '$app/components/cards';
-import { PurchaseOrderContext } from '../Create';
-import { useColorScheme } from '$app/common/colors';
 import { usePurchaseOrderUtilities } from '../../edit/hooks/usePurchaseOrderUtilities';
+import { PurchaseOrderContext } from '../Create';
 
 export default function Create() {
   const colors = useColorScheme();

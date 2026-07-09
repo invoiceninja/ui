@@ -8,30 +8,30 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Checkbox, InputField } from '$app/components/forms';
-import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Task } from '$app/common/interfaces/task';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Task } from '$app/common/interfaces/task';
+import { Checkbox, InputField } from '$app/components/forms';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
+import { Plus } from '$app/components/icons/Plus';
+import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import {
   duration,
   handleTaskDurationChange,
+  parseTime,
   parseTimeToDate,
   useHandleTaskDateChange,
   useHandleTaskTimeChange,
 } from '../helpers';
-import { parseTimeLog, TimeLogsType } from '../helpers/calculate-time';
-import { parseTime } from '../helpers';
-import { useColorScheme } from '$app/common/colors';
-import { DurationClock } from './DurationClock';
 import { isTaskRunning } from '../helpers/calculate-entity-state';
+import { parseTimeLog, TimeLogsType } from '../helpers/calculate-time';
 import { useStart } from '../hooks/useStart';
-import dayjs from 'dayjs';
-import { CircleXMark } from '$app/components/icons/CircleXMark';
-import styled from 'styled-components';
-import classNames from 'classnames';
-import { Plus } from '$app/components/icons/Plus';
+import { DurationClock } from './DurationClock';
 
 interface Props {
   task: Task;

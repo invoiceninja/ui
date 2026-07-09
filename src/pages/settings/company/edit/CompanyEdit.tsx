@@ -8,34 +8,33 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
+import { debounce, isEqual } from 'lodash';
+import { Dispatch, SetStateAction, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { CurrencySelector } from '$app/components/CurrencySelector';
-import { Modal } from '$app/components/Modal';
-import { useRef, useState, SetStateAction, Dispatch } from 'react';
-import { useTranslation } from 'react-i18next';
-import { LanguageSelector } from '$app/components/LanguageSelector';
-import { Logo } from '../components';
 import {
   resetChanges,
   updateRecord,
 } from '$app/common/stores/slices/company-users';
-import { useDispatch } from 'react-redux';
-import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
-import { isEqual } from 'lodash';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { route } from '$app/common/helpers/route';
-import { GatewayTypeIcon } from '$app/pages/clients/show/components/GatewayTypeIcon';
-import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import { useColorScheme } from '$app/common/colors';
+import { CurrencySelector } from '$app/components/CurrencySelector';
+import { Button, InputField } from '$app/components/forms';
+import { LanguageSelector } from '$app/components/LanguageSelector';
+import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
-import { debounce } from 'lodash';
+import { GatewayTypeIcon } from '$app/pages/clients/show/components/GatewayTypeIcon';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { Logo } from '../components';
 
 interface Props {
   isModalOpen: boolean;

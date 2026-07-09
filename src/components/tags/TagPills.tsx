@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
 import { useColorScheme } from '$app/common/colors';
 import { Tag } from '$app/common/interfaces/tag';
-import classNames from 'classnames';
 
 interface Props {
   tags?: Tag[];

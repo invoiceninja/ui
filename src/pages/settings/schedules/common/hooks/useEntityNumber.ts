@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Parameters } from '$app/common/interfaces/schedule';
-import { useQuery } from 'react-query';
 
 interface Params {
   entity: Parameters['entity'] | undefined;
@@ -25,9 +25,10 @@ interface EntityWithNumber {
 }
 
 export function useEntityNumber({ entity, entityId, enabled }: Params) {
-  const { data: entityResponse } = useQuery<EntityWithNumber>(
-    [`/api/v1/${entity}s/:id`, entityId, 'schedule_entity_number'],
-    () =>
+  const { data: entityResponse } = useQuery({
+    queryKey: [`/api/v1/${entity}s/:id`, entityId, 'schedule_entity_number'],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint(`/api/v1/${entity}s/:id`, {
@@ -37,8 +38,10 @@ export function useEntityNumber({ entity, entityId, enabled }: Params) {
         (response: GenericSingleResourceResponse<EntityWithNumber>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: Boolean(entity && entityId && enabled) }
-  );
+
+    staleTime: Infinity,
+    enabled: Boolean(entity && entityId && enabled),
+  });
 
   return entityResponse?.number || '';
 }

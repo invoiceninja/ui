@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import { Document } from '../pages/Documents';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
-import { MdDelete } from 'react-icons/md';
-import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdDelete } from 'react-icons/md';
+import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { endpoint } from '$app/common/helpers';
-import { $refetch } from '$app/common/hooks/useRefetch';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
+import { Document } from '../pages/Documents';
 
 interface Props {
   document: Document;

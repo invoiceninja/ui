@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { lazy, Suspense } from 'react';
+import { Route } from 'react-router-dom';
 import { Guard } from '$app/common/guards/Guard';
 import { assigned } from '$app/common/guards/guards/assigned';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
-import { Route } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
 import { TabLoader } from '$app/components/TabLoader';
 
 const Clients = lazy(() => import('$app/pages/clients/index/Clients'));

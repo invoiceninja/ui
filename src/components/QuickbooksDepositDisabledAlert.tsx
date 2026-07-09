@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Banner } from '$app/components/Banner';
+import { useTranslation } from 'react-i18next';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { useTranslation } from 'react-i18next';
+import { Banner } from '$app/components/Banner';
 
 interface Props {
   className?: string;

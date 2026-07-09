@@ -8,32 +8,32 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { TaskStatus } from '$app/common/interfaces/task-status';
-import { useQuery } from 'react-query';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
 import { GenericQueryOptions } from './invoices';
 
 export function useBlankTaskStatusQuery(options?: GenericQueryOptions) {
   const { isAdmin } = useAdmin();
 
-  return useQuery<TaskStatus>(
-    ['/api/v1/task_statuses', 'create'],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/task_statuses', 'create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/task_statuses/create')).then(
         (response: GenericSingleResourceResponse<TaskStatus>) =>
           response.data.data
       ),
-    {
-      staleTime: Infinity,
-      enabled: isAdmin ? (options?.enabled ?? true) : false,
-    }
-  );
+
+    staleTime: Infinity,
+    enabled: isAdmin ? (options?.enabled ?? true) : false,
+  });
 }
 
 interface Params {
@@ -41,26 +41,30 @@ interface Params {
 }
 
 export function useTaskStatusesQuery(params?: Params) {
-  return useQuery<GenericManyResponse<TaskStatus>>(
-    ['/api/v1/task_statuses', params],
-    () =>
+  return useQuery<GenericManyResponse<TaskStatus>>({
+    queryKey: ['/api/v1/task_statuses', params],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/task_statuses?status=:status', {
           status: params?.status || 'all',
         })
       ).then((response) => response.data),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 }
 
 export function useTaskStatusQuery(params: { id: string | undefined }) {
-  return useQuery(
-    ['/api/v1/task_statuses', params.id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/task_statuses', params.id],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/task_statuses/:id', { id: params.id })),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 }
 
 export function useBulkAction() {

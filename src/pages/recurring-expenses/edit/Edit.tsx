@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useHandleChange } from '$app/pages/recurring-expenses/common/hooks';
-import { Dispatch, SetStateAction } from 'react';
-import { useOutletContext } from 'react-router-dom';
 import { AdditionalInfo } from '../components/AdditionalInfo';
 import { Details } from '../components/Details';
 import { Notes } from '../components/Notes';

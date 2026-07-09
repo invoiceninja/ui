@@ -8,49 +8,48 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import { Settings } from '$app/components/layouts/Settings';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Card, Element } from '$app/components/cards';
-import { InputField, Link, SelectField } from '$app/components/forms';
-import { SettingsLabel } from '$app/components/SettingsLabel';
-import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
-import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
-import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import {
-  isCompanySettingsFormBusy,
-  useHandleCompanySave,
-} from '../common/hooks/useHandleCompanySave';
-import Toggle from '$app/components/forms/Toggle';
-import { useAtom, useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../common/atoms';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { useFormik } from 'formik';
-import { toast } from '$app/common/helpers/toast/toast';
-import { request } from '$app/common/helpers/request';
-import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { AxiosError, AxiosResponse } from 'axios';
+import { useFormik } from 'formik';
+import { useAtom, useAtomValue } from 'jotai';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { useColorScheme } from '$app/common/colors';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { whiteLabelPlan } from '$app/common/guards/guards/white-label';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
+import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import {
   resetChanges,
   updateRecord,
 } from '$app/common/stores/slices/company-users';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useDropzone } from 'react-dropzone';
+import { Card, Element } from '$app/components/cards';
 import { PaymentMeans } from '$app/components/e-invoice/PaymentMeans';
-import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
-import { whiteLabelPlan } from '$app/common/guards/guards/white-label';
+import { Button, InputField, Link, SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { CloudUpload } from '$app/components/icons/CloudUpload';
+import { Trash } from '$app/components/icons/Trash';
+import { Settings } from '$app/components/layouts/Settings';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
+import { companySettingsErrorsAtom } from '../common/atoms';
+import {
+  isCompanySettingsFormBusy,
+  useHandleCompanySave,
+} from '../common/hooks/useHandleCompanySave';
+import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 import { EUTaxDetails } from './common/components/EUTaxDetails';
+import { FranceReporting } from './common/components/FranceReporting';
+import { PEPPOLPlanBanner } from './common/components/PEPPOLPlanBanner';
 import { Onboarding } from './peppol/Onboarding';
 import { Preferences } from './peppol/Preferences';
-import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
-import { PEPPOLPlanBanner } from './common/components/PEPPOLPlanBanner';
-import { FranceReporting } from './common/components/FranceReporting';
-import { CloudUpload } from '$app/components/icons/CloudUpload';
-import { useColorScheme } from '$app/common/colors';
-import { Trash } from '$app/components/icons/Trash';
-import { Button } from '$app/components/forms';
 
 export type EInvoiceType = {
   [key: string]: string | number | EInvoiceType;

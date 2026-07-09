@@ -8,42 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
-import { RecurringInvoiceStatus as RecurringInvoiceStatusBadge } from '../common/components/RecurringInvoiceStatus';
-import { date, endpoint, getEntityState } from '$app/common/helpers';
-import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
-import { Client } from '$app/common/interfaces/client';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import {
-  InvoiceItem,
-  InvoiceItemType,
-} from '$app/common/interfaces/invoice-item';
-import { Invitation } from '$app/common/interfaces/purchase-order';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { blankLineItem } from '$app/common/constants/blank-line-item';
-import { Divider } from '$app/components/cards/Divider';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Action } from '$app/components/ResourceActions';
+import classNames from 'classnames';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
-import { invoiceSumAtom, recurringInvoiceAtom } from './atoms';
-import { route } from '$app/common/helpers/route';
-import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { StatusBadge } from '$app/components/StatusBadge';
-import recurringInvoicesFrequency from '$app/common/constants/recurring-invoices-frequency';
-import { EntityStatus } from '$app/components/EntityStatus';
-import { SelectOption } from '$app/components/datatables/Actions';
-import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdComment,
@@ -56,38 +26,67 @@ import {
   MdSend,
   MdStopCircle,
 } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
-import { Tooltip } from '$app/components/Tooltip';
-import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { useBulkAction } from '$app/pages/recurring-invoices/common/queries';
+import { blankLineItem } from '$app/common/constants/blank-line-item';
+import recurringInvoicesFrequency from '$app/common/constants/recurring-invoices-frequency';
 import { EntityState } from '$app/common/enums/entity-state';
-import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
-
-import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { UpdatePricesAction } from './components/UpdatePricesAction';
-import { IncreasePricesAction } from './components/IncreasePricesAction';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { CloneOptionsModal } from './components/CloneOptionsModal';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useDateTime } from '$app/common/hooks/useDateTime';
-import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
+import { date, endpoint, getEntityState } from '$app/common/helpers';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDateTime } from '$app/common/hooks/useDateTime';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { Client } from '$app/common/interfaces/client';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import {
+  InvoiceItem,
+  InvoiceItemType,
+} from '$app/common/interfaces/invoice-item';
+import { Invitation } from '$app/common/interfaces/purchase-order';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Divider } from '$app/components/cards/Divider';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { SelectOption } from '$app/components/datatables/Actions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { EntityActionElement } from '$app/components/EntityActionElement';
-import classNames from 'classnames';
-import { Dispatch, SetStateAction } from 'react';
-import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
+import { StatusBadge } from '$app/components/StatusBadge';
+import { Tooltip } from '$app/components/Tooltip';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import { useBulkAction } from '$app/pages/recurring-invoices/common/queries';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { RecurringInvoiceStatus as RecurringInvoiceStatusBadge } from '../common/components/RecurringInvoiceStatus';
+import { invoiceSumAtom, recurringInvoiceAtom } from './atoms';
+import { CloneOptionsModal } from './components/CloneOptionsModal';
+import { IncreasePricesAction } from './components/IncreasePricesAction';
 import { SendNowAction } from './components/SendNowAction';
+import { UpdatePricesAction } from './components/UpdatePricesAction';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -301,7 +300,9 @@ export function useToggleStartStop() {
       $refetch(['recurring_invoices']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
 
       toast.success(
         action === 'start'

@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Modal } from '$app/components/Modal';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
-import { useBulk } from '$app/common/queries/credits';
 import { useColorScheme } from '$app/common/colors';
+import { useBulk } from '$app/common/queries/credits';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
 
 interface Props {
   selectedIds: string[];

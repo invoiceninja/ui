@@ -8,25 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
-import { useBankAccountQuery } from '$app/pages/settings/bank-accounts/common/queries';
 import { Settings } from '$app/components/layouts/Settings';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useColorScheme } from '$app/common/colors';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { useBankAccountQuery } from '$app/pages/settings/bank-accounts/common/queries';
 import { useActions } from '../common/hooks/useActions';
 
 export function Edit() {

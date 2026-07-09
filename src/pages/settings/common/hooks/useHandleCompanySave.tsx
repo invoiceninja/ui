@@ -9,24 +9,24 @@
  */
 
 import { AxiosError } from 'axios';
+import { atom, useAtom, useSetAtom } from 'jotai';
+import { useDispatch } from 'react-redux';
 import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useShouldUpdateCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import {
   resetChanges,
   updateRecord,
 } from '$app/common/stores/slices/company-users';
-import { useDispatch } from 'react-redux';
-import { request } from '$app/common/helpers/request';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { toast } from '$app/common/helpers/toast/toast';
-import { atom, useAtom, useSetAtom } from 'jotai';
-import { companySettingsErrorsAtom } from '../atoms';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
-import { useShouldUpdateCompany } from '$app/common/hooks/useCurrentCompany';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { useHandleUpdate } from '../../group-settings/common/hooks/useHandleUpdate';
 import { useUpdateClientSettings } from '$app/pages/clients/common/hooks/useUpdateClientSettings';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
+import { useHandleUpdate } from '../../group-settings/common/hooks/useHandleUpdate';
+import { companySettingsErrorsAtom } from '../atoms';
 
 interface SaveOptions {
   excludeToasters?: boolean;

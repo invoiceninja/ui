@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Invoice } from '$app/common/interfaces/invoice';
-import { useTranslation } from 'react-i18next';
-import { useAllInvoiceColumns } from './useInvoiceColumns';
 import { ReactNode } from 'react';
-import { useSumTableColumn } from '$app/common/hooks/useSumTableColumn';
+import { useTranslation } from 'react-i18next';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useSumTableColumn } from '$app/common/hooks/useSumTableColumn';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { useAllInvoiceColumns } from './useInvoiceColumns';
 
 export type DataTableFooterColumnsExtended<
   TResource = any,

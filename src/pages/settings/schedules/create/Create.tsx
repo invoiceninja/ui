@@ -8,11 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
+import { useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Frequency } from '$app/common/enums/frequency';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Schedule } from '$app/common/interfaces/schedule';
@@ -21,18 +27,12 @@ import { useBlankScheduleQuery } from '$app/common/queries/schedules';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { useFormatSchedulePayload } from '$app/pages/settings/schedules/common/hooks/useFormatSchedulePayload';
-import { AxiosError } from 'axios';
-import { useAtom } from 'jotai';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
 import { scheduleParametersAtom } from '../common/components/EmailStatement';
 import { ScheduleForm } from '../common/components/ScheduleForm';
 import {
   DEFAULT_SCHEDULE_PARAMETERS,
   useHandleChange,
 } from '../common/hooks/useHandleChange';
-import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function Create() {
   const { documentTitle } = useTitle('new_schedule');

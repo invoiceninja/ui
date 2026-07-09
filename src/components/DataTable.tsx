@@ -8,13 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import {
-  docuNinjaEndpoint,
-  endpoint,
-  getEntityState,
-  isProduction,
-} from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
+import { useQuery } from '@tanstack/react-query';
+import classNames from 'classnames';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { cloneDeep, get, isEqual } from 'lodash';
 import React, {
   CSSProperties,
   Dispatch,
@@ -27,15 +24,43 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { toast } from '$app/common/helpers/toast/toast';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
+import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
+import { useDebounce } from 'react-use';
+import { emitter } from '$app';
+import {
+  fullTableLatestDataAtom,
+  invalidationQueryAtom,
+} from '$app/common/atoms/data-table';
+import { useColorScheme } from '$app/common/colors';
+import { EntityState } from '$app/common/enums/entity-state';
+import { Guard } from '$app/common/guards/Guard';
+import {
+  docuNinjaEndpoint,
+  endpoint,
+  getEntityState,
+  isProduction,
+} from '$app/common/helpers';
+import { buildDateRangeQueryParameter } from '$app/common/helpers/data-table';
+import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
+import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
+import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { refetchByUrl } from '$app/common/hooks/useRefetch';
+import CommonProps from '$app/common/interfaces/common-props.interface';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Divider } from './cards/Divider';
 import { Actions, SelectOption } from './datatables/Actions';
+import { DateRangePicker } from './datatables/DateRangePicker';
 import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
+import { FilterColumn } from './FilterColumn';
 import { Button, Checkbox } from './forms';
+import { Icon } from './icons/Icon';
+import { Resource } from './PreviousNextNavigation';
 import { Spinner } from './Spinner';
 import {
   ColumnSortPayload,
@@ -47,32 +72,7 @@ import {
   Th,
   Thead,
 } from './tables';
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { Icon } from './icons/Icon';
-import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
-import {
-  fullTableLatestDataAtom,
-  invalidationQueryAtom,
-} from '$app/common/atoms/data-table';
-import CommonProps from '$app/common/interfaces/common-props.interface';
-import classNames from 'classnames';
-import { Guard } from '$app/common/guards/Guard';
-import { EntityState } from '$app/common/enums/entity-state';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { refetchByUrl } from '$app/common/hooks/useRefetch';
-import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
-import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
-import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
-import { DateRangePicker } from './datatables/DateRangePicker';
-import { emitter } from '$app';
 import { TFooter } from './tables/TFooter';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useColorScheme } from '$app/common/colors';
-import { useDebounce } from 'react-use';
-import { cloneDeep, get, isEqual } from 'lodash';
-import { FilterColumn } from './FilterColumn';
-import { buildDateRangeQueryParameter } from '$app/common/helpers/data-table';
-import { Resource } from './PreviousNextNavigation';
 
 export interface DateRangeColumn {
   column: string;
@@ -589,8 +589,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     };
   }, []);
 
-  const { data, isLoading, isFetching, isError } = useQuery(
-    [
+  const { data, isLoading, isFetching, isError } = useQuery({
+    queryKey: [
       ...(queryIdentificator ? [queryIdentificator] : []),
       apiEndpoint.pathname,
       props.endpoint,
@@ -603,18 +603,18 @@ export function DataTable<T extends object>(props: Props<T>) {
       ...(dateRangeQueryParameter.length > 0 ? [dateRangeQueryParameter] : []),
       filterColumnsValues,
     ],
-    () =>
+
+    queryFn: () =>
       request(
         methodType,
         apiEndpoint.href,
         {},
         { headers: props.endpointHeaders }
       ),
-    {
-      staleTime: props.staleTime ?? Infinity,
-      enabled: !disableQuery && arePreferencesApplied,
-    }
-  );
+
+    staleTime: props.staleTime ?? Infinity,
+    enabled: !disableQuery && arePreferencesApplied,
+  });
 
   useEffect(() => {
     if (!selected?.length) {

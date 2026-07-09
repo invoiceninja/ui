@@ -8,33 +8,33 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
+import classNames from 'classnames';
+import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { date } from '$app/common/helpers';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
 import { Client } from '$app/common/interfaces/client';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { DynamicLink } from '$app/components/DynamicLink';
 import { EntityStatus } from '$app/components/EntityStatus';
+import { Link } from '$app/components/forms';
 import { Tooltip } from '$app/components/Tooltip';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
-import { useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import {
-  extractTextFromHTML,
-  sanitizeHTML,
-} from '$app/common/helpers/html-string';
-import classNames from 'classnames';
-import { normalizeColumnName } from '$app/common/helpers/data-table';
 
 export const defaultColumns: string[] = [
   'name',

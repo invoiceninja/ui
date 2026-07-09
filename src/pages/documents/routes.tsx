@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Guard } from '$app/common/guards/Guard';
-import { Navigate, Route, Routes } from 'react-router-dom';
 import { lazy } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { DocuNinjaProvider } from '$app/common/components/DocuNinjaProvider';
 import { DocuNinjaGuard } from '$app/common/guards/DocuNinjaGuard';
+import { Guard } from '$app/common/guards/Guard';
 import {
   docuNinjaAdmin,
   docuNinjaOwner,
   docuNinjaPermission,
 } from '$app/common/guards/guards/docuninja/permission';
-import { DocuNinjaProvider } from '$app/common/components/DocuNinjaProvider';
 
 const Documents = lazy(() => import('$app/pages/documents/index/Documents'));
 const Document = lazy(() => import('$app/pages/documents/show/Document'));

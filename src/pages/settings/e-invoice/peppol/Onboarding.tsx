@@ -8,8 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError, AxiosResponse } from 'axios';
+import classNames from 'classnames';
+import { useFormik } from 'formik';
+import { get } from 'lodash';
+import { useEffect, useState } from 'react';
+import { Check } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
+import { Classification } from '$app/common/helpers/peppol-countries';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
@@ -19,21 +27,13 @@ import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useIsWhitelabelled } from '$app/common/hooks/usePaidOrSelfhost';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Element } from '$app/components/cards';
 import { CountrySelector } from '$app/components/CountrySelector';
+import { Element } from '$app/components/cards';
 import { ErrorMessage } from '$app/components/ErrorMessage';
 import { Button, InputField, Link } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
-import { AxiosError, AxiosResponse } from 'axios';
-import classNames from 'classnames';
-import { useFormik } from 'formik';
-import { get } from 'lodash';
-import { useEffect, useState } from 'react';
-import { Check } from 'react-feather';
-import { useTranslation } from 'react-i18next';
-import { Classification } from '$app/common/helpers/peppol-countries';
 
 export type Step =
   | 'plan_check'

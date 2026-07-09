@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { isHosted } from '$app/common/helpers';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
 import { Settings } from '../../../../components/layouts/Settings';
+import { BankAccountsPlanAlert } from '../common/components/BankAccountsPlanAlert';
 import { useBlankBankAccountQuery } from '../common/queries';
 import { useHandleCreate } from './hooks/useHandleCreate';
-import { BankAccountsPlanAlert } from '../common/components/BankAccountsPlanAlert';
-import { useColorScheme } from '$app/common/colors';
 
 export function Create() {
   const [t] = useTranslation();

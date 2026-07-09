@@ -8,37 +8,36 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import { useTranslation } from 'react-i18next';
+import { MdWarning } from 'react-icons/md';
+import { Link } from 'react-router-dom';
+import reactStringReplace from 'react-string-replace';
+import { useColorScheme } from '$app/common/colors';
+import { route } from '$app/common/helpers/route';
+import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Expense } from '$app/common/interfaces/expense';
+import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
 import { CurrencySelector } from '$app/components/CurrencySelector';
+import { CustomField } from '$app/components/CustomField';
+import { Card, Element } from '$app/components/cards';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { ExpenseCategorySelector } from '$app/components/expense-categories/ExpenseCategorySelector';
+import { InputField, Link as LinkBase } from '$app/components/forms';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { ExternalLink } from '$app/components/icons/ExternalLink';
+import { Icon } from '$app/components/icons/Icon';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
-import { useTranslation } from 'react-i18next';
-import { ExpenseStatus } from '../../common/components/ExpenseStatus';
-import { CustomField } from '$app/components/CustomField';
-import { useCalculateExpenseExclusiveAmount } from '../../common/hooks/useCalculateExpenseAmount';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { Icon } from '$app/components/icons/Icon';
-import { MdWarning } from 'react-icons/md';
-import { route } from '$app/common/helpers/route';
-import { Link } from 'react-router-dom';
-import { Link as LinkBase } from '$app/components/forms';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import reactStringReplace from 'react-string-replace';
-import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
-import { TaxRate } from '$app/common/interfaces/tax-rate';
-import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
-import { useColorScheme } from '$app/common/colors';
-import { ExternalLink } from '$app/components/icons/ExternalLink';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { ExpenseStatus } from '../../common/components/ExpenseStatus';
+import { useCalculateExpenseExclusiveAmount } from '../../common/hooks/useCalculateExpenseAmount';
 
 export interface ExpenseCardProps {
   expense: Expense | undefined;

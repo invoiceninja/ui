@@ -8,24 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { FormikProps } from 'formik';
+import { cloneDeep, set } from 'lodash';
+import { Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { DataTableColumns } from '$app/components/DataTable';
-import { useTranslation } from 'react-i18next';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { DataTableColumns } from '$app/components/DataTable';
 import { DynamicLink } from '$app/components/DynamicLink';
 import {
   DataTableColumnsExtended,
   useAllInvoiceColumns,
 } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { PaymentOnCreation } from '../..';
-import { Dispatch, SetStateAction } from 'react';
-import { cloneDeep, set } from 'lodash';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { FormikProps } from 'formik';
 import { TableNumberInputField } from '../components/TableNumberInputField';
 
 export interface ApplyInvoice {

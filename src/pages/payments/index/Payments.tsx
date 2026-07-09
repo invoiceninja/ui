@@ -8,44 +8,44 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { EntityState } from '$app/common/enums/entity-state';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
+import { getEntityState } from '$app/common/helpers';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { Payment } from '$app/common/interfaces/payment';
+import { usePaymentQuery } from '$app/common/queries/payments';
+import { useSocketEvent } from '$app/common/queries/sockets';
 import { Page } from '$app/components/Breadcrumbs';
 import { DataTable } from '$app/components/DataTable';
-import { Default } from '$app/components/layouts/Default';
-import { useTranslation } from 'react-i18next';
-import {
-  defaultColumns,
-  useAllPaymentColumns,
-  usePaymentColumns,
-} from '../common/hooks/usePaymentColumns';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
-import { useActions } from '../common/hooks/useActions';
-import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
-import { Payment } from '$app/common/interfaces/payment';
-import { permission } from '$app/common/guards/guards/permission';
-import { or } from '$app/common/guards/guards/or';
-import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEffect, useState } from 'react';
-import { useAtom } from 'jotai';
-import { usePaymentQuery } from '$app/common/queries/payments';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { InputLabel } from '$app/components/forms';
+import { ImportButton } from '$app/components/import/ImportButton';
+import { Default } from '$app/components/layouts/Default';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import {
   PaymentSlider,
   paymentSliderAtom,
   paymentSliderVisibilityAtom,
 } from '../common/components/PaymentSlider';
+import { useActions } from '../common/hooks/useActions';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import {
-  ChangeTemplateModal,
-  useChangeTemplate,
-} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { EntityState } from '$app/common/enums/entity-state';
-import { getEntityState } from '$app/common/helpers';
-import { useSocketEvent } from '$app/common/queries/sockets';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { Guard } from '$app/common/guards/Guard';
-import { ImportButton } from '$app/components/import/ImportButton';
-import { InputLabel } from '$app/components/forms';
+  defaultColumns,
+  useAllPaymentColumns,
+  usePaymentColumns,
+} from '../common/hooks/usePaymentColumns';
+import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
 
 export default function Payments() {
   useTitle('payments');

@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Fragment, isValidElement, ReactNode } from 'react';
 import reactStringReplace from 'react-string-replace';
-import { Fragment, ReactNode, isValidElement } from 'react';
 
 interface Replacements {
   [key: string]: ReactNode;

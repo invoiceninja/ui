@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { request } from '$app/common/helpers/request';
-import { useQuery, useQueryClient } from 'react-query';
-import { route } from '$app/common/helpers/route';
-import { endpoint } from '../helpers';
-import { Payment } from '$app/common/interfaces/payment';
-import { Params } from './common/params.interface';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { toast } from '$app/common/helpers/toast/toast';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Payment } from '$app/common/interfaces/payment';
+import { endpoint } from '../helpers';
 import { $refetch } from '../hooks/useRefetch';
+import { Params } from './common/params.interface';
 
 interface PaymentParams {
   id: string | undefined;
@@ -28,9 +28,10 @@ interface PaymentParams {
 }
 
 export function usePaymentQuery(params: PaymentParams) {
-  return useQuery(
-    ['/api/v1/payments', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/payments', params],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint(
@@ -43,8 +44,10 @@ export function usePaymentQuery(params: PaymentParams) {
       ).then(
         (response: GenericSingleResourceResponse<Payment>) => response.data.data
       ),
-    { enabled: params.enabled ?? Boolean(params.id), staleTime: Infinity }
-  );
+
+    enabled: params.enabled ?? Boolean(params.id),
+    staleTime: Infinity,
+  });
 }
 
 interface PaymentsParams extends Params {
@@ -55,9 +58,10 @@ interface PaymentsParams extends Params {
 }
 
 export function usePaymentsQuery(params: PaymentsParams) {
-  return useQuery<Payment[]>(
-    ['/api/v1/payments', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/payments', params],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint(
@@ -76,18 +80,21 @@ export function usePaymentsQuery(params: PaymentsParams) {
         (response: GenericSingleResourceResponse<Payment[]>) =>
           response.data.data
       ),
-    { enabled: params.enabled ?? true, staleTime: Infinity }
-  );
+
+    enabled: params.enabled ?? true,
+    staleTime: Infinity,
+  });
 }
 
 export function useBlankPaymentQuery() {
   const hasPermission = useHasPermission();
 
-  return useQuery(
-    route('/api/v1/payments/create'),
-    () => request('GET', endpoint('/api/v1/payments/create')),
-    { staleTime: Infinity, enabled: hasPermission('create_payment') }
-  );
+  return useQuery({
+    queryKey: [route('/api/v1/payments/create')],
+    queryFn: () => request('GET', endpoint('/api/v1/payments/create')),
+    staleTime: Infinity,
+    enabled: hasPermission('create_payment'),
+  });
 }
 
 export function useBulk() {
@@ -109,7 +116,9 @@ export function useBulk() {
       toast.success(`${translationKeyword}d_payment`);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
 
       $refetch(['payments']);
     });

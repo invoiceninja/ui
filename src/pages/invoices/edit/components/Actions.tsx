@@ -8,16 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
-import { route } from '$app/common/helpers/route';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { Divider } from '$app/components/cards/Divider';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
+import dayjs from 'dayjs';
 import { useSetAtom } from 'jotai';
-import { invoiceAtom } from '$app/pages/invoices/common/atoms';
-import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
-import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { BiMoney, BiPlusCircle } from 'react-icons/bi';
 import {
@@ -38,34 +30,42 @@ import {
   MdSchedule,
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
-import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
-import { getEntityState } from '$app/common/helpers';
 import { EntityState } from '$app/common/enums/entity-state';
-import dayjs from 'dayjs';
-import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { useBulk } from '$app/common/queries/invoices';
-import { useCancelInvoiceModal } from '../hooks/useCancelInvoiceModal';
-import { CancelInvoiceModal } from './CancelInvoiceModal';
-import { useRectifyInvoiceModal } from '../hooks/useRectifyInvoiceModal';
-import { RectifyInvoiceModal } from './RectifyInvoiceModal';
-// import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
-import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { getEntityState } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
 import {
   useAdmin,
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
-import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
-import { CloneOptionsModal } from '../../common/components/CloneOptionsModal';
-import { EntityActionElement } from '$app/components/EntityActionElement';
-import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { useBulk } from '$app/common/queries/invoices';
+import { Divider } from '$app/components/cards/Divider';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { EntityActionElement } from '$app/components/EntityActionElement';
+import { Icon } from '$app/components/icons/Icon';
+import { useShouldDisplayClientGatewaysAndAutoBill } from '$app/pages/clients/show/hooks/useShouldDisplayClientGatewaysAndAutoBill';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { invoiceAtom } from '$app/pages/invoices/common/atoms';
+import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
+import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
+import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
+import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { CloneOptionsModal } from '../../common/components/CloneOptionsModal';
+// import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
+import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
+import { useCancelInvoiceModal } from '../hooks/useCancelInvoiceModal';
 import { useCloneToCreditFromInvoice } from '../hooks/useCloneToCreditFromInvoice';
 import { useMarkPaid } from '../hooks/useMarkPaid';
-import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
-import { useShouldDisplayClientGatewaysAndAutoBill } from '$app/pages/clients/show/hooks/useShouldDisplayClientGatewaysAndAutoBill';
+import { useRectifyInvoiceModal } from '../hooks/useRectifyInvoiceModal';
+import { CancelInvoiceModal } from './CancelInvoiceModal';
+import { RectifyInvoiceModal } from './RectifyInvoiceModal';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (

@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CustomField } from '$app/components/CustomField';
-import { ChangeHandler } from '$app/pages/invoices/create/Create';
-import { useTranslation } from 'react-i18next';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { useColorScheme } from '$app/common/colors';
 import { PaymentTermsTooltip } from '$app/components/PaymentTermsTooltip';
+import { ChangeHandler } from '$app/pages/invoices/create/Create';
 
 interface Props {
   invoice?: Invoice;

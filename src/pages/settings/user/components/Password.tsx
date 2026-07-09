@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { deletePassword, updateChanges } from '$app/common/stores/slices/user';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOutletContext } from 'react-router-dom';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { deletePassword, updateChanges } from '$app/common/stores/slices/user';
+import { RootState } from '$app/common/stores/store';
 import { Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
-import { RootState } from '$app/common/stores/store';
 
 export function Password() {
   const [t] = useTranslation();

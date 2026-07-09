@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Statics } from '$app/common/interfaces/statics';
-import { useQuery } from 'react-query';
 
 export function useStaticsQuery() {
-  return useQuery<Statics>(
-    ['/api/v1/statics'],
-    () =>
+  return useQuery<Statics>({
+    queryKey: ['/api/v1/statics'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/statics')).then(
         (response) => response.data
       ),
-    {
-      enabled: Boolean(localStorage.getItem('X-NINJA-TOKEN')),
-      staleTime: Infinity,
-    }
-  );
+
+    enabled: Boolean(localStorage.getItem('X-NINJA-TOKEN')),
+    staleTime: Infinity,
+  });
 }

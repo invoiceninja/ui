@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { cloneDeep } from 'lodash';
+import { useDispatch } from 'react-redux';
 import {
   injectInChanges,
   updateChanges,
 } from '$app/common/stores/slices/company-users';
-import { cloneDeep } from 'lodash';
-import { useDispatch } from 'react-redux';
 import { useInjectCompanyChanges } from './useInjectCompanyChanges';
 
 export function useHandleCustomFieldChange() {

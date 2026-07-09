@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useState, useCallback, ReactNode } from 'react';
 import classNames from 'classnames';
-import CommonProps from '../../common/interfaces/common-props.interface';
+import React, { ReactNode, useCallback, useState } from 'react';
+import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { useResizeColumn } from '$app/common/hooks/useResizeColumn';
+import CommonProps from '../../common/interfaces/common-props.interface';
 import { ChevronDown } from '../icons/ChevronDown';
 import { ChevronUp } from '../icons/ChevronUp';
-import styled from 'styled-components';
 
 export interface ColumnSortPayload {
   sort: string;

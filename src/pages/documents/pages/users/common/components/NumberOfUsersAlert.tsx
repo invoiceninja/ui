@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { useUsersQuery as useDocuNinjaUsersQuery } from '$app/common/queries/docuninja/users';
 import { Alert } from '$app/components/Alert';
 import { Link } from '$app/components/forms';
-import { useAtom } from 'jotai';
-import { docuNinjaAtom } from '$app/common/atoms/docuninja';
-import { useTranslation } from 'react-i18next';
-import { useUsersQuery as useDocuNinjaUsersQuery } from '$app/common/queries/docuninja/users';
 
 export function NumberOfUsersAlert() {
   const [t] = useTranslation();

@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { request } from '$app/common/helpers/request';
-import { endpoint, date } from '$app/common/helpers';
-import { Spinner } from '$app/components/Spinner';
-import { Card } from '$app/components/cards';
-import { FIELDS_LABELS } from './DashboardCardSelector';
-import { useColorScheme } from '$app/common/colors';
-import { decodeDashboardField } from '$app/common/helpers/react-settings';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { date, endpoint } from '$app/common/helpers';
+import { decodeDashboardField } from '$app/common/helpers/react-settings';
+import { request } from '$app/common/helpers/request';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { Card } from '$app/components/cards';
+import { Spinner } from '$app/components/Spinner';
+import { FIELDS_LABELS } from './DashboardCardSelector';
 
 export const PERIOD_LABELS: Record<string, string> = {
   current: 'current_period',
@@ -76,7 +76,6 @@ export function DashboardCard({
         currency_id: currencyId,
       }).then((response) => response.data),
     staleTime: Infinity,
-    onSettled,
   });
 
   return (

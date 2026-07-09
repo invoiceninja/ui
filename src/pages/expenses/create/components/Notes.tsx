@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { Card } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
-import { useTranslation } from 'react-i18next';
 import { ExpenseCardProps } from './Details';
-import { useColorScheme } from '$app/common/colors';
 
 export function Notes(props: ExpenseCardProps) {
   const [t] = useTranslation();

@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 import { PurchaseOrderStatus as PurchaseOrderStatusEnum } from '$app/common/enums/purchase-order-status';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Badge } from '$app/components/Badge';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {

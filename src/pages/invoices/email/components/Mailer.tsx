@@ -8,22 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
-import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
-import { freePlan } from '$app/common/guards/guards/free-plan';
-import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { generateEmailPreview } from '$app/common/helpers/emails/generate-email-preview';
-import { useHandleSend } from '$app/common/hooks/emails/useHandleSend';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import { Quote } from '$app/common/interfaces/quote';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { Contact } from '$app/components/emails/Contact';
-import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
-import { useGeneratePdfUrl } from '$app/pages/invoices/common/hooks/useGeneratePdfUrl';
-import { MailerComponent } from '$app/pages/purchase-orders/email/Email';
+import { cloneDeep } from 'lodash';
 import {
   forwardRef,
   RefObject,
@@ -33,13 +18,28 @@ import {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { freePlan } from '$app/common/guards/guards/free-plan';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
-import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { generateEmailPreview } from '$app/common/helpers/emails/generate-email-preview';
 import { request } from '$app/common/helpers/request';
-import { cloneDeep } from 'lodash';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useHandleSend } from '$app/common/hooks/emails/useHandleSend';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Quote } from '$app/common/interfaces/quote';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Card, Element } from '$app/components/cards';
+import { Contact } from '$app/components/emails/Contact';
+import { InputField, SelectField } from '$app/components/forms';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
+import { useGeneratePdfUrl } from '$app/pages/invoices/common/hooks/useGeneratePdfUrl';
+import { MailerComponent } from '$app/pages/purchase-orders/email/Email';
 
 export type MailerResourceType =
   | 'invoice'

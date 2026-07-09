@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import hexColorRegex from 'hex-color-regex';
+import { cloneDeep } from 'lodash';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdDone } from 'react-icons/md';
+import { useColorScheme } from '$app/common/colors';
+import { toast } from '$app/common/helpers/toast/toast';
 import {
   useDraftOrCommittedReactSettings,
   useUpdateDraftOrReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { Modal } from '$app/components/Modal';
 import { Element } from '$app/components/cards';
 import { Button, InputField, SelectField } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { MdDone } from 'react-icons/md';
-import hexColorRegex from 'hex-color-regex';
-import { toast } from '$app/common/helpers/toast/toast';
-import { cloneDeep } from 'lodash';
-import { useColorScheme } from '$app/common/colors';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
 
 type ThemeKey =
   | 'light'

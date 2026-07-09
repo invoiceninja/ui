@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import Tippy from '@tippyjs/react/headless';
 import classNames from 'classnames';
 import { ReactElement, ReactNode, useEffect, useRef, useState } from 'react';
-import Tippy from '@tippyjs/react/headless';
+import { MdPlayArrow } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { Icon } from './icons/Icon';
-import { MdPlayArrow } from 'react-icons/md';
 
 interface Props {
   children: ReactElement;

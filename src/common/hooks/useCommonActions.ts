@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import {
   CommonAction,
   Entity,
 } from '$app/components/CommonActionsPreferenceModal';
-import { useTranslation } from 'react-i18next';
 
 export function useAllCommonActions() {
   const [t] = useTranslation();

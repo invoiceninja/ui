@@ -8,32 +8,34 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
-import { route } from '$app/common/helpers/route';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Page } from '$app/components/Breadcrumbs';
-import Toggle from '$app/components/forms/Toggle';
-import { Default } from '$app/components/layouts/Default';
 import dayjs from 'dayjs';
+import quarter from 'dayjs/plugin/quarterOfYear';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import quarter from 'dayjs/plugin/quarterOfYear';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { toast } from '$app/common/helpers/toast/toast';
-import { Dropdown } from '$app/components/dropdown/Dropdown';
-import { Icon } from '$app/components/icons/Icon';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { MdDownload, MdSchedule, MdSend } from 'react-icons/md';
-import { useClientQuery } from '$app/common/queries/clients';
-import { Client } from '$app/common/interfaces/client';
-import { useScheduleStatement } from '../common/hooks/useScheduleStatement';
-import { Spinner } from '$app/components/Spinner';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useParams } from 'react-router-dom';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Client } from '$app/common/interfaces/client';
+import { useClientQuery } from '$app/common/queries/clients';
+import { Page } from '$app/components/Breadcrumbs';
+import { Card, Element } from '$app/components/cards';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { InputField, SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { Icon } from '$app/components/icons/Icon';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
+import { useScheduleStatement } from '../common/hooks/useScheduleStatement';
 
 dayjs.extend(quarter);
 

@@ -8,30 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
-import { route } from '$app/common/helpers/route';
-import { useCountries } from '$app/common/hooks/useCountries';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { useVendorQuery } from '$app/common/queries/vendor';
-import { Page } from '$app/components/Breadcrumbs';
-import { InfoCard } from '$app/components/InfoCard';
-import { Default } from '$app/components/layouts/Default';
-import { Tabs } from '$app/components/Tabs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { date } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCountries } from '$app/common/hooks/useCountries';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { VendorContact } from '$app/common/interfaces/vendor-contact';
+import { useVendorQuery } from '$app/common/queries/vendor';
+import { Page } from '$app/components/Breadcrumbs';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Link } from '$app/components/forms';
+import { InfoCard } from '$app/components/InfoCard';
+import { Default } from '$app/components/layouts/Default';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { Tabs } from '$app/components/Tabs';
+import { Tooltip } from '$app/components/Tooltip';
 import { useActions } from './common/hooks/useActions';
 import { useTabs } from './show/hooks/useTabs';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date } from '$app/common/helpers';
-import { EntityStatus } from '$app/components/EntityStatus';
-import { useColorScheme } from '$app/common/colors';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
-import { Tooltip } from '$app/components/Tooltip';
-import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 
 export default function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
@@ -246,7 +247,7 @@ export default function Vendor() {
           withoutPadding
         >
           <div className="flex flex-col h-44 w-full overflow-y-auto">
-            {vendor?.contacts.map((contact, index) => (
+            {vendor?.contacts.map((contact: VendorContact, index: number) => (
               <div
                 key={index}
                 className="flex justify-between items-center first:pt-1 py-4 border-b border-dashed"

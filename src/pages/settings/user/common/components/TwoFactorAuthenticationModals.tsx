@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField, Link } from '$app/components/forms';
-import { endpoint, isHosted } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { resetChanges, updateUser } from '$app/common/stores/slices/user';
-import { Modal } from '$app/components/Modal';
+import { AxiosError } from 'axios';
 import { merge } from 'lodash';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'react-qr-code';
 import { useDispatch } from 'react-redux';
-import { SmsVerificationModal } from '../../components/SmsVerificationModal';
 import { useColorScheme } from '$app/common/colors';
+import { endpoint, isHosted } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { AxiosError } from 'axios';
+import { resetChanges, updateUser } from '$app/common/stores/slices/user';
+import { Button, InputField, Link } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
+import { SmsVerificationModal } from '../../components/SmsVerificationModal';
 
 interface Props {
   checkVerification: boolean;

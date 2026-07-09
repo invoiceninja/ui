@@ -7,20 +7,21 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
+import { useTranslation } from 'react-i18next';
+import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { DataTable } from '$app/components/DataTable';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Default } from '$app/components/layouts/Default';
-import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
   useActions,
   useAllRecurringExpenseColumns,
   useRecurringExpenseColumns,
 } from '../common/hooks';
-import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export default function RecurringExpenses() {
   useTitle('recurring_expenses');

@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import collect from 'collect.js';
+import { useTranslation } from 'react-i18next';
 import { apiEndpoint, isHosted } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { Card, Element } from '$app/components/cards';
-import { useTranslation } from 'react-i18next';
-import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { Gateway } from '$app/common/interfaces/statics';
-import collect from 'collect.js';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { Card, Element } from '$app/components/cards';
 import { STRIPE_CONNECT } from '../../index/Gateways';
 
 interface Props {

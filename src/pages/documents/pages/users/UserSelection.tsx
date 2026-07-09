@@ -8,26 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState, useEffect } from 'react';
+import { useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { Checkbox } from '$app/components/forms';
-import { Card, Element } from '$app/components/cards';
-import { User as InvoiceNinjaUser } from '$app/common/interfaces/user';
-import { User as DocuNinjaUser } from '$app/common/interfaces/docuninja/api';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { toast } from '$app/common/helpers/toast/toast';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useUsersForDocuNinjaQuery } from '$app/common/queries/users';
-import { useUsersQuery as useDocuNinjaUsersQuery } from '$app/common/queries/docuninja/users';
-import { Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
-import { Default } from '$app/components/layouts/Default';
-import { useTitle } from '$app/common/hooks/useTitle';
-import Permissions from './common/components/Permissions';
-import { useAtom } from 'jotai';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useTitle } from '$app/common/hooks/useTitle';
+import {
+  User as DocuNinjaUser,
+  Permission as PermissionType,
+} from '$app/common/interfaces/docuninja/api';
+import { User as InvoiceNinjaUser } from '$app/common/interfaces/user';
+import { useUsersQuery as useDocuNinjaUsersQuery } from '$app/common/queries/docuninja/users';
+import { useUsersForDocuNinjaQuery } from '$app/common/queries/users';
+import { Card, Element } from '$app/components/cards';
+import { Checkbox } from '$app/components/forms';
+import { Default } from '$app/components/layouts/Default';
+import Permissions from './common/components/Permissions';
 
 interface UserWithDocuNinjaStatus extends InvoiceNinjaUser {
   hasDocuNinjaAccess: boolean;

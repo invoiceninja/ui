@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { lazy, ReactNode, Suspense } from 'react';
 import { isHosted } from '$app/common/helpers';
-import { ReactNode, Suspense, lazy } from 'react';
 
 const GoogleOAuthProvider = lazy(() =>
   import('@react-oauth/google').then((module) => ({

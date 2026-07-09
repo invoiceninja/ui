@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { customField } from '$app/components/CustomField';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTranslation } from 'react-i18next';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { customField } from '$app/components/CustomField';
 
 export interface CreditRuleField {
   key: string;

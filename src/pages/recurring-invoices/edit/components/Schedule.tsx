@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { useOutletContext } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { date, endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Card } from '$app/components/cards';
 import { Spinner } from '$app/components/Spinner';
-import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
 import { RecurringInvoiceContext } from '../../create/Create';
-import { useOutletContext } from 'react-router-dom';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useColorScheme } from '$app/common/colors';
 
 export default function Schedule() {
   const [t] = useTranslation();

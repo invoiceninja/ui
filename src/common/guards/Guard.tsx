@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { Params, useParams } from 'react-router-dom';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { CompanyUser } from '$app/common/interfaces/company-user';
@@ -16,11 +19,8 @@ import { Fallback } from '$app/components/Fallback';
 import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { SubPageUnauthorized, Unauthorized } from '$app/pages/errors/401';
-import { useEffect, useState } from 'react';
-import { QueryClient, useQueryClient } from 'react-query';
-import { Params, useParams } from 'react-router-dom';
-import { SettingsLevel } from '../stores/slices/settings';
 import { useActiveSettingsDetails } from '../hooks/useActiveSettingsDetails';
+import { SettingsLevel } from '../stores/slices/settings';
 
 export type Guard = (ctx: Context) => Promise<boolean>;
 

@@ -8,41 +8,41 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField, Link, SelectField } from '$app/components/forms';
+import dayjs from 'dayjs';
+import { useAtomValue } from 'jotai';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import reactStringReplace from 'react-string-replace';
+import { useColorScheme } from '$app/common/colors';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { isHosted, trans } from '$app/common/helpers';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { Card, Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
+import { InputField, Link, SelectField } from '$app/components/forms';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/layouts/Settings';
-import dayjs from 'dayjs';
-import { useTranslation } from 'react-i18next';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
+import { UserSelector } from '$app/components/users/UserSelector';
+import { companySettingsErrorsAtom } from '../common/atoms';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import {
   isCompanySettingsFormBusy,
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
-import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
-import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../common/atoms';
-import { UserSelector } from '$app/components/users/UserSelector';
-import { toast } from '$app/common/helpers/toast/toast';
-import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
-import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
-import { SettingsLabel } from '$app/components/SettingsLabel';
-import { useEmailProviders } from './common/hooks/useEmailProviders';
-import { SMTPMailDriver } from './common/components/SMTPMailDriver';
-import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
-import reactStringReplace from 'react-string-replace';
-import { useState } from 'react';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { SendTimeModal } from './common/components/SendTimeModal';
-import { useColorScheme } from '$app/common/colors';
+import { SMTPMailDriver } from './common/components/SMTPMailDriver';
+import { useEmailProviders } from './common/hooks/useEmailProviders';
 
 export function EmailSettings() {
   useTitle('email_settings');

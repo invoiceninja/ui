@@ -8,6 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import {
+  MdArchive,
+  MdDelete,
+  MdDesignServices,
+  MdEdit,
+  MdPayment,
+  MdRestore,
+  MdSend,
+  MdSettingsBackupRestore,
+} from 'react-icons/md';
+import { useLocation } from 'react-router-dom';
 import { EntityState } from '$app/common/enums/entity-state';
 import { getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
@@ -20,18 +32,6 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
-import {
-  MdArchive,
-  MdDelete,
-  MdDesignServices,
-  MdEdit,
-  MdPayment,
-  MdRestore,
-  MdSend,
-  MdSettingsBackupRestore,
-} from 'react-icons/md';
 
 interface Params {
   showEditAction?: boolean;

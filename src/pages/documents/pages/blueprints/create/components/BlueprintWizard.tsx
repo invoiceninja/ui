@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ReactNode, useState } from 'react';
+import { FileText, Tool } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { Card, CardContainer } from '$app/components/cards';
-import { ReactNode, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { InvoiceNinjaDesignStep } from './steps/InvoiceNinjaDesignStep';
-import { CustomBlueprintStep } from './steps/CustomBlueprintStep';
-import { TemplateSelectionStep } from './steps/TemplateSelectionStep';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
-import { FileText, Tool } from 'react-feather';
+import { CustomBlueprintStep } from './steps/CustomBlueprintStep';
+import { InvoiceNinjaDesignStep } from './steps/InvoiceNinjaDesignStep';
+import { TemplateSelectionStep } from './steps/TemplateSelectionStep';
 
 export type WizardStep = 'selection' | 'invoice-ninja' | 'custom' | 'template';
 

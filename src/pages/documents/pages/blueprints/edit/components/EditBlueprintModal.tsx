@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -16,12 +19,8 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { InputField } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { AxiosError } from 'axios';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button } from '$app/components/forms';
 
 interface Props {
   blueprint: Blueprint;

@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { customField } from '$app/components/CustomField';
 import { useTranslation } from 'react-i18next';
+import { customField } from '$app/components/CustomField';
 import { useCurrentCompany } from './useCurrentCompany';
 
 export type Entity =

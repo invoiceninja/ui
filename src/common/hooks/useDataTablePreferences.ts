@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Dispatch, SetStateAction, useEffect, useRef } from 'react';
 import { useAtomValue } from 'jotai';
-import { reactSettingsAtom } from './useReactSettings';
-import { SelectOption } from '$app/components/datatables/Actions';
-import { useDataTablePreference } from './useDataTablePreference';
-import { PerPage } from '$app/components/DataTable';
 import { isEqual } from 'lodash';
-import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
+import { Dispatch, SetStateAction, useEffect, useRef } from 'react';
+import { PerPage } from '$app/components/DataTable';
+import { SelectOption } from '$app/components/datatables/Actions';
 import { useCurrentUser } from './useCurrentUser';
+import { useDataTablePreference } from './useDataTablePreference';
 import {
+  reactSettingsAtom,
   useReactSettings,
   useSaveReactSettings,
   useUpdateReactSettings,
 } from './useReactSettings';
+import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
 
 interface Params {
   apiEndpoint: URL;

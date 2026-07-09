@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { scheduleParametersAtom } from '$app/pages/settings/schedules/common/components/EmailStatement';
-import { DEFAULT_SCHEDULE_PARAMETERS } from '$app/pages/settings/schedules/common/hooks/useHandleChange';
+import collect from 'collect.js';
 import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
-import { Report } from '../useReports';
-import collect from 'collect.js';
-import { reportColumn } from '../components/SortableColumns';
 import { usePreferences } from '$app/common/hooks/usePreferences';
+import { scheduleParametersAtom } from '$app/pages/settings/schedules/common/components/EmailStatement';
+import { DEFAULT_SCHEDULE_PARAMETERS } from '$app/pages/settings/schedules/common/hooks/useHandleChange';
+import { reportColumn } from '../components/SortableColumns';
+import { Report } from '../useReports';
 
 const DATE_RANGES_ALIASES = {
   last7: 'last7_days',

@@ -8,69 +8,69 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { atom, useAtom } from 'jotai';
+import React, { useEffect, useState } from 'react';
+import { ChevronRight } from 'react-feather';
+import { useTranslation } from 'react-i18next';
+import { MdInfo } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
+import reactStringReplace from 'react-string-replace';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { date, endpoint, trans } from '$app/common/helpers';
+import { sanitizeHTML } from '$app/common/helpers/html-string';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDateTime } from '$app/common/hooks/useDateTime';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { TabGroup } from '$app/components/TabGroup';
+import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
+import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { Slider } from '$app/components/cards/Slider';
-import { atom, useAtom } from 'jotai';
-import { useTranslation } from 'react-i18next';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { EmailRecord } from '$app/components/EmailRecord';
+import { Link } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { ArrowRight } from '$app/components/icons/ArrowRight';
+import { CloudPlay } from '$app/components/icons/CloudPlay';
+import { CopyToClipboard } from '$app/components/icons/CopyToClipboard';
+import { History } from '$app/components/icons/History';
+import { Icon } from '$app/components/icons/Icon';
+import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { TabGroup } from '$app/components/TabGroup';
+import { Tooltip } from '$app/components/Tooltip';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { useActions } from '../../edit/components/Actions';
+import { getInvoicePaymentAllocationRows } from '../helpers/invoicePaymentAllocations';
 import {
   generateClientPortalUrl,
   openClientPortal,
 } from '../helpers/open-client-portal';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date, endpoint, trans } from '$app/common/helpers';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { useActions } from '../../edit/components/Actions';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useQuery, useQueryClient } from 'react-query';
-import { request } from '$app/common/helpers/request';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { AxiosResponse } from 'axios';
-import { InvoiceStatus } from './InvoiceStatus';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { NonClickableElement } from '$app/components/cards/NonClickableElement';
-import { Link } from '$app/components/forms';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import { MdInfo } from 'react-icons/md';
-import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
-import { route } from '$app/common/helpers/route';
-import reactStringReplace from 'react-string-replace';
 import { InvoicePaymentAllocationBox } from './InvoicePaymentAllocationBox';
-import { getInvoicePaymentAllocationRows } from '../helpers/invoicePaymentAllocations';
-import { Tooltip } from '$app/components/Tooltip';
-import React, { useEffect, useState } from 'react';
-import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
-import { EmailRecord } from '$app/components/EmailRecord';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { sanitizeHTML } from '$app/common/helpers/html-string';
-import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
-import Toggle from '$app/components/forms/Toggle';
-import { useColorScheme } from '$app/common/colors';
+import { InvoiceStatus } from './InvoiceStatus';
 import { ViewLineItem } from './ViewLineItem';
 import { ViewLineItemExpense } from './ViewLineItemExpense';
 import { ViewLineItemTask } from './ViewLineItemTask';
-import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
-import { useGetSetting } from '$app/common/hooks/useGetSetting';
-import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
-import { useDateTime } from '$app/common/hooks/useDateTime';
-import classNames from 'classnames';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { CloudPlay } from '$app/components/icons/CloudPlay';
-import styled from 'styled-components';
-import { CopyToClipboard } from '$app/components/icons/CopyToClipboard';
-import { useNavigate } from 'react-router-dom';
-import { ArrowRight } from '$app/components/icons/ArrowRight';
-import { History } from '$app/components/icons/History';
-import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
-import { Icon } from '$app/components/icons/Icon';
-import { ChevronRight } from 'react-feather';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -239,15 +239,17 @@ export function InvoiceSlider() {
 
   const fetchEmailHistory = async () => {
     const response = await queryClient
-      .fetchQuery(
-        ['/api/v1/invoices', invoice?.id, 'emailHistory'],
-        () =>
+      .fetchQuery({
+        queryKey: ['/api/v1/invoices', invoice?.id, 'emailHistory'],
+
+        queryFn: () =>
           request('POST', endpoint('/api/v1/emails/entityHistory'), {
             entity: 'invoice',
             entity_id: invoice?.id,
           }),
-        { staleTime: Infinity }
-      )
+
+        staleTime: Infinity,
+      })
       .then((response) => response.data);
 
     setEmailRecords(response);

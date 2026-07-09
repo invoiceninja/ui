@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { Radio } from '$app/components/forms';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
-import { RecurringExpenseCardProps } from './Details';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useColorScheme } from '$app/common/colors';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Card, Element } from '$app/components/cards';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { Radio } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { RecurringExpenseCardProps } from './Details';
 
 interface Props extends RecurringExpenseCardProps {
   taxInputType: 'by_rate' | 'by_amount';

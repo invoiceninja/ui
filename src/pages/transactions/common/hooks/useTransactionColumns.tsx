@@ -8,31 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ApiTransactionType } from '$app/common/enums/transactions';
-import { route } from '$app/common/helpers/route';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { Transaction } from '$app/common/interfaces/transactions';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { Tooltip } from '$app/components/Tooltip';
-import { Link } from '$app/components/forms';
-import { EntityStatus } from '$app/pages/transactions/components/EntityStatus';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { useCleanDescriptionText } from './useCleanDescription';
+import { ApiTransactionType } from '$app/common/enums/transactions';
 import { date } from '$app/common/helpers';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { Transaction } from '$app/common/interfaces/transactions';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { Link } from '$app/components/forms';
+import { Tooltip } from '$app/components/Tooltip';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import { EntityStatus } from '$app/pages/transactions/components/EntityStatus';
 import {
   defaultColumns,
   useAllTransactionColumns,
 } from './useAllTransactionColumns';
-import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
-import classNames from 'classnames';
+import { useCleanDescriptionText } from './useCleanDescription';
 
 export function useTransactionColumns() {
   const { t } = useTranslation();

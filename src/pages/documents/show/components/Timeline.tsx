@@ -9,10 +9,10 @@
  */
 
 import classNames from 'classnames';
-import type { TimelineItemType } from './TimelineLayout';
-import { MdCheck, MdAccessTime } from 'react-icons/md';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { MdAccessTime, MdCheck } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import type { TimelineItemType } from './TimelineLayout';
 
 interface PropsType {
   item: TimelineItemType;

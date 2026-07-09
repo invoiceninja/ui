@@ -10,12 +10,11 @@
 
 import { EInvoiceType } from '$app/pages/settings';
 import { Client } from './client';
-import { Activity } from './invoice';
+import { Activity, Sync } from './invoice';
 import { InvoiceItem } from './invoice-item';
 import { Payment } from './payment';
 import { Invitation } from './purchase-order';
 import { ScheduleItem } from './schedule';
-import { Sync } from './invoice';
 
 export interface Quote {
   id: string;

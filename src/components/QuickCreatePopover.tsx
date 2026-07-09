@@ -1,15 +1,15 @@
-import { Fragment } from 'react';
 import { Popover, Transition } from '@headlessui/react';
-import { BiPlus } from 'react-icons/bi';
-import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
-import { useQuickCreateSections } from '$app/common/hooks/entities/useQuickCreateSections';
-import { useQuickCreateActions } from '$app/common/hooks/entities/useQuickCreateActions';
-import { isHosted, isSelfHosted } from '$app/common/helpers';
-import { useColorScheme } from '$app/common/colors';
+import { Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
+import { BiPlus } from 'react-icons/bi';
 import { styled } from 'styled-components';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useColorScheme } from '$app/common/colors';
+import { isHosted, isSelfHosted } from '$app/common/helpers';
+import { useQuickCreateActions } from '$app/common/hooks/entities/useQuickCreateActions';
+import { useQuickCreateSections } from '$app/common/hooks/entities/useQuickCreateSections';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { Icon } from './icons/Icon';
 
 const Div = styled.div`

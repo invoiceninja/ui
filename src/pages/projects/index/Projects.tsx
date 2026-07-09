@@ -8,16 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtom } from 'jotai';
 import { useEffect, useMemo } from 'react';
-import { useTitle } from '$app/common/hooks/useTitle';
+import { useTranslation } from 'react-i18next';
+import { emitter } from '$app';
+import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Project } from '$app/common/interfaces/project';
 import {
   DataTable,
   dateRangeAtom,
   filterColumnsValuesAtom,
 } from '$app/components/DataTable';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { Button, InputLabel } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
-import { useTranslation } from 'react-i18next';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import {
   defaultColumns,
   useActions,
@@ -26,18 +38,6 @@ import {
   useProjectColumns,
   useProjectFilterColumns,
 } from '../common/hooks';
-import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
-import { permission } from '$app/common/guards/guards/permission';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import {
-  ChangeTemplateModal,
-  useChangeTemplate,
-} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { Project } from '$app/common/interfaces/project';
-import { Button, InputLabel } from '$app/components/forms';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useAtom } from 'jotai';
-import { emitter } from '$app';
 
 export default function Projects() {
   useTitle('projects');

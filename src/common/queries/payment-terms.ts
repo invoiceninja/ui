@@ -8,20 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
-import { PaymentTerm } from '$app/common/interfaces/payment-term';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export function usePaymentTermsQuery(params: Params) {
-  return useQuery(
-    ['/api/v1/payment_terms', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/payment_terms', params],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint(
@@ -34,21 +35,22 @@ export function usePaymentTermsQuery(params: Params) {
           }
         )
       ),
-    {
-      staleTime: Infinity,
-    }
-  );
+
+    staleTime: Infinity,
+  });
 }
 
 export function usePaymentTermQuery(params: { id: string | undefined }) {
-  return useQuery(
-    ['/api/v1/payment_terms', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/payment_terms', params],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/payment_terms/:id', params), {
         headers: defaultHeaders(),
       }),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 }
 
 export function bulk(
@@ -64,13 +66,16 @@ export function bulk(
 export function useBlankPaymentTermQuery() {
   const { isAdmin } = useAdmin();
 
-  return useQuery<PaymentTerm>(
-    ['/api/v1/payment_terms/create'],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/payment_terms/create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/payment_terms/create')).then(
         (response: GenericSingleResourceResponse<PaymentTerm>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: isAdmin }
-  );
+
+    staleTime: Infinity,
+    enabled: isAdmin,
+  });
 }

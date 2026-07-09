@@ -8,27 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ButtonOption, Card, CardContainer } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { TaxRate } from '$app/common/interfaces/tax-rate';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useBlankTaxRateQuery } from '$app/common/queries/tax-rates';
-import { Icon } from '$app/components/icons/Icon';
-import { Settings } from '$app/components/layouts/Settings';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
-import { useHandleChange } from './common/hooks/useHandleChange';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { TaxRate } from '$app/common/interfaces/tax-rate';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankTaxRateQuery } from '$app/common/queries/tax-rates';
+import { ButtonOption, Card, CardContainer } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { Icon } from '$app/components/icons/Icon';
+import { Settings } from '$app/components/layouts/Settings';
+import { useHandleChange } from './common/hooks/useHandleChange';
 
 export function Create() {
   const { documentTitle } = useTitle('create_tax_rate');

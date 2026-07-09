@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import {
   useAdmin,
@@ -17,8 +19,6 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Payment } from '$app/common/interfaces/payment';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Tab } from '$app/components/Tabs';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 
 interface Params {
   payment: Payment | undefined;

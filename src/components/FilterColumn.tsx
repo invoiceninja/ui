@@ -1,13 +1,13 @@
-import { MdFilterList } from 'react-icons/md';
-import { Icon } from './icons/Icon';
-import { FilterOption } from './DataTable';
-import { useEffect, useRef, useState } from 'react';
-import { Button, Checkbox } from './forms';
-import { useTranslation } from 'react-i18next';
-import { useColorScheme } from '$app/common/colors';
 import { Popover } from 'antd';
-import styled from 'styled-components';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdFilterList } from 'react-icons/md';
 import { useClickAway } from 'react-use';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { FilterOption } from './DataTable';
+import { Button, Checkbox } from './forms';
+import { Icon } from './icons/Icon';
 
 interface Props {
   selectedValues: string[];

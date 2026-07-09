@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { RecurringInvoiceStatus as RecurringInvoiceStatusEnum } from '$app/common/enums/recurring-invoice-status';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { Badge } from '$app/components/Badge';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {

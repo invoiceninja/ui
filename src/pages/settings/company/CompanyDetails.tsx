@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtomValue } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { Outlet, useLocation } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { useTranslation } from 'react-i18next';
+import { Card } from '$app/components/cards';
+import { Tabs } from '$app/components/Tabs';
+import { TaxDataModal } from '$app/pages/clients/show/components/TaxDataModal';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import {
   isCompanySettingsFormBusy,
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
-import { Tabs } from '$app/components/Tabs';
-import { Outlet, useLocation } from 'react-router-dom';
 import { useCompanyDetailsTabs } from './common/hooks/useCompanyDetailsTabs';
-import { Card } from '$app/components/cards';
-import { useColorScheme } from '$app/common/colors';
-import { useAtomValue } from 'jotai';
-import { TaxDataModal } from '$app/pages/clients/show/components/TaxDataModal';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
 export function CompanyDetails() {
   const [t] = useTranslation();

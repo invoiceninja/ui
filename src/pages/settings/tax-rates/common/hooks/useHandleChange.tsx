@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction } from 'react';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Dispatch, SetStateAction } from 'react';
 
 interface Params {
   setTaxRate: Dispatch<SetStateAction<TaxRate | undefined>>;

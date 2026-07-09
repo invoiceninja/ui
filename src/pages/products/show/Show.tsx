@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
 import { Navigate, useParams } from 'react-router-dom';
+import { route } from '$app/common/helpers/route';
 
 export default function Show() {
   const { id } = useParams();

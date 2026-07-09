@@ -9,14 +9,14 @@
  */
 
 import { AxiosError } from 'axios';
+import { Dispatch, SetStateAction } from 'react';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { Payment } from '$app/common/interfaces/payment';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { toast } from '$app/common/helpers/toast/toast';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { Dispatch, SetStateAction } from 'react';
 
 interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;

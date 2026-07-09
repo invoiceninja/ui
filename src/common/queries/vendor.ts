@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import { request } from '$app/common/helpers/request';
-import { Vendor } from '$app/common/interfaces/vendor';
-import { useQuery } from 'react-query';
-import { endpoint } from '../helpers';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { Params } from './common/params.interface';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { endpoint } from '../helpers';
 import { toast } from '../helpers/toast/toast';
-import { $refetch } from '../hooks/useRefetch';
 import { useHasPermission } from '../hooks/permissions/useHasPermission';
+import { $refetch } from '../hooks/useRefetch';
+import { Params } from './common/params.interface';
 
 interface VendorParams {
   id: string | undefined;
@@ -24,27 +24,33 @@ interface VendorParams {
 }
 
 export function useVendorQuery(params: VendorParams) {
-  return useQuery<Vendor>(
-    ['/api/v1/vendors', params.id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/vendors', params.id],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/vendors/:id', { id: params.id })).then(
         (response) => response.data.data
       ),
-    { enabled: params.enabled ?? true, staleTime: Infinity }
-  );
+
+    enabled: params.enabled ?? true,
+    staleTime: Infinity,
+  });
 }
 
 export function useBlankVendorQuery() {
   const hasPermission = useHasPermission();
 
-  return useQuery<Vendor>(
-    ['/api/v1/vendors', 'create'],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/vendors', 'create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/vendors/create')).then(
         (response) => response.data.data
       ),
-    { staleTime: Infinity, enabled: hasPermission('create_vendor') }
-  );
+
+    staleTime: Infinity,
+    enabled: hasPermission('create_vendor'),
+  });
 }
 
 interface VendorsParams extends Params {
@@ -53,9 +59,10 @@ interface VendorsParams extends Params {
 }
 
 export function useVendorsQuery(params: VendorsParams) {
-  return useQuery<Vendor[]>(
-    ['/api/v1/vendors', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/vendors', params],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint(
@@ -71,8 +78,10 @@ export function useVendorsQuery(params: VendorsParams) {
         (response: GenericSingleResourceResponse<Vendor[]>) =>
           response.data.data
       ),
-    { enabled: params.enabled ?? true, staleTime: Infinity }
-  );
+
+    enabled: params.enabled ?? true,
+    staleTime: Infinity,
+  });
 }
 
 export function useBulkAction() {

@@ -1,3 +1,7 @@
+import classNames from 'classnames';
+import { useAtom } from 'jotai';
+import React, { useEffect } from 'react';
+import { CSSProperties } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import {
@@ -5,12 +9,8 @@ import {
   isColorLight,
   useAdjustColorDarkness,
 } from '$app/common/hooks/useAdjustColorDarkness';
-import { useAtom } from 'jotai';
-import CommonProps from '../../common/interfaces/common-props.interface';
-import React, { useEffect } from 'react';
 import { currentWidthAtom } from '$app/common/hooks/useResizeColumn';
-import classNames from 'classnames';
-import { CSSProperties } from 'styled-components';
+import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   colSpan?: number;

@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { CalendarEvent } from '$app/common/interfaces/calendar-event';
 import { CalendarProvider } from '$app/common/interfaces/user';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { $refetch } from '../hooks/useRefetch';
 
 interface CalendarEventsParams {
@@ -22,9 +22,10 @@ interface CalendarEventsParams {
 }
 
 export function useCalendarEventsQuery(params: CalendarEventsParams) {
-  return useQuery<CalendarEvent[]>(
-    ['calendar_events', params.from, params.to],
-    () =>
+  return useQuery({
+    queryKey: ['calendar_events', params.from, params.to],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/calendar_connection/events?from=:from&to=:to', {
@@ -41,11 +42,10 @@ export function useCalendarEventsQuery(params: CalendarEventsParams) {
           (Array.isArray(inner) ? inner : null);
         return Array.isArray(events) ? (events as CalendarEvent[]) : [];
       }),
-    {
-      enabled: params.enabled ?? true,
-      staleTime: 60_000,
-    }
-  );
+
+    enabled: params.enabled ?? true,
+    staleTime: 60_000,
+  });
 }
 
 const CALENDAR_CONTEXTS: Record<CalendarProvider, string> = {
@@ -65,25 +65,31 @@ export function isCalendarProvider(value: unknown): value is CalendarProvider {
 }
 
 export function useConnectCalendar() {
-  return useMutation(async (provider: CalendarProvider): Promise<string> => {
-    if (!isCalendarProvider(provider)) {
-      throw new Error(`Unsupported calendar provider: ${String(provider)}`);
-    }
+  return useMutation({
+    mutationFn: async (provider: CalendarProvider): Promise<string> => {
+      if (!isCalendarProvider(provider)) {
+        throw new Error(`Unsupported calendar provider: ${String(provider)}`);
+      }
 
-    const response = await request('POST', endpoint('/api/v1/one_time_token'), {
-      context: CALENDAR_CONTEXTS[provider],
-    });
+      const response = await request(
+        'POST',
+        endpoint('/api/v1/one_time_token'),
+        {
+          context: CALENDAR_CONTEXTS[provider],
+        }
+      );
 
-    const hash = (response.data as { hash?: unknown })?.hash;
+      const hash = (response.data as { hash?: unknown })?.hash;
 
-    if (typeof hash !== 'string' || hash.length === 0) {
-      throw new Error('Invalid one_time_token response: missing hash');
-    }
+      if (typeof hash !== 'string' || hash.length === 0) {
+        throw new Error('Invalid one_time_token response: missing hash');
+      }
 
-    return endpoint('/api/v1/calendar_connection/:provider/authorize/:hash', {
-      provider,
-      hash,
-    });
+      return endpoint('/api/v1/calendar_connection/:provider/authorize/:hash', {
+        provider,
+        hash,
+      });
+    },
   });
 }
 
@@ -93,37 +99,41 @@ export interface CompleteCalendarPayload {
 }
 
 export function useCompleteCalendarConnection() {
-  return useMutation((v: CompleteCalendarPayload) => {
-    if (!isCalendarProvider(v.provider)) {
-      return Promise.reject(
-        new Error(`Unsupported calendar provider: ${String(v.provider)}`)
-      );
-    }
+  return useMutation({
+    mutationFn: (v: CompleteCalendarPayload) => {
+      if (!isCalendarProvider(v.provider)) {
+        return Promise.reject(
+          new Error(`Unsupported calendar provider: ${String(v.provider)}`)
+        );
+      }
 
-    // skipIntercept: Complete.tsx classifies the error itself (expired /
-    // mismatch / error phases). Without this the global interceptor double-
-    // toasts on 404/422/5xx alongside our themed phase card.
-    return request(
-      'POST',
-      endpoint('/api/v1/calendar_connection/:provider/complete', {
-        provider: v.provider,
-      }),
-      { handoff: v.handoff },
-      { skipIntercept: true }
-    );
+      // skipIntercept: Complete.tsx classifies the error itself (expired /
+      // mismatch / error phases). Without this the global interceptor double-
+      // toasts on 404/422/5xx alongside our themed phase card.
+      return request(
+        'POST',
+        endpoint('/api/v1/calendar_connection/:provider/complete', {
+          provider: v.provider,
+        }),
+        { handoff: v.handoff },
+        { skipIntercept: true }
+      );
+    },
   });
 }
 
 export function useDisconnectCalendar() {
   const queryClient = useQueryClient();
 
-  return useMutation(
-    () => request('DELETE', endpoint('/api/v1/calendar_connection')),
-    {
-      onSuccess: () => {
-        queryClient.removeQueries(['calendar_events']);
-        $refetch(['users']);
-      },
-    }
-  );
+  return useMutation({
+    mutationFn: () =>
+      request('DELETE', endpoint('/api/v1/calendar_connection')),
+
+    onSuccess: () => {
+      queryClient.removeQueries({
+        queryKey: ['calendar_events'],
+      });
+      $refetch(['users']);
+    },
+  });
 }

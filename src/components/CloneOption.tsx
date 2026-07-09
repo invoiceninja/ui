@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { IconType } from 'react-icons';
-import { Icon as ReactFeatherIcon } from 'react-feather';
-import { Icon } from './icons/Icon';
-import { Button } from './forms';
 import { ReactElement } from 'react';
+import { Icon as ReactFeatherIcon } from 'react-feather';
+import { IconType } from 'react-icons';
+import { Button } from './forms';
+import { Icon } from './icons/Icon';
 
 interface Props {
   onClick: () => void;

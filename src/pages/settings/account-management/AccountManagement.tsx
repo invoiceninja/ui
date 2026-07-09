@@ -8,11 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Tab, Tabs } from '$app/components/Tabs';
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Card } from '$app/components/cards';
+import { Tab, Tabs } from '$app/components/Tabs';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import {
@@ -20,9 +23,6 @@ import {
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
 import { useAccountManagementTabs } from './common/hooks/useAccountManagementTabs';
-import { Card } from '$app/components/cards';
-import { useColorScheme } from '$app/common/colors';
-import { useAtomValue } from 'jotai';
 
 export function AccountManagement() {
   const [t] = useTranslation();

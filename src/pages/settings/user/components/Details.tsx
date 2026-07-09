@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { useDispatch, useSelector } from 'react-redux';
+import { useOutletContext } from 'react-router-dom';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { updateChanges } from '$app/common/stores/slices/user';
 import { RootState } from '$app/common/stores/store';
 import { CustomField } from '$app/components/CustomField';
-import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
-import { useOutletContext } from 'react-router-dom';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { LanguageSelector } from '$app/components/LanguageSelector';
 import { Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
-import { LanguageSelector } from '$app/components/LanguageSelector';
-import { useAtom } from 'jotai';
 import { hasLanguageChanged } from '../../localization/common/atoms';
-import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 
 export function Details() {
   const [t] = useTranslation();

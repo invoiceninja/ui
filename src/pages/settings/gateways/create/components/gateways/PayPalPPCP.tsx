@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { Button } from '$app/components/forms';
+import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
-import { useResolveConfigValue } from '../../hooks/useResolveConfigValue';
-import { formatLabel } from '../../helpers/format-label';
-import { useResolveInputField } from '../../hooks/useResolveInputField';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Element } from '$app/components/cards';
+import { Button } from '$app/components/forms';
+import { formatLabel } from '../../helpers/format-label';
+import { useResolveConfigValue } from '../../hooks/useResolveConfigValue';
+import { useResolveInputField } from '../../hooks/useResolveInputField';
 
 interface Props {
   gateway: Gateway;

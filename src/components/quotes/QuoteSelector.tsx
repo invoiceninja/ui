@@ -9,10 +9,10 @@
  */
 
 import { endpoint } from '$app/common/helpers';
-import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
 import { Quote } from '$app/common/interfaces/quote';
+import { ComboboxAsync, Entry } from '../forms/Combobox';
 
 interface Props extends GenericSelectorProps<Quote> {
   clearButton?: boolean;

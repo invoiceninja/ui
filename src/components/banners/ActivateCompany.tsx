@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Popover } from '@headlessui/react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Popover } from '@headlessui/react';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 

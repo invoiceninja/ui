@@ -8,44 +8,44 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Client } from '$app/common/interfaces/client';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { Spinner } from '$app/components/Spinner';
 import { useAtomValue } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import {
-  ChangeTemplateModal,
-  useChangeTemplate,
-} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Client } from '$app/common/interfaces/client';
 import { Credit as ICredit } from '$app/common/interfaces/credit';
-import { useCreditQuery } from './common/queries';
-import { creditAtom, invoiceSumAtom } from './common/atoms';
-import { useActions, useCreditUtilities, useSave } from './common/hooks';
-import { Tabs } from '$app/components/Tabs';
-import { useTabs } from './common/hooks/useTabs';
-import { Banner } from '$app/components/Banner';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import {
   socketId,
   useSocketEvent,
   WithSocketId,
 } from '$app/common/queries/sockets';
-import { CommonActions } from '../invoices/edit/components/CommonActions';
-import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
-import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { Banner } from '$app/components/Banner';
+import { Page } from '$app/components/Breadcrumbs';
 import { InputLabel } from '$app/components/forms';
+import { Default } from '$app/components/layouts/Default';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Spinner } from '$app/components/Spinner';
+import { Tabs } from '$app/components/Tabs';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { CommonActions } from '../invoices/edit/components/CommonActions';
 import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { creditAtom, invoiceSumAtom } from './common/atoms';
+import { useActions, useCreditUtilities, useSave } from './common/hooks';
+import { useTabs } from './common/hooks/useTabs';
+import { useCreditQuery } from './common/queries';
 
 export default function Credit() {
   const { documentTitle } = useTitle('edit_credit');

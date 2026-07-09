@@ -9,9 +9,9 @@
  */
 
 import { atom, useAtom, useSetAtom } from 'jotai';
-import { isNavigationModalVisibleAtom } from './usePreventNavigation';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { isNavigationModalVisibleAtom } from './usePreventNavigation';
 
 interface PreventLeavingPage {
   prevent: boolean;

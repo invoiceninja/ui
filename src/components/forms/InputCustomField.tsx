@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AvailableTypes } from '$app/pages/settings/custom-fields/components';
 import { useEffect, useState } from 'react';
+import { useColorScheme } from '$app/common/colors';
+import { AvailableTypes } from '$app/pages/settings/custom-fields/components';
 import { InputField, SelectField } from '.';
 import Toggle from './Toggle';
-import { useColorScheme } from '$app/common/colors';
 
 export interface Props {
   defaultValue: any;

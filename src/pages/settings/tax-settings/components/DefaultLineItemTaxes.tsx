@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { Card, Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { companySettingsErrorsAtom } from '../../common/atoms';
-import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
-import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
-import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useColorScheme } from '$app/common/colors';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { TaxRate } from '$app/common/interfaces/tax-rate';
+import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
+import { Card, Element } from '$app/components/cards';
+import { SelectField } from '$app/components/forms';
+import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 
 export function DefaultLineItemTaxes() {
   const [t] = useTranslation();

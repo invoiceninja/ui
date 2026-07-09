@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
+import dayjs from 'dayjs';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { Task } from '$app/common/interfaces/task';
-import { useQueryClient } from 'react-query';
-import { useAtomValue } from 'jotai';
-import { invalidationQueryAtom } from '$app/common/atoms/data-table';
-import { parseTimeLog } from '../helpers/calculate-time';
-import dayjs from 'dayjs';
-import { isOverlapping } from '../helpers/is-overlapping';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Task } from '$app/common/interfaces/task';
+import { parseTimeLog } from '../helpers/calculate-time';
+import { isOverlapping } from '../helpers/is-overlapping';
 
 export function useStop() {
   const queryClient = useQueryClient();
@@ -52,7 +52,9 @@ export function useStop() {
       $refetch(['tasks']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
     });
   };
 }

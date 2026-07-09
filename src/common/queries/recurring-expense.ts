@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery, useQueryClient } from 'react-query';
-import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useAtomValue } from 'jotai';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { toast } from '../helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
@@ -26,20 +26,21 @@ interface BlankQueryParams {
 export function useBlankRecurringExpenseQuery(params: BlankQueryParams) {
   const hasPermission = useHasPermission();
 
-  return useQuery<RecurringExpense>(
-    ['/api/v1/recurring_expenses', 'create'],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/recurring_expenses', 'create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/recurring_expenses/create')).then(
         (response: GenericSingleResourceResponse<RecurringExpense>) =>
           response.data.data
       ),
-    {
-      enabled: hasPermission('create_recurring_expense')
-        ? (params.enabled ?? true)
-        : false,
-      staleTime: Infinity,
-    }
-  );
+
+    enabled: hasPermission('create_recurring_expense')
+      ? (params.enabled ?? true)
+      : false,
+
+    staleTime: Infinity,
+  });
 }
 
 interface Params {
@@ -48,9 +49,10 @@ interface Params {
 }
 
 export function useRecurringExpenseQuery(params: Params) {
-  return useQuery<RecurringExpense>(
-    ['/api/v1/recurring_expenses', params.id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/recurring_expenses', params.id],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/recurring_expenses/:id', { id: params.id })
@@ -58,8 +60,10 @@ export function useRecurringExpenseQuery(params: Params) {
         (response: GenericSingleResourceResponse<RecurringExpense>) =>
           response.data.data
       ),
-    { enabled: params.enabled ?? true, staleTime: Infinity }
-  );
+
+    enabled: params.enabled ?? true,
+    staleTime: Infinity,
+  });
 }
 
 const successMessages = {
@@ -88,7 +92,9 @@ export const useBulk = () => {
       toast.success(message);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
 
       $refetch(['recurring_expenses']);
     });

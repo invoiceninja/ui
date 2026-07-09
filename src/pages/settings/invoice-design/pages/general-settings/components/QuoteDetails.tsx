@@ -7,12 +7,13 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { Card } from '$app/components/cards';
+
 import { useTranslation } from 'react-i18next';
-import { SortableVariableList } from './SortableVariableList';
-import { useCustomField } from '$app/components/CustomField';
 import { useColorScheme } from '$app/common/colors';
+import { useCustomField } from '$app/components/CustomField';
+import { Card } from '$app/components/cards';
 import { Files } from '$app/components/icons/Files';
+import { SortableVariableList } from './SortableVariableList';
 
 export default function QuoteDetails() {
   const [t] = useTranslation();

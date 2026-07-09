@@ -8,10 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Modal } from '$app/components/Modal';
-import { Button } from '$app/components/forms';
+import { getDefaultStore, useSetAtom } from 'jotai';
+import { cloneDeep, get as lodashGet, set as lodashSet } from 'lodash';
 import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '$app/components/forms';
+import { Gear } from '$app/components/icons/Gear';
+import { Modal } from '$app/components/Modal';
+import { useColorScheme } from '../colors';
+import { toast } from '../helpers/toast/toast';
 import {
   ReactSettings,
   reactSettingsAtom,
@@ -20,11 +25,6 @@ import {
   useReactSettings,
   useUpdateReactSettings,
 } from './useReactSettings';
-import { getDefaultStore, useSetAtom } from 'jotai';
-import { toast } from '../helpers/toast/toast';
-import { Gear } from '$app/components/icons/Gear';
-import { useColorScheme } from '../colors';
-import { cloneDeep, get as lodashGet, set as lodashSet } from 'lodash';
 
 type AutoCompleteKey<T, Prefix extends string = ''> = keyof T extends never
   ? Prefix

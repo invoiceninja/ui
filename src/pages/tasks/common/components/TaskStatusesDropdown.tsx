@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { useTaskStatusesQuery } from '$app/common/queries/task-statuses';
 import Tippy from '@tippyjs/react/headless';
 import { Dispatch, SetStateAction, useState } from 'react';
-import { useUpdateTask } from '../hooks/useUpdateTask';
-import { Task } from '$app/common/interfaces/task';
 import { useTranslation } from 'react-i18next';
-import { CreateTaskStatusModal } from '$app/pages/settings/task-statuses/components/CreateTaskStatusModal';
-import { TaskStatus } from '$app/common/interfaces/task-status';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { Plus } from '$app/components/icons/Plus';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { Task } from '$app/common/interfaces/task';
+import { TaskStatus } from '$app/common/interfaces/task-status';
+import { useTaskStatusesQuery } from '$app/common/queries/task-statuses';
+import { Plus } from '$app/components/icons/Plus';
 import { RadioChecked } from '$app/components/icons/RadioChecked';
 import { RadioUnchecked } from '$app/components/icons/RadioUnchecked';
+import { CreateTaskStatusModal } from '$app/pages/settings/task-statuses/components/CreateTaskStatusModal';
+import { useUpdateTask } from '../hooks/useUpdateTask';
 
 const OptionElement = styled.div`
   &:hover {

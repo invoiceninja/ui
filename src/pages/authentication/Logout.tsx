@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { clearLocalStorage } from '$app/common/helpers/local-storage';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { useQueryClient } from 'react-query';
+import { clearLocalStorage } from '$app/common/helpers/local-storage';
 
 export function Logout() {
   const queryClient = useQueryClient();

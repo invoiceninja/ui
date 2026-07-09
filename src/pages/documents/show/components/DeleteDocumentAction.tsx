@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Modal } from '$app/components/Modal';
 import { useState } from 'react';
-import { docuNinjaEndpoint } from '$app/common/helpers';
 import { useTranslation } from 'react-i18next';
+import { MdDelete } from 'react-icons/md';
+import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { Button } from '$app/components/forms';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { Document } from '$app/common/interfaces/docuninja/api';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
-import { MdDelete } from 'react-icons/md';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { Modal } from '$app/components/Modal';
 
 interface Props {
   document: Document;

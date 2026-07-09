@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { atom } from 'jotai';
+import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 
 export const recurringExpenseAtom = atom<RecurringExpense | undefined>(
   undefined

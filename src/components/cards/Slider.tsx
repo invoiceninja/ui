@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Fragment, ReactNode } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import CommonProps from '$app/common/interfaces/common-props.interface';
-import { MdClose } from 'react-icons/md';
 import classNames from 'classnames';
-import { Inline } from '../Inline';
+import { Fragment, ReactNode } from 'react';
+import { MdClose } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
+import CommonProps from '$app/common/interfaces/common-props.interface';
+import { Inline } from '../Inline';
 
 interface Props extends CommonProps {
   visible: boolean;

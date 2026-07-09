@@ -8,30 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useOutletContext } from 'react-router-dom';
-import { Context } from '../Edit';
+import { AxiosError } from 'axios';
+import classNames from 'classnames';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { Card } from '$app/components/cards';
+import { useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
-import { useState, useEffect } from 'react';
-import { Button } from '$app/components/forms';
-import { InputField } from '$app/components/forms';
-import { SelectField } from '$app/components/forms';
-import { Element } from '$app/components/cards';
-import Toggle from '$app/components/forms/Toggle';
-import classNames from 'classnames';
-import { PaymentSchedule as ScheduleComponent } from '$app/pages/settings/schedules/common/components/PaymentSchedule';
-import { Schedule } from '$app/common/interfaces/schedule';
 import frequencies from '$app/common/constants/frequency';
-import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { AxiosError } from 'axios';
-import { History as HistoryIcon } from '$app/components/icons/History';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Schedule } from '$app/common/interfaces/schedule';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Card, Element } from '$app/components/cards';
+import { Button, InputField, SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { History as HistoryIcon } from '$app/components/icons/History';
+import { PaymentSchedule as ScheduleComponent } from '$app/pages/settings/schedules/common/components/PaymentSchedule';
+import { Context } from '../Edit';
 
 const ScheduleBox = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};

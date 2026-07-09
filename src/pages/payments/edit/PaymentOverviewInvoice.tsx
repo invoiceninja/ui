@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useTranslation } from 'react-i18next';
-import { Payment, Paymentable } from '$app/common/interfaces/payment';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Link } from 'react-router-dom';
-import { route } from '$app/common/helpers/route';
 import { useColorScheme } from '$app/common/colors';
-import { Credit } from '$app/common/interfaces/credit';
-import { ExternalLink } from '$app/components/icons/ExternalLink';
 import { dateUTC } from '$app/common/helpers/payment';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { Credit } from '$app/common/interfaces/credit';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Payment, Paymentable } from '$app/common/interfaces/payment';
+import { ExternalLink } from '$app/components/icons/ExternalLink';
 
 interface Props {
   payment: Payment;

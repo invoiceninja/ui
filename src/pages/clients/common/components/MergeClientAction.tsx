@@ -9,12 +9,12 @@
  */
 
 import { Dispatch, SetStateAction, useState } from 'react';
-import { MergeClientModal } from './MergeClientModal';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { useTranslation } from 'react-i18next';
-import { Client } from '$app/common/interfaces/client';
-import { Icon } from '$app/components/icons/Icon';
 import { BiGitMerge } from 'react-icons/bi';
+import { Client } from '$app/common/interfaces/client';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { MergeClientModal } from './MergeClientModal';
 
 interface Props {
   client: Client;

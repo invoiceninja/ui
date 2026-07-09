@@ -8,35 +8,35 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isCalendarConnectionAvailable } from '$app/common/helpers';
-import { Default } from '$app/components/layouts/Default';
-import { Button } from '$app/components/forms';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { useTasksQuery } from '$app/common/queries/tasks';
-import { Task } from '$app/common/interfaces/task';
+import Tippy from '@tippyjs/react';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
+import { FaGoogle, FaMicrosoft, FaTasks } from 'react-icons/fa';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
-import { useTaskUserFilters } from '../common/components/TaskUserFilters';
-import { ChevronLeft } from '$app/components/icons/ChevronLeft';
-import { ChevronRight } from '$app/components/icons/ChevronRight';
-import { Plus } from '$app/components/icons/Plus';
-import { QuickLogTimeModal } from '../common/components/QuickLogTimeModal';
-import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
-import { CalendarConnectCta } from '../common/components/CalendarConnectCta';
-import { ConvertCalendarEventModal } from '../common/components/ConvertCalendarEventModal';
+import { isCalendarConnectionAvailable } from '$app/common/helpers';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useCalendarEventsQuery } from '$app/common/queries/calendar';
+import { useTitle } from '$app/common/hooks/useTitle';
 import {
   CalendarEvent,
   calendarEventDateKey,
   calendarEventKey,
 } from '$app/common/interfaces/calendar-event';
-import { FaGoogle, FaMicrosoft, FaTasks } from 'react-icons/fa';
-import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
-import Tippy from '@tippyjs/react';
+import { Task } from '$app/common/interfaces/task';
+import { useCalendarEventsQuery } from '$app/common/queries/calendar';
+import { useTasksQuery } from '$app/common/queries/tasks';
+import { Button } from '$app/components/forms';
+import { ChevronLeft } from '$app/components/icons/ChevronLeft';
+import { ChevronRight } from '$app/components/icons/ChevronRight';
+import { Plus } from '$app/components/icons/Plus';
+import { Default } from '$app/components/layouts/Default';
+import { CalendarConnectCta } from '../common/components/CalendarConnectCta';
+import { ConvertCalendarEventModal } from '../common/components/ConvertCalendarEventModal';
+import { QuickLogTimeModal } from '../common/components/QuickLogTimeModal';
+import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
+import { useTaskUserFilters } from '../common/components/TaskUserFilters';
 import {
   taskCalendarLabel,
   taskPrimaryLabel,

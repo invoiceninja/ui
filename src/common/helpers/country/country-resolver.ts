@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Country } from '$app/common/interfaces/country';
 import { useStaticsQuery } from '$app/common/queries/statics';
 
 export function useCountryResolver() {
@@ -16,7 +17,7 @@ export function useCountryResolver() {
   const find = (id: string) => {
     if (statics) {
       return Promise.resolve(
-        statics.data?.countries.find((country) => country.id === id)
+        statics.data?.countries.find((country: Country) => country.id === id)
       );
     }
 

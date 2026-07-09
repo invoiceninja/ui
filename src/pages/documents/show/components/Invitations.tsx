@@ -8,29 +8,29 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Calendar } from 'react-feather';
+import classNames from 'classnames';
 import { useState } from 'react';
+import { Calendar } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { toast } from '$app/common/helpers/toast/toast';
-import { Badge } from '$app/components/Badge';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date, docuNinjaEndpoint } from '$app/common/helpers';
-import {
-  type Document as DocumentType,
-  type DocumentInvitation,
-  DocumentStatus,
-} from '$app/common/interfaces/docuninja/api';
-import { route, routeWithOrigin } from '$app/common/helpers/route';
+import { MdSend } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
-import { Plus } from '$app/components/icons/Plus';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '$app/components/forms';
-import { MdSend } from 'react-icons/md';
-import { Icon } from '$app/components/icons/Icon';
+import { date, docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { route, routeWithOrigin } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import classNames from 'classnames';
+import {
+  type DocumentInvitation,
+  DocumentStatus,
+  type Document as DocumentType,
+} from '$app/common/interfaces/docuninja/api';
+import { Badge } from '$app/components/Badge';
+import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Plus } from '$app/components/icons/Plus';
 
 type InvitationsProps = {
   document: DocumentType;

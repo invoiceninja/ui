@@ -1,19 +1,17 @@
-import { useEffect, useState } from 'react';
-import React from 'react';
-import { Modal } from '$app/components/Modal';
-import { SelectField } from '$app/components/forms';
+import { useQuery } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { PaymentMethodForm } from '$app/pages/settings/account-management/component/plan/PaymentMethodForm';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-import { Button } from '$app/components/forms';
-import Toggle from '$app/components/forms/Toggle';
-import { AxiosResponse } from 'axios';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { useQuery } from 'react-query';
 import { GatewayToken } from '$app/common/interfaces/client';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { Button, SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { Modal } from '$app/components/Modal';
+import { PaymentMethodForm } from '$app/pages/settings/account-management/component/plan/PaymentMethodForm';
 
 interface Props {
   visible: boolean;

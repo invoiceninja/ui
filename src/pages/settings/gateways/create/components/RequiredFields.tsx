@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { Gateway } from '$app/common/interfaces/statics';
-import { Divider } from '$app/components/cards/Divider';
-import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { Gateway } from '$app/common/interfaces/statics';
+import { Element } from '$app/components/cards';
+import { Divider } from '$app/components/cards/Divider';
+import Toggle from '$app/components/forms/Toggle';
 
 interface Props {
   gateway: Gateway;

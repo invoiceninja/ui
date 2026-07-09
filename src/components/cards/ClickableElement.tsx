@@ -9,9 +9,9 @@
  */
 
 import { Link } from 'react-router-dom';
-import CommonProps from '../../common/interfaces/common-props.interface';
 import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import CommonProps from '../../common/interfaces/common-props.interface';
 
 const ButtonStyled = styled.button`
   color: ${(props) => props.theme.color};

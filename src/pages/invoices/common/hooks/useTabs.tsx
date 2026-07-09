@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -18,8 +20,6 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Tab } from '$app/components/Tabs';
 import { ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 import { useUnappliedPayments } from '../../edit/hooks/useUnappliedPayments';
 
 interface Params {

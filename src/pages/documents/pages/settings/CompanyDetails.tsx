@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { classNames } from '$app/common/helpers';
 import { Page } from '$app/components/Breadcrumbs';
 import { SelectField } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
-import { useTranslation } from 'react-i18next';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { styled } from 'styled-components';
 import { useSettingsTabs } from './common/hooks/useSettingsTabs';
 
 const LinkStyled = styled(Link)`

@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Transaction } from '$app/common/interfaces/transactions';
-import { useAtomValue } from 'jotai';
-import { useQuery, useQueryClient } from 'react-query';
-import { $refetch } from '../hooks/useRefetch';
 import { useHasPermission } from '../hooks/permissions/useHasPermission';
+import { $refetch } from '../hooks/useRefetch';
 
 interface TransactionParams {
   id: string | undefined;
@@ -25,9 +25,10 @@ interface TransactionParams {
 }
 
 export function useTransactionQuery(params: TransactionParams) {
-  return useQuery<Transaction>(
-    ['/api/v1/bank_transactions', params.id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/bank_transactions', params.id],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/bank_transactions/:id', { id: params.id })
@@ -35,22 +36,27 @@ export function useTransactionQuery(params: TransactionParams) {
         (response: GenericSingleResourceResponse<Transaction>) =>
           response.data.data
       ),
-    { enabled: params.enabled ?? true, staleTime: Infinity }
-  );
+
+    enabled: params.enabled ?? true,
+    staleTime: Infinity,
+  });
 }
 
 export function useBlankTransactionQuery() {
   const hasPermission = useHasPermission();
 
-  return useQuery<Transaction>(
-    ['/api/v1/bank_transactions', 'create'],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/bank_transactions', 'create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/bank_transactions/create')).then(
         (response: GenericSingleResourceResponse<Transaction>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: hasPermission('create_bank_transaction') }
-  );
+
+    staleTime: Infinity,
+    enabled: hasPermission('create_bank_transaction'),
+  });
 }
 
 const successMessages = {
@@ -81,7 +87,9 @@ export const useBulk = () => {
       $refetch(['bank_transactions']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
     });
   };
 };

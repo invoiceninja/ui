@@ -8,20 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
-import { useGroupSettingsQuery } from '$app/common/queries/group-settings';
-import { useTranslation } from 'react-i18next';
-import { Client } from '$app/common/interfaces/client';
 import { set } from 'lodash';
 import { Dispatch, SetStateAction } from 'react';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { CustomField } from '$app/components/CustomField';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import Toggle from '$app/components/forms/Toggle';
-import { EntityStatus } from '$app/components/EntityStatus';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Client } from '$app/common/interfaces/client';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useGroupSettingsQuery } from '$app/common/queries/group-settings';
+import { CustomField } from '$app/components/CustomField';
+import { Card, Element } from '$app/components/cards';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { InputField, SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
 import { UserSelector } from '$app/components/users/UserSelector';
+
 interface Props {
   client: Client | undefined;
   setClient: Dispatch<SetStateAction<Client | undefined>>;

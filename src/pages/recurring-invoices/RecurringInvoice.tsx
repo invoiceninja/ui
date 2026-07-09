@@ -8,41 +8,40 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Client } from '$app/common/interfaces/client';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { Spinner } from '$app/components/Spinner';
 import { useAtom, useAtomValue } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
-
+import { refreshEntityDataBannerAtom } from '$app/App';
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
-import { ConfirmActionModal } from './common/components/ConfirmActionModal';
+import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { useRecurringInvoiceQuery } from './common/queries';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Client } from '$app/common/interfaces/client';
+import { RecurringInvoice as RecurringInvoiceType } from '$app/common/interfaces/recurring-invoice';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Banner } from '$app/components/Banner';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Spinner } from '$app/components/Spinner';
+import { Tabs } from '$app/components/Tabs';
+import { CommonActions } from '../invoices/edit/components/CommonActions';
+import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { recurringInvoiceAtom } from './common/atoms';
+import { ConfirmActionModal } from './common/components/ConfirmActionModal';
 import {
   useActions,
   useRecurringInvoiceUtilities,
   useSave,
 } from './common/hooks';
-import { RecurringInvoice as RecurringInvoiceType } from '$app/common/interfaces/recurring-invoice';
-import { Tabs } from '$app/components/Tabs';
+import { useRecurringInvoiceQuery } from './common/queries';
 import { useTabs } from './edit/hooks/useTabs';
-import { CommonActions } from '../invoices/edit/components/CommonActions';
-import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
-import { Banner } from '$app/components/Banner';
-import { refreshEntityDataBannerAtom } from '$app/App';
-import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function RecurringInvoice() {
   const { documentTitle } = useTitle('edit_recurring_invoice');

@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Modal } from '$app/components/Modal';
-import { Button } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
+import { Button } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
 
 interface Props {
   visible: boolean;

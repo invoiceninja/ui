@@ -8,19 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { Button } from '$app/components/forms';
-import { CardContainer, Element } from '$app/components/cards';
-import { ReactNode, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { route } from '$app/common/helpers/route';
-import { docuNinjaEndpoint } from '$app/common/helpers';
 import { AxiosError } from 'axios';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Icon } from '$app/components/icons/Icon';
+import { ReactNode, useState } from 'react';
 import {
   Briefcase,
   Clipboard,
@@ -34,6 +23,17 @@ import {
   Tool,
   Users,
 } from 'react-feather';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { docuNinjaEndpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { CardContainer, Element } from '$app/components/cards';
+import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
 
 interface TemplateSelectionStepProps {
   onComplete: (blueprintId: string) => void;

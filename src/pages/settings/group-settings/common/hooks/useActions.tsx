@@ -8,24 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint, getEntityState } from '$app/common/helpers';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Action } from '$app/components/ResourceActions';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Icon } from '$app/components/icons/Icon';
-import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
-import { EntityState } from '$app/common/enums/entity-state';
-import { GroupSettings } from '$app/common/interfaces/group-settings';
-import { Divider } from '$app/components/cards/Divider';
+import { useQueryClient } from '@tanstack/react-query';
 import { Settings } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
-import { useQueryClient } from 'react-query';
+import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { EntityState } from '$app/common/enums/entity-state';
+import { endpoint, getEntityState } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { route } from '$app/common/helpers/route';
-import { useConfigureGroupSettings } from './useConfigureGroupSettings';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { useBulk } from '$app/common/queries/group-settings';
+import { Divider } from '$app/components/cards/Divider';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
+import { useConfigureGroupSettings } from './useConfigureGroupSettings';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -42,9 +42,10 @@ export function useActions() {
   const isEditPage = location.pathname.includes(id!);
 
   const fetchGroupSettingsDetails = async (groupSettingsId: string) => {
-    const groupSettingsResponse = await queryClient.fetchQuery(
-      ['/api/v1/group_settings', groupSettingsId],
-      () =>
+    const groupSettingsResponse = await queryClient.fetchQuery({
+      queryKey: ['/api/v1/group_settings', groupSettingsId],
+
+      queryFn: () =>
         request(
           'GET',
           endpoint('/api/v1/group_settings/:id', { id: groupSettingsId })
@@ -52,8 +53,9 @@ export function useActions() {
           (response: GenericSingleResourceResponse<GroupSettings>) =>
             response.data.data
         ),
-      { staleTime: Infinity }
-    );
+
+      staleTime: Infinity,
+    });
 
     configureGroupSettings(groupSettingsResponse);
   };

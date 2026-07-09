@@ -8,23 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { Vendor } from '$app/common/interfaces/vendor';
-import { useQueryClient } from 'react-query';
 
 export function useVendorResolver() {
   const queryClient = useQueryClient();
 
   const find = (id: string) => {
-    return queryClient.fetchQuery<Vendor>(
-      ['/api/v1/vendors', id],
-      () =>
+    return queryClient.fetchQuery({
+      queryKey: ['/api/v1/vendors', id],
+
+      queryFn: () =>
         request('GET', endpoint('/api/v1/vendors/:id', { id })).then(
           (response) => response.data.data
         ),
-      { staleTime: Infinity }
-    );
+
+      staleTime: Infinity,
+    });
   };
 
   return { find };

@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { MdInfoOutline } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Alert } from '$app/components/Alert';
 import { Link } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
-import { useTranslation } from 'react-i18next';
-import { MdInfoOutline } from 'react-icons/md';
 
 export function UsersPlanAlert() {
   const [t] = useTranslation();

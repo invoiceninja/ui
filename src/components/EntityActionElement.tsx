@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Tooltip } from './Tooltip';
-import { useNavigate } from 'react-router-dom';
-import { IconType } from 'react-icons';
 import { Icon as ReactFeatherIcon } from 'react-feather';
-import { Icon } from './icons/Icon';
-import { DropdownElement } from './dropdown/DropdownElement';
+import { IconType } from 'react-icons';
+import { useNavigate } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import { useShowActionByPreferences } from '$app/common/hooks/useShowActionByPreferences';
 import CommonProps from '$app/common/interfaces/common-props.interface';
 import { Entity } from './CommonActionsPreferenceModal';
-import { useShowActionByPreferences } from '$app/common/hooks/useShowActionByPreferences';
-import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
-import { useColorScheme } from '$app/common/colors';
+import { DropdownElement } from './dropdown/DropdownElement';
+import { Icon } from './icons/Icon';
+import { Tooltip } from './Tooltip';
 
 interface Props extends CommonProps {
   onClick?: () => void;

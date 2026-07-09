@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isHosted, isSelfHosted } from '$app/common/helpers';
 import dayjs from 'dayjs';
+import { isHosted, isSelfHosted } from '$app/common/helpers';
 import { enterprisePlan } from '../guards/guards/enterprise-plan';
 import { proPlan } from '../guards/guards/pro-plan';
 import { useCurrentAccount } from './useCurrentAccount';

@@ -8,32 +8,33 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
-import { useTitle } from '$app/common/hooks/useTitle';
-import {
-  Invitation,
-  PurchaseOrder,
-} from '$app/common/interfaces/purchase-order';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
-import { Spinner } from '$app/components/Spinner';
 import { cloneDeep } from 'lodash';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { blankInvitation } from '$app/common/constants/blank-invitation';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
+import {
+  Invitation,
+  PurchaseOrder,
+} from '$app/common/interfaces/purchase-order';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { VendorContact } from '$app/common/interfaces/vendor-contact';
+import { useBlankPurchaseOrderQuery } from '$app/common/queries/purchase-orders';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
+import { Tab, Tabs } from '$app/components/Tabs';
 import { purchaseOrderAtom } from '../common/atoms';
 import { useCreate } from '../common/hooks';
-import { blankInvitation } from '$app/common/constants/blank-invitation';
-import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
-import { useBlankPurchaseOrderQuery } from '$app/common/queries/purchase-orders';
-import { Tab, Tabs } from '$app/components/Tabs';
-import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 import { usePurchaseOrderUtilities } from '../edit/hooks/usePurchaseOrderUtilities';
-import { Vendor } from '$app/common/interfaces/vendor';
 
 export interface PurchaseOrderContext {
   vendor: Vendor | undefined;
@@ -168,7 +169,7 @@ export default function Create() {
 
         const invitations: Invitation[] = [];
 
-        vendor.contacts.map((contact) => {
+        vendor.contacts.map((contact: VendorContact) => {
           if (contact.send_email) {
             const invitation = cloneDeep(
               blankInvitation

@@ -8,68 +8,68 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { TabGroup } from '$app/components/TabGroup';
-import { Element } from '$app/components/cards';
-import { Divider } from '$app/components/cards/Divider';
-import { Slider } from '$app/components/cards/Slider';
-import { atom, useAtom } from 'jotai';
-import { useTranslation } from 'react-i18next';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date, endpoint, trans } from '$app/common/helpers';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useQuery, useQueryClient } from 'react-query';
-import { request } from '$app/common/helpers/request';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { NonClickableElement } from '$app/components/cards/NonClickableElement';
-import { Link } from '$app/components/forms';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { atom, useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
+import { ChevronRight } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import { MdInfo } from 'react-icons/md';
-import { route } from '$app/common/helpers/route';
+import { useNavigate } from 'react-router-dom';
 import reactStringReplace from 'react-string-replace';
-import { Tooltip } from '$app/components/Tooltip';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { date, endpoint, trans } from '$app/common/helpers';
+import { sanitizeHTML } from '$app/common/helpers/html-string';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { useActions } from '../hooks';
-import { QuoteStatus } from './QuoteStatus';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { Invoice } from '$app/common/interfaces/invoice';
 import { Quote } from '$app/common/interfaces/quote';
+import { QuoteActivity } from '$app/common/interfaces/quote-activity';
+import { useInvoiceQuery } from '$app/common/queries/invoices';
+import { Element } from '$app/components/cards';
+import { Divider } from '$app/components/cards/Divider';
+import { NonClickableElement } from '$app/components/cards/NonClickableElement';
+import { Slider } from '$app/components/cards/Slider';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { EmailRecord } from '$app/components/EmailRecord';
+import { Link } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { ArrowRight } from '$app/components/icons/ArrowRight';
+import { CloudPlay } from '$app/components/icons/CloudPlay';
+import { CopyToClipboard } from '$app/components/icons/CopyToClipboard';
+import { History } from '$app/components/icons/History';
+import { Icon } from '$app/components/icons/Icon';
+import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { TabGroup } from '$app/components/TabGroup';
+import { Tooltip } from '$app/components/Tooltip';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
+import { ViewLineItem } from '$app/pages/invoices/common/components/ViewLineItem';
 import {
   generateClientPortalUrl,
   openClientPortal,
 } from '$app/pages/invoices/common/helpers/open-client-portal';
-import { EmailRecord } from '$app/components/EmailRecord';
-import { useEffect, useState } from 'react';
-import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
-import { QuoteActivity } from '$app/common/interfaces/quote-activity';
-import { useInvoiceQuery } from '$app/common/queries/invoices';
-import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
-import { ViewLineItem } from '$app/pages/invoices/common/components/ViewLineItem';
-import { sanitizeHTML } from '$app/common/helpers/html-string';
-import Toggle from '$app/components/forms/Toggle';
-import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
-import { useColorScheme } from '$app/common/colors';
-import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
-import { useDateTime } from '$app/common/hooks/useDateTime';
-import { useGetSetting } from '$app/common/hooks/useGetSetting';
-import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
-import classNames from 'classnames';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
-import { CloudPlay } from '$app/components/icons/CloudPlay';
-import { CopyToClipboard } from '$app/components/icons/CopyToClipboard';
-import { ArrowRight } from '$app/components/icons/ArrowRight';
-import { History } from '$app/components/icons/History';
-import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
-import { ChevronRight } from 'react-feather';
-import { Icon } from '$app/components/icons/Icon';
+import { useActions } from '../hooks';
+import { QuoteStatus } from './QuoteStatus';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -196,15 +196,17 @@ export function QuoteSlider() {
 
   const fetchEmailHistory = async () => {
     const response = await queryClient
-      .fetchQuery(
-        ['/api/v1/quotes', quote?.id, 'emailHistory'],
-        () =>
+      .fetchQuery({
+        queryKey: ['/api/v1/quotes', quote?.id, 'emailHistory'],
+
+        queryFn: () =>
           request('POST', endpoint('/api/v1/emails/entityHistory'), {
             entity: 'quote',
             entity_id: quote?.id,
           }),
-        { staleTime: Infinity }
-      )
+
+        staleTime: Infinity,
+      })
       .then((response) => response.data);
 
     setEmailRecords(response);

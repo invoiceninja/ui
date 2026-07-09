@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import dayjs from 'dayjs';
+import { useDispatch } from 'react-redux';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { DataTable } from '$app/components/DataTable';
-import { useDispatch } from 'react-redux';
-import { useTaxRateColumns } from './common/hooks/useTaxRateColumns';
 import {
   resetChanges,
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
-import dayjs from 'dayjs';
+import { DataTable } from '$app/components/DataTable';
+import { useTaxRateColumns } from './common/hooks/useTaxRateColumns';
 
 export function TaxRates() {
   const dispatch = useDispatch();

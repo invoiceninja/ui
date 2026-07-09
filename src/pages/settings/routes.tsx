@@ -8,15 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Navigate, Outlet, Route } from 'react-router-dom';
 import { Guard } from '$app/common/guards/Guard';
 import { admin, owner } from '$app/common/guards/guards/admin';
-import { Navigate, Outlet, Route } from 'react-router-dom';
-import { plan } from '$app/common/guards/guards/plan';
-import * as Settings from './index';
-import { isDemo } from '$app/common/helpers';
-import { invoiceDesignRoutes } from '$app/pages/settings/invoice-design/routes';
 import { or } from '$app/common/guards/guards/or';
-import { isHosted } from '$app/common/helpers';
+import { plan } from '$app/common/guards/guards/plan';
+import { isDemo, isHosted } from '$app/common/helpers';
+import { invoiceDesignRoutes } from '$app/pages/settings/invoice-design/routes';
+import * as Settings from './index';
 
 export const settingsRoutes = (
   <Route path="/settings">

@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { MdDownload } from 'react-icons/md';
 import { Document } from '$app/common/interfaces/docuninja/api';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { useDownloadDocument } from '$app/pages/documents/show/hooks/useDownloadDocument';
-import { useTranslation } from 'react-i18next';
-import { MdDownload } from 'react-icons/md';
 
 interface Props {
   blobUrl: string;

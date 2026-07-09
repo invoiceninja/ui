@@ -9,11 +9,11 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { useSumTableColumn } from '$app/common/hooks/useSumTableColumn';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useSumTableColumn } from '$app/common/hooks/useSumTableColumn';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { DataTableFooterColumnsExtended } from '$app/pages/invoices/common/hooks/useFooterColumns';
 import { useAllRecurringInvoiceColumns } from '../hooks';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 
 export function useFooterColumns() {
   const [t] = useTranslation();

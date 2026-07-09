@@ -10,10 +10,9 @@
 
 import { EInvoiceType } from '$app/pages/settings';
 import { Expense } from './expense';
-import { Activity } from './invoice';
+import { Activity, Sync } from './invoice';
 import { InvoiceItem } from './invoice-item';
 import { Vendor } from './vendor';
-import { Sync } from './invoice';
 export interface PurchaseOrder {
   id: string;
   user_id: string;

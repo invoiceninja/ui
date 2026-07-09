@@ -8,19 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
-import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
-import { GroupSettings } from '../interfaces/group-settings';
 import { toast } from '../helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
+import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
+import { GroupSettings } from '../interfaces/group-settings';
 import { Params as GlobalParams } from './common/params.interface';
 
 export function useGroupSettingsQuery(params?: GlobalParams) {
-  return useQuery<GroupSettings[]>(
-    ['/api/v1/group_settings', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/group_settings', params],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/group_settings?status=:status&per_page=:perPage', {
@@ -31,8 +32,9 @@ export function useGroupSettingsQuery(params?: GlobalParams) {
         (response: GenericSingleResourceResponse<GroupSettings[]>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 }
 
 interface Params {
@@ -42,15 +44,17 @@ interface Params {
 export function useGroupQuery(params: Params) {
   const { id } = params;
 
-  return useQuery<GroupSettings>(
-    ['/api/v1/group_settings', id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/group_settings', id],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/group_settings/:id', { id })).then(
         (response: GenericSingleResourceResponse<GroupSettings>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 }
 
 export function useBulk() {

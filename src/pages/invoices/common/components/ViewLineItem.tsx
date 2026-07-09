@@ -8,6 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCallback, useMemo } from 'react';
+import { ChevronRight } from 'react-feather';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Client } from '$app/common/interfaces/client';
@@ -16,11 +21,6 @@ import {
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
 import { Icon } from '$app/components/icons/Icon';
-import { useCallback, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ChevronRight } from 'react-feather';
-import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};

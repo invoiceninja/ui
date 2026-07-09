@@ -1,14 +1,4 @@
-import { endpoint } from '$app/common/helpers';
-import { wait } from '$app/common/helpers/wait';
-import { GatewayToken } from '$app/common/interfaces/client';
-import { request } from '$app/common/helpers/request';
 import { RadioGroup } from '@headlessui/react';
-import { Alert } from '$app/components/Alert';
-import { Spinner } from '$app/components/Spinner';
-import { Button } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
-import { MdCreditCard } from 'react-icons/md';
-
 import type {
   Stripe,
   StripeCardElement,
@@ -16,12 +6,21 @@ import type {
   PaymentIntent as StripePaymentIntent,
 } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js/pure';
+import { useQueryClient } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdCreditCard } from 'react-icons/md';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQueryClient } from 'react-query';
+import { wait } from '$app/common/helpers/wait';
 import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
+import { GatewayToken } from '$app/common/interfaces/client';
+import { Alert } from '$app/components/Alert';
+import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Spinner } from '$app/components/Spinner';
 
 export interface ResponsePaymentIntent {
   id: string;
@@ -243,11 +242,13 @@ export function PaymentMethodForm({
                   onPaymentComplete();
                 }
                 setIsSubmitting(false);
-                queryClient.invalidateQueries(
-                  '/api/client/account_management/methods'
-                );
+                queryClient.invalidateQueries({
+                  queryKey: ['/api/client/account_management/methods'],
+                });
                 // Invalidate DocuNinja login query to refresh account data
-                queryClient.invalidateQueries('/api/docuninja/login');
+                queryClient.invalidateQueries({
+                  queryKey: ['/api/docuninja/login'],
+                });
                 // Force DocuNinja service to reinitialize
                 refresh();
               })
@@ -285,7 +286,9 @@ export function PaymentMethodForm({
           }
           setIsSubmitting(false);
           // Invalidate DocuNinja login query to refresh account data
-          queryClient.invalidateQueries('/api/docuninja/login');
+          queryClient.invalidateQueries({
+            queryKey: ['/api/docuninja/login'],
+          });
           // Force DocuNinja service to reinitialize
           refresh();
         })

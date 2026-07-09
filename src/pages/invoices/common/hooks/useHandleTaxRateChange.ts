@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useSetAtom } from 'jotai';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
-import { useSetAtom } from 'jotai';
 import {
-  ProductTableResource,
   isDeleteActionTriggeredAtom,
+  ProductTableResource,
 } from '../components/ProductsTable';
 
 interface Props {

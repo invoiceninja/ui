@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InputLabel } from '$app/components/forms/InputLabel';
+import { Editor } from '@tinymce/tinymce-react';
 import { debounce } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
 import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { InputLabel } from '$app/components/forms/InputLabel';
 import { TipTapEditor } from '../TipTapEditor';
 
 interface Props {

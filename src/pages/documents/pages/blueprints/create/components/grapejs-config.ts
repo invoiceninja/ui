@@ -1,9 +1,9 @@
 import pluginBlocks from 'grapesjs-blocks-basic';
-import pluginExport from 'grapesjs-plugin-export';
 import pluginParserPostcss from 'grapesjs-parser-postcss';
-import pluginTuiImageEditor from 'grapesjs-tui-image-editor';
-import pluginStyleBg from 'grapesjs-style-bg';
+import pluginExport from 'grapesjs-plugin-export';
 import pluginPresetWebpage from 'grapesjs-preset-webpage';
+import pluginStyleBg from 'grapesjs-style-bg';
+import pluginTuiImageEditor from 'grapesjs-tui-image-editor';
 
 export const grapejsConfig = {
   height: '100%',

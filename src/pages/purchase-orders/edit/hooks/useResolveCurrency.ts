@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
-import { useResolveCurrency as useResolveCurrencyHook } from '$app/common/hooks/useResolveCurrency';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useResolveCurrency as useResolveCurrencyHook } from '$app/common/hooks/useResolveCurrency';
+import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
 
 export function useResolveCurrency() {
   const vendorResolver = useVendorResolver();

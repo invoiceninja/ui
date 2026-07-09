@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 import { endpoint, trans } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Task } from '$app/common/interfaces/task';
-import { useQuery, useQueryClient } from 'react-query';
-import { GenericQueryOptions } from './invoices';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { toast } from '../helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
+import { GenericQueryOptions } from './invoices';
 
 interface TaskParams {
   id?: string;
@@ -27,34 +27,36 @@ interface TaskParams {
 }
 
 export function useTaskQuery(params: TaskParams) {
-  return useQuery<Task>(
-    ['/api/v1/tasks', params.id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/tasks', params.id],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/tasks/:id?include=status', { id: params.id })
       ).then((response) => response.data.data),
-    { staleTime: Infinity, enabled: params.enabled ?? Boolean(params.id) }
-  );
+
+    staleTime: Infinity,
+    enabled: params.enabled ?? Boolean(params.id),
+  });
 }
 
 export function useBlankTaskQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();
 
-  return useQuery(
-    ['/api/v1/tasks/create'],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/tasks/create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/tasks/create')).then(
         (response: GenericSingleResourceResponse<Task>) => response.data.data
       ),
-    {
-      ...options,
-      staleTime: Infinity,
-      enabled: hasPermission('create_task')
-        ? (options?.enabled ?? true)
-        : false,
-    }
-  );
+
+    ...options,
+    staleTime: Infinity,
+
+    enabled: hasPermission('create_task') ? (options?.enabled ?? true) : false,
+  });
 }
 
 interface TasksParams {
@@ -62,17 +64,19 @@ interface TasksParams {
 }
 
 export function useTasksQuery(params: TasksParams) {
-  return useQuery<GenericManyResponse<Task>>(
-    ['/api/v1/tasks', params],
-    () =>
+  return useQuery<GenericManyResponse<Task>>({
+    queryKey: ['/api/v1/tasks', params],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint(':endpoint', {
           endpoint: params.endpoint || '/api/v1/tasks',
         })
       ).then((response) => response.data),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 }
 
 interface Details {
@@ -112,7 +116,9 @@ export const useBulk = () => {
       }
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
 
       $refetch(['tasks']);
     });

@@ -8,31 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Expense } from '$app/common/interfaces/expense';
-import { StatusBadge } from '$app/components/StatusBadge';
-import recurringExpensesFrequency from '$app/common/constants/recurring-expense-frequency';
-import { useTranslation } from 'react-i18next';
-import { date, endpoint, getEntityState } from '$app/common/helpers';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { EntityStatus } from '$app/components/EntityStatus';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { route } from '$app/common/helpers/route';
-import { Divider } from '$app/components/cards/Divider';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Action } from '$app/components/ResourceActions';
-import { useNavigate } from 'react-router-dom';
-import { recurringExpenseAtom } from './atoms';
-import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
-import { RecurringExpenseStatus } from '$app/common/enums/recurring-expense-status';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useQueryClient } from 'react-query';
-import { expenseAtom } from '$app/pages/expenses/common/atoms';
-import paymentType from '$app/common/constants/payment-type';
-import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import { useQueryClient } from '@tanstack/react-query';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { Dispatch, SetStateAction } from 'react';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Icon } from '$app/components/icons/Icon';
+import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
   MdControlPointDuplicate,
@@ -41,32 +22,51 @@ import {
   MdRestore,
   MdStopCircle,
 } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
-import { RecurringExpenseStatus as RecurringExpenseStatusBadge } from './components/RecurringExpenseStatus';
-import { Tooltip } from '$app/components/Tooltip';
-import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import paymentType from '$app/common/constants/payment-type';
+import recurringExpensesFrequency from '$app/common/constants/recurring-expense-frequency';
 import { EntityState } from '$app/common/enums/entity-state';
-import { useBulk } from '$app/common/queries/recurring-expense';
-import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import {
-  useCalculateExpenseAmount,
-  useCalculateExpenseExclusiveAmount,
-} from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
+import { RecurringExpenseStatus } from '$app/common/enums/recurring-expense-status';
+import { date, endpoint, getEntityState } from '$app/common/helpers';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import dayjs from 'dayjs';
-import classNames from 'classnames';
-import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Expense } from '$app/common/interfaces/expense';
+import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBulk } from '$app/common/queries/recurring-expense';
+import { Divider } from '$app/components/cards/Divider';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
+import { StatusBadge } from '$app/components/StatusBadge';
+import { Tooltip } from '$app/components/Tooltip';
+import { expenseAtom } from '$app/pages/expenses/common/atoms';
+import {
+  useCalculateExpenseAmount,
+  useCalculateExpenseExclusiveAmount,
+} from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import { recurringExpenseAtom } from './atoms';
+import { RecurringExpenseStatus as RecurringExpenseStatusBadge } from './components/RecurringExpenseStatus';
 
 export const defaultColumns: string[] = [
   'status',
@@ -482,7 +482,9 @@ export function useToggleStartStop() {
       $refetch(['recurring_expenses']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
 
       toast.success(action === 'start' ? 'start' : 'stop');
     });

@@ -8,35 +8,35 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
+import { useAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Project } from '$app/common/interfaces/project';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankProjectQuery } from '$app/common/queries/projects';
-import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { Container } from '$app/components/Container';
-import { Default } from '$app/components/layouts/Default';
-import { useAtom } from 'jotai';
-import { cloneDeep } from 'lodash';
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { projectAtom } from '../common/atoms';
-import { UserSelector } from '$app/components/users/UserSelector';
 import { CustomField } from '$app/components/CustomField';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { Card, Element } from '$app/components/cards';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { InputField } from '$app/components/forms';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { useColorScheme } from '$app/common/colors';
-import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { Default } from '$app/components/layouts/Default';
 import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { UserSelector } from '$app/components/users/UserSelector';
+import { projectAtom } from '../common/atoms';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_project');

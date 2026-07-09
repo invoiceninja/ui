@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InputField, SelectField } from '$app/components/forms';
+import { ChangeEvent } from 'react';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { InputField, SelectField } from '$app/components/forms';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import Toggle from '$app/components/forms/Toggle';
-import { ChangeEvent } from 'react';
 import { useHandleCredentialsChange } from './useHandleCredentialsChange';
 import { useResolveConfigValue } from './useResolveConfigValue';
-import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 
 export type Field = '' | boolean | Array<string>;
 

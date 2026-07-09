@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Expense } from '$app/common/interfaces/expense';
 import { atom } from 'jotai';
+import { Expense } from '$app/common/interfaces/expense';
 
 export const expenseAtom = atom<Expense | undefined>(undefined);
