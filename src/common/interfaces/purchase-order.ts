@@ -87,7 +87,6 @@ export interface PurchaseOrder {
   sync?: Sync;
   tags?: Tag[];
   purchase_order_tag_ids?: string[];
-
 }
 
 export interface Invitation {

@@ -89,10 +89,7 @@ export function useGetSettingWithLevel() {
 
   const { data: groupSettings } = useGroupSettingsQuery({ perPage: 1000 });
 
-  return (
-    client: Client | undefined,
-    propertyKey: keyof Settings
-  ) => {
+  return (client: Client | undefined, propertyKey: keyof Settings) => {
     return resolveSetting(client, propertyKey, groupSettings, company, false);
   };
 }

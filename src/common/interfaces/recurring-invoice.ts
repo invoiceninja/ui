@@ -84,8 +84,7 @@ export interface RecurringInvoice {
   activities?: Activity[];
   location_id: string;
   e_invoice?: EInvoiceType;
-  schedule?: ScheduleItem[]
+  schedule?: ScheduleItem[];
   tags?: Tag[];
   recurring_invoice_tag_ids?: string[];
 }
-

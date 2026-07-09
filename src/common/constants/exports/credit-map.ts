@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Record } from "./client-map";
+import { Record } from './client-map';
 
 export const creditMap: Record[] = [
   { trans: 'credit_number', value: 'credit.number', map: 'credit' },
@@ -24,10 +24,22 @@ export const creditMap: Record[] = [
   { trans: 'status', value: 'credit.status', map: 'credit' },
   { trans: 'public_notes', value: 'credit.public_notes', map: 'credit' },
   { trans: 'private_notes', value: 'credit.private_notes', map: 'credit' },
-  { trans: 'uses_inclusive_taxes', value: 'credit.uses_inclusive_taxes', map: 'credit' },
-  { trans: 'is_amount_discount', value: 'credit.is_amount_discount', map: 'credit' },
+  {
+    trans: 'uses_inclusive_taxes',
+    value: 'credit.uses_inclusive_taxes',
+    map: 'credit',
+  },
+  {
+    trans: 'is_amount_discount',
+    value: 'credit.is_amount_discount',
+    map: 'credit',
+  },
   { trans: 'partial', value: 'credit.partial', map: 'credit' },
-  { trans: 'partial_due_date', value: 'credit.partial_due_date', map: 'credit' },
+  {
+    trans: 'partial_due_date',
+    value: 'credit.partial_due_date',
+    map: 'credit',
+  },
   { trans: 'custom_value1', value: 'credit.custom_value1', map: 'credit' },
   { trans: 'custom_value2', value: 'credit.custom_value2', map: 'credit' },
   { trans: 'custom_value3', value: 'credit.custom_value3', map: 'credit' },

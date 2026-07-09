@@ -45,7 +45,7 @@ import {
   openClientPortal,
 } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { EmailRecord } from '$app/components/EmailRecord';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
 import { QuoteActivity } from '$app/common/interfaces/quote-activity';
 import { useInvoiceQuery } from '$app/common/queries/invoices';

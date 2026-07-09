@@ -89,7 +89,7 @@ export interface Quote {
   payments?: Payment[];
   reminder_schedule?: string;
   location_id: string;
-  schedule?: ScheduleItem[]
+  schedule?: ScheduleItem[];
   tags?: Tag[];
   quote_tag_ids?: string[];
   sync?: Sync;

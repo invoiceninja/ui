@@ -39,9 +39,14 @@ export function useGetCurrencySeparators<T = any>(
 
     if (relationId.length >= 1 && relationType === 'client_id') {
       // Check if client is already available in the resource relation
-      const clientPromise = (resource && typeof resource === 'object' && resource !== null && 'client' in resource && resource.client)
-        ? Promise.resolve(resource.client as Client)
-        : clientResolver.find(relationId).catch(() => null);
+      const clientPromise =
+        resource &&
+        typeof resource === 'object' &&
+        resource !== null &&
+        'client' in resource &&
+        resource.client
+          ? Promise.resolve(resource.client as Client)
+          : clientResolver.find(relationId).catch(() => null);
 
       await clientPromise.then(async (client: Client | null) => {
         if (!client) {
@@ -49,7 +54,9 @@ export function useGetCurrencySeparators<T = any>(
           await currencyResolver
             .find(company.settings?.currency_id)
             .then((currency: Currency | undefined) => {
-              const companyCountry = resolveCountry(company.settings.country_id);
+              const companyCountry = resolveCountry(
+                company.settings.country_id
+              );
 
               const currentSeparators = {
                 thousandSeparator:
@@ -98,9 +105,14 @@ export function useGetCurrencySeparators<T = any>(
       });
     } else if (relationId.length >= 1 && relationType === 'vendor_id') {
       // Check if vendor is already available in the resource relation
-      const vendorPromise = (resource && typeof resource === 'object' && resource !== null && 'vendor' in resource && resource.vendor)
-        ? Promise.resolve(resource.vendor as Vendor)
-        : vendorResolver.find(relationId).catch(() => null);
+      const vendorPromise =
+        resource &&
+        typeof resource === 'object' &&
+        resource !== null &&
+        'vendor' in resource &&
+        resource.vendor
+          ? Promise.resolve(resource.vendor as Vendor)
+          : vendorResolver.find(relationId).catch(() => null);
 
       await vendorPromise.then(async (vendor: Vendor | null) => {
         if (!vendor) {
@@ -108,7 +120,9 @@ export function useGetCurrencySeparators<T = any>(
           await currencyResolver
             .find(company.settings?.currency_id)
             .then((currency: Currency | undefined) => {
-              const companyCountry = resolveCountry(company.settings.country_id);
+              const companyCountry = resolveCountry(
+                company.settings.country_id
+              );
 
               const currentSeparators = {
                 thousandSeparator:

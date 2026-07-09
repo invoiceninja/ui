@@ -31,8 +31,13 @@ export function useResolveDateAndTimeClientFormat<T = any>(resource?: T) {
 
     if (relationId.length >= 1) {
       // Check if client is already available in the resource relation or passed directly
-      const clientData = client || 
-        (resource && typeof resource === 'object' && resource !== null && 'client' in resource && resource.client as Client | undefined);
+      const clientData =
+        client ||
+        (resource &&
+          typeof resource === 'object' &&
+          resource !== null &&
+          'client' in resource &&
+          (resource.client as Client | undefined));
 
       if (clientData) {
         if (clientData.settings.date_format_id) {
@@ -43,7 +48,8 @@ export function useResolveDateAndTimeClientFormat<T = any>(resource?: T) {
         dateTimeFormats.timeFormat = timeFormat;
       } else {
         // Only fetch if client not already available
-        await clientResolver.find(relationId)
+        await clientResolver
+          .find(relationId)
           .then((fetchedClient: Client) => {
             if (fetchedClient.settings.date_format_id) {
               dateTimeFormats.dateFormat = resolveDateFormat(

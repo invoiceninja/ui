@@ -194,7 +194,6 @@ export function DocumentPreview(props: Props) {
             }
             tabIndex={-1}
             loading="lazy"
-
           />
 
           {unableToPreview && (

@@ -17,7 +17,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export type DataTableFooterColumnsExtended<
   TResource = any,
-  TColumn = string
+  TColumn = string,
 > = {
   column: TColumn;
   id: keyof TResource;

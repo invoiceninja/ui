@@ -582,11 +582,9 @@ export function useActions(params?: Params) {
       company?.settings.e_invoice_type === 'PEPPOL' &&
       hasPermission('create_credit') &&
       !invoice.is_deleted &&
-      [
-        InvoiceStatus.Sent,
-        InvoiceStatus.Partial,
-        InvoiceStatus.Paid,
-      ].includes(invoice.status_id as InvoiceStatus) && (
+      [InvoiceStatus.Sent, InvoiceStatus.Partial, InvoiceStatus.Paid].includes(
+        invoice.status_id as InvoiceStatus
+      ) && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'credit_note',

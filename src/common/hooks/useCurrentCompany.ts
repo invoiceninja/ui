@@ -28,10 +28,7 @@ const selectCurrentCompany = createSelector(
 export function useCurrentCompany(): Company {
   // Use the memoized selector with shallowEqual to prevent unnecessary re-renders
   // Only re-renders when the company object actually changes
-  return useSelector(
-    selectCurrentCompany,
-    shallowEqual
-  );
+  return useSelector(selectCurrentCompany, shallowEqual);
 }
 
 export function useShouldUpdateCompany() {

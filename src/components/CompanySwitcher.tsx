@@ -143,7 +143,6 @@ export function CompanySwitcher() {
     }
   }, [currentCompany]);
 
-
   return (
     <>
       <CompanyCreate

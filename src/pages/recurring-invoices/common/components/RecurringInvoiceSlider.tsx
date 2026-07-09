@@ -411,22 +411,21 @@ export const RecurringInvoiceSlider = () => {
             <Divider withoutPadding borderColor={colors.$20} />
           )}
 
-          {recurringInvoice &&
-            Boolean(recurringInvoice.line_items?.length) && (
-              <div className="flex flex-col space-y-3 px-6 py-5">
-                {recurringInvoice.line_items.map((lineItem, index) => (
-                  <ViewLineItem
-                    key={index}
-                    lineItem={lineItem}
-                    lineItemIndex={index}
-                    client={recurringInvoice.client}
-                    editHref={route('/recurring_invoices/:id/edit', {
-                      id: recurringInvoice.id,
-                    })}
-                  />
-                ))}
-              </div>
-            )}
+          {recurringInvoice && Boolean(recurringInvoice.line_items?.length) && (
+            <div className="flex flex-col space-y-3 px-6 py-5">
+              {recurringInvoice.line_items.map((lineItem, index) => (
+                <ViewLineItem
+                  key={index}
+                  lineItem={lineItem}
+                  lineItemIndex={index}
+                  client={recurringInvoice.client}
+                  editHref={route('/recurring_invoices/:id/edit', {
+                    id: recurringInvoice.id,
+                  })}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         <div>

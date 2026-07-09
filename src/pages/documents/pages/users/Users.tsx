@@ -33,7 +33,7 @@ export default function Users() {
   const [docuData] = useAtom(docuNinjaAtom);
   const docuAccount = docuData?.account;
   const { getToken } = useDocuNinjaActions();
-    
+
   const currentUserCount = docuData?.account?.users?.length || 1;
   // const currentUserCount = docuNinjaUsersData?.data?.meta?.total || 0;
   const maxUsers = docuAccount?.num_users || 0;
@@ -57,7 +57,7 @@ export default function Users() {
   return (
     <Default title={t('users')} breadcrumbs={pages}>
       <NumberOfUsersAlert />
-      
+
       <DataTable<User>
         queryIdentificator="/api/users"
         resource="user"

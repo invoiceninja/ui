@@ -21,7 +21,7 @@ export function Panel(props: Props) {
 
   const { children, renderBasePanel } = props;
 
-  return isLargeScreen || Boolean(renderBasePanel) ? (
+  return isLargeScreen || renderBasePanel ? (
     <PanelBase defaultSize={50} minSize={25}>
       {children}
     </PanelBase>

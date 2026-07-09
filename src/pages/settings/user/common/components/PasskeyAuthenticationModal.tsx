@@ -74,7 +74,8 @@ export function PasskeyAuthenticationModal(props: Props) {
       );
 
       const credential = await registerPasskey(
-        optionsResponse.data.data.publicKey as PublicKeyCredentialCreationOptionsJSON
+        optionsResponse.data.data
+          .publicKey as PublicKeyCredentialCreationOptionsJSON
       );
 
       await request('POST', endpoint('/api/v1/settings/passkeys'), {

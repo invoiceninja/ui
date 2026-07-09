@@ -286,8 +286,8 @@ function ShortcutDetail({
           borderColor: recorder.isRecording
             ? colors.$8
             : hasConflict
-            ? '#ef4444'
-            : colors.$5,
+              ? '#ef4444'
+              : colors.$5,
           backgroundColor: colors.$1,
         }}
         title={hasConflict ? (t('shortcut_conflict') as string) : undefined}
