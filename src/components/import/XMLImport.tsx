@@ -160,8 +160,7 @@ export function XMLImport(props: Props) {
       const shouldAddFiles = await shouldUploadFiles(acceptedFiles);
 
       if (shouldAddFiles) {
-        const isFilesTypeCorrect =
-          acceptedFiles.every(isAcceptedXmlFile);
+        const isFilesTypeCorrect = acceptedFiles.every(isAcceptedXmlFile);
 
         if (isFilesTypeCorrect) {
           setFiles([...acceptedFiles]);

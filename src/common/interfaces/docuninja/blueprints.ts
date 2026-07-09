@@ -23,4 +23,3 @@ export interface Blueprint {
   document?: Document;
   grapesjs?: string;
 }
-

@@ -157,25 +157,21 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
     }
   }, [currentTemplate]);
 
-  useImperativeHandle(
-    ref,
-    () => {
-      return {
-        sendEmail() {
-          handleSend(
-            payloadData.body,
-            props.resourceType,
-            props.resource?.id || '',
-            payloadData.subject,
-            payloadData.templateId,
-            props.redirectUrl,
-            payloadData.ccEmail
-          );
-        },
-      };
-    },
-    [payloadData]
-  );
+  useImperativeHandle(ref, () => {
+    return {
+      sendEmail() {
+        handleSend(
+          payloadData.body,
+          props.resourceType,
+          props.resource?.id || '',
+          payloadData.subject,
+          payloadData.templateId,
+          props.redirectUrl,
+          payloadData.ccEmail
+        );
+      },
+    };
+  }, [payloadData]);
 
   return (
     <div className="grid grid-cols-12 lg:gap-4 my-4">
@@ -272,7 +268,6 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
               height={800}
               tabIndex={-1}
               loading="lazy"
-
             />
           </Card>
         )}

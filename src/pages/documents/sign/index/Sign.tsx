@@ -87,11 +87,11 @@ export default function Index() {
               backgroundColor: colors.$1,
               textColor: colors.$3,
               foregroundColor: colors.$4,
-            }
+            },
           },
           translations: {
             sign_the_document: String(t('sign_the_document')),
-          }
+          },
         }}
       >
         <Sign />

@@ -11,7 +11,7 @@
 import { Alert } from '$app/components/Alert';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import {Button, InputField, SelectField} from '$app/components/forms';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/icons/Settings';
 import { Modal } from '$app/components/Modal';
@@ -321,7 +321,7 @@ export function RectangleSettingsButton({
   const buttonTypes = {
     primary: 'primary',
     danger: 'secondary',
-  }
+  };
 
   return (
     <Button
@@ -330,7 +330,11 @@ export function RectangleSettingsButton({
       id={id}
       type={buttonTypes[variant as keyof typeof Button]}
     >
-      {icon && <span style={{ display: 'inline-flex', marginRight: '0.375rem' }}>{icon}</span>}
+      {icon && (
+        <span style={{ display: 'inline-flex', marginRight: '0.375rem' }}>
+          {icon}
+        </span>
+      )}
       {label}
     </Button>
   );
@@ -392,10 +396,10 @@ export function RectangleSettingsSelect({
   children,
 }: RectangleSettingsSelectProps) {
   return (
-      <SelectField id={id} defaultValue={value} onValueChange={onChange}>
-        {children}
-      </SelectField>
-  )
+    <SelectField id={id} defaultValue={value} onValueChange={onChange}>
+      {children}
+    </SelectField>
+  );
 }
 
 export function RectangleSettingsRemoveButton({

@@ -14,7 +14,6 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Card } from '$app/components/cards';
 import { Spinner } from '$app/components/Spinner';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { RecurringInvoiceContext } from '../../create/Create';

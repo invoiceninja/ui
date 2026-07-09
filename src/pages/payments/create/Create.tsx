@@ -260,7 +260,7 @@ export default function Create() {
 
   const handleChange = <
     TField extends keyof PaymentOnCreation,
-    TValue extends PaymentOnCreation[TField]
+    TValue extends PaymentOnCreation[TField],
   >(
     field: TField,
     value: TValue
@@ -440,8 +440,8 @@ export default function Create() {
                         amount: existingInvoice
                           ? existingInvoice.amount
                           : resource.balance > 0
-                          ? resource.balance
-                          : resource.amount,
+                            ? resource.balance
+                            : resource.amount,
                         invoice_id: resource.id,
                       });
                     });
@@ -518,8 +518,8 @@ export default function Create() {
                         amount: existingCredit
                           ? existingCredit.amount
                           : resource.balance > 0
-                          ? resource.balance
-                          : resource.amount,
+                            ? resource.balance
+                            : resource.amount,
                         credit_id: resource.id,
                       });
                     });

@@ -31,7 +31,7 @@ export function useBlankTaskStatusQuery(options?: GenericQueryOptions) {
       ),
     {
       staleTime: Infinity,
-      enabled: isAdmin ? options?.enabled ?? true : false,
+      enabled: isAdmin ? (options?.enabled ?? true) : false,
     }
   );
 }

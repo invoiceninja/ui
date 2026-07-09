@@ -43,7 +43,11 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useNavigate } from 'react-router-dom';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
-import { Classification, PEPPOL_COUNTRIES, PEPPOL_CLASSIFICATIONS } from '$app/common/helpers/peppol-countries';
+import {
+  Classification,
+  PEPPOL_COUNTRIES,
+  PEPPOL_CLASSIFICATIONS,
+} from '$app/common/helpers/peppol-countries';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -163,11 +167,15 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
     if (reactSettings?.preferences?.hide_peppol_sent_status) {
       return false;
     }
-    
+
     return (
-      currentCompany.settings.e_invoice_type === 'PEPPOL' && 
+      currentCompany.settings.e_invoice_type === 'PEPPOL' &&
       PEPPOL_COUNTRIES.includes(currentInvoice.client?.country_id || '') &&
-      PEPPOL_CLASSIFICATIONS[currentInvoice.client?.country_id as keyof typeof PEPPOL_CLASSIFICATIONS]?.includes((currentInvoice.client?.classification || 'business') as Classification)
+      PEPPOL_CLASSIFICATIONS[
+        currentInvoice.client?.country_id as keyof typeof PEPPOL_CLASSIFICATIONS
+      ]?.includes(
+        (currentInvoice.client?.classification || 'business') as Classification
+      )
     );
   };
 
@@ -182,9 +190,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   };
 
   const peppolSendingSuccess = (currentInvoice: Invoice) => {
-    return (
-      isPeppolEnabled(currentInvoice) && currentInvoice.backup?.guid
-    );
+    return isPeppolEnabled(currentInvoice) && currentInvoice.backup?.guid;
   };
 
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
@@ -194,7 +200,6 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('status'),
       format: (_value, invoice) => (
         <div className="flex items-center gap-x-2">
-
           <InvoiceStatus entity={invoice} />
 
           {peppolSendingFailed(invoice) && (
@@ -206,27 +211,27 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
               }}
             >
               <Tooltip
-                message={
-                  t('peppol_sending_failed') as string
-                }
+                message={t('peppol_sending_failed') as string}
                 width="auto"
                 placement="top"
               >
                 <MdWarning color="red" size={20} />
-              </Tooltip>        
+              </Tooltip>
             </button>
           )}
 
           {peppolSendingSuccess(invoice) && (
             <Tooltip
-              message={
-                t('peppol_sending_success') as string
-              }
+              message={t('peppol_sending_success') as string}
               width="auto"
               placement="top"
             >
-              <MdSend color="#22c55e" size={18} style={{ transform: 'rotate(-45deg)' }} />
-            </Tooltip>   
+              <MdSend
+                color="#22c55e"
+                size={18}
+                style={{ transform: 'rotate(-45deg)' }}
+              />
+            </Tooltip>
           )}
 
           {['R1', 'R2'].includes(invoice.backup?.document_type ?? '') && (

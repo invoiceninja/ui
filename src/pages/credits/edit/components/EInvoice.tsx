@@ -205,8 +205,8 @@ export default function EInvoice() {
                               {entity === 'invoice'
                                 ? (message as unknown as string)
                                 : message.label
-                                ? `${message.label} (${t('required')})`
-                                : message.field}
+                                  ? `${message.label} (${t('required')})`
+                                  : message.field}
                             </span>
                           ))}
                         </div>

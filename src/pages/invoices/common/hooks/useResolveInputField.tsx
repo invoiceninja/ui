@@ -445,10 +445,10 @@ export function useResolveInputField(props: Props) {
               property === 'quantity'
                 ? 6
                 : reactSettings?.number_precision &&
-                  reactSettings?.number_precision > 0 &&
-                  reactSettings?.number_precision <= 100
-                ? reactSettings.number_precision
-                : inputCurrencySeparators?.precision || 2
+                    reactSettings?.number_precision > 0 &&
+                    reactSettings?.number_precision <= 100
+                  ? reactSettings.number_precision
+                  : inputCurrencySeparators?.precision || 2
             }
             id={property}
             value={resource?.line_items[index][property] || ''}

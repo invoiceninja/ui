@@ -19,7 +19,12 @@ interface Props {
   isLoading?: boolean;
 }
 
-export function DowngradeConfirmModal({ visible, onClose, onConfirm, isLoading }: Props) {
+export function DowngradeConfirmModal({
+  visible,
+  onClose,
+  onConfirm,
+  isLoading,
+}: Props) {
   const { t } = useTranslation();
 
   return (
@@ -31,13 +36,12 @@ export function DowngradeConfirmModal({ visible, onClose, onConfirm, isLoading }
     >
       <div className="flex flex-col space-y-6">
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
-            {t('downgrade_end_of_cycle')}
-          </p>
-          
+          <p className="text-sm text-gray-600">{t('downgrade_end_of_cycle')}</p>
+
           <div className="bg-yellow-50 p-4 rounded-md">
             <p className="text-sm text-yellow-800">
-                <strong>⚠️ {t('warning')}:</strong> {t('downgrade_to_free_description')}
+              <strong>⚠️ {t('warning')}:</strong>{' '}
+              {t('downgrade_to_free_description')}
             </p>
           </div>
         </div>
@@ -51,7 +55,7 @@ export function DowngradeConfirmModal({ visible, onClose, onConfirm, isLoading }
           >
             {t('cancel')}
           </Button>
-          
+
           <Button
             behavior="button"
             onClick={onConfirm}
@@ -64,4 +68,4 @@ export function DowngradeConfirmModal({ visible, onClose, onConfirm, isLoading }
       </div>
     </Modal>
   );
-} 
+}

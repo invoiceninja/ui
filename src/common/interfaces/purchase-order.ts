@@ -84,7 +84,6 @@ export interface PurchaseOrder {
   reminder_schedule?: string;
   location_id: string;
   sync?: Sync;
-
 }
 
 export interface Invitation {

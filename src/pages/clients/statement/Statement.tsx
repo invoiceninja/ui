@@ -358,7 +358,6 @@ export default function Statement() {
         style={{ display: !isLoadingPdf ? 'block' : 'none' }}
         tabIndex={-1}
         loading="lazy"
-
       />
 
       {isLoadingPdf && (

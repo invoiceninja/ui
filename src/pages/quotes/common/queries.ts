@@ -28,7 +28,9 @@ export function useBlankQuoteQuery(options?: GenericQueryOptions) {
     {
       ...options,
       staleTime: Infinity,
-      enabled: hasPermission('create_quote') ? options?.enabled ?? true : false,
+      enabled: hasPermission('create_quote')
+        ? (options?.enabled ?? true)
+        : false,
     }
   );
 }

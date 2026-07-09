@@ -23,7 +23,7 @@ export function DocuNinja() {
   const [isCreating, setIsCreating] = useState(false);
 
   const [docuData] = useAtom(docuNinjaAtom);
-  
+
   const { createAccount, flushData } = useDocuNinjaActions();
 
   function createDocuNinjaAccount() {
@@ -44,7 +44,7 @@ export function DocuNinja() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const docuAccount = docuData?.account;
-  
+
   return (
     <Card>
       <div className="px-7 py-3 space-y-4">

@@ -153,9 +153,8 @@ export default function Details(props?: DocuninjaUserProps) {
                               const reader = new FileReader();
                               reader.onload = async (event) => {
                                 const base64 = event.target?.result as string;
-                                const compressed = await compressSignature(
-                                  base64
-                                );
+                                const compressed =
+                                  await compressSignature(base64);
                                 setUser(
                                   (user) =>
                                     user && {
@@ -256,9 +255,8 @@ export default function Details(props?: DocuninjaUserProps) {
                             const reader = new FileReader();
                             reader.onload = async (event) => {
                               const base64 = event.target?.result as string;
-                              const compressed = await compressSignature(
-                                base64
-                              );
+                              const compressed =
+                                await compressSignature(base64);
                               setUser(
                                 (user) =>
                                   user && {
@@ -396,9 +394,8 @@ export default function Details(props?: DocuninjaUserProps) {
 
                                 const initialsImage =
                                   canvas.toDataURL('image/png');
-                                const compressed = await compressInitials(
-                                  initialsImage
-                                );
+                                const compressed =
+                                  await compressInitials(initialsImage);
                                 setUser(
                                   (user) =>
                                     user && {
@@ -499,9 +496,8 @@ export default function Details(props?: DocuninjaUserProps) {
                             ctx.fillText(initials, x, y);
 
                             const initialsImage = canvas.toDataURL('image/png');
-                            const compressed = await compressInitials(
-                              initialsImage
-                            );
+                            const compressed =
+                              await compressInitials(initialsImage);
                             setUser(
                               (user) =>
                                 user && {

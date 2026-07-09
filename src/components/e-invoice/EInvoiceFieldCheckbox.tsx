@@ -57,13 +57,13 @@ export function EInvoiceFieldCheckbox(props: Props) {
   const [isInitialized, setInitialized] = useState<boolean>(false);
 
   useEffect(() => {
-    if (checked && Boolean(payload?.[fieldKey] === undefined)) {
+    if (checked && payload?.[fieldKey] === undefined) {
       const defaultValue =
         fieldType === 'boolean'
           ? false
           : fieldType === 'decimal' || fieldType === 'number'
-          ? 0
-          : '';
+            ? 0
+            : '';
 
       setPayload((currentPayload) => ({
         ...currentPayload,
@@ -71,7 +71,7 @@ export function EInvoiceFieldCheckbox(props: Props) {
       }));
     }
 
-    if (!checked && Boolean(payload?.[fieldKey] !== undefined)) {
+    if (!checked && payload?.[fieldKey] !== undefined) {
       delete payload[fieldKey];
 
       const keysLength = fieldKey.split('|').length;

@@ -35,7 +35,7 @@ export function useBlankRecurringExpenseQuery(params: BlankQueryParams) {
       ),
     {
       enabled: hasPermission('create_recurring_expense')
-        ? params.enabled ?? true
+        ? (params.enabled ?? true)
         : false,
       staleTime: Infinity,
     }

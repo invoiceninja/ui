@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from 'react';
 import { SelectField } from './forms';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { Timezone } from '$app/common/interfaces/statics';
