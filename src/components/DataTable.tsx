@@ -1409,6 +1409,7 @@ export function DataTable<T extends object>(props: Props<T>) {
               ? get(data, totalRecordsPropPath)
               : data.data.meta.pagination.total
           }
+          pagination={data.data.meta?.pagination}
         />
       )}
     </div>
