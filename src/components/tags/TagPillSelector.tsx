@@ -182,6 +182,7 @@ export function TagPillSelector(props: Props) {
 
           {!props.readonly && (
             <input
+              data-cy="tagSelectorInput"
               className="min-w-[8rem] flex-1 border-0 bg-transparent p-0 text-sm focus:outline-none focus:ring-0"
               style={{ color: colors.$3 }}
               value={query}
@@ -200,6 +201,7 @@ export function TagPillSelector(props: Props) {
             {availableTags.map((tag) => (
               <button
                 key={tag.id}
+                data-cy="tagOption"
                 type="button"
                 className="flex w-full items-center gap-2 rounded-[0.1875rem] px-3 py-2 text-left text-sm"
                 style={{ color: colors.$3 }}
@@ -216,6 +218,7 @@ export function TagPillSelector(props: Props) {
 
             {canCreateTag && (
               <button
+                data-cy="createTagOption"
                 type="button"
                 className="flex w-full items-center gap-2 rounded-[0.1875rem] px-3 py-2 text-left text-sm font-medium"
                 style={{ color: colors.$3 }}
