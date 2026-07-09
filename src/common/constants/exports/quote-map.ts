@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Record } from "./client-map";
+import { Record } from './client-map';
 
 export const quoteMap: Record[] = [
   { trans: 'quote_number', value: 'quote.number', map: 'quote' },
@@ -24,8 +24,16 @@ export const quoteMap: Record[] = [
   { trans: 'status', value: 'quote.status', map: 'quote' },
   { trans: 'public_notes', value: 'quote.public_notes', map: 'quote' },
   { trans: 'private_notes', value: 'quote.private_notes', map: 'quote' },
-  { trans: 'uses_inclusive_taxes', value: 'quote.uses_inclusive_taxes', map: 'quote' },
-  { trans: 'is_amount_discount', value: 'quote.is_amount_discount', map: 'quote' },
+  {
+    trans: 'uses_inclusive_taxes',
+    value: 'quote.uses_inclusive_taxes',
+    map: 'quote',
+  },
+  {
+    trans: 'is_amount_discount',
+    value: 'quote.is_amount_discount',
+    map: 'quote',
+  },
   { trans: 'partial', value: 'quote.partial', map: 'quote' },
   { trans: 'partial_due_date', value: 'quote.partial_due_date', map: 'quote' },
   { trans: 'custom_value1', value: 'quote.custom_value1', map: 'quote' },

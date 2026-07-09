@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import classNames from 'classnames';
 import CommonProps from '../common/interfaces/common-props.interface';
 import { X } from 'react-feather';

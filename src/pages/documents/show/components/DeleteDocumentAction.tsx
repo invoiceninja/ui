@@ -78,7 +78,11 @@ export function DeleteDocumentAction({ document }: Props) {
         >
           <span className="font-medium">{t('delete_docuninja_document')}.</span>
 
-          <Button behavior="button" onClick={handleSubmit} disabled={isFormBusy}>
+          <Button
+            behavior="button"
+            onClick={handleSubmit}
+            disabled={isFormBusy}
+          >
             {t('continue')}
           </Button>
         </Modal>

@@ -15,27 +15,23 @@ import { HostedPlan } from './plan/HostedPlan';
 import { Downgrade } from './upgrade/Downgrade';
 
 export function Plan3() {
+  const { t } = useTranslation();
 
-    const { t } = useTranslation();
+  const account = useCurrentAccount();
 
-    const account = useCurrentAccount();
+  return (
+    <div className="space-y-4">
+      <Card>
+        <div className="px-7 py-3 space-y-4">
+          <div className="flex justify-between items-center">
+            <h4 className="text-lg font-semibold">{t('plan')}</h4>
+          </div>
 
+          <HostedPlan />
 
-    return(
-        <div className="space-y-4">
-            <Card>
-                <div className="px-7 py-3 space-y-4">
-                    <div className="flex justify-between items-center">
-                        <h4 className="text-lg font-semibold">{t('plan')}</h4>
-                    </div>
-
-                    <HostedPlan />
-
-                    {account?.plan !== '' && (
-                        <Downgrade />
-                    )}
-                </div>
-            </Card>
+          {account?.plan !== '' && <Downgrade />}
         </div>
-    )
+      </Card>
+    </div>
+  );
 }

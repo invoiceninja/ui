@@ -45,11 +45,7 @@ export function PEPPOLPlanBanner() {
         </div>
 
         {currentUser?.company_user && (
-          <Link
-            className="ml-10"
-            
-            to={route('/settings/account_management')}
-          >
+          <Link className="ml-10" to={route('/settings/account_management')}>
             {t('plan_change')}
           </Link>
         )}

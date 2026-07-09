@@ -95,15 +95,17 @@ export function DocumentSettingsModal({
         errorMessage={errors?.errors.description}
       />
 
-    {document.status_id <= DocumentStatus.Sent && (
-      <InputField
-        type="date"
-        label={t('expiry_date')}
-        value={payload.expires_at}
-        onValueChange={(value) => setPayload({ ...payload, expires_at: value })}
-        errorMessage={errors?.errors.expires_at}
-      />
-    )}
+      {document.status_id <= DocumentStatus.Sent && (
+        <InputField
+          type="date"
+          label={t('expiry_date')}
+          value={payload.expires_at}
+          onValueChange={(value) =>
+            setPayload({ ...payload, expires_at: value })
+          }
+          errorMessage={errors?.errors.expires_at}
+        />
+      )}
       <Button behavior="button" disabled={isFormBusy} onClick={handleSubmit}>
         {t('save')}
       </Button>

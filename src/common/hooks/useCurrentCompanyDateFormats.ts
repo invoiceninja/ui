@@ -25,7 +25,7 @@ export function useCurrentCompanyDateFormats() {
       const result = statics.date_formats.find(
         (format) => format.id === (company?.settings?.date_format_id ?? '0')
       );
-      
+
       if (result) {
         setDateFormat(result.format_moment);
         setDateFormatId(result.id);

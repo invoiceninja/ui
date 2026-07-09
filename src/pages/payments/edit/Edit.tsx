@@ -52,7 +52,7 @@ export default function Edit() {
 
   const handleChange = <
     TField extends keyof Payment,
-    TValue extends Payment[TField]
+    TValue extends Payment[TField],
   >(
     field: TField,
     value: TValue

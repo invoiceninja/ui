@@ -368,17 +368,13 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
       },
     });
 
-    useImperativeHandle(
-      ref,
-      () => {
-        return {
-          saveEInvoice() {
-            form.submitForm();
-          },
-        };
-      },
-      [form.values]
-    );
+    useImperativeHandle(ref, () => {
+      return {
+        saveEInvoice() {
+          form.submitForm();
+        },
+      };
+    }, [form.values]);
 
     const elements = useMemo(() => {
       return form.values.payment_means[0].code

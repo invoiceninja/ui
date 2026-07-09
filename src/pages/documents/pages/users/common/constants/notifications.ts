@@ -55,7 +55,5 @@ export const NOTIFICATION_VALUES = {
   CUSTOM: 'custom',
 } as const;
 
-export type NotificationValue = typeof NOTIFICATION_VALUES[keyof typeof NOTIFICATION_VALUES];
-
-
-
+export type NotificationValue =
+  (typeof NOTIFICATION_VALUES)[keyof typeof NOTIFICATION_VALUES];
