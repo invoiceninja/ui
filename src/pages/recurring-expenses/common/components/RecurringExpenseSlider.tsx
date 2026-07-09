@@ -62,7 +62,7 @@ export function RecurringExpenseSlider() {
         setIsSliderVisible(false);
         setRecurringExpense(null);
       }}
-      title={`${t('recurring_expense')} ${recurringExpense?.number}`}
+      title={`${t('recurring_expense')} ${recurringExpense?.number || ''}`}
       topRight={
         recurringExpense &&
         (hasPermission('edit_recurring_expense') ||

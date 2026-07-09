@@ -58,7 +58,7 @@ export function ProjectSlider() {
         setIsSliderVisible(false);
         setProject(null);
       }}
-      title={`${t('project')} ${project?.name}`}
+      title={`${t('project')} ${project?.name || ''}`}
       topRight={
         project &&
         (hasPermission('edit_project') || entityAssigned(project)) ? (

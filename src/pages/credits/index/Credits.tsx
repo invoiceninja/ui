@@ -67,6 +67,10 @@ export default function Credits() {
   const { data: creditResponse } = useCreditQuery({ id: sliderCreditId });
 
   useEffect(() => {
+    setCreditSlider(null);
+  }, [sliderCreditId]);
+
+  useEffect(() => {
     if (creditResponse && creditSliderVisibility) {
       setCreditSlider(creditResponse);
     }

@@ -59,7 +59,7 @@ export function ExpenseSlider() {
         setIsSliderVisible(false);
         setExpense(null);
       }}
-      title={`${t('expense')} ${expense?.number}`}
+      title={`${t('expense')} ${expense?.number || ''}`}
       topRight={
         expense &&
         (hasPermission('edit_expense') || entityAssigned(expense)) ? (

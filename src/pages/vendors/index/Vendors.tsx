@@ -63,6 +63,10 @@ export default function Vendors() {
   });
 
   useEffect(() => {
+    setVendorSlider(null);
+  }, [sliderVendorId]);
+
+  useEffect(() => {
     if (vendorResponse && vendorSliderVisibility) {
       setVendorSlider(vendorResponse);
     }

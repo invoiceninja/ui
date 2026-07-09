@@ -59,7 +59,7 @@ export function PurchaseOrderSlider() {
         setIsSliderVisible(false);
         setPurchaseOrder(null);
       }}
-      title={`${t('purchase_order')} ${purchaseOrder?.number}`}
+      title={`${t('purchase_order')} ${purchaseOrder?.number || ''}`}
       topRight={
         purchaseOrder &&
         (hasPermission('edit_purchase_order') ||

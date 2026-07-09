@@ -68,6 +68,10 @@ export default function RecurringExpenses() {
   });
 
   useEffect(() => {
+    setRecurringExpenseSlider(null);
+  }, [sliderRecurringExpenseId]);
+
+  useEffect(() => {
     if (recurringExpenseResponse && recurringExpenseSliderVisibility) {
       setRecurringExpenseSlider(recurringExpenseResponse);
     }

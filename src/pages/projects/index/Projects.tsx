@@ -87,6 +87,10 @@ export default function Projects() {
   } = useChangeTemplate();
 
   useEffect(() => {
+    setProjectSlider(null);
+  }, [sliderProjectId]);
+
+  useEffect(() => {
     if (projectResponse && projectSliderVisibility) {
       setProjectSlider(projectResponse);
     }

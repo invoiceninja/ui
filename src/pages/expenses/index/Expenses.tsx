@@ -69,6 +69,10 @@ export default function Expenses() {
   });
 
   useEffect(() => {
+    setExpenseSlider(null);
+  }, [sliderExpenseId]);
+
+  useEffect(() => {
     if (expenseResponse && expenseSliderVisibility) {
       setExpenseSlider(expenseResponse);
     }

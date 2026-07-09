@@ -76,6 +76,10 @@ export default function PurchaseOrders() {
   });
 
   useEffect(() => {
+    setPurchaseOrderSlider(null);
+  }, [sliderPurchaseOrderId]);
+
+  useEffect(() => {
     if (purchaseOrderResponse && purchaseOrderSliderVisibility) {
       setPurchaseOrderSlider(purchaseOrderResponse);
     }

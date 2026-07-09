@@ -52,7 +52,7 @@ export function VendorSlider() {
         setIsSliderVisible(false);
         setVendor(null);
       }}
-      title={`${t('vendor')} ${vendor?.name}`}
+      title={`${t('vendor')} ${vendor?.name || ''}`}
       topRight={
         vendor && (hasPermission('edit_vendor') || entityAssigned(vendor)) ? (
           <ResourceActions

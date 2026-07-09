@@ -57,7 +57,7 @@ export function CreditSlider() {
         setIsSliderVisible(false);
         setCredit(null);
       }}
-      title={`${t('credit')} ${credit?.number}`}
+      title={`${t('credit')} ${credit?.number || ''}`}
       topRight={
         credit && (hasPermission('edit_credit') || entityAssigned(credit)) ? (
           <ResourceActions
