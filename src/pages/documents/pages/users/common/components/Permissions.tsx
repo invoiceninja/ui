@@ -4,7 +4,10 @@ import { Divider } from '$app/components/cards/Divider';
 import { Checkbox } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
-import { User, Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
+import {
+  User,
+  Permission as PermissionType,
+} from '$app/common/interfaces/docuninja/api';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { NotificationValue } from '../constants/notifications';
 
@@ -19,9 +22,13 @@ export interface DocuninjaUserProps {
   permissions: PermissionType[];
   setPermissions: React.Dispatch<React.SetStateAction<PermissionType[]>>;
   notifications: Record<string, string>;
-  setNotifications: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setNotifications: React.Dispatch<
+    React.SetStateAction<Record<string, string>>
+  >;
   allNotificationsValue: NotificationValue;
-  setAllNotificationsValue: React.Dispatch<React.SetStateAction<NotificationValue>>;
+  setAllNotificationsValue: React.Dispatch<
+    React.SetStateAction<NotificationValue>
+  >;
 }
 
 export const PERMISSION_VIEW = 1;
@@ -89,18 +96,13 @@ const MODELS: Record<string, { name: string; permissions: ModelPermission[] }> =
 export default function Permissions(props?: DocuninjaUserProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
-  
+
   if (!props) {
     return null; // Early return if no props available
   }
 
-  const {
-    isFormBusy,
-    permissions,
-    setPermissions,
-    isAdmin,
-    setIsAdmin,
-  } = props;
+  const { isFormBusy, permissions, setPermissions, isAdmin, setIsAdmin } =
+    props;
 
   const basicPermissionTypes = [
     PERMISSION_CREATE,
@@ -204,9 +206,7 @@ export default function Permissions(props?: DocuninjaUserProps) {
 
   return (
     <>
-      <Element
-        leftSide={t('administrator')}
-      >
+      <Element leftSide={t('administrator')}>
         <Toggle
           id="admin-toggle"
           checked={isAdmin}

@@ -34,7 +34,7 @@ export function useBlankPurchaseOrderQuery(options?: GenericQueryOptions) {
       ...options,
       staleTime: Infinity,
       enabled: hasPermission('create_purchase_order')
-        ? options?.enabled ?? true
+        ? (options?.enabled ?? true)
         : false,
     }
   );

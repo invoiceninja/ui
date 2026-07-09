@@ -8,14 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Record } from "./client-map";
+import { Record } from './client-map';
 
 export const paymentMap: Record[] = [
   { trans: 'date', value: 'payment.date', map: 'payment' },
   { trans: 'amount', value: 'payment.amount', map: 'payment' },
   { trans: 'refunded', value: 'payment.refunded', map: 'payment' },
   { trans: 'applied', value: 'payment.applied', map: 'payment' },
-  { trans: 'transaction_reference', value: 'payment.transaction_reference', map: 'payment' },
+  {
+    trans: 'transaction_reference',
+    value: 'payment.transaction_reference',
+    map: 'payment',
+  },
   { trans: 'currency', value: 'payment.currency', map: 'payment' },
   { trans: 'exchange_rate', value: 'payment.exchange_rate', map: 'payment' },
   { trans: 'number', value: 'payment.number', map: 'payment' },

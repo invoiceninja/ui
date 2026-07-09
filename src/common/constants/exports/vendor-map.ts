@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Record } from "./client-map";
+import { Record } from './client-map';
 
 export const vendorMap: Record[] = [
   { trans: 'name', value: 'vendor.name', map: 'vendor' },
@@ -33,10 +33,26 @@ export const vendorMap: Record[] = [
   { trans: 'first_name', value: 'vendor_contact.first_name', map: 'vendor' },
   { trans: 'last_name', value: 'vendor_contact.last_name', map: 'vendor' },
   { trans: 'contact_phone', value: 'vendor_contact.phone', map: 'vendor' },
-  { trans: 'contact_custom_value1', value: 'vendor_contact.custom_value1', map: 'vendor' },
-  { trans: 'contact_custom_value2', value: 'vendor_contact.custom_value2', map: 'vendor' },
-  { trans: 'contact_custom_value3', value: 'vendor_contact.custom_value3', map: 'vendor' },
-  { trans: 'contact_custom_value4', value: 'vendor_contact.custom_value4', map: 'vendor' },
+  {
+    trans: 'contact_custom_value1',
+    value: 'vendor_contact.custom_value1',
+    map: 'vendor',
+  },
+  {
+    trans: 'contact_custom_value2',
+    value: 'vendor_contact.custom_value2',
+    map: 'vendor',
+  },
+  {
+    trans: 'contact_custom_value3',
+    value: 'vendor_contact.custom_value3',
+    map: 'vendor',
+  },
+  {
+    trans: 'contact_custom_value4',
+    value: 'vendor_contact.custom_value4',
+    map: 'vendor',
+  },
   { trans: 'email', value: 'vendor_contact.email', map: 'vendor' },
   { trans: 'status', value: 'vendor.status', map: 'vendor' },
 ];

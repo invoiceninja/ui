@@ -85,7 +85,11 @@ export function RestoreDocumentAction({ document }: Props) {
             {t('restore_document_description')}.
           </span>
 
-          <Button behavior="button" onClick={handleSubmit} disabled={isFormBusy}>
+          <Button
+            behavior="button"
+            onClick={handleSubmit}
+            disabled={isFormBusy}
+          >
             {t('continue')}
           </Button>
         </Modal>

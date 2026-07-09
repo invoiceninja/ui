@@ -24,8 +24,7 @@ const bracket = (task: Task): string => {
 // project name in brackets; falls back to client name; omits the brackets
 // entirely when neither exists.
 export const taskCalendarLabel = (task: Task): string => {
-  const head =
-    task.description || `#${task.number || task.id.slice(0, 6)}`;
+  const head = task.description || `#${task.number || task.id.slice(0, 6)}`;
   const tail = bracket(task);
   return tail ? `${head} (${tail})` : head;
 };
@@ -33,10 +32,7 @@ export const taskCalendarLabel = (task: Task): string => {
 // Same as taskCalendarLabel but safe for rendering descriptions that may
 // contain HTML (lists, links, rich-text). Strips tags and clips to a
 // readable length — pair with a Tooltip that renders the full HTML.
-export const taskCalendarLabelTruncated = (
-  task: Task,
-  max = 50
-): string => {
+export const taskCalendarLabelTruncated = (task: Task, max = 50): string => {
   if (!task.description) {
     const fallback = `#${task.number || task.id.slice(0, 6)}`;
     const tail = bracket(task);

@@ -184,8 +184,7 @@ export function SortableVariableList(props: Props) {
                         </div>
                       )}
                     </Draggable>
-                  )
-                )}
+                  ))}
 
                 {provided.placeholder}
               </div>

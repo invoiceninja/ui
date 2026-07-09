@@ -35,7 +35,9 @@ export function useBlankExpenseQuery(params: BlankQueryParams) {
         (response) => response.data.data
       ),
     {
-      enabled: hasPermission('create_expense') ? params.enabled ?? true : false,
+      enabled: hasPermission('create_expense')
+        ? (params.enabled ?? true)
+        : false,
       staleTime: Infinity,
     }
   );

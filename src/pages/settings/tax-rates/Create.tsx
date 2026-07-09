@@ -133,7 +133,7 @@ export function Create() {
             />
 
             <NumberInputField
-            disablePrecision
+              disablePrecision
               required
               label={t('tax_rate')}
               value={taxRate?.rate || ''}

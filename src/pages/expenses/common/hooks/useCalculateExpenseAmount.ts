@@ -15,7 +15,7 @@ import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 
 const roundToPrecision = (number: number, precision: number) => {
   const isNegative = number < 0;
-  
+
   if (isNegative) {
     number = number * -1;
   }

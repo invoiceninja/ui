@@ -77,10 +77,7 @@ export const variables = {
     '{{ company.state }}',
     '{{ company.postal_code }}',
   ],
-  docu_document: [
-    '{{ document.description }}',
-    '{{ document.link }}',
-  ],
+  docu_document: ['{{ document.description }}', '{{ document.link }}'],
   docu_sender: [
     '{{ sender.first_name }}',
     '{{ sender.last_name }}',
@@ -101,6 +98,5 @@ export const variables = {
     '{{ contact.phone }}',
     '{{ contact.email }}',
     '{{ contact.name }}',
-  ]
-
+  ],
 };

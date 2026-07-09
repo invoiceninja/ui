@@ -25,7 +25,10 @@ import { request } from '$app/common/helpers/request';
 import { docuNinjaEndpoint, endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { AxiosResponse } from 'axios';
-import { GenericSingleResponse, Document } from '$app/common/interfaces/docuninja/api';
+import {
+  GenericSingleResponse,
+  Document,
+} from '$app/common/interfaces/docuninja/api';
 import { toast } from '$app/common/helpers/toast/toast';
 import { ComboboxAsync, Entry } from '$app/components/forms/Combobox';
 import classNames from 'classnames';
@@ -58,7 +61,8 @@ export default function SignatoryMapping() {
   const company = useCurrentCompany();
   const colors = useColorScheme();
 
-  const { blueprint, signatoryIds, signatoryInfo } = (location.state as any) || {};
+  const { blueprint, signatoryIds, signatoryInfo } =
+    (location.state as any) || {};
 
   const [mappings, setMappings] = useState<Record<string, SignatoryMap>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -132,7 +136,7 @@ export default function SignatoryMapping() {
       const { [blueprintSignatoryId]: _, ...rest } = prev;
       return rest;
     });
-    
+
     // Also clear error for this signatory
     setErrors((prevErrors) => {
       const { [blueprintSignatoryId]: _, ...rest } = prevErrors;
@@ -200,7 +204,11 @@ export default function SignatoryMapping() {
     )
       .then((response: AxiosResponse<GenericSingleResponse<Document>>) => {
         toast.success('document_created');
-        navigate(route('/docuninja/:id/builder?from_template=true', { id: response.data.data.id }));
+        navigate(
+          route('/docuninja/:id/builder?from_template=true', {
+            id: response.data.data.id,
+          })
+        );
       })
       .catch((error) => {
         toast.error('error_refresh_page');
@@ -253,7 +261,11 @@ export default function SignatoryMapping() {
             </div>
           </Element>
 
-          <Element leftSide={t('instructions')} noExternalPadding noVerticalPadding>
+          <Element
+            leftSide={t('instructions')}
+            noExternalPadding
+            noVerticalPadding
+          >
             <div className="text-sm" style={{ color: colors.$3 }}>
               {t('map_signatories_instructions')}
             </div>
@@ -267,7 +279,9 @@ export default function SignatoryMapping() {
               const hasClient = mapping?.type === 'contact';
               const hasUser = mapping?.type === 'user';
 
-              const signatoryName = blueprint.document?.metadata?.signatory_map?.[signatoryId]?.name || signatoryId;
+              const signatoryName =
+                blueprint.document?.metadata?.signatory_map?.[signatoryId]
+                  ?.name || signatoryId;
 
               return (
                 <div
@@ -277,83 +291,94 @@ export default function SignatoryMapping() {
                 >
                   <div className="space-y-1">
                     <Element leftSide={t('signatory')} noExternalPadding>
-                        <div className="flex flex-row items-center space-x-2">
-                          <div
-                            className="w-5 h-5 rounded flex-shrink-0"
-                            style={{ backgroundColor: signatoryColor }}
-                          />
-                          <InputLabel>{ signatoryName }</InputLabel>
-                        </div>
+                      <div className="flex flex-row items-center space-x-2">
+                        <div
+                          className="w-5 h-5 rounded flex-shrink-0"
+                          style={{ backgroundColor: signatoryColor }}
+                        />
+                        <InputLabel>{signatoryName}</InputLabel>
+                      </div>
+                    </Element>
+
+                    {!hasUser && (
+                      <Element leftSide={t('client')} noExternalPadding>
+                        <ComboboxAsync<Client>
+                          inputOptions={{
+                            value: mapping?.client?.id || null,
+                          }}
+                          endpoint={endpoint('/api/v1/clients')}
+                          readonly={false}
+                          onDismiss={() => handleClear(signatoryId)}
+                          entryOptions={{
+                            id: 'id',
+                            label: 'display_name',
+                            value: 'id',
+                            customSearchableValue: (client) =>
+                              client.contacts
+                                .map(({ email }) => email)
+                                .join(','),
+                            dropdownLabelFn,
+                            inputLabelFn: (client) =>
+                              client?.display_name || '',
+                          }}
+                          onChange={(entry) =>
+                            handleClientChange(signatoryId, entry)
+                          }
+                          sortBy="display_name|asc"
+                          errorMessage={error && !hasClient ? error : undefined}
+                          querySpecificEntry="/api/v1/clients/:id"
+                          key={`client-combobox-${signatoryId}`}
+                        />
                       </Element>
+                    )}
 
-                      {!hasUser && (
-                        <Element leftSide={t('client')} noExternalPadding>
-                          <ComboboxAsync<Client>
-                            inputOptions={{
-                              value: mapping?.client?.id || null,
-                            }}
-                            endpoint={endpoint('/api/v1/clients')}
-                            readonly={false}
-                            onDismiss={() => handleClear(signatoryId)}
-                            entryOptions={{
-                                id: 'id',
-                                label: 'display_name',
-                                value: 'id',
-                                customSearchableValue: (client) =>
-                                  client.contacts.map(({ email }) => email).join(','),
-                                dropdownLabelFn,
-                                inputLabelFn: (client) => client?.display_name || '',
-                              }}
-                            onChange={(entry) => handleClientChange(signatoryId, entry)}
-                            sortBy="display_name|asc"
-                            errorMessage={error && !hasClient ? error : undefined}
-                            querySpecificEntry="/api/v1/clients/:id"
-                            key={`client-combobox-${signatoryId}`}
-                          />
-                        </Element>
-                      )}
-
-                      {!hasClient && (
-                        <Element leftSide={t('user')} noExternalPadding>
-                          <ComboboxAsync<DocuNinjaUser>
-                            inputOptions={{
-                              value: mapping?.user?.id || null,
-                            }}
-                            endpoint={docuNinjaEndpoint(
-                              `/api/users?ninjaCompanyKey=${company.company_key}`
-                            )}
-                            readonly={false}
-                            onDismiss={() => handleClear(signatoryId)}
-                            querySpecificEntry={docuNinjaEndpoint('/api/users/:id')}
-                            entryOptions={{
-                              id: 'id',
-                              label: 'email',
-                              value: 'id',
-                              searchable: 'email',
-                              dropdownLabelFn: (user: DocuNinjaUser) => {
-                                const name = user?.first_name || user?.last_name
+                    {!hasClient && (
+                      <Element leftSide={t('user')} noExternalPadding>
+                        <ComboboxAsync<DocuNinjaUser>
+                          inputOptions={{
+                            value: mapping?.user?.id || null,
+                          }}
+                          endpoint={docuNinjaEndpoint(
+                            `/api/users?ninjaCompanyKey=${company.company_key}`
+                          )}
+                          readonly={false}
+                          onDismiss={() => handleClear(signatoryId)}
+                          querySpecificEntry={docuNinjaEndpoint(
+                            '/api/users/:id'
+                          )}
+                          entryOptions={{
+                            id: 'id',
+                            label: 'email',
+                            value: 'id',
+                            searchable: 'email',
+                            dropdownLabelFn: (user: DocuNinjaUser) => {
+                              const name =
+                                user?.first_name || user?.last_name
                                   ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
                                   : user?.email;
-                                return name || '';
-                              },
-                              inputLabelFn: (user?: DocuNinjaUser) => {
-                                if (!user) return '';
-                                const name = user?.first_name || user?.last_name
+                              return name || '';
+                            },
+                            inputLabelFn: (user?: DocuNinjaUser) => {
+                              if (!user) return '';
+                              const name =
+                                user?.first_name || user?.last_name
                                   ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
                                   : user?.email;
-                                return name || '';
-                              },
-                            }}
-                            onChange={(entry) => handleUserChange(signatoryId, entry)}
-                            sortBy="created_at|desc"
-                            errorMessage={error && !hasUser ? error : undefined}
-                            headers={{
-                              Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
-                            }}
-                            key={`user-combobox-${signatoryId}`}
-                          />
-                        </Element>
-                      )}
+                              return name || '';
+                            },
+                          }}
+                          onChange={(entry) =>
+                            handleUserChange(signatoryId, entry)
+                          }
+                          sortBy="created_at|desc"
+                          errorMessage={error && !hasUser ? error : undefined}
+                          headers={{
+                            Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+                          }}
+                          key={`user-combobox-${signatoryId}`}
+                        />
+                      </Element>
+                    )}
                   </div>
                 </div>
               );
@@ -375,7 +400,8 @@ export default function SignatoryMapping() {
                   {t('total_signatories')}: {signatoryIds.length}
                 </div>
                 <div style={{ color: colors.$3 }}>
-                  {t('mapped')}: {Object.keys(mappings).filter(id => mappings[id]).length}
+                  {t('mapped')}:{' '}
+                  {Object.keys(mappings).filter((id) => mappings[id]).length}
                 </div>
               </div>
             </div>
@@ -385,12 +411,16 @@ export default function SignatoryMapping() {
                 type="primary"
                 behavior="button"
                 onClick={handleSubmit}
-                disabled={isSubmitting || Object.keys(mappings).filter(id => mappings[id]).length !== signatoryIds.length}
+                disabled={
+                  isSubmitting ||
+                  Object.keys(mappings).filter((id) => mappings[id]).length !==
+                    signatoryIds.length
+                }
                 className="w-full"
               >
                 {t('create')}
               </Button>
-              
+
               <Button
                 type="secondary"
                 behavior="button"
