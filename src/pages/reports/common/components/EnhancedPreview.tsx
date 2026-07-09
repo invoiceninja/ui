@@ -198,7 +198,7 @@ export function EnhancedPreview({
   const data = filtered;
 
   const downloadCsv = () => {
-    if (!data ||!data.rows|| data.rows.length === 0) {
+    if (!data || !data.rows || data.rows.length === 0) {
       return;
     }
 

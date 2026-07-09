@@ -43,20 +43,23 @@ export default function UserSelection() {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [permissions, setPermissions] = useState<PermissionType[]>([]);
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-  const [usersWithStatus, setUsersWithStatus] = useState<UserWithDocuNinjaStatus[]>([]);
+  const [usersWithStatus, setUsersWithStatus] = useState<
+    UserWithDocuNinjaStatus[]
+  >([]);
 
   // Fetch Invoice Ninja users
-  const { data: invoiceNinjaUsers, isLoading: isLoadingInvoiceUsers } = useUsersForDocuNinjaQuery();
+  const { data: invoiceNinjaUsers, isLoading: isLoadingInvoiceUsers } =
+    useUsersForDocuNinjaQuery();
 
-  const company = useCurrentCompany();  
+  const company = useCurrentCompany();
   // Get DocuNinja account details for quota checking (NO QUERY!)
   const [docuData] = useAtom(docuNinjaAtom);
   const docuAccount = docuData?.account;
 
-  const { data: docuNinjaUsers } = useDocuNinjaUsersQuery({ 
-    perPage: '10000', 
-    currentPage: '1', 
-    ninjaCompanyKey: company.company_key
+  const { data: docuNinjaUsers } = useDocuNinjaUsersQuery({
+    perPage: '10000',
+    currentPage: '1',
+    ninjaCompanyKey: company.company_key,
   });
 
   // Combine users with DocuNinja status
@@ -64,37 +67,37 @@ export default function UserSelection() {
     if (invoiceNinjaUsers?.data?.data && docuNinjaUsers) {
       const invoiceUsers = invoiceNinjaUsers.data.data;
       const docuUsers = docuNinjaUsers.data.data;
-      
-      const usersWithStatus: UserWithDocuNinjaStatus[] = invoiceUsers
-        .map((user: InvoiceNinjaUser) => {
+
+      const usersWithStatus: UserWithDocuNinjaStatus[] = invoiceUsers.map(
+        (user: InvoiceNinjaUser) => {
           // Use email as the primary matching criteria since it's unique
-          const docuUser = docuUsers.find((du: DocuNinjaUser) => 
-            du.email === user.email
+          const docuUser = docuUsers.find(
+            (du: DocuNinjaUser) => du.email === user.email
           );
-          
+
           return {
             ...user,
             hasDocuNinjaAccess: !!docuUser,
             docuNinjaUser: docuUser,
           };
-        });
-      
+        }
+      );
+
       setUsersWithStatus(usersWithStatus);
     }
   }, [invoiceNinjaUsers, docuNinjaUsers]);
 
   const handleUserSelection = (userId: string, checked: boolean) => {
-    
-    setSelectedUserIds(prev => {
+    setSelectedUserIds((prev) => {
       const isCurrentlySelected = prev.includes(userId);
-      
+
       if (checked && !isCurrentlySelected) {
         // Add user if checked and not already selected
         const newIds = [...prev, userId];
         return newIds;
       } else if (!checked && isCurrentlySelected) {
         // Remove user if unchecked and currently selected
-        const newIds = prev.filter(id => id !== userId);
+        const newIds = prev.filter((id) => id !== userId);
         return newIds;
       } else {
         // No change needed
@@ -106,8 +109,8 @@ export default function UserSelection() {
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       const availableUserIds = usersWithStatus
-        .filter(user => !user.hasDocuNinjaAccess)
-        .map(user => user.id);
+        .filter((user) => !user.hasDocuNinjaAccess)
+        .map((user) => user.id);
       setSelectedUserIds(availableUserIds);
     } else {
       setSelectedUserIds([]);
@@ -125,19 +128,17 @@ export default function UserSelection() {
 
     try {
       // Filter to only get users that are actually selected and don't have access
-      const selectedUsers = usersWithStatus.filter(user => 
-        selectedUserIds.includes(user.id) && !user.hasDocuNinjaAccess
+      const selectedUsers = usersWithStatus.filter(
+        (user) => selectedUserIds.includes(user.id) && !user.hasDocuNinjaAccess
       );
-
 
       // Remove duplicates by using a Set
-      const uniqueSelectedUsers = selectedUsers.filter((user, index, self) => 
-        index === self.findIndex(u => u.id === user.id)
+      const uniqueSelectedUsers = selectedUsers.filter(
+        (user, index, self) => index === self.findIndex((u) => u.id === user.id)
       );
 
-
       // Create DocuNinja users for selected Invoice Ninja users
-      const promises = uniqueSelectedUsers.map(user => {
+      const promises = uniqueSelectedUsers.map((user) => {
         const payload = {
           id: user.id, // Pass the Invoice Ninja user ID
           first_name: user.first_name,
@@ -147,8 +148,7 @@ export default function UserSelection() {
           permissions: isAdmin ? [] : permissions,
           notifications: [],
         };
-        
-        
+
         return request(
           'POST',
           endpoint('/api/docuninja/create_user'),
@@ -158,31 +158,36 @@ export default function UserSelection() {
       });
 
       await Promise.all(promises);
-      
+
       toast.success(t('docuninja_access_granted_successfully') as string);
-      
+
       // Refetch both DocuNinja users and Invoice Ninja users to update status
       $refetch(['docuninja_users']);
       $refetch(['users']);
-      
+
       // Navigate back to users page
       navigate('/docuninja/users');
-      
     } catch (error: any) {
       console.error('Error granting DocuNinja access:', error);
-      toast.error(error.response?.message ?? t('docuninja_access_grant_failed') as string);
+      toast.error(
+        error.response?.message ??
+          (t('docuninja_access_grant_failed') as string)
+      );
     } finally {
       setIsFormBusy(false);
     }
   };
 
   // Only show users that don't have DocuNinja access
-  const availableUsers = usersWithStatus.filter(user => !user.hasDocuNinjaAccess);
-  const selectedUsers = availableUsers.filter(user =>
+  const availableUsers = usersWithStatus.filter(
+    (user) => !user.hasDocuNinjaAccess
+  );
+  const selectedUsers = availableUsers.filter((user) =>
     selectedUserIds.includes(user.id)
   );
-  const allAvailableSelected = availableUsers.length > 0 && 
-    availableUsers.every(user => selectedUserIds.includes(user.id));
+  const allAvailableSelected =
+    availableUsers.length > 0 &&
+    availableUsers.every((user) => selectedUserIds.includes(user.id));
 
   // Check DocuNinja quotas and available users
   const currentDocuNinjaUserCount = docuNinjaUsers?.data?.data?.length || 1;
@@ -190,8 +195,6 @@ export default function UserSelection() {
   const hasAvailableQuota = currentDocuNinjaUserCount < maxDocuNinjaUsers;
   const hasNoAvailableUsers = availableUsers.length === 0;
   const hasQuotaButNoUsers = hasAvailableQuota && hasNoAvailableUsers;
-
-
 
   const pages = [
     {
@@ -244,7 +247,8 @@ export default function UserSelection() {
                     {t('docuninja_quota_available_but_no_users')}
                   </div>
                   <div className="text-sm text-gray-400 mb-4">
-                    {t('users')}: {currentDocuNinjaUserCount} / {maxDocuNinjaUsers}
+                    {t('users')}: {currentDocuNinjaUserCount} /{' '}
+                    {maxDocuNinjaUsers}
                   </div>
                   <div className="text-sm text-blue-500">
                     <Link to="/settings/users/create">{t('add_user')}</Link>
@@ -256,7 +260,9 @@ export default function UserSelection() {
                   <div className="text-center py-4 space-x-2">
                     <span>{t('user_limit_reached')}</span>
                     <span className="text-blue-500">
-                      <Link to="/settings/account_management">{t('upgrade')}</Link>
+                      <Link to="/settings/account_management">
+                        {t('upgrade')}
+                      </Link>
                     </span>
                   </div>
                 </div>
@@ -279,7 +285,9 @@ export default function UserSelection() {
                         </div>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-400">{t('available')}</div>
+                    <div className="text-xs text-gray-400">
+                      {t('available')}
+                    </div>
                   </div>
 
                   {availableUsers.map((user) => {
@@ -323,10 +331,12 @@ export default function UserSelection() {
             {selectedUserIds.length > 0 && (
               <Card title={t('permissions')} className="shadow-sm">
                 <Permissions
-                  user={{
-                    company_user: { is_admin: isAdmin },
-                    permissions: permissions,
-                  } as any}
+                  user={
+                    {
+                      company_user: { is_admin: isAdmin },
+                      permissions: permissions,
+                    } as any
+                  }
                   setUser={() => {}}
                   errors={undefined}
                   isFormBusy={isFormBusy}

@@ -396,13 +396,15 @@ function Form({ onContinue, businessType, isSingapore }: FormProps) {
       city: company?.settings?.city || '',
       county: company?.settings?.state || '',
       zip: company?.settings?.postal_code || '',
-      country: isSingapore ? '702' : (company?.settings?.country_id || ''),
+      country: isSingapore ? '702' : company?.settings?.country_id || '',
       acts_as_sender: true,
       acts_as_receiver: true,
       vat_number: company?.settings?.vat_number || '',
       id_number: company?.settings.id_number || '',
-      c5_signer_name: isSingapore ? `${user?.first_name || ''} ${user?.last_name || ''}`.trim() : '',
-      c5_signer_email: isSingapore ? (user?.email || '') : '',
+      c5_signer_name: isSingapore
+        ? `${user?.first_name || ''} ${user?.last_name || ''}`.trim()
+        : '',
+      c5_signer_email: isSingapore ? user?.email || '' : '',
     },
     onSubmit: (values, { setSubmitting }) => {
       toast.processing();

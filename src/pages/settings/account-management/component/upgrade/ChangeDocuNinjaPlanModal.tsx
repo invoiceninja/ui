@@ -21,15 +21,16 @@ interface Props {
   isLoading?: boolean;
 }
 
-export function ChangeDocuNinjaPlanModal({ 
-  visible, 
-  onClose, 
-  onConfirm, 
-  currentUserCount, 
-  isLoading 
+export function ChangeDocuNinjaPlanModal({
+  visible,
+  onClose,
+  onConfirm,
+  currentUserCount,
+  isLoading,
 }: Props) {
   const { t } = useTranslation();
-  const [selectedUserCount, setSelectedUserCount] = useState<number>(currentUserCount);
+  const [selectedUserCount, setSelectedUserCount] =
+    useState<number>(currentUserCount);
 
   // Reset selected user count when modal opens or currentUserCount changes
   useEffect(() => {
@@ -39,12 +40,16 @@ export function ChangeDocuNinjaPlanModal({
   }, [visible, currentUserCount]);
 
   // Generate options from current count down to 0
-  const userCountOptions = Array.from({ length: currentUserCount + 1 }, (_, i) => ({
-    value: currentUserCount - i,
-    label: currentUserCount - i === 0 
-      ? `0 ${t('users')} (${t('disable_docuninja')})` 
-      : `${currentUserCount - i} ${t('users')}`
-  }));
+  const userCountOptions = Array.from(
+    { length: currentUserCount + 1 },
+    (_, i) => ({
+      value: currentUserCount - i,
+      label:
+        currentUserCount - i === 0
+          ? `0 ${t('users')} (${t('disable_docuninja')})`
+          : `${currentUserCount - i} ${t('users')}`,
+    })
+  );
 
   const handleConfirm = () => {
     onConfirm(selectedUserCount);
@@ -63,7 +68,8 @@ export function ChangeDocuNinjaPlanModal({
         <div className="space-y-4">
           <div>
             <p className="text-sm text-gray-600 mb-2">
-              {`${t('docuninja')} ${t('users')}`}: <strong>{currentUserCount}</strong>
+              {`${t('docuninja')} ${t('users')}`}:{' '}
+              <strong>{currentUserCount}</strong>
             </p>
           </div>
 
@@ -82,7 +88,8 @@ export function ChangeDocuNinjaPlanModal({
           {selectedUserCount === 0 && (
             <div className="bg-red-50 p-4 rounded-md">
               <p className="text-sm text-red-800">
-                <strong>⚠️ {t('warning')}:</strong> {t('docuninja_disable_warning')}
+                <strong>⚠️ {t('warning')}:</strong>{' '}
+                {t('docuninja_disable_warning')}
               </p>
             </div>
           )}
@@ -105,22 +112,23 @@ export function ChangeDocuNinjaPlanModal({
           >
             {t('cancel')}
           </Button>
-          
+
           {isPlanChanging && (
             <Button
               behavior="button"
               onClick={handleConfirm}
               disabled={isLoading}
-              className={selectedUserCount === 0 ? "bg-red-600 hover:bg-red-700" : undefined}
-            >
-              {isLoading 
-                ? t('processing') 
-                  : t('confirm')
+              className={
+                selectedUserCount === 0
+                  ? 'bg-red-600 hover:bg-red-700'
+                  : undefined
               }
+            >
+              {isLoading ? t('processing') : t('confirm')}
             </Button>
           )}
         </div>
       </div>
     </Modal>
   );
-} 
+}

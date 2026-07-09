@@ -28,7 +28,9 @@ export function useCancelInvoiceModal() {
 
   const confirmCancel = (cancellationReason: string) => {
     if (pendingInvoiceId) {
-      bulk([pendingInvoiceId], 'cancel', undefined, { reason: cancellationReason });
+      bulk([pendingInvoiceId], 'cancel', undefined, {
+        reason: cancellationReason,
+      });
       closeModal();
     }
   };
@@ -40,4 +42,3 @@ export function useCancelInvoiceModal() {
     confirmCancel,
   };
 }
-

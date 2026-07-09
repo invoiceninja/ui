@@ -36,7 +36,10 @@ import { Divider } from '$app/components/cards/Divider';
 import { useColorScheme } from '$app/common/colors';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { InputLabel } from '$app/components/forms';
-import { ChangeTemplateModal, useChangeTemplate } from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 export default function Expense() {
   const [t] = useTranslation();
@@ -87,7 +90,6 @@ export default function Expense() {
     changeTemplateResources,
   } = useChangeTemplate();
 
-  
   useEffect(() => {
     if (data) {
       setExpense(data);
@@ -161,7 +163,6 @@ export default function Expense() {
               )}
             </Panel>
           </PanelGroup>
-
 
           <ChangeTemplateModal<ExpenseType>
             entity="expense"

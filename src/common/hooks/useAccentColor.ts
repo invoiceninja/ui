@@ -17,9 +17,7 @@ export function useAccentColor() {
   const user = useCurrentUser();
   const userState = useSelector((state: RootState) => state.user);
 
-  return (
-    userState.changes?.company_user?.settings?.accent_color ||
+  return (userState.changes?.company_user?.settings?.accent_color ||
     user?.company_user?.settings?.accent_color ||
-    colors.accent
-  ) as string;
+    colors.accent) as string;
 }

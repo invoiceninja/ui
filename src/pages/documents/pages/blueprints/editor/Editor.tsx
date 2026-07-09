@@ -1,7 +1,11 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Default } from '$app/components/layouts/Default';
 import { GrapeJSEditor } from '../create/components/GrapeJSEditor';
-import { useCreateBlueprint, useUpdateBlueprint, useBlueprintQuery } from '$app/common/queries/docuninja/blueprints';
+import {
+  useCreateBlueprint,
+  useUpdateBlueprint,
+  useBlueprintQuery,
+} from '$app/common/queries/docuninja/blueprints';
 import { route } from '$app/common/helpers/route';
 import { useState, useEffect } from 'react';
 
@@ -9,40 +13,46 @@ export default function BlueprintEditor() {
   const location = useLocation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { templateHtml: stateTemplateHtml, templateName: stateBlueprintName, projectData: stateProjectData } = location.state || {};
-  
-  
+  const {
+    templateHtml: stateTemplateHtml,
+    templateName: stateBlueprintName,
+    projectData: stateProjectData,
+  } = location.state || {};
+
   const createBlueprint = useCreateBlueprint();
   const updateBlueprint = useUpdateBlueprint();
-  
+
   // Fallback: fetch blueprint data if state is not available
-  const { data: blueprintResponse, isLoading } = useBlueprintQuery({ id: id || '' });
+  const { data: blueprintResponse, isLoading } = useBlueprintQuery({
+    id: id || '',
+  });
   const [templateHtml, setTemplateHtml] = useState<string>('');
   const [templateName, setTemplateName] = useState<string>('');
   const [projectData, setProjectData] = useState<string>('');
-  
+
   useEffect(() => {
-
-
     // Use state data if available, otherwise use fetched data
     if (stateTemplateHtml) {
       setTemplateHtml(stateTemplateHtml);
     } else if (blueprintResponse?.data?.data?.template) {
       setTemplateHtml(blueprintResponse.data.data.template);
     }
-    
+
     if (stateBlueprintName) {
       setTemplateName(stateBlueprintName);
     } else if (blueprintResponse?.data?.data?.name) {
       setTemplateName(blueprintResponse.data.data.name);
     }
 
-    if(blueprintResponse?.data?.data?.grapesjs) {
+    if (blueprintResponse?.data?.data?.grapesjs) {
       setProjectData(blueprintResponse.data.data.grapesjs);
     }
-
-
-  }, [stateTemplateHtml, stateBlueprintName, blueprintResponse, stateProjectData]);
+  }, [
+    stateTemplateHtml,
+    stateBlueprintName,
+    blueprintResponse,
+    stateProjectData,
+  ]);
 
   // Determine if this is a new template or editing existing
   const isNewTemplate = id === 'create';
@@ -51,18 +61,22 @@ export default function BlueprintEditor() {
     try {
       // Base64 encode the HTML content
       const base64Html = btoa(html);
-      
+
       if (isNewTemplate) {
         // Create new blueprint
         const response = await createBlueprint({
           name: templateName || 'New Template',
           base64_file: base64Html,
           is_template: true,
-          grapesjs: projectData
+          grapesjs: projectData,
         });
-        
+
         // Navigate to the editor for the newly created blueprint
-        navigate(route('/docuninja/templates/:id/editor', { id: response.data.data.id }));
+        navigate(
+          route('/docuninja/templates/:id/editor', {
+            id: response.data.data.id,
+          })
+        );
       } else if (id) {
         // Update existing blueprint
         await updateBlueprint({
@@ -70,12 +84,9 @@ export default function BlueprintEditor() {
           base64_file: base64Html,
           name: templateName || 'Updated Template',
           is_template: true,
-          grapesjs: projectData
+          grapesjs: projectData,
         });
-        
       }
-
-      
     } catch (error) {
       console.error('Error saving template:', error);
     }
@@ -101,18 +112,21 @@ export default function BlueprintEditor() {
   }
 
   return (
-    <Default 
+    <Default
       title="Template Editor"
       breadcrumbs={[
         { name: 'Templates', href: '/docuninja/templates' },
-        { name: templateName || 'Blueprint', href: `/docuninja/templates/${id}/edit` },
-        { name: 'Template Editor', href: '#' }
+        {
+          name: templateName || 'Blueprint',
+          href: `/docuninja/templates/${id}/edit`,
+        },
+        { name: 'Template Editor', href: '#' },
       ]}
     >
       <div className="h-screen overflow-hidden">
-        <GrapeJSEditor 
+        <GrapeJSEditor
           key={`${id}-${templateHtml.length}`}
-          initialHtml={templateHtml} 
+          initialHtml={templateHtml}
           initialProjectData={projectData}
           onSave={handleSave}
           onCancel={handleCancel}

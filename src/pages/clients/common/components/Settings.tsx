@@ -182,8 +182,8 @@ export default function Settings() {
               client?.settings?.send_reminders === true
                 ? 'enabled'
                 : client?.settings?.send_reminders === false
-                ? 'disabled'
-                : ''
+                  ? 'disabled'
+                  : ''
             }
             onValueChange={(value) =>
               handleChange(

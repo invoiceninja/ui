@@ -26,7 +26,7 @@ import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers
 export function StartTrial({ visible, onClose }: PopupProps) {
   const { t } = useTranslation();
   const account = useCurrentAccount();
-    const refresh = useRefreshCompanyUsers();
+  const refresh = useRefreshCompanyUsers();
 
   const { data: methods } = useQuery({
     queryKey: ['/api/client/account_management/methods', account?.id],
@@ -50,7 +50,7 @@ export function StartTrial({ visible, onClose }: PopupProps) {
     })
       .then(() => {
         toast.success(t('trial_success')!);
-        
+
         refresh();
         onClose();
       })
@@ -63,12 +63,11 @@ export function StartTrial({ visible, onClose }: PopupProps) {
     <Modal visible={visible} onClose={onClose} size="regular">
       <div className="space-y-4">
         <div>
-        <p className="text-lg font-bold">{t('free_trial')}</p>
-          <p className="text-sm">
-            {t('trial_message')}
-          </p>
+          <p className="text-lg font-bold">{t('free_trial')}</p>
+          <p className="text-sm">{t('trial_message')}</p>
           <p className="text-sm py-2">
-            At the end of your 14 day trial your card will be charged $14/month. Cancel anytime.
+            At the end of your 14 day trial your card will be charged $14/month.
+            Cancel anytime.
           </p>
         </div>
 

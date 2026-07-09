@@ -533,9 +533,7 @@ export function Preview() {
               {preview.columns.map((column, i) => (
                 <Td key={i}>
                   <InputField
-                    onValueChange={(value) =>
-                      filter(column.identifier, value)
-                    }
+                    onValueChange={(value) => filter(column.identifier, value)}
                     changeOverride
                   />
                 </Td>

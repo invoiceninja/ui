@@ -36,7 +36,7 @@ type AutoCompleteKey<T, Prefix extends string = ''> = keyof T extends never
 
 type ValueFor<
   T,
-  Key extends AutoCompleteKey<T>
+  Key extends AutoCompleteKey<T>,
 > = Key extends `${infer First}.${infer Rest}`
   ? First extends keyof T
     ? Rest extends AutoCompleteKey<T[First]>
@@ -44,8 +44,8 @@ type ValueFor<
       : never
     : never
   : Key extends keyof T
-  ? T[Key]
-  : never;
+    ? T[Key]
+    : never;
 
 type UpdateFn<T> = <K extends AutoCompleteKey<T>>(
   key: K,
@@ -67,7 +67,9 @@ export function usePreferences() {
   const settings = useReactSettings();
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [draftSettings, setDraftSettings] = useState<ReactSettings | null>(null);
+  const [draftSettings, setDraftSettings] = useState<ReactSettings | null>(
+    null
+  );
   const draftDirtyPathsRef = useRef<string[]>([]);
 
   const activeSettings = useMemo(() => {
@@ -214,7 +216,16 @@ export function usePreferences() {
           </>
         );
       },
-    [colors.$1, colors.$24, colors.$3, closeModal, isVisible, openModal, save, t]
+    [
+      colors.$1,
+      colors.$24,
+      colors.$3,
+      closeModal,
+      isVisible,
+      openModal,
+      save,
+      t,
+    ]
   );
 
   return { Preferences, update, preferences: activeSettings.preferences, save };

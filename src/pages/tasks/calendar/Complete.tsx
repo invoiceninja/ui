@@ -116,7 +116,10 @@ export default function Complete() {
         if (currentUser?.id) {
           dispatch(
             updateUser(
-              markCalendarConnected(currentUser, completeResponseEmail(response))
+              markCalendarConnected(
+                currentUser,
+                completeResponseEmail(response)
+              )
             )
           );
         }
@@ -133,8 +136,8 @@ export default function Complete() {
     provider === 'microsoft'
       ? FaMicrosoft
       : provider === 'google'
-      ? FaGoogle
-      : null;
+        ? FaGoogle
+        : null;
 
   const goToCalendar = () => navigate('/tasks/calendar', { replace: true });
 

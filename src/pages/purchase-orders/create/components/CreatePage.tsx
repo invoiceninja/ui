@@ -52,7 +52,6 @@ export default function Create() {
     handleLineItemPropertyChange,
   } = usePurchaseOrderUtilities({ purchaseOrder, setPurchaseOrder });
 
-
   const handleContactCanSignChange = (id: string, checked: boolean) => {
     if (!purchaseOrder) {
       return;
@@ -60,46 +59,51 @@ export default function Create() {
 
     // Use vendor from context if purchaseOrder.vendor is not available
     const vendorContacts = purchaseOrder?.vendor?.contacts || vendor?.contacts;
-    
+
     if (!vendorContacts) {
       return;
     }
 
     // Find the contact by id
-    const contact = vendorContacts.find(c => c.id === id);
+    const contact = vendorContacts.find((c) => c.id === id);
     if (!contact) {
       return;
     }
 
     // Check if contact is invited - if not, don't allow can_sign changes
-    const isInvited = purchaseOrder.invitations?.some(inv => inv.vendor_contact_id === contact.id) || false;
+    const isInvited =
+      purchaseOrder.invitations?.some(
+        (inv) => inv.vendor_contact_id === contact.id
+      ) || false;
     if (!isInvited) {
       return;
     }
 
     // Update the invitations array with the can_sign property
     const invitations = [...(purchaseOrder.invitations || [])];
-    
+
     // Find existing invitation for this contact
-    const existingInvitationIndex = invitations.findIndex(inv => inv.vendor_contact_id === contact.id);
-    
+    const existingInvitationIndex = invitations.findIndex(
+      (inv) => inv.vendor_contact_id === contact.id
+    );
+
     if (existingInvitationIndex >= 0) {
       // Update existing invitation
       invitations[existingInvitationIndex] = {
         ...invitations[existingInvitationIndex],
-        can_sign: checked
+        can_sign: checked,
       };
     }
 
     // Update the purchase order with the modified invitations
-    setPurchaseOrder((current) => 
-      current && {
-        ...current,
-        invitations: invitations,
-      }
+    setPurchaseOrder(
+      (current) =>
+        current && {
+          ...current,
+          invitations: invitations,
+        }
     );
   };
-  
 
   return (
     <>
@@ -118,8 +122,7 @@ export default function Create() {
               handleInvitationChange(purchaseOrder, id, checked)
             }
             onContactCanSignCheckboxChange={(id, checked) =>
-              purchaseOrder &&
-              handleContactCanSignChange(id, checked)
+              purchaseOrder && handleContactCanSignChange(id, checked)
             }
             initiallyVisible
             errorMessage={errors?.errors.vendor_id}

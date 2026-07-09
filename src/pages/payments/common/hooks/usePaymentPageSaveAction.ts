@@ -16,8 +16,9 @@ export interface PaymentPageSaveAction {
   disabled?: boolean;
 }
 
-export const paymentPageSaveActionAtom =
-  atom<PaymentPageSaveAction | null>(null);
+export const paymentPageSaveActionAtom = atom<PaymentPageSaveAction | null>(
+  null
+);
 
 export function usePaymentPageSaveAction(
   options: PaymentPageSaveAction,
