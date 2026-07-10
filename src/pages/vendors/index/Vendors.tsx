@@ -26,6 +26,15 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { or } from '$app/common/guards/guards/or';
 import { Guard } from '$app/common/guards/Guard';
 import { useActions } from '../common/hooks/useActions';
+import { useEffect, useState } from 'react';
+import { useAtom } from 'jotai';
+import { useVendorQuery } from '$app/common/queries/vendor';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  VendorSlider,
+  vendorSliderAtom,
+  vendorSliderVisibilityAtom,
+} from '../common/components/VendorSlider';
 
 export default function Vendors() {
   const { documentTitle } = useTitle('vendors');
@@ -33,6 +42,7 @@ export default function Vendors() {
   const [t] = useTranslation();
 
   const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const pages: Page[] = [{ name: t('vendors'), href: '/vendors' }];
 
@@ -40,6 +50,33 @@ export default function Vendors() {
   const columns = useVendorColumns();
   const vendorColumns = useAllVendorColumns();
   const customBulkActions = useCustomBulkActions();
+
+  const [sliderVendorId, setSliderVendorId] = useState<string>('');
+  const [vendorSlider, setVendorSlider] = useAtom(vendorSliderAtom);
+  const [vendorSliderVisibility, setVendorSliderVisibility] = useAtom(
+    vendorSliderVisibilityAtom
+  );
+
+  const { data: vendorResponse } = useVendorQuery({
+    id: sliderVendorId,
+    enabled: Boolean(sliderVendorId),
+  });
+
+  useEffect(() => {
+    if (sliderVendorId) {
+      setVendorSlider(null);
+    }
+  }, [sliderVendorId]);
+
+  useEffect(() => {
+    if (vendorResponse && vendorSliderVisibility) {
+      setVendorSlider(vendorResponse);
+    }
+  }, [vendorResponse, vendorSliderVisibility]);
+
+  useEffect(() => {
+    return () => setVendorSliderVisibility(false);
+  }, []);
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
@@ -72,12 +109,18 @@ export default function Vendors() {
         }
         linkToCreateGuards={[permission('create_vendor')]}
         hideEditableOptions={!hasPermission('edit_vendor')}
+        onTableRowClick={(vendor) => {
+          setSliderVendorId(vendor.id);
+          setVendorSliderVisibility(true);
+        }}
         enableSavingFilterPreference
         dateRangeColumns={[
           { column: 'created_at', queryParameterKey: 'created_between' },
         ]}
         enableSavingLatestDataForNavigation
       />
+
+      {!disableNavigation('vendor', vendorSlider) && <VendorSlider />}
     </Default>
   );
 }
