@@ -1,22 +1,22 @@
-import { useTranslation } from 'react-i18next';
-import { SubscriptionProps } from './Overview';
-import { Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
-import { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
-  DropResult,
   Droppable,
+  DropResult,
 } from '@hello-pangea/dnd';
-import { useQuery } from 'react-query';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import { useQuery } from '@tanstack/react-query';
 import { AxiosError, AxiosResponse } from 'axios';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Element } from '$app/components/cards';
+import { SelectField } from '$app/components/forms';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
+import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
+import { SubscriptionProps } from './Overview';
 
 export type Steps = Record<
   string,

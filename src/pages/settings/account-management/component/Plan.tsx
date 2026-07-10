@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 import { date, isDemo, isHosted, isSelfHosted } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useTranslation } from 'react-i18next';
-import { License } from '.';
 import { Element } from '../../../../components/cards';
 import { Link } from '../../../../components/forms';
-import dayjs from 'dayjs';
-import { route } from '$app/common/helpers/route';
+import { License } from '.';
 
 export function Plan() {
   const [t] = useTranslation();

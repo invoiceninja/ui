@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Expense } from '$app/common/interfaces/expense';
-import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { Expense } from '$app/common/interfaces/expense';
+import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 
 const roundToPrecision = (number: number, precision: number) => {
   const isNegative = number < 0;

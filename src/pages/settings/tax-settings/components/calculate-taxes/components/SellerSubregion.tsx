@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
+import { useResolveEu } from '$app/common/hooks/useResolveEu';
+import { Element } from '$app/components/cards';
+import { EUCountrySelector } from '$app/components/EUCountrySelector';
+import { InputField } from '$app/components/forms';
 import { USStateSelector } from '$app/components/USStateSelector';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
-import { useTranslation } from 'react-i18next';
-import { Element } from '$app/components/cards';
-import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
-import { EUCountrySelector } from '$app/components/EUCountrySelector';
-import { useResolveEu } from '$app/common/hooks/useResolveEu';
-import { InputField } from '$app/components/forms';
-import { useEffect } from 'react';
 
 export function SellerSubregion() {
   const [t] = useTranslation();

@@ -8,34 +8,34 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import axios, { AxiosPromise } from 'axios';
+import classNames from 'classnames';
+import { useAtomValue } from 'jotai';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Outlet, useLocation, useParams } from 'react-router-dom';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { $refetch, RefetchKey } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { Tabs } from '$app/components/Tabs';
+import { Settings } from '$app/common/interfaces/company.interface';
+import { Page } from '$app/components/Breadcrumbs';
+import { Sparkle } from '$app/components/icons/Sparkle';
+import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { Default } from '$app/components/layouts/Default';
-import axios, { AxiosPromise } from 'axios';
-import { useAtomValue } from 'jotai';
-import { Outlet, useLocation, useParams } from 'react-router-dom';
-import { updatingRecordsAtom } from './common/atoms';
-import { useEffect, useState } from 'react';
+import { Tabs } from '$app/components/Tabs';
+import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
 import {
   isCompanySettingsFormBusy,
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
-import { useSaveBtn } from '$app/components/layouts/common/hooks';
-import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
+import { updatingRecordsAtom } from './common/atoms';
 import { useTabs } from './pages/general-settings/hooks/useTabs';
-import { Settings } from '$app/common/interfaces/company.interface';
-import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
-import { route } from '$app/common/helpers/route';
-import { Page } from '$app/components/Breadcrumbs';
-import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { activeSettingsAtom } from '$app/common/atoms/settings';
-import { $refetch, RefetchKey } from '$app/common/hooks/useRefetch';
-import { Sparkle } from '$app/components/icons/Sparkle';
 
 export interface GeneralSettingsPayload {
   client_id: string;

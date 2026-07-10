@@ -8,33 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { EntityState } from '$app/common/enums/entity-state';
-import { getEntityState } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
-import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { useBulk } from '$app/common/queries/company-gateways';
-import { EntityStatus } from '$app/components/EntityStatus';
-import { Tooltip } from '$app/components/Tooltip';
-import { Dropdown } from '$app/components/dropdown/Dropdown';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button, Checkbox, Link } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
-import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import {
   DragDropContext,
   Draggable,
-  DropResult,
   Droppable,
+  DropResult,
 } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
 import { ChangeEvent, Fragment, useEffect, useRef, useState } from 'react';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { MdArchive, MdDelete, MdRestore, MdWarning } from 'react-icons/md';
-import { STRIPE_CONNECT } from '../../index/Gateways';
-import { useGatewayUtilities } from '../hooks/useGatewayUtilities';
-import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useColorScheme } from '$app/common/colors';
+import { EntityState } from '$app/common/enums/entity-state';
+import { getEntityState } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { Settings } from '$app/common/interfaces/company.interface';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { useBulk } from '$app/common/queries/company-gateways';
 import {
   Control,
   DropdownIndicator,
@@ -44,13 +37,20 @@ import {
   SelectWithApplyButton,
   ValueContainer,
 } from '$app/components/datatables/Actions';
-import { Settings } from '$app/common/interfaces/company.interface';
-import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { useSelectorCustomStyles } from '$app/pages/reports/common/hooks/useSelectorCustomStyles';
-import { useColorScheme } from '$app/common/colors';
-import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Button, Checkbox, Link } from '$app/components/forms';
 import { CircleQuestion } from '$app/components/icons/CircleQuestion';
+import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
+import { Icon } from '$app/components/icons/Icon';
+import { Tooltip } from '$app/components/Tooltip';
+import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
+import { useSelectorCustomStyles } from '$app/pages/reports/common/hooks/useSelectorCustomStyles';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { STRIPE_CONNECT } from '../../index/Gateways';
+import { useGatewayUtilities } from '../hooks/useGatewayUtilities';
 
 interface Params {
   includeRemoveAction: boolean;

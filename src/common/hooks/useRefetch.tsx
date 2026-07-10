@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const keys = {
   invoices: {
@@ -275,10 +275,14 @@ export function useRefetch() {
         return;
       }
 
-      queryClient.invalidateQueries(keys[key].path);
+      queryClient.invalidateQueries({
+        queryKey: [keys[key].path],
+      });
 
       keys[key].dependencies.map((dependency) => {
-        queryClient.invalidateQueries(dependency);
+        queryClient.invalidateQueries({
+          queryKey: [dependency],
+        });
       });
     });
   };

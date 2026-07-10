@@ -8,26 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
-import { Card, Element } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
-import { useTranslation } from 'react-i18next';
+import { AxiosError } from 'axios';
+import { useFormik } from 'formik';
 import { get } from 'lodash';
+import { useState } from 'react';
+import { X } from 'react-feather';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
 import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Modal } from '$app/components/Modal';
-import { useState } from 'react';
-import { useFormik } from 'formik';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
-import { AxiosError } from 'axios';
-import { toast } from '$app/common/helpers/toast/toast';
+import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { Country } from '$app/common/interfaces/country';
-import { X } from 'react-feather';
-import { useColorScheme } from '$app/common/colors';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Card, Element } from '$app/components/cards';
+import { Button, InputField, SelectField } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
 
 export function EUTaxDetails() {
   const [t] = useTranslation();

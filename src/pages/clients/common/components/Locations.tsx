@@ -8,38 +8,38 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { Card } from '$app/components/cards';
+import { AxiosError } from 'axios';
+import classNames from 'classnames';
+import { useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClientContext } from '../../edit/Edit';
 import { useOutletContext, useParams } from 'react-router-dom';
-import { Location } from '$app/common/interfaces/location';
-import { useBlankLocationQuery } from '$app/common/queries/locations';
-import { LocationModal } from './LocationModal';
-import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import styled from 'styled-components';
-import classNames from 'classnames';
-import { Trash } from '$app/components/icons/Trash';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
+import { Location } from '$app/common/interfaces/location';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankLocationQuery } from '$app/common/queries/locations';
+import { useCustomField } from '$app/components/CustomField';
+import { Card } from '$app/components/cards';
 import { Pencil } from '$app/components/icons/Pencil';
 import { Plus } from '$app/components/icons/Plus';
-import { toast } from '$app/common/helpers/toast/toast';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { AxiosError } from 'axios';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Trash } from '$app/components/icons/Trash';
 import {
   ConfirmActionModal,
   confirmActionModalAtom,
 } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
-import { useSetAtom } from 'jotai';
-import { useCustomField } from '$app/components/CustomField';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { ClientContext } from '../../edit/Edit';
 import {
   TaxDataModal,
   TaxDataPayload,
 } from '../../show/components/TaxDataModal';
+import { LocationModal } from './LocationModal';
 
 const StyledIconBox = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};

@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useDocumentsQuery } from '$app/common/queries/documents';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Tab } from '$app/components/Tabs';
-import { useTranslation } from 'react-i18next';
 
 export function useCompanyDetailsTabs() {
   const { t } = useTranslation();

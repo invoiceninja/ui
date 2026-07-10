@@ -8,44 +8,44 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
+import { useAtomValue } from 'jotai';
 import { FormEvent, ReactElement, ReactNode, useState } from 'react';
-import { Menu as MenuIcon, Info } from 'react-feather';
-import CommonProps from '../../common/interfaces/common-props.interface';
+import { Info, Menu as MenuIcon } from 'react-feather';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Button, Link } from '$app/components/forms';
-import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
-import { DesktopSidebar } from './components/DesktopSidebar';
-import { MobileSidebar } from './components/MobileSidebar';
-import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
+import { useColorScheme } from '$app/common/colors';
 import { isDemo, isHosted, isSelfHosted, trans } from '$app/common/helpers';
+import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useUnlockButtonForHosted } from '$app/common/hooks/useUnlockButtonForHosted';
 import { useUnlockButtonForSelfHosted } from '$app/common/hooks/useUnlockButtonForSelfHosted';
-import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Button, Link } from '$app/components/forms';
 import {
   saveBtnAtom,
   useNavigationTopRightElement,
 } from '$app/components/layouts/common/hooks';
-import { VerifyEmail } from '../banners/VerifyEmail';
-import { ActivateCompany } from '../banners/ActivateCompany';
-import { VerifyPhone } from '../banners/VerifyPhone';
-import { useColorScheme } from '$app/common/colors';
+import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
 import { Search } from '$app/pages/dashboard/components/Search';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useAtomValue } from 'jotai';
-import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
-import { Notifications } from '../Notifications';
-import { useSocketEvent } from '$app/common/queries/sockets';
-import { Invoice } from '$app/common/interfaces/invoice';
-import toast from 'react-hot-toast';
+import CommonProps from '../../common/interfaces/common-props.interface';
+import { ActivateCompany } from '../banners/ActivateCompany';
 import { EInvoiceCredits } from '../banners/EInvoiceCredits';
-import classNames from 'classnames';
-import { Feedback } from '../Feedback';
 import { PriceIncreaseBanner } from '../banners/PriceIncrease';
+import { VerifyEmail } from '../banners/VerifyEmail';
+import { VerifyPhone } from '../banners/VerifyPhone';
+import { Feedback } from '../Feedback';
+import { Notifications } from '../Notifications';
 import { useNavigation } from './common/navigation';
+import { DesktopSidebar } from './components/DesktopSidebar';
+import { MobileSidebar } from './components/MobileSidebar';
 
 export interface SaveOption {
   label: string;

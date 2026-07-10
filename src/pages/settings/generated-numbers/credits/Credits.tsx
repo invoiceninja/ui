@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtomValue } from 'jotai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClickableElement, Element } from '../../../../components/cards';
-import { InputField } from '../../../../components/forms';
+import { useColorScheme } from '$app/common/colors';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { Divider } from '$app/components/cards/Divider';
-import { LinkToVariables } from '../common/components/LinkToVariables';
-import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../../common/atoms';
-import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
-import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { useColorScheme } from '$app/common/colors';
+import { ClickableElement, Element } from '../../../../components/cards';
+import { InputField } from '../../../../components/forms';
+import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { LinkToVariables } from '../common/components/LinkToVariables';
 
 export function Credits() {
   const [t] = useTranslation();

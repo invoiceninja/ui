@@ -8,30 +8,30 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { Button, InputField, Link, SelectField } from '$app/components/forms';
+import classNames from 'classnames';
+import { set } from 'lodash';
+import { Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useLanguages } from '$app/common/hooks/useLanguages';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Vendor } from '$app/common/interfaces/vendor';
 import { VendorContact } from '$app/common/interfaces/vendor-contact';
 import { CountrySelector } from '$app/components/CountrySelector';
-import { CustomField } from '$app/components/CustomField';
-import Toggle from '$app/components/forms/Toggle';
-import { UserSelector } from '$app/components/users/UserSelector';
-import { set } from 'lodash';
-import { useTranslation } from 'react-i18next';
-import { TabGroup } from '$app/components/TabGroup';
-import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { CurrencySelector } from '$app/components/CurrencySelector';
-import { useLanguages } from '$app/common/hooks/useLanguages';
+import { CustomField } from '$app/components/CustomField';
+import { Card, Element } from '$app/components/cards';
 import { EntityStatus } from '$app/components/EntityStatus';
-import { Dispatch, SetStateAction } from 'react';
-import { LanguageSelector } from '$app/components/LanguageSelector';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { useColorScheme } from '$app/common/colors';
-import { Trash } from '$app/components/icons/Trash';
+import { Button, InputField, Link, SelectField } from '$app/components/forms';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import Toggle from '$app/components/forms/Toggle';
 import { Plus } from '$app/components/icons/Plus';
-import classNames from 'classnames';
+import { Trash } from '$app/components/icons/Trash';
+import { LanguageSelector } from '$app/components/LanguageSelector';
+import { TabGroup } from '$app/components/TabGroup';
+import { UserSelector } from '$app/components/users/UserSelector';
 
 interface Props {
   vendor: Vendor;

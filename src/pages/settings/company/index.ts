@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 export * from './CompanyDetails';
-export { Documents as CompanyDocuments } from './documents/Documents';
 export {
   Address,
-  Defaults,
-  Logo,
-  Details,
   CompanyDetailsCustomFields,
+  Defaults,
+  Details,
+  Logo,
 } from './components';
+export { Documents as CompanyDocuments } from './documents/Documents';

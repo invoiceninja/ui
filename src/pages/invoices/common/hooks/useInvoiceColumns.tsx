@@ -8,46 +8,46 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
-import { Credit } from '$app/common/interfaces/credit';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import { DataTableColumns } from '$app/components/DataTable';
-import { EntityStatus } from '$app/components/EntityStatus';
-import { Tooltip } from '$app/components/Tooltip';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { InvoiceStatus } from '../components/InvoiceStatus';
-import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { MdSend, MdTextSnippet, MdWarning } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
+import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
+import { date } from '$app/common/helpers';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
-import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
-import { useDateTime } from '$app/common/hooks/useDateTime';
-import { useGetSetting } from '$app/common/hooks/useGetSetting';
-import classNames from 'classnames';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
-import { MdSend, MdTextSnippet, MdWarning } from 'react-icons/md';
-import { Assigned } from '$app/components/Assigned';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useNavigate } from 'react-router-dom';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { normalizeColumnName } from '$app/common/helpers/data-table';
 import {
   Classification,
-  PEPPOL_COUNTRIES,
   PEPPOL_CLASSIFICATIONS,
+  PEPPOL_COUNTRIES,
 } from '$app/common/helpers/peppol-countries';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDateTime } from '$app/common/hooks/useDateTime';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
+import { Credit } from '$app/common/interfaces/credit';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Assigned } from '$app/components/Assigned';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { DataTableColumns } from '$app/components/DataTable';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Tooltip } from '$app/components/Tooltip';
+import { InvoiceStatus } from '../components/InvoiceStatus';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;

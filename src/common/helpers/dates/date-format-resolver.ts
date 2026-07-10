@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { DateFormat } from '$app/common/interfaces/date-format';
 import { useStaticsQuery } from '../../queries/statics';
 
 export function useResolveDateFormat() {
@@ -16,7 +17,7 @@ export function useResolveDateFormat() {
   return (id: string) => {
     if (statics) {
       return statics.data?.date_formats.find(
-        (dateFormat) => dateFormat.id === id
+        (dateFormat: DateFormat) => dateFormat.id === id
       );
     }
 

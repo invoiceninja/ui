@@ -7,6 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-export * from './TaskStatuses';
+
 export { Create as CreateTaskStatus } from './Create';
 export { Edit as EditTaskStatus } from './Edit';
+export * from './TaskStatuses';

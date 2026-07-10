@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { cloneDeep } from 'lodash';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { MultiValue, SingleValue } from 'react-select';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
-import { cloneDeep } from 'lodash';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { MultiValue, SingleValue } from 'react-select';
 
 interface Params {
   currentGateways: CompanyGateway[];

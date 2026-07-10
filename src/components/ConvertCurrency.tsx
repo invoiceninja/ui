@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { getExchangeRate } from '$app/pages/payments/common/helpers/resolve-exchange-rate';
-import { useTranslation } from 'react-i18next';
-import { Element } from './cards';
 import { CurrencySelector } from './CurrencySelector';
+import { Element } from './cards';
 import { NumberInputField } from './forms/NumberInputField';
 
 interface Props {

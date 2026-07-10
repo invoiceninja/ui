@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import dayjs from 'dayjs';
+import { Dispatch, SetStateAction, useState } from 'react';
 import {
   Activity,
   CheckCircle,
@@ -18,26 +20,24 @@ import {
   Twitter,
   Youtube,
 } from 'react-feather';
-import { Modal } from './Modal';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
-import { Dispatch, SetStateAction, useState } from 'react';
-import { Button } from './forms';
-import { request } from '$app/common/helpers/request';
-import { endpoint, isSelfHosted } from '$app/common/helpers';
-import { toast } from '$app/common/helpers/toast/toast';
-import { Icon } from './icons/Icon';
 import { MdInfo, MdWarning } from 'react-icons/md';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
-import {
-  updateCompanyUsers,
-  resetChanges,
-} from '$app/common/stores/slices/company-users';
-import { useDispatch } from 'react-redux';
-import { PasswordConfirmation } from './PasswordConfirmation';
+import { endpoint, isSelfHosted } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
-import dayjs from 'dayjs';
+import {
+  resetChanges,
+  updateCompanyUsers,
+} from '$app/common/stores/slices/company-users';
+import { Button } from './forms';
+import { Icon } from './icons/Icon';
+import { Modal } from './Modal';
+import { PasswordConfirmation } from './PasswordConfirmation';
 
 interface SystemInfo {
   system_health: boolean;

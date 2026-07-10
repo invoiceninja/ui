@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { BankAccount } from '$app/common/interfaces/bank-accounts';
-import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CreateBankAccountModal } from './CreateBankAccountModal';
-import { ComboboxAsync, Entry } from '$app/components/forms/Combobox';
 import { endpoint } from '$app/common/helpers';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { BankAccount } from '$app/common/interfaces/bank-accounts';
+import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
+import { ComboboxAsync, Entry } from '$app/components/forms/Combobox';
+import { CreateBankAccountModal } from './CreateBankAccountModal';
 
 export interface BankAccountSelectorProps
   extends GenericSelectorProps<BankAccount> {

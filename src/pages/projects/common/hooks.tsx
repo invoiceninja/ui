@@ -8,19 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { EntityState } from '$app/common/enums/entity-state';
-import { date, getEntityState } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
-import { Project } from '$app/common/interfaces/project';
-import { Divider } from '$app/components/cards/Divider';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { EntityStatus } from '$app/components/EntityStatus';
-import { Icon } from '$app/components/icons/Icon';
-import { Tooltip } from '$app/components/Tooltip';
-import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import classNames from 'classnames';
+import { useSetAtom } from 'jotai';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   MdAddCircleOutline,
@@ -33,32 +23,42 @@ import {
   MdTextSnippet,
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { projectAtom } from './atoms';
-import { useBulkAction } from './hooks/useBulkAction';
-import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { useInvoiceProject } from '$app/pages/projects/common/hooks/useInvoiceProject';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useSetAtom } from 'jotai';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { CustomBulkAction } from '$app/components/DataTable';
-import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { useDocumentsBulk } from '$app/common/queries/documents';
-import { Dispatch, SetStateAction } from 'react';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { EntityState } from '$app/common/enums/entity-state';
+import { date, getEntityState } from '$app/common/helpers';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
-import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import classNames from 'classnames';
-import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { Project } from '$app/common/interfaces/project';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { useDocumentsBulk } from '$app/common/queries/documents';
 import { useTagsQuery } from '$app/common/queries/tags';
+import { Divider } from '$app/components/cards/Divider';
+import { CustomBulkAction } from '$app/components/DataTable';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Icon } from '$app/components/icons/Icon';
+import { Tooltip } from '$app/components/Tooltip';
 import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import { useInvoiceProject } from '$app/pages/projects/common/hooks/useInvoiceProject';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { projectAtom } from './atoms';
+import { useBulkAction } from './hooks/useBulkAction';
 
 export const defaultColumns: string[] = [
   'name',

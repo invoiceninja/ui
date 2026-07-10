@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { endpoint } from '$app/common/helpers';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
 import { Vendor } from '$app/common/interfaces/vendor';
 import { CreateVendorModal } from '$app/pages/vendors/components/CreateVendorModal';
-import { Dispatch, SetStateAction, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
-import { endpoint } from '$app/common/helpers';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export interface VendorSelectorProps extends GenericSelectorProps<Vendor> {
   initiallyVisibleModal?: boolean;

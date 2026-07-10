@@ -9,15 +9,15 @@
  */
 
 import classNames from 'classnames';
-import { InputLabel } from '.';
-import CommonProps from '../../common/interfaces/common-props.interface';
-import { useColorScheme } from '$app/common/colors';
-import React, { CSSProperties, ReactNode, isValidElement } from 'react';
-import { SelectOption } from '../datatables/Actions';
-import Select, { StylesConfig } from 'react-select';
-import { ChevronDown } from '../icons/ChevronDown';
 import { merge } from 'lodash';
+import React, { CSSProperties, isValidElement, ReactNode } from 'react';
+import Select, { StylesConfig } from 'react-select';
+import { useColorScheme } from '$app/common/colors';
+import CommonProps from '../../common/interfaces/common-props.interface';
+import { SelectOption } from '../datatables/Actions';
 import { ErrorMessage } from '../ErrorMessage';
+import { ChevronDown } from '../icons/ChevronDown';
+import { InputLabel } from '.';
 
 export interface SelectProps extends CommonProps {
   defaultValue?: any;

@@ -8,31 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import dayjs from 'dayjs';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useColorScheme } from '$app/common/colors';
 import { isDemo } from '$app/common/helpers';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { DateFormat } from '$app/common/interfaces/date-format';
 import { Timezone } from '$app/common/interfaces/timezone';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { updateChanges } from '$app/common/stores/slices/company-users';
+import { CurrencySelector } from '$app/components/CurrencySelector';
 import { Divider } from '$app/components/cards/Divider';
-import dayjs from 'dayjs';
+import { LanguageSelector } from '$app/components/LanguageSelector';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
-import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { Element } from '../../../../components/cards';
 import { Radio, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { hasLanguageChanged } from '../common/atoms';
 import { companySettingsErrorsAtom } from '../../common/atoms';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
-import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
-import { SettingsLabel } from '$app/components/SettingsLabel';
-import { CurrencySelector } from '$app/components/CurrencySelector';
-import { LanguageSelector } from '$app/components/LanguageSelector';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useColorScheme } from '$app/common/colors';
+import { hasLanguageChanged } from '../common/atoms';
 
 export function Settings() {
   const [t] = useTranslation();
@@ -176,7 +176,7 @@ export function Settings() {
           customSelector
         >
           {statics?.timezones
-            .sort((a, b) => a.name.localeCompare(b.name))
+            .sort((a: Timezone, b: Timezone) => a.name.localeCompare(b.name))
             .map((timezone: Timezone) => (
               <option value={timezone.id} key={timezone.id}>
                 {timezone.name}

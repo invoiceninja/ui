@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Expense } from '$app/common/interfaces/expense';
 import { useTranslation } from 'react-i18next';
+import { Expense } from '$app/common/interfaces/expense';
 
 interface Props {
   expense: Expense;

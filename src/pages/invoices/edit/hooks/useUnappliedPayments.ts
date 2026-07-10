@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Payment } from '$app/common/interfaces/payment';
-import { useQuery } from 'react-query';
 
 interface Params {
   clientId: string | undefined;

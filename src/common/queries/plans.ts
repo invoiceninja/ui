@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useQuery } from 'react-query';
-import { request } from '../helpers/request';
-import { endpoint } from '../helpers';
+import { useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
+import { endpoint } from '../helpers';
+import { request } from '../helpers/request';
 
 interface Plans {
   features: {

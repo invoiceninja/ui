@@ -8,48 +8,47 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { atom, useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import reactStringReplace from 'react-string-replace';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { date, endpoint, date as formatDate, trans } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { TabGroup } from '$app/components/TabGroup';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { Task } from '$app/common/interfaces/task';
+import { TaskActivity } from '$app/common/interfaces/task-activity';
 import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
-import { atom, useAtom } from 'jotai';
-import { useTranslation } from 'react-i18next';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date, endpoint, trans } from '$app/common/helpers';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { useQuery } from 'react-query';
-import { request } from '$app/common/helpers/request';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { AxiosResponse } from 'axios';
 import { Link } from '$app/components/forms';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import { route } from '$app/common/helpers/route';
-import reactStringReplace from 'react-string-replace';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { useActions } from '../hooks';
-import { TaskStatus } from './TaskStatus';
-import { Task } from '$app/common/interfaces/task';
-import { TaskActivity } from '$app/common/interfaces/task-activity';
-import {
-  calculateDifferenceBetweenLogs,
-  calculateHours,
-} from '../helpers/calculate-time';
+import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { TabGroup } from '$app/components/TabGroup';
+import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceProject';
+import { useFormatTimeLog } from '../../kanban/common/hooks';
+import { TaskClock } from '../../kanban/components/TaskClock';
 import {
   calculateEntityState,
   isTaskRunning,
 } from '../helpers/calculate-entity-state';
-import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceProject';
-import { date as formatDate } from '$app/common/helpers';
-import { useFormatTimeLog } from '../../kanban/common/hooks';
-import { TaskClock } from '../../kanban/components/TaskClock';
-import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
-import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
-import styled from 'styled-components';
-import { useColorScheme } from '$app/common/colors';
-import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
+import {
+  calculateDifferenceBetweenLogs,
+  calculateHours,
+} from '../helpers/calculate-time';
+import { useActions } from '../hooks';
+import { TaskStatus } from './TaskStatus';
 
 export const taskSliderAtom = atom<Task | null>(null);
 export const taskSliderVisibilityAtom = atom(false);

@@ -8,23 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Modal } from '$app/components/Modal';
-import { Dispatch, SetStateAction } from 'react';
-import { Button, InputField, InputLabel } from '$app/components/forms';
-import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { AxiosError } from 'axios';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { TaskStatus } from '$app/common/interfaces/task-status';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useHandleChange } from '../common/hooks';
-import { useBlankTaskStatusQuery } from '$app/common/queries/task-statuses';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { TaskStatus } from '$app/common/interfaces/task-status';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankTaskStatusQuery } from '$app/common/queries/task-statuses';
+import { Button, InputField, InputLabel } from '$app/components/forms';
+import { ColorPicker } from '$app/components/forms/ColorPicker';
+import { Modal } from '$app/components/Modal';
+import { useHandleChange } from '../common/hooks';
 
 interface Props {
   visible: boolean;

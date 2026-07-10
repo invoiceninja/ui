@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { DataTable, DataTableColumns } from '$app/components/DataTable';
-import { route } from '$app/common/helpers/route';
-import { Payment } from '$app/common/interfaces/payment';
-import { Card } from '$app/components/cards';
+import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
-import { Badge } from '$app/components/Badge';
+import { useColorScheme } from '$app/common/colors';
 import { date } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { Payment } from '$app/common/interfaces/payment';
+import { Badge } from '$app/components/Badge';
+import { Card } from '$app/components/cards';
+import { DataTable, DataTableColumns } from '$app/components/DataTable';
 import { DynamicLink } from '$app/components/DynamicLink';
-import { useTranslation } from 'react-i18next';
-import { useColorScheme } from '$app/common/colors';
-import { CreditCardChecked } from '$app/components/icons/CreditCardChecked';
-import { ArrowUp } from '$app/components/icons/ArrowUp';
 import { ArrowDown } from '$app/components/icons/ArrowDown';
+import { ArrowUp } from '$app/components/icons/ArrowUp';
+import { CreditCardChecked } from '$app/components/icons/CreditCardChecked';
 
 export function RecentPayments() {
   const [t] = useTranslation();

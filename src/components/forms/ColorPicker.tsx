@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { Modal } from '$app/components/Modal';
 import classNames from 'classnames';
 import { ReactNode, useEffect, useState } from 'react';
-import { HexColorPicker, HexColorInput } from 'react-colorful';
+import { HexColorInput, HexColorPicker } from 'react-colorful';
 import { useTranslation } from 'react-i18next';
-import { useDebounce } from 'react-use';
-import { Button } from './Button';
-import { Icon } from '../icons/Icon';
 import { MdDone } from 'react-icons/md';
+import { useDebounce } from 'react-use';
+import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { Modal } from '$app/components/Modal';
+import { Icon } from '../icons/Icon';
+import { Button } from './Button';
 
 interface Props {
   value?: string;

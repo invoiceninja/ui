@@ -8,24 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import frequencies from '$app/common/constants/frequency';
 import { Schedule } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useTranslation } from 'react-i18next';
-import frequencies from '$app/common/constants/frequency';
+import { Card, Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
-import { EmailStatement } from './EmailStatement';
+import { InputField, SelectField } from '$app/components/forms';
 import { EmailRecord } from '$app/pages/settings/schedules/common/components/EmailRecord';
 import {
   Template,
   useDisplayTemplateField,
 } from '../hooks/useDisplayTemplateField';
+import { useEntityNumber } from '../hooks/useEntityNumber';
 import { EmailReport } from './EmailReport';
-import { useColorScheme } from '$app/common/colors';
+import { EmailStatement } from './EmailStatement';
 import { InvoiceOutstandingTasks } from './InvoiceOutstandingTasks';
 import { PaymentSchedule } from './PaymentSchedule';
-import { useEntityNumber } from '../hooks/useEntityNumber';
 
 interface Props {
   schedule: Schedule;

@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { Card, Element } from '$app/components/cards';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
-import { TabGroup } from '$app/components/TabGroup';
-import { useTranslation } from 'react-i18next';
-import { PurchaseOrderCardProps } from './Details';
-import { Dispatch, SetStateAction } from 'react';
 import Toggle from '$app/components/forms/Toggle';
-import { useColorScheme } from '$app/common/colors';
+import { TabGroup } from '$app/components/TabGroup';
+import { PurchaseOrderCardProps } from './Details';
 
 interface Props extends PurchaseOrderCardProps {
   isDefaultTerms: boolean;

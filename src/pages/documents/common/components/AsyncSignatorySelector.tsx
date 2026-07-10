@@ -9,15 +9,16 @@
  */
 
 import { SignatorySelectorProps } from '@docuninja/builder2.0';
-import { useTranslation } from 'react-i18next';
 import collect from 'collect.js';
-import { Client } from '$app/common/interfaces/client';
-import { Combobox, Entry } from '$app/components/forms/Combobox';
-import { InputLabel } from '$app/components/forms';
+import { get } from 'lodash';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { get } from 'lodash';
+import { Client } from '$app/common/interfaces/client';
+import { InputLabel } from '$app/components/forms';
+import { Combobox, Entry } from '$app/components/forms/Combobox';
+
 interface Props {
   results: SignatorySelectorProps['results'];
   onSelect: SignatorySelectorProps['onSelect'];

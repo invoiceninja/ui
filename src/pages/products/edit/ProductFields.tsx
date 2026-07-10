@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
-import { Link } from '$app/components/forms';
 import { useColorScheme } from '$app/common/colors';
+import { Card } from '$app/components/cards';
+import { Link } from '$app/components/forms';
 
 export default function ProductFields() {
   const [t] = useTranslation();

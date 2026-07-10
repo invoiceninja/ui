@@ -18,18 +18,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway, Option } from '$app/common/interfaces/statics';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
+import { InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useHandleMethodToggle } from '../hooks/useHandleMethodToggle';
 import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
-import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   gateway: Gateway;

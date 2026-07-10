@@ -9,21 +9,21 @@
  */
 
 import { useState } from 'react';
-import { FooterColumns } from './DataTable';
 import { useTranslation } from 'react-i18next';
-import { Modal } from './Modal';
-import { Button } from './forms';
-import Toggle from './forms/Toggle';
-import { Element } from './cards';
+import { useColorScheme } from '$app/common/colors';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import {
   ReactTableColumns,
   useReactSettings,
   useSaveReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { toast } from '$app/common/helpers/toast/toast';
+import { Element } from './cards';
+import { FooterColumns } from './DataTable';
+import { Button } from './forms';
+import Toggle from './forms/Toggle';
 import { TableColumns } from './icons/TableColumns';
-import { useColorScheme } from '$app/common/colors';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { Modal } from './Modal';
 
 interface Props {
   table: ReactTableColumns;

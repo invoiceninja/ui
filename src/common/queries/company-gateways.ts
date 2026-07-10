@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery, useQueryClient } from 'react-query';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { toast } from '../helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
@@ -26,9 +26,10 @@ export function useCompanyGatewaysQuery(params?: CompanyGatewaysParams) {
 
   const { status } = params || {};
 
-  return useQuery(
-    ['/api/v1/company_gateways', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/company_gateways', params],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint(
@@ -39,8 +40,10 @@ export function useCompanyGatewaysQuery(params?: CompanyGatewaysParams) {
           }
         )
       ),
-    { staleTime: Infinity, enabled: isAdmin }
-  );
+
+    staleTime: Infinity,
+    enabled: isAdmin,
+  });
 }
 
 interface Params {
@@ -52,27 +55,31 @@ interface Params {
 export function useCompanyGatewayQuery(params: Params) {
   const { isAdmin } = useAdmin();
 
-  return useQuery(
-    ['/api/v1/company_gateways', params.id, params.queryParams],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/company_gateways', params.id, params.queryParams],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint(`/api/v1/company_gateways/:id?${params.queryParams || ''}`, {
           id: params.id,
         })
       ),
-    { staleTime: Infinity, enabled: (params.enabled ?? true) && isAdmin }
-  );
+
+    staleTime: Infinity,
+    enabled: (params.enabled ?? true) && isAdmin,
+  });
 }
 
 export function useBlankCompanyGatewayQuery() {
   const { isAdmin } = useAdmin();
 
-  return useQuery(
-    ['/api/v1/company_gateways/create'],
-    () => request('GET', endpoint('/api/v1/company_gateways/create')),
-    { staleTime: Infinity, enabled: isAdmin }
-  );
+  return useQuery({
+    queryKey: ['/api/v1/company_gateways/create'],
+    queryFn: () => request('GET', endpoint('/api/v1/company_gateways/create')),
+    staleTime: Infinity,
+    enabled: isAdmin,
+  });
 }
 
 export function useBulk() {
@@ -91,7 +98,9 @@ export function useBulk() {
       $refetch(['company_gateways']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
     });
   };
 }

@@ -8,27 +8,30 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Schedule } from '$app/common/interfaces/schedule';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { toast } from '../helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
 
 export function useBlankScheduleQuery() {
   const { isAdmin, isOwner } = useAdmin();
 
-  return useQuery<Schedule>(
-    ['/api/v1/task_schedulers', 'create'],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/task_schedulers', 'create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/task_schedulers/create')).then(
         (response: GenericSingleResourceResponse<Schedule>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: isAdmin || isOwner }
-  );
+
+    staleTime: Infinity,
+    enabled: isAdmin || isOwner,
+  });
 }
 
 interface ScheduleParams {
@@ -38,9 +41,10 @@ interface ScheduleParams {
 export function useScheduleQuery(params: ScheduleParams) {
   const { isAdmin, isOwner } = useAdmin();
 
-  return useQuery<Schedule>(
-    ['/api/v1/task_schedulers', params.id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/task_schedulers', params.id],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/task_schedulers/:id', { id: params.id })
@@ -48,8 +52,10 @@ export function useScheduleQuery(params: ScheduleParams) {
         (response: GenericSingleResourceResponse<Schedule>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: isAdmin || isOwner }
-  );
+
+    staleTime: Infinity,
+    enabled: isAdmin || isOwner,
+  });
 }
 
 export function useBulkAction() {

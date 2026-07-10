@@ -8,44 +8,43 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from '$app/common/hooks/useTitle';
-import { useTranslation } from 'react-i18next';
-import { DataTable } from '$app/components/DataTable';
-import { useTableColumns } from '../common/hooks/useTableColumns';
-import { Document as DocumentType } from '$app/common/interfaces/docuninja/api';
-import { Default } from '$app/components/layouts/Default';
-import { Page } from '$app/components/Breadcrumbs';
-import { Button } from '$app/components/forms';
-import { useNavigate } from 'react-router-dom';
-import { Gear } from '$app/components/icons/Gear';
-import { DocumentCreationDropZone } from '../common/components/DocumentCreationDropZone';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { useSocketEvent } from '$app/common/queries/sockets';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
-import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
-import { isPaidDocuninjaUserAtom } from '../atoms';
-import {
-  LoadingState,
-  UpgradePlan,
-  SplashPage,
-  AccountCreation,
-  CompanySetup,
-} from '../components/DocumentStates';
-import { toast } from '$app/common/helpers/toast/toast';
 import {
   useDocuNinjaAdmin,
   useDocuNinjaPaidUser,
   useDocuNinjaPermission,
 } from '$app/common/guards/guards/docuninja/permission';
-import { useActions } from '../common/hooks/useActions';
-import { DocumentSettingsModal } from '../show/components/DocumentSettingsModal';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 import { useDriverTour } from '$app/common/hooks/useDriverTour';
 import { usePreferences } from '$app/common/hooks/usePreferences';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Document as DocumentType } from '$app/common/interfaces/docuninja/api';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { Page } from '$app/components/Breadcrumbs';
+import { DataTable } from '$app/components/DataTable';
+import { Button } from '$app/components/forms';
+import { Gear } from '$app/components/icons/Gear';
+import { Default } from '$app/components/layouts/Default';
+import { isPaidDocuninjaUserAtom } from '../atoms';
+import { DocumentCreationDropZone } from '../common/components/DocumentCreationDropZone';
+import { useActions } from '../common/hooks/useActions';
 import { useDocumentFilters } from '../common/hooks/useDocumentFilters';
+import { useTableColumns } from '../common/hooks/useTableColumns';
+import {
+  AccountCreation,
+  CompanySetup,
+  LoadingState,
+  SplashPage,
+  UpgradePlan,
+} from '../components/DocumentStates';
+import { DocumentSettingsModal } from '../show/components/DocumentSettingsModal';
 
 export default function Documents() {
   useTitle('documents');

@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useSetAtom } from 'jotai';
+import { useNavigate } from 'react-router-dom';
 import { Statement } from '$app/pages/clients/statement/Statement';
 import { scheduleParametersAtom } from '$app/pages/settings/schedules/common/components/EmailStatement';
 import { DEFAULT_SCHEDULE_PARAMETERS } from '$app/pages/settings/schedules/common/hooks/useHandleChange';
-import { useSetAtom } from 'jotai';
-import { useNavigate } from 'react-router-dom';
 
 export function useScheduleStatement() {
   const navigate = useNavigate();

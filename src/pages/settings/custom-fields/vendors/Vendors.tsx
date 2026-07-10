@@ -9,12 +9,12 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Field } from '../components/Field';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { Divider } from '$app/components/cards/Divider';
 import { useColorScheme } from '$app/common/colors';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Divider } from '$app/components/cards/Divider';
+import { Field } from '../components/Field';
 
 export function Vendors() {
   useTitle('custom_fields');

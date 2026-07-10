@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { useDetectBrowser } from '$app/common/hooks/useDetectBrowser';
-import { Banner } from '$app/components/Banner';
-import { Icon } from '$app/components/icons/Icon';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaChrome } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';
+import { useColorScheme } from '$app/common/colors';
+import { useDetectBrowser } from '$app/common/hooks/useDetectBrowser';
+import { Banner } from '$app/components/Banner';
+import { Icon } from '$app/components/icons/Icon';
 
 export function ExtensionBanner() {
   const [t] = useTranslation();

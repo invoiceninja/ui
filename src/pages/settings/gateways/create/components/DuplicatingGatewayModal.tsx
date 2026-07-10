@@ -8,12 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { MdInfo } from 'react-icons/md';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
-
-import { useTranslation } from 'react-i18next';
-import { MdInfo } from 'react-icons/md';
 
 interface Props {
   visible: boolean;

@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-import { Modal } from '$app/components/Modal';
-import { useTranslation } from 'react-i18next';
-import { PopupProps } from './NewCreditCard';
-import { useQuery } from 'react-query';
-import { AxiosResponse } from 'axios';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { AddCreditCard } from './AddCreditCard';
 import { toast } from '$app/common/helpers/toast/toast';
-import { Button } from '$app/components/forms';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { Button } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
+import { AddCreditCard } from './AddCreditCard';
+import { PopupProps } from './NewCreditCard';
 
 export function StartTrial({ visible, onClose }: PopupProps) {
   const { t } = useTranslation();

@@ -11,9 +11,9 @@
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { Button } from './forms';
 import { Modal } from './Modal';
-import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   visible: boolean;

@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { transactionTypes } from '$app/common/constants/transactions';
 import {
   ApiTransactionType,
   TransactionType,
 } from '$app/common/enums/transactions';
-import { BankAccountSelector } from '../components/BankAccountSelector';
+import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useTranslation } from 'react-i18next';
-import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
-import { EntityStatus } from './EntityStatus';
 import { CurrencySelector } from '$app/components/CurrencySelector';
-import { useColorScheme } from '$app/common/colors';
+import { Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { BankAccountSelector } from '../components/BankAccountSelector';
+import { EntityStatus } from './EntityStatus';
 
 interface Props {
   transaction: Transaction;

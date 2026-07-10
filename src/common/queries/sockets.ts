@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useSockets } from '../hooks/useSockets';
 import { useEffect } from 'react';
-import { useCurrentCompany } from '../hooks/useCurrentCompany';
 import { isHosted } from '../helpers';
+import { useCurrentCompany } from '../hooks/useCurrentCompany';
+import { useSockets } from '../hooks/useSockets';
 
 // This file defines global events system for query invalidation.
 

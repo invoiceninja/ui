@@ -8,10 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Tabs } from '$app/components/Tabs';
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Card } from '$app/components/cards';
+import { Tabs } from '$app/components/Tabs';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import {
@@ -19,9 +22,6 @@ import {
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
 import { useLocalizationTabs } from './common/hooks/useLocalizationTabs';
-import { useColorScheme } from '$app/common/colors';
-import { Card } from '$app/components/cards';
-import { useAtomValue } from 'jotai';
 
 export function Localization() {
   const [t] = useTranslation();

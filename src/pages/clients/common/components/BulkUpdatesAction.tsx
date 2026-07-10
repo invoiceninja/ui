@@ -8,15 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdCached } from 'react-icons/md';
 import { useBulkUpdatesColumns } from '$app/common/hooks/useBulkUpdatesColumns';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useBulk as useBulkClients } from '$app/common/queries/clients';
 import { useBulk as useBulkExpenses } from '$app/common/queries/expenses';
-import { useBulkAction as useBulkRecurringInvoices } from '$app/pages/recurring-invoices/common/queries';
 import { useStaticsQuery } from '$app/common/queries/statics';
+import { useBulk as useBulkTasks } from '$app/common/queries/tasks';
 import { CountrySelector } from '$app/components/CountrySelector';
 import { CustomField } from '$app/components/CustomField';
-import { Modal } from '$app/components/Modal';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import {
   Button,
@@ -25,17 +28,14 @@ import {
   SelectField,
 } from '$app/components/forms';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
-import { Icon } from '$app/components/icons/Icon';
-import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { MdCached } from 'react-icons/md';
 import Toggle from '$app/components/forms/Toggle';
-import { useBulk as useBulkTasks } from '$app/common/queries/tasks';
-import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
-import { UserSelector } from '$app/components/users/UserSelector';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
-import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
+import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
+import { UserSelector } from '$app/components/users/UserSelector';
+import { useBulkAction as useBulkRecurringInvoices } from '$app/pages/recurring-invoices/common/queries';
 
 interface Props {
   entity: 'client' | 'expense' | 'recurring_invoice' | 'task';

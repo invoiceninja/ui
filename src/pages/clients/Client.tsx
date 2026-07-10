@@ -9,36 +9,36 @@
  */
 
 import { AxiosError } from 'axios';
+import { cloneDeep, set } from 'lodash';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { Tabs } from '$app/components/Tabs';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { Spinner } from '$app/components/Spinner';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Client as ClientType } from '$app/common/interfaces/client';
+import { ClientContact } from '$app/common/interfaces/client-contact';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useClientQuery } from '$app/common/queries/clients';
+import { Page } from '$app/components/Breadcrumbs';
+import { InputLabel } from '$app/components/forms';
+import { Default } from '$app/components/layouts/Default';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Spinner } from '$app/components/Spinner';
+import { Tabs } from '$app/components/Tabs';
+import { useHandleCompanySave } from '../settings/common/hooks/useHandleCompanySave';
 import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { useHandleCompanySave } from '../settings/common/hooks/useHandleCompanySave';
-import { cloneDeep, set } from 'lodash';
-import { Client as ClientType } from '$app/common/interfaces/client';
-import { ClientContact } from '$app/common/interfaces/client-contact';
 import { useActions } from './common/hooks/useActions';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useTabs } from './common/hooks/useTabs';
-import { InputLabel } from '$app/components/forms';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');

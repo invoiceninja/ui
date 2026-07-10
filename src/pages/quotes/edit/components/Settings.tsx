@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useOutletContext } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { DesignSelector } from '$app/common/generic/DesignSelector';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { Quote } from '$app/common/interfaces/quote';
+import { Card } from '$app/components/cards';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 import Toggle from '$app/components/forms/Toggle';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
-import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
-import { useOutletContext } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { Card } from '$app/components/cards';
 import { QuoteContext } from '../../create/Create';
-import { Quote } from '$app/common/interfaces/quote';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { useColorScheme } from '$app/common/colors';
 
 export default function Settings() {
   const [t] = useTranslation();

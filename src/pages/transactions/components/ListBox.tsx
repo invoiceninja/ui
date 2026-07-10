@@ -8,24 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { TransactionDetails } from './TransactionMatchDetails';
+import classNames from 'classnames';
+import collect from 'collect.js';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useClientsQuery } from '$app/common/queries/clients';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Client } from '$app/common/interfaces/client';
 import CommonProps from '$app/common/interfaces/common-props.interface';
-import { SearchArea } from './SearchArea';
-import { ListBoxItem } from './ListBoxItem';
-import { useInvoicesQuery } from '$app/pages/invoices/common/queries';
-import { useVendorsQuery } from '$app/common/queries/vendor';
+import { useClientsQuery } from '$app/common/queries/clients';
 import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
-import { usePaymentsQuery } from '$app/common/queries/payments';
 import { useExpensesQuery } from '$app/common/queries/expenses';
-import { useColorScheme } from '$app/common/colors';
-import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import collect from 'collect.js';
+import { usePaymentsQuery } from '$app/common/queries/payments';
+import { useVendorsQuery } from '$app/common/queries/vendor';
 import { Checkbox } from '$app/components/forms';
+import { useInvoicesQuery } from '$app/pages/invoices/common/queries';
+import { ListBoxItem } from './ListBoxItem';
+import { SearchArea } from './SearchArea';
+import { TransactionDetails } from './TransactionMatchDetails';
 
 export interface ResourceItem {
   id: string;

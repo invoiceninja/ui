@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { trans } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Modal } from '$app/components/Modal';
-import { Dispatch, SetStateAction } from 'react';
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 import { useBulkAction } from '../hooks/useBulkAction';
 
 interface Props {

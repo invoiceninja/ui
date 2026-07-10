@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import dayjs from 'dayjs';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -16,9 +19,6 @@ import { Element } from '$app/components/cards';
 import { Button, InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
-import dayjs from 'dayjs';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export function SMTPMailDriver() {
   const [t] = useTranslation();

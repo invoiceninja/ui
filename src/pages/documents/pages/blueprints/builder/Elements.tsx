@@ -12,11 +12,11 @@ import {
   SignatorySelectorProps,
   SignatorySwapProps,
 } from '@docuninja/builder2.0';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IoMdSwap } from 'react-icons/io';
-import { Client } from '$app/common/interfaces/client';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useState } from 'react';
+import { Client } from '$app/common/interfaces/client';
 import { Modal } from '$app/components/Modal';
 import { AsyncSignatorySelector } from '$app/pages/documents/common/components/AsyncSignatorySelector';
 

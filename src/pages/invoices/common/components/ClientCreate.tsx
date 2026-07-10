@@ -8,33 +8,33 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { Client } from '$app/common/interfaces/client';
-import { ClientContact } from '$app/common/interfaces/client-contact';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useBlankClientQuery } from '$app/common/queries/clients';
 import { cloneDeep, set } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Spinner } from '$app/components/Spinner';
-import { toast } from '$app/common/helpers/toast/toast';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { Modal } from '$app/components/Modal';
-import { CurrencySelector } from '$app/components/CurrencySelector';
-import { TabGroup } from '$app/components/TabGroup';
-import { CountrySelector } from '$app/components/CountrySelector';
-import { LanguageSelector } from '$app/components/LanguageSelector';
-import { PaymentTerm } from '$app/common/interfaces/payment-term';
-import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
+import { endpoint } from '$app/common/helpers';
 import {
   isUniquePaymentTerm,
   shouldPaymentTermBeVisible,
 } from '$app/common/helpers/payment-terms/payment-term-filters';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Client } from '$app/common/interfaces/client';
+import { ClientContact } from '$app/common/interfaces/client-contact';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankClientQuery } from '$app/common/queries/clients';
+import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
+import { CountrySelector } from '$app/components/CountrySelector';
+import { CurrencySelector } from '$app/components/CurrencySelector';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { GroupSettingsSelector } from '$app/components/GroupSettingsSelector';
+import { LanguageSelector } from '$app/components/LanguageSelector';
+import { Modal } from '$app/components/Modal';
+import { Spinner } from '$app/components/Spinner';
+import { TabGroup } from '$app/components/TabGroup';
 
 interface Props {
   isModalOpen: boolean;

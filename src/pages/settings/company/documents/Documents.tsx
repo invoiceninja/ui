@@ -10,8 +10,8 @@
 
 import { endpoint } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Table as DocumentsTable, Upload } from './components';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Table as DocumentsTable, Upload } from './components';
 
 export function Documents() {
   const onSuccess = () => {

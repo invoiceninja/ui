@@ -8,25 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useOutletContext } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useScrollToLineItem } from '$app/common/hooks/useScrollToLineItem';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { Card } from '$app/components/cards';
+import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 import { Spinner } from '$app/components/Spinner';
 import { ClientSelector } from '$app/pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
-import { useTranslation } from 'react-i18next';
-import { useOutletContext } from 'react-router-dom';
 import { CreditDetails } from '../common/components/CreditDetails';
 import { CreditFooter } from '../common/components/CreditFooter';
-import { useCreditUtilities } from '../common/hooks';
-import { Card } from '$app/components/cards';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
+import { useCreditUtilities } from '../common/hooks';
 import { CreditsContext } from '../create/Create';
-import { useColorScheme } from '$app/common/colors';
-import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 
 export default function Edit() {
   const [t] = useTranslation();

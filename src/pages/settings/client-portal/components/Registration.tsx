@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { cloneDeep } from 'lodash';
-import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { Divider } from '$app/components/cards/Divider';
+import { SelectField } from '$app/components/forms';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';
-import { SelectField } from '$app/components/forms';
-import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import { useColorScheme } from '$app/common/colors';
-import { Divider } from '$app/components/cards/Divider';
 
 interface Field {
   key: string;

@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from '$app/common/hooks/useTitle';
-import { useTranslation } from 'react-i18next';
-import { DataTable } from '$app/components/DataTable';
-import { User } from '$app/common/interfaces/docuninja/api';
-import { useUserColumns } from './common/hooks/useUserColumns';
-import { Default } from '$app/components/layouts/Default';
-import { useSocketEvent } from '$app/common/queries/sockets';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { NumberOfUsersAlert } from './common/components/NumberOfUsersAlert';
 import { useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
-import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { User } from '$app/common/interfaces/docuninja/api';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { DataTable } from '$app/components/DataTable';
+import { Default } from '$app/components/layouts/Default';
+import { NumberOfUsersAlert } from './common/components/NumberOfUsersAlert';
+import { useUserColumns } from './common/hooks/useUserColumns';
 
 export default function Users() {
   useTitle('users');

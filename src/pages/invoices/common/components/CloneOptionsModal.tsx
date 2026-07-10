@@ -8,6 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import dayjs from 'dayjs';
+import { useSetAtom } from 'jotai';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdControlPointDuplicate } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
@@ -29,12 +35,6 @@ import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
-import dayjs from 'dayjs';
-import { useSetAtom } from 'jotai';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { MdControlPointDuplicate } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
 
 interface Props {
   invoice: Invoice;

@@ -8,58 +8,58 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { useEnabled } from '$app/common/guards/guards/enabled';
+import { permission } from '$app/common/guards/guards/permission';
 import { date, endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { Project } from '$app/common/interfaces/project';
-import { Page } from '$app/components/Breadcrumbs';
-import { InfoCard } from '$app/components/InfoCard';
-import { Spinner } from '$app/components/Spinner';
-import { InputLabel, Link } from '$app/components/forms';
-import { Default } from '$app/components/layouts/Default';
-import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
-import { useNavigate, useParams } from 'react-router-dom';
-import duration from 'dayjs/plugin/duration';
-import dayjs from 'dayjs';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { useActions as useProjectsActions } from '../common/hooks';
-import { DataTable } from '$app/components/DataTable';
-import {
-  defaultColumns,
-  useActions as useTasksActions,
-  useAllTaskColumns,
-  useTaskColumns,
-  useTaskFilters,
-  useCustomBulkActions,
-} from '$app/pages/tasks/common/hooks';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
-import { permission } from '$app/common/guards/guards/permission';
-import { Task } from '$app/common/interfaces/task';
-import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOption';
-import { useEnabled } from '$app/common/guards/guards/enabled';
-import { ModuleBitmask } from '$app/pages/settings';
-import { EntityStatus } from '$app/components/EntityStatus';
-import { useColorScheme } from '$app/common/colors';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { Invoice } from '$app/common/interfaces/invoice';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { useTitle } from '$app/common/hooks/useTitle';
 import { Expense } from '$app/common/interfaces/expense';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Project } from '$app/common/interfaces/project';
 import { Quote } from '$app/common/interfaces/quote';
+import { Task } from '$app/common/interfaces/task';
+import { Page } from '$app/components/Breadcrumbs';
+import { DataTable } from '$app/components/DataTable';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { InputLabel, Link } from '$app/components/forms';
+import { InfoCard } from '$app/components/InfoCard';
+import { Default } from '$app/components/layouts/Default';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Spinner } from '$app/components/Spinner';
+import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
+import { ModuleBitmask } from '$app/pages/settings';
 import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
+import {
+  defaultColumns,
+  useAllTaskColumns,
+  useCustomBulkActions,
+  useTaskColumns,
+  useTaskFilters,
+  useActions as useTasksActions,
+} from '$app/pages/tasks/common/hooks';
+import { useFilterColumns } from '$app/pages/tasks/common/hooks/useFilterColumns';
+import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOption';
+import { useActions as useProjectsActions } from '../common/hooks';
 import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
 import { ProjectPublicNotes } from './components/ProjectPublicNotes';
-import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
-import { useFilterColumns } from '$app/pages/tasks/common/hooks/useFilterColumns';
 
 dayjs.extend(duration);
 

@@ -7,24 +7,25 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { SelectOption } from '$app/components/datatables/Actions';
+
+import classNames from 'classnames';
+import { t } from 'i18next';
 import { useRef, useState } from 'react';
 import Select, {
   ClearIndicatorProps,
-  components,
   ControlProps,
+  components,
   OptionProps,
   StylesConfig,
   ValueContainerProps,
 } from 'react-select';
+import { useClickAway } from 'react-use';
+import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
-import classNames from 'classnames';
+import { SelectOption } from '$app/components/datatables/Actions';
 import { Checkbox } from '$app/components/forms';
 import { ChevronDown } from '$app/components/icons/ChevronDown';
-import { useClickAway } from 'react-use';
-import { t } from 'i18next';
 import { XMark } from '../icons/XMark';
-import styled from 'styled-components';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};

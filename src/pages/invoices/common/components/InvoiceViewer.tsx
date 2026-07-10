@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useRef, useState } from 'react';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useEffect, useRef, useState } from 'react';
-import { Resource } from './InvoicePreview';
-import { useQueryClient } from 'react-query';
 import { Spinner } from '$app/components/Spinner';
 import { GeneralSettingsPayload } from '$app/pages/settings/invoice-design/InvoiceDesign';
 import { PreviewPayload } from '$app/pages/settings/invoice-design/pages/custom-designs/CustomDesign';
+import { Resource } from './InvoicePreview';
 
 interface Props {
   link: string;

@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Payment } from '$app/common/interfaces/payment';
-import { ConvertCurrency } from '$app/components/ConvertCurrency';
-import { CustomField } from '$app/components/CustomField';
-import Toggle from '$app/components/forms/Toggle';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
-import { PaymentOverview } from './PaymentOverview';
-import { ClientCard } from '$app/pages/clients/show/components/ClientCard';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useColorScheme } from '$app/common/colors';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Payment } from '$app/common/interfaces/payment';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { ConvertCurrency } from '$app/components/ConvertCurrency';
+import { CustomField } from '$app/components/CustomField';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { ClientCard } from '$app/pages/clients/show/components/ClientCard';
+import { PaymentOverview } from './PaymentOverview';
 
 interface Context {
   errors: ValidationBag | undefined;

@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Check } from 'react-feather';
+import { useTranslation } from 'react-i18next';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Element } from '$app/components/cards';
 import { Button } from '$app/components/forms';
-import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { useTranslation } from 'react-i18next';
 import { useHandleSquareOAuth } from '../../hooks/useHandleSquareOAuth';
 import { useResolveConfigValue } from '../../hooks/useResolveConfigValue';
-import { Check } from 'react-feather';
 
 interface Props {
   companyGateway: CompanyGateway;

@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
 import classNames from 'classnames';
 import { ReactNode } from 'react';
 import { CSSProperties } from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   style?: CSSProperties;

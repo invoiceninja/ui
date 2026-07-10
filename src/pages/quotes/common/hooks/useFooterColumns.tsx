@@ -9,11 +9,11 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { useSumTableColumn } from '$app/common/hooks/useSumTableColumn';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useAllQuoteColumns } from '../hooks';
+import { useSumTableColumn } from '$app/common/hooks/useSumTableColumn';
 import { Quote } from '$app/common/interfaces/quote';
 import { DataTableFooterColumnsExtended } from '$app/pages/invoices/common/hooks/useFooterColumns';
+import { useAllQuoteColumns } from '../hooks';
 
 export function useFooterColumns() {
   const [t] = useTranslation();

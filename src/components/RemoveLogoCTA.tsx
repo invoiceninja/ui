@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { trans } from '$app/common/helpers';
 import { useTranslation } from 'react-i18next';
-import { Link } from './forms';
-import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { trans } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { Link } from './forms';
 
 export function RemoveLogoCTA() {
   const [t] = useTranslation();

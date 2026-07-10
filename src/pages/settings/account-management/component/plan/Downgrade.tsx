@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useFormik } from 'formik';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -16,9 +19,6 @@ import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers
 import { Element } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { useFormik } from 'formik';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export function Downgrade() {
   const { t } = useTranslation();

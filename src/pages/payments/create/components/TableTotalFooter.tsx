@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Client } from '$app/common/interfaces/client';
 import { Badge } from '$app/components/Badge';
-import { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { PaymentOnCreation } from '../..';
 
 interface Props {

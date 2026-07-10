@@ -8,38 +8,41 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
+import { MdLaunch, MdWarning } from 'react-icons/md';
+import { Link, useSearchParams } from 'react-router-dom';
+import reactStringReplace from 'react-string-replace';
+import { useColorScheme } from '$app/common/colors';
+import frequencies from '$app/common/constants/recurring-expense-frequency';
+import { route } from '$app/common/helpers/route';
+import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { CurrencySelector } from '$app/components/CurrencySelector';
+import { CustomField } from '$app/components/CustomField';
+import { Card, Element } from '$app/components/cards';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { ExpenseCategorySelector } from '$app/components/expense-categories/ExpenseCategorySelector';
+import {
+  InputField,
+  Link as LinkBase,
+  SelectField,
+} from '$app/components/forms';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { Icon } from '$app/components/icons/Icon';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
-import { useTranslation } from 'react-i18next';
-import frequencies from '$app/common/constants/recurring-expense-frequency';
-import dayjs from 'dayjs';
-import { Link, useSearchParams } from 'react-router-dom';
-import { RecurringExpenseStatus } from '../common/components/RecurringExpenseStatus';
-import { CustomField } from '$app/components/CustomField';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import {
   useCalculateExpenseAmount,
   useCalculateExpenseExclusiveAmount,
 } from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
-import { Icon } from '$app/components/icons/Icon';
-import { MdLaunch, MdWarning } from 'react-icons/md';
-import { route } from '$app/common/helpers/route';
-import { Link as LinkBase } from '$app/components/forms';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import reactStringReplace from 'react-string-replace';
-import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
-import { useColorScheme } from '$app/common/colors';
+import { RecurringExpenseStatus } from '../common/components/RecurringExpenseStatus';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;

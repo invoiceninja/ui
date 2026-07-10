@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
+import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
 import { TransactionRule } from '$app/common/interfaces/transaction-rules';
 import { DataTableColumns } from '$app/components/DataTable';
-import { useTranslation } from 'react-i18next';
+import { Link } from '$app/components/forms';
 
 export function useTransactionRuleColumns() {
   const [t] = useTranslation();

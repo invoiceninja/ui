@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Document, DocumentStatus } from '$app/common/interfaces/docuninja/api';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import {
   useAdmin,
   useHasPermission,
 } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { Document, DocumentStatus } from '$app/common/interfaces/docuninja/api';
 
 export function useIsSendable() {
   const user = useCurrentUser();

@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { MdEdit } from 'react-icons/md';
-import { DashboardCardField } from '$app/common/interfaces/company-user';
 import { useColorScheme } from '$app/common/colors';
-import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
+import { DashboardCardField } from '$app/common/interfaces/company-user';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
+import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
 import { Icon } from '$app/components/icons/Icon';
-import { FIELDS_LABELS } from './DashboardCardSelector';
 import { PERIOD_LABELS } from './DashboardCard';
-import classNames from 'classnames';
+import { FIELDS_LABELS } from './DashboardCardSelector';
 
 interface Props {
   decoded: DashboardCardField;

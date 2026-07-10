@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { isHosted } from '$app/common/helpers';
 import { Tab } from '$app/components/Tabs';
-import { useTranslation } from 'react-i18next';
 
 export function useUserDetailsTabs() {
   const { t } = useTranslation();

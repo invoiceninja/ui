@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
+import { useTranslation } from 'react-i18next';
+import { route } from '$app/common/helpers/route';
 import { ExpenseCategory } from '$app/common/interfaces/expense-category';
 import { DataTable, DataTableColumns } from '$app/components/DataTable';
-import { route } from '$app/common/helpers/route';
-import { useTranslation } from 'react-i18next';
+import { Link } from '$app/components/forms';
 
 export function ExpenseCategories() {
   const [t] = useTranslation();

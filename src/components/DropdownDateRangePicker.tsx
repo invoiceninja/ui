@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ConfigProvider, DatePicker } from 'antd';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { atom, useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ConfigProvider, DatePicker } from 'antd';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { SelectField } from './forms';
-import { atom, useAtomValue } from 'jotai';
-import { Calendar } from './icons/Calendar';
-import { useColorScheme } from '$app/common/colors';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { SelectField } from './forms';
+import { Calendar } from './icons/Calendar';
 
 type Props = {
   value?: string;

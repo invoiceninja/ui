@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { route } from '$app/common/helpers/route';
 import { ApiWebhook } from '$app/common/interfaces/api-webhook';
 import { DataTableColumns } from '$app/components/DataTable';
-import { useTranslation } from 'react-i18next';
 import { Link } from '$app/components/forms';
-import { route } from '$app/common/helpers/route';
 import { useEvents } from './useEvents';
 
 export function useColumns() {

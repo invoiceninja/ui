@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { atom } from 'jotai';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 export const companySettingsErrorsAtom = atom<ValidationBag | undefined>(
   undefined

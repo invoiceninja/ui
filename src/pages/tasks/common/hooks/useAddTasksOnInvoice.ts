@@ -8,29 +8,29 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useSetAtom } from 'jotai';
-import { useNavigate } from 'react-router-dom';
-import { invoiceAtom } from '$app/pages/invoices/common/atoms';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { parseTimeLog } from '../helpers/calculate-time';
 import dayjs from 'dayjs';
-import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceProject';
+import { useSetAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
+import { route } from '$app/common/helpers/route';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
+import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
+import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
+import { Invoice } from '$app/common/interfaces/invoice';
 import {
   InvoiceItem,
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
-import { route } from '$app/common/helpers/route';
 import { Task } from '$app/common/interfaces/task';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { cloneDeep } from 'lodash';
-import { useTranslation } from 'react-i18next';
-import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
-import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
-import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
 import { useResolveDateAndTimeClientFormat } from '$app/pages/clients/common/hooks/useResolveDateAndTimeClientFormat';
+import { invoiceAtom } from '$app/pages/invoices/common/atoms';
+import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceProject';
+import { parseTimeLog } from '../helpers/calculate-time';
 
 interface Params {
   tasks: Task[];

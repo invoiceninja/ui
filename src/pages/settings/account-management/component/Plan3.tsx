@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
-import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useTranslation } from 'react-i18next';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { Card } from '$app/components/cards';
 import { HostedPlan } from './plan/HostedPlan';
 import { Downgrade } from './upgrade/Downgrade';
 

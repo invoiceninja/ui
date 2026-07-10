@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CustomField } from '$app/components/CustomField';
-import { useAtom } from 'jotai';
-import { useTranslation } from 'react-i18next';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { PaymentTermsTooltip } from '$app/components/PaymentTermsTooltip';
 import { quoteAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { useColorScheme } from '$app/common/colors';
-import { PaymentTermsTooltip } from '$app/components/PaymentTermsTooltip';
 
 interface Props {
   handleChange: ChangeHandler;

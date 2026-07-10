@@ -9,27 +9,27 @@
  */
 
 import { AxiosError } from 'axios';
+import { useAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
+import { FormEvent, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useTitle } from '$app/common/hooks/useTitle';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankProductQuery } from '$app/common/queries/products';
 import { Container } from '$app/components/Container';
 import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom } from 'jotai';
-import { cloneDeep } from 'lodash';
 import { ProductTableResource } from '$app/pages/invoices/common/components/ProductsTable';
-import { FormEvent, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
 import { productAtom } from '../common/atoms';
 import { CreateProduct } from '../common/components/CreateProduct';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_product');

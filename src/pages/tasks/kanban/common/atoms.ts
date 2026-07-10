@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Task } from '$app/common/interfaces/task';
 import { atom } from 'jotai';
+import { Task } from '$app/common/interfaces/task';
 
 export const currentTaskAtom = atom<Task | undefined>(undefined);
 export const currentTaskIdAtom = atom<string | undefined>(undefined);

@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField } from '$app/components/forms';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { Divider } from '$app/components/cards/Divider';
-import { Modal } from '$app/components/Modal';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useColorScheme } from '$app/common/colors';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { Divider } from '$app/components/cards/Divider';
+import { Button, InputField } from '$app/components/forms';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
 import { CreditCard } from '$app/components/icons/CreditCard';
 import { LockCircle } from '$app/components/icons/LockCircle';
+import { Modal } from '$app/components/Modal';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};

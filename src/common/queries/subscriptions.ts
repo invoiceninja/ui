@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery, useQueryClient } from 'react-query';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Subscription } from '$app/common/interfaces/subscription';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { toast } from '../helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
@@ -22,23 +22,27 @@ import { $refetch } from '../hooks/useRefetch';
 export function useBlankSubscriptionQuery() {
   const { isAdmin, isOwner } = useAdmin();
 
-  return useQuery<Subscription>(
-    ['/api/v1/subscriptions', 'create'],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/subscriptions', 'create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/subscriptions/create')).then(
         (response: GenericSingleResourceResponse<Subscription>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: isAdmin || isOwner }
-  );
+
+    staleTime: Infinity,
+    enabled: isAdmin || isOwner,
+  });
 }
 
 export function useSubscriptionQuery(params: { id: string | undefined }) {
   const { isAdmin, isOwner } = useAdmin();
 
-  return useQuery<Subscription>(
-    ['/api/v1/subscriptions', params.id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/subscriptions', params.id],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/subscriptions/:id', { id: params.id })
@@ -46,8 +50,10 @@ export function useSubscriptionQuery(params: { id: string | undefined }) {
         (response: GenericSingleResourceResponse<Subscription>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: isAdmin || isOwner }
-  );
+
+    staleTime: Infinity,
+    enabled: isAdmin || isOwner,
+  });
 }
 
 export function useBulkAction() {
@@ -66,7 +72,9 @@ export function useBulkAction() {
       $refetch(['subscriptions']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
     });
   };
 }

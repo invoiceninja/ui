@@ -8,42 +8,44 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { GenericQueryOptions } from '$app/common/queries/invoices';
-import { useQuery, useQueryClient } from 'react-query';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useAtomValue } from 'jotai';
-import { invalidationQueryAtom } from '$app/common/atoms/data-table';
-import { $refetch } from '../hooks/useRefetch';
 import { useHasPermission } from '../hooks/permissions/useHasPermission';
+import { $refetch } from '../hooks/useRefetch';
 
 export function useBlankPurchaseOrderQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();
 
-  return useQuery<PurchaseOrder>(
-    ['/api/v1/purchase_orders', 'create'],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/purchase_orders', 'create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/purchase_orders/create')).then(
         (response: GenericSingleResourceResponse<PurchaseOrder>) =>
           response.data.data
       ),
-    {
-      ...options,
-      staleTime: Infinity,
-      enabled: hasPermission('create_purchase_order')
-        ? (options?.enabled ?? true)
-        : false,
-    }
-  );
+
+    ...options,
+    staleTime: Infinity,
+
+    enabled: hasPermission('create_purchase_order')
+      ? (options?.enabled ?? true)
+      : false,
+  });
 }
 
 export function usePurchaseOrderQuery(params: { id: string | undefined }) {
-  return useQuery<PurchaseOrder>(
-    ['/api/v1/purchase_orders', params.id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/purchase_orders', params.id],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/purchase_orders/:id?include=vendor', {
@@ -53,8 +55,9 @@ export function usePurchaseOrderQuery(params: { id: string | undefined }) {
         (response: GenericSingleResourceResponse<PurchaseOrder>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 }
 
 const successMessages = {
@@ -98,7 +101,9 @@ export function useBulk() {
       }
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
     });
   };
 }
@@ -122,7 +127,9 @@ export function useMarkSent() {
       $refetch(['purchase_orders']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
     });
   };
 }

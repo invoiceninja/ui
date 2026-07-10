@@ -8,13 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
 import { Switch } from '@headlessui/react';
-import CommonProps from '../../common/interfaces/common-props.interface';
-import { useEffect } from 'react';
-import { useColorScheme } from '$app/common/colors';
-import { styled } from 'styled-components';
 import classNames from 'classnames';
+import { useEffect, useState } from 'react';
+import { styled } from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   label?: string | null;

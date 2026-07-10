@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction } from 'react';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Dispatch, SetStateAction } from 'react';
 
 interface Params {
   setPaymentTerm: Dispatch<SetStateAction<PaymentTerm | undefined>>;

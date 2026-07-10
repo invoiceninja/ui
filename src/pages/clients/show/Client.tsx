@@ -8,42 +8,42 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from '$app/common/hooks/useTitle';
-import { useClientQuery } from '$app/common/queries/clients';
-import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
-import { Spinner } from '$app/components/Spinner';
-import { Tabs } from '$app/components/Tabs';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { Contacts } from './components/Contacts';
-import { Details } from './components/Details';
-import { Standing } from './components/Standing';
 import { route } from '$app/common/helpers/route';
-import { Gateways } from './components/Gateways';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { useActions } from '../common/hooks/useActions';
-import { useTabs } from './hooks/useTabs';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Client as IClient } from '$app/common/interfaces/client';
+import { useClientQuery } from '$app/common/queries/clients';
+import { useSocketEvent } from '$app/common/queries/sockets';
+import { Page } from '$app/components/Breadcrumbs';
+import { InputLabel } from '$app/components/forms';
+import { Default } from '$app/components/layouts/Default';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Spinner } from '$app/components/Spinner';
+import { Tabs } from '$app/components/Tabs';
 import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { Client as IClient } from '$app/common/interfaces/client';
-import { ClientPublicNotes } from './components/ClientPublicNotes';
-import { ClientPrivateNotes } from './components/ClientPrivateNotes';
-import { useSocketEvent } from '$app/common/queries/sockets';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
-import { InputLabel } from '$app/components/forms';
+import { useActions } from '../common/hooks/useActions';
 import { Address } from './components/Address';
 import CardsCustomizationModal, {
   ClientShowCard,
 } from './components/CardsCustomizationModal';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { ClientPrivateNotes } from './components/ClientPrivateNotes';
+import { ClientPublicNotes } from './components/ClientPublicNotes';
+import { Contacts } from './components/Contacts';
+import { Details } from './components/Details';
+import { Gateways } from './components/Gateways';
+import { Standing } from './components/Standing';
 import { useShouldDisplayClientGatewaysAndAutoBill } from './hooks/useShouldDisplayClientGatewaysAndAutoBill';
+import { useTabs } from './hooks/useTabs';
 
 export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');

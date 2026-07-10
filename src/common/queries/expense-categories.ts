@@ -8,24 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
-import { Params } from './common/params.interface';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { ExpenseCategory } from '$app/common/interfaces/expense-category';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
+import { Params } from './common/params.interface';
 
 interface ExpenseCategoriesParams extends Params {
   enabled?: boolean;
 }
 
 export function useExpenseCategoriesQuery(params: ExpenseCategoriesParams) {
-  return useQuery<ExpenseCategory[]>(
-    ['/api/v1/expense_categories', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/expense_categories', params],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint(
@@ -42,8 +43,10 @@ export function useExpenseCategoriesQuery(params: ExpenseCategoriesParams) {
         (response: GenericSingleResourceResponse<ExpenseCategory[]>) =>
           response.data.data
       ),
-    { enabled: params.enabled ?? true, staleTime: Infinity }
-  );
+
+    enabled: params.enabled ?? true,
+    staleTime: Infinity,
+  });
 }
 
 interface Props {
@@ -52,15 +55,18 @@ interface Props {
 }
 
 export function useExpenseCategoryQuery(props: Props) {
-  return useQuery(
-    ['/api/v1/expense_categories', props.id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/expense_categories', props.id],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/expense_categories/:id', { id: props.id })
       ),
-    { enabled: props.enabled ?? true, staleTime: Infinity }
-  );
+
+    enabled: props.enabled ?? true,
+    staleTime: Infinity,
+  });
 }
 
 export function useBulkAction() {
@@ -81,13 +87,16 @@ export function useBulkAction() {
 export function useBlankExpenseCategoryQuery() {
   const { isAdmin } = useAdmin();
 
-  return useQuery<ExpenseCategory>(
-    '/api/v1/expense_categories/create',
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/expense_categories/create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/expense_categories/create')).then(
         (response: GenericSingleResourceResponse<ExpenseCategory>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: isAdmin }
-  );
+
+    staleTime: Infinity,
+    enabled: isAdmin,
+  });
 }

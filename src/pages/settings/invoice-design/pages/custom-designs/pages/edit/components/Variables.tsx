@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
-import { TabGroup } from '$app/components/TabGroup';
 import { Card } from '$app/components/cards';
+import { TabGroup } from '$app/components/TabGroup';
 import { variables } from '$app/pages/settings/invoice-design/customize/common/variables';
 import { Variable } from '$app/pages/settings/templates-and-reminders/common/components/Variable';
-import { useTranslation } from 'react-i18next';
 
 export default function Variables() {
   const { t } = useTranslation();

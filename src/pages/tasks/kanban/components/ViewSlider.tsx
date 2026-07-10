@@ -8,14 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { endpoint } from '$app/common/helpers';
+import { useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint, date as formatDate } from '$app/common/helpers';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Element } from '$app/components/cards';
+import { Divider } from '$app/components/cards/Divider';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { DocumentsTable } from '$app/components/DocumentsTable';
+import { InputLabel } from '$app/components/forms';
 import { TabGroup } from '$app/components/TabGroup';
-import { useAtom } from 'jotai';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { TaskStatus } from '$app/pages/tasks/common/components/TaskStatus';
 import { isTaskRunning } from '$app/pages/tasks/common/helpers/calculate-entity-state';
@@ -23,20 +33,9 @@ import {
   calculateDifferenceBetweenLogs,
   calculateHours,
 } from '$app/pages/tasks/common/helpers/calculate-time';
-import { useTranslation } from 'react-i18next';
 import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
 import { TaskClock } from './TaskClock';
-import { date as formatDate } from '$app/common/helpers';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
-import { useColorScheme } from '$app/common/colors';
-import styled from 'styled-components';
-import { Divider } from '$app/components/cards/Divider';
-import { InputLabel } from '$app/components/forms';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};

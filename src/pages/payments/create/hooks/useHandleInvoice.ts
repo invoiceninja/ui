@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Invoice } from '$app/common/interfaces/invoice';
 import { v4 } from 'uuid';
+import { Invoice } from '$app/common/interfaces/invoice';
 import { PaymentOnCreation } from '../Create';
 
 interface Props {

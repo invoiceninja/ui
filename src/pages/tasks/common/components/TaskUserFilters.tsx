@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ComboboxAsync } from '$app/components/forms/Combobox';
-import { User } from '$app/common/interfaces/user';
-import { Project } from '$app/common/interfaces/project';
-import { endpoint } from '$app/common/helpers';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
+import { endpoint } from '$app/common/helpers';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { Project } from '$app/common/interfaces/project';
+import { User } from '$app/common/interfaces/user';
+import { ComboboxAsync } from '$app/components/forms/Combobox';
 
 interface TaskUserFilterState {
   userId: string;

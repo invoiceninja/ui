@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery, useQueryClient } from 'react-query';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { GenericQueryOptions } from './invoices';
-import { Client } from '../interfaces/client';
-import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
-import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { toast } from '../helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
+import { Client } from '../interfaces/client';
+import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
+import { GenericQueryOptions } from './invoices';
 
 interface BlankQueryParams {
   refetchOnWindowFocus?: boolean;
@@ -27,18 +27,18 @@ interface BlankQueryParams {
 export function useBlankClientQuery(params: BlankQueryParams) {
   const hasPermission = useHasPermission();
 
-  return useQuery(
-    '/api/v1/clients/create',
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/clients/create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/clients/create')).then(
         (response) => response.data.data
       ),
-    {
-      refetchOnWindowFocus: Boolean(params.refetchOnWindowFocus),
-      staleTime: Infinity,
-      enabled: hasPermission('create_client'),
-    }
-  );
+
+    refetchOnWindowFocus: Boolean(params.refetchOnWindowFocus),
+    staleTime: Infinity,
+    enabled: hasPermission('create_client'),
+  });
 }
 
 interface Props {
@@ -47,9 +47,10 @@ interface Props {
 }
 
 export function useClientsQuery(props: Props) {
-  return useQuery(
-    ['/api/v1/clients', 'per_page=500', props],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/clients', 'per_page=500', props],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/clients?per_page=500&status=:status', {
@@ -59,14 +60,17 @@ export function useClientsQuery(props: Props) {
         (response: GenericSingleResourceResponse<Client[]>) =>
           response.data.data
       ),
-    { enabled: props.enabled ?? true, staleTime: Infinity }
-  );
+
+    enabled: props.enabled ?? true,
+    staleTime: Infinity,
+  });
 }
 
 export function useClientQuery({ id, enabled }: GenericQueryOptions) {
-  return useQuery(
-    ['/api/v1/clients', id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/clients', id],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint(
@@ -76,11 +80,10 @@ export function useClientQuery({ id, enabled }: GenericQueryOptions) {
       ).then(
         (response: GenericSingleResourceResponse<Client>) => response.data.data
       ),
-    {
-      enabled,
-      staleTime: Infinity,
-    }
-  );
+
+    enabled,
+    staleTime: Infinity,
+  });
 }
 
 const successMessages = {
@@ -134,7 +137,9 @@ export function useBulk({ onSuccess }: Params = {}) {
       onSuccess?.(response.data.data);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
 
       $refetch(['clients']);
 

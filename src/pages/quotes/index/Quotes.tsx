@@ -8,12 +8,34 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
+import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { Quote } from '$app/common/interfaces/quote';
 import { Page } from '$app/components/Breadcrumbs';
 import { DataTable } from '$app/components/DataTable';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
+import { InputLabel } from '$app/components/forms';
+import { ImportButton } from '$app/components/import/ImportButton';
 import { Default } from '$app/components/layouts/Default';
-import { useTranslation } from 'react-i18next';
-import { route } from '$app/common/helpers/route';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import {
+  QuoteSlider,
+  quoteSliderAtom,
+  quoteSliderVisibilityAtom,
+} from '../common/components/QuoteSlider';
 import {
   defaultColumns,
   useActions,
@@ -21,32 +43,10 @@ import {
   useQuoteColumns,
   useQuoteFilters,
 } from '../common/hooks';
-import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
-import { ImportButton } from '$app/components/import/ImportButton';
-import { Guard } from '$app/common/guards/Guard';
-import { or } from '$app/common/guards/guards/or';
-import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useAtom } from 'jotai';
-import {
-  QuoteSlider,
-  quoteSliderAtom,
-  quoteSliderVisibilityAtom,
-} from '../common/components/QuoteSlider';
-import { useEffect, useState } from 'react';
-import { useQuoteQuery } from '../common/queries';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import {
-  ChangeTemplateModal,
-  useChangeTemplate,
-} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { Quote } from '$app/common/interfaces/quote';
-import { useFooterColumns } from '../common/hooks/useFooterColumns';
-import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
-import { InputLabel } from '$app/components/forms';
+import { useFooterColumns } from '../common/hooks/useFooterColumns';
+import { useQuoteQuery } from '../common/queries';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');

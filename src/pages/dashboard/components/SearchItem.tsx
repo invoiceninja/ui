@@ -8,14 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction } from 'react';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { SearchRecord } from '$app/common/interfaces/search';
 import { Entry } from '$app/components/forms/Combobox';
-import { SetStateAction } from 'react';
-import { Dispatch } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 
 interface Props {
   entry: Entry<SearchRecord>;

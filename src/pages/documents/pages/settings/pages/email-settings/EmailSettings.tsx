@@ -1,3 +1,10 @@
+import { AxiosError } from 'axios';
+import { useAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { useColorScheme } from '$app/common/colors';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -7,13 +14,6 @@ import { Card, Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { ValidationAlert } from '$app/components/ValidationAlert';
-import { useAtom } from 'jotai';
-import { docuNinjaAtom } from '$app/common/atoms/docuninja';
-import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { AxiosError } from 'axios';
-import { useColorScheme } from '$app/common/colors';
 
 function EmailSettings() {
   const [t] = useTranslation();

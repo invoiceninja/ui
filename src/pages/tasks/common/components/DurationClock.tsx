@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useRef, useState } from 'react';
-import { isTaskRunning } from '../helpers/calculate-entity-state';
-import { Task } from '$app/common/interfaces/task';
-import { PauseCircle } from 'react-feather';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { useStop } from '../hooks/useStop';
 import dayjs from 'dayjs';
+import { useEffect, useRef, useState } from 'react';
+import { PauseCircle } from 'react-feather';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { Task } from '$app/common/interfaces/task';
+import { isTaskRunning } from '../helpers/calculate-entity-state';
+import { useStop } from '../hooks/useStop';
 
 interface Props {
   start: number;

@@ -9,25 +9,25 @@
  */
 
 import { AxiosError } from 'axios';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Schedule } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useScheduleQuery } from '$app/common/queries/schedules';
 import { Settings } from '$app/components/layouts/Settings';
-import { Spinner } from '$app/components/Spinner';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import { ScheduleForm } from '../common/components/ScheduleForm';
-import { useHandleChange } from '../common/hooks/useHandleChange';
-import { useFormatSchedulePayload } from '$app/pages/settings/schedules/common/hooks/useFormatSchedulePayload';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useActions } from '../common/hooks/useActions';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { Spinner } from '$app/components/Spinner';
+import { useFormatSchedulePayload } from '$app/pages/settings/schedules/common/hooks/useFormatSchedulePayload';
+import { ScheduleForm } from '../common/components/ScheduleForm';
+import { useActions } from '../common/hooks/useActions';
+import { useHandleChange } from '../common/hooks/useHandleChange';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_schedule');

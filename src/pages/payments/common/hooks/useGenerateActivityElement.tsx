@@ -9,11 +9,11 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Link } from '$app/components/forms';
-import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
-import { PaymentActivity } from '$app/common/interfaces/payment-activity';
 import { trans } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { PaymentActivity } from '$app/common/interfaces/payment-activity';
+import { Link } from '$app/components/forms';
 
 export function useGenerateActivityElement() {
   const [t] = useTranslation();

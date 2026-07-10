@@ -8,24 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { GoogleLogin } from '@react-oauth/google';
+import classNames from 'classnames';
+import { useSetAtom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
+import { useTranslation } from 'react-i18next';
+import { freePlan } from '$app/common/guards/guards/free-plan';
 import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useTranslation } from 'react-i18next';
-import { Element } from '../../../../components/cards';
-import { Button } from '../../../../components/forms';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import {
   createMsal,
   SignInProviderButton,
 } from '$app/pages/authentication/components/SignInProviders';
-import { GoogleLogin } from '@react-oauth/google';
-import classNames from 'classnames';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { atomWithStorage } from 'jotai/utils';
-import { useSetAtom } from 'jotai';
+import { Element } from '../../../../components/cards';
+import { Button } from '../../../../components/forms';
 import { SelectProviderModal } from '../common/components/SelectProviderModal';
-import { freePlan } from '$app/common/guards/guards/free-plan';
 
 export const connectMailerAtom = atomWithStorage('connectMailer', 'false');
 export function Connect() {

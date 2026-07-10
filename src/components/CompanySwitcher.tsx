@@ -9,33 +9,32 @@
  */
 
 import Tippy from '@tippyjs/react/headless';
-import { AuthenticationTypes } from '$app/common/dtos/authentication';
-import { authenticate } from '$app/common/stores/slices/user';
-import { RootState } from '$app/common/stores/store';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLogo } from '$app/common/hooks/useLogo';
-import { useCompanyName } from '$app/common/hooks/useLogo';
-import { CompanyCreate } from '$app/pages/settings/company/create/CompanyCreate';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { isDemo, isHosted, isSelfHosted } from '$app/common/helpers';
-import { freePlan } from '$app/common/guards/guards/free-plan';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ExpandCollapseChevron } from './icons/ExpandCollapseChevron';
 import { styled } from 'styled-components';
-import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
-import { Check } from './icons/Check';
-import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
-import { Plus } from './icons/Plus';
-import { Person } from './icons/Person';
-import { Exit } from './icons/Exit';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useColorScheme } from '$app/common/colors';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import companySettings from '$app/common/constants/company-settings';
+import { AuthenticationTypes } from '$app/common/dtos/authentication';
+import { freePlan } from '$app/common/guards/guards/free-plan';
+import { isDemo, isHosted, isSelfHosted } from '$app/common/helpers';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
+import { useCompanyName, useLogo } from '$app/common/hooks/useLogo';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { authenticate } from '$app/common/stores/slices/user';
+import { RootState } from '$app/common/stores/store';
+import { CompanyCreate } from '$app/pages/settings/company/create/CompanyCreate';
+import { Check } from './icons/Check';
+import { Exit } from './icons/Exit';
+import { ExpandCollapseChevron } from './icons/ExpandCollapseChevron';
+import { Person } from './icons/Person';
+import { Plus } from './icons/Plus';
 
 const SwitcherDiv = styled.div`
   &:hover {

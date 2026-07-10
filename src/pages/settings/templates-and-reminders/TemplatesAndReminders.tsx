@@ -8,12 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { useAtomValue } from 'jotai';
+import { cloneDeep } from 'lodash';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import frequencies from '$app/common/constants/frequency';
 import { freePlan } from '$app/common/guards/guards/free-plan';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { generateEmailPreview } from '$app/common/helpers/emails/generate-email-preview';
 import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -21,10 +28,17 @@ import { Settings as CompanySettings } from '$app/common/interfaces/company.inte
 import { TemplateBody, Templates } from '$app/common/interfaces/statics';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { Card, Element } from '$app/components/cards';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/layouts/Settings';
-import { ReactNode, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
+import { Spinner } from '$app/components/Spinner';
+import { EmailTemplate } from '$app/pages/invoices/email/components/Mailer';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import {
   isCompanySettingsFormBusy,
   useHandleCompanySave,
@@ -33,20 +47,6 @@ import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandle
 import { Variable } from './common/components/Variable';
 import { commonVariables } from './common/constants/variables/common-variables';
 import { paymentVariables } from './common/constants/variables/payment-variables';
-import Toggle from '$app/components/forms/Toggle';
-import frequencies from '$app/common/constants/frequency';
-import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
-import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
-import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
-import { SettingsLabel } from '$app/components/SettingsLabel';
-import { cloneDeep } from 'lodash';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { Spinner } from '$app/components/Spinner';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { EmailTemplate } from '$app/pages/invoices/email/components/Mailer';
-import { route } from '$app/common/helpers/route';
-import { useColorScheme } from '$app/common/colors';
-import { useAtomValue } from 'jotai';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 

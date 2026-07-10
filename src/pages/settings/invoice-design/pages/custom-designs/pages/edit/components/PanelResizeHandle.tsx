@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
 import { PanelResizeHandle as PanelResizeHandleBase } from 'react-resizable-panels';
 import { useMediaQuery } from 'react-responsive';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 
 const PanelResizeHandleBaseStyled = styled(PanelResizeHandleBase)`
   background-color: ${(props) => props.theme.backgroundColor};

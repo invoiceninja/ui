@@ -8,16 +8,39 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputLabel } from '$app/components/forms';
+import { useAtom } from 'jotai';
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { emitter } from '$app';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { Task } from '$app/common/interfaces/task';
+import { useTaskQuery } from '$app/common/queries/tasks';
 import {
   DataTable,
   dateRangeAtom,
   filterColumnsValuesAtom,
 } from '$app/components/DataTable';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { Button, InputLabel } from '$app/components/forms';
+import { ImportButton } from '$app/components/import/ImportButton';
 import { Default } from '$app/components/layouts/Default';
-import { useTranslation } from 'react-i18next';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { ExtensionBanner } from '../common/components/ExtensionBanner';
 import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
+import {
+  TaskSlider,
+  taskSliderAtom,
+  taskSliderVisibilityAtom,
+} from '../common/components/TaskSlider';
+import { useTaskUserFilters } from '../common/components/TaskUserFilters';
 import {
   defaultColumns,
   useActions,
@@ -26,31 +49,8 @@ import {
   useTaskColumns,
   useTaskFilters,
 } from '../common/hooks';
-import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
-import { permission } from '$app/common/guards/guards/permission';
-import { Task } from '$app/common/interfaces/task';
-import { useShowEditOption } from '../common/hooks/useShowEditOption';
-import { Guard } from '$app/common/guards/Guard';
-import { or } from '$app/common/guards/guards/or';
-import { ImportButton } from '$app/components/import/ImportButton';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import {
-  TaskSlider,
-  taskSliderAtom,
-  taskSliderVisibilityAtom,
-} from '../common/components/TaskSlider';
-import { useEffect, useMemo, useState } from 'react';
-import { useAtom } from 'jotai';
-import { useTaskQuery } from '$app/common/queries/tasks';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import {
-  ChangeTemplateModal,
-  useChangeTemplate,
-} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { ExtensionBanner } from '../common/components/ExtensionBanner';
 import { useFilterColumns } from '../common/hooks/useFilterColumns';
-import { useTaskUserFilters } from '../common/components/TaskUserFilters';
-import { emitter } from '$app';
+import { useShowEditOption } from '../common/hooks/useShowEditOption';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');

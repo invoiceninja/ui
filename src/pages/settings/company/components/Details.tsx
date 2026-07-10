@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useStaticsQuery } from '$app/common/queries/statics';
-import { updateChanges } from '$app/common/stores/slices/company-users';
-import { RootState } from '$app/common/stores/store';
-import { Element } from '$app/components/cards/Element';
-import { CustomField } from '$app/components/CustomField';
-import { InputField } from '$app/components/forms/InputField';
-import { SelectField } from '$app/components/forms/SelectField';
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { useStaticsQuery } from '$app/common/queries/statics';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { RootState } from '$app/common/stores/store';
+import { CustomField } from '$app/components/CustomField';
+import { Element } from '$app/components/cards/Element';
+import { InputField } from '$app/components/forms/InputField';
+import { SelectField } from '$app/components/forms/SelectField';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
-import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Details() {
   const [t] = useTranslation();

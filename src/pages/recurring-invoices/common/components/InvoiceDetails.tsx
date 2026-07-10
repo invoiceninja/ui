@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import dayjs from 'dayjs';
+import { useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import frequencies from '$app/common/constants/frequency';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { CustomField } from '$app/components/CustomField';
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { CustomField } from '$app/components/CustomField';
-import { useTranslation } from 'react-i18next';
-import frequencies from '$app/common/constants/frequency';
-import { ChangeHandler } from '../hooks';
-import { useAtom } from 'jotai';
-import { recurringInvoiceAtom } from '../atoms';
-import dayjs from 'dayjs';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { useColorScheme } from '$app/common/colors';
+import { recurringInvoiceAtom } from '../atoms';
+import { ChangeHandler } from '../hooks';
 
 interface Props {
   handleChange: ChangeHandler;

@@ -8,21 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
-import { Params } from './common/params.interface';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
+import { Params } from './common/params.interface';
 
 export function useTaxRatesQuery(params: Params) {
-  return useQuery(
-    ['/api/v1/tax_rates', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/tax_rates', params],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint(
@@ -35,16 +36,18 @@ export function useTaxRatesQuery(params: Params) {
           }
         )
       ),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 }
 
 export function useTaxRateQuery(params: { id: string | undefined }) {
-  return useQuery(
-    ['/api/v1/tax_rates', params.id],
-    () => request('GET', endpoint('/api/v1/tax_rates/:id', { id: params.id })),
-    { staleTime: Infinity }
-  );
+  return useQuery({
+    queryKey: ['/api/v1/tax_rates', params.id],
+    queryFn: () =>
+      request('GET', endpoint('/api/v1/tax_rates/:id', { id: params.id })),
+    staleTime: Infinity,
+  });
 }
 
 export function bulk(
@@ -60,14 +63,17 @@ export function bulk(
 export function useBlankTaxRateQuery() {
   const { isAdmin } = useAdmin();
 
-  return useQuery<TaxRate>(
-    ['/api/v1/tax_rates', 'create'],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/tax_rates', 'create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/tax_rates/create')).then(
         (response: GenericSingleResourceResponse<TaxRate>) => response.data.data
       ),
-    { staleTime: Infinity, enabled: isAdmin }
-  );
+
+    staleTime: Infinity,
+    enabled: isAdmin,
+  });
 }
 
 export function useBulkAction() {

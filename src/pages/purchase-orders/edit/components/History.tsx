@@ -8,30 +8,30 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date, endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Card } from '$app/components/cards';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useQuery } from '@tanstack/react-query';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { Spinner } from '$app/components/Spinner';
-import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { ChevronRight } from 'react-feather';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
-import classNames from 'classnames';
+import { date, endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
-import { History as HistoryIcon } from '$app/components/icons/History';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Card } from '$app/components/cards';
+import { DynamicLink } from '$app/components/DynamicLink';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
+import { History as HistoryIcon } from '$app/components/icons/History';
 import { Icon } from '$app/components/icons/Icon';
-import { ChevronRight } from 'react-feather';
+import { Spinner } from '$app/components/Spinner';
 
 const Box = styled.div`
   display: flex;

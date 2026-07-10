@@ -8,32 +8,32 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { Button } from '$app/components/forms';
-import { Check, Plus } from 'react-feather';
-import { useState } from 'react';
-import { useQuery } from 'react-query';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import { useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
-import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { get } from 'lodash';
-import { Free, Plan } from './plan/Plan';
-import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { DeleteCreditCard } from './plan/DeleteCreditCard';
-import { Popup } from './plan/Popup';
-import { CreditCard } from './plan/CreditCard';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { usePlansQuery } from '$app/common/queries/plans';
+import { useState } from 'react';
+import { Check, Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useEnterpriseUtils } from '../common/hooks/useEnterpriseUtils';
-import { Downgrade } from './plan/Downgrade';
-import { StartTrial } from './plan/StartTrial';
-import { NewCreditCard } from './plan/NewCreditCard';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 // import { DocuNinja } from './plan/DocuNinja';
 import { useIsPaid } from '$app/common/hooks/usePaidOrSelfhost';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { usePlansQuery } from '$app/common/queries/plans';
 import { Divider } from '$app/components/cards/Divider';
+import { Button } from '$app/components/forms';
+import { useEnterpriseUtils } from '../common/hooks/useEnterpriseUtils';
+import { CreditCard } from './plan/CreditCard';
+import { DeleteCreditCard } from './plan/DeleteCreditCard';
+import { Downgrade } from './plan/Downgrade';
+import { NewCreditCard } from './plan/NewCreditCard';
+import { Free, Plan } from './plan/Plan';
+import { Popup } from './plan/Popup';
+import { StartTrial } from './plan/StartTrial';
 
 export function Plan2() {
   const accentColor = useAccentColor();

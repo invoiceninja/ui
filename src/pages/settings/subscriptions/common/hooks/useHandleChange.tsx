@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { cloneDeep, set } from 'lodash';
+import { Dispatch, SetStateAction } from 'react';
 import { Subscription } from '$app/common/interfaces/subscription';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Dispatch, SetStateAction } from 'react';
-import { cloneDeep, set } from 'lodash';
 
 interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;

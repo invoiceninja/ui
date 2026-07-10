@@ -8,30 +8,30 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { Client } from '$app/common/interfaces/client';
 import { Page } from '$app/components/Breadcrumbs';
 import { DataTable } from '$app/components/DataTable';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { InputLabel } from '$app/components/forms';
+import { ImportButton } from '$app/components/import/ImportButton';
 import { Default } from '$app/components/layouts/Default';
-import { useTranslation } from 'react-i18next';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useActions } from '../common/hooks/useActions';
 import {
   defaultColumns,
   useAllClientColumns,
   useClientColumns,
 } from '../common/hooks/useClientColumns';
-import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
-import { ImportButton } from '$app/components/import/ImportButton';
-import { useActions } from '../common/hooks/useActions';
-import { Guard } from '$app/common/guards/Guard';
-import { or } from '$app/common/guards/guards/or';
-import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import {
-  ChangeTemplateModal,
-  useChangeTemplate,
-} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { Client } from '$app/common/interfaces/client';
-import { InputLabel } from '$app/components/forms';
 
 export default function Clients() {
   useTitle('clients');

@@ -8,6 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export * from './index/Users';
-export { Edit as EditUser } from './edit/Edit';
 export { Create as CreateUser } from './create/Create';
+export { Edit as EditUser } from './edit/Edit';
+export * from './index/Users';

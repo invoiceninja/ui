@@ -1,28 +1,27 @@
-import { Default } from '$app/components/layouts/Default';
-import { Card } from '$app/components/cards';
-import { Button, InputField, Link } from '$app/components/forms';
+import { AxiosError } from 'axios';
+import { useEffect, useState } from 'react';
 import {
-  Zap,
-  Star,
+  CheckCircle,
   Clock,
   MessageCircle,
   Send,
-  CheckCircle,
+  Star,
+  Zap,
 } from 'react-feather';
-import { NonClickableElement } from '$app/components/cards/NonClickableElement';
-import { toast } from '$app/common/helpers/toast/toast';
-import { request } from '$app/common/helpers/request';
-import { Modal } from '$app/components/Modal';
-import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { routeWithOrigin } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { useEffect } from 'react';
+import { Card } from '$app/components/cards';
+import { NonClickableElement } from '$app/components/cards/NonClickableElement';
+import { Button, InputField, Link } from '$app/components/forms';
+import { Default } from '$app/components/layouts/Default';
+import { Modal } from '$app/components/Modal';
 import { ValidationAlert } from '$app/components/ValidationAlert';
-import { routeWithOrigin } from '$app/common/helpers/route';
 
 export default function Beta() {
   const navigate = useNavigate();

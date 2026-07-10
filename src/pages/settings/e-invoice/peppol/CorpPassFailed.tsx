@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '$app/components/forms';
 
 export function CorpPassFailed() {
   const { t } = useTranslation();

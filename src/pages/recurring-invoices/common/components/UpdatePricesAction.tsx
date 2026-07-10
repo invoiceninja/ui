@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
 import { Dispatch, SetStateAction, useState } from 'react';
-import { useBulkAction } from '../queries';
+import { useTranslation } from 'react-i18next';
 import { MdSync } from 'react-icons/md';
-import { Modal } from '$app/components/Modal';
-import { Button } from '$app/components/forms';
 import { EntityActionElement } from '$app/components/EntityActionElement';
+import { Button } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
+import { useBulkAction } from '../queries';
 
 interface Props {
   selectedIds: string[];

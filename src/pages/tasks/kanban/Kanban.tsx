@@ -8,65 +8,65 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from '$app/common/hooks/useTitle';
-import { useTaskStatusesQuery } from '$app/common/queries/task-statuses';
-import { useTasksQuery } from '$app/common/queries/tasks';
-import { Default } from '$app/components/layouts/Default';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { calculateHours } from '../common/helpers/calculate-time';
-import collect from 'collect.js';
-import { toast } from '$app/common/helpers/toast/toast';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
 import {
   DragDropContext,
   Draggable,
   DraggableLocation,
   DraggableProvided,
-  DropResult,
   Droppable,
   DroppableProvided,
+  DropResult,
 } from '@hello-pangea/dnd';
-import { cloneDeep } from 'lodash';
 import { arrayMoveImmutable } from 'array-move';
-import { Task } from '$app/common/interfaces/task';
+import collect from 'collect.js';
 import { useAtom } from 'jotai';
-import { ViewSlider } from './components/ViewSlider';
+import { cloneDeep } from 'lodash';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Task } from '$app/common/interfaces/task';
+import { useTaskStatusesQuery } from '$app/common/queries/task-statuses';
+import { useTasksQuery } from '$app/common/queries/tasks';
+import { Slider } from '$app/components/cards/Slider';
+import { MediaPause } from '$app/components/icons/MediaPause';
+import { MediaPlay } from '$app/components/icons/MediaPlay';
+import { Pencil } from '$app/components/icons/Pencil';
+import { Plus } from '$app/components/icons/Plus';
+import { Default } from '$app/components/layouts/Default';
+import { CreateTaskStatusModal } from '$app/pages/settings/task-statuses/components/CreateTaskStatusModal';
+import {
+  CreateTaskModal,
+  TaskDetails,
+} from '../common/components/CreateTaskModal';
 import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
+import { useTaskUserFilters } from '../common/components/TaskUserFilters';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
+import { calculateHours } from '../common/helpers/calculate-time';
 import { shouldShowStartTaskButton } from '../common/helpers/task';
+import { useStart } from '../common/hooks/useStart';
+import { useStop } from '../common/hooks/useStop';
 import {
   currentTaskAtom,
   currentTaskIdAtom,
   isKanbanViewSliderVisibleAtom,
 } from './common/atoms';
 import { useFormatTimeLog, useHandleCurrentTask } from './common/hooks';
-import { useStart } from '../common/hooks/useStart';
-import { useStop } from '../common/hooks/useStop';
-import { Slider } from '$app/components/cards/Slider';
 import { EditSlider } from './components/EditSlider';
-import { useNavigate } from 'react-router-dom';
-import { CreateTaskStatusModal } from '$app/pages/settings/task-statuses/components/CreateTaskStatusModal';
-import { useTaskUserFilters } from '../common/components/TaskUserFilters';
-import {
-  CreateTaskModal,
-  TaskDetails,
-} from '../common/components/CreateTaskModal';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useColorScheme } from '$app/common/colors';
-import {
-  useAdmin,
-  useHasPermission,
-} from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { TaskClock } from './components/TaskClock';
-import styled from 'styled-components';
-import { Pencil } from '$app/components/icons/Pencil';
-import { MediaPlay } from '$app/components/icons/MediaPlay';
-import { MediaPause } from '$app/components/icons/MediaPause';
-import { Plus } from '$app/components/icons/Plus';
+import { ViewSlider } from './components/ViewSlider';
 
 const Container = styled.div`
   min-width: ${(props) => props.theme.minWidth}px;
@@ -160,8 +160,10 @@ export default function Kanban() {
       );
 
       tasks.data
-        .filter(({ invoice_id }) => !invoice_id)
-        .map((task) => {
+        .filter(
+          ({ invoice_id }: { invoice_id: string | undefined }) => !invoice_id
+        )
+        .map((task: Task) => {
           const index = columns.findIndex(
             (column) => column.id === task.status_id
           );

@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useDocumentQuery } from '$app/common/queries/docuninja/documents';
-import { Default } from '$app/components/layouts/Default';
-import { Spinner } from '$app/components/Spinner';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
-import { Actions } from './components/Actions';
-import { Page } from '$app/components/Breadcrumbs';
+import { docuNinjaEndpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { Document, DocumentStatus } from '$app/common/interfaces/docuninja/api';
-import { docuNinjaEndpoint } from '$app/common/helpers';
+import { useDocumentQuery } from '$app/common/queries/docuninja/documents';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
+import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
+import { Actions } from './components/Actions';
 
 export default function Pdf() {
   const [t] = useTranslation();

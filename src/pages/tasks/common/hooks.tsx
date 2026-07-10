@@ -8,21 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
-import { date, endpoint, getEntityState } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Task } from '$app/common/interfaces/task';
-import { Divider } from '$app/components/cards/Divider';
-import { SelectOption } from '$app/components/datatables/Actions';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
-import { Tooltip } from '$app/components/Tooltip';
-import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import classNames from 'classnames';
+import { useSetAtom } from 'jotai';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
@@ -37,7 +25,54 @@ import {
   MdTextSnippet,
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
+import { EntityState } from '$app/common/enums/entity-state';
+import { date, endpoint, getEntityState } from '$app/common/helpers';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import {
+  hexToRGB,
+  isColorLight,
+  useAdjustColorDarkness,
+} from '$app/common/hooks/useAdjustColorDarkness';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Task } from '$app/common/interfaces/task';
+import { User } from '$app/common/interfaces/user';
+import { useDocumentsBulk } from '$app/common/queries/documents';
+import { useTaskStatusesQuery } from '$app/common/queries/task-statuses';
+import { useBulk } from '$app/common/queries/tasks';
+import { Assigned } from '$app/components/Assigned';
+import { Divider } from '$app/components/cards/Divider';
+import { CustomBulkAction } from '$app/components/DataTable';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { SelectOption } from '$app/components/datatables/Actions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Link } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Tooltip } from '$app/components/Tooltip';
+import { TagPills } from '$app/components/tags/TagPills';
+import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { taskAtom } from './atoms';
+import { AddTasksOnInvoiceAction } from './components/AddTasksOnInvoiceAction';
 import { TaskStatus } from './components/TaskStatus';
 import {
   calculateEntityState,
@@ -48,41 +83,6 @@ import { shouldShowStartTaskButton } from './helpers/task';
 import { useInvoiceTask } from './hooks/useInvoiceTask';
 import { useStart } from './hooks/useStart';
 import { useStop } from './hooks/useStop';
-import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { useSetAtom } from 'jotai';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { EntityState } from '$app/common/enums/entity-state';
-import { useBulk } from '$app/common/queries/tasks';
-import { AddTasksOnInvoiceAction } from './components/AddTasksOnInvoiceAction';
-import { CustomBulkAction } from '$app/components/DataTable';
-import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { useTaskStatusesQuery } from '$app/common/queries/task-statuses';
-import {
-  hexToRGB,
-  isColorLight,
-  useAdjustColorDarkness,
-} from '$app/common/hooks/useAdjustColorDarkness';
-import { useDocumentsBulk } from '$app/common/queries/documents';
-import { Dispatch, SetStateAction } from 'react';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { Assigned } from '$app/components/Assigned';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { User } from '$app/common/interfaces/user';
-import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import {
-  extractTextFromHTML,
-  sanitizeHTML,
-} from '$app/common/helpers/html-string';
-import classNames from 'classnames';
-import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
-import { normalizeColumnName } from '$app/common/helpers/data-table';
-import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
-import { TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'status',

@@ -9,8 +9,8 @@
  */
 
 import { ReactNode } from 'react';
-import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
+import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   for?: string;

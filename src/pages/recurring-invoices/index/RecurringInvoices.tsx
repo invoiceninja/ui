@@ -8,13 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Page } from '$app/components/Breadcrumbs';
 import { DataTable } from '$app/components/DataTable';
-import { Default } from '$app/components/layouts/Default';
-import { useTranslation } from 'react-i18next';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
-
+import { Default } from '$app/components/layouts/Default';
+import {
+  RecurringInvoiceSlider,
+  recurringInvoiceSliderAtom,
+  recurringInvoiceSliderVisibilityAtom,
+} from '../common/components/RecurringInvoiceSlider';
 import {
   defaultColumns,
   useActions,
@@ -22,25 +37,9 @@ import {
   useRecurringInvoiceColumns,
   useRecurringInvoiceFilters,
 } from '../common/hooks';
-import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
-import { Guard } from '$app/common/guards/Guard';
-import { or } from '$app/common/guards/guards/or';
-import { permission } from '$app/common/guards/guards/permission';
-import { useAtom } from 'jotai';
-import {
-  RecurringInvoiceSlider,
-  recurringInvoiceSliderAtom,
-  recurringInvoiceSliderVisibilityAtom,
-} from '../common/components/RecurringInvoiceSlider';
-import { useEffect, useState } from 'react';
-import { useRecurringInvoiceQuery } from '../common/queries';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useFooterColumns } from '../common/hooks/useFooterColumns';
-import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useRecurringInvoiceQuery } from '../common/queries';
 
 export default function RecurringInvoices() {
   useTitle('recurring_invoices');

@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { Payload } from './EInvoiceGenerator';
-import { Checkbox } from '../forms';
 import classNames from 'classnames';
-import { useColorScheme } from '$app/common/colors';
 import { cloneDeep } from 'lodash';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { updateChanges } from '$app/common/stores/slices/company-users';
+import { useColorScheme } from '$app/common/colors';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { Checkbox } from '../forms';
+import { Payload } from './EInvoiceGenerator';
 
 interface Props {
   fieldKey: string;

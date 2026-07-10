@@ -8,20 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { EntityState } from '$app/common/enums/entity-state';
-import { date, getEntityState } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Product } from '$app/common/interfaces/product';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { EntityStatus } from '$app/components/EntityStatus';
-import { Icon } from '$app/components/icons/Icon';
-import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import classNames from 'classnames';
+import { useSetAtom } from 'jotai';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BiPlusCircle } from 'react-icons/bi';
 import {
   MdArchive,
   MdControlPointDuplicate,
@@ -29,29 +20,38 @@ import {
   MdRestore,
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { productAtom } from './atoms';
-import { bulk } from '$app/common/queries/products';
-import { Divider } from '$app/components/cards/Divider';
-import { Tooltip } from '$app/components/Tooltip';
-import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { useSetAtom } from 'jotai';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { BiPlusCircle } from 'react-icons/bi';
-import { useInvoiceProducts } from './hooks/useInvoiceProducts';
-import { usePurchaseOrderProducts } from './hooks/usePurchaseOrderProducts';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { EntityState } from '$app/common/enums/entity-state';
+import { date, getEntityState } from '$app/common/helpers';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import classNames from 'classnames';
-import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Product } from '$app/common/interfaces/product';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { bulk } from '$app/common/queries/products';
+import { Divider } from '$app/components/cards/Divider';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Icon } from '$app/components/icons/Icon';
+import { Tooltip } from '$app/components/Tooltip';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import { productAtom } from './atoms';
+import { useInvoiceProducts } from './hooks/useInvoiceProducts';
+import { usePurchaseOrderProducts } from './hooks/usePurchaseOrderProducts';
 
 export const defaultColumns: string[] = [
   'product_key',

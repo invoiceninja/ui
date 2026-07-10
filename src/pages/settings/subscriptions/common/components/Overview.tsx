@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import { useTranslation } from 'react-i18next';
+import { endpoint } from '$app/common/helpers';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { Product } from '$app/common/interfaces/product';
 import { Subscription } from '$app/common/interfaces/subscription';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import { UserSelector } from '$app/components/users/UserSelector';
-import { useTranslation } from 'react-i18next';
-import { MultipleProductSelector } from './MultipleProductSelector';
+import { Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
 import { ComboboxAsync, Entry } from '$app/components/forms/Combobox';
-import { endpoint } from '$app/common/helpers';
+import { UserSelector } from '$app/components/users/UserSelector';
+import { MultipleProductSelector } from './MultipleProductSelector';
 
 export interface SubscriptionProps {
   subscription: Subscription;

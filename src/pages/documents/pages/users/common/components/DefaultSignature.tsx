@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { compressSignature } from '$app/common/helpers/image-compression';
 import { useEffect, useRef, useState } from 'react';
 import SignaturePad from 'signature_pad';
+import { useColorScheme } from '$app/common/colors';
+import { compressSignature } from '$app/common/helpers/image-compression';
 
 interface SignaturePadProps {
   onChange?: (signature: string) => void;

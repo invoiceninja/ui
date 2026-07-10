@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
 import { Tag } from '$app/common/interfaces/tag';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBulkAction } from '$app/common/queries/tags';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
-import { useTranslation } from 'react-i18next';
-import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
 
 interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;

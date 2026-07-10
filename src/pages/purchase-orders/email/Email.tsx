@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { usePurchaseOrderQuery } from '$app/common/queries/purchase-orders';
 import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { Mailer } from '$app/pages/invoices/email/components/Mailer';
-import { useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 
 export interface MailerComponent {
   sendEmail: () => unknown;

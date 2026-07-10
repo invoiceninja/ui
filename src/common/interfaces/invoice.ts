@@ -11,10 +11,10 @@ import { EInvoiceType } from '$app/pages/settings';
 import { Client } from './client';
 import { InvoiceItem } from './invoice-item';
 import { Payment, Paymentable } from './payment';
+import { Project } from './project';
 import { Invitation } from './purchase-order';
 import { ScheduleItem } from './schedule';
 import { TaxInfo } from './tax-info';
-import { Project } from './project';
 export interface Invoice {
   id: string;
   user_id: string;

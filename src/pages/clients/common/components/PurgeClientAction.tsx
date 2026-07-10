@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Client } from '$app/common/interfaces/client';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdDeleteForever } from 'react-icons/md';
-import { usePurgeClient } from '../hooks/usePurgeClient';
-import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
-import { Dispatch, SetStateAction, useState } from 'react';
-import { Modal } from '$app/components/Modal';
+import { Client } from '$app/common/interfaces/client';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
+import { usePurgeClient } from '../hooks/usePurgeClient';
 
 interface Props {
   client: Client;

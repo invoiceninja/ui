@@ -9,10 +9,10 @@
  */
 
 import classNames from 'classnames';
-import CommonProps from '../../common/interfaces/common-props.interface';
-import { useColorScheme } from '$app/common/colors';
-import { memo } from 'react';
 import { isEqual } from 'lodash';
+import { memo } from 'react';
+import { useColorScheme } from '$app/common/colors';
+import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   isLoading?: boolean;

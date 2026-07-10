@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Client } from '$app/common/interfaces/client';
-import { EntityStatus } from '$app/components/EntityStatus';
-import { useTranslation } from 'react-i18next';
-import { useGetSettingWithLevel } from '$app/common/hooks/useGetSetting';
-import { route } from '$app/common/helpers/route';
-import { CustomFields, useCustomField } from '$app/components/CustomField';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useColorScheme } from '$app/common/colors';
+import { useGetSettingWithLevel } from '$app/common/hooks/useGetSetting';
+import { Client } from '$app/common/interfaces/client';
+import { Settings } from '$app/common/interfaces/company.interface';
+import { CustomFields, useCustomField } from '$app/components/CustomField';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Link } from '$app/components/forms';
 import { InfoCard } from '$app/components/InfoCard';
 import { CurrencyCodeBadge } from './CurrencyCodeBadge';
 import { PaymentTermsBadge } from './PaymentTermsBadge';
 import { TaxDataModal } from './TaxDataModal';
 import { TaxExemptBadge } from './TaxExemptBadge';
-import { Settings } from '$app/common/interfaces/company.interface';
 
 interface Props {
   client: Client;

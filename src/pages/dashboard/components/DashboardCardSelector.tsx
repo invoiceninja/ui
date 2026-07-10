@@ -8,10 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { isEqual } from 'lodash';
-import { useTranslation } from 'react-i18next';
-import classNames from 'classnames';
 import {
   DragDropContext,
   Draggable,
@@ -19,29 +15,33 @@ import {
   DropResult,
 } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
+import classNames from 'classnames';
+import { isEqual } from 'lodash';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CgOptions } from 'react-icons/cg';
-import { MdClose, MdDragIndicator } from 'react-icons/md';
 import { IoWarning } from 'react-icons/io5';
+import { MdClose, MdDragIndicator } from 'react-icons/md';
+import { useColorScheme } from '$app/common/colors';
 import {
   decodeDashboardField,
   encodeDashboardField,
 } from '$app/common/helpers/react-settings';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useColorScheme } from '$app/common/colors';
 import {
   useReactSettings,
   useSaveReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { toast } from '$app/common/helpers/toast/toast';
-import { Button, InputField } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
-import { Modal } from '$app/components/Modal';
 import {
   Calculate,
   Field,
   Format,
   Period,
 } from '$app/common/interfaces/company-user';
+import { Button, InputField } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
 
 export const FIELDS_LABELS: Record<string, string> = {
   active_invoices: 'total_active_invoices',

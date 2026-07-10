@@ -8,59 +8,61 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { isCancelledError, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
-import { Page } from '$app/components/Breadcrumbs';
-import { ClientSelector } from '$app/components/clients/ClientSelector';
-import Toggle from '$app/components/forms/Toggle';
-import { Default } from '$app/components/layouts/Default';
+import { useAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdOutlinePreview, MdSchedule } from 'react-icons/md';
+import { useColorScheme } from '$app/common/colors';
+import type { Record as ReportColumnRecord } from '$app/common/constants/exports/client-map';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { endpoint } from '$app/common/helpers';
 import {
-  SortableColumns,
-  reportColumn,
-} from '../common/components/SortableColumns';
-import { Identifier, Payload, Report, useReports } from '../common/useReports';
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { usePreferences } from '$app/common/hooks/usePreferences';
-import { isCancelledError, useQueryClient } from 'react-query';
-import { useAtom } from 'jotai';
-import {
-  Cell,
-  PreviewResponse,
-  previewAtom,
-} from '../common/components/Preview';
-import { EnhancedPreview } from '../common/components/EnhancedPreview';
-import { ProductItemsSelector } from '../common/components/ProductItemsSelector';
-import { StatusSelector } from '../common/components/StatusSelector';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Page } from '$app/components/Breadcrumbs';
+import { Card, Element } from '$app/components/cards';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { InputField, SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
 import { Icon } from '$app/components/icons/Icon';
-import { MdOutlinePreview, MdSchedule } from 'react-icons/md';
-import { useScheduleReport } from '../common/hooks/useScheduleReport';
-import { useColorScheme } from '$app/common/colors';
+import { ActivitySelector } from '$app/components/layouts/ActivitySelector';
+import { Default } from '$app/components/layouts/Default';
+import { EnhancedPreview } from '../common/components/EnhancedPreview';
 import { MultiClientSelector } from '../common/components/MultiClientSelector';
 import { MultiExpenseCategorySelector } from '../common/components/MultiExpenseCategorySelector';
 import { MultiProjectSelector } from '../common/components/MultiProjectSelector';
 import { MultiTagSelector } from '../common/components/MultiTagSelector';
 import { MultiVendorSelector } from '../common/components/MultiVendorSelector';
-import { useShowReportField } from '../common/hooks/useShowReportField';
-import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import {
+  Cell,
+  PreviewResponse,
+  previewAtom,
+} from '../common/components/Preview';
+import { ProductItemsSelector } from '../common/components/ProductItemsSelector';
 import { ReportsPlanAlert } from '../common/components/ReportsPlanAlert';
-import { extractTextFromHTML } from '$app/common/helpers/html-string';
-import { sanitizeHTML } from '$app/common/helpers/html-string';
-import { cloneDeep } from 'lodash';
-import { ActivitySelector } from '$app/components/layouts/ActivitySelector';
+import {
+  reportColumn,
+  SortableColumns,
+} from '../common/components/SortableColumns';
+import { StatusSelector } from '../common/components/StatusSelector';
 import { TemplateSelector } from '../common/components/TemplateSelector';
 import { useGroupByOptions } from '../common/hooks/useGroupByOptions';
-import type { Record as ReportColumnRecord } from '$app/common/constants/exports/client-map';
+import { useScheduleReport } from '../common/hooks/useScheduleReport';
+import { useShowReportField } from '../common/hooks/useShowReportField';
+import { Identifier, Payload, Report, useReports } from '../common/useReports';
 
 interface Range {
   identifier: string;
@@ -229,7 +231,9 @@ export default function Reports() {
   const handleReportChange = (identifier: Identifier) => {
     const report = reports.find((report) => report.identifier === identifier);
 
-    queryClient.cancelQueries(['reports']);
+    queryClient.cancelQueries({
+      queryKey: ['reports'],
+    });
 
     setShowCustomColumns(false);
 
@@ -437,7 +441,9 @@ export default function Reports() {
     setErrors(undefined);
     setPreview(null);
 
-    queryClient.cancelQueries(['reports']);
+    queryClient.cancelQueries({
+      queryKey: ['reports'],
+    });
 
     toast.processing();
 
@@ -506,7 +512,9 @@ export default function Reports() {
 
   useEffect(() => {
     return () => {
-      queryClient.cancelQueries(['reports']);
+      queryClient.cancelQueries({
+        queryKey: ['reports'],
+      });
 
       toast.dismiss();
 

@@ -8,40 +8,40 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Default } from '$app/components/layouts/Default';
-import { Button } from '$app/components/forms';
+import { AxiosError } from 'axios';
+import dayjs from 'dayjs';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { useTasksQuery } from '$app/common/queries/tasks';
 import { Task } from '$app/common/interfaces/task';
-import {
-  taskPrimaryLabel,
-  taskSecondaryLabel,
-} from '../common/helpers/task-label';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useTasksQuery } from '$app/common/queries/tasks';
+import { Button } from '$app/components/forms';
+import { ChevronLeft } from '$app/components/icons/ChevronLeft';
+import { ChevronRight } from '$app/components/icons/ChevronRight';
+import { Plus } from '$app/components/icons/Plus';
+import { Default } from '$app/components/layouts/Default';
 import {
   parseTimeLog,
   TimeLogType,
 } from '$app/pages/tasks/common/helpers/calculate-time';
-import dayjs from 'dayjs';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useColorScheme } from '$app/common/colors';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { toast } from '$app/common/helpers/toast/toast';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { ChevronLeft } from '$app/components/icons/ChevronLeft';
-import { ChevronRight } from '$app/components/icons/ChevronRight';
-import { Plus } from '$app/components/icons/Plus';
 import { QuickLogTimeModal } from '../common/components/QuickLogTimeModal';
 import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
 import { useTaskUserFilters } from '../common/components/TaskUserFilters';
 import { parseDurationToSeconds } from '../common/helpers';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
-import { AxiosError } from 'axios';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import {
+  taskPrimaryLabel,
+  taskSecondaryLabel,
+} from '../common/helpers/task-label';
 import { useTaskDateDisplay } from '../common/hooks/useTaskDateDisplay';
-import { WeeklyCell, CellEdit } from './components/WeeklyCell';
+import { CellEdit, WeeklyCell } from './components/WeeklyCell';
 
 const FLUSH_DELAY_MS = 1800;
 

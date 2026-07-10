@@ -8,43 +8,46 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { Project } from '$app/common/interfaces/project';
-import { useQuery } from 'react-query';
-import { GenericQueryOptions } from './invoices';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Project } from '$app/common/interfaces/project';
+import { GenericQueryOptions } from './invoices';
 
 export function useBlankProjectQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();
 
-  return useQuery<Project>(
-    ['/api/v1/projects/create'],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/projects/create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/projects/create')).then(
         (response: GenericSingleResourceResponse<Project>) => response.data.data
       ),
-    {
-      ...options,
-      staleTime: Infinity,
-      enabled: hasPermission('create_project')
-        ? (options?.enabled ?? true)
-        : false,
-    }
-  );
+
+    ...options,
+    staleTime: Infinity,
+
+    enabled: hasPermission('create_project')
+      ? (options?.enabled ?? true)
+      : false,
+  });
 }
 
 export function useProjectQuery(params: { id: string | undefined }) {
-  return useQuery<Project>(
-    ['/api/v1/projects', params.id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/projects', params.id],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/projects/:id?include=client', { id: params.id })
       ).then((response) => response.data.data),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 }
 
 interface Params {
@@ -52,9 +55,10 @@ interface Params {
 }
 
 export function useProjectsQuery(params?: Params) {
-  return useQuery<Project[]>(
-    ['/api/v1/projects', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/projects', params],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/projects?status=:status&per_page=1000', {
@@ -64,6 +68,7 @@ export function useProjectsQuery(params?: Params) {
         (response: GenericSingleResourceResponse<Project[]>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 }

@@ -8,34 +8,34 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { RegisterForm } from '../../common/dtos/authentication';
-import { apiEndpoint, isHosted } from '../../common/helpers';
-import { register } from '../../common/stores/slices/user';
-import { RegisterValidation } from './common/ValidationInterface';
-import { Header } from './components/Header';
-import { InputField } from '../../components/forms/InputField';
-import { Button } from '../../components/forms/Button';
-import { HostedLinks } from './components/HostedLinks';
-import { Link } from '../../components/forms/Link';
+import { useSearchParams } from 'react-router-dom';
+import { useTurnstile } from 'react-turnstile';
+import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
-import { SignInProviders } from './components/SignInProviders';
+import { useTitle } from '$app/common/hooks/useTitle';
 import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
 import {
   changeCurrentIndex,
   resetChanges,
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { useColorScheme } from '$app/common/colors';
-import { useSearchParams } from 'react-router-dom';
-import { TurnstileWidget } from './components/TurnstileWidget';
-import { useTurnstile } from 'react-turnstile';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { RegisterForm } from '../../common/dtos/authentication';
+import { apiEndpoint, isHosted } from '../../common/helpers';
+import { register } from '../../common/stores/slices/user';
+import { Button } from '../../components/forms/Button';
+import { InputField } from '../../components/forms/InputField';
+import { Link } from '../../components/forms/Link';
+import { RegisterValidation } from './common/ValidationInterface';
+import { Header } from './components/Header';
+import { HostedLinks } from './components/HostedLinks';
+import { SignInProviders } from './components/SignInProviders';
+import { TurnstileWidget } from './components/TurnstileWidget';
 
 export function Register() {
   useTitle('register');

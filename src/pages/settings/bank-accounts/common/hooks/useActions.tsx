@@ -1,11 +1,11 @@
-import { useBulkAction } from '../queries';
 import { useTranslation } from 'react-i18next';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { BankAccount } from '$app/common/interfaces/bank-accounts';
-import { Icon } from '$app/components/icons/Icon';
 import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
-import { getEntityState } from '$app/common/helpers';
 import { EntityState } from '$app/common/enums/entity-state';
+import { getEntityState } from '$app/common/helpers';
+import { BankAccount } from '$app/common/interfaces/bank-accounts';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { useBulkAction } from '../queries';
 
 export function useActions() {
   const [t] = useTranslation();

@@ -8,6 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
+import { useFormik } from 'formik';
+import { useState } from 'react';
+import { Check, Trash2 } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -18,13 +23,8 @@ import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Badge } from '$app/components/Badge';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { useFormik } from 'formik';
-import { useState } from 'react';
-import { Check, Trash2 } from 'react-feather';
-import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
-import visa from '/gateway-card-images/visa.png?url';
 import mc from '/gateway-card-images/mastercard.png?url';
+import visa from '/gateway-card-images/visa.png?url';
 
 interface CreditCardProps {
   gateway: CompanyGateway;

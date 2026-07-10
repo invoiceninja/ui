@@ -8,52 +8,52 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useScrollToLineItem } from '$app/common/hooks/useScrollToLineItem';
-import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
-import { Spinner } from '$app/components/Spinner';
-import { TabGroup } from '$app/components/TabGroup';
 import { useAtom } from 'jotai';
 import { Dispatch, SetStateAction } from 'react';
+import { ExternalLink } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import {
+  Link as RouterLink,
   useNavigate,
   useOutletContext,
   useSearchParams,
 } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { route } from '$app/common/helpers/route';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useScrollToLineItem } from '$app/common/hooks/useScrollToLineItem';
+import { Client } from '$app/common/interfaces/client';
+import { Invoice as IInvoice, Invoice } from '$app/common/interfaces/invoice';
+import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { Project } from '$app/common/interfaces/project';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Assigned } from '$app/components/Assigned';
+import { Badge } from '$app/components/Badge';
+import { Card } from '$app/components/cards';
+import { InputLabel, Link } from '$app/components/forms';
+import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
+import { Icon } from '$app/components/icons/Icon';
+import { Spinner } from '$app/components/Spinner';
+import { TabGroup } from '$app/components/TabGroup';
+import { TaxExemptBadge } from '$app/pages/clients/show/components/TaxExemptBadge';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { invoiceSumAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoicePreview } from '../common/components/InvoicePreview';
+import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { ProductsTable } from '../common/components/ProductsTable';
+import { TasksTabLabel } from '../common/components/TasksTabLabel';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
-import { Card } from '$app/components/cards';
-import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
-import {
-  ChangeTemplateModal,
-  useChangeTemplate,
-} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { Invoice as IInvoice, Invoice } from '$app/common/interfaces/invoice';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Client } from '$app/common/interfaces/client';
-import { Assigned } from '$app/components/Assigned';
-import { route } from '$app/common/helpers/route';
-import { Project } from '$app/common/interfaces/project';
-import { Icon } from '$app/components/icons/Icon';
-import { ExternalLink } from 'react-feather';
-import { InputLabel, Link } from '$app/components/forms';
-import { Link as RouterLink } from 'react-router-dom';
-import { useColorScheme } from '$app/common/colors';
-import { TasksTabLabel } from '../common/components/TasksTabLabel';
 import { TaxDataBadge } from './components/TaxDataBadge';
-import { TaxExemptBadge } from '$app/pages/clients/show/components/TaxExemptBadge';
-import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
-import { Badge } from '$app/components/Badge';
-import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export interface Context {
   invoice: Invoice | undefined;

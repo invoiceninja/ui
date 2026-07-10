@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQueryClient } from 'react-query';
 
 interface Props {
   entity: 'invoice' | 'quote' | 'credit' | 'purchase_order';
@@ -39,30 +39,32 @@ export const usePrintPdf = ({ entity }: Props) => {
 
     toast.processing();
 
-    queryClient.fetchQuery([`/api/v1/${entity}s/bulk`], () =>
-      request(
-        'POST',
-        endpoint(`/api/v1/${entity}s/bulk`),
-        { action: 'bulk_print', ids: resourceIds },
-        { responseType: 'arraybuffer' }
-      ).then(async (response) => {
-        const blob = new Blob([response.data], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
+    queryClient.fetchQuery({
+      queryKey: [`/api/v1/${entity}s/bulk`],
+      queryFn: () =>
+        request(
+          'POST',
+          endpoint(`/api/v1/${entity}s/bulk`),
+          { action: 'bulk_print', ids: resourceIds },
+          { responseType: 'arraybuffer' }
+        ).then(async (response) => {
+          const blob = new Blob([response.data], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
 
-        const iframeElement = document.createElement('iframe');
+          const iframeElement = document.createElement('iframe');
 
-        iframeElement.style.display = 'none';
-        iframeElement.src = url;
+          iframeElement.style.display = 'none';
+          iframeElement.src = url;
 
-        await appendIframe(iframeElement);
+          await appendIframe(iframeElement);
 
-        if (iframeElement && iframeElement.contentWindow) {
-          iframeElement.contentWindow.focus();
-          iframeElement.contentWindow.print();
-        }
+          if (iframeElement && iframeElement.contentWindow) {
+            iframeElement.contentWindow.focus();
+            iframeElement.contentWindow.print();
+          }
 
-        toast.dismiss();
-      })
-    );
+          toast.dismiss();
+        }),
+    });
   };
 };

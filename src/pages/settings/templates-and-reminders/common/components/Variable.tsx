@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import toast from 'react-hot-toast';
 import { useColorScheme } from '$app/common/colors';
 import { trans } from '$app/common/helpers';
-import toast from 'react-hot-toast';
 
 interface Props {
   children: string;
