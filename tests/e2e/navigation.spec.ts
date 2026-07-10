@@ -358,5 +358,5 @@ test('Can add a company and navigate to account management', async ({
 
   await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
   await page.locator('input[name="email"]').click();
-  await page.getByRole('button', { name: 'Login' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
 });
