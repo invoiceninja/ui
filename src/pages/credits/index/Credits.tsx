@@ -32,12 +32,22 @@ import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
 import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { InputLabel } from '$app/components/forms';
+import { useEffect, useState } from 'react';
+import { useAtom } from 'jotai';
+import { useCreditQuery } from '../common/queries';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  CreditSlider,
+  creditSliderAtom,
+  creditSliderVisibilityAtom,
+} from '../common/components/CreditSlider';
 
 export default function Credits() {
   useTitle('credits');
 
   const [t] = useTranslation();
   const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const pages = [{ name: t('credits'), href: '/credits' }];
 
@@ -47,6 +57,24 @@ export default function Credits() {
   const creditColumns = useAllCreditColumns();
   const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
+
+  const [sliderCreditId, setSliderCreditId] = useState<string>('');
+  const [creditSlider, setCreditSlider] = useAtom(creditSliderAtom);
+  const [creditSliderVisibility, setCreditSliderVisibility] = useAtom(
+    creditSliderVisibilityAtom
+  );
+
+  const { data: creditResponse } = useCreditQuery({ id: sliderCreditId });
+
+  useEffect(() => {
+    if (creditResponse && creditSliderVisibility) {
+      setCreditSlider(creditResponse);
+    }
+  }, [creditResponse, creditSliderVisibility]);
+
+  useEffect(() => {
+    return () => setCreditSliderVisibility(false);
+  }, []);
 
   const {
     changeTemplateVisible,
@@ -86,9 +114,15 @@ export default function Credits() {
         dateRangeColumns={dateRangeColumns}
         linkToCreateGuards={[permission('create_credit')]}
         hideEditableOptions={!hasPermission('edit_credit')}
+        onTableRowClick={(credit) => {
+          setSliderCreditId(credit.id);
+          setCreditSliderVisibility(true);
+        }}
         enableSavingFilterPreference
         enableSavingLatestDataForNavigation
       />
+
+      {!disableNavigation('credit', creditSlider) && <CreditSlider />}
 
       <ChangeTemplateModal<Credit>
         entity="credit"
