@@ -42,7 +42,10 @@ export function VendorSlider() {
   const resolveCountry = useResolveCountry();
   const resolveCurrency = useResolveCurrency();
 
-  const actions = useActions({ showEditAction: true });
+  const actions = useActions({
+    showEditAction: true,
+    showCommonBulkAction: true,
+  });
 
   const [vendor, setVendor] = useAtom(vendorSliderAtom);
   const [isVisible, setIsSliderVisible] = useAtom(vendorSliderVisibilityAtom);

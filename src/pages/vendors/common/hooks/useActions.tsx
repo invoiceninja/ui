@@ -31,12 +31,13 @@ import { Divider } from '$app/components/cards/Divider';
 
 interface Params {
   showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
 }
 
 export function useActions(params?: Params) {
   const [t] = useTranslation();
 
-  const { showEditAction } = params || {};
+  const { showEditAction, showCommonBulkAction } = params || {};
 
   const bulk = useBulkAction();
 
@@ -68,8 +69,12 @@ export function useActions(params?: Params) {
       />
     ),
     (vendor) => vendor && <MergeVendorsAction mergeFromVendorId={vendor.id} />,
+    () =>
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (vendor) =>
-      isEditOrShowPage &&
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) &&
       getEntityState(vendor) === EntityState.Active && (
         <DropdownElement
           onClick={() => bulk(vendor.id, 'archive')}
@@ -79,7 +84,7 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (vendor) =>
-      isEditOrShowPage &&
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) &&
       (getEntityState(vendor) === EntityState.Archived ||
         getEntityState(vendor) === EntityState.Deleted) && (
         <DropdownElement
@@ -90,7 +95,7 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     (vendor) =>
-      isEditOrShowPage &&
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) &&
       (getEntityState(vendor) === EntityState.Active ||
         getEntityState(vendor) === EntityState.Archived) && (
         <DropdownElement
