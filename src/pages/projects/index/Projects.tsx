@@ -8,9 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { route } from '$app/common/helpers/route';
+import { useProjectQuery } from '$app/common/queries/projects';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  ProjectSlider,
+  projectSliderAtom,
+  projectSliderVisibilityAtom,
+} from '../common/components/ProjectSlider';
 import {
   DataTable,
   dateRangeAtom,
@@ -44,10 +51,29 @@ export default function Projects() {
 
   const [t] = useTranslation();
   const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const pages = [{ name: t('projects'), href: '/projects' }];
 
   const actions = useActions();
+
+  const [sliderProjectId, setSliderProjectId] = useState<string>('');
+  const [projectSlider, setProjectSlider] = useAtom(projectSliderAtom);
+  const [projectSliderVisibility, setProjectSliderVisibility] = useAtom(
+    projectSliderVisibilityAtom
+  );
+
+  const { data: projectResponse } = useProjectQuery({ id: sliderProjectId });
+
+  useEffect(() => {
+    if (projectResponse && projectSliderVisibility) {
+      setProjectSlider(projectResponse);
+    }
+  }, [projectResponse, projectSliderVisibility]);
+
+  useEffect(() => {
+    return () => setProjectSliderVisibility(false);
+  }, []);
   const reactSettings = useReactSettings();
   const selectedColumns =
     reactSettings?.react_table_columns?.project || defaultColumns;
@@ -162,6 +188,10 @@ export default function Projects() {
         }
         linkToCreateGuards={[permission('create_project')]}
         hideEditableOptions={!hasPermission('edit_project')}
+        onTableRowClick={(project) => {
+          setSliderProjectId(project.id);
+          setProjectSliderVisibility(true);
+        }}
         enableSavingFilterPreference
         dateRangeColumns={[
           {
@@ -173,6 +203,8 @@ export default function Projects() {
         ]}
         enableSavingLatestDataForNavigation
       />
+
+      {!disableNavigation('project', projectSlider) && <ProjectSlider />}
 
       <ChangeTemplateModal<Project>
         entity="project"
