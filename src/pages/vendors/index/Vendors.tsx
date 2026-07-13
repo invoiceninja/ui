@@ -35,6 +35,15 @@ import {
   vendorSliderAtom,
   vendorSliderVisibilityAtom,
 } from '../common/components/VendorSlider';
+import {
+  VendorSlider,
+  vendorSliderAtom,
+  vendorSliderVisibilityAtom,
+} from '../common/components/VendorSlider';
+import { useAtom } from 'jotai';
+import { useVendorQuery } from '$app/common/queries/vendor';
+import { useEffect, useState } from 'react';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export default function Vendors() {
   const { documentTitle } = useTitle('vendors');
@@ -66,6 +75,32 @@ export default function Vendors() {
     if (sliderVendorId) {
       setVendorSlider(null);
     }
+  }, [sliderVendorId]);
+
+  useEffect(() => {
+    if (vendorResponse && vendorSliderVisibility) {
+      setVendorSlider(vendorResponse);
+    }
+  }, [vendorResponse, vendorSliderVisibility]);
+
+  useEffect(() => {
+    return () => setVendorSliderVisibility(false);
+  }, []);
+  const disableNavigation = useDisableNavigation();
+
+  const [sliderVendorId, setSliderVendorId] = useState<string>('');
+  const [vendorSlider, setVendorSlider] = useAtom(vendorSliderAtom);
+  const [vendorSliderVisibility, setVendorSliderVisibility] = useAtom(
+    vendorSliderVisibilityAtom
+  );
+
+  const { data: vendorResponse } = useVendorQuery({
+    id: sliderVendorId,
+    enabled: Boolean(sliderVendorId),
+  });
+
+  useEffect(() => {
+    setVendorSlider(null);
   }, [sliderVendorId]);
 
   useEffect(() => {
@@ -118,6 +153,10 @@ export default function Vendors() {
           { column: 'created_at', queryParameterKey: 'created_between' },
         ]}
         enableSavingLatestDataForNavigation
+        onTableRowClick={(vendor) => {
+          setSliderVendorId(vendor.id);
+          setVendorSliderVisibility(true);
+        }}
       />
 
       {!disableNavigation('vendor', vendorSlider) && <VendorSlider />}

@@ -61,6 +61,10 @@ import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
 import { ChevronRight } from 'react-feather';
 import { Icon } from '$app/components/icons/Icon';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const recurringInvoiceSliderAtom = atom<RecurringInvoice | null>(null);
 export const recurringInvoiceSliderVisibilityAtom = atom(false);
@@ -191,7 +195,7 @@ export const RecurringInvoiceSlider = () => {
         setIsSliderVisible(false);
         setRecurringInvoice(null);
       }}
-      size="regular"
+      size="large"
       title={`${t('recurring_invoice')} ${recurringInvoice?.number || ''}`}
       topRight={
         recurringInvoice &&
@@ -208,8 +212,24 @@ export const RecurringInvoiceSlider = () => {
       withoutHeaderBorder
     >
       <TabGroup
-        tabs={[t('overview'), t('history'), t('schedule'), t('activity')]}
+        tabs={[
+          t('overview'),
+          t('history'),
+          t('schedule'),
+          t('activity'),
+          t('documents'),
+        ]}
         width="full"
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 4) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={recurringInvoice?.documents?.length}
+                textCenter
+              />
+            );
+          }
+        }}
         withHorizontalPadding
         horizontalPaddingWidth="1.5rem"
       >
@@ -613,6 +633,29 @@ export const RecurringInvoiceSlider = () => {
                 </Box>
               ))}
           </div>
+        </div>
+
+        <div className="px-4">
+          <Upload
+            endpoint={endpoint('/api/v1/recurring_invoices/:id/upload', {
+              id: recurringInvoice?.id,
+            })}
+            onSuccess={() => $refetch(['recurring_invoices'])}
+            widgetOnly
+            disableUpload={
+              !hasPermission('edit_recurring_invoice') &&
+              !entityAssigned(recurringInvoice)
+            }
+          />
+
+          <DocumentsTable
+            documents={recurringInvoice?.documents || []}
+            onDocumentDelete={() => $refetch(['recurring_invoices'])}
+            disableEditableOptions={
+              !entityAssigned(recurringInvoice, true) &&
+              !hasPermission('edit_recurring_invoice')
+            }
+          />
         </div>
       </TabGroup>
     </Slider>

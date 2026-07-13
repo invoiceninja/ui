@@ -32,12 +32,22 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Client } from '$app/common/interfaces/client';
 import { InputLabel } from '$app/components/forms';
+import { useEffect, useState } from 'react';
+import { useAtom } from 'jotai';
+import { useClientQuery } from '$app/common/queries/clients';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  ClientSlider,
+  clientSliderAtom,
+  clientSliderVisibilityAtom,
+} from '../common/components/ClientSlider';
 
 export default function Clients() {
   useTitle('clients');
 
   const [t] = useTranslation();
   const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const pages: Page[] = [{ name: t('clients'), href: '/clients' }];
 
@@ -45,6 +55,33 @@ export default function Clients() {
   const columns = useClientColumns();
   const clientColumns = useAllClientColumns();
   const customBulkActions = useCustomBulkActions();
+
+  const [sliderClientId, setSliderClientId] = useState<string>('');
+  const [clientSlider, setClientSlider] = useAtom(clientSliderAtom);
+  const [clientSliderVisibility, setClientSliderVisibility] = useAtom(
+    clientSliderVisibilityAtom
+  );
+
+  const { data: clientResponse } = useClientQuery({
+    id: sliderClientId,
+    enabled: Boolean(sliderClientId),
+  });
+
+  useEffect(() => {
+    if (sliderClientId) {
+      setClientSlider(null);
+    }
+  }, [sliderClientId]);
+
+  useEffect(() => {
+    if (clientResponse && clientSliderVisibility) {
+      setClientSlider(clientResponse);
+    }
+  }, [clientResponse, clientSliderVisibility]);
+
+  useEffect(() => {
+    return () => setClientSliderVisibility(false);
+  }, []);
 
   const {
     changeTemplateVisible,
@@ -84,12 +121,18 @@ export default function Clients() {
         }
         linkToCreateGuards={[permission('create_client')]}
         hideEditableOptions={!hasPermission('edit_client')}
+        onTableRowClick={(client) => {
+          setSliderClientId(client.id);
+          setClientSliderVisibility(true);
+        }}
         enableSavingFilterPreference
         dateRangeColumns={[
           { column: 'created_at', queryParameterKey: 'created_between' },
         ]}
         enableSavingLatestDataForNavigation
       />
+
+      {!disableNavigation('client', clientSlider) && <ClientSlider />}
 
       <ChangeTemplateModal<Client>
         entity="client"
