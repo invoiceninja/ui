@@ -157,6 +157,22 @@ export class InvoiceSumInclusive {
     return this.getSubTotal() + this.getTotalSurcharges();
   }
 
+  public getCashDiscount() {
+    if (!('cash_discount_percent' in this.invoice)) {
+      return 0;
+    }
+
+    if (!this.invoice.cash_discount_percent) {
+      return 0;
+    }
+
+    return percentageOf(
+      this.getBalanceDue(),
+      this.invoice.cash_discount_percent,
+      this.precision
+    );
+  }
+
   public getTotalNetSurcharges() {
     return this.invoiceItems.getCustomSurchargeNetMap().sum('total') as number;
   }
@@ -269,6 +285,12 @@ export class InvoiceSumInclusive {
     );
 
     this.invoice.total_taxes = this.totalTaxes;
+
+    if ('cash_discount' in this.invoice) {
+      this.invoice.cash_discount = parseFloat(
+        NumberFormatter.formatValue(this.getCashDiscount(), this.precision)
+      );
+    }
 
     return this;
   }

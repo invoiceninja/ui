@@ -69,6 +69,27 @@ export function InvoiceDetails(props: Props) {
           />
         </Element>
 
+        <Element leftSide={t('cash_discount_percent')}>
+          <NumberInputField
+            value={invoice?.cash_discount_percent || ''}
+            onValueChange={(value) =>
+              handleChange('cash_discount_percent', parseFloat(value) || 0)
+            }
+            errorMessage={props.errors?.errors.cash_discount_percent}
+          />
+        </Element>
+
+        <Element leftSide={t('cash_discount_expiry_date')}>
+          <InputField
+            type="date"
+            onValueChange={(value) =>
+              handleChange('cash_discount_expiry_date', value)
+            }
+            value={invoice?.cash_discount_expiry_date || ''}
+            errorMessage={props.errors?.errors.cash_discount_expiry_date}
+          />
+        </Element>
+
         <Element leftSide={t('partial')}>
           <NumberInputField
             value={invoice?.partial || ''}

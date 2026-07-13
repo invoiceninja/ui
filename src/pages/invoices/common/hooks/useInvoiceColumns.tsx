@@ -129,6 +129,9 @@ export function useAllInvoiceColumns() {
     'updated_at',
     'project',
     'recurring_invoice',
+    'cash_discount_percent',
+    'cash_discount_expiry_date',
+    'cash_discount',
   ] as const;
 
   return invoiceColumns.map((column) => normalizeColumnName(column));
@@ -663,6 +666,29 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'updated_at',
       label: t('last_updated'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'cash_discount_percent',
+      id: 'cash_discount_percent',
+      label: t('cash_discount_percent'),
+      format: (value) => value ? `${value}%` : '',
+    },
+    {
+      column: 'cash_discount_expiry_date',
+      id: 'cash_discount_expiry_date',
+      label: t('cash_discount_expiry_date'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'cash_discount',
+      id: 'cash_discount',
+      label: t('cash_discount'),
+      format: (value, invoice) =>
+        value ? formatMoney(
+          value,
+          invoice.client?.country_id,
+          invoice.client?.settings.currency_id
+        ) : '',
     },
   ];
 

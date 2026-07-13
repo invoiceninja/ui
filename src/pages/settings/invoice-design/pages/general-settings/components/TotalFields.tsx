@@ -45,6 +45,7 @@ export default function TotalFields() {
     },
     { value: '$paid_to_date', label: t('paid_to_date') },
     { value: '$total', label: t('total') },
+    { value: '$cash_discount', label: t('cash_discount') },
     { value: '$outstanding', label: t('balance_due') },
   ];
 

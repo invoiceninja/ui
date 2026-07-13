@@ -109,6 +109,22 @@ export class InvoiceSum {
     return this.getSubTotal() + this.getTotalSurcharges();
   }
 
+  public getCashDiscount() {
+    if (!('cash_discount_percent' in this.invoice)) {
+      return 0;
+    }
+
+    if (!this.invoice.cash_discount_percent) {
+      return 0;
+    }
+
+    return percentageOf(
+      this.getBalanceDue(),
+      this.invoice.cash_discount_percent,
+      this.precision
+    );
+  }
+
   public getNetSubtotal() {
     return this.getSubTotal() - this.getTotalDiscount();
   }
@@ -268,6 +284,12 @@ export class InvoiceSum {
     this.invoice.total_taxes = parseFloat(
       NumberFormatter.formatValue(this.totalTaxes, this.precision)
     );
+
+    if ('cash_discount' in this.invoice) {
+      this.invoice.cash_discount = parseFloat(
+        NumberFormatter.formatValue(this.getCashDiscount(), this.precision)
+      );
+    }
 
     return this;
   }
