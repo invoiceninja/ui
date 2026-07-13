@@ -78,20 +78,6 @@ export default function Vendors() {
     return () => setVendorSliderVisibility(false);
   }, []);
 
-  useEffect(() => {
-    setVendorSlider(null);
-  }, [sliderVendorId]);
-
-  useEffect(() => {
-    if (vendorResponse && vendorSliderVisibility) {
-      setVendorSlider(vendorResponse);
-    }
-  }, [vendorResponse, vendorSliderVisibility]);
-
-  useEffect(() => {
-    return () => setVendorSliderVisibility(false);
-  }, []);
-
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
