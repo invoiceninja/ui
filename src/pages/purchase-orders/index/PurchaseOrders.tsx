@@ -36,8 +36,6 @@ import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useAtom } from 'jotai';
-import { useEffect } from 'react';
 import {
   PurchaseOrderSlider,
   purchaseOrderSliderAtom,

@@ -28,8 +28,6 @@ import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useAtom } from 'jotai';
-import { useEffect } from 'react';
 import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { useProductQuery } from '$app/common/queries/products';

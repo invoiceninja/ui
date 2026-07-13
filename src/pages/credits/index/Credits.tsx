@@ -34,8 +34,6 @@ import { useSocketEvent } from '$app/common/queries/sockets';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { InputLabel } from '$app/components/forms';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useAtom } from 'jotai';
-import { useEffect } from 'react';
 import {
   CreditSlider,
   creditSliderAtom,

@@ -28,8 +28,6 @@ import { or } from '$app/common/guards/guards/or';
 import { Guard } from '$app/common/guards/Guard';
 import { useActions } from '../common/hooks/useActions';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useAtom } from 'jotai';
-import { useEffect } from 'react';
 import {
   VendorSlider,
   vendorSliderAtom,

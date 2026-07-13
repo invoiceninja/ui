@@ -34,8 +34,6 @@ import {
 import { Expense } from '$app/common/interfaces/expense';
 import { InputLabel } from '$app/components/forms';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useAtom } from 'jotai';
-import { useEffect } from 'react';
 import {
   ExpenseSlider,
   expenseSliderAtom,

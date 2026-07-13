@@ -34,8 +34,6 @@ import {
 import { Client } from '$app/common/interfaces/client';
 import { InputLabel } from '$app/components/forms';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useAtom } from 'jotai';
-import { useEffect } from 'react';
 import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { useClientQuery } from '$app/common/queries/clients';
