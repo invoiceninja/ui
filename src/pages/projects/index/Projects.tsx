@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { route } from '$app/common/helpers/route';
 import {
@@ -38,6 +38,13 @@ import { Button, InputLabel } from '$app/components/forms';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useAtom } from 'jotai';
 import { emitter } from '$app';
+import {
+  ProjectSlider,
+  projectSliderAtom,
+  projectSliderVisibilityAtom,
+} from '../common/components/ProjectSlider';
+import { useProjectQuery } from '$app/common/queries/projects';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export default function Projects() {
   useTitle('projects');
@@ -49,6 +56,7 @@ export default function Projects() {
 
   const actions = useActions();
   const reactSettings = useReactSettings();
+  const disableNavigation = useDisableNavigation();
   const selectedColumns =
     reactSettings?.react_table_columns?.project || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
@@ -63,11 +71,34 @@ export default function Projects() {
   const [filterColumnsValues, setFilterColumnsValues] = useAtom(
     filterColumnsValuesAtom
   );
+
+  const [sliderProjectId, setSliderProjectId] = useState<string>('');
+  const [projectSlider, setProjectSlider] = useAtom(projectSliderAtom);
+  const [projectSliderVisibility, setProjectSliderVisibility] = useAtom(
+    projectSliderVisibilityAtom
+  );
+
+  const { data: projectResponse } = useProjectQuery({ id: sliderProjectId });
+
   const {
     changeTemplateVisible,
     setChangeTemplateVisible,
     changeTemplateResources,
   } = useChangeTemplate();
+
+  useEffect(() => {
+    setProjectSlider(null);
+  }, [sliderProjectId]);
+
+  useEffect(() => {
+    if (projectResponse && projectSliderVisibility) {
+      setProjectSlider(projectResponse);
+    }
+  }, [projectResponse, projectSliderVisibility]);
+
+  useEffect(() => {
+    return () => setProjectSliderVisibility(false);
+  }, []);
 
   useEffect(() => {
     if (!shouldShowTagFilter && filterColumnsValues.project_tag_ids?.length) {
@@ -162,6 +193,10 @@ export default function Projects() {
         }
         linkToCreateGuards={[permission('create_project')]}
         hideEditableOptions={!hasPermission('edit_project')}
+        onTableRowClick={(project) => {
+          setSliderProjectId(project.id);
+          setProjectSliderVisibility(true);
+        }}
         enableSavingFilterPreference
         dateRangeColumns={[
           {
@@ -173,6 +208,8 @@ export default function Projects() {
         ]}
         enableSavingLatestDataForNavigation
       />
+
+      {!disableNavigation('project', projectSlider) && <ProjectSlider />}
 
       <ChangeTemplateModal<Project>
         entity="project"

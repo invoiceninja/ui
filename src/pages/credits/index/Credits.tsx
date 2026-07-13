@@ -41,6 +41,15 @@ import {
   creditSliderAtom,
   creditSliderVisibilityAtom,
 } from '../common/components/CreditSlider';
+import {
+  CreditSlider,
+  creditSliderAtom,
+  creditSliderVisibilityAtom,
+} from '../common/components/CreditSlider';
+import { useAtom } from 'jotai';
+import { useCreditQuery } from '../common/queries';
+import { useEffect, useState } from 'react';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export default function Credits() {
   useTitle('credits');
@@ -65,6 +74,29 @@ export default function Credits() {
   );
 
   const { data: creditResponse } = useCreditQuery({ id: sliderCreditId });
+
+  useEffect(() => {
+    if (creditResponse && creditSliderVisibility) {
+      setCreditSlider(creditResponse);
+    }
+  }, [creditResponse, creditSliderVisibility]);
+
+  useEffect(() => {
+    return () => setCreditSliderVisibility(false);
+  }, []);
+  const disableNavigation = useDisableNavigation();
+
+  const [sliderCreditId, setSliderCreditId] = useState<string>('');
+  const [creditSlider, setCreditSlider] = useAtom(creditSliderAtom);
+  const [creditSliderVisibility, setCreditSliderVisibility] = useAtom(
+    creditSliderVisibilityAtom
+  );
+
+  const { data: creditResponse } = useCreditQuery({ id: sliderCreditId });
+
+  useEffect(() => {
+    setCreditSlider(null);
+  }, [sliderCreditId]);
 
   useEffect(() => {
     if (creditResponse && creditSliderVisibility) {
