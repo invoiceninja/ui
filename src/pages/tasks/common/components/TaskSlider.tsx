@@ -52,6 +52,10 @@ import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { TagPills } from '$app/components/tags/TagPills';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const taskSliderAtom = atom<Task | null>(null);
 export const taskSliderVisibilityAtom = atom(false);
@@ -168,8 +172,18 @@ export function TaskSlider() {
       withoutHeaderBorder
     >
       <TabGroup
-        tabs={[t('overview'), t('activity')]}
+        tabs={[t('overview'), t('activity'), t('documents')]}
         width="full"
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 2) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={task?.documents?.length}
+                textCenter
+              />
+            );
+          }
+        }}
         withHorizontalPadding
         horizontalPaddingWidth="1.5rem"
       >
@@ -225,7 +239,11 @@ export function TaskSlider() {
             </Element>
 
             {Boolean(task?.tags?.length) && (
-              <Element leftSide={t('tags')} pushContentToRight noExternalPadding>
+              <Element
+                leftSide={t('tags')}
+                pushContentToRight
+                noExternalPadding
+              >
                 <TagPills tags={task?.tags} />
               </Element>
             )}
@@ -319,6 +337,25 @@ export function TaskSlider() {
               </Box>
             ))}
           </div>
+        </div>
+
+        <div className="px-4">
+          <Upload
+            endpoint={endpoint('/api/v1/tasks/:id/upload', {
+              id: task?.id,
+            })}
+            onSuccess={() => $refetch(['tasks'])}
+            widgetOnly
+            disableUpload={!hasPermission('edit_task') && !entityAssigned(task)}
+          />
+
+          <DocumentsTable
+            documents={task?.documents || []}
+            onDocumentDelete={() => $refetch(['tasks'])}
+            disableEditableOptions={
+              !entityAssigned(task, true) && !hasPermission('edit_task')
+            }
+          />
         </div>
       </TabGroup>
     </Slider>

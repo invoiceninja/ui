@@ -30,6 +30,15 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useAtom } from 'jotai';
+import { useProductQuery } from '$app/common/queries/products';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  ProductSlider,
+  productSliderAtom,
+  productSliderVisibilityAtom,
+} from '../common/components/ProductSlider';
 
 export default function Products() {
   useTitle('products');
@@ -37,6 +46,7 @@ export default function Products() {
   const [t] = useTranslation();
 
   const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const pages: Page[] = [{ name: t('products'), href: '/products' }];
 
@@ -75,6 +85,30 @@ export default function Products() {
     setFilterColumnsValues,
   ]);
 
+  const [sliderProductId, setSliderProductId] = useState<string>('');
+  const [productSlider, setProductSlider] = useAtom(productSliderAtom);
+  const [productSliderVisibility, setProductSliderVisibility] = useAtom(
+    productSliderVisibilityAtom
+  );
+
+  const { data: productResponse } = useProductQuery({ id: sliderProductId });
+
+  useEffect(() => {
+    if (sliderProductId) {
+      setProductSlider(null);
+    }
+  }, [sliderProductId]);
+
+  useEffect(() => {
+    if (productResponse && productSliderVisibility) {
+      setProductSlider(productResponse.data.data);
+    }
+  }, [productResponse, productSliderVisibility]);
+
+  useEffect(() => {
+    return () => setProductSliderVisibility(false);
+  }, []);
+
   return (
     <Default title={t('products')} breadcrumbs={pages} docsLink="en/products">
       <DataTable
@@ -109,12 +143,18 @@ export default function Products() {
         }
         linkToCreateGuards={[permission('create_product')]}
         hideEditableOptions={!hasPermission('edit_product')}
+        onTableRowClick={(product) => {
+          setSliderProductId(product.id);
+          setProductSliderVisibility(true);
+        }}
         enableSavingFilterPreference
         dateRangeColumns={[
           { column: 'created_at', queryParameterKey: 'created_between' },
         ]}
         enableSavingLatestDataForNavigation
       />
+
+      {!disableNavigation('product', productSlider) && <ProductSlider />}
     </Default>
   );
 }

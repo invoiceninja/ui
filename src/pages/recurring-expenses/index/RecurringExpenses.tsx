@@ -25,6 +25,15 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
+import {
+  RecurringExpenseSlider,
+  recurringExpenseSliderAtom,
+  recurringExpenseSliderVisibilityAtom,
+} from '../common/components/RecurringExpenseSlider';
+import { useAtom } from 'jotai';
+import { useRecurringExpenseQuery } from '$app/common/queries/recurring-expense';
+import { useEffect, useState } from 'react';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export default function RecurringExpenses() {
   useTitle('recurring_expenses');
@@ -75,6 +84,37 @@ export default function RecurringExpenses() {
     setFilterColumnsValues,
   ]);
 
+  const disableNavigation = useDisableNavigation();
+
+  const [sliderRecurringExpenseId, setSliderRecurringExpenseId] =
+    useState<string>('');
+  const [recurringExpenseSlider, setRecurringExpenseSlider] = useAtom(
+    recurringExpenseSliderAtom
+  );
+  const [
+    recurringExpenseSliderVisibility,
+    setRecurringExpenseSliderVisibility,
+  ] = useAtom(recurringExpenseSliderVisibilityAtom);
+
+  const { data: recurringExpenseResponse } = useRecurringExpenseQuery({
+    id: sliderRecurringExpenseId,
+    enabled: Boolean(sliderRecurringExpenseId),
+  });
+
+  useEffect(() => {
+    setRecurringExpenseSlider(null);
+  }, [sliderRecurringExpenseId]);
+
+  useEffect(() => {
+    if (recurringExpenseResponse && recurringExpenseSliderVisibility) {
+      setRecurringExpenseSlider(recurringExpenseResponse);
+    }
+  }, [recurringExpenseResponse, recurringExpenseSliderVisibility]);
+
+  useEffect(() => {
+    return () => setRecurringExpenseSliderVisibility(false);
+  }, []);
+
   return (
     <Default
       title={t('recurring_expenses')}
@@ -111,7 +151,15 @@ export default function RecurringExpenses() {
           { column: 'created_at', queryParameterKey: 'created_between' },
         ]}
         enableSavingLatestDataForNavigation
+        onTableRowClick={(recurringExpense) => {
+          setSliderRecurringExpenseId(recurringExpense.id);
+          setRecurringExpenseSliderVisibility(true);
+        }}
       />
+
+      {!disableNavigation('recurring_expense', recurringExpenseSlider) && (
+        <RecurringExpenseSlider />
+      )}
     </Default>
   );
 }

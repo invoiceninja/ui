@@ -26,6 +26,7 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdEdit,
   MdRestore,
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
@@ -322,8 +323,14 @@ export function useProductFilterColumns(params?: { enabled?: boolean }) {
   ];
 }
 
-export function useActions() {
+interface ActionsParams {
+  showEditAction?: boolean;
+}
+
+export function useActions(params?: ActionsParams) {
   const [t] = useTranslation();
+
+  const { showEditAction } = params ?? {};
 
   const navigate = useNavigate();
 
@@ -360,6 +367,18 @@ export function useActions() {
   };
 
   const actions = [
+    (product: Product) =>
+      showEditAction && (
+        <DropdownElement
+          onClick={() =>
+            navigate(route('/products/:id/edit', { id: product.id }))
+          }
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => showEditAction && <Divider withoutPadding />,
     (product: Product) =>
       !product.is_deleted &&
       hasPermission('create_invoice') && (
