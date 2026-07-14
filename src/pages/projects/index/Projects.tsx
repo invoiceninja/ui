@@ -45,13 +45,6 @@ import { Button, InputLabel } from '$app/components/forms';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useAtom } from 'jotai';
 import { emitter } from '$app';
-import {
-  ProjectSlider,
-  projectSliderAtom,
-  projectSliderVisibilityAtom,
-} from '../common/components/ProjectSlider';
-import { useProjectQuery } from '$app/common/queries/projects';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export default function Projects() {
   useTitle('projects');
@@ -63,26 +56,7 @@ export default function Projects() {
   const pages = [{ name: t('projects'), href: '/projects' }];
 
   const actions = useActions();
-
-  const [sliderProjectId, setSliderProjectId] = useState<string>('');
-  const [projectSlider, setProjectSlider] = useAtom(projectSliderAtom);
-  const [projectSliderVisibility, setProjectSliderVisibility] = useAtom(
-    projectSliderVisibilityAtom
-  );
-
-  const { data: projectResponse } = useProjectQuery({ id: sliderProjectId });
-
-  useEffect(() => {
-    if (projectResponse && projectSliderVisibility) {
-      setProjectSlider(projectResponse);
-    }
-  }, [projectResponse, projectSliderVisibility]);
-
-  useEffect(() => {
-    return () => setProjectSliderVisibility(false);
-  }, []);
   const reactSettings = useReactSettings();
-  const disableNavigation = useDisableNavigation();
   const selectedColumns =
     reactSettings?.react_table_columns?.project || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');

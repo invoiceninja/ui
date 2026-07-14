@@ -17,16 +17,21 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Project } from '$app/common/interfaces/project';
 import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
+import { TabGroup } from '$app/components/TabGroup';
 import { calculateTime } from '$app/pages/tasks/common/helpers/calculate-time';
+import { Upload } from '$app/pages/settings/company/documents/components';
 import { atom, useAtom } from 'jotai';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -100,7 +105,7 @@ export function ProjectSlider() {
     queryFn: () =>
       request(
         'GET',
-        endpoint(`/api/v1/projects/${project?.id}?include=client,tasks`)
+        endpoint(`/api/v1/projects/${project?.id}?include=client,tasks,documents`)
       ).then(
         (response: GenericSingleResourceResponse<Project>) => response.data.data
       ),
@@ -149,166 +154,144 @@ export function ProjectSlider() {
           </Button>
         ) : null
       }
+      withoutHeaderBorder
     >
       {currentProject ? (
-        <div className="space-y-4 pb-4">
-          <p
-            className="px-6 pt-4 text-sm font-medium uppercase tracking-wide"
-            style={{ color: colors.$17 }}
-          >
-            {t('progress')}
-          </p>
-
-          <div className="grid grid-cols-2 gap-3 px-6">
-            <StatCard
-              label={t('logged')}
-              value={`${formatNumber(currentProject.current_hours || 0)} h`}
-            />
-
-            <StatCard
-              label={t('budgeted')}
-              value={
-                hasBudget
-                  ? `${formatNumber(currentProject.budgeted_hours)} h`
-                  : '—'
-              }
-            />
-
-            <StatCard
-              label={t('remaining')}
-              value={
-                hasBudget
-                  ? `${formatNumber(
-                      currentProject.budgeted_hours -
-                        (currentProject.current_hours || 0)
-                    )} h`
-                  : '—'
-              }
-            />
-
-            <StatCard label={t('projected')} value="—" />
-          </div>
-
-          <Divider withoutPadding borderColor={colors.$20} />
-
-          <p
-            className="px-6 pt-2 text-sm font-medium uppercase tracking-wide"
-            style={{ color: colors.$17 }}
-          >
-            {t('details')}
-          </p>
-
-          <div className="px-6">
-            <Element
-              className="border-b border-dashed"
-              leftSide={t('due_date')}
-              withoutWrappingLeftSide
-              pushContentToRight
-              noExternalPadding
-              style={{ borderColor: colors.$20 }}
+        <TabGroup
+          tabs={[t('overview'), t('documents')]}
+          width="full"
+          withHorizontalPadding
+          horizontalPaddingWidth="1.5rem"
+          formatTabLabel={(tabIndex) => {
+            if (tabIndex === 1) {
+              return (
+                <DocumentsTabLabel
+                  numberOfDocuments={currentProject.documents?.length}
+                  textCenter
+                />
+              );
+            }
+          }}
+        >
+          <div className="space-y-4 pb-4">
+            <p
+              className="px-6 pt-4 text-sm font-medium uppercase tracking-wide"
+              style={{ color: colors.$17 }}
             >
-              {currentProject.due_date
-                ? date(currentProject.due_date, dateFormat)
-                : '—'}
-            </Element>
+              {t('progress')}
+            </p>
 
-            <Element
-              className={currentProject.color ? 'border-b border-dashed' : ''}
-              leftSide={t('task_rate')}
-              withoutWrappingLeftSide
-              pushContentToRight
-              noExternalPadding
-              style={{ borderColor: colors.$20 }}
+            <div className="grid grid-cols-2 gap-3 px-6">
+              <StatCard
+                label={t('logged')}
+                value={`${formatNumber(currentProject.current_hours || 0)} h`}
+              />
+
+              <StatCard
+                label={t('budgeted')}
+                value={
+                  hasBudget
+                    ? `${formatNumber(currentProject.budgeted_hours)} h`
+                    : '—'
+                }
+              />
+
+              <StatCard
+                label={t('remaining')}
+                value={
+                  hasBudget
+                    ? `${formatNumber(
+                        currentProject.budgeted_hours -
+                          (currentProject.current_hours || 0)
+                      )} h`
+                    : '—'
+                }
+              />
+
+              <StatCard label={t('projected')} value="—" />
+            </div>
+
+            <Divider withoutPadding borderColor={colors.$20} />
+
+            <p
+              className="px-6 pt-2 text-sm font-medium uppercase tracking-wide"
+              style={{ color: colors.$17 }}
             >
-              {formatMoney(
-                currentProject.task_rate,
-                currentProject.client?.country_id,
-                currentProject.client?.settings.currency_id
-              )}
-            </Element>
+              {t('details')}
+            </p>
 
-            {Boolean(currentProject.color) && (
+            <div className="px-6">
               <Element
-                leftSide={t('color')}
+                className="border-b border-dashed"
+                leftSide={t('due_date')}
                 withoutWrappingLeftSide
                 pushContentToRight
                 noExternalPadding
+                style={{ borderColor: colors.$20 }}
               >
-                <div className="flex items-center justify-end space-x-2">
-                  <div
-                    className="w-4 h-4 rounded border"
-                    style={{
-                      backgroundColor: currentProject.color,
-                      borderColor: colors.$20,
-                    }}
-                  />
-
-                  <span>{currentProject.color}</span>
-                </div>
+                {currentProject.due_date
+                  ? date(currentProject.due_date, dateFormat)
+                  : '—'}
               </Element>
-            )}
-          </div>
 
-          {currentProject.client && (
-            <>
-              <Divider withoutPadding borderColor={colors.$20} />
-
-              <p
-                className="px-6 pt-2 text-sm font-medium uppercase tracking-wide"
-                style={{ color: colors.$17 }}
+              <Element
+                className={currentProject.color ? 'border-b border-dashed' : ''}
+                leftSide={t('task_rate')}
+                withoutWrappingLeftSide
+                pushContentToRight
+                noExternalPadding
+                style={{ borderColor: colors.$20 }}
               >
-                {t('client')}
-              </p>
+                {formatMoney(
+                  currentProject.task_rate,
+                  currentProject.client?.country_id,
+                  currentProject.client?.settings.currency_id
+                )}
+              </Element>
 
-              <div className="px-6">
-                <Box
-                  className="flex items-center justify-between p-4 shadow-sm border w-full cursor-pointer rounded-md"
-                  onClick={() => {
-                    onClose();
-                    navigate(
-                      route('/clients/:id', {
-                        id: currentProject.client_id,
-                      })
-                    );
-                  }}
-                  style={{ borderColor: colors.$20 }}
-                  theme={{
-                    backgroundColor: colors.$1,
-                    hoverBackgroundColor: colors.$4,
-                  }}
+              {Boolean(currentProject.color) && (
+                <Element
+                  leftSide={t('color')}
+                  withoutWrappingLeftSide
+                  pushContentToRight
+                  noExternalPadding
                 >
-                  <span
-                    className="font-medium text-sm"
-                    style={{ color: colors.$3 }}
-                  >
-                    {currentProject.client.display_name}
-                  </span>
+                  <div className="flex items-center justify-end space-x-2">
+                    <div
+                      className="w-4 h-4 rounded border"
+                      style={{
+                        backgroundColor: currentProject.color,
+                        borderColor: colors.$20,
+                      }}
+                    />
 
-                  <Icon element={ChevronRight} size={18} color={colors.$17} />
-                </Box>
-              </div>
-            </>
-          )}
+                    <span>{currentProject.color}</span>
+                  </div>
+                </Element>
+              )}
+            </div>
 
-          {Boolean(currentProject.tasks?.length) && (
-            <>
-              <Divider withoutPadding borderColor={colors.$20} />
+            {currentProject.client && (
+              <>
+                <Divider withoutPadding borderColor={colors.$20} />
 
-              <p
-                className="px-6 pt-2 text-sm font-medium uppercase tracking-wide"
-                style={{ color: colors.$17 }}
-              >
-                {t('tasks')}
-              </p>
+                <p
+                  className="px-6 pt-2 text-sm font-medium uppercase tracking-wide"
+                  style={{ color: colors.$17 }}
+                >
+                  {t('client')}
+                </p>
 
-              <div className="flex flex-col space-y-3 px-6">
-                {currentProject.tasks?.map((task) => (
+                <div className="px-6">
                   <Box
-                    key={task.id}
                     className="flex items-center justify-between p-4 shadow-sm border w-full cursor-pointer rounded-md"
                     onClick={() => {
                       onClose();
-                      navigate(route('/tasks/:id/edit', { id: task.id }));
+                      navigate(
+                        route('/clients/:id', {
+                          id: currentProject.client_id,
+                        })
+                      );
                     }}
                     style={{ borderColor: colors.$20 }}
                     theme={{
@@ -317,35 +300,102 @@ export function ProjectSlider() {
                     }}
                   >
                     <span
-                      className="font-medium text-sm truncate"
+                      className="font-medium text-sm"
                       style={{ color: colors.$3 }}
                     >
-                      {task.description?.trim() ||
-                        `${t('task')} #${task.number}`}
+                      {currentProject.client.display_name}
                     </span>
 
-                    <div
-                      className="flex items-center space-x-2 whitespace-nowrap"
-                      style={{ color: colors.$17 }}
+                    <Icon
+                      element={ChevronRight}
+                      size={18}
+                      color={colors.$17}
+                    />
+                  </Box>
+                </div>
+              </>
+            )}
+
+            {Boolean(currentProject.tasks?.length) && (
+              <>
+                <Divider withoutPadding borderColor={colors.$20} />
+
+                <p
+                  className="px-6 pt-2 text-sm font-medium uppercase tracking-wide"
+                  style={{ color: colors.$17 }}
+                >
+                  {t('tasks')}
+                </p>
+
+                <div className="flex flex-col space-y-3 px-6">
+                  {currentProject.tasks?.map((task) => (
+                    <Box
+                      key={task.id}
+                      className="flex items-center justify-between p-4 shadow-sm border w-full cursor-pointer rounded-md"
+                      onClick={() => {
+                        onClose();
+                        navigate(route('/tasks/:id/edit', { id: task.id }));
+                      }}
+                      style={{ borderColor: colors.$20 }}
+                      theme={{
+                        backgroundColor: colors.$1,
+                        hoverBackgroundColor: colors.$4,
+                      }}
                     >
-                      <span className="text-sm">
-                        {calculateTime(task.time_log, {
-                          inSeconds: false,
-                        })}
+                      <span
+                        className="font-medium text-sm truncate"
+                        style={{ color: colors.$3 }}
+                      >
+                        {task.description?.trim() ||
+                          `${t('task')} #${task.number}`}
                       </span>
 
-                      <Icon
-                        element={ChevronRight}
-                        size={18}
-                        color={colors.$17}
-                      />
-                    </div>
-                  </Box>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
+                      <div
+                        className="flex items-center space-x-2 whitespace-nowrap"
+                        style={{ color: colors.$17 }}
+                      >
+                        <span className="text-sm">
+                          {calculateTime(task.time_log, {
+                            inSeconds: false,
+                          })}
+                        </span>
+
+                        <Icon
+                          element={ChevronRight}
+                          size={18}
+                          color={colors.$17}
+                        />
+                      </div>
+                    </Box>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="px-4 pt-4">
+            <Upload
+              endpoint={endpoint('/api/v1/projects/:id/upload', {
+                id: currentProject.id,
+              })}
+              onSuccess={() => $refetch(['projects'])}
+              widgetOnly
+              disableUpload={
+                !hasPermission('edit_project') &&
+                !entityAssigned(currentProject)
+              }
+            />
+
+            <DocumentsTable
+              documents={currentProject.documents || []}
+              onDocumentDelete={() => $refetch(['projects'])}
+              disableEditableOptions={
+                !entityAssigned(currentProject, true) &&
+                !hasPermission('edit_project')
+              }
+            />
+          </div>
+        </TabGroup>
       ) : (
         <div className="flex flex-1 items-center justify-center py-12">
           <Spinner />
