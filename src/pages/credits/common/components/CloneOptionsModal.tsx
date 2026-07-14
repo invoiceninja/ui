@@ -102,6 +102,9 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
       vendor_id: '',
       paid_to_date: 0,
       po_number: '',
+      cash_discount_percent: 0,
+      cash_discount_expiry_date: '',
+      cash_discount: 0,
       design_id: company.settings.invoice_design_id,
       client: undefined,
     });

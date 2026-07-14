@@ -11,7 +11,9 @@
 import { Checkbox, InputLabel, Link, SelectField } from '$app/components/forms';
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { Client } from '$app/common/interfaces/client';
+import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import {
   ChangeEvent,
@@ -34,7 +36,7 @@ import { Element } from '$app/components/cards';
 
 interface Props {
   readonly?: boolean;
-  resource?: Invoice | RecurringInvoice;
+  resource?: Invoice | RecurringInvoice | Quote | Credit;
   onChange: (id: string) => unknown;
   onClearButtonClick: () => unknown;
   onContactCheckboxChange: (contactId: string, value: boolean) => unknown;

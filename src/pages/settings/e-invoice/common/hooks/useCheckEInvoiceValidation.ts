@@ -12,12 +12,13 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { Credit } from '$app/common/interfaces/credit';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
 
 interface Params {
-  resource: Invoice | RecurringInvoice | undefined;
+  resource: Invoice | RecurringInvoice | Credit | undefined;
   entity?: 'invoice' | 'recurring_invoice';
   enableQuery: boolean;
   onFinished?: () => void;

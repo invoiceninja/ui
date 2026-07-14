@@ -75,9 +75,9 @@ export interface Invoice {
   reminder3_sent: string;
   reminder_last_sent: string;
   paid_to_date: number;
-  cash_discount_percent?: number;
-  cash_discount_expiry_date?: string;
-  cash_discount?: number;
+  cash_discount_percent: number;
+  cash_discount_expiry_date: string;
+  cash_discount: number;
   subscription_id: string;
   auto_bill_enabled: boolean;
   invitations: Invitation[];
