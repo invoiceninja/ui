@@ -110,7 +110,9 @@ export function ProjectSlider() {
 
   const currentProject = resource ?? project;
 
-  const hasBudget = Boolean(currentProject && currentProject.budgeted_hours > 0);
+  const hasBudget = Boolean(
+    currentProject && currentProject.budgeted_hours > 0
+  );
 
   const onClose = () => {
     setIsSliderVisible(false);
