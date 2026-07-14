@@ -11,6 +11,10 @@
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { TabGroup } from '$app/components/TabGroup';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
@@ -190,8 +194,24 @@ export function CreditSlider() {
       withoutHeaderBorder
     >
       <TabGroup
-        tabs={[t('overview'), t('history'), t('activity'), t('email_history')]}
+        tabs={[
+          t('overview'),
+          t('history'),
+          t('activity'),
+          t('email_history'),
+          t('documents'),
+        ]}
         width="full"
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 4) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={credit?.documents?.length}
+                textCenter
+              />
+            );
+          }
+        }}
         withHorizontalPadding
         horizontalPaddingWidth="1.5rem"
       >
@@ -668,6 +688,27 @@ export function CreditSlider() {
               withAllBorders
             />
           ))}
+        </div>
+
+        <div className="px-4">
+          <Upload
+            endpoint={endpoint('/api/v1/credits/:id/upload', {
+              id: credit?.id,
+            })}
+            onSuccess={() => $refetch(['credits'])}
+            widgetOnly
+            disableUpload={
+              !hasPermission('edit_credit') && !entityAssigned(credit)
+            }
+          />
+
+          <DocumentsTable
+            documents={credit?.documents || []}
+            onDocumentDelete={() => $refetch(['credits'])}
+            disableEditableOptions={
+              !entityAssigned(credit, true) && !hasPermission('edit_credit')
+            }
+          />
         </div>
       </TabGroup>
     </Slider>
