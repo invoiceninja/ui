@@ -73,6 +73,7 @@ export interface Preferences {
   enable_public_notifications: boolean | null;
   use_system_fonts: boolean;
   use_legacy_editor: boolean;
+  use_legacy_invoice_editor: boolean;
   hide_peppol_sent_status: boolean;
   feedback_slider_displayed_at: number;
   feedback_given_at: number;
@@ -86,6 +87,11 @@ export interface Preferences {
 export type ImportTemplates = Record<string, Record<string, (string | null)[]>>;
 
 type ColorTheme = Record<ThemeColorField, string>;
+
+export interface InvoiceEditorPreferences {
+  expanded_sections?: Record<string, boolean>;
+  promoted_sections?: Record<string, boolean>;
+}
 
 export interface ReactSettings {
   show_pdf_preview: boolean;
@@ -104,6 +110,7 @@ export interface ReactSettings {
   color_theme?: ColorTheme;
   client_show_cards?: ClientShowCard[];
   dashboard_fields?: string[];
+  invoice_editor?: InvoiceEditorPreferences;
 }
 
 export type ReactTableColumns =
@@ -142,6 +149,7 @@ export const preferencesDefaults: Preferences = {
   enable_public_notifications: null,
   use_system_fonts: false,
   use_legacy_editor: false,
+  use_legacy_invoice_editor: false,
   hide_peppol_sent_status: false,
   feedback_slider_displayed_at: 0,
   feedback_given_at: 0,

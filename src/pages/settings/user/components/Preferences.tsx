@@ -183,6 +183,21 @@ export function Preferences() {
         />
       </Element>
 
+      <Element
+        leftSide={t('use_legacy_invoice_editor')}
+        leftSideHelp={t('use_legacy_invoice_editor_help')}
+      >
+        <Toggle
+          checked={Boolean(reactSettings.preferences.use_legacy_invoice_editor)}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.preferences.use_legacy_invoice_editor',
+              value
+            )
+          }
+        />
+      </Element>
+
       <Element leftSide={t('hide_peppol_sent_status')}>
         <Toggle
           checked={Boolean(reactSettings.preferences.hide_peppol_sent_status)}

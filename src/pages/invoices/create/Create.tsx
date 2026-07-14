@@ -21,12 +21,18 @@ import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
 import { QuickbooksDepositDisabledAlert } from '$app/components/QuickbooksDepositDisabledAlert';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom } from 'jotai';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useSearchParams } from 'react-router-dom';
 import { invoiceAtom, invoiceSumAtom } from '../common/atoms';
+import {
+  clientDraftAtom,
+  isClientDraftDirty,
+} from '../common/atoms/client-draft';
+import { useCreateClientFromDraft, ClientCreationValidationError } from '../common/hooks/useCreateClientFromDraft';
 import { useHandleCreate } from './hooks/useHandleCreate';
 import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
 import { Tab, Tabs } from '$app/components/Tabs';
@@ -51,6 +57,7 @@ export interface CreateInvoiceContext {
   errors: ValidationBag | undefined;
   client: Client | undefined;
   invoiceSum: InvoiceSum | InvoiceSumInclusive | undefined;
+  clientCreationErrors: ValidationBag | undefined;
 }
 
 export default function Create() {
@@ -74,6 +81,12 @@ export default function Create() {
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
+  const [clientCreationErrors, setClientCreationErrors] =
+    useState<ValidationBag>();
+
+  const clientDraft = useAtomValue(clientDraftAtom);
+  const setClientDraft = useSetAtom(clientDraftAtom);
+  const createClientFromDraft = useCreateClientFromDraft();
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -107,6 +120,62 @@ export default function Create() {
     isFormBusy,
     setIsFormBusy,
   });
+
+  const saveWithClientFlow = useCallback(
+    async (target: Invoice) => {
+      if (target.client_id || !isClientDraftDirty(clientDraft)) {
+        return save(target);
+      }
+      if (isFormBusy) return;
+
+      setIsFormBusy(true);
+      setClientCreationErrors(undefined);
+      toast.processing();
+
+      try {
+        const createdClient = await createClientFromDraft(clientDraft!);
+
+        const invitations: Invitation[] = createdClient.contacts
+          .filter((contact) => contact.send_email)
+          .map((contact) => {
+            const invitation = cloneDeep(
+              blankInvitation
+            ) as unknown as Invitation;
+            invitation.client_contact_id = contact.id;
+            invitation.can_sign = contact.can_sign;
+            return invitation;
+          });
+
+        const next: Invoice = {
+          ...target,
+          client_id: createdClient.id,
+          invitations,
+        };
+
+        setInvoice(next);
+        setClientDraft(null);
+        setIsFormBusy(false);
+        return save(next);
+      } catch (error) {
+        setIsFormBusy(false);
+        if (error instanceof ClientCreationValidationError) {
+          setClientCreationErrors(error.errors);
+          toast.dismiss();
+          return;
+        }
+        toast.error();
+        throw error;
+      }
+    },
+    [
+      clientDraft,
+      isFormBusy,
+      createClientFromDraft,
+      save,
+      setInvoice,
+      setClientDraft,
+    ]
+  );
 
   useEffect(() => {
     setInvoiceSum(undefined);
@@ -247,9 +316,15 @@ export default function Create() {
     invoice && calculateInvoiceSum(invoice);
   }, [invoice]);
 
+  const canSave = Boolean(
+    invoice &&
+      !isFormBusy &&
+      (invoice.client_id.length > 0 || isClientDraftDirty(clientDraft))
+  );
+
   useSaveKeyboardShortcut({
-    isEnabled: Boolean(invoice && invoice.client_id.length > 0 && !isFormBusy),
-    onSave: () => save(invoice as Invoice),
+    isEnabled: canSave,
+    onSave: () => saveWithClientFlow(invoice as Invoice),
   });
 
   return (
@@ -257,8 +332,8 @@ export default function Create() {
       <Default
         title={documentTitle}
         breadcrumbs={pages}
-        onSaveClick={() => save(invoice as Invoice)}
-        disableSaveButton={invoice?.client_id.length === 0 || isFormBusy}
+        onSaveClick={() => saveWithClientFlow(invoice as Invoice)}
+        disableSaveButton={!canSave}
         aboveMainContainer={
           invoice && <QuickbooksDepositDisabledAlert resource={invoice} />
         }
@@ -278,6 +353,7 @@ export default function Create() {
                 setIsDefaultFooter,
                 client,
                 invoiceSum,
+                clientCreationErrors,
               }}
             />
           </div>
