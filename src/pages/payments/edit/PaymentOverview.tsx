@@ -28,6 +28,14 @@ export function PaymentOverview(props: Props) {
 
   const formatMoney = useFormatMoney();
 
+  const sumCashDiscount = props.payment.paymentables.reduce(
+    (sum, p) => sum + p.cash_discount,
+    0
+  );
+  const hasCashDiscount = sumCashDiscount > 0;
+  const hasUnapplied = props.payment.applied < props.payment.amount;
+  const overviewCardCount = 3 + Number(hasCashDiscount) + Number(hasUnapplied);
+
   return (
     <div>
       <div
@@ -42,8 +50,8 @@ export function PaymentOverview(props: Props) {
 
         <div
           className={classNames('grid grid-cols-2 gap-3 text-sm md:text-base', {
-            'sm:grid-cols-4': props?.payment?.applied < props?.payment?.amount,
-            'sm:grid-cols-3': props?.payment?.applied >= props?.payment?.amount,
+            'sm:grid-cols-3': overviewCardCount === 3,
+            'lg:grid-cols-4': overviewCardCount >= 4,
           })}
         >
           <div
@@ -86,6 +94,28 @@ export function PaymentOverview(props: Props) {
             </span>
           </div>
 
+          {hasCashDiscount && (
+            <div
+              className="rounded-md p-3 flex items-center flex-col shadow-sm border"
+              style={{ borderColor: colors.$20 }}
+            >
+              <span className="text-xs mb-1" style={{ color: colors.$22 }}>
+                {t('cash_discount')}
+              </span>
+
+              <span
+                className="font-medium text-base md:text-lg"
+                style={{ color: colors.$3 }}
+              >
+                {formatMoney(
+                  sumCashDiscount,
+                  props.payment.client?.country_id,
+                  props.payment?.currency_id
+                )}
+              </span>
+            </div>
+          )}
+
           <div
             className="rounded-md p-3 flex items-center flex-col shadow-sm border"
             style={{ borderColor: colors.$20 }}
@@ -106,7 +136,7 @@ export function PaymentOverview(props: Props) {
             </span>
           </div>
 
-          {props?.payment?.applied < props?.payment?.amount && (
+          {hasUnapplied && (
             <div
               className="rounded-md p-3 flex items-center flex-col shadow-sm border"
               style={{ borderColor: colors.$20 }}
