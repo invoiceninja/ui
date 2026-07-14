@@ -119,7 +119,7 @@ export class InvoiceSum {
     }
 
     return percentageOf(
-      this.getBalanceDue(),
+      this.getTotal(),
       this.invoice.cash_discount_percent,
       this.precision
     );
