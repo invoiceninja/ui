@@ -56,6 +56,7 @@ export interface Paymentable {
   invoice_id: string;
   credit_id: string;
   amount: number;
+  cash_discount: number;
   refunded: number;
   created_at: number;
   updated_at: number;
