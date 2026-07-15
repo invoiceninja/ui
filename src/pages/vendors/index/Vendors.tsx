@@ -44,6 +44,7 @@ export default function Vendors() {
   const [t] = useTranslation();
 
   const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const pages: Page[] = [{ name: t('vendors'), href: '/vendors' }];
 
@@ -77,7 +78,6 @@ export default function Vendors() {
     filterColumnsValues.vendor_tag_ids,
     setFilterColumnsValues,
   ]);
-  const disableNavigation = useDisableNavigation();
 
   const [sliderVendorId, setSliderVendorId] = useState<string>('');
   const [vendorSlider, setVendorSlider] = useAtom(vendorSliderAtom);
@@ -91,7 +91,9 @@ export default function Vendors() {
   });
 
   useEffect(() => {
-    setVendorSlider(null);
+    if (sliderVendorId) {
+      setVendorSlider(null);
+    }
   }, [sliderVendorId]);
 
   useEffect(() => {
@@ -138,15 +140,15 @@ export default function Vendors() {
         }
         linkToCreateGuards={[permission('create_vendor')]}
         hideEditableOptions={!hasPermission('edit_vendor')}
+        onTableRowClick={(vendor) => {
+          setSliderVendorId(vendor.id);
+          setVendorSliderVisibility(true);
+        }}
         enableSavingFilterPreference
         dateRangeColumns={[
           { column: 'created_at', queryParameterKey: 'created_between' },
         ]}
         enableSavingLatestDataForNavigation
-        onTableRowClick={(vendor) => {
-          setSliderVendorId(vendor.id);
-          setVendorSliderVisibility(true);
-        }}
       />
 
       {!disableNavigation('vendor', vendorSlider) && <VendorSlider />}

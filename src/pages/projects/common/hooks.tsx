@@ -29,6 +29,7 @@ import {
   MdDelete,
   MdDesignServices,
   MdDownload,
+  MdEdit,
   MdRestore,
   MdTextSnippet,
 } from 'react-icons/md';
@@ -354,8 +355,15 @@ export function useProjectFilterColumns(params?: { enabled?: boolean }) {
   ];
 }
 
-export function useActions() {
+interface ActionsParams {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
+}
+
+export function useActions(params?: ActionsParams) {
   const [t] = useTranslation();
+
+  const { showEditAction, showCommonBulkAction } = params || {};
 
   const bulk = useBulkAction();
   const navigate = useNavigate();
@@ -389,6 +397,16 @@ export function useActions() {
   } = useChangeTemplate();
 
   const actions = [
+    (project: Project) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/projects/:id/edit', { id: project.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (project: Project) =>
       hasPermission('create_invoice') && (
         <DropdownElement
@@ -432,10 +450,13 @@ export function useActions() {
           {t('run_template')}
         </DropdownElement>
       ),
-    () => isEditOrShowPage && <Divider withoutPadding />,
+    () =>
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (project: Project) =>
       getEntityState(project) === EntityState.Active &&
-      isEditOrShowPage && (
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) && (
         <DropdownElement
           onClick={() => bulk([project.id], 'archive')}
           icon={<Icon element={MdArchive} />}
@@ -446,7 +467,7 @@ export function useActions() {
     (project: Project) =>
       (getEntityState(project) === EntityState.Archived ||
         getEntityState(project) === EntityState.Deleted) &&
-      isEditOrShowPage && (
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) && (
         <DropdownElement
           onClick={() => bulk([project.id], 'restore')}
           icon={<Icon element={MdRestore} />}
@@ -457,7 +478,7 @@ export function useActions() {
     (project: Project) =>
       (getEntityState(project) === EntityState.Active ||
         getEntityState(project) === EntityState.Archived) &&
-      isEditOrShowPage && (
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) && (
         <DropdownElement
           onClick={() => bulk([project.id], 'delete')}
           icon={<Icon element={MdDelete} />}
