@@ -1254,8 +1254,16 @@ export function DataTable<T extends object>(props: Props<T>) {
                             },
                             styleOptions?.tdClassName
                           )}
-                          onClick={() => {
+                          onClick={(event: React.MouseEvent<HTMLTableCellElement>) => {
                             if (index < 3) {
+                              if (
+                                (event.target as HTMLElement).closest(
+                                  'a, button, input, select, textarea, [role="button"]'
+                                )
+                              ) {
+                                return;
+                              }
+
                               props.onTableRowClick
                                 ? props.onTableRowClick(resource)
                                 : document.getElementById(resource.id)?.click();
