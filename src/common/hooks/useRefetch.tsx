@@ -262,6 +262,10 @@ export const keys = {
     path: '/api/docuninja/login',
     dependencies: [],
   },
+  docuninja_reminder_schedules: {
+    path: '/api/reminder_schedules/docuninja',
+    dependencies: [],
+  },
 };
 
 export type RefetchKey = keyof typeof keys;
