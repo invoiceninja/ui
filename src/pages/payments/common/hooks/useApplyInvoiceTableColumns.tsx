@@ -22,18 +22,20 @@ import {
   useAllInvoiceColumns,
 } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { PaymentOnCreation } from '../..';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { cloneDeep, set } from 'lodash';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { FormikProps } from 'formik';
 import { TableNumberInputField } from '../components/TableNumberInputField';
+import { Checkbox } from '$app/components/forms';
+import dayjs from 'dayjs';
 
 export interface ApplyInvoice {
   _id: string;
   amount: number;
-  number: string;
-  balance: number;
+  cash_discount?: number;
   invoice_id: string;
+  credit_id?: string;
 }
 
 interface UseApplyInvoiceTableColumnsProps {
@@ -42,6 +44,64 @@ interface UseApplyInvoiceTableColumnsProps {
   errors: ValidationBag | undefined;
   formik?: FormikProps<{ invoices: ApplyInvoice[] }>;
   isApplyPage?: boolean;
+}
+
+export function isCashDiscountExpired(invoice: Invoice) {
+  if (!invoice.cash_discount_expiry_date) {
+    return false;
+  }
+
+  return dayjs().isAfter(invoice.cash_discount_expiry_date, 'day');
+}
+
+interface CashDiscountCellProps {
+  paymentInvoice: ApplyInvoice | undefined;
+  invoice: Invoice;
+  invoiceIndex: number;
+  errors: ValidationBag | undefined;
+  onValueChange: (value: string, checked: boolean) => unknown;
+  onCheckedChange: (checked: boolean, cashDiscount: number) => unknown;
+}
+
+function CashDiscountCell({
+  paymentInvoice,
+  invoice,
+  invoiceIndex,
+  errors,
+  onValueChange,
+  onCheckedChange,
+}: CashDiscountCellProps) {
+  const [checked, setChecked] = useState(
+    () => Boolean(invoice.cash_discount) && !isCashDiscountExpired(invoice)
+  );
+  const isSelected = invoiceIndex !== -1;
+  const cashDiscount =
+    paymentInvoice?.cash_discount ?? invoice.cash_discount ?? 0;
+
+  return (
+    <div className="flex items-start gap-x-2">
+      <div className="pt-2">
+        <Checkbox
+          checked={checked}
+          onValueChange={(_, checked) => {
+            const isChecked = Boolean(checked);
+
+            setChecked(isChecked);
+            onCheckedChange(isChecked, cashDiscount);
+          }}
+          disabled={!isSelected}
+        />
+      </div>
+      <TableNumberInputField
+        disabled={!checked || !isSelected}
+        value={cashDiscount}
+        onValueChange={(value) => onValueChange(value, checked)}
+        errorMessage={[
+          ...(errors?.errors[`invoices.${invoiceIndex}.cash_discount`] || []),
+        ]}
+      />
+    </div>
+  );
 }
 
 export function useApplyInvoiceTableColumns({
@@ -60,6 +120,41 @@ export function useApplyInvoiceTableColumns({
 
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
+
+  const getSelectedInvoiceIndex = (invoiceId: string): number => {
+    return isApplyPage
+      ? (formik?.values.invoices.findIndex((p) => p.invoice_id === invoiceId) ??
+          -1)
+      : (payment?.invoices.findIndex((p) => p.invoice_id === invoiceId) ?? -1);
+  };
+
+  const getPaymentInvoice = (invoiceId: string): ApplyInvoice | undefined => {
+    return isApplyPage
+      ? formik?.values.invoices.find((p) => p.invoice_id === invoiceId)
+      : payment?.invoices.find((p) => p.invoice_id === invoiceId);
+  };
+
+  const updatePaymentInvoice = (
+    invoiceIndex: number,
+    field: 'cash_discount' | 'amount',
+    value: number
+  ) => {
+    if (invoiceIndex === -1) return;
+
+    setPayment?.((current) => {
+      if (current) {
+        const updatedPayment = cloneDeep(current);
+
+        set(updatedPayment, `invoices.${invoiceIndex}.${field}`, value);
+
+        return updatedPayment;
+      }
+
+      return current;
+    });
+
+    formik?.setFieldValue(`invoices.${invoiceIndex}.${field}`, value);
+  };
 
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
     {
@@ -93,55 +188,69 @@ export function useApplyInvoiceTableColumns({
         ),
     },
     {
+      column: 'cash_discount',
+      id: 'cash_discount',
+      label: t('cash_discount'),
+      format: (_, invoice) => {
+        const invoiceIndex = getSelectedInvoiceIndex(invoice.id);
+        const paymentInvoice = getPaymentInvoice(invoice.id);
+        const amount = paymentInvoice?.amount || 0;
+        const cashDiscount =
+          paymentInvoice?.cash_discount ?? invoice.cash_discount ?? 0;
+
+        return (
+          <CashDiscountCell
+            paymentInvoice={paymentInvoice}
+            invoice={invoice}
+            invoiceIndex={invoiceIndex}
+            errors={errors}
+            onValueChange={(value: string, checked: boolean) => {
+              const nextCashDiscount = isNaN(parseFloat(value))
+                ? 0
+                : parseFloat(value);
+
+              updatePaymentInvoice(
+                invoiceIndex,
+                'cash_discount',
+                nextCashDiscount
+              );
+
+              if (checked) {
+                const baseAmount = amount + cashDiscount;
+                const nextAmount = Math.max(baseAmount - nextCashDiscount, 0);
+
+                updatePaymentInvoice(invoiceIndex, 'amount', nextAmount);
+              }
+            }}
+            onCheckedChange={(checked, cashDiscount) => {
+              const nextAmount = checked
+                ? Math.max(amount - cashDiscount, 0)
+                : Math.min(
+                    amount + cashDiscount,
+                    invoice.balance ? invoice.balance : Infinity
+                  );
+
+              updatePaymentInvoice(invoiceIndex, 'amount', nextAmount);
+            }}
+          />
+        );
+      },
+    },
+    {
       column: 'received',
       id: 'id',
       label: t('received'),
       format: (_, invoice) => {
-        let invoiceIndex = -1;
-
-        if (isApplyPage) {
-          invoiceIndex =
-            formik?.values.invoices.findIndex(
-              (p) => p.invoice_id === invoice.id
-            ) ?? -1;
-        } else {
-          invoiceIndex =
-            payment?.invoices.findIndex((p) => p.invoice_id === invoice.id) ??
-            -1;
-        }
+        const invoiceIndex = getSelectedInvoiceIndex(invoice.id);
 
         return (
           <TableNumberInputField
-            value={
-              (isApplyPage
-                ? formik?.values.invoices.find(
-                    (p) => p.invoice_id === invoice.id
-                  )?.amount
-                : payment?.invoices.find((p) => p.invoice_id === invoice.id)
-                    ?.amount) || 0
-            }
+            value={getPaymentInvoice(invoice.id)?.amount || 0}
             onValueChange={(value) => {
-              if (invoiceIndex === -1) return;
-
-              setPayment?.((current) => {
-                if (current) {
-                  const updatedPayment = cloneDeep(current);
-
-                  set(
-                    updatedPayment,
-                    `invoices.${invoiceIndex}.amount`,
-                    isNaN(parseFloat(value)) ? 0 : parseFloat(value)
-                  );
-
-                  return updatedPayment;
-                }
-
-                return current;
-              });
-
-              formik?.setFieldValue(
-                `invoices.${invoiceIndex}.amount`,
-                parseFloat(value)
+              updatePaymentInvoice(
+                invoiceIndex,
+                'amount',
+                isNaN(parseFloat(value)) ? 0 : parseFloat(value)
               );
             }}
             disabled={invoiceIndex === -1}

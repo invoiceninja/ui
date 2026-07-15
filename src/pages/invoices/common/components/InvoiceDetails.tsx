@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
 import { PaymentTermsTooltip } from '$app/components/PaymentTermsTooltip';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 interface Props {
   invoice?: Invoice;
@@ -67,6 +68,39 @@ export function InvoiceDetails(props: Props) {
             value={invoice?.due_date || ''}
             errorMessage={props.errors?.errors.due_date}
           />
+        </Element>
+
+        <Element leftSide={t('cash_discount')}>
+          <div className="space-y-2">
+            <div className="flex space-x-2">
+              <div className="w-full lg:w-1/3">
+                <NumberInputField
+                  value={invoice?.cash_discount_percent || ''}
+                  onValueChange={(value) =>
+                    handleChange(
+                      'cash_discount_percent',
+                      parseFloat(value) || 0
+                    )
+                  }
+                />
+              </div>
+
+              <div className="w-full lg:w-2/3">
+                <InputField
+                  type="date"
+                  onValueChange={(value) =>
+                    handleChange('cash_discount_expiry_date', value)
+                  }
+                  value={invoice?.cash_discount_expiry_date || ''}
+                />
+              </div>
+            </div>
+
+            <ErrorMessage>
+              {props.errors?.errors.cash_discount_percent ||
+                props.errors?.errors.cash_discount_expiry_date}
+            </ErrorMessage>
+          </div>
         </Element>
 
         <Element leftSide={t('partial')}>

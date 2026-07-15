@@ -12,9 +12,11 @@ import collect from 'collect.js';
 import { Invoice } from '../interfaces/invoice';
 import { useFormatMoney } from './money/useFormatMoney';
 import { Client } from '../interfaces/client';
+import { Credit } from '../interfaces/credit';
 import { RecurringInvoice } from '../interfaces/recurring-invoice';
 import { Payment } from '../interfaces/payment';
 import { PurchaseOrder } from '../interfaces/purchase-order';
+import { Quote } from '../interfaces/quote';
 import { Expense } from '../interfaces/expense';
 import { RecurringExpense } from '../interfaces/recurring-expense';
 import { Transaction } from '../interfaces/transactions';
@@ -22,6 +24,8 @@ import { useReactSettings } from './useReactSettings';
 
 type Resource =
   | Invoice
+  | Quote
+  | Credit
   | Client
   | RecurringInvoice
   | Payment

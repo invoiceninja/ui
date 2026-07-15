@@ -148,6 +148,13 @@ export function useResolveTotalVariable(props: Props) {
       );
     }
 
+    if (variable == '$cash_discount' && invoiceSum) {
+      return renderMoneyRow(
+        resolveTranslation(variable, '$'),
+        invoiceSum.getCashDiscount()
+      );
+    }
+
     if (variable == '$paid_to_date' && invoiceSum) {
       return renderMoneyRow(
         resolveTranslation(variable, '$'),
