@@ -8,32 +8,30 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
-import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
-import { Vendor } from '$app/common/interfaces/vendor';
-import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import { EntityStatus } from '$app/components/EntityStatus';
-import { Tooltip } from '$app/components/Tooltip';
-import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import classNames from 'classnames';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { date } from '$app/common/helpers';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
-import classNames from 'classnames';
-import { normalizeColumnName } from '$app/common/helpers/data-table';
-import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
-import { useTagsQuery } from '$app/common/queries/tags';
-import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
+import { route } from '$app/common/helpers/route';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Tooltip } from '$app/components/Tooltip';
+import { TagPills } from '$app/components/tags/TagPills';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 
 export const defaultColumns: string[] = [
   'number',
@@ -314,23 +312,4 @@ export function useVendorColumns() {
         list.indexOf(normalizeColumnName(a.column)) -
         list.indexOf(normalizeColumnName(b.column))
     );
-}
-
-export function useVendorFilterColumns(params?: { enabled?: boolean }) {
-  const { data: tags } = useTagsQuery({
-    entityType: TAG_ENTITY_TYPES.vendor,
-    enabled: params?.enabled ?? true,
-  });
-
-  return [
-    {
-      column_id: 'vendor_tag_ids',
-      query_identifier: 'tag_ids',
-      options:
-        tags?.data.filter(isActiveTag).map((tag) => ({
-          label: tag.name,
-          value: tag.id,
-        })) || [],
-    },
-  ];
 }

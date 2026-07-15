@@ -88,9 +88,7 @@ import classNames from 'classnames';
 import { Dispatch, SetStateAction } from 'react';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { SendNowAction } from './components/SendNowAction';
-import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
-import { useTagsQuery } from '$app/common/queries/tags';
-import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
+import { TagPills } from '$app/components/tags/TagPills';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -946,27 +944,6 @@ export function useRecurringInvoiceColumns() {
         list.indexOf(normalizeColumnName(a.column)) -
         list.indexOf(normalizeColumnName(b.column))
     );
-}
-
-export function useRecurringInvoiceFilterColumns(params?: {
-  enabled?: boolean;
-}) {
-  const { data: tags } = useTagsQuery({
-    entityType: TAG_ENTITY_TYPES.recurringInvoice,
-    enabled: params?.enabled ?? true,
-  });
-
-  return [
-    {
-      column_id: 'recurring_invoice_tag_ids',
-      query_identifier: 'tag_ids',
-      options:
-        tags?.data.filter(isActiveTag).map((tag) => ({
-          label: tag.name,
-          value: tag.id,
-        })) || [],
-    },
-  ];
 }
 
 export function useRecurringInvoiceFilters() {

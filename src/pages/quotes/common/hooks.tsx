@@ -9,45 +9,10 @@
  */
 
 import { AxiosError } from 'axios';
-import { QuoteStatus } from '$app/common/enums/quote-status';
-import { date, endpoint, getEntityState } from '$app/common/helpers';
-import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
-import { Client } from '$app/common/interfaces/client';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import {
-  InvoiceItem,
-  InvoiceItemType,
-} from '$app/common/interfaces/invoice-item';
-import { Invitation } from '$app/common/interfaces/purchase-order';
-import { Quote } from '$app/common/interfaces/quote';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { blankLineItem } from '$app/common/constants/blank-line-item';
-import { Divider } from '$app/components/cards/Divider';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Action } from '$app/components/ResourceActions';
+import classNames from 'classnames';
 import { useAtom, useSetAtom } from 'jotai';
-import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
-import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { invoiceSumAtom, quoteAtom } from './atoms';
-import { useApprove } from './hooks/useApprove';
-import { useBulkAction } from './hooks/useBulkAction';
-import { useMarkSent } from './hooks/useMarkSent';
-import { route } from '$app/common/helpers/route';
-import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
-import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
-import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import { EntityStatus } from '$app/components/EntityStatus';
 import { Dispatch, SetStateAction, useCallback } from 'react';
-import { Icon } from '$app/components/icons/Icon';
+import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
   MdCloudCircle,
@@ -65,47 +30,80 @@ import {
   MdSend,
   MdTextSnippet,
 } from 'react-icons/md';
-import { SelectOption } from '$app/components/datatables/Actions';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { Tooltip } from '$app/components/Tooltip';
-import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
+import { useNavigate } from 'react-router-dom';
+import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { EntityState } from '$app/common/enums/entity-state';
-import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
-import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
-import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
-import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import {
-  useAdmin,
-  useHasPermission,
-} from '$app/common/hooks/permissions/useHasPermission';
-import { Assigned } from '$app/components/Assigned';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { CloneOptionsModal } from './components/CloneOptionsModal';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
-import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
-import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
-import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { QuoteStatus } from '$app/common/enums/quote-status';
+import { date, endpoint, getEntityState } from '$app/common/helpers';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
 import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
-import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
-import { EntityActionElement } from '$app/components/EntityActionElement';
-import classNames from 'classnames';
-import { normalizeColumnName } from '$app/common/helpers/data-table';
-import { ConvertOptionsModal } from './components/ConvertOptionsModal';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
-import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
-import { useTagsQuery } from '$app/common/queries/tags';
-import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { Client } from '$app/common/interfaces/client';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import {
+  InvoiceItem,
+  InvoiceItemType,
+} from '$app/common/interfaces/invoice-item';
+import { Invitation } from '$app/common/interfaces/purchase-order';
+import { Quote } from '$app/common/interfaces/quote';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Assigned } from '$app/components/Assigned';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { Divider } from '$app/components/cards/Divider';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { SelectOption } from '$app/components/datatables/Actions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { EntityActionElement } from '$app/components/EntityActionElement';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
+import { Tooltip } from '$app/components/Tooltip';
+import { TagPills } from '$app/components/tags/TagPills';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
+import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
+import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
+import { invoiceSumAtom, quoteAtom } from './atoms';
+import { CloneOptionsModal } from './components/CloneOptionsModal';
+import { ConvertOptionsModal } from './components/ConvertOptionsModal';
+import { useApprove } from './hooks/useApprove';
+import { useBulkAction } from './hooks/useBulkAction';
+import { useMarkSent } from './hooks/useMarkSent';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -1199,25 +1197,6 @@ export function useQuoteColumns() {
         list.indexOf(normalizeColumnName(a.column)) -
         list.indexOf(normalizeColumnName(b.column))
     );
-}
-
-export function useQuoteFilterColumns(params?: { enabled?: boolean }) {
-  const { data: tags } = useTagsQuery({
-    entityType: TAG_ENTITY_TYPES.quote,
-    enabled: params?.enabled ?? true,
-  });
-
-  return [
-    {
-      column_id: 'quote_tag_ids',
-      query_identifier: 'tag_ids',
-      options:
-        tags?.data.filter(isActiveTag).map((tag) => ({
-          label: tag.name,
-          value: tag.id,
-        })) || [],
-    },
-  ];
 }
 
 export function useQuoteFilters() {

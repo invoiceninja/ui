@@ -53,9 +53,7 @@ import {
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
-import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
-import { useTagsQuery } from '$app/common/queries/tags';
-import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -302,25 +300,6 @@ export function useProductColumns() {
         list.indexOf(normalizeColumnName(a.column)) -
         list.indexOf(normalizeColumnName(b.column))
     );
-}
-
-export function useProductFilterColumns(params?: { enabled?: boolean }) {
-  const { data: tags } = useTagsQuery({
-    entityType: TAG_ENTITY_TYPES.product,
-    enabled: params?.enabled ?? true,
-  });
-
-  return [
-    {
-      column_id: 'product_tag_ids',
-      query_identifier: 'tag_ids',
-      options:
-        tags?.data.filter(isActiveTag).map((tag) => ({
-          label: tag.name,
-          value: tag.id,
-        })) || [],
-    },
-  ];
 }
 
 interface ActionsParams {

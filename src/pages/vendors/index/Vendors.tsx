@@ -8,35 +8,39 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Page } from '$app/components/Breadcrumbs';
-import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
-import { Default } from '$app/components/layouts/Default';
+import { useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import {
-  defaultColumns,
-  useAllVendorColumns,
-  useVendorColumns,
-  useVendorFilterColumns,
-} from '../common/hooks';
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { useVendorQuery } from '$app/common/queries/vendor';
+import { Page } from '$app/components/Breadcrumbs';
+import { DataTable } from '$app/components/DataTable';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
-import { permission } from '$app/common/guards/guards/permission';
-import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { or } from '$app/common/guards/guards/or';
-import { Guard } from '$app/common/guards/Guard';
-import { useActions } from '../common/hooks/useActions';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { Default } from '$app/components/layouts/Default';
 import {
   VendorSlider,
   vendorSliderAtom,
   vendorSliderVisibilityAtom,
 } from '../common/components/VendorSlider';
-import { useAtom } from 'jotai';
-import { useVendorQuery } from '$app/common/queries/vendor';
-import { useEffect, useState } from 'react';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  defaultColumns,
+  useAllVendorColumns,
+  useVendorColumns,
+} from '../common/hooks';
+import { useActions } from '../common/hooks/useActions';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 
 export default function Vendors() {
   const { documentTitle } = useTitle('vendors');
@@ -57,27 +61,13 @@ export default function Vendors() {
   const selectedColumns =
     reactSettings?.react_table_columns?.vendor || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
-  const filterColumns = useVendorFilterColumns({
-    enabled: shouldShowTagFilter,
-  });
-
-  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
-    filterColumnsValuesAtom
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.vendor,
+    'vendor_tag_ids',
+    { enabled: shouldShowTagFilter }
   );
 
-  useEffect(() => {
-    if (!shouldShowTagFilter && filterColumnsValues.vendor_tag_ids?.length) {
-      setFilterColumnsValues((current) => {
-        const { vendor_tag_ids, ...rest } = current;
-
-        return rest;
-      });
-    }
-  }, [
-    shouldShowTagFilter,
-    filterColumnsValues.vendor_tag_ids,
-    setFilterColumnsValues,
-  ]);
+  useTagFilterCleanup(shouldShowTagFilter, 'vendor_tag_ids');
 
   const [sliderVendorId, setSliderVendorId] = useState<string>('');
   const [vendorSlider, setVendorSlider] = useAtom(vendorSliderAtom);

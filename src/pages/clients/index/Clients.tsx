@@ -10,15 +10,19 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
-import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
+import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
   useAllClientColumns,
   useClientColumns,
-  useClientFilterColumns,
 } from '../common/hooks/useClientColumns';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { useActions } from '../common/hooks/useActions';
@@ -62,27 +66,13 @@ export default function Clients() {
   const selectedColumns =
     reactSettings?.react_table_columns?.client || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
-  const filterColumns = useClientFilterColumns({
-    enabled: shouldShowTagFilter,
-  });
-
-  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
-    filterColumnsValuesAtom
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.client,
+    'client_tag_ids',
+    { enabled: shouldShowTagFilter }
   );
 
-  useEffect(() => {
-    if (!shouldShowTagFilter && filterColumnsValues.client_tag_ids?.length) {
-      setFilterColumnsValues((current) => {
-        const { client_tag_ids, ...rest } = current;
-
-        return rest;
-      });
-    }
-  }, [
-    shouldShowTagFilter,
-    filterColumnsValues.client_tag_ids,
-    setFilterColumnsValues,
-  ]);
+  useTagFilterCleanup(shouldShowTagFilter, 'client_tag_ids');
 
   const [sliderClientId, setSliderClientId] = useState<string>('');
   const [clientSlider, setClientSlider] = useAtom(clientSliderAtom);

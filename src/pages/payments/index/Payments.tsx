@@ -10,15 +10,19 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
-import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
+import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
   useAllPaymentColumns,
   usePaymentColumns,
-  usePaymentFilterColumns,
 } from '../common/hooks/usePaymentColumns';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useActions } from '../common/hooks/useActions';
 import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
@@ -69,13 +73,13 @@ export default function Payments() {
   const selectedColumns =
     reactSettings?.react_table_columns?.payment || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
-  const filterColumns = usePaymentFilterColumns({
-    enabled: shouldShowTagFilter,
-  });
-
-  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
-    filterColumnsValuesAtom
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.payment,
+    'payment_tag_ids',
+    { enabled: shouldShowTagFilter }
   );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'payment_tag_ids');
 
   const [sliderPaymentId, setSliderPaymentId] = useState<string>('');
   const [paymentSlider, setPaymentSlider] = useAtom(paymentSliderAtom);
@@ -97,20 +101,6 @@ export default function Payments() {
   useEffect(() => {
     return () => setPaymentSliderVisibility(false);
   }, []);
-
-  useEffect(() => {
-    if (!shouldShowTagFilter && filterColumnsValues.payment_tag_ids?.length) {
-      setFilterColumnsValues((current) => {
-        const { payment_tag_ids, ...rest } = current;
-
-        return rest;
-      });
-    }
-  }, [
-    shouldShowTagFilter,
-    filterColumnsValues.payment_tag_ids,
-    setFilterColumnsValues,
-  ]);
 
   const {
     changeTemplateVisible,

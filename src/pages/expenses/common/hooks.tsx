@@ -76,9 +76,7 @@ import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/cust
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 import { Frequency } from '$app/common/enums/frequency';
-import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
-import { useTagsQuery } from '$app/common/queries/tags';
-import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -732,23 +730,4 @@ export function useExpenseFilters() {
   });
 
   return filters;
-}
-
-export function useExpenseFilterColumns(params?: { enabled?: boolean }) {
-  const { data: tags } = useTagsQuery({
-    entityType: TAG_ENTITY_TYPES.expense,
-    enabled: params?.enabled ?? true,
-  });
-
-  return [
-    {
-      column_id: 'expense_tag_ids',
-      query_identifier: 'tag_ids',
-      options:
-        tags?.data.filter(isActiveTag).map((tag) => ({
-          label: tag.name,
-          value: tag.id,
-        })) || [],
-    },
-  ];
 }

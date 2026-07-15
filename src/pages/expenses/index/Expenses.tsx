@@ -9,7 +9,7 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
-import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
+import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
@@ -17,9 +17,13 @@ import {
   useActions,
   useAllExpenseColumns,
   useExpenseColumns,
-  useExpenseFilterColumns,
   useExpenseFilters,
 } from '../common/hooks';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { permission } from '$app/common/guards/guards/permission';
@@ -62,27 +66,14 @@ export default function Expenses() {
   const selectedColumns =
     reactSettings?.react_table_columns?.expense || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
-  const filterColumns = useExpenseFilterColumns({
-    enabled: shouldShowTagFilter,
-  });
-
-  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
-    filterColumnsValuesAtom
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.expense,
+    'expense_tag_ids',
+    { enabled: shouldShowTagFilter }
   );
 
-  useEffect(() => {
-    if (!shouldShowTagFilter && filterColumnsValues.expense_tag_ids?.length) {
-      setFilterColumnsValues((current) => {
-        const { expense_tag_ids, ...rest } = current;
+  useTagFilterCleanup(shouldShowTagFilter, 'expense_tag_ids');
 
-        return rest;
-      });
-    }
-  }, [
-    shouldShowTagFilter,
-    filterColumnsValues.expense_tag_ids,
-    setFilterColumnsValues,
-  ]);
   const disableNavigation = useDisableNavigation();
 
   const [sliderExpenseId, setSliderExpenseId] = useState<string>('');

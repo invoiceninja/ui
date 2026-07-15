@@ -11,15 +11,19 @@
 import { useTranslation } from 'react-i18next';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
-import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
+import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import {
   defaultColumns,
   useActions,
   useAllProductColumns,
   useProductColumns,
-  useProductFilterColumns,
 } from '../common/hooks';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { Guard } from '$app/common/guards/Guard';
@@ -61,27 +65,13 @@ export default function Products() {
   const selectedColumns =
     reactSettings?.react_table_columns?.product || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
-  const filterColumns = useProductFilterColumns({
-    enabled: shouldShowTagFilter,
-  });
-
-  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
-    filterColumnsValuesAtom
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.product,
+    'product_tag_ids',
+    { enabled: shouldShowTagFilter }
   );
 
-  useEffect(() => {
-    if (!shouldShowTagFilter && filterColumnsValues.product_tag_ids?.length) {
-      setFilterColumnsValues((current) => {
-        const { product_tag_ids, ...rest } = current;
-
-        return rest;
-      });
-    }
-  }, [
-    shouldShowTagFilter,
-    filterColumnsValues.product_tag_ids,
-    setFilterColumnsValues,
-  ]);
+  useTagFilterCleanup(shouldShowTagFilter, 'product_tag_ids');
 
   const [sliderProductId, setSliderProductId] = useState<string>('');
   const [productSlider, setProductSlider] = useAtom(productSliderAtom);

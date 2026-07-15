@@ -8,7 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { useTitle } from '$app/common/hooks/useTitle';
-import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
+import { DataTable } from '$app/components/DataTable';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +22,6 @@ import {
   useActions,
   useAllRecurringExpenseColumns,
   useRecurringExpenseColumns,
-  useRecurringExpenseFilterColumns,
 } from '../common/hooks';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
@@ -57,30 +61,13 @@ export default function RecurringExpenses() {
   const selectedColumns =
     reactSettings?.react_table_columns?.recurringExpense || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
-  const filterColumns = useRecurringExpenseFilterColumns({
-    enabled: shouldShowTagFilter,
-  });
-
-  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
-    filterColumnsValuesAtom
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.recurringExpense,
+    'recurring_expense_tag_ids',
+    { enabled: shouldShowTagFilter }
   );
 
-  useEffect(() => {
-    if (
-      !shouldShowTagFilter &&
-      filterColumnsValues.recurring_expense_tag_ids?.length
-    ) {
-      setFilterColumnsValues((current) => {
-        const { recurring_expense_tag_ids, ...rest } = current;
-
-        return rest;
-      });
-    }
-  }, [
-    shouldShowTagFilter,
-    filterColumnsValues.recurring_expense_tag_ids,
-    setFilterColumnsValues,
-  ]);
+  useTagFilterCleanup(shouldShowTagFilter, 'recurring_expense_tag_ids');
 
   const disableNavigation = useDisableNavigation();
 

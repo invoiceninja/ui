@@ -9,14 +9,17 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
-import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
+import { DataTable } from '$app/components/DataTable';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useTransactionColumns } from '../common/hooks/useTransactionColumns';
-import { useTransactionFilterColumns } from '../common/hooks/useTransactionFilterColumns';
 import { ImportButton } from '$app/components/import/ImportButton';
-import { useEffect, useState } from 'react';
-import { useAtom } from 'jotai';
+import { useState } from 'react';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { Details } from '../components/Details';
 import { Slider } from '$app/components/cards/Slider';
@@ -69,33 +72,16 @@ export default function Transactions() {
   const selectedColumns =
     reactSettings?.react_table_columns?.transaction || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
-  const filterColumns = useTransactionFilterColumns({
-    enabled: shouldShowTagFilter,
-  });
-
-  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
-    filterColumnsValuesAtom
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.bankTransaction,
+    'bank_transaction_tag_ids',
+    { enabled: shouldShowTagFilter }
   );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'bank_transaction_tag_ids');
 
   const [sliderTitle, setSliderTitle] = useState<string>();
   const [transactionId, setTransactionId] = useState<string>('');
-
-  useEffect(() => {
-    if (
-      !shouldShowTagFilter &&
-      filterColumnsValues.bank_transaction_tag_ids?.length
-    ) {
-      setFilterColumnsValues((current) => {
-        const { bank_transaction_tag_ids, ...rest } = current;
-
-        return rest;
-      });
-    }
-  }, [
-    shouldShowTagFilter,
-    filterColumnsValues.bank_transaction_tag_ids,
-    setFilterColumnsValues,
-  ]);
 
   const getSelectedTransaction = (transaction: Transaction) => {
     setTransactionId(transaction.id);

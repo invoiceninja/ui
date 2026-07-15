@@ -10,7 +10,12 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
-import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
+import { DataTable } from '$app/components/DataTable';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { ImportButton } from '$app/components/import/ImportButton';
@@ -20,7 +25,6 @@ import {
   useActions,
   useAllRecurringInvoiceColumns,
   useRecurringInvoiceColumns,
-  useRecurringInvoiceFilterColumns,
   useRecurringInvoiceFilters,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
@@ -73,13 +77,13 @@ export default function RecurringInvoices() {
   const selectedColumns =
     reactSettings?.react_table_columns?.recurringInvoice || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
-  const filterColumns = useRecurringInvoiceFilterColumns({
-    enabled: shouldShowTagFilter,
-  });
-
-  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
-    filterColumnsValuesAtom
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.recurringInvoice,
+    'recurring_invoice_tag_ids',
+    { enabled: shouldShowTagFilter }
   );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'recurring_invoice_tag_ids');
 
   const [recurringInvoiceSlider, setRecurringInvoiceSlider] = useAtom(
     recurringInvoiceSliderAtom
@@ -98,23 +102,6 @@ export default function RecurringInvoices() {
   useEffect(() => {
     return () => setRecurringInvoiceSliderVisibility(false);
   }, []);
-
-  useEffect(() => {
-    if (
-      !shouldShowTagFilter &&
-      filterColumnsValues.recurring_invoice_tag_ids?.length
-    ) {
-      setFilterColumnsValues((current) => {
-        const { recurring_invoice_tag_ids, ...rest } = current;
-
-        return rest;
-      });
-    }
-  }, [
-    shouldShowTagFilter,
-    filterColumnsValues.recurring_invoice_tag_ids,
-    setFilterColumnsValues,
-  ]);
 
   return (
     <Default

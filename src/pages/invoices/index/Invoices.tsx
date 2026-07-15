@@ -9,7 +9,7 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
-import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
+import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useActions } from '../edit/components/Actions';
@@ -17,8 +17,12 @@ import {
   defaultColumns,
   useAllInvoiceColumns,
   useInvoiceColumns,
-  useInvoiceFilterColumns,
 } from '../common/hooks/useInvoiceColumns';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useInvoiceFilters } from '../common/hooks/useInvoiceFilters';
 import { ImportButton } from '$app/components/import/ImportButton';
@@ -86,13 +90,13 @@ export default function Invoices() {
   const selectedColumns =
     reactSettings?.react_table_columns?.invoice || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
-  const filterColumns = useInvoiceFilterColumns({
-    enabled: shouldShowTagFilter,
-  });
-
-  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
-    filterColumnsValuesAtom
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.invoice,
+    'invoice_tag_ids',
+    { enabled: shouldShowTagFilter }
   );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'invoice_tag_ids');
 
   useEffect(() => {
     if (invoiceResponse && invoiceSliderVisibility) {
@@ -103,20 +107,6 @@ export default function Invoices() {
   useEffect(() => {
     return () => setInvoiceSliderVisibility(false);
   }, []);
-
-  useEffect(() => {
-    if (!shouldShowTagFilter && filterColumnsValues.invoice_tag_ids?.length) {
-      setFilterColumnsValues((current) => {
-        const { invoice_tag_ids, ...rest } = current;
-
-        return rest;
-      });
-    }
-  }, [
-    shouldShowTagFilter,
-    filterColumnsValues.invoice_tag_ids,
-    setFilterColumnsValues,
-  ]);
 
   const {
     changeTemplateVisible,

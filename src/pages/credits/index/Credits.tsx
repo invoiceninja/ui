@@ -9,7 +9,7 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
-import { DataTable, filterColumnsValuesAtom } from '$app/components/DataTable';
+import { DataTable } from '$app/components/DataTable';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
@@ -18,8 +18,12 @@ import {
   useActions,
   useAllCreditColumns,
   useCreditColumns,
-  useCreditFilterColumns,
 } from '../common/hooks';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useCreditsFilters } from '../common/hooks/useCreditsFilters';
@@ -63,13 +67,14 @@ export default function Credits() {
   const selectedColumns =
     reactSettings?.react_table_columns?.credit || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
-  const filterColumns = useCreditFilterColumns({
-    enabled: shouldShowTagFilter,
-  });
-
-  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
-    filterColumnsValuesAtom
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.credit,
+    'credit_tag_ids',
+    { enabled: shouldShowTagFilter }
   );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'credit_tag_ids');
+
   const disableNavigation = useDisableNavigation();
 
   const [sliderCreditId, setSliderCreditId] = useState<string>('');
@@ -99,20 +104,6 @@ export default function Credits() {
     setChangeTemplateVisible,
     changeTemplateResources,
   } = useChangeTemplate();
-
-  useEffect(() => {
-    if (!shouldShowTagFilter && filterColumnsValues.credit_tag_ids?.length) {
-      setFilterColumnsValues((current) => {
-        const { credit_tag_ids, ...rest } = current;
-
-        return rest;
-      });
-    }
-  }, [
-    shouldShowTagFilter,
-    filterColumnsValues.credit_tag_ids,
-    setFilterColumnsValues,
-  ]);
 
   useSocketEvent({
     on: [
