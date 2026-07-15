@@ -64,6 +64,23 @@ export interface Template {
   type_id: number;
 }
 
+export interface ReminderSchedule {
+  id: string;
+  company_id: string;
+  template_id: string;
+  name: string;
+  trigger_event: string;
+  num_days: number;
+  schedule_direction: string;
+  enabled: boolean;
+  order: number;
+  is_deleted: boolean;
+  created_at: string;
+  updated_at: string;
+  archived_at: string | null;
+  template?: Template;
+}
+
 export interface DocuNinjaData {
   account: Account;
   companies?: Company[]; // Relation
