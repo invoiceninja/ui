@@ -47,6 +47,13 @@ const WidgetDefaults = lazy(
     )
 );
 
+const ReminderSchedules = lazy(
+  () =>
+    import(
+      '$app/pages/documents/pages/settings/pages/reminder-schedules/ReminderSchedules'
+    )
+);
+
 const Builder = lazy(() => import('$app/pages/documents/builder/Builder'));
 const BlueprintBuilder = lazy(
   () => import('$app/pages/documents/pages/blueprints/builder/BlueprintBuilder')
@@ -171,6 +178,17 @@ const routes = (
                     guards={[]}
                     type="subPage"
                     component={<WidgetDefaults />}
+                  />
+                }
+              />
+
+              <Route
+                path="reminder_schedules"
+                element={
+                  <DocuNinjaGuard
+                    guards={[docuNinjaAdmin()]}
+                    type="subPage"
+                    component={<ReminderSchedules />}
                   />
                 }
               />
