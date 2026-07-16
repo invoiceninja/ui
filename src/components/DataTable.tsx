@@ -191,7 +191,7 @@ interface Props<T> extends CommonProps {
   withoutPerPageAsPreference?: boolean;
   withoutPageAsPreference?: boolean;
   withoutStoringPreferences?: boolean;
-  withoutStoringStatusPreferences?: boolean;
+  withFilterTextOnly?: boolean;
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
   enableSavingFilterPreference?: boolean;
@@ -303,7 +303,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     onDeleteBulkAction,
     withoutPageAsPreference = false,
     withoutStoringPreferences = false,
-    withoutStoringStatusPreferences = false,
+    withFilterTextOnly = false,
     filterColumns,
     onSelectedResourcesChange,
     preSelected = [],
@@ -378,9 +378,6 @@ export function DataTable<T extends object>(props: Props<T>) {
     });
   }, []);
 
-  const withoutStoringPreferencesEffective =
-    withoutStoringPreferences || reactSettings.persist_table_filters === false;
-
   const { handleUpdateTableFilters } = useDataTablePreferences({
     apiEndpoint,
     isInitialConfiguration,
@@ -398,8 +395,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     defaultCustomFilterValues,
     withoutStoringPerPage: withoutPerPageAsPreference,
     withoutStoringPage: withoutPageAsPreference,
-    withoutStoringPreferences: withoutStoringPreferencesEffective,
-    withoutStoringStatusPreferences,
+    withoutStoringPreferences,
+    withFilterTextOnly,
     enableSavingFilterPreference,
   });
 
@@ -413,8 +410,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     tableKey: `${props.resource}s`,
     customFilter,
     customFilters,
-    withoutStoringPreferences: withoutStoringPreferencesEffective,
-    withoutStoringStatusPreferences,
+    withoutStoringPreferences,
+    withFilterTextOnly,
   });
 
   const normalizeNumericCommas = (value: string): string => {

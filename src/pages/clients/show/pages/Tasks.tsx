@@ -66,7 +66,7 @@ export default function Tasks() {
       linkToCreateGuards={[permission('create_task')]}
       hideEditableOptions={!hasPermission('edit_task')}
       withoutPageAsPreference
-      withoutStoringStatusPreferences
+      withFilterTextOnly
     />
   );
 }

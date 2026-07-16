@@ -42,7 +42,7 @@ interface Params {
   enableSavingFilterPreference?: boolean;
   withoutStoringPage?: boolean;
   withoutStoringPreferences?: boolean;
-  withoutStoringStatusPreferences?: boolean;
+  withFilterTextOnly?: boolean;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -70,11 +70,15 @@ export function useDataTablePreferences(params: Params) {
     enableSavingFilterPreference,
     withoutStoringPage,
     withoutStoringPreferences,
-    withoutStoringStatusPreferences,
+    withFilterTextOnly,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
   const storeSessionTableFilters = useStoreSessionTableFilters({ tableKey });
+
+  // The global toggle only gates server-side persistence. The session text
+  // filter always flows so it can bubble down to sub-tables (client overview).
+  const persistTableFilters = reactSettings.persist_table_filters !== false;
 
   const handleUpdateTableFilters = (
     filter: string,
@@ -84,7 +88,7 @@ export function useDataTablePreferences(params: Params) {
     status: string[],
     perPage: PerPage
   ) => {
-    if (withoutStoringPreferences || withoutStoringStatusPreferences) {
+    if (withoutStoringPreferences || withFilterTextOnly) {
       return;
     }
 
@@ -93,6 +97,12 @@ export function useDataTablePreferences(params: Params) {
     }
 
     if (!customFilter || !tableKey || !enableSavingFilterPreference) {
+      return;
+    }
+
+    // Session text filter already stored above; the toggle only skips the
+    // server-persisted status/sort/perPage/customFilter.
+    if (!persistTableFilters) {
       return;
     }
 
@@ -170,7 +180,7 @@ export function useDataTablePreferences(params: Params) {
       return;
     }
 
-    if (withoutStoringStatusPreferences) {
+    if (withFilterTextOnly || !persistTableFilters) {
       setFilter((getPreference('filter') as string) || '');
       setCustomFilter([]);
       setArePreferencesApplied(true);
