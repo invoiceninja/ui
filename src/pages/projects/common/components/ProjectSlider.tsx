@@ -126,7 +126,7 @@ export function ProjectSlider() {
 
   return (
     <Slider
-      size="regular"
+      size="large"
       visible={isVisible}
       onClose={onClose}
       title={currentProject?.name || `${t('project')}`}

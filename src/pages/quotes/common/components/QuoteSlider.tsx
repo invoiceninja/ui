@@ -396,7 +396,7 @@ export function QuoteSlider() {
             <>
               <div className="space-y-2 whitespace-nowrap px-6">
                 <Tooltip
-                  size="regular"
+                  size="large"
                   width="auto"
                   tooltipElement={
                     <article

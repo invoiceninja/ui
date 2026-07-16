@@ -174,7 +174,7 @@ export function CreditSlider() {
 
   return (
     <Slider
-      size="regular"
+      size="large"
       visible={isVisible}
       onClose={() => {
         setIsSliderVisible(false);
@@ -348,7 +348,7 @@ export function CreditSlider() {
             <>
               <div className="space-y-2 whitespace-nowrap px-6">
                 <Tooltip
-                  size="regular"
+                  size="large"
                   width="auto"
                   tooltipElement={
                     <article
@@ -484,7 +484,7 @@ export function CreditSlider() {
             </div>
           )}
 
-          {Boolean(credit?.line_items?.length) && (
+          {Boolean(invoiceResponse) && Boolean(credit?.line_items?.length) && (
             <Divider withoutPadding borderColor={colors.$20} />
           )}
 
