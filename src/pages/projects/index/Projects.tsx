@@ -11,6 +11,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { route } from '$app/common/helpers/route';
+import { useProjectQuery } from '$app/common/queries/projects';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  ProjectSlider,
+  projectSliderAtom,
+  projectSliderVisibilityAtom,
+} from '../common/components/ProjectSlider';
 import {
   DataTable,
   dateRangeAtom,
@@ -38,25 +45,18 @@ import { Button, InputLabel } from '$app/components/forms';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useAtom } from 'jotai';
 import { emitter } from '$app';
-import {
-  ProjectSlider,
-  projectSliderAtom,
-  projectSliderVisibilityAtom,
-} from '../common/components/ProjectSlider';
-import { useProjectQuery } from '$app/common/queries/projects';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export default function Projects() {
   useTitle('projects');
 
   const [t] = useTranslation();
   const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const pages = [{ name: t('projects'), href: '/projects' }];
 
   const actions = useActions();
   const reactSettings = useReactSettings();
-  const disableNavigation = useDisableNavigation();
   const selectedColumns =
     reactSettings?.react_table_columns?.project || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
