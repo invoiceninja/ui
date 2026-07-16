@@ -91,6 +91,7 @@ const successMessages = {
   mark_sent: 'marked_sent_invoices',
   email: 'emailed_invoices',
   mark_paid: 'marked_invoices_as_paid',
+  mark_paid_with_cash_discount: 'marked_invoices_as_paid',
   download: 'exported_data',
   cancel: 'cancelled_invoices',
   auto_bill: 'auto_billed_invoices',
@@ -113,10 +114,10 @@ export function useBulk(params?: Params) {
       | 'email'
       | 'mark_sent'
       | 'mark_paid'
+      | 'mark_paid_with_cash_discount'
       | 'download'
       | 'cancel'
-      | 'auto_bill'
-      | 'delete',
+      | 'auto_bill',
     emailType?: EmailType,
     additionalParams?: Record<string, unknown>
   ) => {

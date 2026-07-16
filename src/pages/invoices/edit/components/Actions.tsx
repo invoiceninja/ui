@@ -342,6 +342,27 @@ export function useActions(params?: Params) {
         </EntityActionElement>
       ),
     (invoice: Invoice) =>
+      parseInt(invoice.status_id) < parseInt(InvoiceStatus.Paid) &&
+      !invoice.is_deleted &&
+      Boolean(invoice.cash_discount) && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'mark_paid_with_cash_discount',
+          })}
+          entity="invoice"
+          actionKey="mark_paid_with_cash_discount"
+          isCommonActionSection={!dropdown}
+          tooltipText={`${t('mark_paid_with_cash_discount')}`}
+          onClick={() =>
+            markPaid(currentInvoice || invoice, { applyCashDiscount: true })
+          }
+          icon={MdPaid}
+          disablePreventNavigation
+        >
+          {t('mark_paid_with_cash_discount')}
+        </EntityActionElement>
+      ),
+    (invoice: Invoice) =>
       isInvoiceAutoBillable(invoice) &&
       shouldDisplayClientGatewaysAndAutoBill(invoice?.client) && (
         <EntityActionElement

@@ -29,6 +29,10 @@ export function useAllCommonActions() {
       { value: 'add_comment', label: t('add_comment') },
       { value: 'mark_sent', label: t('mark_sent') },
       { value: 'mark_paid', label: t('mark_paid') },
+      {
+        value: 'mark_paid_with_cash_discount',
+        label: `${t('mark_paid_with_cash_discount')}`,
+      },
       { value: 'auto_bill', label: t('auto_bill') },
       { value: 'enter_payment', label: t('enter_payment') },
       { value: 'client_portal', label: t('client_portal') },

@@ -22,12 +22,22 @@ export function useMarkPaid() {
 
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (invoice: Invoice) => {
+  return (
+    invoice: Invoice,
+    options?: {
+      applyCashDiscount?: boolean;
+    }
+  ) => {
     toast.processing();
 
     request(
       'PUT',
-      endpoint('/api/v1/invoices/:id?paid=true', { id: invoice.id }),
+      endpoint(
+        `/api/v1/invoices/:id?paid=true${
+          options?.applyCashDiscount ? '&apply_cash_discount=true' : ''
+        }`,
+        { id: invoice.id }
+      ),
       invoice
     ).then(() => {
       toast.success('marked_invoices_as_paid');
