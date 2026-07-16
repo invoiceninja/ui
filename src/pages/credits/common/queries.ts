@@ -49,6 +49,6 @@ export function useCreditQuery({ id }: CreditQueryProps) {
       ).then(
         (response: GenericSingleResourceResponse<Credit>) => response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: Boolean(id) }
   );
 }
