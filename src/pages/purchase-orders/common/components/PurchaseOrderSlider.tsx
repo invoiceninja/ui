@@ -492,9 +492,10 @@ export function PurchaseOrderSlider() {
             </div>
           )}
 
-          {Boolean(purchaseOrder?.line_items?.length) && (
-            <Divider withoutPadding borderColor={colors.$20} />
-          )}
+          {Boolean(expenseResponse) &&
+            Boolean(purchaseOrder?.line_items?.length) && (
+              <Divider withoutPadding borderColor={colors.$20} />
+            )}
 
           {purchaseOrder && Boolean(purchaseOrder.line_items?.length) && (
             <div className="flex flex-col space-y-3 px-6 py-5">
