@@ -97,7 +97,7 @@ export function PaymentSlider() {
 
   return (
     <Slider
-      size="regular"
+      size="large"
       visible={isVisible}
       onClose={() => {
         setIsSliderVisible(false);

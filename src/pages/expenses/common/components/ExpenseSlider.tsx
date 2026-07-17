@@ -53,7 +53,7 @@ export function ExpenseSlider() {
 
   return (
     <Slider
-      size="regular"
+      size="large"
       visible={isVisible}
       onClose={() => {
         setIsSliderVisible(false);
