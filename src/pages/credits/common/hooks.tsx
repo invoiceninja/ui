@@ -54,6 +54,7 @@ import {
   MdDelete,
   MdDesignServices,
   MdDownload,
+  MdEdit,
   MdMarkEmailRead,
   MdPaid,
   MdPictureAsPdf,
@@ -62,6 +63,8 @@ import {
   MdSchedule,
   MdSend,
 } from 'react-icons/md';
+import { Icon } from '$app/components/icons/Icon';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
@@ -396,6 +399,8 @@ export function useSave(props: CreateProps) {
 }
 
 interface Params {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
   dropdown?: boolean;
 }
 
@@ -404,7 +409,11 @@ export function useActions(params?: Params) {
 
   const hasPermission = useHasPermission();
 
-  const { dropdown = true } = params || {};
+  const {
+    showEditAction,
+    showCommonBulkAction,
+    dropdown = true,
+  } = params || {};
 
   const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
     useDisplayRunTemplateActions();
@@ -433,6 +442,16 @@ export function useActions(params?: Params) {
   } = useChangeTemplate();
 
   const actions: Action<Credit>[] = [
+    (credit) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/credits/:id/edit', { id: credit.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (credit) => (
       <EntityActionElement
         {...(!dropdown && {
@@ -658,9 +677,12 @@ export function useActions(params?: Params) {
         credit={credit}
       />
     ),
-    () => Boolean(isEditPage && dropdown) && <Divider withoutPadding />,
+    () =>
+      Boolean(
+        (isEditPage || Boolean(showCommonBulkAction)) && dropdown
+      ) && <Divider withoutPadding />,
     (credit) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       credit.archived_at === 0 && (
         <EntityActionElement
           {...(!dropdown && {
@@ -679,7 +701,7 @@ export function useActions(params?: Params) {
         </EntityActionElement>
       ),
     (credit) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       credit.archived_at > 0 && (
         <EntityActionElement
           {...(!dropdown && {
@@ -698,7 +720,7 @@ export function useActions(params?: Params) {
         </EntityActionElement>
       ),
     (credit) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       !credit?.is_deleted && (
         <EntityActionElement
           {...(!dropdown && {

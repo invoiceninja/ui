@@ -53,6 +53,7 @@ export default function Credits() {
 
   const [t] = useTranslation();
   const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const pages = [{ name: t('credits'), href: '/credits' }];
 
@@ -74,8 +75,6 @@ export default function Credits() {
   );
 
   useTagFilterCleanup(shouldShowTagFilter, 'credit_tag_ids');
-
-  const disableNavigation = useDisableNavigation();
 
   const [sliderCreditId, setSliderCreditId] = useState<string>('');
   const [creditSlider, setCreditSlider] = useAtom(creditSliderAtom);
