@@ -9,6 +9,7 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
+import paymentType from '$app/common/constants/payment-type';
 import { date, endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
@@ -23,7 +24,7 @@ import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
-import { Icon } from '$app/components/icons/Icon';
+import { Link } from '$app/components/forms';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
@@ -31,23 +32,12 @@ import { Upload } from '$app/pages/settings/company/documents/components';
 import { atom, useAtom } from 'jotai';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight } from 'react-feather';
-import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import { ExpenseStatus } from './ExpenseStatus';
 import { useActions } from '../hooks';
 import { useCalculateExpenseAmount } from '../hooks/useCalculateExpenseAmount';
 
 export const expenseSliderAtom = atom<Expense | null>(null);
 export const expenseSliderVisibilityAtom = atom(false);
-
-const Box = styled.div`
-  background-color: ${({ theme }) => theme.backgroundColor};
-
-  &:hover {
-    background-color: ${({ theme }) => theme.hoverBackgroundColor};
-  }
-`;
 
 interface StatCardProps {
   label: string;
@@ -80,7 +70,6 @@ export function ExpenseSlider() {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
-  const navigate = useNavigate();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -192,7 +181,7 @@ export function ExpenseSlider() {
                 {expense.number}
               </Element>
 
-              {Boolean(expense.vendor) && (
+              {expense.vendor && (
                 <Element
                   className="border-b border-dashed"
                   leftSide={t('vendor')}
@@ -201,7 +190,24 @@ export function ExpenseSlider() {
                   noExternalPadding
                   style={{ borderColor: colors.$20 }}
                 >
-                  {expense.vendor?.name}
+                  <Link to={route('/vendors/:id', { id: expense.vendor_id })}>
+                    {expense.vendor.name}
+                  </Link>
+                </Element>
+              )}
+
+              {expense.client && (
+                <Element
+                  className="border-b border-dashed"
+                  leftSide={t('client')}
+                  withoutWrappingLeftSide
+                  pushContentToRight
+                  noExternalPadding
+                  style={{ borderColor: colors.$20 }}
+                >
+                  <Link to={route('/clients/:id', { id: expense.client_id })}>
+                    {expense.client.display_name}
+                  </Link>
                 </Element>
               )}
 
@@ -269,41 +275,6 @@ export function ExpenseSlider() {
               </>
             )}
 
-            {expense.client && (
-              <>
-                <Divider withoutPadding borderColor={colors.$20} />
-
-                {renderSectionTitle(t('client'))}
-
-                <div className="px-6">
-                  <Box
-                    className="flex items-center justify-between p-4 shadow-sm border w-full cursor-pointer rounded-md"
-                    onClick={() => {
-                      setIsSliderVisible(false);
-                      setExpense(null);
-                      navigate(
-                        route('/clients/:id', { id: expense.client_id })
-                      );
-                    }}
-                    style={{ borderColor: colors.$20 }}
-                    theme={{
-                      backgroundColor: colors.$1,
-                      hoverBackgroundColor: colors.$4,
-                    }}
-                  >
-                    <span
-                      className="font-medium text-sm"
-                      style={{ color: colors.$3 }}
-                    >
-                      {expense.client.display_name}
-                    </span>
-
-                    <Icon element={ChevronRight} size={18} color={colors.$17} />
-                  </Box>
-                </div>
-              </>
-            )}
-
             {Boolean(expense.payment_date) && (
               <>
                 <Divider withoutPadding borderColor={colors.$20} />
@@ -312,13 +283,32 @@ export function ExpenseSlider() {
 
                 <div className="px-6">
                   <Element
+                    className={
+                      expense.payment_type_id ? 'border-b border-dashed' : ''
+                    }
                     leftSide={t('payment_date')}
                     withoutWrappingLeftSide
                     pushContentToRight
                     noExternalPadding
+                    style={{ borderColor: colors.$20 }}
                   >
                     {date(expense.payment_date, dateFormat)}
                   </Element>
+
+                  {Boolean(expense.payment_type_id) && (
+                    <Element
+                      leftSide={t('payment_type')}
+                      withoutWrappingLeftSide
+                      pushContentToRight
+                      noExternalPadding
+                    >
+                      {t(
+                        paymentType[
+                          expense.payment_type_id as keyof typeof paymentType
+                        ]
+                      )}
+                    </Element>
+                  )}
                 </div>
               </>
             )}
