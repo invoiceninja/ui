@@ -35,6 +35,7 @@ import {
   MdDelete,
   MdDesignServices,
   MdDownload,
+  MdEdit,
   MdInventory,
   MdMarkEmailRead,
   MdPageview,
@@ -45,6 +46,8 @@ import {
   MdSend,
   MdSwitchRight,
 } from 'react-icons/md';
+import { Icon } from '$app/components/icons/Icon';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { useNavigate } from 'react-router-dom';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { Divider } from '$app/components/cards/Divider';
@@ -437,11 +440,13 @@ export function usePurchaseOrderFilters() {
 }
 
 interface ActionsParams {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
   dropdown?: boolean;
 }
 
 export function useActions(params: ActionsParams = {}) {
-  const { dropdown = true } = params;
+  const { showEditAction, showCommonBulkAction, dropdown = true } = params;
 
   const [t] = useTranslation();
 
@@ -474,6 +479,16 @@ export function useActions(params: ActionsParams = {}) {
   } = useChangeTemplate();
 
   const actions: Action<PurchaseOrder>[] = [
+    (purchaseOrder) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/purchase_orders/:id/edit', { id: purchaseOrder.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (purchaseOrder) => (
       <EntityActionElement
         {...(!dropdown && {
@@ -714,10 +729,13 @@ export function useActions(params: ActionsParams = {}) {
           {t('run_template')}
         </EntityActionElement>
       ),
-    () => isEditPage && <Divider withoutPadding />,
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (purchaseOrder) =>
       Boolean(!purchaseOrder.archived_at) &&
-      isEditPage && (
+      (isEditPage || Boolean(showCommonBulkAction)) && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'archive',
@@ -736,7 +754,7 @@ export function useActions(params: ActionsParams = {}) {
       ),
     (purchaseOrder) =>
       Boolean(purchaseOrder.archived_at) &&
-      isEditPage && (
+      (isEditPage || Boolean(showCommonBulkAction)) && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'restore',
@@ -755,7 +773,7 @@ export function useActions(params: ActionsParams = {}) {
       ),
     (purchaseOrder) =>
       !purchaseOrder.is_deleted &&
-      isEditPage && (
+      (isEditPage || Boolean(showCommonBulkAction)) && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'delete',
