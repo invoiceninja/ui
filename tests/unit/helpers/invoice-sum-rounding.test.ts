@@ -414,7 +414,7 @@ describe('Zero-precision currency (JPY) rounding', () => {
     expect(result.invoice.amount).toEqual(11);
   });
 
-  it('keeps inclusive JPY line tax unrounded in invoice tax totals', () => {
+  it('rounds inclusive JPY line tax to currency precision in invoice tax totals', () => {
     const inv = makeInvoice({
       uses_inclusive_taxes: true,
       line_items: [makeLineItem({ cost: 10, tax_name1: 'Tax', tax_rate1: 10 })],
@@ -425,13 +425,13 @@ describe('Zero-precision currency (JPY) rounding', () => {
 
     expect(result.subTotal).toEqual(10);
     expect(item.tax_amount).toEqual(1);
-    expect(result.getTaxMap().first()?.total).toEqual(0.91);
-    expect(result.totalTaxes).toEqual(0.91);
-    expect(result.invoice.total_taxes).toEqual(0.91);
+    expect(result.getTaxMap().first()?.total).toEqual(1);
+    expect(result.totalTaxes).toEqual(1);
+    expect(result.invoice.total_taxes).toEqual(1);
     expect(result.invoice.amount).toEqual(10);
   });
 
-  it('rounds inclusive JPY display tax per component while keeping tax-map totals at 2 decimals', () => {
+  it('rounds inclusive JPY tax per component to currency precision with the shared net as base', () => {
     const inv = makeInvoice({
       uses_inclusive_taxes: true,
       line_items: [
@@ -451,10 +451,10 @@ describe('Zero-precision currency (JPY) rounding', () => {
 
     expect(item.tax_amount).toEqual(2);
     expect(item.net_cost).toEqual(13);
-    expect(taxRows.pluck('total').all()).toEqual([1.36, 1.36]);
-    expect(taxRows.pluck('base_amount').all()).toEqual([13.64, 13.64]);
-    expect(result.totalTaxes).toEqual(2.72);
-    expect(result.invoice.total_taxes).toEqual(2.72);
+    expect(taxRows.pluck('total').all()).toEqual([1, 1]);
+    expect(taxRows.pluck('base_amount').all()).toEqual([13, 13]);
+    expect(result.totalTaxes).toEqual(2);
+    expect(result.invoice.total_taxes).toEqual(2);
     expect(result.invoice.amount).toEqual(15);
   });
 });
@@ -757,7 +757,7 @@ describe('API parity invoice sum fields', () => {
     expect(result.invoice.amount).toEqual(1.02);
   });
 
-  it('uses the API combined-rate net cost formula for inclusive amount discounts', () => {
+  it('uses the additive combined-rate back-out for inclusive amount discounts', () => {
     const inv = makeInvoice({
       uses_inclusive_taxes: true,
       is_amount_discount: true,
@@ -777,10 +777,10 @@ describe('API parity invoice sum fields', () => {
     const result = new InvoiceSumInclusive(inv, USD).build();
     const item = result.invoice.line_items[0];
 
-    expect(item.tax_amount).toEqual(15.93);
+    expect(item.tax_amount).toEqual(15);
     expect(item.net_cost).toEqual(100);
-    expect(result.getTaxMap().pluck('total').all()).toEqual([10.45, 5.48]);
-    expect(result.totalTaxes).toEqual(15.93);
+    expect(result.getTaxMap().pluck('total').all()).toEqual([10, 5]);
+    expect(result.totalTaxes).toEqual(15);
   });
 
   it('keeps inclusive line totals at two decimals before JPY invoice rounding', () => {
