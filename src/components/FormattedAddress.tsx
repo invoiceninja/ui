@@ -1,16 +1,10 @@
 import { CSSProperties, Fragment } from 'react';
 import { formatAddress } from 'localized-address-format';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
+import { AddressFields } from '$app/common/interfaces/address';
 
 interface Props {
-  address: {
-    address1?: string;
-    address2?: string;
-    city?: string;
-    state?: string;
-    postal_code?: string;
-    country_id: string;
-  };
+  address: AddressFields;
   className?: string;
   style?: CSSProperties;
 }
