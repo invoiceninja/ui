@@ -125,6 +125,26 @@ export function Create() {
               disablePrecision
             />
           </CardContainer>
+
+          <CardContainer>
+            <NumberInputField
+              value={paymentTerm?.cash_discount_percent || ''}
+              label={t('cash_discount_percent')}
+              onValueChange={(value) => handleChange('cash_discount_percent', Number(value))}
+              errorMessage={errors?.errors.cash_discount_percent}
+            />
+          </CardContainer>
+
+          <CardContainer>
+            <NumberInputField
+              precision={0}
+              value={paymentTerm?.cash_discount_days || ''}
+              label={t('cash_discount_days')}
+              onValueChange={(value) => handleChange('cash_discount_days', Number(value))}
+              errorMessage={errors?.errors.cash_discount_days}
+              disablePrecision
+            />
+          </CardContainer>
         </Card>
       </Container>
     </Settings>

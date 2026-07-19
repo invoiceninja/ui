@@ -9,17 +9,20 @@
  */
 
 import { Card, CardContainer, Element } from '$app/components/cards';
+import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { usePaymentTermQuery } from '$app/common/queries/payment-terms';
 import { Badge } from '$app/components/Badge';
 import { Container } from '$app/components/Container';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
 import { useFormik } from 'formik';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { Actions } from './components/Actions';
@@ -44,6 +47,7 @@ export function Edit() {
   ];
 
   const { data } = usePaymentTermQuery({ id });
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const invalidatePaymentTermCache = () => {
     $refetch(['payment_terms']);
@@ -53,8 +57,11 @@ export function Edit() {
     enableReinitialize: true,
     initialValues: {
       num_days: data?.data.data.num_days || 0,
+      cash_discount_percent: data?.data.data.cash_discount_percent || 0,
+      cash_discount_days: data?.data.data.cash_discount_days || 0,
     },
     onSubmit: (values: Partial<PaymentTerm>) => {
+      setErrors(undefined);
       toast.processing();
 
       request(
@@ -63,6 +70,12 @@ export function Edit() {
         values
       )
         .then(() => toast.success('updated_payment_term'))
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            toast.dismiss();
+            setErrors(error.response.data);
+          }
+        })
         .finally(() => {
           formik.setSubmitting(false);
           invalidatePaymentTermCache();
@@ -107,11 +120,37 @@ export function Edit() {
             <CardContainer>
               <NumberInputField
                 precision={0}
+                required
                 value={formik.values.num_days || ''}
                 label={t('number_of_days')}
                 onValueChange={(value) =>
                   formik.setFieldValue('num_days', value)
                 }
+                errorMessage={errors?.errors.num_days}
+                disablePrecision
+              />
+            </CardContainer>
+
+            <CardContainer>
+              <NumberInputField
+                value={formik.values.cash_discount_percent || ''}
+                label={t('cash_discount_percent')}
+                onValueChange={(value) =>
+                  formik.setFieldValue('cash_discount_percent', value)
+                }
+                errorMessage={errors?.errors.cash_discount_percent}
+              />
+            </CardContainer>
+
+            <CardContainer>
+              <NumberInputField
+                precision={0}
+                value={formik.values.cash_discount_days || ''}
+                label={t('cash_discount_days')}
+                onValueChange={(value) =>
+                  formik.setFieldValue('cash_discount_days', value)
+                }
+                errorMessage={errors?.errors.cash_discount_days}
                 disablePrecision
               />
             </CardContainer>
