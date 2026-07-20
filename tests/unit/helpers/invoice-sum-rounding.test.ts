@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { InvoiceSum } from '../../../src/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '../../../src/common/helpers/invoices/invoice-sum-inclusive';
+import { InclusiveTax } from '../../../src/common/helpers/invoices/inclusive-tax';
 import { Invoice } from '../../../src/common/interfaces/invoice';
 import {
   InvoiceItem,
@@ -842,5 +843,47 @@ describe('calculateTotals no-op fix verification', () => {
 
     expect(result.total).toEqual(36.66);
     expect(result.invoice.amount).toEqual(36.66);
+  });
+});
+
+describe('Issue #12072 - inclusive multi-tax reproduction', () => {
+  it('backs $1000 out of two 10% inclusive taxes additively, not compounded', () => {
+    const { net, tax, components } = InclusiveTax.backout(1000, [10, 10, 0]);
+
+    expect(net).toEqual(833.34);
+    expect(tax).toEqual(166.66);
+    expect(components).toEqual([83.33, 83.33, 0]);
+    expect(net).not.toEqual(826.45);
+  });
+
+  it('shows the additive tax split and reconciling total on an inclusive invoice', () => {
+    const inv = makeInvoice({
+      uses_inclusive_taxes: true,
+      line_items: [
+        makeLineItem({
+          cost: 1000,
+          tax_name1: 'TEST TAX A',
+          tax_rate1: 10,
+          tax_name2: 'TEST TAX B',
+          tax_rate2: 10,
+        }),
+      ],
+    });
+
+    const result = new InvoiceSumInclusive(inv, USD).build();
+    const item = result.invoice.line_items[0];
+    const taxRows = result.getTaxMap();
+
+    expect(item.net_cost).toEqual(833.34);
+    expect(item.tax_amount).toEqual(166.66);
+    expect(taxRows.pluck('name').all()).toEqual([
+      'TEST TAX A 10 %',
+      'TEST TAX B 10 %',
+    ]);
+    expect(taxRows.pluck('total').all()).toEqual([83.33, 83.33]);
+    expect(result.totalTaxes).toEqual(166.66);
+    expect(result.invoice.total_taxes).toEqual(166.66);
+    expect(result.invoice.amount).toEqual(1000);
+    expect(result.getSubTotal()).toEqual(1000);
   });
 });
