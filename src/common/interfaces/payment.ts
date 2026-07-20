@@ -11,6 +11,7 @@
 import { Client } from './client';
 import { Credit } from './credit';
 import { Invoice } from './invoice';
+import { Tag } from './tag';
 
 export interface Payment {
   id: string;
@@ -48,6 +49,8 @@ export interface Payment {
   invoices?: Invoice[];
   credits?: Credit[];
   client?: Client;
+  tags?: Tag[];
+  payment_tag_ids?: string[];
 }
 
 export interface Paymentable {

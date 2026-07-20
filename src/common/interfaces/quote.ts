@@ -16,6 +16,7 @@ import { Payment } from './payment';
 import { Invitation } from './purchase-order';
 import { ScheduleItem } from './schedule';
 import { Sync } from './invoice';
+import { Tag } from './tag';
 
 export interface Quote {
   id: string;
@@ -89,5 +90,7 @@ export interface Quote {
   reminder_schedule?: string;
   location_id: string;
   schedule?: ScheduleItem[];
+  tags?: Tag[];
+  quote_tag_ids?: string[];
   sync?: Sync;
 }

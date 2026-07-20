@@ -8,25 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { PurchaseOrderStatus } from '$app/common/enums/purchase-order-status';
-import { date, endpoint, getEntityState } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import { SelectOption } from '$app/components/datatables/Actions';
-import { EntityStatus } from '$app/components/EntityStatus';
-import { Action } from '$app/components/ResourceActions';
 import { useSetAtom } from 'jotai';
-import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
-import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
@@ -49,35 +33,52 @@ import {
 import { Icon } from '$app/components/icons/Icon';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { useNavigate } from 'react-router-dom';
-import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
-import { Divider } from '$app/components/cards/Divider';
-import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { PurchaseOrderStatus as PurchaseOrderStatusBadge } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
-import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
-import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { EntityState } from '$app/common/enums/entity-state';
-import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { useBulk, useMarkSent } from '$app/common/queries/purchase-orders';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { CloneOptionsModal } from './components/CloneOptionsModal';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
-import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
-import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
-import { EntityActionElement } from '$app/components/EntityActionElement';
-import { Dispatch, SetStateAction } from 'react';
+import { PurchaseOrderStatus } from '$app/common/enums/purchase-order-status';
+import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBulk, useMarkSent } from '$app/common/queries/purchase-orders';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { Divider } from '$app/components/cards/Divider';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { SelectOption } from '$app/components/datatables/Actions';
+import { EntityActionElement } from '$app/components/EntityActionElement';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Link } from '$app/components/forms';
+import { Action } from '$app/components/ResourceActions';
+import { TagPills } from '$app/components/tags/TagPills';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
+import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
+import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
+import { PurchaseOrderStatus as PurchaseOrderStatusBadge } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { CloneOptionsModal } from './components/CloneOptionsModal';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -196,6 +197,7 @@ export function useAllPurchaseOrderColumns() {
     'documents',
     'entity_state',
     'exchange_rate',
+    'tags',
   ] as const;
 
   return purchaseOrderColumns.map((column) => normalizeColumnName(column));
@@ -389,6 +391,14 @@ export function usePurchaseOrderColumns() {
         id: 'exchange_rate',
         label: t('exchange_rate'),
         format: (value) => formatNumber(value),
+      },
+      {
+        column: 'tags',
+        id: 'purchase_order_tag_ids',
+        label: t('tags'),
+        format: (value, purchaseOrder) => (
+          <TagPills tags={purchaseOrder.tags} />
+        ),
       },
     ];
 

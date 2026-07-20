@@ -101,6 +101,7 @@ import classNames from 'classnames';
 import { Dispatch, SetStateAction } from 'react';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { TagPills } from '$app/components/tags/TagPills';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -794,6 +795,7 @@ export function useAllCreditColumns() {
     'tax_amount',
     'updated_at',
     'valid_until',
+    'tags',
     // 'vendor', @Todo: Need to fetch the relationship
   ] as const;
 
@@ -1121,6 +1123,12 @@ export function useCreditColumns() {
       id: 'due_date',
       label: t('valid_until'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'tags',
+      id: 'credit_tag_ids',
+      label: t('tags'),
+      format: (value, credit) => <TagPills tags={credit.tags} />,
     },
   ];
 
