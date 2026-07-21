@@ -32,6 +32,7 @@ import {
   MdControlPointDuplicate,
   MdDelete,
   MdDesignServices,
+  MdEdit,
   MdRestore,
   MdTextSnippet,
 } from 'react-icons/md';
@@ -78,8 +79,15 @@ import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTem
 import { Frequency } from '$app/common/enums/frequency';
 import { TagPills } from '$app/components/tags/TagPills';
 
-export function useActions() {
+interface ActionsParams {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
+}
+
+export function useActions(params?: ActionsParams) {
   const [t] = useTranslation();
+
+  const { showEditAction, showCommonBulkAction } = params || {};
 
   const hasPermission = useHasPermission();
 
@@ -133,6 +141,16 @@ export function useActions() {
 
   const actions: Action<Expense>[] = [
     (expense) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/expenses/:id/edit', { id: expense.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
+    (expense) =>
       expense.should_be_invoiced === true &&
       expense.invoice_id.length === 0 &&
       hasPermission('create_invoice') && (
@@ -182,10 +200,13 @@ export function useActions() {
           {t('run_template')}
         </DropdownElement>
       ),
-    () => isEditPage && <Divider withoutPadding />,
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (expense) =>
       getEntityState(expense) === EntityState.Active &&
-      isEditPage && (
+      (isEditPage || Boolean(showCommonBulkAction)) && (
         <DropdownElement
           onClick={() => bulk([expense.id], 'archive')}
           icon={<Icon element={MdArchive} />}
@@ -196,7 +217,7 @@ export function useActions() {
     (expense) =>
       (getEntityState(expense) === EntityState.Archived ||
         getEntityState(expense) === EntityState.Deleted) &&
-      isEditPage && (
+      (isEditPage || Boolean(showCommonBulkAction)) && (
         <DropdownElement
           onClick={() => bulk([expense.id], 'restore')}
           icon={<Icon element={MdRestore} />}
@@ -207,7 +228,7 @@ export function useActions() {
     (expense) =>
       (getEntityState(expense) === EntityState.Active ||
         getEntityState(expense) === EntityState.Archived) &&
-      isEditPage && (
+      (isEditPage || Boolean(showCommonBulkAction)) && (
         <DropdownElement
           onClick={() => bulk([expense.id], 'delete')}
           icon={<Icon element={MdDelete} />}
