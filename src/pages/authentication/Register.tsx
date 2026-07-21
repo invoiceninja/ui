@@ -147,10 +147,10 @@ export function Register() {
 
   return (
     <>
-      <div className="h-screen">
+      <div className="min-h-screen flex flex-col items-center justify-center py-8">
         <Header />
 
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center w-full">
           <div
             className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border"
             style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
@@ -221,7 +221,7 @@ export function Register() {
 
           {
             <>
-              <SignInProviders />
+              {/* <SignInProviders /> */}
 
               <div className="mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
                 <HostedLinks />
