@@ -40,6 +40,8 @@ import { NumberInputField } from '$app/components/forms/NumberInputField';
 import reactStringReplace from 'react-string-replace';
 import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 import { useColorScheme } from '$app/common/colors';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -223,6 +225,17 @@ export function Details(props: Props) {
               onClearButtonClick={() => handleChange('assigned_user_id', '')}
               onChange={(user) => handleChange('assigned_user_id', user.id)}
               errorMessage={errors?.errors.assigned_user_id}
+            />
+          </Element>
+        )}
+
+        {recurringExpense && (
+          <Element leftSide={t('tags')}>
+            <TagPillSelector
+              entityType={TAG_ENTITY_TYPES.recurringExpense}
+              value={recurringExpense.tags || []}
+              onChange={(tags) => handleChange('tags', tags)}
+              errorMessage={errors?.errors.tags}
             />
           </Element>
         )}

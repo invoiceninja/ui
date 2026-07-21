@@ -31,8 +31,12 @@ import {
   useAllProjectColumns,
   useCustomBulkActions,
   useProjectColumns,
-  useProjectFilterColumns,
 } from '../common/hooks';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { permission } from '$app/common/guards/guards/permission';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -61,9 +65,11 @@ export default function Projects() {
     reactSettings?.react_table_columns?.project || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
   const columns = useProjectColumns();
-  const filterColumns = useProjectFilterColumns({
-    enabled: shouldShowTagFilter,
-  });
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.project,
+    'project_tag_ids',
+    { enabled: shouldShowTagFilter }
+  );
   const projectColumns = useAllProjectColumns();
   const customBulkActions = useCustomBulkActions();
 
@@ -100,19 +106,7 @@ export default function Projects() {
     return () => setProjectSliderVisibility(false);
   }, []);
 
-  useEffect(() => {
-    if (!shouldShowTagFilter && filterColumnsValues.project_tag_ids?.length) {
-      setFilterColumnsValues((current) => {
-        const { project_tag_ids, ...rest } = current;
-
-        return rest;
-      });
-    }
-  }, [
-    shouldShowTagFilter,
-    filterColumnsValues.project_tag_ids,
-    setFilterColumnsValues,
-  ]);
+  useTagFilterCleanup(shouldShowTagFilter, 'project_tag_ids');
 
   const currentFilterColumnsCount = useMemo(
     () =>

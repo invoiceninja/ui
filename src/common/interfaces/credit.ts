@@ -15,6 +15,7 @@ import { Payment } from './payment';
 import { ScheduleItem } from './schedule';
 import { Invitation } from './purchase-order';
 import { Sync } from './invoice';
+import { Tag } from './tag';
 
 export interface Credit {
   id: string;
@@ -89,5 +90,7 @@ export interface Credit {
   location_id: string;
   schedule?: ScheduleItem[];
   backup?: Backup;
+  tags?: Tag[];
+  credit_tag_ids?: string[];
   sync?: Sync;
 }
