@@ -68,6 +68,7 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import dayjs from 'dayjs';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'status',
@@ -129,6 +130,7 @@ export function useAllRecurringExpenseColumns() {
     'frequency',
     'remaining_cycles',
     'next_send_date',
+    'tags',
   ] as const;
 
   return recurringExpenseColumns.map((column) => normalizeColumnName(column));
@@ -448,6 +450,14 @@ export function useRecurringExpenseColumns() {
         }
         return <span>{value}</span>;
       },
+    },
+    {
+      column: 'tags',
+      id: 'recurring_expense_tag_ids',
+      label: t('tags'),
+      format: (value, recurringExpense) => (
+        <TagPills tags={recurringExpense.tags} />
+      ),
     },
   ];
 

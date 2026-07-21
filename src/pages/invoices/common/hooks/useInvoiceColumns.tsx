@@ -48,6 +48,7 @@ import {
   PEPPOL_COUNTRIES,
   PEPPOL_CLASSIFICATIONS,
 } from '$app/common/helpers/peppol-countries';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -128,6 +129,7 @@ export function useAllInvoiceColumns() {
     'created_at',
     'updated_at',
     'project',
+    'tags',
     'recurring_invoice',
   ] as const;
 
@@ -663,6 +665,12 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'updated_at',
       label: t('last_updated'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'tags',
+      id: 'invoice_tag_ids',
+      label: t('tags'),
+      format: (value, invoice) => <TagPills tags={invoice.tags} />,
     },
   ];
 

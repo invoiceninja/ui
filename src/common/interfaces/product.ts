@@ -1,4 +1,5 @@
 import { Company } from './company.interface';
+import { Tag } from './tag';
 
 /**
  * Invoice Ninja (https://invoiceninja.com).
@@ -41,4 +42,6 @@ export interface Product {
   documents: any[];
   company?: Company;
   income_account_id: string;
+  tags?: Tag[];
+  product_tag_ids?: string[];
 }

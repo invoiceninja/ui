@@ -19,6 +19,11 @@ import {
   useAllProductColumns,
   useProductColumns,
 } from '../common/hooks';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { Guard } from '$app/common/guards/Guard';
@@ -26,6 +31,7 @@ import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { useProductQuery } from '$app/common/queries/products';
@@ -52,7 +58,20 @@ export default function Products() {
 
   const actions = useActions();
 
+  const reactSettings = useReactSettings();
+
   const customBulkActions = useCustomBulkActions();
+
+  const selectedColumns =
+    reactSettings?.react_table_columns?.product || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.product,
+    'product_tag_ids',
+    { enabled: shouldShowTagFilter }
+  );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'product_tag_ids');
 
   const [sliderProductId, setSliderProductId] = useState<string>('');
   const [productSlider, setProductSlider] = useAtom(productSliderAtom);
@@ -83,13 +102,16 @@ export default function Products() {
       <DataTable
         resource="product"
         columns={columns}
-        endpoint="/api/v1/products?include=company&sort=id|desc"
+        endpoint={`/api/v1/products?include=company${
+          shouldShowTagFilter ? ',tags' : ''
+        }&sort=id|desc${shouldShowTagFilter ? '' : '&tag_ids='}`}
         bulkRoute="/api/v1/products/bulk"
         linkToCreate="/products/create"
         linkToEdit="/products/:id/edit"
         withResourcefulActions
         customActions={actions}
         customBulkActions={customBulkActions}
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         rightSide={
           <div className="flex items-center space-x-2">
             <DataTableColumnsPicker

@@ -53,6 +53,7 @@ import {
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -92,6 +93,7 @@ export function useAllProductColumns() {
     'tax_rate2',
     'tax_rate3',
     'updated_at',
+    'tags',
   ] as const;
 
   return productColumns.map((column) => normalizeColumnName(column));
@@ -279,6 +281,12 @@ export function useProductColumns() {
       id: 'updated_at',
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'tags',
+      id: 'product_tag_ids',
+      label: t('tags'),
+      format: (value, product) => <TagPills tags={product.tags} />,
     },
   ];
 

@@ -32,6 +32,8 @@ import { useColorScheme } from '$app/common/colors';
 import { Trash } from '$app/components/icons/Trash';
 import { Plus } from '$app/components/icons/Plus';
 import classNames from 'classnames';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
 
 interface Props {
   vendor: Vendor;
@@ -292,6 +294,15 @@ export function Form(props: Props) {
                   <option value="government">{t('government')}</option>
                   <option value="other">{t('other')}</option>
                 </SelectField>
+              </Element>
+
+              <Element leftSide={t('tags')}>
+                <TagPillSelector
+                  entityType={TAG_ENTITY_TYPES.vendor}
+                  value={vendor?.tags || []}
+                  onChange={(tags) => handleChange('tags', tags)}
+                  errorMessage={errors?.errors.tags}
+                />
               </Element>
 
               {company?.custom_fields?.vendor1 && (
