@@ -20,6 +20,8 @@ import { ChangeHandler } from '../hooks';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
 import { PaymentTermsTooltip } from '$app/components/PaymentTermsTooltip';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -92,6 +94,15 @@ export function QuoteDetails(props: Props) {
             />
           </Element>
         )}
+
+        <Element leftSide={t('tags')}>
+          <TagPillSelector
+            entityType={TAG_ENTITY_TYPES.quote}
+            value={quote?.tags || []}
+            onChange={(tags) => handleChange('tags', tags)}
+            errorMessage={errors?.errors.tags}
+          />
+        </Element>
 
         {quote && company?.custom_fields?.invoice1 && (
           <CustomField

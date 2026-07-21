@@ -11,6 +11,7 @@
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { TabGroup } from '$app/components/TabGroup';
 import { Element } from '$app/components/cards';
+import classNames from 'classnames';
 import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
 import { atom, useAtom } from 'jotai';
@@ -50,6 +51,7 @@ import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
+import { TagPills } from '$app/components/tags/TagPills';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Upload } from '$app/pages/settings/company/documents/components';
@@ -225,12 +227,26 @@ export function TaskSlider() {
             </Element>
 
             <Element
+              className={classNames({
+                'border-b border-dashed': Boolean(task?.tags?.length),
+              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {task ? <TaskStatus entity={task} withoutDropdown /> : null}
             </Element>
+
+            {Boolean(task?.tags?.length) && (
+              <Element
+                leftSide={t('tags')}
+                pushContentToRight
+                noExternalPadding
+              >
+                <TagPills tags={task?.tags} />
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />
@@ -330,9 +346,7 @@ export function TaskSlider() {
             })}
             onSuccess={() => $refetch(['tasks'])}
             widgetOnly
-            disableUpload={
-              !hasPermission('edit_task') && !entityAssigned(task)
-            }
+            disableUpload={!hasPermission('edit_task') && !entityAssigned(task)}
           />
 
           <DocumentsTable

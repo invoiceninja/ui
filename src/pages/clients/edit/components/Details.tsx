@@ -22,6 +22,8 @@ import Toggle from '$app/components/forms/Toggle';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { useColorScheme } from '$app/common/colors';
 import { UserSelector } from '$app/components/users/UserSelector';
+import { Tag, TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
 interface Props {
   client: Client | undefined;
   setClient: Dispatch<SetStateAction<Client | undefined>>;
@@ -37,7 +39,10 @@ export function Details(props: Props) {
 
   const { data: groupSettings } = useGroupSettingsQuery();
 
-  const handleChange = (property: keyof Client, value: string | number) => {
+  const handleChange = (
+    property: keyof Client,
+    value: string | number | Tag[]
+  ) => {
     props.setErrors(undefined);
 
     props.setClient((client) => client && set({ ...client }, property, value));
@@ -105,6 +110,15 @@ export function Details(props: Props) {
           onChange={(user) => handleChange('assigned_user_id', user.id)}
           onClearButtonClick={() => handleChange('assigned_user_id', '')}
           errorMessage={props.errors?.errors.assigned_user_id}
+        />
+      </Element>
+
+      <Element leftSide={t('tags')}>
+        <TagPillSelector
+          entityType={TAG_ENTITY_TYPES.client}
+          value={props.client?.tags || []}
+          onChange={(tags) => handleChange('tags', tags)}
+          errorMessage={props.errors?.errors.tags}
         />
       </Element>
 

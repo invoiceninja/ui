@@ -76,6 +76,7 @@ import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/cust
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 import { Frequency } from '$app/common/enums/frequency';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -273,6 +274,7 @@ export function useAllExpenseColumns() {
     'transaction',
     'transaction_reference',
     'updated_at',
+    'tags',
   ] as const;
 
   return expenseColumns.map((column) => normalizeColumnName(column));
@@ -615,6 +617,12 @@ export function useExpenseColumns() {
           {expense?.project?.name}
         </Link>
       ),
+    },
+    {
+      column: 'tags',
+      id: 'expense_tag_ids',
+      label: t('tags'),
+      format: (value, expense) => <TagPills tags={expense.tags} />,
     },
   ];
 

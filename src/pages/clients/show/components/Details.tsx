@@ -25,6 +25,7 @@ import { PaymentTermsBadge } from './PaymentTermsBadge';
 import { TaxDataModal } from './TaxDataModal';
 import { TaxExemptBadge } from './TaxExemptBadge';
 import { Settings } from '$app/common/interfaces/company.interface';
+import { TagPills } from '$app/components/tags/TagPills';
 
 interface Props {
   client: Client;
@@ -102,6 +103,21 @@ export function Details(props: Props) {
                 <EntityStatus entity={client} />
               </div>
             </div>
+
+            {Boolean(client.tags?.length) && (
+              <div className="flex flex-col space-y-1">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('tags')}
+                </span>
+
+                <div>
+                  <TagPills tags={client.tags} />
+                </div>
+              </div>
+            )}
 
             <div className="flex flex-col space-y-1">
               <span

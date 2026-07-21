@@ -13,6 +13,7 @@ import { Client } from './client';
 import { ExpenseCategory } from './expense-category';
 import { Invoice } from './invoice';
 import { Project } from './project';
+import { Tag } from './tag';
 import { Vendor } from './vendor';
 
 export interface Expense {
@@ -69,4 +70,6 @@ export interface Expense {
   invoice?: Invoice;
   e_invoice?: EInvoiceType;
   project?: Project;
+  tags?: Tag[];
+  expense_tag_ids?: string[];
 }

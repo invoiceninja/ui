@@ -12,6 +12,7 @@ import { EInvoiceType } from '$app/pages/settings';
 import { ClientContact } from './client-contact';
 import { GroupSettings } from './group-settings';
 import { Location } from './location';
+import { Tag } from './tag';
 import { TaxInfo } from './tax-info';
 import { Timestamps } from './timestamps';
 
@@ -89,4 +90,6 @@ export interface Client extends Timestamps {
   e_invoice: EInvoiceType;
   locations: Location[];
   contact_email?: string;
+  tags?: Tag[];
+  client_tag_ids?: string[];
 }
