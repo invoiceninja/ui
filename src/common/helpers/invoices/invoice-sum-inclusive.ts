@@ -179,7 +179,10 @@ export class InvoiceSumInclusive {
   }
 
   public getNetSubtotal() {
-    return this.getSubTotal() - this.getTotalDiscount();
+    return roundToPrecision(
+      this.getSubTotal() - this.getTotalTaxes() - this.getTotalDiscount(),
+      2
+    );
   }
 
   protected calculateCustomValues() {

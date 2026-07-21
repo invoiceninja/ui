@@ -578,7 +578,7 @@ describe('API parity invoice sum fields', () => {
     expect(result.subTotal).toEqual(110);
     expect(result.totalDiscount).toEqual(10);
     expect(result.totalTaxes).toEqual(9.09);
-    expect(result.getNetSubtotal()).toEqual(100);
+    expect(result.getNetSubtotal()).toEqual(90.91);
   });
 
   it('keeps invoice-level taxes separate from line taxes', () => {
@@ -1068,5 +1068,61 @@ describe('Inclusive invoice totals - backend parity (PDF values)', () => {
       ).toEqual(line.line_total);
       expect(result.getTotal()).toEqual(result.getSubTotal());
     });
+  });
+
+  it('net subtotal backs out invoice-level inclusive taxes', () => {
+    const result = new InvoiceSumInclusive(
+      makeInvoice({
+        uses_inclusive_taxes: true,
+        tax_name1: 'TAX A',
+        tax_rate1: 10,
+        tax_name2: 'TAX B',
+        tax_rate2: 10,
+        line_items: [makeLineItem({ cost: 1000 })],
+      }),
+      USD
+    ).build();
+
+    expect(result.getSubTotal()).toEqual(1000);
+    expect(result.getTotalTaxes()).toEqual(166.66);
+    expect(result.getNetSubtotal()).toEqual(833.34);
+    expect(result.getTotal()).toEqual(1000);
+  });
+
+  it('net subtotal subtracts inclusive taxes and discount together', () => {
+    const result = new InvoiceSumInclusive(
+      twentyInclusive({
+        discount: 5,
+        is_amount_discount: true,
+        tax_name1: 'GST',
+        tax_rate1: 10,
+      }),
+      USD
+    ).build();
+
+    expect(result.getSubTotal()).toEqual(20);
+    expect(result.getTotalTaxes()).toEqual(1.36);
+    expect(result.getTotalDiscount()).toEqual(5);
+    expect(result.getNetSubtotal()).toEqual(13.64);
+  });
+
+  it('net subtotal backs out line-level inclusive taxes', () => {
+    const result = new InvoiceSumInclusive(
+      makeInvoice({
+        uses_inclusive_taxes: true,
+        line_items: [
+          makeLineItem({
+            cost: 1000,
+            tax_name1: 'GST',
+            tax_rate1: 10,
+            tax_name2: 'PST',
+            tax_rate2: 10,
+          }),
+        ],
+      }),
+      USD
+    ).build();
+
+    expect(result.getNetSubtotal()).toEqual(833.34);
   });
 });
