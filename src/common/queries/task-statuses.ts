@@ -46,7 +46,7 @@ export function useTaskStatusesQuery(params?: Params) {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/task_statuses?status=:status', {
+        endpoint('/api/v1/task_statuses?status=:status&sort=id|asc', {
           status: params?.status || 'all',
         })
       ).then((response) => response.data),

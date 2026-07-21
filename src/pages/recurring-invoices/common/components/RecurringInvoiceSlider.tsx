@@ -61,6 +61,7 @@ import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
 import { ChevronRight } from 'react-feather';
 import { Icon } from '$app/components/icons/Icon';
+import { TagPills } from '$app/components/tags/TagPills';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Upload } from '$app/pages/settings/company/documents/components';
@@ -338,6 +339,18 @@ export const RecurringInvoiceSlider = () => {
                 <RecurringInvoiceStatus entity={recurringInvoice} />
               ) : null}
             </Element>
+
+            {recurringInvoice && Boolean(recurringInvoice.tags?.length) && (
+              <Element
+                className="border-b border-dashed"
+                leftSide={t('tags')}
+                pushContentToRight
+                noExternalPadding
+                style={{ borderColor: colors.$20 }}
+              >
+                <TagPills tags={recurringInvoice.tags} />
+              </Element>
+            )}
 
             {(resource?.recurring_dates || [])?.length > 0 && (
               <Element
