@@ -1,4 +1,4 @@
-import { CSSProperties, Fragment } from 'react';
+import { CSSProperties, Fragment, useMemo } from 'react';
 import { formatAddress } from 'localized-address-format';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { AddressFields } from '$app/common/interfaces/address';
@@ -11,7 +11,11 @@ interface Props {
 
 export function FormattedAddress(props: Props) {
   const resolveCountry = useResolveCountry();
-  const country = resolveCountry(props.address.country_id);
+
+  const country = useMemo(
+    () => resolveCountry(props.address.country_id),
+    [props.address.country_id]
+  );
 
   const addressLines = [
     ...formatAddress({
