@@ -69,7 +69,7 @@ export default function Projects() {
       linkToCreateGuards={[permission('create_project')]}
       hideEditableOptions={!hasPermission('edit_project')}
       withoutPageAsPreference
-      withoutStoringSearchFilter
+      withFilterTextOnly
     />
   );
 }
