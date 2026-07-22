@@ -35,7 +35,9 @@ export function useBlankExpenseQuery(params: BlankQueryParams) {
         (response) => response.data.data
       ),
     {
-      enabled: hasPermission('create_expense') ? params.enabled ?? true : false,
+      enabled: hasPermission('create_expense')
+        ? (params.enabled ?? true)
+        : false,
       staleTime: Infinity,
     }
   );
@@ -52,7 +54,9 @@ export function useExpenseQuery(params: ExpenseParams) {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/expenses/:id?include=category', { id: params.id })
+        endpoint('/api/v1/expenses/:id?include=category,vendor,client', {
+          id: params.id,
+        })
       ).then((response) => response.data.data),
     { enabled: params.enabled ?? true, staleTime: Infinity }
   );

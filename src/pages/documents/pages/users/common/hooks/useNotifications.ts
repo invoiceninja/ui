@@ -10,22 +10,30 @@
 
 import { useState, useCallback } from 'react';
 import { User } from '$app/common/interfaces/docuninja/api';
-import { NOTIFICATION_VALUES, NotificationValue } from '../constants/notifications';
+import {
+  NOTIFICATION_VALUES,
+  NotificationValue,
+} from '../constants/notifications';
 
 export interface UseNotificationsReturn {
   notifications: Record<string, string>;
-  setNotifications: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setNotifications: React.Dispatch<
+    React.SetStateAction<Record<string, string>>
+  >;
   allNotificationsValue: NotificationValue;
-  setAllNotificationsValue: React.Dispatch<React.SetStateAction<NotificationValue>>;
+  setAllNotificationsValue: React.Dispatch<
+    React.SetStateAction<NotificationValue>
+  >;
   adjustNotificationsForPayload: () => string[];
   initializeNotifications: (user: User) => void;
 }
 
 export function useNotifications(): UseNotificationsReturn {
-  const [notifications, setNotifications] = useState<Record<string, string>>({});
-  const [allNotificationsValue, setAllNotificationsValue] = useState<NotificationValue>(
-    NOTIFICATION_VALUES.NONE
+  const [notifications, setNotifications] = useState<Record<string, string>>(
+    {}
   );
+  const [allNotificationsValue, setAllNotificationsValue] =
+    useState<NotificationValue>(NOTIFICATION_VALUES.NONE);
 
   const initializeNotifications = useCallback((user: User) => {
     if (!user?.company_user?.notifications) {
@@ -35,7 +43,7 @@ export function useNotifications(): UseNotificationsReturn {
     }
 
     const userNotifications = user.company_user.notifications;
-    
+
     // Determine the overall notification setting
     let overallValue: NotificationValue;
     if (userNotifications.includes('all')) {
@@ -53,7 +61,7 @@ export function useNotifications(): UseNotificationsReturn {
     // Initialize individual notifications for custom mode
     if (overallValue === NOTIFICATION_VALUES.CUSTOM) {
       const initialNotifications: Record<string, string> = {};
-      
+
       for (const notificationId of userNotifications) {
         const id = String(notificationId);
         if (id.endsWith('_user')) {
@@ -63,7 +71,7 @@ export function useNotifications(): UseNotificationsReturn {
           initialNotifications[id] = NOTIFICATION_VALUES.ALL;
         }
       }
-      
+
       setNotifications(initialNotifications);
     } else {
       setNotifications({});
@@ -71,11 +79,13 @@ export function useNotifications(): UseNotificationsReturn {
   }, []);
 
   const adjustNotificationsForPayload = useCallback((): string[] => {
-    if (allNotificationsValue === NOTIFICATION_VALUES.ALL || 
-        allNotificationsValue === NOTIFICATION_VALUES.ALL_USER) {
+    if (
+      allNotificationsValue === NOTIFICATION_VALUES.ALL ||
+      allNotificationsValue === NOTIFICATION_VALUES.ALL_USER
+    ) {
       return [allNotificationsValue];
     }
-    
+
     if (allNotificationsValue === NOTIFICATION_VALUES.NONE) {
       return [];
     }
@@ -106,4 +116,3 @@ export function useNotifications(): UseNotificationsReturn {
     initializeNotifications,
   };
 }
-

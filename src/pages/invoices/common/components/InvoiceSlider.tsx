@@ -71,6 +71,11 @@ import { History } from '$app/components/icons/History';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { Icon } from '$app/components/icons/Icon';
 import { ChevronRight } from 'react-feather';
+import { TagPills } from '$app/components/tags/TagPills';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -280,7 +285,7 @@ export function InvoiceSlider() {
         setIsSliderVisible(false);
         setInvoice(null);
       }}
-      size="regular"
+      size="large"
       title={`${t('invoice')} ${invoice?.number}`}
       topRight={
         invoice &&
@@ -296,8 +301,24 @@ export function InvoiceSlider() {
       withoutHeaderBorder
     >
       <TabGroup
-        tabs={[t('overview'), t('history'), t('activity'), t('email_history')]}
+        tabs={[
+          t('overview'),
+          t('history'),
+          t('activity'),
+          t('email_history'),
+          t('documents'),
+        ]}
         width="full"
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 4) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={invoice?.documents?.length}
+                textCenter
+              />
+            );
+          }
+        }}
         withHorizontalPadding
         horizontalPaddingWidth="1.5rem"
       >
@@ -376,12 +397,26 @@ export function InvoiceSlider() {
             ) : null}
 
             <Element
+              className={classNames({
+                'border-b border-dashed': Boolean(invoice?.tags?.length),
+              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {invoice ? <InvoiceStatus entity={invoice} /> : null}
             </Element>
+
+            {Boolean(invoice?.tags?.length) && (
+              <Element
+                leftSide={t('tags')}
+                pushContentToRight
+                noExternalPadding
+              >
+                <TagPills tags={invoice?.tags} />
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />
@@ -452,7 +487,7 @@ export function InvoiceSlider() {
             <>
               <div className="space-y-2 whitespace-nowrap px-6">
                 <Tooltip
-                  size="regular"
+                  size="large"
                   width="auto"
                   tooltipElement={
                     <article
@@ -784,6 +819,27 @@ export function InvoiceSlider() {
               withAllBorders
             />
           ))}
+        </div>
+
+        <div className="px-4">
+          <Upload
+            endpoint={endpoint('/api/v1/invoices/:id/upload', {
+              id: invoice?.id,
+            })}
+            onSuccess={() => $refetch(['invoices'])}
+            widgetOnly
+            disableUpload={
+              !hasPermission('edit_invoice') && !entityAssigned(invoice)
+            }
+          />
+
+          <DocumentsTable
+            documents={invoice?.documents || []}
+            onDocumentDelete={() => $refetch(['invoices'])}
+            disableEditableOptions={
+              !entityAssigned(invoice, true) && !hasPermission('edit_invoice')
+            }
+          />
         </div>
       </TabGroup>
 

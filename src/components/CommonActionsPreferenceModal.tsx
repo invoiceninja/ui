@@ -67,7 +67,9 @@ export function CommonActionsPreferenceModal(props: Props) {
   // Avoid re-seeding on atom reference churn from unrelated settings writes.
   const lastHydratedActionsRef = useRef(reactSettings.common_actions);
   useEffect(() => {
-    if (!isEqual(reactSettings.common_actions, lastHydratedActionsRef.current)) {
+    if (
+      !isEqual(reactSettings.common_actions, lastHydratedActionsRef.current)
+    ) {
       lastHydratedActionsRef.current = reactSettings.common_actions;
       setCommonActionsPreferences(reactSettings.common_actions);
     }

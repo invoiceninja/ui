@@ -11,10 +11,5 @@
 import { RegionComponent } from './RegionComponent';
 
 export function AndorraRegions() {
-  return (
-    <RegionComponent
-      regionCode="AD"
-      regionName="Andorra"
-    />
-  );
+  return <RegionComponent regionCode="AD" regionName="Andorra" />;
 }

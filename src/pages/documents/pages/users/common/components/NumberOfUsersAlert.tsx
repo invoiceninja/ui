@@ -21,14 +21,14 @@ export function NumberOfUsersAlert() {
   // Get DocuNinja account data from unified atoms (NO QUERY!)
   const [docuData] = useAtom(docuNinjaAtom);
   const docuAccount = docuData?.account;
-  
+
   // Get actual DocuNinja users count from API
-  const { data: docuNinjaUsersData } = useDocuNinjaUsersQuery({ 
-    perPage: '1', 
-    currentPage: '1', 
-    filter: '' 
+  const { data: docuNinjaUsersData } = useDocuNinjaUsersQuery({
+    perPage: '1',
+    currentPage: '1',
+    filter: '',
   });
-  
+
   const currentUserCount = docuNinjaUsersData?.data?.meta?.total || 0;
   const maxUsers = docuAccount?.num_users || 0;
 

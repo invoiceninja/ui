@@ -8,12 +8,38 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { usePurchaseOrderQuery } from '$app/common/queries/purchase-orders';
 import { Page } from '$app/components/Breadcrumbs';
 import { DataTable } from '$app/components/DataTable';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { InputLabel } from '$app/components/forms';
+import { ImportButton } from '$app/components/import/ImportButton';
 import { Default } from '$app/components/layouts/Default';
-import { useTranslation } from 'react-i18next';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import {
+  PurchaseOrderSlider,
+  purchaseOrderSliderAtom,
+  purchaseOrderSliderVisibilityAtom,
+} from '../common/components/PurchaseOrderSlider';
 import {
   defaultColumns,
   useActions,
@@ -21,19 +47,8 @@ import {
   usePurchaseOrderColumns,
   usePurchaseOrderFilters,
 } from '../common/hooks';
-import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import {
-  ChangeTemplateModal,
-  useChangeTemplate,
-} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
-import { InputLabel } from '$app/components/forms';
-import { Guard } from '$app/common/guards/Guard';
-import { or } from '$app/common/guards/guards/or';
-import { ImportButton } from '$app/components/import/ImportButton';
 
 export default function PurchaseOrders() {
   const { documentTitle } = useTitle('purchase_orders');
@@ -47,11 +62,50 @@ export default function PurchaseOrders() {
   ];
 
   const actions = useActions();
+  const reactSettings = useReactSettings();
   const filters = usePurchaseOrderFilters();
   const columns = usePurchaseOrderColumns();
   const dateRangeColumns = useDateRangeColumns();
   const customBulkActions = useCustomBulkActions();
   const purchaseOrderColumns = useAllPurchaseOrderColumns();
+
+  const selectedColumns =
+    reactSettings?.react_table_columns?.purchaseOrder || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.purchaseOrder,
+    'purchase_order_tag_ids',
+    { enabled: shouldShowTagFilter }
+  );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'purchase_order_tag_ids');
+  const disableNavigation = useDisableNavigation();
+
+  const [sliderPurchaseOrderId, setSliderPurchaseOrderId] =
+    useState<string>('');
+  const [purchaseOrderSlider, setPurchaseOrderSlider] = useAtom(
+    purchaseOrderSliderAtom
+  );
+  const [purchaseOrderSliderVisibility, setPurchaseOrderSliderVisibility] =
+    useAtom(purchaseOrderSliderVisibilityAtom);
+
+  const { data: purchaseOrderResponse } = usePurchaseOrderQuery({
+    id: sliderPurchaseOrderId,
+  });
+
+  useEffect(() => {
+    setPurchaseOrderSlider(null);
+  }, [sliderPurchaseOrderId]);
+
+  useEffect(() => {
+    if (purchaseOrderResponse && purchaseOrderSliderVisibility) {
+      setPurchaseOrderSlider(purchaseOrderResponse);
+    }
+  }, [purchaseOrderResponse, purchaseOrderSliderVisibility]);
+
+  useEffect(() => {
+    return () => setPurchaseOrderSliderVisibility(false);
+  }, []);
 
   const {
     changeTemplateVisible,
@@ -63,7 +117,11 @@ export default function PurchaseOrders() {
     <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
         resource="purchase_order"
-        endpoint="/api/v1/purchase_orders?include=vendor,expense&without_deleted_vendors=true&sort=id|desc"
+        endpoint={`/api/v1/purchase_orders?include=vendor,expense${
+          shouldShowTagFilter ? ',tags' : ''
+        }&without_deleted_vendors=true&sort=id|desc${
+          shouldShowTagFilter ? '' : '&tag_ids='
+        }`}
         bulkRoute="/api/v1/purchase_orders/bulk"
         linkToCreate="/purchase_orders/create"
         linkToEdit="/purchase_orders/:id/edit"
@@ -72,6 +130,7 @@ export default function PurchaseOrders() {
         customBulkActions={customBulkActions}
         customFilters={filters}
         customFilterPlaceholder="status"
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         withResourcefulActions
         rightSide={
           <div className="flex items-center space-x-2">
@@ -96,9 +155,17 @@ export default function PurchaseOrders() {
         dateRangeColumns={dateRangeColumns}
         linkToCreateGuards={[permission('create_purchase_order')]}
         hideEditableOptions={!hasPermission('edit_purchase_order')}
+        onTableRowClick={(purchaseOrder) => {
+          setSliderPurchaseOrderId(purchaseOrder.id);
+          setPurchaseOrderSliderVisibility(true);
+        }}
         enableSavingFilterPreference
         enableSavingLatestDataForNavigation
       />
+
+      {!disableNavigation('purchase_order', purchaseOrderSlider) && (
+        <PurchaseOrderSlider />
+      )}
 
       <ChangeTemplateModal<PurchaseOrder>
         entity="purchase_order"

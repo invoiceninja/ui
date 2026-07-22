@@ -11,6 +11,7 @@
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { TabGroup } from '$app/components/TabGroup';
 import { Element } from '$app/components/cards';
+import classNames from 'classnames';
 import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
 import { atom, useAtom } from 'jotai';
@@ -41,6 +42,11 @@ import { useColorScheme } from '$app/common/colors';
 import { useNavigate } from 'react-router-dom';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { useGenerateActivityElement } from '../hooks/useGenerateActivityElement';
+import { TagPills } from '$app/components/tags/TagPills';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const paymentSliderAtom = atom<Payment | null>(null);
 export const paymentSliderVisibilityAtom = atom(false);
@@ -93,7 +99,7 @@ export function PaymentSlider() {
 
   return (
     <Slider
-      size="regular"
+      size="large"
       visible={isVisible}
       onClose={() => {
         setIsSliderVisible(false);
@@ -114,8 +120,18 @@ export function PaymentSlider() {
       withoutHeaderBorder
     >
       <TabGroup
-        tabs={[t('overview'), t('activity')]}
+        tabs={[t('overview'), t('activity'), t('documents')]}
         width="full"
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 2) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={payment?.documents?.length}
+                textCenter
+              />
+            );
+          }
+        }}
         withHorizontalPadding
         horizontalPaddingWidth="1.5rem"
       >
@@ -177,12 +193,26 @@ export function PaymentSlider() {
             </Element>
 
             <Element
+              className={classNames({
+                'border-b border-dashed': Boolean(payment?.tags?.length),
+              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {payment ? <PaymentStatus entity={payment} /> : null}
             </Element>
+
+            {Boolean(payment?.tags?.length) && (
+              <Element
+                leftSide={t('tags')}
+                pushContentToRight
+                noExternalPadding
+              >
+                <TagPills tags={payment?.tags} />
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />
@@ -335,6 +365,27 @@ export function PaymentSlider() {
               </Box>
             ))}
           </div>
+        </div>
+
+        <div className="px-4">
+          <Upload
+            endpoint={endpoint('/api/v1/payments/:id/upload', {
+              id: payment?.id,
+            })}
+            onSuccess={() => $refetch(['payments'])}
+            widgetOnly
+            disableUpload={
+              !hasPermission('edit_payment') && !entityAssigned(payment)
+            }
+          />
+
+          <DocumentsTable
+            documents={payment?.documents || []}
+            onDocumentDelete={() => $refetch(['payments'])}
+            disableEditableOptions={
+              !entityAssigned(payment, true) && !hasPermission('edit_payment')
+            }
+          />
         </div>
       </TabGroup>
     </Slider>

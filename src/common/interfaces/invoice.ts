@@ -15,6 +15,7 @@ import { Invitation } from './purchase-order';
 import { ScheduleItem } from './schedule';
 import { TaxInfo } from './tax-info';
 import { Project } from './project';
+import { Tag } from './tag';
 export interface Invoice {
   id: string;
   user_id: string;
@@ -91,6 +92,8 @@ export interface Invoice {
   schedule?: ScheduleItem[];
   project?: Project;
   modified_invoice_id?: string;
+  tags?: Tag[];
+  invoice_tag_ids?: string[];
   sync?: Sync;
 }
 

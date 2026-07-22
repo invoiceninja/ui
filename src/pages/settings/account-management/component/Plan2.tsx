@@ -64,7 +64,7 @@ export function Plan2() {
   const { calculatePrice } = useEnterpriseUtils();
   const { t } = useTranslation();
   const isPaid = useIsPaid();
-  
+
   if (!account || !plans) {
     return null;
   }
@@ -189,7 +189,7 @@ export function Plan2() {
         </div>
       </div>
 
-    {/* {isPaid && <DocuNinja />} */}
+      {/* {isPaid && <DocuNinja />} */}
 
       <div className="px-7 pt-3">
         <Divider

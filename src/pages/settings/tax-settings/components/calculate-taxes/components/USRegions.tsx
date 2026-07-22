@@ -102,7 +102,7 @@ export function USRegions() {
                 if (e.target instanceof HTMLInputElement) {
                   return;
                 }
-                
+
                 divClickIntercept(
                   `tax_data.regions.US.subregions.${value[0]}.apply_tax`
                 );

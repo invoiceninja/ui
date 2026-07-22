@@ -18,6 +18,11 @@ import {
   useAllClientColumns,
   useClientColumns,
 } from '../common/hooks/useClientColumns';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { useActions } from '../common/hooks/useActions';
@@ -32,19 +37,69 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Client } from '$app/common/interfaces/client';
 import { InputLabel } from '$app/components/forms';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useEffect, useState } from 'react';
+import { useAtom } from 'jotai';
+import { useClientQuery } from '$app/common/queries/clients';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  ClientSlider,
+  clientSliderAtom,
+  clientSliderVisibilityAtom,
+} from '../common/components/ClientSlider';
 
 export default function Clients() {
   useTitle('clients');
 
   const [t] = useTranslation();
   const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const pages: Page[] = [{ name: t('clients'), href: '/clients' }];
 
   const actions = useActions();
   const columns = useClientColumns();
+  const reactSettings = useReactSettings();
   const clientColumns = useAllClientColumns();
   const customBulkActions = useCustomBulkActions();
+
+  const selectedColumns =
+    reactSettings?.react_table_columns?.client || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.client,
+    'client_tag_ids',
+    { enabled: shouldShowTagFilter }
+  );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'client_tag_ids');
+
+  const [sliderClientId, setSliderClientId] = useState<string>('');
+  const [clientSlider, setClientSlider] = useAtom(clientSliderAtom);
+  const [clientSliderVisibility, setClientSliderVisibility] = useAtom(
+    clientSliderVisibilityAtom
+  );
+
+  const { data: clientResponse } = useClientQuery({
+    id: sliderClientId,
+    enabled: Boolean(sliderClientId),
+  });
+
+  useEffect(() => {
+    if (sliderClientId) {
+      setClientSlider(null);
+    }
+  }, [sliderClientId]);
+
+  useEffect(() => {
+    if (clientResponse && clientSliderVisibility) {
+      setClientSlider(clientResponse);
+    }
+  }, [clientResponse, clientSliderVisibility]);
+
+  useEffect(() => {
+    return () => setClientSliderVisibility(false);
+  }, []);
 
   const {
     changeTemplateVisible,
@@ -56,7 +111,9 @@ export default function Clients() {
     <Default breadcrumbs={pages} title={t('clients')} docsLink="en/clients">
       <DataTable
         resource="client"
-        endpoint="/api/v1/clients?include=group_settings&sort=id|desc"
+        endpoint={`/api/v1/clients?include=group_settings${
+          shouldShowTagFilter ? ',tags' : ''
+        }&sort=id|desc${shouldShowTagFilter ? '' : '&tag_ids='}`}
         bulkRoute="/api/v1/clients/bulk"
         columns={columns}
         linkToCreate="/clients/create"
@@ -65,6 +122,7 @@ export default function Clients() {
         customActions={actions}
         bottomActionsKeys={['purge']}
         customBulkActions={customBulkActions}
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         rightSide={
           <div className="flex items-center space-x-2">
             <DataTableColumnsPicker
@@ -84,12 +142,18 @@ export default function Clients() {
         }
         linkToCreateGuards={[permission('create_client')]}
         hideEditableOptions={!hasPermission('edit_client')}
+        onTableRowClick={(client) => {
+          setSliderClientId(client.id);
+          setClientSliderVisibility(true);
+        }}
         enableSavingFilterPreference
         dateRangeColumns={[
           { column: 'created_at', queryParameterKey: 'created_between' },
         ]}
         enableSavingLatestDataForNavigation
       />
+
+      {!disableNavigation('client', clientSlider) && <ClientSlider />}
 
       <ChangeTemplateModal<Client>
         entity="client"

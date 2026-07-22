@@ -34,7 +34,7 @@ export function useBlankPurchaseOrderQuery(options?: GenericQueryOptions) {
       ...options,
       staleTime: Infinity,
       enabled: hasPermission('create_purchase_order')
-        ? options?.enabled ?? true
+        ? (options?.enabled ?? true)
         : false,
     }
   );
@@ -53,7 +53,7 @@ export function usePurchaseOrderQuery(params: { id: string | undefined }) {
         (response: GenericSingleResourceResponse<PurchaseOrder>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: Boolean(params.id) }
   );
 }
 

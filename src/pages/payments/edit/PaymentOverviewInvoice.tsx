@@ -155,10 +155,7 @@ export function PaymentOverviewInvoice(props: Props) {
             </span>
 
             <span style={{ color: colors.$3 }}>
-              {dateUTC(
-                props.paymentable.created_at,
-                dateFormat
-              )}
+              {dateUTC(props.paymentable.created_at, dateFormat)}
             </span>
 
             {props.paymentable.refunded > 0 && (

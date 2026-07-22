@@ -13,7 +13,6 @@ import { date, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { Project } from '$app/common/interfaces/project';
 import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
@@ -29,6 +28,7 @@ import {
   MdDelete,
   MdDesignServices,
   MdDownload,
+  MdEdit,
   MdRestore,
   MdTextSnippet,
 } from 'react-icons/md';
@@ -57,8 +57,7 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
-import { useTagsQuery } from '$app/common/queries/tags';
-import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'name',
@@ -335,27 +334,15 @@ export function useProjectColumns() {
     );
 }
 
-export function useProjectFilterColumns(params?: { enabled?: boolean }) {
-  const { data: tags } = useTagsQuery({
-    entityType: TAG_ENTITY_TYPES.project,
-    enabled: params?.enabled ?? true,
-  });
-
-  return [
-    {
-      column_id: 'project_tag_ids',
-      query_identifier: 'tag_ids',
-      options:
-        tags?.data.filter(isActiveTag).map((tag) => ({
-          label: tag.name,
-          value: tag.id,
-        })) || [],
-    },
-  ];
+interface ActionsParams {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
 }
 
-export function useActions() {
+export function useActions(params?: ActionsParams) {
   const [t] = useTranslation();
+
+  const { showEditAction, showCommonBulkAction } = params || {};
 
   const bulk = useBulkAction();
   const navigate = useNavigate();
@@ -389,6 +376,16 @@ export function useActions() {
   } = useChangeTemplate();
 
   const actions = [
+    (project: Project) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/projects/:id/edit', { id: project.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (project: Project) =>
       hasPermission('create_invoice') && (
         <DropdownElement
@@ -432,10 +429,13 @@ export function useActions() {
           {t('run_template')}
         </DropdownElement>
       ),
-    () => isEditOrShowPage && <Divider withoutPadding />,
+    () =>
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (project: Project) =>
       getEntityState(project) === EntityState.Active &&
-      isEditOrShowPage && (
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) && (
         <DropdownElement
           onClick={() => bulk([project.id], 'archive')}
           icon={<Icon element={MdArchive} />}
@@ -446,7 +446,7 @@ export function useActions() {
     (project: Project) =>
       (getEntityState(project) === EntityState.Archived ||
         getEntityState(project) === EntityState.Deleted) &&
-      isEditOrShowPage && (
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) && (
         <DropdownElement
           onClick={() => bulk([project.id], 'restore')}
           icon={<Icon element={MdRestore} />}
@@ -457,7 +457,7 @@ export function useActions() {
     (project: Project) =>
       (getEntityState(project) === EntityState.Active ||
         getEntityState(project) === EntityState.Archived) &&
-      isEditOrShowPage && (
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) && (
         <DropdownElement
           onClick={() => bulk([project.id], 'delete')}
           icon={<Icon element={MdDelete} />}

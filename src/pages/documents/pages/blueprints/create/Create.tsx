@@ -44,10 +44,7 @@ export default function Create() {
   };
 
   return (
-    <Default
-      title={t('new_template')}
-      breadcrumbs={pages}
-    >
+    <Default title={t('new_template')} breadcrumbs={pages}>
       <BlueprintWizard
         onComplete={handleWizardComplete}
         onCancel={handleWizardCancel}

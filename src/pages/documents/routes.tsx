@@ -41,7 +41,10 @@ const Notifications = lazy(
 );
 
 const WidgetDefaults = lazy(
-  () => import('$app/pages/documents/pages/settings/pages/widget-defaults/WidgetDefaults')
+  () =>
+    import(
+      '$app/pages/documents/pages/settings/pages/widget-defaults/WidgetDefaults'
+    )
 );
 
 const Builder = lazy(() => import('$app/pages/documents/builder/Builder'));
@@ -107,7 +110,10 @@ const routes = (
               element={
                 <DocuNinjaGuard
                   guards={[
-                    docuNinjaPermission({ model: 'documents', action: 'create' }),
+                    docuNinjaPermission({
+                      model: 'documents',
+                      action: 'create',
+                    }),
                   ]}
                   component={<Create />}
                 />
@@ -123,7 +129,10 @@ const routes = (
                 />
               }
             >
-              <Route index element={<Navigate to="email_templates" replace />} />
+              <Route
+                index
+                element={<Navigate to="email_templates" replace />}
+              />
               <Route
                 path="email_templates"
                 element={
@@ -154,11 +163,15 @@ const routes = (
                   />
                 }
               />
-              
+
               <Route
                 path="widget_defaults"
                 element={
-                  <Guard guards={[]} type="subPage" component={<WidgetDefaults />} />
+                  <Guard
+                    guards={[]}
+                    type="subPage"
+                    component={<WidgetDefaults />}
+                  />
                 }
               />
             </Route>
@@ -173,7 +186,10 @@ const routes = (
               element={
                 <DocuNinjaGuard
                   guards={[
-                    docuNinjaPermission({ model: 'blueprints', action: 'view' }),
+                    docuNinjaPermission({
+                      model: 'blueprints',
+                      action: 'view',
+                    }),
                   ]}
                   component={<Blueprints />}
                 />
@@ -215,7 +231,10 @@ const routes = (
               element={
                 <DocuNinjaGuard
                   guards={[
-                    docuNinjaPermission({ model: 'blueprints', action: 'view' }),
+                    docuNinjaPermission({
+                      model: 'blueprints',
+                      action: 'view',
+                    }),
                   ]}
                   component={<SignatoryMapping />}
                 />
@@ -260,4 +279,5 @@ const routes = (
   </>
 );
 
-export const documentsRoutes = import.meta.env.VITE_ENABLE_DOCUNINJA === 'true' ? routes : null;
+export const documentsRoutes =
+  import.meta.env.VITE_ENABLE_DOCUNINJA === 'true' ? routes : null;

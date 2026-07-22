@@ -45,7 +45,7 @@ import {
   openClientPortal,
 } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { EmailRecord } from '$app/components/EmailRecord';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
 import { QuoteActivity } from '$app/common/interfaces/quote-activity';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
@@ -70,6 +70,11 @@ import { History } from '$app/components/icons/History';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { ChevronRight } from 'react-feather';
 import { Icon } from '$app/components/icons/Icon';
+import { TagPills } from '$app/components/tags/TagPills';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -218,7 +223,7 @@ export function QuoteSlider() {
 
   return (
     <Slider
-      size="regular"
+      size="large"
       visible={isVisible}
       onClose={() => {
         setIsSliderVisible(false);
@@ -238,8 +243,24 @@ export function QuoteSlider() {
       withoutHeaderBorder
     >
       <TabGroup
-        tabs={[t('overview'), t('history'), t('activity'), t('email_history')]}
+        tabs={[
+          t('overview'),
+          t('history'),
+          t('activity'),
+          t('email_history'),
+          t('documents'),
+        ]}
         width="full"
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 4) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={quote?.documents?.length}
+                textCenter
+              />
+            );
+          }
+        }}
         withHorizontalPadding
         horizontalPaddingWidth="1.5rem"
       >
@@ -300,12 +321,26 @@ export function QuoteSlider() {
             </Element>
 
             <Element
+              className={classNames({
+                'border-b border-dashed': Boolean(quote?.tags?.length),
+              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {quote ? <QuoteStatus entity={quote} /> : null}
             </Element>
+
+            {Boolean(quote?.tags?.length) && (
+              <Element
+                leftSide={t('tags')}
+                pushContentToRight
+                noExternalPadding
+              >
+                <TagPills tags={quote?.tags} />
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />
@@ -376,7 +411,7 @@ export function QuoteSlider() {
             <>
               <div className="space-y-2 whitespace-nowrap px-6">
                 <Tooltip
-                  size="regular"
+                  size="large"
                   width="auto"
                   tooltipElement={
                     <article
@@ -716,6 +751,27 @@ export function QuoteSlider() {
               withAllBorders
             />
           ))}
+        </div>
+
+        <div className="px-4">
+          <Upload
+            endpoint={endpoint('/api/v1/quotes/:id/upload', {
+              id: quote?.id,
+            })}
+            onSuccess={() => $refetch(['quotes'])}
+            widgetOnly
+            disableUpload={
+              !hasPermission('edit_quote') && !entityAssigned(quote)
+            }
+          />
+
+          <DocumentsTable
+            documents={quote?.documents || []}
+            onDocumentDelete={() => $refetch(['quotes'])}
+            disableEditableOptions={
+              !entityAssigned(quote, true) && !hasPermission('edit_quote')
+            }
+          />
         </div>
       </TabGroup>
     </Slider>

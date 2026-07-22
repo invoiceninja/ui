@@ -16,8 +16,8 @@ export function GoCardlessOAuth2() {
   const { t } = useTranslation();
 
   return (
-      <Element leftSide={t('OAuth 2.0')}>
-        <Check size={18} />
-      </Element>
+    <Element leftSide={t('OAuth 2.0')}>
+      <Check size={18} />
+    </Element>
   );
 }

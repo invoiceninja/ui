@@ -25,7 +25,6 @@ import { DocuNinjaData } from '$app/common/interfaces/docuninja/api';
 import { useAtom } from 'jotai';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 
-
 export type DocuNinjaGuard = (ctx: DocuNinjaContext) => Promise<boolean>;
 
 export interface DocuNinjaContext {
@@ -59,7 +58,7 @@ export function useDocuNinjaGuardContext(docuData?: DocuNinjaData) {
   const user = useCurrentUser();
   const companyUser = useCurrentCompanyUser();
   const activeSettings = useActiveSettingsDetails();
-  
+
   // Get DocuNinja data from unified atoms (NO QUERY!)
   const [unifiedDocuData] = useAtom(docuNinjaAtom);
 
@@ -82,14 +81,32 @@ enum DocuNinjaState {
   Unauthorized = 'unauthorized',
 }
 
-export function DocuNinjaGuard({ guards, component, type = 'page', docuData }: DocuNinjaGuardProps) {
+export function DocuNinjaGuard({
+  guards,
+  component,
+  type = 'page',
+  docuData,
+}: DocuNinjaGuardProps) {
   const [state, setState] = useState<DocuNinjaState>(DocuNinjaState.Loading);
-  const { companyUser, queryClient, params, user, settingsLevel, docuData: contextDocuData } =
-    useDocuNinjaGuardContext(docuData);
+  const {
+    companyUser,
+    queryClient,
+    params,
+    user,
+    settingsLevel,
+    docuData: contextDocuData,
+  } = useDocuNinjaGuardContext(docuData);
 
   useEffect(() => {
     const promises = guards.map((guard) =>
-      guard({ companyUser, queryClient, params, user, settingsLevel, docuData: contextDocuData || undefined })
+      guard({
+        companyUser,
+        queryClient,
+        params,
+        user,
+        settingsLevel,
+        docuData: contextDocuData || undefined,
+      })
     );
 
     Promise.all(promises)
@@ -101,7 +118,15 @@ export function DocuNinjaGuard({ guards, component, type = 'page', docuData }: D
       .catch((error) => {
         setState(DocuNinjaState.Unauthorized);
       });
-  }, [guards, companyUser, queryClient, params, user, settingsLevel, contextDocuData]);
+  }, [
+    guards,
+    companyUser,
+    queryClient,
+    params,
+    user,
+    settingsLevel,
+    contextDocuData,
+  ]);
 
   if (state === DocuNinjaState.Loading) {
     return type === 'page' ? (

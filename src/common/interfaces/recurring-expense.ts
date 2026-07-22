@@ -9,6 +9,7 @@
  */
 
 import { Client } from './client';
+import { Tag } from './tag';
 import { Vendor } from './vendor';
 
 export interface RecurringExpense {
@@ -65,4 +66,6 @@ export interface RecurringExpense {
   frequency_id: string;
   remaining_cycles: number;
   next_send_date: string;
+  tags?: Tag[];
+  recurring_expense_tag_ids?: string[];
 }

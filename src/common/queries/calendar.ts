@@ -70,11 +70,9 @@ export function useConnectCalendar() {
       throw new Error(`Unsupported calendar provider: ${String(provider)}`);
     }
 
-    const response = await request(
-      'POST',
-      endpoint('/api/v1/one_time_token'),
-      { context: CALENDAR_CONTEXTS[provider] }
-    );
+    const response = await request('POST', endpoint('/api/v1/one_time_token'), {
+      context: CALENDAR_CONTEXTS[provider],
+    });
 
     const hash = (response.data as { hash?: unknown })?.hash;
 
