@@ -17,7 +17,7 @@ import { Slider } from '$app/components/cards/Slider';
 import { atom, useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date, endpoint, trans } from '$app/common/helpers';
+import { date, endpoint } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useQuery, useQueryClient } from 'react-query';
@@ -26,20 +26,23 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 import { AxiosResponse } from 'axios';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
-import { Link } from '$app/components/forms';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { MdInfo } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
-import reactStringReplace from 'react-string-replace';
 import { Tooltip } from '$app/components/Tooltip';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useActions } from '../hooks';
-import { QuoteStatus } from './QuoteStatus';
-import { Quote } from '$app/common/interfaces/quote';
+import { PurchaseOrderStatus } from './PurchaseOrderStatus';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Client } from '$app/common/interfaces/client';
 import {
   generateClientPortalUrl,
   openClientPortal,
@@ -47,18 +50,15 @@ import {
 import { EmailRecord } from '$app/components/EmailRecord';
 import { useEffect, useState } from 'react';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
-import { QuoteActivity } from '$app/common/interfaces/quote-activity';
-import { useInvoiceQuery } from '$app/common/queries/invoices';
-import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
+import { PurchaseOrderActivity } from '$app/common/interfaces/purchase-order-activity';
+import { useExpenseQuery } from '$app/common/queries/expenses';
+import { ExpenseStatus } from '$app/pages/expenses/common/components/ExpenseStatus';
 import { ViewLineItem } from '$app/pages/invoices/common/components/ViewLineItem';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import Toggle from '$app/components/forms/Toggle';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { useColorScheme } from '$app/common/colors';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
-import { useDateTime } from '$app/common/hooks/useDateTime';
-import { useGetSetting } from '$app/common/hooks/useGetSetting';
-import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import classNames from 'classnames';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import styled from 'styled-components';
@@ -70,14 +70,10 @@ import { History } from '$app/components/icons/History';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { ChevronRight } from 'react-feather';
 import { Icon } from '$app/components/icons/Icon';
-import { TagPills } from '$app/components/tags/TagPills';
-import { DocumentsTable } from '$app/components/DocumentsTable';
-import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
-import { Upload } from '$app/pages/settings/company/documents/components';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { useGenerateActivityElement } from '../../edit/components/Activities';
 
-export const quoteSliderAtom = atom<Quote | null>(null);
-export const quoteSliderVisibilityAtom = atom(false);
+export const purchaseOrderSliderAtom = atom<PurchaseOrder | null>(null);
+export const purchaseOrderSliderVisibilityAtom = atom(false);
 
 dayjs.extend(relativeTime);
 
@@ -89,54 +85,7 @@ const Box = styled.div`
   }
 `;
 
-export function useGenerateActivityElement() {
-  const [t] = useTranslation();
-
-  return (activity: QuoteActivity) => {
-    let text = trans(`activity_${activity.activity_type_id}`, {});
-
-    const replacements = {
-      client: (
-        <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
-          {activity.client?.label}
-        </Link>
-      ),
-      user: activity.user?.label ?? t('system'),
-      quote: (
-        <Link
-          to={route('/quotes/:id/edit', {
-            id: activity.quote?.hashed_id,
-          })}
-        >
-          {activity?.quote?.label}
-        </Link>
-      ),
-      contact: (
-        <Link
-          to={route('/clients/:id/edit', {
-            id: activity?.contact?.hashed_id,
-          })}
-        >
-          {activity?.contact?.label}
-        </Link>
-      ),
-      notes: activity?.notes && (
-        <>
-          <br />'{activity?.notes}'
-        </>
-      ),
-    };
-    for (const [variable, value] of Object.entries(replacements)) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      text = reactStringReplace(text, `:${variable}`, () => value);
-    }
-
-    return text;
-  };
-}
-
-export function QuoteSlider() {
+export function PurchaseOrderSlider() {
   const [t] = useTranslation();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -152,61 +101,62 @@ export function QuoteSlider() {
   const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const getSetting = useGetSetting();
-  const getTimezone = useGetTimezone();
-  const dateTime = useDateTime({ withTimezone: true, formatOnlyDate: true });
-
   const formatMoney = useFormatMoney();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
   const activityElement = useGenerateActivityElement();
 
-  const [quote, setQuote] = useAtom(quoteSliderAtom);
-  const [isVisible, setIsSliderVisible] = useAtom(quoteSliderVisibilityAtom);
+  const [purchaseOrder, setPurchaseOrder] = useAtom(purchaseOrderSliderAtom);
+  const [isVisible, setIsSliderVisible] = useAtom(
+    purchaseOrderSliderVisibilityAtom
+  );
 
   const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
 
-  const { data: invoiceResponse } = useInvoiceQuery({ id: quote?.invoice_id });
+  const { data: expenseResponse } = useExpenseQuery({
+    id: purchaseOrder?.expense_id,
+    enabled: Boolean(purchaseOrder?.expense_id),
+  });
 
   const { data: resource } = useQuery({
-    queryKey: ['/api/v1/quotes', quote?.id, 'slider'],
+    queryKey: ['/api/v1/purchase_orders', purchaseOrder?.id, 'slider'],
     queryFn: () =>
       request(
         'GET',
         endpoint(
-          `/api/v1/quotes/${quote?.id}?include=activities.history&reminder_schedule=true`
+          `/api/v1/purchase_orders/${purchaseOrder?.id}?include=activities.history&reminder_schedule=true`
         )
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
-    enabled: quote !== null && isVisible,
+    enabled: purchaseOrder !== null && isVisible,
     staleTime: Infinity,
   });
 
   const { data: activities } = useQuery({
-    queryKey: ['/api/v1/activities', quote?.id, 'quote'],
+    queryKey: ['/api/v1/activities', purchaseOrder?.id, 'purchase_order'],
     queryFn: () =>
       request('POST', endpoint('/api/v1/activities/entity'), {
-        entity: 'quote',
-        entity_id: quote?.id,
+        entity: 'purchase_order',
+        entity_id: purchaseOrder?.id,
       }).then(
-        (response: AxiosResponse<GenericManyResponse<QuoteActivity>>) =>
+        (response: AxiosResponse<GenericManyResponse<PurchaseOrderActivity>>) =>
           response.data.data
       ),
-    enabled: quote !== null && isVisible,
+    enabled: purchaseOrder !== null && isVisible,
     staleTime: Infinity,
   });
 
   const fetchEmailHistory = async () => {
     const response = await queryClient
       .fetchQuery(
-        ['/api/v1/quotes', quote?.id, 'emailHistory'],
+        ['/api/v1/purchase_orders', purchaseOrder?.id, 'emailHistory'],
         () =>
           request('POST', endpoint('/api/v1/emails/entityHistory'), {
-            entity: 'quote',
-            entity_id: quote?.id,
+            entity: 'purchase_order',
+            entity_id: purchaseOrder?.id,
           }),
         { staleTime: Infinity }
       )
@@ -216,10 +166,17 @@ export function QuoteSlider() {
   };
 
   useEffect(() => {
-    if (quote) {
+    if (purchaseOrder) {
       fetchEmailHistory();
     }
-  }, [quote]);
+  }, [purchaseOrder]);
+
+  const vendorAsClient = purchaseOrder?.vendor
+    ? ({
+        country_id: purchaseOrder.vendor.country_id,
+        settings: { currency_id: purchaseOrder.vendor.currency_id },
+      } as unknown as Client)
+    : undefined;
 
   return (
     <Slider
@@ -227,14 +184,16 @@ export function QuoteSlider() {
       visible={isVisible}
       onClose={() => {
         setIsSliderVisible(false);
-        setQuote(null);
+        setPurchaseOrder(null);
       }}
-      title={`${t('quote')} ${quote?.number}`}
+      title={`${t('purchase_order')} ${purchaseOrder?.number}`}
       topRight={
-        quote && (hasPermission('edit_quote') || entityAssigned(quote)) ? (
+        purchaseOrder &&
+        (hasPermission('edit_purchase_order') ||
+          entityAssigned(purchaseOrder)) ? (
           <ResourceActions
             label={t('actions')}
-            resource={quote}
+            resource={purchaseOrder}
             actions={actions}
           />
         ) : null
@@ -255,7 +214,7 @@ export function QuoteSlider() {
           if (tabIndex === 4) {
             return (
               <DocumentsTabLabel
-                numberOfDocuments={quote?.documents?.length}
+                numberOfDocuments={purchaseOrder?.documents?.length}
                 textCenter
               />
             );
@@ -268,17 +227,17 @@ export function QuoteSlider() {
           <div className="px-6">
             <Element
               className="border-b border-dashed"
-              leftSide={t('quote_amount')}
+              leftSide={t('amount')}
               pushContentToRight
               withoutWrappingLeftSide
               noExternalPadding
               style={{ borderColor: colors.$20 }}
             >
-              {quote
+              {purchaseOrder
                 ? formatMoney(
-                    quote?.amount,
-                    quote.client?.country_id,
-                    quote.client?.settings.currency_id
+                    purchaseOrder.amount,
+                    purchaseOrder.vendor?.country_id,
+                    purchaseOrder.vendor?.currency_id
                   )
                 : null}
             </Element>
@@ -291,11 +250,11 @@ export function QuoteSlider() {
               noExternalPadding
               style={{ borderColor: colors.$20 }}
             >
-              {quote
+              {purchaseOrder
                 ? formatMoney(
-                    quote.balance,
-                    quote.client?.country_id,
-                    quote.client?.settings.currency_id
+                    purchaseOrder.balance,
+                    purchaseOrder.vendor?.country_id,
+                    purchaseOrder.vendor?.currency_id
                   )
                 : null}
             </Element>
@@ -307,40 +266,28 @@ export function QuoteSlider() {
               noExternalPadding
               style={{ borderColor: colors.$20 }}
             >
-              {quote ? date(quote?.date, dateFormat) : null}
+              {purchaseOrder ? date(purchaseOrder.date, dateFormat) : null}
             </Element>
 
             <Element
               className="border-b border-dashed"
-              leftSide={t('valid_until')}
+              leftSide={t('due_date')}
               pushContentToRight
               noExternalPadding
               style={{ borderColor: colors.$20 }}
             >
-              {quote ? date(quote.due_date, dateFormat) : null}
+              {purchaseOrder ? date(purchaseOrder.due_date, dateFormat) : null}
             </Element>
 
             <Element
-              className={classNames({
-                'border-b border-dashed': Boolean(quote?.tags?.length),
-              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
-              style={{ borderColor: colors.$20 }}
             >
-              {quote ? <QuoteStatus entity={quote} /> : null}
+              {purchaseOrder ? (
+                <PurchaseOrderStatus entity={purchaseOrder} />
+              ) : null}
             </Element>
-
-            {Boolean(quote?.tags?.length) && (
-              <Element
-                leftSide={t('tags')}
-                pushContentToRight
-                noExternalPadding
-              >
-                <TagPills tags={quote?.tags} />
-              </Element>
-            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />
@@ -348,7 +295,9 @@ export function QuoteSlider() {
           <div className="flex space-x-4 items-center justify-center px-6 py-5">
             <Box
               className="flex flex-col items-center justify-center space-y-2 shadow-sm border px-14 py-5 cursor-pointer rounded-md"
-              onClick={() => (quote ? openClientPortal(quote) : null)}
+              onClick={() =>
+                purchaseOrder ? openClientPortal(purchaseOrder) : null
+              }
               style={{
                 borderColor: colors.$20,
               }}
@@ -371,12 +320,12 @@ export function QuoteSlider() {
               </span>
             </Box>
 
-            {quote ? (
+            {purchaseOrder ? (
               <Box
                 className="flex flex-col items-center justify-center space-y-2 shadow-sm border px-14 py-5 cursor-pointer rounded-md"
                 onClick={() => {
                   navigator.clipboard.writeText(
-                    generateClientPortalUrl(quote) ?? ''
+                    generateClientPortalUrl(purchaseOrder) ?? ''
                   );
 
                   toast.success('copied_to_clipboard', { value: '' });
@@ -407,11 +356,11 @@ export function QuoteSlider() {
 
           <Divider withoutPadding borderColor={colors.$20} />
 
-          {quote && quote.next_send_date ? (
+          {purchaseOrder && purchaseOrder.next_send_date ? (
             <>
               <div className="space-y-2 whitespace-nowrap px-6">
                 <Tooltip
-                  size="large"
+                  size="regular"
                   width="auto"
                   tooltipElement={
                     <article
@@ -439,14 +388,8 @@ export function QuoteSlider() {
                   withoutWrappingLeftSide
                   style={{ borderColor: colors.$20 }}
                 >
-                  {quote
-                    ? dateTime(
-                        quote.next_send_date,
-                        '',
-                        '',
-                        getTimezone(getSetting(quote.client, 'timezone_id'))
-                          .timeZone
-                      )
+                  {purchaseOrder
+                    ? date(purchaseOrder.next_send_date, dateFormat)
                     : null}
                 </Element>
 
@@ -457,10 +400,12 @@ export function QuoteSlider() {
                   noExternalPadding
                   style={{ borderColor: colors.$20 }}
                 >
-                  {quote ? date(quote.reminder_last_sent, dateFormat) : null}
+                  {purchaseOrder
+                    ? date(purchaseOrder.reminder_last_sent, dateFormat)
+                    : null}
                 </Element>
 
-                {quote.reminder1_sent ? (
+                {purchaseOrder.reminder1_sent ? (
                   <Element
                     className="border-b border-dashed"
                     leftSide={t('first_reminder')}
@@ -468,11 +413,11 @@ export function QuoteSlider() {
                     noExternalPadding
                     style={{ borderColor: colors.$20 }}
                   >
-                    {quote ? date(quote.reminder1_sent, dateFormat) : null}
+                    {date(purchaseOrder.reminder1_sent, dateFormat)}
                   </Element>
                 ) : null}
 
-                {quote.reminder2_sent ? (
+                {purchaseOrder.reminder2_sent ? (
                   <Element
                     className="border-b border-dashed"
                     leftSide={t('second_reminder')}
@@ -480,17 +425,17 @@ export function QuoteSlider() {
                     noExternalPadding
                     style={{ borderColor: colors.$20 }}
                   >
-                    {quote ? date(quote.reminder2_sent, dateFormat) : null}
+                    {date(purchaseOrder.reminder2_sent, dateFormat)}
                   </Element>
                 ) : null}
 
-                {quote.reminder3_sent ? (
+                {purchaseOrder.reminder3_sent ? (
                   <Element
                     leftSide={t('third_reminder')}
                     pushContentToRight
                     noExternalPadding
                   >
-                    {quote ? date(quote.reminder3_sent, dateFormat) : null}
+                    {date(purchaseOrder.reminder3_sent, dateFormat)}
                   </Element>
                 ) : null}
               </div>
@@ -499,15 +444,15 @@ export function QuoteSlider() {
             </>
           ) : null}
 
-          {invoiceResponse && (
+          {expenseResponse && (
             <div className="flex flex-col space-y-4 px-6 py-5">
               <Box
                 className="flex flex-col items-start justify-center space-y-2 shadow-sm text-sm border p-5 w-full cursor-pointer rounded-md"
                 onClick={() => {
-                  !disableNavigation('invoice', invoiceResponse) &&
+                  !disableNavigation('expense', expenseResponse) &&
                     navigate(
-                      route('/invoices/:id/edit', {
-                        id: invoiceResponse.id,
+                      route('/expenses/:id/edit', {
+                        id: expenseResponse.id,
                       })
                     );
                 }}
@@ -520,7 +465,7 @@ export function QuoteSlider() {
                 }}
               >
                 <span className="font-medium" style={{ color: colors.$3 }}>
-                  {t('invoice')} {invoiceResponse.number}
+                  {t('expense')} {expenseResponse.number}
                 </span>
 
                 <div
@@ -529,37 +474,40 @@ export function QuoteSlider() {
                 >
                   <span>
                     {formatMoney(
-                      invoiceResponse.amount,
-                      invoiceResponse.client?.country_id,
-                      invoiceResponse.client?.settings.currency_id
+                      expenseResponse.amount,
+                      purchaseOrder?.vendor?.country_id,
+                      purchaseOrder?.vendor?.currency_id
                     )}
                   </span>
 
                   <span>-</span>
 
-                  <span>{date(invoiceResponse.date, dateFormat)}</span>
+                  <span>{date(expenseResponse.date, dateFormat)}</span>
                 </div>
 
                 <div>
-                  <InvoiceStatus entity={invoiceResponse} />
+                  <ExpenseStatus entity={expenseResponse} />
                 </div>
               </Box>
             </div>
           )}
 
-          {Boolean(quote?.line_items?.length) && (
-            <Divider withoutPadding borderColor={colors.$20} />
-          )}
+          {Boolean(expenseResponse) &&
+            Boolean(purchaseOrder?.line_items?.length) && (
+              <Divider withoutPadding borderColor={colors.$20} />
+            )}
 
-          {quote && Boolean(quote.line_items?.length) && (
+          {purchaseOrder && Boolean(purchaseOrder.line_items?.length) && (
             <div className="flex flex-col space-y-3 px-6 py-5">
-              {quote.line_items.map((lineItem, index) => (
+              {purchaseOrder.line_items.map((lineItem, index) => (
                 <ViewLineItem
                   key={index}
                   lineItem={lineItem}
                   lineItemIndex={index}
-                  client={quote.client}
-                  editHref={route('/quotes/:id/edit', { id: quote.id })}
+                  client={vendorAsClient}
+                  editHref={route('/purchase_orders/:id/edit', {
+                    id: purchaseOrder.id,
+                  })}
                 />
               ))}
             </div>
@@ -607,11 +555,11 @@ export function QuoteSlider() {
                         <div className="flex flex-col items-start space-y-0.5 justify-center">
                           <div className="flex space-x-1 text-sm">
                             <span style={{ color: colors.$3 }}>
-                              {quote?.client
+                              {purchaseOrder?.vendor
                                 ? formatMoney(
                                     activity.history.amount,
-                                    quote?.client?.country_id,
-                                    quote?.client?.settings.currency_id
+                                    purchaseOrder.vendor?.country_id,
+                                    purchaseOrder.vendor?.currency_id
                                   )
                                 : null}
                             </span>
@@ -621,13 +569,13 @@ export function QuoteSlider() {
                             </div>
 
                             <DynamicLink
-                              to={`/clients/${activity.client_id}`}
+                              to={`/vendors/${purchaseOrder?.vendor_id}`}
                               renderSpan={disableNavigation(
-                                'client',
-                                quote?.client
+                                'vendor',
+                                purchaseOrder?.vendor
                               )}
                             >
-                              {quote?.client?.display_name}
+                              {purchaseOrder?.vendor?.name}
                             </DynamicLink>
                           </div>
 
@@ -674,7 +622,7 @@ export function QuoteSlider() {
             />
 
             <AddActivityComment
-              entity="quote"
+              entity="purchase_order"
               entityId={resource?.id}
               label={resource?.number || ''}
             />
@@ -755,21 +703,23 @@ export function QuoteSlider() {
 
         <div className="px-4">
           <Upload
-            endpoint={endpoint('/api/v1/quotes/:id/upload', {
-              id: quote?.id,
+            endpoint={endpoint('/api/v1/purchase_orders/:id/upload', {
+              id: purchaseOrder?.id,
             })}
-            onSuccess={() => $refetch(['quotes'])}
+            onSuccess={() => $refetch(['purchase_orders'])}
             widgetOnly
             disableUpload={
-              !hasPermission('edit_quote') && !entityAssigned(quote)
+              !hasPermission('edit_purchase_order') &&
+              !entityAssigned(purchaseOrder)
             }
           />
 
           <DocumentsTable
-            documents={quote?.documents || []}
-            onDocumentDelete={() => $refetch(['quotes'])}
+            documents={purchaseOrder?.documents || []}
+            onDocumentDelete={() => $refetch(['purchase_orders'])}
             disableEditableOptions={
-              !entityAssigned(quote, true) && !hasPermission('edit_quote')
+              !entityAssigned(purchaseOrder, true) &&
+              !hasPermission('edit_purchase_order')
             }
           />
         </div>

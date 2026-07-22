@@ -19,6 +19,11 @@ import {
   useExpenseColumns,
   useExpenseFilters,
 } from '../common/hooks';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { permission } from '$app/common/guards/guards/permission';
@@ -32,6 +37,16 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Expense } from '$app/common/interfaces/expense';
 import { InputLabel } from '$app/components/forms';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import {
+  ExpenseSlider,
+  expenseSliderAtom,
+  expenseSliderVisibilityAtom,
+} from '../common/components/ExpenseSlider';
+import { useAtom } from 'jotai';
+import { useExpenseQuery } from '$app/common/queries/expenses';
+import { useEffect, useState } from 'react';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export default function Expenses() {
   useTitle('expenses');
@@ -44,8 +59,47 @@ export default function Expenses() {
   const actions = useActions();
   const filters = useExpenseFilters();
   const columns = useExpenseColumns();
+  const reactSettings = useReactSettings();
   const expenseColumns = useAllExpenseColumns();
   const customBulkActions = useCustomBulkActions();
+
+  const selectedColumns =
+    reactSettings?.react_table_columns?.expense || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.expense,
+    'expense_tag_ids',
+    { enabled: shouldShowTagFilter }
+  );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'expense_tag_ids');
+
+  const disableNavigation = useDisableNavigation();
+
+  const [sliderExpenseId, setSliderExpenseId] = useState<string>('');
+  const [expenseSlider, setExpenseSlider] = useAtom(expenseSliderAtom);
+  const [expenseSliderVisibility, setExpenseSliderVisibility] = useAtom(
+    expenseSliderVisibilityAtom
+  );
+
+  const { data: expenseResponse } = useExpenseQuery({
+    id: sliderExpenseId,
+    enabled: Boolean(sliderExpenseId),
+  });
+
+  useEffect(() => {
+    setExpenseSlider(null);
+  }, [sliderExpenseId]);
+
+  useEffect(() => {
+    if (expenseResponse && expenseSliderVisibility) {
+      setExpenseSlider(expenseResponse);
+    }
+  }, [expenseResponse, expenseSliderVisibility]);
+
+  useEffect(() => {
+    return () => setExpenseSliderVisibility(false);
+  }, []);
 
   const {
     changeTemplateVisible,
@@ -57,7 +111,11 @@ export default function Expenses() {
     <Default title={t('expenses')} breadcrumbs={pages} docsLink="en/expenses">
       <DataTable
         resource="expense"
-        endpoint="/api/v1/expenses?include=client,vendor,category,project&without_deleted_clients=true&without_deleted_vendors=true&sort=id|desc"
+        endpoint={`/api/v1/expenses?include=client,vendor,category,project${
+          shouldShowTagFilter ? ',tags' : ''
+        }&without_deleted_clients=true&without_deleted_vendors=true&sort=id|desc${
+          shouldShowTagFilter ? '' : '&tag_ids='
+        }`}
         columns={columns}
         bulkRoute="/api/v1/expenses/bulk"
         linkToCreate="/expenses/create"
@@ -66,6 +124,7 @@ export default function Expenses() {
         customFilters={filters}
         customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         withResourcefulActions
         rightSide={
           <div className="flex items-center space-x-2">
@@ -92,7 +151,13 @@ export default function Expenses() {
           { column: 'created_at', queryParameterKey: 'created_between' },
         ]}
         enableSavingLatestDataForNavigation
+        onTableRowClick={(expense) => {
+          setSliderExpenseId(expense.id);
+          setExpenseSliderVisibility(true);
+        }}
       />
+
+      {!disableNavigation('expense', expenseSlider) && <ExpenseSlider />}
 
       <ChangeTemplateModal<Expense>
         entity="expense"

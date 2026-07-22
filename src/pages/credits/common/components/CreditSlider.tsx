@@ -11,13 +11,17 @@
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { TabGroup } from '$app/components/TabGroup';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
 import { atom, useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date, endpoint, trans } from '$app/common/helpers';
+import { date, endpoint } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useQuery, useQueryClient } from 'react-query';
@@ -26,20 +30,18 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 import { AxiosResponse } from 'axios';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
-import { Link } from '$app/components/forms';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { MdInfo } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
-import reactStringReplace from 'react-string-replace';
 import { Tooltip } from '$app/components/Tooltip';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useActions } from '../hooks';
-import { QuoteStatus } from './QuoteStatus';
-import { Quote } from '$app/common/interfaces/quote';
+import { CreditStatus } from './CreditStatus';
+import { Credit } from '$app/common/interfaces/credit';
 import {
   generateClientPortalUrl,
   openClientPortal,
@@ -47,7 +49,7 @@ import {
 import { EmailRecord } from '$app/components/EmailRecord';
 import { useEffect, useState } from 'react';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
-import { QuoteActivity } from '$app/common/interfaces/quote-activity';
+import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
 import { ViewLineItem } from '$app/pages/invoices/common/components/ViewLineItem';
@@ -70,14 +72,10 @@ import { History } from '$app/components/icons/History';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { ChevronRight } from 'react-feather';
 import { Icon } from '$app/components/icons/Icon';
-import { TagPills } from '$app/components/tags/TagPills';
-import { DocumentsTable } from '$app/components/DocumentsTable';
-import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
-import { Upload } from '$app/pages/settings/company/documents/components';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { useGenerateActivityElement } from '../../edit/components/Activities';
 
-export const quoteSliderAtom = atom<Quote | null>(null);
-export const quoteSliderVisibilityAtom = atom(false);
+export const creditSliderAtom = atom<Credit | null>(null);
+export const creditSliderVisibilityAtom = atom(false);
 
 dayjs.extend(relativeTime);
 
@@ -89,54 +87,7 @@ const Box = styled.div`
   }
 `;
 
-export function useGenerateActivityElement() {
-  const [t] = useTranslation();
-
-  return (activity: QuoteActivity) => {
-    let text = trans(`activity_${activity.activity_type_id}`, {});
-
-    const replacements = {
-      client: (
-        <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
-          {activity.client?.label}
-        </Link>
-      ),
-      user: activity.user?.label ?? t('system'),
-      quote: (
-        <Link
-          to={route('/quotes/:id/edit', {
-            id: activity.quote?.hashed_id,
-          })}
-        >
-          {activity?.quote?.label}
-        </Link>
-      ),
-      contact: (
-        <Link
-          to={route('/clients/:id/edit', {
-            id: activity?.contact?.hashed_id,
-          })}
-        >
-          {activity?.contact?.label}
-        </Link>
-      ),
-      notes: activity?.notes && (
-        <>
-          <br />'{activity?.notes}'
-        </>
-      ),
-    };
-    for (const [variable, value] of Object.entries(replacements)) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      text = reactStringReplace(text, `:${variable}`, () => value);
-    }
-
-    return text;
-  };
-}
-
-export function QuoteSlider() {
+export function CreditSlider() {
   const [t] = useTranslation();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -162,51 +113,51 @@ export function QuoteSlider() {
   const disableNavigation = useDisableNavigation();
   const activityElement = useGenerateActivityElement();
 
-  const [quote, setQuote] = useAtom(quoteSliderAtom);
-  const [isVisible, setIsSliderVisible] = useAtom(quoteSliderVisibilityAtom);
+  const [credit, setCredit] = useAtom(creditSliderAtom);
+  const [isVisible, setIsSliderVisible] = useAtom(creditSliderVisibilityAtom);
 
   const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
 
-  const { data: invoiceResponse } = useInvoiceQuery({ id: quote?.invoice_id });
+  const { data: invoiceResponse } = useInvoiceQuery({ id: credit?.invoice_id });
 
   const { data: resource } = useQuery({
-    queryKey: ['/api/v1/quotes', quote?.id, 'slider'],
+    queryKey: ['/api/v1/credits', credit?.id, 'slider'],
     queryFn: () =>
       request(
         'GET',
         endpoint(
-          `/api/v1/quotes/${quote?.id}?include=activities.history&reminder_schedule=true`
+          `/api/v1/credits/${credit?.id}?include=activities.history&reminder_schedule=true`
         )
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
-    enabled: quote !== null && isVisible,
+    enabled: credit !== null && isVisible,
     staleTime: Infinity,
   });
 
   const { data: activities } = useQuery({
-    queryKey: ['/api/v1/activities', quote?.id, 'quote'],
+    queryKey: ['/api/v1/activities', credit?.id, 'credit'],
     queryFn: () =>
       request('POST', endpoint('/api/v1/activities/entity'), {
-        entity: 'quote',
-        entity_id: quote?.id,
+        entity: 'credit',
+        entity_id: credit?.id,
       }).then(
-        (response: AxiosResponse<GenericManyResponse<QuoteActivity>>) =>
+        (response: AxiosResponse<GenericManyResponse<InvoiceActivity>>) =>
           response.data.data
       ),
-    enabled: quote !== null && isVisible,
+    enabled: credit !== null && isVisible,
     staleTime: Infinity,
   });
 
   const fetchEmailHistory = async () => {
     const response = await queryClient
       .fetchQuery(
-        ['/api/v1/quotes', quote?.id, 'emailHistory'],
+        ['/api/v1/credits', credit?.id, 'emailHistory'],
         () =>
           request('POST', endpoint('/api/v1/emails/entityHistory'), {
-            entity: 'quote',
-            entity_id: quote?.id,
+            entity: 'credit',
+            entity_id: credit?.id,
           }),
         { staleTime: Infinity }
       )
@@ -216,10 +167,10 @@ export function QuoteSlider() {
   };
 
   useEffect(() => {
-    if (quote) {
+    if (credit) {
       fetchEmailHistory();
     }
-  }, [quote]);
+  }, [credit]);
 
   return (
     <Slider
@@ -227,14 +178,14 @@ export function QuoteSlider() {
       visible={isVisible}
       onClose={() => {
         setIsSliderVisible(false);
-        setQuote(null);
+        setCredit(null);
       }}
-      title={`${t('quote')} ${quote?.number}`}
+      title={`${t('credit')} ${credit?.number}`}
       topRight={
-        quote && (hasPermission('edit_quote') || entityAssigned(quote)) ? (
+        credit && (hasPermission('edit_credit') || entityAssigned(credit)) ? (
           <ResourceActions
             label={t('actions')}
-            resource={quote}
+            resource={credit}
             actions={actions}
           />
         ) : null
@@ -255,7 +206,7 @@ export function QuoteSlider() {
           if (tabIndex === 4) {
             return (
               <DocumentsTabLabel
-                numberOfDocuments={quote?.documents?.length}
+                numberOfDocuments={credit?.documents?.length}
                 textCenter
               />
             );
@@ -268,17 +219,17 @@ export function QuoteSlider() {
           <div className="px-6">
             <Element
               className="border-b border-dashed"
-              leftSide={t('quote_amount')}
+              leftSide={t('credit_amount')}
               pushContentToRight
               withoutWrappingLeftSide
               noExternalPadding
               style={{ borderColor: colors.$20 }}
             >
-              {quote
+              {credit
                 ? formatMoney(
-                    quote?.amount,
-                    quote.client?.country_id,
-                    quote.client?.settings.currency_id
+                    credit.amount,
+                    credit.client?.country_id,
+                    credit.client?.settings.currency_id
                   )
                 : null}
             </Element>
@@ -291,11 +242,11 @@ export function QuoteSlider() {
               noExternalPadding
               style={{ borderColor: colors.$20 }}
             >
-              {quote
+              {credit
                 ? formatMoney(
-                    quote.balance,
-                    quote.client?.country_id,
-                    quote.client?.settings.currency_id
+                    credit.balance,
+                    credit.client?.country_id,
+                    credit.client?.settings.currency_id
                   )
                 : null}
             </Element>
@@ -307,40 +258,26 @@ export function QuoteSlider() {
               noExternalPadding
               style={{ borderColor: colors.$20 }}
             >
-              {quote ? date(quote?.date, dateFormat) : null}
+              {credit ? date(credit.date, dateFormat) : null}
             </Element>
 
             <Element
               className="border-b border-dashed"
-              leftSide={t('valid_until')}
+              leftSide={t('due_date')}
               pushContentToRight
               noExternalPadding
               style={{ borderColor: colors.$20 }}
             >
-              {quote ? date(quote.due_date, dateFormat) : null}
+              {credit ? date(credit.due_date, dateFormat) : null}
             </Element>
 
             <Element
-              className={classNames({
-                'border-b border-dashed': Boolean(quote?.tags?.length),
-              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
-              style={{ borderColor: colors.$20 }}
             >
-              {quote ? <QuoteStatus entity={quote} /> : null}
+              {credit ? <CreditStatus entity={credit} /> : null}
             </Element>
-
-            {Boolean(quote?.tags?.length) && (
-              <Element
-                leftSide={t('tags')}
-                pushContentToRight
-                noExternalPadding
-              >
-                <TagPills tags={quote?.tags} />
-              </Element>
-            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />
@@ -348,7 +285,7 @@ export function QuoteSlider() {
           <div className="flex space-x-4 items-center justify-center px-6 py-5">
             <Box
               className="flex flex-col items-center justify-center space-y-2 shadow-sm border px-14 py-5 cursor-pointer rounded-md"
-              onClick={() => (quote ? openClientPortal(quote) : null)}
+              onClick={() => (credit ? openClientPortal(credit) : null)}
               style={{
                 borderColor: colors.$20,
               }}
@@ -371,12 +308,12 @@ export function QuoteSlider() {
               </span>
             </Box>
 
-            {quote ? (
+            {credit ? (
               <Box
                 className="flex flex-col items-center justify-center space-y-2 shadow-sm border px-14 py-5 cursor-pointer rounded-md"
                 onClick={() => {
                   navigator.clipboard.writeText(
-                    generateClientPortalUrl(quote) ?? ''
+                    generateClientPortalUrl(credit) ?? ''
                   );
 
                   toast.success('copied_to_clipboard', { value: '' });
@@ -407,7 +344,7 @@ export function QuoteSlider() {
 
           <Divider withoutPadding borderColor={colors.$20} />
 
-          {quote && quote.next_send_date ? (
+          {credit && credit.next_send_date ? (
             <>
               <div className="space-y-2 whitespace-nowrap px-6">
                 <Tooltip
@@ -439,12 +376,12 @@ export function QuoteSlider() {
                   withoutWrappingLeftSide
                   style={{ borderColor: colors.$20 }}
                 >
-                  {quote
+                  {credit
                     ? dateTime(
-                        quote.next_send_date,
+                        credit.next_send_date,
                         '',
                         '',
-                        getTimezone(getSetting(quote.client, 'timezone_id'))
+                        getTimezone(getSetting(credit.client, 'timezone_id'))
                           .timeZone
                       )
                     : null}
@@ -457,10 +394,10 @@ export function QuoteSlider() {
                   noExternalPadding
                   style={{ borderColor: colors.$20 }}
                 >
-                  {quote ? date(quote.reminder_last_sent, dateFormat) : null}
+                  {credit ? date(credit.reminder_last_sent, dateFormat) : null}
                 </Element>
 
-                {quote.reminder1_sent ? (
+                {credit.reminder1_sent ? (
                   <Element
                     className="border-b border-dashed"
                     leftSide={t('first_reminder')}
@@ -468,11 +405,11 @@ export function QuoteSlider() {
                     noExternalPadding
                     style={{ borderColor: colors.$20 }}
                   >
-                    {quote ? date(quote.reminder1_sent, dateFormat) : null}
+                    {credit ? date(credit.reminder1_sent, dateFormat) : null}
                   </Element>
                 ) : null}
 
-                {quote.reminder2_sent ? (
+                {credit.reminder2_sent ? (
                   <Element
                     className="border-b border-dashed"
                     leftSide={t('second_reminder')}
@@ -480,17 +417,17 @@ export function QuoteSlider() {
                     noExternalPadding
                     style={{ borderColor: colors.$20 }}
                   >
-                    {quote ? date(quote.reminder2_sent, dateFormat) : null}
+                    {credit ? date(credit.reminder2_sent, dateFormat) : null}
                   </Element>
                 ) : null}
 
-                {quote.reminder3_sent ? (
+                {credit.reminder3_sent ? (
                   <Element
                     leftSide={t('third_reminder')}
                     pushContentToRight
                     noExternalPadding
                   >
-                    {quote ? date(quote.reminder3_sent, dateFormat) : null}
+                    {credit ? date(credit.reminder3_sent, dateFormat) : null}
                   </Element>
                 ) : null}
               </div>
@@ -547,19 +484,19 @@ export function QuoteSlider() {
             </div>
           )}
 
-          {Boolean(quote?.line_items?.length) && (
+          {Boolean(invoiceResponse) && Boolean(credit?.line_items?.length) && (
             <Divider withoutPadding borderColor={colors.$20} />
           )}
 
-          {quote && Boolean(quote.line_items?.length) && (
+          {credit && Boolean(credit.line_items?.length) && (
             <div className="flex flex-col space-y-3 px-6 py-5">
-              {quote.line_items.map((lineItem, index) => (
+              {credit.line_items.map((lineItem, index) => (
                 <ViewLineItem
                   key={index}
                   lineItem={lineItem}
                   lineItemIndex={index}
-                  client={quote.client}
-                  editHref={route('/quotes/:id/edit', { id: quote.id })}
+                  client={credit.client}
+                  editHref={route('/credits/:id/edit', { id: credit.id })}
                 />
               ))}
             </div>
@@ -607,11 +544,11 @@ export function QuoteSlider() {
                         <div className="flex flex-col items-start space-y-0.5 justify-center">
                           <div className="flex space-x-1 text-sm">
                             <span style={{ color: colors.$3 }}>
-                              {quote?.client
+                              {credit?.client
                                 ? formatMoney(
                                     activity.history.amount,
-                                    quote?.client?.country_id,
-                                    quote?.client?.settings.currency_id
+                                    credit.client?.country_id,
+                                    credit.client?.settings.currency_id
                                   )
                                 : null}
                             </span>
@@ -624,10 +561,10 @@ export function QuoteSlider() {
                               to={`/clients/${activity.client_id}`}
                               renderSpan={disableNavigation(
                                 'client',
-                                quote?.client
+                                credit?.client
                               )}
                             >
-                              {quote?.client?.display_name}
+                              {credit?.client?.display_name}
                             </DynamicLink>
                           </div>
 
@@ -674,7 +611,7 @@ export function QuoteSlider() {
             />
 
             <AddActivityComment
-              entity="quote"
+              entity="credit"
               entityId={resource?.id}
               label={resource?.number || ''}
             />
@@ -755,21 +692,21 @@ export function QuoteSlider() {
 
         <div className="px-4">
           <Upload
-            endpoint={endpoint('/api/v1/quotes/:id/upload', {
-              id: quote?.id,
+            endpoint={endpoint('/api/v1/credits/:id/upload', {
+              id: credit?.id,
             })}
-            onSuccess={() => $refetch(['quotes'])}
+            onSuccess={() => $refetch(['credits'])}
             widgetOnly
             disableUpload={
-              !hasPermission('edit_quote') && !entityAssigned(quote)
+              !hasPermission('edit_credit') && !entityAssigned(credit)
             }
           />
 
           <DocumentsTable
-            documents={quote?.documents || []}
-            onDocumentDelete={() => $refetch(['quotes'])}
+            documents={credit?.documents || []}
+            onDocumentDelete={() => $refetch(['credits'])}
             disableEditableOptions={
-              !entityAssigned(quote, true) && !hasPermission('edit_quote')
+              !entityAssigned(credit, true) && !hasPermission('edit_credit')
             }
           />
         </div>
