@@ -37,6 +37,7 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdEdit,
   MdNotStarted,
   MdRestore,
   MdStopCircle,
@@ -499,8 +500,15 @@ export function useToggleStartStop() {
   };
 }
 
-export function useActions() {
+interface ActionsParams {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
+}
+
+export function useActions(params?: ActionsParams) {
   const [t] = useTranslation();
+
+  const { showEditAction, showCommonBulkAction } = params || {};
 
   const navigate = useNavigate();
 
@@ -545,6 +553,18 @@ export function useActions() {
 
   const actions: Action<RecurringExpense>[] = [
     (recurringExpense) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/recurring_expenses/:id/edit', {
+            id: recurringExpense.id,
+          })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
+    (recurringExpense) =>
       (recurringExpense.status_id === RecurringExpenseStatus.Draft ||
         recurringExpense.status_id === RecurringExpenseStatus.Paused) && (
         <DropdownElement
@@ -582,9 +602,12 @@ export function useActions() {
           {t('clone_to_expense')}
         </DropdownElement>
       ),
-    () => isEditPage && <Divider withoutPadding />,
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (recurringExpense) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       getEntityState(recurringExpense) === EntityState.Active && (
         <DropdownElement
           onClick={() => bulk([recurringExpense.id], 'archive')}
@@ -594,7 +617,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (recurringExpense) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       (getEntityState(recurringExpense) === EntityState.Archived ||
         getEntityState(recurringExpense) === EntityState.Deleted) && (
         <DropdownElement
@@ -605,7 +628,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (recurringExpense) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       (getEntityState(recurringExpense) === EntityState.Active ||
         getEntityState(recurringExpense) === EntityState.Archived) && (
         <DropdownElement

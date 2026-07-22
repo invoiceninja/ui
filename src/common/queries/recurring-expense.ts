@@ -53,7 +53,9 @@ export function useRecurringExpenseQuery(params: Params) {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/recurring_expenses/:id', { id: params.id })
+        endpoint('/api/v1/recurring_expenses/:id?include=vendor,client,category', {
+          id: params.id,
+        })
       ).then(
         (response: GenericSingleResourceResponse<RecurringExpense>) =>
           response.data.data
