@@ -63,6 +63,7 @@ export const clientMap: Record[] = [
   { trans: 'id_number', value: 'client.id_number', map: 'client' },
   { trans: 'public_notes', value: 'client.public_notes', map: 'client' },
   { trans: 'phone', value: 'client.phone', map: 'client' },
+  { trans: 'is_tax_exempt', value: 'client.is_tax_exempt', map: 'client' },
   { trans: 'classification', value: 'client.classification', map: 'client' },
   { trans: 'credit_balance', value: 'client.credit_balance', map: 'client' },
   { trans: 'payment_balance', value: 'client.payment_balance', map: 'client' },
