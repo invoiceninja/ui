@@ -74,4 +74,5 @@ export const clientMap: Record[] = [
   { trans: 'custom_value2', value: 'contact.custom_value2', map: 'client' },
   { trans: 'custom_value3', value: 'contact.custom_value3', map: 'client' },
   { trans: 'custom_value4', value: 'contact.custom_value4', map: 'client' },
+  { trans: 'tags', value: 'client.tags', map: 'client' },
 ];

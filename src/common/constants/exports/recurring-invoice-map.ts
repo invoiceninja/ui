@@ -212,4 +212,9 @@ export const recurringinvoiceMap: Record[] = [
     value: 'recurring_invoice.tax_rate3',
     map: 'recurring_invoice',
   },
+  {
+    trans: 'tags',
+    value: 'recurring_invoice.tags',
+    map: 'recurring_invoice',
+  },
 ];

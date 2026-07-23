@@ -57,4 +57,5 @@ export const expenseMap: Record[] = [
   { trans: 'invoice', value: 'expense.invoice_id', map: 'expense' },
   { trans: 'user', value: 'expense.user', map: 'expense' },
   { trans: 'assigned_user', value: 'expense.assigned_user', map: 'expense' },
+  { trans: 'tags', value: 'expense.tags', map: 'expense' },
 ];
