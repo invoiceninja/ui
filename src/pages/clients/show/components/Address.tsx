@@ -9,8 +9,8 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { Client } from '$app/common/interfaces/client';
+import { FormattedAddress } from '$app/components/FormattedAddress';
 import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
 
@@ -25,8 +25,6 @@ export function Address(props: Props) {
 
   const colors = useColorScheme();
 
-  const resolveCountry = useResolveCountry();
-
   return (
     <>
       {client && (
@@ -38,36 +36,11 @@ export function Address(props: Props) {
           withoutPadding
         >
           <div className="flex flex-col pt-1 h-44 overflow-y-auto">
-            {(client.address1 || client.address2) && (
-              <span
-                className="break-all text-sm font-medium"
-                style={{ color: colors.$3 }}
-              >
-                {client.address1.length > 0 && client.address1}
-                {client.address1.length > 0 && <br />}
-                {client.address2}
-              </span>
-            )}
-
-            {(client.city || client.state || client.postal_code) && (
-              <span
-                className="break-all text-sm font-medium"
-                style={{ color: colors.$3 }}
-              >
-                {client.city.length > 0 && client.city} &nbsp;
-                {client.state} &nbsp;
-                {client.postal_code.length > 0 && client.postal_code}
-              </span>
-            )}
-
-            {resolveCountry(client.country_id)?.name && (
-              <span
-                className="break-all text-sm font-medium"
-                style={{ color: colors.$3 }}
-              >
-                {resolveCountry(client.country_id)?.name}
-              </span>
-            )}
+            <FormattedAddress
+              address={client}
+              className="break-all text-sm font-medium"
+              style={{ color: colors.$3 }}
+            />
           </div>
         </InfoCard>
       )}

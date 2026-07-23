@@ -120,6 +120,21 @@ export function Preferences() {
       </Element>
 
       <Element
+        leftSide={t('persist_table_filters')}
+        leftSideHelp={t('persist_table_filters_help')}
+      >
+        <Toggle
+          checked={reactSettings?.persist_table_filters !== false}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.persist_table_filters',
+              value
+            )
+          }
+        />
+      </Element>
+
+      <Element
         leftSide={t('auto_expand_product_table_notes')}
         leftSideHelp={t('auto_expand_product_table_notes_help')}
       >
