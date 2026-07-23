@@ -22,6 +22,7 @@ import { Header } from './components/Header';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { request } from '$app/common/helpers/request';
 import { SignInProviders } from './components/SignInProviders';
+import { OidcSignIn } from './components/OidcSignIn';
 import { LoginMethod, useLogin, useLoginPrecheck } from './common/hooks';
 import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
@@ -407,6 +408,8 @@ export function Login() {
             <HostedLinks />
           </div>
         )}
+
+        <OidcSignIn />
 
         <p className="mt-4 text-xs">{version}</p>
       </div>
