@@ -22,6 +22,7 @@ import {
   taxKey,
   unroundedPercentageOf,
 } from './round';
+import { InclusiveTax } from './inclusive-tax';
 import type { TaxItem } from './invoice-sum';
 
 interface LineTaxDefinition {
@@ -122,20 +123,18 @@ export class InvoiceItemSumInclusive {
   }
 
   protected calculateTaxes() {
-    let itemTax = 0;
-
     const amount =
       this.item.line_total -
       unroundedPercentageOf(this.item.line_total, this.invoice.discount);
 
-    //
-
-    const itemTaxRateOneLocal = this.calcInclusiveLineTax(
-      this.item.tax_rate1,
-      amount
+    const { net, tax, components } = InclusiveTax.backout(
+      amount,
+      [this.item.tax_rate1, this.item.tax_rate2, this.item.tax_rate3],
+      this.precision
     );
 
-    itemTax += roundToPrecision(itemTaxRateOneLocal, this.precision);
+    const [itemTaxRateOneLocal, itemTaxRateTwoLocal, itemTaxRateThreeLocal] =
+      components;
 
     if (this.item.tax_name1.length > 1) {
       this.groupTax(
@@ -143,18 +142,10 @@ export class InvoiceItemSumInclusive {
         this.item.tax_rate1,
         itemTaxRateOneLocal,
         amount,
-        this.item.tax_id
+        this.item.tax_id,
+        net
       );
     }
-
-    //
-
-    const itemTaxRateTwoLocal = this.calcInclusiveLineTax(
-      this.item.tax_rate2,
-      amount
-    );
-
-    itemTax += roundToPrecision(itemTaxRateTwoLocal, this.precision);
 
     if (this.item.tax_name2.length > 1) {
       this.groupTax(
@@ -162,18 +153,10 @@ export class InvoiceItemSumInclusive {
         this.item.tax_rate2,
         itemTaxRateTwoLocal,
         amount,
-        this.item.tax_id
+        this.item.tax_id,
+        net
       );
     }
-
-    //
-
-    const itemTaxRateThreeLocal = this.calcInclusiveLineTax(
-      this.item.tax_rate3,
-      amount
-    );
-
-    itemTax += roundToPrecision(itemTaxRateThreeLocal, this.precision);
 
     if (this.item.tax_name3.length > 1) {
       this.groupTax(
@@ -181,17 +164,16 @@ export class InvoiceItemSumInclusive {
         this.item.tax_rate3,
         itemTaxRateThreeLocal,
         amount,
-        this.item.tax_id
+        this.item.tax_id,
+        net
       );
     }
 
-    const taxAmount = isNaN(itemTax)
-      ? 0
-      : roundToPrecision(itemTax, this.precision);
+    const taxAmount = isNaN(tax) ? 0 : tax;
 
     this.item.gross_line_total = this.item.line_total;
     this.item.tax_amount = taxAmount;
-    this.item.net_cost = this.calculateNetCost(amount, taxAmount);
+    this.item.net_cost = this.calculateNetCost(net);
     this.totalTaxes += taxAmount;
 
     return this;
@@ -202,11 +184,18 @@ export class InvoiceItemSumInclusive {
     rate: number,
     total: number,
     baseAmount = 0,
-    taxId = ''
+    taxId = '',
+    netAmount: number | null = null
   ) {
     if (rate > 0 && baseAmount === 0) {
       return;
     }
+
+    const base_amount =
+      netAmount ??
+      (rate > 0
+        ? roundToPrecision(baseAmount / (1 + rate / 100), 2)
+        : baseAmount);
 
     const group: TaxItem = {
       key: taxKey(name, rate),
@@ -214,10 +203,7 @@ export class InvoiceItemSumInclusive {
       name: formatTaxName(name, rate),
       tax_id: taxId,
       tax_rate: rate,
-      base_amount:
-        rate > 0
-          ? roundToPrecision(baseAmount / (1 + rate / 100), 2)
-          : baseAmount,
+      base_amount,
     };
 
     this.taxCollection.push(group);
@@ -231,38 +217,12 @@ export class InvoiceItemSumInclusive {
     return roundToPrecision(amount - amount / (1 + rate / 100), 2);
   }
 
-  protected calculateNetCost(amount: number, taxAmount: number) {
+  protected calculateNetCost(net: number) {
     if (!this.item.quantity) {
       return this.item.cost;
     }
 
-    return roundToPrecision(
-      (amount - taxAmount) / this.item.quantity,
-      this.precision
-    );
-  }
-
-  protected calculateAmountDiscountNetCost(amount: number) {
-    if (!this.item.quantity) {
-      return this.item.cost;
-    }
-
-    const totalRate =
-      (this.item.tax_rate1 ?? 0) +
-      (this.item.tax_rate2 ?? 0) +
-      (this.item.tax_rate3 ?? 0);
-    const divisor = 100 + totalRate;
-
-    if (divisor === 0) {
-      return this.item.cost;
-    }
-
-    const netCost = (amount * (100 / divisor)) / this.item.quantity;
-
-    return roundToPrecision(
-      roundToPrecision(netCost, this.precision + 1),
-      this.precision
-    );
+    return roundToPrecision(net / this.item.quantity, this.precision);
   }
 
   protected push() {
@@ -283,7 +243,6 @@ export class InvoiceItemSumInclusive {
     this.lineItems
       // .filter((item) => item.line_total > 0)
       .map((item, index: number) => {
-        let itemTax = 0;
         this.item = item;
 
         const amount =
@@ -292,12 +251,14 @@ export class InvoiceItemSumInclusive {
             : this.item.line_total -
               this.invoice.discount * (this.item.line_total / this.subTotal);
 
-        const itemTaxRateOneTotal = this.calcInclusiveLineTax(
-          this.item.tax_rate1,
-          amount
+        const { net, tax, components } = InclusiveTax.backout(
+          amount,
+          [this.item.tax_rate1, this.item.tax_rate2, this.item.tax_rate3],
+          this.precision
         );
 
-        itemTax += itemTaxRateOneTotal;
+        const [itemTaxRateOneTotal, itemTaxRateTwoTotal, itemTaxRateThree] =
+          components;
 
         if (itemTaxRateOneTotal !== 0) {
           this.groupTax(
@@ -305,18 +266,10 @@ export class InvoiceItemSumInclusive {
             this.item.tax_rate1,
             itemTaxRateOneTotal,
             amount,
-            this.item.tax_id
+            this.item.tax_id,
+            net
           );
         }
-
-        //
-
-        const itemTaxRateTwoTotal = this.calcInclusiveLineTax(
-          this.item.tax_rate2,
-          amount
-        );
-
-        itemTax += itemTaxRateTwoTotal;
 
         if (itemTaxRateTwoTotal !== 0) {
           this.groupTax(
@@ -324,18 +277,10 @@ export class InvoiceItemSumInclusive {
             this.item.tax_rate2,
             itemTaxRateTwoTotal,
             amount,
-            this.item.tax_id
+            this.item.tax_id,
+            net
           );
         }
-
-        //
-
-        const itemTaxRateThree = this.calcInclusiveLineTax(
-          this.item.tax_rate3,
-          amount
-        );
-
-        itemTax += itemTaxRateThree;
 
         if (itemTaxRateThree !== 0) {
           this.groupTax(
@@ -343,18 +288,19 @@ export class InvoiceItemSumInclusive {
             this.item.tax_rate3,
             itemTaxRateThree,
             amount,
-            this.item.tax_id
+            this.item.tax_id,
+            net
           );
         }
 
-        const taxAmount = isNaN(itemTax) ? 0 : itemTax;
+        const taxAmount = isNaN(tax) ? 0 : tax;
 
         this.item.gross_line_total = this.item.line_total;
         this.item.tax_amount = taxAmount;
-        this.item.net_cost = this.calculateAmountDiscountNetCost(amount);
+        this.item.net_cost = this.calculateNetCost(net);
 
         this.lineItems[index] = this.item;
-        this.totalTaxes += isNaN(itemTax) ? 0 : itemTax;
+        this.totalTaxes += taxAmount;
       });
 
     this.addPeppolSurchargeTaxes();

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { InvoiceSum } from '../../../src/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '../../../src/common/helpers/invoices/invoice-sum-inclusive';
+import { InclusiveTax } from '../../../src/common/helpers/invoices/inclusive-tax';
 import { Invoice } from '../../../src/common/interfaces/invoice';
 import {
   InvoiceItem,
@@ -414,7 +415,7 @@ describe('Zero-precision currency (JPY) rounding', () => {
     expect(result.invoice.amount).toEqual(11);
   });
 
-  it('keeps inclusive JPY line tax unrounded in invoice tax totals', () => {
+  it('rounds inclusive JPY line tax to currency precision in invoice tax totals', () => {
     const inv = makeInvoice({
       uses_inclusive_taxes: true,
       line_items: [makeLineItem({ cost: 10, tax_name1: 'Tax', tax_rate1: 10 })],
@@ -425,13 +426,13 @@ describe('Zero-precision currency (JPY) rounding', () => {
 
     expect(result.subTotal).toEqual(10);
     expect(item.tax_amount).toEqual(1);
-    expect(result.getTaxMap().first()?.total).toEqual(0.91);
-    expect(result.totalTaxes).toEqual(0.91);
-    expect(result.invoice.total_taxes).toEqual(0.91);
+    expect(result.getTaxMap().first()?.total).toEqual(1);
+    expect(result.totalTaxes).toEqual(1);
+    expect(result.invoice.total_taxes).toEqual(1);
     expect(result.invoice.amount).toEqual(10);
   });
 
-  it('rounds inclusive JPY display tax per component while keeping tax-map totals at 2 decimals', () => {
+  it('rounds inclusive JPY tax per component to currency precision with the shared net as base', () => {
     const inv = makeInvoice({
       uses_inclusive_taxes: true,
       line_items: [
@@ -451,10 +452,10 @@ describe('Zero-precision currency (JPY) rounding', () => {
 
     expect(item.tax_amount).toEqual(2);
     expect(item.net_cost).toEqual(13);
-    expect(taxRows.pluck('total').all()).toEqual([1.36, 1.36]);
-    expect(taxRows.pluck('base_amount').all()).toEqual([13.64, 13.64]);
-    expect(result.totalTaxes).toEqual(2.72);
-    expect(result.invoice.total_taxes).toEqual(2.72);
+    expect(taxRows.pluck('total').all()).toEqual([1, 1]);
+    expect(taxRows.pluck('base_amount').all()).toEqual([13, 13]);
+    expect(result.totalTaxes).toEqual(2);
+    expect(result.invoice.total_taxes).toEqual(2);
     expect(result.invoice.amount).toEqual(15);
   });
 });
@@ -577,7 +578,7 @@ describe('API parity invoice sum fields', () => {
     expect(result.subTotal).toEqual(110);
     expect(result.totalDiscount).toEqual(10);
     expect(result.totalTaxes).toEqual(9.09);
-    expect(result.getNetSubtotal()).toEqual(100);
+    expect(result.getNetSubtotal()).toEqual(90.91);
   });
 
   it('keeps invoice-level taxes separate from line taxes', () => {
@@ -757,7 +758,7 @@ describe('API parity invoice sum fields', () => {
     expect(result.invoice.amount).toEqual(1.02);
   });
 
-  it('uses the API combined-rate net cost formula for inclusive amount discounts', () => {
+  it('uses the additive combined-rate back-out for inclusive amount discounts', () => {
     const inv = makeInvoice({
       uses_inclusive_taxes: true,
       is_amount_discount: true,
@@ -777,10 +778,10 @@ describe('API parity invoice sum fields', () => {
     const result = new InvoiceSumInclusive(inv, USD).build();
     const item = result.invoice.line_items[0];
 
-    expect(item.tax_amount).toEqual(15.93);
+    expect(item.tax_amount).toEqual(15);
     expect(item.net_cost).toEqual(100);
-    expect(result.getTaxMap().pluck('total').all()).toEqual([10.45, 5.48]);
-    expect(result.totalTaxes).toEqual(15.93);
+    expect(result.getTaxMap().pluck('total').all()).toEqual([10, 5]);
+    expect(result.totalTaxes).toEqual(15);
   });
 
   it('keeps inclusive line totals at two decimals before JPY invoice rounding', () => {
@@ -842,5 +843,286 @@ describe('calculateTotals no-op fix verification', () => {
 
     expect(result.total).toEqual(36.66);
     expect(result.invoice.amount).toEqual(36.66);
+  });
+});
+
+describe('Issue #12072 - inclusive multi-tax reproduction', () => {
+  it('backs $1000 out of two 10% inclusive taxes additively, not compounded', () => {
+    const { net, tax, components } = InclusiveTax.backout(1000, [10, 10, 0]);
+
+    expect(net).toEqual(833.34);
+    expect(tax).toEqual(166.66);
+    expect(components).toEqual([83.33, 83.33, 0]);
+    expect(net).not.toEqual(826.45);
+  });
+
+  it('shows the additive tax split and reconciling total on an inclusive invoice', () => {
+    const inv = makeInvoice({
+      uses_inclusive_taxes: true,
+      line_items: [
+        makeLineItem({
+          cost: 1000,
+          tax_name1: 'TEST TAX A',
+          tax_rate1: 10,
+          tax_name2: 'TEST TAX B',
+          tax_rate2: 10,
+        }),
+      ],
+    });
+
+    const result = new InvoiceSumInclusive(inv, USD).build();
+    const item = result.invoice.line_items[0];
+    const taxRows = result.getTaxMap();
+
+    expect(item.net_cost).toEqual(833.34);
+    expect(item.tax_amount).toEqual(166.66);
+    expect(taxRows.pluck('name').all()).toEqual([
+      'TEST TAX A 10 %',
+      'TEST TAX B 10 %',
+    ]);
+    expect(taxRows.pluck('total').all()).toEqual([83.33, 83.33]);
+    expect(result.totalTaxes).toEqual(166.66);
+    expect(result.invoice.total_taxes).toEqual(166.66);
+    expect(result.invoice.amount).toEqual(1000);
+    expect(result.getSubTotal()).toEqual(1000);
+  });
+});
+
+describe('Inclusive invoice totals - backend parity (PDF values)', () => {
+  const twentyInclusive = (overrides: Partial<Invoice> = {}) =>
+    makeInvoice({
+      uses_inclusive_taxes: true,
+      line_items: [makeLineItem({ cost: 10 }), makeLineItem({ cost: 10 })],
+      ...overrides,
+    });
+
+  it('invoice-level inclusive tax with amount discount and non-taxable surcharge', () => {
+    const result = new InvoiceSumInclusive(
+      twentyInclusive({
+        discount: 5,
+        is_amount_discount: true,
+        custom_surcharge1: 5,
+        custom_surcharge_tax1: false,
+        tax_name1: 'GST',
+        tax_rate1: 10,
+      }),
+      USD
+    ).build();
+
+    expect(result.getSubTotal()).toEqual(20);
+    expect(result.getTotalTaxes()).toEqual(1.36);
+    expect(result.getTotal()).toEqual(20);
+    expect(result.invoice.balance).toEqual(20);
+  });
+
+  it('invoice-level inclusive tax with percent discount and surcharge', () => {
+    const result = new InvoiceSumInclusive(
+      twentyInclusive({
+        discount: 5,
+        is_amount_discount: false,
+        custom_surcharge1: 5,
+        tax_name1: 'GST',
+        tax_rate1: 10,
+      }),
+      USD
+    ).build();
+
+    expect(result.getSubTotal()).toEqual(20);
+    expect(result.getTotalTaxes()).toEqual(1.73);
+    expect(result.getTotal()).toEqual(24);
+  });
+
+  it('double invoice-level inclusive tax is additive, not compounded', () => {
+    const result = new InvoiceSumInclusive(
+      twentyInclusive({
+        discount: 5,
+        is_amount_discount: true,
+        custom_surcharge1: 5,
+        tax_name1: 'GST',
+        tax_rate1: 10,
+        tax_name2: 'GST',
+        tax_rate2: 10,
+      }),
+      USD
+    ).build();
+
+    expect(result.getSubTotal()).toEqual(20);
+    expect(result.getTotalTaxes()).toEqual(2.5);
+    expect(result.getTotal()).toEqual(20);
+  });
+
+  it('taxable surcharge is folded into the inclusive invoice-level tax base', () => {
+    const result = new InvoiceSumInclusive(
+      twentyInclusive({
+        custom_surcharge1: 10,
+        custom_surcharge_tax1: true,
+        tax_name1: 'GST',
+        tax_rate1: 10,
+      }),
+      USD
+    ).build();
+
+    expect(result.getSubTotal()).toEqual(20);
+    expect(result.getTotalTaxes()).toEqual(2.73);
+    expect(result.getTotal()).toEqual(30);
+  });
+
+  it('line taxes share one net base (833.34) that reconciles to the gross', () => {
+    const result = new InvoiceSumInclusive(
+      makeInvoice({
+        uses_inclusive_taxes: true,
+        line_items: [
+          makeLineItem({
+            cost: 1000,
+            tax_name1: 'GST',
+            tax_rate1: 10,
+            tax_name2: 'PST',
+            tax_rate2: 10,
+          }),
+        ],
+      }),
+      USD
+    ).build();
+
+    const map = result.getTaxMap();
+
+    expect(result.getSubTotal()).toEqual(1000);
+    expect(result.getTotalTaxes()).toEqual(166.66);
+    expect(result.getTotal()).toEqual(1000);
+    expect(map.count()).toEqual(2);
+    expect(map.sum('total')).toEqual(166.66);
+    expect(map.pluck('total').all()).toEqual([83.33, 83.33]);
+    expect(map.pluck('base_amount').all()).toEqual([833.34, 833.34]);
+  });
+
+  it('three inclusive line taxes back out additively', () => {
+    const result = new InvoiceSumInclusive(
+      makeInvoice({
+        uses_inclusive_taxes: true,
+        line_items: [
+          makeLineItem({
+            cost: 1000,
+            tax_name1: 'GST',
+            tax_rate1: 10,
+            tax_name2: 'PST',
+            tax_rate2: 10,
+            tax_name3: 'HST',
+            tax_rate3: 10,
+          }),
+        ],
+      }),
+      USD
+    ).build();
+
+    expect(result.getSubTotal()).toEqual(1000);
+    expect(result.getTotalTaxes()).toEqual(230.76);
+    expect(result.getTotal()).toEqual(1000);
+    expect(result.invoice.line_items[0].net_cost).toEqual(769.24);
+    expect(result.getTaxMap().pluck('total').all()).toEqual([76.92, 76.92, 76.92]);
+  });
+
+  it('multi-line inclusive invoice keeps total equal to gross subtotal', () => {
+    const result = new InvoiceSumInclusive(
+      makeInvoice({
+        uses_inclusive_taxes: true,
+        line_items: [
+          makeLineItem({ cost: 100, tax_name1: 'GST', tax_rate1: 10 }),
+          makeLineItem({ cost: 200, tax_name1: 'GST', tax_rate1: 10 }),
+        ],
+      }),
+      USD
+    ).build();
+
+    expect(result.getSubTotal()).toEqual(300);
+    expect(result.getTotal()).toEqual(300);
+    expect(result.getTotalTaxes()).toEqual(27.27);
+    expect(result.getTotal()).toEqual(result.getSubTotal());
+  });
+
+  it('inclusive line net plus tax reconciles to the gross across a sweep', () => {
+    const items: Array<Partial<InvoiceItem>> = [
+      { cost: 1000, tax_name1: 'GST', tax_rate1: 10, tax_name2: 'PST', tax_rate2: 10 },
+      { cost: 123.45, tax_name1: 'GST', tax_rate1: 7, tax_name2: 'PST', tax_rate2: 13 },
+      { cost: 99.99, tax_name1: 'GST', tax_rate1: 15 },
+      {
+        cost: 500,
+        tax_name1: 'GST',
+        tax_rate1: 21,
+        tax_name2: 'PST',
+        tax_rate2: 6,
+        tax_name3: 'HST',
+        tax_rate3: 3,
+      },
+    ];
+
+    items.forEach((item) => {
+      const result = new InvoiceSumInclusive(
+        makeInvoice({ uses_inclusive_taxes: true, line_items: [makeLineItem(item)] }),
+        USD
+      ).build();
+
+      const line = result.invoice.line_items[0];
+
+      expect(
+        Number(((line.net_cost ?? 0) + (line.tax_amount ?? 0)).toFixed(2))
+      ).toEqual(line.line_total);
+      expect(result.getTotal()).toEqual(result.getSubTotal());
+    });
+  });
+
+  it('net subtotal backs out invoice-level inclusive taxes', () => {
+    const result = new InvoiceSumInclusive(
+      makeInvoice({
+        uses_inclusive_taxes: true,
+        tax_name1: 'TAX A',
+        tax_rate1: 10,
+        tax_name2: 'TAX B',
+        tax_rate2: 10,
+        line_items: [makeLineItem({ cost: 1000 })],
+      }),
+      USD
+    ).build();
+
+    expect(result.getSubTotal()).toEqual(1000);
+    expect(result.getTotalTaxes()).toEqual(166.66);
+    expect(result.getNetSubtotal()).toEqual(833.34);
+    expect(result.getTotal()).toEqual(1000);
+  });
+
+  it('net subtotal subtracts inclusive taxes and discount together', () => {
+    const result = new InvoiceSumInclusive(
+      twentyInclusive({
+        discount: 5,
+        is_amount_discount: true,
+        tax_name1: 'GST',
+        tax_rate1: 10,
+      }),
+      USD
+    ).build();
+
+    expect(result.getSubTotal()).toEqual(20);
+    expect(result.getTotalTaxes()).toEqual(1.36);
+    expect(result.getTotalDiscount()).toEqual(5);
+    expect(result.getNetSubtotal()).toEqual(13.64);
+  });
+
+  it('net subtotal backs out line-level inclusive taxes', () => {
+    const result = new InvoiceSumInclusive(
+      makeInvoice({
+        uses_inclusive_taxes: true,
+        line_items: [
+          makeLineItem({
+            cost: 1000,
+            tax_name1: 'GST',
+            tax_rate1: 10,
+            tax_name2: 'PST',
+            tax_rate2: 10,
+          }),
+        ],
+      }),
+      USD
+    ).build();
+
+    expect(result.getNetSubtotal()).toEqual(833.34);
   });
 });
