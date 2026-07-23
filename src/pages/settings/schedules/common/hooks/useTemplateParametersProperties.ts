@@ -13,6 +13,8 @@ import {
   DEFAULT_REPORT_FIELDS,
   REPORTS_FIELDS,
 } from '../components/EmailReport';
+import { REPORT_TAG_ENTITY_TYPES } from '$app/pages/reports/common/hooks/useShowReportField';
+import { Identifier } from '$app/pages/reports/common/useReports';
 
 interface Params {
   schedule: Schedule | undefined;
@@ -43,6 +45,14 @@ export function useTemplateParametersProperties(params: Params) {
         reportProperties = reportProperties.filter(
           (property) => property !== 'start_date' && property !== 'end_date'
         );
+      }
+
+      if (
+        (schedule.parameters.report_name as Identifier) in
+          REPORT_TAG_ENTITY_TYPES &&
+        !reportProperties.includes('tag_ids')
+      ) {
+        reportProperties = [...reportProperties, 'tag_ids'];
       }
 
       return reportProperties;

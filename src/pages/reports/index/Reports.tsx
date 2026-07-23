@@ -50,7 +50,10 @@ import { MultiExpenseCategorySelector } from '../common/components/MultiExpenseC
 import { MultiProjectSelector } from '../common/components/MultiProjectSelector';
 import { MultiTagSelector } from '../common/components/MultiTagSelector';
 import { MultiVendorSelector } from '../common/components/MultiVendorSelector';
-import { useShowReportField } from '../common/hooks/useShowReportField';
+import {
+  REPORT_TAG_ENTITY_TYPES,
+  useShowReportField,
+} from '../common/hooks/useShowReportField';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { ReportsPlanAlert } from '../common/components/ReportsPlanAlert';
@@ -727,9 +730,8 @@ export default function Reports() {
             <MultiTagSelector
               key={report.identifier}
               entityType={
-                report.identifier === 'task'
-                  ? TAG_ENTITY_TYPES.task
-                  : TAG_ENTITY_TYPES.project
+                REPORT_TAG_ENTITY_TYPES[report.identifier] ??
+                TAG_ENTITY_TYPES.invoice
               }
               value={report.payload.tag_ids}
               onValueChange={(tagIds) => handlePayloadChange('tag_ids', tagIds)}
