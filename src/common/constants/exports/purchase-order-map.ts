@@ -143,4 +143,5 @@ export const purchaseorderMap: Record[] = [
     value: 'purchase_order.subtotal',
     map: 'purchase_order',
   },
+  { trans: 'tags', value: 'purchase_order.tags', map: 'purchase_order' },
 ];

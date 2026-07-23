@@ -55,4 +55,5 @@ export const vendorMap: Record[] = [
   },
   { trans: 'email', value: 'vendor_contact.email', map: 'vendor' },
   { trans: 'status', value: 'vendor.status', map: 'vendor' },
+  { trans: 'tags', value: 'vendor.tags', map: 'vendor' },
 ];
