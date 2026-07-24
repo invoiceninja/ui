@@ -17,7 +17,7 @@ import { route } from '$app/common/helpers/route';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { usePaymentQuery } from '$app/common/queries/payments';
 import { FormikProps, useFormik } from 'formik';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -47,6 +47,7 @@ export default function Apply() {
   const { data: payment } = usePaymentQuery({ id });
 
   const [errors, setErrors] = useState<ValidationBag>();
+  const [hasCashDiscount, setHasCashDiscount] = useState(true);
 
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
@@ -119,6 +120,13 @@ export default function Apply() {
     isApplyPage: true,
   });
 
+  const handleDataLoaded = useCallback((invoices: Invoice[]) => {
+    console.log(invoices);
+    setHasCashDiscount(
+      invoices.some((invoice) => Boolean(invoice.cash_discount))
+    );
+  }, []);
+
   useEffect(() => {
     let total = 0;
     formik.values.invoices.map((invoice: any) => {
@@ -186,6 +194,8 @@ export default function Apply() {
               resource="invoice"
               endpoint={`/api/v1/invoices?include=client&payable=${payment?.client_id}&per_page=100&sort=date|desc&per_page=1000`}
               columns={columns}
+              excludeColumns={hasCashDiscount ? undefined : ['cash_discount']}
+              onDataLoaded={handleDataLoaded}
               onSelectedResourcesChange={(selectedResources) => {
                 if (selectedResources.length > 0) {
                   const newInvoices: ApplyInvoice[] = [];

@@ -27,7 +27,7 @@ import { CustomField } from '$app/components/CustomField';
 
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useSave } from './hooks/useSave';
@@ -93,6 +93,7 @@ export default function Create() {
   const [payment, setPayment] = useAtom(paymentAtom);
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [hasCashDiscount, setHasCashDiscount] = useState(true);
   const [sendEmail, setSendEmail] = useState(
     company?.settings?.client_manual_payment_notification
   );
@@ -122,6 +123,12 @@ export default function Create() {
     setPayment,
     errors,
   });
+
+  const handleInvoiceDataLoaded = useCallback((invoices: Invoice[]) => {
+    setHasCashDiscount(
+      invoices.some((invoice) => Boolean(invoice.cash_discount))
+    );
+  }, []);
 
   const calculateInitialAmount = (invoice: Invoice) => {
     const baseAmount = invoice.balance > 0 ? invoice.balance : invoice.amount;
@@ -438,6 +445,10 @@ export default function Create() {
                 queryIdentificator="/api/v1/invoices"
                 endpoint={initialEndpoints.invoices}
                 columns={invoiceColumns}
+                excludeColumns={
+                  hasCashDiscount ? undefined : ['cash_discount']
+                }
+                onDataLoaded={handleInvoiceDataLoaded}
                 onSelectedResourcesChange={(selectedResources) => {
                   if (selectedResources.length > 0) {
                     const newInvoices: PaymentInvoice[] = [];
