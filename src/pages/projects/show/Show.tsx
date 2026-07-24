@@ -58,6 +58,7 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
 import { ProjectPublicNotes } from './components/ProjectPublicNotes';
+import { ProjectBurnUp } from './components/ProjectBurnUp';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { useFilterColumns } from '$app/pages/tasks/common/hooks/useFilterColumns';
 import { TagPills } from '$app/components/tags/TagPills';
@@ -274,6 +275,13 @@ export default function Show() {
           </div>
         </InfoCard>
       </div>
+
+      {enabled(ModuleBitmask.Tasks) &&
+        (hasPermission('view_task') || hasPermission('edit_task')) && (
+          <div className="my-4">
+            <ProjectBurnUp project={project} />
+          </div>
+        )}
 
       {enabled(ModuleBitmask.Tasks) && (
         <div className="my-4">
