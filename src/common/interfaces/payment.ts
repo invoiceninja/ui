@@ -17,6 +17,7 @@ export interface Payment {
   user_id: string;
   assigned_user_id: string;
   amount: number;
+  cash_discount: number;
   refunded: number;
   applied: number;
   transaction_reference: string;
