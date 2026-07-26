@@ -13,7 +13,7 @@ import { Project } from '$app/common/interfaces/project';
 import { Card } from '$app/components/cards';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { computeBurnUp } from './burn-up';
+import { computeBurnUp } from '$app/pages/projects/show/common/helpers/burn-up';
 import { BurnUpChart } from './BurnUpChart';
 import { BurnUpEmptyState } from './BurnUpEmptyState';
 import { BurnUpStatusBadge } from './BurnUpStatusBadge';

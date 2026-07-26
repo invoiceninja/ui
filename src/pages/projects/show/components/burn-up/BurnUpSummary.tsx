@@ -12,7 +12,7 @@ import { date as formatDate } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { useTranslation } from 'react-i18next';
-import { BurnUpData } from './burn-up';
+import { BurnUpData } from '$app/pages/projects/show/common/helpers/burn-up';
 import { BurnUpStat } from './BurnUpStat';
 
 interface Props {

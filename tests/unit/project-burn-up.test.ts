@@ -10,7 +10,7 @@
 
 import { describe, test, expect } from 'vitest';
 import dayjs from 'dayjs';
-import { computeBurnUp } from '$app/pages/projects/show/components/burn-up/burn-up';
+import { computeBurnUp } from '$app/pages/projects/show/common/helpers/burn-up';
 import { Project } from '$app/common/interfaces/project';
 import { Task } from '$app/common/interfaces/task';
 import { User } from '$app/common/interfaces/user';

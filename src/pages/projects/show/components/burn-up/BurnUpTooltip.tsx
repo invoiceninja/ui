@@ -12,14 +12,21 @@ import { useColorScheme } from '$app/common/colors';
 import { date as formatDate } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { BurnUpPoint } from '$app/pages/projects/show/common/helpers/burn-up';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BurnUpPoint } from './burn-up';
 import { BURN_UP_COMPLETED_COLOR, BURN_UP_TARGET_COLOR } from './constants';
 
 interface TooltipRow {
   label: string;
   value: string;
   color?: string;
+}
+
+interface TooltipContent {
+  dateLabel: string;
+  rows: TooltipRow[];
+  deltaLabel: string | null;
 }
 
 interface Props {
@@ -35,56 +42,79 @@ export function BurnUpTooltip({ scopeHours, active, payload }: Props) {
   const formatNumber = useFormatNumber();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  if (!active || !payload?.length) {
+  const point = active && payload && payload.length ? payload[0].payload : null;
+
+  const content = useMemo<TooltipContent | null>(() => {
+    if (!point) {
+      return null;
+    }
+
+    const formatHours = (value: number): string => {
+      return formatNumber(Number(value.toFixed(1))).toString();
+    };
+
+    const formatPercent = (value: number): string => {
+      return `${formatNumber(Math.round(value))}%`;
+    };
+
+    const rows: TooltipRow[] = [
+      {
+        label: t('completed'),
+        value: point.completed !== null ? formatPercent(point.completed) : '—',
+        color: BURN_UP_COMPLETED_COLOR,
+      },
+      ...(point.target !== null
+        ? [
+            {
+              label: t('target'),
+              value: formatPercent(point.target),
+              color: BURN_UP_TARGET_COLOR,
+            },
+          ]
+        : []),
+      ...(point.loggedHours !== null
+        ? [
+            {
+              label: t('logged'),
+              value: `${formatHours(point.loggedHours)} / ${formatHours(
+                scopeHours
+              )}`,
+            },
+          ]
+        : []),
+    ];
+
+    const delta =
+      point.completed !== null && point.target !== null
+        ? point.completed - point.target
+        : null;
+
+    const deltaLabel =
+      delta === null
+        ? null
+        : delta >= 0
+          ? `${t('ahead_of_schedule')} ${formatPercent(Math.abs(delta))}`
+          : `${t('behind_schedule')} ${formatPercent(Math.abs(delta))}`;
+
+    return {
+      dateLabel: formatDate(point.date, dateFormat),
+      rows,
+      deltaLabel,
+    };
+  }, [point, scopeHours, t, formatNumber, dateFormat]);
+
+  if (!content) {
     return null;
   }
-
-  const point = payload[0].payload;
-
-  const formatHours = (value: number): string => {
-    return formatNumber(Number(value.toFixed(1))).toString();
-  };
-
-  const formatPercent = (value: number): string => {
-    return `${formatNumber(Math.round(value))}%`;
-  };
-
-  const rows: TooltipRow[] = [
-    {
-      label: t('completed'),
-      value: point.completed !== null ? formatPercent(point.completed) : '—',
-      color: BURN_UP_COMPLETED_COLOR,
-    },
-  ];
-
-  if (point.target !== null) {
-    rows.push({
-      label: t('target'),
-      value: formatPercent(point.target),
-      color: BURN_UP_TARGET_COLOR,
-    });
-  }
-
-  if (point.loggedHours !== null) {
-    rows.push({
-      label: t('logged'),
-      value: `${formatHours(point.loggedHours)} / ${formatHours(scopeHours)}`,
-    });
-  }
-
-  const delta =
-    point.completed !== null && point.target !== null
-      ? point.completed - point.target
-      : null;
 
   return (
     <div
       className="p-3 shadow-lg rounded-md border text-sm"
       style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
     >
-      <p className="font-semibold mb-2">{formatDate(point.date, dateFormat)}</p>
+      <p className="font-semibold mb-2">{content.dateLabel}</p>
 
-      {rows.map((row) => (
+      {content.rows.map((row) => (
         <div
           key={row.label}
           className="flex items-center justify-between space-x-8 py-0.5"
@@ -106,14 +136,12 @@ export function BurnUpTooltip({ scopeHours, active, payload }: Props) {
         </div>
       ))}
 
-      {delta !== null && (
+      {content.deltaLabel && (
         <p
           className="mt-2 pt-2 border-t text-xs"
           style={{ borderColor: colors.$20, color: colors.$17 }}
         >
-          {delta >= 0
-            ? `${t('ahead_of_schedule')} ${formatPercent(Math.abs(delta))}`
-            : `${t('behind_schedule')} ${formatPercent(Math.abs(delta))}`}
+          {content.deltaLabel}
         </p>
       )}
     </div>

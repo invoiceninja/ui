@@ -10,7 +10,7 @@
 
 import { Badge, BadgeVariant } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
-import { BurnUpStatus } from './burn-up';
+import { BurnUpStatus } from '$app/pages/projects/show/common/helpers/burn-up';
 
 interface Props {
   status: BurnUpStatus;

@@ -25,7 +25,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { BurnUpData } from './burn-up';
+import { BurnUpData } from '$app/pages/projects/show/common/helpers/burn-up';
 import { BurnUpTooltip } from './BurnUpTooltip';
 import {
   BURN_UP_COMPLETED_COLOR,
