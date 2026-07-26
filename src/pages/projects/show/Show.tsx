@@ -58,7 +58,7 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
 import { ProjectPublicNotes } from './components/ProjectPublicNotes';
-import { ProjectBurnUp } from './components/ProjectBurnUp';
+import { ProjectBurnUp } from './components/burn-up';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { useFilterColumns } from '$app/pages/tasks/common/hooks/useFilterColumns';
 import { TagPills } from '$app/components/tags/TagPills';

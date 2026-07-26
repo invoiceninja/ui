@@ -61,20 +61,33 @@ export interface BurnUpData {
   dueDateKey: string | null;
 }
 
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(Math.max(value, min), max);
-
-function isActive(task: Task) {
-  return getEntityState(task) === 'active';
+interface ComputeBurnUpOptions {
+  now?: Dayjs;
 }
 
-function collectLoggedSecondsByDay(tasks: Task[], now: Dayjs) {
+interface LoggedSeconds {
+  cumulative: { timestamp: number; seconds: number }[];
+  totalSeconds: number;
+}
+
+const clamp = (value: number, min: number, max: number): number => {
+  return Math.min(Math.max(value, min), max);
+};
+
+const isActive = (task: Task): boolean => {
+  return getEntityState(task) === 'active';
+};
+
+const collectLoggedSecondsByDay = (
+  tasks: Task[],
+  now: Dayjs
+): LoggedSeconds => {
   const secondsByDay = new Map<string, number>();
   const nowUnix = now.unix();
 
   let totalSeconds = 0;
 
-  const add = (dayKey: string, seconds: number) => {
+  const add = (dayKey: string, seconds: number): void => {
     if (seconds <= 0) {
       return;
     }
@@ -101,13 +114,15 @@ function collectLoggedSecondsByDay(tasks: Task[], now: Dayjs) {
   });
 
   const cumulative = [...secondsByDay.entries()]
-    .map(([key, seconds]) => ({ timestamp: dayjs(key).valueOf(), seconds }))
+    .map(([key, seconds]) => {
+      return { timestamp: dayjs(key).valueOf(), seconds };
+    })
     .sort((a, b) => a.timestamp - b.timestamp);
 
   return { cumulative, totalSeconds };
-}
+};
 
-function resolveGranularity(spanInDays: number): BurnUpGranularity {
+const resolveGranularity = (spanInDays: number): BurnUpGranularity => {
   if (spanInDays <= 45) {
     return 'day';
   }
@@ -117,13 +132,13 @@ function resolveGranularity(spanInDays: number): BurnUpGranularity {
   }
 
   return 'month';
-}
+};
 
-function buildBoundaries(
+const buildBoundaries = (
   start: Dayjs,
   end: Dayjs,
   granularity: BurnUpGranularity
-) {
+): Dayjs[] => {
   const boundaries: Dayjs[] = [];
 
   let cursor = start.clone();
@@ -144,16 +159,79 @@ function buildBoundaries(
   }
 
   return boundaries;
-}
+};
 
-interface ComputeBurnUpOptions {
-  now?: Dayjs;
-}
+const resolveProjectedCompletion = (params: {
+  now: Dayjs;
+  start: Dayjs;
+  loggedHours: number;
+  remainingHours: number;
+  hasScope: boolean;
+}): string | null => {
+  const { now, start, loggedHours, remainingHours, hasScope } = params;
 
-export function computeBurnUp(
+  if (!hasScope || loggedHours <= 0 || remainingHours <= 0) {
+    return null;
+  }
+
+  const elapsedDays = Math.max(now.diff(start, 'day'), 1);
+  const velocityPerDay = loggedHours / elapsedDays;
+
+  if (velocityPerDay <= 0) {
+    return null;
+  }
+
+  const remainingDays = Math.min(
+    Math.ceil(remainingHours / velocityPerDay),
+    3650
+  );
+
+  return now.add(remainingDays, 'day').format('YYYY-MM-DD');
+};
+
+const resolveStatus = (params: {
+  hasScope: boolean;
+  loggedHours: number;
+  percentComplete: number;
+  targetPercent: number | null;
+  isOverdue: boolean;
+}): BurnUpStatus => {
+  const { hasScope, loggedHours, percentComplete, targetPercent, isOverdue } =
+    params;
+
+  if (!hasScope || loggedHours <= 0) {
+    return 'not_started';
+  }
+
+  if (percentComplete > 100) {
+    return 'over_budget';
+  }
+
+  if (percentComplete >= 100) {
+    return 'completed';
+  }
+
+  if (isOverdue) {
+    return 'overdue';
+  }
+
+  if (targetPercent !== null) {
+    if (percentComplete >= targetPercent + 5) {
+      return 'ahead_of_schedule';
+    }
+
+    if (percentComplete <= targetPercent - 5) {
+      return 'behind_schedule';
+    }
+  }
+
+  return 'on_track';
+};
+
+export const computeBurnUp = (
   project: Project,
   options?: ComputeBurnUpOptions
-): BurnUpData {
+): BurnUpData => {
   const now = (options?.now ?? dayjs()).startOf('day');
 
   const activeTasks = (project.tasks ?? []).filter(isActive);
@@ -193,17 +271,15 @@ export function computeBurnUp(
 
   const dueSpanMs = due ? due.diff(timelineStart) : 0;
 
-  const cumulativeSecondsUntil = (moment: Dayjs) => {
+  const cumulativeSecondsUntil = (moment: Dayjs): number => {
     const limit = moment.valueOf();
 
-    return cumulative.reduce(
-      (total, entry) =>
-        entry.timestamp <= limit ? total + entry.seconds : total,
-      0
-    );
+    return cumulative.reduce((total, entry) => {
+      return entry.timestamp <= limit ? total + entry.seconds : total;
+    }, 0);
   };
 
-  const targetAt = (moment: Dayjs) => {
+  const targetAt = (moment: Dayjs): number | null => {
     if (!due) {
       return null;
     }
@@ -229,6 +305,7 @@ export function computeBurnUp(
 
     const containsToday =
       !now.isBefore(periodStart, 'day') && !now.isAfter(safePeriodEnd, 'day');
+
     if (containsToday) {
       todayKey = dateKey;
     }
@@ -236,6 +313,7 @@ export function computeBurnUp(
     if (due) {
       const containsDue =
         !due.isBefore(periodStart, 'day') && !due.isAfter(safePeriodEnd, 'day');
+
       if (containsDue) {
         dueDateKey = dateKey;
       }
@@ -264,9 +342,9 @@ export function computeBurnUp(
   const remainingHours = Math.max(scopeHours - loggedHours, 0);
   const targetPercent = targetAt(now);
 
-  const invoicedTaskCount = activeTasks.filter(
-    (task) => calculateEntityState(task) === 'invoiced'
-  ).length;
+  const invoicedTaskCount = activeTasks.filter((task) => {
+    return calculateEntityState(task) === 'invoiced';
+  }).length;
   const runningTaskCount = activeTasks.filter(isTaskRunning).length;
 
   const projectedCompletion = resolveProjectedCompletion({
@@ -307,71 +385,4 @@ export function computeBurnUp(
       status,
     },
   };
-}
-
-function resolveProjectedCompletion(params: {
-  now: Dayjs;
-  start: Dayjs;
-  loggedHours: number;
-  remainingHours: number;
-  hasScope: boolean;
-}): string | null {
-  const { now, start, loggedHours, remainingHours, hasScope } = params;
-
-  if (!hasScope || loggedHours <= 0 || remainingHours <= 0) {
-    return null;
-  }
-
-  const elapsedDays = Math.max(now.diff(start, 'day'), 1);
-  const velocityPerDay = loggedHours / elapsedDays;
-
-  if (velocityPerDay <= 0) {
-    return null;
-  }
-
-  const remainingDays = Math.min(
-    Math.ceil(remainingHours / velocityPerDay),
-    3650
-  );
-
-  return now.add(remainingDays, 'day').format('YYYY-MM-DD');
-}
-
-function resolveStatus(params: {
-  hasScope: boolean;
-  loggedHours: number;
-  percentComplete: number;
-  targetPercent: number | null;
-  isOverdue: boolean;
-}): BurnUpStatus {
-  const { hasScope, loggedHours, percentComplete, targetPercent, isOverdue } =
-    params;
-
-  if (!hasScope || loggedHours <= 0) {
-    return 'not_started';
-  }
-
-  if (percentComplete > 100) {
-    return 'over_budget';
-  }
-
-  if (percentComplete >= 100) {
-    return 'completed';
-  }
-
-  if (isOverdue) {
-    return 'overdue';
-  }
-
-  if (targetPercent !== null) {
-    if (percentComplete >= targetPercent + 5) {
-      return 'ahead_of_schedule';
-    }
-
-    if (percentComplete <= targetPercent - 5) {
-      return 'behind_schedule';
-    }
-  }
-
-  return 'on_track';
-}
+};
