@@ -39,7 +39,6 @@ interface Props {
 const COMPLETED_COLOR = '#2276ff';
 const TARGET_COLOR = '#a1a1aa';
 const TODAY_COLOR = '#f59e0b';
-const DUE_COLOR = '#ef4444';
 
 const STATUS_VARIANT: Record<BurnUpStatus, BadgeVariant> = {
   not_started: 'generic',
@@ -228,7 +227,7 @@ export function ProjectBurnUp({ project }: Props) {
 
       {data.hasTasks && data.hasScope && (
         <div className="mt-6">
-          <ResponsiveContainer width="100%" height={340}>
+          <ResponsiveContainer width="100%" height={360}>
             <ComposedChart
               data={data.series}
               margin={{ top: 16, right: 16, left: 0, bottom: 0 }}
@@ -277,7 +276,7 @@ export function ProjectBurnUp({ project }: Props) {
                 wrapperStyle={{ outline: 'none' }}
               />
 
-              <Legend />
+              <Legend wrapperStyle={{ paddingTop: 12 }} />
 
               <ReferenceLine
                 y={100}
@@ -301,20 +300,6 @@ export function ProjectBurnUp({ project }: Props) {
                     value: t('today'),
                     position: 'insideTopRight',
                     fill: TODAY_COLOR,
-                    fontSize: 12,
-                  }}
-                />
-              )}
-
-              {data.dueDateKey && (
-                <ReferenceLine
-                  x={data.dueDateKey}
-                  stroke={DUE_COLOR}
-                  strokeDasharray="5 4"
-                  label={{
-                    value: t('due_date'),
-                    position: 'insideBottomRight',
-                    fill: DUE_COLOR,
                     fontSize: 12,
                   }}
                 />
