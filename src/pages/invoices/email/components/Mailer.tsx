@@ -177,12 +177,10 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
     <div className="grid grid-cols-12 lg:gap-4 my-4">
       <div className="col-span-12 lg:col-span-5 space-y-4">
         <Card>
-          <Element leftSide={t('to')}>
-            <Contact
-              resource={props.resource}
-              resourceType={props.resourceType}
-            />
-          </Element>
+          <Contact
+            resource={props.resource}
+            resourceType={props.resourceType}
+          />
 
           <Element leftSide={t('template')}>
             <SelectField
