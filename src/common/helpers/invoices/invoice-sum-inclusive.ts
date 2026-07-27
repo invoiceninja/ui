@@ -55,6 +55,10 @@ export class InvoiceSumInclusive {
     return this.eInvoiceType === 'PEPPOL';
   }
 
+  public isCashDiscountEntity(entity: Invoice | RecurringInvoice | PurchaseOrder | Credit | Quote): entity is Invoice {
+    return entity.entity_type === 'invoice'
+  }
+
   public build() {
     this.calculateLineItems()
       .calculateDiscount()
@@ -158,7 +162,7 @@ export class InvoiceSumInclusive {
   }
 
   public getCashDiscount() {
-    if (!('cash_discount_percent' in this.invoice)) {
+    if (!this.isCashDiscountEntity(this.invoice)) {
       return 0;
     }
 
@@ -278,7 +282,11 @@ export class InvoiceSumInclusive {
 
     const balance = this.shouldZeroBalance()
       ? 0
-      : this.invoice.amount - (this.invoice.paid_to_date ?? 0);
+      : this.invoice.amount -
+        (this.invoice.paid_to_date ?? 0) -
+        (this.isCashDiscountEntity(this.invoice)
+          ? (this.invoice.applied_cash_discount ?? 0)
+          : 0);
 
     this.invoice.balance = parseFloat(
       NumberFormatter.formatValue(balance, this.precision)
@@ -286,7 +294,7 @@ export class InvoiceSumInclusive {
 
     this.invoice.total_taxes = this.totalTaxes;
 
-    if ('cash_discount' in this.invoice) {
+    if (this.isCashDiscountEntity(this.invoice)) {
       this.invoice.cash_discount = parseFloat(
         NumberFormatter.formatValue(this.getCashDiscount(), this.precision)
       );

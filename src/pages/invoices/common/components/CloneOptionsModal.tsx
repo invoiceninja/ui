@@ -76,6 +76,7 @@ export function CloneOptionsModal(props: Props) {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      applied_cash_discount: 0,
       backup: undefined,
       client: undefined,
     });
