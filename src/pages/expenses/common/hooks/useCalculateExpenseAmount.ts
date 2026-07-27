@@ -12,6 +12,7 @@ import { Expense } from '$app/common/interfaces/expense';
 import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { InclusiveTax } from '$app/common/helpers/invoices/inclusive-tax';
 
 const roundToPrecision = (number: number, precision: number) => {
   const isNegative = number < 0;
@@ -96,29 +97,10 @@ export function useCalculateExpenseExclusiveAmount() {
     const currency = resolveCurrency(currencyId);
     const precision = currency?.precision || 2;
 
-    let exclusiveAmount = expense.amount;
-
-    if (expense.tax_rate1 > 0 || expense.tax_rate1 < 0) {
-      exclusiveAmount = roundToPrecision(
-        exclusiveAmount / (1 + expense.tax_rate1 / 100),
-        precision
-      );
-    }
-
-    if (expense.tax_rate2 > 0 || expense.tax_rate2 < 0) {
-      exclusiveAmount = roundToPrecision(
-        exclusiveAmount / (1 + expense.tax_rate2 / 100),
-        precision
-      );
-    }
-
-    if (expense.tax_rate3 > 0 || expense.tax_rate3 < 0) {
-      exclusiveAmount = roundToPrecision(
-        exclusiveAmount / (1 + expense.tax_rate3 / 100),
-        precision
-      );
-    }
-
-    return exclusiveAmount;
+    return InclusiveTax.backout(
+      expense.amount,
+      [expense.tax_rate1, expense.tax_rate2, expense.tax_rate3],
+      precision
+    ).net;
   };
 }
