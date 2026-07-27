@@ -65,29 +65,21 @@ interface ComputeBurnUpOptions {
   now?: Dayjs;
 }
 
-interface LoggedSeconds {
-  cumulative: { timestamp: number; seconds: number }[];
-  totalSeconds: number;
-}
-
-const clamp = (value: number, min: number, max: number): number => {
+const clamp = (value: number, min: number, max: number) => {
   return Math.min(Math.max(value, min), max);
 };
 
-const isActive = (task: Task): boolean => {
+const isActive = (task: Task) => {
   return getEntityState(task) === 'active';
 };
 
-const collectLoggedSecondsByDay = (
-  tasks: Task[],
-  now: Dayjs
-): LoggedSeconds => {
+const collectLoggedSecondsByDay = (tasks: Task[], now: Dayjs) => {
   const secondsByDay = new Map<string, number>();
   const nowUnix = now.unix();
 
   let totalSeconds = 0;
 
-  const add = (dayKey: string, seconds: number): void => {
+  const add = (dayKey: string, seconds: number) => {
     if (seconds <= 0) {
       return;
     }
@@ -122,7 +114,7 @@ const collectLoggedSecondsByDay = (
   return { cumulative, totalSeconds };
 };
 
-const resolveGranularity = (spanInDays: number): BurnUpGranularity => {
+const resolveGranularity = (spanInDays: number) => {
   if (spanInDays <= 45) {
     return 'day';
   }
@@ -138,7 +130,7 @@ const buildBoundaries = (
   start: Dayjs,
   end: Dayjs,
   granularity: BurnUpGranularity
-): Dayjs[] => {
+) => {
   const boundaries: Dayjs[] = [];
 
   let cursor = start.clone();
@@ -167,7 +159,7 @@ const resolveProjectedCompletion = (params: {
   loggedHours: number;
   remainingHours: number;
   hasScope: boolean;
-}): string | null => {
+}) => {
   const { now, start, loggedHours, remainingHours, hasScope } = params;
 
   if (!hasScope || loggedHours <= 0 || remainingHours <= 0) {
@@ -195,7 +187,7 @@ const resolveStatus = (params: {
   percentComplete: number;
   targetPercent: number | null;
   isOverdue: boolean;
-}): BurnUpStatus => {
+}) => {
   const { hasScope, loggedHours, percentComplete, targetPercent, isOverdue } =
     params;
 
@@ -231,7 +223,7 @@ const resolveStatus = (params: {
 export const computeBurnUp = (
   project: Project,
   options?: ComputeBurnUpOptions
-): BurnUpData => {
+) => {
   const now = (options?.now ?? dayjs()).startOf('day');
 
   const activeTasks = (project.tasks ?? []).filter(isActive);
@@ -271,7 +263,7 @@ export const computeBurnUp = (
 
   const dueSpanMs = due ? due.diff(timelineStart) : 0;
 
-  const cumulativeSecondsUntil = (moment: Dayjs): number => {
+  const cumulativeSecondsUntil = (moment: Dayjs) => {
     const limit = moment.valueOf();
 
     return cumulative.reduce((total, entry) => {
@@ -279,7 +271,7 @@ export const computeBurnUp = (
     }, 0);
   };
 
-  const targetAt = (moment: Dayjs): number | null => {
+  const targetAt = (moment: Dayjs) => {
     if (!due) {
       return null;
     }
@@ -363,7 +355,7 @@ export const computeBurnUp = (
     isOverdue: Boolean(due && now.isAfter(due, 'day')),
   });
 
-  return {
+  const data: BurnUpData = {
     series,
     granularity,
     hasTasks: activeTasks.length > 0,
@@ -385,4 +377,6 @@ export const computeBurnUp = (
       status,
     },
   };
+
+  return data;
 };

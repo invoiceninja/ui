@@ -23,12 +23,6 @@ interface TooltipRow {
   color?: string;
 }
 
-interface TooltipContent {
-  dateLabel: string;
-  rows: TooltipRow[];
-  deltaLabel: string | null;
-}
-
 interface Props {
   scopeHours: number;
   active?: boolean;
@@ -44,64 +38,62 @@ export function BurnUpTooltip({ scopeHours, active, payload }: Props) {
 
   const point = active && payload && payload.length ? payload[0].payload : null;
 
-  const content = useMemo<TooltipContent | null>(() => {
+  const content = useMemo(() => {
     if (!point) {
       return null;
     }
 
-    const formatHours = (value: number): string => {
+    const formatHours = (value: number) => {
       return formatNumber(Number(value.toFixed(1))).toString();
     };
 
-    const formatPercent = (value: number): string => {
+    const formatPercent = (value: number) => {
       return `${formatNumber(Math.round(value))}%`;
     };
 
-    const rows: TooltipRow[] = [
+    const formatPercentOrDash = (value: number | null) => {
+      if (value === null) {
+        return '—';
+      }
+
+      return formatPercent(value);
+    };
+
+    const buildDeltaLabel = () => {
+      if (point.completed === null || point.target === null) {
+        return null;
+      }
+
+      const delta = point.completed - point.target;
+      const direction =
+        delta >= 0 ? t('ahead_of_schedule') : t('behind_schedule');
+
+      return `${direction} ${formatPercent(Math.abs(delta))}`;
+    };
+
+    const rows = [
       {
         label: t('completed'),
-        value: point.completed !== null ? formatPercent(point.completed) : '—',
+        value: formatPercentOrDash(point.completed),
         color: BURN_UP_COMPLETED_COLOR,
       },
-      ...(point.target !== null
-        ? [
-            {
-              label: t('target'),
-              value: formatPercent(point.target),
-              color: BURN_UP_TARGET_COLOR,
-            },
-          ]
-        : []),
-      ...(point.loggedHours !== null
-        ? [
-            {
-              label: t('logged'),
-              value: `${formatHours(point.loggedHours)} / ${formatHours(
-                scopeHours
-              )}`,
-            },
-          ]
-        : []),
-    ];
-
-    const delta =
-      point.completed !== null && point.target !== null
-        ? point.completed - point.target
-        : null;
-
-    const deltaLabel =
-      delta === null
-        ? null
-        : delta >= 0
-          ? `${t('ahead_of_schedule')} ${formatPercent(Math.abs(delta))}`
-          : `${t('behind_schedule')} ${formatPercent(Math.abs(delta))}`;
+      point.target !== null && {
+        label: t('target'),
+        value: formatPercent(point.target),
+        color: BURN_UP_TARGET_COLOR,
+      },
+      point.loggedHours !== null && {
+        label: t('logged'),
+        value: `${formatHours(point.loggedHours)} / ${formatHours(scopeHours)}`,
+      },
+    ].filter((row): row is TooltipRow => row !== false);
 
     return {
       dateLabel: formatDate(point.date, dateFormat),
       rows,
-      deltaLabel,
+      deltaLabel: buildDeltaLabel(),
     };
-  }, [point, scopeHours, t, formatNumber, dateFormat]);
+  }, [point, scopeHours, dateFormat]);
 
   if (!content) {
     return null;

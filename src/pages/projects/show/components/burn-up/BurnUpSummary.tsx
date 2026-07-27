@@ -27,11 +27,11 @@ export function BurnUpSummary({ data }: Props) {
 
   const { summary } = data;
 
-  const formatHours = (value: number): string => {
+  const formatHours = (value: number) => {
     return formatNumber(Number(value.toFixed(1))).toString();
   };
 
-  const formatPercent = (value: number): string => {
+  const formatPercent = (value: number) => {
     return `${formatNumber(Math.round(value))}%`;
   };
 
