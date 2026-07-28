@@ -109,6 +109,14 @@ const Field = styled(ReactMultiEmail)<{
   }
 `;
 
+const RemoveBadgeButton = styled.button<{ $hoverBackgroundColor: string }>`
+  transition: background-color 150ms ease-in-out;
+
+  &:hover {
+    background-color: ${({ $hoverBackgroundColor }) => $hoverBackgroundColor};
+  }
+`;
+
 export function MultiEmailInput(props: Props) {
   const [t] = useTranslation();
 
@@ -222,9 +230,9 @@ export function MultiEmailInput(props: Props) {
             <span className="truncate">{email}</span>
 
             {!disabled && (
-              <button
+              <RemoveBadgeButton
                 type="button"
-                className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full hover:opacity-75 focus:outline-none"
+                className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full focus:outline-none"
                 onClick={(event) => {
                   event.stopPropagation();
 
@@ -232,9 +240,12 @@ export function MultiEmailInput(props: Props) {
                 }}
                 aria-label={`${String(t('remove'))} ${email}`}
                 data-cy="removeEmailBadge"
+                $hoverBackgroundColor={
+                  reactSettings.dark_mode ? colors.$5 : colors.$24
+                }
               >
                 <XMark size="0.55rem" color={colors.$3} />
-              </button>
+              </RemoveBadgeButton>
             )}
           </span>
         )}
