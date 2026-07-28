@@ -184,6 +184,7 @@ export function CloneOptionsModal({ quote, dropdown }: Props) {
       cash_discount_percent: 0,
       cash_discount_expiry_date: '',
       cash_discount: 0,
+      applied_cash_discount: 0,
       design_id: company.settings.invoice_design_id,
       client: undefined,
     });
