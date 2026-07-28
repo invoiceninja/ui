@@ -15,6 +15,7 @@ export const invoiceMap: Record[] = [
   { trans: 'amount', value: 'invoice.amount', map: 'invoice' },
   { trans: 'balance', value: 'invoice.balance', map: 'invoice' },
   { trans: 'paid_to_date', value: 'invoice.paid_to_date', map: 'invoice' },
+  { trans: 'applied_cash_discount', value: 'invoice.applied_cash_discount', map: 'invoice' },
   { trans: 'discount', value: 'invoice.discount', map: 'invoice' },
   { trans: 'po_number', value: 'invoice.po_number', map: 'invoice' },
   { trans: 'date', value: 'invoice.date', map: 'invoice' },
@@ -61,4 +62,7 @@ export const invoiceMap: Record[] = [
   { trans: 'tax_name3', value: 'invoice.tax_name3', map: 'invoice' },
   { trans: 'tax_rate3', value: 'invoice.tax_rate3', map: 'invoice' },
   { trans: 'subtotal', value: 'invoice.subtotal', map: 'invoice' },
+  { trans: 'cash_discount', value: 'invoice.subtotal', map: 'invoice' },
+  { trans: 'cash_discount_expiry_date', value: 'invoice.cash_discount_expiry_date', map: 'invoice' },
+  { trans: 'cash_discount_percent', value: 'invoice.cash_discount_percent', map: 'invoice' },
 ];
