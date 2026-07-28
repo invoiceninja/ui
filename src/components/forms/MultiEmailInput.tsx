@@ -20,7 +20,7 @@ import { ErrorMessage } from '$app/components/ErrorMessage';
 import { InputLabel } from '$app/components/forms/InputLabel';
 import { XMark } from '$app/components/icons/XMark';
 import classNames from 'classnames';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isEmail, ReactMultiEmail } from 'react-multi-email';
 import styled from 'styled-components';
@@ -117,25 +117,23 @@ const RemoveBadgeButton = styled.button<{ $hoverBackgroundColor: string }>`
   }
 `;
 
-export function MultiEmailInput(props: Props) {
+export function MultiEmailInput({
+  value = '',
+  onValueChange,
+  label,
+  id,
+  placeholder,
+  maxEmails,
+  disabled,
+  required,
+  errorMessage,
+  className,
+  cypressRef,
+}: Props) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
   const reactSettings = useReactSettings();
-
-  const {
-    value = '',
-    onValueChange,
-    label,
-    id,
-    placeholder,
-    maxEmails,
-    disabled,
-    required,
-    errorMessage,
-    className,
-    cypressRef,
-  } = props;
 
   const [emails, setEmails] = useState<string[]>(() => parseEmailList(value));
   const [isPendingEmailInvalid, setIsPendingEmailInvalid] =
@@ -143,6 +141,11 @@ export function MultiEmailInput(props: Props) {
 
   const currentValueRef = useRef<string>(value);
   const pendingEmailRef = useRef<string>('');
+
+  const isLimitReached = useMemo(
+    () => Boolean(maxEmails && emails.length >= maxEmails),
+    [emails, maxEmails]
+  );
 
   useEffect(() => {
     if (value === currentValueRef.current) {
@@ -153,8 +156,6 @@ export function MultiEmailInput(props: Props) {
 
     setEmails(parseEmailList(value));
   }, [value]);
-
-  const isLimitReached = Boolean(maxEmails && emails.length >= maxEmails);
 
   const handleChange = (updatedEmails: string[]) => {
     const nextEmails = limitEmailList(updatedEmails, maxEmails);
