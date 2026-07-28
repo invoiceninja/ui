@@ -9,7 +9,11 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import {
+  InputField,
+  MultiEmailInput,
+  SelectField,
+} from '$app/components/forms';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { freePlan } from '$app/common/guards/guards/free-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
@@ -51,6 +55,9 @@ export type MailerResourceType =
 export type MailerResource = Invoice | RecurringInvoice | Quote | PurchaseOrder;
 
 export type MailerContactProperty = 'client_id' | 'vendor_id';
+
+const HOSTED_CC_EMAILS_LIMIT = 4;
+
 interface Props {
   ref: RefObject<HTMLInputElement | undefined>;
   resource: MailerResource;
@@ -66,7 +73,7 @@ export interface EmailTemplate {
   wrapper: string;
   raw_body: string;
   raw_subject: string;
-  cc_email: string;
+  cc_email?: string;
 }
 
 export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
@@ -99,10 +106,10 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
     isSelfHosted() || (isHosted() && (proPlan() || enterprisePlan()));
 
   const handleTemplateChange = (id: string) => {
-    setPayloadData(
+    setPayloadData((current) =>
       cloneDeep({
         body: '',
-        ccEmail: '',
+        ccEmail: current.ccEmail,
         subject: '',
         templateId: id,
       })
@@ -152,7 +159,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
         ...current,
         subject: currentTemplate.raw_subject,
         body: currentTemplate.raw_body,
-        ccEmail: currentTemplate.cc_email,
+        ccEmail: currentTemplate.cc_email ?? current.ccEmail,
       }));
     }
   }, [currentTemplate]);
@@ -221,13 +228,17 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
 
         <Card withContainer>
           {isCcEmailAvailable && (
-            <InputField
+            <MultiEmailInput
+              id="cc_email"
               label={t('cc_email')}
               value={payloadData.ccEmail}
               onValueChange={(value) =>
                 setPayloadData((current) => ({ ...current, ccEmail: value }))
               }
+              maxEmails={isHosted() ? HOSTED_CC_EMAILS_LIMIT : undefined}
+              placeholder={t('enter_values_comma_separated')}
               errorMessage={errors?.errors.cc_email}
+              cypressRef="ccEmailInput"
             />
           )}
 
