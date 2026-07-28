@@ -70,7 +70,18 @@ export function InvoiceDetails(props: Props) {
           />
         </Element>
 
-        <Element leftSide={t('cash_discount')}>
+        <Element
+          leftSide={
+            <div className="flex items-center space-x-2">
+              <span>{t('cash_discount')}</span>
+
+              <PaymentTermsTooltip
+                client={invoice?.client}
+                clientId={invoice?.client_id}
+              />
+            </div>
+          }
+        >
           <div className="space-y-2">
             <div className="flex space-x-2">
               <div className="w-full lg:w-1/3">

@@ -53,14 +53,33 @@ export function PaymentTermsTooltip({ client, clientId }: Props) {
     setResolvedClient(undefined);
   }, [client, clientId]);
 
-  const { paymentTerms, hasPaymentTerms } = useMemo(() => {
-    const value = resolvedClient
+  const {
+    paymentTerms,
+    cashDiscountDays,
+    cashDiscountPercent,
+    hasPaymentTerms,
+    hasCashDiscount,
+  } = useMemo(() => {
+    const paymentTerms = resolvedClient
       ? getSetting(resolvedClient, 'payment_terms')
+      : undefined;
+    const cashDiscountDays = resolvedClient
+      ? getSetting(resolvedClient, 'cash_discount_days')
+      : undefined;
+    const cashDiscountPercent = resolvedClient
+      ? getSetting(resolvedClient, 'cash_discount_percent')
       : undefined;
 
     return {
-      paymentTerms: value,
-      hasPaymentTerms: value && Number(value) > 0,
+      paymentTerms,
+      cashDiscountDays,
+      cashDiscountPercent,
+      hasPaymentTerms: paymentTerms && Number(paymentTerms) > 0,
+      hasCashDiscount:
+        cashDiscountDays &&
+        Number(cashDiscountDays) > 0 &&
+        cashDiscountPercent &&
+        Number(cashDiscountPercent) > 0,
     };
   }, [resolvedClient]);
 
@@ -79,6 +98,13 @@ export function PaymentTermsTooltip({ client, clientId }: Props) {
             {t('payment_terms')}:{' '}
             {hasPaymentTerms
               ? `${t('net')} ${paymentTerms} ${t('days')}`
+              : t('none')}
+          </span>
+
+          <span>
+            {t('cash_discount')}:{' '}
+            {hasCashDiscount
+              ? `${cashDiscountPercent}% (${cashDiscountDays} ${t('days')})`
               : t('none')}
           </span>
 
