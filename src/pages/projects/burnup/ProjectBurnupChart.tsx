@@ -115,7 +115,7 @@ export function ProjectBurnupChart({
     <ResponsiveContainer width="100%" height={420}>
       <ComposedChart
         data={data.series}
-        margin={{ top: 24, right: 56, left: 46, bottom: 12 }}
+        margin={{ top: 24, right: 56, left: 46, bottom: 0 }}
       >
         <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
@@ -167,7 +167,7 @@ export function ProjectBurnupChart({
           wrapperStyle={{ outline: 'none' }}
         />
 
-        <Legend wrapperStyle={{ paddingTop: 8 }} />
+        <Legend wrapperStyle={{ paddingTop: 28 }} />
 
         {dueDateMarker && (
           <ReferenceLine

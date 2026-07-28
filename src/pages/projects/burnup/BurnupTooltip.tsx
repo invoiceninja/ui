@@ -96,7 +96,7 @@ export function BurnupTooltip({
       )}
 
       <div
-        className="mb-3 grid grid-cols-3 gap-3 border-b pb-3 text-xs"
+        className="mb-3 grid grid-cols-3 gap-3 border-b border-dashed pb-3 text-xs"
         style={{ borderColor: colors.$20, color: colors.$17 }}
       >
         <span>
