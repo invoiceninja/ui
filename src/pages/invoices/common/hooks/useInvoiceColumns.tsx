@@ -132,6 +132,7 @@ export function useAllInvoiceColumns() {
     'cash_discount_percent',
     'cash_discount_expiry_date',
     'cash_discount',
+    'applied_cash_discount',
   ] as const;
 
   return invoiceColumns.map((column) => normalizeColumnName(column));
@@ -683,6 +684,17 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'cash_discount',
       id: 'cash_discount',
       label: t('cash_discount'),
+      format: (value, invoice) =>
+        value ? formatMoney(
+          value,
+          invoice.client?.country_id,
+          invoice.client?.settings.currency_id
+        ) : '',
+    },
+    {
+      column: 'applied_cash_discount',
+      id: 'applied_cash_discount',
+      label: t('applied_cash_discount'),
       format: (value, invoice) =>
         value ? formatMoney(
           value,
