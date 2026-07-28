@@ -21,6 +21,7 @@ import {
 } from '../components/ProductsTable';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useColorScheme } from '$app/common/colors';
+
 interface Props {
   resource?: ProductTableResource;
   relationType: RelationType;
@@ -149,10 +150,15 @@ export function useResolveTotalVariable(props: Props) {
     }
 
     if (variable == '$cash_discount' && invoiceSum) {
-      return renderMoneyRow(
-        resolveTranslation(variable, '$'),
-        invoiceSum.getCashDiscount()
-      );
+      const cashDiscountLabel = invoiceSum.isCashDiscountEntity(invoiceSum.invoice) && invoiceSum.getCashDiscount()
+        ? `${resolveTranslation(variable, '$')} ${
+            invoiceSum.invoice.cash_discount_percent
+          }%`
+        : resolveTranslation(variable, '$');
+
+      return invoiceSum.getCashDiscount() != 0
+        ? renderMoneyRow(cashDiscountLabel, invoiceSum.getCashDiscount())
+        : '';
     }
 
     if (variable == '$paid_to_date' && invoiceSum) {
@@ -167,6 +173,23 @@ export function useResolveTotalVariable(props: Props) {
         resolveTranslation(variable, '$'),
         invoiceSum.getBalanceDue()
       );
+    }
+
+    if (variable == '$balance_with_cash_discount' && invoiceSum) {
+      const balanceWithCashDiscountLabel =
+        invoiceSum.isCashDiscountEntity(invoiceSum.invoice) &&
+        invoiceSum.getCashDiscount()
+          ? `${resolveTranslation(variable, '$')} ${
+              invoiceSum.invoice.cash_discount_percent
+            }%`
+          : resolveTranslation(variable, '$');
+
+      return invoiceSum.getCashDiscount() != 0
+        ? renderMoneyRow(
+            balanceWithCashDiscountLabel,
+            invoiceSum.getBalanceDue() - invoiceSum.getCashDiscount()
+          )
+        : '';
     }
 
     if (variable === '$custom_surcharge1') {

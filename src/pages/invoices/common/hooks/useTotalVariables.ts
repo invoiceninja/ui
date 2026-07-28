@@ -79,6 +79,7 @@ export function useTotalVariables() {
     variables.push('$cash_discount');
     variables.push('$paid_to_date');
     variables.push('$balance_due');
+    variables.push('$balance_with_cash_discount');
 
     if (company?.enabled_tax_rates > 0) {
       variables.push('$tax1');
