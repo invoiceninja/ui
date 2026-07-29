@@ -74,9 +74,10 @@ function CashDiscountCell({
   const [checked, setChecked] = useState(
     () => Boolean(invoice.cash_discount) && !isCashDiscountExpired(invoice)
   );
+  const [cashDiscount, setCashDiscount] = useState(
+    () => paymentInvoice?.cash_discount ?? invoice.cash_discount ?? 0
+  );
   const isSelected = invoiceIndex !== -1;
-  const cashDiscount =
-    paymentInvoice?.cash_discount ?? invoice.cash_discount ?? 0;
 
   return (
     <div className="flex items-start gap-x-2">
@@ -95,7 +96,10 @@ function CashDiscountCell({
       <TableNumberInputField
         disabled={!checked || !isSelected}
         value={cashDiscount}
-        onValueChange={(value) => onValueChange(value, checked)}
+        onValueChange={(value) => {
+          setCashDiscount(isNaN(parseFloat(value)) ? 0 : parseFloat(value));
+          onValueChange(value, checked);
+        }}
         errorMessage={[
           ...(errors?.errors[`invoices.${invoiceIndex}.cash_discount`] || []),
         ]}
@@ -209,13 +213,13 @@ export function useApplyInvoiceTableColumns({
                 ? 0
                 : parseFloat(value);
 
-              updatePaymentInvoice(
-                invoiceIndex,
-                'cash_discount',
-                nextCashDiscount
-              );
-
               if (checked) {
+                updatePaymentInvoice(
+                  invoiceIndex,
+                  'cash_discount',
+                  nextCashDiscount
+                );
+
                 const baseAmount = amount + cashDiscount;
                 const nextAmount = Math.max(baseAmount - nextCashDiscount, 0);
 
@@ -229,6 +233,12 @@ export function useApplyInvoiceTableColumns({
                     amount + cashDiscount,
                     invoice.balance ? invoice.balance : Infinity
                   );
+
+              updatePaymentInvoice(
+                invoiceIndex,
+                'cash_discount',
+                checked ? cashDiscount : 0
+              );
 
               updatePaymentInvoice(invoiceIndex, 'amount', nextAmount);
             }}
