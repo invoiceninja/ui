@@ -19,6 +19,7 @@ interface Props {
   description?: string;
   className?: string;
   height?: number;
+  topRight?: ReactNode;
 }
 
 export function AnalyticsCard({
@@ -27,6 +28,7 @@ export function AnalyticsCard({
   description,
   className,
   height = 320,
+  topRight,
 }: Props) {
   const colors = useColorScheme();
 
@@ -39,6 +41,7 @@ export function AnalyticsCard({
       childrenClassName="px-4 pb-4"
       style={{ borderColor: colors.$24 }}
       headerStyle={{ borderColor: colors.$20 }}
+      topRight={topRight}
       withoutHeaderPadding
     >
       <div style={{ height }}>{children}</div>

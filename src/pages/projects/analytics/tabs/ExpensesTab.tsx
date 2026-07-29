@@ -16,6 +16,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import {
   Bar,
+  CartesianGrid,
   BarChart,
   Cell,
   Legend,
@@ -32,11 +33,12 @@ import {
   AnalyticsChartTooltip,
   AnalyticsValueFormatter,
 } from '../components/AnalyticsChartTooltip';
+import { ResponsiveChart } from '../components/ResponsiveChart';
 import {
-  AnalyticsChartGrid,
-  ResponsiveChart,
-} from '../components/ResponsiveChart';
-import { ANALYTICS_CHART_COLORS } from '../constants';
+  ANALYTICS_CHART_COLORS,
+  ANALYTICS_GRID_PROPS,
+  ANALYTICS_LEGEND_WRAPPER_STYLE,
+} from '../constants';
 import {
   axisTick,
   cleanTooltipText,
@@ -160,9 +162,9 @@ export function ExpensesTab({
           <ResponsiveChart>
             <BarChart
               data={breakdownData}
-              margin={{ top: 8, right: 16, left: 42, bottom: 48 }}
+              margin={{ top: 8, right: 16, left: 42, bottom: 0 }}
             >
-              <AnalyticsChartGrid />
+              <CartesianGrid {...ANALYTICS_GRID_PROPS} />
 
               <XAxis
                 dataKey="category_name"
@@ -186,7 +188,7 @@ export function ExpensesTab({
                 shared={false}
               />
 
-              <Legend />
+              <Legend wrapperStyle={ANALYTICS_LEGEND_WRAPPER_STYLE} />
 
               <Bar
                 dataKey="expense_amount"
@@ -205,9 +207,9 @@ export function ExpensesTab({
         <ResponsiveChart>
           <LineChart
             data={spendData}
-            margin={{ top: 8, right: 16, left: 42, bottom: 26 }}
+            margin={{ top: 8, right: 16, left: 42, bottom: 0 }}
           >
-            <AnalyticsChartGrid />
+            <CartesianGrid {...ANALYTICS_GRID_PROPS} />
 
             <XAxis dataKey="period" tick={axisTick(colors.$22)} />
 
@@ -223,7 +225,7 @@ export function ExpensesTab({
               wrapperStyle={{ outline: 'none' }}
             />
 
-            <Legend />
+            <Legend wrapperStyle={ANALYTICS_LEGEND_WRAPPER_STYLE} />
 
             <Line
               type="monotone"

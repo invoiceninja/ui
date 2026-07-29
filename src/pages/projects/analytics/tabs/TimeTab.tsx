@@ -20,6 +20,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Bar,
+  CartesianGrid,
   BarChart,
   Legend,
   Line,
@@ -33,12 +34,16 @@ import {
   AnalyticsChartTooltip,
   AnalyticsValueFormatter,
 } from '../components/AnalyticsChartTooltip';
-import { ProjectHealthSummary } from '../components/ProjectHealthSummary';
 import {
-  AnalyticsChartGrid,
-  ResponsiveChart,
-} from '../components/ResponsiveChart';
-import { ANALYTICS_CHART_COLORS } from '../constants';
+  ProjectHealthHeader,
+  ProjectHealthSummary,
+} from '../components/ProjectHealthSummary';
+import { ResponsiveChart } from '../components/ResponsiveChart';
+import {
+  ANALYTICS_CHART_COLORS,
+  ANALYTICS_GRID_PROPS,
+  ANALYTICS_LEGEND_WRAPPER_STYLE,
+} from '../constants';
 import {
   axisTick,
   cleanTooltipText,
@@ -123,9 +128,9 @@ export function TimeTab({
             <BarChart
               layout="vertical"
               data={hoursData}
-              margin={{ top: 8, right: 16, left: 16, bottom: 26 }}
+              margin={{ top: 8, right: 16, left: 16, bottom: 0 }}
             >
-              <AnalyticsChartGrid />
+              <CartesianGrid {...ANALYTICS_GRID_PROPS} />
 
               <XAxis
                 type="number"
@@ -147,7 +152,7 @@ export function TimeTab({
                 shared={false}
               />
 
-              <Legend />
+              <Legend wrapperStyle={ANALYTICS_LEGEND_WRAPPER_STYLE} />
 
               <Bar
                 dataKey="estimated_hours"
@@ -179,6 +184,9 @@ export function TimeTab({
         <AnalyticsCard
           title={t('health_check')}
           className="col-span-12 xl:col-span-6"
+          topRight={
+            <ProjectHealthHeader health={projectHealth} formatter={formatter} />
+          }
         >
           <ProjectHealthSummary health={projectHealth} formatter={formatter} />
         </AnalyticsCard>
@@ -192,9 +200,9 @@ export function TimeTab({
           <ResponsiveChart>
             <BarChart
               data={teamData}
-              margin={{ top: 8, right: 16, left: 42, bottom: 48 }}
+              margin={{ top: 8, right: 16, left: 42, bottom: 0 }}
             >
-              <AnalyticsChartGrid />
+              <CartesianGrid {...ANALYTICS_GRID_PROPS} />
 
               <XAxis
                 dataKey="user_name"
@@ -217,7 +225,7 @@ export function TimeTab({
                 shared={false}
               />
 
-              <Legend />
+              <Legend wrapperStyle={ANALYTICS_LEGEND_WRAPPER_STYLE} />
 
               <Bar
                 dataKey="logged_hours"
@@ -243,15 +251,16 @@ export function TimeTab({
             <BarChart
               layout="vertical"
               data={distributionData}
-              margin={{ top: 8, right: 16, left: 8, bottom: 26 }}
+              margin={{ top: 8, right: 16, left: 8, bottom: 0 }}
             >
-              <AnalyticsChartGrid />
+              <CartesianGrid {...ANALYTICS_GRID_PROPS} />
 
               <XAxis
                 type="number"
                 tick={axisTick(colors.$22)}
                 tickFormatter={formatCompact}
                 label={xAxisLabel(t('hours'), colors.$22)}
+                height={44}
               />
 
               <YAxis
@@ -275,7 +284,7 @@ export function TimeTab({
                 shared={false}
               />
 
-              <Legend />
+              <Legend wrapperStyle={ANALYTICS_LEGEND_WRAPPER_STYLE} />
 
               <Bar
                 dataKey="logged_hours"
@@ -299,9 +308,9 @@ export function TimeTab({
           <ResponsiveChart>
             <LineChart
               data={velocityData}
-              margin={{ top: 8, right: 16, left: 42, bottom: 26 }}
+              margin={{ top: 8, right: 16, left: 42, bottom: 0 }}
             >
-              <AnalyticsChartGrid />
+              <CartesianGrid {...ANALYTICS_GRID_PROPS} />
 
               <XAxis dataKey="period" tick={axisTick(colors.$22)} />
 
@@ -317,7 +326,7 @@ export function TimeTab({
                 wrapperStyle={{ outline: 'none' }}
               />
 
-              <Legend />
+              <Legend wrapperStyle={ANALYTICS_LEGEND_WRAPPER_STYLE} />
 
               <Line
                 type="monotone"

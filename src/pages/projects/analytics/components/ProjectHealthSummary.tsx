@@ -28,6 +28,30 @@ interface Props {
   formatter: AnalyticsValueFormatter;
 }
 
+/** Score and status, rendered next to the card title. */
+export function ProjectHealthHeader({ health, formatter }: Props) {
+  const colors = useColorScheme();
+
+  if (!health) {
+    return null;
+  }
+
+  const score = resolveProjectHealthScore(health);
+  const status = resolveProjectHealthStatus(health);
+
+  return (
+    <div className="flex items-center gap-3">
+      {hasValue(score) && (
+        <span className="text-sm font-semibold" style={{ color: colors.$3 }}>
+          {formatter('score', score)}
+        </span>
+      )}
+
+      {status && <Badge variant={status as BadgeVariant}>{status}</Badge>}
+    </div>
+  );
+}
+
 export function ProjectHealthSummary({ health, formatter }: Props) {
   const [t] = useTranslation();
 
@@ -40,63 +64,44 @@ export function ProjectHealthSummary({ health, formatter }: Props) {
     );
   }
 
-  const score = resolveProjectHealthScore(health);
-  const status = resolveProjectHealthStatus(health);
   const indicatorRows = resolveProjectHealthIndicatorRows(health);
 
+  if (!indicatorRows.length) {
+    return (
+      <AnalyticsEmptyState>
+        {t('no_project_health_indicators')}
+      </AnalyticsEmptyState>
+    );
+  }
+
   return (
-    <div className="flex h-full flex-col gap-4">
-      <div
-        className="rounded-md border p-3"
-        style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div className="text-2xl font-semibold">
-            {hasValue(score) ? formatter('score', score) : '-'}
+    <div className="space-y-3 text-sm">
+      {indicatorRows.map((row) => (
+        <div key={row.key} className="space-y-1">
+          <div className="flex items-center justify-between gap-4">
+            <span style={{ color: colors.$22 }}>{fieldLabel(row.key)}</span>
+
+            <span className="font-medium">{formatter(row.key, row.value)}</span>
           </div>
 
-          {status && <Badge variant={status as BadgeVariant}>{status}</Badge>}
-        </div>
-      </div>
-
-      {indicatorRows.length === 0 && (
-        <AnalyticsEmptyState>
-          {t('no_project_health_indicators')}
-        </AnalyticsEmptyState>
-      )}
-
-      {indicatorRows.length > 0 && (
-        <div className="space-y-3 text-sm">
-          {indicatorRows.map((row) => (
-            <div key={row.key} className="space-y-1">
-              <div className="flex items-center justify-between gap-4">
-                <span style={{ color: colors.$22 }}>{fieldLabel(row.key)}</span>
-
-                <span className="font-medium">
-                  {formatter(row.key, row.value)}
-                </span>
-              </div>
-
-              {(row.showBar || row.showStrip) && (
-                <div
-                  className="h-2 rounded-full"
-                  style={{ backgroundColor: colors.$20 }}
-                >
-                  <div
-                    className="h-2 rounded-full"
-                    style={{
-                      backgroundColor: row.color,
-                      width: row.showStrip
-                        ? '100%'
-                        : `${ratioBarWidth(row.value)}%`,
-                    }}
-                  />
-                </div>
-              )}
+          {(row.showBar || row.showStrip) && (
+            <div
+              className="h-2 rounded-full"
+              style={{ backgroundColor: colors.$20 }}
+            >
+              <div
+                className="h-2 rounded-full"
+                style={{
+                  backgroundColor: row.color,
+                  width: row.showStrip
+                    ? '100%'
+                    : `${ratioBarWidth(row.value)}%`,
+                }}
+              />
             </div>
-          ))}
+          )}
         </div>
-      )}
+      ))}
     </div>
   );
 }

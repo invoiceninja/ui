@@ -120,66 +120,60 @@ export function Burnup({
     });
   };
 
+  const headerControls = (
+    <div className="flex flex-wrap items-center justify-end gap-3">
+      <span className="text-sm" style={{ color: colors.$22 }}>
+        {formatDate(lifecycleDates.start, dateFormat)} -{' '}
+        {formatDate(lifecycleDates.end, dateFormat)}
+      </span>
+
+      <div
+        className="flex w-max overflow-hidden rounded-md border"
+        style={{ borderColor: colors.$24 }}
+      >
+        {BUCKET_OPTIONS.map((bucket, index) => {
+          const active = bucketType === bucket.value;
+
+          return (
+            <button
+              key={bucket.value}
+              type="button"
+              className={classNames('px-3 py-1.5 text-sm font-medium', {
+                'border-l': index > 0,
+              })}
+              style={{
+                borderColor: colors.$24,
+                backgroundColor: active ? colors.$3 : colors.$1,
+                color: active ? colors.$1 : colors.$3,
+              }}
+              onClick={() => setBucketType(bucket.value)}
+            >
+              {t(bucket.translationKey)}
+            </button>
+          );
+        })}
+      </div>
+
+      {!withoutIncludeDraftsToggle && (
+        <Toggle
+          label={t('include_drafts')}
+          checked={resolvedIncludeDrafts}
+          onValueChange={handleIncludeDraftsChange}
+        />
+      )}
+    </div>
+  );
+
   return (
     <Card
       title={t('burn_up')}
       className="shadow-sm"
       style={{ borderColor: colors.$24 }}
       headerStyle={{ borderColor: colors.$20 }}
+      topRight={headerControls}
       withoutBodyPadding
     >
       <div className="space-y-6 p-4 sm:p-6">
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div
-              className="rounded-md border px-3 py-2 text-sm"
-              style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
-            >
-              <span className="font-medium">{t('range')}: </span>
-
-              <span>
-                {formatDate(lifecycleDates.start, dateFormat)} -{' '}
-                {formatDate(lifecycleDates.end, dateFormat)}
-              </span>
-            </div>
-
-            <div
-              className="flex w-max overflow-hidden rounded-md border shadow-sm"
-              style={{ borderColor: colors.$24 }}
-            >
-              {BUCKET_OPTIONS.map((bucket, index) => {
-                const active = bucketType === bucket.value;
-
-                return (
-                  <button
-                    key={bucket.value}
-                    type="button"
-                    className={classNames('px-4 py-2 text-sm font-medium', {
-                      'border-l': index > 0,
-                    })}
-                    style={{
-                      borderColor: colors.$24,
-                      backgroundColor: active ? colors.$3 : colors.$1,
-                      color: active ? colors.$1 : colors.$3,
-                    }}
-                    onClick={() => setBucketType(bucket.value)}
-                  >
-                    {t(bucket.translationKey)}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {!withoutIncludeDraftsToggle && (
-            <Toggle
-              label={t('include_drafts')}
-              checked={resolvedIncludeDrafts}
-              onValueChange={handleIncludeDraftsChange}
-            />
-          )}
-        </div>
-
         <div className="grid gap-6 xl:grid-cols-2">
           <BurnupMetricGroup
             title={t('hours')}

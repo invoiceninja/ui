@@ -16,6 +16,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import {
   Bar,
+  CartesianGrid,
   BarChart,
   ComposedChart,
   Legend,
@@ -29,11 +30,12 @@ import {
   AnalyticsChartTooltip,
   AnalyticsValueFormatter,
 } from '../components/AnalyticsChartTooltip';
+import { ResponsiveChart } from '../components/ResponsiveChart';
 import {
-  AnalyticsChartGrid,
-  ResponsiveChart,
-} from '../components/ResponsiveChart';
-import { ANALYTICS_CHART_COLORS } from '../constants';
+  ANALYTICS_CHART_COLORS,
+  ANALYTICS_GRID_PROPS,
+  ANALYTICS_LEGEND_WRAPPER_STYLE,
+} from '../constants';
 import {
   axisTick,
   formatCompact,
@@ -96,9 +98,9 @@ export function ProfitTab({
         <ResponsiveChart>
           <ComposedChart
             data={profitabilityData}
-            margin={{ top: 8, right: 48, left: 42, bottom: 26 }}
+            margin={{ top: 8, right: 48, left: 42, bottom: 0 }}
           >
-            <AnalyticsChartGrid />
+            <CartesianGrid {...ANALYTICS_GRID_PROPS} />
 
             <XAxis dataKey="project_name" tick={false} />
 
@@ -124,7 +126,7 @@ export function ProfitTab({
               wrapperStyle={{ outline: 'none' }}
             />
 
-            <Legend />
+            <Legend wrapperStyle={ANALYTICS_LEGEND_WRAPPER_STYLE} />
 
             <Bar
               yAxisId="amount"
@@ -166,9 +168,9 @@ export function ProfitTab({
         <ResponsiveChart>
           <BarChart
             data={budgetData}
-            margin={{ top: 8, right: 16, left: 42, bottom: 26 }}
+            margin={{ top: 8, right: 16, left: 42, bottom: 0 }}
           >
-            <AnalyticsChartGrid />
+            <CartesianGrid {...ANALYTICS_GRID_PROPS} />
 
             <XAxis dataKey="project_name" tick={false} />
 
@@ -185,7 +187,7 @@ export function ProfitTab({
               shared={false}
             />
 
-            <Legend />
+            <Legend wrapperStyle={ANALYTICS_LEGEND_WRAPPER_STYLE} />
 
             <Bar
               dataKey="budgeted_amount"
@@ -218,9 +220,9 @@ export function ProfitTab({
         <ResponsiveChart>
           <BarChart
             data={revenueData}
-            margin={{ top: 8, right: 16, left: 42, bottom: 26 }}
+            margin={{ top: 8, right: 16, left: 42, bottom: 0 }}
           >
-            <AnalyticsChartGrid />
+            <CartesianGrid {...ANALYTICS_GRID_PROPS} />
 
             <XAxis dataKey="project_name" tick={false} />
 
@@ -237,7 +239,7 @@ export function ProfitTab({
               shared={false}
             />
 
-            <Legend />
+            <Legend wrapperStyle={ANALYTICS_LEGEND_WRAPPER_STYLE} />
 
             <Bar
               dataKey="work_value"

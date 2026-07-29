@@ -25,7 +25,12 @@ export function useProjectBurnupQuery(
   options?: QueryOptions
 ) {
   return useQuery<ProjectBurnupResponse>({
-    queryKey: ['/api/v1/charts/project_burnup/:id', payload.project_id],
+    queryKey: [
+      '/api/v1/charts/project_burnup/:id',
+      payload.project_id,
+      payload.bucket_type,
+      payload.include_drafts,
+    ],
     queryFn: () =>
       request(
         'POST',

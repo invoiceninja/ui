@@ -9,7 +9,7 @@
  */
 
 import { ReactElement } from 'react';
-import { CartesianGrid, ResponsiveContainer } from 'recharts';
+import { ResponsiveContainer } from 'recharts';
 
 interface Props {
   children: ReactElement;
@@ -23,8 +23,4 @@ export function ResponsiveChart({ children }: Props) {
       </ResponsiveContainer>
     </div>
   );
-}
-
-export function AnalyticsChartGrid() {
-  return <CartesianGrid strokeDasharray="3 3" vertical={false} />;
 }

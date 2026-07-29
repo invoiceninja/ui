@@ -19,7 +19,9 @@ import { Page } from '$app/components/Breadcrumbs';
 import { InfoCard } from '$app/components/InfoCard';
 import { Spinner } from '$app/components/Spinner';
 import { InputLabel, Link } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -111,6 +113,8 @@ export default function Show() {
   const showEditOption = useShowEditOption();
   const colors = useColorScheme();
 
+  const [includeDrafts, setIncludeDrafts] = useState(false);
+
   const {
     changeTemplateVisible,
     setChangeTemplateVisible,
@@ -142,9 +146,19 @@ export default function Show() {
           ),
         })}
       afterBreadcrumbs={<PreviousNextNavigation entity="project" />}
+      topRight={
+        <div className="flex flex-shrink-0 items-center justify-end space-x-3">
+          <span className="whitespace-nowrap text-sm">
+            {t('include_drafts')}
+          </span>
+
+          <Toggle checked={includeDrafts} onValueChange={setIncludeDrafts} />
+        </div>
+      }
     >
       <ProjectAnalytics
         project={project}
+        includeDrafts={includeDrafts}
         overviewContent={(forecastCard) => (
           <div className="grid grid-cols-12 lg:space-y-0 gap-4">
             <InfoCard

@@ -20,6 +20,17 @@ export const ANALYTICS_CHART_COLORS = [
 
 export const ANALYTICS_KEY_FIELDS = ['project_id', 'project_name'];
 
+/**
+ * Recharts resolves grid/legend children by element type, so these are shared
+ * as props rather than wrapper components — a wrapper would never render.
+ */
+export const ANALYTICS_GRID_PROPS = {
+  strokeDasharray: '3 3',
+  vertical: false,
+};
+
+export const ANALYTICS_LEGEND_WRAPPER_STYLE = { paddingTop: 4 };
+
 export const MONEY_FIELDS = new Set([
   'budgeted_amount',
   'actual_amount',

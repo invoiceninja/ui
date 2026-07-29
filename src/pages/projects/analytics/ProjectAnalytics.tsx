@@ -23,7 +23,6 @@ import {
 import { useProjectAnalyticsQuery } from '$app/common/queries/project-analytics';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
-import Toggle from '$app/components/forms/Toggle';
 import { Burnup } from '$app/pages/projects/burnup/Burnup';
 import { ModuleBitmask } from '$app/pages/settings';
 import { ReactNode, useMemo, useState } from 'react';
@@ -46,10 +45,15 @@ import { TimeTab } from './tabs/TimeTab';
 
 interface Props {
   project: Project;
+  includeDrafts: boolean;
   overviewContent?: (forecastCard: ReactNode) => ReactNode;
 }
 
-export function ProjectAnalytics({ project, overviewContent }: Props) {
+export function ProjectAnalytics({
+  project,
+  includeDrafts,
+  overviewContent,
+}: Props) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
@@ -57,7 +61,6 @@ export function ProjectAnalytics({ project, overviewContent }: Props) {
   const hasPermission = useHasPermission();
   const formatValue = useFormatAnalyticsValue(project);
 
-  const [includeDrafts, setIncludeDrafts] = useState(false);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
   /**
@@ -286,7 +289,6 @@ export function ProjectAnalytics({ project, overviewContent }: Props) {
               <Burnup
                 project={project}
                 includeDrafts={includeDrafts}
-                onIncludeDraftsChange={setIncludeDrafts}
                 withoutIncludeDraftsToggle
               />
             ),
@@ -297,19 +299,6 @@ export function ProjectAnalytics({ project, overviewContent }: Props) {
 
   return (
     <section className="my-4 space-y-4">
-      <div className="flex justify-end">
-        <div
-          className="flex items-center justify-start rounded-md border px-3 py-2 md:justify-center"
-          style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
-        >
-          <Toggle
-            label={t('include_drafts')}
-            checked={includeDrafts}
-            onValueChange={setIncludeDrafts}
-          />
-        </div>
-      </div>
-
       {analytics.isLoading && (
         <div
           className="flex min-h-[160px] items-center justify-center rounded-md border"
