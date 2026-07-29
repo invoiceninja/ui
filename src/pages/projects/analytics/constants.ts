@@ -27,6 +27,8 @@ export const ANALYTICS_GRID_PROPS = {
 
 export const ANALYTICS_LEGEND_WRAPPER_STYLE = { paddingTop: 4 };
 
+export const ANALYTICS_AXIS_LABEL_LEGEND_WRAPPER_STYLE = { paddingTop: 16 };
+
 export const MONEY_FIELDS = new Set([
   'budgeted_amount',
   'actual_amount',

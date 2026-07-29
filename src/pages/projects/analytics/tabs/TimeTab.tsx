@@ -40,6 +40,7 @@ import {
 } from '../components/ProjectHealthSummary';
 import { ResponsiveChart } from '../components/ResponsiveChart';
 import {
+  ANALYTICS_AXIS_LABEL_LEGEND_WRAPPER_STYLE,
   ANALYTICS_CHART_COLORS,
   ANALYTICS_GRID_PROPS,
   ANALYTICS_LEGEND_WRAPPER_STYLE,
@@ -284,7 +285,9 @@ export function TimeTab({
                 shared={false}
               />
 
-              <Legend wrapperStyle={ANALYTICS_LEGEND_WRAPPER_STYLE} />
+              <Legend
+                wrapperStyle={ANALYTICS_AXIS_LABEL_LEGEND_WRAPPER_STYLE}
+              />
 
               <Bar
                 dataKey="logged_hours"
