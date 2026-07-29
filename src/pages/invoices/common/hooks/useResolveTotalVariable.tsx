@@ -189,7 +189,7 @@ export function useResolveTotalVariable(props: Props) {
       return invoiceSum.getCashDiscount() != 0
         ? renderMoneyRow(
             balanceWithCashDiscountLabel,
-            invoiceSum.getBalanceDue() - invoiceSum.getCashDiscount()
+            invoiceSum.getBalanceWithCashDiscount()
           )
         : '';
     }

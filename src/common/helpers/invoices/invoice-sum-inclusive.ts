@@ -330,6 +330,23 @@ export class InvoiceSumInclusive {
       : this.invoice.balance;
   }
 
+  public getBalanceWithCashDiscount() {
+    const balance = this.getBalanceDue();
+
+    if (!this.isCashDiscountEntity(this.invoice) || balance === 0) {
+      return balance;
+    }
+
+    const applicableDiscount = Math.min(
+      Math.abs(this.invoice.cash_discount ?? 0),
+      Math.abs(balance)
+    );
+    const signedDiscount =
+      balance < 0 ? -applicableDiscount : applicableDiscount;
+
+    return roundToPrecision(balance - signedDiscount, this.precision);
+  }
+
   /////////////
 
   protected discount(amount: number) {
