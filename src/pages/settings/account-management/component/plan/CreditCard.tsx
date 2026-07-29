@@ -20,7 +20,7 @@ import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { useFormik } from 'formik';
 import { useState } from 'react';
-import { Trash2 } from 'react-feather';
+import { DollarSign, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import visa from '/gateway-card-images/visa.png?url';
@@ -45,6 +45,8 @@ export function CreditCard({ gateway, onDelete }: CreditCardProps) {
     if (gateway.meta.brand === 'mastercard') {
       return mc;
     }
+
+    return null;
   };
 
   const { t } = useTranslation();
@@ -104,10 +106,24 @@ export function CreditCard({ gateway, onDelete }: CreditCardProps) {
 
       <div
         className="flex flex-col w-full lg:w-72 p-4 rounded border"
-        style={{ borderColor: gateway.is_default ? accentColor : colors.$1 }}
+        style={{ borderColor: gateway.is_default ? accentColor : colors.$24 }}
       >
         <div className="flex justify-between items-center">
-          <img src={image()} alt={gateway.meta.brand} className="h-10" />
+          {image() ? (
+            <img
+              src={image() as string}
+              alt={gateway.meta.brand}
+              className="h-10"
+            />
+          ) : (
+            <div
+              className="flex items-center justify-center h-10 w-10 rounded"
+              style={{ backgroundColor: colors.$20 }}
+              title={gateway.meta.brand}
+            >
+              <DollarSign size={22} />
+            </div>
+          )}
 
           <div className="flex items-center gap-2">
             {gateway.is_default ? (
