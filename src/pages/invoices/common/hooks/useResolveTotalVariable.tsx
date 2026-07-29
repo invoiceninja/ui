@@ -150,11 +150,13 @@ export function useResolveTotalVariable(props: Props) {
     }
 
     if (variable == '$cash_discount' && invoiceSum) {
-      const cashDiscountLabel = invoiceSum.isCashDiscountEntity(invoiceSum.invoice) && invoiceSum.getCashDiscount()
-        ? `${resolveTranslation(variable, '$')} ${
-            invoiceSum.invoice.cash_discount_percent
-          }%`
-        : resolveTranslation(variable, '$');
+      const cashDiscountLabel =
+        invoiceSum.isCashDiscountEntity(invoiceSum.invoice) &&
+        invoiceSum.getCashDiscount()
+          ? `${resolveTranslation(variable, '$')} ${
+              invoiceSum.invoice.cash_discount_percent
+            }%`
+          : resolveTranslation(variable, '$');
 
       return invoiceSum.getCashDiscount() != 0
         ? renderMoneyRow(cashDiscountLabel, invoiceSum.getCashDiscount())

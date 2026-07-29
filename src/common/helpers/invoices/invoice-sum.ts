@@ -64,8 +64,10 @@ export class InvoiceSum {
     return this.eInvoiceType === 'PEPPOL';
   }
 
-  public isCashDiscountEntity(entity: Invoice | RecurringInvoice | PurchaseOrder | Credit | Quote): entity is Invoice {
-    return entity.entity_type === 'invoice'
+  public isCashDiscountEntity(
+    entity: Invoice | RecurringInvoice | PurchaseOrder | Credit | Quote
+  ): entity is Invoice {
+    return entity.entity_type === 'invoice';
   }
 
   public build() {
