@@ -62,6 +62,7 @@ export const invoiceMap: Record[] = [
   { trans: 'tax_name3', value: 'invoice.tax_name3', map: 'invoice' },
   { trans: 'tax_rate3', value: 'invoice.tax_rate3', map: 'invoice' },
   { trans: 'subtotal', value: 'invoice.subtotal', map: 'invoice' },
+  { trans: 'tags', value: 'invoice.tags', map: 'invoice' },
   { trans: 'cash_discount', value: 'invoice.subtotal', map: 'invoice' },
   { trans: 'cash_discount_due_date', value: 'invoice.cash_discount_due_date', map: 'invoice' },
   { trans: 'cash_discount_percent', value: 'invoice.cash_discount_percent', map: 'invoice' },

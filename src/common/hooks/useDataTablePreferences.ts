@@ -41,8 +41,8 @@ interface Params {
   withoutStoringPerPage: boolean;
   enableSavingFilterPreference?: boolean;
   withoutStoringPage?: boolean;
-  withoutStoringSearchFilter?: boolean;
   withoutStoringPreferences?: boolean;
+  withFilterTextOnly?: boolean;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -69,12 +69,16 @@ export function useDataTablePreferences(params: Params) {
     withoutStoringPerPage,
     enableSavingFilterPreference,
     withoutStoringPage,
-    withoutStoringSearchFilter,
     withoutStoringPreferences,
+    withFilterTextOnly,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
   const storeSessionTableFilters = useStoreSessionTableFilters({ tableKey });
+
+  // The global toggle only gates server-side persistence. The session text
+  // filter always flows so it can bubble down to sub-tables (client overview).
+  const persistTableFilters = reactSettings.persist_table_filters !== false;
 
   const handleUpdateTableFilters = (
     filter: string,
@@ -84,15 +88,21 @@ export function useDataTablePreferences(params: Params) {
     status: string[],
     perPage: PerPage
   ) => {
-    if (withoutStoringPreferences) {
+    if (withoutStoringPreferences || withFilterTextOnly) {
       return;
     }
 
-    if (tableKey && !withoutStoringSearchFilter) {
+    if (tableKey) {
       storeSessionTableFilters(filter, currentPage, withoutStoringPage);
     }
 
     if (!customFilter || !tableKey || !enableSavingFilterPreference) {
+      return;
+    }
+
+    // Session text filter already stored above; the toggle only skips the
+    // server-persisted status/sort/perPage/customFilter.
+    if (!persistTableFilters) {
       return;
     }
 
@@ -170,10 +180,16 @@ export function useDataTablePreferences(params: Params) {
       return;
     }
 
+    if (withFilterTextOnly || !persistTableFilters) {
+      setFilter((getPreference('filter') as string) || '');
+      setCustomFilter([]);
+      setArePreferencesApplied(true);
+      appliedRef.current = true;
+      return;
+    }
+
     if (!isInitialConfiguration) {
-      if (!withoutStoringSearchFilter) {
-        setFilter((getPreference('filter') as string) || '');
-      }
+      setFilter((getPreference('filter') as string) || '');
 
       if (customFilters) {
         if ((getPreference('customFilter') as string[]).length) {

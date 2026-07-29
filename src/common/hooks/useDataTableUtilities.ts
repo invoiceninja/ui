@@ -11,6 +11,7 @@
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useDataTableOptions } from './useDataTableOptions';
 import { useDataTablePreference } from './useDataTablePreference';
+import { useReactSettings } from './useReactSettings';
 import collect from 'collect.js';
 
 interface Params {
@@ -21,9 +22,11 @@ interface Params {
   defaultCustomFilterValues?: string[];
   customFilter?: string[] | undefined;
   withoutStoringPreferences?: boolean;
+  withFilterTextOnly?: boolean;
 }
 export function useDataTableUtilities(params: Params) {
   const options = useDataTableOptions();
+  const reactSettings = useReactSettings();
 
   const {
     isInitialConfiguration,
@@ -33,13 +36,21 @@ export function useDataTableUtilities(params: Params) {
     apiEndpoint,
     customFilter,
     withoutStoringPreferences,
+    withFilterTextOnly,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
 
+  // Server-persisted status/customFilter dropdowns are skipped when the table
+  // opts out, only inherits the search text, or the global toggle is off.
+  const withoutServerPreferences =
+    withoutStoringPreferences ||
+    withFilterTextOnly ||
+    reactSettings.persist_table_filters === false;
+
   const getDefaultOptions = () => {
     if (!isInitialConfiguration) {
-      const preferenceStatuses = withoutStoringPreferences
+      const preferenceStatuses = withoutServerPreferences
         ? []
         : (getPreference('status') as string[]);
 
@@ -59,7 +70,7 @@ export function useDataTableUtilities(params: Params) {
 
   const getDefaultCustomFilterOptions = () => {
     if (!isInitialConfiguration && customFilters) {
-      const preferenceCustomFilters = withoutStoringPreferences
+      const preferenceCustomFilters = withoutServerPreferences
         ? []
         : (getPreference('customFilter') as string[]);
 
