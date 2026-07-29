@@ -34,6 +34,9 @@ import {
 
 interface Props {
   project: Project;
+  includeDrafts?: boolean;
+  onIncludeDraftsChange?: (value: boolean) => void;
+  withoutIncludeDraftsToggle?: boolean;
 }
 
 const BUCKET_OPTIONS: {
@@ -52,7 +55,12 @@ const MONEY_METRICS = PROJECT_BURNUP_METRICS.filter(
   (metric) => metric.axis === 'money'
 );
 
-export function Burnup({ project }: Props) {
+export function Burnup({
+  project,
+  includeDrafts,
+  onIncludeDraftsChange,
+  withoutIncludeDraftsToggle,
+}: Props) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
@@ -60,10 +68,20 @@ export function Burnup({ project }: Props) {
 
   const [bucketType, setBucketType] =
     useState<ProjectBurnupBucketType>('daily');
-  const [includeDrafts, setIncludeDrafts] = useState(false);
+  const [localIncludeDrafts, setLocalIncludeDrafts] = useState(false);
   const [visibleMetricKeys, setVisibleMetricKeys] = useState<
     ProjectBurnupMetricKey[]
   >(DEFAULT_PROJECT_BURNUP_METRICS);
+
+  const resolvedIncludeDrafts = includeDrafts ?? localIncludeDrafts;
+
+  const handleIncludeDraftsChange = (value: boolean) => {
+    if (typeof includeDrafts === 'undefined') {
+      setLocalIncludeDrafts(value);
+    }
+
+    onIncludeDraftsChange?.(value);
+  };
 
   const lifecycleDates = useMemo(() => {
     return resolveProjectBurnupDateRange({
@@ -78,14 +96,14 @@ export function Burnup({ project }: Props) {
       start_date: lifecycleDates.start,
       end_date: lifecycleDates.end,
       bucket_type: bucketType,
-      include_drafts: includeDrafts,
+      include_drafts: resolvedIncludeDrafts,
     };
   }, [
     project.id,
     lifecycleDates.start,
     lifecycleDates.end,
     bucketType,
-    includeDrafts,
+    resolvedIncludeDrafts,
   ]);
 
   const burnup = useProjectBurnupQuery(payload, {
@@ -153,11 +171,13 @@ export function Burnup({ project }: Props) {
             </div>
           </div>
 
-          <Toggle
-            label={t('include_drafts')}
-            checked={includeDrafts}
-            onValueChange={setIncludeDrafts}
-          />
+          {!withoutIncludeDraftsToggle && (
+            <Toggle
+              label={t('include_drafts')}
+              checked={resolvedIncludeDrafts}
+              onValueChange={handleIncludeDraftsChange}
+            />
+          )}
         </div>
 
         <div className="grid gap-6 xl:grid-cols-2">

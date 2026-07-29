@@ -58,7 +58,7 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
 import { ProjectPublicNotes } from './components/ProjectPublicNotes';
-import { Burnup } from '$app/pages/projects/burnup/Burnup';
+import { ProjectAnalytics } from '$app/pages/projects/analytics/ProjectAnalytics';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { useFilterColumns } from '$app/pages/tasks/common/hooks/useFilterColumns';
 import { TagPills } from '$app/components/tags/TagPills';
@@ -143,145 +143,154 @@ export default function Show() {
         })}
       afterBreadcrumbs={<PreviousNextNavigation entity="project" />}
     >
-      <div className="grid grid-cols-12 lg:space-y-0 gap-4">
-        <InfoCard
-          title={project.name}
-          className="shadow-sm h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 p-4"
-          style={{ borderColor: colors.$24 }}
-          withoutPadding
-        >
-          <div className="flex flex-col space-y-3 pt-1">
-            {project && (
-              <div className="flex space-x-10">
-                <span
-                  className="text-sm font-medium"
-                  style={{
-                    color: colors.$3,
-                  }}
-                >
-                  {t('status')}
-                </span>
+      <ProjectAnalytics
+        project={project}
+        overviewContent={(forecastCard) => (
+          <div className="grid grid-cols-12 lg:space-y-0 gap-4">
+            <InfoCard
+              title={project.name}
+              className="shadow-sm h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 p-4"
+              style={{ borderColor: colors.$24 }}
+              withoutPadding
+            >
+              <div className="flex flex-col space-y-3 pt-1">
+                {project && (
+                  <div className="flex space-x-10">
+                    <span
+                      className="text-sm font-medium"
+                      style={{
+                        color: colors.$3,
+                      }}
+                    >
+                      {t('status')}
+                    </span>
 
-                <EntityStatus entity={project} />
-              </div>
-            )}
+                    <EntityStatus entity={project} />
+                  </div>
+                )}
 
-            {Boolean(project.tags?.length) && (
-              <div className="flex flex-col space-y-1">
-                <span
-                  className="text-sm font-medium"
-                  style={{
-                    color: colors.$3,
-                  }}
-                >
-                  {t('tags')}
-                </span>
+                {Boolean(project.tags?.length) && (
+                  <div className="flex flex-col space-y-1">
+                    <span
+                      className="text-sm font-medium"
+                      style={{
+                        color: colors.$3,
+                      }}
+                    >
+                      {t('tags')}
+                    </span>
+
+                    <div>
+                      <TagPills tags={project.tags} />
+                    </div>
+                  </div>
+                )}
+
+                {project.client && (
+                  <ClientActionButtons
+                    displayClientName
+                    client={project.client}
+                  />
+                )}
 
                 <div>
-                  <TagPills tags={project.tags} />
-                </div>
-              </div>
-            )}
+                  {project.due_date.length > 0 && (
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm font-medium">
+                        {t('due_date')}:
+                      </span>
 
-            {project.client && (
-              <ClientActionButtons displayClientName client={project.client} />
-            )}
-
-            <div>
-              {project.due_date.length > 0 && (
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium">{t('due_date')}:</span>
-
-                  <span className="text-sm">
-                    {date(project.due_date, dateFormat)}
-                  </span>
-                </div>
-              )}
-
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">
-                  {t('budgeted_hours')}:
-                </span>
-
-                <span className="text-sm">
-                  {formatNumber(project.budgeted_hours)}
-                </span>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">{t('task_rate')}:</span>
-
-                <span className="text-sm">
-                  {formatMoney(
-                    project.task_rate,
-                    project.client?.country_id,
-                    project.client?.settings.currency_id
+                      <span className="text-sm">
+                        {date(project.due_date, dateFormat)}
+                      </span>
+                    </div>
                   )}
+
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium">
+                      {t('budgeted_hours')}:
+                    </span>
+
+                    <span className="text-sm">
+                      {formatNumber(project.budgeted_hours)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium">
+                      {t('task_rate')}:
+                    </span>
+
+                    <span className="text-sm">
+                      {formatMoney(
+                        project.task_rate,
+                        project.client?.country_id,
+                        project.client?.settings.currency_id
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  {project?.invoices?.map((invoice: Invoice, index: number) => (
+                    <Link
+                      key={index}
+                      to={route('/invoices/:id/edit', { id: invoice.id })}
+                    >
+                      {t('invoice')} #{invoice.number}
+                    </Link>
+                  ))}
+
+                  {project?.quotes?.map((quote: Quote, index: number) => (
+                    <Link
+                      key={index}
+                      to={route('/quotes/:id/edit', { id: quote.id })}
+                    >
+                      {t('quote')} #{quote.number}
+                    </Link>
+                  ))}
+
+                  {project?.expenses?.map((expense: Expense, index: number) => (
+                    <Link
+                      key={index}
+                      to={route('/expenses/:id/edit', { id: expense.id })}
+                    >
+                      {t('expense')} #{expense.number}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </InfoCard>
+
+            <ProjectPrivateNotes project={project} />
+
+            <ProjectPublicNotes project={project} />
+
+            <InfoCard
+              title={t('summary')}
+              className="shadow-sm h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 p-4"
+              style={{ borderColor: colors.$24 }}
+              withoutPadding
+            >
+              <div className="flex space-x-2">
+                <span className="font-medium">{t('active_tasks')}:</span>
+
+                <span>{project.tasks?.length}</span>
+              </div>
+
+              <div className="flex space-x-2">
+                <span className="font-medium">{t('total_hours')}:</span>
+
+                <span>
+                  {parseFloat((project?.current_hours || 0).toFixed(4))}
                 </span>
               </div>
-            </div>
+            </InfoCard>
 
-            <div>
-              {project?.invoices?.map((invoice: Invoice, index: number) => (
-                <Link
-                  key={index}
-                  to={route('/invoices/:id/edit', { id: invoice.id })}
-                >
-                  {t('invoice')} #{invoice.number}
-                </Link>
-              ))}
-
-              {project?.quotes?.map((quote: Quote, index: number) => (
-                <Link
-                  key={index}
-                  to={route('/quotes/:id/edit', { id: quote.id })}
-                >
-                  {t('quote')} #{quote.number}
-                </Link>
-              ))}
-
-              {project?.expenses?.map((expense: Expense, index: number) => (
-                <Link
-                  key={index}
-                  to={route('/expenses/:id/edit', { id: expense.id })}
-                >
-                  {t('expense')} #{expense.number}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </InfoCard>
-
-        <ProjectPrivateNotes project={project} />
-
-        <ProjectPublicNotes project={project} />
-
-        <InfoCard
-          title={t('summary')}
-          className="shadow-sm h-full 2xl:h-max col-span-12 lg:col-span-6 xl:col-span-4 2xl:col-span-3 p-4"
-          style={{ borderColor: colors.$24 }}
-          withoutPadding
-        >
-          <div className="flex space-x-2">
-            <span className="font-medium">{t('active_tasks')}:</span>
-
-            <span>{project.tasks?.length}</span>
-          </div>
-
-          <div className="flex space-x-2">
-            <span className="font-medium">{t('total_hours')}:</span>
-
-            <span>{parseFloat((project?.current_hours || 0).toFixed(4))}</span>
-          </div>
-        </InfoCard>
-      </div>
-
-      {enabled(ModuleBitmask.Tasks) &&
-        (hasPermission('view_task') || hasPermission('edit_task')) && (
-          <div className="my-4">
-            <Burnup project={project} />
+            {forecastCard}
           </div>
         )}
+      />
 
       {enabled(ModuleBitmask.Tasks) && (
         <div className="my-4">
