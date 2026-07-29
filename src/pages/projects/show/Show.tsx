@@ -60,6 +60,7 @@ import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
 import { ProjectPublicNotes } from './components/ProjectPublicNotes';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { useFilterColumns } from '$app/pages/tasks/common/hooks/useFilterColumns';
+import { TagPills } from '$app/components/tags/TagPills';
 
 dayjs.extend(duration);
 
@@ -161,6 +162,23 @@ export default function Show() {
                 </span>
 
                 <EntityStatus entity={project} />
+              </div>
+            )}
+
+            {Boolean(project.tags?.length) && (
+              <div className="flex flex-col space-y-1">
+                <span
+                  className="text-sm font-medium"
+                  style={{
+                    color: colors.$3,
+                  }}
+                >
+                  {t('tags')}
+                </span>
+
+                <div>
+                  <TagPills tags={project.tags} />
+                </div>
               </div>
             )}
 

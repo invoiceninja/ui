@@ -13,6 +13,7 @@ import { getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { PaymentStatus } from '$app/common/enums/payment-status';
 import { Payment } from '$app/common/interfaces/payment';
 import { useBulk } from '$app/common/queries/payments';
 import { Divider } from '$app/components/cards/Divider';
@@ -90,6 +91,7 @@ export function useActions(params?: Params) {
     (resource: Payment) =>
       !location.pathname.includes('/refund') &&
       resource.amount !== resource.refunded &&
+      resource.status_id !== PaymentStatus.Pending &&
       !resource.is_deleted && (
         <DropdownElement
           to={route('/payments/:id/refund', { id: resource.id })}

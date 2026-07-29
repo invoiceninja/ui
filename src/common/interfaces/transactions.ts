@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Tag } from './tag';
+
 export interface Transaction {
   account_type: string;
   amount: number;
@@ -35,4 +37,6 @@ export interface Transaction {
   participant: string;
   participant_name: string;
   user_id: string;
+  tags?: Tag[];
+  bank_transaction_tag_ids?: string[];
 }

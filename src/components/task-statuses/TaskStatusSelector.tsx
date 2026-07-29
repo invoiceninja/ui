@@ -123,6 +123,7 @@ export function TaskStatusSelector(props: Props) {
 
       <ComboboxAsync<TaskStatus>
         endpoint={endpoint('/api/v1/task_statuses?status=active')}
+        sortBy="id|asc"
         onChange={(taskStatus: Entry<TaskStatus>) =>
           taskStatus.resource && props.onChange(taskStatus.resource)
         }

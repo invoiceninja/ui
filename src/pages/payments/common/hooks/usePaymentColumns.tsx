@@ -33,6 +33,7 @@ import {
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'status',
@@ -80,6 +81,7 @@ export function useAllPaymentColumns() {
     'applied',
     'credits',
     'updated_at',
+    'tags',
   ] as const;
 
   return paymentColumns.map((column) => normalizeColumnName(column));
@@ -376,6 +378,12 @@ export function usePaymentColumns() {
       id: 'updated_at',
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'tags',
+      id: 'payment_tag_ids',
+      label: t('tags'),
+      format: (value, payment) => <TagPills tags={payment.tags} />,
     },
   ];
 

@@ -32,6 +32,7 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { Tooltip } from '$app/components/Tooltip';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export default function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
@@ -103,6 +104,21 @@ export default function Vendor() {
 
                 <div>
                   <EntityStatus entity={vendor} />
+                </div>
+              </div>
+            )}
+
+            {Boolean(vendor?.tags?.length) && (
+              <div className="flex flex-col space-y-1">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('tags')}
+                </span>
+
+                <div>
+                  <TagPills tags={vendor?.tags} />
                 </div>
               </div>
             )}

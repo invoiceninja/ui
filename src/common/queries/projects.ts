@@ -43,7 +43,7 @@ export function useProjectQuery(params: { id: string | undefined }) {
         'GET',
         endpoint('/api/v1/projects/:id?include=client', { id: params.id })
       ).then((response) => response.data.data),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: Boolean(params.id) }
   );
 }
 

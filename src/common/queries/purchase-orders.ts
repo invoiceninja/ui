@@ -53,7 +53,7 @@ export function usePurchaseOrderQuery(params: { id: string | undefined }) {
         (response: GenericSingleResourceResponse<PurchaseOrder>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: Boolean(params.id) }
   );
 }
 

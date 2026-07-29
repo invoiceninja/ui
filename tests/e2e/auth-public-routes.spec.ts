@@ -6,6 +6,17 @@ resetAccountBeforeAll();
 test('unauthenticated visitors are redirected from private routes to login', async ({
   page,
 }) => {
+  await page.route('**/api/v1/login/precheck', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        methods: ['password'],
+        secret_required: false,
+      }),
+    });
+  });
+
   await page.goto('/dashboard');
   await page.waitForURL('**/login');
 
@@ -13,7 +24,14 @@ test('unauthenticated visitors are redirected from private routes to login', asy
     page.getByRole('heading', { name: 'Login', exact: true })
   ).toBeVisible({ timeout: 10000 });
   await expect(page.locator('input[name="email"]')).toBeVisible();
-  await expect(page.getByLabel('Password')).toBeVisible();
+  await expect(page.locator('input[name="password"]')).not.toBeVisible();
+
+  await page.locator('input[name="email"]').fill('public-route@example.test');
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+
+  await expect(page.locator('input[name="password"]')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page.locator('a[href="/recover_password"]').click();
   await page.waitForURL('**/recover_password');
@@ -29,6 +47,22 @@ test('unauthenticated visitors are redirected from private routes to login', asy
 
 test('login form displays API validation failures', async ({ page }) => {
   const requests: Array<Record<string, unknown>> = [];
+  const precheckRequests: Array<Record<string, unknown>> = [];
+
+  await page.route('**/api/v1/login/precheck', async (route) => {
+    precheckRequests.push(
+      route.request().postDataJSON() as Record<string, unknown>
+    );
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        methods: ['password'],
+        secret_required: false,
+      }),
+    });
+  });
 
   await page.route('**/api/v1/login', async (route) => {
     requests.push(route.request().postDataJSON() as Record<string, unknown>);
@@ -47,7 +81,11 @@ test('login form displays API validation failures', async ({ page }) => {
 
   await page.goto('/login');
   await page.locator('input[name="email"]').fill('bad-auth@example.test');
-  await page.getByLabel('Password').fill('wrong-password');
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+
+  const passwordInput = page.locator('input[name="password"]');
+  await expect(passwordInput).toBeVisible({ timeout: 10000 });
+  await passwordInput.fill('wrong-password');
   await page.getByRole('button', { name: 'Login', exact: true }).click();
 
   await expect(page.getByRole('status')).toContainText(
@@ -57,6 +95,9 @@ test('login form displays API validation failures', async ({ page }) => {
   expect(requests[0]).toMatchObject({
     email: 'bad-auth@example.test',
     password: 'wrong-password',
+  });
+  expect(precheckRequests[0]).toMatchObject({
+    email: 'bad-auth@example.test',
   });
 });
 

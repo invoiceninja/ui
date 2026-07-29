@@ -39,6 +39,8 @@ import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-co
 import { useColorScheme } from '$app/common/colors';
 import { ExternalLink } from '$app/components/icons/ExternalLink';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 export interface ExpenseCardProps {
   expense: Expense | undefined;
@@ -255,6 +257,17 @@ export function Details(props: Props) {
               onClearButtonClick={() => handleChange('assigned_user_id', '')}
               onChange={(user) => handleChange('assigned_user_id', user.id)}
               errorMessage={errors?.errors.assigned_user_id}
+            />
+          </Element>
+        )}
+
+        {expense && (
+          <Element leftSide={t('tags')}>
+            <TagPillSelector
+              entityType={TAG_ENTITY_TYPES.expense}
+              value={expense.tags || []}
+              onChange={(tags) => handleChange('tags', tags)}
+              errorMessage={errors?.errors.tags}
             />
           </Element>
         )}
