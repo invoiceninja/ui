@@ -99,9 +99,17 @@ export interface Invoice {
 
 export interface Sync {
   qb_id: string;
+  qb_status?: QuickbooksInvoiceSyncStatus | string | null;
+  qb_status_message?: string | null;
   dn_completed: boolean;
   invitations: SyncInvitation[];
 }
+
+export type QuickbooksInvoiceSyncStatus =
+  | 'syncable'
+  | 'linkable'
+  | 'amount_mismatch'
+  | 'synced';
 
 export interface SyncInvitation {
   invitation_key: string;
