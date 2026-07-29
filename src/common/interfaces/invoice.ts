@@ -77,7 +77,7 @@ export interface Invoice {
   paid_to_date: number;
   applied_cash_discount: number;
   cash_discount_percent: number;
-  cash_discount_expiry_date: string;
+  cash_discount_due_date: string;
   cash_discount: number;
   subscription_id: string;
   auto_bill_enabled: boolean;

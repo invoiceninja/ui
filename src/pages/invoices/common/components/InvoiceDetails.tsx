@@ -100,16 +100,16 @@ export function InvoiceDetails(props: Props) {
                 <InputField
                   type="date"
                   onValueChange={(value) =>
-                    handleChange('cash_discount_expiry_date', value)
+                    handleChange('cash_discount_due_date', value)
                   }
-                  value={invoice?.cash_discount_expiry_date || ''}
+                  value={invoice?.cash_discount_due_date || ''}
                 />
               </div>
             </div>
 
             <ErrorMessage>
               {props.errors?.errors.cash_discount_percent ||
-                props.errors?.errors.cash_discount_expiry_date}
+                props.errors?.errors.cash_discount_due_date}
             </ErrorMessage>
           </div>
         </Element>

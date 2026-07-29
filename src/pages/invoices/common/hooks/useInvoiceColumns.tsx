@@ -130,7 +130,7 @@ export function useAllInvoiceColumns() {
     'project',
     'recurring_invoice',
     'cash_discount_percent',
-    'cash_discount_expiry_date',
+    'cash_discount_due_date',
     'cash_discount',
     'applied_cash_discount',
   ] as const;
@@ -675,9 +675,9 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value) => value ? `${value}%` : '',
     },
     {
-      column: 'cash_discount_expiry_date',
-      id: 'cash_discount_expiry_date',
-      label: t('cash_discount_expiry_date'),
+      column: 'cash_discount_due_date',
+      id: 'cash_discount_due_date',
+      label: t('cash_discount_due_date'),
       format: (value) => date(value, dateFormat),
     },
     {

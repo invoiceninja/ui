@@ -47,11 +47,11 @@ interface UseApplyInvoiceTableColumnsProps {
 }
 
 export function isCashDiscountExpired(invoice: Invoice) {
-  if (!invoice.cash_discount_expiry_date) {
+  if (!invoice.cash_discount_due_date) {
     return false;
   }
 
-  return dayjs().isAfter(invoice.cash_discount_expiry_date, 'day');
+  return dayjs().isAfter(invoice.cash_discount_due_date, 'day');
 }
 
 interface CashDiscountCellProps {

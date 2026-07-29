@@ -142,7 +142,7 @@ const invoice: Invoice = {
   paid_to_date: 0,
   applied_cash_discount: 0,
   cash_discount_percent: 0,
-  cash_discount_expiry_date: '',
+  cash_discount_due_date: '',
   cash_discount: 0,
   subscription_id: '',
   location_id: '',
