@@ -20,10 +20,6 @@ export const ANALYTICS_CHART_COLORS = [
 
 export const ANALYTICS_KEY_FIELDS = ['project_id', 'project_name'];
 
-/**
- * Recharts resolves grid/legend children by element type, so these are shared
- * as props rather than wrapper components — a wrapper would never render.
- */
 export const ANALYTICS_GRID_PROPS = {
   strokeDasharray: '3 3',
   vertical: false,
@@ -77,10 +73,6 @@ export const PERCENT_FIELDS = new Set([
   'score',
 ]);
 
-/**
- * Chart-series field -> i18n key. Every chart carries its own axis
- * (Amount / Hours / %), so series labels are the bare metric name.
- */
 export const FIELD_LABELS: Record<string, string> = {
   actual_amount: 'actual_spend',
   average_daily_velocity: 'daily_velocity',

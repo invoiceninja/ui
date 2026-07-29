@@ -110,13 +110,13 @@ export function BurnupTooltip({
         </span>
       </div>
 
-      {payload.map((item) => {
+      {payload.map((item, index) => {
         const metric = item.dataKey ? metricsByKey[item.dataKey] : undefined;
         const label = metric ? t(metric.translationKey) : String(item.name);
 
         return (
           <div
-            key={item.dataKey || item.name}
+            key={index}
             className="flex items-center justify-between space-x-8 py-1 text-sm"
           >
             <div className="flex items-center space-x-2">

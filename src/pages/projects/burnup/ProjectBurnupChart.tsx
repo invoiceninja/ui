@@ -187,9 +187,9 @@ export function ProjectBurnupChart({
           />
         )}
 
-        {visibleMetrics.map((metric) => (
+        {visibleMetrics.map((metric, index) => (
           <Line
-            key={metric.key}
+            key={index}
             id={metric.key}
             yAxisId={metric.axis}
             type="monotone"

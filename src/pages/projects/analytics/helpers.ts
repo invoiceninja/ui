@@ -47,10 +47,6 @@ export const findProjectRow = <T extends ProjectScopedRow>(
   return rows?.find((row) => idsMatch(row.project_id, projectId));
 };
 
-/**
- * Each nested section carries the project identifiers plus exactly one array
- * property holding the series, whose name differs per section.
- */
 export const getNestedRows = <T>(
   feed: ProjectNestedSection<T>[] | undefined,
   projectId: string

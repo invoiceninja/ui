@@ -63,10 +63,6 @@ export function ProjectAnalytics({
 
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-  /**
-   * Time and burn-up are derived from tasks, so they stay behind a task
-   * permission; the remaining tabs report on the project itself.
-   */
   const showTaskTabs =
     enabled(ModuleBitmask.Tasks) &&
     (hasPermission('view_task') || hasPermission('edit_task'));
@@ -323,8 +319,8 @@ export function ProjectAnalytics({
 
       {!analytics.isLoading && hasAnalyticsData && (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8">
-          {statCards.map((stat) => (
-            <AnalyticsStatCard key={stat.label} {...stat} />
+          {statCards.map((stat, index) => (
+            <AnalyticsStatCard key={index} {...stat} />
           ))}
         </div>
       )}
@@ -337,7 +333,7 @@ export function ProjectAnalytics({
         onTabChange={setActiveTabIndex}
       >
         {tabs.map((tab, index) => (
-          <div key={tab.label} className="space-y-4">
+          <div key={index} className="space-y-4">
             {activeTabIndex === index && tab.content}
           </div>
         ))}

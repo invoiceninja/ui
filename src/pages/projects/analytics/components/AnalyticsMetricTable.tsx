@@ -20,9 +20,9 @@ export function AnalyticsMetricTable({ rows }: Props) {
 
   return (
     <div className="divide-y text-sm" style={{ borderColor: colors.$20 }}>
-      {rows.map((row) => (
+      {rows.map((row, index) => (
         <div
-          key={row.label}
+          key={index}
           className="flex items-center justify-between gap-4 py-3"
           style={{ borderColor: colors.$20 }}
         >

@@ -28,7 +28,6 @@ interface Props {
   formatter: AnalyticsValueFormatter;
 }
 
-/** Score and status, rendered next to the card title. */
 export function ProjectHealthHeader({ health, formatter }: Props) {
   const colors = useColorScheme();
 
@@ -76,8 +75,8 @@ export function ProjectHealthSummary({ health, formatter }: Props) {
 
   return (
     <div className="space-y-3 text-sm">
-      {indicatorRows.map((row) => (
-        <div key={row.key} className="space-y-1">
+      {indicatorRows.map((row, index) => (
+        <div key={index} className="space-y-1">
           <div className="flex items-center justify-between gap-4">
             <span style={{ color: colors.$22 }}>{fieldLabel(row.key)}</span>
 

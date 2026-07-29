@@ -134,10 +134,6 @@ export interface ProjectActivityRow {
   amount?: ProjectAnalyticsValue;
 }
 
-/**
- * Sections keyed per project, where the series lives under a section-specific
- * property alongside the project identifiers.
- */
 export type ProjectNestedSection<TRow> = ProjectScopedRow &
   Record<string, TRow[] | ProjectAnalyticsValue>;
 

@@ -38,9 +38,9 @@ export function BurnupMetricGroup({
       </p>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {metrics.map((metric) => (
+        {metrics.map((metric, index) => (
           <Checkbox
-            key={metric.key}
+            key={index}
             value={metric.key}
             label={t(metric.translationKey)}
             checked={visibleMetricKeys.includes(metric.key)}

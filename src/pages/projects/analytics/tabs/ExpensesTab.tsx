@@ -101,7 +101,7 @@ export function ExpensesTab({
               >
                 {breakdownData.map((entry, index) => (
                   <Cell
-                    key={String(entry.category_name ?? index)}
+                    key={index}
                     fill={
                       ANALYTICS_CHART_COLORS[
                         index % ANALYTICS_CHART_COLORS.length

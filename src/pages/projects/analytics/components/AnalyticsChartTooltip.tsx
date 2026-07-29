@@ -120,7 +120,7 @@ export function AnalyticsChartTooltip({
 
           return (
             <div
-              key={`${dataKey}-${index}`}
+              key={index}
               className="flex items-center justify-between gap-6"
             >
               <div className="flex min-w-0 items-center gap-2">
