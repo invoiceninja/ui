@@ -15,6 +15,7 @@ import { freePlan } from '$app/common/guards/guards/free-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { generateEmailPreview } from '$app/common/helpers/emails/generate-email-preview';
 import { useHandleSend } from '$app/common/hooks/emails/useHandleSend';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
@@ -72,6 +73,7 @@ export interface EmailTemplate {
 export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
   const [t] = useTranslation();
 
+  const account = useCurrentAccount();
   const company = useCurrentCompany();
   const reactSettings = useReactSettings();
 
@@ -95,8 +97,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
     templateId: props.defaultEmail,
   });
 
-  const isCcEmailAvailable =
-    isSelfHosted() || (isHosted() && (proPlan() || enterprisePlan()));
+  const isCcEmailEnabled = isSelfHosted() || account?.is_premium === true;
 
   const handleTemplateChange = (id: string) => {
     setPayloadData(
@@ -220,16 +221,15 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
         </Card>
 
         <Card withContainer>
-          {isCcEmailAvailable && (
-            <InputField
-              label={t('cc_email')}
-              value={payloadData.ccEmail}
-              onValueChange={(value) =>
-                setPayloadData((current) => ({ ...current, ccEmail: value }))
-              }
-              errorMessage={errors?.errors.cc_email}
-            />
-          )}
+          <InputField
+            label={t('cc_email')}
+            value={payloadData.ccEmail}
+            onValueChange={(value) =>
+              setPayloadData((current) => ({ ...current, ccEmail: value }))
+            }
+            disabled={!isCcEmailEnabled}
+            errorMessage={errors?.errors.cc_email}
+          />
 
           <InputField
             label={t('subject')}
