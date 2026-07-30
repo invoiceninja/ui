@@ -97,7 +97,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
     templateId: props.defaultEmail,
   });
 
-  const isCcEmailEnabled = isSelfHosted() || account?.is_premium === true;
+  const isCcEmailEnabled = isSelfHosted() || account?.is_premium;
 
   const handleTemplateChange = (id: string) => {
     setPayloadData(
@@ -158,21 +158,25 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
     }
   }, [currentTemplate]);
 
-  useImperativeHandle(ref, () => {
-    return {
-      sendEmail() {
-        handleSend(
-          payloadData.body,
-          props.resourceType,
-          props.resource?.id || '',
-          payloadData.subject,
-          payloadData.templateId,
-          props.redirectUrl,
-          payloadData.ccEmail
-        );
-      },
-    };
-  }, [payloadData]);
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        sendEmail() {
+          handleSend(
+            payloadData.body,
+            props.resourceType,
+            props.resource?.id || '',
+            payloadData.subject,
+            payloadData.templateId,
+            props.redirectUrl,
+            payloadData.ccEmail
+          );
+        },
+      };
+    },
+    [payloadData]
+  );
 
   return (
     <div className="grid grid-cols-12 lg:gap-4 my-4">
