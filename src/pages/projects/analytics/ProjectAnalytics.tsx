@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -25,8 +27,6 @@ import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
 import { Burnup } from '$app/pages/projects/burnup/Burnup';
 import { ModuleBitmask } from '$app/pages/settings';
-import { ReactNode, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { AnalyticsCard } from './components/AnalyticsCard';
 import { AnalyticsStatCard } from './components/AnalyticsStatCard';
 import { ForecastSummary } from './components/ForecastSummary';
@@ -47,12 +47,14 @@ interface Props {
   project: Project;
   includeDrafts: boolean;
   overviewContent?: (forecastCard: ReactNode) => ReactNode;
+  onCanViewFinancialsChange?: (canViewFinancials: boolean) => void;
 }
 
 export function ProjectAnalytics({
   project,
   includeDrafts,
   overviewContent,
+  onCanViewFinancialsChange,
 }: Props) {
   const [t] = useTranslation();
 
@@ -73,6 +75,13 @@ export function ProjectAnalytics({
   );
 
   const data = analytics.data;
+  const canViewFinancials = data?.metadata.can_view_financials === true;
+
+  useEffect(() => {
+    if (data) {
+      onCanViewFinancialsChange?.(canViewFinancials);
+    }
+  }, [canViewFinancials, data, onCanViewFinancialsChange]);
 
   const sections = useMemo(() => {
     if (!data) {
@@ -96,10 +105,12 @@ export function ProjectAnalytics({
         data.team_contribution,
         project.id
       ),
-      timeDistribution: getNestedRows<ProjectTaskDistributionRow>(
-        data.time_distribution,
-        project.id
-      ),
+      timeDistribution: canViewFinancials
+        ? getNestedRows<ProjectTaskDistributionRow>(
+            data.time_distribution,
+            project.id
+          )
+        : [],
       velocityTrend: getNestedRows<ProjectVelocityRow>(
         data.velocity_trend,
         project.id
@@ -117,7 +128,7 @@ export function ProjectAnalytics({
         project.id
       ),
     };
-  }, [data, project.id]);
+  }, [canViewFinancials, data, project.id]);
 
   const hasAnalyticsData = Boolean(
     sections &&
@@ -138,7 +149,7 @@ export function ProjectAnalytics({
 
   const healthScore = resolveProjectHealthScore(sections?.projectHealth);
 
-  const statCards = [
+  const financialStatCards = [
     {
       label: t('budgeted_amount'),
       value: formatValue(
@@ -201,6 +212,9 @@ export function ProjectAnalytics({
       ),
       accent: ANALYTICS_CHART_COLORS[2],
     },
+  ];
+
+  const operationalStatCards = [
     {
       label: t('health'),
       value: hasValue(healthScore) ? formatValue('score', healthScore) : '-',
@@ -217,6 +231,11 @@ export function ProjectAnalytics({
       detail: t('tracked_time'),
       accent: ANALYTICS_CHART_COLORS[0],
     },
+  ];
+
+  const statCards = [
+    ...(canViewFinancials ? financialStatCards : []),
+    ...operationalStatCards,
   ];
 
   const forecastCard = (
@@ -237,19 +256,23 @@ export function ProjectAnalytics({
       label: t('overview'),
       content: overviewContent?.(forecastCard),
     },
-    {
-      label: t('profit'),
-      content: sections && (
-        <ProfitTab
-          projectName={project.name}
-          profitability={sections.profitability}
-          budgetVsActual={sections.budgetVsActual}
-          invoiceProgress={sections.invoiceProgress}
-          formatter={formatValue}
-        />
-      ),
-    },
-    ...(showTaskTabs
+    ...(canViewFinancials
+      ? [
+          {
+            label: t('profit'),
+            content: sections && (
+              <ProfitTab
+                projectName={project.name}
+                profitability={sections.profitability}
+                budgetVsActual={sections.budgetVsActual}
+                invoiceProgress={sections.invoiceProgress}
+                formatter={formatValue}
+              />
+            ),
+          },
+        ]
+      : []),
+    ...(canViewFinancials && showTaskTabs
       ? [
           {
             label: t('time'),
@@ -267,30 +290,30 @@ export function ProjectAnalytics({
           },
         ]
       : []),
-    {
-      label: t('expenses'),
-      content: sections && (
-        <ExpensesTab
-          expenseBreakdown={sections.expenseBreakdown}
-          cumulativeSpend={sections.cumulativeSpend}
-          formatter={formatValue}
-        />
-      ),
-    },
-    ...(showTaskTabs
+    ...(canViewFinancials
       ? [
           {
-            label: t('burn_up'),
-            content: (
-              <Burnup
-                project={project}
-                includeDrafts={includeDrafts}
-                withoutIncludeDraftsToggle
+            label: t('expenses'),
+            content: sections && (
+              <ExpensesTab
+                expenseBreakdown={sections.expenseBreakdown}
+                cumulativeSpend={sections.cumulativeSpend}
+                formatter={formatValue}
               />
             ),
           },
         ]
       : []),
+    {
+      label: t('burn_up'),
+      content: (
+        <Burnup
+          project={project}
+          includeDrafts={includeDrafts}
+          withoutIncludeDraftsToggle
+        />
+      ),
+    },
   ];
 
   return (

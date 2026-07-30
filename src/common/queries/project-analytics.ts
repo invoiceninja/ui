@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from 'react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import {
   ProjectAnalyticsRequest,
   ProjectAnalyticsResponse,
 } from '$app/common/interfaces/project-analytics';
-import { useQuery } from 'react-query';
 
 interface QueryOptions {
   enabled?: boolean;
@@ -36,9 +36,11 @@ export function useProjectAnalyticsQuery(
         endpoint('/api/v1/charts/project_analytics/:id', {
           id: payload.project_id,
         }),
-        payload
+        payload,
+        { skipIntercept: true }
       ).then((response) => response.data),
     staleTime: Infinity,
+    retry: false,
     enabled: options?.enabled ?? Boolean(payload.project_id),
   });
 }

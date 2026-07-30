@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { date as formatDate } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
@@ -17,20 +20,17 @@ import {
   ProjectBurnupMetricKey,
 } from '$app/common/interfaces/project-burnup';
 import { useProjectBurnupQuery } from '$app/common/queries/project-burnup';
-import { ErrorMessage } from '$app/components/ErrorMessage';
-import { Spinner } from '$app/components/Spinner';
 import { Card } from '$app/components/cards';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 import Toggle from '$app/components/forms/Toggle';
-import classNames from 'classnames';
-import { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Spinner } from '$app/components/Spinner';
 import { BurnupMetricGroup } from './BurnupMetricGroup';
-import { ProjectBurnupChart } from './ProjectBurnupChart';
 import { resolveProjectBurnupDateRange } from './helpers';
 import {
   DEFAULT_PROJECT_BURNUP_METRICS,
   PROJECT_BURNUP_METRICS,
 } from './metrics';
+import { ProjectBurnupChart } from './ProjectBurnupChart';
 
 interface Props {
   project: Project;
@@ -109,6 +109,14 @@ export function Burnup({
   const burnup = useProjectBurnupQuery(payload, {
     enabled: Boolean(project.id),
   });
+  const canViewFinancials = burnup.data?.metadata.can_view_financials === true;
+  const allowedVisibleMetricKeys = canViewFinancials
+    ? visibleMetricKeys
+    : visibleMetricKeys.filter(
+        (key) =>
+          PROJECT_BURNUP_METRICS.find((metric) => metric.key === key)?.axis ===
+          'hours'
+      );
 
   const handleMetricToggle = (metricKey: ProjectBurnupMetricKey) => {
     setVisibleMetricKeys((current) => {
@@ -154,7 +162,7 @@ export function Burnup({
         })}
       </div>
 
-      {!withoutIncludeDraftsToggle && (
+      {!withoutIncludeDraftsToggle && canViewFinancials && (
         <Toggle
           label={t('include_drafts')}
           checked={resolvedIncludeDrafts}
@@ -182,12 +190,14 @@ export function Burnup({
             onToggle={handleMetricToggle}
           />
 
-          <BurnupMetricGroup
-            title={t('money')}
-            metrics={MONEY_METRICS}
-            visibleMetricKeys={visibleMetricKeys}
-            onToggle={handleMetricToggle}
-          />
+          {canViewFinancials && (
+            <BurnupMetricGroup
+              title={t('money')}
+              metrics={MONEY_METRICS}
+              visibleMetricKeys={visibleMetricKeys}
+              onToggle={handleMetricToggle}
+            />
+          )}
         </div>
 
         {burnup.isLoading && (
@@ -204,7 +214,7 @@ export function Burnup({
           <ProjectBurnupChart
             data={burnup.data}
             project={project}
-            visibleMetricKeys={visibleMetricKeys}
+            visibleMetricKeys={allowedVisibleMetricKeys}
           />
         )}
       </div>

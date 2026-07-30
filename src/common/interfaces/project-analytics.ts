@@ -141,6 +141,7 @@ export interface ProjectAnalyticsMetadata {
   project_count: number;
   include_drafts: boolean;
   generated_at: string;
+  can_view_financials: boolean;
 }
 
 export interface ProjectAnalyticsResponse {

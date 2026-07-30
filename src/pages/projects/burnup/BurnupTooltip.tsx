@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { date as formatDate } from '$app/common/helpers';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import {
   ProjectBurnupBucketType,
   ProjectBurnupMetricKey,
   ProjectBurnupSeriesRow,
 } from '$app/common/interfaces/project-burnup';
-import { useTranslation } from 'react-i18next';
 import { ProjectBurnupMetricDefinition } from './metrics';
 
 interface PayloadItem {
@@ -33,6 +33,7 @@ interface Props {
   metricsByKey: Record<string, ProjectBurnupMetricDefinition>;
   countryId: string | undefined;
   currencyId: string | undefined;
+  canViewFinancials: boolean;
   active?: boolean;
   payload?: PayloadItem[];
 }
@@ -42,6 +43,7 @@ export function BurnupTooltip({
   metricsByKey,
   countryId,
   currencyId,
+  canViewFinancials,
   active,
   payload,
 }: Props) {
@@ -96,18 +98,22 @@ export function BurnupTooltip({
       )}
 
       <div
-        className="mb-3 grid grid-cols-3 gap-3 border-b border-dashed pb-3 text-xs"
+        className="mb-3 flex gap-3 border-b border-dashed pb-3 text-xs"
         style={{ borderColor: colors.$20, color: colors.$17 }}
       >
         <span>
           {t('tasks')}: {row.task_log_count}
         </span>
-        <span>
-          {t('invoices')}: {row.invoice_count}
-        </span>
-        <span>
-          {t('expenses')}: {row.expense_count}
-        </span>
+        {canViewFinancials && (
+          <>
+            <span>
+              {t('invoices')}: {row.invoice_count}
+            </span>
+            <span>
+              {t('expenses')}: {row.expense_count}
+            </span>
+          </>
+        )}
       </div>
 
       {payload.map((item, index) => {

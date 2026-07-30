@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from 'react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import {
   ProjectBurnupRequest,
   ProjectBurnupResponse,
 } from '$app/common/interfaces/project-burnup';
-import { useQuery } from 'react-query';
 
 interface QueryOptions {
   enabled?: boolean;

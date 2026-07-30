@@ -8,15 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { date as formatDate } from '$app/common/helpers';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { Project } from '$app/common/interfaces/project';
-import {
-  ProjectBurnupMetricKey,
-  ProjectBurnupResponse,
-} from '$app/common/interfaces/project-burnup';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -30,6 +21,15 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { useColorScheme } from '$app/common/colors';
+import { date as formatDate } from '$app/common/helpers';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { Project } from '$app/common/interfaces/project';
+import {
+  ProjectBurnupMetricKey,
+  ProjectBurnupResponse,
+} from '$app/common/interfaces/project-burnup';
 import { BurnupTooltip } from './BurnupTooltip';
 import { formatBurnupXAxisTick, resolveBurnupMarkerDate } from './helpers';
 import {
@@ -98,6 +98,7 @@ export function ProjectBurnupChart({
 
   const countryId = project.client?.country_id;
   const currencyId = project.client?.settings.currency_id;
+  const canViewFinancials = data.metadata.can_view_financials;
 
   const formatHours = (value: number | string) => {
     return new Intl.NumberFormat(undefined, {
@@ -145,15 +146,17 @@ export function ProjectBurnupChart({
           width={64}
         />
 
-        <YAxis
-          yAxisId="money"
-          orientation="right"
-          tick={{ fontSize: 12 }}
-          stroke={colors.$3}
-          tickFormatter={formatMoneyValue}
-          label={axisLabel(t('amount'), colors.$17, 'right')}
-          width={92}
-        />
+        {canViewFinancials && (
+          <YAxis
+            yAxisId="money"
+            orientation="right"
+            tick={{ fontSize: 12 }}
+            stroke={colors.$3}
+            tickFormatter={formatMoneyValue}
+            label={axisLabel(t('amount'), colors.$17, 'right')}
+            width={92}
+          />
+        )}
 
         <Tooltip
           content={
@@ -162,6 +165,7 @@ export function ProjectBurnupChart({
               metricsByKey={visibleMetricByKey}
               countryId={countryId}
               currencyId={currencyId}
+              canViewFinancials={canViewFinancials}
             />
           }
           wrapperStyle={{ outline: 'none' }}
