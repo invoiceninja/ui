@@ -11,11 +11,11 @@ import { EInvoiceType } from '$app/pages/settings';
 import { Client } from './client';
 import { InvoiceItem } from './invoice-item';
 import { Payment, Paymentable } from './payment';
+import { Project } from './project';
 import { Invitation } from './purchase-order';
 import { ScheduleItem } from './schedule';
-import { TaxInfo } from './tax-info';
-import { Project } from './project';
 import { Tag } from './tag';
+import { TaxInfo } from './tax-info';
 export interface Invoice {
   id: string;
   user_id: string;
@@ -109,6 +109,7 @@ export type QuickbooksInvoiceSyncStatus =
   | 'syncable'
   | 'linkable'
   | 'amount_mismatch'
+  | 'data_mismatch'
   | 'synced';
 
 export interface SyncInvitation {

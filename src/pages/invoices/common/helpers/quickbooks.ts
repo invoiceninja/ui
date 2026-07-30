@@ -8,12 +8,61 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import type { Invoice } from '$app/common/interfaces/invoice';
 import { QuickbooksSyncDirection } from '$app/common/interfaces/quickbooks';
 
 export type QuickbooksInvoiceAction =
+  | 'check_record'
   | 'force_link'
   | 'force_pull'
   | 'force_push';
+
+export type QuickbooksCheckOutcome =
+  | 'syncable'
+  | 'linkable'
+  | 'synced'
+  | 'data_mismatch'
+  | 'not_found'
+  | 'voided';
+
+export type QuickbooksCheckAction =
+  | Exclude<QuickbooksInvoiceAction, 'check_record'>
+  | 'change_invoice_number'
+  | 'verify_quickbooks_invoice';
+
+export interface QuickbooksValueComparison<T> {
+  matches: boolean;
+  invoice_ninja: T;
+  quickbooks: T;
+}
+
+export interface QuickbooksInvoiceCheck {
+  outcome: QuickbooksCheckOutcome;
+  linked: boolean;
+  message: string;
+  checked_at: string;
+  quickbooks: {
+    id: string;
+    number: string;
+    total: number;
+    balance: number;
+    status: string;
+    sync_token: string;
+    last_updated_at: string;
+  } | null;
+  comparison: {
+    number: QuickbooksValueComparison<string>;
+    total: QuickbooksValueComparison<number>;
+  } | null;
+  recommended_actions: QuickbooksCheckAction[];
+}
+
+export interface QuickbooksCheckRecordResponse {
+  data: Invoice;
+  meta: {
+    quickbooks_check: QuickbooksInvoiceCheck;
+  };
+}
 
 export interface QuickbooksInvoiceActionResource {
   sync?: {
@@ -71,6 +120,7 @@ export function getQuickbooksInvoiceActions(
     return [];
   }
 
+  const actions: QuickbooksInvoiceAction[] = ['check_record'];
   const qbId = invoice?.sync?.qb_id?.trim();
   const status = invoice?.sync?.qb_status;
   const hasStatusMessage = Boolean(invoice?.sync?.qb_status_message?.trim());
@@ -83,17 +133,15 @@ export function getQuickbooksInvoiceActions(
 
   if (!qbId) {
     if (status === 'linkable') {
-      return ['force_link'];
+      actions.push('force_link');
     }
 
     if (canForcePush) {
-      return ['force_push'];
+      actions.push('force_push');
     }
 
-    return [];
+    return actions;
   }
-
-  const actions: QuickbooksInvoiceAction[] = [];
 
   if (pullEnabled) {
     actions.push('force_pull');
