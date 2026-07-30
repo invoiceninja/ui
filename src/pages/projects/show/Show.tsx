@@ -149,7 +149,7 @@ export default function Show() {
       afterBreadcrumbs={<PreviousNextNavigation entity="project" />}
       topRight={
         canViewFinancials ? (
-          <div className="flex flex-shrink-0 items-center justify-end space-x-3">
+          <div className="flex flex-shrink-0 items-center justify-end space-x-3 lg:pl-6">
             <span className="whitespace-nowrap text-sm">
               {t('include_drafts')}
             </span>
