@@ -1,4 +1,4 @@
-import { login, logout } from '$tests/e2e/helpers';
+import { login } from '$tests/e2e/helpers';
 import {
   resetAccountBeforeAll,
   test,
@@ -11,6 +11,10 @@ import { type EntityType } from '$tests/e2e/api-helpers';
 import { type Page } from '@playwright/test';
 
 resetAccountBeforeAll();
+
+test.beforeEach(async ({ page }) => {
+  await login(page);
+});
 
 const TAGS = 'tags' as EntityType;
 
@@ -125,8 +129,6 @@ for (const reportCase of REPORT_CASES) {
     page,
     api,
   }) => {
-    await login(page);
-
     const tag = await createTag(api, reportCase.tagEntityType);
 
     await goToReports(page);
@@ -135,8 +137,6 @@ for (const reportCase of REPORT_CASES) {
     await expect(tagSelector(page)).toBeVisible({ timeout: 10000 });
 
     await selectTag(page, tag.name);
-
-    await logout(page);
   });
 }
 
@@ -145,8 +145,6 @@ for (const reportCase of REPORT_CASES) {
     page,
     api,
   }) => {
-    await login(page);
-
     const tag = await createTag(api, reportCase.tagEntityType);
 
     await goToReports(page);
@@ -188,20 +186,14 @@ for (const reportCase of REPORT_CASES) {
     await page.waitForURL('**/settings/schedules/**/edit');
     const scheduleId = extractIdFromUrl(page.url(), 'schedules');
     if (scheduleId) api.trackEntity('task_schedulers', scheduleId);
-
-    await logout(page);
   });
 }
 
 test('reports: no tags field for a non-entity report (Profit and Loss)', async ({
   page,
 }) => {
-  await login(page);
-
   await goToReports(page);
   await selectReport(page, 'Profit and Loss');
 
   await expect(tagSelector(page)).not.toBeVisible();
-
-  await logout(page);
 });
