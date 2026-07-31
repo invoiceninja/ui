@@ -115,6 +115,7 @@ interface CreateBlueprintParams {
   base64_file?: string;
   is_template?: boolean;
   grapesjs?: AuthoredDocumentData;
+  template_kind?: Blueprint['template_kind'];
 }
 
 export function useCreateBlueprint() {
@@ -148,6 +149,7 @@ interface UpdateBlueprintParams {
   base64_file?: string;
   is_template?: boolean;
   grapesjs?: AuthoredDocumentData;
+  template_kind?: Blueprint['template_kind'];
 }
 
 export function useUpdateBlueprint() {

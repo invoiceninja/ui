@@ -9,19 +9,23 @@
  */
 
 import { ReactNode, useState } from 'react';
-import { FileText, Tool } from 'react-feather';
+import { Edit3, FileText, Tool } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { Card, CardContainer } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
+import { AuthoredBlueprintStep } from './steps/AuthoredBlueprintStep';
 import { CustomBlueprintStep } from './steps/CustomBlueprintStep';
 import { InvoiceNinjaDesignStep } from './steps/InvoiceNinjaDesignStep';
 
-export type WizardStep = 'selection' | 'invoice-ninja' | 'custom';
+export type WizardStep = 'selection' | 'invoice-ninja' | 'custom' | 'authored';
 
 export interface BlueprintWizardProps {
-  onComplete: (blueprintId: string) => void;
+  onComplete: (
+    blueprintId: string,
+    templateKind: 'invoice_design' | 'uploaded_pdf' | 'authored_document'
+  ) => void;
   onCancel: () => void;
 }
 
@@ -32,10 +36,6 @@ export function BlueprintWizard({
   const [t] = useTranslation();
   const colors = useColorScheme();
   const [currentStep, setCurrentStep] = useState<WizardStep>('selection');
-
-  const handleStepComplete = (blueprintId: string) => {
-    onComplete(blueprintId);
-  };
 
   const handleBackToSelection = () => {
     setCurrentStep('selection');
@@ -48,20 +48,28 @@ export function BlueprintWizard({
           <SelectionStep
             onSelectInvoiceNinja={() => setCurrentStep('invoice-ninja')}
             onSelectCustom={() => setCurrentStep('custom')}
+            onSelectAuthored={() => setCurrentStep('authored')}
             onCancel={onCancel}
           />
         );
       case 'invoice-ninja':
         return (
           <InvoiceNinjaDesignStep
-            onComplete={handleStepComplete}
+            onComplete={(id) => onComplete(id, 'invoice_design')}
             onBack={handleBackToSelection}
           />
         );
       case 'custom':
         return (
           <CustomBlueprintStep
-            onComplete={handleStepComplete}
+            onComplete={(id) => onComplete(id, 'uploaded_pdf')}
+            onBack={handleBackToSelection}
+          />
+        );
+      case 'authored':
+        return (
+          <AuthoredBlueprintStep
+            onComplete={(id) => onComplete(id, 'authored_document')}
             onBack={handleBackToSelection}
           />
         );
@@ -87,12 +95,14 @@ export function BlueprintWizard({
 interface SelectionStepProps {
   onSelectInvoiceNinja: () => void;
   onSelectCustom: () => void;
+  onSelectAuthored: () => void;
   onCancel: () => void;
 }
 
 function SelectionStep({
   onSelectInvoiceNinja,
   onSelectCustom,
+  onSelectAuthored,
   onCancel,
 }: SelectionStepProps) {
   const [t] = useTranslation();
@@ -119,6 +129,14 @@ function SelectionStep({
       icon: <Icon element={Tool} size={32} />,
       onClick: onSelectCustom,
     },
+    {
+      id: 'authored',
+      title: 'Create document',
+      description:
+        'Compose a WYSIWYG document with flowing content and signing widgets.',
+      icon: <Icon element={Edit3} size={32} />,
+      onClick: onSelectAuthored,
+    },
   ];
 
   return (
@@ -129,7 +147,7 @@ function SelectionStep({
         </h2>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {options.map((option) => (
           <button
             type="button"

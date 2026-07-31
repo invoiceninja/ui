@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { BlueprintWizard } from './components/BlueprintWizard';
 
 export default function Create() {
@@ -31,11 +31,19 @@ export default function Create() {
     },
   ];
 
-  const handleWizardComplete = (blueprintId: string) => {
+  const handleWizardComplete = (
+    blueprintId: string,
+    templateKind: 'invoice_design' | 'uploaded_pdf' | 'authored_document'
+  ) => {
     navigate(
-      route('/docuninja/templates/:id/edit', {
-        id: blueprintId,
-      })
+      route(
+        templateKind === 'authored_document'
+          ? '/docuninja/templates/:id/document-editor'
+          : '/docuninja/templates/:id/edit',
+        {
+          id: blueprintId,
+        }
+      )
     );
   };
 

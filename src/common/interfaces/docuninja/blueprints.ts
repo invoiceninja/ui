@@ -21,6 +21,7 @@ export interface Blueprint {
   archived_at: string;
   is_deleted: boolean;
   is_template: boolean;
+  template_kind: 'invoice_design' | 'uploaded_pdf' | 'authored_document';
   template?: string;
   document?: Document;
   grapesjs?: AuthoredDocumentData;

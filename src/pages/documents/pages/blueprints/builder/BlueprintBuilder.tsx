@@ -246,6 +246,9 @@ function BlueprintBuilder() {
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
 
   const [blueprint, setBlueprint] = useState<Blueprint>();
+  const isAuthoredDocument =
+    blueprint?.template_kind === 'authored_document' ||
+    Boolean(blueprint?.grapesjs);
 
   const actions = useActions({
     onSettingsClick: () => setIsEditModalOpen(true),
@@ -263,7 +266,12 @@ function BlueprintBuilder() {
     { name: t('templates'), href: '/docuninja/templates' },
     {
       name: blueprint?.name || t('blueprint'),
-      href: route('/docuninja/templates/:id/edit', { id }),
+      href: route(
+        isAuthoredDocument
+          ? '/docuninja/templates/:id/document-editor'
+          : '/docuninja/templates/:id/edit',
+        { id }
+      ),
     },
   ];
 
@@ -295,6 +303,7 @@ function BlueprintBuilder() {
       docuNinjaEndpoint(`/api/blueprints/${id}`),
       {
         is_template: true,
+        template_kind: 'authored_document',
         grapesjs: editorData,
         base64_file: await blobToBase64(pdf),
       },
@@ -401,6 +410,10 @@ function BlueprintBuilder() {
       },
     },
   });
+
+  if (!blueprint) {
+    return <Loading />;
+  }
 
   return (
     <Default
@@ -537,6 +550,9 @@ function BlueprintBuilder() {
               header: {
                 sticky: false,
               },
+              files: {
+                visible: !isAuthoredDocument,
+              },
             },
             endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
             blueprint: true,
@@ -544,17 +560,21 @@ function BlueprintBuilder() {
               (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
               undefined,
             readonly: false,
-            authoredDocument: {
-              data: blueprint?.grapesjs,
-            },
+            authoredDocument: isAuthoredDocument
+              ? {
+                  data: blueprint?.grapesjs,
+                }
+              : undefined,
             services: {
               google: {
                 appId: import.meta.env.VITE_GOOGLE_APP_ID,
                 clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
               },
-              authoredDocuments: {
-                persist: persistAuthoredDocument,
-              },
+              authoredDocuments: isAuthoredDocument
+                ? {
+                    persist: persistAuthoredDocument,
+                  }
+                : undefined,
             },
             translations: {
               ...i18n.getResourceBundle(i18n.language, 'translation'),

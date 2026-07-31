@@ -8,6 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import {
+  createAuthoredDocumentData,
+  renderAuthoredDocumentPdf,
+} from '@docuninja/builder2.0';
 import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,47 +25,50 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CardContainer, Element } from '$app/components/cards';
 import { Button, InputField } from '$app/components/forms';
 
-interface CustomBlueprintStepProps {
+interface AuthoredBlueprintStepProps {
   onComplete: (blueprintId: string) => void;
   onBack: () => void;
 }
 
-interface Payload {
-  name: string;
-  description: string;
-}
-
-export function CustomBlueprintStep({
+export function AuthoredBlueprintStep({
   onComplete,
   onBack,
-}: CustomBlueprintStepProps) {
+}: AuthoredBlueprintStepProps) {
   const [t] = useTranslation();
-  const [errors, setErrors] = useState<ValidationBag | undefined>(undefined);
-  const [payload, setPayload] = useState<Payload>({
-    name: '',
-    description: '',
-  });
+  const [errors, setErrors] = useState<ValidationBag | undefined>();
+  const [payload, setPayload] = useState({ name: '', description: '' });
+  const [isCreating, setIsCreating] = useState(false);
 
   function handleCreateBlueprint() {
     setErrors(undefined);
+    setIsCreating(true);
+    const editorData = createAuthoredDocumentData();
 
-    request(
-      'POST',
-      docuNinjaEndpoint('/api/blueprints'),
-      {
-        ...payload,
-        template_kind: 'uploaded_pdf',
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
-        },
-      }
-    )
+    renderAuthoredDocumentPdf(editorData)
+      .then(blobToBase64)
+      .then((base64File) =>
+        request(
+          'POST',
+          docuNinjaEndpoint('/api/blueprints'),
+          {
+            ...payload,
+            is_template: true,
+            template_kind: 'authored_document',
+            grapesjs: editorData,
+            base64_file: base64File,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem(
+                'X-DOCU-NINJA-TOKEN'
+              )}`,
+            },
+          }
+        )
+      )
       .then((response: GenericSingleResourceResponse<Document>) => {
         toast.success('template_created');
         $refetch(['blueprints']);
-
         onComplete(response.data.data.id);
       })
       .catch((error: AxiosError<ValidationBag>) => {
@@ -69,22 +76,26 @@ export function CustomBlueprintStep({
           setErrors(error.response.data);
           toast.dismiss();
         } else {
-          toast.error('Error creating blueprint:');
+          toast.error('Error creating document template');
         }
-      });
+      })
+      .finally(() => setIsCreating(false));
   }
 
   return (
     <CardContainer>
       <div className="text-center">
-        <h2 className="text-xl font-semibold mb-2">{t('create_your_own')}</h2>
-        <p className="text-gray-600">{t('create_your_own_description')}</p>
+        <h2 className="text-xl font-semibold mb-2">Create document</h2>
+        <p className="text-gray-600">
+          Compose a flowing document and place signing widgets alongside its
+          content.
+        </p>
       </div>
 
       <Element leftSide={t('name')}>
         <InputField
           value={payload.name}
-          onValueChange={(value) => setPayload({ ...payload, name: value })}
+          onValueChange={(name) => setPayload({ ...payload, name })}
           errorMessage={errors?.errors.name}
           placeholder={t('template_name')}
         />
@@ -94,8 +105,8 @@ export function CustomBlueprintStep({
         <InputField
           element="textarea"
           value={payload.description}
-          onValueChange={(value) =>
-            setPayload({ ...payload, description: value })
+          onValueChange={(description) =>
+            setPayload({ ...payload, description })
           }
           errorMessage={errors?.errors.description}
           placeholder={t('description')}
@@ -110,10 +121,28 @@ export function CustomBlueprintStep({
           behavior="button"
           type="primary"
           onClick={handleCreateBlueprint}
+          disabled={isCreating}
         >
           {t('create_template')}
         </Button>
       </div>
     </CardContainer>
   );
+}
+
+function blobToBase64(blob: Blob) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onerror = () => reject(reader.error);
+    reader.onload = () => {
+      if (typeof reader.result !== 'string') {
+        reject(new Error('Unable to encode generated PDF'));
+        return;
+      }
+
+      resolve(reader.result.slice(reader.result.indexOf(',') + 1));
+    };
+    reader.readAsDataURL(blob);
+  });
 }
