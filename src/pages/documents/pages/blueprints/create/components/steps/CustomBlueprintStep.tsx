@@ -8,19 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import {
+  createAuthoredDocumentData,
+  renderAuthoredDocumentPdf,
+} from '@docuninja/builder2.0';
+import { AxiosError } from 'axios';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Document } from '$app/common/interfaces/docuninja/api';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Button } from '$app/components/forms';
-import { InputField } from '$app/components/forms';
 import { CardContainer, Element } from '$app/components/cards';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { AxiosError } from 'axios';
-import { docuNinjaEndpoint } from '$app/common/helpers';
+import { Button, InputField } from '$app/components/forms';
+
 interface CustomBlueprintStepProps {
   onComplete: (blueprintId: string) => void;
   onBack: () => void;
@@ -44,12 +48,29 @@ export function CustomBlueprintStep({
 
   function handleCreateBlueprint() {
     setErrors(undefined);
+    const editorData = createAuthoredDocumentData();
 
-    request('POST', docuNinjaEndpoint('/api/blueprints'), payload, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
-      },
-    })
+    renderAuthoredDocumentPdf(editorData)
+      .then(blobToBase64)
+      .then((base64File) =>
+        request(
+          'POST',
+          docuNinjaEndpoint('/api/blueprints'),
+          {
+            ...payload,
+            is_template: true,
+            grapesjs: editorData,
+            base64_file: base64File,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem(
+                'X-DOCU-NINJA-TOKEN'
+              )}`,
+            },
+          }
+        )
+      )
       .then((response: GenericSingleResourceResponse<Document>) => {
         toast.success('template_created');
         $refetch(['blueprints']);
@@ -108,4 +129,21 @@ export function CustomBlueprintStep({
       </div>
     </CardContainer>
   );
+}
+
+function blobToBase64(blob: Blob) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onerror = () => reject(reader.error);
+    reader.onload = () => {
+      if (typeof reader.result !== 'string') {
+        reject(new Error('Unable to encode generated PDF'));
+        return;
+      }
+
+      resolve(reader.result.slice(reader.result.indexOf(',') + 1));
+    };
+    reader.readAsDataURL(blob);
+  });
 }

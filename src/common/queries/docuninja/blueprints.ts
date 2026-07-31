@@ -8,20 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useQuery, useQueryClient } from 'react-query';
-import { Params } from '../common/params.interface';
-import { request } from '$app/common/helpers/request';
-import { docuNinjaEndpoint } from '$app/common/helpers';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useAtomValue } from 'jotai';
-import { invalidationQueryAtom } from '$app/common/atoms/data-table';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useState } from 'react';
+import type { AuthoredDocumentData } from '@docuninja/builder2.0';
 import { AxiosError } from 'axios';
+import { useAtomValue } from 'jotai';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from 'react-query';
+import { useNavigate } from 'react-router-dom';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { docuNinjaEndpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useNavigate } from 'react-router-dom';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Params } from '../common/params.interface';
 
 export function useBlueprintsQuery(params: Params) {
   return useQuery(
@@ -113,7 +114,7 @@ interface CreateBlueprintParams {
   name?: string;
   base64_file?: string;
   is_template?: boolean;
-  grapesjs?: string;
+  grapesjs?: AuthoredDocumentData;
 }
 
 export function useCreateBlueprint() {
@@ -146,7 +147,7 @@ interface UpdateBlueprintParams {
   name?: string;
   base64_file?: string;
   is_template?: boolean;
-  grapesjs?: string;
+  grapesjs?: AuthoredDocumentData;
 }
 
 export function useUpdateBlueprint() {
