@@ -24,6 +24,7 @@ import { MultiClientSelector } from '$app/pages/reports/common/components/MultiC
 import { MultiVendorSelector } from '$app/pages/reports/common/components/MultiVendorSelector';
 import { MultiProjectSelector } from '$app/pages/reports/common/components/MultiProjectSelector';
 import { MultiTagSelector } from '$app/pages/reports/common/components/MultiTagSelector';
+import { REPORT_TAG_ENTITY_TYPES } from '$app/pages/reports/common/hooks/useShowReportField';
 import { MultiExpenseCategorySelector } from '$app/pages/reports/common/components/MultiExpenseCategorySelector';
 import { TemplateSelector } from '$app/pages/reports/common/components/TemplateSelector';
 import { useGroupByOptions } from '$app/pages/reports/common/hooks/useGroupByOptions';
@@ -234,6 +235,13 @@ export function EmailReport(props: Props) {
   );
 
   const showReportFiled = (field: ReportFiled) => {
+    if (field === 'tags') {
+      return (
+        (schedule.parameters.report_name as Identifier) in
+        REPORT_TAG_ENTITY_TYPES
+      );
+    }
+
     return (
       REPORTS_FIELDS[schedule.parameters.report_name] || DEFAULT_REPORT_FIELDS
     ).includes(field);
@@ -494,9 +502,9 @@ export function EmailReport(props: Props) {
       {showReportFiled('tags') && (
         <MultiTagSelector
           entityType={
-            schedule.parameters.report_name === 'task'
-              ? TAG_ENTITY_TYPES.task
-              : TAG_ENTITY_TYPES.project
+            REPORT_TAG_ENTITY_TYPES[
+              schedule.parameters.report_name as Identifier
+            ] ?? TAG_ENTITY_TYPES.invoice
           }
           value={schedule.parameters.tag_ids}
           onValueChange={(tagIds) =>
