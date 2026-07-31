@@ -47,6 +47,12 @@ const CalendarConnectionComplete = lazy(
   () => import('$app/pages/tasks/calendar/Complete')
 );
 const NotFound = lazy(() => import('$app/components/NotFound'));
+const ReactPdfPaginationSpike = lazy(
+  () =>
+    import(
+      '$app/pages/documents/spikes/react-pdf-pagination/ReactPdfPaginationSpike'
+    )
+);
 
 export const routes = (
   <Routes>
@@ -106,6 +112,10 @@ export const routes = (
       />
       <Route element={<TestingRoute />}>
         <Route path="/testing" element={<TestingPage />} />
+        <Route
+          path="/testing/react-pdf-pagination"
+          element={<ReactPdfPaginationSpike />}
+        />
       </Route>
     </Route>
     <Route path="*" element={<NotFound />} />
