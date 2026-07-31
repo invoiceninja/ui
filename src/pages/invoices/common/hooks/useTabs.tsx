@@ -21,6 +21,7 @@ import { ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/h
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useUnappliedPayments } from '../../edit/hooks/useUnappliedPayments';
+import { hasQuickbooksConnection } from '../helpers/quickbooks';
 
 interface Params {
   invoice: Invoice | undefined;
@@ -99,6 +100,11 @@ export function useTabs(params: Params) {
           )}
         </div>
       ),
+    },
+    {
+      name: t('quickbooks'),
+      href: route('/invoices/:id/quickbooks', { id }),
+      enabled: canEditAndView && hasQuickbooksConnection(company),
     },
     {
       name: t('documents'),
