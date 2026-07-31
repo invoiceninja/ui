@@ -9,7 +9,11 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import {
+  InputField,
+  MultiEmailInput,
+  SelectField,
+} from '$app/components/forms';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { freePlan } from '$app/common/guards/guards/free-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
@@ -52,6 +56,9 @@ export type MailerResourceType =
 export type MailerResource = Invoice | RecurringInvoice | Quote | PurchaseOrder;
 
 export type MailerContactProperty = 'client_id' | 'vendor_id';
+
+const HOSTED_CC_EMAILS_LIMIT = 4;
+
 interface Props {
   ref: RefObject<HTMLInputElement | undefined>;
   resource: MailerResource;
@@ -67,7 +74,7 @@ export interface EmailTemplate {
   wrapper: string;
   raw_body: string;
   raw_subject: string;
-  cc_email: string;
+  cc_email?: string;
 }
 
 export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
@@ -100,10 +107,10 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
   const isCcEmailEnabled = isSelfHosted() || account?.is_premium;
 
   const handleTemplateChange = (id: string) => {
-    setPayloadData(
+    setPayloadData((current) =>
       cloneDeep({
         body: '',
-        ccEmail: '',
+        ccEmail: current.ccEmail,
         subject: '',
         templateId: id,
       })
@@ -153,7 +160,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
         ...current,
         subject: currentTemplate.raw_subject,
         body: currentTemplate.raw_body,
-        ccEmail: currentTemplate.cc_email,
+        ccEmail: currentTemplate.cc_email ?? current.ccEmail,
       }));
     }
   }, [currentTemplate]);
@@ -182,12 +189,10 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
     <div className="grid grid-cols-12 lg:gap-4 my-4">
       <div className="col-span-12 lg:col-span-5 space-y-4">
         <Card>
-          <Element leftSide={t('to')}>
-            <Contact
-              resource={props.resource}
-              resourceType={props.resourceType}
-            />
-          </Element>
+          <Contact
+            resource={props.resource}
+            resourceType={props.resourceType}
+          />
 
           <Element leftSide={t('template')}>
             <SelectField
@@ -225,15 +230,20 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
         </Card>
 
         <Card withContainer>
-          <InputField
-            label={t('cc_email')}
-            value={payloadData.ccEmail}
-            onValueChange={(value) =>
-              setPayloadData((current) => ({ ...current, ccEmail: value }))
-            }
-            disabled={!isCcEmailEnabled}
-            errorMessage={errors?.errors.cc_email}
-          />
+          {isCcEmailAvailable && (
+            <MultiEmailInput
+              id="cc_email"
+              label={t('cc_email')}
+              value={payloadData.ccEmail}
+              onValueChange={(value) =>
+                setPayloadData((current) => ({ ...current, ccEmail: value }))
+              }
+              maxEmails={isHosted() ? HOSTED_CC_EMAILS_LIMIT : undefined}
+              placeholder={t('enter_values_comma_separated')}
+              errorMessage={errors?.errors.cc_email}
+              cypressRef="ccEmailInput"
+            />
+          )}
 
           <InputField
             label={t('subject')}

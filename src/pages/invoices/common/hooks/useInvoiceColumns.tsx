@@ -49,6 +49,7 @@ import {
   PEPPOL_CLASSIFICATIONS,
 } from '$app/common/helpers/peppol-countries';
 import { TagPills } from '$app/components/tags/TagPills';
+import { calculateNetAmount } from '$app/common/helpers/invoices/net-amount';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -316,7 +317,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('net_amount'),
       format: (value, invoice) =>
         formatMoney(
-          Number(value) - Number(invoice.total_taxes || 0),
+          calculateNetAmount(invoice),
           invoice.client?.country_id,
           invoice.client?.settings.currency_id
         ),

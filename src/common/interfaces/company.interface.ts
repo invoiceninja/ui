@@ -93,6 +93,17 @@ export interface Company {
   session_timeout?: number;
   quickbooks?: Quickbooks;
   enable_modules?: number;
+  sync?: Sync;
+}
+
+export interface Sync {
+  qb_id: string;
+  invitations: string[];
+  dn_completed: boolean;
+  dn_document_hashed_id: string;
+  qb_status: string;
+  qb_sync_token: string;
+  qb_status_message: string;
 }
 
 export interface Settings {
