@@ -78,9 +78,20 @@ export function ProjectHealthSummary({ health, formatter }: Props) {
       {indicatorRows.map((row, index) => (
         <div key={index} className="space-y-1">
           <div className="flex items-center justify-between gap-4">
-            <span style={{ color: colors.$22 }}>{fieldLabel(row.key)}</span>
+            <span style={{ color: colors.$22 }}>
+              {row.labelKey ? t(row.labelKey) : fieldLabel(row.key)}
+            </span>
 
-            <span className="font-medium">{formatter(row.key, row.value)}</span>
+            <span
+              className="font-medium"
+              style={
+                row.key === 'schedule_variance_days'
+                  ? { color: row.color }
+                  : undefined
+              }
+            >
+              {formatter(row.key, row.value)}
+            </span>
           </div>
 
           {(row.showBar || row.showStrip) && (

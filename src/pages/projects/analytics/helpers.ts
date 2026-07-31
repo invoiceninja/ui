@@ -120,19 +120,38 @@ export const resolveProjectHealthStatus = (health?: ProjectHealth) => {
   return health?.status ?? health?.health_status;
 };
 
+export const resolveScheduleVariancePresentation = (value: unknown) => {
+  const days = toNumber(value);
+  const isBehind = days < 0;
+
+  return {
+    labelKey: isBehind ? 'days_behind' : 'days_ahead',
+    value: Math.abs(days),
+    color: isBehind ? ANALYTICS_CHART_COLORS[3] : ANALYTICS_CHART_COLORS[1],
+  };
+};
+
+interface ProjectHealthIndicatorRow {
+  key: string;
+  labelKey?: string;
+  value: ProjectAnalyticsValue;
+  color: string;
+  showBar: boolean;
+  showStrip: boolean;
+}
+
 export const resolveProjectHealthIndicatorRows = (health?: ProjectHealth) => {
   const indicators = health?.indicators;
 
   if (!indicators) {
-    return [];
+    return [] as ProjectHealthIndicatorRow[];
   }
 
-  const scheduleColor =
-    toNumber(indicators.schedule_variance_days) < 0
-      ? ANALYTICS_CHART_COLORS[3]
-      : ANALYTICS_CHART_COLORS[1];
+  const scheduleVariance = resolveScheduleVariancePresentation(
+    indicators.schedule_variance_days
+  );
 
-  return [
+  const rows: ProjectHealthIndicatorRow[] = [
     {
       key: 'budget_utilization',
       value: indicators.budget_utilization,
@@ -142,8 +161,9 @@ export const resolveProjectHealthIndicatorRows = (health?: ProjectHealth) => {
     },
     {
       key: 'schedule_variance_days',
-      value: indicators.schedule_variance_days,
-      color: scheduleColor,
+      labelKey: scheduleVariance.labelKey,
+      value: scheduleVariance.value,
+      color: scheduleVariance.color,
       showBar: false,
       showStrip: true,
     },
@@ -168,9 +188,9 @@ export const resolveProjectHealthIndicatorRows = (health?: ProjectHealth) => {
       showBar: true,
       showStrip: false,
     },
-  ].filter((row) => {
-    return hasValue(row.value);
-  });
+  ];
+
+  return rows.filter((row) => hasValue(row.value));
 };
 
 export const truncateAxisTick = (value: unknown, maxLength: number) => {

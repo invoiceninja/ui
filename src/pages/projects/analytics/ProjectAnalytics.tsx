@@ -31,13 +31,7 @@ import { AnalyticsCard } from './components/AnalyticsCard';
 import { AnalyticsStatCard } from './components/AnalyticsStatCard';
 import { ForecastSummary } from './components/ForecastSummary';
 import { ANALYTICS_CHART_COLORS } from './constants';
-import {
-  findProjectRow,
-  getNestedRows,
-  hasValue,
-  resolveProjectHealthScore,
-  resolveProjectHealthStatus,
-} from './helpers';
+import { findProjectRow, getNestedRows } from './helpers';
 import { useFormatAnalyticsValue } from './hooks/useFormatAnalyticsValue';
 import { ExpensesTab } from './tabs/ExpensesTab';
 import { ProfitTab } from './tabs/ProfitTab';
@@ -46,7 +40,8 @@ import { TimeTab } from './tabs/TimeTab';
 interface Props {
   project: Project;
   includeDrafts: boolean;
-  overviewContent?: (forecastCard: ReactNode) => ReactNode;
+  overviewContent: (forecastCard: ReactNode) => ReactNode;
+  tasksContent?: ReactNode;
   onCanViewFinancialsChange?: (canViewFinancials: boolean) => void;
 }
 
@@ -54,6 +49,7 @@ export function ProjectAnalytics({
   project,
   includeDrafts,
   overviewContent,
+  tasksContent,
   onCanViewFinancialsChange,
 }: Props) {
   const [t] = useTranslation();
@@ -147,8 +143,6 @@ export function ProjectAnalytics({
         sections.cumulativeSpend.length)
   );
 
-  const healthScore = resolveProjectHealthScore(sections?.projectHealth);
-
   const financialStatCards = [
     {
       label: t('budgeted_amount'),
@@ -157,7 +151,6 @@ export function ProjectAnalytics({
         sections?.budgetSummary?.budgeted_amount ??
           sections?.budgetVsActual?.budgeted_amount
       ),
-      detail: t('planned_value'),
       accent: ANALYTICS_CHART_COLORS[0],
     },
     {
@@ -167,7 +160,6 @@ export function ProjectAnalytics({
         sections?.budgetSummary?.actual_amount ??
           sections?.budgetVsActual?.actual_amount
       ),
-      detail: t('labor_and_expenses'),
       accent: ANALYTICS_CHART_COLORS[1],
     },
     {
@@ -177,7 +169,6 @@ export function ProjectAnalytics({
         sections?.invoiceProgress?.invoiced_amount ??
           sections?.budgetSummary?.invoiced_amount
       ),
-      detail: t('sent_to_client'),
       accent: ANALYTICS_CHART_COLORS[2],
     },
     {
@@ -187,7 +178,6 @@ export function ProjectAnalytics({
         sections?.invoiceProgress?.paid_amount ??
           sections?.budgetSummary?.paid_amount
       ),
-      detail: t('collected'),
       accent: ANALYTICS_CHART_COLORS[3],
     },
     {
@@ -197,7 +187,6 @@ export function ProjectAnalytics({
         sections?.invoiceProgress?.outstanding_amount ??
           sections?.budgetSummary?.outstanding_amount
       ),
-      detail: t('remaining_invoice_balance'),
       accent: ANALYTICS_CHART_COLORS[4],
     },
     {
@@ -206,29 +195,17 @@ export function ProjectAnalytics({
         'unbilled_amount',
         sections?.unbilledHours?.unbilled_amount
       ),
-      detail: formatValue(
-        'unbilled_hours',
-        sections?.unbilledHours?.unbilled_hours
-      ),
       accent: ANALYTICS_CHART_COLORS[2],
     },
   ];
 
   const operationalStatCards = [
     {
-      label: t('health'),
-      value: hasValue(healthScore) ? formatValue('score', healthScore) : '-',
-      detail:
-        resolveProjectHealthStatus(sections?.projectHealth) || t('status'),
-      accent: ANALYTICS_CHART_COLORS[5],
-    },
-    {
       label: t('logged'),
       value: formatValue(
         'logged_hours',
         sections?.estimatedVsLogged?.logged_hours
       ),
-      detail: t('tracked_time'),
       accent: ANALYTICS_CHART_COLORS[0],
     },
   ];
@@ -240,13 +217,15 @@ export function ProjectAnalytics({
 
   const forecastCard = (
     <AnalyticsCard
-      title={t('forecast')}
-      className="col-span-12 xl:col-span-3"
-      height={240}
+      title={t('summary')}
+      className="col-span-12 md:col-span-6 xl:col-span-4 2xl:col-span-3"
+      height={420}
     >
       <ForecastSummary
+        project={project}
         forecast={sections?.forecastCompletion}
         formatter={formatValue}
+        canViewFinancials={canViewFinancials}
       />
     </AnalyticsCard>
   );
@@ -254,12 +233,32 @@ export function ProjectAnalytics({
   const tabs = [
     {
       label: t('overview'),
-      content: overviewContent?.(forecastCard),
+      content: (
+        <div className="space-y-4">
+          {hasAnalyticsData && (
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(8rem,1fr))] gap-3">
+              {statCards.map((stat, index) => (
+                <AnalyticsStatCard key={index} {...stat} />
+              ))}
+            </div>
+          )}
+
+          {overviewContent(forecastCard)}
+        </div>
+      ),
     },
+    ...(tasksContent
+      ? [
+          {
+            label: t('tasks'),
+            content: tasksContent,
+          },
+        ]
+      : []),
     ...(canViewFinancials
       ? [
           {
-            label: t('profit'),
+            label: t('money'),
             content: sections && (
               <ProfitTab
                 projectName={project.name}
@@ -337,14 +336,6 @@ export function ProjectAnalytics({
           }}
         >
           {t('no_project_analytics_data')}
-        </div>
-      )}
-
-      {!analytics.isLoading && hasAnalyticsData && (
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8">
-          {statCards.map((stat, index) => (
-            <AnalyticsStatCard key={index} {...stat} />
-          ))}
         </div>
       )}
 

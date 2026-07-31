@@ -19,9 +19,11 @@ import {
   RATIO_FIELDS,
 } from '../constants';
 import { toNumber } from '../helpers';
+import { useTranslation } from 'react-i18next';
 
 export function useFormatAnalyticsValue(project: Project) {
   const company = useCurrentCompany();
+  const [t] = useTranslation();
   const formatMoney = useFormatMoney();
   const formatNumber = useFormatNumber();
 
@@ -35,7 +37,7 @@ export function useFormatAnalyticsValue(project: Project) {
     }
 
     if (HOURS_FIELDS.has(dataKey)) {
-      return `${formatNumber(toNumber(value))}h`;
+      return `${formatNumber(toNumber(value))} ${t('hours')}`;
     }
 
     if (RATIO_FIELDS.has(dataKey)) {
@@ -46,8 +48,12 @@ export function useFormatAnalyticsValue(project: Project) {
       return `${formatNumber(toNumber(value))}%`;
     }
 
+    if (dataKey === 'average_daily_velocity') {
+      return `${formatNumber(toNumber(value))} ${t('hours')}/${t('day')}`;
+    }
+
     if (dataKey === 'schedule_variance_days') {
-      return `${formatNumber(toNumber(value))}d`;
+      return `${formatNumber(Math.abs(toNumber(value)))} ${t('days')}`;
     }
 
     return formatNumber(toNumber(value)).toString();

@@ -91,7 +91,7 @@ export function ProfitTab({
   return (
     <div className="grid grid-cols-12 gap-4">
       <AnalyticsCard
-        title={t('profit')}
+        title={t('margin')}
         className="col-span-12 xl:col-span-6"
         height={320}
       >
@@ -216,7 +216,7 @@ export function ProfitTab({
         </ResponsiveChart>
       </AnalyticsCard>
 
-      <AnalyticsCard title={t('revenue')} className="col-span-12 xl:col-span-6">
+      <AnalyticsCard title={t('billing_progress')} className="col-span-12 xl:col-span-6">
         <ResponsiveChart>
           <BarChart
             data={revenueData}

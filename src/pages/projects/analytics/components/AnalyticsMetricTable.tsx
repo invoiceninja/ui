@@ -12,7 +12,7 @@ import { useColorScheme } from '$app/common/colors';
 import { ReactNode } from 'react';
 
 interface Props {
-  rows: { label: string; value: ReactNode }[];
+  rows: { label: string; value: ReactNode; valueColor?: string }[];
 }
 
 export function AnalyticsMetricTable({ rows }: Props) {
@@ -28,7 +28,12 @@ export function AnalyticsMetricTable({ rows }: Props) {
         >
           <span style={{ color: colors.$22 }}>{row.label}</span>
 
-          <span className="text-right font-medium">{row.value}</span>
+          <span
+            className="text-right font-medium"
+            style={row.valueColor ? { color: row.valueColor } : undefined}
+          >
+            {row.value}
+          </span>
         </div>
       ))}
     </div>

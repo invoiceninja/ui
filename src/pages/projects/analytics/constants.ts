@@ -53,7 +53,6 @@ export const HOURS_FIELDS = new Set([
   'logged_hours',
   'billable_hours',
   'remaining_hours',
-  'average_daily_velocity',
   'hours',
   'unbilled_hours',
 ]);
@@ -80,7 +79,7 @@ export const FIELD_LABELS: Record<string, string> = {
   average_daily_velocity: 'daily_velocity',
   billable_hours: 'billable',
   billable_value: 'billable',
-  budget_utilization: 'budget_used',
+  budget_utilization: 'budgeted_amount',
   budgeted_amount: 'budgeted_amount',
   cumulative_actual_amount: 'total',
   cumulative_expense_amount: 'expenses',
@@ -106,6 +105,6 @@ export const FIELD_LABELS: Record<string, string> = {
   task_value: 'task_value',
   unbilled_amount: 'billable',
   unbilled_hours: 'unbilled_hours',
-  unbilled_ratio: 'unbilled',
+  unbilled_ratio: 'unbilled_work',
   work_value: 'total',
 };
