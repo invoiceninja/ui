@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^3.28.1",
-    "@dnd-kit/core": "^6.3.1",
     "@docuninja/builder2.0": "file:../builder2.0",
     "@emotion/styled": "^11.14.0",
     "@excalidraw/excalidraw": "^0.18.0",
@@ -18,7 +17,6 @@
     "@hello-pangea/dnd": "^16.6.0",
     "@monaco-editor/react": "^4.7.0",
     "@react-oauth/google": "^0.12.1",
-    "@react-pdf/renderer": "^4.5.1",
     "@reduxjs/toolkit": "^1.9.7",
     "@sentry/react": "^7.120.3",
     "@sentry/tracing": "^7.120.3",
@@ -70,7 +68,6 @@
     "mitt": "^3.0.1",
     "monaco-editor": "^0.53.0",
     "papaparse": "^5.5.2",
-    "pdfjs-dist": "^5.7.284",
     "playwright": "^1.59.0",
     "pretty-bytes": "^6.1.1",
     "pusher-js": "^8.4.0",
