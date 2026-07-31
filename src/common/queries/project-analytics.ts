@@ -26,7 +26,7 @@ export function useProjectAnalyticsQuery(
 ) {
   return useQuery<ProjectAnalyticsResponse>({
     queryKey: [
-      '/api/v1/charts/project_analytics/:id',
+      '/api/v1/charts/project_analytics',
       payload.project_id,
       payload.include_drafts,
     ],
