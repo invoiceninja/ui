@@ -230,20 +230,19 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
         </Card>
 
         <Card withContainer>
-          {isCcEmailAvailable && (
-            <MultiEmailInput
-              id="cc_email"
-              label={t('cc_email')}
-              value={payloadData.ccEmail}
-              onValueChange={(value) =>
-                setPayloadData((current) => ({ ...current, ccEmail: value }))
-              }
-              maxEmails={isHosted() ? HOSTED_CC_EMAILS_LIMIT : undefined}
-              placeholder={t('enter_values_comma_separated')}
-              errorMessage={errors?.errors.cc_email}
-              cypressRef="ccEmailInput"
-            />
-          )}
+          <MultiEmailInput
+            id="cc_email"
+            label={t('cc_email')}
+            value={payloadData.ccEmail}
+            onValueChange={(value) =>
+              setPayloadData((current) => ({ ...current, ccEmail: value }))
+            }
+            disabled={!isCcEmailEnabled}
+            maxEmails={isHosted() ? HOSTED_CC_EMAILS_LIMIT : undefined}
+            placeholder={t('enter_values_comma_separated')}
+            errorMessage={errors?.errors.cc_email}
+            cypressRef="ccEmailInput"
+          />
 
           <InputField
             label={t('subject')}
