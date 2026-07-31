@@ -71,7 +71,10 @@ import { useColorScheme } from '$app/common/colors';
 import { useDebounce } from 'react-use';
 import { cloneDeep, get, isEqual } from 'lodash';
 import { FilterColumn } from './FilterColumn';
-import { buildDateRangeQueryParameter } from '$app/common/helpers/data-table';
+import {
+  buildDateRangeQueryParameter,
+  normalizeColumnName,
+} from '$app/common/helpers/data-table';
 import { Resource } from './PreviousNextNavigation';
 
 export interface DateRangeColumn {
@@ -88,6 +91,7 @@ export interface DateRangeEntry {
 }
 
 export type DataTableColumns<T = any> = {
+  column?: string;
   id: string;
   label: string;
   format?: (field: string | number, resource: T) => unknown;
@@ -95,6 +99,7 @@ export type DataTableColumns<T = any> = {
 }[];
 
 export type FooterColumns<T = any> = {
+  column: string;
   id: string;
   label: string;
   format: (
@@ -775,14 +780,22 @@ export function DataTable<T extends object>(props: Props<T>) {
     [dateRangeEntries]
   );
 
-  const getFooterColumn = (columnId: string) => {
-    return footerColumns.find((footerColumn) => footerColumn.id === columnId);
+  const getFooterColumn = (columnKey: string | undefined) => {
+    if (!columnKey) {
+      return undefined;
+    }
+
+    return footerColumns.find(
+      (footerColumn) =>
+        normalizeColumnName(footerColumn.column) ===
+        normalizeColumnName(columnKey)
+    );
   };
 
   const getColumnValues = (columnId: string) => {
     return currentData.map(
       (resource: T) => resource[columnId as keyof typeof resource]
-    );
+    ) as (string | number)[];
   };
 
   const handleCheckboxClick = useCallback(
@@ -1365,18 +1378,20 @@ export function DataTable<T extends object>(props: Props<T>) {
               <TFooter>
                 {!props.withoutActions && !hideEditableOptions && <Th></Th>}
 
-                {props.columns.map(
-                  (column, index) =>
+                {props.columns.map((column, index) => {
+                  const footerColumn = getFooterColumn(column.column);
+
+                  return (
                     Boolean(!excludeColumns.includes(column.id)) && (
                       <Td
                         key={index}
                         customizeTextColor
                         resizable={`${apiEndpoint.pathname}.${column.id}`}
                       >
-                        {getFooterColumn(column.id) ? (
+                        {footerColumn ? (
                           <div className="flex items-center space-x-3">
-                            {getFooterColumn(column.id)?.format(
-                              getColumnValues(column.id) as (string | number)[],
+                            {footerColumn.format(
+                              getColumnValues(footerColumn.id),
                               currentData || []
                             ) ?? '-/-'}
                           </div>
@@ -1385,7 +1400,8 @@ export function DataTable<T extends object>(props: Props<T>) {
                         )}
                       </Td>
                     )
-                )}
+                  );
+                })}
 
                 {props.withResourcefulActions && !hideEditableOptions && (
                   <Th></Th>

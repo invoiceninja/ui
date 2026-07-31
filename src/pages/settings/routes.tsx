@@ -10,6 +10,7 @@
 
 import { Guard } from '$app/common/guards/Guard';
 import { admin, owner } from '$app/common/guards/guards/admin';
+import { companySettings } from '$app/common/guards/guards/company-settings';
 import { Navigate, Outlet, Route } from 'react-router-dom';
 import { plan } from '$app/common/guards/guards/plan';
 import * as Settings from './index';
@@ -176,7 +177,15 @@ export const settingsRoutes = (
         <Route path="messages" element={<Settings.Messages />} />
         <Route path="customize" element={<Settings.Customize />} />
       </Route>
-      <Route path="e_invoice" element={<Settings.EInvoice />} />
+      <Route
+        path="e_invoice"
+        element={
+          <Guard
+            guards={[companySettings()]}
+            component={<Settings.EInvoice />}
+          />
+        }
+      />
       <Route path="email_settings" element={<Settings.EmailSettings />} />
       <Route
         path="templates_and_reminders"

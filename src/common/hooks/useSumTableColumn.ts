@@ -18,7 +18,8 @@ import { PurchaseOrder } from '../interfaces/purchase-order';
 import { Expense } from '../interfaces/expense';
 import { RecurringExpense } from '../interfaces/recurring-expense';
 import { Transaction } from '../interfaces/transactions';
-import { useReactSettings } from './useReactSettings';
+import { useCurrentCompany } from './useCurrentCompany';
+import { useUserNumberPrecision } from './useUserNumberPrecision';
 
 type Resource =
   | Invoice
@@ -37,14 +38,16 @@ interface Params {
 export function useSumTableColumn(params?: Params) {
   const formatMoney = useFormatMoney();
 
-  const reactSettings = useReactSettings();
+  const company = useCurrentCompany();
+
+  const numberPrecision = useUserNumberPrecision();
 
   const { currencyPath, countryPath } = params || {};
 
   return (values: number[] | undefined, resources: Resource[] | undefined) => {
     if (values && resources) {
       const result = values.reduce(
-        (total, currentValue) => (total = total + currentValue),
+        (total, currentValue) => total + Number(currentValue || 0),
         0
       );
 
@@ -55,18 +58,25 @@ export function useSumTableColumn(params?: Params) {
 
       const currencyIds = collect(resources)
         .pluck(currencyPath || 'client.settings.currency_id')
+        .map((currencyId) =>
+          typeof currencyId === 'string' && currencyId
+            ? currencyId
+            : company?.settings.currency_id
+        )
         .unique()
-        .toArray() as string[];
+        .toArray() as (string | undefined)[];
 
-      if (countryIds.length > 1 || currencyIds.length > 1) {
-        return result;
+      if (currencyIds.length > 1) {
+        return Number(result.toFixed(numberPrecision));
       }
 
       return formatMoney(
         result,
-        typeof countryIds[0] === 'string' ? countryIds[0] : undefined,
-        typeof currencyIds[0] === 'string' ? currencyIds[0] : undefined,
-        reactSettings?.number_precision || 2
+        countryIds.length === 1 && typeof countryIds[0] === 'string'
+          ? countryIds[0]
+          : undefined,
+        currencyIds[0],
+        numberPrecision
       );
     }
 
