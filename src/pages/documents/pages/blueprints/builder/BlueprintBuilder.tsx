@@ -319,6 +319,42 @@ function BlueprintBuilder() {
     );
   };
 
+  const uploadAuthoredImage = async ({
+    file,
+    signal,
+    onProgress,
+  }: {
+    file: File;
+    signal?: AbortSignal;
+    onProgress?: (progress: number) => void;
+  }) => {
+    if (!id) {
+      throw new Error('Blueprint ID is required');
+    }
+
+    const payload = new FormData();
+    payload.append('file', file);
+
+    const response = await request(
+      'POST',
+      docuNinjaEndpoint(`/api/blueprints/${id}/assets`),
+      payload,
+      {
+        signal,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(
+            'X-DOCU-NINJA-TOKEN'
+          )}`,
+        },
+        onUploadProgress: ({ loaded, total }) => {
+          if (total) onProgress?.(loaded / total);
+        },
+      }
+    );
+
+    return response.data.data as { id: string; url: string };
+  };
+
   useEffect(() => {
     const refetchDocuninjaDocument = () => {
       $refetch(['blueprints']);
@@ -573,6 +609,7 @@ function BlueprintBuilder() {
               authoredDocuments: isAuthoredDocument
                 ? {
                     persist: persistAuthoredDocument,
+                    uploadImage: uploadAuthoredImage,
                   }
                 : undefined,
             },
