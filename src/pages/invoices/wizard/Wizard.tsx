@@ -43,7 +43,6 @@ export default function Wizard() {
   const heading = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    // Focus without letting the browser scroll the tabs out of view.
     heading.current?.focus({ preventScroll: true });
   }, [wizard.step]);
 

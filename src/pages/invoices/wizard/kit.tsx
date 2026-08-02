@@ -166,7 +166,6 @@ export function Choice({
   );
 }
 
-/** Step footer: secondary action on the left, primary on the right. */
 export function Footer({
   back,
   children,
