@@ -23,14 +23,15 @@ import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export type StepKey = 'who' | 'what' | 'when' | 'send';
 
-export const STEPS: { key: StepKey; rail: string; question: string }[] = [
-  { key: 'who', rail: 'Who', question: 'Who are you invoicing?' },
-  { key: 'what', rail: 'What', question: 'What are you charging for?' },
-  { key: 'when', rail: 'When', question: 'When should they pay?' },
-  { key: 'send', rail: 'Send', question: 'Preview and send' },
+export const STEPS: { key: StepKey; labelKey: string; href: string }[] = [
+  { key: 'who', labelKey: 'customer', href: '/invoices/wizard' },
+  { key: 'what', labelKey: 'items', href: '/invoices/wizard/items' },
+  { key: 'when', labelKey: 'payment', href: '/invoices/wizard/payment' },
+  { key: 'send', labelKey: 'send', href: '/invoices/wizard/send' },
 ];
 
 export type SaveState = 'idle' | 'saving' | 'saved' | 'failed';
@@ -85,6 +86,11 @@ export interface Wizard {
   flush: () => Promise<string | null>;
 }
 
+export interface WizardContext {
+  wizard: Wizard;
+  money: (value: number) => string;
+}
+
 export interface Totals {
   subtotal: number;
   taxes: number;
@@ -103,7 +109,11 @@ export function useWizard(): Wizard {
   const [loadFailed, setLoadFailed] = useState(false);
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [client, setClient] = useState<Client>();
-  const [step, setStep] = useState<StepKey>('who');
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const step: StepKey =
+    STEPS.find((entry) => entry.href === location.pathname)?.key ?? 'who';
   const [furthest, setFurthest] = useState(0);
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [sent, setSent] = useState(false);
@@ -111,10 +121,13 @@ export function useWizard(): Wizard {
   const latest = useRef<Invoice>();
   const persistedId = useRef<string | null>(null);
   const pending = useRef<Promise<string | null> | null>(null);
-  const dirty = useRef(false);
+  const revision = useRef(0);
+  const written = useRef(0);
   const createFailed = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const alive = useRef(true);
+
+  const flushOnLeave = useRef<() => void>(() => undefined);
 
   useEffect(() => {
     alive.current = true;
@@ -125,6 +138,8 @@ export function useWizard(): Wizard {
       if (timer.current) {
         clearTimeout(timer.current);
       }
+
+      flushOnLeave.current();
     };
   }, []);
 
@@ -173,17 +188,22 @@ export function useWizard(): Wizard {
   const write = useCallback(async (): Promise<string | null> => {
     const current = latest.current;
 
+    const at = revision.current;
+
     if (!current || !current.client_id) {
+      written.current = at;
+
       return persistedId.current;
     }
 
     const id = persistedId.current;
 
     if (!id && createFailed.current) {
+      written.current = at;
+
       return null;
     }
 
-    dirty.current = false;
     setSaveState('saving');
 
     const payload = cloneDeep(current) as Invoice & { paymentables?: unknown };
@@ -208,6 +228,7 @@ export function useWizard(): Wizard {
 
       persistedId.current = saved.id;
       createFailed.current = false;
+      written.current = at;
 
       if (!alive.current) {
         return saved.id;
@@ -240,8 +261,6 @@ export function useWizard(): Wizard {
 
       return saved.id;
     } catch {
-      dirty.current = true;
-
       if (!id) {
         createFailed.current = true;
       }
@@ -255,9 +274,11 @@ export function useWizard(): Wizard {
   }, []);
 
   const save = useCallback((): Promise<string | null> => {
+    const outstanding = () => revision.current !== written.current;
+
     if (pending.current) {
       return pending.current.then(() =>
-        dirty.current ? save() : persistedId.current
+        outstanding() ? save() : persistedId.current
       );
     }
 
@@ -267,7 +288,7 @@ export function useWizard(): Wizard {
 
     pending.current = run;
 
-    return run.then((id) => (dirty.current && id ? save() : id));
+    return run.then((id) => (outstanding() && id ? save() : id));
   }, [write]);
 
   const schedule = useCallback(() => {
@@ -284,7 +305,7 @@ export function useWizard(): Wizard {
         latest.current = { ...latest.current, ...changes };
       }
 
-      dirty.current = true;
+      revision.current += 1;
 
       setInvoice((previous) =>
         previous ? { ...previous, ...changes } : previous
@@ -314,6 +335,12 @@ export function useWizard(): Wizard {
     return save();
   }, [save]);
 
+  flushOnLeave.current = () => {
+    if (revision.current !== written.current) {
+      void save();
+    }
+  };
+
   const attachClient = useCallback(
     (next: Client) => {
       setClient(next);
@@ -342,9 +369,9 @@ export function useWizard(): Wizard {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     patch({ client_id: '', invitations: [] as any });
 
-    setStep('who');
     setFurthest(0);
-  }, [patch]);
+    navigate(STEPS[0].href);
+  }, [patch, navigate]);
 
   const refreshClient = useCallback((next: Client) => setClient(next), []);
 
@@ -381,16 +408,26 @@ export function useWizard(): Wizard {
 
   const stepIndex = STEPS.findIndex((entry) => entry.key === step);
 
-  const goTo = useCallback((next: StepKey) => {
-    setStep(next);
-    setFurthest((current) =>
-      Math.max(
-        current,
-        STEPS.findIndex((entry) => entry.key === next)
-      )
-    );
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+  const goTo = useCallback(
+    (next: StepKey) => {
+      const target = STEPS.find((entry) => entry.key === next);
+
+      if (!target) {
+        return;
+      }
+
+      setFurthest((current) =>
+        Math.max(
+          current,
+          STEPS.findIndex((entry) => entry.key === next)
+        )
+      );
+
+      navigate(target.href);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [navigate]
+  );
 
   const next = useCallback(() => {
     const target = STEPS[Math.min(stepIndex + 1, STEPS.length - 1)];

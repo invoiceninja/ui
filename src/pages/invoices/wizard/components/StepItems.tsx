@@ -15,7 +15,9 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useEffect, useRef, useState } from 'react';
-import { Action, Callout, Question, TextField, useTheme, radius } from '../kit';
+import { useTranslation } from 'react-i18next';
+import { Button, InputField, InputLabel } from '$app/components/forms';
+import { Callout, Footer, Question, useTheme, radius } from '../kit';
 import { Wizard } from '../useWizard';
 import { AppliedTax, TaxSetup } from './TaxSetup';
 import { WorkPicker, WorkSource } from './WorkPicker';
@@ -25,15 +27,13 @@ interface Props {
   money: (value: number) => string;
 }
 
-type Draft = Record<string, { quantity?: string; cost?: string }>;
-
 export function StepItems({ wizard, money }: Props) {
+  const [translate] = useTranslation();
   const t = useTheme();
   const company = useCurrentCompany();
 
   const items = wizard.invoice?.line_items ?? [];
 
-  const [draft, setDraft] = useState<Draft>({});
   const [picker, setPicker] = useState<WorkSource | null>(null);
   const [taxSetup, setTaxSetup] = useState(false);
   const [taxAsked, setTaxAsked] = useState(false);
@@ -96,14 +96,11 @@ export function StepItems({ wizard, money }: Props) {
 
   return (
     <div className="iw-enter">
-      <Question lede="One line per thing you're billing for. Keep it in the words your customer will recognise.">
-        What are you charging for?
-      </Question>
+      <Question>What are you charging for?</Question>
 
       <div className="space-y-3">
         {items.map((item, index) => {
           const key = item._id ?? String(index);
-          const rowDraft = draft[key] ?? {};
 
           return (
             <div
@@ -112,15 +109,18 @@ export function StepItems({ wizard, money }: Props) {
               style={{ borderColor: t.line, borderRadius: radius.panel }}
             >
               <div className="flex items-start gap-2">
-                <TextField
-                  className="flex-1 min-w-0"
-                  placeholder="Website design"
-                  value={item.notes}
-                  aria-label="Description"
-                  onChange={(event) =>
-                    update(index, { notes: event.target.value })
-                  }
-                />
+                <div className="flex-1 min-w-0">
+                  <InputField
+                    id={`iw-desc-${key}`}
+                    width="100%"
+                    label="Description"
+                    placeholder="Website design"
+                    value={item.notes}
+                    changeOverride
+                    debounceTimeout={0}
+                    onValueChange={(value) => update(index, { notes: value })}
+                  />
+                </div>
 
                 {items.length > 1 ? (
                   <button
@@ -142,53 +142,36 @@ export function StepItems({ wizard, money }: Props) {
                 ) : null}
               </div>
 
-              <div className="mt-2.5 flex items-end gap-3">
-                <TextField
-                  className="w-[4.5rem] shrink-0"
+              <div className="mt-3 grid grid-cols-3 gap-3">
+                <InputField
+                  id={`iw-qty-${key}`}
+                  width="100%"
                   label="Qty"
-                  align="right"
-                  inputMode="decimal"
-                  aria-label="Quantity"
-                  value={rowDraft.quantity ?? String(item.quantity ?? 0)}
-                  onChange={(event) => {
-                    const raw = event.target.value;
-                    setDraft({
-                      ...draft,
-                      [key]: { ...rowDraft, quantity: raw },
-                    });
-                    update(index, { quantity: toNumber(raw) });
-                  }}
-                  onBlur={() =>
-                    setDraft({
-                      ...draft,
-                      [key]: { ...rowDraft, quantity: undefined },
-                    })
+                  value={String(item.quantity ?? 0)}
+                  changeOverride
+                  debounceTimeout={0}
+                  onValueChange={(value) =>
+                    update(index, { quantity: toNumber(value) })
                   }
                 />
 
-                <TextField
-                  className="w-[7.5rem] shrink-0"
+                <InputField
+                  id={`iw-price-${key}`}
+                  width="100%"
                   label="Price"
-                  align="right"
-                  inputMode="decimal"
-                  aria-label="Price"
-                  value={rowDraft.cost ?? String(item.cost ?? 0)}
-                  onChange={(event) => {
-                    const raw = event.target.value;
-                    setDraft({ ...draft, [key]: { ...rowDraft, cost: raw } });
-                    update(index, { cost: toNumber(raw) });
-                  }}
-                  onBlur={() =>
-                    setDraft({
-                      ...draft,
-                      [key]: { ...rowDraft, cost: undefined },
-                    })
+                  value={String(item.cost ?? 0)}
+                  changeOverride
+                  debounceTimeout={0}
+                  onValueChange={(value) =>
+                    update(index, { cost: toNumber(value) })
                   }
                 />
 
-                <span className="flex-1 min-w-0 text-right pb-2.5">
-                  <span
-                    className="block text-sm truncate"
+                <div className="min-w-0">
+                  <InputLabel className="mb-1">{translate('total')}</InputLabel>
+
+                  <div
+                    className="text-sm truncate py-2"
                     style={{
                       color: t.text,
                       fontWeight: 500,
@@ -196,8 +179,8 @@ export function StepItems({ wizard, money }: Props) {
                     }}
                   >
                     {money((item.cost ?? 0) * (item.quantity ?? 0))}
-                  </span>
-                </span>
+                  </div>
+                </div>
               </div>
 
               {taxesEnabled ? (
@@ -216,7 +199,9 @@ export function StepItems({ wizard, money }: Props) {
       </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
-        <Action onClick={() => addRow()}>+ Add another item</Action>
+        <Button type="secondary" behavior="button" onClick={() => addRow()}>
+          Add another item
+        </Button>
 
         <button
           type="button"
@@ -260,31 +245,52 @@ export function StepItems({ wizard, money }: Props) {
         <div className="mt-6">
           <Callout title="Do you need to charge tax on this invoice?">
             <div className="flex items-center gap-2">
-              <Action tone="outline" onClick={() => setTaxSetup(true)}>
+              <Button
+                type="secondary"
+                behavior="button"
+                onClick={() => setTaxSetup(true)}
+              >
                 Yes, add tax
-              </Action>
-              <Action tone="quiet" onClick={() => setTaxAsked(true)}>
+              </Button>
+              <Button
+                type="secondary"
+                behavior="button"
+                onClick={() => setTaxAsked(true)}
+              >
                 No
-              </Action>
+              </Button>
             </div>
           </Callout>
         </div>
       ) : null}
 
-      <div className="mt-8 flex items-center gap-2">
-        <Action tone="solid" disabled={!described} onClick={wizard.next}>
-          Continue
-        </Action>
-        <Action tone="quiet" onClick={wizard.back}>
-          Back
-        </Action>
-      </div>
-
       {!described ? (
-        <p className="text-xs mt-2.5" style={{ color: t.muted }}>
+        <p className="text-xs mt-6" style={{ color: t.muted }}>
           Add a description to continue.
         </p>
       ) : null}
+
+      <Footer
+        back={
+          <Button
+            type="secondary"
+            behavior="button"
+            disableWithoutIcon
+            onClick={wizard.back}
+          >
+            {translate('back')}
+          </Button>
+        }
+      >
+        <Button
+          behavior="button"
+          disabled={!described}
+          disableWithoutIcon
+          onClick={wizard.next}
+        >
+          {translate('continue')}
+        </Button>
+      </Footer>
 
       <WorkPicker
         open={picker !== null}
@@ -447,8 +453,8 @@ function Option({
   );
 }
 
-function toNumber(raw: string): number {
-  const parsed = Number(raw.replace(',', '.'));
+function toNumber(raw: unknown): number {
+  const parsed = Number(String(raw ?? '').replace(',', '.'));
 
   return isNaN(parsed) ? 0 : parsed;
 }

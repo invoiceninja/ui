@@ -19,17 +19,11 @@ import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {
-  Action,
-  Callout,
-  Question,
-  Sheet,
-  Spinner,
-  TextArea,
-  TextField,
-  useTheme,
-  radius,
-} from '../kit';
+import { useTranslation } from 'react-i18next';
+import { Modal } from '$app/components/Modal';
+import { Spinner } from '$app/components/Spinner';
+import { Button, InputField } from '$app/components/forms';
+import { Callout, Footer, Question, useTheme, radius } from '../kit';
 import { Wizard } from '../useWizard';
 
 const LOOKS: { label: string; design: string }[] = [
@@ -44,6 +38,7 @@ interface Props {
 }
 
 export function StepReview({ wizard, money }: Props) {
+  const [translate] = useTranslation();
   const t = useTheme();
   const company = useCurrentCompany();
   const navigate = useNavigate();
@@ -301,31 +296,33 @@ export function StepReview({ wizard, money }: Props) {
   if (wizard.sent) {
     return (
       <div className="iw-enter">
-        <Question
-          lede={
-            sentTo
-              ? `We emailed it to ${sentTo}. You'll see it marked as sent in your invoice list.`
-              : "You'll see it marked as sent in your invoice list."
-          }
-        >
-          Invoice sent.
+        <Question>
+          {sentTo ? `Invoice sent to ${sentTo}.` : 'Invoice sent.'}
         </Question>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Action
-            tone="solid"
+          <Button
+            behavior="button"
             onClick={() => navigate(`/invoices/${wizard.invoiceId}/edit`)}
           >
-            View invoice
-          </Action>
+            {translate('view_invoice')}
+          </Button>
 
-          <Action onClick={() => window.location.reload()}>
-            Create another
-          </Action>
+          <Button
+            type="secondary"
+            behavior="button"
+            onClick={() => window.location.reload()}
+          >
+            {translate('new_invoice')}
+          </Button>
 
-          <Action tone="quiet" onClick={() => navigate('/invoices')}>
-            All invoices
-          </Action>
+          <Button
+            type="secondary"
+            behavior="button"
+            onClick={() => navigate('/invoices')}
+          >
+            {translate('invoices')}
+          </Button>
         </div>
       </div>
     );
@@ -421,24 +418,35 @@ export function StepReview({ wizard, money }: Props) {
             <strong style={{ fontWeight: 600 }}>{recipient}</strong>.
           </>
         ) : (
-          <>
-            Your invoice is ready. We'll ask where to send it when you hit send.
-          </>
+          <>Your invoice is ready. We&apos;ll ask where to send it.</>
         )}
       </p>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <Action tone="solid" busy={sending} onClick={send}>
-          Send invoice
-        </Action>
-
-        <Action busy={loadingEmailPreview} onClick={openEmailPreview}>
+      <Footer
+        back={
+          <Button
+            type="secondary"
+            behavior="button"
+            disableWithoutIcon
+            onClick={wizard.back}
+          >
+            {translate('back')}
+          </Button>
+        }
+      >
+        <Button
+          type="secondary"
+          behavior="button"
+          disabled={loadingEmailPreview}
+          onClick={openEmailPreview}
+        >
           Preview email
-        </Action>
+        </Button>
 
-        <Action
-          tone="quiet"
-          busy={savingDraft}
+        <Button
+          type="secondary"
+          behavior="button"
+          disabled={savingDraft}
           onClick={async () => {
             setSavingDraft(true);
 
@@ -456,14 +464,12 @@ export function StepReview({ wizard, money }: Props) {
           }}
         >
           Save draft
-        </Action>
-      </div>
+        </Button>
 
-      <div className="mt-3">
-        <Action tone="quiet" onClick={wizard.back}>
-          Back
-        </Action>
-      </div>
+        <Button behavior="button" disabled={sending} onClick={send}>
+          Send invoice
+        </Button>
+      </Footer>
 
       {hasGateway === false && !payDismissed ? (
         <div className="mt-8">
@@ -474,46 +480,51 @@ export function StepReview({ wizard, money }: Props) {
           >
             {bankInstructions === null ? (
               <div className="flex flex-wrap items-center gap-2">
-                <Action
-                  tone="outline"
+                <Button
+                  type="secondary"
+                  behavior="button"
                   onClick={() =>
                     window.open('/settings/gateways/create', '_blank')
                   }
                 >
                   Set up card payments
-                </Action>
+                </Button>
 
-                <Action tone="outline" onClick={() => setBankInstructions('')}>
+                <Button
+                  type="secondary"
+                  behavior="button"
+                  onClick={() => setBankInstructions('')}
+                >
                   Add bank transfer instructions
-                </Action>
+                </Button>
               </div>
             ) : (
               <div className="space-y-3">
-                <TextArea
-                  rows={3}
-                  autoFocus
-                  placeholder={
-                    'Bank: Example Bank\nAccount: 12345678\nSort code: 00-00-00'
-                  }
+                <InputField
+                  element="textarea"
+                  textareaRows={3}
+                  placeholder="Bank name, account number, sort code"
                   value={bankInstructions}
-                  onChange={(event) => setBankInstructions(event.target.value)}
-                  hint="These appear on this invoice and on future ones."
+                  changeOverride
+                  debounceTimeout={0}
+                  onValueChange={setBankInstructions}
                 />
 
                 <div className="flex items-center gap-2">
-                  <Action
-                    tone="solid"
-                    busy={savingBank}
+                  <Button
+                    behavior="button"
+                    disabled={savingBank}
                     onClick={saveBankInstructions}
                   >
                     Add to invoice
-                  </Action>
-                  <Action
-                    tone="quiet"
+                  </Button>
+                  <Button
+                    type="secondary"
+                    behavior="button"
                     onClick={() => setBankInstructions(null)}
                   >
-                    Cancel
-                  </Action>
+                    {translate('cancel')}
+                  </Button>
                 </div>
               </div>
             )}
@@ -521,46 +532,49 @@ export function StepReview({ wizard, money }: Props) {
         </div>
       ) : null}
 
-      <Sheet
-        open={askEmail}
+      <Modal
+        visible={askEmail}
         onClose={() => setAskEmail(false)}
         title="Where should we send this invoice?"
+        size="small"
       >
         <div className="space-y-4">
-          <TextField
+          <InputField
+            id="iw-send-to"
             label="Email address"
             type="email"
-            autoFocus
             placeholder="jane@example.com"
             value={emailDraft}
-            onChange={(event) => setEmailDraft(event.target.value)}
-            onKeyDown={(event) =>
-              event.key === 'Enter' && void saveEmailThenSend()
-            }
-            error={emailError}
-            hint={`We'll save this to ${client?.display_name || client?.name}'s record.`}
+            changeOverride
+            debounceTimeout={0}
+            onValueChange={setEmailDraft}
+            errorMessage={emailError}
           />
 
           <div className="flex items-center gap-2">
-            <Action
-              tone="solid"
-              busy={savingEmail || sending}
+            <Button
+              behavior="button"
+              disabled={savingEmail || sending}
               onClick={saveEmailThenSend}
             >
               Save and send
-            </Action>
-            <Action tone="quiet" onClick={() => setAskEmail(false)}>
-              Cancel
-            </Action>
+            </Button>
+            <Button
+              type="secondary"
+              behavior="button"
+              onClick={() => setAskEmail(false)}
+            >
+              {translate('cancel')}
+            </Button>
           </div>
         </div>
-      </Sheet>
+      </Modal>
 
-      <Sheet
-        open={emailPreview !== null}
+      <Modal
+        visible={emailPreview !== null}
         onClose={() => setEmailPreview(null)}
         title="What your customer receives"
-        width="40rem"
+        size="regular"
       >
         {emailPreview ? (
           <iframe
@@ -575,14 +589,11 @@ export function StepReview({ wizard, money }: Props) {
             }}
           />
         ) : (
-          <div className="flex items-center justify-center gap-2 py-10">
-            <Spinner tone={t.muted} />
-            <span className="text-sm" style={{ color: t.muted }}>
-              Loading
-            </span>
+          <div className="py-10">
+            <Spinner />
           </div>
         )}
-      </Sheet>
+      </Modal>
     </div>
   );
 }

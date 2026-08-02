@@ -14,8 +14,10 @@ import { request } from '$app/common/helpers/request';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Action, Callout, TextField, useTheme } from '../kit';
+import { Button, InputField } from '$app/components/forms';
+import { Callout, useTheme } from '../kit';
 
 interface Props {
   focus: 'name' | 'logo' | null;
@@ -23,6 +25,7 @@ interface Props {
 }
 
 export function BrandPrompts({ focus, onFocusHandled }: Props) {
+  const [translate] = useTranslation();
   const t = useTheme();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
@@ -124,20 +127,22 @@ export function BrandPrompts({ focus, onFocusHandled }: Props) {
     <div className="space-y-3">
       {missingName ? (
         <Callout title="Your invoice needs a business name.">
-          <div className="flex items-start gap-2">
-            <TextField
-              ref={nameInput}
-              className="flex-1"
-              placeholder="Acme Studio"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              onKeyDown={(event) => event.key === 'Enter' && void saveName()}
-              error={nameError}
-            />
+          <div className="flex items-end gap-2">
+            <div className="flex-1 min-w-0">
+              <InputField
+                innerRef={nameInput}
+                placeholder="Acme Studio"
+                value={name}
+                changeOverride
+                debounceTimeout={0}
+                onValueChange={setName}
+                errorMessage={nameError}
+              />
+            </div>
 
-            <Action tone="solid" busy={savingName} onClick={saveName}>
-              Save
-            </Action>
+            <Button behavior="button" disabled={savingName} onClick={saveName}>
+              {translate('save')}
+            </Button>
           </div>
         </Callout>
       ) : null}
@@ -148,16 +153,17 @@ export function BrandPrompts({ focus, onFocusHandled }: Props) {
           onDismiss={() => setLogoSkipped(true)}
         >
           <div className="flex items-center gap-3">
-            <Action
-              tone="outline"
-              busy={uploading}
+            <Button
+              type="secondary"
+              behavior="button"
+              disabled={uploading}
               onClick={() => filePicker.current?.click()}
             >
               Upload a logo
-            </Action>
+            </Button>
 
             <span className="text-xs" style={{ color: t.muted }}>
-              PNG or JPG. You can add one later.
+              PNG or JPG.
             </span>
           </div>
 

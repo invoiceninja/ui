@@ -15,16 +15,11 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import {
-  Action,
-  Choice,
-  Hint,
-  Legend,
-  Sheet,
-  TextField,
-  useTheme,
-} from '../kit';
+import { Modal } from '$app/components/Modal';
+import { Button, InputField } from '$app/components/forms';
+import { Choice, Legend, useTheme } from '../kit';
 
 export interface AppliedTax {
   name: string;
@@ -39,6 +34,7 @@ interface Props {
 }
 
 export function TaxSetup({ open, onClose, onApplied }: Props) {
+  const [translate] = useTranslation();
   const t = useTheme();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
@@ -142,23 +138,31 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
   }
 
   return (
-    <Sheet open={open} onClose={onClose} title="Charge tax on this invoice">
+    <Modal
+      visible={open}
+      onClose={onClose}
+      title="Charge tax on this invoice"
+      size="small"
+    >
       <div className="space-y-5">
-        <TextField
+        <InputField
+          id="iw-tax-name"
           label="What is it called?"
-          placeholder="GST, VAT, Sales tax…"
+          placeholder="GST, VAT, Sales tax"
           value={name}
-          autoFocus
-          onChange={(event) => setName(event.target.value)}
+          changeOverride
+          debounceTimeout={0}
+          onValueChange={setName}
         />
 
-        <TextField
+        <InputField
+          id="iw-tax-rate"
           label="What percentage is it?"
           placeholder="20"
-          inputMode="decimal"
           value={rate}
-          suffix="%"
-          onChange={(event) => setRate(event.target.value)}
+          changeOverride
+          debounceTimeout={0}
+          onValueChange={setRate}
         />
 
         <div>
@@ -178,12 +182,6 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
               detail="A 100 item stays 100, with the tax worked out from inside."
             />
           </div>
-
-          {inclusive === null ? (
-            <Hint>
-              Most people add tax on top. Pick whichever matches your prices.
-            </Hint>
-          ) : null}
         </div>
 
         {error ? (
@@ -193,24 +191,23 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
         ) : null}
 
         <div className="flex items-center gap-2 pt-1">
-          <Action
-            tone="solid"
-            busy={busy}
-            disabled={inclusive === null}
+          <Button
+            behavior="button"
+            disabled={busy || inclusive === null}
             onClick={apply}
           >
             Apply tax
-          </Action>
+          </Button>
 
-          <Action tone="quiet" onClick={onClose}>
-            Cancel
-          </Action>
+          <Button type="secondary" behavior="button" onClick={onClose}>
+            {translate('cancel')}
+          </Button>
         </div>
 
         <p className="text-xs" style={{ color: t.muted }}>
-          We'll remember this for your next invoice.
+          Saved for future invoices.
         </p>
       </div>
-    </Sheet>
+    </Modal>
   );
 }

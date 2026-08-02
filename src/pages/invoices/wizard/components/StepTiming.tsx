@@ -15,8 +15,10 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import dayjs from 'dayjs';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Action, Callout, Choice, Question, TextField, useTheme } from '../kit';
+import { Button, InputField } from '$app/components/forms';
+import { Callout, Choice, Footer, Question, useTheme } from '../kit';
 import { Wizard, addDays, today } from '../useWizard';
 
 type Term = 'receipt' | '7' | '14' | '30' | 'custom';
@@ -50,6 +52,7 @@ function termFromDates(
 }
 
 export function StepTiming({ wizard }: Props) {
+  const [translate] = useTranslation();
   const t = useTheme();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
@@ -115,9 +118,7 @@ export function StepTiming({ wizard }: Props) {
 
   return (
     <div className="iw-enter">
-      <Question lede="This sets the due date your customer sees.">
-        When should they pay?
-      </Question>
+      <Question>When should they pay?</Question>
 
       <div className="space-y-2" role="radiogroup" aria-label="Payment timing">
         {TERMS.map((option) => (
@@ -137,12 +138,13 @@ export function StepTiming({ wizard }: Props) {
 
       {term === 'custom' ? (
         <div className="mt-4 max-w-xs">
-          <TextField
-            label="Due date"
+          <InputField
+            id="iw-due-date"
+            label={translate('due_date')}
             type="date"
             value={invoice?.due_date || ''}
             min={invoiceDate}
-            onChange={(event) => wizard.patch({ due_date: event.target.value })}
+            onValueChange={(value) => wizard.patch({ due_date: value })}
           />
         </div>
       ) : null}
@@ -150,12 +152,12 @@ export function StepTiming({ wizard }: Props) {
       <div className="mt-6">
         {showDate ? (
           <div className="max-w-xs">
-            <TextField
-              label="Invoice date"
+            <InputField
+              id="iw-invoice-date"
+              label={translate('date')}
               type="date"
               value={invoiceDate}
-              onChange={(event) => {
-                const nextDate = event.target.value;
+              onValueChange={(nextDate) => {
                 const entry = TERMS.find((option) => option.key === term);
 
                 wizard.patch({
@@ -188,9 +190,14 @@ export function StepTiming({ wizard }: Props) {
             onDismiss={() => setDefaultDismissed(true)}
             dismissLabel="Not now"
           >
-            <Action tone="outline" busy={savingDefault} onClick={saveDefault}>
+            <Button
+              type="secondary"
+              behavior="button"
+              disabled={savingDefault}
+              onClick={saveDefault}
+            >
               Yes, make it my default
-            </Action>
+            </Button>
           </Callout>
         </div>
       ) : null}
@@ -201,22 +208,30 @@ export function StepTiming({ wizard }: Props) {
         </p>
       ) : null}
 
-      <div className="mt-8 flex items-center gap-2">
-        <Action
-          tone="solid"
+      <Footer
+        back={
+          <Button
+            type="secondary"
+            behavior="button"
+            disableWithoutIcon
+            onClick={wizard.back}
+          >
+            {translate('back')}
+          </Button>
+        }
+      >
+        <Button
+          behavior="button"
           disabled={!invoice?.due_date}
+          disableWithoutIcon
           onClick={() => {
             void wizard.flush();
             wizard.next();
           }}
         >
           Review and send
-        </Action>
-
-        <Action tone="quiet" onClick={wizard.back}>
-          Back
-        </Action>
-      </div>
+        </Button>
+      </Footer>
     </div>
   );
 }

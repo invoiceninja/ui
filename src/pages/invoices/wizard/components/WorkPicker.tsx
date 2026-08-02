@@ -20,7 +20,10 @@ import { Product } from '$app/common/interfaces/product';
 import { Task } from '$app/common/interfaces/task';
 import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceProject';
 import { useEffect, useState } from 'react';
-import { Sheet, Spinner, TextField, useTheme, radius } from '../kit';
+import { Modal } from '$app/components/Modal';
+import { Spinner } from '$app/components/Spinner';
+import { InputField } from '$app/components/forms';
+import { useTheme, radius } from '../kit';
 
 export type WorkSource = 'saved' | 'work' | 'expenses';
 
@@ -89,11 +92,11 @@ export function WorkPicker({
   }, [open, source, query, clientId]);
 
   return (
-    <Sheet
-      open={open}
+    <Modal
+      visible={open}
       onClose={onClose}
       title="Add to this invoice"
-      width="34rem"
+      size="regular"
     >
       <div
         className="inline-flex p-0.5 mb-4"
@@ -123,21 +126,19 @@ export function WorkPicker({
       </div>
 
       {source === 'saved' ? (
-        <TextField
-          placeholder="Search saved items"
-          value={query}
-          autoFocus
-          onChange={(event) => setQuery(event.target.value)}
-          className="mb-3"
-        />
+        <div className="mb-3">
+          <InputField
+            placeholder="Search saved items"
+            value={query}
+            changeOverride
+            onValueChange={setQuery}
+          />
+        </div>
       ) : null}
 
       {loading ? (
-        <div className="flex items-center gap-2 py-8 justify-center">
-          <Spinner tone={t.muted} />
-          <span className="text-sm" style={{ color: t.muted }}>
-            Loading
-          </span>
+        <div className="py-8">
+          <Spinner />
         </div>
       ) : rows.length === 0 ? (
         <p className="text-sm py-8 text-center" style={{ color: t.muted }}>
@@ -191,7 +192,7 @@ export function WorkPicker({
           ))}
         </div>
       )}
-    </Sheet>
+    </Modal>
   );
 }
 
@@ -322,14 +323,12 @@ function taxRateOf(expense: Expense, amount: number, fallback: number): number {
 
 function emptyCopy(source: WorkSource, hasClient: boolean): string {
   if (source === 'saved') {
-    return 'No saved items yet. Anything you type on the invoice can be saved later.';
+    return 'No saved items.';
   }
 
   if (!hasClient) {
-    return 'Choose who you are invoicing first.';
+    return 'Choose a customer first.';
   }
 
-  return source === 'work'
-    ? 'No unbilled tasks or time for this customer.'
-    : 'No unbilled expenses for this customer.';
+  return source === 'work' ? 'No unbilled tasks.' : 'No unbilled expenses.';
 }

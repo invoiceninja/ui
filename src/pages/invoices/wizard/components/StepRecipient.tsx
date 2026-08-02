@@ -13,15 +13,9 @@ import { request } from '$app/common/helpers/request';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
 import { useEffect, useRef, useState } from 'react';
-import {
-  Action,
-  Hint,
-  Legend,
-  Question,
-  TextField,
-  useTheme,
-  radius,
-} from '../kit';
+import { useTranslation } from 'react-i18next';
+import { Button, InputField } from '$app/components/forms';
+import { Footer, Legend, Question, useTheme, radius } from '../kit';
 import { Wizard } from '../useWizard';
 
 interface Props {
@@ -29,6 +23,7 @@ interface Props {
 }
 
 export function StepRecipient({ wizard }: Props) {
+  const [translate] = useTranslation();
   const t = useTheme();
 
   const [name, setName] = useState('');
@@ -204,9 +199,7 @@ export function StepRecipient({ wizard }: Props) {
   if (selected) {
     return (
       <div className="iw-enter">
-        <Question lede="This invoice is addressed to them. You can change it any time before you send.">
-          Who are you invoicing?
-        </Question>
+        <Question>Who are you invoicing?</Question>
 
         <div
           className="flex items-start justify-between gap-4 border px-4 py-3.5"
@@ -222,67 +215,68 @@ export function StepRecipient({ wizard }: Props) {
             </p>
           </div>
 
-          <Action tone="ghost" onClick={reset}>
-            Change
-          </Action>
+          <Button type="secondary" behavior="button" onClick={reset}>
+            {translate('change')}
+          </Button>
         </div>
 
-        <div className="mt-8">
-          <Action tone="solid" onClick={continueForward}>
-            Continue
-          </Action>
-        </div>
+        <Footer>
+          <Button
+            behavior="button"
+            disableWithoutIcon
+            onClick={continueForward}
+          >
+            {translate('continue')}
+          </Button>
+        </Footer>
       </div>
     );
   }
 
   return (
     <div className="iw-enter">
-      <Question lede="Start typing — we'll look for anyone you've invoiced before.">
-        Who are you invoicing?
-      </Question>
+      <Question>Who are you invoicing?</Question>
 
       <div className="space-y-4">
-        <div className="relative" ref={searchBox}>
-          <TextField
-            label="Customer or company name"
-            placeholder="Jane Smith, or Acme Studio"
-            value={name}
-            autoFocus
-            autoComplete="off"
-            role="combobox"
-            aria-expanded={matches.length > 0}
-            aria-controls="iw-customer-suggestions"
-            aria-activedescendant={
-              active >= 0 ? `iw-customer-${active}` : undefined
+        <div
+          className="relative"
+          ref={searchBox}
+          onKeyDown={(event) => {
+            if (!matches.length) {
+              return;
             }
-            onChange={(event) => {
-              setName(event.target.value);
+
+            if (event.key === 'ArrowDown') {
+              event.preventDefault();
+              setActive((current) => (current + 1) % matches.length);
+            } else if (event.key === 'ArrowUp') {
+              event.preventDefault();
+              setActive((current) =>
+                current <= 0 ? matches.length - 1 : current - 1
+              );
+            } else if (event.key === 'Enter' && active >= 0) {
+              event.preventDefault();
+              choose(matches[active]);
+            } else if (event.key === 'Escape') {
+              setMatches([]);
+              setActive(-1);
+            }
+          }}
+        >
+          <InputField
+            id="iw-customer-name"
+            label="Customer or company name"
+            placeholder="Jane Smith"
+            value={name}
+            changeOverride
+            debounceTimeout={0}
+            required
+            onValueChange={(value) => {
+              setName(value);
               setDismissedSearch(false);
               setActive(-1);
             }}
-            onKeyDown={(event) => {
-              if (!matches.length) {
-                return;
-              }
-
-              if (event.key === 'ArrowDown') {
-                event.preventDefault();
-                setActive((current) => (current + 1) % matches.length);
-              } else if (event.key === 'ArrowUp') {
-                event.preventDefault();
-                setActive((current) =>
-                  current <= 0 ? matches.length - 1 : current - 1
-                );
-              } else if (event.key === 'Enter' && active >= 0) {
-                event.preventDefault();
-                choose(matches[active]);
-              } else if (event.key === 'Escape') {
-                setMatches([]);
-                setActive(-1);
-              }
-            }}
-            error={errors.name}
+            errorMessage={errors.name}
           />
 
           {matches.length > 0 ? (
@@ -331,21 +325,18 @@ export function StepRecipient({ wizard }: Props) {
               </button>
             </div>
           ) : null}
-
-          {searching && matches.length === 0 && name.trim().length >= 2 ? (
-            <Hint>Looking…</Hint>
-          ) : null}
         </div>
 
-        <TextField
+        <InputField
+          id="iw-customer-email"
           label="Email address"
           type="email"
           placeholder="jane@example.com"
           value={email}
-          autoComplete="off"
-          onChange={(event) => setEmail(event.target.value)}
-          error={errors.email}
-          hint="We'll send the invoice here. You can add it later."
+          changeOverride
+          debounceTimeout={0}
+          onValueChange={setEmail}
+          errorMessage={errors.email}
         />
 
         {errors.general ? (
@@ -358,27 +349,33 @@ export function StepRecipient({ wizard }: Props) {
           <div className="space-y-3">
             <Legend>Address</Legend>
 
-            <TextField
+            <InputField
               placeholder="Street address"
               value={address.address1}
-              onChange={(event) =>
-                setAddress({ ...address, address1: event.target.value })
+              changeOverride
+              debounceTimeout={0}
+              onValueChange={(value) =>
+                setAddress({ ...address, address1: value })
               }
             />
 
             <div className="grid grid-cols-2 gap-3">
-              <TextField
+              <InputField
                 placeholder="City"
                 value={address.city}
-                onChange={(event) =>
-                  setAddress({ ...address, city: event.target.value })
+                changeOverride
+                debounceTimeout={0}
+                onValueChange={(value) =>
+                  setAddress({ ...address, city: value })
                 }
               />
-              <TextField
+              <InputField
                 placeholder="Postcode"
                 value={address.postal_code}
-                onChange={(event) =>
-                  setAddress({ ...address, postal_code: event.target.value })
+                changeOverride
+                debounceTimeout={0}
+                onValueChange={(value) =>
+                  setAddress({ ...address, postal_code: value })
                 }
               />
             </div>
@@ -395,11 +392,11 @@ export function StepRecipient({ wizard }: Props) {
         )}
       </div>
 
-      <div className="mt-8">
-        <Action tone="solid" busy={busy} onClick={continueForward}>
-          Continue
-        </Action>
-      </div>
+      <Footer>
+        <Button behavior="button" disabled={busy} onClick={continueForward}>
+          {translate('continue')}
+        </Button>
+      </Footer>
     </div>
   );
 }
