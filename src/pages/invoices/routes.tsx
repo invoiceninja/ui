@@ -15,7 +15,7 @@ import { enabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { or } from '$app/common/guards/guards/or';
 import { assigned } from '$app/common/guards/guards/assigned';
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
 
 const Invoices = lazy(() => import('$app/pages/invoices/index/Invoices'));
 const Invoice = lazy(() => import('$app/pages/invoices/Invoice'));
@@ -60,6 +60,7 @@ const CreatePage = lazy(
 const UnappliedPayments = lazy(
   () => import('$app/pages/invoices/edit/components/UnappliedPayments')
 );
+const Wizard = lazy(() => import('$app/pages/invoices/wizard/Wizard'));
 
 export const invoiceRoutes = (
   <Route path="/invoices">
@@ -88,6 +89,24 @@ export const invoiceRoutes = (
             or(permission('create_invoice'), permission('edit_invoice')),
           ]}
           component={<Import />}
+        />
+      }
+    />
+
+    <Route
+      path="wizard"
+      element={
+        <Guard
+          type="subPage"
+          guards={[
+            enabled(ModuleBitmask.Invoices),
+            permission('create_invoice'),
+          ]}
+          component={
+            <Suspense fallback={<div className="min-h-screen" />}>
+              <Wizard />
+            </Suspense>
+          }
         />
       }
     />

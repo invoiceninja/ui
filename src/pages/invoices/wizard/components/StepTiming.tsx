@@ -1,0 +1,222 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { updateRecord } from '$app/common/stores/slices/company-users';
+import dayjs from 'dayjs';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { Action, Callout, Choice, Question, TextField, useTheme } from '../kit';
+import { Wizard, addDays, today } from '../useWizard';
+
+type Term = 'receipt' | '7' | '14' | '30' | 'custom';
+
+const TERMS: { key: Term; label: string; days: number | null }[] = [
+  { key: 'receipt', label: 'Due on receipt', days: 0 },
+  { key: '7', label: 'In 7 days', days: 7 },
+  { key: '14', label: 'In 14 days', days: 14 },
+  { key: '30', label: 'In 30 days', days: 30 },
+  { key: 'custom', label: 'Choose a date', days: null },
+];
+
+interface Props {
+  wizard: Wizard;
+}
+
+function termFromDates(
+  date: string | undefined,
+  dueDate: string | undefined
+): Term | null {
+  if (!dueDate) {
+    return null;
+  }
+
+  const days = dayjs(dueDate).diff(dayjs(date || today()), 'day');
+  const match = TERMS.find(
+    (option) => option.days !== null && option.days === days
+  );
+
+  return match ? match.key : 'custom';
+}
+
+export function StepTiming({ wizard }: Props) {
+  const t = useTheme();
+  const company = useCurrentCompany();
+  const dispatch = useDispatch();
+
+  const invoice = wizard.invoice;
+  const invoiceDate = invoice?.date || today();
+
+  const [term, setTerm] = useState<Term | null>(() =>
+    termFromDates(invoice?.date, invoice?.due_date)
+  );
+  const [showDate, setShowDate] = useState(false);
+  const [defaultSaved, setDefaultSaved] = useState(false);
+  const [defaultDismissed, setDefaultDismissed] = useState(false);
+  const [savingDefault, setSavingDefault] = useState(false);
+
+  function choose(next: Term) {
+    setTerm(next);
+
+    const entry = TERMS.find((option) => option.key === next);
+
+    if (entry?.days !== null && entry?.days !== undefined) {
+      wizard.patch({ due_date: addDays(invoiceDate, entry.days) });
+    }
+  }
+
+  const chosen = TERMS.find((option) => option.key === term);
+  const currentDefault = company?.settings?.payment_terms ?? '';
+  const offerDefault =
+    chosen &&
+    chosen.days !== null &&
+    String(chosen.days) !== String(currentDefault);
+
+  async function saveDefault() {
+    if (!company?.id || chosen?.days === null || chosen?.days === undefined) {
+      return;
+    }
+
+    setSavingDefault(true);
+
+    try {
+      const response = await request(
+        'PUT',
+        endpoint('/api/v1/companies/:id', { id: company.id }),
+        {
+          ...company,
+          settings: {
+            ...company.settings,
+            payment_terms: String(chosen.days),
+          },
+        },
+        { skipIntercept: true }
+      );
+
+      dispatch(updateRecord({ object: 'company', data: response.data.data }));
+      setDefaultSaved(true);
+      toast.success('updated_settings');
+    } catch {
+      toast.error();
+    } finally {
+      setSavingDefault(false);
+    }
+  }
+
+  return (
+    <div className="iw-enter">
+      <Question lede="This sets the due date your customer sees.">
+        When should they pay?
+      </Question>
+
+      <div className="space-y-2" role="radiogroup" aria-label="Payment timing">
+        {TERMS.map((option) => (
+          <Choice
+            key={option.key}
+            selected={term === option.key}
+            onSelect={() => choose(option.key)}
+            title={option.label}
+            trailing={
+              option.days !== null && option.days > 0
+                ? dayjs(addDays(invoiceDate, option.days)).format('D MMM')
+                : undefined
+            }
+          />
+        ))}
+      </div>
+
+      {term === 'custom' ? (
+        <div className="mt-4 max-w-xs">
+          <TextField
+            label="Due date"
+            type="date"
+            value={invoice?.due_date || ''}
+            min={invoiceDate}
+            onChange={(event) => wizard.patch({ due_date: event.target.value })}
+          />
+        </div>
+      ) : null}
+
+      <div className="mt-6">
+        {showDate ? (
+          <div className="max-w-xs">
+            <TextField
+              label="Invoice date"
+              type="date"
+              value={invoiceDate}
+              onChange={(event) => {
+                const nextDate = event.target.value;
+                const entry = TERMS.find((option) => option.key === term);
+
+                wizard.patch({
+                  date: nextDate,
+                  ...(entry?.days !== null && entry?.days !== undefined
+                    ? { due_date: addDays(nextDate, entry.days) }
+                    : {}),
+                });
+              }}
+            />
+          </div>
+        ) : (
+          <p className="text-sm" style={{ color: t.muted }}>
+            Dated {dayjs(invoiceDate).format('D MMMM YYYY')}.{' '}
+            <button
+              type="button"
+              onClick={() => setShowDate(true)}
+              style={{ color: t.accent, fontWeight: 500 }}
+            >
+              Change
+            </button>
+          </p>
+        )}
+      </div>
+
+      {offerDefault && !defaultSaved && !defaultDismissed ? (
+        <div className="mt-6">
+          <Callout
+            title={`Use ${chosen.days === 0 ? 'due on receipt' : `${chosen.days} days`} for future invoices?`}
+            onDismiss={() => setDefaultDismissed(true)}
+            dismissLabel="Not now"
+          >
+            <Action tone="outline" busy={savingDefault} onClick={saveDefault}>
+              Yes, make it my default
+            </Action>
+          </Callout>
+        </div>
+      ) : null}
+
+      {defaultSaved ? (
+        <p className="text-xs mt-6" style={{ color: t.muted }}>
+          New invoices will use this by default.
+        </p>
+      ) : null}
+
+      <div className="mt-8 flex items-center gap-2">
+        <Action
+          tone="solid"
+          disabled={!invoice?.due_date}
+          onClick={() => {
+            void wizard.flush();
+            wizard.next();
+          }}
+        >
+          Review and send
+        </Action>
+
+        <Action tone="quiet" onClick={wizard.back}>
+          Back
+        </Action>
+      </div>
+    </div>
+  );
+}
