@@ -97,6 +97,7 @@
     "react-image-crop": "^11.0.10",
     "react-json-tree": "^0.20.0",
     "react-markdown": "^10.1.0",
+    "react-multi-email": "^1.0.25",
     "react-number-format": "^5.4.3",
     "react-phone-number-input": "^3.4.12",
     "react-qr-code": "^2.0.15",

@@ -13,20 +13,44 @@ import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
 import { Client } from '$app/common/interfaces/client';
 import { ClientContact } from '$app/common/interfaces/client-contact';
 import { Vendor } from '$app/common/interfaces/vendor';
+import { VendorContact } from '$app/common/interfaces/vendor-contact';
 
 import {
   MailerResource,
   MailerResourceType,
 } from '$app/pages/invoices/email/components/Mailer';
 import { UserUnsubscribedTooltip } from '$app/pages/clients/common/components/UserUnsubscribedTooltip';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Element } from '$app/components/cards';
 
 interface Props {
   resource: MailerResource;
   resourceType: MailerResourceType;
 }
 
+interface ContactLineProps {
+  contact: ClientContact | VendorContact;
+}
+
+function ContactLine({ contact }: ContactLineProps) {
+  return (
+    <div className="flex items-center space-x-2">
+      <p>
+        {contact.first_name} {contact.last_name} &#183;
+        <span className="font-semibold"> {contact.email}</span>
+      </p>
+
+      {(contact as ClientContact).is_locked && (
+        <UserUnsubscribedTooltip size={20} />
+      )}
+    </div>
+  );
+}
+
 export function Contact(props: Props) {
+  const [t] = useTranslation();
+
   const clientResolver = useClientResolver();
   const vendorResolver = useVendorResolver();
 
@@ -57,29 +81,44 @@ export function Contact(props: Props) {
     }
   }, []);
 
+  const { toContacts, ccContacts } = useMemo(() => {
+    if (!relation) {
+      return { toContacts: [], ccContacts: [] };
+    }
+
+    const isInvited = (contactId: string) =>
+      props.resource.invitations.some(
+        (invitation) => invitation[relationKey] === contactId
+      );
+
+    return {
+      toContacts: relation.contacts.filter(
+        (contact) => isInvited(contact.id) && !contact.cc_only
+      ),
+      ccContacts: relation.contacts.filter((contact) => contact.cc_only),
+    };
+  }, [relation, props.resource.invitations, relationKey]);
+
   return (
     <>
-      {relation && (
-        <div>
-          {relation.contacts
-            .filter((contact) =>
-              props.resource.invitations.find(
-                (invitation) => invitation[relationKey] === contact.id
-              )
-            )
-            .map((contact, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <p>
-                  {contact.first_name} {contact.last_name} &#183;
-                  <span className="font-semibold"> {contact.email}</span>
-                </p>
-
-                {(contact as ClientContact).is_locked && (
-                  <UserUnsubscribedTooltip size={20} />
-                )}
-              </div>
+      <Element leftSide={t('to')}>
+        {relation && (
+          <div>
+            {toContacts.map((contact, index) => (
+              <ContactLine key={index} contact={contact} />
             ))}
-        </div>
+          </div>
+        )}
+      </Element>
+
+      {ccContacts.length > 0 && (
+        <Element leftSide={t('cc')}>
+          <div>
+            {ccContacts.map((contact, index) => (
+              <ContactLine key={index} contact={contact} />
+            ))}
+          </div>
+        </Element>
       )}
     </>
   );
