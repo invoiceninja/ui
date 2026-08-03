@@ -8,8 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError, AxiosResponse } from 'axios';
+import classNames from 'classnames';
+import { useFormik } from 'formik';
+import { get } from 'lodash';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Check } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
+import { Classification } from '$app/common/helpers/peppol-countries';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
@@ -19,21 +27,13 @@ import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useIsWhitelabelled } from '$app/common/hooks/usePaidOrSelfhost';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Element } from '$app/components/cards';
 import { CountrySelector } from '$app/components/CountrySelector';
+import { Element } from '$app/components/cards';
 import { ErrorMessage } from '$app/components/ErrorMessage';
 import { Button, InputField, Link } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
-import { AxiosError, AxiosResponse } from 'axios';
-import classNames from 'classnames';
-import { useFormik } from 'formik';
-import { get } from 'lodash';
-import { useEffect, useState } from 'react';
-import { Check } from 'react-feather';
-import { useTranslation } from 'react-i18next';
-import { Classification } from '$app/common/helpers/peppol-countries';
 
 export type Step =
   | 'plan_check'
@@ -65,14 +65,21 @@ export function Onboarding() {
   const accentColor = useAccentColor();
 
   const { t } = useTranslation();
+  const account = useCurrentAccount();
   const company = useCurrentCompany();
 
   const isSingapore = company?.settings?.country_id === '702';
+  const hasEInvoiceCredits = Number(account?.e_invoice_quota) > 0;
 
   const [isVisible, setIsVisible] = useState(false);
   const [step, setStep] = useState<Step>('plan_check');
-  const [steps, setSteps] = useState<Step[]>(defaultSteps);
   const [businessType, setBusinessType] = useState<Classification>();
+
+  const steps = defaultSteps.filter(
+    (step) =>
+      !(isHosted() && step === 'token') &&
+      !(hasEInvoiceCredits && step === 'buy_credits')
+  );
 
   useEffect(() => {
     if (step === 'completed') {
@@ -81,12 +88,6 @@ export function Onboarding() {
       toast.success(t('peppol_successfully_configured')!);
     }
   }, [step]);
-
-  useEffect(() => {
-    if (isHosted()) {
-      setSteps((c) => c.filter((s) => s !== 'token'));
-    }
-  }, [steps]);
 
   const next = () => {
     const next = steps[steps.indexOf(step) + 1];
@@ -202,8 +203,6 @@ function PlanCheck({ onContinue }: StepProps) {
   const isWhitelabelled = useIsWhitelabelled();
   const accentColor = useAccentColor();
 
-  const [hasValidLicense, setHasValidLicense] = useState(false);
-
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -217,18 +216,10 @@ function PlanCheck({ onContinue }: StepProps) {
   const form = useFormik({
     initialValues: {},
     onSubmit(_, { setSubmitting }) {
-      if (import.meta.env.DEV) {
-        setHasValidLicense(true);
-
-        onContinue();
-
-        return;
-      }
-
-      request('POST', endpoint('/api/v1/check_license'))
+      request('POST', endpoint('/api/v1/check_license'), undefined, {
+        skipIntercept: true,
+      })
         .then(() => {
-          setHasValidLicense(true);
-
           onContinue();
         })
         .catch((e: AxiosError<ValidationBag>) => {
@@ -292,39 +283,81 @@ function PlanCheck({ onContinue }: StepProps) {
       ) : null}
 
       <div className="flex justify-end">
-        {hasValidLicense ? (
-          <Button behavior="button" type="primary" onClick={() => onContinue()}>
-            {t('continue')}
-          </Button>
-        ) : (
-          <Button
-            form="checkLicenseForm"
-            type="primary"
-            onClick={form.submitForm}
-            disabled={form.isSubmitting}
-          >
-            {t('verify')}
-          </Button>
-        )}
+        <Button
+          form="checkLicenseForm"
+          type="primary"
+          onClick={form.submitForm}
+          disabled={form.isSubmitting}
+        >
+          {t('verify')}
+        </Button>
       </div>
     </div>
   );
 }
 
 function Token({ onContinue }: StepProps) {
-  const generate = () => {
-    request('POST', endpoint(`/api/v1/einvoice/token/update`))
-      .then(() => {
-        onContinue();
-      })
-      .catch(() => toast.error());
-  };
+  const { t } = useTranslation();
+  const hasStarted = useRef(false);
+  const [hasError, setHasError] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const generate = useCallback(async () => {
+    setHasError(false);
+    setIsGenerating(true);
+
+    try {
+      await request(
+        'POST',
+        endpoint('/api/v1/einvoice/token/update'),
+        undefined,
+        { skipIntercept: true }
+      );
+
+      await request(
+        'GET',
+        endpoint('/api/v1/einvoice/health_check'),
+        undefined,
+        { skipIntercept: true }
+      );
+
+      onContinue();
+    } catch (error) {
+      console.error(error);
+      setHasError(true);
+      toast.error(t('token_regeneration_failed')!);
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [onContinue, t]);
 
   useEffect(() => {
-    generate();
-  }, []);
+    if (!hasStarted.current) {
+      hasStarted.current = true;
+      generate();
+    }
+  }, [generate]);
 
-  return <Spinner />;
+  if (!hasError) {
+    return <Spinner />;
+  }
+
+  return (
+    <div className="space-y-5">
+      <ErrorMessage>{t('token_regeneration_failed')}</ErrorMessage>
+
+      <div className="flex justify-end">
+        <Button
+          behavior="button"
+          type="primary"
+          onClick={generate}
+          disabled={isGenerating}
+        >
+          {t('regenerate_token')}
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 function BuyCredits({ onContinue }: StepProps) {
@@ -380,7 +413,6 @@ function Form({ onContinue, businessType, isSingapore }: FormProps) {
   const { t } = useTranslation();
   const company = useCurrentCompany();
   const refresh = useRefreshCompanyUsers();
-  const account = useCurrentAccount();
   const user = useCurrentUser();
 
   const isFrance = company?.settings?.country_id === '250';
@@ -414,7 +446,6 @@ function Form({ onContinue, businessType, isSingapore }: FormProps) {
       request('POST', endpoint('/api/v1/einvoice/peppol/setup'), {
         ...values,
         tenant_id: company?.company_key,
-        e_invoicing_token: account?.e_invoicing_token,
         classification: businessType,
       })
         .then((response: AxiosResponse) => {
