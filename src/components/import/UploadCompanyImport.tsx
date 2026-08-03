@@ -34,6 +34,10 @@ import { sha256 } from 'js-sha256';
 import { CloudUpload } from '../icons/CloudUpload';
 import styled from 'styled-components';
 import { ErrorMessage } from '../ErrorMessage';
+import {
+  formatImportMappingLabel,
+  resolveImportMappingHints,
+} from './common/import-mappings';
 
 interface Props {
   entity: string;
@@ -145,19 +149,6 @@ export function UploadCompanyImport(props: Props) {
     }));
   };
 
-  const decorateMapping = (mapping: any) => {
-    const split_map = mapping.split('.');
-
-    let label_property = split_map[1];
-
-    if (split_map[1] == 'user_id') label_property = 'user';
-
-    if (split_map[1] == 'shipping_country_id')
-      label_property = 'shipping_country';
-
-    return `${t(split_map[0])} - ${t(label_property)}`;
-  };
-
   const processImport = async () => {
     if (!files.length && isImportFileTypeZip) {
       toast.error('select_file');
@@ -228,17 +219,14 @@ export function UploadCompanyImport(props: Props) {
           toast.dismiss();
 
           if (response.data?.mappings[props.entity]?.hints) {
-            response.data?.mappings[props.entity]?.hints.forEach(
-              (mapping: number, index: number) => {
-                payload.column_map[props.entity].mapping[index] =
-                  response.data?.mappings[props.entity].available[mapping] ??
-                  '';
-                setPayloadData(payload);
-                setDefaultMapping({
-                  ...payload?.column_map?.[props.entity]?.mapping,
-                });
-              }
+            const mapping = resolveImportMappingHints(
+              response.data.mappings[props.entity].available,
+              response.data.mappings[props.entity].hints
             );
+
+            payload.column_map[props.entity].mapping = mapping;
+            setPayloadData({ ...payload });
+            setDefaultMapping({ ...mapping });
           }
 
           setSelectedTemplate('');
@@ -687,7 +675,7 @@ export function UploadCompanyImport(props: Props) {
                           {mapData.mappings[props.entity].available.map(
                             (mapping: any, index: number) => (
                               <option value={mapping} key={index}>
-                                {decorateMapping(mapping)}
+                                {formatImportMappingLabel(mapping, t)}
                               </option>
                             )
                           )}
