@@ -44,4 +44,5 @@ export interface Account {
   hosted_company_count: number;
   can_trial: boolean;
   docuninja_num_users: number;
+  is_premium: boolean;
 }
