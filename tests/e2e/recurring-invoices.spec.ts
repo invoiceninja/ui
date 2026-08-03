@@ -5,6 +5,7 @@ import {
   login,
   logout,
   permissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -151,8 +152,7 @@ const createRecurringInvoice = async (params: CreateParams) => {
       .getByRole('link', { name: 'Settings', exact: true })
       .first()
       .click();
-    await page.getByLabel('User').first().click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    await selectAssignedUser(page, assignTo, page.getByLabel('User').first());
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -176,7 +176,6 @@ test("can't view recurring invoices without permission", async ({ page }) => {
     'Recurring Invoices'
   );
 
-  await logout(page);
 });
 
 test('can view recurring invoice', async ({ page, api }) => {
@@ -212,7 +211,6 @@ test('can view recurring invoice', async ({ page, api }) => {
 
   await checkEditPage(page, false);
 
-  await logout(page);
 });
 
 test('can edit recurring invoice', async ({ page, api }) => {
@@ -271,7 +269,6 @@ test('can edit recurring invoice', async ({ page, api }) => {
     true
   );
 
-  await logout(page);
 });
 
 test('can create a recurring invoice', async ({ page, api }) => {
@@ -318,7 +315,6 @@ test('can create a recurring invoice', async ({ page, api }) => {
     true
   );
 
-  await logout(page);
 });
 
 test('can view and edit assigned invoice with create_recurring_invoice', async ({
@@ -359,6 +355,8 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
 
   await checkTableEditability(page, false);
 
+  expect(await waitForTableData(page)).toBe(true);
+
   const tableRow = page.locator('tbody').first().getByRole('row').first();
 
   await tableRow.getByRole('link').first().click();
@@ -384,7 +382,6 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
     true
   );
 
-  await logout(page);
 });
 
 test('deleting invoice with edit_recurring_invoice', async ({ page, api }) => {
@@ -685,7 +682,6 @@ test('all actions in dropdown displayed with admin permission', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('all clone actions displayed with creation permissions', async ({
@@ -741,7 +737,6 @@ test('all clone actions displayed with creation permissions', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('cloning recurring invoice', async ({ page, api }) => {

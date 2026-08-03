@@ -5,6 +5,7 @@ import {
   login,
   logout,
   permissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -114,8 +115,11 @@ const createTask = async (params: CreateParams) => {
   await clientOption.click();
 
   if (assignTo) {
-    await page.locator('[data-testid="combobox-input-field"]').nth(2).click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    await selectAssignedUser(
+      page,
+      assignTo,
+      page.locator('[data-testid="combobox-input-field"]').nth(2)
+    );
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -139,7 +143,6 @@ test("can't view tasks without permission", async ({ page }) => {
     'Tasks'
   );
 
-  await logout(page);
 });
 
 test('can view task', async ({ page, api }) => {
@@ -172,7 +175,6 @@ test('can view task', async ({ page, api }) => {
 
   await checkEditPage(page, false, false);
 
-  await logout(page);
 });
 
 test('can edit task', async ({ page, api }) => {
@@ -222,7 +224,6 @@ test('can edit task', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'taskActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can create a task', async ({ page, api }) => {
@@ -260,7 +261,6 @@ test('can create a task', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'taskActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can view and edit assigned task with create_task', async ({
@@ -294,6 +294,8 @@ test('can view and edit assigned task with create_task', async ({
 
   await checkTableEditability(page, false);
 
+  expect(await waitForTableData(page)).toBe(true);
+
   const tableRow = page.locator('tbody').first().getByRole('row').first();
 
   await tableRow.getByRole('link').first().click();
@@ -313,7 +315,6 @@ test('can view and edit assigned task with create_task', async ({
 
   await checkDropdownActions(page, actions, 'taskActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('deleting task with edit_task', async ({ page, api }) => {
@@ -566,7 +567,6 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkDropdownActions(page, actions, 'taskActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('invoice_task and clone action displayed with creation permissions', async ({
@@ -598,7 +598,6 @@ test('invoice_task and clone action displayed with creation permissions', async 
 
   await checkDropdownActions(page, actions, 'taskActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('cloning task', async ({ page, api }) => {
@@ -701,7 +700,6 @@ test('Invoice Task displayed with admin permission', async ({ page, api }) => {
     'dataTable'
   );
 
-  await logout(page);
 });
 
 test('Invoice Task displayed with creation permissions', async ({
@@ -754,5 +752,4 @@ test('Invoice Task displayed with creation permissions', async ({
     'dataTable'
   );
 
-  await logout(page);
 });

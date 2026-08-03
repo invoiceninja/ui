@@ -107,7 +107,6 @@ test("can't view payments without permission", async ({ page }) => {
     'Payments'
   );
 
-  await logout(page);
 });
 
 test('can view payment', async ({ page, api }) => {
@@ -146,7 +145,6 @@ test('can view payment', async ({ page, api }) => {
 
   await checkEditPage(page, false, false);
 
-  await logout(page);
 });
 
 test('can edit payment', async ({ page, api }) => {
@@ -193,7 +191,6 @@ test('can edit payment', async ({ page, api }) => {
     page.getByText('Successfully updated payment', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('can create a payment', async ({ page, api }) => {
@@ -230,7 +227,6 @@ test('can create a payment', async ({ page, api }) => {
     page.getByText('Successfully updated payment', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('deleting payment with edit_payment', async ({ page, api }) => {
@@ -494,5 +490,4 @@ test('rendering documents and custom_fields tabs with admin permission', async (
 
   await expect(page.getByRole('link', { name: 'Documents' })).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });

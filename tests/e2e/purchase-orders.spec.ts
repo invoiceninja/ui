@@ -5,6 +5,7 @@ import {
   login,
   logout,
   permissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -131,8 +132,7 @@ const createPurchaseOrder = async (params: CreateParams) => {
       .first()
       .getByRole('link', { name: 'Settings', exact: true })
       .click();
-    await page.getByLabel('User').first().click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    await selectAssignedUser(page, assignTo, page.getByLabel('User').first());
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -156,7 +156,6 @@ test("can't view purchase_orders without permission", async ({ page }) => {
     'Purchase Orders'
   );
 
-  await logout(page);
 });
 
 test('can view purchase_order', async ({ page, api }) => {
@@ -192,7 +191,6 @@ test('can view purchase_order', async ({ page, api }) => {
 
   await checkEditPage(page, false);
 
-  await logout(page);
 });
 
 test('can edit purchase_order', async ({ page, api }) => {
@@ -251,7 +249,6 @@ test('can edit purchase_order', async ({ page, api }) => {
     true
   );
 
-  await logout(page);
 });
 
 test('can create a purchase_order', async ({ page, api }) => {
@@ -298,7 +295,6 @@ test('can create a purchase_order', async ({ page, api }) => {
     true
   );
 
-  await logout(page);
 });
 
 test('can view and edit own purchase_order with create_purchase_order', async ({
@@ -365,7 +361,6 @@ test('can view and edit own purchase_order with create_purchase_order', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('deleting purchase_order with edit_purchase_order', async ({
@@ -660,7 +655,6 @@ test('all actions in dropdown displayed with admin permission', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('all clone actions displayed with creation permissions', async ({
@@ -714,7 +708,6 @@ test('all clone actions displayed with creation permissions', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('cloning purchase_order', async ({ page, api }) => {

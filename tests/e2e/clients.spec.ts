@@ -5,6 +5,7 @@ import {
   login,
   logout,
   permissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -110,15 +111,11 @@ const createClient = async (params: CreateParams) => {
   await page.locator('#email_0').fill(email || 'first@example.com');
 
   if (assignTo) {
-    const assignedUserInput = page.getByTestId('combobox-input-field').first();
-    await assignedUserInput.scrollIntoViewIfNeeded();
-    await assignedUserInput.click();
-    // UserSelector label is first_name only, so search by first word
-    await assignedUserInput.fill(assignTo.split(' ')[0]);
-
-    const option = page.getByRole('option', { name: assignTo }).first();
-    await option.waitFor({ state: 'visible', timeout: 5000 });
-    await option.click();
+    await selectAssignedUser(
+      page,
+      assignTo,
+      page.getByTestId('combobox-input-field').first()
+    );
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -220,7 +217,6 @@ test("can't view clients without permission", async ({ page }) => {
     'Clients'
   );
 
-  await logout(page);
 });
 
 test('can view client', async ({ page, api }) => {
@@ -251,7 +247,6 @@ test('can view client', async ({ page, api }) => {
 
   await checkShowPage(page, false);
 
-  await logout(page);
 });
 
 test('can edit client', async ({ page, api }) => {
@@ -306,7 +301,6 @@ test('can edit client', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can create a client', async ({ page, api }) => {
@@ -367,7 +361,6 @@ test('can create a client', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can view and edit assigned client with create_client', async ({
@@ -430,7 +423,6 @@ test('can view and edit assigned client with create_client', async ({
 
   await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('deleting client with edit_client', async ({ page, api }) => {
@@ -561,7 +553,6 @@ test("can't purge client without admin permission", async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can purge client with admin permission', async ({ page, api }) => {
@@ -610,7 +601,6 @@ test('can purge client with admin permission', async ({ page, api }) => {
   await page.locator('#filter').fill(clientName);
   await expect(page.getByRole('link', { name: clientName, exact: true })).toHaveCount(0);
 
-  await logout(page);
 });
 
 test('client documents preview with edit_client', async ({ page, api }) => {
@@ -758,7 +748,6 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with creation permissions', async ({
@@ -806,7 +795,6 @@ test('New Invoice, Enter Credit, New Quote and Enter Payment displayed with crea
 
   await checkDropdownActions(page, actions, 'clientActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('View Statement action opens the statement page', async ({ page, api }) => {
@@ -839,7 +827,6 @@ test('View Statement action opens the statement page', async ({ page, api }) => 
 
   await page.waitForURL('**/clients/**/statement');
 
-  await logout(page);
 });
 
 test('Settings action opens company settings in client context', async ({ page, api }) => {
@@ -872,7 +859,6 @@ test('Settings action opens company settings in client context', async ({ page, 
     timeout: 10000,
   });
 
-  await logout(page);
 });
 
 test('New Resource action routes to Invoice create for selected client', async ({
@@ -915,7 +901,6 @@ test('New Resource action routes to Invoice create for selected client', async (
 
   await page.waitForURL(`**/invoices/create?client=${clientId}`);
 
-  await logout(page);
 });
 
 test('Clone action creates a new client from overview', async ({ page, api }) => {
@@ -956,7 +941,6 @@ test('Clone action creates a new client from overview', async ({ page, api }) =>
     })
     .toBeGreaterThan(beforeCount);
 
-  await logout(page);
 });
 
 test('Add Comment action saves and displays a client comment', async ({ page, api }) => {
@@ -999,7 +983,6 @@ test('Add Comment action saves and displays a client comment', async ({ page, ap
 
   await expect(page.getByText(comment)).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Merge client action', async ({ page, api }) => {
@@ -1060,7 +1043,6 @@ test('Merge client action', async ({ page, api }) => {
   await expect(page.getByText('firstMerge@example.com').first()).toBeVisible({ timeout: 10000 });
   await expect(page.getByText('secondMerge@example.com').first()).not.toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Testing military_time property on all settings levels', async ({
@@ -1191,5 +1173,4 @@ test('Testing military_time property on all settings levels', async ({
     'Client: true'
   );
 
-  await logout(page);
 });

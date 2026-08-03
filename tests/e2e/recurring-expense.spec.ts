@@ -5,6 +5,7 @@ import {
   login,
   logout,
   permissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -84,13 +85,11 @@ const createRecurringExpense = async (params: CreateParams) => {
   await page.waitForURL('**/recurring_expenses/create');
 
   if (assignTo) {
-    const assignedUserInput = page.getByTestId('combobox-input-field').nth(4);
-    await assignedUserInput.click();
-    await assignedUserInput.fill(assignTo.split(' ')[0]);
-
-    const option = page.getByRole('option', { name: assignTo }).first();
-    await option.waitFor({ state: 'visible', timeout: 5000 });
-    await option.click();
+    await selectAssignedUser(
+      page,
+      assignTo,
+      page.getByTestId('combobox-input-field').nth(4)
+    );
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -120,7 +119,6 @@ test("can't view recurring expenses without permission", async ({ page }) => {
     'Recurring Expenses'
   );
 
-  await logout(page);
 });
 
 test('can view recurring expense', async ({ page, api }) => {
@@ -155,7 +153,6 @@ test('can view recurring expense', async ({ page, api }) => {
 
   await checkEditPage(page, false);
 
-  await logout(page);
 });
 
 test('can edit recurring expense', async ({ page, api }) => {
@@ -212,7 +209,6 @@ test('can edit recurring expense', async ({ page, api }) => {
     true
   );
 
-  await logout(page);
 });
 
 test('can create a recurring expense', async ({ page, api }) => {
@@ -257,7 +253,6 @@ test('can create a recurring expense', async ({ page, api }) => {
     true
   );
 
-  await logout(page);
 });
 
 test('can view and edit assigned recurring expense with create_recurring_expense', async ({
@@ -321,7 +316,6 @@ test('can view and edit assigned recurring expense with create_recurring_expense
     true
   );
 
-  await logout(page);
 });
 
 test('deleting recurring expense with edit_recurring_expense', async ({
@@ -585,7 +579,6 @@ test('all actions in dropdown displayed with admin permission', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('all clone actions displayed with creation permissions', async ({
@@ -624,7 +617,6 @@ test('all clone actions displayed with creation permissions', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('cloning recurring expense', async ({ page, api }) => {
@@ -723,7 +715,6 @@ test('Checking should_be_invoiced expense settings value on recurring expense cr
     page.locator('[data-cy="shouldBeInvoicedToggle"]')
   ).toBeChecked();
 
-  await logout(page);
 });
 
 test('Checking mark_paid expense settings value on recurring_expense creation page', async ({
@@ -760,7 +751,6 @@ test('Checking mark_paid expense settings value on recurring_expense creation pa
 
   await expect(page.locator('[data-cy="markPaidToggle"]')).toBeChecked();
 
-  await logout(page);
 });
 
 test('Checking convert_currency expense settings value on recurring_expense creation page', async ({
@@ -797,7 +787,6 @@ test('Checking convert_currency expense settings value on recurring_expense crea
 
   await expect(page.locator('[data-cy="convertCurrencyToggle"]')).toBeChecked();
 
-  await logout(page);
 });
 
 test('Checking add_documents_to_invoice expense settings value on recurring_expense creation page', async ({
@@ -838,7 +827,6 @@ test('Checking add_documents_to_invoice expense settings value on recurring_expe
     page.locator('[data-cy="addDocumentsToInvoiceToggle"]')
   ).toBeChecked();
 
-  await logout(page);
 });
 
 test('Checking the gross amount by rate', async ({ page, api }) => {
@@ -906,7 +894,6 @@ test('Checking the gross amount by rate', async ({ page, api }) => {
 
   await expect(page.getByText('$ 15,888.60')).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Checking the gross amount with inclusive taxes turned on', async ({
@@ -979,7 +966,6 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
 
   await expect(page.getByText('$ 12,222.00')).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Checking the gross amount by amount', async ({ page, api }) => {
@@ -1036,5 +1022,4 @@ test('Checking the gross amount by amount', async ({ page, api }) => {
 
   await expect(page.getByText('$ 12,522.00')).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });

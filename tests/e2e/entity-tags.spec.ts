@@ -1,4 +1,4 @@
-import { login, logout } from '$tests/e2e/helpers';
+import { login } from '$tests/e2e/helpers';
 import {
   resetAccountBeforeAll,
   test,
@@ -265,7 +265,6 @@ for (const entityCase of ENTITY_CASES) {
 
     await assertTagPersists(page, api, entityCase.editPath, entity.id as string);
 
-    await logout(page);
   });
 }
 
@@ -290,5 +289,4 @@ test('can create and persist a tag on a bank transaction', async ({
 
   await assertTagPersists(page, api, 'transactions', transaction.id as string);
 
-  await logout(page);
 });
