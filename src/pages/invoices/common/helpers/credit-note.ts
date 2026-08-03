@@ -76,6 +76,7 @@ export function buildClonedCredit(
     design_id: creditDesignId,
     client: undefined,
     invoice_id: '',
+    e_invoice: null,
   } as unknown as Credit;
 }
 
