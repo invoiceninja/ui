@@ -27,6 +27,7 @@ import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import {
   isUniquePaymentTerm,
+  matchesPaymentTerm,
   shouldPaymentTermBeVisible,
 } from '$app/common/helpers/payment-terms/payment-term-filters';
 import { useEffect, useState } from 'react';
@@ -83,6 +84,48 @@ export function OnlinePayments() {
       setPaymentTerms(termsResponse.data.data);
     }
   }, [termsResponse]);
+
+  const validUntilOptions = paymentTerms?.filter((paymentTerm: PaymentTerm) => !paymentTerm.cash_discount_days && !paymentTerm.cash_discount_percent);
+
+  const selectedPaymentTerm = paymentTerms?.find((paymentTerm: PaymentTerm) => {
+    return matchesPaymentTerm(
+      paymentTerm,
+      company?.settings.payment_terms?.toString(),
+      company?.settings.cash_discount_days?.toString(),
+      company?.settings.cash_discount_percent?.toString()
+    );
+  });
+
+  const handlePaymentTermChange = (paymentTermId: string) => {
+    if (!paymentTermId) {
+      handleChangeProperty('settings.payment_terms', '');
+      handleChangeProperty('settings.cash_discount_days', '');
+      handleChangeProperty('settings.cash_discount_percent', '');
+
+      return;
+    }
+
+    const paymentTerm = paymentTerms?.find(
+      (paymentTerm: PaymentTerm) => paymentTerm.id === paymentTermId
+    );
+
+    if (!paymentTerm) {
+      return;
+    }
+
+    handleChangeProperty(
+      'settings.payment_terms',
+      paymentTerm.num_days.toString() || ''
+    );
+    handleChangeProperty(
+      'settings.cash_discount_days',
+      paymentTerm.cash_discount_days?.toString() || ''
+    );
+    handleChangeProperty(
+      'settings.cash_discount_percent',
+      paymentTerm.cash_discount_percent?.toString() || ''
+    );
+  };
 
   return (
     <Settings
@@ -295,12 +338,16 @@ export function OnlinePayments() {
             }
           >
             <SelectField
-              value={company?.settings?.payment_terms || ''}
+              value={selectedPaymentTerm?.id || ''}
               onValueChange={(value) =>
-                handleChangeProperty('settings.payment_terms', value)
+                handlePaymentTermChange(value)
               }
               disabled={disableSettingsField('payment_terms')}
-              errorMessage={errors?.errors['settings.payment_terms']}
+              errorMessage={
+                errors?.errors['settings.payment_terms'] ||
+                errors?.errors['settings.cash_discount_days'] ||
+                errors?.errors['settings.cash_discount_percent']
+              }
               customSelector
               withBlank
             >
@@ -308,12 +355,14 @@ export function OnlinePayments() {
                 .filter((type: PaymentTerm) =>
                   shouldPaymentTermBeVisible(
                     type,
-                    company?.settings?.payment_terms
+                    company?.settings?.payment_terms,
+                    company?.settings?.cash_discount_days,
+                    company?.settings?.cash_discount_percent
                   )
                 )
                 .filter(isUniquePaymentTerm)
                 .map((type: PaymentTerm) => (
-                  <option key={type.id} value={type.num_days.toString()}>
+                  <option key={type.id} value={type.id}>
                     {type.name}
                   </option>
                 ))}
@@ -378,7 +427,7 @@ export function OnlinePayments() {
             errorMessage={errors?.errors['settings.valid_until']}
             customSelector
           >
-            {paymentTerms
+            {validUntilOptions
               ?.filter((type: PaymentTerm) =>
                 shouldPaymentTermBeVisible(type, company?.settings?.valid_until)
               )
