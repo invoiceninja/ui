@@ -19,6 +19,7 @@ import { freePlan } from '$app/common/guards/guards/free-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { generateEmailPreview } from '$app/common/helpers/emails/generate-email-preview';
 import { useHandleSend } from '$app/common/hooks/emails/useHandleSend';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
@@ -79,6 +80,7 @@ export interface EmailTemplate {
 export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
   const [t] = useTranslation();
 
+  const account = useCurrentAccount();
   const company = useCurrentCompany();
   const reactSettings = useReactSettings();
 
@@ -102,8 +104,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
     templateId: props.defaultEmail,
   });
 
-  const isCcEmailAvailable =
-    isSelfHosted() || (isHosted() && (proPlan() || enterprisePlan()));
+  const isCcEmailEnabled = isSelfHosted() || account?.is_premium;
 
   const handleTemplateChange = (id: string) => {
     setPayloadData((current) =>
@@ -164,21 +165,25 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
     }
   }, [currentTemplate]);
 
-  useImperativeHandle(ref, () => {
-    return {
-      sendEmail() {
-        handleSend(
-          payloadData.body,
-          props.resourceType,
-          props.resource?.id || '',
-          payloadData.subject,
-          payloadData.templateId,
-          props.redirectUrl,
-          payloadData.ccEmail
-        );
-      },
-    };
-  }, [payloadData]);
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        sendEmail() {
+          handleSend(
+            payloadData.body,
+            props.resourceType,
+            props.resource?.id || '',
+            payloadData.subject,
+            payloadData.templateId,
+            props.redirectUrl,
+            payloadData.ccEmail
+          );
+        },
+      };
+    },
+    [payloadData]
+  );
 
   return (
     <div className="grid grid-cols-12 lg:gap-4 my-4">
@@ -225,20 +230,19 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
         </Card>
 
         <Card withContainer>
-          {isCcEmailAvailable && (
-            <MultiEmailInput
-              id="cc_email"
-              label={t('cc_email')}
-              value={payloadData.ccEmail}
-              onValueChange={(value) =>
-                setPayloadData((current) => ({ ...current, ccEmail: value }))
-              }
-              maxEmails={isHosted() ? HOSTED_CC_EMAILS_LIMIT : undefined}
-              placeholder={t('enter_values_comma_separated')}
-              errorMessage={errors?.errors.cc_email}
-              cypressRef="ccEmailInput"
-            />
-          )}
+          <MultiEmailInput
+            id="cc_email"
+            label={t('cc_email')}
+            value={payloadData.ccEmail}
+            onValueChange={(value) =>
+              setPayloadData((current) => ({ ...current, ccEmail: value }))
+            }
+            disabled={!isCcEmailEnabled}
+            maxEmails={isHosted() ? HOSTED_CC_EMAILS_LIMIT : undefined}
+            placeholder={t('enter_values_comma_separated')}
+            errorMessage={errors?.errors.cc_email}
+            cypressRef="ccEmailInput"
+          />
 
           <InputField
             label={t('subject')}
