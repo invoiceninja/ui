@@ -74,6 +74,10 @@ function makeInvoice(overrides: Partial<Invoice> = {}): Invoice {
     reminder3_sent: '',
     reminder_last_sent: '',
     paid_to_date: 0,
+    applied_cash_discount: 0,
+    cash_discount_percent: 0,
+    cash_discount_due_date: '',
+    cash_discount: 0,
     subscription_id: '',
     location_id: '',
     auto_bill_enabled: false,
@@ -1124,5 +1128,24 @@ describe('Inclusive invoice totals - backend parity (PDF values)', () => {
     ).build();
 
     expect(result.getNetSubtotal()).toEqual(833.34);
+  });
+});
+
+describe('applied cash discount balance', () => {
+  it.each([
+    ['exclusive', InvoiceSum, false],
+    ['inclusive', InvoiceSumInclusive, true],
+  ])('subtracts the applied cash discount for %s tax invoices', (_label, Calculator, usesInclusiveTaxes) => {
+    const inv = makeInvoice({
+      uses_inclusive_taxes: usesInclusiveTaxes,
+      paid_to_date: 25,
+      applied_cash_discount: 5,
+      line_items: [makeLineItem({ cost: 100, quantity: 1 })],
+    });
+
+    const result = new Calculator(inv, USD).build();
+
+    expect(result.invoice.amount).toEqual(100);
+    expect(result.invoice.balance).toEqual(70);
   });
 });

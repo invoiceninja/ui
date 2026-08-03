@@ -15,6 +15,7 @@ export const paymentMap: Record[] = [
   { trans: 'amount', value: 'payment.amount', map: 'payment' },
   { trans: 'refunded', value: 'payment.refunded', map: 'payment' },
   { trans: 'applied', value: 'payment.applied', map: 'payment' },
+  { trans: 'applied_cash_discount', value: 'payment.applied_cash_discount', map: 'payment' },
   {
     trans: 'transaction_reference',
     value: 'payment.transaction_reference',

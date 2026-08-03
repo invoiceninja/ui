@@ -24,6 +24,7 @@ import { LanguageSelector } from '$app/components/LanguageSelector';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import {
   isUniquePaymentTerm,
+  matchesPaymentTerm,
   shouldPaymentTermBeVisible,
 } from '$app/common/helpers/payment-terms/payment-term-filters';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
@@ -45,6 +46,21 @@ export default function Settings() {
 
   const { data: paymentTermsResponse } = usePaymentTermsQuery({});
 
+  const paymentTerms = paymentTermsResponse?.data.data ?? [];
+
+  const selectedPaymentTerm = paymentTerms.find((paymentTerm: PaymentTerm) => {
+    const settings = client?.settings || {};
+
+    return matchesPaymentTerm(
+      paymentTerm,
+      settings.payment_terms?.toString(),
+      settings.cash_discount_days?.toString(),
+      settings.cash_discount_percent?.toString()
+    );
+  });
+
+  const validUntilOptions = paymentTerms.filter((paymentTerm: PaymentTerm) => !paymentTerm.cash_discount_days && !paymentTerm.cash_discount_percent);
+
   const handleChange = (property: string, value: string | number | boolean) => {
     const $client = cloneDeep(client)!;
 
@@ -56,6 +72,38 @@ export default function Settings() {
       delete $client.settings?.[property];
     } else {
       set($client, property, value);
+    }
+
+    setClient($client);
+  };
+
+  const handlePaymentTermChange = (paymentTermId: string) => {
+    const $client = cloneDeep(client)!;
+
+    if (!paymentTermId) {
+      delete $client.settings?.payment_terms;
+      delete $client.settings?.cash_discount_days;
+      delete $client.settings?.cash_discount_percent;
+    } else {
+      const paymentTerm = paymentTerms.find(
+        (paymentTerm: PaymentTerm) => paymentTerm.id === paymentTermId
+      );
+
+      if (!paymentTerm) {
+        return;
+      }
+
+      set($client, 'settings.payment_terms', paymentTerm.num_days.toString() || '');
+      set(
+        $client,
+        'settings.cash_discount_days',
+        paymentTerm.cash_discount_days?.toString() || ''
+      );
+      set(
+        $client,
+        'settings.cash_discount_percent',
+        paymentTerm.cash_discount_percent?.toString() || ''
+      );
     }
 
     setClient($client);
@@ -111,24 +159,28 @@ export default function Settings() {
           >
             <SelectField
               id="settings.payment_terms"
-              value={client?.settings?.payment_terms || ''}
-              errorMessage={errors?.errors['settings.payment_terms']}
-              onValueChange={(value) =>
-                handleChange('settings.payment_terms', value)
+              value={selectedPaymentTerm?.id || ''}
+              errorMessage={
+                errors?.errors['settings.payment_terms'] ||
+                errors?.errors['settings.cash_discount_days'] ||
+                errors?.errors['settings.cash_discount_percent']
               }
+              onValueChange={handlePaymentTermChange}
               withBlank
               customSelector
             >
-              {paymentTermsResponse.data.data
+              {paymentTerms
                 .filter((paymentTerm: PaymentTerm) =>
                   shouldPaymentTermBeVisible(
                     paymentTerm,
-                    client?.settings?.payment_terms
+                    client?.settings?.payment_terms,
+                    client?.settings?.cash_discount_days,
+                    client?.settings?.cash_discount_percent,
                   )
                 )
                 .filter(isUniquePaymentTerm)
-                .map((paymentTerm: PaymentTerm, index: number) => (
-                  <option key={index} value={paymentTerm.num_days.toString()}>
+                .map((paymentTerm: PaymentTerm) => (
+                  <option key={paymentTerm.id} value={paymentTerm.id}>
                     {paymentTerm.name}
                   </option>
                 ))}
@@ -148,17 +200,17 @@ export default function Settings() {
               withBlank
               customSelector
             >
-              {paymentTermsResponse.data.data
-                .filter((paymentTerm: PaymentTerm) =>
+              {validUntilOptions
+                .filter((validUntilOption: PaymentTerm) =>
                   shouldPaymentTermBeVisible(
-                    paymentTerm,
+                    validUntilOption,
                     client?.settings?.valid_until
                   )
                 )
                 .filter(isUniquePaymentTerm)
-                .map((paymentTerm: PaymentTerm, index: number) => (
-                  <option key={index} value={paymentTerm.num_days.toString()}>
-                    {paymentTerm.name}
+                .map((validUntilOption: PaymentTerm) => (
+                  <option key={validUntilOption.id} value={validUntilOption.num_days.toString()}>
+                    {validUntilOption.name}
                   </option>
                 ))}
             </SelectField>

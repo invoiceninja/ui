@@ -10,12 +10,34 @@
 
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 
+export function matchesPaymentTerm(
+  paymentTerm: PaymentTerm,
+  days: string | undefined,
+  cashDiscountDays?: string | undefined,
+  cashDiscountPercent?: string | undefined
+): boolean {
+  return (
+    (days || '') === (paymentTerm.num_days?.toString() || '') &&
+    (cashDiscountDays || '') ===
+      (paymentTerm.cash_discount_days?.toString() || '') &&
+    (cashDiscountPercent || '') ===
+      (paymentTerm.cash_discount_percent?.toString() || '')
+  );
+}
+
 export function shouldPaymentTermBeVisible(
   paymentTerm: PaymentTerm,
-  currentValue: string | undefined
+  days: string | undefined,
+  cashDiscountDays?: string | undefined,
+  cashDiscountPercent?: string | undefined
 ): boolean {
   const isActive = !paymentTerm.is_deleted && !paymentTerm.archived_at;
-  const isCurrentlySelected = paymentTerm.num_days.toString() === currentValue;
+  const isCurrentlySelected = matchesPaymentTerm(
+    paymentTerm,
+    days,
+    cashDiscountDays,
+    cashDiscountPercent
+  );
 
   return isActive || isCurrentlySelected;
 }
@@ -26,6 +48,13 @@ export function isUniquePaymentTerm(
   paymentTerms: PaymentTerm[]
 ): boolean {
   return (
-    paymentTerms.findIndex((t) => t.num_days === paymentTerm.num_days) === index
+    paymentTerms.findIndex((term) =>
+      matchesPaymentTerm(
+        paymentTerm,
+        term.num_days?.toString(),
+        term.cash_discount_days?.toString(),
+        term.cash_discount_percent?.toString()
+      )
+    ) === index
   );
 }

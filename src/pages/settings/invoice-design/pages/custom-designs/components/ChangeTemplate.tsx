@@ -14,11 +14,13 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Client } from '$app/common/interfaces/client';
+import { Credit } from '$app/common/interfaces/credit';
 import { Design } from '$app/common/interfaces/design';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Payment } from '$app/common/interfaces/payment';
 import { Project } from '$app/common/interfaces/project';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Quote } from '$app/common/interfaces/quote';
 import { Task } from '$app/common/interfaces/task';
 import { Expense } from '$app/common/interfaces/expense';
 import { Modal } from '$app/components/Modal';
@@ -37,6 +39,8 @@ import { useQuery, useQueryClient } from 'react-query';
 
 type ChangeTemplateResource =
   | Invoice
+  | Quote
+  | Credit
   | Payment
   | Client
   | PurchaseOrder

@@ -17,7 +17,7 @@ import { route } from '$app/common/helpers/route';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { usePaymentQuery } from '$app/common/queries/payments';
 import { FormikProps, useFormik } from 'formik';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -31,6 +31,7 @@ import { DataTable } from '$app/components/DataTable';
 import { Invoice } from '$app/common/interfaces/invoice';
 import {
   ApplyInvoice,
+  isCashDiscountExpired,
   useApplyInvoiceTableColumns,
 } from '../common/hooks/useApplyInvoiceTableColumns';
 import { PaymentOnCreation } from '..';
@@ -46,11 +47,15 @@ export default function Apply() {
   const { data: payment } = usePaymentQuery({ id });
 
   const [errors, setErrors] = useState<ValidationBag>();
+  const [hasCashDiscount, setHasCashDiscount] = useState(true);
 
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
 
-  const calcApplyAmount = (balance: number, currentInvoices: Invoice[]) => {
+  const calcApplyAmount = (
+    balance: number,
+    currentInvoices: ApplyInvoice[]
+  ) => {
     if (payment) {
       const unapplied = payment?.amount - payment?.applied;
 
@@ -114,6 +119,13 @@ export default function Apply() {
     formik: formik as unknown as FormikProps<{ invoices: ApplyInvoice[] }>,
     isApplyPage: true,
   });
+
+  const handleDataLoaded = useCallback((invoices: Invoice[]) => {
+    console.log(invoices);
+    setHasCashDiscount(
+      invoices.some((invoice) => Boolean(invoice.cash_discount))
+    );
+  }, []);
 
   useEffect(() => {
     let total = 0;
@@ -182,17 +194,31 @@ export default function Apply() {
               resource="invoice"
               endpoint={`/api/v1/invoices?include=client&payable=${payment?.client_id}&per_page=100&sort=date|desc&per_page=1000`}
               columns={columns}
+              excludeColumns={hasCashDiscount ? undefined : ['cash_discount']}
+              onDataLoaded={handleDataLoaded}
               onSelectedResourcesChange={(selectedResources) => {
                 if (selectedResources.length > 0) {
-                  const newInvoices: any[] = [];
+                  const newInvoices: ApplyInvoice[] = [];
 
                   selectedResources.forEach((resource: Invoice) => {
+                    const cashDiscount = resource.cash_discount || 0;
+                    const isCashDiscountApplied =
+                      Boolean(cashDiscount) && !isCashDiscountExpired(resource);
+
+                    const amount = calcApplyAmount(
+                      resource.balance,
+                      newInvoices
+                    );
+                    const discountedAmount = isCashDiscountApplied
+                      ? Math.max(amount - cashDiscount, 0)
+                      : amount;
+
                     newInvoices.push({
                       _id: v4(),
-                      amount: calcApplyAmount(resource.balance, newInvoices),
+                      amount: discountedAmount,
+                      cash_discount: cashDiscount,
                       credit_id: '',
                       invoice_id: resource.id,
-                      number: resource.number,
                     });
                   });
 

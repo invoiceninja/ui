@@ -23,12 +23,19 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Credit } from '$app/common/interfaces/credit';
+import { Quote } from '$app/common/interfaces/quote';
 import { atom, useSetAtom } from 'jotai';
 import classNames from 'classnames';
 import { useColorScheme } from '$app/common/colors';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
-export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
+export type ProductTableResource =
+  | Invoice
+  | RecurringInvoice
+  | PurchaseOrder
+  | Credit
+  | Quote;
 export type RelationType = 'client_id' | 'vendor_id';
 
 export const isDeleteActionTriggeredAtom = atom<boolean | undefined>(undefined);

@@ -132,6 +132,10 @@ export function useAllInvoiceColumns() {
     'project',
     'tags',
     'recurring_invoice',
+    'cash_discount_percent',
+    'cash_discount_due_date',
+    'cash_discount',
+    'applied_cash_discount',
   ] as const;
 
   return invoiceColumns.map((column) => normalizeColumnName(column));
@@ -672,6 +676,40 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'invoice_tag_ids',
       label: t('tags'),
       format: (value, invoice) => <TagPills tags={invoice.tags} />,
+    },
+    {
+      column: 'cash_discount_percent',
+      id: 'cash_discount_percent',
+      label: t('cash_discount_percent'),
+      format: (value) => value ? `${value}%` : '',
+    },
+    {
+      column: 'cash_discount_due_date',
+      id: 'cash_discount_due_date',
+      label: t('cash_discount_due_date'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'cash_discount',
+      id: 'cash_discount',
+      label: t('cash_discount'),
+      format: (value, invoice) =>
+        value ? formatMoney(
+          value,
+          invoice.client?.country_id,
+          invoice.client?.settings.currency_id
+        ) : '',
+    },
+    {
+      column: 'applied_cash_discount',
+      id: 'applied_cash_discount',
+      label: t('applied_cash_discount'),
+      format: (value, invoice) =>
+        value ? formatMoney(
+          value,
+          invoice.client?.country_id,
+          invoice.client?.settings.currency_id
+        ) : '',
     },
   ];
 

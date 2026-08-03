@@ -27,7 +27,7 @@ import { CustomField } from '$app/components/CustomField';
 
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useSave } from './hooks/useSave';
@@ -42,7 +42,10 @@ import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { ErrorMessage } from '$app/components/ErrorMessage';
 import { DataTable } from '$app/components/DataTable';
-import { useApplyInvoiceTableColumns } from '../common/hooks/useApplyInvoiceTableColumns';
+import {
+  isCashDiscountExpired,
+  useApplyInvoiceTableColumns,
+} from '../common/hooks/useApplyInvoiceTableColumns';
 import { useCreditColumns } from './hooks/useCreditColumns';
 import { TableTotalFooter } from './components/TableTotalFooter';
 import { v4 } from 'uuid';
@@ -56,6 +59,7 @@ export interface PaymentOnCreation
 interface PaymentInvoice {
   _id: string;
   amount: number;
+  cash_discount: number;
   invoice_id: string;
 }
 
@@ -89,6 +93,7 @@ export default function Create() {
   const [payment, setPayment] = useAtom(paymentAtom);
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [hasCashDiscount, setHasCashDiscount] = useState(true);
   const [sendEmail, setSendEmail] = useState(
     company?.settings?.client_manual_payment_notification
   );
@@ -118,6 +123,20 @@ export default function Create() {
     setPayment,
     errors,
   });
+
+  const handleInvoiceDataLoaded = useCallback((invoices: Invoice[]) => {
+    setHasCashDiscount(
+      invoices.some((invoice) => Boolean(invoice.cash_discount))
+    );
+  }, []);
+
+  const calculateInitialAmount = (invoice: Invoice) => {
+    const baseAmount = invoice.balance > 0 ? invoice.balance : invoice.amount;
+
+    return isCashDiscountExpired(invoice)
+      ? baseAmount
+      : Math.max(baseAmount - (invoice.cash_discount || 0), 0);
+  };
 
   useEffect(() => {
     setPayment((current) => {
@@ -165,8 +184,8 @@ export default function Create() {
                   {
                     _id: v4(),
                     invoice_id: invoice.id,
-                    amount:
-                      invoice.balance > 0 ? invoice.balance : invoice.amount,
+                    cash_discount: invoice.cash_discount || 0,
+                    amount: calculateInitialAmount(invoice),
                   },
                 ],
               }
@@ -386,8 +405,8 @@ export default function Create() {
                     {
                       _id: v4(),
                       invoice_id: invoice.id,
-                      amount:
-                        invoice.balance > 0 ? invoice.balance : invoice.amount,
+                      cash_discount: invoice.cash_discount || 0,
+                      amount: calculateInitialAmount(invoice),
                     },
                   ]);
                 }, 25);
@@ -426,6 +445,10 @@ export default function Create() {
                 queryIdentificator="/api/v1/invoices"
                 endpoint={initialEndpoints.invoices}
                 columns={invoiceColumns}
+                excludeColumns={
+                  hasCashDiscount ? undefined : ['cash_discount']
+                }
+                onDataLoaded={handleInvoiceDataLoaded}
                 onSelectedResourcesChange={(selectedResources) => {
                   if (selectedResources.length > 0) {
                     const newInvoices: PaymentInvoice[] = [];
@@ -437,11 +460,13 @@ export default function Create() {
 
                       newInvoices.push({
                         _id: v4(),
+                        cash_discount:
+                          existingInvoice?.cash_discount ||
+                          resource.cash_discount ||
+                          0,
                         amount: existingInvoice
                           ? existingInvoice.amount
-                          : resource.balance > 0
-                            ? resource.balance
-                            : resource.amount,
+                          : calculateInitialAmount(resource),
                         invoice_id: resource.id,
                       });
                     });

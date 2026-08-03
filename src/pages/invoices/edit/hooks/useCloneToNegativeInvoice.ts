@@ -35,6 +35,7 @@ export function useCloneToNegativeInvoice() {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      applied_cash_discount: 0,
       partial: 0,
       partial_due_date: '',
       // Reverse monetary amounts for credit note
