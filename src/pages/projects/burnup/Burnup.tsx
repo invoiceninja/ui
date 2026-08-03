@@ -1,0 +1,223 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
+import classNames from 'classnames';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { date as formatDate } from '$app/common/helpers';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { Project } from '$app/common/interfaces/project';
+import {
+  ProjectBurnupBucketType,
+  ProjectBurnupMetricKey,
+} from '$app/common/interfaces/project-burnup';
+import { useProjectBurnupQuery } from '$app/common/queries/project-burnup';
+import { Card } from '$app/components/cards';
+import { ErrorMessage } from '$app/components/ErrorMessage';
+import Toggle from '$app/components/forms/Toggle';
+import { Spinner } from '$app/components/Spinner';
+import { BurnupMetricGroup } from './BurnupMetricGroup';
+import { resolveProjectBurnupDateRange } from './helpers';
+import {
+  DEFAULT_PROJECT_BURNUP_METRICS,
+  PROJECT_BURNUP_METRICS,
+} from './metrics';
+import { ProjectBurnupChart } from './ProjectBurnupChart';
+
+interface Props {
+  project: Project;
+  includeDrafts?: boolean;
+  onIncludeDraftsChange?: (value: boolean) => void;
+  withoutIncludeDraftsToggle?: boolean;
+}
+
+const BUCKET_OPTIONS: {
+  value: ProjectBurnupBucketType;
+  translationKey: string;
+}[] = [
+  { value: 'daily', translationKey: 'freq_daily' },
+  { value: 'weekly', translationKey: 'freq_weekly' },
+  { value: 'monthly', translationKey: 'freq_monthly' },
+];
+
+const HOUR_METRICS = PROJECT_BURNUP_METRICS.filter(
+  (metric) => metric.axis === 'hours'
+);
+const MONEY_METRICS = PROJECT_BURNUP_METRICS.filter(
+  (metric) => metric.axis === 'money'
+);
+
+export function Burnup({
+  project,
+  includeDrafts,
+  onIncludeDraftsChange,
+  withoutIncludeDraftsToggle,
+}: Props) {
+  const [t] = useTranslation();
+
+  const colors = useColorScheme();
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const [bucketType, setBucketType] =
+    useState<ProjectBurnupBucketType>('daily');
+  const [localIncludeDrafts, setLocalIncludeDrafts] = useState(false);
+  const [visibleMetricKeys, setVisibleMetricKeys] = useState<
+    ProjectBurnupMetricKey[]
+  >(DEFAULT_PROJECT_BURNUP_METRICS);
+
+  const resolvedIncludeDrafts = includeDrafts ?? localIncludeDrafts;
+
+  const handleIncludeDraftsChange = (value: boolean) => {
+    if (typeof includeDrafts === 'undefined') {
+      setLocalIncludeDrafts(value);
+    }
+
+    onIncludeDraftsChange?.(value);
+  };
+
+  const lifecycleDates = useMemo(() => {
+    return resolveProjectBurnupDateRange({
+      createdAt: project.created_at,
+      dueDate: project.due_date,
+    });
+  }, [project.created_at, project.due_date]);
+
+  const payload = useMemo(() => {
+    return {
+      project_id: project.id,
+      start_date: lifecycleDates.start,
+      end_date: lifecycleDates.end,
+      bucket_type: bucketType,
+      include_drafts: resolvedIncludeDrafts,
+    };
+  }, [
+    project.id,
+    lifecycleDates.start,
+    lifecycleDates.end,
+    bucketType,
+    resolvedIncludeDrafts,
+  ]);
+
+  const burnup = useProjectBurnupQuery(payload, {
+    enabled: Boolean(project.id),
+  });
+  const canViewFinancials = burnup.data?.metadata.can_view_financials === true;
+  const allowedVisibleMetricKeys = canViewFinancials
+    ? visibleMetricKeys
+    : visibleMetricKeys.filter(
+        (key) =>
+          PROJECT_BURNUP_METRICS.find((metric) => metric.key === key)?.axis ===
+          'hours'
+      );
+
+  const handleMetricToggle = (metricKey: ProjectBurnupMetricKey) => {
+    setVisibleMetricKeys((current) => {
+      if (current.includes(metricKey)) {
+        return current.filter((key) => key !== metricKey);
+      }
+
+      return [...current, metricKey];
+    });
+  };
+
+  const headerControls = (
+    <div className="flex flex-wrap items-center justify-end gap-3">
+      <span className="text-sm" style={{ color: colors.$22 }}>
+        {formatDate(lifecycleDates.start, dateFormat)} -{' '}
+        {formatDate(lifecycleDates.end, dateFormat)}
+      </span>
+
+      <div
+        className="flex w-max overflow-hidden rounded-md border"
+        style={{ borderColor: colors.$24 }}
+      >
+        {BUCKET_OPTIONS.map((bucket, index) => {
+          const active = bucketType === bucket.value;
+
+          return (
+            <button
+              key={index}
+              type="button"
+              className={classNames('px-3 py-1.5 text-sm font-medium', {
+                'border-l': index > 0,
+              })}
+              style={{
+                borderColor: colors.$24,
+                backgroundColor: active ? colors.$3 : colors.$1,
+                color: active ? colors.$1 : colors.$3,
+              }}
+              onClick={() => setBucketType(bucket.value)}
+            >
+              {t(bucket.translationKey)}
+            </button>
+          );
+        })}
+      </div>
+
+      {!withoutIncludeDraftsToggle && canViewFinancials && (
+        <Toggle
+          label={t('include_drafts')}
+          checked={resolvedIncludeDrafts}
+          onValueChange={handleIncludeDraftsChange}
+        />
+      )}
+    </div>
+  );
+
+  return (
+    <Card
+      title={t('burn_up')}
+      className="shadow-sm"
+      style={{ borderColor: colors.$24 }}
+      headerStyle={{ borderColor: colors.$20 }}
+      topRight={headerControls}
+      withoutBodyPadding
+    >
+      <div className="space-y-6 p-4 sm:p-6">
+        <div className="grid gap-6 xl:grid-cols-2">
+          <BurnupMetricGroup
+            title={t('hours')}
+            metrics={HOUR_METRICS}
+            visibleMetricKeys={visibleMetricKeys}
+            onToggle={handleMetricToggle}
+          />
+
+          {canViewFinancials && (
+            <BurnupMetricGroup
+              title={t('money')}
+              metrics={MONEY_METRICS}
+              visibleMetricKeys={visibleMetricKeys}
+              onToggle={handleMetricToggle}
+            />
+          )}
+        </div>
+
+        {burnup.isLoading && (
+          <div className="flex justify-center py-12">
+            <Spinner />
+          </div>
+        )}
+
+        {burnup.isError && (
+          <ErrorMessage>{t('something_went_wrong')}</ErrorMessage>
+        )}
+
+        {burnup.data && !burnup.isLoading && (
+          <ProjectBurnupChart
+            data={burnup.data}
+            project={project}
+            visibleMetricKeys={allowedVisibleMetricKeys}
+          />
+        )}
+      </div>
+    </Card>
+  );
+}
