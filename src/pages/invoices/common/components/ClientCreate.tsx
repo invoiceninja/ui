@@ -171,7 +171,7 @@ export function ClientCreate({
     if (blankClient && isModalOpen) {
       setClient({ ...blankClient });
     }
-  }, [isModalOpen]);
+  }, [blankClient, isModalOpen]);
 
   return (
     <Modal
