@@ -196,7 +196,7 @@ interface Props<T> extends CommonProps {
   withoutPerPageAsPreference?: boolean;
   withoutPageAsPreference?: boolean;
   withoutStoringPreferences?: boolean;
-  withFilterTextOnly?: boolean;
+  withRecordScopedFilters?: boolean;
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
   enableSavingFilterPreference?: boolean;
@@ -308,7 +308,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     onDeleteBulkAction,
     withoutPageAsPreference = false,
     withoutStoringPreferences = false,
-    withFilterTextOnly = false,
+    withRecordScopedFilters = false,
     filterColumns,
     onSelectedResourcesChange,
     preSelected = [],
@@ -401,7 +401,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutStoringPerPage: withoutPerPageAsPreference,
     withoutStoringPage: withoutPageAsPreference,
     withoutStoringPreferences,
-    withFilterTextOnly,
+    withRecordScopedFilters,
     enableSavingFilterPreference,
   });
 
@@ -416,7 +416,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     customFilter,
     customFilters,
     withoutStoringPreferences,
-    withFilterTextOnly,
+    withRecordScopedFilters,
   });
 
   const normalizeNumericCommas = (value: string): string => {
