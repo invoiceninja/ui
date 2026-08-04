@@ -1,15 +1,13 @@
-import { Permissions as TPermissions } from '$app/common/hooks/permissions/useHasPermission';
 import { Locator, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 import { Action } from './clients.spec';
+import type { Permission as ApiPermission } from './api-helpers';
 import {
   emailForCurrentAccount,
   passwordForCurrentAccount,
 } from './accounts';
 
-type AdminPermission = 'admin';
-
-export type Permission = TPermissions | AdminPermission;
+export type Permission = ApiPermission;
 
 export async function logout(page: Page) {
   // The /logout component calls window.location.href='/' in a useEffect, which
@@ -51,76 +49,6 @@ export async function login(
   await passwordInput.press('Enter');
 
   await expect(page.locator('[data-cy="navigationBar"]')).toBeVisible({ timeout: 10000 });
-}
-
-export function permissions(page: Page) {
-  const clear = async (email = 'permissions@example.com') => {
-    const resolvedEmail = emailForCurrentAccount(email);
-    await page
-      .locator('[data-cy="navigationBar"]')
-      .getByRole('link', { name: 'Settings' })
-      .click();
-    await page.getByRole('link', { name: 'User Management' }).click();
-    await page.locator('#filter').fill(resolvedEmail);
-
-    const tableBody = page.locator('tbody').first();
-    const matchingRow = tableBody
-      .locator('tr')
-      .filter({ hasText: resolvedEmail })
-      .first();
-
-    await matchingRow.waitFor({ state: 'visible', timeout: 10000 });
-    await matchingRow.getByRole('link').first().click();
-
-    const passwordField = page.locator('#current_password');
-    const permissionsButton = page.getByRole('button', { name: 'Permissions' });
-
-    // Wait for either the password modal or the Permissions tab to appear.
-    // If password is not required, the app auto-confirms and goes straight to the edit page.
-    await Promise.any([
-      passwordField.waitFor({ state: 'visible', timeout: 5000 }),
-      permissionsButton.waitFor({ state: 'visible', timeout: 5000 }),
-    ]);
-
-    if (await passwordField.isVisible()) {
-      await passwordField.fill('password');
-      await page.getByRole('button', { name: 'Continue' }).click();
-      await permissionsButton.waitFor({ state: 'visible', timeout: 5000 });
-    }
-
-    await permissionsButton.click();
-
-    await page.uncheck('[data-cy="admin"]');
-    await page.uncheck('[data-cy="viewDashboard"]');
-    await page.uncheck('[data-cy="viewReports"]');
-
-    for (const checkbox of await page.locator('input[type=checkbox]').all()) {
-      await checkbox.uncheck();
-    }
-  };
-
-  const save = async () => {
-    await page.getByRole('button', { name: 'Save' }).click();
-    await expect(page.getByText('Successfully updated user')).toBeVisible({ timeout: 10000 });
-  };
-
-  const set = async (...permissions: Permission[]) => {
-    for (const p of permissions) {
-      let updatedPermission = p;
-
-      if (updatedPermission === 'view_dashboard') {
-        updatedPermission = 'viewDashboard' as Permission;
-      }
-
-      if (updatedPermission === 'view_reports') {
-        updatedPermission = 'viewReports' as Permission;
-      }
-
-      await page.check(`[data-cy=${updatedPermission}]`);
-    }
-  };
-
-  return { clear, save, set };
 }
 
 /**

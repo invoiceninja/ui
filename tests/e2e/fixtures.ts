@@ -20,8 +20,10 @@ import {
   fetchEntityByName,
   getCompanySettings,
   putCompanySettings,
+  setPermissions as setUserPermissions,
   type ApiContext,
   type EntityType,
+  type Permission,
 } from './api-helpers';
 import {
   accountForParallelIndex,
@@ -100,6 +102,10 @@ export interface ApiFixture {
     type: EntityType,
     data: Record<string, unknown>
   ) => Promise<Record<string, unknown>>;
+  /**
+   * Replace a permission user's permissions through the API.
+   */
+  setPermissions: (email: string, permissions: Permission[]) => Promise<void>;
 }
 
 export interface SettingsFixture {
@@ -120,6 +126,7 @@ export const test = base.extend<
   }
 >({
   account: [
+    // biome-ignore lint/correctness/noEmptyPattern: Playwright requires fixture dependencies to use object destructuring.
     async ({}, use, workerInfo) => {
       const account = accountForParallelIndex(workerInfo.parallelIndex);
       setCurrentTestAccount(account);
@@ -172,6 +179,10 @@ export const test = base.extend<
 
         await reqContext.dispose();
         return entity;
+      },
+
+      async setPermissions(email, permissions) {
+        await setUserPermissions(context, email, permissions);
       },
     };
 

@@ -2,7 +2,6 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
   waitForTableData,
 } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
@@ -105,14 +104,11 @@ test("can't view payments without permission", async ({ page }) => {
 });
 
 test('can view payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const clientName = uniqueName('pay-client');
 
   await login(page);
-  await clear('payments@example.com');
-  await set('view_payment');
-  await save();
+  await api.setPermissions('payments@example.com', ['view_payment']);
 
   await createPayment({
     page,
@@ -143,14 +139,11 @@ test('can view payment', async ({ page, api }) => {
 });
 
 test('can edit payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const clientName = uniqueName('pay-client');
 
   await login(page);
-  await clear('payments@example.com');
-  await set('edit_payment');
-  await save();
+  await api.setPermissions('payments@example.com', ['edit_payment']);
 
   await createPayment({ page, clientName });
 
@@ -189,15 +182,10 @@ test('can edit payment', async ({ page, api }) => {
 });
 
 test('can create a payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const clientName = uniqueName('pay-client');
 
-  await login(page);
-  await clear('payments@example.com');
-  await set('create_payment', 'create_client', 'view_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('payments@example.com', ['create_payment', 'create_client', 'view_client']);
 
   await login(page, 'payments@example.com', 'password');
 
@@ -225,15 +213,10 @@ test('can create a payment', async ({ page, api }) => {
 });
 
 test('deleting payment with edit_payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const clientName = uniqueName('pay-client');
 
-  await login(page);
-  await clear('payments@example.com');
-  await set('create_payment', 'edit_payment', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('payments@example.com', ['create_payment', 'edit_payment', 'create_client']);
 
   await login(page, 'payments@example.com', 'password');
 
@@ -274,15 +257,10 @@ test('deleting payment with edit_payment', async ({ page, api }) => {
 });
 
 test('archiving payment with edit_payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const clientName = uniqueName('pay-client');
 
-  await login(page);
-  await clear('payments@example.com');
-  await set('create_payment', 'edit_payment', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('payments@example.com', ['create_payment', 'edit_payment', 'create_client']);
 
   await login(page, 'payments@example.com', 'password');
 
@@ -333,15 +311,10 @@ test('archiving payment with edit_payment', async ({ page, api }) => {
 });
 
 test('payment documents preview with edit_payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const clientName = uniqueName('pay-client');
 
-  await login(page);
-  await clear('payments@example.com');
-  await set('create_payment', 'edit_payment', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('payments@example.com', ['create_payment', 'edit_payment', 'create_client']);
 
   await login(page, 'payments@example.com', 'password');
 
@@ -384,15 +357,10 @@ test('payment documents preview with edit_payment', async ({ page, api }) => {
 });
 
 test('payment documents uploading with edit_payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const clientName = uniqueName('pay-client');
 
-  await login(page);
-  await clear('payments@example.com');
-  await set('create_payment', 'edit_payment', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('payments@example.com', ['create_payment', 'edit_payment', 'create_client']);
 
   await login(page, 'payments@example.com', 'password');
 

@@ -1,4 +1,4 @@
-import { login, logout, permissions } from '$tests/e2e/helpers';
+import { login } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
 import { emailForCurrentAccount } from '$tests/e2e/accounts';
 import {
@@ -92,14 +92,10 @@ async function ensureUserExists(userName: string): Promise<string> {
 
 test("Can't see owner of the account in the list of users", async ({
   page,
+  api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear();
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('permissions@example.com', ['admin']);
 
   await login(page, 'permissions@example.com', 'password');
 

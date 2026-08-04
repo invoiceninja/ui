@@ -4,7 +4,6 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
   selectAssignedUser,
   useHasPermission,
   waitForTableData,
@@ -140,12 +139,9 @@ test("can't view tasks without permission", async ({ page }) => {
 });
 
 test('can view task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('tasks@example.com');
-  await set('view_task', 'view_client', 'view_all');
-  await save();
+  await api.setPermissions('tasks@example.com', ['view_task', 'view_client', 'view_all']);
 
   await createTask({ page });
 
@@ -172,16 +168,13 @@ test('can view task', async ({ page, api }) => {
 });
 
 test('can edit task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
     permissions: ['edit_task', 'view_client'],
   });
 
   await login(page);
-  await clear('tasks@example.com');
-  await set('edit_task', 'view_client', 'view_all');
-  await save();
+  await api.setPermissions('tasks@example.com', ['edit_task', 'view_client', 'view_all']);
 
   await createTask({ page });
 
@@ -221,17 +214,12 @@ test('can edit task', async ({ page, api }) => {
 });
 
 test('can create a task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
     permissions: ['create_task'],
   });
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('create_task', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['create_task', 'create_client']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -261,16 +249,13 @@ test('can view and edit assigned task with create_task', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
     permissions: ['create_task'],
   });
 
   await login(page);
-  await clear('tasks@example.com');
-  await set('create_task');
-  await save();
+  await api.setPermissions('tasks@example.com', ['create_task']);
 
   await createTask({ page, assignTo: 'Tasks Example' });
 
@@ -312,13 +297,8 @@ test('can view and edit assigned task with create_task', async ({
 });
 
 test('deleting task with edit_task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('create_task', 'edit_task', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['create_task', 'edit_task', 'create_client']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -365,13 +345,8 @@ test('deleting task with edit_task', async ({ page, api }) => {
 });
 
 test('archiving task withe edit_task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('create_task', 'edit_task', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['create_task', 'edit_task', 'view_client', 'create_client']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -422,13 +397,8 @@ test('archiving task withe edit_task', async ({ page, api }) => {
 });
 
 test('task documents preview with edit_task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('create_client', 'create_task', 'edit_task');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['create_client', 'create_task', 'edit_task']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -473,13 +443,8 @@ test('task documents preview with edit_task', async ({ page, api }) => {
 });
 
 test('task documents uploading with edit_task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('create_client', 'create_task', 'edit_task');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['create_client', 'create_task', 'edit_task']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -536,17 +501,12 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['admin']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -567,17 +527,12 @@ test('invoice_task and clone action displayed with creation permissions', async 
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
     permissions: ['create_invoice', 'create_task'],
   });
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('create_invoice', 'create_task', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['create_invoice', 'create_task', 'create_client']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -595,13 +550,8 @@ test('invoice_task and clone action displayed with creation permissions', async 
 });
 
 test('cloning task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('create_task', 'edit_task', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['create_task', 'edit_task', 'create_client']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -655,17 +605,12 @@ test('cloning task', async ({ page, api }) => {
 
 test('Invoice Task displayed with admin permission', async ({ page, api }) => {
   test.setTimeout(60000); // 2 minutes for this test only
-  const { clear, save, set } = permissions(page);
 
   const customActions = useCustomTaskActions({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['admin']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -702,23 +647,18 @@ test('Invoice Task displayed with creation permissions', async ({
 }) => {
   test.setTimeout(60000); // 2 minutes for this test only
 
-  const { clear, save, set } = permissions(page);
 
   const customActions = useCustomTaskActions({
     permissions: ['create_invoice'],
   });
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set(
+  await api.setPermissions('tasks@example.com', [
     'create_task',
     'create_invoice',
     'edit_task',
     'create_client',
     'view_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'tasks@example.com', 'password');
 

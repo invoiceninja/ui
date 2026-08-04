@@ -4,7 +4,6 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
   selectAssignedUser,
   useHasPermission,
   waitForTableData,
@@ -177,12 +176,9 @@ test("can't view invoices without permission", async ({ page }) => {
 });
 
 test('can view invoice', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('invoices@example.com');
-  await set('view_invoice', 'view_client');
-  await save();
+  await api.setPermissions('invoices@example.com', ['view_invoice', 'view_client']);
 
   const clientName = uniqueName('inv-view');
   await createInvoice({ page, clientName });
@@ -210,16 +206,13 @@ test('can view invoice', async ({ page, api }) => {
 });
 
 test('can edit invoice', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
     permissions: ['edit_invoice', 'view_client'],
   });
 
   await login(page);
-  await clear('invoices@example.com');
-  await set('edit_invoice', 'view_client');
-  await save();
+  await api.setPermissions('invoices@example.com', ['edit_invoice', 'view_client']);
 
   const clientName = uniqueName('inv-edit');
   await createInvoice({ page, clientName });
@@ -260,17 +253,12 @@ test('can edit invoice', async ({ page, api }) => {
 });
 
 test('can create a invoice', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
     permissions: ['create_invoice', 'create_client', 'view_client'],
   });
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('create_invoice', 'create_client', 'view_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['create_invoice', 'create_client', 'view_client']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -301,16 +289,13 @@ test('can view and edit assigned invoice with create_invoice', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
     permissions: ['create_invoice'],
   });
 
   await login(page);
-  await clear('invoices@example.com');
-  await set('create_invoice');
-  await save();
+  await api.setPermissions('invoices@example.com', ['create_invoice']);
 
   const clientName = uniqueName('inv-assigned');
   await createInvoice({ page, assignTo: 'Invoices Example', clientName });
@@ -355,13 +340,8 @@ test('can view and edit assigned invoice with create_invoice', async ({
 });
 
 test('deleting invoice with edit_invoice', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['create_invoice', 'edit_invoice', 'view_client', 'create_client']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -405,13 +385,8 @@ test('deleting invoice with edit_invoice', async ({ page, api }) => {
 });
 
 test('archiving invoice withe edit_invoice', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['create_invoice', 'edit_invoice', 'view_client', 'create_client']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -460,13 +435,8 @@ test('archiving invoice withe edit_invoice', async ({ page, api }) => {
 });
 
 test('invoice documents preview with edit_invoice', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['create_invoice', 'edit_invoice', 'view_client', 'create_client']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -511,13 +481,8 @@ test('invoice documents preview with edit_invoice', async ({ page, api }) => {
 });
 
 test('invoice documents uploading with edit_invoice', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['create_invoice', 'edit_invoice', 'view_client', 'create_client']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -576,17 +541,12 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['admin']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -608,7 +568,6 @@ test('Enter Payment and all clone actions displayed with creation permissions', 
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useInvoiceActions({
     permissions: [
@@ -622,9 +581,7 @@ test('Enter Payment and all clone actions displayed with creation permissions', 
     ],
   });
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set(
+  await api.setPermissions('invoices@example.com', [
     'create_payment',
     'create_invoice',
     'create_quote',
@@ -633,9 +590,7 @@ test('Enter Payment and all clone actions displayed with creation permissions', 
     'create_purchase_order',
     'view_client',
     'create_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -654,13 +609,8 @@ test('Enter Payment and all clone actions displayed with creation permissions', 
 });
 
 test('cloning invoice', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['create_invoice', 'edit_invoice', 'view_client', 'create_client']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -717,14 +667,7 @@ test('cloning invoice', async ({ page, api }) => {
 });
 
 test('Enter Payment displayed with admin permission', async ({ page, api }) => {
-  await login(page);
-
-  const { clear, save, set } = permissions(page);
-
-  await clear('invoices@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['admin']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -761,11 +704,8 @@ test('Enter Payment displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set(
+  await api.setPermissions('invoices@example.com', [
     'create_payment',
     'create_invoice',
     'create_quote',
@@ -775,9 +715,7 @@ test('Enter Payment displayed with creation permissions', async ({
     'view_client',
     'edit_invoice',
     'create_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'invoices@example.com', 'password');
 

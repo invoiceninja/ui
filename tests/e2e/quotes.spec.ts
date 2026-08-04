@@ -4,7 +4,6 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
   selectAssignedUser,
   useHasPermission,
   waitForTableData,
@@ -216,12 +215,9 @@ test("can't view quotes without permission", async ({ page }) => {
 });
 
 test('can view quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('quotes@example.com');
-  await set('view_quote', 'view_client');
-  await save();
+  await api.setPermissions('quotes@example.com', ['view_quote', 'view_client']);
 
   const clientName = uniqueName('qt-view');
   await createQuote({ page, clientName });
@@ -249,16 +245,13 @@ test('can view quote', async ({ page, api }) => {
 });
 
 test('can edit quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useQuotesActions({
     permissions: ['edit_quote', 'view_client'],
   });
 
   await login(page);
-  await clear('quotes@example.com');
-  await set('edit_quote', 'view_client');
-  await save();
+  await api.setPermissions('quotes@example.com', ['edit_quote', 'view_client']);
 
   const clientName = uniqueName('qt-edit');
   await createQuote({ page, clientName });
@@ -299,17 +292,12 @@ test('can edit quote', async ({ page, api }) => {
 });
 
 test('can create a quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useQuotesActions({
     permissions: ['create_quote'],
   });
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('create_quote', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['create_quote', 'create_client']);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -336,16 +324,13 @@ test('can view and edit assigned quote with create_quote', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useQuotesActions({
     permissions: ['create_quote'],
   });
 
   await login(page);
-  await clear('quotes@example.com');
-  await set('create_quote');
-  await save();
+  await api.setPermissions('quotes@example.com', ['create_quote']);
 
   const clientName = uniqueName('qt-assigned');
   await createQuote({ page, assignTo: 'Quotes Example', clientName });
@@ -384,13 +369,8 @@ test('can view and edit assigned quote with create_quote', async ({
 });
 
 test('deleting quote with edit_quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('create_quote', 'edit_quote', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['create_quote', 'edit_quote', 'create_client']);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -434,13 +414,8 @@ test('deleting quote with edit_quote', async ({ page, api }) => {
 });
 
 test('archiving quote withe edit_quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('create_quote', 'edit_quote', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['create_quote', 'edit_quote', 'view_client', 'create_client']);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -489,13 +464,8 @@ test('archiving quote withe edit_quote', async ({ page, api }) => {
 });
 
 test('quote documents preview with edit_quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('create_quote', 'edit_quote', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['create_quote', 'edit_quote', 'view_client', 'create_client']);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -538,13 +508,8 @@ test('quote documents preview with edit_quote', async ({ page, api }) => {
 });
 
 test('quote documents uploading with edit_quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('create_quote', 'edit_quote', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['create_quote', 'edit_quote', 'view_client', 'create_client']);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -602,17 +567,12 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useQuotesActions({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['admin']);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -630,7 +590,6 @@ test('convert_to_invoice, convert_to_project and all clone actions displayed wit
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useQuotesActions({
     permissions: [
@@ -642,18 +601,14 @@ test('convert_to_invoice, convert_to_project and all clone actions displayed wit
     ],
   });
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set(
+  await api.setPermissions('quotes@example.com', [
     'create_invoice',
     'create_project',
     'create_quote',
     'create_recurring_invoice',
     'create_purchase_order',
     'create_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -668,13 +623,8 @@ test('convert_to_invoice, convert_to_project and all clone actions displayed wit
 });
 
 test('cloning quote', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('create_quote', 'edit_quote', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['create_quote', 'edit_quote', 'create_client']);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -738,17 +688,12 @@ test('Convert to Invoice and Convert to Project displayed with admin permission'
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const customActions = useCustomQuoteActions({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['admin']);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -782,7 +727,6 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const customActions = useCustomQuoteActions({
     permissions: [
@@ -794,18 +738,14 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
     ],
   });
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set(
+  await api.setPermissions('quotes@example.com', [
     'create_quote',
     'create_invoice',
     'create_project',
     'edit_quote',
     'create_client',
     'view_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'quotes@example.com', 'password');
 

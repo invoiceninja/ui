@@ -6,6 +6,7 @@
  */
 
 import { request as playwrightRequest } from '@playwright/test';
+import type { Permissions as AppPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 import {
   baseEmailForAccount,
@@ -38,6 +39,7 @@ const ENTITY_ENDPOINTS = [
 ] as const;
 
 export type EntityType = (typeof ENTITY_ENDPOINTS)[number];
+export type Permission = AppPermission | 'admin';
 
 const RESET_PURGE_ENDPOINTS: EntityType[] = [
   'invoices',
@@ -391,6 +393,74 @@ async function fetchAllUsers(api: ApiContext): Promise<ApiUser[]> {
 }
 
 /**
+ * Assign permissions to a permission user through the API.
+ * The `admin` test permission maps to company_user.is_admin, matching the UI.
+ */
+export async function setPermissions(
+  api: ApiContext,
+  email: string,
+  permissions: Permission[]
+): Promise<void> {
+  const resolvedEmail = emailForCurrentAccount(email);
+  const users = await fetchAllUsers(api);
+  const user = users.find((candidate) => candidate.email === resolvedEmail);
+
+  if (!user) {
+    throw new Error(`Could not find permission user ${resolvedEmail}`);
+  }
+
+  const isAdmin = permissions.includes('admin');
+  const assignedPermissions = permissions.filter(
+    (permission) => permission !== 'admin'
+  );
+
+  if (isAdmin && assignedPermissions.length > 0) {
+    throw new Error(
+      `Administrator permission cannot be combined with granular permissions for ${resolvedEmail}`
+    );
+  }
+
+  const context = await apiRequest(api);
+
+  try {
+    const detailResponse = await context.get(
+      `/api/v1/users/${user.id}?include=company_user`,
+      { headers: api.headers }
+    );
+
+    if (!detailResponse.ok()) {
+      throw new Error(
+        `Failed to load user ${resolvedEmail} for permission assignment (${detailResponse.status()}): ${await detailResponse.text()}`
+      );
+    }
+
+    const fullUser = (await detailResponse.json()).data;
+    const response = await context.put(
+      `/api/v1/users/${user.id}?include=company_user`,
+      {
+        headers: api.headers,
+        data: {
+          ...fullUser,
+          company_user: {
+            ...fullUser.company_user,
+            permissions: isAdmin ? '' : assignedPermissions.join(','),
+            is_admin: isAdmin,
+          },
+        },
+      }
+    );
+
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to assign permissions to ${resolvedEmail} (${response.status()}): ${await response.text()}`
+      );
+    }
+  } finally {
+    await context.dispose();
+  }
+}
+
+/**
  * Reset permission user back to no permissions.
  * Permissions live on company_user (not the top-level user payload).
  */
@@ -398,52 +468,7 @@ export async function resetPermissionUser(
   api: ApiContext,
   email: string
 ): Promise<void> {
-  const users = await fetchAllUsers(api);
-  const user = users.find((u) => u.email === email);
-
-  if (!user) return;
-
-  const context = await apiRequest(api);
-
-  const detailResponse = await context.get(
-    `/api/v1/users/${user.id}?include=company_user`,
-    { headers: api.headers }
-  );
-
-  if (!detailResponse.ok()) {
-    console.warn(
-      `  Failed to load user ${email} for permission reset: ${detailResponse.status()}`
-    );
-    await context.dispose();
-    return;
-  }
-
-  const fullUser = (await detailResponse.json()).data;
-
-  const response = await context.put(
-    `/api/v1/users/${user.id}?include=company_user`,
-    {
-      headers: api.headers,
-      data: {
-        ...fullUser,
-        company_user: {
-          ...fullUser.company_user,
-          permissions: '',
-          is_admin: false,
-        },
-      },
-    }
-  );
-
-  if (response.ok()) {
-    // console.log(`  Reset permissions for ${email}`);
-  } else {
-    console.warn(
-      `  Failed to reset permissions for ${email}: ${response.status()}`
-    );
-  }
-
-  await context.dispose();
+  await setPermissions(api, email, []);
 }
 
 /**
