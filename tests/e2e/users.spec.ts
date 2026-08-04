@@ -6,6 +6,7 @@ import {
   bulkAction,
   type EntityType,
 } from '$tests/e2e/api-helpers';
+import type { Page } from '@playwright/test';
 
 resetAccountBeforeAll();
 
@@ -123,28 +124,34 @@ test("Can't see owner of the account in the list of users", async ({
 
   await expect(page.getByText(ownerEmail)).not.toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
-test('deleting user', async ({ page }) => {
-  // Ensure the user exists (restore if deleted by a prior failed run)
-  const userId = await ensureUserExists('Quotes Example');
-
-  await login(page);
-
-  await page.getByRole('link', { name: 'Settings', exact: true }).click();
-
-  await page
-    .getByRole('link', { name: 'User Management', exact: true })
-    .click();
-
-  await page.getByRole('link', { name: 'Quotes Example', exact: true }).click();
+/**
+ * Open a user edit page by ID, confirming password if prompted.
+ * Prefer this over matching display names — duplicate names break strict mode.
+ */
+async function openUserById(page: Page, userId: string) {
+  await page.goto(`/settings/users/${userId}/edit`);
 
   const passwordField = page.getByLabel('Password');
   if (await passwordField.isVisible({ timeout: 2000 }).catch(() => false)) {
     await passwordField.fill('password');
     await passwordField.press('Enter');
   }
+
+  await page.waitForURL(`**/settings/users/${userId}/edit`);
+}
+
+function userRowLink(page: Page, userId: string) {
+  return page.locator(`a[href*="/settings/users/${userId}/edit"]`);
+}
+
+test('deleting user', async ({ page }) => {
+  // Ensure the user exists (restore if deleted by a prior failed run)
+  const userId = await ensureUserExists('Quotes Example');
+
+  await login(page);
+  await openUserById(page, userId);
 
   const moreActionsButton = page
     .locator('[data-cy="chevronDownButton"]')
@@ -161,9 +168,7 @@ test('deleting user', async ({ page }) => {
     .first()
     .click();
 
-  await expect(
-    page.getByRole('link', { name: 'Quotes Example', exact: true })
-  ).not.toBeVisible({ timeout: 10000 });
+  await expect(userRowLink(page, userId)).not.toBeVisible({ timeout: 10000 });
 
   // Restore the user so subsequent runs still work
   await restoreUser(userId);
@@ -173,22 +178,7 @@ test('archiving user', async ({ page }) => {
   const userId = await ensureUserExists('Expenses Example');
 
   await login(page);
-
-  await page.getByRole('link', { name: 'Settings', exact: true }).click();
-
-  await page
-    .getByRole('link', { name: 'User Management', exact: true })
-    .click();
-
-  await page
-    .getByRole('link', { name: 'Expenses Example', exact: true })
-    .click();
-
-  const passwordField = page.getByLabel('Password');
-  if (await passwordField.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await passwordField.fill('password');
-    await passwordField.press('Enter');
-  }
+  await openUserById(page, userId);
 
   const moreActionsButton = page
     .locator('[data-cy="chevronDownButton"]')
@@ -205,9 +195,7 @@ test('archiving user', async ({ page }) => {
     .first()
     .click();
 
-  await expect(
-    page.getByRole('link', { name: 'Expenses Example', exact: true })
-  ).not.toBeVisible({ timeout: 10000 });
+  await expect(userRowLink(page, userId)).not.toBeVisible({ timeout: 10000 });
 
   // Restore the user so subsequent runs still work
   await restoreUser(userId);
@@ -217,22 +205,7 @@ test('removing user', async ({ page }) => {
   const userId = await ensureUserExists('Tasks Example');
 
   await login(page);
-
-  await page.getByRole('link', { name: 'Settings', exact: true }).click();
-
-  await page
-    .getByRole('link', { name: 'User Management', exact: true })
-    .click();
-
-  await page
-    .getByRole('link', { name: 'Tasks Example', exact: true })
-    .click();
-
-  const passwordField = page.getByLabel('Password');
-  if (await passwordField.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await passwordField.fill('password');
-    await passwordField.press('Enter');
-  }
+  await openUserById(page, userId);
 
   const moreActionsButton = page
     .locator('[data-cy="chevronDownButton"]')
@@ -249,9 +222,7 @@ test('removing user', async ({ page }) => {
     .first()
     .click();
 
-  await expect(
-    page.getByRole('link', { name: 'Tasks Example', exact: true })
-  ).not.toBeVisible({ timeout: 10000 });
+  await expect(userRowLink(page, userId)).not.toBeVisible({ timeout: 10000 });
 
   // Restore the user so subsequent runs still work
   await restoreUser(userId);

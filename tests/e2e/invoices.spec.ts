@@ -5,6 +5,7 @@ import {
   login,
   logout,
   permissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -157,8 +158,7 @@ const createInvoice = async (params: CreateParams) => {
       .getByRole('link', { name: 'Settings', exact: true })
       .first()
       .click();
-    await page.getByLabel('User').first().click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    await selectAssignedUser(page, assignTo, page.getByLabel('User').first());
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -166,21 +166,14 @@ const createInvoice = async (params: CreateParams) => {
   await expect(page.getByText('Successfully created invoice')).toBeVisible({ timeout: 10000 });
 };
 
-test("can't view invoices without permission", async ({ page, api }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('invoices@example.com');
-  await save();
-  await logout(page);
-
+test("can't view invoices without permission", async ({ page }) => {
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'invoices@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Invoices'
   );
 
-  await logout(page);
 });
 
 test('can view invoice', async ({ page, api }) => {
@@ -214,7 +207,6 @@ test('can view invoice', async ({ page, api }) => {
 
   await checkEditPage(page, false, false);
 
-  await logout(page);
 });
 
 test('can edit invoice', async ({ page, api }) => {
@@ -265,7 +257,6 @@ test('can edit invoice', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can create a invoice', async ({ page, api }) => {
@@ -304,7 +295,6 @@ test('can create a invoice', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can view and edit assigned invoice with create_invoice', async ({
@@ -339,6 +329,8 @@ test('can view and edit assigned invoice with create_invoice', async ({
 
   await checkTableEditability(page, false);
 
+  expect(await waitForTableData(page)).toBe(true);
+
   const tableRow = page.locator('tbody').first().getByRole('row').first();
 
   await tableRow.getByRole('link').first().click();
@@ -360,7 +352,6 @@ test('can view and edit assigned invoice with create_invoice', async ({
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('deleting invoice with edit_invoice', async ({ page, api }) => {
@@ -611,7 +602,6 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('Enter Payment and all clone actions displayed with creation permissions', async ({
@@ -661,7 +651,6 @@ test('Enter Payment and all clone actions displayed with creation permissions', 
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('cloning invoice', async ({ page, api }) => {
@@ -766,7 +755,6 @@ test('Enter Payment displayed with admin permission', async ({ page, api }) => {
       .getByRole('button', { name: 'Enter Payment', exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Enter Payment displayed with creation permissions', async ({
@@ -819,7 +807,6 @@ test('Enter Payment displayed with creation permissions', async ({
       .getByRole('button', { name: 'Enter Payment', exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Second and Third Custom email sending template is displayed', async ({
@@ -923,7 +910,6 @@ test('Second and Third Custom email sending template is displayed', async ({
   await expect(page.getByText(secondSubject)).toBeVisible({ timeout: 10000 });
   await expect(page.getByText(thirdSubject)).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Prevent navigation in the main navbar', async ({ page, api }) => {
@@ -992,7 +978,6 @@ test('Prevent navigation in the main navbar', async ({ page, api }) => {
 
   await page.waitForURL('**/projects');
 
-  await logout(page);
 });
 
 test('Prevent archive invoice action', async ({ page, api }) => {
@@ -1025,7 +1010,6 @@ test('Prevent archive invoice action', async ({ page, api }) => {
     page.getByRole('button', { name: 'Restore', exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Prevent email invoice action', async ({ page, api }) => {
@@ -1091,7 +1075,6 @@ test('Prevent email invoice action', async ({ page, api }) => {
 
   await page.waitForURL('**/invoices/**/email');
 
-  await logout(page);
 });
 
 test('Prevent breadcrumb navigation', async ({ page, api }) => {
@@ -1155,7 +1138,6 @@ test('Prevent breadcrumb navigation', async ({ page, api }) => {
 
   await page.waitForURL('**/invoices');
 
-  await logout(page);
 });
 
 test('Products combobox various selections', async ({ page, api }) => {
@@ -1220,5 +1202,4 @@ test('Products combobox various selections', async ({ page, api }) => {
       testProductName
   ).toBeTruthy();
 
-  await logout(page);
 });

@@ -3,6 +3,7 @@ import {
   login,
   logout,
   permissions,
+  selectAssignedUser,
   waitForTableData,
 } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
@@ -50,14 +51,11 @@ const createVendor = async (params: CreateParams) => {
   await page.locator('#email_0').fill(email || 'first@example.com');
 
   if (assignTo) {
-    const assignedUserInput = page.getByTestId('combobox-input-field').first();
-    await assignedUserInput.scrollIntoViewIfNeeded();
-    await assignedUserInput.click();
-    await assignedUserInput.fill(assignTo.split(' ')[0]);
-
-    const option = page.getByRole('option', { name: assignTo }).first();
-    await option.waitFor({ state: 'visible', timeout: 5000 });
-    await option.click();
+    await selectAssignedUser(
+      page,
+      assignTo,
+      page.getByTestId('combobox-input-field').first()
+    );
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -145,20 +143,13 @@ const checkEditPage = async (page: Page) => {
 };
 
 test("can't view vendors without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('vendors@example.com');
-  await save();
-  await logout(page);
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'vendors@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Vendors'
   );
 
-  await logout(page);
 });
 
 test('can view vendor', async ({ page, api }) => {
@@ -192,7 +183,6 @@ test('can view vendor', async ({ page, api }) => {
 
   await checkShowPage(page, false);
 
-  await logout(page);
 });
 
 test('can edit vendor', async ({ page, api }) => {
@@ -242,7 +232,6 @@ test('can edit vendor', async ({ page, api }) => {
     page.getByText('Successfully updated vendor', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('can create a vendor', async ({ page, api }) => {
@@ -297,7 +286,6 @@ test('can create a vendor', async ({ page, api }) => {
     page.getByText('Successfully updated vendor', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('can view and edit assigned vendor with create_vendor', async ({
@@ -354,7 +342,6 @@ test('can view and edit assigned vendor with create_vendor', async ({
     page.getByText('Successfully updated vendor', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('deleting vendor with edit_vendor', async ({ page, api }) => {
