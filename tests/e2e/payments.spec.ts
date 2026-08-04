@@ -44,6 +44,7 @@ const createPayment = async (params: CreateParams) => {
   const clientOption = page.getByRole('option').first();
   await clientOption.waitFor({ state: 'visible', timeout: 5000 });
   await clientOption.click();
+  await page.waitForTimeout(150);
 
   await page.getByRole('button', { name: 'Save' }).click();
 
