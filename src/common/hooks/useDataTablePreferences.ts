@@ -19,7 +19,6 @@ import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
 import { useCurrentUser } from './useCurrentUser';
 import {
   ScopedTableFilters,
-  useClearRecordFiltersScope,
   useScopedTableFilters,
 } from './useScopedTableFilters';
 import {
@@ -83,12 +82,6 @@ export function useDataTablePreferences(params: Params) {
   const { scopeId, storedFilters, storeFilters } = useScopedTableFilters({
     tableKey,
   });
-
-  useClearRecordFiltersScope(
-    Boolean(enableSavingFilterPreference) &&
-      !withRecordScopedFilters &&
-      !withoutStoringPreferences
-  );
 
   // The global toggle only gates server-side persistence. The session text
   // filter always flows so it can bubble down to sub-tables (client overview).

@@ -10,7 +10,6 @@
 
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useMemo } from 'react';
-import { isEqual } from 'lodash';
 import { PerPage } from '$app/components/DataTable';
 
 export interface ScopedTableFilters {
@@ -48,18 +47,6 @@ export function useRecordFiltersScope(scopeId: string | undefined) {
   }, [scopeId, setScopedFilters]);
 }
 
-export function useClearRecordFiltersScope(enabled: boolean) {
-  const setScopedFilters = useSetAtom(scopedTableFiltersAtom);
-
-  useEffect(() => {
-    if (!enabled) {
-      return;
-    }
-
-    setScopedFilters((current) => (current ? null : current));
-  }, [enabled]);
-}
-
 interface Params {
   tableKey: string | undefined;
 }
@@ -79,16 +66,14 @@ export function useScopedTableFilters(params: Params) {
         return;
       }
 
-      setScopedFilters((current) => {
-        if (!current || isEqual(current.tables[tableKey], filters)) {
-          return current;
-        }
-
-        return {
-          ...current,
-          tables: { ...current.tables, [tableKey]: filters },
-        };
-      });
+      setScopedFilters((current) =>
+        current
+          ? {
+              ...current,
+              tables: { ...current.tables, [tableKey]: filters },
+            }
+          : current
+      );
     },
     [tableKey]
   );
