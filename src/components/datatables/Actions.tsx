@@ -28,6 +28,7 @@ import React, {
   useRef,
   useState,
   useCallback,
+  useEffect,
 } from 'react';
 import { useColorScheme } from '$app/common/colors';
 import collect from 'collect.js';
@@ -193,6 +194,20 @@ export function SelectWithApplyButton(props: any) {
   } = props;
 
   const [tempValue, setTempValue] = useState(defaultValue);
+  const defaultValueKey = (defaultValue ?? [])
+    .map((option: SelectOption) => option.value)
+    .sort()
+    .join(',');
+  const previousDefaultValueKey = useRef(defaultValueKey);
+
+  useEffect(() => {
+    if (previousDefaultValueKey.current === defaultValueKey) {
+      return;
+    }
+
+    previousDefaultValueKey.current = defaultValueKey;
+    setTempValue(defaultValue ?? []);
+  }, [defaultValue, defaultValueKey]);
 
   const CustomMenu = useCallback((menuProps: MenuProps<SelectOption, true>) => {
     const [t] = useTranslation();

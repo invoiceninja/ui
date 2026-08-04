@@ -39,12 +39,12 @@ export function useRecordFiltersScope(scopeId: string | undefined) {
       return;
     }
 
+    // Keep scoped filters across in-app navigations (e.g. client -> invoice ->
+    // client). Only start a fresh scope when the record id changes.
     setScopedFilters((current) =>
       current?.scopeId === scopeId ? current : { scopeId, tables: {} }
     );
-
-    return () => setScopedFilters(null);
-  }, [scopeId]);
+  }, [scopeId, setScopedFilters]);
 }
 
 interface Params {
