@@ -72,18 +72,36 @@ produce consistent results regardless of prior test runs or failures.
 ### How it works
 
 1. **Global setup** (`tests/e2e/global-setup.ts`) runs before the suite and
-   resets the API to a clean state: purges entities, restores deleted seed users,
-   resets permissions, and resets company settings.
+   calls `resetTestAccount` for each account lane: purges entities, restores
+   deleted seed users, clears permission users via API (`permissions: ''`), and
+   resets company settings.
 
-2. **Per-test cleanup** via fixtures (`tests/e2e/fixtures.ts`). Tests use the
+2. **Per-spec reset** — every spec calls `resetAccountBeforeAll()` from
+   `tests/e2e/fixtures.ts`. That registers a `beforeAll` which runs the same
+   `resetTestAccount` again for the worker’s lane before the file’s tests.
+   This is intentional isolation (and duplicates global setup); keep it until a
+   later remediation removes one of the layers.
+
+3. **Per-test cleanup** via fixtures (`tests/e2e/fixtures.ts`). Tests use the
    `api` fixture to track entities they create; tracked entities are
    automatically deleted (archive + delete) on teardown, even if the test fails.
 
-3. **Unique names** — every entity created by a test uses `uniqueName('prefix')`
+4. **Unique names** — every entity created by a test uses `uniqueName('prefix')`
    to generate a timestamped name, avoiding collisions across runs.
 
-4. **Settings guard** — tests that modify company settings call
+5. **Settings guard** — tests that modify company settings call
    `settingsGuard.snapshot()` before changes. Settings are restored on teardown.
+
+### Permission users
+
+After account reset, the seeded permission users (e.g. `clients@example.com`,
+`permissions@example.com`) start with empty permissions. For a “no permission”
+assertion you can log in as that user directly — do not re-clear via the
+Settings UI unless a prior test in the same file may have assigned permissions.
+
+Tests that *assign* permissions still use `permissions(page).clear/set/save`
+via the UI. If a test sets permissions, later tests in the same file that need
+a clean slate must clear/set again (there is no permission teardown).
 
 ### Writing idempotent tests
 

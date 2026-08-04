@@ -4,14 +4,8 @@ import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
 resetAccountBeforeAll();
 
 test("Can't view dashboard without permission", async ({ page }) => {
-  test.setTimeout(60000); 
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear();
-  await save();
-  await logout(page);
-
+  test.setTimeout(60000);
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'permissions@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(

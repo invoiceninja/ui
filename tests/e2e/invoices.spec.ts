@@ -166,14 +166,8 @@ const createInvoice = async (params: CreateParams) => {
   await expect(page.getByText('Successfully created invoice')).toBeVisible({ timeout: 10000 });
 };
 
-test("can't view invoices without permission", async ({ page, api }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('invoices@example.com');
-  await save();
-  await logout(page);
-
+test("can't view invoices without permission", async ({ page }) => {
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'invoices@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(

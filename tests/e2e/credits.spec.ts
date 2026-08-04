@@ -194,14 +194,8 @@ const createCredit = async (params: CreateParams) => {
   }
 };
 
-test("can't view credits without permission", async ({ page, api }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('credits@example.com');
-  await save();
-  await logout(page);
-
+test("can't view credits without permission", async ({ page }) => {
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'credits@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
@@ -585,6 +579,8 @@ test('credit documents uploading with edit_credit', async ({ page, api }) => {
     .locator('input[type="file"]')
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
+
+    await page.waitForTimeout(150);
 
   await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
