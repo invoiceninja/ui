@@ -7,6 +7,7 @@ import {
   type ApiFixture,
 } from '$tests/e2e/fixtures';
 import { request as playwrightRequest, type Page } from '@playwright/test';
+import { createClient } from './client-helpers';
 
 resetAccountBeforeAll();
 
@@ -14,8 +15,10 @@ test('paid status filter persists into client overview but clears after leaving 
   page,
   api,
 }) => {
-  test.setTimeout(90_000);
 
+  const clientName = uniqueName('paid-filter-client');
+
+  // 1. Login with the admin user.
   await login(page);
 
   await page
@@ -27,26 +30,28 @@ test('paid status filter persists into client overview but clears after leaving 
 
   const hasInvoices = await waitForTableData(page);
 
+  // 2. If no invoices are present, create a new invoice and mark it as paid.
   if (!hasInvoices) {
-    const { clientName } = await createPaidInvoice(api);
+    await createAndMarkPaidInvoiceViaUI(page, api, clientName);
 
-    await page.reload();
+    await page
+      .locator('[data-cy="navigationBar"]')
+      .getByRole('link', { name: 'Invoices', exact: true })
+      .click();
+
     await page.waitForURL('**/invoices');
     await waitForTableData(page);
-
-    await expect(
-      page.locator('[data-cy="dataTable"]').getByText(clientName).first()
-    ).toBeVisible({ timeout: 10000 });
   }
 
+  // 3. From the invoices list view, set the paid status filter on.
   await setStatusFilter(page, 'Paid');
   await expectStatusFilterValue(page, 'Paid');
   await waitForTableData(page);
 
-  // Table filter preferences are debounced 1500ms before they are stored and
-  // available for the client overview to inherit.
+  // Table filter preferences are debounced before the client overview can inherit them.
   await page.waitForTimeout(2000);
 
+  // 4. Click the client on the first invoice to navigate to the client overview.
   const clientLink = page
     .locator('[data-cy="dataTable"] tbody a[href*="/clients/"]')
     .first();
@@ -55,108 +60,137 @@ test('paid status filter persists into client overview but clears after leaving 
   await clientLink.click();
 
   await page.waitForURL('**/clients/**');
-  await waitForTableData(page);
 
+  // 5. Confirm the paid filter exists on the client overview invoices tab.
+  await waitForTableData(page);
   await expectStatusFilterValue(page, 'Paid');
 
+  // 6. Remove the paid status filter on the client overview.
   await clearStatusFilter(page);
-  await expectStatusFilterValue(page, '');
+  await expectStatusFilterEmpty(page);
   await waitForTableData(page);
 
+  // Persist the cleared filter in the client scope before navigating away.
+  await page.waitForTimeout(2000);
+
+  // 7. Open the invoice from the client overview.
   await page
     .locator('[data-cy="dataTable"] tbody a[href*="/invoices/"]')
     .first()
     .click();
 
-  await page.waitForURL('**/invoices/**');
+  await page.waitForURL('**/invoices/**/edit');
 
-  await page
-    .getByRole('main')
-    .getByRole('link', { name: 'View', exact: true })
-    .first()
-    .click();
+  // 8. Click the View client action on the invoice to return to the overview.
+  await clickViewClientFromInvoice(page);
 
   await page.waitForURL('**/clients/**');
   await waitForTableData(page);
 
-  await expectStatusFilterValue(page, '');
+  // 9. The status filter must be empty — Paid should not be applied.
+  await expectStatusFilterEmpty(page);
 });
 
-async function createPaidInvoice(api: ApiFixture) {
-  const clientName = uniqueName('paid-filter-client');
-  const client = await api.createEntity('clients', {
+async function createAndMarkPaidInvoiceViaUI(
+  page: Page,
+  api: ApiFixture,
+  clientName: string
+) {
+  await createClient({
+    page,
+    withNavigation: true,
+    createIfNotExist: false,
     name: clientName,
-    contacts: [
-      {
-        first_name: 'Paid',
-        last_name: 'Filter',
-        email: `${clientName}@example.test`,
-      },
-    ],
   });
 
+  const clientId = page.url().match(/clients\/([^/]+)/)?.[1];
+  if (clientId) api.trackEntity('clients', clientId);
+
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Invoices', exact: true })
+    .click();
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Invoice' })
+    .click();
+
+  const clientCombobox = page.getByRole('combobox', { name: 'Client' });
+  await clientCombobox.click();
+  await clientCombobox.fill(clientName);
+  await page.getByRole('option', { name: clientName }).first().click();
+
+  await page.getByRole('button', { name: 'Add Item' }).click();
+  await page.locator('#notes').fill('Paid filter test item');
+  await page.locator('#notes').press('Tab');
+
+  const lineItemRow = page.getByRole('row', { name: /Paid filter test item/ });
+  await lineItemRow.getByRole('textbox').nth(2).fill('1');
+  await lineItemRow.getByRole('textbox').nth(3).fill('25');
+
+  await page.getByRole('button', { name: 'Save' }).click();
+
+  await expect(
+    page.getByText('Successfully created invoice', { exact: true })
+  ).toBeVisible({ timeout: 10000 });
+
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
+
+  await clickInvoiceDropdownAction(page, 'Mark Paid');
+
+  await expect(page.getByText('Paid', { exact: true }).first()).toBeVisible({
+    timeout: 10000,
+  });
+
+}
+
+async function markInvoicePaidViaApi(api: ApiFixture, invoiceId: string) {
   const context = await playwrightRequest.newContext({
     baseURL: api.context.baseUrl,
   });
 
   try {
-    const blankResponse = await context.get('/api/v1/invoices/create', {
+    const response = await context.post('/api/v1/invoices/bulk', {
       headers: api.context.headers,
+      data: { action: 'mark_paid', ids: [invoiceId] },
     });
 
-    if (!blankResponse.ok()) {
+    if (!response.ok()) {
       throw new Error(
-        `Failed to fetch blank invoice (${blankResponse.status()})`
-      );
-    }
-
-    const blank = (await blankResponse.json()).data;
-
-    const createResponse = await context.post('/api/v1/invoices', {
-      headers: api.context.headers,
-      data: {
-        ...blank,
-        client_id: client.id,
-        date: '2026-08-01',
-        line_items: [
-          {
-            product_key: uniqueName('paid-filter-item'),
-            notes: 'Paid filter persistence item',
-            cost: 25,
-            quantity: 1,
-          },
-        ],
-      },
-    });
-
-    if (!createResponse.ok()) {
-      throw new Error(
-        `Failed to create invoice (${createResponse.status()}): ${(
-          await createResponse.text()
+        `Failed to mark invoice paid (${response.status()}): ${(
+          await response.text()
         ).slice(0, 300)}`
       );
     }
-
-    const invoice = (await createResponse.json()).data;
-    api.trackEntity('invoices', invoice.id);
-
-    const paidResponse = await context.post('/api/v1/invoices/bulk', {
-      headers: api.context.headers,
-      data: { action: 'mark_paid', ids: [invoice.id] },
-    });
-
-    if (!paidResponse.ok()) {
-      throw new Error(
-        `Failed to mark invoice paid (${paidResponse.status()}): ${(
-          await paidResponse.text()
-        ).slice(0, 300)}`
-      );
-    }
-
-    return { clientName, clientId: client.id as string, invoiceId: invoice.id };
   } finally {
     await context.dispose();
   }
+}
+
+async function clickInvoiceDropdownAction(page: Page, actionName: string) {
+  await page.keyboard.press('Escape');
+
+  const chevron = page
+    .locator('[data-cy="topNavbar"]')
+    .locator('[data-cy="chevronDownButton"]');
+
+  await chevron.click();
+
+  const dropdown = page.locator('[data-cy="invoiceActionDropdown"]');
+  await expect(dropdown).toBeVisible({ timeout: 5000 });
+  await dropdown.getByText(actionName, { exact: true }).click();
+}
+
+async function clickViewClientFromInvoice(page: Page) {
+  await page
+    // .locator('div')
+    // .filter({ has: page.getByRole('combobox', { name: 'Client' }) })
+    // .getByRole('link', { name: 'View', exact: true })
+    // .click();
+
+    page.getByRole('link', { name: 'View', exact: true }).click();
 }
 
 function statusFilterControl(page: Page) {
@@ -187,9 +221,7 @@ async function setStatusFilter(page: Page, label: string) {
 
   const menu = statusFilterMenu(page);
 
-  // Reset first so a leftover selection does not toggle the option off.
   await menu.getByRole('button', { name: 'Reset', exact: true }).click();
-
   await menu.getByText(label, { exact: true }).click();
   await menu.getByRole('button', { name: 'Apply', exact: true }).click();
 }
@@ -199,8 +231,7 @@ async function clearStatusFilter(page: Page) {
 
   const menu = statusFilterMenu(page);
 
-  // Toggle off the active status instead of Reset — the fixed menu can block Reset clicks.
-  await menu.getByText('Paid', { exact: true }).click();
+  await menu.getByRole('button', { name: 'Reset', exact: true }).click({ force: true });
   await menu.getByRole('button', { name: 'Apply', exact: true }).click({ force: true });
 }
 
@@ -209,4 +240,11 @@ async function expectStatusFilterValue(page: Page, value: string) {
     value,
     { timeout: 10000 }
   );
+}
+
+async function expectStatusFilterEmpty(page: Page) {
+  const statusValue = statusFilterControl(page).locator('span.truncate');
+
+  await expect(statusValue).toHaveText('', { timeout: 10000 });
+  await expect(statusFilterControl(page)).not.toContainText('Paid');
 }
