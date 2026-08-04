@@ -1,5 +1,5 @@
 import { Permissions as TPermissions } from '$app/common/hooks/permissions/useHasPermission';
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 import { Action } from './clients.spec';
 import {
@@ -244,4 +244,31 @@ export function useHasPermission({
   return (permission: Permission) => {
     return isAdmin || permissions.includes(permission);
   };
+}
+
+/**
+ * Select an assigned user from a UserSelector / Settings "User" combobox.
+ * Filters by first name and requires exactly one matching option so duplicate
+ * display names (lane orphans) fail loudly instead of assigning the wrong user.
+ */
+export async function selectAssignedUser(
+  page: Page,
+  assignTo: string,
+  input: Locator
+) {
+  await input.scrollIntoViewIfNeeded();
+  await input.click();
+
+  const filter = assignTo.split(' ')[0];
+  // Some comboboxes are click-to-open only; fill when the control accepts text.
+  if (await input.isEditable().catch(() => false)) {
+    await input.fill(filter);
+  }
+
+  const options = page.getByRole('option', { name: assignTo, exact: true });
+  await expect(
+    options,
+    `Expected exactly one assignee option for "${assignTo}" after filtering`
+  ).toHaveCount(1, { timeout: 5000 });
+  await options.click();
 }

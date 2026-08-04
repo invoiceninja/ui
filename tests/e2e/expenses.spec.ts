@@ -5,6 +5,7 @@ import {
   login,
   logout,
   permissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -87,13 +88,11 @@ const createExpense = async (params: CreateParams) => {
   await page.waitForURL('**/expenses/create');
 
   if (assignTo) {
-    const assignedUserInput = page.getByTestId('combobox-input-field').nth(4);
-    await assignedUserInput.click();
-    await assignedUserInput.fill(assignTo.split(' ')[0]);
-
-    const option = page.getByRole('option', { name: assignTo }).first();
-    await option.waitFor({ state: 'visible', timeout: 5000 });
-    await option.click();
+    await selectAssignedUser(
+      page,
+      assignTo,
+      page.getByTestId('combobox-input-field').nth(4)
+    );
   }
 
   await page.locator('section').filter({ hasText: 'Public Notes' }).getByRole('textbox').fill('Public Notes');
@@ -115,20 +114,13 @@ const createExpense = async (params: CreateParams) => {
 };
 
 test("can't view expenses without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('expenses@example.com');
-  await save();
-  await logout(page);
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'expenses@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Expenses'
   );
 
-  await logout(page);
 });
 
 test('can view expense', async ({ page, api }) => {
@@ -162,7 +154,6 @@ test('can view expense', async ({ page, api }) => {
 
   await checkEditPage(page, false);
 
-  await logout(page);
 });
 
 test('can edit expense', async ({ page, api }) => {
@@ -213,7 +204,6 @@ test('can edit expense', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'expenseActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can create a expense', async ({ page, api }) => {
@@ -252,7 +242,6 @@ test('can create a expense', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'expenseActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can view and edit assigned expense with create_expense', async ({
@@ -308,7 +297,6 @@ test('can view and edit assigned expense with create_expense', async ({
 
   await checkDropdownActions(page, actions, 'expenseActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('deleting expense with edit_expense', async ({ page, api }) => {
@@ -542,7 +530,6 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkDropdownActions(page, actions, 'expenseActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('all clone actions displayed with creation permissions', async ({
@@ -575,7 +562,6 @@ test('all clone actions displayed with creation permissions', async ({
 
   await checkDropdownActions(page, actions, 'expenseActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('cloning expense', async ({ page, api }) => {
@@ -689,7 +675,6 @@ test('Expense categories endpoint contains sort but not with parameter', async (
     route.continue();
   });
 
-  await logout(page);
 });
 
 test('Expense categories endpoint contains with but not sort parameter', async ({
@@ -747,7 +732,6 @@ test('Expense categories endpoint contains with but not sort parameter', async (
     route.continue();
   });
 
-  await logout(page);
 });
 
 test('Checking should_be_invoiced expense settings value on expense creation page', async ({
@@ -789,7 +773,6 @@ test('Checking should_be_invoiced expense settings value on expense creation pag
     page.locator('[data-cy="shouldBeInvoicedToggle"]')
   ).toBeChecked();
 
-  await logout(page);
 });
 
 test('Checking mark_paid expense settings value on expense creation page', async ({
@@ -829,7 +812,6 @@ test('Checking mark_paid expense settings value on expense creation page', async
 
   await expect(page.locator('[data-cy="markPaidToggle"]')).toBeChecked();
 
-  await logout(page);
 });
 
 test('Checking convert_currency expense settings value on expense creation page', async ({
@@ -869,7 +851,6 @@ test('Checking convert_currency expense settings value on expense creation page'
 
   await expect(page.locator('[data-cy="convertCurrencyToggle"]')).toBeChecked();
 
-  await logout(page);
 });
 
 test('Checking add_documents_to_invoice expense settings value on expense creation page', async ({
@@ -913,7 +894,6 @@ test('Checking add_documents_to_invoice expense settings value on expense creati
     page.locator('[data-cy="addDocumentsToInvoiceToggle"]')
   ).toBeChecked();
 
-  await logout(page);
 });
 
 test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) => {
@@ -981,7 +961,6 @@ test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) =
 
   await expect(page.getByText('$ 15,888.60')).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Checking the gross amount with inclusive taxes turned on', async ({
@@ -1061,7 +1040,6 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
 
   await expect(page.getByText('$ 12,222.00').first()).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Checking the gross amount by amount', async ({ page, api, settingsGuard }) => {
@@ -1127,7 +1105,6 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
 
   await expect(page.getByText('$ 12,522.00')).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('The new_expense_category action is not shown on the badge dropdown', async ({
@@ -1209,7 +1186,6 @@ test('The new_expense_category action is not shown on the badge dropdown', async
     page.getByText('Create New', { exact: true }).first()
   ).not.toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('The new_expense_category action is shown on the badge dropdown', async ({
@@ -1251,7 +1227,6 @@ test('The new_expense_category action is shown on the badge dropdown', async ({
     page.getByText('Create New', { exact: true }).first()
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('The new_expense_category action is shown on the badge dropdown with only create_expense permission', async ({
@@ -1293,7 +1268,6 @@ test('The new_expense_category action is shown on the badge dropdown with only c
     page.getByText('Create New', { exact: true }).first()
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Creating expense with Save / Create button', async ({ page, api }) => {
@@ -1322,5 +1296,4 @@ test('Creating expense with Save / Create button', async ({ page, api }) => {
   // The expense was created but we navigated to /create; extract ID from the previous navigation
   // We can't easily get the ID here since URL changed, but we track via the response if needed
 
-  await logout(page);
 });

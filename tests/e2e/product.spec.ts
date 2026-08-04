@@ -145,20 +145,13 @@ const checkEditPage = async (
 };
 
 test("can't view products without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('products@example.com');
-  await save();
-  await logout(page);
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'products@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Products'
   );
 
-  await logout(page);
 });
 
 test('can view product', async ({ page, api }) => {
@@ -197,7 +190,6 @@ test('can view product', async ({ page, api }) => {
 
   await checkEditPage(page, false, false);
 
-  await logout(page);
 });
 
 test('can edit product', async ({ page, api }) => {
@@ -252,7 +244,6 @@ test('can edit product', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can create a product', async ({ page, api }) => {
@@ -296,7 +287,6 @@ test('can create a product', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('deleting product with edit_product', async ({ page, api }) => {
@@ -546,7 +536,6 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('New Invoice, New Purchase Order, and Clone displayed with creation permissions', async ({
@@ -584,7 +573,6 @@ test('New Invoice, New Purchase Order, and Clone displayed with creation permiss
 
   await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('cloning product with edit_product', async ({ page, api }) => {
@@ -711,7 +699,6 @@ test('all custom actions in dropdown displayed with admin permission', async ({
     }
   }
 
-  await logout(page);
 });
 
 test('New Invoice and New Purchase Order displayed with creation permissions', async ({
@@ -770,7 +757,6 @@ test('New Invoice and New Purchase Order displayed with creation permissions', a
     }
   }
 
-  await logout(page);
 });
 
 test('rendering documents and product_fields tabs with admin permission', async ({
@@ -814,7 +800,6 @@ test('rendering documents and product_fields tabs with admin permission', async 
 
   await expect(page.getByRole('link', { name: 'Documents' })).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Product selector list gets updated on the report page when it is created', async ({
@@ -855,5 +840,4 @@ test('Product selector list gets updated on the report page when it is created',
     page.getByText(productName, { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });

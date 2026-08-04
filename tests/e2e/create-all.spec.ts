@@ -3,14 +3,20 @@ import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
 
 resetAccountBeforeAll();
 
-test.beforeEach(async ({ page }) => {
-  const { clear, save, set } = permissions(page);
+// Assign create_all once for the file; each test still logs in on a fresh page.
+let createAllPermissionsReady = false;
 
-  await login(page);
-  await clear();
-  await set('create_all');
-  await save();
-  await logout(page);
+test.beforeEach(async ({ page }) => {
+  if (!createAllPermissionsReady) {
+    const { clear, save, set } = permissions(page);
+
+    await login(page);
+    await clear();
+    await set('create_all');
+    await save();
+    await logout(page);
+    createAllPermissionsReady = true;
+  }
 
   await login(page, 'permissions@example.com', 'password');
 });

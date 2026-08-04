@@ -5,6 +5,7 @@ import {
   login,
   logout,
   permissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -76,11 +77,19 @@ const checkShowPage = async (page: Page, isEditable: boolean) => {
   await page.waitForURL('**/projects/**');
 
   await expect(
-    page
-      .getByRole('definition', { exact: true })
-      .filter({ hasText: 'Summary' })
-      .first()
+    page.locator('[data-cy="tabs"]').getByRole('button', {
+      name: 'Overview',
+      exact: true,
+    })
   ).toBeVisible({ timeout: 10000 });
+
+  await expect(
+    page.getByRole('heading', { name: 'Summary', exact: true })
+  ).toBeVisible({ timeout: 10000 });
+
+  await expect(page.getByText('Status', { exact: true }).first()).toBeVisible({
+    timeout: 10000,
+  });
 
   if (!isEditable) {
     await expect(
@@ -134,8 +143,11 @@ const createProject = async (params: CreateParams) => {
   await page.getByRole('option').first().click();
 
   if (assignTo) {
-    await page.locator('[data-testid="combobox-input-field"]').last().click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    await selectAssignedUser(
+      page,
+      assignTo,
+      page.locator('[data-testid="combobox-input-field"]').last()
+    );
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -144,20 +156,13 @@ const createProject = async (params: CreateParams) => {
 };
 
 test("can't view projects without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('projects@example.com');
-  await save();
-  await logout(page);
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'projects@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Projects'
   );
 
-  await logout(page);
 });
 
 test('can view project', async ({ page, api }) => {
@@ -193,7 +198,6 @@ test('can view project', async ({ page, api }) => {
 
   await checkShowPage(page, false);
 
-  await logout(page);
 });
 
 test('can edit project', async ({ page, api }) => {
@@ -250,7 +254,6 @@ test('can edit project', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'projectActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can create a project', async ({ page, api }) => {
@@ -291,7 +294,6 @@ test('can create a project', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'projectActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can view and edit assigned project with create_project', async ({
@@ -359,7 +361,6 @@ test('can view and edit assigned project with create_project', async ({
 
   await checkDropdownActions(page, actions, 'projectActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('deleting project with edit_project', async ({ page, api }) => {
@@ -605,7 +606,6 @@ test('Invoice project and clone action in dropdown displayed with admin permissi
 
   await checkDropdownActions(page, actions, 'projectActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('Invoice project and clone action displayed with creation permissions', async ({
@@ -641,7 +641,6 @@ test('Invoice project and clone action displayed with creation permissions', asy
 
   await checkDropdownActions(page, actions, 'projectActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('cloning project', async ({ page, api }) => {
@@ -747,7 +746,6 @@ test('Invoice Project displayed with admin permission', async ({
     'dataTable'
   );
 
-  await logout(page);
 });
 
 test('Invoice Project displayed with creation permissions', async ({
@@ -807,5 +805,4 @@ test('Invoice Project displayed with creation permissions', async ({
     'dataTable'
   );
 
-  await logout(page);
 });

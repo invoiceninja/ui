@@ -44,11 +44,18 @@ test('imports invoices, quotes, and recurring invoices from mapped CSV files', a
   page,
   api,
 }) => {
+  // Three queued imports; each may take tens of seconds to land in the API.
+  test.setTimeout(180000);
   await login(page);
 
   const invoiceClient = await createClient(api, 'import-invoice-client');
   const quoteClient = await createClient(api, 'import-quote-client');
   const recurringClient = await createClient(api, 'import-recurring-client');
+  const invoiceNotes = uniqueName('imported-invoice-notes');
+  const quoteNotes = uniqueName('imported-quote-notes');
+  const recurringNotes = uniqueName('imported-recurring-notes');
+  // Recurring invoices reject next_send_date before yesterday.
+  const recurringNextSendDate = new Date().toISOString().slice(0, 10);
 
   await importEntity(page, api, {
     entityType: 'invoices',
@@ -65,7 +72,7 @@ test('imports invoices, quotes, and recurring invoices from mapped CSV files', a
         'Imported invoice line',
         '10',
         '2',
-        uniqueName('imported-invoice-notes'),
+        invoiceNotes,
       ].join(','),
     ].join('\n'),
     mappings: [
@@ -83,6 +90,7 @@ test('imports invoices, quotes, and recurring invoices from mapped CSV files', a
       client_id: invoiceClient.id,
       date: '2026-06-09',
       due_date: '2026-06-16',
+      public_notes: invoiceNotes,
     },
     expectedAmount: 20,
   });
@@ -101,7 +109,7 @@ test('imports invoices, quotes, and recurring invoices from mapped CSV files', a
         'Imported quote line',
         '11',
         '3',
-        uniqueName('imported-quote-notes'),
+        quoteNotes,
       ].join(','),
     ].join('\n'),
     mappings: [
@@ -117,6 +125,7 @@ test('imports invoices, quotes, and recurring invoices from mapped CSV files', a
     expectedApiFields: {
       client_id: quoteClient.id,
       date: '2026-06-09',
+      public_notes: quoteNotes,
     },
     expectedAmount: 33,
   });
@@ -130,13 +139,13 @@ test('imports invoices, quotes, and recurring invoices from mapped CSV files', a
       'Client,Start Date,Frequency,Item,Description,Unit Cost,Quantity,Public Notes',
       [
         recurringClient.name,
-        '2026-06-09',
+        recurringNextSendDate,
         '5',
         uniqueName('recurring-item'),
         'Imported recurring invoice line',
         '7',
         '4',
-        uniqueName('imported-recurring-notes'),
+        recurringNotes,
       ].join(','),
     ].join('\n'),
     mappings: [
@@ -152,6 +161,7 @@ test('imports invoices, quotes, and recurring invoices from mapped CSV files', a
     listSearch: recurringClient.name,
     expectedApiFields: {
       client_id: recurringClient.id,
+      public_notes: recurringNotes,
     },
     expectedAmount: 28,
   });
@@ -161,6 +171,7 @@ test('imports purchase orders and payments from mapped CSV files', async ({
   page,
   api,
 }) => {
+  test.setTimeout(180000);
   await login(page);
 
   const vendor = await createVendor(api, 'import-po-vendor');
@@ -219,6 +230,7 @@ test('imports purchase orders and payments from mapped CSV files', async ({
     listAssertText: /\$ 12\.34/,
     expectedApiFields: {
       date: '2026-06-09',
+      transaction_reference: paymentReference,
     },
     expectedAmount: 12.34,
   });
@@ -228,6 +240,7 @@ test('imports tasks and bank transactions from mapped CSV files', async ({
   page,
   api,
 }) => {
+  test.setTimeout(180000);
   await login(page);
 
   const client = await createClient(api, 'import-task-client');
@@ -309,7 +322,7 @@ async function importEntity(page: Page, api: ApiFixture, testCase: ImportCase) {
       .click();
   }
 
-  const importResponse = page.waitForResponse(
+  const importResponsePromise = page.waitForResponse(
     (response) =>
       response.url().includes('/api/v1/import') && response.status() === 200
   );
@@ -317,22 +330,13 @@ async function importEntity(page: Page, api: ApiFixture, testCase: ImportCase) {
   await mappingTable
     .getByRole('button', { name: 'Import', exact: true })
     .click();
-  await importResponse;
+  await importResponsePromise;
 
   await declineTemplateSave(page);
   await page.waitForURL(`**${testCase.listRoute}`, { timeout: 10000 });
 
-  await waitForTableData(page);
-
-  if (testCase.listSearch) {
-    await page.locator('#filter').fill(testCase.listSearch);
-  }
-
-  await expect(page.locator('[data-cy="dataTable"] tbody')).toContainText(
-    testCase.listAssertText || testCase.listSearch || '',
-    { timeout: 10000 }
-  );
-
+  // Sales-doc imports are queued ("Your import has started..."); wait for the
+  // API record before asserting the list UI.
   const importedEntity = await waitForImportedEntity(api, testCase);
 
   api.trackEntity(testCase.entityType, importedEntity.id as string);
@@ -344,6 +348,19 @@ async function importEntity(page: Page, api: ApiFixture, testCase: ImportCase) {
   if (typeof testCase.expectedAmount === 'number') {
     expect(Number(importedEntity.amount)).toBeCloseTo(testCase.expectedAmount);
   }
+
+  await page.goto(testCase.listRoute);
+  await page.waitForURL(`**${testCase.listRoute}`);
+  await waitForTableData(page);
+
+  if (testCase.listSearch) {
+    await page.locator('#filter').fill(testCase.listSearch);
+  }
+
+  await expect(page.locator('[data-cy="dataTable"] tbody')).toContainText(
+    testCase.listAssertText || testCase.listSearch || '',
+    { timeout: 15000 }
+  );
 }
 
 async function uploadCsv(page: Page, name: string, csv: string) {
@@ -382,14 +399,34 @@ async function waitForImportedEntity(api: ApiFixture, testCase: ImportCase) {
     baseURL: api.context.baseUrl,
   });
 
+  // Prefer listSearch (client/vendor/description). Filtering by public_notes
+  // returns empty for invoices/quotes even when the notes field is set.
+  const filterHint =
+    testCase.listSearch ||
+    (typeof testCase.expectedApiFields.description === 'string'
+      ? String(testCase.expectedApiFields.description)
+      : typeof testCase.expectedApiFields.transaction_reference === 'string'
+        ? String(testCase.expectedApiFields.transaction_reference)
+        : '');
+
   try {
     let importedEntity: Record<string, unknown> | undefined;
 
     await expect
       .poll(
         async () => {
+          const params = new URLSearchParams({
+            per_page: '100',
+            sort: 'id|desc',
+            status: 'active',
+          });
+
+          if (filterHint) {
+            params.set('filter', filterHint);
+          }
+
           const response = await context.get(
-            `/api/v1/${testCase.entityType}?per_page=100&status=active`,
+            `/api/v1/${testCase.entityType}?${params.toString()}`,
             { headers: api.context.headers }
           );
 
@@ -407,7 +444,10 @@ async function waitForImportedEntity(api: ApiFixture, testCase: ImportCase) {
 
           return Boolean(importedEntity);
         },
-        { timeout: 10000 }
+        {
+          timeout: 60000,
+          intervals: [500, 1000, 2000, 3000],
+        }
       )
       .toBe(true);
 

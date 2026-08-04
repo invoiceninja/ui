@@ -5,6 +5,7 @@ import {
   login,
   logout,
   permissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -179,8 +180,7 @@ const createCredit = async (params: CreateParams) => {
       .getByRole('link', { name: 'Settings', exact: true })
       .first()
       .click();
-    await page.getByLabel('User').first().click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    await selectAssignedUser(page, assignTo, page.getByLabel('User').first());
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -194,21 +194,14 @@ const createCredit = async (params: CreateParams) => {
   }
 };
 
-test("can't view credits without permission", async ({ page, api }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('credits@example.com');
-  await save();
-  await logout(page);
-
+test("can't view credits without permission", async ({ page }) => {
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'credits@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Credits'
   );
 
-  await logout(page);
 });
 
 test('can view credit', async ({ page, api }) => {
@@ -242,7 +235,6 @@ test('can view credit', async ({ page, api }) => {
 
   await checkEditPage(page, false, false);
 
-  await logout(page);
 });
 
 test('can edit credit', async ({ page, api }) => {
@@ -293,7 +285,6 @@ test('can edit credit', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'creditActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can create a credit', async ({ page, api }) => {
@@ -332,7 +323,6 @@ test('can create a credit', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'creditActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can view and edit assigned credit with create_credit', async ({
@@ -389,7 +379,6 @@ test('can view and edit assigned credit with create_credit', async ({
 
   await checkDropdownActions(page, actions, 'creditActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('deleting credit with edit_credit', async ({ page, api }) => {
@@ -591,6 +580,8 @@ test('credit documents uploading with edit_credit', async ({ page, api }) => {
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
+    await page.waitForTimeout(150);
+
   await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
@@ -628,7 +619,6 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkDropdownActions(page, actions, 'creditActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('all clone actions displayed with creation permissions', async ({
@@ -674,7 +664,6 @@ test('all clone actions displayed with creation permissions', async ({
 
   await checkDropdownActions(page, actions, 'creditActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('cloning credit', async ({ page, api }) => {

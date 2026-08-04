@@ -44,6 +44,7 @@ const createPayment = async (params: CreateParams) => {
   const clientOption = page.getByRole('option').first();
   await clientOption.waitFor({ state: 'visible', timeout: 5000 });
   await clientOption.click();
+  await page.waitForTimeout(150);
 
   await page.getByRole('button', { name: 'Save' }).click();
 
@@ -94,20 +95,13 @@ const checkEditPage = async (
 };
 
 test("can't view payments without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('payments@example.com');
-  await save();
-  await logout(page);
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'payments@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Payments'
   );
 
-  await logout(page);
 });
 
 test('can view payment', async ({ page, api }) => {
@@ -146,7 +140,6 @@ test('can view payment', async ({ page, api }) => {
 
   await checkEditPage(page, false, false);
 
-  await logout(page);
 });
 
 test('can edit payment', async ({ page, api }) => {
@@ -193,7 +186,6 @@ test('can edit payment', async ({ page, api }) => {
     page.getByText('Successfully updated payment', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('can create a payment', async ({ page, api }) => {
@@ -230,7 +222,6 @@ test('can create a payment', async ({ page, api }) => {
     page.getByText('Successfully updated payment', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('deleting payment with edit_payment', async ({ page, api }) => {
@@ -494,5 +485,4 @@ test('rendering documents and custom_fields tabs with admin permission', async (
 
   await expect(page.getByRole('link', { name: 'Documents' })).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });

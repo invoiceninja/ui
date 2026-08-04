@@ -4,6 +4,7 @@ import {
   purgeAllEntities,
   purgeGroupSettings,
   purgeSchedules,
+  purgeUnsuffixedPermissionUsers,
   resetCompanySettings,
   resetPermissionUser,
   restoreDeletedUsers,
@@ -37,5 +38,6 @@ export async function resetTestAccount(account: TestAccount, label?: string) {
     await resetPermissionUser(api, scopedEmail);
   }
 
+  await purgeUnsuffixedPermissionUsers(api, account);
   await purgeAllEntities(api);
 }
