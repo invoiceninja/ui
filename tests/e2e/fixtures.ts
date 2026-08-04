@@ -18,8 +18,8 @@ import {
   bulkAction,
   createApiContext,
   fetchEntityByName,
-  getCompanySettings,
-  putCompanySettings,
+  getCompany,
+  updateCompany,
   setPermissions as setUserPermissions,
   type ApiContext,
   type EntityType,
@@ -194,7 +194,7 @@ export const test = base.extend<
   settingsGuard: async ({ account }, use) => {
     let savedCompanyId: string | undefined;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let savedSettings: Record<string, any> | undefined;
+    let savedCompany: Record<string, any> | undefined;
 
     const fixture: SettingsFixture = {
       async snapshot() {
@@ -203,23 +203,23 @@ export const test = base.extend<
           account.ownerEmail,
           account.password
         );
-        const { companyId, settings } = await getCompanySettings(api);
+        const { companyId, company } = await getCompany(api);
         savedCompanyId = companyId;
-        savedSettings = { ...settings };
+        savedCompany = structuredClone(company);
       },
     };
 
     await use(fixture);
 
-    // Restore settings on teardown if a snapshot was taken
-    if (savedCompanyId && savedSettings) {
+    // Restore company state on teardown if a snapshot was taken
+    if (savedCompanyId && savedCompany) {
       try {
         const api = await createApiContext(
           account.apiUrl,
           account.ownerEmail,
           account.password
         );
-        await putCompanySettings(api, savedCompanyId, savedSettings);
+        await updateCompany(api, savedCompanyId, savedCompany);
       } catch {
         // Best effort
       }

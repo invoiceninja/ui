@@ -13,7 +13,7 @@ import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createExpenseCategory } from './expense-categories-helpers';
 import { createTaxRate } from './taxes-helpers';
-import { getCompanySettings, putCompanySettings } from './api-helpers';
+import { getCompany, updateCompanyFields } from './api-helpers';
 
 resetAccountBeforeAll();
 
@@ -859,10 +859,14 @@ test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) =
   await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
 
   // Enable two expense tax rates via API and reload so the app picks up the change
-  const { companyId, settings } = await getCompanySettings(api.context);
-  if (settings.enabled_expense_tax_rates !== 2) {
-    await putCompanySettings(api.context, companyId, { ...settings, enabled_expense_tax_rates: 2 });
+  const { companyId, company } = await getCompany(api.context);
+  if (company.enabled_expense_tax_rates !== 2) {
+    await updateCompanyFields(api.context, companyId, {
+      enabled_expense_tax_rates: 2,
+    });
   }
+
+  await page.waitForTimeout(300);
 
   await page.reload({ waitUntil: 'networkidle' });
 
@@ -935,12 +939,14 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
   await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
 
   // Enable two expense tax rates via API and reload so the app picks up the change
-  const { companyId: companyId2, settings: settings2 } = await getCompanySettings(api.context);
-  if (settings2.enabled_expense_tax_rates !== 2) {
-    await putCompanySettings(api.context, companyId2, { ...settings2, enabled_expense_tax_rates: 2 });
+  const { companyId: companyId2, company: company2 } = await getCompany(api.context);
+  if (company2.enabled_expense_tax_rates !== 2) {
+    await updateCompanyFields(api.context, companyId2, {
+      enabled_expense_tax_rates: 2,
+    });
   }
 
-  // await page.reload({ waitUntil: 'networkidle' });
+  await page.reload({ waitUntil: 'networkidle' });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -1007,9 +1013,11 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
   await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
 
   // Enable two expense tax rates via API and reload so the app picks up the change
-  const { companyId: companyId3, settings: settings3 } = await getCompanySettings(api.context);
-  if (settings3.enabled_expense_tax_rates !== 2) {
-    await putCompanySettings(api.context, companyId3, { ...settings3, enabled_expense_tax_rates: 2 });
+  const { companyId: companyId3, company: company3 } = await getCompany(api.context);
+  if (company3.enabled_expense_tax_rates !== 2) {
+    await updateCompanyFields(api.context, companyId3, {
+      enabled_expense_tax_rates: 2,
+    });
   }
 
   await page.reload({ waitUntil: 'networkidle' });
@@ -1159,7 +1167,7 @@ test('The new_expense_category action is shown on the badge dropdown', async ({
     .click();
 
   await page.waitForTimeout(300);
-  
+
   await waitForTableData(page);
 
   // Click the chevron arrow inside the badge to open the dropdown
