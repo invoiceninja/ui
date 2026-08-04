@@ -586,6 +586,8 @@ test('credit documents uploading with edit_credit', async ({ page, api }) => {
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
+    await page.waitForTimeout(150);
+
   await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
 
   await expect(
