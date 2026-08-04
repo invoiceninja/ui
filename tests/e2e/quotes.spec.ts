@@ -5,6 +5,7 @@ import {
   login,
   logout,
   permissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -196,8 +197,7 @@ const createQuote = async (params: CreateParams) => {
       .first()
       .getByRole('link', { name: 'Settings', exact: true })
       .click();
-    await page.getByLabel('User').first().click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    await selectAssignedUser(page, assignTo, page.getByLabel('User').first());
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -219,7 +219,6 @@ test("can't view quotes without permission", async ({ page, api }) => {
     'Quotes'
   );
 
-  await logout(page);
 });
 
 test('can view quote', async ({ page, api }) => {
@@ -253,7 +252,6 @@ test('can view quote', async ({ page, api }) => {
 
   await checkEditPage(page, false, false);
 
-  await logout(page);
 });
 
 test('can edit quote', async ({ page, api }) => {
@@ -304,7 +302,6 @@ test('can edit quote', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'quoteActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can create a quote', async ({ page, api }) => {
@@ -339,7 +336,6 @@ test('can create a quote', async ({ page, api }) => {
     page.getByText('Successfully updated quote', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('can view and edit assigned quote with create_quote', async ({
@@ -374,6 +370,8 @@ test('can view and edit assigned quote with create_quote', async ({
 
   await checkTableEditability(page, false);
 
+  expect(await waitForTableData(page)).toBe(true);
+
   const tableRow = page.locator('tbody').first().getByRole('row').first();
 
   await tableRow.getByRole('link').first().click();
@@ -389,7 +387,6 @@ test('can view and edit assigned quote with create_quote', async ({
     page.getByText('Successfully updated quote', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('deleting quote with edit_quote', async ({ page, api }) => {
@@ -633,7 +630,6 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkEditPage(page, true, true);
 
-  await logout(page);
 });
 
 test('convert_to_invoice, convert_to_project and all clone actions displayed with creation permissions', async ({
@@ -675,7 +671,6 @@ test('convert_to_invoice, convert_to_project and all clone actions displayed wit
 
   await checkEditPage(page, true, false);
 
-  await logout(page);
 });
 
 test('cloning quote', async ({ page, api }) => {
@@ -787,7 +782,6 @@ test('Convert to Invoice and Convert to Project displayed with admin permission'
     'dataTable'
   );
 
-  await logout(page);
 });
 
 test('Convert to Invoice and Convert to Project displayed with creation permissions', async ({
@@ -845,5 +839,4 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
     'dataTable'
   );
 
-  await logout(page);
 });

@@ -11,6 +11,8 @@ import {
   baseEmailForAccount,
   emailForCurrentAccount,
   passwordForCurrentAccount,
+  permissionBaseEmails,
+  type TestAccount,
 } from './accounts';
 
 const ENTITY_ENDPOINTS = [
@@ -419,6 +421,8 @@ export async function resetPermissionUser(
 
 /**
  * Restore any deleted/archived seed users that tests may have removed.
+ * Skips unsuffixed permission-base emails (tasks@example.com, …) so this
+ * cannot undo purgeUnsuffixedPermissionUsers on parallel account lanes.
  */
 export async function restoreDeletedUsers(api: ApiContext): Promise<void> {
   const seedUserNames = [
@@ -426,6 +430,7 @@ export async function restoreDeletedUsers(api: ApiContext): Promise<void> {
     'Products Example',
     'Credits Example',
   ];
+  const unsuffixedEmails = new Set<string>(permissionBaseEmails);
 
   const users = await fetchAllUsers(api);
   const deletedIds = users
@@ -433,7 +438,9 @@ export async function restoreDeletedUsers(api: ApiContext): Promise<void> {
       (u) =>
         seedUserNames.some(
           (name) => `${u.first_name} ${u.last_name}`.trim() === name
-        ) && u.is_deleted
+        ) &&
+        u.is_deleted &&
+        !unsuffixedEmails.has(u.email)
     )
     .map((u) => u.id);
 
@@ -441,6 +448,43 @@ export async function restoreDeletedUsers(api: ApiContext): Promise<void> {
     await bulkAction(api, 'users' as EntityType, deletedIds, 'restore');
     console.log(`  Restored ${deletedIds.length} deleted seed users`);
   }
+}
+
+/**
+ * Remove leftover unsuffixed permission users (e.g. tasks@example.com) from
+ * this company. Parallel lanes use tasks1@ / tasks2@ / … with the same display
+ * name ("Tasks Example"); keeping the unsuffixed orphan makes assignee
+ * combobox `.first()` picks ambiguous and flaky across workers.
+ *
+ * Safe under parallel lanes: each reset is company-scoped via that lane's
+ * owner token, and only exact base emails from permissionBaseEmails are
+ * removed — never the lane-scoped `{base}{id}@…` users.
+ */
+export async function purgeUnsuffixedPermissionUsers(
+  api: ApiContext,
+  account: TestAccount
+): Promise<void> {
+  const unsuffixedEmails = new Set<string>(permissionBaseEmails);
+  const users = await fetchAllUsers(api);
+
+  const orphanIds = users
+    .filter(
+      (user) =>
+        unsuffixedEmails.has(user.email) &&
+        user.email !== account.ownerEmail &&
+        !user.is_deleted
+    )
+    .map((user) => user.id);
+
+  if (orphanIds.length === 0) {
+    return;
+  }
+
+  await bulkAction(api, 'users' as EntityType, orphanIds, 'archive');
+  await bulkAction(api, 'users' as EntityType, orphanIds, 'delete');
+  console.log(
+    `  Purged ${orphanIds.length} unsuffixed permission users on lane ${account.id}`
+  );
 }
 
 /**

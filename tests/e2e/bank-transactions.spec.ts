@@ -170,7 +170,6 @@ test("can't view transactions without permission", async ({ page }) => {
     'Transactions'
   );
 
-  await logout(page);
 });
 
 test('can view transaction', async ({ page, api }) => {
@@ -203,7 +202,6 @@ test('can view transaction', async ({ page, api }) => {
 
   await checkEditPage(page, false);
 
-  await logout(page);
 });
 
 test('can edit transaction', async ({ page, api }) => {
@@ -249,7 +247,6 @@ test('can edit transaction', async ({ page, api }) => {
     page.getByText('Successfully updated transaction', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('can create a transaction', async ({ page, api }) => {
@@ -284,7 +281,6 @@ test('can create a transaction', async ({ page, api }) => {
     page.getByText('Successfully updated transaction', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 // @todothis test is broken because the toast shows successfully deleted invoice
@@ -445,7 +441,6 @@ test('archiving transaction with edit_bank_transaction removes it from active li
     )
     .toBeGreaterThan(0);
 
-  await logout(page);
 });
 
 test('restoring an archived transaction returns it to active list', async ({
@@ -491,7 +486,6 @@ test('restoring an archived transaction returns it to active list', async ({
     page.locator('[data-cy="topNavbar"]').getByRole('button', { name: 'Restore', exact: true })
   ).not.toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('deleting transaction with edit_bank_transaction removes it from active list', async ({
@@ -530,7 +524,6 @@ test('deleting transaction with edit_bank_transaction removes it from active lis
     )
     .toBeGreaterThan(0);
 
-  await logout(page);
 });
 
 test('link withdrawal on list to existing expense via match slider', async ({
@@ -623,7 +616,6 @@ test('link withdrawal on list to existing expense via match slider', async ({
     )
     .toContain(String(expense.id));
 
-  await logout(page);
 });
 
 test('link credit transaction on list to existing payment via match slider', async ({
@@ -715,7 +707,6 @@ test('link credit transaction on list to existing payment via match slider', asy
     )
     .toContain(String(payment.id));
 
-  await logout(page);
 });
 
 test('Create expense bulk action', async ({ page, api }) => {
@@ -825,5 +816,4 @@ test('Create expense bulk action', async ({ page, api }) => {
     'Converted'
   );
 
-  await logout(page);
 });

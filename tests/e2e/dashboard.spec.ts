@@ -18,7 +18,6 @@ test("Can't view dashboard without permission", async ({ page }) => {
     'Dashboard'
   );
 
-  await logout(page);
 });
 
 test('Can view dashboard with permission', async ({ page }) => {
@@ -97,5 +96,4 @@ test('Can view dashboard with permission', async ({ page }) => {
       .first()
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });

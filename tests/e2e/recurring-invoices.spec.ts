@@ -5,6 +5,7 @@ import {
   login,
   logout,
   permissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -151,8 +152,7 @@ const createRecurringInvoice = async (params: CreateParams) => {
       .getByRole('link', { name: 'Settings', exact: true })
       .first()
       .click();
-    await page.getByLabel('User').first().click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    await selectAssignedUser(page, assignTo, page.getByLabel('User').first());
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -176,7 +176,6 @@ test("can't view recurring invoices without permission", async ({ page }) => {
     'Recurring Invoices'
   );
 
-  await logout(page);
 });
 
 test('can view recurring invoice', async ({ page, api }) => {
@@ -212,7 +211,6 @@ test('can view recurring invoice', async ({ page, api }) => {
 
   await checkEditPage(page, false);
 
-  await logout(page);
 });
 
 test('can edit recurring invoice', async ({ page, api }) => {
@@ -271,7 +269,6 @@ test('can edit recurring invoice', async ({ page, api }) => {
     true
   );
 
-  await logout(page);
 });
 
 test('can create a recurring invoice', async ({ page, api }) => {
@@ -318,7 +315,6 @@ test('can create a recurring invoice', async ({ page, api }) => {
     true
   );
 
-  await logout(page);
 });
 
 test('can view and edit assigned invoice with create_recurring_invoice', async ({
@@ -359,6 +355,8 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
 
   await checkTableEditability(page, false);
 
+  expect(await waitForTableData(page)).toBe(true);
+
   const tableRow = page.locator('tbody').first().getByRole('row').first();
 
   await tableRow.getByRole('link').first().click();
@@ -384,7 +382,6 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
     true
   );
 
-  await logout(page);
 });
 
 test('deleting invoice with edit_recurring_invoice', async ({ page, api }) => {
@@ -685,7 +682,6 @@ test('all actions in dropdown displayed with admin permission', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('all clone actions displayed with creation permissions', async ({
@@ -741,7 +737,6 @@ test('all clone actions displayed with creation permissions', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('cloning recurring invoice', async ({ page, api }) => {
@@ -832,20 +827,67 @@ test('recurring invoice creation and start stop sequence', async ({ page, api })
   await newClientButton.waitFor({ state: 'visible', timeout: 5000 });
   await newClientButton.click();
 
-  await page.locator('section').filter({ hasText: 'Contact First Name' }).getByRole('textbox').click();
-  await page.locator('section').filter({ hasText: 'Contact First Name' }).getByRole('textbox').fill('Clients');
-  await page.locator('section').filter({ hasText: 'Contact First Name' }).getByRole('textbox').press('Tab');
-  await page.locator('section').filter({ hasText: 'Contact Last Name' }).getByRole('textbox').fill('Last Name');
-  await page.locator('section').filter({ hasText: 'Contact Last Name' }).getByRole('textbox').press('Tab');
-  await page.locator('section').filter({ hasText: 'Contact Email' }).getByRole('textbox').fill('contact@gmail.com');
-  await page.getByRole('button', { name: 'Save' }).click();
+  const clientModal = page.getByRole('dialog');
+  await expect(clientModal).toBeVisible({ timeout: 10000 });
+  await expect(
+    clientModal.getByRole('heading', { name: 'New Client' })
+  ).toBeVisible({ timeout: 10000 });
+
+  // Fields render only after blank-client query hydrates (Spinner until then).
+  const firstName = clientModal
+    .locator('section')
+    .filter({ hasText: 'Contact First Name' })
+    .getByRole('textbox');
+  await expect(firstName).toBeVisible({ timeout: 20000 });
+  await expect(firstName).toBeEditable({ timeout: 5000 });
+
+  await firstName.click();
+  await firstName.fill('Clients');
+  await firstName.press('Tab');
+  await clientModal
+    .locator('section')
+    .filter({ hasText: 'Contact Last Name' })
+    .getByRole('textbox')
+    .fill('Last Name');
+  await clientModal
+    .locator('section')
+    .filter({ hasText: 'Contact Last Name' })
+    .getByRole('textbox')
+    .press('Tab');
+  await clientModal
+    .locator('section')
+    .filter({ hasText: 'Contact Email' })
+    .getByRole('textbox')
+    .fill('contact@gmail.com');
+  await clientModal.getByRole('button', { name: 'Save' }).click();
+  await expect(clientModal).not.toBeVisible({ timeout: 10000 });
   await page.getByRole('button', { name: 'Add Item' }).click();
-  await page.getByRole('textbox').nth(4).click();
-  await page.getByRole('cell', { name: 'New Product' }).getByRole('textbox').fill('12345');
-  await page.locator('#notes').click();
-  await page.locator('#notes').fill('67890');
+
+  // ProductSelector lives in #line-item-{index}; prefer that over nth() textboxes
+  // which also match client/frequency controls on the create form.
+  // Tab commits free-text product_key from Combobox React state (nullable).
+  // fill() updates the DOM immediately but inputValue state can lag one tick —
+  // Tab before that sync commits a stale/empty value and the highlighted option wins.
+  const lineItem = page.locator('#line-item-0');
+  const productInput = lineItem.locator('[data-cy="comboboxInput"]');
+  await productInput.click();
+  await productInput.fill('12345');
+  await expect(productInput).toHaveValue('12345');
+  await page.waitForTimeout(150);
+  await productInput.press('Tab');
+  await expect(productInput).toHaveValue('12345', { timeout: 5000 });
+
+  const notesInput = lineItem.locator('#notes');
+  await notesInput.click();
+  await notesInput.fill('67890');
+  await expect(notesInput).toHaveValue('67890');
+  await page.waitForTimeout(150);
+  await notesInput.press('Tab');
+  await expect(notesInput).toHaveValue('67890', { timeout: 5000 });
+  await expect(productInput).toHaveValue('12345');
+
   await page.getByRole('textbox').filter({ hasText: /^$/ }).nth(5).click();
-  await page.getByRole('textbox').filter({ hasText: /^$/ }).nth(5).fill('10');
+  // await page.getByRole('textbox').filter({ hasText: /^$/ }).nth(5).fill('10');
   await page.getByRole('button', { name: 'Save' }).click();
   // await page.getByRole('button').nth(4).click();
 
@@ -865,8 +907,12 @@ test('recurring invoice creation and start stop sequence', async ({ page, api })
   // await expect(page.getByText('Clients Last Name')).toBeVisible({ timeout: 10000 });
   await page.locator('div').filter({ hasText: /^Monthly$/ }).nth(2).click();
   await page.locator('div').filter({ hasText: /^Monthly$/ }).first().click();
-  await page.getByRole('cell', { name: '12345' }).getByRole('textbox').click();
-  await expect(page.locator('#notes')).toContainText('67890');
+  // await page.getByRole('cell', { name: '12345' }).getByRole('textbox').click();
+  // await expect(page.locator('#notes')).toContainText('67890');
+  const lineItem2 = page.locator('#line-item-0');
+  const productInput2 = lineItem2.locator('[data-cy="comboboxInput"]');
+  await expect(productInput2).toHaveValue('12345');
+  await expect(lineItem2.locator('#notes')).toHaveValue('67890');
 
   
 });
