@@ -77,11 +77,19 @@ const checkShowPage = async (page: Page, isEditable: boolean) => {
   await page.waitForURL('**/projects/**');
 
   await expect(
-    page
-      .getByRole('definition', { exact: true })
-      .filter({ hasText: 'Summary' })
-      .first()
+    page.locator('[data-cy="tabs"]').getByRole('button', {
+      name: 'Overview',
+      exact: true,
+    })
   ).toBeVisible({ timeout: 10000 });
+
+  await expect(
+    page.getByRole('heading', { name: 'Summary', exact: true })
+  ).toBeVisible({ timeout: 10000 });
+
+  await expect(page.getByText('Status', { exact: true }).first()).toBeVisible({
+    timeout: 10000,
+  });
 
   if (!isEditable) {
     await expect(
@@ -148,13 +156,7 @@ const createProject = async (params: CreateParams) => {
 };
 
 test("can't view projects without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('projects@example.com');
-  await save();
-  await logout(page);
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'projects@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(

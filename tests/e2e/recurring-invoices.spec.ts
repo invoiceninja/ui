@@ -163,13 +163,7 @@ const createRecurringInvoice = async (params: CreateParams) => {
 };
 
 test("can't view recurring invoices without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('invoices@example.com');
-  await save();
-  await logout(page);
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'invoices@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(

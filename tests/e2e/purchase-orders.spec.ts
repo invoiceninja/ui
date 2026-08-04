@@ -143,13 +143,7 @@ const createPurchaseOrder = async (params: CreateParams) => {
 };
 
 test("can't view purchase_orders without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('purchase_orders@example.com');
-  await save();
-  await logout(page);
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'purchase_orders@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(

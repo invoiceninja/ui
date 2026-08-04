@@ -1,4 +1,4 @@
-import { login, logout, permissions } from '$tests/e2e/helpers';
+import { login } from '$tests/e2e/helpers';
 import { createInvoice } from '$tests/helpers/invoice';
 import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
 import dayjs from 'dayjs';
@@ -8,13 +8,7 @@ resetAccountBeforeAll();
 test('Can not add a company and navigate to account management', async ({
   page,
 }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear();
-  await save();
-  await logout(page);
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'permissions@example.com', 'password');
 
   await page.locator('[data-cy="companyDropdown"]').click();

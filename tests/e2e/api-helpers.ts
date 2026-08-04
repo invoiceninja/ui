@@ -392,6 +392,7 @@ async function fetchAllUsers(api: ApiContext): Promise<ApiUser[]> {
 
 /**
  * Reset permission user back to no permissions.
+ * Permissions live on company_user (not the top-level user payload).
  */
 export async function resetPermissionUser(
   api: ApiContext,
@@ -403,10 +404,36 @@ export async function resetPermissionUser(
   if (!user) return;
 
   const context = await apiRequest(api);
-  const response = await context.put(`/api/v1/users/${user.id}`, {
-    headers: api.headers,
-    data: { ...user, permissions: '' },
-  });
+
+  const detailResponse = await context.get(
+    `/api/v1/users/${user.id}?include=company_user`,
+    { headers: api.headers }
+  );
+
+  if (!detailResponse.ok()) {
+    console.warn(
+      `  Failed to load user ${email} for permission reset: ${detailResponse.status()}`
+    );
+    await context.dispose();
+    return;
+  }
+
+  const fullUser = (await detailResponse.json()).data;
+
+  const response = await context.put(
+    `/api/v1/users/${user.id}?include=company_user`,
+    {
+      headers: api.headers,
+      data: {
+        ...fullUser,
+        company_user: {
+          ...fullUser.company_user,
+          permissions: '',
+          is_admin: false,
+        },
+      },
+    }
+  );
 
   if (response.ok()) {
     console.log(`  Reset permissions for ${email}`);
