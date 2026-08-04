@@ -436,7 +436,7 @@ export async function resetPermissionUser(
   );
 
   if (response.ok()) {
-    console.log(`  Reset permissions for ${email}`);
+    // console.log(`  Reset permissions for ${email}`);
   } else {
     console.warn(
       `  Failed to reset permissions for ${email}: ${response.status()}`
