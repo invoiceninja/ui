@@ -455,20 +455,31 @@ export function DataTable<T extends object>(props: Props<T>) {
     if (!isInitialConfiguration) {
       clearTimeout(companyUpdateTimeOut.current);
 
-      const currentTimeout = setTimeout(
-        () =>
-          handleUpdateTableFilters(
-            filter,
-            sortedBy,
-            sort,
-            currentPage,
-            status,
-            perPage
-          ),
-        1500
-      );
+      if (withRecordScopedFilters) {
+        handleUpdateTableFilters(
+          filter,
+          sortedBy,
+          sort,
+          currentPage,
+          status,
+          perPage
+        );
+      } else {
+        const currentTimeout = setTimeout(
+          () =>
+            handleUpdateTableFilters(
+              filter,
+              sortedBy,
+              sort,
+              currentPage,
+              status,
+              perPage
+            ),
+          1500
+        );
 
-      companyUpdateTimeOut.current = currentTimeout;
+        companyUpdateTimeOut.current = currentTimeout;
+      }
     }
 
     apiEndpoint.searchParams.set('per_page', perPage);
