@@ -594,6 +594,8 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
+  await page.waitForTimeout(300);
+
   await expect(page.getByText('Successfully uploaded document')).toBeVisible({
     timeout: 10000,
   });
