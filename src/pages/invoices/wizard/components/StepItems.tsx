@@ -17,7 +17,7 @@ import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InputField, InputLabel } from '$app/components/forms';
-import { Callout, Footer, Question, useTheme, radius } from '../kit';
+import { Callout, Footer, useTheme, radius } from '../kit';
 import { Wizard } from '../useWizard';
 import { AppliedTax, TaxSetup } from './TaxSetup';
 import { WorkPicker, WorkSource } from './WorkPicker';
@@ -36,7 +36,6 @@ export function StepItems({ wizard, money }: Props) {
 
   const [picker, setPicker] = useState<WorkSource | null>(null);
   const [taxSetup, setTaxSetup] = useState(false);
-  const [taxAsked, setTaxAsked] = useState(false);
   const [rates, setRates] = useState<TaxRate[]>([]);
 
   const taxesEnabled = (company?.enabled_item_tax_rates ?? 0) > 0;
@@ -96,8 +95,6 @@ export function StepItems({ wizard, money }: Props) {
 
   return (
     <div className="iw-enter">
-      <Question>What are you charging for?</Question>
-
       <div className="space-y-3">
         {items.map((item, index) => {
           const key = item._id ?? String(index);
@@ -241,7 +238,7 @@ export function StepItems({ wizard, money }: Props) {
         </span>
       </div>
 
-      {!taxesEnabled && !taxAsked ? (
+      {!taxesEnabled && !wizard.dismissed('tax') ? (
         <div className="mt-6">
           <Callout title="Do you need to charge tax on this invoice?">
             <div className="flex items-center gap-2">
@@ -255,7 +252,7 @@ export function StepItems({ wizard, money }: Props) {
               <Button
                 type="secondary"
                 behavior="button"
-                onClick={() => setTaxAsked(true)}
+                onClick={() => wizard.dismiss('tax')}
               >
                 No
               </Button>
@@ -363,16 +360,16 @@ function TaxChip({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="inline-flex items-center gap-1.5 text-xs px-2 py-1"
+        className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 border"
         style={{
-          borderRadius: radius.pill,
-          border: `1px ${applied ? 'solid' : 'dashed'} ${applied ? t.line : t.colors.$5}`,
-          color: applied ? t.text : t.muted,
-          backgroundColor: applied ? t.hover : 'transparent',
+          borderRadius: radius.control,
+          borderColor: applied ? t.line : hexToRgba(t.accent, 0.35),
+          color: applied ? t.text : t.accent,
+          backgroundColor: applied ? t.hover : hexToRgba(t.accent, 0.1),
           fontWeight: 500,
         }}
       >
-        {applied ? `${item.tax_name1} ${item.tax_rate1}%` : '+ Tax'}
+        {applied ? `${item.tax_name1} ${item.tax_rate1}%` : 'Add tax'}
       </button>
 
       {open ? (
@@ -451,6 +448,18 @@ function Option({
       {children}
     </button>
   );
+}
+
+function hexToRgba(hex: string, alpha: number): string {
+  const match = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})/i.exec(hex);
+
+  if (!match) {
+    return `rgba(17, 125, 192, ${alpha})`;
+  }
+
+  const [, r, g, b] = match;
+
+  return `rgba(${parseInt(r, 16)}, ${parseInt(g, 16)}, ${parseInt(b, 16)}, ${alpha})`;
 }
 
 function toNumber(raw: unknown): number {

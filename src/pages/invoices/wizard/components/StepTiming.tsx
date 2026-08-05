@@ -18,7 +18,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Button, InputField } from '$app/components/forms';
-import { Callout, Choice, Footer, Question, useTheme } from '../kit';
+import { Callout, Choice, Footer, useTheme } from '../kit';
 import { Wizard, addDays, today } from '../useWizard';
 
 type Term = 'receipt' | '7' | '14' | '30' | 'custom';
@@ -65,7 +65,6 @@ export function StepTiming({ wizard }: Props) {
   );
   const [showDate, setShowDate] = useState(false);
   const [defaultSaved, setDefaultSaved] = useState(false);
-  const [defaultDismissed, setDefaultDismissed] = useState(false);
   const [savingDefault, setSavingDefault] = useState(false);
 
   function choose(next: Term) {
@@ -118,8 +117,6 @@ export function StepTiming({ wizard }: Props) {
 
   return (
     <div className="iw-enter">
-      <Question>When should they pay?</Question>
-
       <div className="space-y-2" role="radiogroup" aria-label="Payment timing">
         {TERMS.map((option) => (
           <Choice
@@ -144,6 +141,8 @@ export function StepTiming({ wizard }: Props) {
             type="date"
             value={invoice?.due_date || ''}
             min={invoiceDate}
+            changeOverride
+            debounceTimeout={0}
             onValueChange={(value) => wizard.patch({ due_date: value })}
           />
         </div>
@@ -157,6 +156,8 @@ export function StepTiming({ wizard }: Props) {
               label={translate('date')}
               type="date"
               value={invoiceDate}
+              changeOverride
+              debounceTimeout={0}
               onValueChange={(nextDate) => {
                 const entry = TERMS.find((option) => option.key === term);
 
@@ -183,11 +184,11 @@ export function StepTiming({ wizard }: Props) {
         )}
       </div>
 
-      {offerDefault && !defaultSaved && !defaultDismissed ? (
+      {offerDefault && !defaultSaved && !wizard.dismissed('terms') ? (
         <div className="mt-6">
           <Callout
             title={`Use ${chosen.days === 0 ? 'due on receipt' : `${chosen.days} days`} for future invoices?`}
-            onDismiss={() => setDefaultDismissed(true)}
+            onDismiss={() => wizard.dismiss('terms')}
             dismissLabel="Not now"
           >
             <Button

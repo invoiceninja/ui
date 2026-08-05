@@ -13,53 +13,30 @@ import { compressImageFileForLogo } from '$app/common/helpers/logo-image';
 import { request } from '$app/common/helpers/request';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { updateRecord } from '$app/common/stores/slices/company-users';
-import { useEffect, useRef, useState } from 'react';
+import { Button, InputField } from '$app/components/forms';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Button, InputField } from '$app/components/forms';
-import { Callout, useTheme } from '../kit';
+import { useTheme } from '../kit';
 
-interface Props {
-  focus: 'name' | 'logo' | null;
-  onFocusHandled: () => void;
-}
-
-export function BrandPrompts({ focus, onFocusHandled }: Props) {
+export function BrandPrompts() {
   const [translate] = useTranslation();
   const t = useTheme();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
 
   const [name, setName] = useState('');
+  const [editingName, setEditingName] = useState(false);
   const [savingName, setSavingName] = useState(false);
   const [nameError, setNameError] = useState<string>();
 
   const [uploading, setUploading] = useState(false);
-  const [logoSkipped, setLogoSkipped] = useState(false);
   const [logoError, setLogoError] = useState<string>();
 
-  const nameInput = useRef<HTMLInputElement>(null);
   const filePicker = useRef<HTMLInputElement>(null);
 
-  const missingName = !company?.settings?.name;
-  const missingLogo = !company?.settings?.company_logo;
-
-  useEffect(() => {
-    if (focus === null) {
-      return;
-    }
-
-    if (focus === 'name' && missingName) {
-      nameInput.current?.focus();
-    }
-
-    if (focus === 'logo' && missingLogo) {
-      setLogoSkipped(false);
-      filePicker.current?.click();
-    }
-
-    onFocusHandled();
-  }, [focus, missingName, missingLogo, onFocusHandled]);
+  const businessName: string = company?.settings?.name ?? '';
+  const hasLogo = Boolean(company?.settings?.company_logo);
 
   async function saveName() {
     if (!company?.id) {
@@ -83,6 +60,7 @@ export function BrandPrompts({ focus, onFocusHandled }: Props) {
       );
 
       dispatch(updateRecord({ object: 'company', data: response.data.data }));
+      setEditingName(false);
     } catch {
       setNameError("We couldn't save that. Try again.");
     } finally {
@@ -123,56 +101,68 @@ export function BrandPrompts({ focus, onFocusHandled }: Props) {
     }
   }
 
+  const showNameEditor = editingName || !businessName;
+
   return (
     <div className="space-y-3">
-      {missingName ? (
-        <Callout title="Your invoice needs a business name.">
-          <div className="flex items-end gap-2">
-            <div className="flex-1 min-w-0">
-              <InputField
-                innerRef={nameInput}
-                placeholder="Acme Studio"
-                value={name}
-                changeOverride
-                debounceTimeout={0}
-                onValueChange={setName}
-                errorMessage={nameError}
-              />
-            </div>
-
-            <Button behavior="button" disabled={savingName} onClick={saveName}>
-              {translate('save')}
-            </Button>
+      {showNameEditor ? (
+        <div className="flex items-end gap-2">
+          <div className="flex-1 min-w-0">
+            <InputField
+              id="iw-business-name"
+              label="Your business name"
+              placeholder="Acme Studio"
+              value={name || businessName}
+              changeOverride
+              debounceTimeout={0}
+              onValueChange={setName}
+              errorMessage={nameError}
+            />
           </div>
-        </Callout>
-      ) : null}
 
-      {!missingName && missingLogo && !logoSkipped ? (
-        <Callout
-          title="Add a logo to make this invoice look professional."
-          onDismiss={() => setLogoSkipped(true)}
+          <Button behavior="button" disabled={savingName} onClick={saveName}>
+            {translate('save')}
+          </Button>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm truncate" style={{ color: t.text }}>
+            {businessName}
+          </p>
+
+          <Button
+            type="secondary"
+            behavior="button"
+            disableWithoutIcon
+            onClick={() => {
+              setName(businessName);
+              setEditingName(true);
+            }}
+          >
+            {translate('change')}
+          </Button>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm" style={{ color: t.muted }}>
+          {hasLogo ? 'Logo added' : 'No logo'}
+        </p>
+
+        <Button
+          type="secondary"
+          behavior="button"
+          disabled={uploading}
+          onClick={() => filePicker.current?.click()}
         >
-          <div className="flex items-center gap-3">
-            <Button
-              type="secondary"
-              behavior="button"
-              disabled={uploading}
-              onClick={() => filePicker.current?.click()}
-            >
-              Upload a logo
-            </Button>
+          {hasLogo ? translate('change') : 'Add a logo'}
+        </Button>
+      </div>
 
-            <span className="text-xs" style={{ color: t.muted }}>
-              PNG or JPG.
-            </span>
-          </div>
-
-          {logoError ? (
-            <p className="text-xs mt-2" style={{ color: '#DC2626' }}>
-              {logoError}
-            </p>
-          ) : null}
-        </Callout>
+      {logoError ? (
+        <p className="text-xs" style={{ color: '#DC2626' }}>
+          {logoError}
+        </p>
       ) : null}
 
       <input

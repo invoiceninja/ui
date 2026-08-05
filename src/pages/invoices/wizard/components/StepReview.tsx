@@ -15,6 +15,8 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { Client } from '$app/common/interfaces/client';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -23,8 +25,9 @@ import { useTranslation } from 'react-i18next';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import { Button, InputField } from '$app/components/forms';
-import { Callout, Footer, Question, useTheme, radius } from '../kit';
+import { Callout, Footer, useTheme, radius } from '../kit';
 import { Wizard } from '../useWizard';
+import { BrandPrompts } from './BrandPrompts';
 
 const LOOKS: { label: string; design: string }[] = [
   { label: 'Clean', design: 'Clean' },
@@ -46,13 +49,15 @@ export function StepReview({ wizard, money }: Props) {
 
   const invoice = wizard.invoice;
   const client = wizard.client;
-  const contact = client?.contacts?.[0];
+  const emailable = (client?.contacts ?? []).filter(
+    (entry) => entry.send_email !== false && entry.email
+  );
+  const contact = emailable[0] ?? client?.contacts?.[0];
   const recipient = contact?.email ?? '';
 
   const [designs, setDesigns] = useState<Record<string, string>>({});
   const [designsFailed, setDesignsFailed] = useState(false);
   const [sending, setSending] = useState(false);
-  const [sentTo, setSentTo] = useState<string>('');
   const [askEmail, setAskEmail] = useState(false);
   const [emailDraft, setEmailDraft] = useState('');
   const [savingEmail, setSavingEmail] = useState(false);
@@ -62,7 +67,6 @@ export function StepReview({ wizard, money }: Props) {
   const [loadingEmailPreview, setLoadingEmailPreview] = useState(false);
 
   const [hasGateway, setHasGateway] = useState<boolean | null>(null);
-  const [payDismissed, setPayDismissed] = useState(false);
   const [bankInstructions, setBankInstructions] = useState<string | null>(null);
   const [savingBank, setSavingBank] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
@@ -140,8 +144,7 @@ export function StepReview({ wizard, money }: Props) {
       { skipIntercept: true }
     );
 
-    setSentTo(address);
-    wizard.markSent();
+    wizard.markSent(address);
 
     $refetch(['invoices']);
   }
@@ -284,7 +287,7 @@ export function StepReview({ wizard, money }: Props) {
       dispatch(updateRecord({ object: 'company', data: response.data.data }));
 
       setBankInstructions(null);
-      setPayDismissed(true);
+      wizard.dismiss('pay');
       toast.success('updated_settings');
     } catch {
       toast.error();
@@ -293,49 +296,14 @@ export function StepReview({ wizard, money }: Props) {
     }
   }
 
-  if (wizard.sent) {
-    return (
-      <div className="iw-enter">
-        <Question>
-          {sentTo ? `Invoice sent to ${sentTo}.` : 'Invoice sent.'}
-        </Question>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            behavior="button"
-            onClick={() => navigate(`/invoices/${wizard.invoiceId}/edit`)}
-          >
-            {translate('view_invoice')}
-          </Button>
-
-          <Button
-            type="secondary"
-            behavior="button"
-            onClick={() => window.location.reload()}
-          >
-            {translate('new_invoice')}
-          </Button>
-
-          <Button
-            type="secondary"
-            behavior="button"
-            onClick={() => navigate('/invoices')}
-          >
-            {translate('invoices')}
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   const itemCount = (invoice?.line_items ?? []).filter(
     (item) => item.notes || item.product_key
   ).length;
 
+  const previewable = Boolean(wizard.invoiceId) && Boolean(invoice?.client_id);
+
   return (
     <div className="iw-enter">
-      <Question>Preview and send</Question>
-
       <dl
         className="border divide-y"
         style={{
@@ -368,7 +336,10 @@ export function StepReview({ wizard, money }: Props) {
         />
       </dl>
 
-      <div className="mt-6">
+      <div
+        className="mt-6 border px-4 py-4"
+        style={{ borderColor: t.line, borderRadius: radius.panel }}
+      >
         <p
           className="text-[0.8125rem] mb-2.5"
           style={{ color: t.label, fontWeight: 500 }}
@@ -409,7 +380,92 @@ export function StepReview({ wizard, money }: Props) {
             })}
           </div>
         )}
+
+        <div className="mt-4">
+          <BrandPrompts />
+        </div>
       </div>
+
+      {previewable ? (
+        <div
+          className="iw-preview mt-6 border overflow-hidden"
+          style={{ borderColor: t.line, borderRadius: radius.panel }}
+        >
+          <style>
+            {'.iw-preview .flex.flex-col.w-full{height:38rem !important;}'}
+          </style>
+
+          <InvoicePreview
+            for="invoice"
+            resource={invoice as Invoice}
+            entity="invoice"
+            relationType="client_id"
+            endpoint="/api/v1/live_preview?entity=:entity"
+            initiallyVisible
+          />
+        </div>
+      ) : null}
+
+      {hasGateway === false && !wizard.dismissed('pay') ? (
+        <div className="mt-8">
+          <Callout
+            title="Would you like customers to pay online?"
+            onDismiss={() => wizard.dismiss('pay')}
+            dismissLabel="Not now"
+          >
+            {bankInstructions === null ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  type="secondary"
+                  behavior="button"
+                  onClick={() =>
+                    window.open('/settings/gateways/create', '_blank')
+                  }
+                >
+                  Set up card payments
+                </Button>
+
+                <Button
+                  type="secondary"
+                  behavior="button"
+                  onClick={() => setBankInstructions('')}
+                >
+                  Add bank transfer instructions
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <InputField
+                  element="textarea"
+                  textareaRows={3}
+                  placeholder="Bank name, account number, sort code"
+                  value={bankInstructions}
+                  changeOverride
+                  debounceTimeout={0}
+                  onValueChange={setBankInstructions}
+                />
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    behavior="button"
+                    disabled={savingBank}
+                    onClick={saveBankInstructions}
+                  >
+                    Add to invoice
+                  </Button>
+                  <Button
+                    type="secondary"
+                    behavior="button"
+                    onClick={() => setBankInstructions(null)}
+                  >
+                    {translate('cancel')}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </Callout>
+        </div>
+      ) : null}
 
       <p className="text-sm mt-8 leading-6" style={{ color: t.text }}>
         {recipient ? (
@@ -470,67 +526,6 @@ export function StepReview({ wizard, money }: Props) {
           Send invoice
         </Button>
       </Footer>
-
-      {hasGateway === false && !payDismissed ? (
-        <div className="mt-8">
-          <Callout
-            title="Would you like customers to pay online?"
-            onDismiss={() => setPayDismissed(true)}
-            dismissLabel="Not now"
-          >
-            {bankInstructions === null ? (
-              <div className="flex flex-wrap items-center gap-2">
-                <Button
-                  type="secondary"
-                  behavior="button"
-                  onClick={() =>
-                    window.open('/settings/gateways/create', '_blank')
-                  }
-                >
-                  Set up card payments
-                </Button>
-
-                <Button
-                  type="secondary"
-                  behavior="button"
-                  onClick={() => setBankInstructions('')}
-                >
-                  Add bank transfer instructions
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <InputField
-                  element="textarea"
-                  textareaRows={3}
-                  placeholder="Bank name, account number, sort code"
-                  value={bankInstructions}
-                  changeOverride
-                  debounceTimeout={0}
-                  onValueChange={setBankInstructions}
-                />
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    behavior="button"
-                    disabled={savingBank}
-                    onClick={saveBankInstructions}
-                  >
-                    Add to invoice
-                  </Button>
-                  <Button
-                    type="secondary"
-                    behavior="button"
-                    onClick={() => setBankInstructions(null)}
-                  >
-                    {translate('cancel')}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </Callout>
-        </div>
-      ) : null}
 
       <Modal
         visible={askEmail}

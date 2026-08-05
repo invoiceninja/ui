@@ -14,8 +14,9 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, InputField } from '$app/components/forms';
-import { Footer, Legend, Question, useTheme, radius } from '../kit';
+import { Spinner } from '$app/components/Spinner';
+import { Button, InputField, InputLabel } from '$app/components/forms';
+import { Footer, Legend, useTheme, radius } from '../kit';
 import { Wizard } from '../useWizard';
 
 interface Props {
@@ -48,7 +49,27 @@ export function StepRecipient({ wizard }: Props) {
 
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const searchBox = useRef<HTMLDivElement>(null);
+  const nameInput = useRef<HTMLInputElement>(null);
   const selected = wizard.client;
+
+  useEffect(() => {
+    const input = nameInput.current;
+
+    if (!input) {
+      return;
+    }
+
+    input.setAttribute('role', 'combobox');
+    input.setAttribute('aria-expanded', String(matches.length > 0));
+    input.setAttribute('aria-controls', 'iw-customer-suggestions');
+    input.setAttribute('aria-autocomplete', 'list');
+
+    if (active >= 0 && matches[active]) {
+      input.setAttribute('aria-activedescendant', `iw-customer-${active}`);
+    } else {
+      input.removeAttribute('aria-activedescendant');
+    }
+  }, [matches, active]);
 
   useEffect(() => {
     if (!matches.length) {
@@ -58,6 +79,8 @@ export function StepRecipient({ wizard }: Props) {
     const onPointerDown = (event: MouseEvent) => {
       if (!searchBox.current?.contains(event.target as Node)) {
         setMatches([]);
+        setActive(-1);
+        setDismissedSearch(true);
       }
     };
 
@@ -69,6 +92,7 @@ export function StepRecipient({ wizard }: Props) {
   useEffect(() => {
     if (selected || dismissedSearch || name.trim().length < 2) {
       setMatches([]);
+      setSearching(false);
       return;
     }
 
@@ -76,11 +100,11 @@ export function StepRecipient({ wizard }: Props) {
       clearTimeout(timer.current);
     }
 
-    setSearching(true);
-
     let cancelled = false;
 
     timer.current = setTimeout(() => {
+      setSearching(true);
+
       request(
         'GET',
         endpoint(
@@ -90,8 +114,22 @@ export function StepRecipient({ wizard }: Props) {
         {},
         { skipIntercept: true }
       )
-        .then((response) => !cancelled && setMatches(response.data.data ?? []))
-        .catch(() => !cancelled && setMatches([]))
+        .then((response) => {
+          if (cancelled) {
+            return;
+          }
+
+          setMatches(response.data.data ?? []);
+          setActive(-1);
+        })
+        .catch(() => {
+          if (cancelled) {
+            return;
+          }
+
+          setMatches([]);
+          setActive(-1);
+        })
         .finally(() => !cancelled && setSearching(false));
     }, 300);
 
@@ -199,8 +237,6 @@ export function StepRecipient({ wizard }: Props) {
   if (selected) {
     return (
       <div className="iw-enter">
-        <Question>Who are you invoicing?</Question>
-
         <div
           className="flex items-start justify-between gap-4 border px-4 py-3.5"
           style={{ borderColor: t.line, borderRadius: radius.panel }}
@@ -235,14 +271,12 @@ export function StepRecipient({ wizard }: Props) {
 
   return (
     <div className="iw-enter">
-      <Question>Who are you invoicing?</Question>
-
       <div className="space-y-4">
         <div
           className="relative"
           ref={searchBox}
           onKeyDown={(event) => {
-            if (!matches.length) {
+            if (event.target !== nameInput.current || !matches.length) {
               return;
             }
 
@@ -254,37 +288,60 @@ export function StepRecipient({ wizard }: Props) {
               setActive((current) =>
                 current <= 0 ? matches.length - 1 : current - 1
               );
-            } else if (event.key === 'Enter' && active >= 0) {
+            } else if (event.key === 'Enter' && matches[active]) {
               event.preventDefault();
               choose(matches[active]);
             } else if (event.key === 'Escape') {
               setMatches([]);
               setActive(-1);
+              setDismissedSearch(true);
             }
           }}
         >
-          <InputField
-            id="iw-customer-name"
-            label="Customer or company name"
-            placeholder="Jane Smith"
-            value={name}
-            changeOverride
-            debounceTimeout={0}
-            required
-            onValueChange={(value) => {
-              setName(value);
-              setDismissedSearch(false);
-              setActive(-1);
-            }}
-            errorMessage={errors.name}
-          />
+          <InputLabel className="mb-1" for="iw-customer-name">
+            Customer or company name
+            <span className="ml-1 text-red-600">*</span>
+          </InputLabel>
+
+          <div className="flex items-start">
+            <div className="flex-1 min-w-0">
+              <InputField
+                id="iw-customer-name"
+                innerRef={nameInput}
+                placeholder="Jane Smith"
+                required
+                value={name}
+                changeOverride
+                debounceTimeout={0}
+                onValueChange={(value) => {
+                  setName(value);
+                  setDismissedSearch(false);
+                  setActive(-1);
+                }}
+                errorMessage={errors.name}
+              />
+            </div>
+
+            <span
+              className="shrink-0 overflow-hidden flex items-center justify-end"
+              style={{
+                width: searching ? '1.875rem' : 0,
+                height: '2.6875rem',
+                transition: 'width 150ms ease',
+              }}
+              aria-hidden={!searching}
+            >
+              <Spinner />
+            </span>
+          </div>
 
           {matches.length > 0 ? (
             <div
               id="iw-customer-suggestions"
               role="listbox"
-              className="absolute left-0 right-0 mt-1.5 z-20 border overflow-hidden"
+              className="absolute left-0 mt-1.5 z-20 border overflow-hidden"
               style={{
+                right: searching ? '1.875rem' : 0,
                 backgroundColor: t.surface,
                 borderColor: t.line,
                 borderRadius: radius.control,

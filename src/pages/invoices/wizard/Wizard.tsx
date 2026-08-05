@@ -12,18 +12,16 @@ import { useColorScheme } from '$app/common/colors';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { Invoice } from '$app/common/interfaces/invoice';
+import { Badge } from '$app/components/Badge';
 import { Page } from '$app/components/Breadcrumbs';
 import { Spinner } from '$app/components/Spinner';
-import { Tabs } from '$app/components/Tabs';
 import { Card } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
-import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
-import { MouseEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { BrandPrompts } from './components/BrandPrompts';
+import { SentPanel } from './components/SentPanel';
 import { Motion, useTheme } from './kit';
 import { STEPS, useWizard } from './useWizard';
 
@@ -39,7 +37,6 @@ export default function Wizard() {
   const formatMoney = useFormatMoney();
   const wizard = useWizard();
 
-  const [brandFocus, setBrandFocus] = useState<'name' | 'logo' | null>(null);
   const heading = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -51,18 +48,6 @@ export default function Wizard() {
     { name: translate('new_invoice'), href: '/invoices/wizard' },
   ];
 
-  const tabs = STEPS.map((entry) => ({
-    name: translate(entry.labelKey),
-    href: entry.href,
-  }));
-
-  const locked = STEPS.filter((entry, index) =>
-    wizard.sent ? entry.key !== 'send' : index > wizard.furthest
-  ).map((entry) => entry.href);
-
-  const isLocked = (href: string | null) =>
-    Boolean(href) && locked.some((path) => href?.endsWith(path));
-
   const money = (value: number) =>
     String(
       formatMoney(
@@ -73,18 +58,24 @@ export default function Wizard() {
       )
     );
 
-  const previewable =
-    Boolean(wizard.invoiceId) && Boolean(wizard.invoice?.client_id);
+  const current = STEPS[wizard.stepIndex] ?? STEPS[0];
+  const onSendStep = wizard.step === 'send';
 
-  if (wizard.ready) {
-    const sendStep = STEPS[STEPS.length - 1];
+  const described = (wizard.invoice?.line_items ?? []).some(
+    (item) => item.notes || item.product_key
+  );
 
-    if (wizard.sent && location.pathname !== sendStep.href) {
-      return <Navigate to={sendStep.href} replace />;
-    }
-
+  if (wizard.ready && !wizard.sent) {
     if (location.pathname !== STEPS[0].href && !wizard.invoice?.client_id) {
       return <Navigate to={STEPS[0].href} replace />;
+    }
+
+    if (!described && (wizard.step === 'when' || wizard.step === 'send')) {
+      return <Navigate to={STEPS[1].href} replace />;
+    }
+
+    if (wizard.step === 'send' && !wizard.invoice?.due_date) {
+      return <Navigate to={STEPS[2].href} replace />;
     }
   }
 
@@ -98,45 +89,26 @@ export default function Wizard() {
     >
       <Motion />
 
-      <Card
-        className="shadow-sm"
-        title={translate('new_invoice')}
-        withoutBodyPadding
-        withoutHeaderBorder
-        style={{ borderColor: colors.$24 }}
+      <div
+        className="mx-auto w-full"
+        style={{ maxWidth: onSendStep ? '54rem' : '40rem' }}
       >
-        <div
-          className="iw-tabs"
-          onClickCapture={(event: MouseEvent<HTMLDivElement>) => {
-            const anchor = (event.target as HTMLElement).closest('a');
-
-            if (anchor && isLocked(anchor.getAttribute('href'))) {
-              event.preventDefault();
-              event.stopPropagation();
-            }
-          }}
+        <Card
+          className="shadow-sm"
+          title={wizard.sent ? 'Invoice sent' : current.title}
+          childrenClassName="px-4 sm:px-6 pb-4 sm:pb-6"
+          style={{ borderColor: colors.$24 }}
+          headerStyle={{ borderColor: colors.$20 }}
+          topRight={
+            wizard.sent ? null : (
+              <Badge variant="primary" className="shrink-0">
+                {`${wizard.stepIndex + 1} / ${STEPS.length}`}
+              </Badge>
+            )
+          }
         >
-          <style>
-            {locked
-              .map(
-                (path) =>
-                  `.iw-tabs a[href$="${path}"]{opacity:.45;cursor:default;}`
-              )
-              .join('')}
-          </style>
-
-          <Tabs
-            tabs={tabs}
-            disableBackupNavigation
-            withHorizontalPadding
-            fullRightPadding
-            withHorizontalPaddingOnSmallScreen
-          />
-        </div>
-
-        <div className="px-4 sm:px-6 pt-8 pb-8">
           {wizard.loadFailed ? (
-            <div className="py-16 text-center">
+            <div className="py-14 text-center">
               <p className="text-sm mb-4" style={{ color: t.text }}>
                 {translate('error_title')}
               </p>
@@ -151,57 +123,25 @@ export default function Wizard() {
               </Button>
             </div>
           ) : !wizard.ready ? (
-            <div className="py-16">
+            <div className="py-14">
               <Spinner />
             </div>
           ) : (
-            <div className="grid gap-8 lg:gap-12 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,28rem)_minmax(0,1fr)]">
-              <section
-                key={wizard.step}
-                ref={heading}
-                tabIndex={-1}
-                className="min-w-0 focus:outline-none"
-              >
+            <section
+              key={wizard.sent ? 'sent' : wizard.step}
+              ref={heading}
+              tabIndex={-1}
+              className="min-w-0 focus:outline-none pt-2"
+            >
+              {wizard.sent ? (
+                <SentPanel wizard={wizard} />
+              ) : (
                 <Outlet context={{ wizard, money }} />
-              </section>
-
-              <section className="min-w-0 space-y-4">
-                {wizard.sent ? null : (
-                  <BrandPrompts
-                    focus={brandFocus}
-                    onFocusHandled={() => setBrandFocus(null)}
-                  />
-                )}
-
-                {previewable ? (
-                  <InvoicePreview
-                    for="invoice"
-                    resource={wizard.invoice as Invoice}
-                    entity="invoice"
-                    relationType="client_id"
-                    endpoint="/api/v1/live_preview?entity=:entity"
-                    initiallyVisible
-                  />
-                ) : (
-                  <div
-                    className="border flex items-center justify-center text-center px-8"
-                    style={{
-                      borderColor: t.line,
-                      borderRadius: '0.375rem',
-                      backgroundColor: t.surface,
-                      minHeight: '28rem',
-                    }}
-                  >
-                    <p className="text-sm" style={{ color: t.muted }}>
-                      {translate('preview')}
-                    </p>
-                  </div>
-                )}
-              </section>
-            </div>
+              )}
+            </section>
           )}
-        </div>
-      </Card>
+        </Card>
+      </div>
     </Default>
   );
 }

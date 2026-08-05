@@ -124,14 +124,9 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
       toast.success('updated_settings');
       onClose();
     } catch {
-      onApplied({
-        name: name.trim(),
-        rate: parsedRate,
-        inclusive: Boolean(inclusive),
-      });
-
-      toast.error();
-      onClose();
+      setError(
+        "The tax rate was saved, but we couldn't switch taxes on for your company. Try again."
+      );
     } finally {
       setBusy(false);
     }

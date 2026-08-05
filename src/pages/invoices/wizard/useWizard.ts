@@ -27,11 +27,19 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 export type StepKey = 'who' | 'what' | 'when' | 'send';
 
-export const STEPS: { key: StepKey; labelKey: string; href: string }[] = [
-  { key: 'who', labelKey: 'customer', href: '/invoices/wizard' },
-  { key: 'what', labelKey: 'items', href: '/invoices/wizard/items' },
-  { key: 'when', labelKey: 'payment', href: '/invoices/wizard/payment' },
-  { key: 'send', labelKey: 'send', href: '/invoices/wizard/send' },
+export const STEPS: { key: StepKey; title: string; href: string }[] = [
+  { key: 'who', title: 'Who are you invoicing?', href: '/invoices/wizard' },
+  {
+    key: 'what',
+    title: 'What are you charging for?',
+    href: '/invoices/wizard/items',
+  },
+  {
+    key: 'when',
+    title: 'When should they pay?',
+    href: '/invoices/wizard/payment',
+  },
+  { key: 'send', title: 'Review and send', href: '/invoices/wizard/send' },
 ];
 
 export type SaveState = 'idle' | 'saving' | 'saved' | 'failed';
@@ -66,10 +74,12 @@ export interface Wizard {
   client: Client | undefined;
   step: StepKey;
   stepIndex: number;
-  furthest: number;
   saveState: SaveState;
   sent: boolean;
-  markSent: () => void;
+  sentTo: string;
+  markSent: (address: string) => void;
+  dismissed: (key: string) => boolean;
+  dismiss: (key: string) => void;
   totals: Totals;
   currency: Currency | undefined;
 
@@ -114,9 +124,10 @@ export function useWizard(): Wizard {
 
   const step: StepKey =
     STEPS.find((entry) => entry.href === location.pathname)?.key ?? 'who';
-  const [furthest, setFurthest] = useState(0);
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [sent, setSent] = useState(false);
+  const [sentTo, setSentTo] = useState('');
+  const [dismissals, setDismissals] = useState<Record<string, boolean>>({});
 
   const latest = useRef<Invoice>();
   const persistedId = useRef<string | null>(null);
@@ -193,7 +204,7 @@ export function useWizard(): Wizard {
     if (!current || !current.client_id) {
       written.current = at;
 
-      return persistedId.current;
+      return null;
     }
 
     const id = persistedId.current;
@@ -369,9 +380,10 @@ export function useWizard(): Wizard {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     patch({ client_id: '', invitations: [] as any });
 
-    setFurthest(0);
-    navigate(STEPS[0].href);
-  }, [patch, navigate]);
+    if (location.pathname !== STEPS[0].href) {
+      navigate(STEPS[0].href);
+    }
+  }, [patch, navigate, location.pathname]);
 
   const refreshClient = useCallback((next: Client) => setClient(next), []);
 
@@ -416,13 +428,6 @@ export function useWizard(): Wizard {
         return;
       }
 
-      setFurthest((current) =>
-        Math.max(
-          current,
-          STEPS.findIndex((entry) => entry.key === next)
-        )
-      );
-
       navigate(target.href);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
@@ -448,10 +453,20 @@ export function useWizard(): Wizard {
     client,
     step,
     stepIndex,
-    furthest,
     saveState,
     sent,
-    markSent: () => setSent(true),
+    sentTo,
+    markSent: (address: string) => {
+      if (!latest.current?.client_id) {
+        return;
+      }
+
+      setSentTo(address);
+      setSent(true);
+    },
+    dismissed: (key: string) => Boolean(dismissals[key]),
+    dismiss: (key: string) =>
+      setDismissals((current) => ({ ...current, [key]: true })),
     totals,
     currency,
     goTo,

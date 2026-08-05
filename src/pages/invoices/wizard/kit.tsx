@@ -54,19 +54,6 @@ export function Motion() {
   );
 }
 
-export function Question({ children }: { children: ReactNode }) {
-  const t = useTheme();
-
-  return (
-    <h2
-      className="text-xl mb-6"
-      style={{ color: t.text, fontWeight: 600, letterSpacing: '-0.01em' }}
-    >
-      {children}
-    </h2>
-  );
-}
-
 export function Legend({ children }: { children: ReactNode }) {
   const t = useTheme();
 
