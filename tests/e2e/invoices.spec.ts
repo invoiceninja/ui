@@ -769,6 +769,8 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await waitForTableData(page);
 
+  await page.waitForTimeout(300);
+  
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
   await expect(page.locator('[data-cy="bulkActionsTrigger"]')).toBeVisible({ timeout: 10000 });
