@@ -423,33 +423,12 @@ test('product documents uploading with edit_product', async ({ page, api }) => {
 
   await login(page, 'products@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  const docUploadName = uniqueName('test-doc-upload-product');
 
-  await page.getByRole('link', { name: 'Products', exact: true }).click();
+  await createProduct({ page, name: docUploadName });
 
-  await page.waitForURL('**/products');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    const docUploadName = uniqueName('test-doc-upload-product');
-
-    await createProduct({ page, withNavigation: false, name: docUploadName });
-
-    const docUploadId = page.url().match(/products\/([^/]+)/)?.[1];
-    if (docUploadId) api.trackEntity('products', docUploadId);
-  } else {
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
-
-    await moreActionsButton.click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  const docUploadId = page.url().match(/products\/([^/]+)/)?.[1];
+  if (docUploadId) api.trackEntity('products', docUploadId);
 
   await page.waitForURL('**/products/**/edit');
 
@@ -460,6 +439,10 @@ test('product documents uploading with edit_product', async ({ page, api }) => {
     .click();
 
   await page.waitForURL('**/products/**/documents');
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')

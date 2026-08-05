@@ -513,7 +513,7 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
   api,
 }) => {
 
-  const vendorName = uniqueName('po-vendor');
+  const vendorName = uniqueName('po-doc-upload-vendor');
 
   await api.setPermissions('purchase_orders@example.com', [
     'create_purchase_order',
@@ -524,33 +524,10 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
 
   await login(page, 'purchase_orders@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  await createPurchaseOrder({ page, vendorName });
 
-  await page
-    .getByRole('link', { name: 'Purchase Orders', exact: true })
-    .click();
-
-  await page.waitForURL('**/purchase_orders');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    await createPurchaseOrder({ page, vendorName });
-
-    await page.waitForURL('**/purchase_orders/**/edit');
-    const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
-    if (createdId) api.trackEntity('purchase_orders', createdId);
-  } else {
-    await tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first()
-      .click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('purchase_orders', createdId);
 
   await page.waitForURL('**/purchase_orders/**/edit');
 
@@ -560,7 +537,9 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
     .getByRole('link', { name: 'Documents' })
     .click();
 
-    await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')

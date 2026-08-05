@@ -452,33 +452,10 @@ test('recurring expense documents uploading with edit_recurring_expense', async 
 
   await login(page, 'expenses@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  await createRecurringExpense({ page });
 
-  await page
-    .getByRole('link', { name: 'Recurring Expenses', exact: true })
-    .click();
-
-  await page.waitForURL('**/recurring_expenses');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    await createRecurringExpense({ page });
-
-    await page.waitForURL('**/recurring_expenses/**/edit');
-    const createdId = page.url().match(/recurring_expenses\/([^/]+)/)?.[1];
-    if (createdId) api.trackEntity('recurring_expenses', createdId);
-  } else {
-    await tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first()
-      .click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  const createdId = page.url().match(/recurring_expenses\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('recurring_expenses', createdId);
 
   await page.waitForURL('**/recurring_expenses/**/edit');
 
@@ -489,6 +466,10 @@ test('recurring expense documents uploading with edit_recurring_expense', async 
     .click();
 
   await page.waitForURL('**/recurring_expenses/**/documents');
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')

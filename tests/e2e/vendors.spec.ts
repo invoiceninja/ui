@@ -471,24 +471,10 @@ test('vendor documents uploading with edit_vendor', async ({ page, api }) => {
 
   await login(page, 'vendors@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  await createVendor({ page, vendorName });
 
-  await page.getByRole('link', { name: 'Vendors', exact: true }).click();
-
-  await page.waitForURL('**/vendors');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    await createVendor({ page, vendorName });
-
-    const id = page.url().match(/vendors\/([^/]+)/)?.[1];
-    if (id) api.trackEntity('vendors', id);
-  } else {
-    await tableRow.getByRole('link').first().click();
-  }
+  const id = page.url().match(/vendors\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('vendors', id);
 
   await checkShowPage(page, true);
 
@@ -499,6 +485,10 @@ test('vendor documents uploading with edit_vendor', async ({ page, api }) => {
     .click();
 
   await page.waitForURL('**/vendors/**/documents');
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')
