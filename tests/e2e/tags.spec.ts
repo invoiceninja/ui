@@ -26,25 +26,6 @@ const TAGS = 'tags' as EntityType;
 
 type TagType = 'global' | 'tasks' | 'projects';
 
-const TAG_ENTITY_TYPE_VALUES = [
-  'global',
-  'bank_transaction',
-  'client',
-  'credit',
-  'expense',
-  'invoice',
-  'payment',
-  'product',
-  'project',
-  'purchase_order',
-  'quote',
-  'recurring_expense',
-  'recurring_invoice',
-  'task',
-  'transaction',
-  'vendor',
-];
-
 // Tag ids created during the active test, cleaned up in afterEach. Tags are not
 // covered by the api fixture's automatic teardown order, so we sweep them here.
 // Tests in a worker run sequentially, making this module-level array safe.
@@ -127,6 +108,16 @@ const createTag = async (params: CreateParams) => {
  */
 const selectTagRow = async (page: Page, name: string) => {
   await waitForTableData(page);
+
+  // Bulk tests create task tags; clear any persisted Type filter from earlier tests.
+  const typeFilterLabel = page
+    .locator('[data-cy="dataTable"]')
+    .getByText('Type:', { exact: true });
+
+  if (await typeFilterLabel.isVisible()) {
+    await applyTagTypeFilter(page, 'all');
+    await waitForTableData(page);
+  }
 
   await page.locator('#filter').fill(name);
 
@@ -311,19 +302,34 @@ test('can filter tags by entity type', async ({ page, api }) => {
     page.getByRole('link', { name: taskName, exact: true })
   ).not.toBeVisible();
 
-  // const resetRequest = page.waitForResponse((response) => {
-  //   const url = new URL(response.url());
+  await page.locator('#filter').fill('');
+  await page.waitForTimeout(600);
 
-  //   return (
-  //     url.pathname.endsWith('/api/v1/tags') &&
-  //     url.searchParams.get('entity_types') === TAG_ENTITY_TYPE_VALUES.join(',')
-  //   );
-  // });
+  const preferencesSaved = page.waitForResponse(
+    (response) =>
+      response.request().method() === 'PUT' &&
+      response.url().includes('/api/v1/company_users/') &&
+      response.url().includes('/preferences') &&
+      response.ok(),
+    { timeout: 15000 }
+  );
 
-  // await applyTagTypeFilter(page, 'all');
-  // await resetRequest;
-  // await page.waitForTimeout(1700);
+  await applyTagTypeFilter(page, 'all');
+  await waitForTableData(page);
 
+  await page.locator('#filter').fill(taskName);
+  await page.waitForTimeout(600);
+
+  await expect(
+    page.getByRole('link', { name: taskName, exact: true })
+  ).toBeVisible({
+    timeout: 10000,
+  });
+
+  await page.locator('#filter').fill('');
+  await page.waitForTimeout(600);
+
+  await preferencesSaved;
 });
 
 test('can edit a task tag', async ({ page, api }) => {

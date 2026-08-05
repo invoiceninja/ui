@@ -486,36 +486,13 @@ test('invoice documents uploading with edit_invoice', async ({ page, api }) => {
 
   await login(page, 'invoices@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  const clientName = uniqueName('inv-doc-upload');
+  await createInvoice({ page, clientName });
 
-  await page.getByRole('link', { name: 'Invoices', exact: true }).click();
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
 
-  await page.waitForURL('**/invoices');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    const clientName = uniqueName('inv-docup');
-    await createInvoice({ page, clientName });
-
-    const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
-    if (invoiceId) api.trackEntity('invoices', invoiceId);
-
-    await page.waitForURL('**/invoices/**/edit**');
-  } else {
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
-
-    await moreActionsButton.click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-
-    await page.waitForURL('**/invoices/**/edit');
-  }
+  await page.waitForURL('**/invoices/**/edit**');
 
   await page
     .getByRole('link', {

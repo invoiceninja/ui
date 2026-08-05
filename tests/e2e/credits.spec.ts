@@ -504,32 +504,11 @@ test('credit documents uploading with edit_credit', async ({ page, api }) => {
 
   await login(page, 'credits@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  const clientName = uniqueName('cr-doc-upload');
+  await createCredit({ page, clientName });
 
-  await page.getByRole('link', { name: 'Credits', exact: true }).click();
-
-  await page.waitForURL('**/credits');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    const clientName = uniqueName('cr-docup');
-    await createCredit({ page, clientName });
-
-    const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
-    if (creditId) api.trackEntity('credits', creditId);
-  } else {
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
-
-    await moreActionsButton.click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (creditId) api.trackEntity('credits', creditId);
 
   await page.waitForURL('**/credits/**/edit');
 
@@ -540,14 +519,18 @@ test('credit documents uploading with edit_credit', async ({ page, api }) => {
     .first()
     .click();
 
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
+
   await page
     .locator('input[type="file"]')
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-    await page.waitForTimeout(150);
-
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({
+    timeout: 10000,
+  });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()

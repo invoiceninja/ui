@@ -417,31 +417,10 @@ test('expense documents uploading with edit_expense', async ({ page, api }) => {
 
   await login(page, 'expenses@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  await createExpense({ page });
 
-  await page.getByRole('link', { name: 'Expenses', exact: true }).click();
-
-  await page.waitForURL('**/expenses');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    await createExpense({ page });
-
-    await page.waitForURL('**/expenses/**/edit');
-    const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
-    if (createdId) api.trackEntity('expenses', createdId);
-  } else {
-    await tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first()
-      .click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  const createdId = page.url().match(/expenses\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('expenses', createdId);
 
   await page.waitForURL('**/expenses/**/edit');
 
@@ -452,6 +431,10 @@ test('expense documents uploading with edit_expense', async ({ page, api }) => {
     .click();
 
   await page.waitForURL('**/expenses/**/documents');
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')

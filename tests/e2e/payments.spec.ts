@@ -358,38 +358,16 @@ test('payment documents preview with edit_payment', async ({ page, api }) => {
 
 test('payment documents uploading with edit_payment', async ({ page, api }) => {
 
-  const clientName = uniqueName('pay-client');
+  const clientName = uniqueName('pay-doc-upload');
 
   await api.setPermissions('payments@example.com', ['create_payment', 'edit_payment', 'create_client']);
 
   await login(page, 'payments@example.com', 'password');
 
-  await page.getByRole('link', { name: 'Payments', exact: true }).click();
+  await createPayment({ page, clientName });
 
-  await page.waitForURL('**/payments');
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    await createPayment({ page, withNavigation: false, clientName });
-
-    await page.waitForURL('**/payments/**/edit');
-    const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
-    if (createdId) api.trackEntity('payments', createdId);
-  } else {
-    const tableRow = page.locator('tbody').first().getByRole('row').first();
-
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
-
-    await moreActionsButton.click();
-
-    const editLink = page.getByRole('link', { name: 'Edit', exact: true }).first();
-    await editLink.waitFor({ state: 'visible' });
-    await editLink.click();
-  }
+  const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('payments', createdId);
 
   await page.waitForURL('**/payments/**/edit');
 
@@ -398,6 +376,10 @@ test('payment documents uploading with edit_payment', async ({ page, api }) => {
   await docsLink.click();
 
   await page.waitForURL('**/payments/**/documents');
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')

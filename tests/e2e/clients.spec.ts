@@ -614,33 +614,13 @@ test('client documents uploading with edit_client', async ({ page, api }) => {
 
   await login(page, 'clients@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  const clientName = uniqueName('cl-doc-upload');
+  await createClient({ page, api, clientName });
 
-  await page.getByRole('link', { name: 'Clients', exact: true }).click();
-
-  await page.waitForURL('**/clients');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    await createClient({ page, api });
-
-    await page
-      .getByRole('button')
-      .filter({ has: page.getByText('Edit') })
-      .click();
-  } else {
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
-
-    await moreActionsButton.click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  await page
+    .getByRole('button')
+    .filter({ has: page.getByText('Edit') })
+    .click();
 
   await checkEditPage(page);
 
@@ -650,6 +630,10 @@ test('client documents uploading with edit_client', async ({ page, api }) => {
     })
     .first()
     .click();
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')

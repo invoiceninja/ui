@@ -494,31 +494,10 @@ test('project documents uploading with edit_project', async ({ page, api }) => {
 
   await login(page, 'projects@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  await createProject({ page, name: projectName });
 
-  await page.getByRole('link', { name: 'Projects', exact: true }).click();
-
-  await page.waitForURL('**/projects');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    await createProject({ page, name: projectName });
-
-    const id = page.url().match(/projects\/([^/]+)/)?.[1];
-    if (id) api.trackEntity('projects', id);
-  } else {
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
-
-    await moreActionsButton.click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await page.waitForURL('**/projects/**/edit');
 
@@ -527,6 +506,10 @@ test('project documents uploading with edit_project', async ({ page, api }) => {
       name: 'Documents',
     })
     .click();
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')

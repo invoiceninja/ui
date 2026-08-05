@@ -541,7 +541,7 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
   api,
 }) => {
 
-  const clientName = uniqueName('ri-client');
+  const clientName = uniqueName('ri-doc-upload-client');
 
   await api.setPermissions('invoices@example.com', [
     'create_recurring_invoice',
@@ -552,36 +552,11 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
 
   await login(page, 'invoices@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
-
-  await page
-    .getByRole('link', { name: 'Recurring Invoices', exact: true })
-    .click();
-
-  await page.waitForURL('**/recurring_invoices');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    await createRecurringInvoice({ page, clientName });
-
-    await page.waitForURL('**/recurring_invoices/**/edit');
-    const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
-    if (createdId) api.trackEntity('recurring_invoices', createdId);
-  } else {
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
-
-    await moreActionsButton.click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  await createRecurringInvoice({ page, clientName });
 
   await page.waitForURL('**/recurring_invoices/**/edit');
+  const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('recurring_invoices', createdId);
 
   await page
     .locator('[data-cy="tabs"]')
@@ -589,12 +564,14 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
     .first()
     .click();
 
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
+
   await page
     .locator('input[type="file"]')
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
-
-  await page.waitForTimeout(300);
 
   await expect(page.getByText('Successfully uploaded document')).toBeVisible({
     timeout: 10000,

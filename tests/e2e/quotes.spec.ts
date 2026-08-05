@@ -513,32 +513,11 @@ test('quote documents uploading with edit_quote', async ({ page, api }) => {
 
   await login(page, 'quotes@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  const clientName = uniqueName('qt-doc-upload');
+  await createQuote({ page, clientName });
 
-  await page.getByRole('link', { name: 'Quotes', exact: true }).click();
-
-  await page.waitForURL('**/quotes');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    const clientName = uniqueName('qt-docup');
-    await createQuote({ page, clientName });
-
-    const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
-    if (quoteId) api.trackEntity('quotes', quoteId);
-  } else {
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
-
-    await moreActionsButton.click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await page.waitForURL('**/quotes/**/edit');
 
@@ -548,8 +527,9 @@ test('quote documents uploading with edit_quote', async ({ page, api }) => {
     .getByRole('link', { name: 'Documents' })
     .click();
 
-    await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
-
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')
