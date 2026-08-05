@@ -45,25 +45,6 @@ const TAG_ENTITY_TYPE_VALUES = [
   'vendor',
 ];
 
-const TAG_ENTITY_TYPE_LABELS = [
-  'Global',
-  'Bank Transaction',
-  'Client',
-  'Credit',
-  'Expense',
-  'Invoice',
-  'Payment',
-  'Product',
-  'Project',
-  'Purchase Order',
-  'Quote',
-  'Recurring Expense',
-  'Recurring Invoice',
-  'Task',
-  'Transaction',
-  'Vendor',
-];
-
 // Tag ids created during the active test, cleaned up in afterEach. Tags are not
 // covered by the api fixture's automatic teardown order, so we sweep them here.
 // Tests in a worker run sequentially, making this module-level array safe.
@@ -157,33 +138,63 @@ const selectTagRow = async (page: Page, name: string) => {
   await checkbox.click();
 };
 
+const openTypeFilterMenu = async (page: Page) => {
+  await page.getByText('Type:', { exact: true }).click();
+
+  await expect(
+    page.getByRole('option', { name: 'Global', exact: true })
+  ).toBeVisible();
+};
+
+const typeFilterMenu = (page: Page) =>
+  page.locator('[class*="menu"]').filter({
+    has: page.getByRole('option', { name: 'Global', exact: true }),
+  });
+
+/**
+ * Narrow the tag table by entity type using the Type multi-select.
+ * Options are toggled by index so duplicate labels (e.g. two "Transaction"
+ * entries) do not confuse role-based lookups.
+ */
 const applyTagTypeFilter = async (
   page: Page,
   type: 'task' | 'project' | 'all'
 ) => {
-  await page.getByText('Type:', { exact: true }).click();
+  await openTypeFilterMenu(page);
 
+  const menu = typeFilterMenu(page);
+  const options = menu.getByRole('option');
   const selectedLabel =
-    type === 'project' ? 'Project' : type === 'task' ? 'Task' : undefined;
+    type === 'project' ? 'Project' : type === 'task' ? 'Task' : null;
+  const optionCount = await options.count();
 
-  for (const label of TAG_ENTITY_TYPE_LABELS) {
-    const option = page.getByRole('option', { name: label, exact: true });
-    const checkbox = option.getByRole('checkbox');
+  for (let index = 0; index < optionCount; index++) {
+    const option = options.nth(index);
+    const label =
+      (await option.locator('span.text-sm').textContent())?.trim() ?? '';
     const shouldBeSelected = type === 'all' || label === selectedLabel;
+    const checkbox = option.getByRole('checkbox');
     const isChecked = await checkbox.isChecked();
 
     if (isChecked !== shouldBeSelected) {
+      await option.scrollIntoViewIfNeeded();
       await option.click();
     }
   }
 
   if (selectedLabel) {
     await expect(
-      page.getByRole('option', { name: selectedLabel, exact: true }).getByRole('checkbox')
+      options.filter({ hasText: selectedLabel }).first().getByRole('checkbox')
     ).toBeChecked();
   }
 
-  await page.getByRole('button', { name: 'Apply', exact: true }).click();
+  const applyButton = menu.getByRole('button', { name: 'Apply', exact: true });
+
+  // The react-select menu uses menuPosition="fixed"; its footer can sit outside
+  // the viewport, so trigger Apply directly in the DOM.
+  await applyButton.evaluate((button) => {
+    (button as HTMLButtonElement).click();
+  });
 };
 
 /**
@@ -271,27 +282,34 @@ test('can filter tags by entity type', async ({ page, api }) => {
   const projectName = uniqueName('filter-project-tag');
 
   await createTag({ page, name: taskName, type: 'tasks' });
+  const taskId = extractIdFromUrl(page.url(), 'tags');
+  if (taskId) createdTagIds.push(taskId);
+
   await createTag({ page, name: projectName, type: 'projects' });
+  const projectId = extractIdFromUrl(page.url(), 'tags');
+  if (projectId) createdTagIds.push(projectId);
 
   await navigateToTags(page);
   await waitForTableData(page);
 
-  // const filteredRequest = page.waitForResponse((response) => {
-  //   const url = new URL(response.url());
-
-  //   return (
-  //     url.pathname.endsWith('/api/v1/tags') &&
-  //     url.searchParams.get('entity_types') === 'project'
-  //   );
-  // });
-
   await applyTagTypeFilter(page, 'project');
-  // await filteredRequest;
+  await waitForTableData(page);
 
-  await expect(page.getByRole('link', { name: projectName })).toBeVisible({
+  await page.locator('#filter').fill(projectName);
+  await page.waitForTimeout(600);
+
+  await expect(
+    page.getByRole('link', { name: projectName, exact: true })
+  ).toBeVisible({
     timeout: 10000,
   });
-  await expect(page.getByRole('link', { name: taskName })).not.toBeVisible();
+
+  await page.locator('#filter').fill(taskName);
+  await page.waitForTimeout(600);
+
+  await expect(
+    page.getByRole('link', { name: taskName, exact: true })
+  ).not.toBeVisible();
 
   // const resetRequest = page.waitForResponse((response) => {
   //   const url = new URL(response.url());

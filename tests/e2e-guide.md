@@ -96,12 +96,14 @@ produce consistent results regardless of prior test runs or failures.
 
 After account reset, the seeded permission users (e.g. `clients@example.com`,
 `permissions@example.com`) start with empty permissions. For a “no permission”
-assertion you can log in as that user directly — do not re-clear via the
-Settings UI unless a prior test in the same file may have assigned permissions.
+assertion you can log in as that user directly. If a prior test in the same file
+assigned permissions, reset them with `api.setPermissions(email, [])` first.
 
-Tests that *assign* permissions still use `permissions(page).clear/set/save`
-via the UI. If a test sets permissions, later tests in the same file that need
-a clean slate must clear/set again (there is no permission teardown).
+Tests assign permissions through `api.setPermissions(email, permissions)`.
+The helper replaces the complete permission state and maps `admin` to the
+company-user administrator flag. Do not leave permissions dirty for later tests
+in the same file: call `api.setPermissions` again when the next test needs a
+different permission state (there is no permission teardown).
 
 ### Writing idempotent tests
 

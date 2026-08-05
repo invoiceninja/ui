@@ -4,7 +4,6 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
   selectAssignedUser,
   useHasPermission,
   waitForTableData,
@@ -14,7 +13,7 @@ import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createExpenseCategory } from './expense-categories-helpers';
 import { createTaxRate } from './taxes-helpers';
-import { getCompanySettings, putCompanySettings } from './api-helpers';
+import { getCompany, updateCompanyFields } from './api-helpers';
 
 resetAccountBeforeAll();
 
@@ -124,12 +123,9 @@ test("can't view expenses without permission", async ({ page }) => {
 });
 
 test('can view expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('expenses@example.com');
-  await set('view_expense');
-  await save();
+  await api.setPermissions('expenses@example.com', ['view_expense']);
 
   await createExpense({ page });
 
@@ -157,16 +153,13 @@ test('can view expense', async ({ page, api }) => {
 });
 
 test('can edit expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useExpensesActions({
     permissions: ['edit_expense'],
   });
 
   await login(page);
-  await clear('expenses@example.com');
-  await set('edit_expense');
-  await save();
+  await api.setPermissions('expenses@example.com', ['edit_expense']);
 
   await createExpense({ page });
 
@@ -207,17 +200,12 @@ test('can edit expense', async ({ page, api }) => {
 });
 
 test('can create a expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useExpensesActions({
     permissions: ['create_expense'],
   });
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_expense']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -248,16 +236,13 @@ test('can view and edit assigned expense with create_expense', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useExpensesActions({
     permissions: ['create_expense'],
   });
 
   await login(page);
-  await clear('expenses@example.com');
-  await set('create_expense');
-  await save();
+  await api.setPermissions('expenses@example.com', ['create_expense']);
 
   const expenseNumber = await createExpense({
     page,
@@ -300,13 +285,8 @@ test('can view and edit assigned expense with create_expense', async ({
 });
 
 test('deleting expense with edit_expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_expense', 'edit_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_expense', 'edit_expense']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -344,13 +324,8 @@ test('deleting expense with edit_expense', async ({ page, api }) => {
 });
 
 test('archiving expense with edit_expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_expense', 'edit_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_expense', 'edit_expense']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -392,13 +367,8 @@ test('archiving expense with edit_expense', async ({ page, api }) => {
 });
 
 test('expense documents preview with edit_expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_expense', 'edit_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_expense', 'edit_expense']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -442,13 +412,8 @@ test('expense documents preview with edit_expense', async ({ page, api }) => {
 });
 
 test('expense documents uploading with edit_expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_expense', 'edit_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_expense', 'edit_expense']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -504,17 +469,12 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useExpensesActions({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['admin']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -536,17 +496,12 @@ test('all clone actions displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useExpensesActions({
     permissions: ['create_expense', 'create_recurring_expense'],
   });
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_expense', 'create_recurring_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_expense', 'create_recurring_expense']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -565,13 +520,8 @@ test('all clone actions displayed with creation permissions', async ({
 });
 
 test('cloning expense', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_expense', 'edit_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_expense', 'edit_expense']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -909,10 +859,14 @@ test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) =
   await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
 
   // Enable two expense tax rates via API and reload so the app picks up the change
-  const { companyId, settings } = await getCompanySettings(api.context);
-  if (settings.enabled_expense_tax_rates !== 2) {
-    await putCompanySettings(api.context, companyId, { ...settings, enabled_expense_tax_rates: 2 });
+  const { companyId, company } = await getCompany(api.context);
+  if (company.enabled_expense_tax_rates !== 2) {
+    await updateCompanyFields(api.context, companyId, {
+      enabled_expense_tax_rates: 2,
+    });
   }
+
+  await page.waitForTimeout(300);
 
   await page.reload({ waitUntil: 'networkidle' });
 
@@ -944,6 +898,8 @@ test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) =
   await taxOption2.click();
 
   await page.locator('[data-cy="expenseAmount"]').fill('12222');
+
+  await page.waitForTimeout(300);
 
   await page.getByRole('button', { name: 'Save' }).click();
 
@@ -983,12 +939,14 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
   await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
 
   // Enable two expense tax rates via API and reload so the app picks up the change
-  const { companyId: companyId2, settings: settings2 } = await getCompanySettings(api.context);
-  if (settings2.enabled_expense_tax_rates !== 2) {
-    await putCompanySettings(api.context, companyId2, { ...settings2, enabled_expense_tax_rates: 2 });
+  const { companyId: companyId2, company: company2 } = await getCompany(api.context);
+  if (company2.enabled_expense_tax_rates !== 2) {
+    await updateCompanyFields(api.context, companyId2, {
+      enabled_expense_tax_rates: 2,
+    });
   }
 
-  // await page.reload({ waitUntil: 'networkidle' });
+  await page.reload({ waitUntil: 'networkidle' });
 
   await page
     .locator('[data-cy="navigationBar"]')
@@ -1055,9 +1013,11 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
   await createTaxRate({ page, taxName: taxRate20Name, rate: 20 });
 
   // Enable two expense tax rates via API and reload so the app picks up the change
-  const { companyId: companyId3, settings: settings3 } = await getCompanySettings(api.context);
-  if (settings3.enabled_expense_tax_rates !== 2) {
-    await putCompanySettings(api.context, companyId3, { ...settings3, enabled_expense_tax_rates: 2 });
+  const { companyId: companyId3, company: company3 } = await getCompany(api.context);
+  if (company3.enabled_expense_tax_rates !== 2) {
+    await updateCompanyFields(api.context, companyId3, {
+      enabled_expense_tax_rates: 2,
+    });
   }
 
   await page.reload({ waitUntil: 'networkidle' });
@@ -1111,15 +1071,10 @@ test('The new_expense_category action is not shown on the badge dropdown', async
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
   const { createExpenseCategoryViaApi, createEntityViaApi, createApiContext } = await import('./api-helpers');
 
   // Step 1: Give create_expense + edit_expense so the user can create data
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_expense', 'edit_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_expense', 'edit_expense']);
 
   // Step 2: Create category + expense as expenses@example.com via API
   const userApiCtx = await createApiContext(process.env.VITE_API_URL!, 'expenses@example.com', 'password');
@@ -1131,11 +1086,7 @@ test('The new_expense_category action is not shown on the badge dropdown', async
   api.trackEntity('expenses', expense.id as string);
 
   // Step 3: Downgrade to edit_expense only (no create) — "Create New" should NOT appear
-  await login(page);
-  await clear('expenses@example.com');
-  await set('edit_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['edit_expense']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -1155,6 +1106,8 @@ test('The new_expense_category action is not shown on the badge dropdown', async
 
   if (!badgeAlreadyVisible) {
     await page.getByRole('button').filter({ hasText: 'Columns' }).click();
+
+    await page.waitForTimeout(300);
 
     const columnInput = page.locator('input[role="combobox"]').last();
     await columnInput.waitFor({ state: 'visible', timeout: 5000 });
@@ -1192,15 +1145,10 @@ test('The new_expense_category action is shown on the badge dropdown', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
   const { createExpenseCategoryViaApi, createEntityViaApi, createApiContext } = await import('./api-helpers');
 
   // Step 1: Give admin so the user can create and see everything
-  await login(page);
-  await clear('expenses@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['admin']);
 
   // Step 2: Create category + expense as expenses@example.com via API
   const userApiCtx = await createApiContext(process.env.VITE_API_URL!, 'expenses@example.com', 'password');
@@ -1218,6 +1166,8 @@ test('The new_expense_category action is shown on the badge dropdown', async ({
     .getByRole('link', { name: 'Expenses', exact: true })
     .click();
 
+  await page.waitForTimeout(300);
+
   await waitForTableData(page);
 
   // Click the chevron arrow inside the badge to open the dropdown
@@ -1233,15 +1183,10 @@ test('The new_expense_category action is shown on the badge dropdown with only c
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
   const { createExpenseCategoryViaApi, createEntityViaApi, createApiContext } = await import('./api-helpers');
 
   // Step 1: Give create_expense so the user can create data
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_expense']);
 
   // Step 2: Create category + expense as expenses@example.com via API
   const userApiCtx = await createApiContext(process.env.VITE_API_URL!, 'expenses@example.com', 'password');
