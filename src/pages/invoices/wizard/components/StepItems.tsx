@@ -14,10 +14,11 @@ import { request } from '$app/common/helpers/request';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
+import { Plus } from '$app/components/icons/Plus';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InputField, InputLabel } from '$app/components/forms';
-import { Callout, Footer, useTheme, radius } from '../kit';
+import { Callout, ErrorBanner, Footer, useTheme, radius } from '../kit';
 import { Wizard } from '../useWizard';
 import { AppliedTax, TaxSetup } from './TaxSetup';
 import { WorkPicker, WorkSource } from './WorkPicker';
@@ -25,9 +26,10 @@ import { WorkPicker, WorkSource } from './WorkPicker';
 interface Props {
   wizard: Wizard;
   money: (value: number) => string;
+  embedded?: boolean;
 }
 
-export function StepItems({ wizard, money }: Props) {
+export function StepItems({ wizard, money, embedded }: Props) {
   const [translate] = useTranslation();
   const t = useTheme();
   const company = useCurrentCompany();
@@ -95,80 +97,71 @@ export function StepItems({ wizard, money }: Props) {
 
   return (
     <div className="iw-enter">
-      <div className="space-y-3">
+      {embedded ? null : <ErrorBanner errors={wizard.errors} />}
+
+      <div className="space-y-5">
         {items.map((item, index) => {
           const key = item._id ?? String(index);
 
           return (
             <div
               key={key}
-              className="border p-3"
-              style={{ borderColor: t.line, borderRadius: radius.panel }}
+              className="relative border p-4"
+              style={{
+                borderColor: t.line,
+                borderRadius: radius.panel,
+                backgroundColor: t.dark ? t.colors.$25 : t.colors.$2,
+              }}
             >
-              <div className="flex items-start gap-2">
+              {items.length > 1 ? (
+                <RemoveButton onClick={() => removeRow(index)} />
+              ) : null}
+
+              <InputField
+                id={`iw-desc-${key}`}
+                width="100%"
+                label="Description"
+                placeholder="Website design"
+                value={item.notes}
+                changeOverride
+                debounceTimeout={0}
+                onValueChange={(value) => update(index, { notes: value })}
+              />
+
+              <div className="mt-3 flex items-end gap-3">
                 <div className="flex-1 min-w-0">
                   <InputField
-                    id={`iw-desc-${key}`}
+                    id={`iw-qty-${key}`}
                     width="100%"
-                    label="Description"
-                    placeholder="Website design"
-                    value={item.notes}
+                    label="Qty"
+                    value={String(item.quantity ?? 0)}
                     changeOverride
                     debounceTimeout={0}
-                    onValueChange={(value) => update(index, { notes: value })}
+                    onValueChange={(value) =>
+                      update(index, { quantity: toNumber(value) })
+                    }
                   />
                 </div>
 
-                {items.length > 1 ? (
-                  <button
-                    type="button"
-                    onClick={() => removeRow(index)}
-                    aria-label="Remove item"
-                    className="shrink-0 text-sm leading-none w-9 h-[2.6875rem] grid place-items-center"
-                    style={{ color: t.muted, borderRadius: radius.control }}
-                    onMouseEnter={(event) =>
-                      (event.currentTarget.style.backgroundColor = t.hover)
+                <div className="flex-1 min-w-0">
+                  <InputField
+                    id={`iw-price-${key}`}
+                    width="100%"
+                    label="Price"
+                    value={String(item.cost ?? 0)}
+                    changeOverride
+                    debounceTimeout={0}
+                    onValueChange={(value) =>
+                      update(index, { cost: toNumber(value) })
                     }
-                    onMouseLeave={(event) =>
-                      (event.currentTarget.style.backgroundColor =
-                        'transparent')
-                    }
-                  >
-                    ✕
-                  </button>
-                ) : null}
-              </div>
+                  />
+                </div>
 
-              <div className="mt-3 grid grid-cols-3 gap-3">
-                <InputField
-                  id={`iw-qty-${key}`}
-                  width="100%"
-                  label="Qty"
-                  value={String(item.quantity ?? 0)}
-                  changeOverride
-                  debounceTimeout={0}
-                  onValueChange={(value) =>
-                    update(index, { quantity: toNumber(value) })
-                  }
-                />
-
-                <InputField
-                  id={`iw-price-${key}`}
-                  width="100%"
-                  label="Price"
-                  value={String(item.cost ?? 0)}
-                  changeOverride
-                  debounceTimeout={0}
-                  onValueChange={(value) =>
-                    update(index, { cost: toNumber(value) })
-                  }
-                />
-
-                <div className="min-w-0">
+                <div className="shrink-0 text-right">
                   <InputLabel className="mb-1">{translate('total')}</InputLabel>
 
                   <div
-                    className="text-sm truncate py-2"
+                    className="text-sm whitespace-nowrap py-2"
                     style={{
                       color: t.text,
                       fontWeight: 500,
@@ -181,7 +174,7 @@ export function StepItems({ wizard, money }: Props) {
               </div>
 
               {taxesEnabled ? (
-                <div className="mt-2.5">
+                <div className="mt-3">
                   <TaxChip
                     item={item}
                     rates={rates}
@@ -220,8 +213,8 @@ export function StepItems({ wizard, money }: Props) {
       </div>
 
       <div
-        className="mt-6 pt-4 flex items-baseline justify-between"
-        style={{ borderTop: `1px solid ${t.hairline}` }}
+        className="mt-6 pt-6 flex items-baseline justify-between"
+        style={{ borderTop: `1px dashed ${t.colors.$5}` }}
       >
         <span className="text-sm" style={{ color: t.muted }}>
           {wizard.totals.taxes ? 'Total including tax' : 'Total'}
@@ -261,37 +254,41 @@ export function StepItems({ wizard, money }: Props) {
         </div>
       ) : null}
 
-      {!described ? (
-        <p className="text-xs mt-6" style={{ color: t.muted }}>
-          Add a description to continue.
-        </p>
-      ) : null}
+      {embedded ? null : (
+        <>
+          {!described ? (
+            <p className="text-xs mt-6" style={{ color: t.muted }}>
+              Add a description to continue.
+            </p>
+          ) : null}
 
-      <Footer
-        back={
-          <Button
-            type="secondary"
-            behavior="button"
-            disableWithoutIcon
-            onClick={wizard.back}
+          <Footer
+            back={
+              <Button
+                type="secondary"
+                behavior="button"
+                disableWithoutIcon
+                onClick={wizard.back}
+              >
+                {translate('back')}
+              </Button>
+            }
           >
-            {translate('back')}
-          </Button>
-        }
-      >
-        <Button
-          behavior="button"
-          disabled={!described}
-          disableWithoutIcon
-          onClick={wizard.next}
-        >
-          {translate('continue')}
-        </Button>
-      </Footer>
+            <Button
+              behavior="button"
+              disabled={!described}
+              disableWithoutIcon
+              onClick={wizard.next}
+            >
+              {translate('continue')}
+            </Button>
+          </Footer>
+        </>
+      )}
 
       <WorkPicker
         open={picker !== null}
-        initial={picker ?? 'saved'}
+        source={picker ?? 'saved'}
         clientId={wizard.invoice?.client_id ?? ''}
         money={money}
         onClose={() => setPicker(null)}
@@ -335,6 +332,7 @@ function TaxChip({
 }) {
   const t = useTheme();
   const [open, setOpen] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const box = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -367,8 +365,13 @@ function TaxChip({
           color: applied ? t.text : t.accent,
           backgroundColor: applied ? t.hover : hexToRgba(t.accent, 0.1),
           fontWeight: 500,
+          opacity: hovered ? 0.75 : 1,
+          transition: 'opacity 150ms ease',
         }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
       >
+        {applied ? null : <Plus size="0.6875rem" color={t.accent} />}
         {applied ? `${item.tax_name1} ${item.tax_rate1}%` : 'Add tax'}
       </button>
 
@@ -446,6 +449,38 @@ function Option({
       }
     >
       {children}
+    </button>
+  );
+}
+
+function RemoveButton({ onClick }: { onClick: () => void }) {
+  const t = useTheme();
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="Remove item"
+      className="absolute grid place-items-center leading-none"
+      style={{
+        top: '0.375rem',
+        right: '0.375rem',
+        width: '1.5rem',
+        height: '1.5rem',
+        fontSize: '0.9375rem',
+        color: t.muted,
+        borderRadius: radius.control,
+      }}
+      onMouseEnter={(event) => {
+        event.currentTarget.style.backgroundColor = t.hover;
+        event.currentTarget.style.color = t.text;
+      }}
+      onMouseLeave={(event) => {
+        event.currentTarget.style.backgroundColor = 'transparent';
+        event.currentTarget.style.color = t.muted;
+      }}
+    >
+      ✕
     </button>
   );
 }

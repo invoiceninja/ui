@@ -20,6 +20,9 @@ import { Client } from '$app/common/interfaces/client';
 import { Currency } from '$app/common/interfaces/currency';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { toast } from '$app/common/helpers/toast/toast';
+import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -75,9 +78,8 @@ export interface Wizard {
   step: StepKey;
   stepIndex: number;
   saveState: SaveState;
-  sent: boolean;
-  sentTo: string;
-  markSent: (address: string) => void;
+  errors: ValidationBag | undefined;
+  clearErrors: () => void;
   dismissed: (key: string) => boolean;
   dismiss: (key: string) => void;
   totals: Totals;
@@ -110,7 +112,7 @@ export interface Totals {
 
 const EMPTY_TOTALS: Totals = { subtotal: 0, taxes: 0, total: 0, discount: 0 };
 
-export function useWizard(): Wizard {
+export function useWizard(existingId?: string): Wizard {
   const company = useCurrentCompany();
   const resolveCurrency = useResolveCurrency();
 
@@ -125,8 +127,7 @@ export function useWizard(): Wizard {
   const step: StepKey =
     STEPS.find((entry) => entry.href === location.pathname)?.key ?? 'who';
   const [saveState, setSaveState] = useState<SaveState>('idle');
-  const [sent, setSent] = useState(false);
-  const [sentTo, setSentTo] = useState('');
+  const [errors, setErrors] = useState<ValidationBag>();
   const [dismissals, setDismissals] = useState<Record<string, boolean>>({});
 
   const latest = useRef<Invoice>();
@@ -159,26 +160,39 @@ export function useWizard(): Wizard {
 
     setLoadFailed(false);
 
-    request(
-      'GET',
-      endpoint('/api/v1/invoices/create'),
-      {},
-      { skipIntercept: true }
-    )
+    const url = existingId
+      ? endpoint('/api/v1/invoices/:id?include=client', { id: existingId })
+      : endpoint('/api/v1/invoices/create');
+
+    request('GET', url, {}, { skipIntercept: true })
       .then((response) => {
         if (cancelled) {
           return;
         }
 
-        const blank = response.data.data as Invoice;
+        const loaded = response.data.data as Invoice;
 
-        if (typeof blank.line_items === 'string') {
-          blank.line_items = [];
+        if (typeof loaded.line_items === 'string') {
+          loaded.line_items = [];
+        }
+
+        if (existingId) {
+          persistedId.current = loaded.id;
+          setInvoiceId(loaded.id);
+
+          if (loaded.client) {
+            setClient(loaded.client);
+          }
+
+          latest.current = loaded;
+          setInvoice(loaded);
+
+          return;
         }
 
         const seeded = {
-          ...blank,
-          date: blank.date || today(),
+          ...loaded,
+          date: loaded.date || today(),
           uses_inclusive_taxes: Boolean(company?.settings?.inclusive_taxes),
           line_items: [{ ...blankLineItem(), quantity: 1, sort_id: 0 }],
         };
@@ -192,7 +206,7 @@ export function useWizard(): Wizard {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadAttempt]);
+  }, [loadAttempt, existingId]);
 
   const retryLoad = useCallback(() => setLoadAttempt((n) => n + 1), []);
 
@@ -237,6 +251,8 @@ export function useWizard(): Wizard {
       const saved = response.data.data as Invoice;
       const created = !id;
 
+      setErrors(undefined);
+
       persistedId.current = saved.id;
       createFailed.current = false;
       written.current = at;
@@ -271,12 +287,26 @@ export function useWizard(): Wizard {
       }
 
       return saved.id;
-    } catch {
+    } catch (caught) {
       if (!id) {
         createFailed.current = true;
       }
 
+      const response = (caught as AxiosError<ValidationBag>).response;
+
       if (alive.current) {
+        if (response?.status === 422) {
+          const bag = response.data;
+
+          if (bag.errors?.amount) {
+            toast.error(bag.errors.amount[0]);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(bag);
+        }
+
         setSaveState('failed');
       }
 
@@ -454,16 +484,8 @@ export function useWizard(): Wizard {
     step,
     stepIndex,
     saveState,
-    sent,
-    sentTo,
-    markSent: (address: string) => {
-      if (!latest.current?.client_id) {
-        return;
-      }
-
-      setSentTo(address);
-      setSent(true);
-    },
+    errors,
+    clearErrors: () => setErrors(undefined),
     dismissed: (key: string) => Boolean(dismissals[key]),
     dismiss: (key: string) =>
       setDismissals((current) => ({ ...current, [key]: true })),

@@ -18,7 +18,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Button, InputField } from '$app/components/forms';
-import { Callout, Choice, Footer, useTheme } from '../kit';
+import { Callout, Choice, ErrorBanner, Footer, useTheme } from '../kit';
 import { Wizard, addDays, today } from '../useWizard';
 
 type Term = 'receipt' | '7' | '14' | '30' | 'custom';
@@ -33,6 +33,7 @@ const TERMS: { key: Term; label: string; days: number | null }[] = [
 
 interface Props {
   wizard: Wizard;
+  embedded?: boolean;
 }
 
 function termFromDates(
@@ -51,7 +52,7 @@ function termFromDates(
   return match ? match.key : 'custom';
 }
 
-export function StepTiming({ wizard }: Props) {
+export function StepTiming({ wizard, embedded }: Props) {
   const [translate] = useTranslation();
   const t = useTheme();
   const company = useCurrentCompany();
@@ -115,8 +116,12 @@ export function StepTiming({ wizard }: Props) {
     }
   }
 
+  const serverErrors = wizard.errors?.errors;
+
   return (
     <div className="iw-enter">
+      {embedded ? null : <ErrorBanner errors={wizard.errors} />}
+
       <div className="space-y-2" role="radiogroup" aria-label="Payment timing">
         {TERMS.map((option) => (
           <Choice
@@ -134,7 +139,7 @@ export function StepTiming({ wizard }: Props) {
       </div>
 
       {term === 'custom' ? (
-        <div className="mt-4 max-w-xs">
+        <div className="mt-4">
           <InputField
             id="iw-due-date"
             label={translate('due_date')}
@@ -143,6 +148,7 @@ export function StepTiming({ wizard }: Props) {
             min={invoiceDate}
             changeOverride
             debounceTimeout={0}
+            errorMessage={serverErrors?.due_date}
             onValueChange={(value) => wizard.patch({ due_date: value })}
           />
         </div>
@@ -150,7 +156,7 @@ export function StepTiming({ wizard }: Props) {
 
       <div className="mt-6">
         {showDate ? (
-          <div className="max-w-xs">
+          <div>
             <InputField
               id="iw-invoice-date"
               label={translate('date')}
@@ -158,6 +164,7 @@ export function StepTiming({ wizard }: Props) {
               value={invoiceDate}
               changeOverride
               debounceTimeout={0}
+              errorMessage={serverErrors?.date}
               onValueChange={(nextDate) => {
                 const entry = TERMS.find((option) => option.key === term);
 
@@ -184,7 +191,10 @@ export function StepTiming({ wizard }: Props) {
         )}
       </div>
 
-      {offerDefault && !defaultSaved && !wizard.dismissed('terms') ? (
+      {!embedded &&
+      offerDefault &&
+      !defaultSaved &&
+      !wizard.dismissed('terms') ? (
         <div className="mt-6">
           <Callout
             title={`Use ${chosen.days === 0 ? 'due on receipt' : `${chosen.days} days`} for future invoices?`}
@@ -209,30 +219,32 @@ export function StepTiming({ wizard }: Props) {
         </p>
       ) : null}
 
-      <Footer
-        back={
-          <Button
-            type="secondary"
-            behavior="button"
-            disableWithoutIcon
-            onClick={wizard.back}
-          >
-            {translate('back')}
-          </Button>
-        }
-      >
-        <Button
-          behavior="button"
-          disabled={!invoice?.due_date}
-          disableWithoutIcon
-          onClick={() => {
-            void wizard.flush();
-            wizard.next();
-          }}
+      {embedded ? null : (
+        <Footer
+          back={
+            <Button
+              type="secondary"
+              behavior="button"
+              disableWithoutIcon
+              onClick={wizard.back}
+            >
+              {translate('back')}
+            </Button>
+          }
         >
-          Review and send
-        </Button>
-      </Footer>
+          <Button
+            behavior="button"
+            disabled={!invoice?.due_date}
+            disableWithoutIcon
+            onClick={() => {
+              void wizard.flush();
+              wizard.next();
+            }}
+          >
+            Review and send
+          </Button>
+        </Footer>
+      )}
     </div>
   );
 }

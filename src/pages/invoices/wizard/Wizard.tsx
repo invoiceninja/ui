@@ -21,7 +21,6 @@ import { Default } from '$app/components/layouts/Default';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { SentPanel } from './components/SentPanel';
 import { Motion, useTheme } from './kit';
 import { STEPS, useWizard } from './useWizard';
 
@@ -65,7 +64,7 @@ export default function Wizard() {
     (item) => item.notes || item.product_key
   );
 
-  if (wizard.ready && !wizard.sent) {
+  if (wizard.ready) {
     if (location.pathname !== STEPS[0].href && !wizard.invoice?.client_id) {
       return <Navigate to={STEPS[0].href} replace />;
     }
@@ -83,9 +82,7 @@ export default function Wizard() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      navigationTopRight={
-        <SaveState state={wizard.sent ? 'idle' : wizard.saveState} />
-      }
+      navigationTopRight={<SaveState state={wizard.saveState} />}
     >
       <Motion />
 
@@ -95,16 +92,14 @@ export default function Wizard() {
       >
         <Card
           className="shadow-sm"
-          title={wizard.sent ? 'Invoice sent' : current.title}
+          title={current.title}
           childrenClassName="px-4 sm:px-6 pb-4 sm:pb-6"
           style={{ borderColor: colors.$24 }}
           headerStyle={{ borderColor: colors.$20 }}
           topRight={
-            wizard.sent ? null : (
-              <Badge variant="primary" className="shrink-0">
-                {`${wizard.stepIndex + 1} / ${STEPS.length}`}
-              </Badge>
-            )
+            <Badge variant="primary" className="shrink-0">
+              {`${wizard.stepIndex + 1} / ${STEPS.length}`}
+            </Badge>
           }
         >
           {wizard.loadFailed ? (
@@ -123,21 +118,17 @@ export default function Wizard() {
               </Button>
             </div>
           ) : !wizard.ready ? (
-            <div className="py-14">
+            <div className="py-14 flex justify-center">
               <Spinner />
             </div>
           ) : (
             <section
-              key={wizard.sent ? 'sent' : wizard.step}
+              key={wizard.step}
               ref={heading}
               tabIndex={-1}
               className="min-w-0 focus:outline-none pt-2"
             >
-              {wizard.sent ? (
-                <SentPanel wizard={wizard} />
-              ) : (
-                <Outlet context={{ wizard, money }} />
-              )}
+              <Outlet context={{ wizard, money }} />
             </section>
           )}
         </Card>

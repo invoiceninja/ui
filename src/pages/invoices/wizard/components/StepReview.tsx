@@ -25,7 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import { Button, InputField } from '$app/components/forms';
-import { Callout, Footer, useTheme, radius } from '../kit';
+import { Callout, ErrorBanner, Footer, useTheme, radius } from '../kit';
 import { Wizard } from '../useWizard';
 import { BrandPrompts } from './BrandPrompts';
 
@@ -144,9 +144,10 @@ export function StepReview({ wizard, money }: Props) {
       { skipIntercept: true }
     );
 
-    wizard.markSent(address);
-
     $refetch(['invoices']);
+
+    toast.success('emailed_invoice');
+    navigate('/invoices');
   }
 
   async function saveEmailThenSend() {
@@ -304,6 +305,8 @@ export function StepReview({ wizard, money }: Props) {
 
   return (
     <div className="iw-enter">
+      <ErrorBanner errors={wizard.errors} />
+
       <dl
         className="border divide-y"
         style={{
@@ -516,7 +519,7 @@ export function StepReview({ wizard, money }: Props) {
             }
 
             toast.success('created_invoice');
-            navigate('/invoices');
+            navigate(`/invoices/wizard/edit/${id}`);
           }}
         >
           Save draft
@@ -584,7 +587,7 @@ export function StepReview({ wizard, money }: Props) {
             }}
           />
         ) : (
-          <div className="py-10">
+          <div className="py-10 flex justify-center">
             <Spinner />
           </div>
         )}

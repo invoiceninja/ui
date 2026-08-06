@@ -69,6 +69,7 @@ const WizardPayment = lazy(
   () => import('$app/pages/invoices/wizard/steps/Payment')
 );
 const WizardSend = lazy(() => import('$app/pages/invoices/wizard/steps/Send'));
+const WizardEdit = lazy(() => import('$app/pages/invoices/wizard/Edit'));
 
 export const invoiceRoutes = (
   <Route path="/invoices">
@@ -118,6 +119,19 @@ export const invoiceRoutes = (
       <Route path="payment" element={<WizardPayment />} />
       <Route path="send" element={<WizardSend />} />
     </Route>
+
+    <Route
+      path="wizard/edit/:id"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.Invoices),
+            or(permission('edit_invoice'), assigned('/api/v1/invoices/:id')),
+          ]}
+          component={<WizardEdit />}
+        />
+      }
+    />
 
     <Route
       path="create"

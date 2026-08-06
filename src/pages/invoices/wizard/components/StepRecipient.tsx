@@ -16,7 +16,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Spinner } from '$app/components/Spinner';
 import { Button, InputField, InputLabel } from '$app/components/forms';
-import { Footer, Legend, useTheme, radius } from '../kit';
+import { ErrorBanner, Footer, Legend, useTheme, radius } from '../kit';
 import { Wizard } from '../useWizard';
 
 interface Props {
@@ -237,6 +237,8 @@ export function StepRecipient({ wizard }: Props) {
   if (selected) {
     return (
       <div className="iw-enter">
+        <ErrorBanner errors={wizard.errors} />
+
         <div
           className="flex items-start justify-between gap-4 border px-4 py-3.5"
           style={{ borderColor: t.line, borderRadius: radius.panel }}
@@ -269,8 +271,12 @@ export function StepRecipient({ wizard }: Props) {
     );
   }
 
+  const serverErrors = wizard.errors?.errors;
+
   return (
     <div className="iw-enter">
+      <ErrorBanner errors={wizard.errors} />
+
       <div className="space-y-4">
         <div
           className="relative"
@@ -318,7 +324,7 @@ export function StepRecipient({ wizard }: Props) {
                   setDismissedSearch(false);
                   setActive(-1);
                 }}
-                errorMessage={errors.name}
+                errorMessage={errors.name ?? serverErrors?.client_id?.[0]}
               />
             </div>
 

@@ -26,7 +26,6 @@ export function BrandPrompts() {
   const dispatch = useDispatch();
 
   const [name, setName] = useState('');
-  const [editingName, setEditingName] = useState(false);
   const [savingName, setSavingName] = useState(false);
   const [nameError, setNameError] = useState<string>();
 
@@ -60,7 +59,6 @@ export function BrandPrompts() {
       );
 
       dispatch(updateRecord({ object: 'company', data: response.data.data }));
-      setEditingName(false);
     } catch {
       setNameError("We couldn't save that. Try again.");
     } finally {
@@ -101,18 +99,16 @@ export function BrandPrompts() {
     }
   }
 
-  const showNameEditor = editingName || !businessName;
-
   return (
     <div className="space-y-3">
-      {showNameEditor ? (
+      {businessName ? null : (
         <div className="flex items-end gap-2">
           <div className="flex-1 min-w-0">
             <InputField
               id="iw-business-name"
               label="Your business name"
               placeholder="Acme Studio"
-              value={name || businessName}
+              value={name}
               changeOverride
               debounceTimeout={0}
               onValueChange={setName}
@@ -122,24 +118,6 @@ export function BrandPrompts() {
 
           <Button behavior="button" disabled={savingName} onClick={saveName}>
             {translate('save')}
-          </Button>
-        </div>
-      ) : (
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-sm truncate" style={{ color: t.text }}>
-            {businessName}
-          </p>
-
-          <Button
-            type="secondary"
-            behavior="button"
-            disableWithoutIcon
-            onClick={() => {
-              setName(businessName);
-              setEditingName(true);
-            }}
-          >
-            {translate('change')}
           </Button>
         </div>
       )}

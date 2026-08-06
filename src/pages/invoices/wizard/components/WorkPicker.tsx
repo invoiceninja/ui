@@ -18,24 +18,18 @@ import {
 } from '$app/common/interfaces/invoice-item';
 import { Product } from '$app/common/interfaces/product';
 import { Task } from '$app/common/interfaces/task';
-import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceProject';
-import { useEffect, useState } from 'react';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import { InputField } from '$app/components/forms';
+import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceProject';
+import { useEffect, useState } from 'react';
 import { useTheme, radius } from '../kit';
 
-export type WorkSource = 'saved' | 'work' | 'expenses';
-
-const SOURCES: { key: WorkSource; label: string }[] = [
-  { key: 'saved', label: 'Saved items' },
-  { key: 'work', label: 'Tasks & time' },
-  { key: 'expenses', label: 'Expenses' },
-];
+export type WorkSource = 'saved' | 'work';
 
 interface Props {
   open: boolean;
-  initial: WorkSource;
+  source: WorkSource;
   clientId: string;
   money: (value: number) => string;
   onClose: () => void;
@@ -46,13 +40,14 @@ interface Row {
   id: string;
   title: string;
   detail?: string;
+  tag?: string;
   amount: number;
   build: () => InvoiceItem;
 }
 
 export function WorkPicker({
   open,
-  initial,
+  source,
   clientId,
   money,
   onClose,
@@ -60,17 +55,15 @@ export function WorkPicker({
 }: Props) {
   const t = useTheme();
 
-  const [source, setSource] = useState<WorkSource>(initial);
   const [query, setQuery] = useState('');
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setSource(initial);
       setQuery('');
     }
-  }, [open, initial]);
+  }, [open]);
 
   useEffect(() => {
     if (!open) {
@@ -95,40 +88,16 @@ export function WorkPicker({
     <Modal
       visible={open}
       onClose={onClose}
-      title="Add to this invoice"
-      size="regular"
+      title={
+        source === 'saved' ? 'Choose a saved item' : 'Add from existing work'
+      }
+      size="small"
     >
-      <div
-        className="inline-flex p-0.5 mb-4"
-        style={{
-          backgroundColor: t.dark ? t.colors.$25 : t.colors.$15,
-          borderRadius: radius.control,
-        }}
-      >
-        {SOURCES.map((entry) => (
-          <button
-            key={entry.key}
-            type="button"
-            onClick={() => setSource(entry.key)}
-            className="text-xs px-3 py-1.5"
-            style={{
-              borderRadius: '0.375rem',
-              fontWeight: 500,
-              color: source === entry.key ? t.text : t.muted,
-              backgroundColor: source === entry.key ? t.surface : 'transparent',
-              boxShadow:
-                source === entry.key ? '0 1px 2px rgba(9,9,11,0.10)' : 'none',
-            }}
-          >
-            {entry.label}
-          </button>
-        ))}
-      </div>
-
       {source === 'saved' ? (
         <div className="mb-3">
           <InputField
-            placeholder="Search saved items"
+            id="iw-item-search"
+            placeholder="Search products"
             value={query}
             changeOverride
             onValueChange={setQuery}
@@ -137,19 +106,16 @@ export function WorkPicker({
       ) : null}
 
       {loading ? (
-        <div className="py-8">
+        <div className="py-10 flex justify-center">
           <Spinner />
         </div>
       ) : rows.length === 0 ? (
-        <p className="text-sm py-8 text-center" style={{ color: t.muted }}>
+        <p className="text-sm py-10 text-center" style={{ color: t.muted }}>
           {emptyCopy(source, Boolean(clientId))}
         </p>
       ) : (
-        <div
-          className="border overflow-hidden"
-          style={{ borderColor: t.line, borderRadius: radius.control }}
-        >
-          {rows.map((row, index) => (
+        <div className="space-y-2">
+          {rows.map((row) => (
             <button
               key={row.id}
               type="button"
@@ -157,27 +123,30 @@ export function WorkPicker({
                 onPick(row.build());
                 onClose();
               }}
-              className="w-full text-left px-3.5 py-3 flex items-start justify-between gap-4"
+              className="w-full text-left px-3.5 py-3 flex items-start justify-between gap-4 border"
               style={{
-                borderTop: index === 0 ? 'none' : `1px solid ${t.hairline}`,
+                borderColor: t.line,
+                borderRadius: radius.control,
+                backgroundColor: t.surface,
               }}
               onMouseEnter={(event) =>
                 (event.currentTarget.style.backgroundColor = t.hover)
               }
               onMouseLeave={(event) =>
-                (event.currentTarget.style.backgroundColor = 'transparent')
+                (event.currentTarget.style.backgroundColor = t.surface)
               }
             >
               <span className="min-w-0">
                 <span className="block text-sm" style={{ color: t.text }}>
                   {row.title}
                 </span>
-                {row.detail ? (
+
+                {row.detail || row.tag ? (
                   <span
                     className="block text-xs mt-0.5"
                     style={{ color: t.muted }}
                   >
-                    {row.detail}
+                    {[row.tag, row.detail].filter(Boolean).join(' · ')}
                   </span>
                 ) : null}
               </span>
@@ -205,7 +174,7 @@ async function load(
     const response = await request(
       'GET',
       endpoint(
-        '/api/v1/products?status=active&per_page=8&sort=product_key|asc&filter=:filter',
+        '/api/v1/products?status=active&per_page=50&sort=product_key|asc&filter=:filter',
         { filter: encodeURIComponent(query.trim()) }
       ),
       {},
@@ -239,56 +208,61 @@ async function load(
     return [];
   }
 
-  if (source === 'work') {
-    const response = await request(
+  const [tasks, expenses] = await Promise.all([
+    request(
       'GET',
       endpoint('/api/v1/tasks?status=active&per_page=50&client_id=:id', {
         id: clientId,
       }),
       {},
       { skipIntercept: true }
-    );
+    )
+      .then((response) => response.data.data as Task[])
+      .catch(() => [] as Task[]),
+    request(
+      'GET',
+      endpoint('/api/v1/expenses?status=active&per_page=50&client_id=:id', {
+        id: clientId,
+      }),
+      {},
+      { skipIntercept: true }
+    )
+      .then((response) => response.data.data as Expense[])
+      .catch(() => [] as Expense[]),
+  ]);
 
-    return (response.data.data as Task[])
-      .filter((task) => !task.invoice_id)
-      .map((task) => {
-        const hours = calculateTaskHours(task.time_log);
+  const taskRows: Row[] = tasks
+    .filter((task) => !task.invoice_id)
+    .map((task) => {
+      const hours = calculateTaskHours(task.time_log);
 
-        return {
-          id: task.id,
-          title: task.description || `Task ${task.number}`,
-          detail: `${hours} h`,
-          amount: (task.rate || 0) * hours,
-          build: () => ({
-            ...blankLineItem(),
-            type_id: InvoiceItemType.Task,
-            task_id: task.id,
-            notes: task.description || `Task ${task.number}`,
-            quantity: hours,
-            cost: task.rate || 0,
-          }),
-        };
-      });
-  }
+      return {
+        id: `task-${task.id}`,
+        title: task.description || `Task ${task.number}`,
+        tag: 'Task',
+        detail: `${hours} h`,
+        amount: (task.rate || 0) * hours,
+        build: () => ({
+          ...blankLineItem(),
+          type_id: InvoiceItemType.Task,
+          task_id: task.id,
+          notes: task.description || `Task ${task.number}`,
+          quantity: hours,
+          cost: task.rate || 0,
+        }),
+      };
+    });
 
-  const response = await request(
-    'GET',
-    endpoint('/api/v1/expenses?status=active&per_page=50&client_id=:id', {
-      id: clientId,
-    }),
-    {},
-    { skipIntercept: true }
-  );
-
-  return (response.data.data as Expense[])
+  const expenseRows: Row[] = expenses
     .filter((expense) => !expense.invoice_id && expense.should_be_invoiced)
     .map((expense) => {
       const cost =
         expense.foreign_amount > 0 ? expense.foreign_amount : expense.amount;
 
       return {
-        id: expense.id,
+        id: `expense-${expense.id}`,
         title: expense.public_notes || `Expense ${expense.number}`,
+        tag: 'Expense',
         detail: expense.date,
         amount: cost,
         build: () => ({
@@ -307,6 +281,8 @@ async function load(
         }),
       };
     });
+
+  return [...taskRows, ...expenseRows];
 }
 
 function taxRateOf(expense: Expense, amount: number, fallback: number): number {
@@ -323,12 +299,12 @@ function taxRateOf(expense: Expense, amount: number, fallback: number): number {
 
 function emptyCopy(source: WorkSource, hasClient: boolean): string {
   if (source === 'saved') {
-    return 'No saved items.';
+    return 'No saved products.';
   }
 
   if (!hasClient) {
     return 'Choose a customer first.';
   }
 
-  return source === 'work' ? 'No unbilled tasks.' : 'No unbilled expenses.';
+  return 'No unbilled tasks or expenses.';
 }

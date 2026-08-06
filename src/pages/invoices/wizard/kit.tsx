@@ -10,6 +10,7 @@
 
 import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ReactNode } from 'react';
 import styled from 'styled-components';
 
@@ -164,6 +165,48 @@ export function Footer({
     <div className="mt-8 flex items-center justify-between gap-3">
       <div className="flex items-center gap-2">{back}</div>
       <div className="flex items-center gap-2">{children}</div>
+    </div>
+  );
+}
+
+const MAPPED_ERROR_KEYS = [
+  'client_id',
+  'date',
+  'due_date',
+  'amount',
+  'contacts',
+  'name',
+];
+
+export function ErrorBanner({ errors }: { errors?: ValidationBag }) {
+  const t = useTheme();
+
+  if (!errors?.errors) {
+    return null;
+  }
+
+  const unmapped = Object.entries(errors.errors)
+    .filter(
+      ([key]) => !MAPPED_ERROR_KEYS.some((known) => key.startsWith(known))
+    )
+    .flatMap(([, messages]) => messages);
+
+  if (!unmapped.length) {
+    return null;
+  }
+
+  return (
+    <div
+      className="border-l-4 py-2 mb-4"
+      style={{ borderColor: '#EF4444', backgroundColor: '#FEF2F2' }}
+    >
+      <div className="mx-4 space-y-1">
+        {unmapped.map((message) => (
+          <p key={message} className="text-sm" style={{ color: '#B91C1C' }}>
+            {message}
+          </p>
+        ))}
+      </div>
     </div>
   );
 }
