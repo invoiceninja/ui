@@ -2,7 +2,6 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
   selectAssignedUser,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -153,14 +152,11 @@ test("can't view vendors without permission", async ({ page }) => {
 });
 
 test('can view vendor', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('view-vendor');
 
   await login(page);
-  await clear('vendors@example.com');
-  await set('view_vendor');
-  await save();
+  await api.setPermissions('vendors@example.com', ['view_vendor']);
 
   await createVendor({ page, vendorName });
 
@@ -186,14 +182,11 @@ test('can view vendor', async ({ page, api }) => {
 });
 
 test('can edit vendor', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('edit-vendor');
 
   await login(page);
-  await clear('vendors@example.com');
-  await set('edit_vendor');
-  await save();
+  await api.setPermissions('vendors@example.com', ['edit_vendor']);
 
   await createVendor({ page, vendorName });
 
@@ -235,15 +228,10 @@ test('can edit vendor', async ({ page, api }) => {
 });
 
 test('can create a vendor', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('create-vendor');
 
-  await login(page);
-  await clear('vendors@example.com');
-  await set('create_vendor');
-  await save();
-  await logout(page);
+  await api.setPermissions('vendors@example.com', ['create_vendor']);
 
   await login(page, 'vendors@example.com', 'password');
 
@@ -292,14 +280,11 @@ test('can view and edit assigned vendor with create_vendor', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('assigned-vendor');
 
   await login(page);
-  await clear('vendors@example.com');
-  await set('create_vendor');
-  await save();
+  await api.setPermissions('vendors@example.com', ['create_vendor']);
 
   await createVendor({
     page,
@@ -345,15 +330,10 @@ test('can view and edit assigned vendor with create_vendor', async ({
 });
 
 test('deleting vendor with edit_vendor', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('delete-vendor');
 
-  await login(page);
-  await clear('vendors@example.com');
-  await set('create_vendor', 'edit_vendor');
-  await save();
-  await logout(page);
+  await api.setPermissions('vendors@example.com', ['create_vendor', 'edit_vendor']);
 
   await login(page, 'vendors@example.com', 'password');
 
@@ -396,15 +376,10 @@ test('deleting vendor with edit_vendor', async ({ page, api }) => {
 });
 
 test('archiving vendor withe edit_vendor', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('archive-vendor');
 
-  await login(page);
-  await clear('vendors@example.com');
-  await set('create_vendor', 'edit_vendor');
-  await save();
-  await logout(page);
+  await api.setPermissions('vendors@example.com', ['create_vendor', 'edit_vendor']);
 
   await login(page, 'vendors@example.com', 'password');
 
@@ -447,15 +422,10 @@ test('archiving vendor withe edit_vendor', async ({ page, api }) => {
 });
 
 test('vendor documents preview with view_vendor', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('docpreview-vendor');
 
-  await login(page);
-  await clear('vendors@example.com');
-  await set('create_vendor', 'view_vendor');
-  await save();
-  await logout(page);
+  await api.setPermissions('vendors@example.com', ['create_vendor', 'view_vendor']);
 
   await login(page, 'vendors@example.com', 'password');
 
@@ -494,36 +464,17 @@ test('vendor documents preview with view_vendor', async ({ page, api }) => {
 });
 
 test('vendor documents uploading with edit_vendor', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('docupload-vendor');
 
-  await login(page);
-  await clear('vendors@example.com');
-  await set('create_vendor', 'edit_vendor');
-  await save();
-  await logout(page);
+  await api.setPermissions('vendors@example.com', ['create_vendor', 'edit_vendor']);
 
   await login(page, 'vendors@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  await createVendor({ page, vendorName });
 
-  await page.getByRole('link', { name: 'Vendors', exact: true }).click();
-
-  await page.waitForURL('**/vendors');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    await createVendor({ page, vendorName });
-
-    const id = page.url().match(/vendors\/([^/]+)/)?.[1];
-    if (id) api.trackEntity('vendors', id);
-  } else {
-    await tableRow.getByRole('link').first().click();
-  }
+  const id = page.url().match(/vendors\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('vendors', id);
 
   await checkShowPage(page, true);
 
@@ -534,6 +485,10 @@ test('vendor documents uploading with edit_vendor', async ({ page, api }) => {
     .click();
 
   await page.waitForURL('**/vendors/**/documents');
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')

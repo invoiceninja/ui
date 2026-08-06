@@ -357,6 +357,8 @@ async function importEntity(page: Page, api: ApiFixture, testCase: ImportCase) {
     await page.locator('#filter').fill(testCase.listSearch);
   }
 
+  await page.waitForTimeout(300);
+  
   await expect(page.locator('[data-cy="dataTable"] tbody')).toContainText(
     testCase.listAssertText || testCase.listSearch || '',
     { timeout: 15000 }

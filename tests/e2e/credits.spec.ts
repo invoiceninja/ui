@@ -4,7 +4,6 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
   selectAssignedUser,
   useHasPermission,
   waitForTableData,
@@ -205,12 +204,9 @@ test("can't view credits without permission", async ({ page }) => {
 });
 
 test('can view credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('credits@example.com');
-  await set('view_credit', 'view_client');
-  await save();
+  await api.setPermissions('credits@example.com', ['view_credit', 'view_client']);
 
   const clientName = uniqueName('cr-view');
   await createCredit({ page, clientName });
@@ -238,16 +234,13 @@ test('can view credit', async ({ page, api }) => {
 });
 
 test('can edit credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useCreditsActions({
     permissions: ['edit_credit', 'view_client'],
   });
 
   await login(page);
-  await clear('credits@example.com');
-  await set('edit_credit', 'view_client');
-  await save();
+  await api.setPermissions('credits@example.com', ['edit_credit', 'view_client']);
 
   const clientName = uniqueName('cr-edit');
   await createCredit({ page, clientName });
@@ -288,17 +281,12 @@ test('can edit credit', async ({ page, api }) => {
 });
 
 test('can create a credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useCreditsActions({
     permissions: ['create_credit'],
   });
 
-  await login(page);
-  await clear('credits@example.com');
-  await set('create_credit', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('credits@example.com', ['create_credit', 'create_client']);
 
   await login(page, 'credits@example.com', 'password');
 
@@ -329,16 +317,13 @@ test('can view and edit assigned credit with create_credit', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useCreditsActions({
     permissions: ['create_credit'],
   });
 
   await login(page);
-  await clear('credits@example.com');
-  await set('create_credit');
-  await save();
+  await api.setPermissions('credits@example.com', ['create_credit']);
 
   const clientName = uniqueName('cr-assigned');
   const creditNumber = await createCredit({
@@ -382,13 +367,8 @@ test('can view and edit assigned credit with create_credit', async ({
 });
 
 test('deleting credit with edit_credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('credits@example.com');
-  await set('create_credit', 'edit_credit', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('credits@example.com', ['create_credit', 'edit_credit', 'create_client']);
 
   await login(page, 'credits@example.com', 'password');
 
@@ -428,13 +408,8 @@ test('deleting credit with edit_credit', async ({ page, api }) => {
 });
 
 test('archiving credit withe edit_credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('credits@example.com');
-  await set('create_credit', 'edit_credit', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('credits@example.com', ['create_credit', 'edit_credit', 'view_client', 'create_client']);
 
   await login(page, 'credits@example.com', 'password');
 
@@ -479,13 +454,8 @@ test('archiving credit withe edit_credit', async ({ page, api }) => {
 });
 
 test('credit documents preview with edit_credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('credits@example.com');
-  await set('create_credit', 'edit_credit', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('credits@example.com', ['create_credit', 'edit_credit', 'view_client', 'create_client']);
 
   await login(page, 'credits@example.com', 'password');
 
@@ -529,42 +499,16 @@ test('credit documents preview with edit_credit', async ({ page, api }) => {
 });
 
 test('credit documents uploading with edit_credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('credits@example.com');
-  await set('create_credit', 'edit_credit', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('credits@example.com', ['create_credit', 'edit_credit', 'view_client', 'create_client']);
 
   await login(page, 'credits@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  const clientName = uniqueName('cr-doc-upload');
+  await createCredit({ page, clientName });
 
-  await page.getByRole('link', { name: 'Credits', exact: true }).click();
-
-  await page.waitForURL('**/credits');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    const clientName = uniqueName('cr-docup');
-    await createCredit({ page, clientName });
-
-    const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
-    if (creditId) api.trackEntity('credits', creditId);
-  } else {
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
-
-    await moreActionsButton.click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  const creditId = page.url().match(/credits\/([^/]+)/)?.[1];
+  if (creditId) api.trackEntity('credits', creditId);
 
   await page.waitForURL('**/credits/**/edit');
 
@@ -575,14 +519,18 @@ test('credit documents uploading with edit_credit', async ({ page, api }) => {
     .first()
     .click();
 
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
+
   await page
     .locator('input[type="file"]')
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-    await page.waitForTimeout(150);
-
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({
+    timeout: 10000,
+  });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
@@ -593,17 +541,12 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useCreditsActions({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('credits@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('credits@example.com', ['admin']);
 
   await login(page, 'credits@example.com', 'password');
 
@@ -625,7 +568,6 @@ test('all clone actions displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useCreditsActions({
     permissions: [
@@ -637,18 +579,14 @@ test('all clone actions displayed with creation permissions', async ({
     ],
   });
 
-  await login(page);
-  await clear('credits@example.com');
-  await set(
+  await api.setPermissions('credits@example.com', [
     'create_credit',
     'create_invoice',
     'create_quote',
     'create_recurring_invoice',
     'create_purchase_order',
     'create_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'credits@example.com', 'password');
 
@@ -667,13 +605,8 @@ test('all clone actions displayed with creation permissions', async ({
 });
 
 test('cloning credit', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('credits@example.com');
-  await set('create_credit', 'edit_credit', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('credits@example.com', ['create_credit', 'edit_credit', 'create_client']);
 
   await login(page, 'credits@example.com', 'password');
 

@@ -2,7 +2,6 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
   waitForTableData,
 } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
@@ -105,14 +104,11 @@ test("can't view payments without permission", async ({ page }) => {
 });
 
 test('can view payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const clientName = uniqueName('pay-client');
 
   await login(page);
-  await clear('payments@example.com');
-  await set('view_payment');
-  await save();
+  await api.setPermissions('payments@example.com', ['view_payment']);
 
   await createPayment({
     page,
@@ -143,14 +139,11 @@ test('can view payment', async ({ page, api }) => {
 });
 
 test('can edit payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const clientName = uniqueName('pay-client');
 
   await login(page);
-  await clear('payments@example.com');
-  await set('edit_payment');
-  await save();
+  await api.setPermissions('payments@example.com', ['edit_payment']);
 
   await createPayment({ page, clientName });
 
@@ -189,15 +182,10 @@ test('can edit payment', async ({ page, api }) => {
 });
 
 test('can create a payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const clientName = uniqueName('pay-client');
 
-  await login(page);
-  await clear('payments@example.com');
-  await set('create_payment', 'create_client', 'view_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('payments@example.com', ['create_payment', 'create_client', 'view_client']);
 
   await login(page, 'payments@example.com', 'password');
 
@@ -225,15 +213,10 @@ test('can create a payment', async ({ page, api }) => {
 });
 
 test('deleting payment with edit_payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const clientName = uniqueName('pay-client');
 
-  await login(page);
-  await clear('payments@example.com');
-  await set('create_payment', 'edit_payment', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('payments@example.com', ['create_payment', 'edit_payment', 'create_client']);
 
   await login(page, 'payments@example.com', 'password');
 
@@ -274,15 +257,10 @@ test('deleting payment with edit_payment', async ({ page, api }) => {
 });
 
 test('archiving payment with edit_payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const clientName = uniqueName('pay-client');
 
-  await login(page);
-  await clear('payments@example.com');
-  await set('create_payment', 'edit_payment', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('payments@example.com', ['create_payment', 'edit_payment', 'create_client']);
 
   await login(page, 'payments@example.com', 'password');
 
@@ -333,15 +311,10 @@ test('archiving payment with edit_payment', async ({ page, api }) => {
 });
 
 test('payment documents preview with edit_payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const clientName = uniqueName('pay-client');
 
-  await login(page);
-  await clear('payments@example.com');
-  await set('create_payment', 'edit_payment', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('payments@example.com', ['create_payment', 'edit_payment', 'create_client']);
 
   await login(page, 'payments@example.com', 'password');
 
@@ -384,44 +357,17 @@ test('payment documents preview with edit_payment', async ({ page, api }) => {
 });
 
 test('payment documents uploading with edit_payment', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  const clientName = uniqueName('pay-client');
+  const clientName = uniqueName('pay-doc-upload');
 
-  await login(page);
-  await clear('payments@example.com');
-  await set('create_payment', 'edit_payment', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('payments@example.com', ['create_payment', 'edit_payment', 'create_client']);
 
   await login(page, 'payments@example.com', 'password');
 
-  await page.getByRole('link', { name: 'Payments', exact: true }).click();
+  await createPayment({ page, clientName });
 
-  await page.waitForURL('**/payments');
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    await createPayment({ page, withNavigation: false, clientName });
-
-    await page.waitForURL('**/payments/**/edit');
-    const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
-    if (createdId) api.trackEntity('payments', createdId);
-  } else {
-    const tableRow = page.locator('tbody').first().getByRole('row').first();
-
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
-
-    await moreActionsButton.click();
-
-    const editLink = page.getByRole('link', { name: 'Edit', exact: true }).first();
-    await editLink.waitFor({ state: 'visible' });
-    await editLink.click();
-  }
+  const createdId = page.url().match(/payments\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('payments', createdId);
 
   await page.waitForURL('**/payments/**/edit');
 
@@ -430,6 +376,10 @@ test('payment documents uploading with edit_payment', async ({ page, api }) => {
   await docsLink.click();
 
   await page.waitForURL('**/payments/**/documents');
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')

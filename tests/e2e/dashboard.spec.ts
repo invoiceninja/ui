@@ -1,4 +1,4 @@
-import { login, logout, permissions } from '$tests/e2e/helpers';
+import { login } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
 
 resetAccountBeforeAll();
@@ -14,15 +14,10 @@ test("Can't view dashboard without permission", async ({ page }) => {
 
 });
 
-test('Can view dashboard with permission', async ({ page }) => {
+test('Can view dashboard with permission', async ({ page, api }) => {
   test.setTimeout(60000); 
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear();
-  await set('view_dashboard');
-  await save();
-  await logout(page);
+  await api.setPermissions('permissions@example.com', ['view_dashboard']);
 
   await login(page, 'permissions@example.com', 'password');
 
