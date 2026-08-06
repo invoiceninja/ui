@@ -12,6 +12,8 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { AxiosError } from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Spinner } from '$app/components/Spinner';
@@ -142,26 +144,38 @@ export function StepRecipient({ wizard }: Props) {
     };
   }, [name, selected, dismissedSearch]);
 
-  function choose(client: Client) {
+  const choose = (client: Client) => {
     wizard.attachClient(client);
     setMatches([]);
     setActive(-1);
     setErrors({});
-  }
+  };
 
-  function reset() {
+  const reset = () => {
     wizard.detachClient();
     setName('');
     setEmail('');
     setDismissedSearch(false);
     setErrors({});
-  }
+  };
 
-  async function continueForward() {
+  const proceed = () => {
+    setBusy(true);
+
+    return wizard.flush().then((saved) => {
+      setBusy(false);
+
+      if (saved) {
+        wizard.next();
+      }
+    });
+  };
+
+  const continueForward = () => {
     setErrors({});
 
     if (selected) {
-      wizard.next();
+      proceed();
       return;
     }
 
@@ -171,48 +185,51 @@ export function StepRecipient({ wizard }: Props) {
     }
 
     if (email.trim() && !/^\S+@\S+\.\S+$/.test(email.trim())) {
-      setErrors({ email: "That doesn't look like an email address." });
+      setErrors({ email: 'Enter a valid email address.' });
       return;
     }
 
     setBusy(true);
 
-    try {
-      const response = await request(
-        'POST',
-        endpoint('/api/v1/clients'),
-        {
-          name: name.trim(),
-          address1: address.address1,
-          city: address.city,
-          postal_code: address.postal_code,
-          contacts: [
-            {
-              first_name: name.trim(),
-              last_name: '',
-              email: email.trim(),
-              send_email: true,
-            },
-          ],
-        },
-        { skipIntercept: true }
-      );
+    request(
+      'POST',
+      endpoint('/api/v1/clients'),
+      {
+        name: name.trim(),
+        address1: address.address1,
+        city: address.city,
+        postal_code: address.postal_code,
+        contacts: [
+          {
+            first_name: name.trim(),
+            last_name: '',
+            email: email.trim(),
+            send_email: true,
+          },
+        ],
+      },
+      { skipIntercept: true }
+    )
+      .then((response) => {
+        choose(response.data.data as Client);
 
-      choose(response.data.data as Client);
+        $refetch(['clients']);
 
-      $refetch(['clients']);
+        return proceed();
+      })
+      .catch((caught: AxiosError<ValidationBag>) => {
+        const bag = caught.response?.data?.errors;
 
-      wizard.next();
-    } catch (caught) {
-      const bag = (
-        caught as {
-          response?: { data?: { errors?: Record<string, string[]> } };
+        setBusy(false);
+
+        if (!bag) {
+          setErrors({
+            general: 'This customer could not be saved. Try again.',
+          });
+
+          return;
         }
-      ).response?.data?.errors;
 
-      if (!bag) {
-        setErrors({ general: "We couldn't save this customer. Try again." });
-      } else {
         const next: { name?: string; email?: string; general?: string } = {};
 
         Object.entries(bag).forEach(([key, messages]) => {
@@ -228,11 +245,8 @@ export function StepRecipient({ wizard }: Props) {
         });
 
         setErrors(next);
-      }
-    } finally {
-      setBusy(false);
-    }
-  }
+      });
+  };
 
   if (selected) {
     return (
@@ -249,7 +263,7 @@ export function StepRecipient({ wizard }: Props) {
             </p>
 
             <p className="text-xs mt-0.5" style={{ color: t.muted }}>
-              {selected.contacts?.[0]?.email || 'No email address yet'}
+              {selected.contacts?.[0]?.email || 'No email address'}
             </p>
           </div>
 
@@ -258,12 +272,14 @@ export function StepRecipient({ wizard }: Props) {
           </Button>
         </div>
 
+        {wizard.errors?.errors?.client_id ? (
+          <p className="text-xs mt-2" style={{ color: '#DC2626' }}>
+            {wizard.errors.errors.client_id[0]}
+          </p>
+        ) : null}
+
         <Footer>
-          <Button
-            behavior="button"
-            disableWithoutIcon
-            onClick={continueForward}
-          >
+          <Button behavior="button" disabled={busy} onClick={continueForward}>
             {translate('continue')}
           </Button>
         </Footer>
@@ -384,7 +400,7 @@ export function StepRecipient({ wizard }: Props) {
                 className="w-full text-left px-3.5 py-2.5 border-t text-xs"
                 style={{ borderColor: t.hairline, color: t.muted }}
               >
-                None of these — add “{name.trim()}” as a new customer
+                Add “{name.trim()}” as a new customer
               </button>
             </div>
           ) : null}

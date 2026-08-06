@@ -210,7 +210,7 @@ export function useWizard(existingId?: string): Wizard {
 
   const retryLoad = useCallback(() => setLoadAttempt((n) => n + 1), []);
 
-  const write = useCallback(async (): Promise<string | null> => {
+  const write = useCallback((): Promise<string | null> => {
     const current = latest.current;
 
     const at = revision.current;
@@ -218,7 +218,7 @@ export function useWizard(existingId?: string): Wizard {
     if (!current || !current.client_id) {
       written.current = at;
 
-      return null;
+      return Promise.resolve(null);
     }
 
     const id = persistedId.current;
@@ -226,7 +226,7 @@ export function useWizard(existingId?: string): Wizard {
     if (!id && createFailed.current) {
       written.current = at;
 
-      return null;
+      return Promise.resolve(null);
     }
 
     setSaveState('saving');
@@ -234,84 +234,79 @@ export function useWizard(existingId?: string): Wizard {
     const payload = cloneDeep(current) as Invoice & { paymentables?: unknown };
     delete payload.paymentables;
 
-    try {
-      const response = id
-        ? await request(
-            'PUT',
-            endpoint('/api/v1/invoices/:id', { id }),
-            payload,
-            {
-              skipIntercept: true,
-            }
-          )
-        : await request('POST', endpoint('/api/v1/invoices'), payload, {
+    return (
+      id
+        ? request('PUT', endpoint('/api/v1/invoices/:id', { id }), payload, {
             skipIntercept: true,
-          });
+          })
+        : request('POST', endpoint('/api/v1/invoices'), payload, {
+            skipIntercept: true,
+          })
+    )
+      .then((response) => {
+        const saved = response.data.data as Invoice;
+        const created = !id;
 
-      const saved = response.data.data as Invoice;
-      const created = !id;
+        setErrors(undefined);
 
-      setErrors(undefined);
+        persistedId.current = saved.id;
+        createFailed.current = false;
+        written.current = at;
 
-      persistedId.current = saved.id;
-      createFailed.current = false;
-      written.current = at;
-
-      if (!alive.current) {
-        return saved.id;
-      }
-
-      setInvoiceId(saved.id);
-
-      const merge = (previous: Invoice | undefined) => {
-        if (!previous) {
-          return previous;
+        if (!alive.current) {
+          return saved.id;
         }
 
-        const merged = { ...previous };
+        setInvoiceId(saved.id);
 
-        SERVER_OWNED.forEach((key) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (merged as any)[key] = (saved as any)[key];
-        });
-
-        return merged;
-      };
-
-      latest.current = merge(latest.current);
-      setInvoice(merge);
-      setSaveState('saved');
-
-      if (created) {
-        $refetch(['invoices']);
-      }
-
-      return saved.id;
-    } catch (caught) {
-      if (!id) {
-        createFailed.current = true;
-      }
-
-      const response = (caught as AxiosError<ValidationBag>).response;
-
-      if (alive.current) {
-        if (response?.status === 422) {
-          const bag = response.data;
-
-          if (bag.errors?.amount) {
-            toast.error(bag.errors.amount[0]);
-          } else {
-            toast.dismiss();
+        const merge = (previous: Invoice | undefined) => {
+          if (!previous) {
+            return previous;
           }
 
-          setErrors(bag);
+          const merged = { ...previous };
+
+          SERVER_OWNED.forEach((key) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (merged as any)[key] = (saved as any)[key];
+          });
+
+          return merged;
+        };
+
+        latest.current = merge(latest.current);
+        setInvoice(merge);
+        setSaveState('saved');
+
+        if (created) {
+          $refetch(['invoices']);
         }
 
-        setSaveState('failed');
-      }
+        return saved.id;
+      })
+      .catch((caught: AxiosError<ValidationBag>) => {
+        if (!id) {
+          createFailed.current = true;
+        }
 
-      return null;
-    }
+        if (alive.current) {
+          if (caught.response?.status === 422) {
+            const bag = caught.response.data;
+
+            if (bag.errors?.amount) {
+              toast.error(bag.errors.amount[0]);
+            } else {
+              toast.dismiss();
+            }
+
+            setErrors(bag);
+          }
+
+          setSaveState('failed');
+        }
+
+        return null;
+      });
   }, []);
 
   const save = useCallback((): Promise<string | null> => {

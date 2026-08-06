@@ -161,7 +161,7 @@ function SaveState({
       {state === 'saving'
         ? `${translate('saving')}…`
         : failed
-          ? "Draft didn't save"
+          ? 'Draft not saved'
           : 'Draft saved'}
     </span>
   );

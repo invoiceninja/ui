@@ -165,13 +165,13 @@ export function WorkPicker({
   );
 }
 
-async function load(
+const load = (
   source: WorkSource,
   query: string,
   clientId: string
-): Promise<Row[]> {
+): Promise<Row[]> => {
   if (source === 'saved') {
-    const response = await request(
+    return request(
       'GET',
       endpoint(
         '/api/v1/products?status=active&per_page=50&sort=product_key|asc&filter=:filter',
@@ -179,36 +179,36 @@ async function load(
       ),
       {},
       { skipIntercept: true }
+    ).then((response) =>
+      (response.data.data as Product[]).map((product) => ({
+        id: product.id,
+        title: product.product_key || product.notes,
+        detail: product.product_key ? product.notes : undefined,
+        amount: product.price,
+        build: () => ({
+          ...blankLineItem(),
+          type_id: InvoiceItemType.Product,
+          product_key: product.product_key,
+          notes: product.notes,
+          cost: product.price,
+          quantity: product.quantity || 1,
+          tax_name1: product.tax_name1,
+          tax_rate1: product.tax_rate1,
+          tax_name2: product.tax_name2,
+          tax_rate2: product.tax_rate2,
+          tax_name3: product.tax_name3,
+          tax_rate3: product.tax_rate3,
+          tax_id: product.tax_id || '1',
+        }),
+      }))
     );
-
-    return (response.data.data as Product[]).map((product) => ({
-      id: product.id,
-      title: product.product_key || product.notes,
-      detail: product.product_key ? product.notes : undefined,
-      amount: product.price,
-      build: () => ({
-        ...blankLineItem(),
-        type_id: InvoiceItemType.Product,
-        product_key: product.product_key,
-        notes: product.notes,
-        cost: product.price,
-        quantity: product.quantity || 1,
-        tax_name1: product.tax_name1,
-        tax_rate1: product.tax_rate1,
-        tax_name2: product.tax_name2,
-        tax_rate2: product.tax_rate2,
-        tax_name3: product.tax_name3,
-        tax_rate3: product.tax_rate3,
-        tax_id: product.tax_id || '1',
-      }),
-    }));
   }
 
   if (!clientId) {
-    return [];
+    return Promise.resolve([]);
   }
 
-  const [tasks, expenses] = await Promise.all([
+  return Promise.all([
     request(
       'GET',
       endpoint('/api/v1/tasks?status=active&per_page=50&client_id=:id', {
@@ -229,63 +229,79 @@ async function load(
     )
       .then((response) => response.data.data as Expense[])
       .catch(() => [] as Expense[]),
-  ]);
+  ]).then(([tasks, expenses]) => {
+    const taskRows: Row[] = tasks
+      .filter((task) => !task.invoice_id)
+      .map((task) => {
+        const hours = calculateTaskHours(task.time_log);
 
-  const taskRows: Row[] = tasks
-    .filter((task) => !task.invoice_id)
-    .map((task) => {
-      const hours = calculateTaskHours(task.time_log);
+        return {
+          id: `task-${task.id}`,
+          title: task.description || `Task ${task.number}`,
+          tag: 'Task',
+          detail: `${hours} h`,
+          amount: (task.rate || 0) * hours,
+          build: () => ({
+            ...blankLineItem(),
+            type_id: InvoiceItemType.Task,
+            task_id: task.id,
+            notes: task.description || `Task ${task.number}`,
+            quantity: hours,
+            cost: task.rate || 0,
+          }),
+        };
+      });
 
-      return {
-        id: `task-${task.id}`,
-        title: task.description || `Task ${task.number}`,
-        tag: 'Task',
-        detail: `${hours} h`,
-        amount: (task.rate || 0) * hours,
-        build: () => ({
-          ...blankLineItem(),
-          type_id: InvoiceItemType.Task,
-          task_id: task.id,
-          notes: task.description || `Task ${task.number}`,
-          quantity: hours,
-          cost: task.rate || 0,
-        }),
-      };
-    });
+    const expenseRows: Row[] = expenses
+      .filter((expense) => !expense.invoice_id && expense.should_be_invoiced)
+      .map((expense) => {
+        const cost =
+          expense.foreign_amount > 0 ? expense.foreign_amount : expense.amount;
 
-  const expenseRows: Row[] = expenses
-    .filter((expense) => !expense.invoice_id && expense.should_be_invoiced)
-    .map((expense) => {
-      const cost =
-        expense.foreign_amount > 0 ? expense.foreign_amount : expense.amount;
+        return {
+          id: `expense-${expense.id}`,
+          title: expense.public_notes || `Expense ${expense.number}`,
+          tag: 'Expense',
+          detail: expense.date,
+          amount: cost,
+          build: () => ({
+            ...blankLineItem(),
+            type_id: InvoiceItemType.Product,
+            expense_id: expense.id,
+            notes: expense.public_notes || `Expense ${expense.number}`,
+            quantity: 1,
+            cost,
+            tax_name1: expense.tax_name1,
+            tax_rate1: taxRateOf(
+              expense,
+              expense.tax_amount1,
+              expense.tax_rate1
+            ),
+            tax_name2: expense.tax_name2,
+            tax_rate2: taxRateOf(
+              expense,
+              expense.tax_amount2,
+              expense.tax_rate2
+            ),
+            tax_name3: expense.tax_name3,
+            tax_rate3: taxRateOf(
+              expense,
+              expense.tax_amount3,
+              expense.tax_rate3
+            ),
+          }),
+        };
+      });
 
-      return {
-        id: `expense-${expense.id}`,
-        title: expense.public_notes || `Expense ${expense.number}`,
-        tag: 'Expense',
-        detail: expense.date,
-        amount: cost,
-        build: () => ({
-          ...blankLineItem(),
-          type_id: InvoiceItemType.Product,
-          expense_id: expense.id,
-          notes: expense.public_notes || `Expense ${expense.number}`,
-          quantity: 1,
-          cost,
-          tax_name1: expense.tax_name1,
-          tax_rate1: taxRateOf(expense, expense.tax_amount1, expense.tax_rate1),
-          tax_name2: expense.tax_name2,
-          tax_rate2: taxRateOf(expense, expense.tax_amount2, expense.tax_rate2),
-          tax_name3: expense.tax_name3,
-          tax_rate3: taxRateOf(expense, expense.tax_amount3, expense.tax_rate3),
-        }),
-      };
-    });
+    return [...taskRows, ...expenseRows];
+  });
+};
 
-  return [...taskRows, ...expenseRows];
-}
-
-function taxRateOf(expense: Expense, amount: number, fallback: number): number {
+const taxRateOf = (
+  expense: Expense,
+  amount: number,
+  fallback: number
+): number => {
   if (!expense.calculate_tax_by_amount) {
     return fallback;
   }
@@ -295,9 +311,9 @@ function taxRateOf(expense: Expense, amount: number, fallback: number): number {
   }
 
   return Math.round(((amount / expense.amount) * 1000) / 10) / 1;
-}
+};
 
-function emptyCopy(source: WorkSource, hasClient: boolean): string {
+const emptyCopy = (source: WorkSource, hasClient: boolean): string => {
   if (source === 'saved') {
     return 'No saved products.';
   }
@@ -307,4 +323,4 @@ function emptyCopy(source: WorkSource, hasClient: boolean): string {
   }
 
   return 'No unbilled tasks or expenses.';
-}
+};

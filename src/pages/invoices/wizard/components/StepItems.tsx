@@ -57,26 +57,26 @@ export function StepItems({ wizard, money, embedded }: Props) {
       .catch(() => setRates([]));
   }, [taxesEnabled]);
 
-  function update(index: number, changes: Partial<InvoiceItem>) {
+  const update = (index: number, changes: Partial<InvoiceItem>) => {
     wizard.setLineItems(
       items.map((item, position) =>
         position === index ? { ...item, ...changes } : item
       )
     );
-  }
+  };
 
-  function addRow(item?: InvoiceItem) {
+  const addRow = (item?: InvoiceItem) => {
     wizard.setLineItems([
       ...items,
       item ?? { ...blankLineItem(), quantity: 1 },
     ]);
-  }
+  };
 
-  function removeRow(index: number) {
+  const removeRow = (index: number) => {
     wizard.setLineItems(items.filter((_, position) => position !== index));
-  }
+  };
 
-  function applyTaxEverywhere(tax: AppliedTax) {
+  const applyTaxEverywhere = (tax: AppliedTax) => {
     wizard.patch({
       uses_inclusive_taxes: tax.inclusive,
       line_items: items.map((item) => ({
@@ -91,7 +91,7 @@ export function StepItems({ wizard, money, embedded }: Props) {
         ? current
         : [...current, { name: tax.name, rate: tax.rate } as TaxRate]
     );
-  }
+  };
 
   const described = items.some((item) => item.notes || item.product_key);
 
@@ -485,7 +485,7 @@ function RemoveButton({ onClick }: { onClick: () => void }) {
   );
 }
 
-function hexToRgba(hex: string, alpha: number): string {
+const hexToRgba = (hex: string, alpha: number): string => {
   const match = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})/i.exec(hex);
 
   if (!match) {
@@ -495,10 +495,10 @@ function hexToRgba(hex: string, alpha: number): string {
   const [, r, g, b] = match;
 
   return `rgba(${parseInt(r, 16)}, ${parseInt(g, 16)}, ${parseInt(b, 16)}, ${alpha})`;
-}
+};
 
-function toNumber(raw: unknown): number {
+const toNumber = (raw: unknown): number => {
   const parsed = Number(String(raw ?? '').replace(',', '.'));
 
   return isNaN(parsed) ? 0 : parsed;
-}
+};

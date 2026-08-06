@@ -30,6 +30,7 @@ export function BrandPrompts() {
   const [nameError, setNameError] = useState<string>();
 
   const [uploading, setUploading] = useState(false);
+  const [logoSkipped, setLogoSkipped] = useState(false);
   const [logoError, setLogoError] = useState<string>();
 
   const filePicker = useRef<HTMLInputElement>(null);
@@ -37,7 +38,7 @@ export function BrandPrompts() {
   const businessName: string = company?.settings?.name ?? '';
   const hasLogo = Boolean(company?.settings?.company_logo);
 
-  async function saveName() {
+  const saveName = () => {
     if (!company?.id) {
       return;
     }
@@ -50,23 +51,20 @@ export function BrandPrompts() {
     setNameError(undefined);
     setSavingName(true);
 
-    try {
-      const response = await request(
-        'PUT',
-        endpoint('/api/v1/companies/:id', { id: company.id }),
-        { ...company, settings: { ...company.settings, name: name.trim() } },
-        { skipIntercept: true }
-      );
+    request(
+      'PUT',
+      endpoint('/api/v1/companies/:id', { id: company.id }),
+      { ...company, settings: { ...company.settings, name: name.trim() } },
+      { skipIntercept: true }
+    )
+      .then((response) =>
+        dispatch(updateRecord({ object: 'company', data: response.data.data }))
+      )
+      .catch(() => setNameError('This name could not be saved. Try again.'))
+      .finally(() => setSavingName(false));
+  };
 
-      dispatch(updateRecord({ object: 'company', data: response.data.data }));
-    } catch {
-      setNameError("We couldn't save that. Try again.");
-    } finally {
-      setSavingName(false);
-    }
-  }
-
-  async function uploadLogo(file: File) {
+  const uploadLogo = (file: File) => {
     if (!company?.id) {
       return;
     }
@@ -74,30 +72,30 @@ export function BrandPrompts() {
     setLogoError(undefined);
     setUploading(true);
 
-    try {
-      const prepared = await compressImageFileForLogo(file);
+    compressImageFileForLogo(file)
+      .then((prepared) => {
+        const body = new FormData();
+        body.append('company_logo', prepared);
+        body.append('_method', 'PUT');
 
-      const body = new FormData();
-      body.append('company_logo', prepared);
-      body.append('_method', 'PUT');
-
-      const response = await request(
-        'POST',
-        endpoint('/api/v1/companies/:id', { id: company.id }),
-        body,
-        {
-          headers: { 'Content-Type': 'multipart/form-data' },
-          skipIntercept: true,
-        }
-      );
-
-      dispatch(updateRecord({ object: 'company', data: response.data.data }));
-    } catch {
-      setLogoError("That image didn't upload. Try a PNG or JPG.");
-    } finally {
-      setUploading(false);
-    }
-  }
+        return request(
+          'POST',
+          endpoint('/api/v1/companies/:id', { id: company.id }),
+          body,
+          {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            skipIntercept: true,
+          }
+        );
+      })
+      .then((response) =>
+        dispatch(updateRecord({ object: 'company', data: response.data.data }))
+      )
+      .catch(() =>
+        setLogoError('The image could not be uploaded. Use a PNG or JPG.')
+      )
+      .finally(() => setUploading(false));
+  };
 
   return (
     <div className="space-y-3">
@@ -130,20 +128,51 @@ export function BrandPrompts() {
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm" style={{ color: t.muted }}>
-          {hasLogo ? 'Logo added' : 'No logo'}
-        </p>
+      {!hasLogo && !logoSkipped ? (
+        <div>
+          <p
+            className="text-sm mb-2"
+            style={{ color: t.text, fontWeight: 500 }}
+          >
+            Add a logo to make this invoice look professional.
+          </p>
 
-        <Button
-          type="secondary"
-          behavior="button"
-          disabled={uploading}
-          onClick={() => filePicker.current?.click()}
-        >
-          {hasLogo ? translate('change') : 'Add a logo'}
-        </Button>
-      </div>
+          <div className="flex items-center gap-2">
+            <Button
+              type="secondary"
+              behavior="button"
+              disabled={uploading}
+              onClick={() => filePicker.current?.click()}
+            >
+              Add a logo
+            </Button>
+
+            <Button
+              type="secondary"
+              behavior="button"
+              disableWithoutIcon
+              onClick={() => setLogoSkipped(true)}
+            >
+              Skip
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm" style={{ color: t.muted }}>
+            {hasLogo ? 'Logo added' : 'No logo'}
+          </p>
+
+          <Button
+            type="secondary"
+            behavior="button"
+            disabled={uploading}
+            onClick={() => filePicker.current?.click()}
+          >
+            {hasLogo ? translate('change') : 'Add a logo'}
+          </Button>
+        </div>
+      )}
 
       {logoError ? (
         <p className="text-xs" style={{ color: '#DC2626' }}>
@@ -160,7 +189,7 @@ export function BrandPrompts() {
           const file = event.target.files?.[0];
 
           if (file) {
-            void uploadLogo(file);
+            uploadLogo(file);
           }
 
           event.target.value = '';

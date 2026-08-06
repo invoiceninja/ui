@@ -58,11 +58,35 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
   const rateIsValid =
     rate.trim() !== '' && !isNaN(parsedRate) && parsedRate >= 0;
 
-  async function apply() {
+  const enableTaxesForCompany = () => {
+    if (!company?.id) {
+      return Promise.resolve();
+    }
+
+    const payload = {
+      ...company,
+      enabled_item_tax_rates: Math.max(1, company.enabled_item_tax_rates ?? 0),
+      settings: {
+        ...company.settings,
+        inclusive_taxes: Boolean(inclusive),
+      },
+    };
+
+    return request(
+      'PUT',
+      endpoint('/api/v1/companies/:id', { id: company.id }),
+      payload,
+      { skipIntercept: true }
+    ).then((response) =>
+      dispatch(updateRecord({ object: 'company', data: response.data.data }))
+    );
+  };
+
+  const apply = () => {
     setError(undefined);
 
     if (!name.trim()) {
-      setError('Give the tax a name so it reads correctly on the invoice.');
+      setError('Enter a name for the tax.');
       return;
     }
 
@@ -73,64 +97,39 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
 
     setBusy(true);
 
-    try {
-      await request(
-        'POST',
-        endpoint('/api/v1/tax_rates'),
-        { name: name.trim(), rate: parsedRate },
-        { skipIntercept: true }
-      );
+    request(
+      'POST',
+      endpoint('/api/v1/tax_rates'),
+      { name: name.trim(), rate: parsedRate },
+      { skipIntercept: true }
+    )
+      .then(() => {
+        $refetch(['tax_rates']);
 
-      $refetch(['tax_rates']);
-    } catch {
-      setError(
-        "We couldn't save the tax rate. Check the details and try again."
-      );
-      setBusy(false);
+        return enableTaxesForCompany()
+          .then(() => {
+            onApplied({
+              name: name.trim(),
+              rate: parsedRate,
+              inclusive: Boolean(inclusive),
+            });
 
-      return;
-    }
-
-    try {
-      if (company?.id) {
-        const payload = {
-          ...company,
-          enabled_item_tax_rates: Math.max(
-            1,
-            company.enabled_item_tax_rates ?? 0
-          ),
-          settings: {
-            ...company.settings,
-            inclusive_taxes: Boolean(inclusive),
-          },
-        };
-
-        const response = await request(
-          'PUT',
-          endpoint('/api/v1/companies/:id', { id: company.id }),
-          payload,
-          { skipIntercept: true }
-        );
-
-        dispatch(updateRecord({ object: 'company', data: response.data.data }));
-      }
-
-      onApplied({
-        name: name.trim(),
-        rate: parsedRate,
-        inclusive: Boolean(inclusive),
-      });
-
-      toast.success('updated_settings');
-      onClose();
-    } catch {
-      setError(
-        "The tax rate was saved, but we couldn't switch taxes on for your company. Try again."
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
+            toast.success('updated_settings');
+            onClose();
+          })
+          .catch(() =>
+            setError(
+              'The tax rate was saved, but taxes could not be switched on for your company. Try again.'
+            )
+          );
+      })
+      .catch(() =>
+        setError(
+          'The tax rate could not be saved. Check the details and try again.'
+        )
+      )
+      .finally(() => setBusy(false));
+  };
 
   return (
     <Modal
@@ -167,14 +166,14 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
             <Choice
               selected={inclusive === false}
               onSelect={() => setInclusive(false)}
-              title="No — add it on top"
+              title="No, add it on top"
               detail="A 100 item becomes 120 with 20% tax."
             />
             <Choice
               selected={inclusive === true}
               onSelect={() => setInclusive(true)}
-              title="Yes — my prices already include it"
-              detail="A 100 item stays 100, with the tax worked out from inside."
+              title="Yes, my prices already include it"
+              detail="A 100 item stays 100, and the tax is included in that."
             />
           </div>
         </div>
@@ -189,6 +188,7 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
           <Button
             behavior="button"
             disabled={busy || inclusive === null}
+            disableWithoutIcon={!busy}
             onClick={apply}
           >
             Apply tax
@@ -200,7 +200,7 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
         </div>
 
         <p className="text-xs" style={{ color: t.muted }}>
-          Saved for future invoices.
+          This tax is saved for future invoices.
         </p>
       </div>
     </Modal>

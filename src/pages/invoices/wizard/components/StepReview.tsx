@@ -20,7 +20,7 @@ import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePre
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useHref, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { Modal } from '$app/components/Modal';
@@ -49,6 +49,7 @@ export function StepReview({ wizard, money }: Props) {
   const company = useCurrentCompany();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const gatewaysHref = useHref('/settings/gateways/create');
 
   const invoice = wizard.invoice;
   const client = wizard.client;
@@ -121,7 +122,26 @@ export function StepReview({ wizard, money }: Props) {
       });
   }, []);
 
-  async function send() {
+  const deliver = () =>
+    wizard.flush().then((id) => {
+      if (!id) {
+        return Promise.reject(new Error('draft not saved'));
+      }
+
+      return request(
+        'POST',
+        endpoint('/api/v1/invoices/bulk'),
+        { action: 'email', ids: [id] },
+        { skipIntercept: true }
+      ).then(() => {
+        $refetch(['invoices']);
+
+        toast.success('emailed_invoice');
+        navigate('/invoices');
+      });
+    });
+
+  const send = () => {
     if (!recipient) {
       setEmailDraft('');
       setAskEmail(true);
@@ -130,36 +150,12 @@ export function StepReview({ wizard, money }: Props) {
 
     setSending(true);
 
-    try {
-      await deliver(recipient);
-    } catch {
-      toast.error();
-    } finally {
-      setSending(false);
-    }
-  }
+    deliver()
+      .catch(() => toast.error())
+      .finally(() => setSending(false));
+  };
 
-  async function deliver(address: string) {
-    const id = await wizard.flush();
-
-    if (!id) {
-      throw new Error('draft not saved');
-    }
-
-    await request(
-      'POST',
-      endpoint('/api/v1/invoices/bulk'),
-      { action: 'email', ids: [id] },
-      { skipIntercept: true }
-    );
-
-    $refetch(['invoices']);
-
-    toast.success('emailed_invoice');
-    navigate('/invoices');
-  }
-
-  async function saveEmailThenSend() {
+  const saveEmailThenSend = () => {
     if (!client?.id) {
       return;
     }
@@ -167,79 +163,81 @@ export function StepReview({ wizard, money }: Props) {
     const address = emailDraft.trim();
 
     if (!/^\S+@\S+\.\S+$/.test(address)) {
-      setEmailError('Enter an email address we can deliver to.');
+      setEmailError('Enter a valid email address.');
       return;
     }
 
     setEmailError(undefined);
     setSavingEmail(true);
 
-    let saved: Client;
+    const contacts = (client.contacts ?? []).length
+      ? client.contacts.map((entry, index) =>
+          index === 0 ? { ...entry, email: address, send_email: true } : entry
+        )
+      : [
+          {
+            first_name: client.name,
+            last_name: '',
+            email: address,
+            send_email: true,
+          },
+        ];
 
-    try {
-      const contacts = (client.contacts ?? []).length
-        ? client.contacts.map((entry, index) =>
-            index === 0 ? { ...entry, email: address, send_email: true } : entry
-          )
-        : [
-            {
-              first_name: client.name,
-              last_name: '',
-              email: address,
-              send_email: true,
-            },
-          ];
+    request(
+      'PUT',
+      endpoint('/api/v1/clients/:id', { id: client.id }),
+      { ...client, contacts, documents: [] },
+      { skipIntercept: true }
+    )
+      .then((response) => {
+        const saved = response.data.data as Client;
 
-      const response = await request(
-        'PUT',
-        endpoint('/api/v1/clients/:id', { id: client.id }),
-        { ...client, contacts, documents: [] },
-        { skipIntercept: true }
-      );
+        wizard.refreshClient(saved);
+        wizard.patch({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          invitations: (saved.contacts ?? [])
+            .slice(0, 1)
+            .map((entry) => ({ client_contact_id: entry.id })) as any,
+        });
 
-      saved = response.data.data as Client;
+        $refetch(['clients']);
 
-      wizard.refreshClient(saved);
-      wizard.patch({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        invitations: (saved.contacts ?? [])
-          .slice(0, 1)
-          .map((entry) => ({ client_contact_id: entry.id })) as any,
+        return true;
+      })
+      .catch(() => {
+        setEmailError('This address could not be saved. Try again.');
+
+        return false;
+      })
+      .finally(() => setSavingEmail(false))
+      .then((stored) => {
+        if (!stored) {
+          return;
+        }
+
+        setAskEmail(false);
+        setSending(true);
+
+        return deliver()
+          .catch(() => toast.error())
+          .finally(() => setSending(false));
       });
+  };
 
-      $refetch(['clients']);
-    } catch {
-      setEmailError("We couldn't save that address. Try again.");
+  const openEmailPreview = () => {
+    const resolved = wizard.invoiceId
+      ? Promise.resolve(wizard.invoiceId)
+      : wizard.flush();
 
-      return;
-    } finally {
-      setSavingEmail(false);
-    }
+    return resolved.then((id) => {
+      if (!id) {
+        return;
+      }
 
-    setAskEmail(false);
-    setSending(true);
+      setLoadingEmailPreview(true);
+      setEmailPreview('');
 
-    try {
-      await deliver(saved.contacts?.[0]?.email ?? address);
-    } catch {
-      toast.error();
-    } finally {
-      setSending(false);
-    }
-  }
-
-  async function openEmailPreview() {
-    const id = wizard.invoiceId ?? (await wizard.flush());
-
-    if (!id) {
-      return;
-    }
-
-    setLoadingEmailPreview(true);
-    setEmailPreview('');
-
-    try {
-      const response = await request(
+      return request(
         'POST',
         endpoint('/api/v1/templates'),
         {
@@ -250,61 +248,59 @@ export function StepReview({ wizard, money }: Props) {
           body: '',
         },
         { skipIntercept: true }
-      );
+      )
+        .then((response) => {
+          const { body, wrapper, subject } = response.data as {
+            body: string;
+            wrapper: string;
+            subject: string;
+          };
 
-      const { body, wrapper, subject } = response.data as {
-        body: string;
-        wrapper: string;
-        subject: string;
-      };
+          setEmailPreview(
+            `<div style="font:14px/1.6 -apple-system,Segoe UI,sans-serif;padding:12px 16px;border-bottom:1px solid #e4e4e7;color:#3f3f46"><strong>Subject:</strong> ${escapeHtml(
+              subject
+            )}</div>${(wrapper || '$body').replace('$body', body)}`
+          );
+        })
+        .catch(() => {
+          setEmailPreview(null);
+          toast.error();
+        })
+        .finally(() => setLoadingEmailPreview(false));
+    });
+  };
 
-      setEmailPreview(
-        `<div style="font:14px/1.6 -apple-system,Segoe UI,sans-serif;padding:12px 16px;border-bottom:1px solid #e4e4e7;color:#3f3f46"><strong>Subject:</strong> ${escapeHtml(
-          subject
-        )}</div>${(wrapper || '$body').replace('$body', body)}`
-      );
-    } catch {
-      setEmailPreview(null);
-      toast.error();
-    } finally {
-      setLoadingEmailPreview(false);
-    }
-  }
-
-  async function saveBankInstructions() {
+  const saveBankInstructions = () => {
     if (!bankInstructions?.trim() || !company?.id) {
       return;
     }
 
     setSavingBank(true);
 
-    try {
-      wizard.patch({ terms: bankInstructions.trim() });
+    wizard.patch({ terms: bankInstructions.trim() });
 
-      const response = await request(
-        'PUT',
-        endpoint('/api/v1/companies/:id', { id: company.id }),
-        {
-          ...company,
-          settings: {
-            ...company.settings,
-            invoice_terms: bankInstructions.trim(),
-          },
+    request(
+      'PUT',
+      endpoint('/api/v1/companies/:id', { id: company.id }),
+      {
+        ...company,
+        settings: {
+          ...company.settings,
+          invoice_terms: bankInstructions.trim(),
         },
-        { skipIntercept: true }
-      );
+      },
+      { skipIntercept: true }
+    )
+      .then((response) => {
+        dispatch(updateRecord({ object: 'company', data: response.data.data }));
 
-      dispatch(updateRecord({ object: 'company', data: response.data.data }));
-
-      setBankInstructions(null);
-      wizard.dismiss('pay');
-      toast.success('updated_settings');
-    } catch {
-      toast.error();
-    } finally {
-      setSavingBank(false);
-    }
-  }
+        setBankInstructions(null);
+        wizard.dismiss('pay');
+        toast.success('updated_settings');
+      })
+      .catch(() => toast.error())
+      .finally(() => setSavingBank(false));
+  };
 
   const itemCount = (invoice?.line_items ?? []).filter(
     (item) => item.notes || item.product_key
@@ -340,7 +336,7 @@ export function StepReview({ wizard, money }: Props) {
             <p>{client?.display_name || client?.name || '—'}</p>
 
             <p className="text-xs mt-0.5" style={{ color: t.muted }}>
-              {recipient || 'No email address yet'}
+              {recipient || 'No email address'}
             </p>
           </div>
         </Element>
@@ -394,7 +390,7 @@ export function StepReview({ wizard, money }: Props) {
 
         {designsFailed ? (
           <p className="text-sm" style={{ color: t.muted }}>
-            We couldn't load the layouts. Your invoice uses your usual one.
+            Layouts could not be loaded. Your usual layout will be used.
           </p>
         ) : (
           <div className="flex flex-wrap gap-2">
@@ -463,9 +459,7 @@ export function StepReview({ wizard, money }: Props) {
                 <Button
                   type="secondary"
                   behavior="button"
-                  onClick={() =>
-                    window.open('/settings/gateways/create', '_blank')
-                  }
+                  onClick={() => window.open(gatewaysHref, '_blank')}
                 >
                   Set up card payments
                 </Button>
@@ -519,7 +513,7 @@ export function StepReview({ wizard, money }: Props) {
             <strong style={{ fontWeight: 600 }}>{recipient}</strong>.
           </>
         ) : (
-          <>Your invoice is ready. We&apos;ll ask where to send it.</>
+          <>Your invoice is ready. Add an email address to send it.</>
         )}
       </p>
 
@@ -548,20 +542,21 @@ export function StepReview({ wizard, money }: Props) {
           type="secondary"
           behavior="button"
           disabled={savingDraft}
-          onClick={async () => {
+          onClick={() => {
             setSavingDraft(true);
 
-            const id = await wizard.flush();
+            wizard
+              .flush()
+              .then((id) => {
+                if (!id) {
+                  toast.error();
+                  return;
+                }
 
-            setSavingDraft(false);
-
-            if (!id) {
-              toast.error();
-              return;
-            }
-
-            toast.success('created_invoice');
-            navigate('/invoices');
+                toast.success('created_invoice');
+                navigate('/invoices');
+              })
+              .finally(() => setSavingDraft(false));
           }}
         >
           Save draft
@@ -638,9 +633,5 @@ export function StepReview({ wizard, money }: Props) {
   );
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
+const escapeHtml = (value: string): string =>
+  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

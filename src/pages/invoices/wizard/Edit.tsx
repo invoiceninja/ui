@@ -67,47 +67,47 @@ export default function Edit() {
     (contact) => contact.send_email !== false && contact.email
   )?.email;
 
-  async function save() {
+  const save = () => {
     setSaving(true);
 
-    const saved = await wizard.flush();
+    wizard
+      .flush()
+      .then((saved) => {
+        if (!saved) {
+          return;
+        }
 
-    setSaving(false);
+        toast.success('updated_invoice');
+        $refetch(['invoices']);
+      })
+      .finally(() => setSaving(false));
+  };
 
-    if (!saved) {
-      return;
-    }
-
-    toast.success('updated_invoice');
-    $refetch(['invoices']);
-  }
-
-  async function send() {
+  const send = () => {
     setSending(true);
 
-    try {
-      const saved = await wizard.flush();
+    wizard
+      .flush()
+      .then((saved) => {
+        if (!saved) {
+          return Promise.reject(new Error('not saved'));
+        }
 
-      if (!saved) {
-        throw new Error('not saved');
-      }
+        return request(
+          'POST',
+          endpoint('/api/v1/invoices/bulk'),
+          { action: 'email', ids: [saved] },
+          { skipIntercept: true }
+        ).then(() => {
+          $refetch(['invoices']);
 
-      await request(
-        'POST',
-        endpoint('/api/v1/invoices/bulk'),
-        { action: 'email', ids: [saved] },
-        { skipIntercept: true }
-      );
-
-      $refetch(['invoices']);
-      toast.success('emailed_invoice');
-      navigate('/invoices');
-    } catch {
-      toast.error();
-    } finally {
-      setSending(false);
-    }
-  }
+          toast.success('emailed_invoice');
+          navigate('/invoices');
+        });
+      })
+      .catch(() => toast.error())
+      .finally(() => setSending(false));
+  };
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
@@ -162,7 +162,7 @@ export default function Edit() {
                     </p>
 
                     <p className="text-xs mt-0.5" style={{ color: t.muted }}>
-                      {recipient || 'No email address yet'}
+                      {recipient || 'No email address'}
                     </p>
                   </div>
                 </div>

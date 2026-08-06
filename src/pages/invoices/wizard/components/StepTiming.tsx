@@ -36,10 +36,10 @@ interface Props {
   embedded?: boolean;
 }
 
-function termFromDates(
+const termFromDates = (
   date: string | undefined,
   dueDate: string | undefined
-): Term | null {
+): Term | null => {
   if (!dueDate) {
     return null;
   }
@@ -50,7 +50,7 @@ function termFromDates(
   );
 
   return match ? match.key : 'custom';
-}
+};
 
 export function StepTiming({ wizard, embedded }: Props) {
   const [translate] = useTranslation();
@@ -68,7 +68,7 @@ export function StepTiming({ wizard, embedded }: Props) {
   const [defaultSaved, setDefaultSaved] = useState(false);
   const [savingDefault, setSavingDefault] = useState(false);
 
-  function choose(next: Term) {
+  const choose = (next: Term) => {
     setTerm(next);
 
     const entry = TERMS.find((option) => option.key === next);
@@ -76,7 +76,7 @@ export function StepTiming({ wizard, embedded }: Props) {
     if (entry?.days !== null && entry?.days !== undefined) {
       wizard.patch({ due_date: addDays(invoiceDate, entry.days) });
     }
-  }
+  };
 
   const chosen = TERMS.find((option) => option.key === term);
   const currentDefault = company?.settings?.payment_terms ?? '';
@@ -85,36 +85,33 @@ export function StepTiming({ wizard, embedded }: Props) {
     chosen.days !== null &&
     String(chosen.days) !== String(currentDefault);
 
-  async function saveDefault() {
+  const saveDefault = () => {
     if (!company?.id || chosen?.days === null || chosen?.days === undefined) {
       return;
     }
 
     setSavingDefault(true);
 
-    try {
-      const response = await request(
-        'PUT',
-        endpoint('/api/v1/companies/:id', { id: company.id }),
-        {
-          ...company,
-          settings: {
-            ...company.settings,
-            payment_terms: String(chosen.days),
-          },
+    request(
+      'PUT',
+      endpoint('/api/v1/companies/:id', { id: company.id }),
+      {
+        ...company,
+        settings: {
+          ...company.settings,
+          payment_terms: String(chosen.days),
         },
-        { skipIntercept: true }
-      );
-
-      dispatch(updateRecord({ object: 'company', data: response.data.data }));
-      setDefaultSaved(true);
-      toast.success('updated_settings');
-    } catch {
-      toast.error();
-    } finally {
-      setSavingDefault(false);
-    }
-  }
+      },
+      { skipIntercept: true }
+    )
+      .then((response) => {
+        dispatch(updateRecord({ object: 'company', data: response.data.data }));
+        setDefaultSaved(true);
+        toast.success('updated_settings');
+      })
+      .catch(() => toast.error())
+      .finally(() => setSavingDefault(false));
+  };
 
   const serverErrors = wizard.errors?.errors;
 
