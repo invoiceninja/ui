@@ -74,7 +74,7 @@ export function useQuickCreateActions() {
     },
     {
       key: 'invoice',
-      url: '/invoices/create',
+      url: '/invoices/wizard',
       section: 'income',
       visible:
         hasPermission('create_invoice') && enabled(ModuleBitmask.Invoices),

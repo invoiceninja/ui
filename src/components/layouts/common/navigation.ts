@@ -101,7 +101,7 @@ export function useNavigation() {
           hasPermission('edit_invoice')),
       rightButton: {
         icon: Plus,
-        to: '/invoices/create',
+        to: '/invoices/wizard',
         label: t('new_invoice'),
         visible: hasPermission('create_invoice'),
         tooltipLabel: tooltipFor('create_invoice'),

@@ -59,7 +59,7 @@ export default function Invoices() {
         withoutDefaultBulkActions
         bulkRoute="/api/v1/invoices/bulk"
         linkToCreate={route('/invoices/create?client=:id', { id })}
-        linkToEdit="/invoices/:id/edit"
+        linkToEdit="/invoices/wizard/edit/:id"
         excludeColumns={['client_id']}
         linkToCreateGuards={[permission('create_invoice')]}
         hideEditableOptions={!hasPermission('edit_invoice')}

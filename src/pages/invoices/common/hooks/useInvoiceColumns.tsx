@@ -293,7 +293,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('number'),
       format: (value, invoice) => (
         <DynamicLink
-          to={route('/invoices/:id/edit', { id: invoice.id })}
+          to={route('/invoices/wizard/edit/:id', { id: invoice.id })}
           renderSpan={disableNavigation('invoice', invoice)}
         >
           {value}

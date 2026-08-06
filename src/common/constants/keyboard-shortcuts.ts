@@ -35,7 +35,7 @@ const navigationShortcuts: ShortcutDefinition[] = [
   {
     id: 'create_invoice',
     labelKey: 'new_invoice',
-    action: { type: 'navigate', to: '/invoices/create' },
+    action: { type: 'navigate', to: '/invoices/wizard' },
   },
   {
     id: 'create_recurring_invoice',

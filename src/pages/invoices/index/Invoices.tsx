@@ -126,8 +126,8 @@ export default function Invoices() {
         columns={columns}
         footerColumns={footerColumns}
         bulkRoute="/api/v1/invoices/bulk"
-        linkToCreate="/invoices/create"
-        linkToEdit="/invoices/:id/edit"
+        linkToCreate="/invoices/wizard"
+        linkToEdit="/invoices/wizard/edit/:id"
         withResourcefulActions
         withoutDefaultBulkActions
         customActions={actions}
