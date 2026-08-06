@@ -102,23 +102,31 @@ export function BrandPrompts() {
   return (
     <div className="space-y-3">
       {businessName ? null : (
-        <div className="flex items-end gap-2">
-          <div className="flex-1 min-w-0">
-            <InputField
-              id="iw-business-name"
-              label="Your business name"
-              placeholder="Acme Studio"
-              value={name}
-              changeOverride
-              debounceTimeout={0}
-              onValueChange={setName}
-              errorMessage={nameError}
-            />
-          </div>
+        <div>
+          <p
+            className="text-sm mb-2"
+            style={{ color: t.text, fontWeight: 500 }}
+          >
+            Your invoice needs a business name.
+          </p>
 
-          <Button behavior="button" disabled={savingName} onClick={saveName}>
-            {translate('save')}
-          </Button>
+          <div className="flex items-end gap-2">
+            <div className="flex-1 min-w-0">
+              <InputField
+                id="iw-business-name"
+                placeholder="Acme Studio"
+                value={name}
+                changeOverride
+                debounceTimeout={0}
+                onValueChange={setName}
+                errorMessage={nameError}
+              />
+            </div>
+
+            <Button behavior="button" disabled={savingName} onClick={saveName}>
+              {translate('save')}
+            </Button>
+          </div>
         </div>
       )}
 

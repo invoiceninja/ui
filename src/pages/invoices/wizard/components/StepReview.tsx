@@ -22,7 +22,9 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { Modal } from '$app/components/Modal';
+import { Element } from '$app/components/cards';
 import { Spinner } from '$app/components/Spinner';
 import { Button, InputField } from '$app/components/forms';
 import { Callout, ErrorBanner, Footer, useTheme, radius } from '../kit';
@@ -43,6 +45,7 @@ interface Props {
 export function StepReview({ wizard, money }: Props) {
   const [translate] = useTranslation();
   const t = useTheme();
+  const colors = useColorScheme();
   const company = useCurrentCompany();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -109,7 +112,13 @@ export function StepReview({ wizard, money }: Props) {
       { skipIntercept: true }
     )
       .then((response) => setHasGateway((response.data.data ?? []).length > 0))
-      .catch(() => setHasGateway(null));
+      .catch(() => {
+        const configured = String(
+          company?.settings?.company_gateway_ids ?? ''
+        ).replace(/0|,/g, '');
+
+        setHasGateway(configured.length > 0);
+      });
   }, []);
 
   async function send() {
@@ -307,37 +316,70 @@ export function StepReview({ wizard, money }: Props) {
     <div className="iw-enter">
       <ErrorBanner errors={wizard.errors} />
 
-      <dl
-        className="border divide-y"
-        style={{
-          borderColor: t.line,
-          borderRadius: radius.panel,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ['--tw-divide-opacity' as any]: 1,
-        }}
-      >
-        <Row label="From" value={company?.settings?.name || 'Your business'} />
-        <Row
-          label="Bill to"
-          value={client?.display_name || client?.name || '—'}
-          detail={recipient || 'No email address yet'}
-        />
-        <Row
-          label="Items"
-          value={`${itemCount} ${itemCount === 1 ? 'item' : 'items'}`}
-        />
-        <Row label="Total" value={money(wizard.totals.total)} emphasis />
-        <Row
-          label="Due"
-          value={
-            invoice?.due_date
-              ? invoice.due_date === invoice.date
-                ? 'On receipt'
-                : dayjs(invoice.due_date).format('D MMMM YYYY')
-              : '—'
-          }
-        />
-      </dl>
+      <div>
+        <Element
+          className="border-b border-dashed"
+          leftSide="From"
+          pushContentToRight
+          withoutWrappingLeftSide
+          noExternalPadding
+          style={{ borderColor: colors.$20 }}
+        >
+          {company?.settings?.name || 'Your business'}
+        </Element>
+
+        <Element
+          className="border-b border-dashed"
+          leftSide="Bill to"
+          pushContentToRight
+          withoutWrappingLeftSide
+          noExternalPadding
+          style={{ borderColor: colors.$20 }}
+        >
+          <div>
+            <p>{client?.display_name || client?.name || '—'}</p>
+
+            <p className="text-xs mt-0.5" style={{ color: t.muted }}>
+              {recipient || 'No email address yet'}
+            </p>
+          </div>
+        </Element>
+
+        <Element
+          className="border-b border-dashed"
+          leftSide="Items"
+          pushContentToRight
+          withoutWrappingLeftSide
+          noExternalPadding
+          style={{ borderColor: colors.$20 }}
+        >
+          {`${itemCount} ${itemCount === 1 ? 'item' : 'items'}`}
+        </Element>
+
+        <Element
+          className="border-b border-dashed"
+          leftSide="Total"
+          pushContentToRight
+          withoutWrappingLeftSide
+          noExternalPadding
+          style={{ borderColor: colors.$20 }}
+        >
+          {money(wizard.totals.total)}
+        </Element>
+
+        <Element
+          leftSide="Due"
+          pushContentToRight
+          withoutWrappingLeftSide
+          noExternalPadding
+        >
+          {invoice?.due_date
+            ? invoice.due_date === invoice.date
+              ? 'On receipt'
+              : dayjs(invoice.due_date).format('D MMMM YYYY')
+            : '—'}
+        </Element>
+      </div>
 
       <div
         className="mt-6 border px-4 py-4"
@@ -519,7 +561,7 @@ export function StepReview({ wizard, money }: Props) {
             }
 
             toast.success('created_invoice');
-            navigate(`/invoices/wizard/edit/${id}`);
+            navigate('/invoices');
           }}
         >
           Save draft
@@ -592,50 +634,6 @@ export function StepReview({ wizard, money }: Props) {
           </div>
         )}
       </Modal>
-    </div>
-  );
-}
-
-function Row({
-  label,
-  value,
-  detail,
-  emphasis,
-}: {
-  label: string;
-  value: string;
-  detail?: string;
-  emphasis?: boolean;
-}) {
-  const t = useTheme();
-
-  return (
-    <div
-      className="flex items-baseline justify-between gap-4 px-4 py-3"
-      style={{ borderColor: t.hairline }}
-    >
-      <dt className="text-sm shrink-0" style={{ color: t.muted }}>
-        {label}
-      </dt>
-
-      <dd className="text-right min-w-0">
-        <span
-          className={emphasis ? 'text-base' : 'text-sm'}
-          style={{
-            color: t.text,
-            fontWeight: emphasis ? 600 : 500,
-            fontVariantNumeric: emphasis ? 'tabular-nums' : undefined,
-          }}
-        >
-          {value}
-        </span>
-
-        {detail ? (
-          <span className="block text-xs mt-0.5" style={{ color: t.muted }}>
-            {detail}
-          </span>
-        ) : null}
-      </dd>
     </div>
   );
 }
