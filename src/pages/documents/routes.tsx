@@ -79,12 +79,8 @@ const UserSelection = lazy(
 const Sign = lazy(() => import('$app/pages/documents/sign/index/Sign'));
 const Pdf = lazy(() => import('$app/pages/documents/pdf/Pdf'));
 
-const Beta = lazy(() => import('$app/pages/documents/beta/Beta'));
-
 const routes = (
   <>
-    <Route path="/docuninja/beta" element={<Beta />} />
-
     <Route
       path="docuninja/*"
       element={
