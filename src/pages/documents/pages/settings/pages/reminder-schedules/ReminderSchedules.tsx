@@ -258,7 +258,7 @@ export default function ReminderSchedules() {
                       {schedule.name}
                     </p>
 
-                    <p className="text-xs" style={{ color: colors.$5 }}>
+                    <p className="text-xs" style={{ color: colors.$17 }}>
                       {schedule.template?.name || t('no_template')} &mdash;{' '}
                       {schedule.num_days} {t('days')}{' '}
                       {t(schedule.schedule_direction)}
