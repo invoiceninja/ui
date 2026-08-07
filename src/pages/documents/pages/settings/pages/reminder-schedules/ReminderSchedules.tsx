@@ -15,6 +15,7 @@ import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import { ValidationAlert } from '$app/components/ValidationAlert';
 import { AxiosError } from 'axios';
+import { MdDelete, MdEdit } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
@@ -205,6 +206,8 @@ export default function ReminderSchedules() {
       }
     )
       .then(() => {
+        toast.success('updated_reminder_schedule');
+
         $refetch(['docuninja_reminder_schedules']);
       })
       .catch(() => toast.error('error_title'));
@@ -272,6 +275,7 @@ export default function ReminderSchedules() {
                     behavior="button"
                     onClick={() => openEditModal(schedule)}
                   >
+                    <MdEdit className="mr-2 h-4 w-4" />
                     {t('edit')}
                   </Button>
 
@@ -280,6 +284,7 @@ export default function ReminderSchedules() {
                     behavior="button"
                     onClick={() => handleDelete(schedule)}
                   >
+                    <MdDelete className="mr-2 h-4 w-4" />
                     {t('delete')}
                   </Button>
                 </div>
