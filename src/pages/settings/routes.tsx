@@ -17,7 +17,6 @@ import * as Settings from './index';
 import { isDemo } from '$app/common/helpers';
 import { invoiceDesignRoutes } from '$app/pages/settings/invoice-design/routes';
 import { or } from '$app/common/guards/guards/or';
-import { isHosted } from '$app/common/helpers';
 
 export const settingsRoutes = (
   <Route path="/settings">
