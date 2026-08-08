@@ -24,6 +24,8 @@ import { useTaxCategories } from '$app/components/tax-rates/TaxCategorySelector'
 import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 import { ErrorMessage } from '$app/components/ErrorMessage';
 import { IncomeAccountSelector } from '$app/components/IncomeAccountSelector';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 interface Props {
   type?: 'create' | 'edit';
@@ -67,6 +69,15 @@ export function ProductForm(props: Props) {
           value={product.notes}
           onValueChange={(value) => handleChange('notes', value)}
           errorMessage={errors?.errors.notes}
+        />
+      </Element>
+
+      <Element leftSide={t('tags')}>
+        <TagPillSelector
+          entityType={TAG_ENTITY_TYPES.product}
+          value={product.tags || []}
+          onChange={(tags) => handleChange('tags', tags)}
+          errorMessage={errors?.errors.tags}
         />
       </Element>
 

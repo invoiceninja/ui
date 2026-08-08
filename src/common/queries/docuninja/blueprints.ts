@@ -124,16 +124,11 @@ export function useCreateBlueprint() {
   return async (params: CreateBlueprintParams) => {
     toast.processing();
 
-    return request(
-      'POST',
-      docuNinjaEndpoint('/api/blueprints'),
-      params,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
-        },
-      }
-    ).then((response) => {
+    return request('POST', docuNinjaEndpoint('/api/blueprints'), params, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+      },
+    }).then((response) => {
       toast.success('template_created');
 
       invalidateQueryValue &&
@@ -142,7 +137,6 @@ export function useCreateBlueprint() {
       $refetch(['blueprints']);
 
       return response;
-
     });
   };
 }
@@ -167,9 +161,7 @@ export function useUpdateBlueprint() {
       params,
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem(
-            'X-DOCU-NINJA-TOKEN'
-          )}`,
+          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
         },
       }
     )
@@ -177,9 +169,8 @@ export function useUpdateBlueprint() {
         toast.success('template_updated');
 
         $refetch(['blueprints']);
-   
+
         return response;
-   
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
@@ -188,6 +179,5 @@ export function useUpdateBlueprint() {
         }
       })
       .finally();
-
   };
 }

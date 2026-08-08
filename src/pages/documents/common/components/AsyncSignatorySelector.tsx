@@ -25,7 +25,10 @@ interface Props {
   signatories?: SignatorySelectorProps['signatories'];
   valuePrefix?: 'contact' | 'client';
   transformContact?: (client: Client) => Record<string, unknown> | null;
-  transformPayload?: (client: Client, contactKey: string) => Record<string, unknown>;
+  transformPayload?: (
+    client: Client,
+    contactKey: string
+  ) => Record<string, unknown>;
 }
 
 export function AsyncSignatorySelector({
@@ -71,9 +74,7 @@ export function AsyncSignatorySelector({
     try {
       const response = await request(
         'GET',
-        endpoint(
-          `/api/v1/clients?per_page=500&status=active&filter=${filter}`
-        )
+        endpoint(`/api/v1/clients?per_page=500&status=active&filter=${filter}`)
       );
 
       setClients(response.data.data);

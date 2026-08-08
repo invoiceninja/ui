@@ -188,7 +188,9 @@ function Builder() {
   });
 
   useDriverTour({
-    show: Boolean(isFromTemplate && !preferences.blueprint_use_template_tour_shown),
+    show: Boolean(
+      isFromTemplate && !preferences.blueprint_use_template_tour_shown
+    ),
     steps: [
       {
         element: '.builder-rightSide',
@@ -252,7 +254,7 @@ function Builder() {
     const onSaveSuccess = () => {
       window.removeEventListener(
         'builder:document.successfully.saved',
-        onSaveSuccess,
+        onSaveSuccess
       );
       window.removeEventListener('builder:save.error', onSaveError);
 
@@ -267,7 +269,7 @@ function Builder() {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
           },
-        },
+        }
       )
         .then(() => {
           setIsDocumentSending(false);
@@ -276,7 +278,7 @@ function Builder() {
           window.dispatchEvent(
             new CustomEvent('builder:document.sent', {
               detail: { documentId: entity.id },
-            }),
+            })
           );
 
           toast.success('document_queued_for_sending');
@@ -293,14 +295,17 @@ function Builder() {
     const onSaveError = () => {
       window.removeEventListener(
         'builder:document.successfully.saved',
-        onSaveSuccess,
+        onSaveSuccess
       );
       window.removeEventListener('builder:save.error', onSaveError);
 
       setIsDocumentSaving(false);
     };
 
-    window.addEventListener('builder:document.successfully.saved', onSaveSuccess);
+    window.addEventListener(
+      'builder:document.successfully.saved',
+      onSaveSuccess
+    );
     window.addEventListener('builder:save.error', onSaveError);
     window.dispatchEvent(new CustomEvent('builder:save'));
   };
@@ -439,15 +444,9 @@ function Builder() {
         handleSingleSignatorySent
       );
 
-      window.removeEventListener(
-        'builder:document.sent',
-        handleDocumentSent
-      );
+      window.removeEventListener('builder:document.sent', handleDocumentSent);
 
-      window.removeEventListener(
-        'builder:send.error',
-        handleSendError
-      );
+      window.removeEventListener('builder:send.error', handleSendError);
     };
   }, []);
 
@@ -496,7 +495,10 @@ function Builder() {
               behavior="button"
               onClick={handleSend}
               disabled={
-                isDocumentSaving || isDocumentSending || hasBeenSent || !hasRealSignatories()
+                isDocumentSaving ||
+                isDocumentSending ||
+                hasBeenSent ||
+                !hasRealSignatories()
               }
               disableWithoutIcon
               className="builder-send-button"

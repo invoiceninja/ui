@@ -22,13 +22,15 @@ import { useActions } from './common/hooks/useActions';
 
 export default function Blueprints() {
   useTitle('blueprints');
-  
+
   const [t] = useTranslation();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedBlueprint, setSelectedBlueprint] = useState<Blueprint | null>(null);
+  const [selectedBlueprint, setSelectedBlueprint] = useState<Blueprint | null>(
+    null
+  );
 
   const columns = useTableColumns();
-  
+
   // Get token from unified actions (NO QUERY!)
   const { getToken } = useDocuNinjaActions();
 

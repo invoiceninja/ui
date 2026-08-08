@@ -64,7 +64,7 @@ export function CompanyCreate(props: Props) {
     localStorage.setItem('X-CURRENT-INDEX', index.toString());
 
     queryClient.invalidateQueries();
-    
+
     // Clear DocuNinja data and cache when switching companies
     flushData();
 

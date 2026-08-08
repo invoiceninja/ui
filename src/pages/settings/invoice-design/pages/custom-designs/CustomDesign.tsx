@@ -118,7 +118,7 @@ export default function CustomDesign() {
               design: data,
               entity: storedDesignPreviewProperties.entity,
               entity_id: storedDesignPreviewProperties.entity_id,
-            } as PreviewPayload)
+            }) as PreviewPayload
         );
       } else {
         setDesignPreviewProperties((current) => [

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useColorScheme } from '$app/common/colors';
 

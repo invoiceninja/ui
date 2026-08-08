@@ -39,12 +39,12 @@ const stringOperators = [
 ];
 
 const numberOperators = [
-    { value: '<', label: '<' },
-    { value: '<=', label: '<=' },
-    { value: '=', label: '=' },
-    { value: '>', label: '>' },
-    { value: '>=', label: '>=' },
-  ];
+  { value: '<', label: '<' },
+  { value: '<=', label: '<=' },
+  { value: '=', label: '=' },
+  { value: '>', label: '>' },
+  { value: '>=', label: '>=' },
+];
 
 const OPERATORS = {
   description: stringOperators,
@@ -83,7 +83,9 @@ export function RuleModal({
   const handleChangeRuleField = (value: string) => {
     handleChangeRule('search_key', value);
 
-    const matches = ['description', 'participant', 'participant_name'].includes(value);
+    const matches = ['description', 'participant', 'participant_name'].includes(
+      value
+    );
     if (matches) handleChangeRule('operator', 'contains');
 
     if (value === 'amount') {

@@ -88,7 +88,7 @@ export default function Document() {
     data: timelineData,
     isLoading: isTimelineLoading,
     isFetching: isTimelineFetching,
-    refetch: refetchTimeline
+    refetch: refetchTimeline,
   } = useDocumentTimelineQuery({
     id,
     enabled: Boolean(id),

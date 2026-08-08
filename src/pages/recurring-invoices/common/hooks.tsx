@@ -88,6 +88,8 @@ import classNames from 'classnames';
 import { Dispatch, SetStateAction } from 'react';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { SendNowAction } from './components/SendNowAction';
+import { TagPills } from '$app/components/tags/TagPills';
+import { calculateNetAmount } from '$app/common/helpers/invoices/net-amount';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -638,6 +640,7 @@ export function useAllRecurringInvoiceColumns() {
     'private_notes',
     'public_notes',
     'updated_at',
+    'tags',
   ] as const;
 
   return recurringInvoiceColumns.map((column) => normalizeColumnName(column));
@@ -736,7 +739,7 @@ export function useRecurringInvoiceColumns() {
       label: t('net_amount'),
       format: (value, recurringInvoice) =>
         formatMoney(
-          Number(value) - Number(recurringInvoice.total_taxes || 0),
+          calculateNetAmount(recurringInvoice),
           recurringInvoice.client?.country_id,
           recurringInvoice.client?.settings.currency_id
         ),
@@ -921,6 +924,14 @@ export function useRecurringInvoiceColumns() {
       id: 'updated_at',
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'tags',
+      id: 'recurring_invoice_tag_ids',
+      label: t('tags'),
+      format: (value, recurringInvoice) => (
+        <TagPills tags={recurringInvoice.tags} />
+      ),
     },
   ];
 

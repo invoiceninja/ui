@@ -102,8 +102,7 @@ export function SendInvitationsModal({
           title={t('send_confirmation')}
           visible={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-        >     
-
+        >
           <div className="w-full pt-3">
             <Button
               className="w-full"

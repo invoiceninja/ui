@@ -88,11 +88,7 @@ export function DataTableFooterColumnsPicker(props: Props) {
 
   return (
     <>
-      <Button
-        className="shadow-sm"
-        type="secondary"
-        onClick={openModal}
-      >
+      <Button className="shadow-sm" type="secondary" onClick={openModal}>
         <div className="flex items-center space-x-2">
           <TableColumns size="1.3rem" color={colors.$3} />
 
@@ -102,11 +98,7 @@ export function DataTableFooterColumnsPicker(props: Props) {
         </div>
       </Button>
 
-      <Modal
-        title={t('footer')}
-        visible={isModalOpen}
-        onClose={closeModal}
-      >
+      <Modal title={t('footer')} visible={isModalOpen} onClose={closeModal}>
         <div className="flex flex-col">
           {columns.map((column, index) => (
             <Element
@@ -117,8 +109,8 @@ export function DataTableFooterColumnsPicker(props: Props) {
               pushContentToRight
             >
               <Toggle
-                checked={isColumnChecked(column.id)}
-                onValueChange={(value) => handleChange(column.id, value)}
+                checked={isColumnChecked(column.column)}
+                onValueChange={(value) => handleChange(column.column, value)}
               />
             </Element>
           ))}

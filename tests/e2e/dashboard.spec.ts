@@ -1,31 +1,23 @@
-import { apiPermissions, login, logout } from '$tests/e2e/helpers';
+import { login } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
 
 resetAccountBeforeAll();
 
-test("Can't view dashboard without permission", async ({ page, api }) => {
+test("Can't view dashboard without permission", async ({ page }) => {
   test.setTimeout(60000);
-  const { clear, save } = apiPermissions(api.context);
-
-  await clear();
-  await save();
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'permissions@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Dashboard'
   );
 
-  await logout(page);
 });
 
 test('Can view dashboard with permission', async ({ page, api }) => {
-  test.setTimeout(60000);
-  const { clear, save, set } = apiPermissions(api.context);
+  test.setTimeout(60000); 
 
-  await clear();
-  await set('view_dashboard');
-  await save();
+  await api.setPermissions('permissions@example.com', ['view_dashboard']);
 
   await login(page, 'permissions@example.com', 'password');
 
@@ -93,5 +85,4 @@ test('Can view dashboard with permission', async ({ page, api }) => {
       .first()
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });

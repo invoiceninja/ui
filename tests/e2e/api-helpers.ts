@@ -12,6 +12,8 @@ import {
   baseEmailForAccount,
   emailForCurrentAccount,
   passwordForCurrentAccount,
+  permissionBaseEmails,
+  type TestAccount,
 } from './accounts';
 
 const ENTITY_ENDPOINTS = [
@@ -37,6 +39,7 @@ const ENTITY_ENDPOINTS = [
 ] as const;
 
 export type EntityType = (typeof ENTITY_ENDPOINTS)[number];
+export type Permission = AppPermission | 'admin';
 
 const RESET_PURGE_ENDPOINTS: EntityType[] = [
   'invoices',
@@ -219,54 +222,6 @@ export async function createEntityViaApi(
   return body.data;
 }
 
-export async function updateEntityViaApi(
-  api: ApiContext,
-  entityType: EntityType,
-  id: string,
-  data: Record<string, unknown>
-): Promise<Record<string, unknown>> {
-  const context = await apiRequest(api);
-
-  const response = await context.put('/api/v1/' + entityType + '/' + id, {
-    headers: api.headers,
-    data,
-  });
-
-  if (!response.ok()) {
-    const text = await response.text();
-    await context.dispose();
-    throw new Error(
-      'Failed to update ' +
-        entityType +
-        ' ' +
-        id +
-        ' (' +
-        response.status() +
-        '): ' +
-        text.slice(0, 300)
-    );
-  }
-
-  const body = await response.json();
-  await context.dispose();
-  return body.data;
-}
-
-export async function assignEntityToUser(
-  api: ApiContext,
-  entityType: EntityType,
-  id: string,
-  email: string
-): Promise<void> {
-  const userId = await fetchUserIdByEmail(api, email);
-
-  if (!userId) {
-    throw new Error('Could not find user ' + email + ' for assignment');
-  }
-
-  await updateEntityViaApi(api, entityType, id, { assigned_user_id: userId });
-}
-
 // ---------------------------------------------------------------------------
 // Typed creation helpers
 // ---------------------------------------------------------------------------
@@ -416,15 +371,9 @@ interface ApiUser {
   last_name: string;
   email: string;
   is_deleted: boolean;
-  company_user?: {
-    is_admin?: boolean;
-    permissions?: string;
-    [key: string]: unknown;
-  };
-  [key: string]: unknown;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
 }
-
-export type UserPermission = AppPermission | 'admin';
 
 async function fetchAllUsers(api: ApiContext): Promise<ApiUser[]> {
   const context = await apiRequest(api);
@@ -443,142 +392,89 @@ async function fetchAllUsers(api: ApiContext): Promise<ApiUser[]> {
   return body.data || [];
 }
 
-export async function fetchUserIdByEmail(
-  api: ApiContext,
-  email: string
-): Promise<string | null> {
-  const resolvedEmail = emailForCurrentAccount(email);
-  const users = await fetchAllUsers(api);
-
-  return users.find((user) => user.email === resolvedEmail)?.id || null;
-}
-
-async function fetchUser(api: ApiContext, id: string): Promise<ApiUser> {
-  const context = await apiRequest(api);
-  const response = await context.get(
-    '/api/v1/users/' + id + '?include=company_user',
-    { headers: api.headers }
-  );
-
-  if (!response.ok()) {
-    const text = await response.text();
-    await context.dispose();
-    throw new Error(
-      'Failed to fetch user ' +
-        id +
-        ' (' +
-        response.status() +
-        '): ' +
-        text.slice(0, 300)
-    );
-  }
-
-  const body = await response.json();
-  await context.dispose();
-
-  if (!body.data) {
-    throw new Error('Failed to fetch user ' + id + ': empty response');
-  }
-
-  return body.data;
-}
-
-export async function setUserPermissions(
+/**
+ * Assign permissions to a permission user through the API.
+ * The `admin` test permission maps to company_user.is_admin, matching the UI.
+ */
+export async function setPermissions(
   api: ApiContext,
   email: string,
-  permissions: UserPermission[]
+  permissions: Permission[]
 ): Promise<void> {
   const resolvedEmail = emailForCurrentAccount(email);
   const users = await fetchAllUsers(api);
-  const listUser = users.find((user) => user.email === resolvedEmail);
+  const user = users.find((candidate) => candidate.email === resolvedEmail);
 
-  if (!listUser) {
-    throw new Error(
-      'Could not find user ' + resolvedEmail + ' to update permissions'
-    );
+  if (!user) {
+    throw new Error(`Could not find permission user ${resolvedEmail}`);
   }
 
-  const user = await fetchUser(api, listUser.id);
-
-  if (!user.company_user) {
-    throw new Error(
-      'Could not update permissions for ' +
-        resolvedEmail +
-        ': missing company_user'
-    );
-  }
-
-  const uniquePermissions = Array.from(new Set(permissions));
-  const isAdmin = uniquePermissions.includes('admin');
-  const permissionString = isAdmin
-    ? ''
-    : uniquePermissions
-        .filter((permission) => permission !== 'admin')
-        .join(',');
-
-  const context = await apiRequest(api);
-  const response = await context.put(
-    '/api/v1/users/' + user.id + '?include=company_user',
-    {
-      headers: api.headers,
-      data: {
-        ...user,
-        company_user: {
-          ...user.company_user,
-          is_admin: isAdmin,
-          permissions: permissionString,
-        },
-      },
-    }
+  const isAdmin = permissions.includes('admin');
+  const assignedPermissions = permissions.filter(
+    (permission) => permission !== 'admin'
   );
 
-  if (!response.ok()) {
-    const text = await response.text();
-    await context.dispose();
+  if (isAdmin && assignedPermissions.length > 0) {
     throw new Error(
-      'Failed to update permissions for ' +
-        resolvedEmail +
-        ' (' +
-        response.status() +
-        '): ' +
-        text.slice(0, 300)
+      `Administrator permission cannot be combined with granular permissions for ${resolvedEmail}`
     );
   }
 
-  await context.dispose();
+  const context = await apiRequest(api);
+
+  try {
+    const detailResponse = await context.get(
+      `/api/v1/users/${user.id}?include=company_user`,
+      { headers: api.headers }
+    );
+
+    if (!detailResponse.ok()) {
+      throw new Error(
+        `Failed to load user ${resolvedEmail} for permission assignment (${detailResponse.status()}): ${await detailResponse.text()}`
+      );
+    }
+
+    const fullUser = (await detailResponse.json()).data;
+    const response = await context.put(
+      `/api/v1/users/${user.id}?include=company_user`,
+      {
+        headers: api.headers,
+        data: {
+          ...fullUser,
+          company_user: {
+            ...fullUser.company_user,
+            permissions: isAdmin ? '' : assignedPermissions.join(','),
+            is_admin: isAdmin,
+          },
+        },
+      }
+    );
+
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to assign permissions to ${resolvedEmail} (${response.status()}): ${await response.text()}`
+      );
+    }
+  } finally {
+    await context.dispose();
+  }
 }
 
 /**
  * Reset permission user back to no permissions.
+ * Permissions live on company_user (not the top-level user payload).
  */
 export async function resetPermissionUser(
   api: ApiContext,
   email: string
 ): Promise<void> {
-  const users = await fetchAllUsers(api);
-  const user = users.find((u) => u.email === email);
-
-  if (!user) return;
-
-  const context = await apiRequest(api);
-  const response = await context.put(`/api/v1/users/${user.id}`, {
-    headers: api.headers,
-    data: { ...user, permissions: '' },
-  });
-
-  if (response.ok()) {
-    console.log(`  Reset permissions for ${email}`);
-  } else {
-    console.warn(
-      `  Failed to reset permissions for ${email}: ${response.status()}`
-    );
-  }
-
-  await context.dispose();
+  await setPermissions(api, email, []);
 }
 
 /**
  * Restore any deleted/archived seed users that tests may have removed.
+ * Skips unsuffixed permission-base emails (tasks@example.com, …) so this
+ * cannot undo purgeUnsuffixedPermissionUsers on parallel account lanes.
  */
 export async function restoreDeletedUsers(api: ApiContext): Promise<void> {
   const seedUserNames = [
@@ -586,6 +482,7 @@ export async function restoreDeletedUsers(api: ApiContext): Promise<void> {
     'Products Example',
     'Credits Example',
   ];
+  const unsuffixedEmails = new Set<string>(permissionBaseEmails);
 
   const users = await fetchAllUsers(api);
   const deletedIds = users
@@ -593,7 +490,9 @@ export async function restoreDeletedUsers(api: ApiContext): Promise<void> {
       (u) =>
         seedUserNames.some(
           (name) => `${u.first_name} ${u.last_name}`.trim() === name
-        ) && u.is_deleted
+        ) &&
+        u.is_deleted &&
+        !unsuffixedEmails.has(u.email)
     )
     .map((u) => u.id);
 
@@ -601,6 +500,43 @@ export async function restoreDeletedUsers(api: ApiContext): Promise<void> {
     await bulkAction(api, 'users' as EntityType, deletedIds, 'restore');
     console.log(`  Restored ${deletedIds.length} deleted seed users`);
   }
+}
+
+/**
+ * Remove leftover unsuffixed permission users (e.g. tasks@example.com) from
+ * this company. Parallel lanes use tasks1@ / tasks2@ / … with the same display
+ * name ("Tasks Example"); keeping the unsuffixed orphan makes assignee
+ * combobox `.first()` picks ambiguous and flaky across workers.
+ *
+ * Safe under parallel lanes: each reset is company-scoped via that lane's
+ * owner token, and only exact base emails from permissionBaseEmails are
+ * removed — never the lane-scoped `{base}{id}@…` users.
+ */
+export async function purgeUnsuffixedPermissionUsers(
+  api: ApiContext,
+  account: TestAccount
+): Promise<void> {
+  const unsuffixedEmails = new Set<string>(permissionBaseEmails);
+  const users = await fetchAllUsers(api);
+
+  const orphanIds = users
+    .filter(
+      (user) =>
+        unsuffixedEmails.has(user.email) &&
+        user.email !== account.ownerEmail &&
+        !user.is_deleted
+    )
+    .map((user) => user.id);
+
+  if (orphanIds.length === 0) {
+    return;
+  }
+
+  await bulkAction(api, 'users' as EntityType, orphanIds, 'archive');
+  await bulkAction(api, 'users' as EntityType, orphanIds, 'delete');
+  console.log(
+    `  Purged ${orphanIds.length} unsuffixed permission users on lane ${account.id}`
+  );
 }
 
 /**
@@ -686,14 +622,14 @@ export async function ensurePermissionUserExists(
 
 export interface CompanySettings {
   companyId: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   settings: Record<string, any>;
 }
 
-export interface CompanyData extends CompanySettings {
-  company: Record<string, any>;
-}
-
-export async function getCompany(api: ApiContext): Promise<CompanyData> {
+export async function getCompany(
+  api: ApiContext
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Promise<{ companyId: string; company: Record<string, any> }> {
   const context = await apiRequest(api);
   const response = await context.get('/api/v1/companies', {
     headers: api.headers,
@@ -715,26 +651,28 @@ export async function getCompany(api: ApiContext): Promise<CompanyData> {
   return {
     companyId: company.id,
     company,
-    settings: company.settings || {},
   };
 }
 
 export async function getCompanySettings(
   api: ApiContext
 ): Promise<CompanySettings> {
-  const { companyId, settings } = await getCompany(api);
+  const { companyId, company } = await getCompany(api);
 
-  return { companyId, settings };
+  return {
+    companyId,
+    settings: company.settings || {},
+  };
 }
 
-export async function putCompany(
+export async function updateCompany(
   api: ApiContext,
   companyId: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   company: Record<string, any>
 ): Promise<void> {
   const context = await apiRequest(api);
-
-  const response = await context.put('/api/v1/companies/' + companyId, {
+  const response = await context.put(`/api/v1/companies/${companyId}`, {
     headers: api.headers,
     data: company,
   });
@@ -743,33 +681,42 @@ export async function putCompany(
     const text = await response.text();
     await context.dispose();
     throw new Error(
-      'Failed to update company (' +
-        response.status() +
-        '): ' +
-        text.slice(0, 300)
+      `Failed to update company: ${response.status()} ${text.slice(0, 300)}`
     );
   }
 
   await context.dispose();
 }
 
+export async function updateCompanyFields(
+  api: ApiContext,
+  companyId: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fields: Record<string, any>
+): Promise<void> {
+  const { company } = await getCompany(api);
+
+  await updateCompany(api, companyId, {
+    ...company,
+    ...fields,
+  });
+}
+
 export async function putCompanySettings(
   api: ApiContext,
   companyId: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   settings: Record<string, any>
 ): Promise<void> {
-  const context = await apiRequest(api);
+  const { company } = await getCompany(api);
 
-  const response = await context.put(`/api/v1/companies/${companyId}`, {
-    headers: api.headers,
-    data: { settings },
+  await updateCompany(api, companyId, {
+    ...company,
+    settings: {
+      ...(company.settings || {}),
+      ...settings,
+    },
   });
-
-  if (!response.ok()) {
-    console.warn(`Failed to update company settings: ${response.status()}`);
-  }
-
-  await context.dispose();
 }
 
 /**
@@ -777,9 +724,9 @@ export async function putCompanySettings(
  */
 export async function resetCompanySettings(api: ApiContext): Promise<void> {
   try {
-    const { companyId, company, settings } = await getCompany(api);
+    const { companyId, company } = await getCompany(api);
 
-    await putCompany(api, companyId, {
+    await updateCompany(api, companyId, {
       ...company,
       enabled_expense_tax_rates: 0,
       mark_expenses_invoiceable: false,
@@ -787,7 +734,7 @@ export async function resetCompanySettings(api: ApiContext): Promise<void> {
       convert_expense_currency: false,
       invoice_expense_documents: false,
       settings: {
-        ...settings,
+        ...(company.settings || {}),
         military_time: false,
       },
     });

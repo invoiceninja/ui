@@ -107,13 +107,11 @@ export function ImportTemplateModal(props: Props) {
         {};
 
       if (!Array.isArray(currentEntityImportTemplates)) {
-        Object.entries(currentEntityImportTemplates).forEach(
-          ([key, value]) => {
-            if (!key || !value || !Array.isArray(value)) return;
+        Object.entries(currentEntityImportTemplates).forEach(([key, value]) => {
+          if (!key || !value || !Array.isArray(value)) return;
 
-            updatedEntityImportTemplates[key] = value;
-          }
-        );
+          updatedEntityImportTemplates[key] = value;
+        });
       }
 
       updatedEntityImportTemplates[templateName] = Object.values(

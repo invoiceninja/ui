@@ -42,11 +42,7 @@ export default function Pdf() {
       }
 
       if (data.files && data.files.length > 0 && data.files[0].url) {
-        setPdfUrl(
-          docuNinjaEndpoint(
-            `/api/documents/${data.id}/download`
-          )
-        );
+        setPdfUrl(docuNinjaEndpoint(`/api/documents/${data.id}/download`));
       }
     }
   }, [data, navigate, id]);

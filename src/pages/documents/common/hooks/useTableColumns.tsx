@@ -121,7 +121,8 @@ export function useTableColumns() {
       format: (_, document) => (
         <Link
           to={
-            document.status_id === DocumentStatus.Draft && !document.invitations?.length
+            document.status_id === DocumentStatus.Draft &&
+            !document.invitations?.length
               ? route('/docuninja/:id/builder', { id: document.id })
               : route('/docuninja/:id', { id: document.id })
           }

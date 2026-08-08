@@ -13,12 +13,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
 import { EInvoiceComponent } from '$app/pages/settings';
 import { useQueryClient } from 'react-query';
-import {
-  Dispatch,
-  ReactNode,
-  RefObject,
-  SetStateAction,
-} from 'react';
+import { Dispatch, ReactNode, RefObject, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useOutletContext } from 'react-router-dom';
 import {
@@ -234,8 +229,8 @@ export default function EInvoice() {
                               {entity === 'invoice'
                                 ? (message as unknown as string)
                                 : message.label
-                                ? `${message.label} (${t('required')})`
-                                : message.field}
+                                  ? `${message.label} (${t('required')})`
+                                  : message.field}
                             </span>
                           ))}
                         </div>

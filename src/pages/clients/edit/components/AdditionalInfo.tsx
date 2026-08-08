@@ -215,8 +215,8 @@ export function AdditionalInfo({ client, errors, setClient }: Props) {
                 client?.settings?.send_reminders === true
                   ? 'enabled'
                   : client?.settings?.send_reminders === false
-                  ? 'disabled'
-                  : ''
+                    ? 'disabled'
+                    : ''
               }
               onValueChange={(value) =>
                 handleSettingsChange(

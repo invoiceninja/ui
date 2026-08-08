@@ -71,7 +71,7 @@ export function useBlankInvoiceQuery(options?: GenericQueryOptions) {
       ...options,
       staleTime: Infinity,
       enabled: hasPermission('create_invoice')
-        ? options?.enabled ?? true
+        ? (options?.enabled ?? true)
         : false,
     }
   );

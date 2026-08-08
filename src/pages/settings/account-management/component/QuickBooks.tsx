@@ -71,7 +71,7 @@ export function QuickBooks() {
   });
 
   const quickbooksSettings: QuickbooksSettings | undefined = isConnected
-    ? companyChanges?.quickbooks?.settings ?? quickbooks?.settings
+    ? (companyChanges?.quickbooks?.settings ?? quickbooks?.settings)
     : undefined;
 
   return (

@@ -4,7 +4,7 @@ import {
   checkTableEditability,
   login,
   logout,
-  apiPermissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -12,7 +12,6 @@ import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixt
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
-import { assignEntityToUser } from './api-helpers';
 
 resetAccountBeforeAll();
 
@@ -197,8 +196,7 @@ const createQuote = async (params: CreateParams) => {
       .first()
       .getByRole('link', { name: 'Settings', exact: true })
       .click();
-    await page.getByLabel('User').first().click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    await selectAssignedUser(page, assignTo, page.getByLabel('User').first());
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -206,30 +204,20 @@ const createQuote = async (params: CreateParams) => {
   await expect(page.getByText('Successfully created quote')).toBeVisible({ timeout: 10000 });
 };
 
-test("can't view quotes without permission", async ({ page, api }) => {
-  const { clear, save } = apiPermissions(api.context);
-
-  await login(page);
-  await clear('quotes@example.com');
-  await save();
-  await logout(page);
-
+test("can't view quotes without permission", async ({ page }) => {
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'quotes@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Quotes'
   );
 
-  await logout(page);
 });
 
 test('can view quote', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
-  await clear('quotes@example.com');
-  await set('view_quote', 'view_client');
-  await save();
+  await api.setPermissions('quotes@example.com', ['view_quote', 'view_client']);
 
   const clientName = uniqueName('qt-view');
   await createQuote({ page, clientName });
@@ -254,20 +242,16 @@ test('can view quote', async ({ page, api }) => {
 
   await checkEditPage(page, false, false);
 
-  await logout(page);
 });
 
 test('can edit quote', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useQuotesActions({
     permissions: ['edit_quote', 'view_client'],
   });
 
   await login(page);
-  await clear('quotes@example.com');
-  await set('edit_quote', 'view_client');
-  await save();
+  await api.setPermissions('quotes@example.com', ['edit_quote', 'view_client']);
 
   const clientName = uniqueName('qt-edit');
   await createQuote({ page, clientName });
@@ -305,21 +289,15 @@ test('can edit quote', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'quoteActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can create a quote', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useQuotesActions({
     permissions: ['create_quote'],
   });
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('create_quote', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['create_quote', 'create_client']);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -340,35 +318,25 @@ test('can create a quote', async ({ page, api }) => {
     page.getByText('Successfully updated quote', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('can view and edit assigned quote with create_quote', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useQuotesActions({
     permissions: ['create_quote'],
   });
 
   await login(page);
-  await clear('quotes@example.com');
-  await set('create_quote');
-  await save();
+  await api.setPermissions('quotes@example.com', ['create_quote']);
 
   const clientName = uniqueName('qt-assigned');
   await createQuote({ page, assignTo: 'Quotes Example', clientName });
 
   const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
-
-  if (!quoteId) {
-    throw new Error('Failed to extract quote id');
-  }
-
-  api.trackEntity('quotes', quoteId);
-  await assignEntityToUser(api.context, 'quotes', quoteId, 'quotes@example.com');
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await logout(page);
 
@@ -380,6 +348,8 @@ test('can view and edit assigned quote with create_quote', async ({
     .click();
 
   await checkTableEditability(page, false);
+
+  expect(await waitForTableData(page)).toBe(true);
 
   const tableRow = page.locator('tbody').first().getByRole('row').first();
 
@@ -396,17 +366,11 @@ test('can view and edit assigned quote with create_quote', async ({
     page.getByText('Successfully updated quote', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('deleting quote with edit_quote', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('create_quote', 'edit_quote', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['create_quote', 'edit_quote', 'create_client']);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -450,13 +414,8 @@ test('deleting quote with edit_quote', async ({ page, api }) => {
 });
 
 test('archiving quote withe edit_quote', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('create_quote', 'edit_quote', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['create_quote', 'edit_quote', 'view_client', 'create_client']);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -505,13 +464,8 @@ test('archiving quote withe edit_quote', async ({ page, api }) => {
 });
 
 test('quote documents preview with edit_quote', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('create_quote', 'edit_quote', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['create_quote', 'edit_quote', 'view_client', 'create_client']);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -554,42 +508,16 @@ test('quote documents preview with edit_quote', async ({ page, api }) => {
 });
 
 test('quote documents uploading with edit_quote', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('create_quote', 'edit_quote', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['create_quote', 'edit_quote', 'view_client', 'create_client']);
 
   await login(page, 'quotes@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  const clientName = uniqueName('qt-doc-upload');
+  await createQuote({ page, clientName });
 
-  await page.getByRole('link', { name: 'Quotes', exact: true }).click();
-
-  await page.waitForURL('**/quotes');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    const clientName = uniqueName('qt-docup');
-    await createQuote({ page, clientName });
-
-    const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
-    if (quoteId) api.trackEntity('quotes', quoteId);
-  } else {
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
-
-    await moreActionsButton.click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  const quoteId = page.url().match(/quotes\/([^/]+)/)?.[1];
+  if (quoteId) api.trackEntity('quotes', quoteId);
 
   await page.waitForURL('**/quotes/**/edit');
 
@@ -599,8 +527,9 @@ test('quote documents uploading with edit_quote', async ({ page, api }) => {
     .getByRole('link', { name: 'Documents' })
     .click();
 
-    await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
-
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')
@@ -618,17 +547,12 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useQuotesActions({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['admin']);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -640,14 +564,12 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkEditPage(page, true, true);
 
-  await logout(page);
 });
 
 test('convert_to_invoice, convert_to_project and all clone actions displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useQuotesActions({
     permissions: [
@@ -659,18 +581,14 @@ test('convert_to_invoice, convert_to_project and all clone actions displayed wit
     ],
   });
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set(
+  await api.setPermissions('quotes@example.com', [
     'create_invoice',
     'create_project',
     'create_quote',
     'create_recurring_invoice',
     'create_purchase_order',
     'create_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -682,17 +600,11 @@ test('convert_to_invoice, convert_to_project and all clone actions displayed wit
 
   await checkEditPage(page, true, false);
 
-  await logout(page);
 });
 
 test('cloning quote', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('create_quote', 'edit_quote', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['create_quote', 'edit_quote', 'create_client']);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -756,17 +668,12 @@ test('Convert to Invoice and Convert to Project displayed with admin permission'
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const customActions = useCustomQuoteActions({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('quotes@example.com', ['admin']);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -794,14 +701,12 @@ test('Convert to Invoice and Convert to Project displayed with admin permission'
     'dataTable'
   );
 
-  await logout(page);
 });
 
 test('Convert to Invoice and Convert to Project displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const customActions = useCustomQuoteActions({
     permissions: [
@@ -813,18 +718,14 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
     ],
   });
 
-  await login(page);
-  await clear('quotes@example.com');
-  await set(
+  await api.setPermissions('quotes@example.com', [
     'create_quote',
     'create_invoice',
     'create_project',
     'edit_quote',
     'create_client',
     'view_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'quotes@example.com', 'password');
 
@@ -852,5 +753,4 @@ test('Convert to Invoice and Convert to Project displayed with creation permissi
     'dataTable'
   );
 
-  await logout(page);
 });

@@ -1,14 +1,44 @@
-import { login, logout, apiPermissions } from '$tests/e2e/helpers';
+import { login } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
-import { baseEmailForAccount, emailForCurrentAccount } from '$tests/e2e/accounts';
+import { emailForCurrentAccount } from '$tests/e2e/accounts';
 import {
   createApiContext,
   bulkAction,
-  fetchUserIdByEmail,
   type EntityType,
 } from '$tests/e2e/api-helpers';
+import type { Page } from '@playwright/test';
 
 resetAccountBeforeAll();
+
+/**
+ * Helper: find a user by display name via API and return their ID.
+ * Searches all users including deleted/archived so we can restore them.
+ */
+async function findUserId(userName: string): Promise<string | null> {
+  const api = await createApiContext(process.env.VITE_API_URL!);
+  const { request } = await import('@playwright/test');
+  const context = await request.newContext({ baseURL: api.baseUrl });
+
+  const response = await context.get(
+    `/api/v1/users?per_page=100&include_deleted=true`,
+    { headers: api.headers }
+  );
+
+  if (!response.ok()) {
+    await context.dispose();
+    return null;
+  }
+
+  const body = await response.json();
+  await context.dispose();
+
+  const user = (body.data || []).find(
+    (u: { first_name: string; last_name: string }) =>
+      `${u.first_name} ${u.last_name}`.trim() === userName
+  );
+
+  return user?.id || null;
+}
 
 /**
  * Helper: restore a user by ID via API (undoes delete/archive).
@@ -19,22 +49,24 @@ async function restoreUser(userId: string): Promise<void> {
 }
 
 /**
- * Helper: ensure the current account lane user exists and is active.
- * Display names are duplicated across seed lanes, so resolve users by email.
+ * Helper: ensure a user exists and is active before a test runs.
+ * If they were deleted/archived in a prior failed run, restore them.
+ * If they don't exist at all, create them via API.
  */
-async function ensureUserExists(email: string): Promise<string> {
-  const api = await createApiContext(process.env.VITE_API_URL!);
-  let userId = await fetchUserIdByEmail(api, email);
+async function ensureUserExists(userName: string): Promise<string> {
+  let userId = await findUserId(userName);
 
   if (userId) {
     await restoreUser(userId);
     return userId;
   }
 
-  const resolvedEmail = emailForCurrentAccount(email);
-  const localPart = baseEmailForAccount(email).split('@')[0];
-  const firstName = localPart.charAt(0).toUpperCase() + localPart.slice(1);
+  // User doesn't exist — create them
+  const [firstName, ...lastParts] = userName.split(' ');
+  const lastName = lastParts.join(' ');
+  const email = `${firstName.toLowerCase()}@example.com`;
 
+  const api = await createApiContext(process.env.VITE_API_URL!);
   const { request } = await import('@playwright/test');
   const context = await request.newContext({ baseURL: api.baseUrl });
 
@@ -42,8 +74,8 @@ async function ensureUserExists(email: string): Promise<string> {
     headers: api.headers,
     data: {
       first_name: firstName,
-      last_name: 'Example',
-      email: resolvedEmail,
+      last_name: lastName,
+      email,
     },
   });
 
@@ -52,22 +84,18 @@ async function ensureUserExists(email: string): Promise<string> {
 
   userId = body.data?.id;
   if (!userId) {
-    throw new Error(`Failed to create user "${resolvedEmail}": ${JSON.stringify(body).slice(0, 200)}`);
+    throw new Error(`Failed to create user "${userName}": ${JSON.stringify(body).slice(0, 200)}`);
   }
 
   return userId;
 }
 
 test("Can't see owner of the account in the list of users", async ({
-  page, api,
+  page,
+  api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear();
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('permissions@example.com', ['admin']);
 
   await login(page, 'permissions@example.com', 'password');
 
@@ -92,22 +120,13 @@ test("Can't see owner of the account in the list of users", async ({
 
   await expect(page.getByText(ownerEmail)).not.toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
-test('deleting user', async ({ page }) => {
-  // Ensure the user exists (restore if deleted by a prior failed run)
-  const userId = await ensureUserExists('quotes@example.com');
-  const userEmail = emailForCurrentAccount('quotes@example.com');
-
-  await login(page);
-
-  await page.getByRole('link', { name: 'Settings', exact: true }).click();
-
-  await page
-    .getByRole('link', { name: 'User Management', exact: true })
-    .click();
-
+/**
+ * Open a user edit page by ID, confirming password if prompted.
+ * Prefer this over matching display names — duplicate names break strict mode.
+ */
+async function openUserById(page: Page, userId: string) {
   await page.goto(`/settings/users/${userId}/edit`);
 
   const passwordField = page.getByLabel('Password');
@@ -115,6 +134,20 @@ test('deleting user', async ({ page }) => {
     await passwordField.fill('password');
     await passwordField.press('Enter');
   }
+
+  await page.waitForURL(`**/settings/users/${userId}/edit`);
+}
+
+function userRowLink(page: Page, userId: string) {
+  return page.locator(`a[href*="/settings/users/${userId}/edit"]`);
+}
+
+test('deleting user', async ({ page }) => {
+  // Ensure the user exists (restore if deleted by a prior failed run)
+  const userId = await ensureUserExists('Quotes Example');
+
+  await login(page);
+  await openUserById(page, userId);
 
   const moreActionsButton = page
     .locator('[data-cy="chevronDownButton"]')
@@ -131,33 +164,17 @@ test('deleting user', async ({ page }) => {
     .first()
     .click();
 
-  await page.locator('#filter').fill(userEmail);
-
-  await expect(page.getByText(userEmail)).not.toBeVisible({ timeout: 10000 });
+  await expect(userRowLink(page, userId)).not.toBeVisible({ timeout: 10000 });
 
   // Restore the user so subsequent runs still work
   await restoreUser(userId);
 });
 
 test('archiving user', async ({ page }) => {
-  const userId = await ensureUserExists('expenses@example.com');
-  const userEmail = emailForCurrentAccount('expenses@example.com');
+  const userId = await ensureUserExists('Expenses Example');
 
   await login(page);
-
-  await page.getByRole('link', { name: 'Settings', exact: true }).click();
-
-  await page
-    .getByRole('link', { name: 'User Management', exact: true })
-    .click();
-
-  await page.goto(`/settings/users/${userId}/edit`);
-
-  const passwordField = page.getByLabel('Password');
-  if (await passwordField.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await passwordField.fill('password');
-    await passwordField.press('Enter');
-  }
+  await openUserById(page, userId);
 
   const moreActionsButton = page
     .locator('[data-cy="chevronDownButton"]')
@@ -174,33 +191,17 @@ test('archiving user', async ({ page }) => {
     .first()
     .click();
 
-  await page.locator('#filter').fill(userEmail);
-
-  await expect(page.getByText(userEmail)).not.toBeVisible({ timeout: 10000 });
+  await expect(userRowLink(page, userId)).not.toBeVisible({ timeout: 10000 });
 
   // Restore the user so subsequent runs still work
   await restoreUser(userId);
 });
 
 test('removing user', async ({ page }) => {
-  const userId = await ensureUserExists('tasks@example.com');
-  const userEmail = emailForCurrentAccount('tasks@example.com');
+  const userId = await ensureUserExists('Tasks Example');
 
   await login(page);
-
-  await page.getByRole('link', { name: 'Settings', exact: true }).click();
-
-  await page
-    .getByRole('link', { name: 'User Management', exact: true })
-    .click();
-
-  await page.goto(`/settings/users/${userId}/edit`);
-
-  const passwordField = page.getByLabel('Password');
-  if (await passwordField.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await passwordField.fill('password');
-    await passwordField.press('Enter');
-  }
+  await openUserById(page, userId);
 
   const moreActionsButton = page
     .locator('[data-cy="chevronDownButton"]')
@@ -217,9 +218,7 @@ test('removing user', async ({ page }) => {
     .first()
     .click();
 
-  await page.locator('#filter').fill(userEmail);
-
-  await expect(page.getByText(userEmail)).not.toBeVisible({ timeout: 10000 });
+  await expect(userRowLink(page, userId)).not.toBeVisible({ timeout: 10000 });
 
   // Restore the user so subsequent runs still work
   await restoreUser(userId);

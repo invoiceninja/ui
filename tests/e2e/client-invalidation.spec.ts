@@ -1,15 +1,12 @@
-import { login, apiPermissions } from '$tests/e2e/helpers';
+import { login } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
 
 resetAccountBeforeAll();
 
 test('test appropriate invalidation of clients', async ({ page, api }) => {
-  const { clear, save } = apiPermissions(api.context);
   const clientName = uniqueName('inv-client');
 
   await login(page);
-  await clear();
-  await save();
 
   await page.getByRole('link', { name: 'Clients' }).click();
   await page
@@ -71,8 +68,9 @@ test('test appropriate invalidation of clients', async ({ page, api }) => {
 
   await page.getByRole('link', { name: 'View', exact: true }).click();
 
-  await page.waitForTimeout(800);
-
+  // await page.getByRole('button', { name: 'Discard Changes' }).click();
+  // await page.getByRole('link', { name: 'View Client' }).click();
+  
   await expect(
     page.getByText('Paid to Date$')
       .filter({ hasText: /^Paid to Date\$ 0\.00$/ })

@@ -50,7 +50,7 @@ import {
   SendDialogButtonProps,
   SendDialogProps,
   SignatorySelectorProps,
-  CreateBlueprintSignatoryProps
+  CreateBlueprintSignatoryProps,
 } from '@docuninja/builder2.0';
 import { SignatorySwap } from './Elements';
 import { useEffect, useState } from 'react';

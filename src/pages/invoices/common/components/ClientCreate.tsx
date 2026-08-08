@@ -171,7 +171,7 @@ export function ClientCreate({
     if (blankClient && isModalOpen) {
       setClient({ ...blankClient });
     }
-  }, [isModalOpen]);
+  }, [blankClient, isModalOpen]);
 
   return (
     <Modal
@@ -439,8 +439,8 @@ export function ClientCreate({
                   client?.settings?.send_reminders === true
                     ? 'enabled'
                     : client?.settings?.send_reminders === false
-                    ? 'disabled'
-                    : ''
+                      ? 'disabled'
+                      : ''
                 }
                 onValueChange={(value) =>
                   handleSettingsChange(

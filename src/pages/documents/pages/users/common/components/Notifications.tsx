@@ -12,33 +12,41 @@ import { Element } from '$app/components/cards';
 import { SelectField } from '$app/components/forms';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NOTIFICATION_TYPES, NOTIFICATION_VALUES } from '../constants/notifications';
+import {
+  NOTIFICATION_TYPES,
+  NOTIFICATION_VALUES,
+} from '../constants/notifications';
 import { NotificationValue } from '../constants/notifications';
 
 interface NotificationsProps {
   notifications: Record<string, string>;
-  setNotifications: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setNotifications: React.Dispatch<
+    React.SetStateAction<Record<string, string>>
+  >;
   allNotificationsValue: NotificationValue;
-  setAllNotificationsValue: React.Dispatch<React.SetStateAction<NotificationValue>>;
+  setAllNotificationsValue: React.Dispatch<
+    React.SetStateAction<NotificationValue>
+  >;
   isFormBusy: boolean;
 }
 
 export function Notifications(props: NotificationsProps) {
   const [t] = useTranslation();
-  
-  const { 
-    notifications, 
-    setNotifications, 
-    allNotificationsValue, 
-    setAllNotificationsValue, 
-    isFormBusy 
+
+  const {
+    notifications,
+    setNotifications,
+    allNotificationsValue,
+    setAllNotificationsValue,
+    isFormBusy,
   } = props;
 
   const notificationTypes = useMemo(
-    () => NOTIFICATION_TYPES.map(type => ({
-      id: type.id,
-      label: t(type.labelKey),
-    })),
+    () =>
+      NOTIFICATION_TYPES.map((type) => ({
+        id: type.id,
+        label: t(type.labelKey),
+      })),
     [t]
   );
 
@@ -68,7 +76,10 @@ export function Notifications(props: NotificationsProps) {
         <SelectField
           value={allNotificationsValue}
           onValueChange={(value) => {
-            if (value === NOTIFICATION_VALUES.ALL || value === NOTIFICATION_VALUES.ALL_USER) {
+            if (
+              value === NOTIFICATION_VALUES.ALL ||
+              value === NOTIFICATION_VALUES.ALL_USER
+            ) {
               const newNotifications: Record<string, string> = {};
               setAllNotificationsValue(value);
               setNotifications(newNotifications);
@@ -85,7 +96,9 @@ export function Notifications(props: NotificationsProps) {
           <option value={NOTIFICATION_VALUES.CUSTOM}>{t('custom')}</option>
           <option value={NOTIFICATION_VALUES.NONE}>{t('none')}</option>
           <option value={NOTIFICATION_VALUES.ALL}>{t('all')}</option>
-          <option value={NOTIFICATION_VALUES.ALL_USER}>{t('owned_by_user')}</option>
+          <option value={NOTIFICATION_VALUES.ALL_USER}>
+            {t('owned_by_user')}
+          </option>
         </SelectField>
       </Element>
 
@@ -107,7 +120,9 @@ export function Notifications(props: NotificationsProps) {
           >
             <option value={NOTIFICATION_VALUES.NONE}>{t('none')}</option>
             <option value={NOTIFICATION_VALUES.ALL}>{t('all')}</option>
-            <option value={NOTIFICATION_VALUES.ALL_USER}>{t('owned_by_user')}</option>
+            <option value={NOTIFICATION_VALUES.ALL_USER}>
+              {t('owned_by_user')}
+            </option>
           </SelectField>
         </Element>
       ))}

@@ -47,8 +47,8 @@ export function NumberInputField(props: Props) {
     typeof props.value === 'number'
       ? props.value
       : props.value
-      ? parseFloat(String(props.value))
-      : undefined
+        ? parseFloat(String(props.value))
+        : undefined
   );
 
   const getDecimalSeparator = () => {

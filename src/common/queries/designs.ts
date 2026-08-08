@@ -73,7 +73,7 @@ export function useBlankDesignQuery(options?: GenericQueryOptions) {
     {
       ...options,
       staleTime: Infinity,
-      enabled: isAdmin ? options?.enabled ?? true : false,
+      enabled: isAdmin ? (options?.enabled ?? true) : false,
     }
   );
 }

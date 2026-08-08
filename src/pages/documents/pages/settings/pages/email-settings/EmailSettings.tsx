@@ -41,7 +41,7 @@ function EmailSettings() {
       toast.processing();
 
       const updatedCompany = cloneDeep(docuCompany);
-      
+
       if (updatedCompany) {
         updatedCompany.settings.email_from_name = emailFromName || null;
         updatedCompany.settings.reply_to_email = replyToEmail || null;
@@ -68,7 +68,8 @@ function EmailSettings() {
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
             setErrors(error.response.data);
-            const errorMessage = error.response.data.message || 'validation_errors';
+            const errorMessage =
+              error.response.data.message || 'validation_errors';
             toast.error(errorMessage);
           } else {
             toast.error('error_title');
@@ -99,9 +100,7 @@ function EmailSettings() {
         <Element
           leftSide={
             <div className="flex flex-col">
-              <span className="text-sm font-medium">
-                {t('from_name')}
-              </span>
+              <span className="text-sm font-medium">{t('from_name')}</span>
               <span className="text-xs text-gray-500">
                 Custom sender name for outgoing document emails.
               </span>
@@ -119,9 +118,7 @@ function EmailSettings() {
         <Element
           leftSide={
             <div className="flex flex-col">
-              <span className="text-sm font-medium">
-                {t('reply_to_email')}
-              </span>
+              <span className="text-sm font-medium">{t('reply_to_email')}</span>
               <span className="text-xs text-gray-500">
                 Custom reply-to email address for outgoing document emails.
               </span>

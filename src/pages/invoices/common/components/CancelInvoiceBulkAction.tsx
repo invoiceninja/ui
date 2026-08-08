@@ -24,7 +24,11 @@ interface Props {
   setSelected: (ids: string[]) => void;
 }
 
-export function CancelInvoiceBulkAction({ selectedIds, selectedResources, setSelected }: Props) {
+export function CancelInvoiceBulkAction({
+  selectedIds,
+  selectedResources,
+  setSelected,
+}: Props) {
   const [t] = useTranslation();
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const bulk = useBulk();
@@ -55,7 +59,7 @@ export function CancelInvoiceBulkAction({ selectedIds, selectedResources, setSel
       >
         {t('cancel_invoice')}
       </DropdownElement>
-      
+
       {verifactuEnabled && (
         <CancelInvoiceModal
           visible={isCancelModalOpen}

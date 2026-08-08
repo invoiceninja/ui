@@ -4,7 +4,7 @@ import {
   checkTableEditability,
   login,
   logout,
-  apiPermissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -12,7 +12,6 @@ import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixt
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
-import { assignEntityToUser } from './api-helpers';
 
 resetAccountBeforeAll();
 
@@ -152,8 +151,7 @@ const createRecurringInvoice = async (params: CreateParams) => {
       .getByRole('link', { name: 'Settings', exact: true })
       .first()
       .click();
-    await page.getByLabel('User').first().click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    await selectAssignedUser(page, assignTo, page.getByLabel('User').first());
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -163,32 +161,22 @@ const createRecurringInvoice = async (params: CreateParams) => {
   ).toBeVisible({ timeout: 10000 });
 };
 
-test("can't view recurring invoices without permission", async ({ page, api }) => {
-  const { clear, save } = apiPermissions(api.context);
-
-  await login(page);
-  await clear('invoices@example.com');
-  await save();
-  await logout(page);
-
+test("can't view recurring invoices without permission", async ({ page }) => {
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'invoices@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Recurring Invoices'
   );
 
-  await logout(page);
 });
 
 test('can view recurring invoice', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
   await login(page);
-  await clear('invoices@example.com');
-  await set('view_recurring_invoice', 'view_client');
-  await save();
+  await api.setPermissions('invoices@example.com', ['view_recurring_invoice', 'view_client']);
 
   await createRecurringInvoice({ page, clientName });
 
@@ -213,11 +201,9 @@ test('can view recurring invoice', async ({ page, api }) => {
 
   await checkEditPage(page, false);
 
-  await logout(page);
 });
 
 test('can edit recurring invoice', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -226,9 +212,7 @@ test('can edit recurring invoice', async ({ page, api }) => {
   });
 
   await login(page);
-  await clear('invoices@example.com');
-  await set('edit_recurring_invoice', 'view_client');
-  await save();
+  await api.setPermissions('invoices@example.com', ['edit_recurring_invoice', 'view_client']);
 
   await createRecurringInvoice({ page, clientName });
 
@@ -272,11 +256,9 @@ test('can edit recurring invoice', async ({ page, api }) => {
     true
   );
 
-  await logout(page);
 });
 
 test('can create a recurring invoice', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -284,11 +266,7 @@ test('can create a recurring invoice', async ({ page, api }) => {
     permissions: ['create_recurring_invoice', 'create_client', 'view_client'],
   });
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('create_recurring_invoice', 'create_client', 'view_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['create_recurring_invoice', 'create_client', 'view_client']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -319,14 +297,12 @@ test('can create a recurring invoice', async ({ page, api }) => {
     true
   );
 
-  await logout(page);
 });
 
 test('can view and edit assigned invoice with create_recurring_invoice', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -335,9 +311,7 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
   });
 
   await login(page);
-  await clear('invoices@example.com');
-  await set('create_recurring_invoice');
-  await save();
+  await api.setPermissions('invoices@example.com', ['create_recurring_invoice']);
 
   await createRecurringInvoice({
     page,
@@ -347,13 +321,7 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
 
   await page.waitForURL('**/recurring_invoices/**/edit');
   const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
-
-  if (!createdId) {
-    throw new Error('Failed to extract recurring invoice id');
-  }
-
-  api.trackEntity('recurring_invoices', createdId);
-  await assignEntityToUser(api.context, 'recurring_invoices', createdId, 'invoices@example.com');
+  if (createdId) api.trackEntity('recurring_invoices', createdId);
 
   await logout(page);
 
@@ -365,6 +333,8 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
     .click();
 
   await checkTableEditability(page, false);
+
+  expect(await waitForTableData(page)).toBe(true);
 
   const tableRow = page.locator('tbody').first().getByRole('row').first();
 
@@ -391,24 +361,18 @@ test('can view and edit assigned invoice with create_recurring_invoice', async (
     true
   );
 
-  await logout(page);
 });
 
 test('deleting invoice with edit_recurring_invoice', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set(
+  await api.setPermissions('invoices@example.com', [
     'create_recurring_invoice',
     'edit_recurring_invoice',
     'view_client',
     'create_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -458,20 +422,15 @@ test('archiving invoice withe edit_recurring_invoice', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set(
+  await api.setPermissions('invoices@example.com', [
     'create_recurring_invoice',
     'edit_recurring_invoice',
     'view_client',
     'create_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -525,20 +484,15 @@ test('invoice documents preview with edit_recurring_invoice', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set(
+  await api.setPermissions('invoices@example.com', [
     'create_recurring_invoice',
     'edit_recurring_invoice',
     'view_client',
     'create_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -586,59 +540,33 @@ test('invoice documents uploading with edit_recurring_invoice', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  const clientName = uniqueName('ri-client');
+  const clientName = uniqueName('ri-doc-upload-client');
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set(
+  await api.setPermissions('invoices@example.com', [
     'create_recurring_invoice',
     'edit_recurring_invoice',
     'view_client',
     'create_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'invoices@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
-
-  await page
-    .getByRole('link', { name: 'Recurring Invoices', exact: true })
-    .click();
-
-  await page.waitForURL('**/recurring_invoices');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    await createRecurringInvoice({ page, clientName });
-
-    await page.waitForURL('**/recurring_invoices/**/edit');
-    const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
-    if (createdId) api.trackEntity('recurring_invoices', createdId);
-  } else {
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
-
-    await moreActionsButton.click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  await createRecurringInvoice({ page, clientName });
 
   await page.waitForURL('**/recurring_invoices/**/edit');
+  const createdId = page.url().match(/recurring_invoices\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('recurring_invoices', createdId);
 
   await page
     .locator('[data-cy="tabs"]')
     .getByRole('link', { name: 'Documents' })
     .first()
     .click();
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')
@@ -658,7 +586,6 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -666,11 +593,7 @@ test('all actions in dropdown displayed with admin permission', async ({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['admin']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -692,14 +615,12 @@ test('all actions in dropdown displayed with admin permission', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('all clone actions displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
@@ -714,9 +635,7 @@ test('all clone actions displayed with creation permissions', async ({
     ],
   });
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set(
+  await api.setPermissions('invoices@example.com', [
     'create_recurring_invoice',
     'create_invoice',
     'create_quote',
@@ -724,9 +643,7 @@ test('all clone actions displayed with creation permissions', async ({
     'create_purchase_order',
     'view_client',
     'create_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -748,24 +665,18 @@ test('all clone actions displayed with creation permissions', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('cloning recurring invoice', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const clientName = uniqueName('ri-client');
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set(
+  await api.setPermissions('invoices@example.com', [
     'create_recurring_invoice',
     'edit_recurring_invoice',
     'view_client',
     'create_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -826,7 +737,6 @@ test('cloning recurring invoice', async ({ page, api }) => {
 
 test('recurring invoice creation and start stop sequence', async ({ page, api }) => {
 
-  const { clear, save, set } = apiPermissions(api.context);
   await login(page, 'user@example.com', 'password');
   await page.getByRole('link', { name: 'Recurring Invoices' }).click();
   await page.getByRole('link', { name: 'New Recurring Invoice' }).click();
@@ -839,20 +749,67 @@ test('recurring invoice creation and start stop sequence', async ({ page, api })
   await newClientButton.waitFor({ state: 'visible', timeout: 5000 });
   await newClientButton.click();
 
-  await page.locator('section').filter({ hasText: 'Contact First Name' }).getByRole('textbox').click();
-  await page.locator('section').filter({ hasText: 'Contact First Name' }).getByRole('textbox').fill('Clients');
-  await page.locator('section').filter({ hasText: 'Contact First Name' }).getByRole('textbox').press('Tab');
-  await page.locator('section').filter({ hasText: 'Contact Last Name' }).getByRole('textbox').fill('Last Name');
-  await page.locator('section').filter({ hasText: 'Contact Last Name' }).getByRole('textbox').press('Tab');
-  await page.locator('section').filter({ hasText: 'Contact Email' }).getByRole('textbox').fill('contact@gmail.com');
-  await page.getByRole('button', { name: 'Save' }).click();
+  const clientModal = page.getByRole('dialog');
+  await expect(clientModal).toBeVisible({ timeout: 10000 });
+  await expect(
+    clientModal.getByRole('heading', { name: 'New Client' })
+  ).toBeVisible({ timeout: 10000 });
+
+  // Fields render only after blank-client query hydrates (Spinner until then).
+  const firstName = clientModal
+    .locator('section')
+    .filter({ hasText: 'Contact First Name' })
+    .getByRole('textbox');
+  await expect(firstName).toBeVisible({ timeout: 20000 });
+  await expect(firstName).toBeEditable({ timeout: 5000 });
+
+  await firstName.click();
+  await firstName.fill('Clients');
+  await firstName.press('Tab');
+  await clientModal
+    .locator('section')
+    .filter({ hasText: 'Contact Last Name' })
+    .getByRole('textbox')
+    .fill('Last Name');
+  await clientModal
+    .locator('section')
+    .filter({ hasText: 'Contact Last Name' })
+    .getByRole('textbox')
+    .press('Tab');
+  await clientModal
+    .locator('section')
+    .filter({ hasText: 'Contact Email' })
+    .getByRole('textbox')
+    .fill('contact@gmail.com');
+  await clientModal.getByRole('button', { name: 'Save' }).click();
+  await expect(clientModal).not.toBeVisible({ timeout: 10000 });
   await page.getByRole('button', { name: 'Add Item' }).click();
-  await page.getByRole('textbox').nth(4).click();
-  await page.getByRole('cell', { name: 'New Product' }).getByRole('textbox').fill('12345');
-  await page.locator('#notes').click();
-  await page.locator('#notes').fill('67890');
+
+  // ProductSelector lives in #line-item-{index}; prefer that over nth() textboxes
+  // which also match client/frequency controls on the create form.
+  // Tab commits free-text product_key from Combobox React state (nullable).
+  // fill() updates the DOM immediately but inputValue state can lag one tick —
+  // Tab before that sync commits a stale/empty value and the highlighted option wins.
+  const lineItem = page.locator('#line-item-0');
+  const productInput = lineItem.locator('[data-cy="comboboxInput"]');
+  await productInput.click();
+  await productInput.fill('12345');
+  await expect(productInput).toHaveValue('12345');
+  await page.waitForTimeout(150);
+  await productInput.press('Tab');
+  await expect(productInput).toHaveValue('12345', { timeout: 5000 });
+
+  const notesInput = lineItem.locator('#notes');
+  await notesInput.click();
+  await notesInput.fill('67890');
+  await expect(notesInput).toHaveValue('67890');
+  await page.waitForTimeout(150);
+  await notesInput.press('Tab');
+  await expect(notesInput).toHaveValue('67890', { timeout: 5000 });
+  await expect(productInput).toHaveValue('12345');
+
   await page.getByRole('textbox').filter({ hasText: /^$/ }).nth(5).click();
-  await page.getByRole('textbox').filter({ hasText: /^$/ }).nth(5).fill('10');
+  // await page.getByRole('textbox').filter({ hasText: /^$/ }).nth(5).fill('10');
   await page.getByRole('button', { name: 'Save' }).click();
   // await page.getByRole('button').nth(4).click();
 
@@ -872,8 +829,12 @@ test('recurring invoice creation and start stop sequence', async ({ page, api })
   // await expect(page.getByText('Clients Last Name')).toBeVisible({ timeout: 10000 });
   await page.locator('div').filter({ hasText: /^Monthly$/ }).nth(2).click();
   await page.locator('div').filter({ hasText: /^Monthly$/ }).first().click();
-  await page.getByRole('cell', { name: '12345' }).getByRole('textbox').click();
-  await expect(page.locator('#notes')).toContainText('67890');
+  // await page.getByRole('cell', { name: '12345' }).getByRole('textbox').click();
+  // await expect(page.locator('#notes')).toContainText('67890');
+  const lineItem2 = page.locator('#line-item-0');
+  const productInput2 = lineItem2.locator('[data-cy="comboboxInput"]');
+  await expect(productInput2).toHaveValue('12345');
+  await expect(lineItem2.locator('#notes')).toHaveValue('67890');
 
   
 });

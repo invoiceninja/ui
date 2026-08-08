@@ -142,7 +142,7 @@ export function Edit() {
               />
 
               <NumberInputField
-              disablePrecision
+                disablePrecision
                 value={formik.values.rate || ''}
                 label={t('tax_rate')}
                 onValueChange={(value) => formik.setFieldValue('rate', value)}

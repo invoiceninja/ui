@@ -380,10 +380,7 @@ export function OnlinePayments() {
           >
             {paymentTerms
               ?.filter((type: PaymentTerm) =>
-                shouldPaymentTermBeVisible(
-                  type,
-                  company?.settings?.valid_until
-                )
+                shouldPaymentTermBeVisible(type, company?.settings?.valid_until)
               )
               .filter(isUniquePaymentTerm)
               .map((type: PaymentTerm) => (

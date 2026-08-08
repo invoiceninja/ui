@@ -25,6 +25,7 @@ import {
 } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useTranslation } from 'react-i18next';
 import { currentTaskAtom } from '../common/atoms';
+import { TagPills } from '$app/components/tags/TagPills';
 import { useFormatTimeLog } from '../common/hooks';
 import { TaskClock } from './TaskClock';
 import { date as formatDate } from '$app/common/helpers';
@@ -103,6 +104,12 @@ export function ViewSlider() {
             <Element leftSide={t('status')}>
               <TaskStatus entity={currentTask} withoutDropdown />
             </Element>
+
+            {Boolean(currentTask.tags?.length) && (
+              <Element leftSide={t('tags')}>
+                <TagPills tags={currentTask.tags} />
+              </Element>
+            )}
 
             {currentTask.description && (
               <div className="flex flex-col justify-start px-6 py-3">

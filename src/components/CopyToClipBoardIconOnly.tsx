@@ -53,8 +53,8 @@ export function CopyToClipboardIconOnly({
           {secure
             ? text.split('').map(() => '*')
             : value.length > limit
-            ? value.substring(0, limit).concat(' ')
-            : value}
+              ? value.substring(0, limit).concat(' ')
+              : value}
         </span>
       )}
 

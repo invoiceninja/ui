@@ -4,14 +4,13 @@ import {
   checkTableEditability,
   login,
   logout,
-  apiPermissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
-import { assignEntityToUser } from './api-helpers';
 
 resetAccountBeforeAll();
 
@@ -85,13 +84,11 @@ const createRecurringExpense = async (params: CreateParams) => {
   await page.waitForURL('**/recurring_expenses/create');
 
   if (assignTo) {
-    const assignedUserInput = page.getByTestId('combobox-input-field').nth(4);
-    await assignedUserInput.click();
-    await assignedUserInput.fill(assignTo.split(' ')[0]);
-
-    const option = page.getByRole('option', { name: assignTo }).first();
-    await option.waitFor({ state: 'visible', timeout: 5000 });
-    await option.click();
+    await selectAssignedUser(
+      page,
+      assignTo,
+      page.getByTestId('combobox-input-field').nth(4)
+    );
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -107,31 +104,21 @@ const createRecurringExpense = async (params: CreateParams) => {
   }
 };
 
-test("can't view recurring expenses without permission", async ({ page, api }) => {
-  const { clear, save } = apiPermissions(api.context);
-
-  await login(page);
-  await clear('expenses@example.com');
-  await save();
-  await logout(page);
-
+test("can't view recurring expenses without permission", async ({ page }) => {
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'expenses@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Recurring Expenses'
   );
 
-  await logout(page);
 });
 
 test('can view recurring expense', async ({ page, api }) => {
   test.setTimeout(60000); 
-  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
-  await clear('expenses@example.com');
-  await set('view_recurring_expense');
-  await save();
+  await api.setPermissions('expenses@example.com', ['view_recurring_expense']);
 
   await createRecurringExpense({ page });
 
@@ -156,20 +143,16 @@ test('can view recurring expense', async ({ page, api }) => {
 
   await checkEditPage(page, false);
 
-  await logout(page);
 });
 
 test('can edit recurring expense', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useRecurringExpensesActions({
     permissions: ['edit_recurring_expense'],
   });
 
   await login(page);
-  await clear('expenses@example.com');
-  await set('edit_recurring_expense');
-  await save();
+  await api.setPermissions('expenses@example.com', ['edit_recurring_expense']);
 
   await createRecurringExpense({ page });
 
@@ -213,21 +196,15 @@ test('can edit recurring expense', async ({ page, api }) => {
     true
   );
 
-  await logout(page);
 });
 
 test('can create a recurring expense', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useRecurringExpensesActions({
     permissions: ['create_recurring_expense'],
   });
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_recurring_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_recurring_expense']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -258,23 +235,19 @@ test('can create a recurring expense', async ({ page, api }) => {
     true
   );
 
-  await logout(page);
 });
 
 test('can view and edit assigned recurring expense with create_recurring_expense', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useRecurringExpensesActions({
     permissions: ['create_recurring_expense'],
   });
 
   await login(page);
-  await clear('expenses@example.com');
-  await set('create_recurring_expense');
-  await save();
+  await api.setPermissions('expenses@example.com', ['create_recurring_expense']);
 
   const recurringExpenseNumber = await createRecurringExpense({
     page,
@@ -284,13 +257,7 @@ test('can view and edit assigned recurring expense with create_recurring_expense
 
   await page.waitForURL('**/recurring_expenses/**/edit');
   const createdId = page.url().match(/recurring_expenses\/([^/]+)/)?.[1];
-
-  if (!createdId) {
-    throw new Error('Failed to extract recurring expense id');
-  }
-
-  api.trackEntity('recurring_expenses', createdId);
-  await assignEntityToUser(api.context, 'recurring_expenses', createdId, 'expenses@example.com');
+  if (createdId) api.trackEntity('recurring_expenses', createdId);
 
   await logout(page);
 
@@ -328,20 +295,14 @@ test('can view and edit assigned recurring expense with create_recurring_expense
     true
   );
 
-  await logout(page);
 });
 
 test('deleting recurring expense with edit_recurring_expense', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_recurring_expense', 'edit_recurring_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_recurring_expense', 'edit_recurring_expense']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -386,13 +347,8 @@ test('archiving recurring expense with edit_recurring_expense', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_recurring_expense', 'edit_recurring_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_recurring_expense', 'edit_recurring_expense']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -441,13 +397,8 @@ test('recurring expense documents preview with edit_recurring_expense', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_recurring_expense', 'edit_recurring_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_recurring_expense', 'edit_recurring_expense']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -496,43 +447,15 @@ test('recurring expense documents uploading with edit_recurring_expense', async 
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_recurring_expense', 'edit_recurring_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_recurring_expense', 'edit_recurring_expense']);
 
   await login(page, 'expenses@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  await createRecurringExpense({ page });
 
-  await page
-    .getByRole('link', { name: 'Recurring Expenses', exact: true })
-    .click();
-
-  await page.waitForURL('**/recurring_expenses');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    await createRecurringExpense({ page });
-
-    await page.waitForURL('**/recurring_expenses/**/edit');
-    const createdId = page.url().match(/recurring_expenses\/([^/]+)/)?.[1];
-    if (createdId) api.trackEntity('recurring_expenses', createdId);
-  } else {
-    await tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first()
-      .click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  const createdId = page.url().match(/recurring_expenses\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('recurring_expenses', createdId);
 
   await page.waitForURL('**/recurring_expenses/**/edit');
 
@@ -543,6 +466,10 @@ test('recurring expense documents uploading with edit_recurring_expense', async 
     .click();
 
   await page.waitForURL('**/recurring_expenses/**/documents');
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')
@@ -560,17 +487,12 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useRecurringExpensesActions({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['admin']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -592,24 +514,18 @@ test('all actions in dropdown displayed with admin permission', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('all clone actions displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useRecurringExpensesActions({
     permissions: ['create_expense', 'create_recurring_expense'],
   });
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_expense', 'create_recurring_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_expense', 'create_recurring_expense']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -631,17 +547,11 @@ test('all clone actions displayed with creation permissions', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('cloning recurring expense', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('expenses@example.com');
-  await set('create_recurring_expense', 'edit_recurring_expense');
-  await save();
-  await logout(page);
+  await api.setPermissions('expenses@example.com', ['create_recurring_expense', 'edit_recurring_expense']);
 
   await login(page, 'expenses@example.com', 'password');
 
@@ -730,7 +640,6 @@ test('Checking should_be_invoiced expense settings value on recurring expense cr
     page.locator('[data-cy="shouldBeInvoicedToggle"]')
   ).toBeChecked();
 
-  await logout(page);
 });
 
 test('Checking mark_paid expense settings value on recurring_expense creation page', async ({
@@ -767,7 +676,6 @@ test('Checking mark_paid expense settings value on recurring_expense creation pa
 
   await expect(page.locator('[data-cy="markPaidToggle"]')).toBeChecked();
 
-  await logout(page);
 });
 
 test('Checking convert_currency expense settings value on recurring_expense creation page', async ({
@@ -804,7 +712,6 @@ test('Checking convert_currency expense settings value on recurring_expense crea
 
   await expect(page.locator('[data-cy="convertCurrencyToggle"]')).toBeChecked();
 
-  await logout(page);
 });
 
 test('Checking add_documents_to_invoice expense settings value on recurring_expense creation page', async ({
@@ -845,7 +752,6 @@ test('Checking add_documents_to_invoice expense settings value on recurring_expe
     page.locator('[data-cy="addDocumentsToInvoiceToggle"]')
   ).toBeChecked();
 
-  await logout(page);
 });
 
 test('Checking the gross amount by rate', async ({ page, api }) => {
@@ -913,7 +819,6 @@ test('Checking the gross amount by rate', async ({ page, api }) => {
 
   await expect(page.getByText('$ 15,888.60')).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Checking the gross amount with inclusive taxes turned on', async ({
@@ -986,7 +891,6 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
 
   await expect(page.getByText('$ 12,222.00')).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Checking the gross amount by amount', async ({ page, api }) => {
@@ -1043,5 +947,4 @@ test('Checking the gross amount by amount', async ({ page, api }) => {
 
   await expect(page.getByText('$ 12,522.00')).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });

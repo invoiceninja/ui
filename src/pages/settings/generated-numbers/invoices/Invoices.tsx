@@ -11,7 +11,7 @@
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Divider } from '$app/components/cards/Divider';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClickableElement, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';

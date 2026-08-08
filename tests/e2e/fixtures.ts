@@ -19,9 +19,11 @@ import {
   createApiContext,
   fetchEntityByName,
   getCompany,
-  putCompany,
+  updateCompany,
+  setPermissions as setUserPermissions,
   type ApiContext,
   type EntityType,
+  type Permission,
 } from './api-helpers';
 import {
   accountForParallelIndex,
@@ -30,7 +32,6 @@ import {
   type TestAccount,
 } from './accounts';
 import { resetTestAccount } from './account-reset';
-import { purgeCompanyDataViaDangerZone } from './company-purge';
 
 config({ path: '.env.testing', override: true });
 config();
@@ -101,6 +102,10 @@ export interface ApiFixture {
     type: EntityType,
     data: Record<string, unknown>
   ) => Promise<Record<string, unknown>>;
+  /**
+   * Replace a permission user's permissions through the API.
+   */
+  setPermissions: (email: string, permissions: Permission[]) => Promise<void>;
 }
 
 export interface SettingsFixture {
@@ -121,7 +126,7 @@ export const test = base.extend<
   }
 >({
   account: [
-    // eslint-disable-next-line no-empty-pattern
+    // biome-ignore lint/correctness/noEmptyPattern: Playwright requires fixture dependencies to use object destructuring.
     async ({}, use, workerInfo) => {
       const account = accountForParallelIndex(workerInfo.parallelIndex);
       setCurrentTestAccount(account);
@@ -175,6 +180,10 @@ export const test = base.extend<
         await reqContext.dispose();
         return entity;
       },
+
+      async setPermissions(email, permissions) {
+        await setUserPermissions(context, email, permissions);
+      },
     };
 
     await use(fixture);
@@ -184,6 +193,7 @@ export const test = base.extend<
 
   settingsGuard: async ({ account }, use) => {
     let savedCompanyId: string | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let savedCompany: Record<string, any> | undefined;
 
     const fixture: SettingsFixture = {
@@ -195,13 +205,13 @@ export const test = base.extend<
         );
         const { companyId, company } = await getCompany(api);
         savedCompanyId = companyId;
-        savedCompany = JSON.parse(JSON.stringify(company));
+        savedCompany = structuredClone(company);
       },
     };
 
     await use(fixture);
 
-    // Restore settings on teardown if a snapshot was taken
+    // Restore company state on teardown if a snapshot was taken
     if (savedCompanyId && savedCompany) {
       try {
         const api = await createApiContext(
@@ -209,7 +219,7 @@ export const test = base.extend<
           account.ownerEmail,
           account.password
         );
-        await putCompany(api, savedCompanyId, savedCompany);
+        await updateCompany(api, savedCompanyId, savedCompany);
       } catch {
         // Best effort
       }
@@ -263,10 +273,9 @@ async function cleanupTrackedEntityType(
 }
 
 export function resetAccountBeforeAll(timeout = RESET_ACCOUNT_TIMEOUT) {
-  test.beforeAll(async ({ account, browser }, testInfo) => {
+  test.beforeAll(async ({ account }, testInfo) => {
     test.setTimeout(timeout);
     await resetTestAccount(account, 'before ' + testInfo.file);
-    await purgeCompanyDataViaDangerZone(browser, account);
   });
 }
 

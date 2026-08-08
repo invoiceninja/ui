@@ -10,7 +10,7 @@
 
 import { Modal } from '$app/components/Modal';
 import { useAtom } from 'jotai';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { connectMailerAtom } from '../../components';
 import { Button } from '$app/components/forms';

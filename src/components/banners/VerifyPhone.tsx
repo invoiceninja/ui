@@ -10,7 +10,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { Modal } from '../Modal';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Button, SelectField } from '../forms';
 import PhoneInput, { isPossiblePhoneNumber } from 'react-phone-number-input';

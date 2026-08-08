@@ -27,7 +27,10 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { RecurringExpenseStatus } from '../common/components/RecurringExpenseStatus';
 import { CustomField } from '$app/components/CustomField';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCalculateExpenseAmount, useCalculateExpenseExclusiveAmount } from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
+import {
+  useCalculateExpenseAmount,
+  useCalculateExpenseExclusiveAmount,
+} from '$app/pages/expenses/common/hooks/useCalculateExpenseAmount';
 import { Icon } from '$app/components/icons/Icon';
 import { MdLaunch, MdWarning } from 'react-icons/md';
 import { route } from '$app/common/helpers/route';
@@ -37,6 +40,8 @@ import { NumberInputField } from '$app/components/forms/NumberInputField';
 import reactStringReplace from 'react-string-replace';
 import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 import { useColorScheme } from '$app/common/colors';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -84,18 +89,19 @@ export function Details(props: Props) {
       {recurringExpense && (
         <Card className="shadow-sm" style={{ borderColor: colors.$24 }}>
           <Element leftSide={t('net_amount')} withoutWrappingLeftSide>
-            {recurringExpense.uses_inclusive_taxes ? formatMoney(
-              calculateExpenseExclusiveAmount(recurringExpense),
-              recurringExpense.client?.country_id,
-              recurringExpense.currency_id ||
-                recurringExpense.client?.settings.currency_id
-            )
-            : formatMoney(
-              calculateExpenseAmount(recurringExpense),
-              recurringExpense.client?.country_id,
-              recurringExpense.currency_id ||
-                recurringExpense.client?.settings.currency_id
-            )}
+            {recurringExpense.uses_inclusive_taxes
+              ? formatMoney(
+                  calculateExpenseExclusiveAmount(recurringExpense),
+                  recurringExpense.client?.country_id,
+                  recurringExpense.currency_id ||
+                    recurringExpense.client?.settings.currency_id
+                )
+              : formatMoney(
+                  calculateExpenseAmount(recurringExpense),
+                  recurringExpense.client?.country_id,
+                  recurringExpense.currency_id ||
+                    recurringExpense.client?.settings.currency_id
+                )}
           </Element>
         </Card>
       )}
@@ -219,6 +225,17 @@ export function Details(props: Props) {
               onClearButtonClick={() => handleChange('assigned_user_id', '')}
               onChange={(user) => handleChange('assigned_user_id', user.id)}
               errorMessage={errors?.errors.assigned_user_id}
+            />
+          </Element>
+        )}
+
+        {recurringExpense && (
+          <Element leftSide={t('tags')}>
+            <TagPillSelector
+              entityType={TAG_ENTITY_TYPES.recurringExpense}
+              value={recurringExpense.tags || []}
+              onChange={(tags) => handleChange('tags', tags)}
+              errorMessage={errors?.errors.tags}
             />
           </Element>
         )}

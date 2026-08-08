@@ -11,6 +11,8 @@
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useDataTableOptions } from './useDataTableOptions';
 import { useDataTablePreference } from './useDataTablePreference';
+import { useReactSettings } from './useReactSettings';
+import { useScopedTableFilters } from './useScopedTableFilters';
 import collect from 'collect.js';
 
 interface Params {
@@ -21,9 +23,11 @@ interface Params {
   defaultCustomFilterValues?: string[];
   customFilter?: string[] | undefined;
   withoutStoringPreferences?: boolean;
+  withRecordScopedFilters?: boolean;
 }
 export function useDataTableUtilities(params: Params) {
   const options = useDataTableOptions();
+  const reactSettings = useReactSettings();
 
   const {
     isInitialConfiguration,
@@ -33,19 +37,47 @@ export function useDataTableUtilities(params: Params) {
     apiEndpoint,
     customFilter,
     withoutStoringPreferences,
+    withRecordScopedFilters,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
+  const { storedFilters } = useScopedTableFilters({ tableKey });
+
+  const inheritsServerPreferences =
+    !withoutStoringPreferences &&
+    reactSettings.persist_table_filters !== false;
+
+  const scopedFilters = withRecordScopedFilters ? storedFilters : undefined;
+
+  const getSelectedStatuses = (): string[] => {
+    if (scopedFilters) {
+      return scopedFilters.status?.length ? scopedFilters.status : ['active'];
+    }
+
+    const preferenceStatuses = inheritsServerPreferences
+      ? (getPreference('status') as string[])
+      : [];
+
+    return preferenceStatuses?.length ? preferenceStatuses : ['active'];
+  };
+
+  const getSelectedCustomFilters = (): string[] => {
+    if (scopedFilters) {
+      return scopedFilters.customFilter ?? [];
+    }
+
+    const preferenceCustomFilters = inheritsServerPreferences
+      ? (getPreference('customFilter') as string[])
+      : [];
+
+    return preferenceCustomFilters?.length
+      ? preferenceCustomFilters
+      : (defaultCustomFilterValues ?? []);
+  };
 
   const getDefaultOptions = () => {
     if (!isInitialConfiguration) {
-      const preferenceStatuses = withoutStoringPreferences
-        ? []
-        : (getPreference('status') as string[]);
-
-      const currentStatuses = preferenceStatuses?.length
-        ? preferenceStatuses
-        : ['active'];
+      const currentStatuses = getSelectedStatuses();
 
       return (
         options.filter(({ value }) => currentStatuses.includes(value)) || [
@@ -59,13 +91,7 @@ export function useDataTableUtilities(params: Params) {
 
   const getDefaultCustomFilterOptions = () => {
     if (!isInitialConfiguration && customFilters) {
-      const preferenceCustomFilters = withoutStoringPreferences
-        ? []
-        : (getPreference('customFilter') as string[]);
-
-      const currentStatuses = preferenceCustomFilters?.length
-        ? preferenceCustomFilters
-        : defaultCustomFilterValues ?? [];
+      const currentStatuses = getSelectedCustomFilters();
 
       return (
         customFilters.filter(({ value }) =>

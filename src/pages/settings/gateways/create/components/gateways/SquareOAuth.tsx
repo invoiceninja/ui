@@ -39,9 +39,7 @@ export function SquareOAuth(props: Props) {
             </div>
           </Element>
 
-          <Element leftSide={t('location')}>
-            {config('locationId')}
-          </Element>
+          <Element leftSide={t('location')}>{config('locationId')}</Element>
 
           <Element leftSide={t('test_mode')}>
             {config('testMode') ? t('yes') : t('no')}

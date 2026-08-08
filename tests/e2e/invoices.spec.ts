@@ -4,7 +4,7 @@ import {
   checkTableEditability,
   login,
   logout,
-  apiPermissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -13,7 +13,6 @@ import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
 import dayjs from 'dayjs';
-import { assignEntityToUser } from './api-helpers';
 
 resetAccountBeforeAll();
 
@@ -158,8 +157,7 @@ const createInvoice = async (params: CreateParams) => {
       .getByRole('link', { name: 'Settings', exact: true })
       .first()
       .click();
-    await page.getByLabel('User').first().click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    await selectAssignedUser(page, assignTo, page.getByLabel('User').first());
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -167,30 +165,20 @@ const createInvoice = async (params: CreateParams) => {
   await expect(page.getByText('Successfully created invoice')).toBeVisible({ timeout: 10000 });
 };
 
-test("can't view invoices without permission", async ({ page, api }) => {
-  const { clear, save } = apiPermissions(api.context);
-
-  await login(page);
-  await clear('invoices@example.com');
-  await save();
-  await logout(page);
-
+test("can't view invoices without permission", async ({ page }) => {
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'invoices@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Invoices'
   );
 
-  await logout(page);
 });
 
 test('can view invoice', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   await login(page);
-  await clear('invoices@example.com');
-  await set('view_invoice', 'view_client');
-  await save();
+  await api.setPermissions('invoices@example.com', ['view_invoice', 'view_client']);
 
   const clientName = uniqueName('inv-view');
   await createInvoice({ page, clientName });
@@ -215,20 +203,16 @@ test('can view invoice', async ({ page, api }) => {
 
   await checkEditPage(page, false, false);
 
-  await logout(page);
 });
 
 test('can edit invoice', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useInvoiceActions({
     permissions: ['edit_invoice', 'view_client'],
   });
 
   await login(page);
-  await clear('invoices@example.com');
-  await set('edit_invoice', 'view_client');
-  await save();
+  await api.setPermissions('invoices@example.com', ['edit_invoice', 'view_client']);
 
   const clientName = uniqueName('inv-edit');
   await createInvoice({ page, clientName });
@@ -266,21 +250,15 @@ test('can edit invoice', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can create a invoice', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useInvoiceActions({
     permissions: ['create_invoice', 'create_client', 'view_client'],
   });
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('create_invoice', 'create_client', 'view_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['create_invoice', 'create_client', 'view_client']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -305,35 +283,25 @@ test('can create a invoice', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can view and edit assigned invoice with create_invoice', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useInvoiceActions({
     permissions: ['create_invoice'],
   });
 
   await login(page);
-  await clear('invoices@example.com');
-  await set('create_invoice');
-  await save();
+  await api.setPermissions('invoices@example.com', ['create_invoice']);
 
   const clientName = uniqueName('inv-assigned');
   await createInvoice({ page, assignTo: 'Invoices Example', clientName });
 
   const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
-
-  if (!invoiceId) {
-    throw new Error('Failed to extract invoice id');
-  }
-
-  api.trackEntity('invoices', invoiceId);
-  await assignEntityToUser(api.context, 'invoices', invoiceId, 'invoices@example.com');
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
 
   await logout(page);
 
@@ -345,6 +313,8 @@ test('can view and edit assigned invoice with create_invoice', async ({
     .click();
 
   await checkTableEditability(page, false);
+
+  expect(await waitForTableData(page)).toBe(true);
 
   const tableRow = page.locator('tbody').first().getByRole('row').first();
 
@@ -367,17 +337,11 @@ test('can view and edit assigned invoice with create_invoice', async ({
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('deleting invoice with edit_invoice', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['create_invoice', 'edit_invoice', 'view_client', 'create_client']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -421,13 +385,8 @@ test('deleting invoice with edit_invoice', async ({ page, api }) => {
 });
 
 test('archiving invoice withe edit_invoice', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['create_invoice', 'edit_invoice', 'view_client', 'create_client']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -476,13 +435,8 @@ test('archiving invoice withe edit_invoice', async ({ page, api }) => {
 });
 
 test('invoice documents preview with edit_invoice', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['create_invoice', 'edit_invoice', 'view_client', 'create_client']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -527,46 +481,18 @@ test('invoice documents preview with edit_invoice', async ({ page, api }) => {
 });
 
 test('invoice documents uploading with edit_invoice', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['create_invoice', 'edit_invoice', 'view_client', 'create_client']);
 
   await login(page, 'invoices@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  const clientName = uniqueName('inv-doc-upload');
+  await createInvoice({ page, clientName });
 
-  await page.getByRole('link', { name: 'Invoices', exact: true }).click();
+  const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
+  if (invoiceId) api.trackEntity('invoices', invoiceId);
 
-  await page.waitForURL('**/invoices');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    const clientName = uniqueName('inv-docup');
-    await createInvoice({ page, clientName });
-
-    const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
-    if (invoiceId) api.trackEntity('invoices', invoiceId);
-
-    await page.waitForURL('**/invoices/**/edit**');
-  } else {
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
-
-    await moreActionsButton.click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-
-    await page.waitForURL('**/invoices/**/edit');
-  }
+  await page.waitForURL('**/invoices/**/edit**');
 
   await page
     .getByRole('link', {
@@ -592,17 +518,12 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useInvoiceActions({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['admin']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -618,14 +539,12 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('Enter Payment and all clone actions displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
   const actions = useInvoiceActions({
     permissions: [
@@ -639,9 +558,7 @@ test('Enter Payment and all clone actions displayed with creation permissions', 
     ],
   });
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set(
+  await api.setPermissions('invoices@example.com', [
     'create_payment',
     'create_invoice',
     'create_quote',
@@ -650,9 +567,7 @@ test('Enter Payment and all clone actions displayed with creation permissions', 
     'create_purchase_order',
     'view_client',
     'create_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -668,17 +583,11 @@ test('Enter Payment and all clone actions displayed with creation permissions', 
 
   await checkDropdownActions(page, actions, 'invoiceActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('cloning invoice', async ({ page, api }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set('create_invoice', 'edit_invoice', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['create_invoice', 'edit_invoice', 'view_client', 'create_client']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -735,14 +644,7 @@ test('cloning invoice', async ({ page, api }) => {
 });
 
 test('Enter Payment displayed with admin permission', async ({ page, api }) => {
-  await login(page);
-
-  const { clear, save, set } = apiPermissions(api.context);
-
-  await clear('invoices@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('invoices@example.com', ['admin']);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -773,18 +675,14 @@ test('Enter Payment displayed with admin permission', async ({ page, api }) => {
       .getByRole('button', { name: 'Enter Payment', exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Enter Payment displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = apiPermissions(api.context);
 
-  await login(page);
-  await clear('invoices@example.com');
-  await set(
+  await api.setPermissions('invoices@example.com', [
     'create_payment',
     'create_invoice',
     'create_quote',
@@ -794,9 +692,7 @@ test('Enter Payment displayed with creation permissions', async ({
     'view_client',
     'edit_invoice',
     'create_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'invoices@example.com', 'password');
 
@@ -826,7 +722,6 @@ test('Enter Payment displayed with creation permissions', async ({
       .getByRole('button', { name: 'Enter Payment', exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Second and Third Custom email sending template is displayed', async ({
@@ -851,6 +746,8 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await waitForTableData(page);
 
+  await page.waitForTimeout(300);
+  
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
   await expect(page.locator('[data-cy="bulkActionsTrigger"]')).toBeVisible({ timeout: 10000 });
@@ -930,7 +827,6 @@ test('Second and Third Custom email sending template is displayed', async ({
   await expect(page.getByText(secondSubject)).toBeVisible({ timeout: 10000 });
   await expect(page.getByText(thirdSubject)).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Prevent navigation in the main navbar', async ({ page, api }) => {
@@ -999,7 +895,6 @@ test('Prevent navigation in the main navbar', async ({ page, api }) => {
 
   await page.waitForURL('**/projects');
 
-  await logout(page);
 });
 
 test('Prevent archive invoice action', async ({ page, api }) => {
@@ -1032,7 +927,6 @@ test('Prevent archive invoice action', async ({ page, api }) => {
     page.getByRole('button', { name: 'Restore', exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Prevent email invoice action', async ({ page, api }) => {
@@ -1098,7 +992,6 @@ test('Prevent email invoice action', async ({ page, api }) => {
 
   await page.waitForURL('**/invoices/**/email');
 
-  await logout(page);
 });
 
 test('Prevent breadcrumb navigation', async ({ page, api }) => {
@@ -1162,7 +1055,6 @@ test('Prevent breadcrumb navigation', async ({ page, api }) => {
 
   await page.waitForURL('**/invoices');
 
-  await logout(page);
 });
 
 test('Products combobox various selections', async ({ page, api }) => {
@@ -1227,5 +1119,4 @@ test('Products combobox various selections', async ({ page, api }) => {
       testProductName
   ).toBeTruthy();
 
-  await logout(page);
 });

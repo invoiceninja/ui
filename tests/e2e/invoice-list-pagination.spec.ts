@@ -74,6 +74,74 @@ test('preserves invoice list page after navigating back from an invoice', async 
   await expect(getPageInput(page)).toHaveValue('2');
 });
 
+test('navigates the invoice list with the pagination controls', async ({
+  page,
+  api,
+}) => {
+  test.setTimeout(60_000);
+
+  const client = await api.createEntity('clients', {
+    name: uniqueName('pagination-controls-client'),
+    contacts: [
+      {
+        first_name: 'Pagination',
+        last_name: 'Controls',
+        email: uniqueName('pagination-controls-client') + '@example.test',
+      },
+    ],
+  });
+
+  for (let index = 1; index <= INVOICE_COUNT; index++) {
+    await api.createEntity('invoices', {
+      client_id: client.id,
+      number: uniqueName(`pagination-controls-invoice-${index}`),
+      status_id: '1',
+      date: '2026-06-14',
+      line_items: [lineItem(index)],
+    });
+  }
+
+  await login(page);
+  await page
+    .locator('[data-cy="navigationBar"]')
+    .getByRole('link', { name: 'Invoices', exact: true })
+    .click();
+
+  await page.waitForURL('**/invoices');
+  await waitForTableData(page);
+
+  const pageInput = getPageInput(page);
+
+  await expect(pageInput).toHaveValue('1');
+  await expect(
+    page.locator('[data-cy="dataTable"]').getByText('/ 2')
+  ).toBeVisible();
+
+  await expectControlDisabled(page, 'paginationFirstPage', true);
+  await expectControlDisabled(page, 'paginationPreviousPage', true);
+  await expectControlDisabled(page, 'paginationNextPage', false);
+  await expectControlDisabled(page, 'paginationLastPage', false);
+
+  const nextResponse = waitForInvoicesPage(page, 2);
+  await paginationControl(page, 'paginationNextPage').click();
+  await nextResponse;
+  await expect(pageInput).toHaveValue('2');
+
+  await expectControlDisabled(page, 'paginationNextPage', true);
+  await expectControlDisabled(page, 'paginationLastPage', true);
+  await expectControlDisabled(page, 'paginationPreviousPage', false);
+  await expectControlDisabled(page, 'paginationFirstPage', false);
+
+  await paginationControl(page, 'paginationPreviousPage').click();
+  await expect(pageInput).toHaveValue('1');
+
+  await paginationControl(page, 'paginationLastPage').click();
+  await expect(pageInput).toHaveValue('2');
+
+  await paginationControl(page, 'paginationFirstPage').click();
+  await expect(pageInput).toHaveValue('1');
+});
+
 function getPageInput(page: Page) {
   return page
     .locator('[data-cy="dataTable"]')
@@ -82,18 +150,40 @@ function getPageInput(page: Page) {
     );
 }
 
-async function goToPage(page: Page, pageNumber: number) {
-  const response = page.waitForResponse(
+function waitForInvoicesPage(page: Page, pageNumber: number) {
+  return page.waitForResponse(
     (currentResponse) =>
       currentResponse.request().method() === 'GET' &&
       currentResponse.url().includes('/api/v1/invoices?') &&
       currentResponse.url().includes(`page=${pageNumber}`) &&
       currentResponse.ok()
   );
+}
+
+async function goToPage(page: Page, pageNumber: number) {
+  const response = waitForInvoicesPage(page, pageNumber);
 
   await getPageInput(page).fill(pageNumber.toString());
   await getPageInput(page).press('Enter');
   await response;
+}
+
+function paginationControl(page: Page, dataCy: string) {
+  return page.locator(`[data-cy="dataTable"] [data-cy="${dataCy}"]`);
+}
+
+async function expectControlDisabled(
+  page: Page,
+  dataCy: string,
+  disabled: boolean
+) {
+  const control = paginationControl(page, dataCy);
+
+  if (disabled) {
+    await expect(control).toBeDisabled();
+  } else {
+    await expect(control).toBeEnabled();
+  }
 }
 
 async function expectStoredInvoicePage(page: Page, pageNumber: number) {

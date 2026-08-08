@@ -155,7 +155,7 @@ export function Invoices() {
           <PropertyCheckbox
             propertyKey="lock_invoices"
             labelElement={<SettingsLabel label={t('lock_invoices')} />}
-            defaultValue={verifactuEnabled ? "when_sent" : "off"}
+            defaultValue={verifactuEnabled ? 'when_sent' : 'off'}
           />
         }
       >

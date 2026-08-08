@@ -37,8 +37,13 @@ export function AccountWarningsModal(props: Props) {
       visible={props.visible}
       onClose={() => props.setVisible(false)}
     >
-      <div className=""
-        style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
+      <div
+        className=""
+        style={{
+          backgroundColor: colors.$2,
+          color: colors.$3,
+          colorScheme: colors.$0,
+        }}
       >
         <p>
           {props.type === 'activity'

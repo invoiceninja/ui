@@ -69,9 +69,9 @@ export function RegionComponent({
 
     if (checkbox && !checkbox.disabled) {
       const newChecked = !checkbox.checked;
-    
+
       checkbox.checked = newChecked;
-    
+
       handleChange(
         `tax_data.regions.${regionCode}.subregions.${subregionKey}.apply_tax`,
         newChecked
@@ -187,7 +187,9 @@ export function RegionComponent({
       {showSalesAboveThreshold && (
         <Element
           leftSide={
-            <p className="lg:pl-5">({regionCode}) {t('sales_above_threshold')}</p>
+            <p className="lg:pl-5">
+              ({regionCode}) {t('sales_above_threshold')}
+            </p>
           }
         >
           <Toggle

@@ -38,19 +38,19 @@ export function FranceReporting() {
     companyChanges?.settings?.france_reporting_enabled ?? true
   );
 
-  const reportingSchedule = (companyChanges?.settings?.france_reporting_schedule ??
-    'ten_day') as ReportingSchedule;
+  const reportingSchedule = (companyChanges?.settings
+    ?.france_reporting_schedule ?? 'ten_day') as ReportingSchedule;
 
   const options: ReportingOption[] = [
     {
       id: 'ten_day',
       title: t('ten_day_reporting'),
-      help: t('ten_day_reporting_help')
+      help: t('ten_day_reporting_help'),
     },
     {
       id: 'monthly',
       title: t('monthly_reporting'),
-      help: t('monthly_reporting_help')
+      help: t('monthly_reporting_help'),
     },
   ];
 
@@ -73,14 +73,10 @@ export function FranceReporting() {
         htmlFor={`france_reporting_${option.id}`}
         className="ml-3 flex flex-col cursor-pointer"
       >
-
-        <p className="text-sm font-medium">
-          {option.title}
-        </p>
+        <p className="text-sm font-medium">{option.title}</p>
         <p className="text-xs mt-1" style={{ color: colors.$17 }}>
           {option.help}
         </p>
-
       </label>
     </div>
   );
@@ -115,7 +111,6 @@ export function FranceReporting() {
               </p>
             )}
           </div>
-
         </>
       )}
     </Card>

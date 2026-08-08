@@ -127,7 +127,7 @@ function Edit() {
   useEffect(() => {
     if (user) {
       initializeNotifications(user);
-      
+
       if (user.permissions) {
         setPermissions(user.permissions);
       }
@@ -171,7 +171,7 @@ function Edit() {
               fullRightPadding
             >
               <div className="py-4">
-                <Details 
+                <Details
                   user={user}
                   setUser={setUser}
                   errors={errors}
@@ -189,7 +189,7 @@ function Edit() {
               </div>
 
               <div className="py-4">
-                <Notifications 
+                <Notifications
                   notifications={notifications}
                   setNotifications={setNotifications}
                   allNotificationsValue={allNotificationsValue}
@@ -199,7 +199,7 @@ function Edit() {
               </div>
 
               <div className="py-4">
-                <Permissions 
+                <Permissions
                   user={user}
                   setUser={setUser}
                   errors={errors}

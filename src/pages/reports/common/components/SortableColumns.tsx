@@ -20,6 +20,7 @@ import { quoteMap } from '$app/common/constants/exports/quote-map';
 import { creditMap } from '$app/common/constants/exports/credit-map';
 import { useTranslation } from 'react-i18next';
 import { itemMap } from '$app/common/constants/exports/item-map';
+import { locationMap } from '$app/common/constants/exports/location-map';
 import { vendorMap } from '$app/common/constants/exports/vendor-map';
 import { purchaseorderMap } from '$app/common/constants/exports/purchase-order-map';
 import { taskMap } from '$app/common/constants/exports/task-map';
@@ -285,37 +286,48 @@ export function useColumns({ report, columns }: Props) {
     () => [
       columns.includes('client') ? clientMap : [],
       columns.includes('invoice')
-        ? columns.includes('item')
-          ? invoiceMap.concat(itemMap.map((i) => ({ ...i, origin: 'invoice' })))
-          : invoiceMap
+        ? (columns.includes('item')
+            ? invoiceMap.concat(
+                itemMap.map((i) => ({ ...i, origin: 'invoice' }))
+              )
+            : invoiceMap
+          ).concat(locationMap.map((l) => ({ ...l, origin: 'invoice' })))
         : [],
       columns.includes('credit')
-        ? columns.includes('item')
-          ? creditMap.concat(itemMap.map((i) => ({ ...i, origin: 'credit' })))
-          : creditMap
+        ? (columns.includes('item')
+            ? creditMap.concat(itemMap.map((i) => ({ ...i, origin: 'credit' })))
+            : creditMap
+          ).concat(locationMap.map((l) => ({ ...l, origin: 'credit' })))
         : [],
       columns.includes('quote')
-        ? columns.includes('item')
-          ? quoteMap.concat(itemMap.map((i) => ({ ...i, origin: 'quote' })))
-          : quoteMap
+        ? (columns.includes('item')
+            ? quoteMap.concat(itemMap.map((i) => ({ ...i, origin: 'quote' })))
+            : quoteMap
+          ).concat(locationMap.map((l) => ({ ...l, origin: 'quote' })))
         : [],
       columns.includes('payment') ? paymentMap : [],
       columns.includes('vendor') ? vendorMap : [],
       columns.includes('purchase_order')
-        ? columns.includes('item')
-          ? purchaseorderMap.concat(
-              itemMap.map((i) => ({ ...i, origin: 'purchase_order' }))
-            )
-          : purchaseorderMap
+        ? (columns.includes('item')
+            ? purchaseorderMap.concat(
+                itemMap.map((i) => ({ ...i, origin: 'purchase_order' }))
+              )
+            : purchaseorderMap
+          ).concat(
+            locationMap.map((l) => ({ ...l, origin: 'purchase_order' }))
+          )
         : [],
       columns.includes('task') ? taskMap : [],
       columns.includes('expense') ? expenseMap : [],
       columns.includes('recurring_invoice')
-        ? columns.includes('item')
-          ? recurringinvoiceMap.concat(
-              itemMap.map((i) => ({ ...i, origin: 'recurring_invoice' }))
-            )
-          : recurringinvoiceMap
+        ? (columns.includes('item')
+            ? recurringinvoiceMap.concat(
+                itemMap.map((i) => ({ ...i, origin: 'recurring_invoice' }))
+              )
+            : recurringinvoiceMap
+          ).concat(
+            locationMap.map((l) => ({ ...l, origin: 'recurring_invoice' }))
+          )
         : [],
       columns.includes('contact') ? contactMap : [],
       [],

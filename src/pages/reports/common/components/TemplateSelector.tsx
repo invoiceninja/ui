@@ -24,42 +24,41 @@ export interface TemplateSelectorProps extends GenericSelectorProps<Design> {
 }
 
 export function TemplateSelector(props: TemplateSelectorProps) {
+  const [t] = useTranslation();
 
-    const [t] = useTranslation();
-
-
-    const templateEntity = {
-        client: 'client',
-        contact: 'client',
-        credit: 'credit',
-        credit_item: 'credit',
-        expense: 'expense',
-        invoice: 'invoice',
-        invoice_item: 'invoice',
-        quote: 'quote',
-        quote_item: 'quote',
-        payment: 'payment',
-        product_sales: 'product_sales',
-        project: 'project',
-        product: 'product',
-        purchase_order: 'purchase_order',
-        purchase_order_item: 'purchase_order',
-        recurring_invoice: 'recurring_invoice',
-        recurring_invoice_item: 'recurring_invoice',
-        task: 'task',
-        vendor: 'vendor',
-    };
+  const templateEntity = {
+    client: 'client',
+    contact: 'client',
+    credit: 'credit',
+    credit_item: 'credit',
+    expense: 'expense',
+    invoice: 'invoice',
+    invoice_item: 'invoice',
+    quote: 'quote',
+    quote_item: 'quote',
+    payment: 'payment',
+    product_sales: 'product_sales',
+    project: 'project',
+    product: 'product',
+    purchase_order: 'purchase_order',
+    purchase_order_item: 'purchase_order',
+    recurring_invoice: 'recurring_invoice',
+    recurring_invoice_item: 'recurring_invoice',
+    task: 'task',
+    vendor: 'vendor',
+  };
 
   return (
     <>
-
       <ComboboxAsync<Design>
         inputOptions={{
           label: props.inputLabel?.toString(),
           value: props.value || null,
           placeholder: t('template') as string,
         }}
-        endpoint={endpoint(`/api/v1/designs?is_template=true&entities=${templateEntity[props.entity as keyof typeof templateEntity] || ''}`)}
+        endpoint={endpoint(
+          `/api/v1/designs?is_template=true&entities=${templateEntity[props.entity as keyof typeof templateEntity] || ''}`
+        )}
         readonly={props.readonly}
         onDismiss={props.onClearButtonClick}
         querySpecificEntry="/api/v1/designs/:id"
@@ -67,7 +66,7 @@ export function TemplateSelector(props: TemplateSelectorProps) {
         entryOptions={{
           id: 'id',
           label: 'name',
-          value: 'id'
+          value: 'id',
         }}
         onChange={(value) => value.resource && props.onChange(value.resource)}
         staleTime={props.staleTime || Infinity}

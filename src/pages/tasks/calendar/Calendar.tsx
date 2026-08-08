@@ -312,7 +312,7 @@ export default function Calendar() {
                   const dayKey = day.format('YYYY-MM-DD');
                   const isCurrentMonth = day.month() === monthAnchor.month();
                   const isToday = day.isSame(today, 'day');
-                  const events = hideEvents ? [] : dailyEvents[dayKey] ?? [];
+                  const events = hideEvents ? [] : (dailyEvents[dayKey] ?? []);
                   const visibleEvents = events.slice(0, 3);
                   const overflowEvents = events.slice(visibleEvents.length);
                   const overflowCount = overflowEvents.length;

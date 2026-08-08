@@ -47,7 +47,7 @@ export function useProductQuery(params: { id: string | undefined }) {
   return useQuery(
     ['/api/v1/products', params.id],
     () => request('GET', endpoint('/api/v1/products/:id', { id: params.id })),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: Boolean(params.id) }
   );
 }
 export function useBlankProductQuery(options?: GenericQueryOptions) {
@@ -63,7 +63,7 @@ export function useBlankProductQuery(options?: GenericQueryOptions) {
       ...options,
       staleTime: Infinity,
       enabled: hasPermission('create_product')
-        ? options?.enabled ?? true
+        ? (options?.enabled ?? true)
         : false,
     }
   );

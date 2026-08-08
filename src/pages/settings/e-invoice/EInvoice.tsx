@@ -247,7 +247,10 @@ export function EInvoice() {
           headerStyle={{ borderColor: colors.$20 }}
         >
           <Element leftSide={t('help')}>
-            <Link external to="https://invoiceninja.github.io/docs/user-guide/einvoicing">
+            <Link
+              external
+              to="https://invoiceninja.github.io/docs/user-guide/einvoicing"
+            >
               {t('learn_more')}
             </Link>
           </Element>
