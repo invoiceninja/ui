@@ -70,7 +70,7 @@ export function CompanyEdit(props: Props) {
 
   const debouncedCheckSubdomain = useRef(
     debounce((value: string) => {
-      if (!value || company?.subdomain === value) return;
+      if (!isHosted() ||!value || company?.subdomain === value) return;
 
       setIsCheckingSubdomain(true);
 

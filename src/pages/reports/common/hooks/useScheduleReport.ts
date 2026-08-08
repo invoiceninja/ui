@@ -50,7 +50,7 @@ export function useScheduleReport() {
 
     setScheduleParameters({
       ...DEFAULT_SCHEDULE_PARAMETERS,
-      report_name: report.identifier,
+      report_name: report.schedule_identifier || report.identifier,
       start_date: report.payload.start_date,
       end_date: report.payload.end_date,
       client_id: report.payload.client_id || '',

@@ -415,6 +415,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     tableKey: `${props.resource}s`,
     customFilter,
     customFilters,
+    defaultCustomFilterValues,
     withoutStoringPreferences,
     withRecordScopedFilters,
   });
