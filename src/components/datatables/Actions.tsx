@@ -38,6 +38,7 @@ import classNames from 'classnames';
 import { useClickAway } from 'react-use';
 import styled from 'styled-components';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { getMultiSelectDefaultValueKey } from './multiSelectDefaultValueKey';
 
 export interface SelectOption {
   value: string;
@@ -194,10 +195,7 @@ export function SelectWithApplyButton(props: any) {
   } = props;
 
   const [tempValue, setTempValue] = useState(defaultValue);
-  const defaultValueKey = (defaultValue ?? [])
-    .map((option: SelectOption) => option.value)
-    .sort()
-    .join(',');
+  const defaultValueKey = getMultiSelectDefaultValueKey(defaultValue);
   const previousDefaultValueKey = useRef(defaultValueKey);
 
   useEffect(() => {

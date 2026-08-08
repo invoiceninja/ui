@@ -17,7 +17,7 @@ import {
   resetChanges,
 } from '$app/common/stores/slices/company-users';
 import { useFormik } from 'formik';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Mail } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -138,6 +138,12 @@ export function HelpSidebarIcons(props: Props) {
       setCronsNotEnabledModal(false);
     });
   };
+
+  useEffect(() => {
+    const handler = () => setIsContactVisible(true);
+    window.addEventListener('open-contact-modal', handler);
+    return () => window.removeEventListener('open-contact-modal', handler);
+  }, []);
 
   return (
     <>

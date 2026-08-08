@@ -30,6 +30,7 @@ import { useEffect } from 'react';
 import { useResolvedShortcuts } from '$app/common/hooks/useReactSettings';
 import { formatBinding } from '$app/common/helpers/keyboard-shortcuts';
 import { ShortcutId } from '$app/common/constants/keyboard-shortcuts';
+import { isHosted } from '$app/common/helpers';
 
 const $cache = atom<NavigationItem[] | null>(null);
 const $navigationLanguage = atom<string | null>(null);
@@ -307,10 +308,10 @@ export function useNavigation() {
         icon: Plus,
         to: '/docuninja/create',
         label: t('new_document'),
-        visible: import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
+        visible: isHosted() || import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
         tooltipLabel: tooltipFor('create_document'),
       },
-      visible: import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
+      visible: isHosted() || import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
       subOptions: [
         {
           name: t('templates'),

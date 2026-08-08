@@ -86,13 +86,10 @@ export const settingsRoutes = (
         <Route
           path=""
           element={
-            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
-            isHosted() ? (
-              // import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
-
+            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' || isHosted() ? (
               <Guard
                 guards={[owner()]}
-                component={<Settings.Plan2 />}
+                component={<Settings.Plan3 />}
                 type="subPage"
               />
             ) : (
@@ -105,6 +102,30 @@ export const settingsRoutes = (
           path="overview"
           element={<Settings.AccountManagementOverview />}
         />
+        {(import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' || isHosted()) && (
+          <>
+        <Route
+          path="users"
+          element={
+            <Guard
+              guards={[owner()]}
+              component={<Settings.AccountUsers />}
+              type="subPage"
+            />
+          }
+        />
+        <Route
+          path="billing_history"
+          element={
+            <Guard
+              guards={[owner()]}
+              component={<Settings.BillingHistory />}
+              type="subPage"
+            />
+          }
+        />
+        </>
+        )}
         <Route path="enabled_modules" element={<Settings.EnabledModules />} />
         <Route path="integrations" element={<Settings.Integrations />} />
         <Route
