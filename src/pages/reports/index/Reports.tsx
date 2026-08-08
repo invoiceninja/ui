@@ -848,6 +848,7 @@ export default function Reports() {
                 onValueChange={(value) => {
                   setShowCustomColumns(Boolean(value));
                 }}
+                cypressRef="customizeReportColumns"
               />
             </Element>
           )}
