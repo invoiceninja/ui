@@ -16,7 +16,8 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { Plus } from '$app/components/icons/Plus';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -114,6 +115,12 @@ export function StepItems({ wizard, money, embedded }: Props) {
 
   const described = items.some((item) => item.notes || item.product_key);
   const clientName = wizard.client?.display_name || wizard.client?.name || '';
+  const contacts = wizard.client?.contacts ?? [];
+  const recipientEmail =
+    contacts.find((entry) => entry.send_email !== false && entry.email)
+      ?.email ??
+    contacts[0]?.email ??
+    '';
   const totals = wizard.totals;
   const inclusive = Boolean(wizard.invoice?.uses_inclusive_taxes);
 
@@ -122,10 +129,39 @@ export function StepItems({ wizard, money, embedded }: Props) {
       {embedded ? null : <ErrorBanner errors={wizard.errors} />}
 
       {embedded || !clientName ? null : (
-        <p className="text-sm mb-4" style={{ color: t.muted }}>
-          For{' '}
-          <span style={{ color: t.text, fontWeight: 500 }}>{clientName}</span>
-        </p>
+        <div
+          className="pb-5 mb-5 flex items-start justify-between gap-4"
+          style={{ borderBottom: `1px dashed ${t.colors.$5}` }}
+        >
+          <div className="min-w-0">
+            <p
+              className="text-xs mb-1"
+              style={{ color: t.label, fontWeight: 500 }}
+            >
+              Bill to
+            </p>
+
+            <p
+              className="text-sm truncate"
+              style={{ color: t.text, fontWeight: 500 }}
+            >
+              {clientName}
+            </p>
+
+            <p className="text-xs mt-0.5 truncate" style={{ color: t.muted }}>
+              {recipientEmail || 'No email address'}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={wizard.detachClient}
+            className="shrink-0 text-sm"
+            style={{ color: t.accent, fontWeight: 500 }}
+          >
+            {translate('change')}
+          </button>
+        </div>
       )}
 
       <div className="space-y-5">
@@ -287,7 +323,7 @@ export function StepItems({ wizard, money, embedded }: Props) {
 
       {taxesConfigured ? (
         <div
-          className="mt-4 pt-4 flex items-center gap-2.5"
+          className="mt-6 pt-6 flex items-center gap-2.5"
           style={{ borderTop: `1px dashed ${t.colors.$5}` }}
         >
           <Checkbox
@@ -437,6 +473,18 @@ function MoneyRow({
   );
 }
 
+const PANEL_WIDTH = 288;
+const PANEL_MARGIN = 12;
+const PANEL_MAX_HEIGHT = 320;
+const PANEL_MIN_HEIGHT = 160;
+
+interface Placement {
+  left: number;
+  top: number;
+  maxHeight: number;
+  above: boolean;
+}
+
 function TaxChip({
   item,
   rates,
@@ -451,30 +499,81 @@ function TaxChip({
   const t = useTheme();
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
-  const box = useRef<HTMLDivElement>(null);
+  const [placement, setPlacement] = useState<Placement>();
+  const chip = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+
+  const reposition = useCallback(() => {
+    const anchor = chip.current?.getBoundingClientRect();
+
+    if (!anchor) {
+      return;
+    }
+
+    const roomBelow = window.innerHeight - anchor.bottom - PANEL_MARGIN;
+    const roomAbove = anchor.top - PANEL_MARGIN;
+    const above = roomBelow < PANEL_MIN_HEIGHT && roomAbove > roomBelow;
+
+    setPlacement({
+      left: Math.max(
+        PANEL_MARGIN,
+        Math.min(anchor.left, window.innerWidth - PANEL_MARGIN - PANEL_WIDTH)
+      ),
+      top: above ? anchor.top - 6 : anchor.bottom + 6,
+      maxHeight: Math.max(
+        PANEL_MIN_HEIGHT,
+        Math.min(PANEL_MAX_HEIGHT, above ? roomAbove : roomBelow)
+      ),
+      above,
+    });
+  }, []);
 
   useEffect(() => {
     if (!open) {
       return;
     }
 
+    reposition();
+
     const onPointerDown = (event: MouseEvent) => {
-      if (!box.current?.contains(event.target as Node)) {
+      const target = event.target as Node;
+
+      if (chip.current?.contains(target) || panel.current?.contains(target)) {
+        return;
+      }
+
+      setOpen(false);
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
         setOpen(false);
+        chip.current?.focus();
       }
     };
 
     document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    window.addEventListener('scroll', reposition, true);
+    window.addEventListener('resize', reposition);
 
-    return () => document.removeEventListener('mousedown', onPointerDown);
-  }, [open]);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('scroll', reposition, true);
+      window.removeEventListener('resize', reposition);
+    };
+  }, [open, reposition]);
 
   const applied = Boolean(item.tax_name1);
 
   return (
-    <div className="relative inline-block" ref={box}>
+    <div className="inline-block">
       <button
+        ref={chip}
         type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
         onClick={() => setOpen(!open)}
         className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 border"
         style={{
@@ -493,51 +592,68 @@ function TaxChip({
         {applied ? formatTaxName(item.tax_name1, item.tax_rate1) : 'Add tax'}
       </button>
 
-      {open ? (
-        <div
-          className="absolute left-0 mt-1.5 z-20 border overflow-hidden"
-          style={{
-            minWidth: '11rem',
-            backgroundColor: t.surface,
-            borderColor: t.line,
-            borderRadius: radius.control,
-            boxShadow: '0 12px 32px -12px rgba(9,9,11,0.28)',
-          }}
-        >
-          {applied ? (
-            <Option
-              onClick={() => {
-                onChange({ tax_name1: '', tax_rate1: 0 });
-                setOpen(false);
+      {open && placement
+        ? createPortal(
+            <div
+              ref={panel}
+              className="fixed flex flex-col border overflow-hidden"
+              style={{
+                left: placement.left,
+                top: placement.top,
+                width: PANEL_WIDTH,
+                maxHeight: placement.maxHeight,
+                transform: placement.above ? 'translateY(-100%)' : undefined,
+                zIndex: 50,
+                backgroundColor: t.surface,
+                borderColor: t.line,
+                borderRadius: radius.control,
+                boxShadow: '0 12px 32px -12px rgba(9,9,11,0.28)',
               }}
             >
-              No tax
-            </Option>
-          ) : null}
+              <div className="overflow-y-auto" role="listbox">
+                {applied ? (
+                  <Option
+                    onClick={() => {
+                      onChange({ tax_name1: '', tax_rate1: 0 });
+                      setOpen(false);
+                    }}
+                  >
+                    No tax
+                  </Option>
+                ) : null}
 
-          {rates.map((rate) => (
-            <Option
-              key={rate.id ?? rate.name}
-              onClick={() => {
-                onChange({ tax_name1: rate.name, tax_rate1: rate.rate });
-                setOpen(false);
-              }}
-            >
-              {rate.name} {rate.rate}%
-            </Option>
-          ))}
+                {rates.map((rate) => (
+                  <Option
+                    key={rate.id ?? rate.name}
+                    selected={applied && item.tax_name1 === rate.name}
+                    onClick={() => {
+                      onChange({ tax_name1: rate.name, tax_rate1: rate.rate });
+                      setOpen(false);
+                    }}
+                  >
+                    {formatTaxName(rate.name, rate.rate)}
+                  </Option>
+                ))}
+              </div>
 
-          <Option
-            onClick={() => {
-              setOpen(false);
-              onCreate();
-            }}
-            muted
-          >
-            Add a different tax…
-          </Option>
-        </div>
-      ) : null}
+              <div
+                className="shrink-0"
+                style={{ borderTop: `1px solid ${t.hairline}` }}
+              >
+                <Option
+                  onClick={() => {
+                    setOpen(false);
+                    onCreate();
+                  }}
+                  muted
+                >
+                  Add a different tax…
+                </Option>
+              </div>
+            </div>,
+            document.body
+          )
+        : null}
     </div>
   );
 }
@@ -546,24 +662,34 @@ function Option({
   children,
   onClick,
   muted,
+  selected,
 }: {
   children: React.ReactNode;
   onClick: () => void;
   muted?: boolean;
+  selected?: boolean;
 }) {
   const t = useTheme();
 
   return (
     <button
       type="button"
+      role={typeof selected === 'boolean' ? 'option' : undefined}
+      aria-selected={typeof selected === 'boolean' ? selected : undefined}
       onClick={onClick}
       className="w-full text-left px-3 py-2 text-xs"
-      style={{ color: muted ? t.muted : t.text }}
+      style={{
+        color: muted ? t.muted : t.text,
+        backgroundColor: selected ? t.hover : 'transparent',
+        fontWeight: selected ? 500 : 400,
+      }}
       onMouseEnter={(event) =>
         (event.currentTarget.style.backgroundColor = t.hover)
       }
       onMouseLeave={(event) =>
-        (event.currentTarget.style.backgroundColor = 'transparent')
+        (event.currentTarget.style.backgroundColor = selected
+          ? t.hover
+          : 'transparent')
       }
     >
       {children}
