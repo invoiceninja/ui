@@ -283,6 +283,7 @@ export interface DocumentInvitation {
   message_id: string | null;
   email_error: string | null;
   entity: 'contact' | 'user';
+  signing_order?: number | null;
   sent_date: string | null; // ISO 8601 date string
   viewed_date: string | null; // ISO 8601 date string
   opened_date: string | null; // ISO 8601 date string
