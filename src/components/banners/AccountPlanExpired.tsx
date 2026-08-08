@@ -41,7 +41,8 @@ export function AccountPlanExpired() {
 
   const handlePayInvoice = () => {
     if (
-      import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT ||
+      import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true'||
+      isHosted() &&
       !user?.company_user?.ninja_portal_url
     ) {
       preventNavigation({ url: '/settings/account_management/billing_history' });

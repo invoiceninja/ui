@@ -17,6 +17,7 @@ import * as Settings from './index';
 import { isDemo } from '$app/common/helpers';
 import { invoiceDesignRoutes } from '$app/pages/settings/invoice-design/routes';
 import { or } from '$app/common/guards/guards/or';
+import { isHosted } from '$app/common/helpers';
 
 export const settingsRoutes = (
   <Route path="/settings">
@@ -85,7 +86,7 @@ export const settingsRoutes = (
         <Route
           path=""
           element={
-            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' ? (
+            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' || isHosted() ? (
               <Guard
                 guards={[owner()]}
                 component={<Settings.Plan3 />}
@@ -101,6 +102,8 @@ export const settingsRoutes = (
           path="overview"
           element={<Settings.AccountManagementOverview />}
         />
+        {(import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' || isHosted()) && (
+          <>
         <Route
           path="users"
           element={
@@ -121,6 +124,8 @@ export const settingsRoutes = (
             />
           }
         />
+        </>
+        )}
         <Route path="enabled_modules" element={<Settings.EnabledModules />} />
         <Route path="integrations" element={<Settings.Integrations />} />
         <Route

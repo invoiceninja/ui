@@ -200,8 +200,8 @@ export function Default(props: Props) {
                   }}
                   onClick={() => {
                     if (
-                      isHosted() &&
-                      import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT
+                      isHosted() ||
+                      import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true'
                     ) {
                       return navigate('/settings/account_management');
                     }

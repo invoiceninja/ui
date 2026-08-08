@@ -35,7 +35,7 @@ export function useAccountManagementTabs() {
     },
   ];
 
-  tabs = isHosted()
+  tabs = isHosted() || import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true'
     ? [
         ...tabs,
         {
