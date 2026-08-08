@@ -10,33 +10,34 @@
 
 import {
   DragDropContext,
-  DropResult,
-  Droppable,
   Draggable,
+  Droppable,
+  DropResult,
 } from '@hello-pangea/dnd';
-import { Record, clientMap } from '$app/common/constants/exports/client-map';
-import { paymentMap } from '$app/common/constants/exports/payment-map';
-import { quoteMap } from '$app/common/constants/exports/quote-map';
-import { creditMap } from '$app/common/constants/exports/credit-map';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { clientMap, Record } from '$app/common/constants/exports/client-map';
+import { contactMap } from '$app/common/constants/exports/contact-map';
+import { creditMap } from '$app/common/constants/exports/credit-map';
+import { expenseMap } from '$app/common/constants/exports/expense-map';
+import { invoiceMap } from '$app/common/constants/exports/invoice-map';
 import { itemMap } from '$app/common/constants/exports/item-map';
 import { locationMap } from '$app/common/constants/exports/location-map';
-import { vendorMap } from '$app/common/constants/exports/vendor-map';
+import { paymentMap } from '$app/common/constants/exports/payment-map';
 import { purchaseorderMap } from '$app/common/constants/exports/purchase-order-map';
-import { taskMap } from '$app/common/constants/exports/task-map';
-import { expenseMap } from '$app/common/constants/exports/expense-map';
+import { quoteMap } from '$app/common/constants/exports/quote-map';
 import { recurringinvoiceMap } from '$app/common/constants/exports/recurring-invoice-map';
-import { usePreferences } from '$app/common/hooks/usePreferences';
-import { Identifier } from '../useReports';
-import { contactMap } from '$app/common/constants/exports/contact-map';
-import { useColorScheme } from '$app/common/colors';
-import { Entity } from '$app/common/hooks/useEntityCustomFields';
-import { invoiceMap } from '$app/common/constants/exports/invoice-map';
+import { taskMap } from '$app/common/constants/exports/task-map';
+import { vendorMap } from '$app/common/constants/exports/vendor-map';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Entity } from '$app/common/hooks/useEntityCustomFields';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 import { customField } from '$app/components/CustomField';
 import { DoubleChevronRight } from '$app/components/icons/DoubleChevronRight';
 import { XMark } from '$app/components/icons/XMark';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Identifier } from '../useReports';
+import { getColumnPosition } from '../utils/sortableColumns';
 
 export const reportColumn = 11;
 
@@ -254,20 +255,6 @@ interface Props {
   onColumnsChange?: (columns: Record[][]) => void;
 }
 
-const positions = [
-  'client',
-  'invoice',
-  'credit',
-  'quote',
-  'payment',
-  'vendor',
-  'purchase_order',
-  'task',
-  'expense',
-  'recurring_invoice',
-  'contact',
-] as const;
-
 export function useColumns({ report, columns }: Props) {
   const { preferences } = usePreferences();
 
@@ -302,9 +289,7 @@ export function useColumns({ report, columns }: Props) {
                 itemMap.map((i) => ({ ...i, origin: 'purchase_order' }))
               )
             : purchaseorderMap
-          ).concat(
-            locationMap.map((l) => ({ ...l, origin: 'purchase_order' }))
-          )
+          ).concat(locationMap.map((l) => ({ ...l, origin: 'purchase_order' })))
         : [],
       columns.includes('task') ? taskMap : [],
       columns.includes('expense') ? expenseMap : [],
@@ -411,7 +396,7 @@ export function SortableColumns({
 
   const onRemove = useCallback(
     (record: Record) => {
-      const index = positions.indexOf(record.map as (typeof positions)[number]);
+      const index = getColumnPosition(record);
 
       if (index === -1) {
         return;
