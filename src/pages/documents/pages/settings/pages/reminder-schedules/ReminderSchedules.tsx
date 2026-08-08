@@ -328,17 +328,6 @@ export default function ReminderSchedules() {
             ))}
           </SelectField>
 
-          <SelectField
-            label={t('trigger_event')}
-            value={formData.trigger_event}
-            onValueChange={(value) =>
-              setFormData((prev) => ({ ...prev, trigger_event: value }))
-            }
-            disabled={isFormBusy}
-          >
-            <option value="after_send">{t('after_send')}</option>
-          </SelectField>
-
           <InputField
             label={t('num_days')}
             type="number"
