@@ -79,9 +79,12 @@ const UserSelection = lazy(
 );
 const Sign = lazy(() => import('$app/pages/documents/sign/index/Sign'));
 const Pdf = lazy(() => import('$app/pages/documents/pdf/Pdf'));
+const Join = lazy(() => import('$app/pages/documents/join/Join'));
 
 const routes = (
   <>
+    <Route path="/docuninja/join" element={<Join />} />
+
     <Route
       path="docuninja/*"
       element={
