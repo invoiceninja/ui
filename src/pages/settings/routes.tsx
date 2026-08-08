@@ -86,8 +86,7 @@ export const settingsRoutes = (
         <Route
           path=""
           element={
-            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
-            !isHosted() ? (
+            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' ? (
               <Guard
                 guards={[owner()]}
                 component={<Settings.Plan3 />}

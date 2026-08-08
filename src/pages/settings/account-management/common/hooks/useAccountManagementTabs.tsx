@@ -20,16 +20,7 @@ export function useAccountManagementTabs() {
   let tabs: Tab[] = [
     { name: t('plan'), href: '/settings/account_management' },
     { name: t('overview'), href: '/settings/account_management/overview' },
-    {
-      name: t('users'),
-      href: '/settings/account_management/users',
-      enabled: isOwner,
-    },
-    {
-      name: 'Billing History',
-      href: '/settings/account_management/billing_history',
-      enabled: isOwner,
-    },
+    
     {
       name: t('enabled_modules'),
       href: '/settings/account_management/enabled_modules',
@@ -50,6 +41,16 @@ export function useAccountManagementTabs() {
         {
           name: t('referral_program'),
           href: '/settings/account_management/referral_program',
+        },
+        {
+          name: t('users'),
+          href: '/settings/account_management/users',
+          enabled: isOwner,
+        },
+        {
+          name: 'Billing History',
+          href: '/settings/account_management/billing_history',
+          enabled: isOwner,
         },
       ]
     : tabs;
