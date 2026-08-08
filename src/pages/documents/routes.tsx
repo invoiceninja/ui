@@ -18,6 +18,7 @@ import {
   docuNinjaPermission,
 } from '$app/common/guards/guards/docuninja/permission';
 import { DocuNinjaProvider } from '$app/common/components/DocuNinjaProvider';
+import { isHosted } from '$app/common/helpers';
 
 const Documents = lazy(() => import('$app/pages/documents/index/Documents'));
 const Document = lazy(() => import('$app/pages/documents/show/Document'));
@@ -276,4 +277,6 @@ const routes = (
 );
 
 export const documentsRoutes =
-  import.meta.env.VITE_ENABLE_DOCUNINJA === 'true' ? routes : null;
+  isHosted() || import.meta.env.VITE_ENABLE_DOCUNINJA === 'true'
+    ? routes
+    : null;
