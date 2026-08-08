@@ -57,15 +57,12 @@ const SERVER_OWNED = [
   'is_deleted',
 ] as const;
 
-export function today(): string {
-  return dayjs().format('YYYY-MM-DD');
-}
+export const today = (): string => dayjs().format('YYYY-MM-DD');
 
-export function addDays(from: string, days: number): string {
-  return dayjs(from || today())
+export const addDays = (from: string, days: number): string =>
+  dayjs(from || today())
     .add(days, 'day')
     .format('YYYY-MM-DD');
-}
 
 export interface Wizard {
   ready: boolean;
@@ -103,14 +100,28 @@ export interface WizardContext {
   money: (value: number) => string;
 }
 
-export interface Totals {
-  subtotal: number;
-  taxes: number;
+export interface TaxRow {
+  name: string;
   total: number;
-  discount: number;
 }
 
-const EMPTY_TOTALS: Totals = { subtotal: 0, taxes: 0, total: 0, discount: 0 };
+export interface Totals {
+  subtotal: number;
+  total: number;
+  discount: number;
+  taxRows: TaxRow[];
+  surchargeRows: TaxRow[];
+}
+
+const EMPTY_TOTALS: Totals = {
+  subtotal: 0,
+  total: 0,
+  discount: 0,
+  taxRows: [],
+  surchargeRows: [],
+};
+
+const SURCHARGES = [1, 2, 3, 4] as const;
 
 export function useWizard(existingId?: string): Wizard {
   const company = useCurrentCompany();
@@ -361,7 +372,7 @@ export function useWizard(existingId?: string): Wizard {
     [patch]
   );
 
-  const flush = useCallback(async () => {
+  const flush = useCallback((): Promise<string | null> => {
     if (timer.current) {
       clearTimeout(timer.current);
     }
@@ -435,13 +446,33 @@ export function useWizard(existingId?: string): Wizard {
           company?.settings?.e_invoice_type
         ).build();
 
+    const taxRows = [
+      ...sum.getTotalTaxMap().all(),
+      ...sum.getTaxMap().all(),
+    ].map((entry) => ({ name: entry.name, total: entry.total }));
+
+    const surchargeRows = SURCHARGES.map((position) => ({
+      name: String(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (company?.custom_fields as any)?.[`surcharge${position}`] ?? ''
+      ).split('|')[0],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      total: Number((invoice as any)[`custom_surcharge${position}`] ?? 0),
+    })).filter((row) => row.total !== 0);
+
     return {
       subtotal: sum.getSubTotal(),
-      taxes: sum.getTotalTaxes(),
       discount: sum.getTotalDiscount(),
       total: sum.getTotal(),
+      taxRows,
+      surchargeRows,
     };
-  }, [invoice, currency, company?.settings?.e_invoice_type]);
+  }, [
+    invoice,
+    currency,
+    company?.settings?.e_invoice_type,
+    company?.custom_fields,
+  ]);
 
   const stepIndex = STEPS.findIndex((entry) => entry.key === step);
 

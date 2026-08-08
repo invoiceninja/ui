@@ -156,7 +156,7 @@ export function StepTiming({ wizard, embedded }: Props) {
           <div>
             <InputField
               id="iw-invoice-date"
-              label={translate('date')}
+              label={translate('invoice_date')}
               type="date"
               value={invoiceDate}
               changeOverride
@@ -164,25 +164,28 @@ export function StepTiming({ wizard, embedded }: Props) {
               errorMessage={serverErrors?.date}
               onValueChange={(nextDate) => {
                 const entry = TERMS.find((option) => option.key === term);
+                const dueDate = invoice?.due_date ?? '';
 
                 wizard.patch({
                   date: nextDate,
                   ...(entry?.days !== null && entry?.days !== undefined
                     ? { due_date: addDays(nextDate, entry.days) }
-                    : {}),
+                    : dueDate && dueDate < nextDate
+                      ? { due_date: nextDate }
+                      : {}),
                 });
               }}
             />
           </div>
         ) : (
           <p className="text-sm" style={{ color: t.muted }}>
-            Dated {dayjs(invoiceDate).format('D MMMM YYYY')}.{' '}
+            Invoice date {dayjs(invoiceDate).format('D MMMM YYYY')}.{' '}
             <button
               type="button"
               onClick={() => setShowDate(true)}
               style={{ color: t.accent, fontWeight: 500 }}
             >
-              Change
+              {translate('change')}
             </button>
           </p>
         )}

@@ -10,6 +10,7 @@
 
 import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { endpoint } from '$app/common/helpers';
+import { formatTaxName } from '$app/common/helpers/invoices/round';
 import { request } from '$app/common/helpers/request';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
@@ -17,7 +18,12 @@ import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { Plus } from '$app/components/icons/Plus';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, InputField, InputLabel } from '$app/components/forms';
+import {
+  Button,
+  Checkbox,
+  InputField,
+  InputLabel,
+} from '$app/components/forms';
 import { Callout, ErrorBanner, Footer, useTheme, radius } from '../kit';
 import { Wizard } from '../useWizard';
 import { AppliedTax, TaxSetup } from './TaxSetup';
@@ -29,6 +35,8 @@ interface Props {
   embedded?: boolean;
 }
 
+type TaxTarget = { scope: 'invoice' } | { scope: 'item'; index: number };
+
 export function StepItems({ wizard, money, embedded }: Props) {
   const [translate] = useTranslation();
   const t = useTheme();
@@ -37,13 +45,16 @@ export function StepItems({ wizard, money, embedded }: Props) {
   const items = wizard.invoice?.line_items ?? [];
 
   const [picker, setPicker] = useState<WorkSource | null>(null);
-  const [taxSetup, setTaxSetup] = useState(false);
+  const [taxSetup, setTaxSetup] = useState<TaxTarget | null>(null);
+  const [taxOpen, setTaxOpen] = useState(false);
   const [rates, setRates] = useState<TaxRate[]>([]);
 
-  const taxesEnabled = (company?.enabled_item_tax_rates ?? 0) > 0;
+  const itemTaxesEnabled = (company?.enabled_item_tax_rates ?? 0) > 0;
+  const taxesConfigured =
+    itemTaxesEnabled || (company?.enabled_tax_rates ?? 0) > 0;
 
   useEffect(() => {
-    if (!taxesEnabled) {
+    if (!taxesConfigured) {
       return;
     }
 
@@ -55,7 +66,7 @@ export function StepItems({ wizard, money, embedded }: Props) {
     )
       .then((response) => setRates(response.data.data ?? []))
       .catch(() => setRates([]));
-  }, [taxesEnabled]);
+  }, [taxesConfigured]);
 
   const update = (index: number, changes: Partial<InvoiceItem>) => {
     wizard.setLineItems(
@@ -76,28 +87,46 @@ export function StepItems({ wizard, money, embedded }: Props) {
     wizard.setLineItems(items.filter((_, position) => position !== index));
   };
 
-  const applyTaxEverywhere = (tax: AppliedTax) => {
+  const applyTax = (tax: AppliedTax) => {
+    setRates((current) =>
+      current.some((entry) => entry.name === tax.name)
+        ? current
+        : [...current, { name: tax.name, rate: tax.rate } as TaxRate]
+    );
+
+    if (taxSetup?.scope === 'item') {
+      update(taxSetup.index, { tax_name1: tax.name, tax_rate1: tax.rate });
+
+      return;
+    }
+
     wizard.patch({
-      uses_inclusive_taxes: tax.inclusive,
+      ...(typeof tax.inclusive === 'boolean'
+        ? { uses_inclusive_taxes: tax.inclusive }
+        : {}),
       line_items: items.map((item) => ({
         ...item,
         tax_name1: tax.name,
         tax_rate1: tax.rate,
       })),
     });
-
-    setRates((current) =>
-      current.some((entry) => entry.name === tax.name)
-        ? current
-        : [...current, { name: tax.name, rate: tax.rate } as TaxRate]
-    );
   };
 
   const described = items.some((item) => item.notes || item.product_key);
+  const clientName = wizard.client?.display_name || wizard.client?.name || '';
+  const totals = wizard.totals;
+  const inclusive = Boolean(wizard.invoice?.uses_inclusive_taxes);
 
   return (
     <div className="iw-enter">
       {embedded ? null : <ErrorBanner errors={wizard.errors} />}
+
+      {embedded || !clientName ? null : (
+        <p className="text-sm mb-4" style={{ color: t.muted }}>
+          For{' '}
+          <span style={{ color: t.text, fontWeight: 500 }}>{clientName}</span>
+        </p>
+      )}
 
       <div className="space-y-5">
         {items.map((item, index) => {
@@ -173,13 +202,16 @@ export function StepItems({ wizard, money, embedded }: Props) {
                 </div>
               </div>
 
-              {taxesEnabled ? (
+              {itemTaxesEnabled ? (
                 <div className="mt-3">
                   <TaxChip
                     item={item}
                     rates={rates}
                     onChange={(changes) => update(index, changes)}
-                    onCreate={() => setTaxSetup(true)}
+                    onCreate={() => {
+                      setTaxSetup({ scope: 'item', index });
+                      setTaxOpen(true);
+                    }}
                   />
                 </div>
               ) : null}
@@ -213,32 +245,80 @@ export function StepItems({ wizard, money, embedded }: Props) {
       </div>
 
       <div
-        className="mt-6 pt-6 flex items-baseline justify-between"
+        className="mt-6 pt-6 space-y-2"
         style={{ borderTop: `1px dashed ${t.colors.$5}` }}
       >
-        <span className="text-sm" style={{ color: t.muted }}>
-          {wizard.totals.taxes ? 'Total including tax' : 'Total'}
-        </span>
-        <span
-          className="text-lg"
-          style={{
-            color: t.text,
-            fontWeight: 600,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {money(wizard.totals.total)}
-        </span>
+        <MoneyRow
+          label={translate('subtotal')}
+          value={money(totals.subtotal)}
+        />
+
+        {totals.discount ? (
+          <MoneyRow
+            label={translate('discount')}
+            value={money(totals.discount)}
+          />
+        ) : null}
+
+        {totals.surchargeRows.map((row, index) => (
+          <MoneyRow
+            key={`surcharge-${index}`}
+            label={row.name || translate('surcharge')}
+            value={money(row.total)}
+          />
+        ))}
+
+        {totals.taxRows.map((row, index) => (
+          <MoneyRow
+            key={`${row.name}-${index}`}
+            label={
+              inclusive ? `${translate('includes')} ${row.name}` : row.name
+            }
+            value={money(row.total)}
+          />
+        ))}
+
+        <MoneyRow
+          label={translate('total')}
+          value={money(totals.total)}
+          strong
+        />
       </div>
 
-      {!taxesEnabled && !wizard.dismissed('tax') ? (
+      {taxesConfigured ? (
+        <div
+          className="mt-4 pt-4 flex items-center gap-2.5"
+          style={{ borderTop: `1px dashed ${t.colors.$5}` }}
+        >
+          <Checkbox
+            id="iw-inclusive-taxes"
+            checked={inclusive}
+            onValueChange={(_, next) =>
+              wizard.patch({ uses_inclusive_taxes: Boolean(next) })
+            }
+          />
+
+          <label
+            htmlFor="iw-inclusive-taxes"
+            className="text-sm cursor-pointer"
+            style={{ color: t.text }}
+          >
+            Prices include tax on this invoice
+          </label>
+        </div>
+      ) : null}
+
+      {!taxesConfigured && !wizard.dismissed('tax') ? (
         <div className="mt-6">
           <Callout title="Do you need to charge tax on this invoice?">
             <div className="flex items-center gap-2">
               <Button
                 type="secondary"
                 behavior="button"
-                onClick={() => setTaxSetup(true)}
+                onClick={() => {
+                  setTaxSetup({ scope: 'invoice' });
+                  setTaxOpen(true);
+                }}
               >
                 Yes, add tax
               </Button>
@@ -311,10 +391,48 @@ export function StepItems({ wizard, money, embedded }: Props) {
       />
 
       <TaxSetup
-        open={taxSetup}
-        onClose={() => setTaxSetup(false)}
-        onApplied={applyTaxEverywhere}
+        open={taxOpen}
+        scope={taxSetup?.scope ?? 'invoice'}
+        onClose={() => setTaxOpen(false)}
+        onApplied={applyTax}
       />
+    </div>
+  );
+}
+
+function MoneyRow({
+  label,
+  value,
+  strong,
+}: {
+  label: string;
+  value: string;
+  strong?: boolean;
+}) {
+  const t = useTheme();
+
+  return (
+    <div className="flex items-baseline justify-between gap-4">
+      <span
+        className="text-sm"
+        style={{
+          color: strong ? t.text : t.muted,
+          fontWeight: strong ? 500 : 400,
+        }}
+      >
+        {label}
+      </span>
+
+      <span
+        className={strong ? 'text-lg' : 'text-sm'}
+        style={{
+          color: t.text,
+          fontWeight: strong ? 600 : 400,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {value}
+      </span>
     </div>
   );
 }
@@ -372,7 +490,7 @@ function TaxChip({
         onMouseLeave={() => setHovered(false)}
       >
         {applied ? null : <Plus size="0.6875rem" color={t.accent} />}
-        {applied ? `${item.tax_name1} ${item.tax_rate1}%` : 'Add tax'}
+        {applied ? formatTaxName(item.tax_name1, item.tax_rate1) : 'Add tax'}
       </button>
 
       {open ? (

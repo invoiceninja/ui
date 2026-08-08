@@ -30,7 +30,6 @@ export function StepRecipient({ wizard }: Props) {
   const t = useTheme();
 
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
   const [showAddress, setShowAddress] = useState(false);
   const [address, setAddress] = useState({
     address1: '',
@@ -44,7 +43,6 @@ export function StepRecipient({ wizard }: Props) {
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<{
     name?: string;
-    email?: string;
     general?: string;
   }>({});
   const [active, setActive] = useState(-1);
@@ -154,7 +152,6 @@ export function StepRecipient({ wizard }: Props) {
   const reset = () => {
     wizard.detachClient();
     setName('');
-    setEmail('');
     setDismissedSearch(false);
     setErrors({});
   };
@@ -184,11 +181,6 @@ export function StepRecipient({ wizard }: Props) {
       return;
     }
 
-    if (email.trim() && !/^\S+@\S+\.\S+$/.test(email.trim())) {
-      setErrors({ email: 'Enter a valid email address.' });
-      return;
-    }
-
     setBusy(true);
 
     request(
@@ -199,14 +191,6 @@ export function StepRecipient({ wizard }: Props) {
         address1: address.address1,
         city: address.city,
         postal_code: address.postal_code,
-        contacts: [
-          {
-            first_name: name.trim(),
-            last_name: '',
-            email: email.trim(),
-            send_email: true,
-          },
-        ],
       },
       { skipIntercept: true }
     )
@@ -230,15 +214,13 @@ export function StepRecipient({ wizard }: Props) {
           return;
         }
 
-        const next: { name?: string; email?: string; general?: string } = {};
+        const next: { name?: string; general?: string } = {};
 
         Object.entries(bag).forEach(([key, messages]) => {
           const message = messages[0];
 
           if (key === 'name') {
             next.name = message;
-          } else if (key.includes('email')) {
-            next.email = message;
           } else {
             next.general = message;
           }
@@ -406,18 +388,6 @@ export function StepRecipient({ wizard }: Props) {
           ) : null}
         </div>
 
-        <InputField
-          id="iw-customer-email"
-          label="Email address"
-          type="email"
-          placeholder="jane@example.com"
-          value={email}
-          changeOverride
-          debounceTimeout={0}
-          onValueChange={setEmail}
-          errorMessage={errors.email}
-        />
-
         {errors.general ? (
           <p className="text-xs" style={{ color: '#DC2626' }}>
             {errors.general}
@@ -429,7 +399,8 @@ export function StepRecipient({ wizard }: Props) {
             <Legend>Address</Legend>
 
             <InputField
-              placeholder="Street address"
+              id="iw-customer-address1"
+              label="Street address"
               value={address.address1}
               changeOverride
               debounceTimeout={0}
@@ -440,7 +411,8 @@ export function StepRecipient({ wizard }: Props) {
 
             <div className="grid grid-cols-2 gap-3">
               <InputField
-                placeholder="City"
+                id="iw-customer-city"
+                label="City"
                 value={address.city}
                 changeOverride
                 debounceTimeout={0}
@@ -449,7 +421,8 @@ export function StepRecipient({ wizard }: Props) {
                 }
               />
               <InputField
-                placeholder="Postcode"
+                id="iw-customer-postcode"
+                label="Postcode"
                 value={address.postal_code}
                 changeOverride
                 debounceTimeout={0}

@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -26,7 +28,7 @@ import { useColorScheme } from '$app/common/colors';
 import { Modal } from '$app/components/Modal';
 import { Element } from '$app/components/cards';
 import { Spinner } from '$app/components/Spinner';
-import { Button, InputField } from '$app/components/forms';
+import { Button, Checkbox, InputField } from '$app/components/forms';
 import { Callout, ErrorBanner, Footer, useTheme, radius } from '../kit';
 import { Wizard } from '../useWizard';
 import { BrandPrompts } from './BrandPrompts';
@@ -36,6 +38,8 @@ const LOOKS: { label: string; design: string }[] = [
   { label: 'Modern', design: 'Modern' },
   { label: 'Traditional', design: 'Plain' },
 ];
+
+type AttachmentKey = 'pdf_email_attachment' | 'document_email_attachment';
 
 interface Props {
   wizard: Wizard;
@@ -70,6 +74,8 @@ export function StepReview({ wizard, money }: Props) {
   const [emailPreview, setEmailPreview] = useState<string | null>(null);
   const [loadingEmailPreview, setLoadingEmailPreview] = useState(false);
 
+  const [savingAttachment, setSavingAttachment] =
+    useState<AttachmentKey | null>(null);
   const [hasGateway, setHasGateway] = useState<boolean | null>(null);
   const [bankInstructions, setBankInstructions] = useState<string | null>(null);
   const [savingBank, setSavingBank] = useState(false);
@@ -121,6 +127,26 @@ export function StepReview({ wizard, money }: Props) {
         setHasGateway(configured.length > 0);
       });
   }, []);
+
+  const saveAttachment = (key: AttachmentKey, value: boolean) => {
+    if (!company?.id) {
+      return;
+    }
+
+    setSavingAttachment(key);
+
+    request(
+      'PUT',
+      endpoint('/api/v1/companies/:id', { id: company.id }),
+      { ...company, settings: { ...company.settings, [key]: value } },
+      { skipIntercept: true }
+    )
+      .then((response) =>
+        dispatch(updateRecord({ object: 'company', data: response.data.data }))
+      )
+      .catch(() => toast.error())
+      .finally(() => setSavingAttachment(null));
+  };
 
   const deliver = () =>
     wizard.flush().then((id) => {
@@ -381,46 +407,82 @@ export function StepReview({ wizard, money }: Props) {
         className="mt-6 border px-4 py-4"
         style={{ borderColor: t.line, borderRadius: radius.panel }}
       >
-        <p
-          className="text-[0.8125rem] mb-2.5"
-          style={{ color: t.label, fontWeight: 500 }}
-        >
-          How it looks
-        </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <p
+              className="text-[0.8125rem] mb-2.5"
+              style={{ color: t.label, fontWeight: 500 }}
+            >
+              How it looks
+            </p>
 
-        {designsFailed ? (
-          <p className="text-sm" style={{ color: t.muted }}>
-            Layouts could not be loaded. Your usual layout will be used.
-          </p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {LOOKS.map((look) => {
-              const id = designs[look.design];
-              const active = Boolean(id) && invoice?.design_id === id;
+            {designsFailed ? (
+              <p className="text-sm" style={{ color: t.muted }}>
+                Layouts could not be loaded. Your usual layout will be used.
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {LOOKS.map((look) => {
+                  const id = designs[look.design];
+                  const active = Boolean(id) && invoice?.design_id === id;
 
-              return (
-                <button
-                  key={look.label}
-                  type="button"
-                  disabled={!id}
-                  onClick={() => wizard.patch({ design_id: id })}
-                  className="text-sm px-3.5 py-2 border"
-                  style={{
-                    borderRadius: radius.control,
-                    borderColor: active ? t.text : t.line,
-                    backgroundColor: active ? t.hover : t.surface,
-                    color: id ? t.text : t.muted,
-                    fontWeight: 500,
-                    boxShadow: active ? `inset 0 0 0 1px ${t.text}` : 'none',
-                    cursor: id ? 'pointer' : 'not-allowed',
-                  }}
-                >
-                  {look.label}
-                </button>
-              );
-            })}
+                  return (
+                    <button
+                      key={look.label}
+                      type="button"
+                      disabled={!id}
+                      onClick={() => wizard.patch({ design_id: id })}
+                      className="text-sm px-3.5 py-2 border"
+                      style={{
+                        borderRadius: radius.control,
+                        borderColor: active ? t.text : t.line,
+                        backgroundColor: active ? t.hover : t.surface,
+                        color: id ? t.text : t.muted,
+                        fontWeight: 500,
+                        boxShadow: active
+                          ? `inset 0 0 0 1px ${t.text}`
+                          : 'none',
+                        cursor: id ? 'pointer' : 'not-allowed',
+                      }}
+                    >
+                      {look.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        )}
+
+          <div className="shrink-0 space-y-2.5">
+            <AttachmentOption
+              id="iw-attach-pdf"
+              label="Attach PDF to email"
+              checked={Boolean(company?.settings?.pdf_email_attachment)}
+              allowed={proPlan() || enterprisePlan()}
+              requirement="Pro plan"
+              busy={savingAttachment !== null}
+              onChange={(value) =>
+                saveAttachment('pdf_email_attachment', value)
+              }
+            />
+
+            <AttachmentOption
+              id="iw-attach-documents"
+              label="Attach Documents to email"
+              checked={Boolean(company?.settings?.document_email_attachment)}
+              allowed={enterprisePlan()}
+              requirement="Enterprise plan"
+              busy={savingAttachment !== null}
+              onChange={(value) =>
+                saveAttachment('document_email_attachment', value)
+              }
+            />
+
+            <p className="text-xs" style={{ color: t.muted }}>
+              Saved for all future emails.
+            </p>
+          </div>
+        </div>
 
         <div className="mt-4">
           <BrandPrompts />
@@ -513,7 +575,7 @@ export function StepReview({ wizard, money }: Props) {
             <strong style={{ fontWeight: 600 }}>{recipient}</strong>.
           </>
         ) : (
-          <>Your invoice is ready. Add an email address to send it.</>
+          <>Your invoice is ready. We'll ask where to send it.</>
         )}
       </p>
 
@@ -629,6 +691,55 @@ export function StepReview({ wizard, money }: Props) {
           </div>
         )}
       </Modal>
+    </div>
+  );
+}
+
+function AttachmentOption({
+  id,
+  label,
+  checked,
+  allowed,
+  requirement,
+  busy,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  checked: boolean;
+  allowed: boolean;
+  requirement: string;
+  busy: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  const t = useTheme();
+  const disabled = !allowed || busy;
+
+  return (
+    <div className="flex items-start gap-2.5">
+      <Checkbox
+        id={id}
+        checked={checked}
+        disabled={disabled}
+        onValueChange={(_, next) => onChange(Boolean(next))}
+      />
+
+      <label
+        htmlFor={id}
+        className="text-sm leading-5"
+        style={{
+          color: allowed ? t.text : t.muted,
+          cursor: disabled ? 'not-allowed' : 'pointer',
+        }}
+      >
+        {label}
+
+        {allowed ? null : (
+          <span className="block text-xs" style={{ color: t.muted }}>
+            {requirement}
+          </span>
+        )}
+      </label>
     </div>
   );
 }

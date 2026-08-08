@@ -9,6 +9,8 @@
  */
 
 import { endpoint } from '$app/common/helpers';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { AxiosError } from 'axios';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -24,16 +26,17 @@ import { Choice, Legend, useTheme } from '../kit';
 export interface AppliedTax {
   name: string;
   rate: number;
-  inclusive: boolean;
+  inclusive?: boolean;
 }
 
 interface Props {
   open: boolean;
+  scope: 'invoice' | 'item';
   onClose: () => void;
   onApplied: (tax: AppliedTax) => void;
 }
 
-export function TaxSetup({ open, onClose, onApplied }: Props) {
+export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
   const [translate] = useTranslation();
   const t = useTheme();
   const company = useCurrentCompany();
@@ -44,6 +47,8 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
   const [inclusive, setInclusive] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
+  const [nameError, setNameError] = useState<string>();
+  const [rateError, setRateError] = useState<string>();
 
   useEffect(() => {
     if (open) {
@@ -51,6 +56,8 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
       setRate('');
       setInclusive(null);
       setError(undefined);
+      setNameError(undefined);
+      setRateError(undefined);
     }
   }, [open]);
 
@@ -58,8 +65,10 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
   const rateIsValid =
     rate.trim() !== '' && !isNaN(parsedRate) && parsedRate >= 0;
 
+  const invoiceScope = scope === 'invoice';
+
   const enableTaxesForCompany = () => {
-    if (!company?.id) {
+    if (!invoiceScope || !company?.id) {
       return Promise.resolve();
     }
 
@@ -84,14 +93,16 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
 
   const apply = () => {
     setError(undefined);
+    setNameError(undefined);
+    setRateError(undefined);
 
     if (!name.trim()) {
-      setError('Enter a name for the tax.');
+      setNameError('Enter a name for the tax.');
       return;
     }
 
     if (!rateIsValid) {
-      setError('Enter the percentage as a number, for example 20.');
+      setRateError('Enter the percentage as a number, for example 20.');
       return;
     }
 
@@ -111,10 +122,12 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
             onApplied({
               name: name.trim(),
               rate: parsedRate,
-              inclusive: Boolean(inclusive),
+              ...(invoiceScope ? { inclusive: Boolean(inclusive) } : {}),
             });
 
-            toast.success('updated_settings');
+            toast.success(
+              invoiceScope ? 'updated_settings' : 'created_tax_rate'
+            );
             onClose();
           })
           .catch(() =>
@@ -123,11 +136,27 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
             )
           );
       })
-      .catch(() =>
-        setError(
-          'The tax rate could not be saved. Check the details and try again.'
-        )
-      )
+      .catch((caught: AxiosError<ValidationBag>) => {
+        const bag = caught.response?.data?.errors;
+
+        if (!bag) {
+          setError(
+            'The tax rate could not be saved. Check the details and try again.'
+          );
+
+          return;
+        }
+
+        Object.entries(bag).forEach(([key, messages]) => {
+          if (key === 'name') {
+            setNameError(messages[0]);
+          } else if (key === 'rate') {
+            setRateError(messages[0]);
+          } else {
+            setError(messages[0]);
+          }
+        });
+      })
       .finally(() => setBusy(false));
   };
 
@@ -135,7 +164,7 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
     <Modal
       visible={open}
       onClose={onClose}
-      title="Charge tax on this invoice"
+      title={invoiceScope ? 'Charge tax on this invoice' : 'Add a tax'}
       size="small"
     >
       <div className="space-y-5">
@@ -147,6 +176,7 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
           changeOverride
           debounceTimeout={0}
           onValueChange={setName}
+          errorMessage={nameError}
         />
 
         <InputField
@@ -157,26 +187,34 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
           changeOverride
           debounceTimeout={0}
           onValueChange={setRate}
+          errorMessage={rateError}
         />
 
-        <div>
-          <Legend>Is tax already included in your prices?</Legend>
+        {invoiceScope ? (
+          <div>
+            <Legend>Is tax already included in your prices?</Legend>
 
-          <div className="space-y-2" role="radiogroup">
-            <Choice
-              selected={inclusive === false}
-              onSelect={() => setInclusive(false)}
-              title="No, add it on top"
-              detail="A 100 item becomes 120 with 20% tax."
-            />
-            <Choice
-              selected={inclusive === true}
-              onSelect={() => setInclusive(true)}
-              title="Yes, my prices already include it"
-              detail="A 100 item stays 100, and the tax is included in that."
-            />
+            <div className="space-y-2" role="radiogroup">
+              <Choice
+                selected={inclusive === false}
+                onSelect={() => setInclusive(false)}
+                title="No, add it on top"
+                detail="A 100 item becomes 120 with 20% tax."
+              />
+              <Choice
+                selected={inclusive === true}
+                onSelect={() => setInclusive(true)}
+                title="Yes, my prices already include it"
+                detail="A 100 item stays 100, and the tax is included in that."
+              />
+            </div>
+
+            <p className="text-xs mt-2" style={{ color: t.muted }}>
+              This applies to the whole invoice and becomes the default for new
+              ones.
+            </p>
           </div>
-        </div>
+        ) : null}
 
         {error ? (
           <p className="text-xs" style={{ color: '#DC2626' }}>
@@ -187,7 +225,7 @@ export function TaxSetup({ open, onClose, onApplied }: Props) {
         <div className="flex items-center gap-2 pt-1">
           <Button
             behavior="button"
-            disabled={busy || inclusive === null}
+            disabled={busy || (invoiceScope && inclusive === null)}
             disableWithoutIcon={!busy}
             onClick={apply}
           >
