@@ -484,10 +484,11 @@ export function RangeSliderInput({
   unit = '%',
 }: RangeSliderInputProps) {
   const colors = useColorScheme();
-  const numericValue = parseInt(value?.replace(/[^0-9]/g, '') || String(min), 10);
+  const parsedValue = Number.parseFloat(value || '');
+  const numericValue = Number.isFinite(parsedValue) ? parsedValue : min;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = parseInt(e.target.value, 10);
+    const newValue = Number.parseFloat(e.target.value);
     onChange(`${newValue}${unit}`);
   };
 

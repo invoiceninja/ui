@@ -10,6 +10,8 @@ import type { CSSProperties } from 'react';
 
 export const TABLE_BORDER_WIDTH_MIN = 0;
 export const TABLE_BORDER_WIDTH_MAX = 20;
+export const TABLE_BORDER_WIDTH_STEP = 0.5;
+export const TABLE_BORDER_WIDTH_DEFAULT = 0.5;
 
 export interface TableBorderSidesInput {
   top?: boolean;
@@ -20,7 +22,7 @@ export interface TableBorderSidesInput {
 
 export interface TableRegionBordersInput {
   color?: string;
-  /** Integer 0–20 (pixels); strings like `"2px"` or `"3"` are accepted when resolving. */
+  /** 0–20 pixels in 0.5px increments; strings like `"0.5px"` are accepted. */
   width?: number | string;
   sides?: TableBorderSidesInput;
 }
@@ -47,15 +49,18 @@ const DEFAULT_BORDER_COLOR = '#E5E7EB';
 
 function clampWidthPx(n: number): number {
   if (!Number.isFinite(n)) {
-    return 1;
+    return TABLE_BORDER_WIDTH_DEFAULT;
   }
+  const snapped =
+    Math.round(n / TABLE_BORDER_WIDTH_STEP) * TABLE_BORDER_WIDTH_STEP;
+
   return Math.max(
     TABLE_BORDER_WIDTH_MIN,
-    Math.min(TABLE_BORDER_WIDTH_MAX, Math.round(n))
+    Math.min(TABLE_BORDER_WIDTH_MAX, snapped)
   );
 }
 
-/** Normalize stored JSON to 0–20 px (integers only in normal operation). */
+/** Normalize stored JSON to 0–20 px in half-pixel increments. */
 export function coerceBorderWidthPx(raw: unknown): number {
   if (typeof raw === 'number') {
     return clampWidthPx(raw);
@@ -68,13 +73,13 @@ export function coerceBorderWidthPx(raw: unknown): number {
       return clampWidthPx(parsed);
     }
   }
-  return 1;
+  return TABLE_BORDER_WIDTH_DEFAULT;
 }
 
 /** Saved on new table / tasks-table blocks alongside `showBorders`. */
 export const DEFAULT_TABLE_REGION_BORDER_PROPS: TableRegionBordersInput = {
   color: DEFAULT_BORDER_COLOR,
-  width: 1,
+  width: TABLE_BORDER_WIDTH_DEFAULT,
   sides: { top: true, right: true, bottom: true, left: true },
 };
 

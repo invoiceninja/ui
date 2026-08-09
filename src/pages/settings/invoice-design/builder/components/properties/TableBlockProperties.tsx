@@ -27,6 +27,7 @@ import {
   DEFAULT_TABLE_REGION_BORDER_PROPS,
   TABLE_BORDER_WIDTH_MAX,
   TABLE_BORDER_WIDTH_MIN,
+  TABLE_BORDER_WIDTH_STEP,
 } from '../../utils/table-cell-borders';
 import { DEFAULT_VALUE_TEXT_COLOR } from '../../constants/design-colors';
 
@@ -585,7 +586,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
                   }
                   min={TABLE_BORDER_WIDTH_MIN}
                   max={TABLE_BORDER_WIDTH_MAX}
-                  step={1}
+                  step={TABLE_BORDER_WIDTH_STEP}
                   unit=""
                 />
                 <div className="grid grid-cols-2 gap-2">

@@ -85,7 +85,7 @@ export interface TableColumn {
 /** Stored on table / tasks-table blocks (header vs body borders). */
 export interface TableRegionBordersHint {
   color?: string;
-  /** Pixel thickness 0–20 (integer); API may coerce string values when reading. */
+  /** Pixel thickness 0–20 in 0.5px increments; string values are accepted when reading. */
   width?: number | string;
   sides?: {
     top?: boolean;

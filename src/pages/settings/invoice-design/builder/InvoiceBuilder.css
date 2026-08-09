@@ -128,8 +128,14 @@
   transition: opacity 150ms ease;
 }
 
-.invoice-gridstack-grid .grid-stack-item:hover .block-topbar,
-.invoice-gridstack-grid .grid-stack-item.selected .block-topbar {
+/* The topbar sits outside the item bounds, so item:hover would let the hidden
+   topbar trigger itself. Content hover opens it; topbar hover keeps it usable. */
+.invoice-gridstack-grid
+  .grid-stack-item:has(.block-content:hover)
+  .block-topbar,
+.invoice-gridstack-grid
+  .grid-stack-item:has(.block-topbar:hover)
+  .block-topbar {
   opacity: 1;
   pointer-events: auto;
 }
