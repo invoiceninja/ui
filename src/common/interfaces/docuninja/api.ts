@@ -67,9 +67,9 @@ export interface Template {
 export interface ReminderSchedule {
   id: string;
   company_id: string;
-  template_id: string;
   name: string;
-  trigger_event: string;
+  subject: string;
+  body: string;
   num_days: number;
   schedule_direction: string;
   enabled: boolean;
@@ -78,7 +78,6 @@ export interface ReminderSchedule {
   created_at: string;
   updated_at: string;
   archived_at: string | null;
-  template?: Template;
 }
 
 export interface DocuNinjaData {
