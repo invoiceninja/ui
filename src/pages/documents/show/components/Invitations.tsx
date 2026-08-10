@@ -31,6 +31,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { request } from '$app/common/helpers/request';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import classNames from 'classnames';
+import { Modal } from '$app/components/Modal';
 
 type InvitationsProps = {
   document: DocumentType;
@@ -96,6 +97,9 @@ function Invitation({ invitation, document }: InvitationProps) {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const [isSendingInvitation, setIsSendingInvitation] =
+    useState<boolean>(false);
+
+  const [isSendConfirmOpen, setIsSendConfirmOpen] =
     useState<boolean>(false);
 
   const canSendInvitation = (invitation: DocumentInvitation) => {
@@ -212,6 +216,7 @@ function Invitation({ invitation, document }: InvitationProps) {
           $refetch(['docuninja_documents']);
 
           toast.success('document_queued_for_sending');
+          setIsSendConfirmOpen(false);
         })
         .finally(() => setIsSendingInvitation(false));
     }
@@ -292,7 +297,7 @@ function Invitation({ invitation, document }: InvitationProps) {
           <Button
             type="minimal"
             behavior="button"
-            onClick={handleSendInvitation}
+            onClick={() => setIsSendConfirmOpen(true)}
             disabled={isSendingInvitation || !canSendInvitation(invitation)}
             disableWithoutIcon
           >
@@ -306,6 +311,23 @@ function Invitation({ invitation, document }: InvitationProps) {
           </Button>
         </div>
       )}
+
+      <Modal
+        title={t('send_confirmation')}
+        visible={isSendConfirmOpen}
+        onClose={() => setIsSendConfirmOpen(false)}
+        size="small"
+      >
+        <div className="flex justify-end pt-4">
+          <Button
+            behavior="button"
+            disabled={isSendingInvitation}
+            onClick={handleSendInvitation}
+          >
+            {isSendingInvitation ? t('sending') : t('send')}
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }
