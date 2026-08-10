@@ -9,11 +9,16 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import type { Block } from '../types';
+import type { CSSProperties } from 'react';
+import type { SignatureBlock } from '../types';
 import { ensurePx } from '../utils/html-generator';
 
+function asTextAlign(align?: string): CSSProperties['textAlign'] {
+  return (align as CSSProperties['textAlign']) || 'left';
+}
+
 interface SignatureBlockRendererProps {
-  block: Block;
+  block: SignatureBlock;
 }
 
 export function SignatureBlockRenderer({ block }: SignatureBlockRendererProps) {
@@ -32,17 +37,16 @@ export function SignatureBlockRenderer({ block }: SignatureBlockRendererProps) {
   const signatureHeight = ensurePx(block.properties.signatureHeight) || '40px';
   const lineWidth = ensurePx(block.properties.lineWidth) || '200px';
   const lineThickness = ensurePx(block.properties.lineThickness) || '1px';
-  const lineStyle = ['solid', 'dashed', 'dotted'].includes(
-    block.properties.lineStyle
-  )
-    ? block.properties.lineStyle
+  const lineStyleValue = block.properties.lineStyle;
+  const lineStyle = ['solid', 'dashed', 'dotted'].includes(lineStyleValue || '')
+    ? lineStyleValue
     : 'solid';
   const lineColor = block.properties.lineColor || '#000000';
 
   return (
     <div
       style={{
-        textAlign: align || 'left',
+        textAlign: asTextAlign(align),
         padding: ensurePx(padding),
         boxSizing: 'border-box',
       }}

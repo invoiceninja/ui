@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { PropertyEditorProps } from '../../types';
+import { PropertyEditorProps, QRCodeBlock } from '../../types';
 import { SectionDivider, AlignmentInput } from './PropertyInputs';
 import {
   DesignerPxNumberInput,
@@ -36,7 +36,7 @@ const QR_CODE_TYPES = [
 export function QRCodeBlockProperties({
   block,
   onChange,
-}: PropertyEditorProps) {
+}: PropertyEditorProps<QRCodeBlock>) {
   const [t] = useTranslation();
 
   const updateProperty = (key: string, value: any) => {

@@ -14,7 +14,7 @@ import {
   SAMPLE_INVOICE_DATA,
   replaceVariables,
 } from '../../utils/variable-replacer';
-import { Block } from '../../types';
+import { TotalBlock as TotalBlockModel, TotalItem } from '../../types';
 import {
   DEFAULT_LABEL_TEXT_COLOR,
   DEFAULT_VALUE_TEXT_COLOR,
@@ -22,7 +22,7 @@ import {
 import { useLabelMapping } from '../../utils/label-variables';
 
 interface TotalBlockProps {
-  block: Block;
+  block: TotalBlockModel;
 }
 
 export const TotalBlock = memo(function TotalBlock({ block }: TotalBlockProps) {
@@ -30,7 +30,7 @@ export const TotalBlock = memo(function TotalBlock({ block }: TotalBlockProps) {
   const labelMapping = useLabelMapping();
 
   const {
-    items,
+    items = [],
     align,
     spacing,
     labelPadding,
@@ -50,34 +50,7 @@ export const TotalBlock = memo(function TotalBlock({ block }: TotalBlockProps) {
   return (
     <table style={tableStyle}>
       <tbody>
-        {items.map(
-          (
-            item: {
-              show: boolean;
-              isTotal?: boolean;
-                isBalance?: boolean;
-                field: string;
-                label: string;
-                labelStyle?: {
-                  fontSize?: string;
-                  fontWeight?: string;
-                  fontStyle?: string;
-                  color?: string;
-                };
-                valueStyle?: {
-                  fontSize?: string;
-                  fontWeight?: string;
-                  fontStyle?: string;
-                  color?: string;
-                };
-                fontSize?: string;
-                fontWeight?: string;
-                color?: string;
-              fontStyle?: string;
-              amountColor?: string;
-            },
-            index: number
-          ) => {
+        {items.map((item: TotalItem, index: number) => {
             const displayValue = replaceVariables(
               item.field,
               SAMPLE_INVOICE_DATA
@@ -130,8 +103,7 @@ export const TotalBlock = memo(function TotalBlock({ block }: TotalBlockProps) {
                 </td>
               </tr>
             );
-          }
-        )}
+        })}
       </tbody>
     </table>
   );

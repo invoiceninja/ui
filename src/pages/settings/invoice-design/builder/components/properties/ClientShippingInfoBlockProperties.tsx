@@ -10,14 +10,14 @@
 
 import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';
-import { PropertyEditorProps } from '../../types';
+import { PropertyEditorProps, ClientShippingInfoBlock } from '../../types';
 import { InfoBlockProperties } from './InfoBlockProperties';
 import { useCustomField } from '$app/components/CustomField';
 
 export function ClientShippingInfoBlockProperties({
   block,
   onChange,
-}: PropertyEditorProps) {
+}: PropertyEditorProps<ClientShippingInfoBlock>) {
   const [t] = useTranslation();
   const customField = useCustomField();
 
@@ -115,7 +115,7 @@ export function ClientShippingInfoBlockProperties({
   return (
     <InfoBlockProperties
       block={block}
-      onChange={onChange}
+      onChange={(updated) => onChange(updated as ClientShippingInfoBlock)}
       availableFields={availableFields}
       title={String(t('ship_to'))}
       showTitleOption

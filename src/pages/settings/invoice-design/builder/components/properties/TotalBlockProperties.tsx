@@ -11,7 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { ChevronUp, ChevronDown, Type, Trash2 } from 'lucide-react';
-import { PropertyEditorProps } from '../../types';
+import { PropertyEditorProps, TotalBlock } from '../../types';
 import {
   AlignmentInput,
   SectionDivider,
@@ -45,7 +45,10 @@ const AVAILABLE_TOTAL_ITEMS = [
   { label: '$balance_due_label', field: '$balance_due', isBalance: true },
 ];
 
-export function TotalBlockProperties({ block, onChange }: PropertyEditorProps) {
+export function TotalBlockProperties({
+  block,
+  onChange,
+}: PropertyEditorProps<TotalBlock>) {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const labelMapping = useLabelMapping();

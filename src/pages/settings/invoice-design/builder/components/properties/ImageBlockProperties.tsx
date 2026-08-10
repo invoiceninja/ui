@@ -12,7 +12,9 @@ import { useTranslation } from 'react-i18next';
 import { X, ImageIcon } from 'lucide-react';
 import { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { PropertyEditorProps } from '../../types';
+import { PropertyEditorProps, ImageBlock, LogoBlock } from '../../types';
+
+type ImageLikeBlock = ImageBlock | LogoBlock;
 import { useLogo } from '$app/common/hooks/useLogo';
 import { AlignmentInput, SelectInput, SectionDivider } from './PropertyInputs';
 import {
@@ -21,7 +23,10 @@ import {
 } from './DesignerPxNumberInput';
 import { useColorScheme } from '$app/common/colors';
 
-export function ImageBlockProperties({ block, onChange }: PropertyEditorProps) {
+export function ImageBlockProperties({
+  block,
+  onChange,
+}: PropertyEditorProps<ImageLikeBlock>) {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const companyLogo = useLogo();
@@ -44,7 +49,7 @@ export function ImageBlockProperties({ block, onChange }: PropertyEditorProps) {
       
       {block.type !== 'logo' && (
         <ImageUploader
-          value={block.properties.source}
+          value={block.properties.source || ''}
           onChange={(value) => updateProperty('source', value)}
         />
       )}

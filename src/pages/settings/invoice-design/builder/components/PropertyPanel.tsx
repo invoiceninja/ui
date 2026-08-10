@@ -11,7 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { Trash2 } from 'lucide-react';
 import { Button } from '$app/components/forms';
-import { PropertyPanelProps, Block } from '../types';
+import { PropertyPanelProps, Block, DividerBlock, SpacerBlock } from '../types';
 import { useBlockLabel, useBlockDescription } from '../block-library';
 import { useColorScheme } from '$app/common/colors';
 import { TextBlockProperties } from './properties/TextBlockProperties';
@@ -24,7 +24,7 @@ import { ClientShippingInfoBlockProperties } from './properties/ClientShippingIn
 import { InvoiceDetailsBlockProperties } from './properties/InvoiceDetailsBlockProperties';
 import { QRCodeBlockProperties } from './properties/QRCodeBlockProperties';
 import { SignatureBlockProperties } from './properties/SignatureBlockProperties';
-import { TextInput } from './properties/PropertyInputs';
+import { TextInput, ColorInput, SelectInput } from './properties/PropertyInputs';
 import {
   INVOICE_WIDGET_CLASS,
   INVOICE_WIDGET_CLASS_BY_TYPE,
@@ -192,7 +192,7 @@ export function PropertyPanel({
 
 // Simple property editors for basic block types
 interface DividerPropertiesProps {
-  block: Block;
+  block: DividerBlock;
   onChange: (block: Block) => void;
 }
 
@@ -201,65 +201,49 @@ function DividerProperties({ block, onChange }: DividerPropertiesProps) {
 
   return (
     <div className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('width')}
-        </label>
-        <input
-          type="text"
-          value={block.properties.thickness}
-          onChange={(e) =>
-            onChange({
-              ...block,
-              properties: { ...block.properties, thickness: e.target.value },
-            })
-          }
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-        />
-      </div>
+      <TextInput
+        label={String(t('width'))}
+        value={block.properties.thickness}
+        onChange={(thickness) =>
+          onChange({
+            ...block,
+            properties: { ...block.properties, thickness },
+          })
+        }
+      />
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('color')}
-        </label>
-        <input
-          type="color"
-          value={block.properties.color}
-          onChange={(e) =>
-            onChange({
-              ...block,
-              properties: { ...block.properties, color: e.target.value },
-            })
-          }
-          className="w-full h-10 border border-gray-300 rounded-md"
-        />
-      </div>
+      <ColorInput
+        label={String(t('color'))}
+        value={block.properties.color}
+        onChange={(color) =>
+          onChange({
+            ...block,
+            properties: { ...block.properties, color },
+          })
+        }
+      />
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('style')}
-        </label>
-        <select
-          value={block.properties.style}
-          onChange={(e) =>
-            onChange({
-              ...block,
-              properties: { ...block.properties, style: e.target.value },
-            })
-          }
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-        >
-          <option value="solid">{t('solid')}</option>
-          <option value="dashed">{t('dashed')}</option>
-          <option value="dotted">{t('dotted')}</option>
-        </select>
-      </div>
+      <SelectInput
+        label={String(t('style'))}
+        value={block.properties.style}
+        onChange={(style) =>
+          onChange({
+            ...block,
+            properties: { ...block.properties, style },
+          })
+        }
+        options={[
+          { value: 'solid', label: String(t('solid')) },
+          { value: 'dashed', label: String(t('dashed')) },
+          { value: 'dotted', label: String(t('dotted')) },
+        ]}
+      />
     </div>
   );
 }
 
 interface SpacerPropertiesProps {
-  block: Block;
+  block: SpacerBlock;
   onChange: (block: Block) => void;
 }
 
@@ -267,22 +251,16 @@ function SpacerProperties({ block, onChange }: SpacerPropertiesProps) {
   const [t] = useTranslation();
 
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        {t('height')}
-      </label>
-      <input
-        type="text"
-        value={block.properties.height}
-        onChange={(e) =>
-          onChange({
-            ...block,
-            properties: { ...block.properties, height: e.target.value },
-          })
-        }
-        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-        placeholder={String(t('height_placeholder_example'))}
-      />
-    </div>
+    <TextInput
+      label={String(t('height'))}
+      value={block.properties.height}
+      placeholder={String(t('height_placeholder_example'))}
+      onChange={(height) =>
+        onChange({
+          ...block,
+          properties: { ...block.properties, height },
+        })
+      }
+    />
   );
 }

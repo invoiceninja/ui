@@ -10,14 +10,14 @@
 
 import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';
-import { PropertyEditorProps } from '../../types';
+import { PropertyEditorProps, CompanyInfoBlock } from '../../types';
 import { InfoBlockProperties } from './InfoBlockProperties';
 import { useCustomField } from '$app/components/CustomField';
 
 export function CompanyInfoBlockProperties({
   block,
   onChange,
-}: PropertyEditorProps) {
+}: PropertyEditorProps<CompanyInfoBlock>) {
   const [t] = useTranslation();
   const customField = useCustomField();
 
@@ -109,7 +109,7 @@ export function CompanyInfoBlockProperties({
   return (
     <InfoBlockProperties
       block={block}
-      onChange={onChange}
+      onChange={(updated) => onChange(updated as CompanyInfoBlock)}
       availableFields={availableFields}
       title={String(t('company_details'))}
       showTitleOption

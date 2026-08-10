@@ -10,7 +10,7 @@
 
 import { memo } from 'react';
 import { SAMPLE_INVOICE_DATA } from '../../utils/variable-replacer';
-import { Block } from '../../types';
+import { TableBlock as TableBlockModel, TasksTableBlock } from '../../types';
 import {
   resolveTableBorderProps,
   tableHeaderCellBorderStyles,
@@ -18,12 +18,12 @@ import {
 } from '../../utils/table-cell-borders';
 
 interface TableBlockProps {
-  block: Block;
+  block: TableBlockModel | TasksTableBlock;
 }
 
 export const TableBlock = memo(function TableBlock({ block }: TableBlockProps) {
   const {
-    columns,
+    columns = [],
     headerBg,
     headerColor,
     headerFontWeight,

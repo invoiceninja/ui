@@ -12,7 +12,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { ChevronUp, ChevronDown, Settings2, Trash2 } from 'lucide-react';
-import { PropertyEditorProps } from '../../types';
+import { PropertyEditorProps, TableBlock, TasksTableBlock } from '../../types';
+
+type TableLikeBlock = TableBlock | TasksTableBlock;
 import {
   ColorInput,
   CheckboxInput,
@@ -130,7 +132,10 @@ const getAvailableColumns = (isTasksTable: boolean, t: TFunction) => [
   },
 ];
 
-export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
+export function TableBlockProperties({
+  block,
+  onChange,
+}: PropertyEditorProps<TableLikeBlock>) {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const [expandedColumn, setExpandedColumn] = useState<string | null>(null);
@@ -583,7 +588,7 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
       <CheckboxInput
         id="alternateRows"
         label={String(t('alternate_row_colors'))}
-        checked={block.properties.alternateRows}
+        checked={Boolean(block.properties.alternateRows)}
         onChange={(value) => updateProperty('alternateRows', value)}
       />
 

@@ -11,7 +11,14 @@
 import { useTranslation } from 'react-i18next';
 import { useMemo, useCallback, useState } from 'react';
 import { Type, ChevronUp, ChevronDown } from 'lucide-react';
-import { PropertyEditorProps, FieldConfig } from '../../types';
+import {
+  PropertyEditorProps,
+  FieldConfig,
+  Block,
+  CompanyInfoBlock,
+  ClientInfoBlock,
+  ClientShippingInfoBlock,
+} from '../../types';
 import {
   AlignmentInput,
   ColorInput,
@@ -26,7 +33,11 @@ import { ReorderableFieldList, FieldDefinition } from './ReorderableFieldList';
 import { useColorScheme } from '$app/common/colors';
 import { DEFAULT_VALUE_TEXT_COLOR } from '../../constants/design-colors';
 
-interface InfoBlockPropertiesProps extends PropertyEditorProps {
+type InfoBlock = CompanyInfoBlock | ClientInfoBlock | ClientShippingInfoBlock;
+
+interface InfoBlockPropertiesProps {
+  block: InfoBlock;
+  onChange: (block: InfoBlock) => void;
   availableFields: FieldDefinition[];
   title?: string;
   showTitleOption?: boolean;
@@ -55,38 +66,40 @@ export function InfoBlockProperties({
 
     const lines = content.split('\n').filter((line: string) => line.trim());
 
-    return lines
-      .map((line: string) => {
-        const variable = line.trim();
-        const fieldDef = availableFields.find((f) => f.variable === variable);
-        if (fieldDef) {
-          return {
-            id: fieldDef.id,
-            label: fieldDef.label,
-            variable: fieldDef.variable || '',
-            prefix: '',
-            suffix: '',
-            hideIfEmpty: true,
-          };
-        }
+    const configs: FieldConfig[] = [];
 
-        const variableMatch = variable.match(/\$([^.]+)\.(.+)/);
+    lines.forEach((line: string) => {
+      const variable = line.trim();
+      const fieldDef = availableFields.find((f) => f.variable === variable);
+      if (fieldDef) {
+        configs.push({
+          id: fieldDef.id,
+          label: fieldDef.label,
+          variable: fieldDef.variable || '',
+          prefix: '',
+          suffix: '',
+          hideIfEmpty: true,
+        });
+        return;
+      }
 
-        if (variableMatch) {
-          return {
-            id: variable.replace(/\$/g, '').replace(/\./g, '_'),
-            label: variableMatch[2]
-              .replace(/_/g, ' ')
-              .replace(/\b\w/g, (l: string) => l.toUpperCase()),
-            variable: variable,
-            prefix: '',
-            suffix: '',
-            hideIfEmpty: true,
-          };
-        }
-        return null;
-      })
-      .filter((f: FieldConfig | null): f is FieldConfig => f !== null);
+      const variableMatch = variable.match(/\$([^.]+)\.(.+)/);
+
+      if (variableMatch) {
+        configs.push({
+          id: variable.replace(/\$/g, '').replace(/\./g, '_'),
+          label: variableMatch[2]
+            .replace(/_/g, ' ')
+            .replace(/\b\w/g, (l: string) => l.toUpperCase()),
+          variable: variable,
+          prefix: '',
+          suffix: '',
+          hideIfEmpty: true,
+        });
+      }
+    });
+
+    return configs;
   }, [block.properties.content, availableFields]);
 
   const fieldConfigs: FieldConfig[] = useMemo(

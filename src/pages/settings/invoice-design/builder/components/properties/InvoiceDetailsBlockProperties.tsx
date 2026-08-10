@@ -11,7 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useMemo } from 'react';
 import { ChevronUp, ChevronDown, Trash2, Type } from 'lucide-react';
-import { PropertyEditorProps, FieldConfig } from '../../types';
+import { PropertyEditorProps, FieldConfig, InvoiceDetailsBlock } from '../../types';
 import {
   AlignmentInput,
   ColorInput,
@@ -32,7 +32,7 @@ import {
 export function InvoiceDetailsBlockProperties({
   block,
   onChange,
-}: PropertyEditorProps) {
+}: PropertyEditorProps<InvoiceDetailsBlock>) {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const customField = useCustomField();

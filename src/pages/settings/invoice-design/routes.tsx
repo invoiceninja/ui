@@ -85,9 +85,36 @@ export const invoiceDesignRoutes = (
   <Route path="invoice_design" element={<InvoiceDesign />}>
     <Route path="" element={<GeneralSettings />} />
     <Route path="custom_designs" element={<CustomDesigns />} />
-    <Route path="builder/templates" element={<TemplateGallery />} />
-    <Route path="builder/new" element={<InvoiceBuilder />} />
-    <Route path="builder/:id" element={<InvoiceBuilder />} />
+    <Route
+      path="builder/templates"
+      element={
+        <Guard
+          guards={[companySettings(), or(plan('enterprise'), plan('pro'))]}
+          component={<TemplateGallery />}
+          type="subPage"
+        />
+      }
+    />
+    <Route
+      path="builder/new"
+      element={
+        <Guard
+          guards={[companySettings(), or(plan('enterprise'), plan('pro'))]}
+          component={<InvoiceBuilder />}
+          type="subPage"
+        />
+      }
+    />
+    <Route
+      path="builder/:id"
+      element={
+        <Guard
+          guards={[companySettings(), or(plan('enterprise'), plan('pro'))]}
+          component={<InvoiceBuilder />}
+          type="subPage"
+        />
+      }
+    />
     <Route
       path="custom_designs/:id/edit"
       element={

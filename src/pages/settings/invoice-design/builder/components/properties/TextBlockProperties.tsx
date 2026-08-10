@@ -11,7 +11,15 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Code } from 'lucide-react';
-import { PropertyEditorProps } from '../../types';
+import {
+  PropertyEditorProps,
+  TextBlock,
+  PublicNotesBlock,
+  FooterBlock,
+  TermsBlock,
+} from '../../types';
+
+type TextLikeBlock = TextBlock | PublicNotesBlock | FooterBlock | TermsBlock;
 import { VariablePicker } from '../VariablePicker';
 import { useDebouncedCallback } from '../../hooks/useDebounce';
 import {
@@ -28,7 +36,10 @@ import {
 } from './DesignerPxNumberInput';
 import { useColorScheme } from '$app/common/colors';
 
-export function TextBlockProperties({ block, onChange }: PropertyEditorProps) {
+export function TextBlockProperties({
+  block,
+  onChange,
+}: PropertyEditorProps<TextLikeBlock>) {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const [showVariablePicker, setShowVariablePicker] = useState(false);

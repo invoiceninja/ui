@@ -139,7 +139,7 @@ function wrappedLineCount(
 
 function textContentSize(
   text: string,
-  properties: BlockProperties,
+  properties: { fontSize?: string; lineHeight?: string },
   inheritedFontSize: number
 ): ContentSize {
   const fontSize = parseCssNumber(properties.fontSize, inheritedFontSize);
@@ -187,7 +187,12 @@ function visibleFieldLines(
 }
 
 function fieldContentSize(
-  properties: BlockProperties,
+  properties: {
+    fieldConfigs?: FieldConfig[];
+    content?: string;
+    fontSize?: string;
+    lineHeight?: string;
+  },
   inheritedFontSize: number,
   options: { title?: string; includeLabels?: boolean } = {}
 ): ContentSize {
@@ -218,7 +223,7 @@ function fieldContentSize(
 }
 
 function tableContentSize(
-  properties: BlockProperties,
+  properties: { fontSize?: string; padding?: string },
   inheritedFontSize: number
 ): ContentSize {
   const fontSize = parseCssNumber(properties.fontSize, inheritedFontSize);
@@ -234,7 +239,12 @@ function tableContentSize(
 }
 
 function totalContentSize(
-  properties: BlockProperties,
+  properties: {
+    items?: Array<{ show?: boolean; label?: string; field?: string }>;
+    spacing?: string;
+    labelValueGap?: string;
+    fontSize?: string;
+  },
   inheritedFontSize: number
 ): ContentSize {
   const items = Array.isArray(properties.items) ? properties.items : [];
@@ -285,12 +295,13 @@ function imageContentSize(
   type: BlockType,
   properties: BlockProperties
 ): ContentSize {
+  const props = properties as Record<string, unknown>;
   const width = parseCssNumber(
-    properties.maxWidth,
+    props.maxWidth as string | number | undefined,
     type === 'logo' ? 150 : 200
   );
   const height = parseCssNumber(
-    properties.maxHeight,
+    props.maxHeight as string | number | undefined,
     type === 'logo' ? 100 : width * 0.75
   );
 
@@ -302,44 +313,98 @@ function blockContentSize(
   properties: BlockProperties,
   inheritedFontSize: number
 ): ContentSize {
+  const props = properties as Record<string, unknown>;
+
   switch (type) {
     case 'text':
       return textContentSize(
-        replaceVariables(properties.content || 'Text', SAMPLE_INVOICE_DATA),
-        properties,
+        replaceVariables(String(props.content || 'Text'), SAMPLE_INVOICE_DATA),
+        {
+          fontSize: props.fontSize as string | undefined,
+          lineHeight: props.lineHeight as string | undefined,
+        },
         inheritedFontSize
       );
     case 'public-notes':
     case 'footer':
     case 'terms':
       return textContentSize(
-        replaceVariables(properties.content || ' ', SAMPLE_INVOICE_DATA),
-        properties,
+        replaceVariables(String(props.content || ' '), SAMPLE_INVOICE_DATA),
+        {
+          fontSize: props.fontSize as string | undefined,
+          lineHeight: props.lineHeight as string | undefined,
+        },
         inheritedFontSize
       );
     case 'company-info':
-      return fieldContentSize(properties, inheritedFontSize);
+      return fieldContentSize(
+        {
+          fieldConfigs: props.fieldConfigs as FieldConfig[] | undefined,
+          content: props.content as string | undefined,
+          fontSize: props.fontSize as string | undefined,
+          lineHeight: props.lineHeight as string | undefined,
+        },
+        inheritedFontSize
+      );
     case 'client-info':
     case 'client-shipping-info':
-      return fieldContentSize(properties, inheritedFontSize, {
-        title: properties.showTitle ? properties.title : undefined,
-      });
+      return fieldContentSize(
+        {
+          fieldConfigs: props.fieldConfigs as FieldConfig[] | undefined,
+          content: props.content as string | undefined,
+          fontSize: props.fontSize as string | undefined,
+          lineHeight: props.lineHeight as string | undefined,
+        },
+        inheritedFontSize,
+        {
+          title: props.showTitle ? (props.title as string | undefined) : undefined,
+        }
+      );
     case 'invoice-details':
-      return fieldContentSize(properties, inheritedFontSize, {
-        includeLabels: properties.showLabels !== false,
-      });
+      return fieldContentSize(
+        {
+          fieldConfigs: props.fieldConfigs as FieldConfig[] | undefined,
+          fontSize: props.fontSize as string | undefined,
+          lineHeight: props.lineHeight as string | undefined,
+        },
+        inheritedFontSize,
+        {
+          includeLabels: props.showLabels !== false,
+        }
+      );
     case 'table':
     case 'tasks-table':
-      return tableContentSize(properties, inheritedFontSize);
+      return tableContentSize(
+        {
+          fontSize: props.fontSize as string | undefined,
+          padding: props.padding as string | undefined,
+        },
+        inheritedFontSize
+      );
     case 'total':
-      return totalContentSize(properties, inheritedFontSize);
+      return totalContentSize(
+        {
+          items: props.items as Array<{
+            show?: boolean;
+            label?: string;
+            field?: string;
+          }>,
+          spacing: props.spacing as string | undefined,
+          labelValueGap: props.labelValueGap as string | undefined,
+          fontSize: props.fontSize as string | undefined,
+        },
+        inheritedFontSize
+      );
     case 'logo':
     case 'image':
       return imageContentSize(type, properties);
     case 'divider': {
-      const thickness = parseCssNumber(properties.thickness, 1);
-      const marginTop = parseCssNumber(properties.marginTop, 10);
-      const marginBottom = parseCssNumber(properties.marginBottom, 10);
+      const thickness = parseCssNumber(props.thickness as string | number, 1);
+      const marginTop = parseCssNumber(props.marginTop as string | number, 10);
+      const marginBottom = parseCssNumber(
+        props.marginBottom as string | number,
+        10
+      );
 
       return {
         width: GRID_CONFIG.canvasWidth,
@@ -350,31 +415,37 @@ function blockContentSize(
     case 'spacer':
       return {
         width: GRID_CONFIG.canvasWidth,
-        height: parseCssNumber(properties.height, 40),
+        height: parseCssNumber(props.height as string | number, 40),
         fullWidth: true,
       };
     case 'qrcode': {
-      const size = parseCssNumber(properties.size, 100);
+      const size = parseCssNumber(props.size as string | number, 100);
 
       return { width: size, height: size };
     }
     case 'signature': {
-      const fontSize = parseCssNumber(properties.fontSize, inheritedFontSize);
-      const padding = parseCssNumber(properties.padding, 0);
-      const signatureHeight = parseCssNumber(properties.signatureHeight, 40);
-      const labelWidth = textWidth(properties.label || '', fontSize);
-      const dateWidth = properties.showDate
+      const fontSize = parseCssNumber(
+        props.fontSize as string | number,
+        inheritedFontSize
+      );
+      const padding = parseCssNumber(props.padding as string | number, 0);
+      const signatureHeight = parseCssNumber(
+        props.signatureHeight as string | number,
+        40
+      );
+      const labelWidth = textWidth(String(props.label || ''), fontSize);
+      const dateWidth = props.showDate
         ? textWidth('Date: ________________', fontSize)
         : 0;
-      const showLine = properties.showLine !== false;
+      const showLine = props.showLine !== false;
       const lineWidth = showLine
-        ? parseCssNumber(properties.lineWidth, 200)
+        ? parseCssNumber(props.lineWidth as string | number, 200)
         : 0;
-      const labelHeight = properties.label ? fontSize * 1.2 : 0;
+      const labelHeight = props.label ? fontSize * 1.2 : 0;
       const lineHeight = showLine
-        ? parseCssNumber(properties.lineThickness, 1) + 8
+        ? parseCssNumber(props.lineThickness as string | number, 1) + 8
         : 0;
-      const dateHeight = properties.showDate ? fontSize * 1.2 + 4 : 0;
+      const dateHeight = props.showDate ? fontSize * 1.2 + 4 : 0;
 
       return {
         width: Math.max(labelWidth, dateWidth, lineWidth) + padding * 2,

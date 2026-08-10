@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { PropertyEditorProps } from '../../types';
+import { PropertyEditorProps, SignatureBlock } from '../../types';
 import {
   AlignmentInput,
   CheckboxInput,
@@ -25,7 +25,7 @@ import { DesignerPxNumberInput, mergePxOrOmit } from './DesignerPxNumberInput';
 export function SignatureBlockProperties({
   block,
   onChange,
-}: PropertyEditorProps) {
+}: PropertyEditorProps<SignatureBlock>) {
   const [t] = useTranslation();
 
   const updateProperty = (key: string, value: unknown) => {

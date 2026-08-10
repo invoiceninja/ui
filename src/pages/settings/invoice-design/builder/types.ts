@@ -31,30 +31,18 @@ export type BlockType =
   | 'terms';
 
 export interface GridPosition {
-  x: number; // Grid column (0-11 for 12-column grid)
-  y: number; // Grid row
-  w: number; // Width in columns
-  h: number; // Height in rows
+  x: number;
+  y: number;
+  w: number;
+  h: number;
 }
-
-export interface Block {
-  id: string;
-  type: BlockType;
-  gridPosition: GridPosition;
-  properties: BlockProperties;
-  locked?: boolean; // Prevent accidental editing/deletion
-}
-
-// Flexible property type that allows any properties with type hints
-export type BlockProperties = Record<string, any>;
 
 export interface WidgetCssClassesHint {
   /** Optional whitespace-separated classes appended to the stable widget classes. */
   cssClasses?: string;
 }
 
-// Type hints for common block properties (not strict requirements)
-export interface TextBlockPropertiesHint {
+export interface TextBlockProperties extends WidgetCssClassesHint {
   content?: string;
   fontSize?: string;
   fontWeight?: string;
@@ -65,18 +53,22 @@ export interface TextBlockPropertiesHint {
   padding?: string;
 }
 
-export interface ImageBlockPropertiesHint {
+export interface ImageBlockProperties extends WidgetCssClassesHint {
   source?: string;
   align?: string;
   maxWidth?: string;
+  maxHeight?: string;
   objectFit?: string;
+  padding?: string;
 }
 
-export interface LogoBlockPropertiesHint {
+export interface LogoBlockProperties extends WidgetCssClassesHint {
   source?: string;
   align?: string;
   maxWidth?: string;
+  maxHeight?: string;
   objectFit?: string;
+  padding?: string;
 }
 
 export interface TableColumn {
@@ -87,10 +79,8 @@ export interface TableColumn {
   align: string;
 }
 
-/** Stored on table / tasks-table blocks (header vs body borders). */
 export interface TableRegionBordersHint {
   color?: string;
-  /** Pixel thickness 0–20 in 0.5px increments; string values are accepted when reading. */
   width?: number | string;
   sides?: {
     top?: boolean;
@@ -100,7 +90,7 @@ export interface TableRegionBordersHint {
   };
 }
 
-export interface TableBlockPropertiesHint {
+export interface TableBlockProperties extends WidgetCssClassesHint {
   columns?: TableColumn[];
   headerBg?: string;
   headerColor?: string;
@@ -109,14 +99,14 @@ export interface TableBlockPropertiesHint {
   alternateRowBg?: string;
   fontSize?: string;
   padding?: string;
-  /** Header row (`th`) border styling. */
   headerBorders?: TableRegionBordersHint;
-  /** Body rows (`td`) border styling. */
   rowBorders?: TableRegionBordersHint;
   alternateRows?: boolean;
+  rowColor?: string;
+  showBorders?: boolean;
 }
 
-export interface DividerBlockPropertiesHint {
+export interface DividerBlockProperties extends WidgetCssClassesHint {
   thickness?: string;
   color?: string;
   style?: string;
@@ -124,15 +114,10 @@ export interface DividerBlockPropertiesHint {
   marginBottom?: string;
 }
 
-export interface SpacerBlockPropertiesHint {
+export interface SpacerBlockProperties extends WidgetCssClassesHint {
   height?: string;
 }
 
-/**
- * Per-cell typography. Used for label and value cells in the row-based
- * blocks (invoice-details, total). All fields are optional. Totals use
- * these as the canonical typography settings for each row/cell.
- */
 export interface CellTypography {
   fontSize?: string;
   fontWeight?: string;
@@ -143,13 +128,11 @@ export interface CellTypography {
 export interface TotalItem {
   label: string;
   field: string;
-  show: boolean;
+  show?: boolean;
   isTotal?: boolean;
   isBalance?: boolean;
   labelStyle?: CellTypography;
   valueStyle?: CellTypography;
-  // Legacy flat fields - kept readable for back-compat with existing
-  // saved templates. New writes go to labelStyle / valueStyle.
   fontSize?: string;
   fontWeight?: string;
   color?: string;
@@ -157,7 +140,7 @@ export interface TotalItem {
   amountColor?: string;
 }
 
-export interface TotalBlockPropertiesHint {
+export interface TotalBlockProperties extends WidgetCssClassesHint {
   items?: TotalItem[];
   align?: string;
   labelAlign?: 'left' | 'center' | 'right';
@@ -168,22 +151,19 @@ export interface TotalBlockPropertiesHint {
   labelValueGap?: string;
   valueMinWidth?: string;
   showLabels?: boolean;
-  /**
-   * Page-break behaviour for the totals block.
-   *  - `true`  → force a page break before the block (always start on a new page)
-   *  - `false` → avoid breaking inside the block (keep it together on one page)
-   *  - undefined → renderer default (no page-break rule emitted)
-   */
   keepTogether?: boolean;
+  padding?: string;
 }
 
-export interface QRCodeBlockPropertiesHint {
+export interface QRCodeBlockProperties extends WidgetCssClassesHint {
   data?: string;
   size?: string;
   align?: string;
+  qrType?: string;
+  content?: string;
 }
 
-export interface SignatureBlockPropertiesHint {
+export interface SignatureBlockProperties extends WidgetCssClassesHint {
   label?: string;
   showLine?: boolean;
   showDate?: boolean;
@@ -209,20 +189,20 @@ export interface FieldConfig {
   hideIfEmpty?: boolean;
   labelStyle?: CellTypography;
   valueStyle?: CellTypography;
-  // Legacy flat fields - kept readable for back-compat with existing
-  // saved templates. New writes go to labelStyle / valueStyle.
   fontSize?: string;
   fontWeight?: string;
   color?: string;
   fontStyle?: string;
 }
 
-export interface ClientInfoBlockPropertiesHint {
+export interface ClientInfoBlockProperties extends WidgetCssClassesHint {
   fieldConfigs?: FieldConfig[];
+  content?: string;
   fontSize?: string;
   lineHeight?: string;
   align?: string;
   color?: string;
+  padding?: string;
   showTitle?: boolean;
   title?: string;
   titleFontSize?: string;
@@ -234,16 +214,16 @@ export interface ClientInfoBlockPropertiesHint {
   titleSuffix?: string;
 }
 
-/** Same shape as client-info; used for ship-to blocks with shipping-only fields. */
-export type ClientShippingInfoBlockPropertiesHint =
-  ClientInfoBlockPropertiesHint;
+export type ClientShippingInfoBlockProperties = ClientInfoBlockProperties;
 
-export interface CompanyInfoBlockPropertiesHint {
+export interface CompanyInfoBlockProperties extends WidgetCssClassesHint {
   fieldConfigs?: FieldConfig[];
+  content?: string;
   fontSize?: string;
   lineHeight?: string;
   align?: string;
   color?: string;
+  padding?: string;
   showTitle?: boolean;
   title?: string;
   titleFontSize?: string;
@@ -255,7 +235,7 @@ export interface CompanyInfoBlockPropertiesHint {
   titleSuffix?: string;
 }
 
-export interface InvoiceDetailsBlockPropertiesHint {
+export interface InvoiceDetailsBlockProperties extends WidgetCssClassesHint {
   fieldConfigs?: FieldConfig[];
   fontSize?: string;
   lineHeight?: string;
@@ -270,7 +250,152 @@ export interface InvoiceDetailsBlockPropertiesHint {
   labelValueGap?: string;
   rowSpacing?: string;
   valueMinWidth?: string;
+  padding?: string;
 }
+
+export type PublicNotesBlockProperties = TextBlockProperties;
+export type FooterBlockProperties = TextBlockProperties;
+export type TermsBlockProperties = TextBlockProperties;
+export type TasksTableBlockProperties = TableBlockProperties;
+
+/** @deprecated Use *Properties types instead. */
+export type TextBlockPropertiesHint = TextBlockProperties;
+/** @deprecated Use *Properties types instead. */
+export type ImageBlockPropertiesHint = ImageBlockProperties;
+/** @deprecated Use *Properties types instead. */
+export type LogoBlockPropertiesHint = LogoBlockProperties;
+/** @deprecated Use *Properties types instead. */
+export type TableBlockPropertiesHint = TableBlockProperties;
+/** @deprecated Use *Properties types instead. */
+export type DividerBlockPropertiesHint = DividerBlockProperties;
+/** @deprecated Use *Properties types instead. */
+export type SpacerBlockPropertiesHint = SpacerBlockProperties;
+/** @deprecated Use *Properties types instead. */
+export type TotalBlockPropertiesHint = TotalBlockProperties;
+/** @deprecated Use *Properties types instead. */
+export type QRCodeBlockPropertiesHint = QRCodeBlockProperties;
+/** @deprecated Use *Properties types instead. */
+export type SignatureBlockPropertiesHint = SignatureBlockProperties;
+/** @deprecated Use *Properties types instead. */
+export type ClientInfoBlockPropertiesHint = ClientInfoBlockProperties;
+/** @deprecated Use *Properties types instead. */
+export type ClientShippingInfoBlockPropertiesHint = ClientShippingInfoBlockProperties;
+/** @deprecated Use *Properties types instead. */
+export type CompanyInfoBlockPropertiesHint = CompanyInfoBlockProperties;
+/** @deprecated Use *Properties types instead. */
+export type InvoiceDetailsBlockPropertiesHint = InvoiceDetailsBlockProperties;
+
+export interface BaseBlock {
+  id: string;
+  gridPosition: GridPosition;
+  locked?: boolean;
+}
+
+export interface TextBlock extends BaseBlock {
+  type: 'text';
+  properties: TextBlockProperties;
+}
+
+export interface ImageBlock extends BaseBlock {
+  type: 'image';
+  properties: ImageBlockProperties;
+}
+
+export interface LogoBlock extends BaseBlock {
+  type: 'logo';
+  properties: LogoBlockProperties;
+}
+
+export interface TableBlock extends BaseBlock {
+  type: 'table';
+  properties: TableBlockProperties;
+}
+
+export interface TasksTableBlock extends BaseBlock {
+  type: 'tasks-table';
+  properties: TasksTableBlockProperties;
+}
+
+export interface DividerBlock extends BaseBlock {
+  type: 'divider';
+  properties: DividerBlockProperties;
+}
+
+export interface SpacerBlock extends BaseBlock {
+  type: 'spacer';
+  properties: SpacerBlockProperties;
+}
+
+export interface TotalBlock extends BaseBlock {
+  type: 'total';
+  properties: TotalBlockProperties;
+}
+
+export interface QRCodeBlock extends BaseBlock {
+  type: 'qrcode';
+  properties: QRCodeBlockProperties;
+}
+
+export interface SignatureBlock extends BaseBlock {
+  type: 'signature';
+  properties: SignatureBlockProperties;
+}
+
+export interface ClientInfoBlock extends BaseBlock {
+  type: 'client-info';
+  properties: ClientInfoBlockProperties;
+}
+
+export interface ClientShippingInfoBlock extends BaseBlock {
+  type: 'client-shipping-info';
+  properties: ClientShippingInfoBlockProperties;
+}
+
+export interface CompanyInfoBlock extends BaseBlock {
+  type: 'company-info';
+  properties: CompanyInfoBlockProperties;
+}
+
+export interface InvoiceDetailsBlock extends BaseBlock {
+  type: 'invoice-details';
+  properties: InvoiceDetailsBlockProperties;
+}
+
+export interface PublicNotesBlock extends BaseBlock {
+  type: 'public-notes';
+  properties: PublicNotesBlockProperties;
+}
+
+export interface FooterBlock extends BaseBlock {
+  type: 'footer';
+  properties: FooterBlockProperties;
+}
+
+export interface TermsBlock extends BaseBlock {
+  type: 'terms';
+  properties: TermsBlockProperties;
+}
+
+export type Block =
+  | TextBlock
+  | ImageBlock
+  | LogoBlock
+  | TableBlock
+  | TasksTableBlock
+  | DividerBlock
+  | SpacerBlock
+  | TotalBlock
+  | QRCodeBlock
+  | SignatureBlock
+  | ClientInfoBlock
+  | ClientShippingInfoBlock
+  | CompanyInfoBlock
+  | InvoiceDetailsBlock
+  | PublicNotesBlock
+  | FooterBlock
+  | TermsBlock;
+
+export type BlockProperties = Block['properties'];
 
 export interface LayoutConfig {
   cols: number;
@@ -317,13 +442,6 @@ export interface VariableGroup {
   variables: Variable[];
 }
 
-/**
- * Per-template document-level settings. Initially seeded from company.settings
- * but stored on the template so designs can override company defaults.
- *
- * Canonical type lives in `$app/common/interfaces/design` so both the builder
- * and any non-builder consumer (preview, future PDF tooling) share one shape.
- */
 export type { DocumentSettings } from '$app/common/interfaces/design';
 import type { DocumentSettings } from '$app/common/interfaces/design';
 
@@ -358,7 +476,6 @@ export function createDefaultDocumentSettings(
     embedDocuments: Boolean(companySettings?.embed_documents),
     hideEmptyColumns: Boolean(companySettings?.hide_empty_columns_on_pdf),
     pageNumbering: Boolean(companySettings?.page_numbering),
-    // Design-level only — not seeded from company.settings.
     pageMarginTop: 0,
     pageMarginRight: 0,
     pageMarginBottom: 0,
@@ -370,27 +487,16 @@ export function createDefaultDocumentSettings(
   };
 }
 
-// Builder state management
 export interface BuilderState {
   blocks: Block[];
   customCss: string;
   selectedBlockId: string | null;
-  history: BuilderHistoryEntry[];
-  historyIndex: number;
   zoom: number;
   templateId?: string;
   documentSettings: DocumentSettings;
-  /** Right-panel mode when no block is selected. */
   panelMode?: 'block' | 'document' | 'css';
 }
 
-export interface BuilderHistoryEntry {
-  blocks: Block[];
-  timestamp: number;
-  action: string;
-}
-
-// Property editor types
 export interface PropertyEditorProps<T = Block> {
   block: T;
   onChange: (block: T) => void;
