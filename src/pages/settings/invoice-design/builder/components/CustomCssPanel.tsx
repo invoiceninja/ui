@@ -5,6 +5,7 @@ import {
   INVOICE_WIDGET_CLASS,
   INVOICE_WIDGET_CLASS_BY_TYPE,
 } from '../constants/widget-classes';
+import { sanitizeCustomCss } from '../utils/custom-css';
 
 interface CustomCssPanelProps {
   value: string;
@@ -14,6 +15,7 @@ interface CustomCssPanelProps {
 export function CustomCssPanel({ value, onChange }: CustomCssPanelProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
+  const containsUnsafeCss = Boolean(value.trim()) && !sanitizeCustomCss(value);
 
   return (
     <div className="flex h-full min-h-[600px] flex-col">
@@ -29,6 +31,14 @@ export function CustomCssPanel({ value, onChange }: CustomCssPanelProps) {
           <code>{`.${INVOICE_WIDGET_CLASS_BY_TYPE.table}`}</code>. Properties
           already set by the designer may require <code>!important</code>.
         </p>
+        {containsUnsafeCss && (
+          <p className="text-xs leading-5 text-red-600" role="alert">
+            {t('custom_css_security_warning', {
+              defaultValue:
+                'This CSS contains an external resource or unsafe construct and will not be applied or saved.',
+            })}
+          </p>
+        )}
         <details className="text-xs" style={{ color: colors.$17 }}>
           <summary className="cursor-pointer select-none font-medium">
             Available widget selectors
