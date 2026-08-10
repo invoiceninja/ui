@@ -25,11 +25,12 @@ export function usePaymentTermsQuery(params: Params) {
       request(
         'GET',
         endpoint(
-          '/api/v1/payment_terms?per_page=:perPage&page=:currentPage&sort=:sort',
+          '/api/v1/payment_terms?per_page=:perPage&page=:currentPage&sort=:sort&status=:status',
           {
             perPage: params.perPage ?? 1000,
             currentPage: params.currentPage,
             sort: params.sort ?? 'id|asc',
+            status: params.status ?? 'all',
           }
         )
       ),

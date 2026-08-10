@@ -8,10 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { route } from '$app/common/helpers/route';
-import { DataTable } from '$app/components/DataTable';
+import { useProjectQuery } from '$app/common/queries/projects';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  ProjectSlider,
+  projectSliderAtom,
+  projectSliderVisibilityAtom,
+} from '../common/components/ProjectSlider';
+import {
+  DataTable,
+  dateRangeAtom,
+  filterColumnsValuesAtom,
+} from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
@@ -21,6 +32,11 @@ import {
   useCustomBulkActions,
   useProjectColumns,
 } from '../common/hooks';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { permission } from '$app/common/guards/guards/permission';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -29,22 +45,46 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Project } from '$app/common/interfaces/project';
-import { InputLabel } from '$app/components/forms';
+import { Button, InputLabel } from '$app/components/forms';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useAtom } from 'jotai';
+import { emitter } from '$app';
 
 export default function Projects() {
   useTitle('projects');
 
   const [t] = useTranslation();
   const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const pages = [{ name: t('projects'), href: '/projects' }];
 
   const actions = useActions();
-  const columns = useProjectColumns();
   const reactSettings = useReactSettings();
+  const selectedColumns =
+    reactSettings?.react_table_columns?.project || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const columns = useProjectColumns();
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.project,
+    'project_tag_ids',
+    { enabled: shouldShowTagFilter }
+  );
   const projectColumns = useAllProjectColumns();
   const customBulkActions = useCustomBulkActions();
+
+  const [dateRangeEntries, setDateRangeEntries] = useAtom(dateRangeAtom);
+  const [filterColumnsValues, setFilterColumnsValues] = useAtom(
+    filterColumnsValuesAtom
+  );
+
+  const [sliderProjectId, setSliderProjectId] = useState<string>('');
+  const [projectSlider, setProjectSlider] = useAtom(projectSliderAtom);
+  const [projectSliderVisibility, setProjectSliderVisibility] = useAtom(
+    projectSliderVisibilityAtom
+  );
+
+  const { data: projectResponse } = useProjectQuery({ id: sliderProjectId });
 
   const {
     changeTemplateVisible,
@@ -52,10 +92,39 @@ export default function Projects() {
     changeTemplateResources,
   } = useChangeTemplate();
 
-  const queryInclusionEntities = useMemo(() => {
-    const selectedColumns =
-      reactSettings?.react_table_columns?.project || defaultColumns;
+  useEffect(() => {
+    setProjectSlider(null);
+  }, [sliderProjectId]);
 
+  useEffect(() => {
+    if (projectResponse && projectSliderVisibility) {
+      setProjectSlider(projectResponse);
+    }
+  }, [projectResponse, projectSliderVisibility]);
+
+  useEffect(() => {
+    return () => setProjectSliderVisibility(false);
+  }, []);
+
+  useTagFilterCleanup(shouldShowTagFilter, 'project_tag_ids');
+
+  const currentFilterColumnsCount = useMemo(
+    () =>
+      filterColumns.filter(
+        (column) => (filterColumnsValues[column.column_id] || []).length > 0
+      ).length,
+    [filterColumns, filterColumnsValues]
+  );
+
+  const currentDateRangeColumnsCount = useMemo(
+    () =>
+      dateRangeEntries.filter(
+        (entry) => entry.startDate.length > 0 && entry.endDate.length > 0
+      ).length,
+    [dateRangeEntries]
+  );
+
+  const queryInclusionEntities = useMemo(() => {
     let value = 'client';
 
     if (selectedColumns.includes('user')) {
@@ -66,33 +135,62 @@ export default function Projects() {
       value += ',assigned_user';
     }
 
+    if (selectedColumns.includes('tags')) {
+      value += ',tags';
+    }
+
     return value;
-  }, [reactSettings?.react_table_columns?.project]);
+  }, [selectedColumns]);
 
   return (
     <Default title={t('projects')} breadcrumbs={pages} docsLink="en/projects/">
       <DataTable
         resource="project"
         endpoint={route(
-          '/api/v1/projects?status=active&include=:include&without_deleted_clients=true&sort=id|desc',
+          shouldShowTagFilter
+            ? '/api/v1/projects?status=active&include=:include&without_deleted_clients=true&sort=id|desc'
+            : '/api/v1/projects?status=active&include=:include&without_deleted_clients=true&sort=id|desc&tag_ids=',
           { include: queryInclusionEntities }
         )}
         bulkRoute="/api/v1/projects/bulk"
         columns={columns}
         customActions={actions}
         customBulkActions={customBulkActions}
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         linkToCreate="/projects/create"
         linkToEdit="/projects/:id/edit"
         withResourcefulActions
         rightSide={
-          <DataTableColumnsPicker
-            columns={projectColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="project"
-          />
+          <div className="flex items-center space-x-2">
+            {(currentFilterColumnsCount > 0 ||
+              currentDateRangeColumnsCount > 0) && (
+              <Button
+                type="secondary"
+                behavior="button"
+                onClick={() => {
+                  setFilterColumnsValues({});
+                  setDateRangeEntries([]);
+                  emitter.emit('date_range_picker.clear');
+                }}
+              >
+                {t('clear_filters')} (
+                {currentFilterColumnsCount + currentDateRangeColumnsCount})
+              </Button>
+            )}
+
+            <DataTableColumnsPicker
+              columns={projectColumns as unknown as string[]}
+              defaultColumns={defaultColumns}
+              table="project"
+            />
+          </div>
         }
         linkToCreateGuards={[permission('create_project')]}
         hideEditableOptions={!hasPermission('edit_project')}
+        onTableRowClick={(project) => {
+          setSliderProjectId(project.id);
+          setProjectSliderVisibility(true);
+        }}
         enableSavingFilterPreference
         dateRangeColumns={[
           {
@@ -104,6 +202,8 @@ export default function Projects() {
         ]}
         enableSavingLatestDataForNavigation
       />
+
+      {!disableNavigation('project', projectSlider) && <ProjectSlider />}
 
       <ChangeTemplateModal<Project>
         entity="project"

@@ -124,6 +124,7 @@ export function RecentPayments() {
           withoutPagination
           withoutPadding
           withoutPerPageAsPreference
+          withoutStoringPreferences
           styleOptions={{
             withoutBottomBorder: true,
             withoutTopBorder: true,

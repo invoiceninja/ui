@@ -79,6 +79,7 @@ export const gatewaysDetails = [
   { name: 'eway', key: '944c20175bbe6b9972c05bcfe294c2c7' },
   { name: 'btcpay', key: 'vpyfbmdrkqcicpkjqdusgjfluebftuva' },
   { name: 'blockonomics', key: 'wbhf02us6owgo7p4nfjd0ymssdshks4d' },
+  { name: 'payware', key: 'b0a6294fca4488c2bab58f3e11e3c623' },
 ];
 
 const hostedGatewayFilter = [
@@ -387,7 +388,7 @@ export function Create() {
           <>
             {tabIndex === 1 && (
               <button
-                style={{ color: '#0062FF' }}
+                style={{ color: accentColor }}
                 type="button"
                 onClick={() =>
                   $help('gateways', {
@@ -404,7 +405,7 @@ export function Create() {
 
             {tabIndex === 3 && (
               <button
-                style={{ color: '#0062FF' }}
+                style={{ color: accentColor }}
                 type="button"
                 onClick={() =>
                   $help('gateways', {

@@ -26,6 +26,7 @@ export interface Payload {
   categories?: string;
   projects?: string;
   vendors?: string;
+  tag_ids?: string;
   include_deleted?: boolean;
   pdf_email_attachment?: boolean;
   activity_type_id?: string;
@@ -454,6 +455,7 @@ export function useReports() {
         include_deleted: false,
         status: '',
         client_id: '',
+        tag_ids: '',
       },
       preview: '/api/v1/reports/tasks?output=json',
       supports_previews: true,
@@ -672,6 +674,7 @@ export function useReports() {
         include_tax: false,
         clients: '',
         projects: '',
+        tag_ids: '',
       },
       preview: '/api/v1/reports/project?output=json',
       supports_previews: false,

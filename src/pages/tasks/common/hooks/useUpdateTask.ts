@@ -39,7 +39,6 @@ export function useUpdateTask(params: Params) {
 
       request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task)
         .then(() => {
-          
           toast.success('updated_task');
           $refetch(['tasks']);
         })

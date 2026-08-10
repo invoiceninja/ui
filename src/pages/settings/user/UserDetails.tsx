@@ -20,7 +20,7 @@ import {
 import { RootState } from '$app/common/stores/store';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { Tabs } from '$app/components/Tabs';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
@@ -32,8 +32,11 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { useAtom } from 'jotai';
-import { usePreferences } from '$app/common/hooks/usePreferences';
+import { useAtom, useAtomValue } from 'jotai';
+import {
+  reactSettingsAtom,
+  useUserDetailsDraft,
+} from '$app/common/hooks/useReactSettings';
 import { TwoFactorAuthenticationModals } from './common/components/TwoFactorAuthenticationModals';
 import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -73,8 +76,24 @@ export function UserDetails() {
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const userState = useSelector((state: RootState) => state.user);
+  const rawReactSettings = useAtomValue(reactSettingsAtom);
+  const isReactSettingsHydrated = rawReactSettings !== null;
+  const userDetailsDraft = useUserDetailsDraft();
 
-  const { save } = usePreferences();
+  useLayoutEffect(() => {
+    if (isReactSettingsHydrated) {
+      userDetailsDraft.begin();
+    }
+
+    return () => {
+      userDetailsDraft.discard();
+    };
+  }, [user?.id, isReactSettingsHydrated, userDetailsDraft]);
+
+  const resetUserDetailsDraft = () => {
+    userDetailsDraft.discard();
+    userDetailsDraft.begin();
+  };
 
   const onSave = (password: string, passwordIsRequired: boolean) => {
     if (isFormBusy) {
@@ -86,17 +105,24 @@ export function UserDetails() {
     toast.processing();
     setErrors(undefined);
 
-    const requests = [
+    // `react_settings` is owned by the dedicated `/preferences` endpoint.
+    const userChanges = { ...userState.changes };
+    if (userChanges.company_user) {
+      userChanges.company_user = { ...userChanges.company_user };
+      delete userChanges.company_user.react_settings;
+    }
+
+    const userRequests = [
       request(
         'PUT',
         endpoint('/api/v1/users/:id?include=company_user', { id: user!.id }),
-        userState.changes,
+        userChanges,
         { headers: { 'X-Api-Password': password } }
       ),
     ];
 
     if (isAdmin) {
-      requests.push(
+      userRequests.push(
         request(
           'PUT',
           endpoint('/api/v1/companies/:id', { id: company?.id }),
@@ -105,10 +131,21 @@ export function UserDetails() {
       );
     }
 
-    axios
-      .all(requests)
+    let preferencesFlushed = true;
+
+    userDetailsDraft
+      .commit()
+      .catch(() => {
+        preferencesFlushed = false;
+      })
+      .then(() => axios.all(userRequests))
       .then((response) => {
-        toast.success('updated_settings');
+        if (preferencesFlushed) {
+          toast.success('updated_settings');
+          userDetailsDraft.begin();
+        } else {
+          toast.error();
+        }
 
         $refetch(['users']);
 
@@ -117,15 +154,17 @@ export function UserDetails() {
           setHasLanguageIdChanged(false);
         }
 
+        const userResponse = response[0];
+
         if (
-          response[0].data.data.phone !== user?.phone &&
+          userResponse.data.data.phone !== user?.phone &&
           user?.google_2fa_secret &&
-          !response[0].data.data.verified_phone_number
+          !userResponse.data.data.verified_phone_number
         ) {
           setCheckVerification(true);
         }
 
-        dispatch(updateUser(response[0].data.data));
+        dispatch(updateUser(userResponse.data.data));
         dispatch(resetChanges());
 
         window.dispatchEvent(new CustomEvent('user.updated'));
@@ -150,8 +189,6 @@ export function UserDetails() {
         }
       })
       .finally(() => setIsFormBusy(false));
-
-    save({ silent: true });
   };
 
   useEffect(() => {
@@ -162,7 +199,10 @@ export function UserDetails() {
     <>
       <Settings
         onSaveClick={() => setPasswordConfirmModalOpen(true)}
-        onCancelClick={() => dispatch(resetChanges())}
+        onCancelClick={() => {
+          dispatch(resetChanges());
+          resetUserDetailsDraft();
+        }}
         title={t('user_details')}
         breadcrumbs={pages}
         docsLink="en/basic-settings/#user_details"

@@ -60,7 +60,7 @@ export function useHandleProductChange(props: Props) {
       } else {
         lineItem.quantity = company?.default_quantity
           ? 1
-          : product?.quantity ?? 1;
+          : (product?.quantity ?? 1);
       }
 
       if (resource.client_id) {

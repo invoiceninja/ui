@@ -19,6 +19,25 @@ import {
 import { authenticate } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
 import { useQueryClient } from 'react-query';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+
+export type LoginMethod = 'password' | 'totp' | 'passkey';
+
+export interface LoginPrecheck {
+  methods?: LoginMethod[];
+  secret_required?: boolean;
+}
+
+export function useLoginPrecheck() {
+  return (email: string) => {
+    return request('POST', endpoint('/api/v1/login/precheck'), { email }).then(
+      (response: AxiosResponse<LoginPrecheck>) => {
+        return response.data;
+      }
+    );
+  };
+}
 
 export function useLogin() {
   const dispatch = useDispatch();

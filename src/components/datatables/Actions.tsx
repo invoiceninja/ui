@@ -28,6 +28,7 @@ import React, {
   useRef,
   useState,
   useCallback,
+  useEffect,
 } from 'react';
 import { useColorScheme } from '$app/common/colors';
 import collect from 'collect.js';
@@ -37,6 +38,7 @@ import classNames from 'classnames';
 import { useClickAway } from 'react-use';
 import styled from 'styled-components';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { getMultiSelectDefaultValueKey } from './multiSelectDefaultValueKey';
 
 export interface SelectOption {
   value: string;
@@ -193,6 +195,17 @@ export function SelectWithApplyButton(props: any) {
   } = props;
 
   const [tempValue, setTempValue] = useState(defaultValue);
+  const defaultValueKey = getMultiSelectDefaultValueKey(defaultValue);
+  const previousDefaultValueKey = useRef(defaultValueKey);
+
+  useEffect(() => {
+    if (previousDefaultValueKey.current === defaultValueKey) {
+      return;
+    }
+
+    previousDefaultValueKey.current = defaultValueKey;
+    setTempValue(defaultValue ?? []);
+  }, [defaultValue, defaultValueKey]);
 
   const CustomMenu = useCallback((menuProps: MenuProps<SelectOption, true>) => {
     const [t] = useTranslation();
@@ -220,6 +233,7 @@ export function SelectWithApplyButton(props: any) {
               className={classNames('w-1/2 rounded-md text-sm font-medium', {
                 border: reactSettings?.dark_mode,
               })}
+              type="button"
               onClick={handleReset}
               theme={{
                 textColor: colors.$3,
@@ -231,6 +245,7 @@ export function SelectWithApplyButton(props: any) {
 
             <Button
               className="w-1/2 rounded-md font-medium"
+              behavior="button"
               onClick={handleApply}
             >
               {t('apply')}
@@ -411,7 +426,7 @@ export function Actions(props: Props) {
             onValueChange={(value) =>
               props.onFilterChange && props.onFilterChange(value)
             }
-            debounceTimeout={300}
+            debounceTimeout={500}
             clearable
           />
         </div>

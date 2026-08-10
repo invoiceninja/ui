@@ -37,14 +37,13 @@ export function RectifyInvoiceModal({ visible, onClose, onConfirm }: Props) {
   };
 
   return (
-    <Modal
-      title="Rectificar factura"
-      visible={visible}
-      onClose={handleClose}
-    >
+    <Modal title="Rectificar factura" visible={visible} onClose={handleClose}>
       <div className="flex items-center">
         <Icon element={MdOutlineWarning} color="orange" size={48} />
-        <span className="font-medium text-sm ml-2 text-orange-500">Esto le permitirá crear una factura rectificativa parcial por una parte del importe de la factura.</span>
+        <span className="font-medium text-sm ml-2 text-orange-500">
+          Esto le permitirá crear una factura rectificativa parcial por una
+          parte del importe de la factura.
+        </span>
       </div>
       <InputField
         label="Motivo de la rectificación"
@@ -54,20 +53,13 @@ export function RectifyInvoiceModal({ visible, onClose, onConfirm }: Props) {
         required
       />
       <div className="flex justify-end space-x-2 mt-4">
-        <Button
-          type="secondary"
-          onClick={handleClose}
-        >
+        <Button type="secondary" onClick={handleClose}>
           {t('cancel')}
         </Button>
-        <Button
-          onClick={handleConfirm}
-          disabled={!rectificationReason.trim()}
-        >
+        <Button onClick={handleConfirm} disabled={!rectificationReason.trim()}>
           {t('confirm')}
         </Button>
       </div>
     </Modal>
   );
 }
-

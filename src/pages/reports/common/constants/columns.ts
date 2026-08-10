@@ -41,3 +41,40 @@ export const numberFormattableColumns = [
   '.applied',
   '.rate',
 ];
+
+export const summableColumns = [
+  '.amount',
+  '.foreign_amount',
+  '.subtotal',
+  '.balance',
+  '.paid_to_date',
+  '.credit_balance',
+  '.payment_balance',
+  '.discount',
+  '.partial',
+  '.refunded',
+  '.applied',
+
+  '.custom_surcharge1',
+  '.custom_surcharge2',
+  '.custom_surcharge3',
+  '.custom_surcharge4',
+
+  '.total_taxes',
+  '.tax_amount',
+  '.tax_amount1',
+  '.tax_amount2',
+  '.tax_amount3',
+
+  '.quantity',
+  '.cost',
+
+  '.price',
+  '.in_stock_quantity',
+
+  '.duration',
+];
+
+export const isSummableColumn = (identifier: string) => {
+  return summableColumns.some((suffix) => identifier.endsWith(suffix));
+};

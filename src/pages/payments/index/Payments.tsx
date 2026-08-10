@@ -18,6 +18,11 @@ import {
   useAllPaymentColumns,
   usePaymentColumns,
 } from '../common/hooks/usePaymentColumns';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useActions } from '../common/hooks/useActions';
 import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
@@ -46,6 +51,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { Guard } from '$app/common/guards/Guard';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { InputLabel } from '$app/components/forms';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export default function Payments() {
   useTitle('payments');
@@ -58,10 +64,22 @@ export default function Payments() {
   const actions = useActions();
   const filters = usePaymentFilters();
   const columns = usePaymentColumns();
+  const reactSettings = useReactSettings();
   const paymentColumns = useAllPaymentColumns();
   const customBulkActions = useCustomBulkActions();
 
   const pages: Page[] = [{ name: t('payments'), href: '/payments' }];
+
+  const selectedColumns =
+    reactSettings?.react_table_columns?.payment || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.payment,
+    'payment_tag_ids',
+    { enabled: shouldShowTagFilter }
+  );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'payment_tag_ids');
 
   const [sliderPaymentId, setSliderPaymentId] = useState<string>('');
   const [paymentSlider, setPaymentSlider] = useAtom(paymentSliderAtom);
@@ -100,7 +118,11 @@ export default function Payments() {
       <DataTable
         resource="payment"
         columns={columns}
-        endpoint="/api/v1/payments?include=client,invoices&without_deleted_clients=true&sort=id|desc"
+        endpoint={`/api/v1/payments?include=client,invoices${
+          shouldShowTagFilter ? ',tags' : ''
+        }&without_deleted_clients=true&sort=id|desc${
+          shouldShowTagFilter ? '' : '&tag_ids='
+        }`}
         linkToCreate="/payments/create"
         bulkRoute="/api/v1/payments/bulk"
         linkToEdit="/payments/:id/edit"
@@ -109,6 +131,7 @@ export default function Payments() {
         customFilters={filters}
         customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         showRestore={(resource: Payment) => !resource.is_deleted}
         rightSide={
           <div className="flex items-center space-x-2">

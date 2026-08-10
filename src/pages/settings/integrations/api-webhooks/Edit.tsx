@@ -217,7 +217,7 @@ export function Edit() {
                   }
                 )}
                 onClick={() => {
-                  if (Boolean(!header.key) || Boolean(!header.value)) {
+                  if (!header.key || !header.value) {
                     return;
                   }
 

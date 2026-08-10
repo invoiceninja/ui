@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { TAG_ENTITY_TYPES, TagEntityType } from '$app/common/interfaces/tag';
 import { Identifier } from '../useReports';
 
 type Field =
@@ -20,6 +21,7 @@ type Field =
   | 'clients'
   | 'vendors'
   | 'projects'
+  | 'tags'
   | 'categories'
   | 'include_deleted'
   | 'client'
@@ -104,6 +106,7 @@ const ReportFields: Record<Identifier, Field[]> = {
     'include_deleted',
     'status',
     'client',
+    'tags',
     'template_id',
     'group_by',
   ],
@@ -125,10 +128,16 @@ const ReportFields: Record<Identifier, Field[]> = {
     'template_id',
     'group_by',
   ],
-  project: ['clients', 'projects', 'group_by'],
+  project: ['clients', 'projects', 'tags', 'group_by'],
   activity: ['activity_type_id', 'group_by'],
   contact: ['group_by'],
-  recurring_invoice: ['include_deleted', 'status', 'client', 'template_id', 'group_by'],
+  recurring_invoice: [
+    'include_deleted',
+    'status',
+    'client',
+    'template_id',
+    'group_by',
+  ],
   recurring_invoice_item: [
     'document_email_attachment',
     'product_key',
@@ -143,11 +152,36 @@ const ReportFields: Record<Identifier, Field[]> = {
   aged_receivable_summary_report: ['group_by'],
   client_balance_report: ['group_by'],
   client_sales_report: ['group_by'],
-  profitloss: ['is_expense_billed', 'is_income_billed', 'include_tax', 'group_by'],
+  profitloss: [
+    'is_expense_billed',
+    'is_income_billed',
+    'include_tax',
+    'group_by',
+  ],
   tax_summary_report: ['group_by'],
   tax_period_report: ['is_income_billed', 'group_by'],
   user_sales_report: ['group_by'],
 };
+
+export const REPORT_TAG_ENTITY_TYPES: Partial<Record<Identifier, TagEntityType>> =
+  {
+    client: TAG_ENTITY_TYPES.client,
+    invoice: TAG_ENTITY_TYPES.invoice,
+    invoice_item: TAG_ENTITY_TYPES.invoice,
+    quote: TAG_ENTITY_TYPES.quote,
+    quote_item: TAG_ENTITY_TYPES.quote,
+    credit: TAG_ENTITY_TYPES.credit,
+    payment: TAG_ENTITY_TYPES.payment,
+    expense: TAG_ENTITY_TYPES.expense,
+    task: TAG_ENTITY_TYPES.task,
+    product: TAG_ENTITY_TYPES.product,
+    vendor: TAG_ENTITY_TYPES.vendor,
+    purchase_order: TAG_ENTITY_TYPES.purchaseOrder,
+    purchase_order_item: TAG_ENTITY_TYPES.purchaseOrder,
+    recurring_invoice: TAG_ENTITY_TYPES.recurringInvoice,
+    recurring_invoice_item: TAG_ENTITY_TYPES.recurringInvoice,
+    project: TAG_ENTITY_TYPES.project,
+  };
 
 interface Params {
   report: Identifier;
@@ -157,6 +191,10 @@ export function useShowReportField(params: Params) {
   const { report } = params;
 
   return (field: Field) => {
+    if (field === 'tags') {
+      return report in REPORT_TAG_ENTITY_TYPES;
+    }
+
     return Boolean(ReportFields[report].includes(field));
   };
 }

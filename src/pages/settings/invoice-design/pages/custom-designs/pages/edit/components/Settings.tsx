@@ -294,7 +294,7 @@ export default function Settings() {
 
         {!payload.design?.is_template && (
           <>
-            <Element leftSide={t('entity')}>
+            <Element leftSide={t('type')}>
               <SelectField
                 value={entityValue}
                 onValueChange={(value) =>

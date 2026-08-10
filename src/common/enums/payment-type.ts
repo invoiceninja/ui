@@ -60,4 +60,5 @@ export const enum PaymentType {
   GOOGLE_WALLET = '14',
   MONEY_ORDER = '26',
   SWISH = '24',
+  MOBILE_PAYMENT = '53',
 }

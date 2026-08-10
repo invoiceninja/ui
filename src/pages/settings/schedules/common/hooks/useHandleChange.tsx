@@ -43,6 +43,7 @@ export const DEFAULT_SCHEDULE_PARAMETERS: Parameters = {
   client_id: '',
   vendors: '',
   projects: '',
+  tag_ids: '',
   categories: '',
   report_keys: [],
   pdf_email_attachment: false,

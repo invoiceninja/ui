@@ -36,9 +36,7 @@ export function CustomDesignsPlanAlert(props?: CommonProps) {
 
               {user?.company_user && (
                 <Link
-                  to={
-                    route('/settings/account_management')
-                  }
+                  to={route('/settings/account_management')}
                   className="ml-10"
                 >
                   {t('plan_change')}

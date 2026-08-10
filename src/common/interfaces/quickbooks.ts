@@ -18,6 +18,7 @@ export interface Quickbooks {
   companyName: string;
   settings: QuickbooksSettings;
   requires_reconnect: boolean;
+  allow_deposit?: boolean | null; // QBO Sales > Deposit preference
 }
 
 export interface QuickbooksSettings {

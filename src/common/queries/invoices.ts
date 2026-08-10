@@ -43,7 +43,7 @@ export function useInvoiceQuery(params: InvoiceQueryParams) {
       request(
         'GET',
         endpoint(
-          `/api/v1/invoices/:id?include=payments,client.group_settings&show_schedule=true${isLockedParam}`,
+          `/api/v1/invoices/:id?include=paymentables,payments,client.group_settings&show_schedule=true${isLockedParam}`,
           {
             id: params.id,
           }
@@ -71,7 +71,7 @@ export function useBlankInvoiceQuery(options?: GenericQueryOptions) {
       ...options,
       staleTime: Infinity,
       enabled: hasPermission('create_invoice')
-        ? options?.enabled ?? true
+        ? (options?.enabled ?? true)
         : false,
     }
   );

@@ -71,7 +71,10 @@ import { useColorScheme } from '$app/common/colors';
 import { useDebounce } from 'react-use';
 import { cloneDeep, get, isEqual } from 'lodash';
 import { FilterColumn } from './FilterColumn';
-import { buildDateRangeQueryParameter } from '$app/common/helpers/data-table';
+import {
+  buildDateRangeQueryParameter,
+  normalizeColumnName,
+} from '$app/common/helpers/data-table';
 import { Resource } from './PreviousNextNavigation';
 
 export interface DateRangeColumn {
@@ -88,6 +91,7 @@ export interface DateRangeEntry {
 }
 
 export type DataTableColumns<T = any> = {
+  column?: string;
   id: string;
   label: string;
   format?: (field: string | number, resource: T) => unknown;
@@ -95,6 +99,7 @@ export type DataTableColumns<T = any> = {
 }[];
 
 export type FooterColumns<T = any> = {
+  column: string;
   id: string;
   label: string;
   format: (
@@ -157,6 +162,7 @@ interface Props<T> extends CommonProps {
   customBulkActions?: CustomBulkAction<T>[];
   customFilters?: SelectOption[];
   customFilterPlaceholder?: string;
+  defaultCustomFilterValues?: string[];
   withoutActions?: boolean;
   withoutPagination?: boolean;
   rightSide?: ReactNode;
@@ -189,6 +195,8 @@ interface Props<T> extends CommonProps {
   footerColumns?: FooterColumns;
   withoutPerPageAsPreference?: boolean;
   withoutPageAsPreference?: boolean;
+  withoutStoringPreferences?: boolean;
+  withRecordScopedFilters?: boolean;
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
   enableSavingFilterPreference?: boolean;
@@ -281,6 +289,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   const {
     styleOptions,
     customFilters,
+    defaultCustomFilterValues,
     onBulkActionCall,
     hideEditableOptions = false,
     dateRangeColumns = [],
@@ -298,6 +307,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     totalRecordsPropPath,
     onDeleteBulkAction,
     withoutPageAsPreference = false,
+    withoutStoringPreferences = false,
+    withRecordScopedFilters = false,
     filterColumns,
     onSelectedResourcesChange,
     preSelected = [],
@@ -319,9 +330,11 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const [filter, setFilter] = useState<string>('');
   const [customFilter, setCustomFilter] = useState<string[] | undefined>(
-    undefined
+    defaultCustomFilterValues
   );
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(
+    Number(apiEndpoint.searchParams.get('page')) || 1
+  );
   const [perPage, setPerPage] = useState<PerPage>(
     (apiEndpoint.searchParams.get('per_page') as PerPage) || '10'
   );
@@ -329,7 +342,9 @@ export function DataTable<T extends object>(props: Props<T>) {
     apiEndpoint.searchParams.get('sort') || 'id|asc'
   );
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
-  const [status, setStatus] = useState<string[]>(['active']);
+  const [status, setStatus] = useState<string[]>(
+    apiEndpoint.searchParams.get('status')?.split(',') || ['active']
+  );
   const [dateRangeEntries, setDateRangeEntries] = useAtom(dateRangeAtom);
   const [dateRangeQueryParameter, setDateRangeQueryParameter] =
     useState<string>('');
@@ -347,22 +362,46 @@ export function DataTable<T extends object>(props: Props<T>) {
   );
   const [selectedResources, setSelectedResources] = useState<T[]>([]);
 
+  const setStatusIfChanged = useCallback<Dispatch<SetStateAction<string[]>>>(
+    (value) => {
+      setStatus((current) => {
+        const next = value instanceof Function ? value(current) : value;
+
+        return isEqual(current, next) ? current : next;
+      });
+    },
+    []
+  );
+
+  const setCustomFilterIfChanged = useCallback<
+    Dispatch<SetStateAction<string[] | undefined>>
+  >((value) => {
+    setCustomFilter((current) => {
+      const next = value instanceof Function ? value(current) : value;
+
+      return isEqual(current ?? [], next ?? []) ? current : next;
+    });
+  }, []);
+
   const { handleUpdateTableFilters } = useDataTablePreferences({
     apiEndpoint,
     isInitialConfiguration,
     customFilter,
     setCurrentPage,
-    setCustomFilter,
+    setCustomFilter: setCustomFilterIfChanged,
     setFilter,
     setPerPage,
     setSort,
     setSortedBy,
-    setStatus,
+    setStatus: setStatusIfChanged,
     setArePreferencesApplied,
     tableKey: `${props.resource}s`,
     customFilters,
+    defaultCustomFilterValues,
     withoutStoringPerPage: withoutPerPageAsPreference,
     withoutStoringPage: withoutPageAsPreference,
+    withoutStoringPreferences,
+    withRecordScopedFilters,
     enableSavingFilterPreference,
   });
 
@@ -376,6 +415,9 @@ export function DataTable<T extends object>(props: Props<T>) {
     tableKey: `${props.resource}s`,
     customFilter,
     customFilters,
+    defaultCustomFilterValues,
+    withoutStoringPreferences,
+    withRecordScopedFilters,
   });
 
   const normalizeNumericCommas = (value: string): string => {
@@ -446,7 +488,19 @@ export function DataTable<T extends object>(props: Props<T>) {
       apiEndpoint.searchParams.set('sort', sort);
     }
 
-    apiEndpoint.searchParams.set('status', status as unknown as string);
+    const customStatusValues = (customFilters || [])
+      .filter(
+        (currentFilter) =>
+          currentFilter.queryKey === 'status' &&
+          customFilter?.includes(currentFilter.value)
+      )
+      .map((currentFilter) => currentFilter.value);
+
+    const mergedStatusValues = Array.from(
+      new Set([...(status as string[]), ...customStatusValues])
+    );
+
+    apiEndpoint.searchParams.set('status', mergedStatusValues.join(','));
 
     dateRangeColumns.forEach((dateRangeColumn) => {
       apiEndpoint.searchParams.delete(dateRangeColumn.queryParameterKey);
@@ -606,7 +660,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     const route =
       useDeleteMethod && action === 'delete'
         ? deleteBulkRoute
-        : props.bulkRoute ?? `${props.endpoint}/bulk`;
+        : (props.bulkRoute ?? `${props.endpoint}/bulk`);
 
     const updatedIds = { ids: id ? [id] : Array.from(selected) };
 
@@ -727,14 +781,22 @@ export function DataTable<T extends object>(props: Props<T>) {
     [dateRangeEntries]
   );
 
-  const getFooterColumn = (columnId: string) => {
-    return footerColumns.find((footerColumn) => footerColumn.id === columnId);
+  const getFooterColumn = (columnKey: string | undefined) => {
+    if (!columnKey) {
+      return undefined;
+    }
+
+    return footerColumns.find(
+      (footerColumn) =>
+        normalizeColumnName(footerColumn.column) ===
+        normalizeColumnName(columnKey)
+    );
   };
 
   const getColumnValues = (columnId: string) => {
     return currentData.map(
       (resource: T) => resource[columnId as keyof typeof resource]
-    );
+    ) as (string | number)[];
   };
 
   const handleCheckboxClick = useCallback(
@@ -897,10 +959,10 @@ export function DataTable<T extends object>(props: Props<T>) {
           options={options}
           defaultOptions={defaultOptions}
           defaultCustomFilterOptions={defaultCustomFilterOptions}
-          onStatusChange={setStatus}
+          onStatusChange={setStatusIfChanged}
           customFilters={props.customFilters}
           customFilterPlaceholder={props.customFilterPlaceholder}
-          onCustomFilterChange={setCustomFilter}
+          onCustomFilterChange={setCustomFilterIfChanged}
           customFilter={customFilter}
           rightSide={
             <>
@@ -1317,18 +1379,20 @@ export function DataTable<T extends object>(props: Props<T>) {
               <TFooter>
                 {!props.withoutActions && !hideEditableOptions && <Th></Th>}
 
-                {props.columns.map(
-                  (column, index) =>
+                {props.columns.map((column, index) => {
+                  const footerColumn = getFooterColumn(column.column);
+
+                  return (
                     Boolean(!excludeColumns.includes(column.id)) && (
                       <Td
                         key={index}
                         customizeTextColor
                         resizable={`${apiEndpoint.pathname}.${column.id}`}
                       >
-                        {getFooterColumn(column.id) ? (
+                        {footerColumn ? (
                           <div className="flex items-center space-x-3">
-                            {getFooterColumn(column.id)?.format(
-                              getColumnValues(column.id) as (string | number)[],
+                            {footerColumn.format(
+                              getColumnValues(footerColumn.id),
                               currentData || []
                             ) ?? '-/-'}
                           </div>
@@ -1337,7 +1401,8 @@ export function DataTable<T extends object>(props: Props<T>) {
                         )}
                       </Td>
                     )
-                )}
+                  );
+                })}
 
                 {props.withResourcefulActions && !hideEditableOptions && (
                   <Th></Th>
@@ -1363,6 +1428,7 @@ export function DataTable<T extends object>(props: Props<T>) {
               ? get(data, totalRecordsPropPath)
               : data.data.meta.pagination.total
           }
+          pagination={data.data.meta?.pagination}
         />
       )}
     </div>

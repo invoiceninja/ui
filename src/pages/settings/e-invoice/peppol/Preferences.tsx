@@ -224,8 +224,10 @@ export function Preferences() {
         )}
 
         {company.legal_entity_id && (
-          <Element leftSide={t('e_invoice_forward_email')}
-          leftSideHelp={t('e_invoice_forward_email_help')}>
+          <Element
+            leftSide={t('e_invoice_forward_email')}
+            leftSideHelp={t('e_invoice_forward_email_help')}
+          >
             <InputField
               value={company?.settings.e_invoice_forward_email || ''}
               onValueChange={(value) =>
@@ -237,8 +239,10 @@ export function Preferences() {
         )}
 
         {company.legal_entity_id && (
-          <Element leftSide={t('e_expense_forward_email')}
-          leftSideHelp={t('e_expense_forward_email_help')}>
+          <Element
+            leftSide={t('e_expense_forward_email')}
+            leftSideHelp={t('e_expense_forward_email_help')}
+          >
             <InputField
               value={company?.settings.e_expense_forward_email || ''}
               onValueChange={(value) =>
@@ -250,10 +254,14 @@ export function Preferences() {
         )}
 
         {company.legal_entity_id && (
-          <Element leftSide={t('skip_automatic_email_with_peppol')}
-          leftSideHelp={t('skip_automatic_email_with_peppol_help')}>
+          <Element
+            leftSide={t('skip_automatic_email_with_peppol')}
+            leftSideHelp={t('skip_automatic_email_with_peppol_help')}
+          >
             <Toggle
-              checked={Boolean(company?.settings.skip_automatic_email_with_peppol)}
+              checked={Boolean(
+                company?.settings.skip_automatic_email_with_peppol
+              )}
               onValueChange={(value) =>
                 handleChange('settings.skip_automatic_email_with_peppol', value)
               }

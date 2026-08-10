@@ -1,6 +1,8 @@
 import { login } from '$tests/e2e/helpers';
-import { test, expect, uniqueName, extractIdFromUrl } from '$tests/e2e/fixtures';
+import { resetAccountBeforeAll, test, expect, uniqueName, extractIdFromUrl } from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
+
+resetAccountBeforeAll();
 
 interface CreateParams {
   page: Page;

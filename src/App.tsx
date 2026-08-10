@@ -44,7 +44,10 @@ import {
 import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
 import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
 import { useSystemFonts } from './common/hooks/useSystemFonts';
-import { useReactSettings } from './common/hooks/useReactSettings';
+import {
+  useFetchReactSettings,
+  useReactSettings,
+} from './common/hooks/useReactSettings';
 import { useKeyboardShortcuts } from './common/hooks/useKeyboardShortcuts';
 import { useCompanyTranslations } from './common/hooks/useCompanyTranslations';
 
@@ -89,7 +92,9 @@ export function App() {
   const resolveDayJSLocale = useResolveDayJSLocale();
   const switchToCompanySettings = useSwitchToCompanySettings();
 
-  const reactSettings = useReactSettings({ overwrite: false });
+  useFetchReactSettings();
+
+  const reactSettings = useReactSettings();
   const setIsPasswordRequired = useSetAtom(isPasswordRequiredAtom);
   const setRefreshEntityDataBanner = useSetAtom(refreshEntityDataBannerAtom);
 

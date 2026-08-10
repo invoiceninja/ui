@@ -83,7 +83,12 @@ export function CreateBankAccountModal(props: Props) {
       />
 
       <div className="flex justify-end">
-        <Button onClick={handleSave} style={{ color: colors.$3, colorScheme: colors.$0 }}>{t('save')}</Button>
+        <Button
+          onClick={handleSave}
+          style={{ color: colors.$3, colorScheme: colors.$0 }}
+        >
+          {t('save')}
+        </Button>
       </div>
     </Modal>
   );

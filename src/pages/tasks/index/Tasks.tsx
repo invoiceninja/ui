@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputLabel, Link } from '$app/components/forms';
+import { Button, InputLabel } from '$app/components/forms';
 import { useTitle } from '$app/common/hooks/useTitle';
 import {
   DataTable,
@@ -17,7 +17,7 @@ import {
 } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { BsKanban } from 'react-icons/bs';
+import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
 import {
   defaultColumns,
   useActions,
@@ -27,7 +27,6 @@ import {
   useTaskFilters,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
-import { Inline } from '$app/components/Inline';
 import { permission } from '$app/common/guards/guards/permission';
 import { Task } from '$app/common/interfaces/task';
 import { useShowEditOption } from '../common/hooks/useShowEditOption';
@@ -50,6 +49,7 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { ExtensionBanner } from '../common/components/ExtensionBanner';
 import { useFilterColumns } from '../common/hooks/useFilterColumns';
+import { useTaskUserFilters } from '../common/components/TaskUserFilters';
 import { emitter } from '$app';
 
 export default function Tasks() {
@@ -68,6 +68,7 @@ export default function Tasks() {
   const taskColumns = useAllTaskColumns();
   const filterColumns = useFilterColumns();
   const customBulkActions = useCustomBulkActions();
+  const userFilter = useTaskUserFilters();
 
   const [taskSlider, setTaskSlider] = useAtom(taskSliderAtom);
   const [sliderTaskId, setSliderTaskId] = useState<string>('');
@@ -80,6 +81,14 @@ export default function Tasks() {
   );
 
   const { data: taskResponse } = useTaskQuery({ id: sliderTaskId });
+
+  const currentFilterColumnsCount = useMemo(
+    () =>
+      filterColumns.filter(
+        (column) => (filterColumnsValues[column.column_id] || []).length > 0
+      ).length,
+    [filterColumns, filterColumnsValues]
+  );
 
   const currentDateRangeColumnsCount = useMemo(
     () =>
@@ -109,13 +118,14 @@ export default function Tasks() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
+      topRight={<TaskHeaderControls />}
       aboveMainContainer={<ExtensionBanner />}
     >
       <DataTable
         resource="task"
         columns={columns}
         customActions={actions}
-        endpoint="/api/v1/tasks?include=status,client,project,user,assigned_user&without_deleted_clients=true&sort=id|desc"
+        endpoint={`/api/v1/tasks?include=status,client,project,user,assigned_user,tags&without_deleted_clients=true&sort=id|desc${userFilter.queryString}`}
         bulkRoute="/api/v1/tasks/bulk"
         linkToCreate="/tasks/create"
         linkToEdit="/tasks/:id/edit"
@@ -126,7 +136,7 @@ export default function Tasks() {
         withResourcefulActions
         rightSide={
           <div className="flex items-center space-x-2">
-            {(Object.keys(filterColumnsValues).length > 0 ||
+            {(currentFilterColumnsCount > 0 ||
               currentDateRangeColumnsCount > 0) && (
               <Button
                 type="secondary"
@@ -138,9 +148,7 @@ export default function Tasks() {
                 }}
               >
                 {t('clear_filters')} (
-                {Object.keys(filterColumnsValues).length +
-                  currentDateRangeColumnsCount}
-                )
+                {currentFilterColumnsCount + currentDateRangeColumnsCount})
               </Button>
             )}
 
@@ -156,16 +164,6 @@ export default function Tasks() {
               guards={[or(permission('create_task'), permission('edit_task'))]}
             />
           </div>
-        }
-        beforeFilter={
-          (hasPermission('view_task') || hasPermission('edit_task')) && (
-            <Link to="/tasks/kanban">
-              <Inline>
-                <BsKanban size={20} />
-                <span>Kanban</span>
-              </Inline>
-            </Link>
-          )
         }
         linkToCreateGuards={[permission('create_task')]}
         hideEditableOptions={!hasPermission('edit_task')}

@@ -18,6 +18,7 @@ import {
   docuNinjaPermission,
 } from '$app/common/guards/guards/docuninja/permission';
 import { DocuNinjaProvider } from '$app/common/components/DocuNinjaProvider';
+import { isHosted } from '$app/common/helpers';
 
 const Documents = lazy(() => import('$app/pages/documents/index/Documents'));
 const Document = lazy(() => import('$app/pages/documents/show/Document'));
@@ -40,6 +41,13 @@ const Notifications = lazy(
     )
 );
 
+const WidgetDefaults = lazy(
+  () =>
+    import(
+      '$app/pages/documents/pages/settings/pages/widget-defaults/WidgetDefaults'
+    )
+);
+
 const Builder = lazy(() => import('$app/pages/documents/builder/Builder'));
 const BlueprintBuilder = lazy(
   () => import('$app/pages/documents/pages/blueprints/builder/BlueprintBuilder')
@@ -47,6 +55,13 @@ const BlueprintBuilder = lazy(
 const SignatoryMapping = lazy(
   () => import('$app/pages/documents/pages/blueprints/mapping/SignatoryMapping')
 );
+const EmailTemplates = lazy(
+  () =>
+    import(
+      '$app/pages/documents/pages/settings/pages/email-templates/EmailTemplates'
+    )
+);
+
 const EmailSettings = lazy(
   () =>
     import(
@@ -64,12 +79,11 @@ const UserSelection = lazy(
 );
 const Sign = lazy(() => import('$app/pages/documents/sign/index/Sign'));
 const Pdf = lazy(() => import('$app/pages/documents/pdf/Pdf'));
-
-const Beta = lazy(() => import('$app/pages/documents/beta/Beta'));
+const Join = lazy(() => import('$app/pages/documents/join/Join'));
 
 const routes = (
   <>
-    <Route path="/docuninja/beta" element={<Beta />} />
+    <Route path="/docuninja/join" element={<Join />} />
 
     <Route
       path="docuninja/*"
@@ -96,7 +110,10 @@ const routes = (
               element={
                 <DocuNinjaGuard
                   guards={[
-                    docuNinjaPermission({ model: 'documents', action: 'create' }),
+                    docuNinjaPermission({
+                      model: 'documents',
+                      action: 'create',
+                    }),
                   ]}
                   component={<Create />}
                 />
@@ -112,9 +129,22 @@ const routes = (
                 />
               }
             >
-              <Route index element={<Navigate to="email_templates" replace />} />
+              <Route
+                index
+                element={<Navigate to="email_templates" replace />}
+              />
               <Route
                 path="email_templates"
+                element={
+                  <DocuNinjaGuard
+                    guards={[docuNinjaAdmin()]}
+                    type="subPage"
+                    component={<EmailTemplates />}
+                  />
+                }
+              />
+              <Route
+                path="email_settings"
                 element={
                   <DocuNinjaGuard
                     guards={[docuNinjaAdmin()]}
@@ -133,6 +163,17 @@ const routes = (
                   />
                 }
               />
+
+              <Route
+                path="widget_defaults"
+                element={
+                  <Guard
+                    guards={[]}
+                    type="subPage"
+                    component={<WidgetDefaults />}
+                  />
+                }
+              />
             </Route>
 
             <Route
@@ -145,7 +186,10 @@ const routes = (
               element={
                 <DocuNinjaGuard
                   guards={[
-                    docuNinjaPermission({ model: 'blueprints', action: 'view' }),
+                    docuNinjaPermission({
+                      model: 'blueprints',
+                      action: 'view',
+                    }),
                   ]}
                   component={<Blueprints />}
                 />
@@ -187,7 +231,10 @@ const routes = (
               element={
                 <DocuNinjaGuard
                   guards={[
-                    docuNinjaPermission({ model: 'blueprints', action: 'view' }),
+                    docuNinjaPermission({
+                      model: 'blueprints',
+                      action: 'view',
+                    }),
                   ]}
                   component={<SignatoryMapping />}
                 />
@@ -232,4 +279,7 @@ const routes = (
   </>
 );
 
-export const documentsRoutes = import.meta.env.VITE_ENABLE_DOCUNINJA === 'true' ? routes : null;
+export const documentsRoutes =
+  isHosted() || import.meta.env.VITE_ENABLE_DOCUNINJA === 'true'
+    ? routes
+    : null;

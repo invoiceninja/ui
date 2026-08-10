@@ -28,17 +28,23 @@ export function useStoreSessionTableFilters(params: Params) {
 
   const setDataTableFilters = useSetAtom(dataTableFiltersAtom);
 
-  return (filter: string, currentPage: number) => {
+  return (filter: string, currentPage: number, preserveCurrentPage = false) => {
     if (!tableKey) {
       return;
     }
 
-    setDataTableFilters((current) => ({
-      ...current,
-      [tableKey]: {
-        filter,
-        currentPage,
-      },
-    }));
+    setDataTableFilters((current) => {
+      const existing = (current as SessionDataTableFilters)?.[tableKey];
+
+      return {
+        ...current,
+        [tableKey]: {
+          filter,
+          currentPage: preserveCurrentPage
+            ? (existing?.currentPage ?? currentPage)
+            : currentPage,
+        },
+      };
+    });
   };
 }

@@ -411,8 +411,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           element.base_type === 'boolean'
             ? false
             : element.base_type === 'decimal' || element.base_type === 'number'
-            ? 0
-            : '';
+              ? 0
+              : '';
 
         if (
           ((currentFieldValue as string | number) ||
@@ -866,9 +866,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                                 'number'
                                   ? 0
                                   : typeof currentPayload[choiceFieldKey] ===
-                                    'boolean'
-                                  ? false
-                                  : '',
+                                      'boolean'
+                                    ? false
+                                    : '',
                             }));
                           }
                         }
@@ -1600,17 +1600,13 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       }
     }, [currentEInvoice, allAvailableGroups]);
 
-    useImperativeHandle(
-      ref,
-      () => {
-        return {
-          saveEInvoice() {
-            return handleSave();
-          },
-        };
-      },
-      [payload]
-    );
+    useImperativeHandle(ref, () => {
+      return {
+        saveEInvoice() {
+          return handleSave();
+        },
+      };
+    }, [payload]);
 
     return (
       <div className="flex flex-col mt-5">

@@ -10,7 +10,7 @@
 
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import CommonProps from '$app/common/interfaces/common-props.interface';
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
 interface Props extends CommonProps {

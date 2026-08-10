@@ -65,7 +65,11 @@ export function useHandleSave(params: Params) {
       apiEndpoint += 'save_default_footer=true';
     }
 
-    request('PUT', endpoint(apiEndpoint, { id: invoice.id }), invoice)
+    const invoicePayload = { ...invoice };
+
+    delete invoicePayload.paymentables;
+
+    request('PUT', endpoint(apiEndpoint, { id: invoice.id }), invoicePayload)
       .then(async () => {
         if (isDefaultTerms || isDefaultFooter) {
           await refreshCompanyUsers();

@@ -113,6 +113,7 @@ export function PastDueInvoices() {
           withoutPagination
           withoutPadding
           withoutPerPageAsPreference
+          withoutStoringPreferences
           styleOptions={{
             withoutBottomBorder: true,
             withoutTopBorder: true,

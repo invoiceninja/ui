@@ -44,6 +44,8 @@ import { TaskClock } from './TaskClock';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { isTaskRunning } from '../../common/helpers/calculate-entity-state';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
@@ -261,6 +263,13 @@ export function EditSlider() {
                 taskStatus && handleChange('status_id', taskStatus.id)
               }
               onClearButtonClick={() => handleChange('status_id', '')}
+            />
+
+            <TagPillSelector
+              label={t('tags')}
+              entityType={TAG_ENTITY_TYPES.task}
+              value={task?.tags || []}
+              onChange={(tags) => handleChange('tags', tags)}
             />
 
             <InputField

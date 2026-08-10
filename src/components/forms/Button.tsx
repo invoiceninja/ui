@@ -62,8 +62,8 @@ export function Button(props: Props) {
       props.type === 'primary'
         ? accentColor
         : props.noBackgroundColor
-        ? 'transparent'
-        : 'white',
+          ? 'transparent'
+          : 'white',
     color:
       props.type !== 'primary' && props.type !== 'secondary' ? accentColor : '',
   };

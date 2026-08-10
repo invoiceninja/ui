@@ -19,6 +19,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankInvoiceQuery } from '$app/common/queries/invoices';
 import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
+import { QuickbooksDepositDisabledAlert } from '$app/components/QuickbooksDepositDisabledAlert';
 import { Spinner } from '$app/components/Spinner';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
@@ -258,6 +259,9 @@ export default function Create() {
         breadcrumbs={pages}
         onSaveClick={() => save(invoice as Invoice)}
         disableSaveButton={invoice?.client_id.length === 0 || isFormBusy}
+        aboveMainContainer={
+          invoice && <QuickbooksDepositDisabledAlert resource={invoice} />
+        }
       >
         {!isLoading ? (
           <div className="space-y-4">

@@ -10,10 +10,11 @@ import { PaymentMethodForm } from '$app/pages/settings/account-management/compon
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { useQuery } from 'react-query';
 import { GatewayToken } from '$app/common/interfaces/client';
+import { canActivateUpgradeButton } from '../helpers';
 
 interface Props {
     visible: boolean;
@@ -24,19 +25,32 @@ interface Props {
 interface PricingResponse {
     description: string;
     price: string;
-    ninja_price: string;
-    docuninja_price: string;
     pro_rata: string;
     pro_rata_raw: number;
-    hash: string;
+    requires_payment: boolean;
     credit: string;
     credit_raw: number;
+    hash?: string;
+}
+
+interface ApiError {
+    message: string;
 }
 
 enum ModalStep {
     PLAN_SELECTION = 'plan_selection',
     PAYMENT = 'payment'
 }
+
+type BillingUiState =
+    | 'quote_pending'
+    | 'quote_ready_requires_payment'
+    | 'quote_ready_no_payment'
+    | 'payment_intent_pending'
+    | 'stripe_confirmation_pending'
+    | 'finalizing_plan_change'
+    | 'plan_change_success'
+    | 'plan_change_failed';
 
 type PlanType = 'pro' | 'enterprise' | 'docuninja';
 
@@ -51,6 +65,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     const [isYearly, setIsYearly] = useState(true);
     const [pricing, setPricing] = useState<PricingResponse | null>(null);
     const [currentStep, setCurrentStep] = useState<ModalStep>(ModalStep.PLAN_SELECTION);
+    const [billingUiState, setBillingUiState] = useState<BillingUiState>('quote_pending');
 
     // Check if user already has a plan (pro or enterprise)
     const hasExistingPlan = account?.plan === 'pro' || account?.plan === 'enterprise';
@@ -250,9 +265,10 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             description: 'Add E-Signatures to your plan',
             features: [
                 'Capture E-Signatures',
-                'Intgrates with existing workflows',
+                'Integrates with existing workflows',
                 'Unlimited Signature requests',
                 'API Access',
+                '$6 per user'
             ]
         }])
     ];
@@ -261,6 +277,8 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
         if (visible) {
             // Reset to first step when modal opens
             setCurrentStep(ModalStep.PLAN_SELECTION);
+            setPricing(null);
+            setBillingUiState('quote_pending');
 
             // Auto-select DocuNinja if user already has DocuNinja users
             const hasDocuNinjaUsers = (account?.docuninja_num_users || 0) > 0;
@@ -338,14 +356,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
         } else {
             const planType = planValue as 'pro' | 'enterprise';
             if (selectedMainPlan === planType) {
-                // Deselecting current plan
-                setSelectedMainPlan(null);
-                // Only deselect DocuNinja if user doesn't have existing DocuNinja users
-                const hasExistingDocuNinjaUsers = (account?.docuninja_num_users || 0) > 0;
-                if (!hasExistingDocuNinjaUsers) {
-                    setDocuNinjaSelected(false);
-                    setDocuNinjaUsers(account?.docuninja_num_users);
-                }
+                return;
             } else {
                 // Selecting new plan
                 setSelectedMainPlan(planType);
@@ -378,8 +389,16 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
         return false;
     };
 
+    const isSelectedMainPlan = (planValue: string) =>
+        planValue !== 'docuninja' && selectedMainPlan === planValue;
+
     const handleEnterpriseUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newValue = parseInt(event.target.value);
+
+        if (selectedMainPlan !== 'enterprise') {
+            setSelectedMainPlan('enterprise');
+        }
+
         setEnterpriseUsers(newValue);
         // If DocuNinja users exceed new enterprise users, reset it
         if (docuNinjaUsers > newValue) {
@@ -406,6 +425,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
 
     const fetchPricing = (plan: 'pro' | 'enterprise', users: number, docuNinjaUsers: number, yearly: boolean) => {
         setIsLoading(true);
+        setBillingUiState('quote_pending');
 
         request('POST', endpoint('/api/client/account_management/v2/description'), {
             plan: plan,
@@ -413,11 +433,37 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             docuninja_users: docuNinjaUsers,
             term: yearly ? 'year' : 'month'
         },{skipIntercept: true})
-            .then((response) => {
+            .then((response: AxiosResponse<PricingResponse>) => {
                 setPricing(response.data);
+                setBillingUiState(response.data.requires_payment ? 'quote_ready_requires_payment' : 'quote_ready_no_payment');
             })
-            .catch((error) => {
+            .catch(() => {
+                setPricing(null);
+                setBillingUiState('plan_change_failed');
                 toast.error(t('error_fetching_pricing') as string);
+            })
+            .finally(() => setIsLoading(false));
+    };
+
+    const handleFinalizePlanChange = () => {
+        if (!pricing) {
+            toast.error(t('please_select_plan') as string);
+            return;
+        }
+
+        setIsLoading(true);
+        setBillingUiState('finalizing_plan_change');
+
+        request('POST', endpoint('/api/client/account_management/v2/payment'), {})
+            .then(() => {
+                setBillingUiState('plan_change_success');
+                toast.success(t('success') as string);
+                onPaymentComplete();
+                onClose();
+            })
+            .catch((error: AxiosError<ApiError>) => {
+                setBillingUiState('plan_change_failed');
+                toast.error(error.response?.data?.message || 'error_title');
             })
             .finally(() => setIsLoading(false));
     };
@@ -427,7 +473,13 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             toast.error(t('please_select_plan') as string);
             return;
         }
-        setCurrentStep(ModalStep.PAYMENT);
+
+        if (pricing.requires_payment) {
+            setCurrentStep(ModalStep.PAYMENT);
+            return;
+        }
+
+        handleFinalizePlanChange();
     };
 
     const handleBackToPlanSelection = () => {
@@ -435,7 +487,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     };
 
     const handlePaymentSuccess = () => {
-        toast.success(t('success') as string);
+        setBillingUiState('plan_change_success');
         onPaymentComplete();
         onClose();
     };
@@ -482,7 +534,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
             visible={visible}
             onClose={onClose}
             size={account?.plan == 'enterprise' || currentStep === ModalStep.PAYMENT ? 'regular' : 'large'}
-            disableClosing={currentStep === ModalStep.PAYMENT}
+            disableClosing={currentStep === ModalStep.PAYMENT || billingUiState === 'finalizing_plan_change'}
         >
             <div className="space-y-6">
                 {currentStep === ModalStep.PLAN_SELECTION && (
@@ -498,12 +550,19 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                             className={`border-2 rounded-lg p-4 transition-all duration-200 ${isPlanSelected(plan.value)
                                                     ? isPlanPermanentlySelected(plan.value)
                                                         ? 'border-green-500 bg-green-50 shadow-md ring-2 ring-green-200 cursor-default'
+                                                        : isSelectedMainPlan(plan.value)
+                                                        ? 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200 cursor-default'
                                                         : 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200 cursor-pointer'
                                                     : isPlanDisabled(plan.value)
                                                         ? 'border-gray-200 bg-gray-100 cursor-not-allowed opacity-60'
                                                         : 'border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50 hover:shadow-sm cursor-pointer'
                                                 }`}
-                                            onClick={() => !isPlanDisabled(plan.value) && !isPlanPermanentlySelected(plan.value) && handlePlanToggle(plan.value)}
+                                            onClick={() =>
+                                                !isPlanDisabled(plan.value) &&
+                                                !isPlanPermanentlySelected(plan.value) &&
+                                                !isSelectedMainPlan(plan.value) &&
+                                                handlePlanToggle(plan.value)
+                                            }
                                         >
                                             <div className="flex items-center justify-between mb-2">
                                                 <h4 className="text-lg font-semibold">{plan.label}</h4>
@@ -611,57 +670,49 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                     {pricing ? (
                                         <>
                                         
-                                            <div className="mt-2 space-y-2">
-                                                <div className="flex justify-between">
-                                                    <span><h3 className="font-medium">{pricing.description}</h3></span>
-                                                    <div className="flex items-center space-x-2">
-                                                        <span className="font-medium">{pricing.ninja_price}</span>
-                                                        {isLoading && (
-                                                            <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <span>DocuNinja users: ({docuNinjaUsers})</span>
-                                                    <div className="flex items-center space-x-2">
-                                                        <span className="font-medium">{pricing.docuninja_price}</span>
-                                                        {isLoading && (
-                                                            <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <span>{t('total')}</span>
-                                                    <div className="flex items-center space-x-2">
+                                            <div className="ml-auto w-full max-w-md space-y-2 text-sm">
+                                                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                                    <h3 className="font-medium text-right">{pricing.description}</h3>
+                                                    <div className="flex min-w-[5rem] items-center justify-end space-x-2">
                                                         <span className="font-medium">{pricing.price}</span>
                                                         {isLoading && (
                                                             <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
                                                         )}
                                                     </div>
                                                 </div>
-
-                                                {pricing.credit_raw > 0 && pricing.pro_rata_raw > 0 &&(
-                                                <div className="flex justify-between">
-                                                    <span>{t('credit')}:</span>
-                                                    <div className="flex items-center space-x-2">
-                                                        <span className="font-medium">-{pricing.credit}</span>
-                                                        {isLoading && (
-                                                            <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
-                                                        )}
+                                                {selectedMainPlan === 'enterprise' && (
+                                                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                                        <span className="text-right">InvoiceNinja {t('users')}:</span>
+                                                        <span className="min-w-[5rem] text-right font-medium">{enterpriseUsers}</span>
                                                     </div>
-                                                </div>
                                                 )}
-                                                {pricing.pro_rata_raw >= 0 && (
-                                                <div className="flex justify-between">
-                                                    <span>{t('balance')}:</span>
-                                                    <div className="flex items-center space-x-2">
+                                                {docuNinjaSelected && docuNinjaUsers > 0 && (
+                                                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                                        <span className="text-right">DocuNinja {t('users')}:</span>
+                                                        <span className="min-w-[5rem] text-right font-medium">{docuNinjaUsers}</span>
+                                                    </div>
+                                                )}
+                                                {pricing.credit_raw > 0 && (
+                                                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                                        <span className="text-right">{t('credit')}:</span>
+                                                        <div className="flex min-w-[5rem] items-center justify-end space-x-2">
+                                                            <span className="font-medium">{pricing.credit}</span>
+                                                            {isLoading && (
+                                                                <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                                    <span className="text-right">{t('balance')}:</span>
+                                                    <div className="flex min-w-[5rem] items-center justify-end space-x-2">
                                                         <span className="font-medium">{pricing.pro_rata}</span>
                                                         {isLoading && (
                                                             <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
                                                         )}
                                                     </div>
                                                 </div>
-                                                )}
+                                                
                                             </div>
                                         </>
                                     ) : (
@@ -682,9 +733,13 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                         type="primary"
                                         behavior="button"
                                         onClick={handleContinueToPayment}
-                                        disabled={!pricing || isLoading || pricing.pro_rata_raw <= 0}
+                                        disabled={!canActivateUpgradeButton(pricing, isLoading)}
                                     >
-                                        {t('next')}
+                                        {isLoading && billingUiState === 'finalizing_plan_change'
+                                            ? t('processing')
+                                            : pricing?.requires_payment
+                                                ? t('next')
+                                                : `${t('confirm')} ${t('plan_change')}`}
                                     </Button>
                                 </div>
                             </div>
@@ -709,10 +764,10 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                         {t('change')}
                                     </Button>
                                 </div>
-                                <div className="mt-2 space-y-1">
-                                    <div className="flex justify-between text-sm">
-                                        <span>{t('plan')}:</span>
-                                        <span className="capitalize">
+                                <div className="ml-auto mt-2 w-full max-w-md space-y-1 text-sm">
+                                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                        <span className="text-right">{t('plan')}:</span>
+                                        <span className="min-w-[5rem] text-right capitalize">
                                             {hasExistingPlan && docuNinjaSelected && !selectedMainPlan
                                                 ? `DocuNinja (${account?.plan} add-on)`
                                                 : selectedMainPlan === account?.plan
@@ -722,24 +777,24 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                         </span>
                                     </div>
                                     {selectedMainPlan === 'enterprise' && (
-                                        <div className="flex justify-between text-sm">
-                                            <span>{t('users')}:</span>
-                                            <span>{enterpriseUsers}</span>
+                                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                            <span className="text-right">{t('users')}:</span>
+                                            <span className="min-w-[5rem] text-right">{enterpriseUsers}</span>
                                         </div>
                                     )}
 
-                                    <div className="flex justify-between text-sm">
-                                        <span>{t('plan_term')}:</span>
-                                        <span>{isYearly ? t('plan_term_yearly') : t('plan_term_monthly')}</span>
+                                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                        <span className="text-right">{t('plan_term')}:</span>
+                                        <span className="min-w-[5rem] text-right">{isYearly ? t('plan_term_yearly') : t('plan_term_monthly')}</span>
                                     </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span>DocuNinja {t('users')}:</span>
-                                        <span>{docuNinjaSelected ? docuNinjaUsers : 0}</span>
+                                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6">
+                                        <span className="text-right">DocuNinja {t('users')}:</span>
+                                        <span className="min-w-[5rem] text-right">{docuNinjaSelected ? docuNinjaUsers : 0}</span>
                                     </div>
                                     {pricing && (
-                                        <div className="flex justify-between text-sm font-medium pt-2 border-t">
-                                            <span>{t('total')}:</span>
-                                            <span>{pricing.pro_rata}</span>
+                                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 border-t pt-2 font-medium">
+                                            <span className="text-right">{t('total')}:</span>
+                                            <span className="min-w-[5rem] text-right">{pricing.pro_rata}</span>
                                         </div>
                                     )}
                                 </div>
@@ -748,15 +803,8 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                             {/* Payment Form */}
                             <PaymentMethodForm
                                 tokens={methods ?? []}
-                                num_users={selectedMainPlan === 'enterprise' ? enterpriseUsers : (hasExistingPlan && !selectedMainPlan ? (account?.num_users || 1) : 1)}
-                                plan={hasExistingPlan && docuNinjaSelected && !selectedMainPlan ? 'docuninja' : (selectedMainPlan || 'pro')}
-                                docuninja_users={docuNinjaSelected ? docuNinjaUsers : 0}
-                                term={isYearly ? 'year' : 'month'}
                                 amount_string={pricing?.pro_rata}
-                                amount_raw={pricing?.pro_rata_raw}
-                                hash={pricing?.hash}
                                 onPaymentSuccess={handlePaymentSuccess}
-                                onPaymentComplete={onPaymentComplete}
                                 onCancel={handleBackToPlanSelection}
                             />
                         </div>

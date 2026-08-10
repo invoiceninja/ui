@@ -9,7 +9,10 @@
  */
 
 import React, { createContext, useContext, ReactNode } from 'react';
-import { User, Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
+import {
+  User,
+  Permission as PermissionType,
+} from '$app/common/interfaces/docuninja/api';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { NotificationValue } from '../constants/notifications';
 
@@ -23,13 +26,19 @@ export interface UserEditContextValue {
   permissions: PermissionType[];
   setPermissions: React.Dispatch<React.SetStateAction<PermissionType[]>>;
   notifications: Record<string, string>;
-  setNotifications: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setNotifications: React.Dispatch<
+    React.SetStateAction<Record<string, string>>
+  >;
   allNotificationsValue: NotificationValue;
-  setAllNotificationsValue: React.Dispatch<React.SetStateAction<NotificationValue>>;
+  setAllNotificationsValue: React.Dispatch<
+    React.SetStateAction<NotificationValue>
+  >;
   editPage?: boolean;
 }
 
-const UserEditContext = createContext<UserEditContextValue | undefined>(undefined);
+const UserEditContext = createContext<UserEditContextValue | undefined>(
+  undefined
+);
 
 export interface UserEditProviderProps {
   children: ReactNode;
@@ -47,8 +56,9 @@ export function UserEditProvider({ children, value }: UserEditProviderProps) {
 export function useUserEditContext(): UserEditContextValue {
   const context = useContext(UserEditContext);
   if (context === undefined) {
-    throw new Error('useUserEditContext must be used within a UserEditProvider');
+    throw new Error(
+      'useUserEditContext must be used within a UserEditProvider'
+    );
   }
   return context;
 }
-

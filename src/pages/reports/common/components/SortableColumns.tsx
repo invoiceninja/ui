@@ -10,32 +10,34 @@
 
 import {
   DragDropContext,
-  DropResult,
-  Droppable,
   Draggable,
+  Droppable,
+  DropResult,
 } from '@hello-pangea/dnd';
-import { Record, clientMap } from '$app/common/constants/exports/client-map';
-import { paymentMap } from '$app/common/constants/exports/payment-map';
-import { quoteMap } from '$app/common/constants/exports/quote-map';
-import { creditMap } from '$app/common/constants/exports/credit-map';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { itemMap } from '$app/common/constants/exports/item-map';
-import { vendorMap } from '$app/common/constants/exports/vendor-map';
-import { purchaseorderMap } from '$app/common/constants/exports/purchase-order-map';
-import { taskMap } from '$app/common/constants/exports/task-map';
-import { expenseMap } from '$app/common/constants/exports/expense-map';
-import { recurringinvoiceMap } from '$app/common/constants/exports/recurring-invoice-map';
-import { usePreferences } from '$app/common/hooks/usePreferences';
-import { Identifier } from '../useReports';
-import { contactMap } from '$app/common/constants/exports/contact-map';
 import { useColorScheme } from '$app/common/colors';
-import { Entity } from '$app/common/hooks/useEntityCustomFields';
+import { clientMap, Record } from '$app/common/constants/exports/client-map';
+import { contactMap } from '$app/common/constants/exports/contact-map';
+import { creditMap } from '$app/common/constants/exports/credit-map';
+import { expenseMap } from '$app/common/constants/exports/expense-map';
 import { invoiceMap } from '$app/common/constants/exports/invoice-map';
+import { itemMap } from '$app/common/constants/exports/item-map';
+import { locationMap } from '$app/common/constants/exports/location-map';
+import { paymentMap } from '$app/common/constants/exports/payment-map';
+import { purchaseorderMap } from '$app/common/constants/exports/purchase-order-map';
+import { quoteMap } from '$app/common/constants/exports/quote-map';
+import { recurringinvoiceMap } from '$app/common/constants/exports/recurring-invoice-map';
+import { taskMap } from '$app/common/constants/exports/task-map';
+import { vendorMap } from '$app/common/constants/exports/vendor-map';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Entity } from '$app/common/hooks/useEntityCustomFields';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 import { customField } from '$app/components/CustomField';
 import { DoubleChevronRight } from '$app/components/icons/DoubleChevronRight';
 import { XMark } from '$app/components/icons/XMark';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Identifier } from '../useReports';
+import { getColumnPosition } from '../utils/sortableColumns';
 
 export const reportColumn = 11;
 
@@ -130,6 +132,7 @@ export function Column({
             <span style={{ color: colors.$3 }}>{label}</span>
 
             <div
+              data-cy={`report-column-reset-${droppableId}`}
               className="flex items-center space-x-1 cursor-pointer"
               onClick={onReset}
             >
@@ -147,7 +150,11 @@ export function Column({
             <span style={{ color: colors.$3 }}>{label}</span>
 
             {onAddAll && (
-              <button type="button" onClick={onAddAll}>
+              <button
+                type="button"
+                onClick={onAddAll}
+                data-cy={`report-column-add-all-${droppableId}`}
+              >
                 <DoubleChevronRight size="0.85rem" color={colors.$3} />
               </button>
             )}
@@ -168,6 +175,8 @@ export function Column({
               {...provided.dragHandleProps}
             >
               <div
+                data-cy="report-column-item"
+                data-report-column-value={record.value}
                 className="p-2 flex border justify-between items-center cursor-grab text-sm shadow-sm"
                 style={{
                   color: colors.$3,
@@ -186,6 +195,7 @@ export function Column({
             className="w-80 flex-column"
             ref={provided.innerRef}
             {...provided.droppableProps}
+            data-cy={`report-column-${droppableId}`}
           >
             <div
               className="overflow-y-scroll h-96 mt-2 border rounded-md"
@@ -202,6 +212,8 @@ export function Column({
                   >
                     {(provided) => (
                       <div
+                        data-cy="report-column-item"
+                        data-report-column-value={record.value}
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
@@ -218,6 +230,7 @@ export function Column({
 
                           {droppableId === reportColumn.toString() && (
                             <button
+                              data-cy="report-column-remove"
                               style={{
                                 color: colors.$3,
                                 colorScheme: colors.$0,
@@ -249,21 +262,9 @@ export function Column({
 interface Props {
   report: Identifier;
   columns: string[];
+  draftColumns?: Record[][] | null;
+  onColumnsChange?: (columns: Record[][]) => void;
 }
-
-const positions = [
-  'client',
-  'invoice',
-  'credit',
-  'quote',
-  'payment',
-  'vendor',
-  'purchase_order',
-  'task',
-  'expense',
-  'recurring_invoice',
-  'contact',
-] as const;
 
 export function useColumns({ report, columns }: Props) {
   const { preferences } = usePreferences();
@@ -272,37 +273,46 @@ export function useColumns({ report, columns }: Props) {
     () => [
       columns.includes('client') ? clientMap : [],
       columns.includes('invoice')
-        ? columns.includes('item')
-          ? invoiceMap.concat(itemMap.map((i) => ({ ...i, origin: 'invoice' })))
-          : invoiceMap
+        ? (columns.includes('item')
+            ? invoiceMap.concat(
+                itemMap.map((i) => ({ ...i, origin: 'invoice' }))
+              )
+            : invoiceMap
+          ).concat(locationMap.map((l) => ({ ...l, origin: 'invoice' })))
         : [],
       columns.includes('credit')
-        ? columns.includes('item')
-          ? creditMap.concat(itemMap.map((i) => ({ ...i, origin: 'credit' })))
-          : creditMap
+        ? (columns.includes('item')
+            ? creditMap.concat(itemMap.map((i) => ({ ...i, origin: 'credit' })))
+            : creditMap
+          ).concat(locationMap.map((l) => ({ ...l, origin: 'credit' })))
         : [],
       columns.includes('quote')
-        ? columns.includes('item')
-          ? quoteMap.concat(itemMap.map((i) => ({ ...i, origin: 'quote' })))
-          : quoteMap
+        ? (columns.includes('item')
+            ? quoteMap.concat(itemMap.map((i) => ({ ...i, origin: 'quote' })))
+            : quoteMap
+          ).concat(locationMap.map((l) => ({ ...l, origin: 'quote' })))
         : [],
       columns.includes('payment') ? paymentMap : [],
       columns.includes('vendor') ? vendorMap : [],
       columns.includes('purchase_order')
-        ? columns.includes('item')
-          ? purchaseorderMap.concat(
-              itemMap.map((i) => ({ ...i, origin: 'purchase_order' }))
-            )
-          : purchaseorderMap
+        ? (columns.includes('item')
+            ? purchaseorderMap.concat(
+                itemMap.map((i) => ({ ...i, origin: 'purchase_order' }))
+              )
+            : purchaseorderMap
+          ).concat(locationMap.map((l) => ({ ...l, origin: 'purchase_order' })))
         : [],
       columns.includes('task') ? taskMap : [],
       columns.includes('expense') ? expenseMap : [],
       columns.includes('recurring_invoice')
-        ? columns.includes('item')
-          ? recurringinvoiceMap.concat(
-              itemMap.map((i) => ({ ...i, origin: 'recurring_invoice' }))
-            )
-          : recurringinvoiceMap
+        ? (columns.includes('item')
+            ? recurringinvoiceMap.concat(
+                itemMap.map((i) => ({ ...i, origin: 'recurring_invoice' }))
+              )
+            : recurringinvoiceMap
+          ).concat(
+            locationMap.map((l) => ({ ...l, origin: 'recurring_invoice' }))
+          )
         : [],
       columns.includes('contact') ? contactMap : [],
       [],
@@ -319,29 +329,49 @@ export function useColumns({ report, columns }: Props) {
   return { data, defaultColumns };
 }
 
-export function SortableColumns({ report, columns }: Props) {
+export function SortableColumns({
+  report,
+  columns,
+  draftColumns,
+  onColumnsChange,
+}: Props) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
-
-  const { update } = usePreferences();
 
   const { data: persistedData, defaultColumns } = useColumns({
     report,
     columns,
   });
 
-  const [localData, setLocalData] = useState<Record[][]>(persistedData);
+  const [localData, setLocalData] = useState<Record[][]>(
+    draftColumns ?? persistedData
+  );
 
   useEffect(() => {
-    setLocalData(persistedData);
-  }, [report]);
+    setLocalData(draftColumns ?? persistedData);
+  }, [draftColumns, persistedData, report]);
 
-  const syncToPreferences = useCallback(
-    (newData: Record[][]) => {
-      update(`preferences.reports.columns.${report}`, [...newData]);
+  const cloneColumnData = useCallback(
+    (data: Record[][], indexes?: number[]) => {
+      const next = [...data];
+      const indexesToClone = indexes ?? data.map((_, index) => index);
+
+      Array.from(new Set(indexesToClone)).forEach((index) => {
+        next[index] = [...(data[index] ?? [])];
+      });
+
+      return next;
     },
-    [report, update]
+    []
+  );
+
+  const applyColumnChange = useCallback(
+    (newData: Record[][]) => {
+      setLocalData(newData);
+      onColumnsChange?.(newData);
+    },
+    [onColumnsChange]
   );
 
   const onDragEnd = useCallback(
@@ -352,75 +382,71 @@ export function SortableColumns({ report, columns }: Props) {
 
       try {
         const sourceIndex = parseInt(result.source.droppableId);
-        const destinationIndex = parseInt(result.destination!.droppableId);
-        const destinationIndexPosition = result.destination!.index;
+        const destinationIndex = parseInt(result.destination.droppableId);
+        const destinationIndexPosition = result.destination.index;
+        const newData = cloneColumnData(localData, [
+          sourceIndex,
+          destinationIndex,
+        ]);
+        const word = newData[sourceIndex]?.[result.source.index];
 
-        setLocalData((current) => {
-          const newData = [...current];
-          newData[sourceIndex] = [...current[sourceIndex]];
-          newData[destinationIndex] = [...current[destinationIndex]];
+        if (!word || !newData[destinationIndex]) {
+          return;
+        }
 
-          const word = newData[sourceIndex][result.source.index];
-          newData[sourceIndex].splice(result.source.index, 1);
-          newData[destinationIndex].splice(destinationIndexPosition, 0, word);
+        newData[sourceIndex].splice(result.source.index, 1);
+        newData[destinationIndex].splice(destinationIndexPosition, 0, word);
 
-          syncToPreferences(newData);
-          return newData;
-        });
+        applyColumnChange(newData);
       } catch (e) {
-        setLocalData(defaultColumns);
-        syncToPreferences(defaultColumns);
+        applyColumnChange(cloneColumnData(defaultColumns));
       }
     },
-    [defaultColumns, syncToPreferences]
+    [applyColumnChange, cloneColumnData, defaultColumns, localData]
   );
 
   const onRemove = useCallback(
     (record: Record) => {
-      const index = positions.indexOf(record.map as (typeof positions)[number]);
+      const index = getColumnPosition(record);
 
-      setLocalData((current) => {
-        const newData = [...current];
-        newData[reportColumn] = [...current[reportColumn]];
-        newData[index] = [...current[index]];
+      if (index === -1) {
+        return;
+      }
 
-        newData[reportColumn] = newData[reportColumn].filter(
-          (r) => r.value !== record.value
-        );
+      const newData = cloneColumnData(localData, [reportColumn, index]);
 
-        newData[index].push(record);
+      newData[reportColumn] = newData[reportColumn].filter(
+        (r) => r.value !== record.value
+      );
 
-        syncToPreferences(newData);
-        return newData;
-      });
+      newData[index].push(record);
+
+      applyColumnChange(newData);
     },
-    [syncToPreferences]
+    [applyColumnChange, cloneColumnData, localData]
   );
 
   const onRemoveAll = useCallback(() => {
-    setLocalData(defaultColumns);
-    syncToPreferences(defaultColumns);
-  }, [defaultColumns, syncToPreferences]);
+    applyColumnChange(cloneColumnData(defaultColumns));
+  }, [applyColumnChange, cloneColumnData, defaultColumns]);
 
   const handleAddAll = useCallback(
     (index: number) => {
-      setLocalData((current) => {
-        const newData = [...current];
-        newData[reportColumn] = [...current[reportColumn]];
-        newData[index] = [...current[index]];
-        newData[reportColumn] = [...newData[reportColumn], ...newData[index]];
-        newData[index] = [];
-        syncToPreferences(newData);
-        return newData;
-      });
+      const newData = cloneColumnData(localData, [reportColumn, index]);
+
+      newData[reportColumn] = [...newData[reportColumn], ...newData[index]];
+      newData[index] = [];
+
+      applyColumnChange(newData);
     },
-    [syncToPreferences]
+    [applyColumnChange, cloneColumnData, localData]
   );
 
   const reportColumnsLabel = `${t('report')} ${t('columns')}`;
 
   return (
     <div
+      data-cy="sortable-columns"
       className="overflow-x-auto border rounded-md w-full my-6 shadow-sm"
       style={{ borderColor: colors.$24 }}
     >

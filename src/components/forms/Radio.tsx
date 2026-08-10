@@ -57,8 +57,8 @@ export function Radio(props: Props) {
                 borderColor: reactSettings?.dark_mode
                   ? 'white'
                   : option.value === props.defaultSelected
-                  ? ''
-                  : colors.$5,
+                    ? ''
+                    : colors.$5,
               }}
             />
 

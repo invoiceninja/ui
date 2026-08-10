@@ -607,15 +607,15 @@ export function ComboboxStatic<T = any>({
     entry
       ? setSelectedValue(entry)
       : nullable
-      ? setSelectedValue({
-          id: -1,
-          label: inputOptions.value ? inputOptions.value.toString() : '',
-          value: inputOptions.value ? inputOptions.value.toString() : '',
-          resource: null,
-          eventType: 'external',
-          searchable: entryOptions.searchable || entryOptions.value,
-        })
-      : setSelectedValue(null);
+        ? setSelectedValue({
+            id: -1,
+            label: inputOptions.value ? inputOptions.value.toString() : '',
+            value: inputOptions.value ? inputOptions.value.toString() : '',
+            resource: null,
+            eventType: 'external',
+            searchable: entryOptions.searchable || entryOptions.value,
+          })
+        : setSelectedValue(null);
   }, [entries, inputOptions.value]);
 
   useEffect(() => {

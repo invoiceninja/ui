@@ -47,7 +47,7 @@ interface Props extends CommonProps {
 
 export function InputField(props: Props) {
   const colors = useColorScheme();
-  const reactSettings = useReactSettings({ overwrite: false });
+  const reactSettings = useReactSettings();
 
   const isInitialTypePassword = props.type === 'password';
 

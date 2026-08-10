@@ -41,14 +41,14 @@ export function NumberInputField(props: Props) {
   const colors = useColorScheme();
   const company = useCurrentCompany();
 
-  const reactSettings = useReactSettings({ overwrite: false });
+  const reactSettings = useReactSettings();
 
   const [currentValue, setCurrentValue] = useState<number | undefined>(
     typeof props.value === 'number'
       ? props.value
       : props.value
-      ? parseFloat(String(props.value))
-      : undefined
+        ? parseFloat(String(props.value))
+        : undefined
   );
 
   const getDecimalSeparator = () => {

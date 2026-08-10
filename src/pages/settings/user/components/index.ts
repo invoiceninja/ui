@@ -15,3 +15,4 @@ export * from './Password';
 export * from './TwoFactorAuthentication';
 export * from './CustomFields';
 export * from './Preferences';
+export * from './KeyboardShortcuts';

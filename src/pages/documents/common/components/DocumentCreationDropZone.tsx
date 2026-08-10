@@ -18,8 +18,12 @@ import { Document } from '$app/common/interfaces/docuninja/api';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { getDocumentNameFromFile } from '../helpers';
 import { CloudUpload } from '$app/components/icons/CloudUpload';
-import { getPasswordForPdf, isPdfPasswordProtected } from '@docuninja/builder2.0';
+import {
+  getPasswordForPdf,
+  isPdfPasswordProtected,
+} from '@docuninja/builder2.0';
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
@@ -81,7 +85,7 @@ export function DocumentCreationDropZone({ onSelectFiles }: Props) {
   const onDrop = async (acceptedFiles: File[]) => {
     // Clear any previous file rejection errors
     setFileRejectionErrors([]);
-    
+
     // Only proceed if there are actually accepted files
     if (acceptedFiles.length === 0) {
       return;
@@ -89,23 +93,21 @@ export function DocumentCreationDropZone({ onSelectFiles }: Props) {
 
     const formData = new FormData();
 
-
-
     for (const file of acceptedFiles) {
       const isProtected = await isPdfPasswordProtected(file);
 
       if (isProtected) {
         const password = await getPasswordForPdf(file);
-        
+
         if (!password) {
           toast.error(t('pdf_password_required') as string);
 
           return;
         }
 
-        formData.append("files[]", file, `${file.name}|${password}`);
+        formData.append('files[]', file, `${file.name}|${password}`);
       } else {
-        formData.append("files[]", file);
+        formData.append('files[]', file);
       }
     }
 
@@ -113,12 +115,15 @@ export function DocumentCreationDropZone({ onSelectFiles }: Props) {
 
     if (onSelectFiles) {
       onSelectFiles(files);
-     
+
       return;
     }
-    
+
     formData.append(
-      'description', 'Untitled document'
+      'description',
+      acceptedFiles[0]
+        ? getDocumentNameFromFile(acceptedFiles[0])
+        : 'Untitled document'
     );
 
     handleCreateDocument(formData);
@@ -126,7 +131,7 @@ export function DocumentCreationDropZone({ onSelectFiles }: Props) {
 
   const onDropRejected = (fileRejections: any[]) => {
     const rejectionErrors: string[] = [];
-    
+
     fileRejections.forEach((rejection) => {
       const fileName = rejection.file.name;
       const errors = rejection.errors.map((error: any) => {
@@ -138,12 +143,12 @@ export function DocumentCreationDropZone({ onSelectFiles }: Props) {
           case 'too-many-files':
             return t('too_many_files');
           default:
-            return t('file_upload_error', { fileName });
+            return t('upload_failed', { fileName });
         }
       });
       rejectionErrors.push(...errors);
     });
-    
+
     setFileRejectionErrors(rejectionErrors);
     toast.error(t('invalid_file') as string);
   };
@@ -153,16 +158,16 @@ export function DocumentCreationDropZone({ onSelectFiles }: Props) {
     onDropRejected,
     multiple: true,
     accept: {
-      "application/pdf": [".pdf"],
-      "application/msword": [".doc"],
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        [".docx"],
-      "image/png": [".png"],
-      "image/jpeg": [".jpg"],
-      "application/vnd.oasis.opendocument.text": [".odt"],
-      "application/vnd.ms-excel": [".xls"],
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
-        ".xlsx",
+      'application/pdf': ['.pdf'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        ['.docx'],
+      'image/png': ['.png'],
+      'image/jpeg': ['.jpg'],
+      'application/vnd.oasis.opendocument.text': ['.odt'],
+      'application/vnd.ms-excel': ['.xls'],
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [
+        '.xlsx',
       ],
     },
     disabled: isFormBusy,

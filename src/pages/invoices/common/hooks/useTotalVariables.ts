@@ -10,79 +10,52 @@
 
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 export function useTotalVariables() {
   const company = useCurrentCompany();
-  const [columns, setColumns] = useState<string[]>([]);
 
-  useEffect(() => {
+  return useMemo(() => {
     if (company?.settings.pdf_variables.total_columns.length > 0) {
-      let columns = cloneDeep(company?.settings.pdf_variables.total_columns);
+      const columns = cloneDeep(company.settings.pdf_variables.total_columns);
 
-      columns = columns.filter(
-        (variable) => !variable.includes('$custom_surcharge')
+      const filtered = columns.filter(
+        (variable: string) => !variable.includes('$custom_surcharge')
       );
 
-      if (company?.enabled_tax_rates > 0) {
-        columns.push('$tax1');
+      if (company.enabled_tax_rates > 0) {
+        filtered.push('$tax1');
       }
-      if (company?.enabled_tax_rates > 1) {
-        columns.push('$tax2');
+      if (company.enabled_tax_rates > 1) {
+        filtered.push('$tax2');
       }
-      if (company?.enabled_tax_rates > 2) {
-        columns.push('$tax3');
-      }
-
-      if (company?.custom_fields?.surcharge1) {
-        columns.push('$custom_surcharge1');
+      if (company.enabled_tax_rates > 2) {
+        filtered.push('$tax3');
       }
 
-      if (company?.custom_fields?.surcharge2) {
-        columns.push('$custom_surcharge2');
+      if (company.custom_fields?.surcharge1) {
+        filtered.push('$custom_surcharge1');
       }
 
-      if (company?.custom_fields?.surcharge3) {
-        columns.push('$custom_surcharge3');
+      if (company.custom_fields?.surcharge2) {
+        filtered.push('$custom_surcharge2');
       }
 
-      if (company?.custom_fields?.surcharge4) {
-        columns.push('$custom_surcharge4');
+      if (company.custom_fields?.surcharge3) {
+        filtered.push('$custom_surcharge3');
       }
 
-      // Replace $line_taxes and $total_taxes with $taxes at their positions
-      columns.forEach((column, index) => {
-        if (column === '$line_taxes' || column === '$total_taxes') {
-          columns[index] = '$taxes';
-        }
-      });
+      if (company.custom_fields?.surcharge4) {
+        filtered.push('$custom_surcharge4');
+      }
 
-      // Remove duplicates of $taxes that might have been created
-      const uniqueColumns = columns.filter(
-        (column, index, arr) =>
-          column !== '$taxes' || arr.indexOf(column) === index
-      );
-
-      setColumns(uniqueColumns);
-      return;
+      return filtered;
     }
 
-    // We need to clone the product columns to local object,
-    // because by default it's frozen.
     const variables: string[] = ['$subtotal'];
-    variables.push('$total');
 
-    // clone(company?.settings.pdf_variables.total_columns) || [];
-
-    // In case we have `$line_taxes` or `$total_taxes` we want to remove them
-    // if setting isn't enabled.
-
-    // const enabledTaxRates = company?.enabled_tax_rates || 0;
-
-    // if (enabledTaxRates <= 0) {
-    //   variables = variables.filter((variable) => variable !== '$total_taxes');
-    //   variables = variables.filter((variable) => variable !== '$line_taxes');
-    // }
+    variables.push('$discount');
+    variables.push('$net_subtotal');
 
     if (company?.custom_fields?.surcharge1) {
       variables.push('$custom_surcharge1');
@@ -100,10 +73,11 @@ export function useTotalVariables() {
       variables.push('$custom_surcharge4');
     }
 
-    variables.push('$discount');
+    variables.push('$total_taxes');
+    variables.push('$line_taxes');
+    variables.push('$total');
     variables.push('$paid_to_date');
     variables.push('$balance_due');
-    variables.push('$taxes');
 
     if (company?.enabled_tax_rates > 0) {
       variables.push('$tax1');
@@ -115,8 +89,6 @@ export function useTotalVariables() {
       variables.push('$tax3');
     }
 
-    setColumns(variables);
+    return variables;
   }, [company]);
-
-  return columns;
 }

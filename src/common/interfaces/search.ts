@@ -31,4 +31,5 @@ export interface SearchRecord {
   id: string;
   path: string;
   heading: string;
+  keywords?: string;
 }

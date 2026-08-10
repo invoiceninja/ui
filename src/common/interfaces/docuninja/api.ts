@@ -82,7 +82,6 @@ export interface DocuNinjaData {
   phone_number?: string;
   phone_number_verified?: number;
   updated_at?: string;
-
 }
 export interface Account {
   id: string;
@@ -210,8 +209,8 @@ export interface Metadata {
   entity_type: string;
   invitation_key: string;
   company_key: string;
-  is_ninja: boolean; 
-  is_sent: boolean; 
+  is_ninja: boolean;
+  is_sent: boolean;
   design_id: string;
 }
 
@@ -247,6 +246,12 @@ export interface Settings {
   email_client_when_completed: boolean;
   force_des_signature: boolean;
   attach_audit_log_to_completed_email: boolean;
+  email_from_name?: string | null;
+  reply_to_email?: string | null;
+  reply_to_name?: string | null;
+  widget_show_label?: boolean;
+  widget_border_style?: 'hidden' | 'dotted' | 'solid';
+  widget_border_color?: string;
 }
 
 export interface DocumentFile {
@@ -278,6 +283,7 @@ export interface DocumentInvitation {
   message_id: string | null;
   email_error: string | null;
   entity: 'contact' | 'user';
+  signing_order?: number | null;
   sent_date: string | null; // ISO 8601 date string
   viewed_date: string | null; // ISO 8601 date string
   opened_date: string | null; // ISO 8601 date string

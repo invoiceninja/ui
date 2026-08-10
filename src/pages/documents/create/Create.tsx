@@ -27,6 +27,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { DocumentCreationDropZone } from '../common/components/DocumentCreationDropZone';
+import { getDocumentNameFromFile } from '../common/helpers';
 import { X } from 'react-feather';
 
 interface Payload {
@@ -131,7 +132,18 @@ export default function Create() {
 
           <Element>
             <DocumentCreationDropZone
-              onSelectFiles={(f) => setPayload({ ...payload, 'files[]': f })}
+              onSelectFiles={(f) =>
+                setPayload({
+                  ...payload,
+                  'files[]': f,
+                  description:
+                    payload.description === 'Untitled document'
+                      ? f[0]
+                        ? getDocumentNameFromFile(f[0])
+                        : payload.description
+                      : payload.description,
+                })
+              }
             />
           </Element>
 

@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { usePaymentPageSaveAction } from '../common/hooks/usePaymentPageSaveAction';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useColorScheme } from '$app/common/colors';
@@ -122,10 +122,10 @@ export default function Apply() {
     });
   }, [formik.values.invoices]);
 
-  useSaveBtn(
+  usePaymentPageSaveAction(
     {
       onClick: () => formik.submitForm(),
-      disableSaveButton: formik.isSubmitting,
+      disabled: formik.isSubmitting,
     },
     [formik.values, formik.isSubmitting]
   );

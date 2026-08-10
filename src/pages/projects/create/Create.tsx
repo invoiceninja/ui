@@ -35,6 +35,8 @@ import { CustomField } from '$app/components/CustomField';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_project');
@@ -172,6 +174,15 @@ export default function Create() {
               onChange={(user) => handleChange('assigned_user_id', user.id)}
               onClearButtonClick={() => handleChange('assigned_user_id', '')}
               errorMessage={errors?.errors.assigned_user_id}
+            />
+          </Element>
+
+          <Element leftSide={t('tags')}>
+            <TagPillSelector
+              entityType={TAG_ENTITY_TYPES.project}
+              value={project?.tags || []}
+              onChange={(tags) => handleChange('tags', tags)}
+              errorMessage={errors?.errors.tags}
             />
           </Element>
 

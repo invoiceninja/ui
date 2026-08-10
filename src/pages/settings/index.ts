@@ -38,6 +38,7 @@ export * from './payment-terms';
 export * from './tax-rates';
 export * from './company';
 export * from './task-statuses';
+export * from './tags';
 export * from './integrations/api-tokens';
 export * from './integrations/api-webhooks';
 export * from './integrations/analytics';

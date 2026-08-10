@@ -10,11 +10,12 @@
 import { EInvoiceType } from '$app/pages/settings';
 import { Client } from './client';
 import { InvoiceItem } from './invoice-item';
-import { Payment } from './payment';
+import { Payment, Paymentable } from './payment';
+import { Project } from './project';
 import { Invitation } from './purchase-order';
 import { ScheduleItem } from './schedule';
+import { Tag } from './tag';
 import { TaxInfo } from './tax-info';
-import { Project } from './project';
 export interface Invoice {
   id: string;
   user_id: string;
@@ -82,6 +83,7 @@ export interface Invoice {
   client?: Client;
   activities?: Activity[];
   payments?: Payment[];
+  paymentables?: Paymentable[];
   reminder_schedule?: string;
   e_invoice?: EInvoiceType;
   is_locked?: boolean;
@@ -90,14 +92,25 @@ export interface Invoice {
   schedule?: ScheduleItem[];
   project?: Project;
   modified_invoice_id?: string;
+  tags?: Tag[];
+  invoice_tag_ids?: string[];
   sync?: Sync;
 }
 
 export interface Sync {
   qb_id: string;
+  qb_status?: QuickbooksInvoiceSyncStatus | string | null;
+  qb_status_message?: string | null;
   dn_completed: boolean;
   invitations: SyncInvitation[];
 }
+
+export type QuickbooksInvoiceSyncStatus =
+  | 'syncable'
+  | 'linkable'
+  | 'amount_mismatch'
+  | 'data_mismatch'
+  | 'synced';
 
 export interface SyncInvitation {
   invitation_key: string;

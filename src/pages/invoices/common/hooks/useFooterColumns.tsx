@@ -14,10 +14,11 @@ import { useAllInvoiceColumns } from './useInvoiceColumns';
 import { ReactNode } from 'react';
 import { useSumTableColumn } from '$app/common/hooks/useSumTableColumn';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { calculateNetAmount } from '$app/common/helpers/invoices/net-amount';
 
 export type DataTableFooterColumnsExtended<
   TResource = any,
-  TColumn = string
+  TColumn = string,
 > = {
   column: TColumn;
   id: keyof TResource;
@@ -47,6 +48,13 @@ export function useFooterColumns() {
         sumTableColumn(values as number[], invoices),
     },
     {
+      column: 'net_amount',
+      id: 'amount',
+      label: t('net_amount'),
+      format: (values, invoices) =>
+        sumTableColumn(invoices.map(calculateNetAmount), invoices),
+    },
+    {
       column: 'balance',
       id: 'balance',
       label: t('balance'),
@@ -59,7 +67,9 @@ export function useFooterColumns() {
     reactSettings?.table_footer_columns?.invoice || [];
 
   return {
-    footerColumns: columns.filter(({ id }) => currentColumns.includes(id)),
+    footerColumns: columns.filter(({ column }) =>
+      currentColumns.includes(column)
+    ),
     allFooterColumns: columns,
   };
 }

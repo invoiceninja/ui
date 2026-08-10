@@ -4,20 +4,21 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
-import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import {
+  resetAccountBeforeAll,
+  test,
+  expect,
+  uniqueName,
+} from '$tests/e2e/fixtures';
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
-import { createApiContext, ensurePermissionUserExists } from './api-helpers';
 
-test.beforeAll(async () => {
-  const api = await createApiContext(process.env.VITE_API_URL!);
-  await ensurePermissionUserExists(api, 'tasks@example.com', 'Tasks', 'Example');
-});
+resetAccountBeforeAll();
 
 interface Params {
   permissions: Permission[];
@@ -66,7 +67,9 @@ const checkEditPage = async (
         .getByRole('button', { name: 'Save', exact: true })
     ).toBeVisible({ timeout: 10000 });
 
-    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('[data-cy="chevronDownButton"]')).toBeVisible({
+      timeout: 10000,
+    });
   } else {
     await expect(
       page
@@ -74,9 +77,9 @@ const checkEditPage = async (
         .getByRole('button', { name: 'Save', exact: true })
     ).not.toBeVisible({ timeout: 10000 });
 
-    await expect(
-      page.locator('[data-cy="chevronDownButton"]')
-    ).not.toBeVisible({ timeout: 10000 });
+    await expect(page.locator('[data-cy="chevronDownButton"]')).not.toBeVisible(
+      { timeout: 10000 }
+    );
   }
 };
 
@@ -102,9 +105,7 @@ const createTask = async (params: CreateParams) => {
 
   await checkTableEditability(page, isTableEditable);
 
-  await page
-    .getByRole('main')
-    .getByRole('link', { name: 'New Task' }).click();
+  await page.getByRole('main').getByRole('link', { name: 'New Task' }).click();
 
   // Select client from combobox
   await page.locator('[data-testid="combobox-input-field"]').first().click();
@@ -113,39 +114,34 @@ const createTask = async (params: CreateParams) => {
   await clientOption.click();
 
   if (assignTo) {
-    await page.locator('[data-testid="combobox-input-field"]').nth(2).click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    await selectAssignedUser(
+      page,
+      assignTo,
+      page.locator('[data-testid="combobox-input-field"]').nth(2)
+    );
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created task')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully created task')).toBeVisible({
+    timeout: 10000,
+  });
 };
 
 test("can't view tasks without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('tasks@example.com');
-  await save();
-  await logout(page);
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'tasks@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Tasks'
   );
 
-  await logout(page);
 });
 
 test('can view task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('tasks@example.com');
-  await set('view_task', 'view_client');
-  await save();
+  await api.setPermissions('tasks@example.com', ['view_task', 'view_client', 'view_all']);
 
   await createTask({ page });
 
@@ -169,20 +165,16 @@ test('can view task', async ({ page, api }) => {
 
   await checkEditPage(page, false, false);
 
-  await logout(page);
 });
 
 test('can edit task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
     permissions: ['edit_task', 'view_client'],
   });
 
   await login(page);
-  await clear('tasks@example.com');
-  await set('edit_task', 'view_client');
-  await save();
+  await api.setPermissions('tasks@example.com', ['edit_task', 'view_client', 'view_all']);
 
   await createTask({ page });
 
@@ -219,21 +211,15 @@ test('can edit task', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'taskActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can create a task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
     permissions: ['create_task'],
   });
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('create_task', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['create_task', 'create_client']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -257,23 +243,19 @@ test('can create a task', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'taskActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can view and edit assigned task with create_task', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
     permissions: ['create_task'],
   });
 
   await login(page);
-  await clear('tasks@example.com');
-  await set('create_task');
-  await save();
+  await api.setPermissions('tasks@example.com', ['create_task']);
 
   await createTask({ page, assignTo: 'Tasks Example' });
 
@@ -290,6 +272,8 @@ test('can view and edit assigned task with create_task', async ({
     .click();
 
   await checkTableEditability(page, false);
+
+  expect(await waitForTableData(page)).toBe(true);
 
   const tableRow = page.locator('tbody').first().getByRole('row').first();
 
@@ -310,17 +294,11 @@ test('can view and edit assigned task with create_task', async ({
 
   await checkDropdownActions(page, actions, 'taskActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('deleting task with edit_task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('create_task', 'edit_task', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['create_task', 'edit_task', 'create_client']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -348,7 +326,9 @@ test('deleting task with edit_task', async ({ page, api }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted task')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Successfully deleted task')).toBeVisible({
+      timeout: 10000,
+    });
   } else {
     await tableRow
       .getByRole('button')
@@ -358,18 +338,15 @@ test('deleting task with edit_task', async ({ page, api }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Successfully deleted task')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Successfully deleted task')).toBeVisible({
+      timeout: 10000,
+    });
   }
 });
 
 test('archiving task withe edit_task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('create_task', 'edit_task', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['create_task', 'edit_task', 'view_client', 'create_client']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -397,7 +374,9 @@ test('archiving task withe edit_task', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived task')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Successfully archived task')).toBeVisible({
+      timeout: 10000,
+    });
 
     await expect(
       page.getByRole('button', { name: 'Restore', exact: true })
@@ -411,18 +390,15 @@ test('archiving task withe edit_task', async ({ page, api }) => {
 
     await page.getByText('Archive').click();
 
-    await expect(page.getByText('Successfully archived task')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Successfully archived task')).toBeVisible({
+      timeout: 10000,
+    });
   }
 });
 
 test('task documents preview with edit_task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('create_client', 'create_task', 'edit_task');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['create_client', 'create_task', 'edit_task']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -461,44 +437,21 @@ test('task documents preview with edit_task', async ({ page, api }) => {
 
   await page.waitForURL('**/tasks/**/documents');
 
-  await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 });
 
 test('task documents uploading with edit_task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('create_client', 'create_task', 'edit_task');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['create_client', 'create_task', 'edit_task']);
 
   await login(page, 'tasks@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  await createTask({ page });
 
-  await page.getByRole('link', { name: 'Tasks', exact: true }).click();
-
-  await page.waitForURL('**/tasks');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    await createTask({ page });
-
-    const id = page.url().match(/tasks\/([^/]+)/)?.[1];
-    if (id) api.trackEntity('tasks', id);
-  } else {
-    await tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first()
-      .click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  const id = page.url().match(/tasks\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('tasks', id);
 
   await page.waitForURL('**/tasks/**/edit');
 
@@ -509,13 +462,19 @@ test('task documents uploading with edit_task', async ({ page, api }) => {
     .click();
 
   await page.waitForURL('**/tasks/**/documents');
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')
     .first()
     .setInputFiles('./tests/assets/images/test-image.png');
 
-  await expect(page.getByText('Successfully uploaded document')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully uploaded document')).toBeVisible({
+    timeout: 10000,
+  });
 
   await expect(
     page.getByText('test-image.png', { exact: true }).first()
@@ -526,17 +485,12 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['admin']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -551,24 +505,18 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkDropdownActions(page, actions, 'taskActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('invoice_task and clone action displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useTasksActions({
     permissions: ['create_invoice', 'create_task'],
   });
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('create_invoice', 'create_task', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['create_invoice', 'create_task', 'create_client']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -583,17 +531,11 @@ test('invoice_task and clone action displayed with creation permissions', async 
 
   await checkDropdownActions(page, actions, 'taskActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('cloning task', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('create_task', 'edit_task', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['create_task', 'edit_task', 'create_client']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -631,7 +573,9 @@ test('cloning task', async ({ page, api }) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created task')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully created task')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page.waitForURL('**/tasks/**/edit');
 
@@ -644,19 +588,13 @@ test('cloning task', async ({ page, api }) => {
 });
 
 test('Invoice Task displayed with admin permission', async ({ page, api }) => {
- 
- test.setTimeout(60000); // 2 minutes for this test only
-  const { clear, save, set } = permissions(page);
+  test.setTimeout(60000); // 2 minutes for this test only
 
   const customActions = useCustomTaskActions({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('tasks@example.com', ['admin']);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -676,12 +614,7 @@ test('Invoice Task displayed with admin permission', async ({ page, api }) => {
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  // Wait for bulk actions button to appear after checkbox selection
-  await page
-    .locator('[data-cy="dataTable"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .first()
-    .waitFor({ state: 'visible', timeout: 5000 });
+  await expect(page.locator('[data-cy="bulkActionsTrigger"]')).toBeVisible({ timeout: 10000 });
 
   await checkDropdownActions(
     page,
@@ -690,7 +623,6 @@ test('Invoice Task displayed with admin permission', async ({ page, api }) => {
     'dataTable'
   );
 
-  await logout(page);
 });
 
 test('Invoice Task displayed with creation permissions', async ({
@@ -699,23 +631,18 @@ test('Invoice Task displayed with creation permissions', async ({
 }) => {
   test.setTimeout(60000); // 2 minutes for this test only
 
-  const { clear, save, set } = permissions(page);
 
   const customActions = useCustomTaskActions({
     permissions: ['create_invoice'],
   });
 
-  await login(page);
-  await clear('tasks@example.com');
-  await set(
+  await api.setPermissions('tasks@example.com', [
     'create_task',
     'create_invoice',
     'edit_task',
     'create_client',
     'view_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'tasks@example.com', 'password');
 
@@ -734,12 +661,7 @@ test('Invoice Task displayed with creation permissions', async ({
   await waitForTableData(page);
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
-  // Wait for bulk actions button to appear after checkbox selection
-  await page
-    .locator('[data-cy="dataTable"]')
-    .getByRole('button', { name: 'Actions', exact: true })
-    .first()
-    .waitFor({ state: 'visible', timeout: 5000 });
+  await expect(page.locator('[data-cy="bulkActionsTrigger"]')).toBeVisible({ timeout: 10000 });
 
   await checkDropdownActions(
     page,
@@ -748,5 +670,4 @@ test('Invoice Task displayed with creation permissions', async ({
     'dataTable'
   );
 
-  await logout(page);
 });

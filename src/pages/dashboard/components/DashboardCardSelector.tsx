@@ -9,9 +9,9 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { isEqual } from 'lodash';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { cloneDeep, set } from 'lodash';
+import classNames from 'classnames';
 import {
   DragDropContext,
   Draggable,
@@ -22,19 +22,17 @@ import { arrayMoveImmutable } from 'array-move';
 import { CgOptions } from 'react-icons/cg';
 import { MdClose, MdDragIndicator } from 'react-icons/md';
 import { IoWarning } from 'react-icons/io5';
-import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
   decodeDashboardField,
   encodeDashboardField,
 } from '$app/common/helpers/react-settings';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useColorScheme } from '$app/common/colors';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
+import {
+  useReactSettings,
+  useSaveReactSettings,
+} from '$app/common/hooks/useReactSettings';
 import { toast } from '$app/common/helpers/toast/toast';
-import { resetChanges, updateUser } from '$app/common/stores/slices/user';
-import { $refetch } from '$app/common/hooks/useRefetch';
 import { Button, InputField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
@@ -192,10 +190,11 @@ function DragItem({ decoded, onRemove }: DragItemProps) {
 
 export function DashboardCardSelector() {
   const [t] = useTranslation();
-  const dispatch = useDispatch();
 
   const colors = useColorScheme();
   const currentUser = useCurrentUser();
+  const reactSettings = useReactSettings();
+  const saveSettings = useSaveReactSettings();
 
   const fieldsRef = useRef<string[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -214,19 +213,28 @@ export function DashboardCardSelector() {
     fieldsRef.current = fields;
   }, [fields]);
 
+  // Avoid re-seeding on atom reference churn from unrelated settings writes.
+  const lastSeededFieldsRef = useRef<string[] | undefined>(undefined);
   useEffect(() => {
-    if (manageOpen && currentUser) {
-      setFields(
-        currentUser.company_user?.react_settings.dashboard_fields ?? []
-      );
-
-      setSearchQuery('');
-      setSelectedField('');
-      setPeriod('current');
-      setCalculate('sum');
-      setFormat('money');
+    if (!manageOpen || !currentUser) {
+      lastSeededFieldsRef.current = undefined;
+      return;
     }
-  }, [manageOpen, currentUser]);
+    if (
+      lastSeededFieldsRef.current !== undefined &&
+      isEqual(reactSettings.dashboard_fields, lastSeededFieldsRef.current)
+    ) {
+      return;
+    }
+    lastSeededFieldsRef.current = reactSettings.dashboard_fields;
+    setFields(reactSettings.dashboard_fields ?? []);
+
+    setSearchQuery('');
+    setSelectedField('');
+    setPeriod('current');
+    setCalculate('sum');
+    setFormat('money');
+  }, [manageOpen, currentUser, reactSettings.dashboard_fields]);
 
   const filteredFields = useMemo(
     () =>
@@ -259,40 +267,21 @@ export function DashboardCardSelector() {
   );
 
   const handleSave = useCallback(() => {
-    const updated = cloneDeep(currentUser);
-
-    if (!updated || isFormBusy) {
+    if (!currentUser || isFormBusy) {
       return;
     }
 
     toast.processing();
     setIsFormBusy(true);
 
-    set(
-      updated,
-      'company_user.react_settings.dashboard_fields',
-      fieldsRef.current
-    );
-
-    request(
-      'PUT',
-      endpoint('/api/v1/company_users/:id', { id: updated.id }),
-      updated
-    )
-      .then((response: GenericSingleResourceResponse<CompanyUser>) => {
+    saveSettings('dashboard_fields', fieldsRef.current)
+      .then(() => {
         toast.success('updated_settings');
-
-        set(updated, 'company_user', response.data.data);
-
-        $refetch(['company_users']);
-
-        dispatch(updateUser(updated));
-        dispatch(resetChanges());
-
         setManageOpen(false);
       })
+      .catch(() => toast.dismiss())
       .finally(() => setIsFormBusy(false));
-  }, [currentUser, isFormBusy, dispatch]);
+  }, [currentUser, isFormBusy, saveSettings]);
 
   const handleAdd = useCallback(() => {
     if (!selectedField || isDuplicate) {
@@ -396,7 +385,13 @@ export function DashboardCardSelector() {
 
                       return (
                         <div
-                          className="flex items-center justify-between rounded-md px-2 py-2 bg-gray-100"
+                          className={classNames(
+                            'flex items-center justify-between rounded-md px-2 py-2',
+                            {
+                              'bg-gray-100': !reactSettings.dark_mode,
+                              'bg-[#1f2e41]': reactSettings.dark_mode,
+                            }
+                          )}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                           ref={provided.innerRef}
@@ -423,7 +418,13 @@ export function DashboardCardSelector() {
                             >
                               {(provided) => (
                                 <div
-                                  className="flex items-center justify-between rounded-md px-2 py-2 bg-gray-100"
+                                  className={classNames(
+                                    'flex items-center justify-between rounded-md px-2 py-2',
+                                    {
+                                      'bg-gray-100': !reactSettings.dark_mode,
+                                      'bg-[#1f2e41]': reactSettings.dark_mode,
+                                    }
+                                  )}
                                   {...provided.draggableProps}
                                   ref={provided.innerRef}
                                 >

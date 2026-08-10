@@ -9,25 +9,28 @@
  */
 
 import { Dispatch, SetStateAction, useEffect, useRef } from 'react';
+import { useAtomValue } from 'jotai';
+import { reactSettingsAtom } from './useReactSettings';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useDataTablePreference } from './useDataTablePreference';
 import { PerPage } from '$app/components/DataTable';
-import { cloneDeep, isEqual, set } from 'lodash';
-import { User } from '../interfaces/user';
-import { $refetch } from './useRefetch';
-import { GenericSingleResourceResponse } from '../interfaces/generic-api-response';
-import { CompanyUser } from '../interfaces/company-user';
-import { endpoint } from '../helpers';
-import { request } from '../helpers/request';
-import { useDispatch } from 'react-redux';
-import { injectInChangesWithData, updateUser } from '../stores/slices/user';
+import { isEqual } from 'lodash';
 import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
 import { useCurrentUser } from './useCurrentUser';
-import { useLocation } from 'react-router-dom';
+import {
+  ScopedTableFilters,
+  useScopedTableFilters,
+} from './useScopedTableFilters';
+import {
+  useReactSettings,
+  useSaveReactSettings,
+  useUpdateReactSettings,
+} from './useReactSettings';
 
 interface Params {
   apiEndpoint: URL;
   customFilters?: SelectOption[];
+  defaultCustomFilterValues?: string[];
   tableKey: string | undefined;
   isInitialConfiguration: boolean;
   customFilter: string[] | undefined;
@@ -42,17 +45,20 @@ interface Params {
   withoutStoringPerPage: boolean;
   enableSavingFilterPreference?: boolean;
   withoutStoringPage?: boolean;
+  withoutStoringPreferences?: boolean;
+  withRecordScopedFilters?: boolean;
 }
 
 export function useDataTablePreferences(params: Params) {
   const user = useCurrentUser();
-  const dispatch = useDispatch();
-
-  const currentUserRef = useRef<User | undefined>();
+  const reactSettings = useReactSettings();
+  const updateSettings = useUpdateReactSettings();
+  const saveSettings = useSaveReactSettings();
 
   const {
     apiEndpoint,
     customFilters,
+    defaultCustomFilterValues,
     tableKey,
     isInitialConfiguration,
     customFilter,
@@ -67,24 +73,19 @@ export function useDataTablePreferences(params: Params) {
     withoutStoringPerPage,
     enableSavingFilterPreference,
     withoutStoringPage,
+    withoutStoringPreferences,
+    withRecordScopedFilters,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
   const storeSessionTableFilters = useStoreSessionTableFilters({ tableKey });
+  const { scopeId, storedFilters, storeFilters } = useScopedTableFilters({
+    tableKey,
+  });
 
-  const handleUpdateUserPreferences = (updatedUser: User) => {
-    request(
-      'PUT',
-      endpoint('/api/v1/company_users/:id', { id: updatedUser.id }),
-      updatedUser
-    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
-      set(updatedUser, 'company_user', response.data.data);
-
-      $refetch(['company_users']);
-
-      currentUserRef.current = updatedUser;
-    });
-  };
+  // The global toggle only gates server-side persistence. The session text
+  // filter always flows so it can bubble down to sub-tables (client overview).
+  const persistTableFilters = reactSettings.persist_table_filters !== false;
 
   const handleUpdateTableFilters = (
     filter: string,
@@ -94,41 +95,73 @@ export function useDataTablePreferences(params: Params) {
     status: string[],
     perPage: PerPage
   ) => {
+    if (withoutStoringPreferences) {
+      return;
+    }
+
+    if (withRecordScopedFilters) {
+      storeFilters({
+        filter,
+        customFilter,
+        status,
+        sort,
+        sortedBy,
+        perPage,
+        currentPage,
+      });
+
+      return;
+    }
+
+    if (tableKey) {
+      storeSessionTableFilters(filter, currentPage, withoutStoringPage);
+    }
+
     if (!customFilter || !tableKey || !enableSavingFilterPreference) {
       return;
     }
 
-    const currentTableFilters =
-      user?.company_user?.react_settings.table_filters?.[tableKey];
+    // Session text filter already stored above; the toggle only skips the
+    // server-persisted status/sort/perPage/customFilter.
+    if (!persistTableFilters) {
+      return;
+    }
+
+    const currentTableFilters = reactSettings.table_filters?.[tableKey];
+    const defaultCustomFilter = defaultCustomFilterValues ?? [];
+    const currentCustomFilter = customFilter.length
+      ? customFilter
+      : defaultCustomFilter;
 
     const defaultFilters = {
-      ...(customFilters && { customFilter: [] }),
+      ...(customFilters && { customFilter: defaultCustomFilter }),
       sort: apiEndpoint.searchParams.get('sort') || 'id|asc',
       status: ['active'],
       ...(!withoutStoringPerPage && { perPage: '10' }),
-      ...(!withoutStoringPage && { currentPage: 1 }),
     };
 
     const cleanedUpFilters = {
       ...(sortedBy && { sortedBy }),
-      ...(customFilters && { customFilter }),
+      ...(customFilters && { customFilter: currentCustomFilter }),
       sort,
       status,
       ...(!withoutStoringPerPage && { perPage }),
-      ...(!withoutStoringPage && { currentPage }),
     };
 
-    if (currentTableFilters && withoutStoringPerPage) {
-      delete currentTableFilters.perPage;
-    }
+    if (isEqual(defaultFilters, cleanedUpFilters)) {
+      if (currentTableFilters && user?.id) {
+        const tableFilters = { ...(reactSettings.table_filters ?? {}) };
 
-    if (currentTableFilters && withoutStoringPage) {
-      delete currentTableFilters.currentPage;
-    }
+        Object.keys(tableFilters).forEach((key) => {
+          if (key.includes('/')) {
+            delete tableFilters[key];
+          }
+        });
 
-    storeSessionTableFilters(filter, currentPage);
+        delete tableFilters[tableKey];
+        saveSettings('table_filters', tableFilters);
+      }
 
-    if (isEqual(defaultFilters, cleanedUpFilters) && !currentTableFilters) {
       return;
     }
 
@@ -136,83 +169,116 @@ export function useDataTablePreferences(params: Params) {
       return;
     }
 
-    const updatedUser = cloneDeep(user) as User;
+    if (!user?.id) return;
 
-    if (updatedUser) {
-      // @Todo: This is a temporary solution for creating the table_filters object. It can be removed after some time.
-      const tableFilters =
-        updatedUser.company_user?.react_settings.table_filters || {};
+    // Strip legacy URL-shaped table filter keys before persisting.
+    const tableFilters = { ...(reactSettings.table_filters ?? {}) };
+    Object.keys(tableFilters).forEach((key) => {
+      if (key.includes('/')) {
+        delete tableFilters[key];
+      }
+    });
+    updateSettings('table_filters', tableFilters);
+    saveSettings(`table_filters.${tableKey}`, cleanedUpFilters);
+  };
 
-      Object.keys(tableFilters).forEach((key) => {
-        if (key.includes('/')) {
-          delete tableFilters[key];
-        }
-      });
+  // Apply saved table preferences once per table key.
+  const appliedRef = useRef<boolean>(false);
+  useEffect(() => {
+    appliedRef.current = false;
+  }, [tableKey, scopeId]);
 
-      set(
-        updatedUser,
-        `company_user.react_settings.table_filters.${tableKey}`,
-        cleanedUpFilters
-      );
+  const rawAtom = useAtomValue(reactSettingsAtom);
+  const isHydrated = rawAtom !== null;
 
-      handleUpdateUserPreferences(updatedUser as User);
+  const applyServerPreferences = () => {
+    if (customFilters) {
+      if ((getPreference('customFilter') as string[]).length) {
+        setCustomFilter(getPreference('customFilter') as string[]);
+      } else {
+        setCustomFilter(defaultCustomFilterValues ?? []);
+      }
+    } else {
+      setCustomFilter([]);
+    }
+    if (!withoutStoringPerPage) {
+      setPerPage((getPreference('perPage') as PerPage) || '10');
+    }
+    if (!withoutStoringPage) {
+      setCurrentPage((getPreference('currentPage') as number) || 1);
+    }
+    setSort(
+      (getPreference('sort') as string) ||
+        apiEndpoint.searchParams.get('sort') ||
+        'id|asc'
+    );
+    setSortedBy((getPreference('sortedBy') as string) || undefined);
+    if ((getPreference('status') as string[]).length) {
+      setStatus(getPreference('status') as string[]);
+    } else {
+      setStatus(['active']);
     }
   };
 
-  const { pathname } = useLocation();
+  const applyScopedFilters = (filters: ScopedTableFilters) => {
+    setFilter(filters.filter ?? '');
+    setCustomFilter(filters.customFilter ?? defaultCustomFilterValues ?? []);
+    setSort(filters.sort || apiEndpoint.searchParams.get('sort') || 'id|asc');
+    setSortedBy(filters.sortedBy);
+    setStatus(filters.status?.length ? filters.status : ['active']);
 
-  useEffect(() => {
-    if (!isInitialConfiguration && !customFilter) {
-      // We wanna set filter only if we're on parent invoices page.
-      // Skip setting filter on other pages like client invoices.
-
-      if (tableKey !== 'invoices') {
-        setFilter((getPreference('filter') as string) || '');
-      }
-
-      if (tableKey === 'invoices' && pathname.endsWith('/invoices')) {
-        setFilter((getPreference('filter') as string) || '');
-      }
-
-      if (customFilters) {
-        if ((getPreference('customFilter') as string[]).length) {
-          setCustomFilter(getPreference('customFilter') as string[]);
-        } else {
-          setCustomFilter([]);
-        }
-      } else {
-        setCustomFilter([]);
-      }
-      if (!withoutStoringPerPage) {
-        setPerPage((getPreference('perPage') as PerPage) || '10');
-      }
-      if (!withoutStoringPage) {
-        setCurrentPage((getPreference('currentPage') as number) || 1);
-      }
-      setSort(
-        (getPreference('sort') as string) ||
-          apiEndpoint.searchParams.get('sort') ||
-          'id|asc'
-      );
-      setSortedBy((getPreference('sortedBy') as string) || undefined);
-      if ((getPreference('status') as string[]).length) {
-        setStatus(getPreference('status') as string[]);
-      } else {
-        setStatus(['active']);
-      }
-
-      setArePreferencesApplied(true);
+    if (!withoutStoringPerPage) {
+      setPerPage(filters.perPage ?? '10');
     }
-  }, [isInitialConfiguration]);
+    if (!withoutStoringPage) {
+      setCurrentPage(filters.currentPage ?? 1);
+    }
+  };
 
   useEffect(() => {
-    return () => {
-      if (currentUserRef.current) {
-        dispatch(updateUser(currentUserRef.current));
-        dispatch(injectInChangesWithData(currentUserRef.current));
-      }
+    // Guards logout/unmount races where the atom has been reset to null.
+    if (!isHydrated || appliedRef.current) return;
+
+    const markAsApplied = () => {
+      setArePreferencesApplied(true);
+      appliedRef.current = true;
     };
-  }, []);
+
+    if (withoutStoringPreferences) {
+      markAsApplied();
+      return;
+    }
+
+    if (withRecordScopedFilters) {
+      if (storedFilters) {
+        applyScopedFilters(storedFilters);
+      } else {
+        setFilter((getPreference('filter') as string) || '');
+
+        if (persistTableFilters) {
+          applyServerPreferences();
+        } else {
+          setCustomFilter(defaultCustomFilterValues ?? []);
+        }
+      }
+
+      markAsApplied();
+      return;
+    }
+
+    if (!persistTableFilters) {
+      setFilter((getPreference('filter') as string) || '');
+      setCustomFilter([]);
+      markAsApplied();
+      return;
+    }
+
+    if (!isInitialConfiguration) {
+      setFilter((getPreference('filter') as string) || '');
+      applyServerPreferences();
+      markAsApplied();
+    }
+  }, [isInitialConfiguration, isHydrated, tableKey, scopeId]);
 
   return { handleUpdateTableFilters };
 }

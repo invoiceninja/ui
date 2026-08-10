@@ -39,7 +39,7 @@ export function EInvoiceCredits() {
 
   if (
     !company.legal_entity_id ||
-    company.settings.e_invoice_type !== 'PEPPOL' 
+    company.settings.e_invoice_type !== 'PEPPOL'
   ) {
     return null;
   }

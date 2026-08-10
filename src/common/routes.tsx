@@ -10,6 +10,8 @@
 
 import { Route, Routes } from 'react-router';
 import { PrivateRoute } from '../components/PrivateRoute';
+import { HostedRoute } from '../components/HostedRoute';
+import { isCalendarConnectionAvailable } from '$app/common/helpers';
 import { invoiceRoutes } from '$app/pages/invoices/routes';
 import { clientRoutes } from '$app/pages/clients/routes';
 import { productRoutes } from '$app/pages/products/routes';
@@ -34,10 +36,16 @@ import { TestingPage } from '$app/components/TestingPage';
 import { activityRoutes } from '$app/pages/activities/routes';
 import { Guard } from './guards/Guard';
 import { permission } from './guards/guards/permission';
+import { enabled } from './guards/guards/enabled';
+import { or } from './guards/guards/or';
+import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { documentsRoutes } from '$app/pages/documents/routes';
 import { CorpPassSuccess } from '$app/pages/settings/e-invoice/peppol/CorpPassSuccess';
 import { CorpPassFailed } from '$app/pages/settings/e-invoice/peppol/CorpPassFailed';
 const Dashboard = lazy(() => import('$app/pages/dashboard/Dashboard'));
+const CalendarConnectionComplete = lazy(
+  () => import('$app/pages/tasks/calendar/Complete')
+);
 const NotFound = lazy(() => import('$app/components/NotFound'));
 
 export const routes = (
@@ -72,6 +80,22 @@ export const routes = (
       {documentsRoutes}
       {settingsRoutes}
       {activityRoutes}
+      <Route
+        element={<HostedRoute enabled={isCalendarConnectionAvailable()} />}
+      >
+        <Route
+          path="/calendar_connection/complete"
+          element={
+            <Guard
+              guards={[
+                enabled(ModuleBitmask.Tasks),
+                or(permission('view_task'), permission('edit_task')),
+              ]}
+              component={<CalendarConnectionComplete />}
+            />
+          }
+        />
+      </Route>
       <Route
         path="/einvoice/registration/success"
         element={<CorpPassSuccess />}

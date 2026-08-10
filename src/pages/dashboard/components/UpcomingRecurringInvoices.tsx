@@ -121,6 +121,7 @@ export function UpcomingRecurringInvoices() {
           withoutPagination
           withoutPadding
           withoutPerPageAsPreference
+          withoutStoringPreferences
           styleOptions={{
             withoutBottomBorder: true,
             withoutTopBorder: true,

@@ -44,6 +44,7 @@ import {
   isTaskRunning,
 } from './helpers/calculate-entity-state';
 import { calculateHours } from './helpers/calculate-time';
+import { shouldShowStartTaskButton } from './helpers/task';
 import { useInvoiceTask } from './hooks/useInvoiceTask';
 import { useStart } from './hooks/useStart';
 import { useStop } from './hooks/useStop';
@@ -81,6 +82,7 @@ import classNames from 'classnames';
 import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'status',
@@ -125,6 +127,7 @@ export function useAllTaskColumns() {
     'updated_at',
     'user',
     'assigned_user',
+    'tags',
   ] as const;
 
   return taskColumns.map((column) => normalizeColumnName(column));
@@ -384,6 +387,12 @@ export function useTaskColumns() {
       format: (value, task) =>
         task?.assigned_user ? formatUserName(task?.assigned_user) : '',
     },
+    {
+      column: 'tags',
+      id: 'task_tag_ids',
+      label: t('tags'),
+      format: (value, task) => <TagPills tags={task.tags} />,
+    },
   ];
 
   const list: string[] =
@@ -514,8 +523,7 @@ export function useActions(params?: Params) {
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
     (task: Task) =>
-      !isTaskRunning(task) &&
-      !task.invoice_id && (
+      shouldShowStartTaskButton(task) && (
         <DropdownElement
           onClick={() => start(task)}
           icon={<Icon element={MdNotStarted} />}
@@ -633,9 +641,7 @@ export const useCustomBulkActions = () => {
   };
 
   const showStartAction = (selectedTasks: Task[]) => {
-    return selectedTasks.every(
-      (task) => !isTaskRunning(task) && !task.invoice_id
-    );
+    return selectedTasks.every((task) => shouldShowStartTaskButton(task));
   };
 
   const showStopAction = (selectedTasks: Task[]) => {

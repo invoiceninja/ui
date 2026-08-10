@@ -16,7 +16,9 @@ import { Route } from 'react-router-dom';
 import { lazy } from 'react';
 import { admin } from '$app/common/guards/guards/admin';
 
-const Activities = lazy(() => import('$app/pages/payments/edit/components/Activities'));
+const Activities = lazy(
+  () => import('$app/pages/payments/edit/components/Activities')
+);
 const Payment = lazy(() => import('$app/pages/payments/Payment'));
 const Import = lazy(() => import('$app/pages/payments/import/Import'));
 const Payments = lazy(() => import('$app/pages/payments/index/Payments'));

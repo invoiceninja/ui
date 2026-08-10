@@ -8,8 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import {
+  useDraftOrCommittedReactSettings,
+  useUpdateDraftOrReactSettings,
+} from '$app/common/hooks/useReactSettings';
 import { Modal } from '$app/components/Modal';
 import { Element } from '$app/components/cards';
 import { Button, InputField, SelectField } from '$app/components/forms';
@@ -20,8 +22,6 @@ import { MdDone } from 'react-icons/md';
 import hexColorRegex from 'hex-color-regex';
 import { toast } from '$app/common/helpers/toast/toast';
 import { cloneDeep } from 'lodash';
-import { useDispatch } from 'react-redux';
-import { updateChanges } from '$app/common/stores/slices/user';
 import { useColorScheme } from '$app/common/colors';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
 
@@ -185,7 +185,7 @@ export function useIsColorValid() {
 }
 
 export function useStatusThemeColorScheme() {
-  const reactSettings = useReactSettings();
+  const reactSettings = useDraftOrCommittedReactSettings();
 
   const colors = {
     $1: '',
@@ -205,7 +205,7 @@ export function useStatusThemeColorScheme() {
 }
 
 export function useThemeColorScheme() {
-  const reactSettings = useReactSettings();
+  const reactSettings = useDraftOrCommittedReactSettings();
 
   const colors = {
     $1: '',
@@ -228,10 +228,12 @@ export function useThemeColorScheme() {
 export function StatusColorTheme() {
   const [t] = useTranslation();
 
-  const reactSettings = useReactSettings();
+  const reactSettings = useDraftOrCommittedReactSettings();
+  const updateSettings = useUpdateDraftOrReactSettings();
 
-  const dispatch = useDispatch();
-  const handleUserChange = useHandleCurrentUserChangeProperty();
+  const handleUserChange = (path: string, value: unknown) => {
+    updateSettings(path.replace(/^company_user\.react_settings\./, ''), value);
+  };
 
   const handleExportColors = () => {
     let value = '';
@@ -261,12 +263,7 @@ export function StatusColorTheme() {
         updatedColorTheme[fieldKey] = '';
       });
 
-      dispatch(
-        updateChanges({
-          property: 'company_user.react_settings.color_theme',
-          value: updatedColorTheme,
-        })
-      );
+      updateSettings('color_theme', updatedColorTheme);
     }
   };
 
@@ -335,9 +332,12 @@ interface Props {
 export function CustomColorField(props: Props) {
   const { fieldKey } = props;
 
-  const reactSettings = useReactSettings();
+  const reactSettings = useDraftOrCommittedReactSettings();
+  const updateSettings = useUpdateDraftOrReactSettings();
 
-  const handleUserChange = useHandleCurrentUserChangeProperty();
+  const handleUserChange = (path: string, value: unknown) => {
+    updateSettings(path.replace(/^company_user\.react_settings\./, ''), value);
+  };
 
   return (
     <div className="flex space-x-20">
@@ -366,10 +366,14 @@ export function DefaultColorPickerModal(props: ModalProps) {
   const { fieldKey } = props;
 
   const colors = useColorScheme();
-  const reactSettings = useReactSettings();
+  const reactSettings = useDraftOrCommittedReactSettings();
+  const updateSettings = useUpdateDraftOrReactSettings();
 
   const isColorValid = useIsColorValid();
-  const handleUserChange = useHandleCurrentUserChangeProperty();
+
+  const handleUserChange = (path: string, value: unknown) => {
+    updateSettings(path.replace(/^company_user\.react_settings\./, ''), value);
+  };
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedColor, setSelectedColor] = useState<string>('');

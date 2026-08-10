@@ -123,7 +123,7 @@ export function EditBlueprintModal({ blueprint, isOpen, onClose }: Props) {
         </div>
 
         <div className="flex justify-end space-x-2 pt-4">
-        <Button 
+          <Button
             type="secondary"
             onClick={handleClose}
             disabled={isFormBusy}
@@ -132,7 +132,7 @@ export function EditBlueprintModal({ blueprint, isOpen, onClose }: Props) {
             {t('cancel')}
           </Button>
 
-          <Button 
+          <Button
             type="primary"
             onClick={handleSave}
             disabled={isFormBusy || !formData.name.trim()}

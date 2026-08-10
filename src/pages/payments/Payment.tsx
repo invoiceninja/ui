@@ -37,6 +37,8 @@ import {
 } from '$app/common/queries/sockets';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { InputLabel } from '$app/components/forms';
+import { useAtomValue } from 'jotai';
+import { paymentPageSaveActionAtom } from './common/hooks/usePaymentPageSaveAction';
 
 export default function Payment() {
   const [t] = useTranslation();
@@ -65,6 +67,8 @@ export default function Payment() {
   const onSave = useSave({ setErrors, isFormBusy, setIsFormBusy });
 
   const actions = useActions();
+
+  const subPageSaveAction = useAtomValue(paymentPageSaveActionAtom);
 
   useEffect(() => {
     if (data) {
@@ -95,16 +99,23 @@ export default function Payment() {
       breadcrumbs={pages}
       {...((hasPermission('edit_payment') || entityAssigned(paymentValue)) &&
         paymentValue && {
-          onSaveClick: () => onSave(paymentValue as unknown as PaymentEntity),
           navigationTopRight: (
             <ResourceActions
-              label={t('more_actions')}
               resource={paymentValue}
               actions={actions}
+              onSaveClick={
+                subPageSaveAction
+                  ? subPageSaveAction.onClick
+                  : () => onSave(paymentValue as unknown as PaymentEntity)
+              }
+              disableSaveButton={
+                subPageSaveAction
+                  ? subPageSaveAction.disabled
+                  : !paymentValue || isFormBusy
+              }
               cypressRef="paymentActionDropdown"
             />
           ),
-          disableSaveButton: !paymentValue || isFormBusy,
         })}
       aboveMainContainer={
         <Banner id="paymentUpdateBanner" className="hidden" variant="orange">

@@ -13,4 +13,8 @@ export * from './permission';
 
 // Re-export the main guard component and types
 export { DocuNinjaGuard } from '../../DocuNinjaGuard';
-export type { DocuNinjaGuard as DocuNinjaGuardType, DocuNinjaContext, DocuNinjaPermission } from '../../DocuNinjaGuard';
+export type {
+  DocuNinjaGuard as DocuNinjaGuardType,
+  DocuNinjaContext,
+  DocuNinjaPermission,
+} from '../../DocuNinjaGuard';

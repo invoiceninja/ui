@@ -20,13 +20,21 @@ export function isHosted(): boolean {
   return import.meta.env.VITE_IS_HOSTED === 'true';
 }
 
+export function isDevCalendarEnabled(): boolean {
+  return import.meta.env.DEV && import.meta.env.VITE_DEV_CALENDAR === 'true';
+}
+
+export function isCalendarConnectionAvailable(): boolean {
+  return isHosted() || isDevCalendarEnabled();
+}
+
 export function isSelfHosted(): boolean {
   return !isHosted();
 }
 
 export function apiEndpoint(): string {
   if (isHosted()) {
-    return 'https://invoicing.co';
+    return import.meta.env.VITE_HOSTED_API_URL || 'https://invoicing.co';
   }
 
   return (
@@ -61,7 +69,7 @@ export function classNames(...classes: any) {
 }
 
 export function date(date: number | string, format: string) {
-  if (date === 0 || date === '' || date === undefined) {
+  if (!date) {
     return '';
   }
 

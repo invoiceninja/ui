@@ -83,14 +83,8 @@ export function InvoiceTotals(props: Props) {
     return false;
   };
 
-  const isTaxField = (variable: string) => {
-    return (
-      variable === '$tax1' ||
-      variable === '$tax2' ||
-      variable === '$tax3' ||
-      variable === '$total_taxes' ||
-      variable === '$line_taxes'
-    );
+  const isTaxSelectorField = (variable: string) => {
+    return variable === '$tax1' || variable === '$tax2' || variable === '$tax3';
   };
 
   const isSurchargeField = (variable: string) => {
@@ -137,7 +131,7 @@ export function InvoiceTotals(props: Props) {
         >
           {variables.map((variable, index) => (
             <Fragment key={index}>
-              {isTaxField(variable) && (
+              {isTaxSelectorField(variable) && (
                 <>
                   {Boolean(
                     company &&
@@ -432,7 +426,7 @@ export function InvoiceTotals(props: Props) {
                 </>
               )}
 
-              {!isTaxField(variable) && !isSurchargeField(variable) && (
+              {!isTaxSelectorField(variable) && !isSurchargeField(variable) && (
                 <>{resolveVariable(variable)}</>
               )}
             </Fragment>

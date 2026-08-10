@@ -19,13 +19,25 @@ import { DoubleChevronLeft } from '../icons/DoubleChevronLeft';
 import { ChevronRight } from '../icons/ChevronRight';
 import { DoubleChevronRight } from '../icons/DoubleChevronRight';
 import styled from 'styled-components';
+import {
+  getPageNavigationState,
+  PageNavigationAction,
+  resolvePageNavigation,
+} from '$app/common/helpers/pagination';
+import { PaginationMeta } from '$app/common/interfaces/generic-many-response';
 
-const PaginationButton = styled.div`
+const PaginationButton = styled.button`
   background-color: ${(props) => props.theme.backgroundColor};
   border-color: ${(props) => props.theme.borderColor};
+  cursor: pointer;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: ${(props) => props.theme.hoverColor};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
@@ -48,6 +60,7 @@ interface Props extends CommonProps {
   currentPerPage?: PerPage;
   onRowsChange: (rows: PerPage) => any;
   totalRecords?: number;
+  pagination?: PaginationMeta;
 }
 
 const defaultProps: Props = {
@@ -73,11 +86,25 @@ export function Pagination(props: Props) {
     setPageInputValue(String(props.currentPage));
   }, [props.currentPage]);
 
-  const goToPage = (pageNumber: number) => {
-    if (pageNumber >= 1 && pageNumber <= props.totalPages) {
-      props.onPageChange(pageNumber);
+  const navigate = (action: PageNavigationAction) => {
+    const page = resolvePageNavigation(action, {
+      currentPage: props.currentPage,
+      totalPages: props.totalPages,
+      pagination: props.pagination,
+    });
+
+    if (page !== null) {
+      props.onPageChange(page);
     }
+
+    return page;
   };
+
+  const { canPrevious, canNext } = getPageNavigationState({
+    currentPage: props.currentPage,
+    totalPages: props.totalPages,
+    pagination: props.pagination,
+  });
 
   const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -94,13 +121,9 @@ export function Pagination(props: Props) {
   const handlePageInputBlur = () => {
     const pageNumber = parseInt(pageInputValue, 10);
 
-    if (
-      !isNaN(pageNumber) &&
-      pageNumber >= 1 &&
-      pageNumber <= props.totalPages
-    ) {
-      goToPage(pageNumber);
-    } else {
+    const page = !isNaN(pageNumber) ? navigate(pageNumber) : null;
+
+    if (page === null) {
       setPageInputValue(String(props.currentPage));
     }
   };
@@ -125,25 +148,31 @@ export function Pagination(props: Props) {
       >
         <div className="flex items-center">
           <PaginationButton
-            className="p-2 sm:p-[0.725rem] border rounded-l-md shadow-sm cursor-pointer"
+            type="button"
+            className="p-2 sm:p-[0.725rem] border rounded-l-md shadow-sm"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            onClick={() => goToPage(1)}
+            disabled={!canPrevious}
+            data-cy="paginationFirstPage"
+            onClick={() => navigate('first')}
           >
             <DoubleChevronLeft size="0.9rem" color={colors.$3} />
           </PaginationButton>
 
           <PaginationButton
-            className="p-2 sm:p-[0.725rem] border-b border-t border-r rounded-r-md shadow-sm cursor-pointer"
+            type="button"
+            className="p-2 sm:p-[0.725rem] border-b border-t border-r rounded-r-md shadow-sm"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            onClick={() => goToPage(props.currentPage - 1)}
+            disabled={!canPrevious}
+            data-cy="paginationPreviousPage"
+            onClick={() => navigate('previous')}
           >
             <ChevronLeft size="0.9rem" color={colors.$3} />
           </PaginationButton>
@@ -170,25 +199,31 @@ export function Pagination(props: Props) {
 
         <div className="flex">
           <PaginationButton
-            className="p-2 sm:p-[0.725rem] border-t border-b border-l rounded-l-md shadow-sm cursor-pointer"
+            type="button"
+            className="p-2 sm:p-[0.725rem] border-t border-b border-l rounded-l-md shadow-sm"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            onClick={() => goToPage(props.currentPage + 1)}
+            disabled={!canNext}
+            data-cy="paginationNextPage"
+            onClick={() => navigate('next')}
           >
             <ChevronRight size="0.9rem" color={colors.$3} />
           </PaginationButton>
 
           <PaginationButton
-            className="p-2 sm:p-[0.725rem] border rounded-r-md shadow-sm cursor-pointer"
+            type="button"
+            className="p-2 sm:p-[0.725rem] border rounded-r-md shadow-sm"
             theme={{
               hoverColor: colors.$4,
               backgroundColor: colors.$1,
               borderColor: colors.$24,
             }}
-            onClick={() => goToPage(props.totalPages)}
+            disabled={!canNext}
+            data-cy="paginationLastPage"
+            onClick={() => navigate('last')}
           >
             <DoubleChevronRight size="0.9rem" color={colors.$3} />
           </PaginationButton>

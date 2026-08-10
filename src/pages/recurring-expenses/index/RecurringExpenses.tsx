@@ -9,6 +9,11 @@
  */
 import { useTitle } from '$app/common/hooks/useTitle';
 import { DataTable } from '$app/components/DataTable';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +26,16 @@ import {
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import {
+  RecurringExpenseSlider,
+  recurringExpenseSliderAtom,
+  recurringExpenseSliderVisibilityAtom,
+} from '../common/components/RecurringExpenseSlider';
+import { useAtom } from 'jotai';
+import { useRecurringExpenseQuery } from '$app/common/queries/recurring-expense';
+import { useEffect, useState } from 'react';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 
 export default function RecurringExpenses() {
   useTitle('recurring_expenses');
@@ -37,9 +52,53 @@ export default function RecurringExpenses() {
 
   const actions = useActions();
 
+  const reactSettings = useReactSettings();
+
   const recurringExpenseColumns = useAllRecurringExpenseColumns();
 
   const customBulkActions = useCustomBulkActions();
+
+  const selectedColumns =
+    reactSettings?.react_table_columns?.recurringExpense || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.recurringExpense,
+    'recurring_expense_tag_ids',
+    { enabled: shouldShowTagFilter }
+  );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'recurring_expense_tag_ids');
+
+  const disableNavigation = useDisableNavigation();
+
+  const [sliderRecurringExpenseId, setSliderRecurringExpenseId] =
+    useState<string>('');
+  const [recurringExpenseSlider, setRecurringExpenseSlider] = useAtom(
+    recurringExpenseSliderAtom
+  );
+  const [
+    recurringExpenseSliderVisibility,
+    setRecurringExpenseSliderVisibility,
+  ] = useAtom(recurringExpenseSliderVisibilityAtom);
+
+  const { data: recurringExpenseResponse } = useRecurringExpenseQuery({
+    id: sliderRecurringExpenseId,
+    enabled: Boolean(sliderRecurringExpenseId),
+  });
+
+  useEffect(() => {
+    setRecurringExpenseSlider(null);
+  }, [sliderRecurringExpenseId]);
+
+  useEffect(() => {
+    if (recurringExpenseResponse && recurringExpenseSliderVisibility) {
+      setRecurringExpenseSlider(recurringExpenseResponse);
+    }
+  }, [recurringExpenseResponse, recurringExpenseSliderVisibility]);
+
+  useEffect(() => {
+    return () => setRecurringExpenseSliderVisibility(false);
+  }, []);
 
   return (
     <Default
@@ -49,13 +108,18 @@ export default function RecurringExpenses() {
     >
       <DataTable
         resource="recurring_expense"
-        endpoint="/api/v1/recurring_expenses?include=client,vendor&sort=id|desc&without_deleted_clients=true&without_deleted_vendors=true"
+        endpoint={`/api/v1/recurring_expenses?include=client,vendor${
+          shouldShowTagFilter ? ',tags' : ''
+        }&sort=id|desc&without_deleted_clients=true&without_deleted_vendors=true${
+          shouldShowTagFilter ? '' : '&tag_ids='
+        }`}
         columns={columns}
         bulkRoute="/api/v1/recurring_expenses/bulk"
         linkToCreate="/recurring_expenses/create"
         linkToEdit="/recurring_expenses/:id/edit"
         customActions={actions}
         customBulkActions={customBulkActions}
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         withResourcefulActions
         rightSide={
           <DataTableColumnsPicker
@@ -72,7 +136,15 @@ export default function RecurringExpenses() {
           { column: 'created_at', queryParameterKey: 'created_between' },
         ]}
         enableSavingLatestDataForNavigation
+        onTableRowClick={(recurringExpense) => {
+          setSliderRecurringExpenseId(recurringExpense.id);
+          setRecurringExpenseSliderVisibility(true);
+        }}
       />
+
+      {!disableNavigation('recurring_expense', recurringExpenseSlider) && (
+        <RecurringExpenseSlider />
+      )}
     </Default>
   );
 }

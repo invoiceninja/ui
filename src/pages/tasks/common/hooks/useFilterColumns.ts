@@ -1,13 +1,19 @@
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { User } from '$app/common/interfaces/user';
 import { useClientsQuery } from '$app/common/queries/clients';
 import { useProjectsQuery } from '$app/common/queries/projects';
 import { useUsersQuery } from '$app/common/queries/users';
 import { FilterColumn } from '$app/components/DataTable';
+import { useEntityTagFilterColumns } from '$app/common/hooks/useEntityTagFilters';
 
 export function useFilterColumns() {
   const { data: users } = useUsersQuery();
   const { data: clients } = useClientsQuery({ status: ['active'] });
   const { data: projects } = useProjectsQuery({ status: ['active'] });
+  const tagFilterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.task,
+    'task_tag_ids'
+  );
 
   const filterColumns: FilterColumn[] = [
     {
@@ -40,6 +46,7 @@ export function useFilterColumns() {
           value: client.id,
         })) || [],
     },
+    ...tagFilterColumns,
   ];
 
   return filterColumns;

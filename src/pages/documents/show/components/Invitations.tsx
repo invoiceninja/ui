@@ -20,7 +20,7 @@ import {
   type DocumentInvitation,
   DocumentStatus,
 } from '$app/common/interfaces/docuninja/api';
-import { route } from '$app/common/helpers/route';
+import { route, routeWithOrigin } from '$app/common/helpers/route';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { Plus } from '$app/components/icons/Plus';
@@ -98,6 +98,26 @@ function Invitation({ invitation, document }: InvitationProps) {
   const [isSendingInvitation, setIsSendingInvitation] =
     useState<boolean>(false);
 
+  const canSendInvitation = (invitation: DocumentInvitation) => {
+    const invitations = document.invitations || [];
+
+    const usesOrderedSigning = invitations.some(
+      (i) => i.signing_order != null
+    );
+
+    if (!usesOrderedSigning) {
+      return true;
+    }
+
+    const current = [...invitations]
+      .filter((i) => !i.signed_date)
+      .sort(
+        (a, b) => (a.signing_order ?? 0) - (b.signing_order ?? 0)
+      )[0];
+
+    return current?.id === invitation.id;
+  };
+
   const getInvitationStatus = (invitation: DocumentInvitation) => {
     if (invitation.signed_date) {
       return <Badge variant="green">{t('signed')}</Badge>;
@@ -160,7 +180,9 @@ function Invitation({ invitation, document }: InvitationProps) {
   };
 
   const handleCopyLink = () => {
-    const link = `${window.location.origin}/docuninja/sign/${document.id}/${invitation.id}`;
+    const link = routeWithOrigin(
+      `/docuninja/sign/${document.id}/${invitation.id}`
+    );
     navigator.clipboard.writeText(link);
     toast.success(t('link_copied') || 'Link copied to clipboard');
   };
@@ -271,7 +293,7 @@ function Invitation({ invitation, document }: InvitationProps) {
             type="minimal"
             behavior="button"
             onClick={handleSendInvitation}
-            disabled={isSendingInvitation}
+            disabled={isSendingInvitation || !canSendInvitation(invitation)}
             disableWithoutIcon
           >
             <div className="flex items-center space-x-2">

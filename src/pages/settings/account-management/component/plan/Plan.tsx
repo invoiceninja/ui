@@ -52,8 +52,6 @@ export function Plan({ title, color, trial, price, custom, term }: PlanProps) {
       });
   };
 
-  
-
   const width = () => {
     const percentage = (account.trial_days_left / 14) * 100;
 
@@ -65,55 +63,58 @@ export function Plan({ title, color, trial, price, custom, term }: PlanProps) {
 
   return (
     <>
-    <div
-      className="border border-l-8 rounded p-4 flex flex-col space-y-4"
-      style={{ borderColor: color }}
-    >
-      <div className="flex justify-between items-center">
-        <p className="font-semibold">{title}</p>
+      <div
+        className="border border-l-8 rounded p-4 flex flex-col space-y-4"
+        style={{ borderColor: color }}
+      >
+        <div className="flex justify-between items-center">
+          <p className="font-semibold">{title}</p>
 
-        {custom ? (
-          <b>{price}</b>
+          {custom ? (
+            <b>{price}</b>
+          ) : (
+            <p>
+              {trial ? t('free_trial_then') : null} <b> ${price} /</b>{' '}
+              <span className="lowercase mr-4">{t(term)}</span>
+              {account.trial_days_left > 0 && (
+                <Button
+                  className="bg-red-500 text-white"
+                  behavior="button"
+                  type="minimal"
+                  onClick={handleTrialCancellation}
+                >
+                  {t('cancel')}
+                </Button>
+              )}
+            </p>
+          )}
+        </div>
+
+        {trial ? (
+          <div className="flex justify-between items-center">
+            <p>{trans('days_left', { days: account.trial_days_left })}</p>
+            <p>{trans('days_trial', { days: 14 })}</p>
+          </div>
         ) : (
-          <p>
-            {trial ? t('free_trial_then') : null} <b> ${price} /</b>{' '}
-            <span className="lowercase mr-4">{t(term)}</span>
-            {account.trial_days_left > 0 && (
-            <Button className="bg-red-500 text-white" behavior="button" type="minimal" onClick={handleTrialCancellation}>
-              {t('cancel')}
-            </Button>
-            )}
-          </p>
+          <div className="flex justify-between items-center">
+            <p>
+              {t('expires_on')} <b>{date(account.plan_expires, dateFormat)}</b>
+            </p>
+          </div>
         )}
-      </div>
 
-      {trial ? (
-        <div className="flex justify-between items-center">
-          <p>{trans('days_left', { days: account.trial_days_left })}</p>
-          <p>{trans('days_trial', { days: 14 })}</p>
-        </div>
-      ) : (
-        <div className="flex justify-between items-center">
-          <p>
-            {t('expires_on')} <b>{date(account.plan_expires, dateFormat)}</b>
-          </p>
-        </div>
-      )}
-
-      {trial ? (
-        <div
-          className="w-full rounded-full h-2.5"
-          style={{ backgroundColor: scheme.$2 }}
-        >
+        {trial ? (
           <div
-            className="h-2.5 rounded-full"
-            style={{ width: width(), background: color }}
-          ></div>
-        </div>
-      ) : null}
-
-
-    </div>
+            className="w-full rounded-full h-2.5"
+            style={{ backgroundColor: scheme.$2 }}
+          >
+            <div
+              className="h-2.5 rounded-full"
+              style={{ width: width(), background: color }}
+            ></div>
+          </div>
+        ) : null}
+      </div>
 
       <Modal
         title={t('cancel_trial')}
@@ -135,7 +136,7 @@ export function Plan({ title, color, trial, price, custom, term }: PlanProps) {
           </div>
         </div>
       </Modal>
-      </>
+    </>
   );
 }
 

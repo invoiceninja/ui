@@ -15,7 +15,7 @@ import { X } from 'react-feather';
 import { NavigationItem } from './DesktopSidebar';
 import { SidebarItem } from './SidebarItem';
 import { useColorScheme } from '$app/common/colors';
-import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { HelpSidebarIcons } from '$app/components/HelpSidebarIcons';
 
 interface Props {
@@ -26,11 +26,9 @@ interface Props {
 
 export function MobileSidebar(props: Props) {
   const colors = useColorScheme();
-  const user = useInjectUserChanges();
+  const reactSettings = useReactSettings();
 
-  const isMiniSidebar = Boolean(
-    user?.company_user?.react_settings.show_mini_sidebar
-  );
+  const isMiniSidebar = Boolean(reactSettings.show_mini_sidebar);
 
   return (
     <Transition.Root show={props.sidebarOpen} as={Fragment}>

@@ -156,18 +156,20 @@ export function InvoicePreview(props: Props) {
   ) {
     return (
       <div className="flex flex-col space-y-3">
-        <InvoiceViewer
-          link={previewEndpoint(
-            '/api/v1/live_preview/purchase_order?entity=:entity&entity_id=:id',
-            {
-              entity: props.entity,
-              id: debouncedResource?.id,
-            }
-          )}
-          resource={debouncedResource}
-          method="POST"
-          enabled={props.observable ? isIntersecting : true}
-        />
+        <div ref={divRef}>
+          <InvoiceViewer
+            link={previewEndpoint(
+              '/api/v1/live_preview/purchase_order?entity=:entity&entity_id=:id',
+              {
+                entity: props.entity,
+                id: debouncedResource?.id,
+              }
+            )}
+            resource={debouncedResource}
+            method="POST"
+            enabled={props.observable ? isIntersecting : true}
+          />
+        </div>
 
         {props.withRemoveLogoCTA && <RemoveLogoCTA />}
       </div>

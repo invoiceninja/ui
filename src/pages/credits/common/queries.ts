@@ -29,7 +29,7 @@ export function useBlankCreditQuery(options?: GenericQueryOptions) {
       ...options,
       staleTime: Infinity,
       enabled: hasPermission('create_credit')
-        ? options?.enabled ?? true
+        ? (options?.enabled ?? true)
         : false,
     }
   );
@@ -49,6 +49,6 @@ export function useCreditQuery({ id }: CreditQueryProps) {
       ).then(
         (response: GenericSingleResourceResponse<Credit>) => response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: Boolean(id) }
   );
 }

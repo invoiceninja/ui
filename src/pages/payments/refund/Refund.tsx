@@ -27,7 +27,7 @@ import { Gateway } from '$app/common/interfaces/statics';
 import { toast } from '$app/common/helpers/toast/toast';
 import collect from 'collect.js';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { usePaymentPageSaveAction } from '../common/hooks/usePaymentPageSaveAction';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
@@ -167,10 +167,10 @@ export default function Refund() {
     );
   };
 
-  useSaveBtn(
+  usePaymentPageSaveAction(
     {
       onClick: () => formik.handleSubmit(),
-      disableSaveButton: formik.isSubmitting || !formik.values.invoices.length,
+      disabled: formik.isSubmitting || !formik.values.invoices.length,
     },
     [formik.values, formik.isSubmitting]
   );

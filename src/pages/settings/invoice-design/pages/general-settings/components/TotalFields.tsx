@@ -23,8 +23,8 @@ export default function TotalFields() {
 
   const defaultVariables = [
     { value: '$subtotal', label: t('subtotal') },
-    { value: '$net_subtotal', label: t('net_subtotal') },
     { value: '$discount', label: t('discount') },
+    { value: '$net_subtotal', label: t('net_subtotal') },
     { value: '$line_taxes', label: t('line_taxes') },
     { value: '$total_taxes', label: t('total_taxes') },
     {

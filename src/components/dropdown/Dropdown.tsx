@@ -142,7 +142,7 @@ export function Dropdown(props: Props) {
               }
             )}
             style={{
-              backgroundColor: props.cardActions && accentColor,
+              backgroundColor: props.cardActions ? accentColor : '',
               color: props.cardActions ? 'white' : '',
             }}
             data-cy={props.triggerCypressRef ?? 'chevronDownButton'}

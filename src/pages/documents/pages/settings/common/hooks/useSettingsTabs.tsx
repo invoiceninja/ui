@@ -24,6 +24,12 @@ export function useSettingsTabs() {
 
   const routes: SettingsRoute[] = [
     {
+      name: t('email_settings'),
+      href: '/docuninja/settings/email_settings',
+      current: location.pathname === '/docuninja/settings/email_settings',
+      enabled: true,
+    },
+    {
       name: t('email_templates'),
       href: '/docuninja/settings/email_templates',
       current: location.pathname === '/docuninja/settings/email_templates',
@@ -33,6 +39,12 @@ export function useSettingsTabs() {
       name: t('notifications'),
       href: '/docuninja/settings/notifications',
       current: location.pathname === '/docuninja/settings/notifications',
+      enabled: true,
+    },
+    {
+      name: t('widget_defaults'),
+      href: '/docuninja/settings/widget_defaults',
+      current: location.pathname === '/docuninja/settings/widget_defaults',
       enabled: true,
     },
   ];

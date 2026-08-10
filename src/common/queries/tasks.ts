@@ -50,7 +50,9 @@ export function useBlankTaskQuery(options?: GenericQueryOptions) {
     {
       ...options,
       staleTime: Infinity,
-      enabled: hasPermission('create_task') ? options?.enabled ?? true : false,
+      enabled: hasPermission('create_task')
+        ? (options?.enabled ?? true)
+        : false,
     }
   );
 }

@@ -10,21 +10,14 @@
 
 import { useTranslation } from 'react-i18next';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { request } from '$app/common/helpers/request';
-import { endpoint, isHosted } from '$app/common/helpers';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { isHosted } from '$app/common/helpers';
 import dayjs from 'dayjs';
-import { cloneDeep, set } from 'lodash';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { resetChanges, updateUser } from '$app/common/stores/slices/user';
-import { useDispatch } from 'react-redux';
-import { CompanyUser } from '$app/common/interfaces/company-user';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { Icon } from '../icons/Icon';
 import { MdClose } from 'react-icons/md';
 import { Link } from '../forms';
 import { useColorScheme } from '$app/common/colors';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useSaveReactSettings } from '$app/common/hooks/useReactSettings';
 import { useEffect, useState } from 'react';
 import { useCompanyUsers } from '$app/common/hooks/useCompanyUsers';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
@@ -32,46 +25,28 @@ import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers
 export function PriceIncreaseBanner() {
   const [t] = useTranslation();
 
-  const dispatch = useDispatch();
   const refreshCompanyUsers = useRefreshCompanyUsers();
 
   const { isOwner } = useAdmin();
   const colors = useColorScheme();
   const currentUser = useCurrentUser();
   const companyUsers = useCompanyUsers();
-  const reactSettings = useReactSettings();
+  const saveSettings = useSaveReactSettings();
 
   const [shouldDisplayBanner, setShouldDisplayBanner] = useState<boolean>();
 
   const handleDismiss = () => {
     setShouldDisplayBanner(false);
 
-    const currentUnixTime = dayjs().utc().unix();
-
-    const updatedReactSettings = cloneDeep(reactSettings);
-
-    set(
-      updatedReactSettings,
+    saveSettings(
       'preferences.price_increase_banner_dismissed_at',
-      currentUnixTime
-    );
-
-    request(
-      'PUT',
-      endpoint('/api/v1/company_users/:id/preferences?include=company_user', {
-        id: currentUser?.id,
-      }),
-      {
-        react_settings: updatedReactSettings,
-      }
-    ).then((response: GenericSingleResourceResponse<CompanyUser>) => {
-      $refetch(['company_users']);
-
-      dispatch(updateUser(response.data.data));
-      dispatch(resetChanges());
-
-      refreshCompanyUsers();
-    });
+      dayjs().utc().unix()
+    )
+      .then(() => {
+        // Keep the redux `companyUsers` mirror in sync for the banner gate.
+        refreshCompanyUsers();
+      })
+      .catch(() => undefined);
   };
 
   const handleClick = () => {

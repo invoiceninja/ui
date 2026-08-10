@@ -1,11 +1,13 @@
-import { Permissions as TPermissions } from '$app/common/hooks/permissions/useHasPermission';
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 import { Action } from './clients.spec';
+import type { Permission as ApiPermission } from './api-helpers';
+import {
+  emailForCurrentAccount,
+  passwordForCurrentAccount,
+} from './accounts';
 
-type AdminPermission = 'admin';
-
-export type Permission = TPermissions | AdminPermission;
+export type Permission = ApiPermission;
 
 export async function logout(page: Page) {
   // The /logout component calls window.location.href='/' in a useEffect, which
@@ -26,6 +28,9 @@ export async function login(
   email = 'user@example.com',
   password = 'password'
 ) {
+  const resolvedEmail = emailForCurrentAccount(email);
+  const resolvedPassword = passwordForCurrentAccount(password);
+
   // Only navigate to /login when not already there. logout() already lands on
   // /login with the form ready, so a redundant goto() would cause a needless
   // full-page reload that can race with ongoing page initialisation.
@@ -34,82 +39,16 @@ export async function login(
   }
 
   await page.locator('input[name="email"]').waitFor({ state: 'visible', timeout: 10000 });
-  await page.locator('input[name="email"]').fill(email);
-  await page.getByLabel('Password').fill(password);
-  await page.getByLabel('Password').press('Enter');
+  await page.locator('input[name="email"]').fill(resolvedEmail);
+
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+
+  const passwordInput = page.locator('input[name="password"]');
+  await passwordInput.waitFor({ state: 'visible', timeout: 10000 });
+  await passwordInput.fill(resolvedPassword);
+  await passwordInput.press('Enter');
 
   await expect(page.locator('[data-cy="navigationBar"]')).toBeVisible({ timeout: 10000 });
-}
-
-export function permissions(page: Page) {
-  const clear = async (email = 'permissions@example.com') => {
-    await page
-      .locator('[data-cy="navigationBar"]')
-      .getByRole('link', { name: 'Settings' })
-      .click();
-    await page.getByRole('link', { name: 'User Management' }).click();
-    await page.locator('#filter').fill(email);
-
-    const tableBody = page.locator('tbody').first();
-
-    // The filter input has a 300ms debounce before the API request fires.
-    // Wait well past it so the table reflects the filtered results before
-    // clicking — the link text is the user's name, not the email, so we
-    // cannot use hasText to distinguish filtered from unfiltered rows.
-    await page.waitForTimeout(500);
-
-    await tableBody.getByRole('link').first().waitFor({ state: 'visible', timeout: 10000 });
-    await tableBody.getByRole('link').first().click();
-
-    const passwordField = page.locator('#current_password');
-    const permissionsButton = page.getByRole('button', { name: 'Permissions' });
-
-    // Wait for either the password modal or the Permissions tab to appear.
-    // If password is not required, the app auto-confirms and goes straight to the edit page.
-    await Promise.any([
-      passwordField.waitFor({ state: 'visible', timeout: 5000 }),
-      permissionsButton.waitFor({ state: 'visible', timeout: 5000 }),
-    ]);
-
-    if (await passwordField.isVisible()) {
-      await passwordField.fill('password');
-      await page.getByRole('button', { name: 'Continue' }).click();
-      await permissionsButton.waitFor({ state: 'visible', timeout: 5000 });
-    }
-
-    await permissionsButton.click();
-
-    await page.uncheck('[data-cy="admin"]');
-    await page.uncheck('[data-cy="viewDashboard"]');
-    await page.uncheck('[data-cy="viewReports"]');
-
-    for (const checkbox of await page.locator('input[type=checkbox]').all()) {
-      await checkbox.uncheck();
-    }
-  };
-
-  const save = async () => {
-    await page.getByRole('button', { name: 'Save' }).click();
-    await expect(page.getByText('Successfully updated user')).toBeVisible({ timeout: 10000 });
-  };
-
-  const set = async (...permissions: Permission[]) => {
-    for (const p of permissions) {
-      let updatedPermission = p;
-
-      if (updatedPermission === 'view_dashboard') {
-        updatedPermission = 'viewDashboard' as Permission;
-      }
-
-      if (updatedPermission === 'view_reports') {
-        updatedPermission = 'viewReports' as Permission;
-      }
-
-      await page.check(`[data-cy=${updatedPermission}]`);
-    }
-  };
-
-  return { clear, save, set };
 }
 
 /**
@@ -160,24 +99,46 @@ export async function checkDropdownActions(
   withOutOpening?: boolean
 ) {
   if (!withOutOpening) {
-    await page
-      .locator(`[data-cy=${containerId || 'topNavbar'}]`)
-      .getByRole('button', { name: 'Actions', exact: true })
-      .first()
-      .click();
+    const container = page.locator(`[data-cy=${containerId || 'topNavbar'}]`);
+
+    if (containerId === 'dataTable') {
+      const bulkActionsTrigger = container.locator('[data-cy="bulkActionsTrigger"]');
+
+      await expect(bulkActionsTrigger).toBeVisible({ timeout: 10000 });
+      await bulkActionsTrigger.click();
+    } else {
+      await container
+        .getByRole('button', { name: 'Actions', exact: true })
+        .first()
+        .click();
+    }
   }
 
   const dropDown = dropdownId
     ? page.locator(`[data-cy=${dropdownId}]`)
+    : containerId === 'dataTable'
+    ? page.locator('[data-cy="bulkActionsDropdown"]')
     : page.locator('[data-tippy-root]:visible');
   await dropDown.waitFor({ state: 'visible', timeout: 5000 });
 
   for (const { label, visible, modal } of actions) {
+    const buttonAction = dropDown
+      .getByRole('button', { name: label, exact: true })
+      .first();
+    const linkAction = dropDown
+      .getByRole('link', { name: label, exact: true })
+      .first();
+    const action = (await buttonAction.count())
+      ? buttonAction
+      : (await linkAction.count())
+      ? linkAction
+      : dropDown.getByText(label).first();
+
     if (visible) {
-      await expect(dropDown.getByText(label).first()).toBeVisible({ timeout: 10000 });
+      await expect(action).toBeVisible({ timeout: 10000 });
 
       if (modal) {
-        await dropDown.getByText(label).first().click();
+        await action.click();
 
         const modalDialog = page.getByRole('dialog');
         await modalDialog.waitFor({ state: 'visible', timeout: 5000 });
@@ -223,4 +184,31 @@ export function useHasPermission({
   return (permission: Permission) => {
     return isAdmin || permissions.includes(permission);
   };
+}
+
+/**
+ * Select an assigned user from a UserSelector / Settings "User" combobox.
+ * Filters by first name and requires exactly one matching option so duplicate
+ * display names (lane orphans) fail loudly instead of assigning the wrong user.
+ */
+export async function selectAssignedUser(
+  page: Page,
+  assignTo: string,
+  input: Locator
+) {
+  await input.scrollIntoViewIfNeeded();
+  await input.click();
+
+  const filter = assignTo.split(' ')[0];
+  // Some comboboxes are click-to-open only; fill when the control accepts text.
+  if (await input.isEditable().catch(() => false)) {
+    await input.fill(filter);
+  }
+
+  const options = page.getByRole('option', { name: assignTo, exact: true });
+  await expect(
+    options,
+    `Expected exactly one assignee option for "${assignTo}" after filtering`
+  ).toHaveCount(1, { timeout: 5000 });
+  await options.click();
 }

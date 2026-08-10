@@ -44,8 +44,9 @@ import { whiteLabelPlan } from '$app/common/guards/guards/white-label';
 import { EUTaxDetails } from './common/components/EUTaxDetails';
 import { Onboarding } from './peppol/Onboarding';
 import { Preferences } from './peppol/Preferences';
-import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
+import { isPeppolCountryAllowed } from '$app/common/helpers/peppol-countries';
 import { PEPPOLPlanBanner } from './common/components/PEPPOLPlanBanner';
+import { FranceReporting } from './common/components/FranceReporting';
 import { CloudUpload } from '$app/components/icons/CloudUpload';
 import { useColorScheme } from '$app/common/colors';
 import { Trash } from '$app/components/icons/Trash';
@@ -93,7 +94,7 @@ export function EInvoice() {
 
     return (
       (isPlanActive || skipPlanCheck) &&
-      PEPPOL_COUNTRIES.includes(company?.settings.country_id || '')
+      isPeppolCountryAllowed(company?.settings.country_id || '')
     );
   };
 
@@ -246,7 +247,10 @@ export function EInvoice() {
           headerStyle={{ borderColor: colors.$20 }}
         >
           <Element leftSide={t('help')}>
-            <Link external to="https://invoiceninja.github.io/docs/user-guide/einvoicing">
+            <Link
+              external
+              to="https://invoiceninja.github.io/docs/user-guide/einvoicing"
+            >
               {t('learn_more')}
             </Link>
           </Element>
@@ -569,6 +573,13 @@ export function EInvoice() {
       shouldShowPEPPOLOption(true) &&
       company.legal_entity_id ? (
         <Preferences />
+      ) : null}
+
+      {company?.settings.e_invoice_type === 'PEPPOL' &&
+      company?.settings.country_id === '250' &&
+      company?.legal_entity_id &&
+      shouldShowPEPPOLOption() ? (
+        <FranceReporting />
       ) : null}
 
       <PaymentMeans

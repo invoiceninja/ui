@@ -1,5 +1,7 @@
-import { login, logout } from '$tests/e2e/helpers';
-import { test, expect } from '$tests/e2e/fixtures';
+import { login } from '$tests/e2e/helpers';
+import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
+
+resetAccountBeforeAll();
 
 test('Expense report (clients, vendors, project, expense_categories) fields are not visible', async ({
   page,
@@ -19,7 +21,6 @@ test('Expense report (clients, vendors, project, expense_categories) fields are 
 
   await expect(page.locator('#expenseCategoryItemSelector')).not.toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Expense report (clients, vendors, project, expense_categories) fields are visible', async ({
@@ -49,5 +50,4 @@ test('Expense report (clients, vendors, project, expense_categories) fields are 
 
   await expect(page.locator('#expenseCategoryItemSelector')).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });

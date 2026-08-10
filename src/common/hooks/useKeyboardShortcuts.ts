@@ -1,45 +1,55 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
 import { useEffect, useCallback } from 'react';
 import { usePreventNavigation } from './usePreventNavigation';
-
-const SHORTCUT_KEYS = {
-  c: '/clients/create',
-  k: '/products/create',
-  i: '/invoices/create',
-  r: '/recurring_invoices/create',
-  q: '/quotes/create',
-  p: '/payments/create',
-  e: '/expenses/create',
-  o: '/purchase_orders/create',
-  d: '/credits/create',
-  j: '/projects/create',
-  t: '/tasks/create',
-  v: '/vendors/create',
-  x: '/recurring_expenses/create',
-  a: '/transactions/create',
-  n: '/docuninja/create',
-} as const;
-
-type ShortcutKey = keyof typeof SHORTCUT_KEYS;
+import { useResolvedShortcuts } from './useReactSettings';
+import { keyboardShortcuts } from '../constants/keyboard-shortcuts';
+import { eventMatchesBinding } from '../helpers/keyboard-shortcuts';
+import { isShortcutRecordingActive } from './useShortcutRecorder';
+import { getHeldKeys, useTrackHeldKeys } from './useHeldKeys';
 
 export function useKeyboardShortcuts() {
   const preventNavigation = usePreventNavigation();
+  const bindings = useResolvedShortcuts();
+
+  useTrackHeldKeys();
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      if (!event.ctrlKey || !event.shiftKey || event.altKey || event.metaKey) {
+      if (isShortcutRecordingActive()) {
         return;
       }
 
-      const key = event.key.toLowerCase() as ShortcutKey;
-      const route = SHORTCUT_KEYS[key];
+      const heldKeys = getHeldKeys();
 
-      if (route) {
-        event.preventDefault();
-        event.stopPropagation();
-        preventNavigation({ url: route });
+      for (const definition of keyboardShortcuts) {
+        if (definition.action.type !== 'navigate') {
+          continue;
+        }
+
+        const binding = bindings[definition.id];
+
+        if (!binding) {
+          continue;
+        }
+
+        if (eventMatchesBinding(event, binding, heldKeys)) {
+          event.preventDefault();
+          event.stopPropagation();
+          preventNavigation({ url: definition.action.to });
+          return;
+        }
       }
     },
-    [preventNavigation]
+    [preventNavigation, bindings]
   );
 
   useEffect(() => {

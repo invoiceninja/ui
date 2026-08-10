@@ -29,9 +29,9 @@ export default function Edit() {
   const colors = useColorScheme();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
-  
+
   const { data: blueprintResponse, isLoading } = useBlueprintQuery({ id });
-  
+
   const actions = useActions({
     onSettingsClick: () => {
       setIsEditModalOpen(true);
@@ -55,7 +55,10 @@ export default function Edit() {
       title={t('edit_template')}
       breadcrumbs={pages}
       navigationTopRight={
-        <ResourceActions resource={blueprintResponse?.data?.data} actions={actions} />
+        <ResourceActions
+          resource={blueprintResponse?.data?.data}
+          actions={actions}
+        />
       }
     >
       <div className="flex justify-center">
@@ -72,24 +75,31 @@ export default function Edit() {
           ) : (
             <div className="space-y-4">
               <Element leftSide={t('name')}>
-                <div className="text-sm text-gray-600">{blueprintResponse?.data.data.name}</div>
+                <div className="text-sm text-gray-600">
+                  {blueprintResponse?.data.data.name}
+                </div>
               </Element>
               <Element leftSide={t('description')}>
                 <div className="text-sm text-gray-600">
-                  {blueprintResponse?.data.data.description || t('no_description')}
+                  {blueprintResponse?.data.data.description ||
+                    t('no_description')}
                 </div>
               </Element>
               <Element leftSide={t('created_at')}>
                 <div className="text-sm text-gray-600">
                   {blueprintResponse?.data.data.created_at
-                    ? new Date(blueprintResponse?.data.data.created_at).toLocaleDateString()
+                    ? new Date(
+                        blueprintResponse?.data.data.created_at
+                      ).toLocaleDateString()
                     : '-'}
                 </div>
               </Element>
               <Element leftSide={t('updated_at')}>
                 <div className="text-sm text-gray-600">
                   {blueprintResponse?.data.data.updated_at
-                    ? new Date(blueprintResponse?.data.data.updated_at).toLocaleDateString()
+                    ? new Date(
+                        blueprintResponse?.data.data.updated_at
+                      ).toLocaleDateString()
                     : '-'}
                 </div>
               </Element>

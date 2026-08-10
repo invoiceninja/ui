@@ -82,6 +82,12 @@ export function useSettingsRoutes() {
       enabled: isAdmin || isOwner || false,
     },
     {
+      name: t('tags'),
+      href: '/settings/tags',
+      current: location.pathname.startsWith('/settings/tags'),
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
+    },
+    {
       name: t('expense_settings'),
       href: '/settings/expense_settings',
       current:
@@ -144,7 +150,7 @@ export function useSettingsRoutes() {
       name: t('e_invoicing'),
       href: '/settings/e_invoice',
       current: location.pathname.startsWith('/settings/e_invoice'),
-      enabled: isAdmin || isOwner || false,
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
     {
       name: t('email_settings'),

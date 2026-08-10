@@ -42,6 +42,7 @@ import {
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { Banner } from '$app/components/Banner';
+import { QuickbooksDepositDisabledAlert } from '$app/components/QuickbooksDepositDisabledAlert';
 import { Invoice as InvoiceType } from '$app/common/interfaces/invoice';
 import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -208,6 +209,8 @@ export default function Invoice() {
             <Banner id="invoiceUpdateBanner" className="hidden" variant="blue">
               {t('invoice_status_paid')}
             </Banner>
+
+            {invoice && <QuickbooksDepositDisabledAlert resource={invoice} />}
           </>
         }
         afterBreadcrumbs={<PreviousNextNavigation entity="invoice" />}

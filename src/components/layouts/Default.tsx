@@ -33,7 +33,8 @@ import { ActivateCompany } from '../banners/ActivateCompany';
 import { VerifyPhone } from '../banners/VerifyPhone';
 import { useColorScheme } from '$app/common/colors';
 import { Search } from '$app/pages/dashboard/components/Search';
-import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useAtomValue } from 'jotai';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { Notifications } from '../Notifications';
@@ -45,6 +46,7 @@ import classNames from 'classnames';
 import { Feedback } from '../Feedback';
 import { PriceIncreaseBanner } from '../banners/PriceIncrease';
 import { useNavigation } from './common/navigation';
+import { AccountPlanExpired } from '../banners/AccountPlanExpired';
 
 export interface SaveOption {
   label: string;
@@ -74,12 +76,11 @@ export function Default(props: Props) {
 
   const preventNavigation = usePreventNavigation();
 
-  const user = useInjectUserChanges();
+  const user = useCurrentUser();
   const companyUser = useCurrentCompanyUser();
+  const reactSettings = useReactSettings();
 
-  const isMiniSidebar = Boolean(
-    user?.company_user?.react_settings.show_mini_sidebar
-  );
+  const isMiniSidebar = Boolean(reactSettings.show_mini_sidebar);
   const shouldShowUnlockButton =
     !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
 
@@ -134,6 +135,7 @@ export function Default(props: Props) {
         <VerifyEmail />
         <VerifyPhone />
         <EInvoiceCredits />
+        <AccountPlanExpired />
 
         {/* This component is only created for December 2025 if you see it in 2026 you can remove and delete it */}
         <PriceIncreaseBanner />
@@ -198,8 +200,8 @@ export function Default(props: Props) {
                   }}
                   onClick={() => {
                     if (
-                      isHosted() &&
-                      import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT
+                      isHosted() ||
+                      import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true'
                     ) {
                       return navigate('/settings/account_management');
                     }

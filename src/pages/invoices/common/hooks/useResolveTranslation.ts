@@ -34,7 +34,7 @@ export function useResolveTranslation(params?: Params) {
   };
 
   return (key: string, delimiter = '.') => {
-    if (Object.prototype.hasOwnProperty.call(aliases, key)) {
+    if (Object.hasOwn(aliases, key)) {
       return aliases[key];
     }
 

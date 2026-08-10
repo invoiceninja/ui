@@ -74,7 +74,6 @@ export default function CreatePage() {
             }}
             onContactCheckboxChange={handleInvitationChange}
             onContactCanSignCheckboxChange={handleContactCanSignChange}
-
             errorMessage={errors?.errors.client_id}
             disableWithSpinner={searchParams.get('action') === 'create'}
           />
