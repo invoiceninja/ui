@@ -8,7 +8,6 @@ const STYLE_ELEMENT_PATTERN =
 const CSS_ESCAPE_PATTERN = /\\([0-9a-f]{1,6})\s?|\\([^\r\n\f])/gi;
 const CSS_LINE_CONTINUATION_PATTERN = /\\(?:\r\n|[\n\r\f])/g;
 const CSS_COMMENT_PATTERN = /\/\*[\s\S]*?\*\//g;
-const CSS_CONTROL_CHARACTER_PATTERN = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g;
 
 /**
  * CSS is inserted into both a live style element and generated preview HTML.
@@ -22,19 +21,41 @@ const UNSAFE_CSS_PATTERN =
 function decodeCssEscapesForInspection(css: string): string {
   return css
     .replace(CSS_LINE_CONTINUATION_PATTERN, '')
-    .replace(CSS_ESCAPE_PATTERN, (_match, hex: string | undefined, char: string) => {
-      if (!hex) {
-        return char;
+    .replace(
+      CSS_ESCAPE_PATTERN,
+      (_match, hex: string | undefined, char: string) => {
+        if (!hex) {
+          return char;
+        }
+
+        const codePoint = Number.parseInt(hex, 16);
+
+        if (
+          !Number.isFinite(codePoint) ||
+          codePoint === 0 ||
+          codePoint > 0x10ffff
+        ) {
+          return '\uFFFD';
+        }
+
+        return String.fromCodePoint(codePoint);
       }
+    );
+}
 
-      const codePoint = Number.parseInt(hex, 16);
+function removeCssControlCharacters(css: string): string {
+  return Array.from(css)
+    .filter((character) => {
+      const codePoint = character.codePointAt(0) ?? 0;
 
-      if (!Number.isFinite(codePoint) || codePoint === 0 || codePoint > 0x10ffff) {
-        return '\uFFFD';
-      }
-
-      return String.fromCodePoint(codePoint);
-    });
+      return (
+        codePoint === 9 ||
+        codePoint === 10 ||
+        codePoint === 13 ||
+        (codePoint >= 32 && codePoint !== 127)
+      );
+    })
+    .join('');
 }
 
 export function unwrapCustomCssFromApi(value: unknown): string {
@@ -48,9 +69,7 @@ export function unwrapCustomCssFromApi(value: unknown): string {
 }
 
 export function sanitizeCustomCss(value: unknown): string {
-  const css = unwrapCustomCssFromApi(value)
-    .replace(CSS_CONTROL_CHARACTER_PATTERN, '')
-    .trim();
+  const css = removeCssControlCharacters(unwrapCustomCssFromApi(value)).trim();
 
   if (!css) {
     return '';
