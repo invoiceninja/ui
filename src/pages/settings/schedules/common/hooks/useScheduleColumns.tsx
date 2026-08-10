@@ -13,6 +13,9 @@ import { DataTableColumns } from '$app/components/DataTable';
 import { useTranslation } from 'react-i18next';
 import frequencies from '$app/common/constants/frequency';
 import { ScheduleName } from '$app/pages/settings/schedules/common/components/ScheduleName';
+import { ScheduleEntityLink } from '$app/pages/settings/schedules/common/components/ScheduleEntityLink';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { route } from '$app/common/helpers/route';
 
 export function useScheduleColumns() {
   const [t] = useTranslation();
@@ -21,7 +24,13 @@ export function useScheduleColumns() {
     {
       id: 'name',
       label: t('name'),
-      format: (_, schedule) => <ScheduleName schedule={schedule} />,
+      format: (_, schedule) => (
+        <DynamicLink
+          to={route('/settings/schedules/:id/edit', { id: schedule.id })}
+        >
+          <ScheduleName schedule={schedule} />
+        </DynamicLink>
+      ),
     },
     {
       id: 'next_run',
@@ -31,6 +40,11 @@ export function useScheduleColumns() {
       id: 'frequency_id',
       label: t('frequency'),
       format: (value) => t(frequencies[value as keyof typeof frequencies]),
+    },
+    {
+      id: 'related_entity',
+      label: t('link'),
+      format: (_, schedule) => <ScheduleEntityLink schedule={schedule} />,
     },
   ];
 
