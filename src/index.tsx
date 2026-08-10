@@ -19,6 +19,11 @@ import * as Sentry from '@sentry/react';
 import { ScrollToTop } from '$app/components/ScrollToTop';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { createRoot } from 'react-dom/client';
+import { restoreQueryCache } from './common/queries/persistence';
+import {
+  refreshCompanyUsers,
+  restoreCompanyUsers,
+} from './common/queries/refresh';
 
 import './resources/css/app.css';
 import en from './resources/lang/en/en.json';
@@ -89,20 +94,26 @@ loader.init().then(/* ... */);
 
 const container = document.getElementById('root') as HTMLElement;
 
-createRoot(container).render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <Provider store={store}>
-        <GoogleOAuth>
-          <Router>
-            <ScrollToTop>
-              <App />
-            </ScrollToTop>
-          </Router>
-        </GoogleOAuth>
-      </Provider>
-    </QueryClientProvider>
-  </React.StrictMode>
-);
+restoreQueryCache(queryClient).then(() => {
+  if (restoreCompanyUsers(queryClient, store.dispatch)) {
+    refreshCompanyUsers(queryClient, store.dispatch).catch(console.error);
+  }
+
+  createRoot(container).render(
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>
+          <GoogleOAuth>
+            <Router>
+              <ScrollToTop>
+                <App />
+              </ScrollToTop>
+            </Router>
+          </GoogleOAuth>
+        </Provider>
+      </QueryClientProvider>
+    </React.StrictMode>
+  );
+});
 
 export const emitter = mitt<Events>();

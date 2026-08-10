@@ -27,6 +27,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { PublicClientApplication } from '@azure/msal-browser';
 import { v4 } from 'uuid';
 import AppleSignin from 'react-apple-signin-auth';
+import { dropQueryCache } from '$app/common/queries/persistence';
 
 interface SignInProviderButtonProps {
   disabled?: boolean;
@@ -51,6 +52,8 @@ export function SignInProviders() {
   const queryClient = useQueryClient();
 
   const login = (response: AxiosResponse) => {
+    dropQueryCache(queryClient);
+
     localStorage.removeItem('X-CURRENT-INDEX');
 
     let currentIndex = 0;

@@ -36,6 +36,8 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import companySettings from '$app/common/constants/company-settings';
+import { dropQueryCache } from '$app/common/queries/persistence';
+import { useQueryClient } from 'react-query';
 
 const SwitcherDiv = styled.div`
   &:hover {
@@ -93,6 +95,7 @@ export function CompanySwitcher() {
     : 'rgba(255, 255, 255, 0.82)';
 
   const preventNavigation = usePreventNavigation();
+  const queryClient = useQueryClient();
 
   const [visible, setVisible] = useState<boolean>(false);
   const [shouldShowAddCompany, setShouldShowAddCompany] =
@@ -101,6 +104,8 @@ export function CompanySwitcher() {
     useState<boolean>(false);
 
   const switchCompany = (index: number) => {
+    dropQueryCache(queryClient);
+
     dispatch(
       authenticate({
         type: AuthenticationTypes.TOKEN,

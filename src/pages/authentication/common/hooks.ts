@@ -21,6 +21,7 @@ import { useDispatch } from 'react-redux';
 import { useQueryClient } from 'react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { dropQueryCache } from '$app/common/queries/persistence';
 
 export type LoginMethod = 'password' | 'totp' | 'passkey';
 
@@ -44,6 +45,8 @@ export function useLogin() {
   const queryClient = useQueryClient();
 
   return (response: AxiosResponse) => {
+    dropQueryCache(queryClient);
+
     localStorage.removeItem('X-CURRENT-INDEX');
 
     let currentIndex = 0;
