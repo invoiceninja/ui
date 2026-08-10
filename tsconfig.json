@@ -27,5 +27,5 @@
     },
     "types": ["node", "vite/client"]
   },
-  "exclude": ["node_modules", "public/tinymce_6.4.2"]
+  "exclude": ["node_modules", "public/tinymce_6.4.2", "tests"]
 }

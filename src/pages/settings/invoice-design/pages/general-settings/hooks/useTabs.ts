@@ -35,6 +35,15 @@ export function useTabs() {
       enabled: isCompanySettingsActive,
     },
     {
+      name: t('visual_builder'),
+      href: '/settings/invoice_design/builder/templates',
+      matcher: [
+        () => '/settings/invoice_design/builder/templates',
+        () => '/settings/invoice_design/builder/new',
+      ],
+      enabled: isCompanySettingsActive,
+    },
+    {
       name: t('client'),
       href: '/settings/invoice_design/client_details',
       enabled: isCompanySettingsActive,
