@@ -41,7 +41,7 @@ export function PaymentMethods({ withDivider = true }: PaymentMethodsProps) {
     null
   );
 
-  const { data: methods } = useQuery({
+  const { data: methods } = useQuery<CompanyGateway[]>({
     queryKey: ['/api/client/account_management/methods', account?.id],
     queryFn: () =>
       request('POST', endpoint('/api/client/account_management/methods'), {

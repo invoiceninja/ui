@@ -64,7 +64,7 @@ export function useExpenseCategoryQuery(props: Props) {
         endpoint('/api/v1/expense_categories/:id', { id: props.id })
       ),
 
-    enabled: props.enabled ?? true,
+    enabled: (props.enabled ?? true) && Boolean(props.id),
     staleTime: Infinity,
   });
 }

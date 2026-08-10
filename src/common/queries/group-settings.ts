@@ -54,6 +54,7 @@ export function useGroupQuery(params: Params) {
       ),
 
     staleTime: Infinity,
+    enabled: Boolean(id),
   });
 }
 

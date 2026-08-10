@@ -22,6 +22,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { GenericQueryOptions } from '$app/common/queries/invoices';
+import { resolveBlankQueryEnabled } from '$app/common/queries/blank-query-options';
 
 interface RecurringInvoiceQueryParams {
   id: string;
@@ -59,12 +60,12 @@ export function useBlankRecurringInvoiceQuery(options?: GenericQueryOptions) {
           response.data.data
       ),
 
-    ...options,
     staleTime: Infinity,
 
-    enabled: hasPermission('create_recurring_invoice')
-      ? (options?.enabled ?? true)
-      : false,
+    enabled: resolveBlankQueryEnabled(
+      options,
+      hasPermission('create_recurring_invoice')
+    ),
   });
 }
 

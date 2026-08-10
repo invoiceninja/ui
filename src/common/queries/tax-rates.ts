@@ -47,6 +47,7 @@ export function useTaxRateQuery(params: { id: string | undefined }) {
     queryFn: () =>
       request('GET', endpoint('/api/v1/tax_rates/:id', { id: params.id })),
     staleTime: Infinity,
+    enabled: Boolean(params.id),
   });
 }
 

@@ -54,7 +54,7 @@ export function useScheduleQuery(params: ScheduleParams) {
       ),
 
     staleTime: Infinity,
-    enabled: isAdmin || isOwner,
+    enabled: Boolean(params.id) && (isAdmin || isOwner),
   });
 }
 

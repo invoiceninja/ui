@@ -20,11 +20,12 @@ import { EmailType } from '$app/pages/invoices/common/components/SendEmailModal'
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { toast } from '../helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
+import { resolveBlankQueryEnabled } from './blank-query-options';
 
 export interface GenericQueryOptions {
   id?: string;
   with?: string[];
-  enabled: boolean;
+  enabled?: boolean;
 }
 
 interface InvoiceQueryParams {
@@ -69,12 +70,12 @@ export function useBlankInvoiceQuery(options?: GenericQueryOptions) {
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
 
-    ...options,
     staleTime: Infinity,
 
-    enabled: hasPermission('create_invoice')
-      ? (options?.enabled ?? true)
-      : false,
+    enabled: resolveBlankQueryEnabled(
+      options,
+      hasPermission('create_invoice')
+    ),
   });
 }
 

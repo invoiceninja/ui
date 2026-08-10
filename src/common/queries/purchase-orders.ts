@@ -17,6 +17,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { GenericQueryOptions } from '$app/common/queries/invoices';
+import { resolveBlankQueryEnabled } from './blank-query-options';
 import { useHasPermission } from '../hooks/permissions/useHasPermission';
 import { $refetch } from '../hooks/useRefetch';
 
@@ -32,12 +33,12 @@ export function useBlankPurchaseOrderQuery(options?: GenericQueryOptions) {
           response.data.data
       ),
 
-    ...options,
     staleTime: Infinity,
 
-    enabled: hasPermission('create_purchase_order')
-      ? (options?.enabled ?? true)
-      : false,
+    enabled: resolveBlankQueryEnabled(
+      options,
+      hasPermission('create_purchase_order')
+    ),
   });
 }
 

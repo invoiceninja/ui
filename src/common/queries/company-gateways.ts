@@ -67,7 +67,7 @@ export function useCompanyGatewayQuery(params: Params) {
       ),
 
     staleTime: Infinity,
-    enabled: (params.enabled ?? true) && isAdmin,
+    enabled: (params.enabled ?? true) && Boolean(params.id) && isAdmin,
   });
 }
 

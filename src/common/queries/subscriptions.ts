@@ -52,7 +52,7 @@ export function useSubscriptionQuery(params: { id: string | undefined }) {
       ),
 
     staleTime: Infinity,
-    enabled: isAdmin || isOwner,
+    enabled: Boolean(params.id) && (isAdmin || isOwner),
   });
 }
 

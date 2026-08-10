@@ -63,7 +63,7 @@ export function useRecurringExpenseQuery(params: Params) {
           response.data.data
       ),
 
-    enabled: params.enabled ?? true,
+    enabled: (params.enabled ?? true) && Boolean(params.id),
     staleTime: Infinity,
   });
 }

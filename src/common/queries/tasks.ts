@@ -19,6 +19,7 @@ import { Task } from '$app/common/interfaces/task';
 import { invalidationQueryAtom } from '../atoms/data-table';
 import { toast } from '../helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
+import { resolveBlankQueryEnabled } from './blank-query-options';
 import { GenericQueryOptions } from './invoices';
 
 interface TaskParams {
@@ -52,10 +53,9 @@ export function useBlankTaskQuery(options?: GenericQueryOptions) {
         (response: GenericSingleResourceResponse<Task>) => response.data.data
       ),
 
-    ...options,
     staleTime: Infinity,
 
-    enabled: hasPermission('create_task') ? (options?.enabled ?? true) : false,
+    enabled: resolveBlankQueryEnabled(options, hasPermission('create_task')),
   });
 }
 

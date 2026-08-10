@@ -10,7 +10,6 @@
 
 import * as Sentry from '@sentry/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import i18n from 'i18next';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
@@ -33,6 +32,7 @@ import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import { Events } from './common/events';
 import { GoogleOAuth } from './components/GoogleOAuth';
+import { ReactQueryDevtoolsPanel } from './components/ReactQueryDevtoolsPanel';
 import en from './resources/lang/en/en.json';
 
 Sentry.init({
@@ -105,7 +105,7 @@ createRoot(container).render(
           </Router>
         </GoogleOAuth>
       </Provider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      <ReactQueryDevtoolsPanel />
     </QueryClientProvider>
   </React.StrictMode>
 );

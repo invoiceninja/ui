@@ -51,7 +51,7 @@ export function useApiTokenQuery(params: { id: string | undefined }) {
       ),
 
     staleTime: Infinity,
-    enabled: isOwner || isAdmin,
+    enabled: (isOwner || isAdmin) && Boolean(params.id),
   });
 }
 

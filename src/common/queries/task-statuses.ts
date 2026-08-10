@@ -17,6 +17,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { TaskStatus } from '$app/common/interfaces/task-status';
 import { $refetch } from '../hooks/useRefetch';
+import { resolveBlankQueryEnabled } from './blank-query-options';
 import { GenericQueryOptions } from './invoices';
 
 export function useBlankTaskStatusQuery(options?: GenericQueryOptions) {
@@ -32,7 +33,7 @@ export function useBlankTaskStatusQuery(options?: GenericQueryOptions) {
       ),
 
     staleTime: Infinity,
-    enabled: isAdmin ? (options?.enabled ?? true) : false,
+    enabled: resolveBlankQueryEnabled(options, isAdmin),
   });
 }
 
@@ -64,6 +65,7 @@ export function useTaskStatusQuery(params: { id: string | undefined }) {
       request('GET', endpoint('/api/v1/task_statuses/:id', { id: params.id })),
 
     staleTime: Infinity,
+    enabled: Boolean(params.id),
   });
 }
 

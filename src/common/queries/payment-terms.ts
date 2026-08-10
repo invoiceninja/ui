@@ -50,6 +50,7 @@ export function usePaymentTermQuery(params: { id: string | undefined }) {
       }),
 
     staleTime: Infinity,
+    enabled: Boolean(params.id),
   });
 }
 

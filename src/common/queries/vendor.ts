@@ -32,7 +32,7 @@ export function useVendorQuery(params: VendorParams) {
         (response) => response.data.data
       ),
 
-    enabled: params.enabled ?? true,
+    enabled: (params.enabled ?? true) && Boolean(params.id),
     staleTime: Infinity,
   });
 }

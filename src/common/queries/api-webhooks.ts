@@ -30,7 +30,7 @@ export function useApiWebhookQuery(params: { id: string | undefined }) {
       ),
 
     staleTime: Infinity,
-    enabled: isAdmin,
+    enabled: isAdmin && Boolean(params.id),
   });
 }
 

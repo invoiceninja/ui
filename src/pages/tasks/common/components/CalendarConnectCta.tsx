@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaCalendarCheck, FaGoogle, FaMicrosoft } from 'react-icons/fa';
 import { MdInfoOutline } from 'react-icons/md';
+import { useQueryClient } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
 import { useColorScheme } from '$app/common/colors';
 import {
@@ -25,6 +26,7 @@ import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useIsPaid } from '$app/common/hooks/usePaidOrSelfhost';
 import type { CalendarProvider } from '$app/common/interfaces/user';
 import {
+  invalidateCalendarDisconnectCache,
   useConnectCalendar,
   useDisconnectCalendar,
 } from '$app/common/queries/calendar';
@@ -53,6 +55,7 @@ export function CalendarConnectCta() {
 
   const connect = useConnectCalendar();
   const disconnect = useDisconnectCalendar();
+  const queryClient = useQueryClient();
 
   const [disconnectVisible, setDisconnectVisible] = useState(false);
 
@@ -82,6 +85,8 @@ export function CalendarConnectCta() {
     toast.processing();
     disconnect.mutate(undefined, {
       onSuccess: () => {
+        invalidateCalendarDisconnectCache(queryClient);
+
         // Redux holds the current user; flip the status locally so the chip
         // returns to the connect CTA immediately without waiting on refetch.
         if (user) {

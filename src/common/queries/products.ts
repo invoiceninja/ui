@@ -17,6 +17,7 @@ import { Product } from '$app/common/interfaces/product';
 import { endpoint } from '../helpers';
 import { Params } from './common/params.interface';
 import { GenericQueryOptions } from './invoices';
+import { resolveBlankQueryEnabled } from './blank-query-options';
 
 interface ProductsParams extends Params {
   include?: string;
@@ -65,12 +66,9 @@ export function useBlankProductQuery(options?: GenericQueryOptions) {
         (response: GenericSingleResourceResponse<Product>) => response.data.data
       ),
 
-    ...options,
     staleTime: Infinity,
 
-    enabled: hasPermission('create_product')
-      ? (options?.enabled ?? true)
-      : false,
+    enabled: resolveBlankQueryEnabled(options, hasPermission('create_product')),
   });
 }
 

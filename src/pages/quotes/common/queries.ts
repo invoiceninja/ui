@@ -15,6 +15,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Quote } from '$app/common/interfaces/quote';
 import { GenericQueryOptions } from '$app/common/queries/invoices';
+import { resolveBlankQueryEnabled } from '$app/common/queries/blank-query-options';
 
 export function useBlankQuoteQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();
@@ -27,10 +28,9 @@ export function useBlankQuoteQuery(options?: GenericQueryOptions) {
         (response: GenericSingleResourceResponse<Quote>) => response.data.data
       ),
 
-    ...options,
     staleTime: Infinity,
 
-    enabled: hasPermission('create_quote') ? (options?.enabled ?? true) : false,
+    enabled: resolveBlankQueryEnabled(options, hasPermission('create_quote')),
   });
 }
 

@@ -59,7 +59,7 @@ export function useExpenseQuery(params: ExpenseParams) {
         })
       ).then((response) => response.data.data),
 
-    enabled: params.enabled ?? true,
+    enabled: (params.enabled ?? true) && Boolean(params.id),
     staleTime: Infinity,
   });
 }

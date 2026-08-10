@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, type QueryClient } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { CalendarEvent } from '$app/common/interfaces/calendar-event';
@@ -122,18 +122,16 @@ export function useCompleteCalendarConnection() {
   });
 }
 
-export function useDisconnectCalendar() {
-  const queryClient = useQueryClient();
+export function invalidateCalendarDisconnectCache(queryClient: QueryClient) {
+  queryClient.removeQueries({
+    queryKey: ['calendar_events'],
+  });
+  $refetch(['users']);
+}
 
+export function useDisconnectCalendar() {
   return useMutation({
     mutationFn: () =>
       request('DELETE', endpoint('/api/v1/calendar_connection')),
-
-    onSuccess: () => {
-      queryClient.removeQueries({
-        queryKey: ['calendar_events'],
-      });
-      $refetch(['users']);
-    },
   });
 }

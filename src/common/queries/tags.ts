@@ -17,6 +17,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Tag, TagEntityType } from '$app/common/interfaces/tag';
 import { GenericQueryOptions } from './invoices';
+import { resolveBlankQueryEnabled } from './blank-query-options';
 
 export function tagEndpoint(
   entityType: TagEntityType,
@@ -51,9 +52,8 @@ export function useBlankTagQuery(
         updated_at: 0,
       }),
 
-    ...options,
     staleTime: Infinity,
-    enabled: isAdmin ? (options?.enabled ?? true) : false,
+    enabled: resolveBlankQueryEnabled(options, isAdmin),
   });
 }
 

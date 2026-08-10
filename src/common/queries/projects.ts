@@ -15,6 +15,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Project } from '$app/common/interfaces/project';
 import { GenericQueryOptions } from './invoices';
+import { resolveBlankQueryEnabled } from './blank-query-options';
 
 export function useBlankProjectQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();
@@ -27,12 +28,9 @@ export function useBlankProjectQuery(options?: GenericQueryOptions) {
         (response: GenericSingleResourceResponse<Project>) => response.data.data
       ),
 
-    ...options,
     staleTime: Infinity,
 
-    enabled: hasPermission('create_project')
-      ? (options?.enabled ?? true)
-      : false,
+    enabled: resolveBlankQueryEnabled(options, hasPermission('create_project')),
   });
 }
 

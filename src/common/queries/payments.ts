@@ -45,7 +45,7 @@ export function usePaymentQuery(params: PaymentParams) {
         (response: GenericSingleResourceResponse<Payment>) => response.data.data
       ),
 
-    enabled: params.enabled ?? Boolean(params.id),
+    enabled: (params.enabled ?? true) && Boolean(params.id),
     staleTime: Infinity,
   });
 }

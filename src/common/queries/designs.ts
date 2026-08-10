@@ -21,6 +21,7 @@ import { enterprisePlan } from '../guards/guards/enterprise-plan';
 import { proPlan } from '../guards/guards/pro-plan';
 import { useAdmin } from '../hooks/permissions/useHasPermission';
 import { useFreePlanDesigns } from '../hooks/useFreePlanDesigns';
+import { resolveBlankQueryEnabled } from './blank-query-options';
 
 export function useDesignsQuery() {
   const freePlanDesigns = useFreePlanDesigns();
@@ -50,19 +51,21 @@ interface DesignQueryOptions extends GenericQueryOptions {
 }
 
 export function useDesignQuery(params: DesignQueryOptions) {
+  const { id, enabled } = params;
+
   return useQuery({
-    queryKey: ['/api/v1/designs', params.id],
+    queryKey: ['/api/v1/designs', id],
 
     queryFn: () =>
       request(
         'GET',
-        endpoint('/api/v1/designs/:id?include=client', { id: params.id })
+        endpoint('/api/v1/designs/:id?include=client', { id })
       ).then(
         (response: GenericSingleResourceResponse<Design>) => response.data.data
       ),
 
     staleTime: Infinity,
-    ...params,
+    enabled: enabled && Boolean(id),
   });
 }
 
@@ -77,9 +80,8 @@ export function useBlankDesignQuery(options?: GenericQueryOptions) {
         (response: GenericSingleResourceResponse<Design>) => response.data.data
       ),
 
-    ...options,
     staleTime: Infinity,
-    enabled: isAdmin ? (options?.enabled ?? true) : false,
+    enabled: resolveBlankQueryEnabled(options, isAdmin),
   });
 }
 
