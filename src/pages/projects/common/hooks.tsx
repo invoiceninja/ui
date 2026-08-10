@@ -8,9 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import classNames from 'classnames';
-import { useSetAtom } from 'jotai';
-import { Dispatch, SetStateAction } from 'react';
+import { EntityState } from '$app/common/enums/entity-state';
+import { date, getEntityState } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { Project } from '$app/common/interfaces/project';
+import { Divider } from '$app/components/cards/Divider';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Icon } from '$app/components/icons/Icon';
+import { Tooltip } from '$app/components/Tooltip';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import {
   MdAddCircleOutline,
@@ -19,46 +28,36 @@ import {
   MdDelete,
   MdDesignServices,
   MdDownload,
+  MdEdit,
   MdRestore,
   MdTextSnippet,
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { EntityState } from '$app/common/enums/entity-state';
-import { date, getEntityState } from '$app/common/helpers';
-import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { projectAtom } from './atoms';
+import { useBulkAction } from './hooks/useBulkAction';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useInvoiceProject } from '$app/pages/projects/common/hooks/useInvoiceProject';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useSetAtom } from 'jotai';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { CustomBulkAction } from '$app/components/DataTable';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useDocumentsBulk } from '$app/common/queries/documents';
+import { Dispatch, SetStateAction } from 'react';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
-import { route } from '$app/common/helpers/route';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
-import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { Project } from '$app/common/interfaces/project';
-import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
-import { useDocumentsBulk } from '$app/common/queries/documents';
-import { useTagsQuery } from '$app/common/queries/tags';
-import { Divider } from '$app/components/cards/Divider';
-import { CustomBulkAction } from '$app/components/DataTable';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { EntityStatus } from '$app/components/EntityStatus';
-import { Icon } from '$app/components/icons/Icon';
-import { Tooltip } from '$app/components/Tooltip';
-import { isActiveTag, TagPills } from '$app/components/tags/TagPills';
-import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
-import { useInvoiceProject } from '$app/pages/projects/common/hooks/useInvoiceProject';
-import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { projectAtom } from './atoms';
-import { useBulkAction } from './hooks/useBulkAction';
+import classNames from 'classnames';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'name',
@@ -335,27 +334,15 @@ export function useProjectColumns() {
     );
 }
 
-export function useProjectFilterColumns(params?: { enabled?: boolean }) {
-  const { data: tags } = useTagsQuery({
-    entityType: TAG_ENTITY_TYPES.project,
-    enabled: params?.enabled ?? true,
-  });
-
-  return [
-    {
-      column_id: 'project_tag_ids',
-      query_identifier: 'tag_ids',
-      options:
-        tags?.data.filter(isActiveTag).map((tag) => ({
-          label: tag.name,
-          value: tag.id,
-        })) || [],
-    },
-  ];
+interface ActionsParams {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
 }
 
-export function useActions() {
+export function useActions(params?: ActionsParams) {
   const [t] = useTranslation();
+
+  const { showEditAction, showCommonBulkAction } = params || {};
 
   const bulk = useBulkAction();
   const navigate = useNavigate();
@@ -389,6 +376,16 @@ export function useActions() {
   } = useChangeTemplate();
 
   const actions = [
+    (project: Project) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/projects/:id/edit', { id: project.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (project: Project) =>
       hasPermission('create_invoice') && (
         <DropdownElement
@@ -432,10 +429,13 @@ export function useActions() {
           {t('run_template')}
         </DropdownElement>
       ),
-    () => isEditOrShowPage && <Divider withoutPadding />,
+    () =>
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (project: Project) =>
       getEntityState(project) === EntityState.Active &&
-      isEditOrShowPage && (
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) && (
         <DropdownElement
           onClick={() => bulk([project.id], 'archive')}
           icon={<Icon element={MdArchive} />}
@@ -446,7 +446,7 @@ export function useActions() {
     (project: Project) =>
       (getEntityState(project) === EntityState.Archived ||
         getEntityState(project) === EntityState.Deleted) &&
-      isEditOrShowPage && (
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) && (
         <DropdownElement
           onClick={() => bulk([project.id], 'restore')}
           icon={<Icon element={MdRestore} />}
@@ -457,7 +457,7 @@ export function useActions() {
     (project: Project) =>
       (getEntityState(project) === EntityState.Active ||
         getEntityState(project) === EntityState.Archived) &&
-      isEditOrShowPage && (
+      (isEditOrShowPage || Boolean(showCommonBulkAction)) && (
         <DropdownElement
           onClick={() => bulk([project.id], 'delete')}
           icon={<Icon element={MdDelete} />}

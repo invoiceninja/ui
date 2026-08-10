@@ -32,6 +32,7 @@ export function useAllTransactionColumns() {
     'is_deleted',
     'created_at',
     'updated_at',
+    'tags',
   ] as const;
 
   return transactionColumns;

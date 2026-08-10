@@ -30,6 +30,7 @@ import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Tooltip } from '$app/components/Tooltip';
+import { TagPills } from '$app/components/tags/TagPills';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 
 export const defaultColumns: string[] = [
@@ -75,6 +76,7 @@ export function useAllVendorColumns() {
     'updated_at',
     'vat_number',
     'website',
+    'tags',
   ] as const;
 
   return vendorColumns.map((column) => normalizeColumnName(column));
@@ -291,6 +293,12 @@ export function useVendorColumns() {
       id: 'website',
       label: t('website'),
       format: (value) => <CopyToClipboard text={value.toString()} />,
+    },
+    {
+      column: 'tags',
+      id: 'vendor_tag_ids',
+      label: t('tags'),
+      format: (value, vendor) => <TagPills tags={vendor.tags} />,
     },
   ];
 

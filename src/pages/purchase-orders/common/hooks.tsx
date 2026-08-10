@@ -19,6 +19,7 @@ import {
   MdDelete,
   MdDesignServices,
   MdDownload,
+  MdEdit,
   MdInventory,
   MdMarkEmailRead,
   MdPageview,
@@ -29,6 +30,8 @@ import {
   MdSend,
   MdSwitchRight,
 } from 'react-icons/md';
+import { Icon } from '$app/components/icons/Icon';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { useNavigate } from 'react-router-dom';
 import { EntityState } from '$app/common/enums/entity-state';
 import { PurchaseOrderStatus } from '$app/common/enums/purchase-order-status';
@@ -63,6 +66,7 @@ import { EntityActionElement } from '$app/components/EntityActionElement';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Link } from '$app/components/forms';
 import { Action } from '$app/components/ResourceActions';
+import { TagPills } from '$app/components/tags/TagPills';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
@@ -193,6 +197,7 @@ export function useAllPurchaseOrderColumns() {
     'documents',
     'entity_state',
     'exchange_rate',
+    'tags',
   ] as const;
 
   return purchaseOrderColumns.map((column) => normalizeColumnName(column));
@@ -387,6 +392,14 @@ export function usePurchaseOrderColumns() {
         label: t('exchange_rate'),
         format: (value) => formatNumber(value),
       },
+      {
+        column: 'tags',
+        id: 'purchase_order_tag_ids',
+        label: t('tags'),
+        format: (value, purchaseOrder) => (
+          <TagPills tags={purchaseOrder.tags} />
+        ),
+      },
     ];
 
   const list: string[] =
@@ -437,11 +450,13 @@ export function usePurchaseOrderFilters() {
 }
 
 interface ActionsParams {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
   dropdown?: boolean;
 }
 
 export function useActions(params: ActionsParams = {}) {
-  const { dropdown = true } = params;
+  const { showEditAction, showCommonBulkAction, dropdown = true } = params;
 
   const [t] = useTranslation();
 
@@ -474,6 +489,16 @@ export function useActions(params: ActionsParams = {}) {
   } = useChangeTemplate();
 
   const actions: Action<PurchaseOrder>[] = [
+    (purchaseOrder) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/purchase_orders/:id/edit', { id: purchaseOrder.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (purchaseOrder) => (
       <EntityActionElement
         {...(!dropdown && {
@@ -714,10 +739,13 @@ export function useActions(params: ActionsParams = {}) {
           {t('run_template')}
         </EntityActionElement>
       ),
-    () => isEditPage && <Divider withoutPadding />,
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (purchaseOrder) =>
       Boolean(!purchaseOrder.archived_at) &&
-      isEditPage && (
+      (isEditPage || Boolean(showCommonBulkAction)) && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'archive',
@@ -736,7 +764,7 @@ export function useActions(params: ActionsParams = {}) {
       ),
     (purchaseOrder) =>
       Boolean(purchaseOrder.archived_at) &&
-      isEditPage && (
+      (isEditPage || Boolean(showCommonBulkAction)) && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'restore',
@@ -755,7 +783,7 @@ export function useActions(params: ActionsParams = {}) {
       ),
     (purchaseOrder) =>
       !purchaseOrder.is_deleted &&
-      isEditPage && (
+      (isEditPage || Boolean(showCommonBulkAction)) && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'delete',

@@ -9,11 +9,12 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useSumTableColumn } from '$app/common/hooks/useSumTableColumn';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { DataTableFooterColumnsExtended } from '$app/pages/invoices/common/hooks/useFooterColumns';
 import { useAllRecurringInvoiceColumns } from '../hooks';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { calculateNetAmount } from '$app/common/helpers/invoices/net-amount';
 
 export function useFooterColumns() {
   const [t] = useTranslation();
@@ -36,13 +37,25 @@ export function useFooterColumns() {
       format: (values, recurringInvoices) =>
         sumTableColumn(values as number[], recurringInvoices),
     },
+    {
+      column: 'net_amount',
+      id: 'amount',
+      label: t('net_amount'),
+      format: (values, recurringInvoices) =>
+        sumTableColumn(
+          recurringInvoices.map(calculateNetAmount),
+          recurringInvoices
+        ),
+    },
   ];
 
   const currentColumns: string[] =
     reactSettings?.table_footer_columns?.recurringInvoice || [];
 
   return {
-    footerColumns: columns.filter(({ id }) => currentColumns.includes(id)),
+    footerColumns: columns.filter(({ column }) =>
+      currentColumns.includes(column)
+    ),
     allFooterColumns: columns,
   };
 }

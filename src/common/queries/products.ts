@@ -51,6 +51,7 @@ export function useProductQuery(params: { id: string | undefined }) {
     queryFn: () =>
       request('GET', endpoint('/api/v1/products/:id', { id: params.id })),
     staleTime: Infinity,
+    enabled: Boolean(params.id),
   });
 }
 export function useBlankProductQuery(options?: GenericQueryOptions) {

@@ -9,58 +9,14 @@
  */
 
 import { AxiosError } from 'axios';
-import classNames from 'classnames';
-import { useAtom, useSetAtom } from 'jotai';
-import { Dispatch, SetStateAction } from 'react';
-import { useTranslation } from 'react-i18next';
-import {
-  MdArchive,
-  MdCloudCircle,
-  MdComment,
-  MdCreditScore,
-  MdDelete,
-  MdDesignServices,
-  MdDownload,
-  MdMarkEmailRead,
-  MdPaid,
-  MdPictureAsPdf,
-  MdPrint,
-  MdRestore,
-  MdSchedule,
-  MdSend,
-} from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { CreditStatus } from '$app/common/enums/credit-status';
-import { EntityState } from '$app/common/enums/entity-state';
 import { date, endpoint, getEntityState } from '$app/common/helpers';
-import { normalizeColumnName } from '$app/common/helpers/data-table';
-import {
-  extractTextFromHTML,
-  sanitizeHTML,
-} from '$app/common/helpers/html-string';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
-import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import {
-  useAdmin,
-  useHasPermission,
-} from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
-import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
-import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Client } from '$app/common/interfaces/client';
 import { Credit } from '$app/common/interfaces/credit';
@@ -71,33 +27,81 @@ import {
 } from '$app/common/interfaces/invoice-item';
 import { Invitation } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useBulk } from '$app/common/queries/credits';
-import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
-import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { Divider } from '$app/components/cards/Divider';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { EntityActionElement } from '$app/components/EntityActionElement';
-import { EntityStatus } from '$app/components/EntityStatus';
 import { Action } from '$app/components/ResourceActions';
-import { Tooltip } from '$app/components/Tooltip';
-import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
-import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { useAtom, useSetAtom } from 'jotai';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
-import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import {
   DataTableColumnsExtended,
   resourceViewedAt,
 } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
-import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
-import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
-import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
-import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from './atoms';
-import { CloneOptionsModal } from './components/CloneOptionsModal';
-import { useMarkPaid } from './hooks/useMarkPaid';
 import { useMarkSent } from './hooks/useMarkSent';
+import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { EntityStatus } from '$app/components/EntityStatus';
+import {
+  MdArchive,
+  MdCloudCircle,
+  MdComment,
+  MdCreditScore,
+  MdDelete,
+  MdDesignServices,
+  MdDownload,
+  MdEdit,
+  MdMarkEmailRead,
+  MdPaid,
+  MdPictureAsPdf,
+  MdPrint,
+  MdRestore,
+  MdSchedule,
+  MdSend,
+} from 'react-icons/md';
+import { Icon } from '$app/components/icons/Icon';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Tooltip } from '$app/components/Tooltip';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
+import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
+import { EntityState } from '$app/common/enums/entity-state';
+import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { useMarkPaid } from './hooks/useMarkPaid';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useBulk } from '$app/common/queries/credits';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { CloneOptionsModal } from './components/CloneOptionsModal';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useDownloadEInvoice } from '$app/pages/invoices/common/hooks/useDownloadEInvoice';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { EntityActionElement } from '$app/components/EntityActionElement';
+import classNames from 'classnames';
+import { Dispatch, SetStateAction } from 'react';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { TagPills } from '$app/components/tags/TagPills';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -395,6 +399,8 @@ export function useSave(props: CreateProps) {
 }
 
 interface Params {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
   dropdown?: boolean;
 }
 
@@ -403,7 +409,11 @@ export function useActions(params?: Params) {
 
   const hasPermission = useHasPermission();
 
-  const { dropdown = true } = params || {};
+  const {
+    showEditAction,
+    showCommonBulkAction,
+    dropdown = true,
+  } = params || {};
 
   const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
     useDisplayRunTemplateActions();
@@ -432,6 +442,16 @@ export function useActions(params?: Params) {
   } = useChangeTemplate();
 
   const actions: Action<Credit>[] = [
+    (credit) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/credits/:id/edit', { id: credit.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (credit) => (
       <EntityActionElement
         {...(!dropdown && {
@@ -657,9 +677,12 @@ export function useActions(params?: Params) {
         credit={credit}
       />
     ),
-    () => Boolean(isEditPage && dropdown) && <Divider withoutPadding />,
+    () =>
+      Boolean(
+        (isEditPage || Boolean(showCommonBulkAction)) && dropdown
+      ) && <Divider withoutPadding />,
     (credit) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       credit.archived_at === 0 && (
         <EntityActionElement
           {...(!dropdown && {
@@ -678,7 +701,7 @@ export function useActions(params?: Params) {
         </EntityActionElement>
       ),
     (credit) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       credit.archived_at > 0 && (
         <EntityActionElement
           {...(!dropdown && {
@@ -697,7 +720,7 @@ export function useActions(params?: Params) {
         </EntityActionElement>
       ),
     (credit) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       !credit?.is_deleted && (
         <EntityActionElement
           {...(!dropdown && {
@@ -772,6 +795,7 @@ export function useAllCreditColumns() {
     'tax_amount',
     'updated_at',
     'valid_until',
+    'tags',
     // 'vendor', @Todo: Need to fetch the relationship
   ] as const;
 
@@ -1099,6 +1123,12 @@ export function useCreditColumns() {
       id: 'due_date',
       label: t('valid_until'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'tags',
+      id: 'credit_tag_ids',
+      label: t('tags'),
+      format: (value, credit) => <TagPills tags={credit.tags} />,
     },
   ];
 

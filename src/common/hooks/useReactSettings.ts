@@ -95,6 +95,7 @@ export interface ReactSettings {
   show_document_preview?: boolean;
   preferences: Preferences;
   table_filters?: Record<string, TableFiltersPreference>;
+  persist_table_filters?: boolean;
   common_actions?: Record<Entity, string[]>;
   show_mini_sidebar?: boolean;
   import_templates?: ImportTemplates;
@@ -160,6 +161,7 @@ function withDefaults(settings: ReactSettings | null): ReactSettings {
   const base: ReactSettings = {
     show_pdf_preview: true,
     react_notification_link: true,
+    persist_table_filters: true,
     react_table_columns: {} as Record<ReactTableColumns, string[]>,
     preferences: cloneDeep(preferencesDefaults),
   };

@@ -17,9 +17,14 @@ import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Quote } from '$app/common/interfaces/quote';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { Page } from '$app/components/Breadcrumbs';
 import { DataTable } from '$app/components/DataTable';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
@@ -70,6 +75,17 @@ export default function Quotes() {
   const customBulkActions = useCustomBulkActions();
   const { footerColumns, allFooterColumns } = useFooterColumns();
 
+  const selectedColumns =
+    reactSettings?.react_table_columns?.quote || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.quote,
+    'quote_tag_ids',
+    { enabled: shouldShowTagFilter }
+  );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'quote_tag_ids');
+
   const { data: quoteResponse } = useQuoteQuery({ id: sliderQuoteId });
 
   const pages: Page[] = [{ name: t('quotes'), href: route('/quotes') }];
@@ -96,7 +112,11 @@ export default function Quotes() {
         resource="quote"
         columns={columns}
         footerColumns={footerColumns}
-        endpoint="/api/v1/quotes?include=client&without_deleted_clients=true&sort=id|desc"
+        endpoint={`/api/v1/quotes?include=client${
+          shouldShowTagFilter ? ',tags' : ''
+        }&without_deleted_clients=true&sort=id|desc${
+          shouldShowTagFilter ? '' : '&tag_ids='
+        }`}
         linkToEdit="/quotes/:id/edit"
         linkToCreate="/quotes/create"
         bulkRoute="/api/v1/quotes/bulk"
@@ -104,6 +124,7 @@ export default function Quotes() {
         customBulkActions={customBulkActions}
         customFilters={filters}
         customFilterPlaceholder="status"
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         withResourcefulActions
         rightSide={
           <div className="flex items-center space-x-2">

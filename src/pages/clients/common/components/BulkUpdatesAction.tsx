@@ -54,6 +54,7 @@ interface BulkUpdateField {
     | 'taxSelector'
     | 'toggle'
     | 'remainingCyclesSelector'
+    | 'autoBillSelector'
     | 'textarea'
     | 'statusSelector'
     | 'userSelector'
@@ -85,7 +86,9 @@ const bulkUpdateFieldsTypes: BulkUpdateField[] = [
   { key: 'tax3', type: 'taxSelector' },
   { key: 'should_be_invoiced', type: 'toggle' },
   { key: 'uses_inclusive_taxes', type: 'toggle' },
+  { key: 'auto_bill_enabled', type: 'toggle' },
   { key: 'remaining_cycles', type: 'remainingCyclesSelector' },
+  { key: 'auto_bill', type: 'autoBillSelector' },
   { key: 'status_id', type: 'statusSelector' },
   { key: 'assigned_user_id', type: 'userSelector' },
   { key: 'project_id', type: 'projectSelector' },
@@ -129,7 +132,9 @@ export function BulkUpdatesAction(props: Props) {
   useEffect(() => {
     if (column === 'remaining_cycles') {
       setNewColumnValue('-1');
-    } else if (column === 'uses_inclusive_taxes') {
+    } else if (column === 'auto_bill') {
+      setNewColumnValue('always');
+    } else if (getFieldType() === 'toggle') {
       setNewColumnValue(false);
     } else {
       setNewColumnValue('');
@@ -341,6 +346,18 @@ export function BulkUpdatesAction(props: Props) {
                     {number}
                   </option>
                 ))}
+              </SelectField>
+            )}
+
+            {getFieldType() === 'autoBillSelector' && (
+              <SelectField
+                value={newColumnValue}
+                onValueChange={(value) => setNewColumnValue(value)}
+              >
+                <option value="always">{t('enabled')}</option>
+                <option value="optout">{t('optout')}</option>
+                <option value="optin">{t('optin')}</option>
+                <option value="off">{t('disabled')}</option>
               </SelectField>
             )}
 

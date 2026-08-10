@@ -8,22 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import { useColorScheme } from '$app/common/colors';
+import { Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
 import { transactionTypes } from '$app/common/constants/transactions';
 import {
   ApiTransactionType,
   TransactionType,
 } from '$app/common/enums/transactions';
-import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
+import { BankAccountSelector } from '../components/BankAccountSelector';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { CurrencySelector } from '$app/components/CurrencySelector';
-import { Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { BankAccountSelector } from '../components/BankAccountSelector';
+import { useTranslation } from 'react-i18next';
+import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { EntityStatus } from './EntityStatus';
+import { CurrencySelector } from '$app/components/CurrencySelector';
+import { useColorScheme } from '$app/common/colors';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 interface Props {
   transaction: Transaction;
@@ -130,6 +132,15 @@ export function TransactionForm(props: Props) {
           value={props.transaction.description}
           onValueChange={(value) => props.handleChange('description', value)}
           errorMessage={props.errors?.errors.description}
+        />
+      </Element>
+
+      <Element leftSide={t('tags')}>
+        <TagPillSelector
+          entityType={TAG_ENTITY_TYPES.bankTransaction}
+          value={props.transaction.tags || []}
+          onChange={(tags) => props.handleChange('tags', tags)}
+          errorMessage={props.errors?.errors.tags}
         />
       </Element>
 

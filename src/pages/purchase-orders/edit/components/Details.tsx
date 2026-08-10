@@ -8,17 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import { useColorScheme } from '$app/common/colors';
-import { date as formatDate } from '$app/common/helpers';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { CustomField } from '$app/components/CustomField';
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Inline } from '$app/components/Inline';
+import { useTranslation } from 'react-i18next';
+import { date as formatDate } from '$app/common/helpers';
+import { CustomField } from '$app/components/CustomField';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { useColorScheme } from '$app/common/colors';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 export interface PurchaseOrderCardProps {
   purchaseOrder: PurchaseOrder;
@@ -85,6 +87,16 @@ export function Details(props: PurchaseOrderCardProps) {
             />
           </Element>
         )}
+
+        <Element leftSide={t('tags')}>
+          <TagPillSelector
+            entityType={TAG_ENTITY_TYPES.purchaseOrder}
+            value={purchaseOrder?.tags || []}
+            onChange={(tags) => handleChange('tags', tags)}
+            errorMessage={errors?.errors.tags}
+          />
+        </Element>
+
         {purchaseOrder && company?.custom_fields?.invoice1 && (
           <CustomField
             field="invoice1"

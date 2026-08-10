@@ -261,7 +261,7 @@ export function GatewaysTable(params: Params) {
 
           <SelectWithApplyButton
             styles={newCustomStyles}
-            defaultValue={options[0]}
+            defaultValue={[options[0]]}
             onChange={(options: SelectOption[]) => onStatusChange(options)}
             placeholder={t('status')}
             options={options}

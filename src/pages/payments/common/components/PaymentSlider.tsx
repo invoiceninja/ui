@@ -8,39 +8,45 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { TabGroup } from '$app/components/TabGroup';
+import { Element } from '$app/components/cards';
+import classNames from 'classnames';
+import { Divider } from '$app/components/cards/Divider';
+import { Slider } from '$app/components/cards/Slider';
+import { atom, useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { date, endpoint } from '$app/common/helpers';
+import { ResourceActions } from '$app/components/ResourceActions';
 import { useQuery } from '@tanstack/react-query';
+import { request } from '$app/common/helpers/request';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { atom, useAtom } from 'jotai';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { Payment } from '$app/common/interfaces/payment';
+import { useActions } from '../hooks/useActions';
+import { PaymentStatus } from './PaymentStatus';
+import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
+import { PaymentActivity } from '$app/common/interfaces/payment-activity';
+import { CreditStatus } from '$app/pages/credits/common/components/CreditStatus';
+import paymentType from '$app/common/constants/payment-type';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
-import paymentType from '$app/common/constants/payment-type';
-import { date, endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { Payment } from '$app/common/interfaces/payment';
-import { PaymentActivity } from '$app/common/interfaces/payment-activity';
-import { Element } from '$app/components/cards';
-import { Divider } from '$app/components/cards/Divider';
-import { Slider } from '$app/components/cards/Slider';
+import { useNavigate } from 'react-router-dom';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { TabGroup } from '$app/components/TabGroup';
-import { CreditStatus } from '$app/pages/credits/common/components/CreditStatus';
-import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
-import { useActions } from '../hooks/useActions';
 import { useGenerateActivityElement } from '../hooks/useGenerateActivityElement';
-import { PaymentStatus } from './PaymentStatus';
+import { TagPills } from '$app/components/tags/TagPills';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const paymentSliderAtom = atom<Payment | null>(null);
 export const paymentSliderVisibilityAtom = atom(false);
@@ -93,7 +99,7 @@ export function PaymentSlider() {
 
   return (
     <Slider
-      size="regular"
+      size="large"
       visible={isVisible}
       onClose={() => {
         setIsSliderVisible(false);
@@ -114,8 +120,18 @@ export function PaymentSlider() {
       withoutHeaderBorder
     >
       <TabGroup
-        tabs={[t('overview'), t('activity')]}
+        tabs={[t('overview'), t('activity'), t('documents')]}
         width="full"
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 2) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={payment?.documents?.length}
+                textCenter
+              />
+            );
+          }
+        }}
         withHorizontalPadding
         horizontalPaddingWidth="1.5rem"
       >
@@ -177,12 +193,26 @@ export function PaymentSlider() {
             </Element>
 
             <Element
+              className={classNames({
+                'border-b border-dashed': Boolean(payment?.tags?.length),
+              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {payment ? <PaymentStatus entity={payment} /> : null}
             </Element>
+
+            {Boolean(payment?.tags?.length) && (
+              <Element
+                leftSide={t('tags')}
+                pushContentToRight
+                noExternalPadding
+              >
+                <TagPills tags={payment?.tags} />
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />
@@ -335,6 +365,27 @@ export function PaymentSlider() {
               </Box>
             ))}
           </div>
+        </div>
+
+        <div className="px-4">
+          <Upload
+            endpoint={endpoint('/api/v1/payments/:id/upload', {
+              id: payment?.id,
+            })}
+            onSuccess={() => $refetch(['payments'])}
+            widgetOnly
+            disableUpload={
+              !hasPermission('edit_payment') && !entityAssigned(payment)
+            }
+          />
+
+          <DocumentsTable
+            documents={payment?.documents || []}
+            onDocumentDelete={() => $refetch(['payments'])}
+            disableEditableOptions={
+              !entityAssigned(payment, true) && !hasPermission('edit_payment')
+            }
+          />
         </div>
       </TabGroup>
     </Slider>

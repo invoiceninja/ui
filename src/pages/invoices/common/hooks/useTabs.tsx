@@ -21,6 +21,7 @@ import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Tab } from '$app/components/Tabs';
 import { ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { useUnappliedPayments } from '../../edit/hooks/useUnappliedPayments';
+import { hasQuickbooksConnection } from '../helpers/quickbooks';
 
 interface Params {
   invoice: Invoice | undefined;
@@ -99,6 +100,11 @@ export function useTabs(params: Params) {
           )}
         </div>
       ),
+    },
+    {
+      name: t('quickbooks'),
+      href: route('/invoices/:id/quickbooks', { id }),
+      enabled: canEditAndView && hasQuickbooksConnection(company),
     },
     {
       name: t('documents'),

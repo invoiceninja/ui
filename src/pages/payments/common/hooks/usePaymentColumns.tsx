@@ -8,31 +8,32 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
 import paymentType from '$app/common/constants/payment-type';
 import { date } from '$app/common/helpers';
-import { normalizeColumnName } from '$app/common/helpers/data-table';
-import {
-  extractTextFromHTML,
-  sanitizeHTML,
-} from '$app/common/helpers/html-string';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Payment } from '$app/common/interfaces/payment';
-import { DynamicLink } from '$app/components/DynamicLink';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { StatusBadge } from '$app/components/StatusBadge';
 import { Tooltip } from '$app/components/Tooltip';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import { useTranslation } from 'react-i18next';
 import { PaymentStatus } from '../components/PaymentStatus';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import classNames from 'classnames';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'status',
@@ -79,6 +80,7 @@ export function useAllPaymentColumns() {
     'applied',
     'credits',
     'updated_at',
+    'tags',
   ] as const;
 
   return paymentColumns.map((column) => normalizeColumnName(column));
@@ -358,6 +360,12 @@ export function usePaymentColumns() {
       id: 'updated_at',
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'tags',
+      id: 'payment_tag_ids',
+      label: t('tags'),
+      format: (value, payment) => <TagPills tags={payment.tags} />,
     },
   ];
 

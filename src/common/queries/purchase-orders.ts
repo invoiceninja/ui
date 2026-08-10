@@ -57,6 +57,7 @@ export function usePurchaseOrderQuery(params: { id: string | undefined }) {
       ),
 
     staleTime: Infinity,
+    enabled: Boolean(params.id),
   });
 }
 

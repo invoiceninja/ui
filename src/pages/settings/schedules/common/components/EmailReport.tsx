@@ -8,25 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
 import { Schedule } from '$app/common/interfaces/schedule';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Element } from '$app/components/cards';
-import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
-import { MultiClientSelector } from '$app/pages/reports/common/components/MultiClientSelector';
-import { MultiExpenseCategorySelector } from '$app/pages/reports/common/components/MultiExpenseCategorySelector';
-import { MultiProjectSelector } from '$app/pages/reports/common/components/MultiProjectSelector';
-import { MultiTagSelector } from '$app/pages/reports/common/components/MultiTagSelector';
-import { MultiVendorSelector } from '$app/pages/reports/common/components/MultiVendorSelector';
 import { ProductItemsSelector } from '$app/pages/reports/common/components/ProductItemsSelector';
 import { StatusSelector } from '$app/pages/reports/common/components/StatusSelector';
-import { TemplateSelector } from '$app/pages/reports/common/components/TemplateSelector';
-import { useGroupByOptions } from '$app/pages/reports/common/hooks/useGroupByOptions';
 import { Identifier, useReports } from '$app/pages/reports/common/useReports';
 import { ranges } from '$app/pages/reports/index/Reports';
+import { useTranslation } from 'react-i18next';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { MultiClientSelector } from '$app/pages/reports/common/components/MultiClientSelector';
+import { MultiVendorSelector } from '$app/pages/reports/common/components/MultiVendorSelector';
+import { MultiProjectSelector } from '$app/pages/reports/common/components/MultiProjectSelector';
+import { MultiTagSelector } from '$app/pages/reports/common/components/MultiTagSelector';
+import { REPORT_TAG_ENTITY_TYPES } from '$app/pages/reports/common/hooks/useShowReportField';
+import { MultiExpenseCategorySelector } from '$app/pages/reports/common/components/MultiExpenseCategorySelector';
+import { TemplateSelector } from '$app/pages/reports/common/components/TemplateSelector';
+import { useGroupByOptions } from '$app/pages/reports/common/hooks/useGroupByOptions';
 
 interface Props {
   schedule: Schedule;
@@ -234,6 +235,13 @@ export function EmailReport(props: Props) {
   );
 
   const showReportFiled = (field: ReportFiled) => {
+    if (field === 'tags') {
+      return (
+        (schedule.parameters.report_name as Identifier) in
+        REPORT_TAG_ENTITY_TYPES
+      );
+    }
+
     return (
       REPORTS_FIELDS[schedule.parameters.report_name] || DEFAULT_REPORT_FIELDS
     ).includes(field);
@@ -494,9 +502,9 @@ export function EmailReport(props: Props) {
       {showReportFiled('tags') && (
         <MultiTagSelector
           entityType={
-            schedule.parameters.report_name === 'task'
-              ? TAG_ENTITY_TYPES.task
-              : TAG_ENTITY_TYPES.project
+            REPORT_TAG_ENTITY_TYPES[
+              schedule.parameters.report_name as Identifier
+            ] ?? TAG_ENTITY_TYPES.invoice
           }
           value={schedule.parameters.tag_ids}
           onValueChange={(tagIds) =>

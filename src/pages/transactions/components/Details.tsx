@@ -8,34 +8,35 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useColorScheme } from '$app/common/colors';
+import { Element } from '$app/components/cards';
+import { Link } from '$app/components/forms';
+import { TagPills } from '$app/components/tags/TagPills';
 import {
   ApiTransactionType,
   TransactionStatus,
   TransactionType,
 } from '$app/common/enums/transactions';
-import { date as formatDate } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Expense } from '$app/common/interfaces/expense';
 import { ExpenseCategory } from '$app/common/interfaces/expense-category';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Payment } from '$app/common/interfaces/payment';
 import { useExpenseCategoryQuery } from '$app/common/queries/expense-categories';
 import { useExpensesQuery } from '$app/common/queries/expenses';
 import { usePaymentQuery } from '$app/common/queries/payments';
-import { useTransactionRuleQuery } from '$app/common/queries/transaction-rules';
-import { useTransactionQuery } from '$app/common/queries/transactions';
 import { useVendorQuery } from '$app/common/queries/vendor';
-import { Element } from '$app/components/cards';
-import { Link } from '$app/components/forms';
 import { useInvoicesQuery } from '$app/pages/invoices/common/queries';
 import { useBankAccountQuery } from '$app/pages/settings/bank-accounts/common/queries';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TransactionMatchDetails } from './TransactionMatchDetails';
+import { useTransactionRuleQuery } from '$app/common/queries/transaction-rules';
+import { Expense } from '$app/common/interfaces/expense';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { date as formatDate } from '$app/common/helpers';
+import { useTransactionQuery } from '$app/common/queries/transactions';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   transactionId: string;
@@ -161,6 +162,12 @@ export function Details(props: Props) {
         <Element leftSide={t('date')}>
           {formatDate(transaction?.date || '', dateFormat)}
         </Element>
+
+        {Boolean(transaction?.tags?.length) && (
+          <Element leftSide={t('tags')}>
+            <TagPills tags={transaction?.tags} />
+          </Element>
+        )}
 
         <Element leftSide={t('bank_account')} className="cursor-pointer">
           <Link

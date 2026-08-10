@@ -33,6 +33,10 @@ import { ErrorMessage } from '../ErrorMessage';
 import { CloudUpload } from '../icons/CloudUpload';
 import { Icon } from '../icons/Icon';
 import { useEntityImportTemplates } from './common/hooks/useEntityImportTemplates';
+import {
+  formatImportMappingLabel,
+  resolveImportMappingHints,
+} from './common/import-mappings';
 import { ImportTemplate } from './ImportTemplate';
 import { ImportTemplateModal } from './ImportTemplateModal';
 
@@ -133,19 +137,6 @@ export function UploadImport(props: Props) {
     }));
   };
 
-  const decorateMapping = (mapping: any) => {
-    const split_map = mapping.split('.');
-
-    let label_property = split_map[1];
-
-    if (split_map[1] == 'user_id') label_property = 'user';
-
-    if (split_map[1] == 'shipping_country_id')
-      label_property = 'shipping_country';
-
-    return `${t(split_map[0])} - ${t(label_property)}`;
-  };
-
   const processImport = () => {
     if (!files.length && isImportFileTypeZip) {
       toast.error('select_file');
@@ -227,17 +218,14 @@ export function UploadImport(props: Props) {
           toast.dismiss();
 
           if (response.data?.mappings[props.entity]?.hints) {
-            response.data?.mappings[props.entity]?.hints.forEach(
-              (mapping: number, index: number) => {
-                payload.column_map[props.entity].mapping[index] =
-                  response.data?.mappings[props.entity].available[mapping] ??
-                  '';
-                setPayloadData(payload);
-                setDefaultMapping({
-                  ...payload?.column_map?.[props.entity]?.mapping,
-                });
-              }
+            const mapping = resolveImportMappingHints(
+              response.data.mappings[props.entity].available,
+              response.data.mappings[props.entity].hints
             );
+
+            payload.column_map[props.entity].mapping = mapping;
+            setPayloadData(cloneDeep(payload));
+            setDefaultMapping({ ...mapping });
           }
 
           setSelectedTemplate('');
@@ -634,7 +622,7 @@ export function UploadImport(props: Props) {
                             )
                             .map((mapping: string, index: number) => (
                               <option value={mapping} key={index}>
-                                {decorateMapping(mapping)}
+                                {formatImportMappingLabel(mapping, t)}
                               </option>
                             ))}
                         </SelectField>

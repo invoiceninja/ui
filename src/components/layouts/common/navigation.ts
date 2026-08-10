@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { ShortcutId } from '$app/common/constants/keyboard-shortcuts';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { formatBinding } from '$app/common/helpers/keyboard-shortcuts';
+import { isHosted } from '$app/common/helpers';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
@@ -307,10 +308,10 @@ export function useNavigation() {
         icon: Plus,
         to: '/docuninja/create',
         label: t('new_document'),
-        visible: import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
+        visible: isHosted() || import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
         tooltipLabel: tooltipFor('create_document'),
       },
-      visible: import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
+      visible: isHosted() || import.meta.env.VITE_ENABLE_DOCUNINJA === 'true',
       subOptions: [
         {
           name: t('templates'),

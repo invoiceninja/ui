@@ -8,16 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { lazy } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import { DocuNinjaProvider } from '$app/common/components/DocuNinjaProvider';
-import { DocuNinjaGuard } from '$app/common/guards/DocuNinjaGuard';
 import { Guard } from '$app/common/guards/Guard';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { lazy } from 'react';
+import { DocuNinjaGuard } from '$app/common/guards/DocuNinjaGuard';
 import {
   docuNinjaAdmin,
   docuNinjaOwner,
   docuNinjaPermission,
 } from '$app/common/guards/guards/docuninja/permission';
+import { DocuNinjaProvider } from '$app/common/components/DocuNinjaProvider';
+import { isHosted } from '$app/common/helpers';
 
 const Documents = lazy(() => import('$app/pages/documents/index/Documents'));
 const Document = lazy(() => import('$app/pages/documents/show/Document'));
@@ -78,12 +79,11 @@ const UserSelection = lazy(
 );
 const Sign = lazy(() => import('$app/pages/documents/sign/index/Sign'));
 const Pdf = lazy(() => import('$app/pages/documents/pdf/Pdf'));
-
-const Beta = lazy(() => import('$app/pages/documents/beta/Beta'));
+const Join = lazy(() => import('$app/pages/documents/join/Join'));
 
 const routes = (
   <>
-    <Route path="/docuninja/beta" element={<Beta />} />
+    <Route path="/docuninja/join" element={<Join />} />
 
     <Route
       path="docuninja/*"
@@ -280,4 +280,6 @@ const routes = (
 );
 
 export const documentsRoutes =
-  import.meta.env.VITE_ENABLE_DOCUNINJA === 'true' ? routes : null;
+  isHosted() || import.meta.env.VITE_ENABLE_DOCUNINJA === 'true'
+    ? routes
+    : null;

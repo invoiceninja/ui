@@ -19,17 +19,14 @@ import { GenericQueryOptions } from '$app/common/queries/invoices';
 export function useBlankCreditQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();
 
-  return useQuery({
+  return useQuery<Credit>({
     queryKey: ['/api/v1/credits', 'create'],
-
     queryFn: () =>
       request('GET', endpoint('/api/v1/credits/create')).then(
         (response: GenericSingleResourceResponse<Credit>) => response.data.data
       ),
-
     ...options,
     staleTime: Infinity,
-
     enabled: hasPermission('create_credit')
       ? (options?.enabled ?? true)
       : false,
@@ -41,9 +38,8 @@ interface CreditQueryProps {
 }
 
 export function useCreditQuery({ id }: CreditQueryProps) {
-  return useQuery({
+  return useQuery<Credit>({
     queryKey: ['/api/v1/credits', id],
-
     queryFn: () =>
       request(
         'GET',
@@ -51,7 +47,7 @@ export function useCreditQuery({ id }: CreditQueryProps) {
       ).then(
         (response: GenericSingleResourceResponse<Credit>) => response.data.data
       ),
-
     staleTime: Infinity,
+    enabled: Boolean(id),
   });
 }

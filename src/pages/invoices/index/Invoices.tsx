@@ -8,47 +8,52 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAtom, useSetAtom } from 'jotai';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
-import { Guard } from '$app/common/guards/Guard';
-import { or } from '$app/common/guards/guards/or';
-import { permission } from '$app/common/guards/guards/permission';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { DataTable } from '$app/components/DataTable';
-import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
-import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
-import { InputLabel } from '$app/components/forms';
-import { ImportButton } from '$app/components/import/ImportButton';
 import { Default } from '$app/components/layouts/Default';
-import { confirmActionModalAtom } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
-import {
-  ChangeTemplateModal,
-  useChangeTemplate,
-} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { DeleteInvoicesConfirmationModal } from '../common/components/DeleteInvoicesConfirmationModal';
-import {
-  InvoiceSlider,
-  invoiceSliderAtom,
-  invoiceSliderVisibilityAtom,
-} from '../common/components/InvoiceSlider';
-import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
-import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
-import { useFooterColumns } from '../common/hooks/useFooterColumns';
+import { useTranslation } from 'react-i18next';
+import { useActions } from '../edit/components/Actions';
 import {
   defaultColumns,
   useAllInvoiceColumns,
   useInvoiceColumns,
 } from '../common/hooks/useInvoiceColumns';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useInvoiceFilters } from '../common/hooks/useInvoiceFilters';
-import { useActions } from '../edit/components/Actions';
+import { ImportButton } from '$app/components/import/ImportButton';
+import { Guard } from '$app/common/guards/Guard';
+import { permission } from '$app/common/guards/guards/permission';
+import { or } from '$app/common/guards/guards/or';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import {
+  InvoiceSlider,
+  invoiceSliderAtom,
+  invoiceSliderVisibilityAtom,
+} from '../common/components/InvoiceSlider';
+import { useAtom, useSetAtom } from 'jotai';
+import { useInvoiceQuery } from '$app/common/queries/invoices';
+import { useEffect, useState } from 'react';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { useFooterColumns } from '../common/hooks/useFooterColumns';
+import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { InputLabel } from '$app/components/forms';
+import { confirmActionModalAtom } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
+import { DeleteInvoicesConfirmationModal } from '../common/components/DeleteInvoicesConfirmationModal';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -82,6 +87,17 @@ export default function Invoices() {
   const { footerColumns, allFooterColumns } = useFooterColumns();
   const verifactuEnabled = useCompanyVerifactu();
 
+  const selectedColumns =
+    reactSettings?.react_table_columns?.invoice || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.invoice,
+    'invoice_tag_ids',
+    { enabled: shouldShowTagFilter }
+  );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'invoice_tag_ids');
+
   useEffect(() => {
     if (invoiceResponse && invoiceSliderVisibility) {
       setInvoiceSlider(invoiceResponse);
@@ -102,7 +118,11 @@ export default function Invoices() {
     <Default title={documentTitle} breadcrumbs={pages} docsLink="en/invoices">
       <DataTable
         resource="invoice"
-        endpoint="/api/v1/invoices?include=client.group_settings,project&without_deleted_clients=true&sort=id|desc"
+        endpoint={`/api/v1/invoices?include=client.group_settings,project${
+          shouldShowTagFilter ? ',tags' : ''
+        }&without_deleted_clients=true&sort=id|desc${
+          shouldShowTagFilter ? '' : '&tag_ids='
+        }`}
         columns={columns}
         footerColumns={footerColumns}
         bulkRoute="/api/v1/invoices/bulk"
@@ -111,10 +131,11 @@ export default function Invoices() {
         withResourcefulActions
         withoutDefaultBulkActions
         customActions={actions}
-        bottomActionsKeys={['cancel_invoice']}
+        bottomActionsKeys={['cancel_invoice', 'credit_note']}
         customBulkActions={customBulkActions}
         customFilters={filters}
         customFilterPlaceholder="status"
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         rightSide={
           <div className="flex items-center space-x-2">
             {Boolean(reactSettings.show_table_footer) && (

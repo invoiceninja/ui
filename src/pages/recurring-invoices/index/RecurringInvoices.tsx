@@ -8,28 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAtom } from 'jotai';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Guard } from '$app/common/guards/Guard';
-import { or } from '$app/common/guards/guards/or';
-import { permission } from '$app/common/guards/guards/permission';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Page } from '$app/components/Breadcrumbs';
 import { DataTable } from '$app/components/DataTable';
-import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
-import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
-import { ImportButton } from '$app/components/import/ImportButton';
-import { Default } from '$app/components/layouts/Default';
 import {
-  RecurringInvoiceSlider,
-  recurringInvoiceSliderAtom,
-  recurringInvoiceSliderVisibilityAtom,
-} from '../common/components/RecurringInvoiceSlider';
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { Default } from '$app/components/layouts/Default';
+import { useTranslation } from 'react-i18next';
+import { ImportButton } from '$app/components/import/ImportButton';
+
 import {
   defaultColumns,
   useActions,
@@ -37,9 +27,25 @@ import {
   useRecurringInvoiceColumns,
   useRecurringInvoiceFilters,
 } from '../common/hooks';
-import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
-import { useFooterColumns } from '../common/hooks/useFooterColumns';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
+import { useAtom } from 'jotai';
+import {
+  RecurringInvoiceSlider,
+  recurringInvoiceSliderAtom,
+  recurringInvoiceSliderVisibilityAtom,
+} from '../common/components/RecurringInvoiceSlider';
+import { useEffect, useState } from 'react';
 import { useRecurringInvoiceQuery } from '../common/queries';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useFooterColumns } from '../common/hooks/useFooterColumns';
+import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export default function RecurringInvoices() {
   useTitle('recurring_invoices');
@@ -67,6 +73,17 @@ export default function RecurringInvoices() {
   const customBulkActions = useCustomBulkActions();
   const { footerColumns, allFooterColumns } = useFooterColumns();
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
+
+  const selectedColumns =
+    reactSettings?.react_table_columns?.recurringInvoice || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.recurringInvoice,
+    'recurring_invoice_tag_ids',
+    { enabled: shouldShowTagFilter }
+  );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'recurring_invoice_tag_ids');
 
   const [recurringInvoiceSlider, setRecurringInvoiceSlider] = useAtom(
     recurringInvoiceSliderAtom
@@ -96,7 +113,11 @@ export default function RecurringInvoices() {
         resource="recurring_invoice"
         columns={columns}
         footerColumns={footerColumns}
-        endpoint="/api/v1/recurring_invoices?include=client&without_deleted_clients=true&sort=id|desc"
+        endpoint={`/api/v1/recurring_invoices?include=client${
+          shouldShowTagFilter ? ',tags' : ''
+        }&without_deleted_clients=true&sort=id|desc${
+          shouldShowTagFilter ? '' : '&tag_ids='
+        }`}
         linkToCreate="/recurring_invoices/create"
         linkToEdit="/recurring_invoices/:id/edit"
         bulkRoute="/api/v1/recurring_invoices/bulk"
@@ -104,6 +125,7 @@ export default function RecurringInvoices() {
         customFilters={filters}
         customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         withResourcefulActions
         rightSide={
           <div className="flex items-center space-x-2">

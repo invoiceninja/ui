@@ -8,47 +8,54 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useQuery } from '@tanstack/react-query';
-import { AxiosResponse } from 'axios';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import { atom, useAtom } from 'jotai';
-import { useTranslation } from 'react-i18next';
-import reactStringReplace from 'react-string-replace';
-import styled from 'styled-components';
-import { useColorScheme } from '$app/common/colors';
-import { date, endpoint, date as formatDate, trans } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { Task } from '$app/common/interfaces/task';
-import { TaskActivity } from '$app/common/interfaces/task-activity';
+import { TabGroup } from '$app/components/TabGroup';
 import { Element } from '$app/components/cards';
+import classNames from 'classnames';
 import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
-import { Link } from '$app/components/forms';
-import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
+import { atom, useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { date, endpoint, trans } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { TabGroup } from '$app/components/TabGroup';
-import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceProject';
-import { useFormatTimeLog } from '../../kanban/common/hooks';
-import { TaskClock } from '../../kanban/components/TaskClock';
-import {
-  calculateEntityState,
-  isTaskRunning,
-} from '../helpers/calculate-entity-state';
+import { useQuery } from '@tanstack/react-query';
+import { request } from '$app/common/helpers/request';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { AxiosResponse } from 'axios';
+import { Link } from '$app/components/forms';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { route } from '$app/common/helpers/route';
+import reactStringReplace from 'react-string-replace';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useActions } from '../hooks';
+import { TaskStatus } from './TaskStatus';
+import { Task } from '$app/common/interfaces/task';
+import { TaskActivity } from '$app/common/interfaces/task-activity';
 import {
   calculateDifferenceBetweenLogs,
   calculateHours,
 } from '../helpers/calculate-time';
-import { useActions } from '../hooks';
-import { TaskStatus } from './TaskStatus';
+import {
+  calculateEntityState,
+  isTaskRunning,
+} from '../helpers/calculate-entity-state';
+import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceProject';
+import { date as formatDate } from '$app/common/helpers';
+import { useFormatTimeLog } from '../../kanban/common/hooks';
+import { TaskClock } from '../../kanban/components/TaskClock';
+import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
+import { TagPills } from '$app/components/tags/TagPills';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const taskSliderAtom = atom<Task | null>(null);
 export const taskSliderVisibilityAtom = atom(false);
@@ -145,7 +152,7 @@ export function TaskSlider() {
 
   return (
     <Slider
-      size="regular"
+      size="large"
       visible={isVisible}
       onClose={() => {
         setIsSliderVisible(false);
@@ -165,8 +172,18 @@ export function TaskSlider() {
       withoutHeaderBorder
     >
       <TabGroup
-        tabs={[t('overview'), t('activity')]}
+        tabs={[t('overview'), t('activity'), t('documents')]}
         width="full"
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 2) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={task?.documents?.length}
+                textCenter
+              />
+            );
+          }
+        }}
         withHorizontalPadding
         horizontalPaddingWidth="1.5rem"
       >
@@ -210,12 +227,26 @@ export function TaskSlider() {
             </Element>
 
             <Element
+              className={classNames({
+                'border-b border-dashed': Boolean(task?.tags?.length),
+              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {task ? <TaskStatus entity={task} withoutDropdown /> : null}
             </Element>
+
+            {Boolean(task?.tags?.length) && (
+              <Element
+                leftSide={t('tags')}
+                pushContentToRight
+                noExternalPadding
+              >
+                <TagPills tags={task?.tags} />
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />
@@ -306,6 +337,25 @@ export function TaskSlider() {
               </Box>
             ))}
           </div>
+        </div>
+
+        <div className="px-4">
+          <Upload
+            endpoint={endpoint('/api/v1/tasks/:id/upload', {
+              id: task?.id,
+            })}
+            onSuccess={() => $refetch(['tasks'])}
+            widgetOnly
+            disableUpload={!hasPermission('edit_task') && !entityAssigned(task)}
+          />
+
+          <DocumentsTable
+            documents={task?.documents || []}
+            onDocumentDelete={() => $refetch(['tasks'])}
+            disableEditableOptions={
+              !entityAssigned(task, true) && !hasPermission('edit_task')
+            }
+          />
         </div>
       </TabGroup>
     </Slider>

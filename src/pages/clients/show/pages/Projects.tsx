@@ -8,20 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useMemo } from 'react';
-import { useParams } from 'react-router-dom';
-import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { DataTable } from '$app/components/DataTable';
+import { useParams } from 'react-router-dom';
 import {
   defaultColumns,
   useActions,
   useCustomBulkActions,
   useProjectColumns,
-  useProjectFilterColumns,
 } from '$app/pages/projects/common/hooks';
+import { useEntityTagFilterColumns } from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useMemo } from 'react';
 
 export default function Projects() {
   const { id } = useParams();
@@ -34,9 +35,11 @@ export default function Projects() {
   const shouldShowTagFilter = selectedColumns.includes('tags');
 
   const columns = useProjectColumns();
-  const filterColumns = useProjectFilterColumns({
-    enabled: shouldShowTagFilter,
-  });
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.project,
+    'project_tag_ids',
+    { enabled: shouldShowTagFilter }
+  );
 
   const actions = useActions();
 
@@ -66,7 +69,7 @@ export default function Projects() {
       linkToCreateGuards={[permission('create_project')]}
       hideEditableOptions={!hasPermission('edit_project')}
       withoutPageAsPreference
-      withoutStoringSearchFilter
+      withRecordScopedFilters
     />
   );
 }

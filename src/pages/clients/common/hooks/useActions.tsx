@@ -16,6 +16,7 @@ import {
   MdComment,
   MdDelete,
   MdDesignServices,
+  MdEdit,
   MdPictureAsPdf,
   MdRestore,
   MdSettings,
@@ -41,13 +42,14 @@ import { PurgeClientAction } from '../components/PurgeClientAction';
 import { useConfigureClientSettings } from './useConfigureClientSettings';
 
 interface Params {
+  showEditAction?: boolean;
   setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
 }
 export function useActions(params?: Params) {
   const [t] = useTranslation();
   const bulk = useBulk();
 
-  const { setIsPurgeOrMergeActionCalled } = params || {};
+  const { showEditAction, setIsPurgeOrMergeActionCalled } = params || {};
 
   const { isAdmin, isOwner } = useAdmin();
   const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
@@ -66,6 +68,16 @@ export function useActions(params?: Params) {
   } = useChangeTemplate();
 
   const actions: Action<Client>[] = [
+    (client) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/clients/:id/edit', { id: client.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (client) =>
       !client.is_deleted && (
         <DropdownElement

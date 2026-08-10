@@ -86,10 +86,6 @@ interface Props {
 export function PreviousNextNavigation({ entity }: Props) {
   const { id } = useParams();
 
-  if (!id) {
-    return null;
-  }
-
   const [t] = useTranslation();
   const navigate = useNavigate();
   const preventNavigation = usePreventNavigation();
@@ -100,8 +96,12 @@ export function PreviousNextNavigation({ entity }: Props) {
   const navigationData = useAtomValue(fullTableLatestDataAtom);
 
   const currentList = useMemo(() => {
-    return navigationData?.resources as Resource[] | undefined;
-  }, [navigationData]);
+    if (navigationData?.type !== entity) {
+      return undefined;
+    }
+
+    return navigationData.resources as Resource[] | undefined;
+  }, [navigationData, entity]);
 
   const getPreviousIndex = () => {
     const currentIndex =
@@ -147,6 +147,7 @@ export function PreviousNextNavigation({ entity }: Props) {
   };
 
   if (
+    !id ||
     !currentList?.length ||
     currentList.length === 1 ||
     !currentList.find((resource) => resource.id === id)

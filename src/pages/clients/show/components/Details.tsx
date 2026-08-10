@@ -8,23 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import { useColorScheme } from '$app/common/colors';
-import { route } from '$app/common/helpers/route';
+import { Link } from '$app/components/forms';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useGetSettingWithLevel } from '$app/common/hooks/useGetSetting';
 import { Client } from '$app/common/interfaces/client';
-import { Settings } from '$app/common/interfaces/company.interface';
-import { CustomFields, useCustomField } from '$app/components/CustomField';
 import { EntityStatus } from '$app/components/EntityStatus';
-import { Link } from '$app/components/forms';
+import { useTranslation } from 'react-i18next';
+import { useGetSettingWithLevel } from '$app/common/hooks/useGetSetting';
+import { route } from '$app/common/helpers/route';
+import { CustomFields, useCustomField } from '$app/components/CustomField';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { useColorScheme } from '$app/common/colors';
 import { InfoCard } from '$app/components/InfoCard';
 import { CurrencyCodeBadge } from './CurrencyCodeBadge';
 import { PaymentTermsBadge } from './PaymentTermsBadge';
 import { TaxDataModal } from './TaxDataModal';
 import { TaxExemptBadge } from './TaxExemptBadge';
+import { Settings } from '$app/common/interfaces/company.interface';
+import { TagPills } from '$app/components/tags/TagPills';
 
 interface Props {
   client: Client;
@@ -102,6 +103,21 @@ export function Details(props: Props) {
                 <EntityStatus entity={client} />
               </div>
             </div>
+
+            {Boolean(client.tags?.length) && (
+              <div className="flex flex-col space-y-1">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('tags')}
+                </span>
+
+                <div>
+                  <TagPills tags={client.tags} />
+                </div>
+              </div>
+            )}
 
             <div className="flex flex-col space-y-1">
               <span

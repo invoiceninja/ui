@@ -8,38 +8,37 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Link } from '$app/components/forms';
+import { route } from '$app/common/helpers/route';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { useVendorQuery } from '$app/common/queries/vendor';
+import { Page } from '$app/components/Breadcrumbs';
+import { InfoCard } from '$app/components/InfoCard';
+import { Default } from '$app/components/layouts/Default';
+import { Tabs } from '$app/components/Tabs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { useColorScheme } from '$app/common/colors';
-import { date } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useCountries } from '$app/common/hooks/useCountries';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { VendorContact } from '$app/common/interfaces/vendor-contact';
-import { useVendorQuery } from '$app/common/queries/vendor';
-import { Page } from '$app/components/Breadcrumbs';
-import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
-import { EntityStatus } from '$app/components/EntityStatus';
-import { Link } from '$app/components/forms';
-import { InfoCard } from '$app/components/InfoCard';
-import { Default } from '$app/components/layouts/Default';
-import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { Tabs } from '$app/components/Tabs';
-import { Tooltip } from '$app/components/Tooltip';
 import { useActions } from './common/hooks/useActions';
 import { useTabs } from './show/hooks/useTabs';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { date } from '$app/common/helpers';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { useColorScheme } from '$app/common/colors';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { Tooltip } from '$app/components/Tooltip';
+import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import { FormattedAddress } from '$app/components/FormattedAddress';
+import { TagPills } from '$app/components/tags/TagPills';
+import { useRecordFiltersScope } from '$app/common/hooks/useScopedTableFilters';
 
 export default function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
   const { id } = useParams();
   const { data: vendor } = useVendorQuery({ id });
-
-  const countries = useCountries();
 
   const actions = useActions();
 
@@ -48,6 +47,8 @@ export default function Vendor() {
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
+
+  useRecordFiltersScope(id);
 
   useEffect(() => {
     if (vendor && vendor.name.length >= 1) {
@@ -104,6 +105,21 @@ export default function Vendor() {
 
                 <div>
                   <EntityStatus entity={vendor} />
+                </div>
+              </div>
+            )}
+
+            {Boolean(vendor?.tags?.length) && (
+              <div className="flex flex-col space-y-1">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.$22 }}
+                >
+                  {t('tags')}
+                </span>
+
+                <div>
+                  <TagPills tags={vendor?.tags} />
                 </div>
               </div>
             )}
@@ -192,51 +208,13 @@ export default function Vendor() {
           withoutPadding
         >
           <div className="flex flex-col pt-1 h-44 overflow-y-auto">
-            {vendor?.address1 && (
-              <span
+            {vendor && (
+              <FormattedAddress
+                address={vendor}
                 className="break-all text-sm font-medium"
                 style={{ color: colors.$3 }}
-              >
-                {vendor.address1}
-              </span>
+              />
             )}
-
-            {vendor?.address2 && (
-              <span
-                className="break-all text-sm font-medium"
-                style={{ color: colors.$3 }}
-              >
-                {vendor.address2}
-              </span>
-            )}
-
-            {(vendor?.city || vendor?.state || vendor?.postal_code) && (
-              <span
-                className="break-all text-sm font-medium"
-                style={{ color: colors.$3 }}
-              >
-                {vendor.city && vendor.city}
-                {vendor.city && vendor.state && ', '}
-                {vendor.state}
-                {(vendor.city || vendor.state) && vendor.postal_code && ' '}
-                {vendor.postal_code}
-              </span>
-            )}
-
-            {vendor?.country_id &&
-              countries.find((country) => country.id === vendor.country_id)
-                ?.name && (
-                <span
-                  className="break-all text-sm font-medium"
-                  style={{ color: colors.$3 }}
-                >
-                  {
-                    countries.find(
-                      (country) => country.id === vendor.country_id
-                    )?.name
-                  }
-                </span>
-              )}
           </div>
         </InfoCard>
 
@@ -247,7 +225,7 @@ export default function Vendor() {
           withoutPadding
         >
           <div className="flex flex-col h-44 w-full overflow-y-auto">
-            {vendor?.contacts.map((contact: VendorContact, index: number) => (
+            {vendor?.contacts.map((contact, index) => (
               <div
                 key={index}
                 className="flex justify-between items-center first:pt-1 py-4 border-b border-dashed"

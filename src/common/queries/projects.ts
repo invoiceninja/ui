@@ -47,6 +47,7 @@ export function useProjectQuery(params: { id: string | undefined }) {
       ).then((response) => response.data.data),
 
     staleTime: Infinity,
+    enabled: Boolean(params.id),
   });
 }
 

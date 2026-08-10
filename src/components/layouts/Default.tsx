@@ -43,6 +43,7 @@ import { VerifyEmail } from '../banners/VerifyEmail';
 import { VerifyPhone } from '../banners/VerifyPhone';
 import { Feedback } from '../Feedback';
 import { Notifications } from '../Notifications';
+import { AccountPlanExpired } from '../banners/AccountPlanExpired';
 import { useNavigation } from './common/navigation';
 import { DesktopSidebar } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
@@ -134,6 +135,7 @@ export function Default(props: Props) {
         <VerifyEmail />
         <VerifyPhone />
         <EInvoiceCredits />
+        <AccountPlanExpired />
 
         {/* This component is only created for December 2025 if you see it in 2026 you can remove and delete it */}
         <PriceIncreaseBanner />
@@ -198,8 +200,8 @@ export function Default(props: Props) {
                   }}
                   onClick={() => {
                     if (
-                      isHosted() &&
-                      import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT
+                      isHosted() ||
+                      import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true'
                     ) {
                       return navigate('/settings/account_management');
                     }

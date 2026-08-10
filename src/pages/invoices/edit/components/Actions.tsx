@@ -61,7 +61,7 @@ import { CloneOptionsModal } from '../../common/components/CloneOptionsModal';
 // import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
 import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
 import { useCancelInvoiceModal } from '../hooks/useCancelInvoiceModal';
-import { useCloneToCreditFromInvoice } from '../hooks/useCloneToCreditFromInvoice';
+import { useCreatePeppolCreditNote } from '../hooks/useCreatePeppolCreditNote';
 import { useMarkPaid } from '../hooks/useMarkPaid';
 import { useRectifyInvoiceModal } from '../hooks/useRectifyInvoiceModal';
 import { CancelInvoiceModal } from './CancelInvoiceModal';
@@ -129,7 +129,7 @@ export function useActions(params?: Params) {
     confirmRectify,
   } = useRectifyInvoiceModal();
   const hasPermission = useHasPermission();
-  const cloneToCreditFromInvoice = useCloneToCreditFromInvoice();
+  const createPeppolCreditNote = useCreatePeppolCreditNote();
   // const reverseInvoice = useReverseInvoice();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
   const downloadEInvoice = useDownloadEInvoice({ resource: 'invoice' });
@@ -142,6 +142,7 @@ export function useActions(params?: Params) {
   } = useChangeTemplate();
 
   const setInvoice = useSetAtom(invoiceAtom);
+  const isPeppol = company?.settings.e_invoice_type === 'PEPPOL';
 
   const cloneToNegativeInvoice = (invoice: Invoice) => {
     // Create a deep copy of the invoice with negative quantities for all line items
@@ -466,6 +467,7 @@ export function useActions(params?: Params) {
         })}
         dropdown={dropdown}
         invoice={invoice}
+        isPeppol={isPeppol}
       />
     ),
     () =>
@@ -579,21 +581,19 @@ export function useActions(params?: Params) {
         </EntityActionElement>
       ),
     (invoice: Invoice) =>
-      company?.settings.e_invoice_type === 'PEPPOL' &&
+      isPeppol &&
       hasPermission('create_credit') &&
       !invoice.is_deleted &&
       [InvoiceStatus.Sent, InvoiceStatus.Partial, InvoiceStatus.Paid].includes(
         invoice.status_id as InvoiceStatus
       ) && (
         <EntityActionElement
-          {...(!dropdown && {
-            key: 'credit_note',
-          })}
+          key="credit_note"
           entity="invoice"
           actionKey="credit_note"
           isCommonActionSection={!dropdown}
           tooltipText={t('credit_note')}
-          onClick={() => cloneToCreditFromInvoice(invoice)}
+          onClick={() => createPeppolCreditNote(invoice)}
           icon={MdCreditScore}
           disablePreventNavigation
         >

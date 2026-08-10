@@ -109,8 +109,8 @@ export function DataTableFooterColumnsPicker(props: Props) {
               pushContentToRight
             >
               <Toggle
-                checked={isColumnChecked(column.id)}
-                onValueChange={(value) => handleChange(column.id, value)}
+                checked={isColumnChecked(column.column)}
+                onValueChange={(value) => handleChange(column.column, value)}
               />
             </Element>
           ))}

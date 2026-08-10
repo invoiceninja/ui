@@ -32,4 +32,5 @@ export const paymentMap: Record[] = [
   { trans: 'custom_value4', value: 'payment.custom_value4', map: 'payment' },
   { trans: 'user', value: 'payment.user_id', map: 'payment' },
   { trans: 'assigned_user', value: 'payment.assigned_user_id', map: 'payment' },
+  { trans: 'tags', value: 'payment.tags', map: 'payment' },
 ];

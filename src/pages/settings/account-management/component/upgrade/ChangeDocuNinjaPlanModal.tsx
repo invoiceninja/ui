@@ -8,10 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button, SelectField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
+import { Button, SelectField } from '$app/components/forms';
+import { useTranslation } from 'react-i18next';
+import { useState, useEffect } from 'react';
+import { Alert } from '$app/components/Alert';
 
 interface Props {
   visible: boolean;
@@ -19,14 +20,18 @@ interface Props {
   onConfirm: (selectedUserCount: number) => void;
   currentUserCount: number;
   isLoading?: boolean;
+  error?: string | null;
+  onErrorClear?: () => void;
 }
 
-export function ChangeDocuNinjaPlanModal({
-  visible,
-  onClose,
-  onConfirm,
-  currentUserCount,
+export function ChangeDocuNinjaPlanModal({ 
+  visible, 
+  onClose, 
+  onConfirm, 
+  currentUserCount, 
   isLoading,
+  error,
+  onErrorClear
 }: Props) {
   const { t } = useTranslation();
   const [selectedUserCount, setSelectedUserCount] =
@@ -73,10 +78,19 @@ export function ChangeDocuNinjaPlanModal({
             </p>
           </div>
 
+          {error && (
+            <Alert type="danger" disableClosing>
+              {error}
+            </Alert>
+          )}
+
           <SelectField
             label={t('docuninja_change_users')}
             value={selectedUserCount.toString()}
-            onValueChange={(value) => setSelectedUserCount(parseInt(value))}
+            onValueChange={(value) => {
+              setSelectedUserCount(parseInt(value, 10));
+              onErrorClear?.();
+            }}
           >
             {userCountOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -131,4 +145,4 @@ export function ChangeDocuNinjaPlanModal({
       </div>
     </Modal>
   );
-}
+} 

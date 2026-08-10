@@ -8,42 +8,54 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAtom } from 'jotai';
-import { useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { emitter } from '$app';
-import { permission } from '$app/common/guards/guards/permission';
-import { route } from '$app/common/helpers/route';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useEffect, useMemo, useState } from 'react';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { Project } from '$app/common/interfaces/project';
+import { route } from '$app/common/helpers/route';
+import { useProjectQuery } from '$app/common/queries/projects';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import {
+  ProjectSlider,
+  projectSliderAtom,
+  projectSliderVisibilityAtom,
+} from '../common/components/ProjectSlider';
 import {
   DataTable,
   dateRangeAtom,
   filterColumnsValuesAtom,
 } from '$app/components/DataTable';
-import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
-import { Button, InputLabel } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
-import {
-  ChangeTemplateModal,
-  useChangeTemplate,
-} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
   useActions,
   useAllProjectColumns,
   useCustomBulkActions,
   useProjectColumns,
-  useProjectFilterColumns,
 } from '../common/hooks';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { permission } from '$app/common/guards/guards/permission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { Project } from '$app/common/interfaces/project';
+import { Button, InputLabel } from '$app/components/forms';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useAtom } from 'jotai';
+import { emitter } from '$app';
 
 export default function Projects() {
   useTitle('projects');
 
   const [t] = useTranslation();
   const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const pages = [{ name: t('projects'), href: '/projects' }];
 
@@ -53,9 +65,11 @@ export default function Projects() {
     reactSettings?.react_table_columns?.project || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
   const columns = useProjectColumns();
-  const filterColumns = useProjectFilterColumns({
-    enabled: shouldShowTagFilter,
-  });
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.project,
+    'project_tag_ids',
+    { enabled: shouldShowTagFilter }
+  );
   const projectColumns = useAllProjectColumns();
   const customBulkActions = useCustomBulkActions();
 
@@ -63,6 +77,15 @@ export default function Projects() {
   const [filterColumnsValues, setFilterColumnsValues] = useAtom(
     filterColumnsValuesAtom
   );
+
+  const [sliderProjectId, setSliderProjectId] = useState<string>('');
+  const [projectSlider, setProjectSlider] = useAtom(projectSliderAtom);
+  const [projectSliderVisibility, setProjectSliderVisibility] = useAtom(
+    projectSliderVisibilityAtom
+  );
+
+  const { data: projectResponse } = useProjectQuery({ id: sliderProjectId });
+
   const {
     changeTemplateVisible,
     setChangeTemplateVisible,
@@ -70,18 +93,20 @@ export default function Projects() {
   } = useChangeTemplate();
 
   useEffect(() => {
-    if (!shouldShowTagFilter && filterColumnsValues.project_tag_ids?.length) {
-      setFilterColumnsValues((current) => {
-        const { project_tag_ids, ...rest } = current;
+    setProjectSlider(null);
+  }, [sliderProjectId]);
 
-        return rest;
-      });
+  useEffect(() => {
+    if (projectResponse && projectSliderVisibility) {
+      setProjectSlider(projectResponse);
     }
-  }, [
-    shouldShowTagFilter,
-    filterColumnsValues.project_tag_ids,
-    setFilterColumnsValues,
-  ]);
+  }, [projectResponse, projectSliderVisibility]);
+
+  useEffect(() => {
+    return () => setProjectSliderVisibility(false);
+  }, []);
+
+  useTagFilterCleanup(shouldShowTagFilter, 'project_tag_ids');
 
   const currentFilterColumnsCount = useMemo(
     () =>
@@ -162,6 +187,10 @@ export default function Projects() {
         }
         linkToCreateGuards={[permission('create_project')]}
         hideEditableOptions={!hasPermission('edit_project')}
+        onTableRowClick={(project) => {
+          setSliderProjectId(project.id);
+          setProjectSliderVisibility(true);
+        }}
         enableSavingFilterPreference
         dateRangeColumns={[
           {
@@ -173,6 +202,8 @@ export default function Projects() {
         ]}
         enableSavingLatestDataForNavigation
       />
+
+      {!disableNavigation('project', projectSlider) && <ProjectSlider />}
 
       <ChangeTemplateModal<Project>
         entity="project"

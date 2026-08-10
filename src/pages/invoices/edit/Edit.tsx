@@ -9,7 +9,7 @@
  */
 
 import { useAtom } from 'jotai';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { ExternalLink } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import {
@@ -90,6 +90,12 @@ export default function Edit() {
   const productColumns = useProductColumns();
 
   useScrollToLineItem(Boolean(invoice && client));
+
+  useEffect(() => {
+    if (searchParams.get('focus') === 'number') {
+      requestAnimationFrame(() => document.getElementById('number')?.focus());
+    }
+  }, [searchParams]);
 
   const [invoiceSum] = useAtom(invoiceSumAtom);
 

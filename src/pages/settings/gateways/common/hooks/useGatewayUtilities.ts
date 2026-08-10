@@ -98,49 +98,59 @@ export function useGatewayUtilities(params: Params) {
   };
 
   useEffect(() => {
-    if (companyGatewaysResponse) {
-      if (companyChanges?.settings.company_gateway_ids !== '0') {
-        if (companyChanges?.settings.company_gateway_ids) {
-          let filteredCompanyGateways =
-            companyChanges.settings.company_gateway_ids
-              .split(',')
-              .map((id: string) =>
-                companyGatewaysResponse.data.data.find(
-                  (gateway: CompanyGateway) => gateway.id === id
-                )
-              );
-
-          filteredCompanyGateways = filteredCompanyGateways.filter(
-            (companyGateway: CompanyGateway) => companyGateway
-          );
-
-          if (isCompanySettingsActive) {
-            (companyGatewaysResponse.data.data as CompanyGateway[]).forEach(
-              (companyGateway) => {
-                const isAlreadyAdded = filteredCompanyGateways.some(
-                  (gateway: CompanyGateway) => gateway.id === companyGateway.id
-                );
-
-                if (!isAlreadyAdded) {
-                  filteredCompanyGateways.push(companyGateway);
-                }
-              }
-            );
-          }
-
-          setCurrentSettingGateways(
-            removeDuplicatedGateways(filteredCompanyGateways)
-          );
-        } else {
-          setCurrentSettingGateways(
-            removeDuplicatedGateways(companyGatewaysResponse.data.data)
-          );
-        }
-      } else {
-        setCurrentSettingGateways([]);
-      }
+    if (!companyGatewaysResponse) {
+      return;
     }
-  }, [companyGatewaysResponse]);
+
+    const apiGateways = companyGatewaysResponse.data.data as CompanyGateway[];
+    const isActiveStatusOnly = status === 'active';
+
+    // Archived/deleted gateways are removed from company_gateway_ids on bulk
+    // archive, so only apply that filter while viewing active records.
+    if (!isActiveStatusOnly) {
+      setCurrentSettingGateways(removeDuplicatedGateways(apiGateways));
+      return;
+    }
+
+    if (companyChanges?.settings.company_gateway_ids !== '0') {
+      if (companyChanges?.settings.company_gateway_ids) {
+        let filteredCompanyGateways = companyChanges.settings.company_gateway_ids
+          .split(',')
+          .map((id: string) =>
+            apiGateways.find((gateway: CompanyGateway) => gateway.id === id)
+          );
+
+        filteredCompanyGateways = filteredCompanyGateways.filter(
+          (companyGateway: CompanyGateway) => companyGateway
+        );
+
+        if (isCompanySettingsActive) {
+          apiGateways.forEach((companyGateway) => {
+            const isAlreadyAdded = filteredCompanyGateways.some(
+              (gateway: CompanyGateway) => gateway.id === companyGateway.id
+            );
+
+            if (!isAlreadyAdded) {
+              filteredCompanyGateways.push(companyGateway);
+            }
+          });
+        }
+
+        setCurrentSettingGateways(
+          removeDuplicatedGateways(filteredCompanyGateways)
+        );
+      } else {
+        setCurrentSettingGateways(removeDuplicatedGateways(apiGateways));
+      }
+    } else {
+      setCurrentSettingGateways([]);
+    }
+  }, [
+    companyGatewaysResponse,
+    status,
+    companyChanges?.settings.company_gateway_ids,
+    isCompanySettingsActive,
+  ]);
 
   return {
     gateways: currentSettingGateways,

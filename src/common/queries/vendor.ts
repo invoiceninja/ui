@@ -24,7 +24,7 @@ interface VendorParams {
 }
 
 export function useVendorQuery(params: VendorParams) {
-  return useQuery({
+  return useQuery<Vendor>({
     queryKey: ['/api/v1/vendors', params.id],
 
     queryFn: () =>

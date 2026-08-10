@@ -15,6 +15,7 @@ import React, {
   ReactNode,
   SetStateAction,
   useCallback,
+  useEffect,
   useRef,
   useState,
 } from 'react';
@@ -37,6 +38,7 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 import { Button, Checkbox } from '../forms';
 import { InputField } from '../forms/InputField';
 import { ChevronDown } from '../icons/ChevronDown';
+import { getMultiSelectDefaultValueKey } from './multiSelectDefaultValueKey';
 
 export interface SelectOption {
   value: string;
@@ -193,6 +195,17 @@ export function SelectWithApplyButton(props: any) {
   } = props;
 
   const [tempValue, setTempValue] = useState(defaultValue);
+  const defaultValueKey = getMultiSelectDefaultValueKey(defaultValue);
+  const previousDefaultValueKey = useRef(defaultValueKey);
+
+  useEffect(() => {
+    if (previousDefaultValueKey.current === defaultValueKey) {
+      return;
+    }
+
+    previousDefaultValueKey.current = defaultValueKey;
+    setTempValue(defaultValue ?? []);
+  }, [defaultValue, defaultValueKey]);
 
   const CustomMenu = useCallback((menuProps: MenuProps<SelectOption, true>) => {
     const [t] = useTranslation();

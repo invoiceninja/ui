@@ -8,11 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useQueryClient } from '@tanstack/react-query';
-import { useFormik } from 'formik';
-import { useState } from 'react';
-import { Check, Trash2 } from 'react-feather';
-import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -23,8 +18,13 @@ import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Badge } from '$app/components/Badge';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import mc from '/gateway-card-images/mastercard.png?url';
+import { useFormik } from 'formik';
+import { useState } from 'react';
+import { DollarSign, Trash2 } from 'react-feather';
+import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import visa from '/gateway-card-images/visa.png?url';
+import mc from '/gateway-card-images/mastercard.png?url';
 
 interface CreditCardProps {
   gateway: CompanyGateway;
@@ -45,6 +45,8 @@ export function CreditCard({ gateway, onDelete }: CreditCardProps) {
     if (gateway.meta.brand === 'mastercard') {
       return mc;
     }
+
+    return null;
   };
 
   const { t } = useTranslation();
@@ -104,10 +106,24 @@ export function CreditCard({ gateway, onDelete }: CreditCardProps) {
 
       <div
         className="flex flex-col w-full lg:w-72 p-4 rounded border"
-        style={{ borderColor: gateway.is_default ? accentColor : colors.$1 }}
+        style={{ borderColor: gateway.is_default ? accentColor : colors.$24 }}
       >
         <div className="flex justify-between items-center">
-          <img src={image()} alt={gateway.meta.brand} className="h-10" />
+          {image() ? (
+            <img
+              src={image() as string}
+              alt={gateway.meta.brand}
+              className="h-10"
+            />
+          ) : (
+            <div
+              className="flex items-center justify-center h-10 w-10 rounded"
+              style={{ backgroundColor: colors.$20 }}
+              title={gateway.meta.brand}
+            >
+              <DollarSign size={22} />
+            </div>
+          )}
 
           <div className="flex items-center gap-2">
             {gateway.is_default ? (
@@ -115,11 +131,10 @@ export function CreditCard({ gateway, onDelete }: CreditCardProps) {
             ) : (
               <button
                 type="button"
-                className="p-1 rounded-full cursor-pointer"
+                className="px-2 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded cursor-pointer whitespace-nowrap"
                 onClick={() => setDefaultPopupVisible(true)}
-                style={{ backgroundColor: colors.$1 }}
               >
-                <Check size={18} />
+                ✓ {t('save_as_default')}
               </button>
             )}
 
@@ -142,7 +157,7 @@ export function CreditCard({ gateway, onDelete }: CreditCardProps) {
         </div>
 
         <div className="flex items-center justify-between text-sm">
-          <p>Valid through</p>
+          <p>{t('expiry_date')}</p>
           <p>
             {gateway.meta.exp_month}/{gateway.meta.exp_year}
           </p>

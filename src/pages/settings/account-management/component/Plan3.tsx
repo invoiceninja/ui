@@ -8,16 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { Card } from '$app/components/cards';
+import { Divider } from '$app/components/cards/Divider';
+import { useColorScheme } from '$app/common/colors';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { useTranslation } from 'react-i18next';
 import { HostedPlan } from './plan/HostedPlan';
+import { PaymentMethods } from './plan/PaymentMethods';
 import { Downgrade } from './upgrade/Downgrade';
 
 export function Plan3() {
   const { t } = useTranslation();
 
   const account = useCurrentAccount();
+  const colors = useColorScheme();
 
   return (
     <div className="space-y-4">
@@ -28,9 +32,25 @@ export function Plan3() {
           </div>
 
           <HostedPlan />
-
-          {account?.plan !== '' && <Downgrade />}
         </div>
+
+        <PaymentMethods />
+
+        {account?.plan !== '' && (
+          <>
+            <div className="px-7 pt-3">
+              <Divider
+                className="border-dashed"
+                withoutPadding
+                borderColor={colors.$20}
+              />
+            </div>
+
+            <div className="px-7 py-3">
+              <Downgrade />
+            </div>
+          </>
+        )}
       </Card>
     </div>
   );

@@ -8,9 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import classNames from 'classnames';
-import dayjs from 'dayjs';
-import { useSetAtom } from 'jotai';
+import paymentType from '$app/common/constants/payment-type';
+import { date, getEntityState } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { Expense } from '$app/common/interfaces/expense';
+import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { SelectOption } from '$app/components/datatables/Actions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
+import { StatusBadge } from '$app/components/StatusBadge';
+import { Tooltip } from '$app/components/Tooltip';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import { recurringExpenseAtom } from '$app/pages/recurring-expenses/common/atoms';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -18,67 +32,62 @@ import {
   MdControlPointDuplicate,
   MdDelete,
   MdDesignServices,
+  MdEdit,
   MdRestore,
   MdTextSnippet,
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import paymentType from '$app/common/constants/payment-type';
+import { expenseAtom } from './atoms';
+import { ExpenseStatus } from './components/ExpenseStatus';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useSetAtom } from 'jotai';
+import { useBulk } from '$app/common/queries/expenses';
+import { Divider } from '$app/components/cards/Divider';
 import { EntityState } from '$app/common/enums/entity-state';
-import { Frequency } from '$app/common/enums/frequency';
-import { date, getEntityState } from '$app/common/helpers';
-import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useInvoiceExpense } from './useInvoiceExpense';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { AddToInvoiceAction } from './components/AddToInvoiceAction';
+import { ExpenseCategory } from './components/ExpenseCategory';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { Assigned } from '$app/components/Assigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import {
+  useCalculateExpenseAmount,
+  useCalculateExpenseExclusiveAmount,
+} from './hooks/useCalculateExpenseAmount';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
-import { route } from '$app/common/helpers/route';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import dayjs from 'dayjs';
+import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
 import {
   hexToRGB,
   isColorLight,
   useAdjustColorDarkness,
 } from '$app/common/hooks/useAdjustColorDarkness';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
-import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
-import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { Expense } from '$app/common/interfaces/expense';
-import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
-import { useBulk } from '$app/common/queries/expenses';
-import { Assigned } from '$app/components/Assigned';
-import { Divider } from '$app/components/cards/Divider';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { SelectOption } from '$app/components/datatables/Actions';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { EntityStatus } from '$app/components/EntityStatus';
 import { Link } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
-import { Action } from '$app/components/ResourceActions';
-import { StatusBadge } from '$app/components/StatusBadge';
-import { Tooltip } from '$app/components/Tooltip';
-import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
-import { recurringExpenseAtom } from '$app/pages/recurring-expenses/common/atoms';
+import classNames from 'classnames';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import { expenseAtom } from './atoms';
-import { AddToInvoiceAction } from './components/AddToInvoiceAction';
-import { ExpenseCategory } from './components/ExpenseCategory';
-import { ExpenseStatus } from './components/ExpenseStatus';
-import {
-  useCalculateExpenseAmount,
-  useCalculateExpenseExclusiveAmount,
-} from './hooks/useCalculateExpenseAmount';
-import { useInvoiceExpense } from './useInvoiceExpense';
+import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { Frequency } from '$app/common/enums/frequency';
+import { TagPills } from '$app/components/tags/TagPills';
 
-export function useActions() {
+interface ActionsParams {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
+}
+
+export function useActions(params?: ActionsParams) {
   const [t] = useTranslation();
+
+  const { showEditAction, showCommonBulkAction } = params || {};
 
   const hasPermission = useHasPermission();
 
@@ -132,6 +141,16 @@ export function useActions() {
 
   const actions: Action<Expense>[] = [
     (expense) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/expenses/:id/edit', { id: expense.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
+    (expense) =>
       expense.should_be_invoiced === true &&
       expense.invoice_id.length === 0 &&
       hasPermission('create_invoice') && (
@@ -181,10 +200,13 @@ export function useActions() {
           {t('run_template')}
         </DropdownElement>
       ),
-    () => isEditPage && <Divider withoutPadding />,
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (expense) =>
       getEntityState(expense) === EntityState.Active &&
-      isEditPage && (
+      (isEditPage || Boolean(showCommonBulkAction)) && (
         <DropdownElement
           onClick={() => bulk([expense.id], 'archive')}
           icon={<Icon element={MdArchive} />}
@@ -195,7 +217,7 @@ export function useActions() {
     (expense) =>
       (getEntityState(expense) === EntityState.Archived ||
         getEntityState(expense) === EntityState.Deleted) &&
-      isEditPage && (
+      (isEditPage || Boolean(showCommonBulkAction)) && (
         <DropdownElement
           onClick={() => bulk([expense.id], 'restore')}
           icon={<Icon element={MdRestore} />}
@@ -206,7 +228,7 @@ export function useActions() {
     (expense) =>
       (getEntityState(expense) === EntityState.Active ||
         getEntityState(expense) === EntityState.Archived) &&
-      isEditPage && (
+      (isEditPage || Boolean(showCommonBulkAction)) && (
         <DropdownElement
           onClick={() => bulk([expense.id], 'delete')}
           icon={<Icon element={MdDelete} />}
@@ -273,6 +295,7 @@ export function useAllExpenseColumns() {
     'transaction',
     'transaction_reference',
     'updated_at',
+    'tags',
   ] as const;
 
   return expenseColumns.map((column) => normalizeColumnName(column));
@@ -615,6 +638,12 @@ export function useExpenseColumns() {
           {expense?.project?.name}
         </Link>
       ),
+    },
+    {
+      column: 'tags',
+      id: 'expense_tag_ids',
+      label: t('tags'),
+      format: (value, expense) => <TagPills tags={expense.tags} />,
     },
   ];
 

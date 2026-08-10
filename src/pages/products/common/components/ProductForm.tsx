@@ -9,21 +9,23 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
-import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { InputField, SelectField } from '$app/components/forms';
+import { Element } from '$app/components/cards';
+import { CustomField } from '$app/components/CustomField';
+import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
+import Toggle from '$app/components/forms/Toggle';
 import { Product } from '$app/common/interfaces/product';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { CustomField } from '$app/components/CustomField';
-import { Element } from '$app/components/cards';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { EntityStatus } from '$app/components/EntityStatus';
-import { ErrorMessage } from '$app/components/ErrorMessage';
-import { InputField, SelectField } from '$app/components/forms';
+import { useSearchParams } from 'react-router-dom';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
-import Toggle from '$app/components/forms/Toggle';
-import { IncomeAccountSelector } from '$app/components/IncomeAccountSelector';
 import { useTaxCategories } from '$app/components/tax-rates/TaxCategorySelector';
-import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
+import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
+import { ErrorMessage } from '$app/components/ErrorMessage';
+import { IncomeAccountSelector } from '$app/components/IncomeAccountSelector';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 interface Props {
   type?: 'create' | 'edit';
@@ -67,6 +69,15 @@ export function ProductForm(props: Props) {
           value={product.notes}
           onValueChange={(value) => handleChange('notes', value)}
           errorMessage={errors?.errors.notes}
+        />
+      </Element>
+
+      <Element leftSide={t('tags')}>
+        <TagPillSelector
+          entityType={TAG_ENTITY_TYPES.product}
+          value={product.tags || []}
+          onChange={(tags) => handleChange('tags', tags)}
+          errorMessage={errors?.errors.tags}
         />
       </Element>
 

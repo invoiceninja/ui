@@ -30,6 +30,9 @@ const EInvoice = lazy(
 const Verifactu = lazy(
   () => import('$app/pages/invoices/edit/components/Verifactu')
 );
+const Quickbooks = lazy(
+  () => import('$app/pages/invoices/edit/components/Quickbooks')
+);
 const Documents = lazy(
   () => import('$app/pages/invoices/edit/components/Documents')
 );
@@ -125,6 +128,7 @@ export const invoiceRoutes = (
       <Route path="edit" element={<Edit />} />
       <Route path="e_invoice" element={<EInvoice />} />
       <Route path="verifactu" element={<Verifactu />} />
+      <Route path="quickbooks" element={<Quickbooks />} />
       <Route path="documents" element={<Documents />} />
       <Route path="settings" element={<Settings />} />
       <Route path="activity" element={<Activities />} />
