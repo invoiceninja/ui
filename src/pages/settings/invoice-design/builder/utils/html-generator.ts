@@ -28,7 +28,8 @@ import {
   DEFAULT_VALUE_TEXT_COLOR,
 } from '../constants/design-colors';
 import { getInvoiceWidgetClassName } from '../constants/widget-classes';
-import { unwrapCustomCssFromApi } from './custom-css';
+import { sanitizeCustomCss } from './custom-css';
+import { sanitizeHTML } from '$app/common/helpers/html-string';
 
 /**
  * Resolved document-level globals threaded through every block renderer so the
@@ -214,7 +215,7 @@ export function generateInvoiceHTML(
   designSettings?: GeneratorDesignSettings,
   customCss: string = ''
 ): string {
-  customCss = unwrapCustomCssFromApi(customCss);
+  customCss = sanitizeCustomCss(customCss);
   // Layout/height calculations always need a concrete data shape.
   // Variable substitution is gated on previewData — when absent, tokens stay literal.
   const layoutData = previewData || SAMPLE_INVOICE_DATA;
@@ -342,13 +343,13 @@ export function generateInvoiceHTML(
 
   const showPageNumbering = designSettings?.page_numbering;
 
-  return `
+  const generatedHtml = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Invoice ${layoutData.invoice.number}</title>
+  <title>Invoice ${escapeHtml(layoutData.invoice.number)}</title>
   <style>
     @page {
       size: ${pageDimensions.widthMm}mm ${pageDimensions.heightMm}mm;
@@ -489,6 +490,8 @@ export function generateInvoiceHTML(
 </body>
 </html>
   `.trim();
+
+  return sanitizeGeneratedInvoiceHtml(generatedHtml);
 }
 
 /**
@@ -622,7 +625,9 @@ function renderBlockContent(
     case 'signature':
       return renderSignatureBlock(block, globals);
     default:
-      return `<div style="padding: 10px; color: #999;">Unknown block type: ${block.type}</div>`;
+      return `<div style="padding: 10px; color: #999;">Unknown block type: ${escapeHtml(
+        block.type
+      )}</div>`;
   }
 }
 
@@ -673,7 +678,7 @@ function renderImageBlock(block: Block, data: InvoiceData | undefined): string {
       <img src="${escapeHtml(
         resolvedSource
       )}" style="max-width: ${maxWidth}; max-height: 100%; object-fit: ${objectFit};" alt="${
-    block.type
+    escapeHtml(block.type)
   }" />
     </div>
   `;
@@ -1297,7 +1302,7 @@ function renderTotalBlock(
             text-align: ${colValueAlign};
             white-space: nowrap;
             ${minWidthStyle}
-          ">${value}</td>
+          ">${escapeHtml(value)}</td>
         </tr>
       `;
     }
@@ -1440,4 +1445,34 @@ function escapeHtml(text: unknown): string {
 /** Prevent custom CSS from terminating its generated HTML style element. */
 function escapeStyleElementContent(css: string): string {
   return css.replace(/<\/style/gi, '<\\/style');
+}
+
+/**
+ * Contextual escaping above keeps variable values as text. This final browser
+ * pass is defence in depth for malformed/tampered saved block properties that
+ * could otherwise create elements or attributes while the HTML string parses.
+ */
+function sanitizeGeneratedInvoiceHtml(html: string): string {
+  if (typeof window === 'undefined') {
+    return html;
+  }
+
+  return sanitizeHTML(html, {
+    WHOLE_DOCUMENT: true,
+    ADD_TAGS: ['meta', '!doctype'],
+    ADD_ATTR: [
+      'data-invoice-custom-css',
+      'data-widget-type',
+      'aria-hidden',
+    ],
+    FORBID_TAGS: [
+      'script',
+      'iframe',
+      'object',
+      'embed',
+      'link',
+      'base',
+      'form',
+    ],
+  });
 }

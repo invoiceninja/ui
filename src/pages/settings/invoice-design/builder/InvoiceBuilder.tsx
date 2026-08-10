@@ -69,6 +69,7 @@ import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { getInvoiceWidgetClassName } from './constants/widget-classes';
 import {
+  sanitizeCustomCss,
   unwrapCustomCssFromApi,
   wrapCustomCssForApi,
 } from './utils/custom-css';
@@ -1731,6 +1732,7 @@ export function InvoiceBuilder() {
     state.documentSettings.pageSize,
     state.documentSettings.pageLayout
   );
+  const sanitizedCustomCss = sanitizeCustomCss(state.customCss);
 
   return (
     <>
@@ -1913,11 +1915,11 @@ export function InvoiceBuilder() {
                 }
               }}
             >
-              {state.customCss.trim() && (
+              {sanitizedCustomCss && (
                 <style
                   data-invoice-custom-css
                 >{`@scope (.invoice-gridstack-page) {
-${state.customCss}
+${sanitizedCustomCss}
 }`}</style>
               )}
               <div

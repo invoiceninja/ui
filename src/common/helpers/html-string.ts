@@ -20,8 +20,13 @@ export function extractTextFromHTML(html: string) {
 interface SanitizeHTMLOptions {
   ALLOWED_TAGS?: string[];
   ALLOWED_ATTR?: string[];
+  ADD_TAGS?: string[];
+  ADD_ATTR?: string[];
+  FORBID_TAGS?: string[];
+  FORBID_ATTR?: string[];
   KEEP_CONTENT?: boolean;
   USE_PROFILES?: { html: boolean };
+  WHOLE_DOCUMENT?: boolean;
 }
 
 export function sanitizeHTML(html: string, options?: SanitizeHTMLOptions) {
