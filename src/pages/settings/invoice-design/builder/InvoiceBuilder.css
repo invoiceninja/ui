@@ -151,6 +151,8 @@
 .invoice-gridstack-grid .block-content-measure {
   width: 100%;
   min-width: 0;
+  height: auto;
+  min-height: 0;
 }
 
 .invoice-gridstack-grid .block-wrapper--grow-to-content .block-content .h-full {

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import type { DragEvent as ReactDragEvent, KeyboardEvent } from 'react';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -128,6 +128,7 @@ export function InvoiceBuilder() {
 
   const [designName, setDesignName] = useState<string>('');
   const [isEditMode, setIsEditMode] = useState(false);
+  const shouldFitLoadedContentHeightRef = useRef(false);
 
   const builderStateRef = useRef(state);
   builderStateRef.current = state;
@@ -144,23 +145,10 @@ export function InvoiceBuilder() {
     });
   }, []);
 
-  const {
-    gridContainerRef,
-    isDraggingBlock,
-    isResizing,
-    getBlocksWithCurrentGridPositions,
-    markShouldFitLoadedContentHeight,
-  } = useGridStackCanvas({
-    blocks: state.blocks,
-    setBlocks,
-    documentSettings: state.documentSettings,
-    builderStateRef,
-  });
-
   const [currentDragDefinition, setCurrentDragDefinition] =
     useState<BlockDefinition | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (existingDesign && designId) {
       try {
         const blocks = extractBlocksFromDesign(existingDesign);
@@ -169,7 +157,7 @@ export function InvoiceBuilder() {
             existingDesign.design as { documentSettings?: DocumentSettings }
           )?.documentSettings;
 
-          markShouldFitLoadedContentHeight();
+          shouldFitLoadedContentHeightRef.current = true;
           setState((prev) => ({
             ...prev,
             blocks,
@@ -189,19 +177,13 @@ export function InvoiceBuilder() {
         navigate(route('/settings/invoice_design/custom_designs'));
       }
     }
-  }, [
-    designId,
-    designSettings,
-    existingDesign,
-    markShouldFitLoadedContentHeight,
-    navigate,
-  ]);
+  }, [designId, designSettings, existingDesign, navigate]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (templateId) {
       const template = getTemplateById(templateId);
       if (template) {
-        markShouldFitLoadedContentHeight();
+        shouldFitLoadedContentHeightRef.current = true;
         setState((prev) => ({
           ...prev,
           blocks: normalizeSavedBlocksForBuilder(
@@ -212,7 +194,26 @@ export function InvoiceBuilder() {
         }));
       }
     }
-  }, [markShouldFitLoadedContentHeight, templateId]);
+  }, [templateId]);
+
+  const isCanvasMounted = !(
+    (isLoadingDesign && Boolean(designId) && state.blocks.length === 0) ||
+    (Boolean(templateId) && !designId && state.blocks.length === 0)
+  );
+
+  const {
+    gridContainerRef,
+    isDraggingBlock,
+    isResizing,
+    getBlocksWithCurrentGridPositions,
+  } = useGridStackCanvas({
+    blocks: state.blocks,
+    isCanvasMounted,
+    setBlocks,
+    documentSettings: state.documentSettings,
+    builderStateRef,
+    shouldFitLoadedContentHeightRef,
+  });
 
   const handleUpdateBlock = useCallback((updatedBlock: Block) => {
     setState((prev) => ({
@@ -565,7 +566,7 @@ export function InvoiceBuilder() {
     [designId, handleSave, isEditMode, saving, state.blocks.length]
   );
 
-  if (isLoadingDesign && designId && state.blocks.length === 0) {
+  if (!isCanvasMounted) {
     return (
       <div
         className="flex h-screen items-center justify-center"

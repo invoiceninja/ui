@@ -33,31 +33,30 @@ import {
 
 interface UseGridStackCanvasOptions {
   blocks: Block[];
+  isCanvasMounted: boolean;
   setBlocks: (updater: (prev: Block[]) => Block[]) => void;
   documentSettings: Pick<DocumentSettings, 'globalFontSize' | 'primaryFont'>;
   builderStateRef: MutableRefObject<BuilderState>;
+  shouldFitLoadedContentHeightRef: MutableRefObject<boolean>;
 }
 
 export function useGridStackCanvas({
   blocks,
+  isCanvasMounted,
   setBlocks,
   documentSettings,
   builderStateRef,
+  shouldFitLoadedContentHeightRef,
 }: UseGridStackCanvasOptions) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const gridRef = useRef<GridStack | null>(null);
   const isSyncingGridRef = useRef(false);
   const isDraggingGridRef = useRef(false);
   const isResizingGridRef = useRef(false);
-  const shouldFitLoadedContentHeightRef = useRef(false);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
   const [isDraggingBlock, setIsDraggingBlock] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-
-  const markShouldFitLoadedContentHeight = useCallback(() => {
-    shouldFitLoadedContentHeightRef.current = true;
-  }, []);
 
   const syncBlocksFromGrid = useCallback(() => {
     const grid = gridRef.current;
@@ -104,6 +103,10 @@ export function useGridStackCanvas({
   }, [builderStateRef, setBlocks]);
 
   useEffect(() => {
+    if (!isCanvasMounted) {
+      return;
+    }
+
     const container = gridContainerRef.current;
 
     if (!container || gridRef.current) {
@@ -135,7 +138,11 @@ export function useGridStackCanvas({
     gridRef.current = grid;
 
     const handleGridChange = () => {
-      if (isDraggingGridRef.current || isResizingGridRef.current) {
+      if (
+        isSyncingGridRef.current ||
+        isDraggingGridRef.current ||
+        isResizingGridRef.current
+      ) {
         return;
       }
 
@@ -193,9 +200,13 @@ export function useGridStackCanvas({
       grid.destroy(false);
       gridRef.current = null;
     };
-  }, [builderStateRef, syncBlocksFromGrid]);
+  }, [builderStateRef, isCanvasMounted, syncBlocksFromGrid]);
 
   useEffect(() => {
+    if (!isCanvasMounted) {
+      return;
+    }
+
     const grid = gridRef.current;
     const container = gridContainerRef.current;
 
@@ -297,11 +308,16 @@ export function useGridStackCanvas({
     blocks,
     documentSettings.globalFontSize,
     documentSettings.primaryFont,
+    isCanvasMounted,
     setBlocks,
     syncBlocksFromGrid,
   ]);
 
   useEffect(() => {
+    if (!isCanvasMounted) {
+      return;
+    }
+
     const grid = gridRef.current;
     const container = gridContainerRef.current;
 
@@ -386,7 +402,7 @@ export function useGridStackCanvas({
         resizeObserverRef.current = null;
       }
     };
-  }, [blocks, builderStateRef, syncBlocksFromGrid]);
+  }, [blocks, builderStateRef, isCanvasMounted, syncBlocksFromGrid]);
 
   return {
     gridContainerRef,
@@ -394,7 +410,5 @@ export function useGridStackCanvas({
     isResizing,
     syncBlocksFromGrid,
     getBlocksWithCurrentGridPositions,
-    shouldFitLoadedContentHeightRef,
-    markShouldFitLoadedContentHeight,
   };
 }

@@ -31,10 +31,35 @@ export function measureGridItemContentHeight(el: GridItemHTMLElement): number {
   }
 
   const measurementTarget = measuredContent || content;
-  const contentHeight = Math.max(
-    measurementTarget.getBoundingClientRect().height,
-    measurementTarget.scrollHeight
+
+  // Saved grid rows stretch `.block-content` to `height: 100%`. Measuring
+  // getBoundingClientRect() in that state returns the cell height, not the
+  // content height, which prevents shrink-on-load from correcting oversized h.
+  const previousContentStyles = {
+    height: content.style.height,
+    minHeight: content.style.minHeight,
+  };
+  const previousMeasureStyles = {
+    height: measurementTarget.style.height,
+    minHeight: measurementTarget.style.minHeight,
+  };
+
+  content.style.height = 'auto';
+  content.style.minHeight = '0';
+  measurementTarget.style.height = 'auto';
+  measurementTarget.style.minHeight = '0';
+
+  const contentHeight = Math.ceil(
+    Math.max(
+      measurementTarget.scrollHeight,
+      measurementTarget.getBoundingClientRect().height
+    )
   );
+
+  content.style.height = previousContentStyles.height;
+  content.style.minHeight = previousContentStyles.minHeight;
+  measurementTarget.style.height = previousMeasureStyles.height;
+  measurementTarget.style.minHeight = previousMeasureStyles.minHeight;
 
   return contentHeight;
 }

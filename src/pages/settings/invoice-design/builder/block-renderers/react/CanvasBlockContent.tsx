@@ -621,7 +621,7 @@ function TableBlockRenderer({ block }: { block: TableLikeBlock }) {
   const borderResolved = resolveTableBorderProps(block.properties);
 
   return (
-    <div className="w-full h-full overflow-auto">
+    <div className="w-full overflow-auto">
       <table
         className="w-full"
         style={{

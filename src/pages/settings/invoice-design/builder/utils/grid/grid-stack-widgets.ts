@@ -91,9 +91,13 @@ export function readGridPositionsById(
       return;
     }
 
+    if (node.x === undefined || node.y === undefined) {
+      return;
+    }
+
     positionsById.set(blockId, {
-      x: node.x ?? 0,
-      y: node.y ?? 0,
+      x: node.x,
+      y: node.y,
       w: node.w ?? 1,
       h: node.h ?? 1,
     });
