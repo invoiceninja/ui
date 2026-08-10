@@ -33,8 +33,9 @@ const ENTITY_ROUTES: Record<ScheduleEntityType, string> = {
   purchase_order: '/purchase_orders/:id/edit',
 };
 
-const isScheduleEntityType = (value: unknown): value is ScheduleEntityType =>
-  SCHEDULE_ENTITY_TYPES.includes(value as ScheduleEntityType);
+const isScheduleEntityType = (entity: string | undefined) => {
+  return SCHEDULE_ENTITY_TYPES.includes(entity as ScheduleEntityType);
+};
 
 export const scheduleRelatedEntity = (
   schedule: Schedule | undefined | null
@@ -63,7 +64,8 @@ export const scheduleRelatedEntity = (
 
 export const scheduleRelatedEntityRoute = (
   relatedEntity: ScheduleRelatedEntity
-): string =>
-  route(ENTITY_ROUTES[relatedEntity.entity], {
+) => {
+  return route(ENTITY_ROUTES[relatedEntity.entity], {
     id: relatedEntity.entityId,
   });
+};
