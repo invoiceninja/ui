@@ -107,6 +107,10 @@ export async function clearKeyboardShortcuts(page: Page) {
     timeout: 10000,
   });
 
+  await expect(
+    shortcutListButton(page, shortcutLabel('create_client'))
+  ).toBeVisible({ timeout: 10000 });
+
   const disableAll = page.getByRole('button', {
     name: 'Disable All',
     exact: true,
@@ -116,6 +120,11 @@ export async function clearKeyboardShortcuts(page: Page) {
     await disableAll.click();
     await saveKeyboardShortcutPreferences(page);
   }
+
+  await page.goto('/dashboard');
+  await expect(page.locator('[data-cy="navigationBar"]')).toBeVisible({
+    timeout: 10000,
+  });
 }
 
 export async function configureKeyboardShortcuts(
