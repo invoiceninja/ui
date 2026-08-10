@@ -26,10 +26,10 @@ import {
   FileJson,
   Clipboard,
   GripVertical,
-  LayoutGrid,
   Type,
   Pencil,
   Settings as SettingsIcon,
+  Code2,
 } from 'lucide-react';
 import { Button } from '$app/components/forms';
 import { InputField } from '$app/components/forms/InputField';
@@ -48,6 +48,7 @@ import { getTemplateById } from './templates/templates';
 import { ComponentLibrary } from './components/ComponentLibrary';
 import { PropertyPanel } from './components/PropertyPanel';
 import { DocumentSettingsPanel } from './components/DocumentSettingsPanel';
+import { CustomCssPanel } from './components/CustomCssPanel';
 import { BlockRenderer } from './components/BlockRenderer';
 import { PreviewModal } from './components/PreviewModal';
 import { useBlockLabel } from './block-library';
@@ -66,6 +67,11 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { getInvoiceWidgetClassName } from './constants/widget-classes';
+import {
+  unwrapCustomCssFromApi,
+  wrapCustomCssForApi,
+} from './utils/custom-css';
 import 'gridstack/dist/gridstack.min.css';
 import './InvoiceBuilder.css';
 
@@ -506,7 +512,8 @@ function mergeDesignParts(
   blocks: Block[],
   htmlBody: string,
   previous: Design['design'] | undefined,
-  documentSettings: DocumentSettings
+  documentSettings: DocumentSettings,
+  customCss: string
 ): Design['design'] {
   // Annotate each block with row-layout hints (rowAlign, rowWidth, colStart,
   // colSpan) so the API can place blocks within their flex-row correctly —
@@ -524,6 +531,7 @@ function mergeDesignParts(
     product: previous?.product ?? '',
     task: previous?.task ?? '',
     footer: previous?.footer ?? '',
+    customCss: wrapCustomCssForApi(customCss),
     blocks: annotatedBlocks,
     documentSettings,
     builderGridVersion: BUILDER_GRID_VERSION,
@@ -832,6 +840,7 @@ export function InvoiceBuilder() {
 
   const [state, setState] = useState<BuilderState>({
     blocks: [],
+    customCss: '',
     selectedBlockId: null,
     history: [],
     historyIndex: -1,
@@ -907,6 +916,7 @@ export function InvoiceBuilder() {
           setState((prev) => ({
             ...prev,
             blocks,
+            customCss: unwrapCustomCssFromApi(existingDesign.design.customCss),
             documentSettings:
               savedDocSettings || createDefaultDocumentSettings(designSettings),
           }));
@@ -1065,6 +1075,23 @@ export function InvoiceBuilder() {
     setState((prev) => ({
       ...prev,
       selectedBlockId: blockId || null,
+      panelMode: blockId ? 'block' : 'document',
+    }));
+  }, []);
+
+  const handleOpenCustomCss = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      selectedBlockId: null,
+      panelMode: 'css',
+    }));
+  }, []);
+
+  const handleOpenDocumentSettings = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      selectedBlockId: null,
+      panelMode: 'document',
     }));
   }, []);
 
@@ -1526,17 +1553,6 @@ export function InvoiceBuilder() {
     ]
   );
 
-  const compactLayout = useCallback(() => {
-    const grid = gridRef.current;
-
-    if (!grid) {
-      return;
-    }
-
-    grid.compact();
-    syncBlocksFromGrid();
-  }, [syncBlocksFromGrid]);
-
   const selectedBlock = state.blocks.find(
     (b) => b.id === state.selectedBlockId
   );
@@ -1592,7 +1608,8 @@ export function InvoiceBuilder() {
         undefined,
         documentSettingsToGeneratorShape(
           builderStateRef.current.documentSettings
-        )
+        ),
+        builderStateRef.current.customCss
       );
 
       // PUT must send the full Design resource (same as custom design editor): merge
@@ -1603,7 +1620,8 @@ export function InvoiceBuilder() {
         blocks,
         htmlBody,
         existingDesignRef.current?.design,
-        builderStateRef.current.documentSettings
+        builderStateRef.current.documentSettings,
+        builderStateRef.current.customCss
       );
 
       if (isEditMode && designId) {
@@ -1765,23 +1783,26 @@ export function InvoiceBuilder() {
               <Redo2 className="w-4 h-4" />
             </Button>
             <Button
-              type="secondary"
+              type={
+                state.selectedBlockId === null && state.panelMode === 'document'
+                  ? 'primary'
+                  : 'secondary'
+              }
               behavior="button"
-              onClick={compactLayout}
-              disabled={state.blocks.length === 0}
-              className="flex items-center gap-2"
-            >
-              <LayoutGrid className="w-4 h-4" />
-              {t('fix_overlaps')}
-            </Button>
-            <Button
-              type={state.selectedBlockId === null ? 'primary' : 'secondary'}
-              behavior="button"
-              onClick={() => handleSelectBlock(null)}
+              onClick={handleOpenDocumentSettings}
               className="flex items-center gap-2"
             >
               <SettingsIcon className="w-4 h-4" />
               {t('settings')}
+            </Button>
+            <Button
+              type={state.panelMode === 'css' ? 'primary' : 'secondary'}
+              behavior="button"
+              onClick={handleOpenCustomCss}
+              className="flex items-center gap-2"
+            >
+              <Code2 className="w-4 h-4" />
+              {t('css') || 'CSS'}
             </Button>
             <Button
               type="secondary"
@@ -1799,6 +1820,8 @@ export function InvoiceBuilder() {
                   {
                     blocks: state.blocks,
                     templateId: state.templateId,
+                    documentSettings: state.documentSettings,
+                    customCss: state.customCss,
                   },
                   null,
                   2
@@ -1890,6 +1913,13 @@ export function InvoiceBuilder() {
                 }
               }}
             >
+              {state.customCss.trim() && (
+                <style
+                  data-invoice-custom-css
+                >{`@scope (.invoice-gridstack-page) {
+${state.customCss}
+}`}</style>
+              )}
               <div
                 className="invoice-gridstack-stage"
                 style={{
@@ -2020,7 +2050,13 @@ export function InvoiceBuilder() {
                               handleSelectBlock(block.id);
                             }}
                           >
-                            <div className="block-content-measure">
+                            <div
+                              className={`block-content-measure ${getInvoiceWidgetClassName(
+                                block.type,
+                                block.properties.cssClasses
+                              )}`}
+                              data-widget-type={block.type}
+                            >
                               <BlockRenderer block={block} />
                             </div>
                           </div>
@@ -2068,6 +2104,13 @@ export function InvoiceBuilder() {
                 onDelete={() => handleDeleteBlock(selectedBlock.id)}
                 onDuplicate={() => handleDuplicateBlock(selectedBlock.id)}
               />
+            ) : state.panelMode === 'css' ? (
+              <CustomCssPanel
+                value={state.customCss}
+                onChange={(customCss) =>
+                  setState((prev) => ({ ...prev, customCss }))
+                }
+              />
             ) : (
               <DocumentSettingsPanel
                 settings={state.documentSettings}
@@ -2082,6 +2125,7 @@ export function InvoiceBuilder() {
       {showPreview && (
         <PreviewModal
           blocks={state.blocks}
+          customCss={state.customCss}
           onClose={() => setShowPreview(false)}
           designSettings={documentSettingsToGeneratorShape(
             state.documentSettings

@@ -28,6 +28,7 @@ import {
   DEFAULT_LABEL_TEXT_COLOR,
   DEFAULT_VALUE_TEXT_COLOR,
 } from '../constants/design-colors';
+import { SignatureBlockRenderer } from './SignatureBlockRenderer';
 
 interface BlockRendererProps {
   block: Block;
@@ -889,28 +890,6 @@ function QRCodeBlockRenderer({ block }: BlockRendererProps) {
         </span>
         <span className="text-gray-300 text-[10px]">{size}</span>
       </div>
-    </div>
-  );
-}
-
-function SignatureBlockRenderer({ block }: BlockRendererProps) {
-  const { t } = useTranslation();
-  const { label, showLine, showDate, align, fontSize, color } =
-    block.properties;
-
-  return (
-    <div style={{ textAlign: align }}>
-      <div style={{ marginBottom: '40px' }} />
-      {showLine && (
-        <div
-          style={{
-            borderTop: '1px solid #000',
-            width: '200px',
-            marginBottom: '8px',
-            display: align === 'center' ? 'inline-block' : 'block',
-          }}
-        />
-      )}
     </div>
   );
 }

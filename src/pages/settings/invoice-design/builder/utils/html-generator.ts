@@ -27,6 +27,8 @@ import {
   DEFAULT_LABEL_TEXT_COLOR,
   DEFAULT_VALUE_TEXT_COLOR,
 } from '../constants/design-colors';
+import { getInvoiceWidgetClassName } from '../constants/widget-classes';
+import { unwrapCustomCssFromApi } from './custom-css';
 
 /**
  * Resolved document-level globals threaded through every block renderer so the
@@ -209,8 +211,10 @@ export interface GeneratorDesignSettings {
 export function generateInvoiceHTML(
   blocks: Block[],
   previewData?: InvoiceData,
-  designSettings?: GeneratorDesignSettings
+  designSettings?: GeneratorDesignSettings,
+  customCss: string = ''
 ): string {
+  customCss = unwrapCustomCssFromApi(customCss);
   // Layout/height calculations always need a concrete data shape.
   // Variable substitution is gated on previewData — when absent, tokens stay literal.
   const layoutData = previewData || SAMPLE_INVOICE_DATA;
@@ -469,6 +473,13 @@ export function generateInvoiceHTML(
       }
     }
   </style>
+  ${
+    customCss.trim()
+      ? `<style data-invoice-custom-css>\n${escapeStyleElementContent(
+          customCss
+        )}\n  </style>`
+      : ''
+  }
 </head>
 <body>
   <div class="invoice-container">
@@ -560,7 +571,16 @@ function renderBlockWithRowHeight(
     .trim()
     .replace(/\s+/g, ' ');
 
-  return `<div class="block" style="${styles}">${content}</div>`;
+  const widgetClasses = getInvoiceWidgetClassName(
+    block.type,
+    block.properties.cssClasses
+  );
+
+  return `<div id="${escapeHtml(
+    block.id
+  )}" class="block ${widgetClasses}" data-widget-type="${escapeHtml(
+    block.type
+  )}" style="${styles}">${content}</div>`;
 }
 
 /**
@@ -1069,8 +1089,6 @@ function renderTableBlock(
   const resolvedRowTextColor = pick(rowColor, DEFAULT_VALUE_TEXT_COLOR);
 
   const borderResolved = resolveTableBorderProps(block.properties);
-  const headerBorderCss = tableHeaderCellBorderCssFragments(borderResolved);
-
   // Generate header
   let headerHTML =
     '<thead><tr style="font-family: ' +
@@ -1083,13 +1101,22 @@ function renderTableBlock(
     headerFontWeight +
     ';">';
   columns.forEach(
-    (col: {
-      id: string;
-      header: string;
-      align: string;
-      width: string;
-      field: string;
-    }) => {
+    (
+      col: {
+        id: string;
+        header: string;
+        align: string;
+        width: string;
+        field: string;
+      },
+      colIndex: number
+    ) => {
+      const headerBorderCss = tableHeaderCellBorderCssFragments(
+        borderResolved,
+        colIndex,
+        columns.length
+      );
+
       headerHTML += `
       <th style="
         padding: ${padding};
@@ -1114,15 +1141,16 @@ function renderTableBlock(
       alternateRows && index % 2 === 1 ? alternateRowBg : rowBg;
     rowsHTML += `<tr style="background: ${rowBackground};">`;
 
-    const cellBorderCss = tableBodyCellBorderCssFragments(
-      borderResolved,
-      index,
-      columns.length
-    );
-
-    columns.forEach((col: { id: string; align: string; field: string }) => {
-      const value = resolveVariable(col.field, item, previewData);
-      rowsHTML += `
+    columns.forEach(
+      (col: { id: string; align: string; field: string }, colIndex: number) => {
+        const cellBorderCss = tableBodyCellBorderCssFragments(
+          borderResolved,
+          index,
+          colIndex,
+          columns.length
+        );
+        const value = resolveVariable(col.field, item, previewData);
+        rowsHTML += `
         <td style="
           padding: ${padding};
           text-align: ${col.align};
@@ -1132,7 +1160,8 @@ function renderTableBlock(
           ${escapeHtml(value)}
         </td>
       `;
-    });
+      }
+    );
 
     rowsHTML += '</tr>';
   });
@@ -1332,34 +1361,60 @@ function renderQRCodeBlock(
 }
 
 function renderSignatureBlock(block: Block, globals: GeneratorGlobals): string {
-  const { label, showLine, showDate, align, fontSize, color } =
-    block.properties;
+  const {
+    label,
+    showDate,
+    align,
+    fontSize,
+    fontWeight,
+    fontStyle,
+    color,
+    padding,
+  } = block.properties;
+  const showLine = block.properties.showLine !== false;
+  const signatureHeight = ensurePx(block.properties.signatureHeight) || '40px';
+  const lineWidth = ensurePx(block.properties.lineWidth) || '200px';
+  const lineThickness = ensurePx(block.properties.lineThickness) || '1px';
+  const lineStyle = ['solid', 'dashed', 'dotted'].includes(
+    block.properties.lineStyle
+  )
+    ? block.properties.lineStyle
+    : 'solid';
+  const lineColor = block.properties.lineColor || '#000000';
   const sigFontSizeStyle = fontSize ? `font-size: ${fontSize};` : '';
+  const sigFontWeightStyle = fontWeight
+    ? `font-weight: ${fontWeight};`
+    : '';
+  const sigFontStyleStyle = fontStyle ? `font-style: ${fontStyle};` : '';
   const sigColor = pick(color, DEFAULT_VALUE_TEXT_COLOR, globals.primaryColor);
+  const paddingStyle = padding ? `padding: ${ensurePx(padding)};` : '';
 
   return `
-    <div style="text-align: ${align || 'left'};">
-      <div style="margin-bottom: 40px;"></div>
+    <div style="text-align: ${
+      align || 'left'
+    }; ${paddingStyle} box-sizing: border-box;">
+      <div aria-hidden="true" style="height: ${signatureHeight};"></div>
       ${
         showLine
           ? `
         <div style="
-          border-top: 1px solid #000;
-          width: 200px;
+          border-top: ${lineThickness} ${lineStyle} ${lineColor};
+          width: ${lineWidth};
+          max-width: 100%;
           margin-bottom: 8px;
-          display: ${align === 'center' ? 'inline-block' : 'block'};
+          display: inline-block;
         "></div>
       `
           : ''
       }
-      <div style="${sigFontSizeStyle} color: ${sigColor};">
+      <div style="${sigFontSizeStyle} ${sigFontWeightStyle} ${sigFontStyleStyle} color: ${sigColor};">
         ${escapeHtml(label)}
       </div>
       ${
         showDate
           ? `
-        <div style="${sigFontSizeStyle} color: ${sigColor}; margin-top: 4px;">
-          Date: ________________
+        <div style="${sigFontSizeStyle} ${sigFontWeightStyle} ${sigFontStyleStyle} color: ${sigColor}; margin-top: 4px;">
+          ${escapeHtml(t('date') || 'Date')}: ________________
         </div>
       `
           : ''
@@ -1371,7 +1426,7 @@ function renderSignatureBlock(block: Block, globals: GeneratorGlobals): string {
 /**
  * Escape HTML special characters to prevent XSS
  */
-function escapeHtml(text: string): string {
+function escapeHtml(text: unknown): string {
   const htmlEscapes: Record<string, string> = {
     '&': '&amp;',
     '<': '&lt;',
@@ -1379,5 +1434,10 @@ function escapeHtml(text: string): string {
     '"': '&quot;',
     "'": '&#39;',
   };
-  return text.replace(/[&<>"']/g, (match) => htmlEscapes[match]);
+  return String(text ?? '').replace(/[&<>"']/g, (match) => htmlEscapes[match]);
+}
+
+/** Prevent custom CSS from terminating its generated HTML style element. */
+function escapeStyleElementContent(css: string): string {
+  return css.replace(/<\/style/gi, '<\\/style');
 }

@@ -24,12 +24,14 @@ import { useSampleInvoiceData } from '../hooks/useSampleInvoiceData';
 
 interface PreviewModalProps {
   blocks: Block[];
+  customCss?: string;
   onClose: () => void;
   designSettings?: GeneratorDesignSettings;
 }
 
 export function PreviewModal({
   blocks,
+  customCss,
   onClose,
   designSettings,
 }: PreviewModalProps) {
@@ -37,7 +39,12 @@ export function PreviewModal({
   const [zoom, setZoom] = useState(80);
   const colors = useColorScheme();
   const sampleData = useSampleInvoiceData();
-  const html = generateInvoiceHTML(blocks, sampleData, designSettings);
+  const html = generateInvoiceHTML(
+    blocks,
+    sampleData,
+    designSettings,
+    customCss
+  );
   const dimensions = getGeneratorPageDimensions(
     designSettings?.page_size,
     designSettings?.page_layout

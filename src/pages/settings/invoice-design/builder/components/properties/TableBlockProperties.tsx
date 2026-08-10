@@ -167,6 +167,76 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
     });
   };
 
+  const renderBorderControls = (regionKey: 'headerBorders' | 'rowBorders') => {
+    const region = mergeTableRegion(block.properties[regionKey]);
+
+    return (
+      <div className="space-y-3 pt-2">
+        <ColorInput
+          label={String(t('border_color', { defaultValue: 'Border Color' }))}
+          value={region.color}
+          onChange={(value) => patchTableRegion(regionKey, { color: value })}
+          defaultValue={DEFAULT_TABLE_REGION_BORDER_PROPS.color as string}
+        />
+        <RangeSliderInput
+          label={String(t('width'))}
+          value={String(region.width)}
+          onChange={(value) =>
+            patchTableRegion(regionKey, {
+              width: coerceBorderWidthPx(value),
+            })
+          }
+          min={TABLE_BORDER_WIDTH_MIN}
+          max={TABLE_BORDER_WIDTH_MAX}
+          step={TABLE_BORDER_WIDTH_STEP}
+          unit=""
+        />
+        <div className="grid grid-cols-2 gap-2">
+          <CheckboxInput
+            id={`${regionKey}-top`}
+            label={String(t('top'))}
+            checked={region.sides.top}
+            onChange={(checked) =>
+              patchTableRegion(regionKey, {
+                sides: { top: checked },
+              })
+            }
+          />
+          <CheckboxInput
+            id={`${regionKey}-right`}
+            label={String(t('right'))}
+            checked={region.sides.right}
+            onChange={(checked) =>
+              patchTableRegion(regionKey, {
+                sides: { right: checked },
+              })
+            }
+          />
+          <CheckboxInput
+            id={`${regionKey}-bottom`}
+            label={String(t('bottom'))}
+            checked={region.sides.bottom}
+            onChange={(checked) =>
+              patchTableRegion(regionKey, {
+                sides: { bottom: checked },
+              })
+            }
+          />
+          <CheckboxInput
+            id={`${regionKey}-left`}
+            label={String(t('left'))}
+            checked={region.sides.left}
+            onChange={(checked) =>
+              patchTableRegion(regionKey, {
+                sides: { left: checked },
+              })
+            }
+          />
+        </div>
+      </div>
+    );
+  };
+
   // Get current columns from block
   const currentColumns = block.properties.columns || [];
 
@@ -505,6 +575,8 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
         />
       </div>
 
+      {renderBorderControls('headerBorders')}
+
       <SectionDivider label={String(t('row'))} />
 
       {/* Alternate Rows */}
@@ -533,109 +605,8 @@ export function TableBlockProperties({ block, onChange }: PropertyEditorProps) {
           defaultValue={DEFAULT_VALUE_TEXT_COLOR}
         />
       </div>
-      <SectionDivider label={String(t('borders'))} />
 
-      <CheckboxInput
-        id="showBorders"
-        label={String(t('show_borders'))}
-        checked={Boolean(block.properties.showBorders)}
-        onChange={(value) => updateProperty('showBorders', value)}
-      />
-
-      {block.properties.showBorders && (
-        <div className="space-y-4">
-          {(['headerBorders', 'rowBorders'] as const).map((regionKey, idx) => {
-            const label =
-              regionKey === 'headerBorders'
-                ? String(t('header'))
-                : String(t('table_rows'));
-
-            const region = mergeTableRegion(block.properties[regionKey]);
-
-            return (
-              <div key={regionKey} className="space-y-3">
-                {idx === 1 && (
-                  <div
-                    className="border-t pt-4"
-                    style={{ borderColor: colors.$24 }}
-                  />
-                )}
-                <div
-                  className="text-sm font-medium"
-                  style={{ color: colors.$3 }}
-                >
-                  {label}
-                </div>
-                <ColorInput
-                  label={String(t('color'))}
-                  value={region.color}
-                  onChange={(value) =>
-                    patchTableRegion(regionKey, { color: value })
-                  }
-                  defaultValue={
-                    DEFAULT_TABLE_REGION_BORDER_PROPS.color as string
-                  }
-                />
-                <RangeSliderInput
-                  label={String(t('width'))}
-                  value={String(region.width)}
-                  onChange={(value) =>
-                    patchTableRegion(regionKey, {
-                      width: coerceBorderWidthPx(value),
-                    })
-                  }
-                  min={TABLE_BORDER_WIDTH_MIN}
-                  max={TABLE_BORDER_WIDTH_MAX}
-                  step={TABLE_BORDER_WIDTH_STEP}
-                  unit=""
-                />
-                <div className="grid grid-cols-2 gap-2">
-                  <CheckboxInput
-                    id={`${regionKey}-top`}
-                    label={String(t('top'))}
-                    checked={region.sides.top}
-                    onChange={(checked) =>
-                      patchTableRegion(regionKey, {
-                        sides: { top: checked },
-                      })
-                    }
-                  />
-                  <CheckboxInput
-                    id={`${regionKey}-right`}
-                    label={String(t('right'))}
-                    checked={region.sides.right}
-                    onChange={(checked) =>
-                      patchTableRegion(regionKey, {
-                        sides: { right: checked },
-                      })
-                    }
-                  />
-                  <CheckboxInput
-                    id={`${regionKey}-bottom`}
-                    label={String(t('bottom'))}
-                    checked={region.sides.bottom}
-                    onChange={(checked) =>
-                      patchTableRegion(regionKey, {
-                        sides: { bottom: checked },
-                      })
-                    }
-                  />
-                  <CheckboxInput
-                    id={`${regionKey}-left`}
-                    label={String(t('left'))}
-                    checked={region.sides.left}
-                    onChange={(checked) =>
-                      patchTableRegion(regionKey, {
-                        sides: { left: checked },
-                      })
-                    }
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {renderBorderControls('rowBorders')}
 
       <SectionDivider label={String(t('spacing'))} />
 

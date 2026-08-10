@@ -161,6 +161,7 @@ export function TextInput({
  */
 interface ColorInputProps extends BaseInputProps {
   defaultValue?: string;
+  inline?: boolean;
 }
 
 export function ColorInput({
@@ -168,15 +169,18 @@ export function ColorInput({
   value,
   onChange,
   defaultValue = '#000000',
+  inline = false,
 }: ColorInputProps) {
   const colors = useColorScheme();
   const currentValue = value || defaultValue;
 
   return (
-    <div>
+    <div className={inline ? 'flex items-center gap-2' : undefined}>
       {label && (
         <label
-          className="block text-sm font-medium mb-2"
+          className={
+            inline ? 'text-sm font-medium' : 'block text-sm font-medium mb-2'
+          }
           style={{ color: colors.$3 }}
         >
           {label}

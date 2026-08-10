@@ -535,18 +535,23 @@ export function replaceVariables(
  * @returns Resolved value
  */
 export function resolveVariable(
-  variable: string,
+  variable: string | null | undefined,
   itemData: InvoiceData['line_items'][0] | null,
   invoiceData?: InvoiceData
 ): string {
+  const normalizedVariable = typeof variable === 'string' ? variable : '';
+
   // Save mode — emit the variable literal so the backend substitutes it.
   if (!invoiceData) {
-    return variable;
+    return normalizedVariable;
   }
 
   // Handle item.field format (e.g., "item.product_key")
-  if (variable.startsWith('item.') && itemData) {
-    const field = variable.replace('item.', '') as keyof typeof itemData;
+  if (normalizedVariable.startsWith('item.') && itemData) {
+    const field = normalizedVariable.replace(
+      'item.',
+      ''
+    ) as keyof typeof itemData;
     const value = itemData[field];
 
     if (typeof value === 'number') {
@@ -556,5 +561,5 @@ export function resolveVariable(
   }
 
   // Handle other variables using replaceVariables
-  return replaceVariables(variable, invoiceData);
+  return replaceVariables(normalizedVariable, invoiceData);
 }

@@ -360,18 +360,26 @@ function blockContentSize(
     }
     case 'signature': {
       const fontSize = parseCssNumber(properties.fontSize, inheritedFontSize);
+      const padding = parseCssNumber(properties.padding, 0);
+      const signatureHeight = parseCssNumber(properties.signatureHeight, 40);
       const labelWidth = textWidth(properties.label || '', fontSize);
       const dateWidth = properties.showDate
         ? textWidth('Date: ________________', fontSize)
         : 0;
-      const lineWidth = properties.showLine ? 200 : 0;
-      const labelHeight = fontSize * 1.2;
-      const lineHeight = properties.showLine ? 9 : 0;
+      const showLine = properties.showLine !== false;
+      const lineWidth = showLine
+        ? parseCssNumber(properties.lineWidth, 200)
+        : 0;
+      const labelHeight = properties.label ? fontSize * 1.2 : 0;
+      const lineHeight = showLine
+        ? parseCssNumber(properties.lineThickness, 1) + 8
+        : 0;
       const dateHeight = properties.showDate ? fontSize * 1.2 + 4 : 0;
 
       return {
-        width: Math.max(labelWidth, dateWidth, lineWidth),
-        height: 40 + lineHeight + labelHeight + dateHeight,
+        width: Math.max(labelWidth, dateWidth, lineWidth) + padding * 2,
+        height:
+          signatureHeight + lineHeight + labelHeight + dateHeight + padding * 2,
       };
     }
     default:

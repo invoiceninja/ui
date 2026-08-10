@@ -48,6 +48,11 @@ export interface Block {
 // Flexible property type that allows any properties with type hints
 export type BlockProperties = Record<string, any>;
 
+export interface WidgetCssClassesHint {
+  /** Optional whitespace-separated classes appended to the stable widget classes. */
+  cssClasses?: string;
+}
+
 // Type hints for common block properties (not strict requirements)
 export interface TextBlockPropertiesHint {
   content?: string;
@@ -104,7 +109,6 @@ export interface TableBlockPropertiesHint {
   alternateRowBg?: string;
   fontSize?: string;
   padding?: string;
-  showBorders?: boolean;
   /** Header row (`th`) border styling. */
   headerBorders?: TableRegionBordersHint;
   /** Body rows (`td`) border styling. */
@@ -185,7 +189,15 @@ export interface SignatureBlockPropertiesHint {
   showDate?: boolean;
   align?: string;
   fontSize?: string;
+  fontWeight?: string;
+  fontStyle?: string;
   color?: string;
+  signatureHeight?: string;
+  lineWidth?: string;
+  lineThickness?: string;
+  lineStyle?: 'solid' | 'dashed' | 'dotted';
+  lineColor?: string;
+  padding?: string;
 }
 
 export interface FieldConfig {
@@ -361,6 +373,7 @@ export function createDefaultDocumentSettings(
 // Builder state management
 export interface BuilderState {
   blocks: Block[];
+  customCss: string;
   selectedBlockId: string | null;
   history: BuilderHistoryEntry[];
   historyIndex: number;
@@ -368,7 +381,7 @@ export interface BuilderState {
   templateId?: string;
   documentSettings: DocumentSettings;
   /** Right-panel mode when no block is selected. */
-  panelMode?: 'block' | 'document';
+  panelMode?: 'block' | 'document' | 'css';
 }
 
 export interface BuilderHistoryEntry {

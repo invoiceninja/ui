@@ -23,12 +23,17 @@ import { ClientInfoBlockProperties } from './properties/ClientInfoBlockPropertie
 import { ClientShippingInfoBlockProperties } from './properties/ClientShippingInfoBlockProperties';
 import { InvoiceDetailsBlockProperties } from './properties/InvoiceDetailsBlockProperties';
 import { QRCodeBlockProperties } from './properties/QRCodeBlockProperties';
+import { SignatureBlockProperties } from './properties/SignatureBlockProperties';
+import { TextInput } from './properties/PropertyInputs';
+import {
+  INVOICE_WIDGET_CLASS,
+  INVOICE_WIDGET_CLASS_BY_TYPE,
+} from '../constants/widget-classes';
 
 export function PropertyPanel({
   block,
   onChange,
   onDelete,
-  // onDuplicate, // temporarily disabled
 }: PropertyPanelProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
@@ -83,7 +88,10 @@ export function PropertyPanel({
         )}
 
         {block.type === 'client-shipping-info' && (
-          <ClientShippingInfoBlockProperties block={block} onChange={onChange} />
+          <ClientShippingInfoBlockProperties
+            block={block}
+            onChange={onChange}
+          />
         )}
 
         {block.type === 'invoice-details' && (
@@ -113,6 +121,57 @@ export function PropertyPanel({
         {block.type === 'qrcode' && (
           <QRCodeBlockProperties block={block} onChange={onChange} />
         )}
+
+        {block.type === 'signature' && (
+          <SignatureBlockProperties block={block} onChange={onChange} />
+        )}
+      </div>
+
+      <div
+        className="space-y-3 border-t pt-4"
+        style={{ borderColor: colors.$24 }}
+      >
+        <div>
+          <h4 className="text-sm font-medium" style={{ color: colors.$3 }}>
+            {String(t('css_classes', { defaultValue: 'CSS classes' }))}
+          </h4>
+          <p className="mt-1 text-xs leading-5" style={{ color: colors.$17 }}>
+            Built-in selectors remain available on this widget. Add class names
+            without a leading dot, separated by spaces.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-1.5">
+          {[INVOICE_WIDGET_CLASS, INVOICE_WIDGET_CLASS_BY_TYPE[block.type]].map(
+            (className) => (
+              <code
+                key={className}
+                className="select-all break-all rounded px-1.5 py-1 text-xs"
+                style={{ backgroundColor: colors.$20, color: colors.$16 }}
+              >
+                .{className}
+              </code>
+            )
+          )}
+        </div>
+
+        <TextInput
+          label={String(
+            t('additional_css_classes', {
+              defaultValue: 'Additional CSS classes',
+            })
+          )}
+          value={block.properties.cssClasses}
+          placeholder="compact highlighted"
+          changeOverride
+          debounceTimeout={0}
+          onChange={(cssClasses) =>
+            onChange({
+              ...block,
+              properties: { ...block.properties, cssClasses },
+            })
+          }
+        />
       </div>
 
       {/* Actions */}

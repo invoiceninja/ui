@@ -38,6 +38,8 @@ export interface Parts {
   product: string;
   task: string;
   footer: string;
+  /** Custom CSS authored in the visual invoice designer. */
+  customCss?: string;
   blocks?: any[];
   pageSettings?: Record<string, string>;
   documentSettings?: DocumentSettings;
