@@ -183,6 +183,24 @@ function Invitation({ invitation, document }: InvitationProps) {
     }
   };
 
+  const getRecipient = (invitation: DocumentInvitation) => {
+    const name =
+      invitation.entity === 'contact'
+        ? `${invitation.contact?.first_name ?? ''} ${
+            invitation.contact?.last_name ?? ''
+          }`.trim()
+        : `${invitation.user?.first_name ?? ''} ${
+            invitation.user?.last_name ?? ''
+          }`.trim();
+
+    const email =
+      invitation.entity === 'contact'
+        ? invitation.contact?.email
+        : invitation.user?.email;
+
+    return name ? `${name} (${email})` : email;
+  };
+
   const handleCopyLink = () => {
     const link = routeWithOrigin(
       `/docuninja/sign/${document.id}/${invitation.id}`
@@ -318,14 +336,27 @@ function Invitation({ invitation, document }: InvitationProps) {
         onClose={() => setIsSendConfirmOpen(false)}
         size="small"
       >
-        <div className="flex justify-end pt-4">
-          <Button
-            behavior="button"
-            disabled={isSendingInvitation}
-            onClick={handleSendInvitation}
-          >
-            {isSendingInvitation ? t('sending') : t('send')}
-          </Button>
+        <div className="space-y-4 pt-3">
+          <div>
+            <p>{t('send_emails_to_following')}</p>
+
+            <ul className="mt-2">
+              <li className="flex items-center gap-1">
+                <span>-</span>
+                <span>{getRecipient(invitation)}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="flex justify-end">
+            <Button
+              behavior="button"
+              disabled={isSendingInvitation}
+              onClick={handleSendInvitation}
+            >
+              {isSendingInvitation ? t('sending') : t('send')}
+            </Button>
+          </div>
         </div>
       </Modal>
     </div>
