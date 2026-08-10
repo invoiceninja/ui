@@ -78,7 +78,7 @@ export function DesignerPxNumberInput({
 }: DesignerPxNumberInputProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
-  const reactSettings = useReactSettings({ overwrite: false });
+  const reactSettings = useReactSettings();
   const showReset =
     resettable && value !== undefined && value !== null && value !== '';
 
