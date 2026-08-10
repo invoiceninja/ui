@@ -1,5 +1,6 @@
 import { login } from '$tests/e2e/helpers';
 import {
+  clearKeyboardShortcuts,
   configureKeyboardShortcuts,
   expectShortcutDoesNotNavigate,
   shortcutLabel,
@@ -12,6 +13,7 @@ test('creation keyboard shortcuts navigate to create pages', async ({
   page,
 }) => {
   await login(page);
+  await clearKeyboardShortcuts(page);
 
   await expectShortcutDoesNotNavigate(
     page,
@@ -49,6 +51,7 @@ test('keyboard shortcuts can be reused after route changes', async ({
   page,
 }) => {
   await login(page);
+  await clearKeyboardShortcuts(page);
 
   await configureKeyboardShortcuts(page, [
     { id: 'create_recurring_expense', binding: 'Control+Shift+X' },

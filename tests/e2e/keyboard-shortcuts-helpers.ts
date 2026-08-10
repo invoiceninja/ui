@@ -87,6 +87,37 @@ async function recordShortcutBinding(
   });
 }
 
+async function saveKeyboardShortcutPreferences(page: Page) {
+  const preferencesSaved = page.waitForResponse(
+    (response) =>
+      response.request().method() === 'PUT' &&
+      response.url().includes('/api/v1/company_users/') &&
+      response.url().includes('/preferences') &&
+      response.ok(),
+    { timeout: 15000 }
+  );
+
+  await page.getByRole('button', { name: 'Save', exact: true }).first().click();
+  await preferencesSaved;
+}
+
+export async function clearKeyboardShortcuts(page: Page) {
+  await page.goto('/settings/user_details/keyboard_shortcuts');
+  await expect(page.locator('[data-cy="navigationBar"]')).toBeVisible({
+    timeout: 10000,
+  });
+
+  const disableAll = page.getByRole('button', {
+    name: 'Disable All',
+    exact: true,
+  });
+
+  if (await disableAll.isVisible()) {
+    await disableAll.click();
+    await saveKeyboardShortcutPreferences(page);
+  }
+}
+
 export async function configureKeyboardShortcuts(
   page: Page,
   shortcuts: KeyboardShortcutConfig[]
@@ -104,17 +135,7 @@ export async function configureKeyboardShortcuts(
     );
   }
 
-  const preferencesSaved = page.waitForResponse(
-    (response) =>
-      response.request().method() === 'PUT' &&
-      response.url().includes('/api/v1/company_users/') &&
-      response.url().includes('/preferences') &&
-      response.ok(),
-    { timeout: 15000 }
-  );
-
-  await page.getByRole('button', { name: 'Save', exact: true }).first().click();
-  await preferencesSaved;
+  await saveKeyboardShortcutPreferences(page);
 }
 
 export async function expectShortcutDoesNotNavigate(
