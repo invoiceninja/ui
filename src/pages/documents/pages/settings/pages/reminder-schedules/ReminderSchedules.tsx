@@ -3,20 +3,18 @@ import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import {
-  ReminderSchedule,
-  Template,
-} from '$app/common/interfaces/docuninja/api';
+import { ReminderSchedule } from '$app/common/interfaces/docuninja/api';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
+import { Textarea } from '$app/components/forms/Textarea';
 import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import { ValidationAlert } from '$app/components/ValidationAlert';
 import { AxiosError } from 'axios';
 import { MdDelete, MdEdit } from 'react-icons/md';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 
@@ -31,8 +29,8 @@ export default function ReminderSchedules() {
     useState<ReminderSchedule | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    template_id: '',
-    trigger_event: 'after_send',
+    subject: '',
+    body: '',
     num_days: 1,
     schedule_direction: 'after_event',
     enabled: true,
@@ -56,30 +54,12 @@ export default function ReminderSchedules() {
     staleTime: Infinity,
   });
 
-  const { data: templates } = useQuery({
-    queryKey: ['/api/templates/docuninja'],
-    queryFn: () =>
-      request(
-        'GET',
-        docuNinjaEndpoint('/api/templates'),
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(
-              'X-DOCU-NINJA-TOKEN'
-            )}`,
-          },
-        }
-      ).then((res) => res.data.data),
-    staleTime: Infinity,
-  });
-
   const openAddModal = () => {
     setEditingSchedule(null);
     setFormData({
       name: '',
-      template_id: templates?.[0]?.id || '',
-      trigger_event: 'after_send',
+      subject: '',
+      body: '',
       num_days: 1,
       schedule_direction: 'after_event',
       enabled: true,
@@ -88,18 +68,12 @@ export default function ReminderSchedules() {
     setIsModalOpen(true);
   };
 
-  useEffect(() => {
-    if (!editingSchedule && templates?.length && !formData.template_id) {
-      setFormData((prev) => ({ ...prev, template_id: templates[0].id }));
-    }
-  }, [templates, editingSchedule]);
-
   const openEditModal = (schedule: ReminderSchedule) => {
     setEditingSchedule(schedule);
     setFormData({
       name: schedule.name,
-      template_id: schedule.template_id,
-      trigger_event: schedule.trigger_event,
+      subject: schedule.subject,
+      body: schedule.body,
       num_days: schedule.num_days,
       schedule_direction: schedule.schedule_direction,
       enabled: schedule.enabled,
@@ -127,8 +101,8 @@ export default function ReminderSchedules() {
 
     const payload = {
       name: formData.name,
-      template_id: formData.template_id,
-      trigger_event: formData.trigger_event,
+      subject: formData.subject,
+      body: formData.body,
       num_days: Number(formData.num_days),
       schedule_direction: formData.schedule_direction,
       enabled: formData.enabled,
@@ -262,7 +236,6 @@ export default function ReminderSchedules() {
                     </p>
 
                     <p className="text-xs" style={{ color: colors.$17 }}>
-                      {schedule.template?.name || t('no_template')} &mdash;{' '}
                       {schedule.num_days} {t('days')}{' '}
                       {t(schedule.schedule_direction)}
                     </p>
@@ -313,20 +286,23 @@ export default function ReminderSchedules() {
             disabled={isFormBusy}
           />
 
-          <SelectField
-            label={t('template')}
-            value={formData.template_id}
+          <InputField
+            label={t('subject')}
+            value={formData.subject}
             onValueChange={(value) =>
-              setFormData((prev) => ({ ...prev, template_id: value }))
+              setFormData((prev) => ({ ...prev, subject: value }))
             }
             disabled={isFormBusy}
-          >
-            {templates?.map((template: Template) => (
-              <option key={template.id} value={template.id}>
-                {template.name}
-              </option>
-            ))}
-          </SelectField>
+          />
+
+          <Textarea
+            id="body"
+            label={t('body')}
+            value={formData.body}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              setFormData((prev) => ({ ...prev, body: e.target.value }))
+            }
+          />
 
           <InputField
             label={t('num_days')}
