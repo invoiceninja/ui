@@ -44,7 +44,7 @@ import { whiteLabelPlan } from '$app/common/guards/guards/white-label';
 import { EUTaxDetails } from './common/components/EUTaxDetails';
 import { Onboarding } from './peppol/Onboarding';
 import { Preferences } from './peppol/Preferences';
-import { PEPPOL_COUNTRIES } from '$app/common/helpers/peppol-countries';
+import { isPeppolCountryAllowed } from '$app/common/helpers/peppol-countries';
 import { PEPPOLPlanBanner } from './common/components/PEPPOLPlanBanner';
 import { FranceReporting } from './common/components/FranceReporting';
 import { CloudUpload } from '$app/components/icons/CloudUpload';
@@ -94,7 +94,7 @@ export function EInvoice() {
 
     return (
       (isPlanActive || skipPlanCheck) &&
-      PEPPOL_COUNTRIES.includes(company?.settings.country_id || '')
+      isPeppolCountryAllowed(company?.settings.country_id || '')
     );
   };
 
