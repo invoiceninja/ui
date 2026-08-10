@@ -12,9 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useMemo, useCallback, useState } from 'react';
 import { Type, ChevronUp, ChevronDown } from 'lucide-react';
 import {
-  PropertyEditorProps,
   FieldConfig,
-  Block,
   CompanyInfoBlock,
   ClientInfoBlock,
   ClientShippingInfoBlock,
