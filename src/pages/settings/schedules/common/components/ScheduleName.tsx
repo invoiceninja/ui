@@ -54,11 +54,12 @@ export function ScheduleName({ schedule }: Props) {
     );
   }
 
-  if (
-    schedule.template === Templates.PAYMENT_SCHEDULE ||
-    schedule.template === Templates.INVOICE_OUTSTANDING_TASKS
-  ) {
-    return <>{t(schedule.template as string)}</>;
+  if (schedule.template === Templates.PAYMENT_SCHEDULE) {
+    return <>{schedule.name}</>;
+  }
+
+  if (schedule.template === Templates.INVOICE_OUTSTANDING_TASKS) {
+    return <>{schedule.name}</>;
   }
 
   return (

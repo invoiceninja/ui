@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { Schedule } from '$app/common/interfaces/schedule';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +15,7 @@ import {
   scheduleRelatedEntity,
   scheduleRelatedEntityRoute,
 } from '../helpers/related-entity';
-import { useEntityResource } from '../hooks/useEntityNumber';
+import { useEntityNumber } from '../hooks/useEntityNumber';
 
 interface Props {
   schedule: Schedule;
@@ -25,11 +24,9 @@ interface Props {
 export function ScheduleEntityLink({ schedule }: Props) {
   const [t] = useTranslation();
 
-  const disableNavigation = useDisableNavigation();
-
   const relatedEntity = scheduleRelatedEntity(schedule);
 
-  const resource = useEntityResource({
+  const entityNumber = useEntityNumber({
     entity: relatedEntity?.entity,
     entityId: relatedEntity?.entityId,
     enabled: Boolean(relatedEntity),
@@ -40,12 +37,9 @@ export function ScheduleEntityLink({ schedule }: Props) {
   }
 
   return (
-    <DynamicLink
-      to={scheduleRelatedEntityRoute(relatedEntity)}
-      renderSpan={disableNavigation(relatedEntity.entity, resource)}
-    >
-      {resource?.number
-        ? `${t(relatedEntity.entity)} #${resource.number}`
+    <DynamicLink to={scheduleRelatedEntityRoute(relatedEntity)}>
+      {entityNumber
+        ? `${t(relatedEntity.entity)} #${entityNumber}`
         : t(relatedEntity.entity)}
     </DynamicLink>
   );
