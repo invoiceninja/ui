@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-// Export only the used DocuNinja guards
-export * from './permission';
+export type {
+  DocuNinjaContext,
+  DocuNinjaGuard as DocuNinjaGuardType,
+  DocuNinjaPermission,
+} from '../../DocuNinjaGuard';
 
 // Re-export the main guard component and types
 export { DocuNinjaGuard } from '../../DocuNinjaGuard';
-export type {
-  DocuNinjaGuard as DocuNinjaGuardType,
-  DocuNinjaContext,
-  DocuNinjaPermission,
-} from '../../DocuNinjaGuard';
+// Export only the used DocuNinja guards
+export * from './permission';

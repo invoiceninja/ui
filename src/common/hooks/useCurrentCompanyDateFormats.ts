@@ -8,8 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useStaticsQuery } from '$app/common/queries/statics';
 import { useEffect, useState } from 'react';
+import { DateFormat } from '$app/common/interfaces/date-format';
+import { useStaticsQuery } from '$app/common/queries/statics';
 import { useCurrentCompany } from './useCurrentCompany';
 
 export function useCurrentCompanyDateFormats() {
@@ -23,7 +24,8 @@ export function useCurrentCompanyDateFormats() {
   useEffect(() => {
     if (statics?.date_formats) {
       const result = statics.date_formats.find(
-        (format) => format.id === (company?.settings?.date_format_id ?? '0')
+        (format: DateFormat) =>
+          format.id === (company?.settings?.date_format_id ?? '0')
       );
 
       if (result) {

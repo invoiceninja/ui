@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Document } from '$app/common/interfaces/document.interface';
 import { defaultHeaders } from '$app/common/queries/common/headers';
 import { FileIcon } from '$app/components/FileIcon';
-import { Spinner } from '$app/components/Spinner';
 import { ChevronLeft } from '$app/components/icons/ChevronLeft';
 import { ChevronRight } from '$app/components/icons/ChevronRight';
 import { DoubleChevronLeft } from '$app/components/icons/DoubleChevronLeft';
 import { DoubleChevronRight } from '$app/components/icons/DoubleChevronRight';
+import { Spinner } from '$app/components/Spinner';
 import { android } from '$app/pages/invoices/common/components/InvoiceViewer';
-import { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
-import styled from 'styled-components';
 
 const Button = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};
@@ -77,9 +77,10 @@ export function DocumentPreview(props: Props) {
 
       if (documents[documentIndex]) {
         queryClient
-          .fetchQuery(
-            ['/api/v1/documents', documents[documentIndex]?.hash],
-            () =>
+          .fetchQuery({
+            queryKey: ['/api/v1/documents', documents[documentIndex]?.hash],
+
+            queryFn: () =>
               request(
                 'GET',
                 endpoint('/documents/:hash', {
@@ -88,8 +89,9 @@ export function DocumentPreview(props: Props) {
                 { headers: defaultHeaders() },
                 { responseType: 'arraybuffer' }
               ),
-            { staleTime: Infinity }
-          )
+
+            staleTime: Infinity,
+          })
           .then((response) => {
             const blob = new Blob([response.data], {
               type: response.headers['content-type'],

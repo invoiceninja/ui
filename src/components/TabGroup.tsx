@@ -16,8 +16,8 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { useColorScheme } from '$app/common/colors';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   children: ReactElement[];

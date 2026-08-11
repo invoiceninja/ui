@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useSetAtom } from 'jotai';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Client } from '$app/common/interfaces/client';
 import { injectInChanges } from '$app/common/stores/slices/company-users';
 import { setActiveSettings } from '$app/common/stores/slices/settings';
-import { useSetAtom } from 'jotai';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 
 interface Params {
   withoutNavigation: boolean;

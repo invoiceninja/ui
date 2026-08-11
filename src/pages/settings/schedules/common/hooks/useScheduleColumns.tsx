@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Schedule } from '$app/common/interfaces/schedule';
-import { DataTableColumns } from '$app/components/DataTable';
 import { useTranslation } from 'react-i18next';
 import frequencies from '$app/common/constants/frequency';
+import { Schedule } from '$app/common/interfaces/schedule';
+import { DataTableColumns } from '$app/components/DataTable';
 import { ScheduleName } from '$app/pages/settings/schedules/common/components/ScheduleName';
 
 export function useScheduleColumns() {

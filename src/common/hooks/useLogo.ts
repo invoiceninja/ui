@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import companySettings from '$app/common/constants/company-settings';
 import { useCompanyChanges } from './useCompanyChanges';
 import { useCurrentCompany } from './useCurrentCompany';
-import { useTranslation } from 'react-i18next';
 
 interface Params {
   fallbackSmallLogo?: boolean;

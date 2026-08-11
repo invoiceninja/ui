@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { isHosted } from '$app/common/helpers';
 import dayjs from 'dayjs';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { Icon } from '../icons/Icon';
-import { MdClose } from 'react-icons/md';
-import { Link } from '../forms';
-import { useColorScheme } from '$app/common/colors';
-import { useSaveReactSettings } from '$app/common/hooks/useReactSettings';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdClose } from 'react-icons/md';
+import { useColorScheme } from '$app/common/colors';
+import { isHosted } from '$app/common/helpers';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useCompanyUsers } from '$app/common/hooks/useCompanyUsers';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useSaveReactSettings } from '$app/common/hooks/useReactSettings';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { Link } from '../forms';
+import { Icon } from '../icons/Icon';
 
 export function PriceIncreaseBanner() {
   const [t] = useTranslation();

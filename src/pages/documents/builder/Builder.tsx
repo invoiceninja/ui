@@ -8,19 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { docuNinjaAtom } from '$app/common/atoms/docuninja';
-import { useColorScheme } from '$app/common/colors';
-import { docuNinjaEndpoint } from '$app/common/helpers';
-import { route, routeWithOrigin } from '$app/common/helpers/route';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { Page } from '$app/components/Breadcrumbs';
-import { Card } from '$app/components/cards';
-import { Button } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
-import { Default } from '$app/components/layouts/Default';
-import { Modal } from '$app/components/Modal';
 import {
   Builder as Builder$,
   BuilderContext,
@@ -33,16 +20,31 @@ import {
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FaFileSignature } from 'react-icons/fa';
 import { MdSend } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { useColorScheme } from '$app/common/colors';
+import { docuNinjaEndpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route, routeWithOrigin } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useDriverTour } from '$app/common/hooks/useDriverTour';
+import { usePreferences } from '$app/common/hooks/usePreferences';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
+import { Page } from '$app/components/Breadcrumbs';
+import { Card } from '$app/components/cards';
+import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Default } from '$app/components/layouts/Default';
+import { Modal } from '$app/components/Modal';
+import { ClientCreate } from '$app/pages/invoices/common/components/ClientCreate';
 import {
   SignatorySelector,
   SignatorySwap,
 } from '../pages/blueprints/builder/Elements';
-import { FaFileSignature } from 'react-icons/fa';
-import { ClientCreate } from '$app/pages/invoices/common/components/ClientCreate';
 import {
   Alertbox,
   ConfirmationDialog,
@@ -70,8 +72,6 @@ import {
   UploadDialog,
   ValidationErrors,
 } from './components';
-import { useDriverTour } from '$app/common/hooks/useDriverTour';
-import { usePreferences } from '$app/common/hooks/usePreferences';
 
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();

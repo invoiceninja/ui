@@ -8,6 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
+import classNames from 'classnames';
+import { ChangeEvent, ReactNode, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useClickAway } from 'react-use';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -17,6 +22,7 @@ import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Tag, TagEntityType } from '$app/common/interfaces/tag';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTagsQuery } from '$app/common/queries/tags';
 import { ErrorMessage } from '$app/components/ErrorMessage';
 import { InputLabel } from '$app/components/forms';
@@ -27,12 +33,6 @@ import {
   tagPillBackgroundColor,
   tagPillColor,
 } from '$app/components/tags/TagPills';
-import { AxiosError } from 'axios';
-import classNames from 'classnames';
-import { ChangeEvent, ReactNode, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useClickAway } from 'react-use';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   entityType: TagEntityType;

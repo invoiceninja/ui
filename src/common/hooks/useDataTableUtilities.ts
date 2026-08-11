@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import collect from 'collect.js';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useDataTableOptions } from './useDataTableOptions';
 import { useDataTablePreference } from './useDataTablePreference';
 import { useReactSettings } from './useReactSettings';
 import { useScopedTableFilters } from './useScopedTableFilters';
-import collect from 'collect.js';
 
 interface Params {
   apiEndpoint: URL;

@@ -9,12 +9,12 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Default } from '$app/components/layouts/Default';
-import { Page } from '$app/components/Breadcrumbs';
-import { Button } from '$app/components/forms';
 import { useNavigate } from 'react-router-dom';
-import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
+import { Page } from '$app/components/Breadcrumbs';
+import { Card } from '$app/components/cards';
+import { Button } from '$app/components/forms';
+import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 
 interface DocumentStateProps {

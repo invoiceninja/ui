@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdDeleteForever } from 'react-icons/md';
-import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
-import { useState } from 'react';
-import { Modal } from '$app/components/Modal';
-import { Button } from '$app/components/forms';
 import { User } from '$app/common/interfaces/user';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { usePurgeUser } from '../hooks/usePurgeUser';
 
 interface Props {

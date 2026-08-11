@@ -32,7 +32,7 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, recurringInvoiceAtom } from './atoms';
 import { route } from '$app/common/helpers/route';
@@ -303,7 +303,7 @@ export function useToggleStartStop() {
       $refetch(['recurring_invoices']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({ queryKey: [invalidateQueryValue] });
 
       toast.success(
         action === 'start'

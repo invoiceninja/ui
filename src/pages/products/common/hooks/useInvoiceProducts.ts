@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useSetAtom } from 'jotai';
+import { useNavigate } from 'react-router-dom';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useUserNumberPrecision } from '$app/common/hooks/useUserNumberPrecision';
@@ -15,8 +17,6 @@ import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Product } from '$app/common/interfaces/product';
 import { useBlankInvoiceQuery } from '$app/common/queries/invoices';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
-import { useSetAtom } from 'jotai';
-import { useNavigate } from 'react-router-dom';
 
 interface Params {
   onlyAddToInvoice?: boolean;

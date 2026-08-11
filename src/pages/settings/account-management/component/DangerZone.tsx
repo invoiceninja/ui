@@ -7,22 +7,23 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { Button, InputField } from '$app/components/forms';
-import { endpoint, isHosted } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Modal } from '$app/components/Modal';
+
+import { useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { route } from '$app/common/helpers/route';
 import { useSelector } from 'react-redux';
-import { RootState } from '$app/common/stores/store';
-import { toast } from '$app/common/helpers/toast/toast';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { endpoint, isHosted } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { RootState } from '$app/common/stores/store';
+import { Button, InputField } from '$app/components/forms';
 import { Trash } from '$app/components/icons/Trash';
 import { TrashXMark } from '$app/components/icons/TrashXMark';
-import { useQueryClient } from 'react-query';
+import { Modal } from '$app/components/Modal';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};

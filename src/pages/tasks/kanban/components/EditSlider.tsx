@@ -8,16 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField } from '$app/components/forms';
+import { useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { date as formatDate } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { Task } from '$app/common/interfaces/task';
 import { TaskStatus } from '$app/common/interfaces/task-status';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { Button, InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { TabGroup } from '$app/components/TabGroup';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
 import { UserSelector } from '$app/components/users/UserSelector';
-import { useAtom } from 'jotai';
 import { LogPosition } from '$app/pages/tasks/common/components/TaskTable';
 import {
   duration,
@@ -33,19 +42,10 @@ import {
   TimeLogsType,
 } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useSave } from '$app/pages/tasks/common/hooks';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { isTaskRunning } from '../../common/helpers/calculate-entity-state';
 import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
-import { date as formatDate } from '$app/common/helpers';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
 import { TaskClock } from './TaskClock';
-import styled from 'styled-components';
-import { useColorScheme } from '$app/common/colors';
-import { isTaskRunning } from '../../common/helpers/calculate-entity-state';
-import { TagPillSelector } from '$app/components/tags/TagPillSelector';
-import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};

@@ -10,7 +10,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Navigate,
   useNavigate,
@@ -153,11 +153,9 @@ export default function Quickbooks() {
         toast.success();
 
         if (action !== 'check_record') {
-          await queryClient.invalidateQueries([
-            '/api/v1/invoices',
-            'detail',
-            invoice.id,
-          ]);
+          await queryClient.invalidateQueries({
+            queryKey: ['/api/v1/invoices', 'detail', invoice.id],
+          });
 
           $refetch(['invoices']);
         }

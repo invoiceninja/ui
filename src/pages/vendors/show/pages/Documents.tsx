@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -17,8 +19,6 @@ import { useVendorQuery } from '$app/common/queries/vendor';
 import { Card } from '$app/components/cards';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { Upload } from '$app/pages/settings/company/documents/components';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 
 export default function Documents() {
   const [t] = useTranslation();

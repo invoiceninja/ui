@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useSelector } from 'react-redux';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { RootState } from '$app/common/stores/store';
-import { useSelector } from 'react-redux';
 
 export function useCurrentCompanyUser(): CompanyUser | undefined {
   return useSelector(

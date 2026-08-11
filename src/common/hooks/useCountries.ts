@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useEffect, useState } from 'react';
 import { Country } from '$app/common/interfaces/country';
 import { useStaticsQuery } from '$app/common/queries/statics';
-import { useEffect, useState } from 'react';
 
 export function useCountries(): Country[] {
   const { data: statics } = useStaticsQuery();

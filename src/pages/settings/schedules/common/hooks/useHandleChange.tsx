@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Dispatch, SetStateAction } from 'react';
-import { Parameters, Schedule } from '$app/common/interfaces/schedule';
 import { cloneDeep, set } from 'lodash';
-import { useBlankScheduleQuery } from '$app/common/queries/schedules';
+import { Dispatch, SetStateAction } from 'react';
 import { Frequency } from '$app/common/enums/frequency';
+import { Parameters, Schedule } from '$app/common/interfaces/schedule';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankScheduleQuery } from '$app/common/queries/schedules';
 
 interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;

@@ -8,34 +8,34 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useWebSocketSubscription } from '@docuninja/builder2.0';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { route } from '$app/common/helpers/route';
 import { useTitle } from '$app/common/hooks/useTitle';
+import {
+  DocumentStatus,
+  Document as DocumentType,
+} from '$app/common/interfaces/docuninja/api';
 import {
   useDocumentQuery,
   useDocumentTimelineQuery,
 } from '$app/common/queries/docuninja/documents';
-import { Page } from '$app/components/Breadcrumbs';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import { route } from '$app/common/helpers/route';
-import { Default } from '$app/components/layouts/Default';
 import { Alert } from '$app/components/Alert';
-import { useMemo, useState } from 'react';
 import { Badge, BadgeVariant } from '$app/components/Badge';
-import { Spinner } from '$app/components/Spinner';
-import { Button } from '$app/components/forms';
-import { TimelineLayout } from './components/TimelineLayout';
-import { Invitations } from './components/Invitations';
+import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
-import { useColorScheme } from '$app/common/colors';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
-import { STATUS_VARIANTS } from '../common/hooks/useTableColumns';
-import {
-  Document as DocumentType,
-  DocumentStatus,
-} from '$app/common/interfaces/docuninja/api';
+import { Button } from '$app/components/forms';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
 import { useActions } from '../common/hooks/useActions';
+import { STATUS_VARIANTS } from '../common/hooks/useTableColumns';
 import { DocumentSettingsModal } from './components/DocumentSettingsModal';
-import { useWebSocketSubscription } from '@docuninja/builder2.0';
+import { Invitations } from './components/Invitations';
+import { TimelineLayout } from './components/TimelineLayout';
 
 export default function Document() {
   const { documentTitle } = useTitle('view_document');

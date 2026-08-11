@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Quickbooks } from '$app/common/interfaces/quickbooks';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Quickbooks } from '$app/common/interfaces/quickbooks';
 
 export function useQuickbooksConnection() {
   const company = useCurrentCompany();
