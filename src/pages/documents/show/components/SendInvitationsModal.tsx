@@ -1,4 +1,3 @@
-import collect from 'collect.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
