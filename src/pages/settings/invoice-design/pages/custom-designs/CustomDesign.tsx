@@ -8,28 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Design } from '$app/common/interfaces/design';
-import { useEffect, useState } from 'react';
-import { useDesignQuery } from '$app/common/queries/designs';
-import { Outlet, useLocation, useParams } from 'react-router-dom';
-import { atom, useAtom } from 'jotai';
-import { useNavigationTopRightElement } from '$app/components/layouts/common/hooks';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
-import { toast } from '$app/common/helpers/toast/toast';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
+import { atom, useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
+import { Outlet, useLocation, useParams } from 'react-router-dom';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { useActions } from '$app/pages/settings/invoice-design/common/hooks/useActions';
-import { PanelGroup } from './pages/edit/components/PanelGroup';
-import { Panel } from './pages/edit/components/Panel';
-import { PanelResizeHandle } from './pages/edit/components/PanelResizeHandle';
-import { Tabs } from '$app/components/Tabs';
-import { useTabs } from './pages/edit/common/hooks/useTabs';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { Design } from '$app/common/interfaces/design';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useDesignQuery } from '$app/common/queries/designs';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { useNavigationTopRightElement } from '$app/components/layouts/common/hooks';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Tabs } from '$app/components/Tabs';
+import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
+import { useActions } from '$app/pages/settings/invoice-design/common/hooks/useActions';
+import { useTabs } from './pages/edit/common/hooks/useTabs';
+import { Panel } from './pages/edit/components/Panel';
+import { PanelGroup } from './pages/edit/components/PanelGroup';
+import { PanelResizeHandle } from './pages/edit/components/PanelResizeHandle';
 import { designPreviewPropertiesAtom } from './pages/edit/components/Settings';
 
 export interface PreviewPayload {

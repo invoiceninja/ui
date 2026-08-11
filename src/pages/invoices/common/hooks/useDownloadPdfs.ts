@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQueryClient } from 'react-query';
 
 interface Props {
   entity: 'invoice' | 'quote' | 'credit' | 'purchase_order';
@@ -27,11 +27,13 @@ export function useDownloadPdfs({ entity }: Props) {
 
     toast.processing();
 
-    queryClient.fetchQuery([`/api/v1/${entity}s/bulk`], () =>
-      request('POST', endpoint(`/api/v1/${entity}s/bulk`), {
-        action: 'bulk_download',
-        ids: resourceIds,
-      }).then(() => toast.success('downloaded_entities'))
-    );
+    queryClient.fetchQuery({
+      queryKey: [`/api/v1/${entity}s/bulk`],
+      queryFn: () =>
+        request('POST', endpoint(`/api/v1/${entity}s/bulk`), {
+          action: 'bulk_download',
+          ids: resourceIds,
+        }).then(() => toast.success('downloaded_entities')),
+    });
   };
 }

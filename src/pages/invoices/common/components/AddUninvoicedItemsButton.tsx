@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { date } from '$app/common/helpers';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
@@ -25,14 +28,11 @@ import { Plus } from '$app/components/icons/Plus';
 import { Modal } from '$app/components/Modal';
 import { ProductSelector } from '$app/components/products/ProductSelector';
 import { TabGroup } from '$app/components/TabGroup';
-import { TaskSelector } from '$app/components/tasks/TaskSelector';
 import { Tooltip } from '$app/components/Tooltip';
+import { TaskSelector } from '$app/components/tasks/TaskSelector';
 import { useInvoiceExpense } from '$app/pages/expenses/common/useInvoiceExpense';
 import { useInvoiceProducts } from '$app/pages/products/common/hooks/useInvoiceProducts';
 import { useInvoiceTask } from '$app/pages/tasks/common/hooks/useInvoiceTask';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 
 const RoundButton = styled.div`
   display: flex;

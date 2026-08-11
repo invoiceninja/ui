@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { GenericSelectorProps } from './CountrySelector';
 import { ukRegions } from '$app/common/constants/uk-regions';
+import { GenericSelectorProps } from './CountrySelector';
 import { SelectField } from './forms';
 
 export function UKRegionSelector(props: GenericSelectorProps) {

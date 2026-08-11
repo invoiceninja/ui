@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { DataTable } from '$app/components/DataTable';
 import { Settings } from '$app/components/layouts/Settings';
-import { useTranslation } from 'react-i18next';
 import { useScheduleColumns } from '../common/hooks/useScheduleColumns';
 
 export function Schedules() {

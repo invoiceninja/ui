@@ -10,10 +10,10 @@
 
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
+import { Fallback } from '$app/components/Fallback';
 import { useAuthenticated } from '../common/hooks/useAuthenticated';
 import { RootState } from '../common/stores/store';
 import { LoadingScreen } from './LoadingScreen';
-import { Fallback } from '$app/components/Fallback';
 
 export function PrivateRoute() {
   const authenticated = useAuthenticated();

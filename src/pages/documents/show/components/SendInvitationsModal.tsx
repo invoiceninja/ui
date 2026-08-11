@@ -1,18 +1,18 @@
+import collect from 'collect.js';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdSend } from 'react-icons/md';
+import { useColorScheme } from '$app/common/colors';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Document } from '$app/common/interfaces/docuninja/api';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
-import collect from 'collect.js';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { MdSend } from 'react-icons/md';
 import { useIsSendable } from '../hooks/useIsSendable';
-import { useColorScheme } from '$app/common/colors';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 
 interface Props {
   document: Document;

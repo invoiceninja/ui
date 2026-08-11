@@ -8,9 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { SelectField } from '$app/components/forms';
+import { PaymentType } from '$app/common/interfaces/statics';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { GenericSelectorProps } from '$app/components/CountrySelector';
+import { SelectField } from '$app/components/forms';
 
 export function PaymentTypeSelector(props: GenericSelectorProps) {
   const statics = useStaticsQuery();
@@ -24,8 +25,8 @@ export function PaymentTypeSelector(props: GenericSelectorProps) {
       customSelector
     >
       {statics.data?.payment_types
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((type, index) => (
+        .sort((a: PaymentType, b: PaymentType) => a.name.localeCompare(b.name))
+        .map((type: PaymentType, index: number) => (
           <option key={index} value={type.id}>
             {type.name}
           </option>

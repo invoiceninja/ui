@@ -1,5 +1,6 @@
 import { login } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { ensureInvoicesStatusFilterCleared } from './status-filter-helpers';
 
 resetAccountBeforeAll();
 
@@ -7,6 +8,8 @@ test('test appropriate invalidation of clients', async ({ page, api }) => {
   const clientName = uniqueName('inv-client');
 
   await login(page);
+
+  await ensureInvoicesStatusFilterCleared(page);
 
   await page.getByRole('link', { name: 'Clients' }).click();
   await page

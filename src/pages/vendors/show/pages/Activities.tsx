@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+import classNames from 'classnames';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useOutletContext, useParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
-import { Card } from '$app/components/cards';
-import { useTranslation } from 'react-i18next';
 import { ActivityRecord } from '$app/common/interfaces/activity-record';
-import React, { useState } from 'react';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { Card } from '$app/components/cards';
+import Toggle from '$app/components/forms/Toggle';
 import {
   AddActivityComment,
   useGenerateActivityElement,
 } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
-import { AxiosResponse } from 'axios';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import Toggle from '$app/components/forms/Toggle';
-import { useColorScheme } from '$app/common/colors';
-import classNames from 'classnames';
 
 interface Context {
   displayName: string;

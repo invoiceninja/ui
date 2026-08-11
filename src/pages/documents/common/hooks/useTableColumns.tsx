@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import collect from 'collect.js';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
@@ -16,8 +18,6 @@ import { Document, DocumentStatus } from '$app/common/interfaces/docuninja/api';
 import { Badge, BadgeVariant } from '$app/components/Badge';
 import { DataTableColumns } from '$app/components/DataTable';
 import { Link } from '$app/components/forms';
-import collect from 'collect.js';
-import { useTranslation } from 'react-i18next';
 
 export const STATUS_VARIANTS = {
   1: 'generic',

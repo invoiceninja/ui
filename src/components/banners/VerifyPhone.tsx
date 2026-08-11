@@ -8,35 +8,35 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import { Modal } from '../Modal';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import PhoneInput, { isPossiblePhoneNumber } from 'react-phone-number-input';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Button, SelectField } from '../forms';
-import PhoneInput, { isPossiblePhoneNumber } from 'react-phone-number-input';
+import { Modal } from '../Modal';
 import 'react-phone-number-input/style.css';
-import { toast } from '$app/common/helpers/toast/toast';
-import { request } from '$app/common/helpers/request';
-import { endpoint, isHosted } from '$app/common/helpers';
+import { Popover } from '@headlessui/react';
 import { AxiosError } from 'axios';
-import VerificationInput from 'react-verification-input';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { CompanyUser } from '$app/common/interfaces/company-user';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
 import { useDispatch } from 'react-redux';
+import VerificationInput from 'react-verification-input';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint, isHosted } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { CompanyUser } from '$app/common/interfaces/company-user';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import {
   resetChanges,
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
-import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { Popover } from '@headlessui/react';
-import dayjs from 'dayjs';
 import { ErrorMessage } from '../ErrorMessage';
-import classNames from 'classnames';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useColorScheme } from '$app/common/colors';
 
 interface VerificationProps {
   visible: boolean;

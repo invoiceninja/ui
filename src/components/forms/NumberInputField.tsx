@@ -10,16 +10,15 @@
 import classNames from 'classnames';
 import currency from 'currency.js';
 import { useEffect, useState } from 'react';
-
-import CommonProps from '../../common/interfaces/common-props.interface';
-import { useColorScheme } from '$app/common/colors';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { NumericFormat } from 'react-number-format';
 import { useDebounce } from 'react-use';
-import { InputLabel } from './InputLabel';
+import { useColorScheme } from '$app/common/colors';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { InputField } from './InputField';
+import CommonProps from '../../common/interfaces/common-props.interface';
 import { ErrorMessage } from '../ErrorMessage';
+import { InputField } from './InputField';
+import { InputLabel } from './InputLabel';
 
 interface Props extends CommonProps {
   id?: string;

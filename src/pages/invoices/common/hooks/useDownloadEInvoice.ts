@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import {
   MailerResource,
   MailerResourceType,
 } from '$app/pages/invoices/email/components/Mailer';
-import { useQueryClient } from 'react-query';
 import { useGenerateEInvoiceUrl } from './useGenerateEInvoiceUrl';
 
 interface Props {
@@ -38,34 +38,36 @@ export function useDownloadEInvoice(props: Props) {
     if (downloadableUrl) {
       toast.processing();
 
-      queryClient.fetchQuery(downloadableUrl, () =>
-        request(
-          'GET',
-          downloadableUrl,
-          {},
-          { responseType: 'arraybuffer' }
-        ).then((response) => {
-          const blob = new Blob([response.data], { type: 'application/xml' });
-          const url = URL.createObjectURL(blob);
+      queryClient.fetchQuery({
+        queryKey: [downloadableUrl],
+        queryFn: () =>
+          request(
+            'GET',
+            downloadableUrl,
+            {},
+            { responseType: 'arraybuffer' }
+          ).then((response) => {
+            const blob = new Blob([response.data], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
 
-          const [, filename] =
-            response.headers['content-disposition'].split('filename=');
+            const [, filename] =
+              response.headers['content-disposition'].split('filename=');
 
-          const link = document.createElement('a');
+            const link = document.createElement('a');
 
-          link.download = filename;
-          link.href = url;
-          link.target = '_blank';
+            link.download = filename;
+            link.href = url;
+            link.target = '_blank';
 
-          document.body.appendChild(link);
+            document.body.appendChild(link);
 
-          link.click();
+            link.click();
 
-          document.body.removeChild(link);
+            document.body.removeChild(link);
 
-          toast.dismiss();
-        })
-      );
+            toast.dismiss();
+          }),
+      });
     }
   };
 }

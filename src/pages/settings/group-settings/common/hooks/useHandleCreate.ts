@@ -8,6 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { useAtomValue } from 'jotai';
+import { Dispatch, SetStateAction } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -17,11 +22,6 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { AxiosError } from 'axios';
-import { useAtomValue } from 'jotai';
-import { Dispatch, SetStateAction } from 'react';
-import { useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
 
 interface Params {
   groupSettings: GroupSettings | undefined;
@@ -50,7 +50,9 @@ export function useHandleCreate(params: Params) {
           $refetch(['group_settings']);
 
           invalidateQueryValue &&
-            queryClient.invalidateQueries([invalidateQueryValue]);
+            queryClient.invalidateQueries({
+              queryKey: [invalidateQueryValue],
+            });
 
           navigate(
             route('/settings/group_settings/:id/edit', {

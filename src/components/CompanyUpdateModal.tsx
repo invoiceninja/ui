@@ -8,26 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { cloneDeep, set } from 'lodash';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Spinner } from '$app/components/Spinner';
-import { toast } from '$app/common/helpers/toast/toast';
-import { Modal } from '$app/components/Modal';
-import { TabGroup } from '$app/components/TabGroup';
-import { Company } from '$app/common/interfaces/company.interface';
 import { useDispatch } from 'react-redux';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Company } from '$app/common/interfaces/company.interface';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import {
   resetChanges,
   updateRecord,
 } from '$app/common/stores/slices/company-users';
+import { Button, InputField } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
+import { Spinner } from '$app/components/Spinner';
+import { TabGroup } from '$app/components/TabGroup';
 import { CountrySelector } from './CountrySelector';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 interface Props {
   visible: boolean;

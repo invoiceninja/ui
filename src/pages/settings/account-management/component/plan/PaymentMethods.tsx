@@ -20,7 +20,7 @@ import { AxiosResponse } from 'axios';
 import { useState } from 'react';
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { CreditCard } from './CreditCard';
 import { DeleteCreditCard } from './DeleteCreditCard';
 import { NewCreditCard } from './NewCreditCard';
@@ -41,7 +41,7 @@ export function PaymentMethods({ withDivider = true }: PaymentMethodsProps) {
     null
   );
 
-  const { data: methods } = useQuery({
+  const { data: methods } = useQuery<CompanyGateway[]>({
     queryKey: ['/api/client/account_management/methods', account?.id],
     queryFn: () =>
       request('POST', endpoint('/api/client/account_management/methods'), {

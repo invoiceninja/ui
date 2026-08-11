@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
+import { User } from '$app/common/interfaces/docuninja/api';
+import { useBulk } from '$app/common/queries/docuninja/users';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
-import { useTranslation } from 'react-i18next';
-import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
-import { useBulk } from '$app/common/queries/docuninja/users';
-import { User } from '$app/common/interfaces/docuninja/api';
 
 export function useActions() {
   const [t] = useTranslation();

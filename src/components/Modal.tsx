@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
 import { Dialog, Transition } from '@headlessui/react';
 import classNames from 'classnames';
-import { Fragment, useState, useEffect, ReactNode, RefObject } from 'react';
+import { Fragment, ReactNode, RefObject, useEffect, useState } from 'react';
+import { useColorScheme } from '$app/common/colors';
 import { XMark } from './icons/XMark';
 
 interface Props {
