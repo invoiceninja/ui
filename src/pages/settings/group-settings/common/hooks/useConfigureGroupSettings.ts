@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { useSetAtom } from 'jotai';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
+import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { setActiveSettings } from '$app/common/stores/slices/settings';
-import { GroupSettings } from '$app/common/interfaces/group-settings';
 
 interface Params {
   withoutNavigation: boolean;

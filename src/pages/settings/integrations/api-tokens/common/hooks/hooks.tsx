@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction } from 'react';
 import { ApiToken } from '$app/common/interfaces/api-token';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Dispatch, SetStateAction } from 'react';
 
 interface HandleChangeApiTokenParams {
   setApiToken: Dispatch<SetStateAction<ApiToken | undefined>>;

@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Client } from '$app/common/interfaces/client';
 import { Link } from '$app/components/forms';
-import { useTranslation } from 'react-i18next';
 
 interface Props {
   client?: Client;

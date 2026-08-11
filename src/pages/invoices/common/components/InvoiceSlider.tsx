@@ -25,7 +25,7 @@ import { date, endpoint, trans } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../../edit/components/Actions';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
@@ -244,15 +244,15 @@ export function InvoiceSlider() {
 
   const fetchEmailHistory = async () => {
     const response = await queryClient
-      .fetchQuery(
-        ['/api/v1/invoices', invoice?.id, 'emailHistory'],
-        () =>
+      .fetchQuery({
+        queryKey: ['/api/v1/invoices', invoice?.id, 'emailHistory'],
+        queryFn: () =>
           request('POST', endpoint('/api/v1/emails/entityHistory'), {
             entity: 'invoice',
             entity_id: invoice?.id,
           }),
-        { staleTime: Infinity }
-      )
+        staleTime: Infinity,
+      })
       .then((response) => response.data);
 
     setEmailRecords(response);

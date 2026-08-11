@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
-import { SortableVariableList } from './SortableVariableList';
-import { useCustomField } from '$app/components/CustomField';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCustomField } from '$app/components/CustomField';
+import { Card } from '$app/components/cards';
 import { ClipboardCheck } from '$app/components/icons/ClipboardCheck';
+import { SortableVariableList } from './SortableVariableList';
 
 export default function TaskColumns() {
   const [t] = useTranslation();

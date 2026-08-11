@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
+import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
+import { ComboboxAsync, Entry } from '../forms/Combobox';
 
 export interface GroupSettingsSelectorProps
   extends GenericSelectorProps<GroupSettings> {

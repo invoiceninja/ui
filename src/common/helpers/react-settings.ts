@@ -1,9 +1,9 @@
 import {
+  Calculate,
   DashboardCardField,
   Field,
   Format,
   Period,
-  Calculate,
 } from '../interfaces/company-user';
 
 export function encodeDashboardField(

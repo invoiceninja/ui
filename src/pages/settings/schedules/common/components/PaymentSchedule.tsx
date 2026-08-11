@@ -8,26 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
+import { atom } from 'jotai';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { date, endpoint } from '$app/common/helpers';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { Invoice } from '$app/common/interfaces/invoice';
 import {
   Parameters,
   Schedule,
   ScheduleParams,
 } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { atom } from 'jotai';
-import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { date, endpoint } from '$app/common/helpers';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { ComboboxAsync, Entry } from '$app/components/forms/Combobox';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { Button } from '$app/components/forms';
-import Toggle from '$app/components/forms/Toggle';
-import { AddScheduleModal } from './AddScheduleModal';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { Element } from '$app/components/cards';
+import { Button } from '$app/components/forms';
+import { ComboboxAsync, Entry } from '$app/components/forms/Combobox';
+import Toggle from '$app/components/forms/Toggle';
+import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
+import { AddScheduleModal } from './AddScheduleModal';
 
 interface Props {
   schedule: Schedule;
@@ -442,7 +442,6 @@ export function PaymentSchedule(props: Props) {
           />
         )}
       </Element>
-
       <Element leftSide={t('auto_bill')} leftSideHelp={t('auto_bill_help')}>
         <Toggle
           checked={schedule.parameters.auto_bill}
@@ -451,7 +450,6 @@ export function PaymentSchedule(props: Props) {
           }
         />
       </Element>
-
       {(selectedInvoice || schedules.length > 0) && (
         <div>
           {schedules.length > 0 && (
@@ -537,7 +535,6 @@ export function PaymentSchedule(props: Props) {
           )}
         </div>
       )}
-
       <AddScheduleModal
         visible={isModalOpen}
         setVisible={setIsModalOpen}

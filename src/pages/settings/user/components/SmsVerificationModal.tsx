@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '$app/components/forms';
-import { Modal } from '$app/components/Modal';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import VerificationInput from 'react-verification-input';
+import { Button } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
 
 interface Props {
   visible: boolean;

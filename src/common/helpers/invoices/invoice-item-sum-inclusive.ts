@@ -8,13 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import collect from 'collect.js';
+import { Credit } from '$app/common/interfaces/credit';
+import { Currency } from '$app/common/interfaces/currency';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import { Credit } from '$app/common/interfaces/credit';
 import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { Currency } from '$app/common/interfaces/currency';
+import type { TaxItem } from './invoice-sum';
 import {
   formatTaxName,
   precisionOrDefault,
@@ -23,7 +24,6 @@ import {
   unroundedPercentageOf,
 } from './round';
 import { InclusiveTax } from './inclusive-tax';
-import type { TaxItem } from './invoice-sum';
 
 interface LineTaxDefinition {
   name: string;

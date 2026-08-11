@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQueryClient } from 'react-query';
-import { useAtomValue } from 'jotai';
-import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { $refetch } from '../hooks/useRefetch';
 
 const successMessages = {
@@ -44,7 +44,9 @@ export const useBulk = () => {
       $refetch(['credits']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
     });
   };
 };

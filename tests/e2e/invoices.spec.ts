@@ -12,6 +12,7 @@ import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixt
 import { Page } from '@playwright/test';
 import { Action } from './clients.spec';
 import { createClient } from './client-helpers';
+import { ensureInvoicesStatusFilterCleared } from './status-filter-helpers';
 import dayjs from 'dayjs';
 
 resetAccountBeforeAll();
@@ -732,6 +733,7 @@ test('Second and Third Custom email sending template is displayed', async ({
   await settingsGuard.snapshot();
 
   await login(page);
+  await ensureInvoicesStatusFilterCleared(page);
 
   const clientName = uniqueName('inv-custom-email');
   await createInvoice({ page, clientName });
@@ -739,15 +741,10 @@ test('Second and Third Custom email sending template is displayed', async ({
   const invoiceId = page.url().match(/invoices\/([^/]+)/)?.[1];
   if (invoiceId) api.trackEntity('invoices', invoiceId);
 
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Invoices', exact: true })
-    .click();
-
-  await waitForTableData(page);
+  await ensureInvoicesStatusFilterCleared(page);
 
   await page.waitForTimeout(300);
-  
+
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 
   await expect(page.locator('[data-cy="bulkActionsTrigger"]')).toBeVisible({ timeout: 10000 });
@@ -810,12 +807,7 @@ test('Second and Third Custom email sending template is displayed', async ({
 
   await expect(page.getByText('Successfully updated settings')).toBeVisible({ timeout: 10000 });
 
-  await page
-    .locator('[data-cy="navigationBar"]')
-    .getByRole('link', { name: 'Invoices', exact: true })
-    .click();
-
-  await waitForTableData(page);
+  await ensureInvoicesStatusFilterCleared(page);
 
   await page.locator('[data-cy="dataTableCheckbox"]').first().click();
 

@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
+import { cloneDeep } from 'lodash';
+import { useEffect, useState } from 'react';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
-import { useQueryClient } from 'react-query';
 
 interface Params {
   resource: Invoice | RecurringInvoice | undefined;
@@ -49,17 +49,19 @@ export function useCheckEInvoiceValidation(params: Params) {
   >();
 
   const handleCheckValidation = async () => {
-    const validationResponse = await queryClient.fetchQuery(
-      ['/api/v1/einvoice/validateEntity', resource?.id],
-      () =>
+    const validationResponse = await queryClient.fetchQuery({
+      queryKey: ['/api/v1/einvoice/validateEntity', resource?.id],
+
+      queryFn: () =>
         request('POST', endpoint('/api/v1/einvoice/validateEntity'), {
           entity: `${entity}s`,
           entity_id: resource?.id,
         })
           .then((response) => response)
           .catch((error) => error.response),
-      { staleTime: Infinity }
-    );
+
+      staleTime: Infinity,
+    });
 
     let currentValidationResult = {
       client: [],

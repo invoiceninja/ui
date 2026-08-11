@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { SelectOption } from '$app/components/datatables/Actions';
 import { useTranslation } from 'react-i18next';
+import { SelectOption } from '$app/components/datatables/Actions';
 
 export function useDocumentFilters() {
   const [t] = useTranslation();

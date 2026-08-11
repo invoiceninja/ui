@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Modal } from '$app/components/Modal';
-import { Button } from '$app/components/forms';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineCreateNewFolder } from 'react-icons/md';
-import { useBulkAction } from '../hooks/useBulkAction';
 import { useColorScheme } from '$app/common/colors';
 import { EntityActionElement } from '$app/components/EntityActionElement';
+import { Button } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
+import { useBulkAction } from '../hooks/useBulkAction';
 
 interface Props {
   selectedIds: string[];

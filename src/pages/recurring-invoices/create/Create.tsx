@@ -8,7 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import dayjs from 'dayjs';
+import { useAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdNotStarted, MdSend } from 'react-icons/md';
+import { Outlet, useSearchParams } from 'react-router-dom';
 import { blankInvitation } from '$app/common/constants/blank-invitation';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -16,27 +25,18 @@ import { Client } from '$app/common/interfaces/client';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Page } from '$app/components/Breadcrumbs';
+import { Icon } from '$app/components/icons/Icon';
 import { Default, SaveOption } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
-import { useAtom } from 'jotai';
-import { cloneDeep } from 'lodash';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Outlet, useSearchParams } from 'react-router-dom';
+import { Tab, Tabs } from '$app/components/Tabs';
+import { ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { invoiceSumAtom, recurringInvoiceAtom } from '../common/atoms';
-import { useCreate, useRecurringInvoiceUtilities } from '../common/hooks';
-import { useBlankRecurringInvoiceQuery } from '../common/queries';
-import { Icon } from '$app/components/icons/Icon';
-import { MdNotStarted, MdSend } from 'react-icons/md';
-import dayjs from 'dayjs';
 import {
   ConfirmActionModal,
   confirmActionModalAtom,
 } from '../common/components/ConfirmActionModal';
-import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
-import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
-import { Tab, Tabs } from '$app/components/Tabs';
-import { ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
+import { useCreate, useRecurringInvoiceUtilities } from '../common/hooks';
+import { useBlankRecurringInvoiceQuery } from '../common/queries';
 
 export interface RecurringInvoiceContext {
   recurringInvoice: RecurringInvoice | undefined;

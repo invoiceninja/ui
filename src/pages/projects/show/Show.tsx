@@ -12,7 +12,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { useEnabled } from '$app/common/guards/guards/enabled';

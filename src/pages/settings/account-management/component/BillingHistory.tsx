@@ -32,7 +32,7 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdDownload } from 'react-icons/md';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
 import type { PaymentIntent as StripePaymentIntent } from '@stripe/stripe-js';
 import {
@@ -183,23 +183,23 @@ export function BillingHistory() {
     data: invoices = [],
     isLoading,
     isError,
-  } = useQuery(
-    BILLING_HISTORY_QUERY_KEY,
-    () =>
+  } = useQuery({
+    queryKey: BILLING_HISTORY_QUERY_KEY,
+    queryFn: () =>
       request('POST', endpoint(BILLING_HISTORY_ENDPOINT)).then((response) =>
         extractBillingInvoices(response.data as BillingHistoryResponse)
       ),
-    { staleTime: Infinity }
-  );
+    staleTime: Infinity,
+  });
 
   const { data: paymentMethods = [], isLoading: isPaymentMethodsLoading } =
-    useQuery(
-      [
+    useQuery({
+      queryKey: [
         '/api/client/account_management/methods',
         account?.id,
         'billing_history',
       ],
-      () =>
+      queryFn: () =>
         request(
           'POST',
           endpoint('/api/client/account_management/methods'),
@@ -211,10 +211,8 @@ export function BillingHistory() {
           (response: AxiosResponse<GenericManyResponse<GatewayToken>>) =>
             response.data.data
         ),
-      {
-        enabled: Boolean(account) && Boolean(paymentInvoice),
-      }
-    );
+      enabled: Boolean(account) && Boolean(paymentInvoice),
+    });
 
   const selectableInvoiceIds = useMemo(
     () => invoices.map((invoice) => invoice.id).filter(Boolean),
@@ -256,7 +254,9 @@ export function BillingHistory() {
 
         if (!paymentIntent.requires_payment) {
           toast.success(response.data?.message || 'success');
-          await queryClient.invalidateQueries(BILLING_HISTORY_QUERY_KEY);
+          await queryClient.invalidateQueries({
+            queryKey: BILLING_HISTORY_QUERY_KEY,
+          });
 
           return;
         }
@@ -299,7 +299,9 @@ export function BillingHistory() {
         }
       );
 
-      await queryClient.invalidateQueries(BILLING_HISTORY_QUERY_KEY);
+      await queryClient.invalidateQueries({
+        queryKey: BILLING_HISTORY_QUERY_KEY,
+      });
     },
     [paymentInvoice, queryClient]
   );

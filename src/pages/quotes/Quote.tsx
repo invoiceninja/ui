@@ -8,36 +8,36 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Client } from '$app/common/interfaces/client';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { Spinner } from '$app/components/Spinner';
+import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Client } from '$app/common/interfaces/client';
+import { Quote as IQuote } from '$app/common/interfaces/quote';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Page } from '$app/components/Breadcrumbs';
+import { InputLabel } from '$app/components/forms';
+import { Default } from '$app/components/layouts/Default';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Spinner } from '$app/components/Spinner';
+import { Tabs } from '$app/components/Tabs';
 import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { Quote as IQuote } from '$app/common/interfaces/quote';
-import { useQuoteQuery } from './common/queries';
+import { CommonActions } from '../invoices/edit/components/CommonActions';
 import { invoiceSumAtom, quoteAtom } from './common/atoms';
 import { useActions, useQuoteUtilities, useSave } from './common/hooks';
-import { Tabs } from '$app/components/Tabs';
+import { useQuoteQuery } from './common/queries';
 import { useTabs } from './edit/hooks/useTabs';
-import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
-import { useAtom } from 'jotai';
-import { CommonActions } from '../invoices/edit/components/CommonActions';
-import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
-import { InputLabel } from '$app/components/forms';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');

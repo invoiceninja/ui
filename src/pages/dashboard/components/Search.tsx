@@ -7,41 +7,42 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
-import { useTranslation } from 'react-i18next';
-import { SearchRecord, SearchResponse } from '$app/common/interfaces/search';
-import { Entry } from '$app/components/forms/Combobox';
+
+import { useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
+import collect from 'collect.js';
+import { useAtomValue } from 'jotai';
+import { debounce } from 'lodash';
+import { memo, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { BiSearch } from 'react-icons/bi';
+import { useNavigate } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { useColorScheme } from '$app/common/colors';
-import { useEffect, useState, useRef, memo } from 'react';
-import collect from 'collect.js';
+import { endpoint } from '$app/common/helpers';
+import {
+  eventMatchesBinding,
+  formatBinding,
+} from '$app/common/helpers/keyboard-shortcuts';
+import { request } from '$app/common/helpers/request';
+import { getHeldKeys } from '$app/common/hooks/useHeldKeys';
 import {
   isNavigationModalVisibleAtom,
   usePreventNavigation,
 } from '$app/common/hooks/usePreventNavigation';
 import { useResolvedShortcuts } from '$app/common/hooks/useReactSettings';
-import {
-  eventMatchesBinding,
-  formatBinding,
-} from '$app/common/helpers/keyboard-shortcuts';
 import { isShortcutRecordingActive } from '$app/common/hooks/useShortcutRecorder';
-import { getHeldKeys } from '$app/common/hooks/useHeldKeys';
-import { debounce } from 'lodash';
+import { SearchRecord, SearchResponse } from '$app/common/interfaces/search';
 import { InputField } from '$app/components/forms';
-import { Modal } from '$app/components/Modal';
-import { useAtomValue } from 'jotai';
-import { useNavigate } from 'react-router-dom';
-import { Spinner } from '$app/components/Spinner';
-import { Search as SearchIcon } from '$app/components/icons/Search';
-import { OppositeArrows } from '$app/components/icons/OppositeArrows';
-import { ReturnKey } from './ReturnKey';
+import { Entry } from '$app/components/forms/Combobox';
 import { ExternalLink } from '$app/components/icons/ExternalLink';
-import { SearchGroups } from './SearchGroups';
-import { BiSearch } from 'react-icons/bi';
 import { Icon } from '$app/components/icons/Icon';
+import { OppositeArrows } from '$app/components/icons/OppositeArrows';
+import { Search as SearchIcon } from '$app/components/icons/Search';
+import { Modal } from '$app/components/Modal';
+import { Spinner } from '$app/components/Spinner';
+import { ReturnKey } from './ReturnKey';
+import { SearchGroups } from './SearchGroups';
 
 export function Search$() {
   const [t] = useTranslation();
@@ -67,9 +68,10 @@ export function Search$() {
   const searchBindingRef = useRef<string | null>(shortcutBindings.search);
   searchBindingRef.current = shortcutBindings.search;
 
-  const { data, refetch, isFetching } = useQuery(
-    ['/api/v1/search'],
-    () => {
+  const { data, refetch, isFetching } = useQuery({
+    queryKey: ['/api/v1/search'],
+
+    queryFn: () => {
       const $endpoint =
         query.length === 0
           ? '/api/v1/search'
@@ -99,8 +101,9 @@ export function Search$() {
         }
       );
     },
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 
   const filtered = collect(data)
     .filter(

@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export { Settings as ClientPortalSettings } from './components/Settings';
+export { ClientPortal } from './ClientPortal';
 export { Authorization } from './components/Authorization';
 export { Customize } from './components/Customize';
 export { Messages } from './components/Messages';
 export { Registration } from './components/Registration';
-export { ClientPortal } from './ClientPortal';
+export { Settings as ClientPortalSettings } from './components/Settings';

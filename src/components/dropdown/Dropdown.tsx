@@ -9,8 +9,7 @@
  */
 
 import Tippy from '@tippyjs/react/headless';
-import CommonProps from '../../common/interfaces/common-props.interface';
-import { ChevronDown } from 'react-feather';
+import classNames from 'classnames';
 import {
   Children,
   cloneElement,
@@ -19,12 +18,13 @@ import {
   useRef,
   useState,
 } from 'react';
-import { DropdownElement } from './DropdownElement';
+import { ChevronDown } from 'react-feather';
 import { useClickAway } from 'react-use';
-import classNames from 'classnames';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import CommonProps from '../../common/interfaces/common-props.interface';
+import { DropdownElement } from './DropdownElement';
 
 interface Props extends CommonProps {
   label?: string | null;

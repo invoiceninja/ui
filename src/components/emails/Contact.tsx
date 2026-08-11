@@ -8,21 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
 import { Client } from '$app/common/interfaces/client';
 import { ClientContact } from '$app/common/interfaces/client-contact';
 import { Vendor } from '$app/common/interfaces/vendor';
 import { VendorContact } from '$app/common/interfaces/vendor-contact';
-
+import { Element } from '$app/components/cards';
 import {
   MailerResource,
   MailerResourceType,
 } from '$app/pages/invoices/email/components/Mailer';
 import { UserUnsubscribedTooltip } from '$app/pages/clients/common/components/UserUnsubscribedTooltip';
-import { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Element } from '$app/components/cards';
 
 interface Props {
   resource: MailerResource;

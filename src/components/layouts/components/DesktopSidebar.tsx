@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
+import { useColorScheme } from '$app/common/colors';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { CompanySwitcher } from '$app/components/CompanySwitcher';
 import { HelpSidebarIcons } from '$app/components/HelpSidebarIcons';
-import { SidebarItem } from './SidebarItem';
-import { useColorScheme } from '$app/common/colors';
 import { Tooltip } from '$app/components/Tooltip';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import classNames from 'classnames';
+import { SidebarItem } from './SidebarItem';
 
 interface SubNavigationItem {
   name: string;

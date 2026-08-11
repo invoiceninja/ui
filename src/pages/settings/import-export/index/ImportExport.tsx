@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from '$app/common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
+import { useTitle } from '$app/common/hooks/useTitle';
 import { Settings } from '../../../../components/layouts/Settings';
 import { Export } from '../common/components/Export';
 import { Import } from '../common/components/Import';

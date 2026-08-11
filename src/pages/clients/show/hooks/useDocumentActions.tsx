@@ -8,25 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Divider } from '$app/components/cards/Divider';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
-import { Document } from '../pages/Documents';
 import {
   MdDownload,
   MdLockOutline,
   MdOutlineLockOpen,
   MdPreview,
 } from 'react-icons/md';
+import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { endpoint } from '$app/common/helpers';
-import { defaultHeaders } from '$app/common/queries/common/headers';
-import { DeleteDocumentAction } from '../components/DeleteDocumentAction';
-import { useSetDocumentVisibility } from '$app/common/queries/documents';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { defaultHeaders } from '$app/common/queries/common/headers';
+import { useSetDocumentVisibility } from '$app/common/queries/documents';
+import { Divider } from '$app/components/cards/Divider';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { DeleteDocumentAction } from '../components/DeleteDocumentAction';
+import { Document } from '../pages/Documents';
 
 export function useDocumentActions() {
   const [t] = useTranslation();
@@ -38,17 +38,19 @@ export function useDocumentActions() {
     toast.processing();
 
     queryClient
-      .fetchQuery(
-        ['/api/v1/documents', doc.hash],
-        () =>
+      .fetchQuery({
+        queryKey: ['/api/v1/documents', doc.hash],
+
+        queryFn: () =>
           request(
             'GET',
             endpoint('/documents/:hash', { hash: doc.hash }),
             { headers: defaultHeaders() },
             { responseType: 'arraybuffer' }
           ),
-        { staleTime: Infinity }
-      )
+
+        staleTime: Infinity,
+      })
       .then((response) => {
         const blob = new Blob([response.data], {
           type: response.headers['content-type'],

@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useEffect, useState } from 'react';
+import { useCountryResolver } from '$app/common/helpers/country/country-resolver';
+import { useCurrencyResolver } from '$app/common/helpers/currencies/currency-resolver';
 import { Number as NumberHelper } from '$app/common/helpers/number';
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -16,13 +19,10 @@ import { Client } from '$app/common/interfaces/client';
 import { Country } from '$app/common/interfaces/country';
 import { Currency } from '$app/common/interfaces/currency';
 import { Vendor } from '$app/common/interfaces/vendor';
-import { useEffect, useState } from 'react';
 import {
   ProductTableResource,
   RelationType,
 } from '../components/ProductsTable';
-import { useCurrencyResolver } from '$app/common/helpers/currencies/currency-resolver';
-import { useCountryResolver } from '$app/common/helpers/country/country-resolver';
 
 interface Props {
   resource: ProductTableResource | undefined;

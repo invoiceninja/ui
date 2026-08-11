@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { Button, InputField } from '$app/components/forms';
-import { Client } from '$app/common/interfaces/client';
 import { set } from 'lodash';
 import { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Client } from '$app/common/interfaces/client';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CountrySelector } from '$app/components/CountrySelector';
+import { Element } from '$app/components/cards';
+import { Button, InputField } from '$app/components/forms';
 
 interface Props {
   client: Client | undefined;

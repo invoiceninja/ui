@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
 import { useEffect, useState } from 'react';
-import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { BankAccount } from '$app/common/interfaces/bank-accounts';
-import { useBankAccountsQuery } from '$app/pages/settings/bank-accounts/common/queries';
-import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
-import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
-import { TaxRate } from '$app/common/interfaces/tax-rate';
-import { useCurrentCompany } from '../useCurrentCompany';
-import { useAdmin, useHasPermission } from '../permissions/useHasPermission';
-import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { useEnabled } from '$app/common/guards/guards/enabled';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { BankAccount } from '$app/common/interfaces/bank-accounts';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { TaxRate } from '$app/common/interfaces/tax-rate';
+import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
+import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
+import { useBankAccountsQuery } from '$app/pages/settings/bank-accounts/common/queries';
+import { useAdmin, useHasPermission } from '../permissions/useHasPermission';
+import { useCurrentCompany } from '../useCurrentCompany';
 
 interface EntityAction {
   key: string;

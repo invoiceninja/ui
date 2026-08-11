@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useCallback } from 'react';
-import { useResolvedShortcuts } from './useReactSettings';
+import { useCallback, useEffect } from 'react';
 import { eventMatchesBinding } from '../helpers/keyboard-shortcuts';
-import { isShortcutRecordingActive } from './useShortcutRecorder';
 import { getHeldKeys } from './useHeldKeys';
+import { useResolvedShortcuts } from './useReactSettings';
+import { isShortcutRecordingActive } from './useShortcutRecorder';
 
 interface UseSaveKeyboardShortcutOptions {
   isEnabled: boolean;

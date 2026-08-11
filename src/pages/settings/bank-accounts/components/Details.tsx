@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { BankAccount } from '$app/common/interfaces/bank-accounts';
-import { useTranslation } from 'react-i18next';
-import { Card, Element } from '../../../../components/cards';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
-import { useColorScheme } from '$app/common/colors';
+import { BankAccount } from '$app/common/interfaces/bank-accounts';
+import { Card, Element } from '../../../../components/cards';
 
 interface Props {
   accountDetails?: BankAccount;

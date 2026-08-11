@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { HelpCircle } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
 import { $help, HelpWidget } from '$app/components/HelpWidget';
 import { UploadImport } from '$app/components/import/UploadImport';
 import { Default } from '$app/components/layouts/Default';
-import { HelpCircle } from 'react-feather';
-import { useTranslation } from 'react-i18next';
 
 export default function Import() {
   const { t } = useTranslation();
