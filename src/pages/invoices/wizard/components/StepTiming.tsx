@@ -241,7 +241,7 @@ export function StepTiming({ wizard, embedded }: Props) {
               wizard.next();
             }}
           >
-            Review and send
+            {translate('continue')}
           </Button>
         </Footer>
       )}

@@ -9,6 +9,7 @@
  */
 
 import paymentType from '$app/common/constants/payment-type';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { date, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -302,6 +303,7 @@ export function useAllExpenseColumns() {
 }
 
 export function useExpenseColumns() {
+  const invoicePaths = useInvoiceEditorPaths();
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -359,7 +361,7 @@ export function useExpenseColumns() {
                   size={19}
                   onClick={() =>
                     navigate(
-                      route('/invoices/:id/edit', { id: expense.invoice_id })
+                      route(invoicePaths.edit, { id: expense.invoice_id })
                     )
                   }
                 />

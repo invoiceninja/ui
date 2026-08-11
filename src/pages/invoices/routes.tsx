@@ -68,6 +68,9 @@ const WizardItems = lazy(
 const WizardPayment = lazy(
   () => import('$app/pages/invoices/wizard/steps/Payment')
 );
+const WizardNotes = lazy(
+  () => import('$app/pages/invoices/wizard/steps/Notes')
+);
 const WizardSend = lazy(() => import('$app/pages/invoices/wizard/steps/Send'));
 const WizardEdit = lazy(() => import('$app/pages/invoices/wizard/Edit'));
 
@@ -117,6 +120,7 @@ export const invoiceRoutes = (
       <Route path="" element={<WizardWho />} />
       <Route path="items" element={<WizardItems />} />
       <Route path="payment" element={<WizardPayment />} />
+      <Route path="notes" element={<WizardNotes />} />
       <Route path="send" element={<WizardSend />} />
     </Route>
 

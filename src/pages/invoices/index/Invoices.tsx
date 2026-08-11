@@ -9,6 +9,7 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
@@ -56,6 +57,7 @@ import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 
 export default function Invoices() {
+  const invoicePaths = useInvoiceEditorPaths();
   const { documentTitle } = useTitle('invoices');
 
   const [t] = useTranslation();
@@ -126,8 +128,8 @@ export default function Invoices() {
         columns={columns}
         footerColumns={footerColumns}
         bulkRoute="/api/v1/invoices/bulk"
-        linkToCreate="/invoices/wizard"
-        linkToEdit="/invoices/wizard/edit/:id"
+        linkToCreate={invoicePaths.create}
+        linkToEdit={invoicePaths.edit}
         withResourcefulActions
         withoutDefaultBulkActions
         customActions={actions}

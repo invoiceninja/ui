@@ -58,7 +58,7 @@ export default function Wizard() {
     );
 
   const current = STEPS[wizard.stepIndex] ?? STEPS[0];
-  const onSendStep = wizard.step === 'send';
+  const wideStep = wizard.step === 'send' || wizard.step === 'notes';
 
   const described = (wizard.invoice?.line_items ?? []).some(
     (item) => item.notes || item.product_key
@@ -69,11 +69,19 @@ export default function Wizard() {
       return <Navigate to={STEPS[0].href} replace />;
     }
 
-    if (!described && (wizard.step === 'when' || wizard.step === 'send')) {
+    if (
+      !described &&
+      (wizard.step === 'when' ||
+        wizard.step === 'notes' ||
+        wizard.step === 'send')
+    ) {
       return <Navigate to={STEPS[1].href} replace />;
     }
 
-    if (wizard.step === 'send' && !wizard.invoice?.due_date) {
+    if (
+      (wizard.step === 'notes' || wizard.step === 'send') &&
+      !wizard.invoice?.due_date
+    ) {
       return <Navigate to={STEPS[2].href} replace />;
     }
   }
@@ -88,7 +96,7 @@ export default function Wizard() {
 
       <div
         className="mx-auto w-full"
-        style={{ maxWidth: onSendStep ? '54rem' : '40rem' }}
+        style={{ maxWidth: wideStep ? '54rem' : '40rem' }}
       >
         <Card
           className="shadow-sm"

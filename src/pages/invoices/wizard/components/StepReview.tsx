@@ -338,7 +338,17 @@ export function StepReview({ wizard, money }: Props) {
     <div className="iw-enter">
       <ErrorBanner errors={wizard.errors} />
 
-      <div>
+      <p className="text-xs mb-2" style={{ color: t.label, fontWeight: 500 }}>
+        Invoice summary
+      </p>
+
+      <div
+        className="px-4 py-1"
+        style={{
+          borderRadius: radius.panel,
+          backgroundColor: t.dark ? t.colors.$25 : t.colors.$2,
+        }}
+      >
         <Element
           className="border-b border-dashed"
           leftSide="From"
@@ -403,9 +413,20 @@ export function StepReview({ wizard, money }: Props) {
         </Element>
       </div>
 
+      <p
+        className="text-xs mt-6 mb-2"
+        style={{ color: t.label, fontWeight: 500 }}
+      >
+        Before you send
+      </p>
+
       <div
-        className="mt-6 border px-4 py-4"
-        style={{ borderColor: t.line, borderRadius: radius.panel }}
+        className="border px-4 py-4"
+        style={{
+          borderColor: t.line,
+          borderRadius: radius.panel,
+          backgroundColor: t.surface,
+        }}
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">

@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { permission } from '$app/common/guards/guards/permission';
 import { endpoint } from '$app/common/helpers';
@@ -65,6 +66,7 @@ import { ProjectPublicNotes } from './components/ProjectPublicNotes';
 dayjs.extend(duration);
 
 export default function Show() {
+  const invoicePaths = useInvoiceEditorPaths();
   const { documentTitle } = useTitle('project');
   const { t } = useTranslation();
   const { id } = useParams();
@@ -193,7 +195,7 @@ export default function Show() {
               {project.invoices?.map((invoice: Invoice, index: number) => (
                 <Link
                   key={index}
-                  to={route('/invoices/:id/edit', { id: invoice.id })}
+                  to={route(invoicePaths.edit, { id: invoice.id })}
                 >
                   {t('invoice')} #{invoice.number}
                 </Link>

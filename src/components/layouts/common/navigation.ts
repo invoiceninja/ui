@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { File } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { ShortcutId } from '$app/common/constants/keyboard-shortcuts';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { formatBinding } from '$app/common/helpers/keyboard-shortcuts';
 import { isHosted } from '$app/common/helpers';
@@ -36,6 +37,7 @@ const $cache = atom<NavigationItem[] | null>(null);
 const $navigationLanguage = atom<string | null>(null);
 
 export function useNavigation() {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t, i18n] = useTranslation();
   const enabled = useEnabled();
   const hasPermission = useHasPermission();
@@ -102,7 +104,7 @@ export function useNavigation() {
           hasPermission('edit_invoice')),
       rightButton: {
         icon: Plus,
-        to: '/invoices/wizard',
+        to: invoicePaths.create,
         label: t('new_invoice'),
         visible: hasPermission('create_invoice'),
         tooltipLabel: tooltipFor('create_invoice'),

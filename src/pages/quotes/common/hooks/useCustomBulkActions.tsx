@@ -20,6 +20,7 @@ import {
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { QuoteStatus } from '$app/common/enums/quote-status';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -39,6 +40,7 @@ import { SendEmailBulkAction } from '../components/SendEmailBulkAction';
 import { useBulkAction } from './useBulkAction';
 
 export function useCustomBulkActions() {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const navigate = useNavigate();
@@ -142,7 +144,7 @@ export function useCustomBulkActions() {
             <DropdownElement
               onClick={() =>
                 navigate(
-                  route('/invoices/:id/edit', {
+                  route(invoicePaths.edit, {
                     id: selectedResources[0].invoice_id,
                   })
                 )

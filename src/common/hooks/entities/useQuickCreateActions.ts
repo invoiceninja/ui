@@ -21,6 +21,7 @@ import { ModuleBitmask } from '$app/pages/settings/account-management/component'
 import { useBankAccountsQuery } from '$app/pages/settings/bank-accounts/common/queries';
 import { useAdmin, useHasPermission } from '../permissions/useHasPermission';
 import { useCurrentCompany } from '../useCurrentCompany';
+import { useInvoiceEditorPaths } from '../useInvoiceEditor';
 
 interface EntityAction {
   key: string;
@@ -34,6 +35,7 @@ export function useQuickCreateActions() {
   const currentCompany = useCurrentCompany();
   const hasPermission = useHasPermission();
   const enabled = useEnabled();
+  const invoicePaths = useInvoiceEditorPaths();
 
   const { isAdmin, isOwner } = useAdmin();
 
@@ -74,7 +76,7 @@ export function useQuickCreateActions() {
     },
     {
       key: 'invoice',
-      url: '/invoices/wizard',
+      url: invoicePaths.create,
       section: 'income',
       visible:
         hasPermission('create_invoice') && enabled(ModuleBitmask.Invoices),

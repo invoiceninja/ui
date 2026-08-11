@@ -12,6 +12,7 @@ import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -26,6 +27,7 @@ import { useActions } from '$app/pages/invoices/edit/components/Actions';
 import { confirmActionModalAtom } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
 
 export default function Invoices() {
+  const invoicePaths = useInvoiceEditorPaths();
   const { id } = useParams();
 
   const hasPermission = useHasPermission();
@@ -58,8 +60,8 @@ export default function Invoices() {
         withResourcefulActions
         withoutDefaultBulkActions
         bulkRoute="/api/v1/invoices/bulk"
-        linkToCreate={route('/invoices/create?client=:id', { id })}
-        linkToEdit="/invoices/wizard/edit/:id"
+        linkToCreate={route(`${invoicePaths.create}?client=:id`, { id })}
+        linkToEdit={invoicePaths.edit}
         excludeColumns={['client_id']}
         linkToCreateGuards={[permission('create_invoice')]}
         hideEditableOptions={!hasPermission('edit_invoice')}

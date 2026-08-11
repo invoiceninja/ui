@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BrandPrompts } from './components/BrandPrompts';
 import { StepItems } from './components/StepItems';
+import { StepNotes } from './components/StepNotes';
 import { StepTiming } from './components/StepTiming';
 import { ErrorBanner, Motion, useTheme, radius } from './kit';
 import { useWizard } from './useWizard';
@@ -174,6 +175,10 @@ export default function Edit() {
 
               <Section label={translate('payment')}>
                 <StepTiming wizard={wizard} embedded />
+              </Section>
+
+              <Section label={translate('notes')}>
+                <StepNotes wizard={wizard} embedded />
               </Section>
 
               <Section label={translate('preview')} last>

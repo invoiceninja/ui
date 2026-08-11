@@ -17,7 +17,7 @@ import { Button, InputField } from '$app/components/forms';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { useTheme } from '../kit';
+import { radius, useTheme } from '../kit';
 
 export function BrandPrompts() {
   const [translate] = useTranslation();
@@ -30,6 +30,7 @@ export function BrandPrompts() {
   const [nameError, setNameError] = useState<string>();
 
   const [uploading, setUploading] = useState(false);
+  const [logoFailed, setLogoFailed] = useState(false);
   const [logoSkipped, setLogoSkipped] = useState(false);
   const [logoError, setLogoError] = useState<string>();
 
@@ -88,9 +89,13 @@ export function BrandPrompts() {
           }
         );
       })
-      .then((response) =>
-        dispatch(updateRecord({ object: 'company', data: response.data.data }))
-      )
+      .then((response) => {
+        setLogoFailed(false);
+
+        return dispatch(
+          updateRecord({ object: 'company', data: response.data.data })
+        );
+      })
       .catch(() =>
         setLogoError('The image could not be uploaded. Use a PNG or JPG.')
       )
@@ -158,10 +163,26 @@ export function BrandPrompts() {
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-sm" style={{ color: t.muted }}>
-            {hasLogo ? 'Logo added' : 'No logo'}
-          </p>
+        <div className="flex items-center gap-3">
+          {hasLogo && !logoFailed ? (
+            <span
+              className="shrink-0 grid place-items-center border overflow-hidden"
+              style={{
+                width: '3rem',
+                height: '2.25rem',
+                borderColor: t.line,
+                borderRadius: radius.control,
+                backgroundColor: t.surface,
+              }}
+            >
+              <img
+                src={company?.settings?.company_logo}
+                alt=""
+                style={{ maxWidth: '2.5rem', maxHeight: '1.75rem' }}
+                onError={() => setLogoFailed(true)}
+              />
+            </span>
+          ) : null}
 
           <Button
             type="secondary"
@@ -169,7 +190,7 @@ export function BrandPrompts() {
             disabled={uploading}
             onClick={() => filePicker.current?.click()}
           >
-            {hasLogo ? translate('change') : 'Add a logo'}
+            {hasLogo ? 'Update logo' : 'Add a logo'}
           </Button>
         </div>
       )}

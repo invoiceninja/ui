@@ -25,10 +25,12 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
+import { invoiceAtom } from '$app/pages/invoices/common/atoms';
+import { useAtom } from 'jotai';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
-export type StepKey = 'who' | 'what' | 'when' | 'send';
+export type StepKey = 'who' | 'what' | 'when' | 'notes' | 'send';
 
 export const STEPS: { key: StepKey; title: string; href: string }[] = [
   { key: 'who', title: 'Who are you invoicing?', href: '/invoices/wizard' },
@@ -41,6 +43,11 @@ export const STEPS: { key: StepKey; title: string; href: string }[] = [
     key: 'when',
     title: 'When should they pay?',
     href: '/invoices/wizard/payment',
+  },
+  {
+    key: 'notes',
+    title: 'Anything else to add?',
+    href: '/invoices/wizard/notes',
   },
   { key: 'send', title: 'Review and send', href: '/invoices/wizard/send' },
 ];
@@ -123,6 +130,18 @@ const EMPTY_TOTALS: Totals = {
 
 const SURCHARGES = [1, 2, 3, 4] as const;
 
+const HANDOFF_ACTIONS = [
+  'clone',
+  'invoice_project',
+  'invoice_task',
+  'invoice_expense',
+  'invoice_product',
+  'invoice_transaction',
+];
+
+const withRows = (items: InvoiceItem[]): InvoiceItem[] =>
+  items.length ? items : [{ ...blankLineItem(), quantity: 1, sort_id: 0 }];
+
 export function useWizard(existingId?: string): Wizard {
   const company = useCurrentCompany();
   const resolveCurrency = useResolveCurrency();
@@ -134,6 +153,9 @@ export function useWizard(existingId?: string): Wizard {
   const [client, setClient] = useState<Client>();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [handoff, setHandoff] = useAtom(invoiceAtom);
+  const handoffOnEntry = useRef(handoff);
 
   const step: StepKey =
     STEPS.find((entry) => entry.href === location.pathname)?.key ?? 'who';
@@ -171,6 +193,65 @@ export function useWizard(existingId?: string): Wizard {
 
     setLoadFailed(false);
 
+    const action = searchParams.get('action') ?? '';
+    const clientParam = searchParams.get('client') ?? '';
+
+    const adoptClient = (id: string) =>
+      request(
+        'GET',
+        endpoint('/api/v1/clients/:id', { id }),
+        {},
+        { skipIntercept: true }
+      )
+        .then((response) => {
+          if (cancelled) {
+            return;
+          }
+
+          const adopted = response.data.data as Client | undefined;
+
+          if (adopted?.id) {
+            attachClient(adopted);
+
+            return;
+          }
+
+          detachClient();
+        })
+        .catch(() => !cancelled && detachClient());
+
+    const handedOff =
+      !existingId && HANDOFF_ACTIONS.includes(action)
+        ? handoffOnEntry.current
+        : undefined;
+
+    if (handedOff) {
+      const adopted = cloneDeep(handedOff);
+
+      if (typeof adopted.line_items === 'string') {
+        adopted.line_items = [];
+      }
+
+      const seeded = {
+        ...adopted,
+        date: adopted.date || today(),
+        line_items: withRows(adopted.line_items),
+      };
+
+      latest.current = seeded;
+      setInvoice(seeded);
+      setHandoff(undefined);
+
+      if (seeded.client_id) {
+        navigate(STEPS[1].href, { replace: true });
+        void adoptClient(seeded.client_id);
+      }
+
+      return () => {
+        cancelled = true;
+      };
+    }
+
     const url = existingId
       ? endpoint('/api/v1/invoices/:id?include=client', { id: existingId })
       : endpoint('/api/v1/invoices/create');
@@ -206,10 +287,16 @@ export function useWizard(existingId?: string): Wizard {
           date: loaded.date || today(),
           uses_inclusive_taxes: Boolean(company?.settings?.inclusive_taxes),
           line_items: [{ ...blankLineItem(), quantity: 1, sort_id: 0 }],
+          ...(clientParam ? { client_id: clientParam } : {}),
         };
 
         latest.current = seeded;
         setInvoice(seeded);
+
+        if (clientParam) {
+          navigate(STEPS[1].href, { replace: true });
+          void adoptClient(clientParam);
+        }
       })
       .catch(() => !cancelled && setLoadFailed(true));
 
