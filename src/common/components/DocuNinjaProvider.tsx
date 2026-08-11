@@ -12,6 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import collect from 'collect.js';
 import { useSetAtom } from 'jotai';
 import { ReactNode, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { endpoint } from '$app/common/helpers';
@@ -28,6 +29,7 @@ interface DocuNinjaProviderProps {
 export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
   const company = useCurrentCompany();
   const navigate = useNavigate();
+  const [t] = useTranslation();
 
   const setData = useSetAtom(docuNinjaAtom);
 
@@ -89,16 +91,31 @@ export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
     retry: false,
   });
 
+  const isNoAccount =
+    (error as { response?: { status?: number } })?.response?.status === 401;
+
   useEffect(() => {
-    if (error) {
-      navigate('/docuninja/join');
+    if (isNoAccount) {
+      navigate('/docuninja/join?ie=true');
     }
-  }, [error, navigate]);
+  }, [isNoAccount, navigate]);
 
   if (isPending) {
     return (
       <Default breadcrumbs={[]}>
         <Spinner />
+      </Default>
+    );
+  }
+
+  if (error) {
+    return (
+      <Default breadcrumbs={[]}>
+        <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+          <p className="text-center opacity-70 max-w-lg">
+            {t('server_not_reachable')}
+          </p>
+        </div>
       </Default>
     );
   }
