@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import { useTranslation } from 'react-i18next';
 
 export function usePaymentFilters() {
   const [t] = useTranslation();

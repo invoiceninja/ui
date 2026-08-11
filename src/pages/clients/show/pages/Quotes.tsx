@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
-import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
+import { permission } from '$app/common/guards/guards/permission';
+import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { DataTable } from '$app/components/DataTable';
 import {
   useActions,
   useQuoteColumns,
   useQuoteFilters,
 } from '$app/pages/quotes/common/hooks';
 import { useCustomBulkActions } from '$app/pages/quotes/common/hooks/useCustomBulkActions';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { permission } from '$app/common/guards/guards/permission';
 import { useFooterColumns } from '$app/pages/quotes/common/hooks/useFooterColumns';
 
 export default function Quotes() {

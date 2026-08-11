@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
-import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
-import { useColorScheme } from '$app/common/colors';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { companySettingsErrorsAtom } from '../../common/atoms';
 
 export function Messages() {
   const [t] = useTranslation();

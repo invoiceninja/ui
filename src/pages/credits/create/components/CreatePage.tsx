@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { Card } from '$app/components/cards';
 import { Spinner } from '$app/components/Spinner';
 import { ClientSelector } from '$app/pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
-import { Card } from '$app/components/cards';
+import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
+import { CreditDetails } from '../../common/components/CreditDetails';
+import { CreditFooter } from '../../common/components/CreditFooter';
 import { useCreditUtilities } from '../../common/hooks';
 import { CreditsContext } from '../Create';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
-import { CreditDetails } from '../../common/components/CreditDetails';
-import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
-import { CreditFooter } from '../../common/components/CreditFooter';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useColorScheme } from '$app/common/colors';
 
 export default function CreatePage() {
   const context: CreditsContext = useOutletContext();

@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Modal } from '$app/components/Modal';
-import { Button, InputField } from '$app/components/forms';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import {
-  PublicKeyCredentialCreationOptionsJSON,
-  registerPasskey,
-} from '$app/common/helpers/passkeys';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { updateUser } from '$app/common/stores/slices/user';
 import { AxiosError } from 'axios';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import {
+  PublicKeyCredentialCreationOptionsJSON,
+  registerPasskey,
+} from '$app/common/helpers/passkeys';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useDateTime } from '$app/common/hooks/useDateTime';
+import { updateUser } from '$app/common/stores/slices/user';
+import { Button, InputField } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
 
 interface Props {
   visible: boolean;

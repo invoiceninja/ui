@@ -8,14 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-
+import { useAtomValue } from 'jotai';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useColorScheme } from '$app/common/colors';
+import {
+  isUniquePaymentTerm,
+  shouldPaymentTermBeVisible,
+} from '$app/common/helpers/payment-terms/payment-term-filters';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
+import { useStaticsQuery } from '$app/common/queries/statics';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { Card, Element } from '$app/components/cards';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/layouts/Settings';
-import { useTranslation } from 'react-i18next';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 import { Link, SelectField } from '../../../components/forms';
+import { companySettingsErrorsAtom } from '../common/atoms';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import {
   isCompanySettingsFormBusy,
@@ -23,24 +40,6 @@ import {
 } from '../common/hooks/useHandleCompanySave';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 import { Gateways } from '../gateways/index/Gateways';
-import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
-import { PaymentTerm } from '$app/common/interfaces/payment-term';
-import {
-  isUniquePaymentTerm,
-  shouldPaymentTermBeVisible,
-} from '$app/common/helpers/payment-terms/payment-term-filters';
-import { useEffect, useState } from 'react';
-import { updateChanges } from '$app/common/stores/slices/company-users';
-import { useDispatch } from 'react-redux';
-import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../common/atoms';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
-import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
-import { SettingsLabel } from '$app/components/SettingsLabel';
-import { useStaticsQuery } from '$app/common/queries/statics';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { useColorScheme } from '$app/common/colors';
 
 export function OnlinePayments() {
   useTitle('online_payments');

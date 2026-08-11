@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useLocation, useOutletContext, useParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Card } from '$app/components/cards';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { Upload } from '$app/pages/settings/company/documents/components';
-import { useLocation, useOutletContext, useParams } from 'react-router-dom';
-import { Card } from '$app/components/cards';
-import { useTranslation } from 'react-i18next';
 import { RecurringInvoiceContext } from '../../create/Create';
-import { useColorScheme } from '$app/common/colors';
 
 export default function Documents() {
   const [t] = useTranslation();

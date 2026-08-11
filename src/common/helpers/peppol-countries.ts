@@ -8,7 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isSelfHosted } from '$app/common/helpers';
+
 export type Classification = 'individual' | 'business' | 'government';
+
+export const FRANCE_COUNTRY_ID = '250';
+
+export function isPeppolBlockedForCompany(countryId: string): boolean {
+  return isSelfHosted() && countryId === FRANCE_COUNTRY_ID;
+}
+
+export function isPeppolCountryAllowed(countryId: string): boolean {
+  return (
+    PEPPOL_COUNTRIES.includes(countryId) &&
+    !isPeppolBlockedForCompany(countryId)
+  );
+}
 
 export const PEPPOL_COUNTRIES = [
   '20',

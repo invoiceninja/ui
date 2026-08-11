@@ -8,23 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
+import { useAtomValue } from 'jotai';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { useQuery, useQueryClient } from 'react-query';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { toast } from '../helpers/toast/toast';
 import { EmailType } from '$app/pages/invoices/common/components/SendEmailModal';
-import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '../atoms/data-table';
+import { toast } from '../helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
+import { resolveBlankQueryEnabled } from './blank-query-options';
 
 export interface GenericQueryOptions {
   id?: string;
   with?: string[];
-  enabled: boolean;
+  enabled?: boolean;
 }
 
 interface InvoiceQueryParams {
@@ -37,9 +38,10 @@ export function useInvoiceQuery(params: InvoiceQueryParams) {
 
   const isLockedParam = includeIsLocked ? '&is_locked=true' : '';
 
-  return useQuery<Invoice>(
-    ['/api/v1/invoices', 'detail', params.id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/invoices', 'detail', params.id],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint(
@@ -51,30 +53,30 @@ export function useInvoiceQuery(params: InvoiceQueryParams) {
       ).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
-    {
-      staleTime: Infinity,
-      enabled: Boolean(params.id),
-    }
-  );
+
+    staleTime: Infinity,
+    enabled: Boolean(params.id),
+  });
 }
 
 export function useBlankInvoiceQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();
 
-  return useQuery<Invoice>(
-    ['/api/v1/invoices/create'],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/invoices/create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/invoices/create')).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
-    {
-      ...options,
-      staleTime: Infinity,
-      enabled: hasPermission('create_invoice')
-        ? (options?.enabled ?? true)
-        : false,
-    }
-  );
+
+    staleTime: Infinity,
+
+    enabled: resolveBlankQueryEnabled(
+      options,
+      hasPermission('create_invoice')
+    ),
+  });
 }
 
 export function bulk(
@@ -141,7 +143,9 @@ export function useBulk(params?: Params) {
       }
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
     });
   };
 }

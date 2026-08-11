@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useParams } from 'react-router-dom';
 import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -21,7 +22,6 @@ import {
   useTaskFilters,
 } from '$app/pages/tasks/common/hooks';
 import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOption';
-import { useParams } from 'react-router-dom';
 
 export default function Tasks() {
   const { id } = useParams();

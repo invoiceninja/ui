@@ -8,16 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Modal } from '$app/components/Modal';
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, InputField } from '$app/components/forms';
-import { BankAccount } from '$app/common/interfaces/bank-accounts';
-import { useState } from 'react';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useHandleCreate } from '$app/pages/settings/bank-accounts/create/hooks/useHandleCreate';
-import { useBlankBankAccountQuery } from '$app/pages/settings/bank-accounts/common/queries';
 import { useColorScheme } from '$app/common/colors';
+import { BankAccount } from '$app/common/interfaces/bank-accounts';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Button, InputField } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
+import { useBlankBankAccountQuery } from '$app/pages/settings/bank-accounts/common/queries';
+import { useHandleCreate } from '$app/pages/settings/bank-accounts/create/hooks/useHandleCreate';
 
 interface Props {
   isModalOpen: boolean;

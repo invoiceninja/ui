@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
 import { useColorScheme } from '$app/common/colors';
 import CommonProps from '$app/common/interfaces/common-props.interface';
-import classNames from 'classnames';
 
 interface Props extends CommonProps {
   withoutPadding?: boolean;

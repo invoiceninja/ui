@@ -8,35 +8,35 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { Expense } from '$app/common/interfaces/expense';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { Modal } from '$app/components/Modal';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
-import { invoiceAtom } from '$app/pages/invoices/common/atoms';
+import { useQueryClient } from '@tanstack/react-query';
+import collect from 'collect.js';
 import { useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdTextSnippet } from 'react-icons/md';
-import { useQueryClient } from 'react-query';
-import { useInvoiceExpense } from '../useInvoiceExpense';
-import { blankLineItem } from '$app/common/constants/blank-line-item';
-import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
-import { route } from '$app/common/helpers/route';
 import { useNavigate } from 'react-router-dom';
-import { Spinner } from '$app/components/Spinner';
 import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { blankLineItem } from '$app/common/constants/blank-line-item';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import collect from 'collect.js';
-import { toast } from '$app/common/helpers/toast/toast';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { Expense } from '$app/common/interfaces/expense';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
+import { Spinner } from '$app/components/Spinner';
+import { invoiceAtom } from '$app/pages/invoices/common/atoms';
+import { useInvoiceExpense } from '../useInvoiceExpense';
 
 interface Props {
   expenses: Expense[];
@@ -149,12 +149,13 @@ export function AddToInvoiceAction(props: Props) {
       setIsLoading(true);
 
       queryClient
-        .fetchQuery(
-          [
+        .fetchQuery({
+          queryKey: [
             '/api/v1/invoices',
             `include=client&status_id=1,2,3&is_deleted=true&filter_deleted_clients=true&client_id=${expenses[0]?.client_id}`,
           ],
-          () =>
+
+          queryFn: () =>
             request(
               'GET',
               endpoint(
@@ -162,8 +163,9 @@ export function AddToInvoiceAction(props: Props) {
                 { clientId: expenses[0]?.client_id || '' }
               )
             ),
-          { staleTime: Infinity }
-        )
+
+          staleTime: Infinity,
+        })
         .then((response: GenericSingleResourceResponse<Invoice[]>) => {
           if (hasPermission('edit_invoice')) {
             setInvoices(response.data.data);

@@ -16,7 +16,7 @@ import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
@@ -33,11 +33,14 @@ export default function Join() {
   const isEligible =
     account?.plan === 'pro' || account?.plan === 'enterprise';
 
+  const [searchParams] = useSearchParams();
+  const hasInternalError = searchParams.get('ie') === 'true';
+
   useEffect(() => {
-    if (account && account.docuninja_num_users > 0) {
+    if (account && account.docuninja_num_users > 0 && !hasInternalError) {
       navigate('/docuninja', { replace: true });
     }
-  }, [account, navigate]);
+  }, [account, navigate, hasInternalError]);
 
   const create = () => {
     setIsCreating(true);

@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ForgotPasswordForm } from '../../common/dtos/authentication';
-import { endpoint, isHosted } from '../../common/helpers';
-import { ForgotPasswordValidation } from './common/ValidationInterface';
-import { InputField } from '../../components/forms/InputField';
-import { Button } from '../../components/forms/Button';
-import { HostedLinks } from './components/HostedLinks';
-import { Link } from '../../components/forms/Link';
-import { Header } from './components/Header';
+import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { useColorScheme } from '$app/common/colors';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { ForgotPasswordForm } from '../../common/dtos/authentication';
+import { endpoint, isHosted } from '../../common/helpers';
+import { Button } from '../../components/forms/Button';
+import { InputField } from '../../components/forms/InputField';
+import { Link } from '../../components/forms/Link';
+import { ForgotPasswordValidation } from './common/ValidationInterface';
+import { Header } from './components/Header';
+import { HostedLinks } from './components/HostedLinks';
 
 interface Response {
   message: string;

@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
-import { AxiosError } from 'axios';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 export function useQuickbooksDisconnect() {
   const refresh = useRefreshCompanyUsers();

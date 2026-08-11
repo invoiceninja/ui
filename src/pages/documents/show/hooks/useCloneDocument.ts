@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
@@ -15,9 +18,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Document } from '$app/common/interfaces/docuninja/api';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { AxiosError } from 'axios';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 export function useCloneDocument() {
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ export function useCloneDocument() {
 
           toast.success('cloned_document');
 
-          navigate(route('/docuninja/:id', { id: response.data.data?.id }));
+          navigate(route('/docuninja/:id/builder', { id: response.data.data?.id }));
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {

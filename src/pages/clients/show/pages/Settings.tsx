@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Card } from '$app/components/cards';
-import { AxiosResponse } from 'axios';
-import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
-import { useParams } from 'react-router-dom';
-import styled from 'styled-components';
 
 interface ClientGroupSettings {
   client_settings: Record<string, string | number | boolean>;

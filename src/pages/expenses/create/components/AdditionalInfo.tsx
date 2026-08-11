@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { CurrencySelector } from '$app/components/CurrencySelector';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 import Toggle from '$app/components/forms/Toggle';
 import { PaymentTypeSelector } from '$app/components/payment-types/PaymentTypeSelector';
-import dayjs from 'dayjs';
 import { useResolveCurrencySeparator } from '$app/pages/transactions/common/hooks/useResolveCurrencySeparator';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { ExpenseCardProps } from './Details';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { useColorScheme } from '$app/common/colors';
 
 export function AdditionalInfo(props: ExpenseCardProps) {
   const [t] = useTranslation();

@@ -12,7 +12,7 @@ import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { AxiosError, AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { GatewayToken } from '$app/common/interfaces/client';
 import { canActivateUpgradeButton } from '../helpers';
 

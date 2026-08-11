@@ -8,35 +8,35 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
 import { AxiosResponse } from 'axios';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useAtomValue } from 'jotai';
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
+import { MdCrop } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { compressImageFileForLogo } from '$app/common/helpers/logo-image';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useLogo } from '$app/common/hooks/useLogo';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import {
   resetChanges,
   updateRecord,
 } from '$app/common/stores/slices/company-users';
+import { Element } from '$app/components/cards';
+import { Button } from '$app/components/forms';
+import { CloudUpload } from '$app/components/icons/CloudUpload';
+import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
+import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
 import { DeleteLogo } from './DeleteLogo';
 import { LogoCropModal } from './LogoCropModal';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { endpoint } from '$app/common/helpers';
-import { useAtomValue } from 'jotai';
-import { activeSettingsAtom } from '$app/common/atoms/settings';
-import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
-import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { CloudUpload } from '$app/components/icons/CloudUpload';
-import { useColorScheme } from '$app/common/colors';
-import { Button } from '$app/components/forms';
-import { MdCrop } from 'react-icons/md';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { compressImageFileForLogo } from '$app/common/helpers/logo-image';
 
 interface Props {
   isSettingsPage?: boolean;

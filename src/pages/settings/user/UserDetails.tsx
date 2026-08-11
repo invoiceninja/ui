@@ -8,42 +8,44 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import axios, { AxiosError } from 'axios';
+import { useAtom, useAtomValue } from 'jotai';
+import { useEffect, useLayoutEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch, useSelector } from 'react-redux';
+import { Outlet } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import {
+  reactSettingsAtom,
+  useUserDetailsDraft,
+} from '$app/common/hooks/useReactSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import {
+  resetChanges as resetCompanyChanges,
+  updateRecord,
+} from '$app/common/stores/slices/company-users';
 import {
   injectInChanges,
   resetChanges,
   updateUser,
 } from '$app/common/stores/slices/user';
 import { RootState } from '$app/common/stores/store';
+import { Card } from '$app/components/cards';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { Tabs } from '$app/components/Tabs';
-import { useEffect, useLayoutEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
-import { Outlet } from 'react-router-dom';
-import { Settings } from '../../../components/layouts/Settings';
-import { useUserDetailsTabs } from './common/hooks/useUserDetailsTabs';
-import axios, { AxiosError } from 'axios';
-import { updateRecord } from '$app/common/stores/slices/company-users';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { useAtom, useAtomValue } from 'jotai';
-import {
-  reactSettingsAtom,
-  useUserDetailsDraft,
-} from '$app/common/hooks/useReactSettings';
-import { TwoFactorAuthenticationModals } from './common/components/TwoFactorAuthenticationModals';
 import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
-import { resetChanges as resetCompanyChanges } from '$app/common/stores/slices/company-users';
-import { Card } from '$app/components/cards';
-import { useColorScheme } from '$app/common/colors';
+import { Settings } from '../../../components/layouts/Settings';
+import { TwoFactorAuthenticationModals } from './common/components/TwoFactorAuthenticationModals';
+import { useUserDetailsTabs } from './common/hooks/useUserDetailsTabs';
 
 export function UserDetails() {
   useTitle('user_details');

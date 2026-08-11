@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField } from '$app/components/forms';
-import { Modal } from '$app/components/Modal';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TaxSetting } from '$app/common/interfaces/company.interface';
-import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { Button, InputField } from '$app/components/forms';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { Modal } from '$app/components/Modal';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 
 interface Props {
   region: string;

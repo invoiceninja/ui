@@ -8,25 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
-import { arrayMoveImmutable } from 'array-move';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { injectInChanges } from '$app/common/stores/slices/company-users';
-import { cloneDeep, set } from 'lodash';
-import { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
 } from '@hello-pangea/dnd';
+import { arrayMoveImmutable } from 'array-move';
+import classNames from 'classnames';
+import { cloneDeep, set } from 'lodash';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
 import { useColorScheme } from '$app/common/colors';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { injectInChanges } from '$app/common/stores/slices/company-users';
+import { Element } from '$app/components/cards';
+import { SelectField } from '$app/components/forms';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
-import classNames from 'classnames';
+import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
 
 interface Props {
   defaultVariables: { value: string; label: string }[];
