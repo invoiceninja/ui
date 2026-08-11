@@ -288,7 +288,7 @@ export default function Refund() {
                   {(errors?.errors[`invoices.${[index]}.invoice_id`] ||
                     errors?.errors[`invoices.${[index]}.amount`]) && (
                     <div className="px-6">
-                      <ErrorMessage className="mt-2 break-all">
+                      <ErrorMessage className="mt-2">
                         {errors?.errors[`invoices.${[index]}.invoice_id`] ||
                           errors?.errors[`invoices.${[index]}.amount`]}
                       </ErrorMessage>
