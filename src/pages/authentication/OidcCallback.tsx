@@ -19,11 +19,14 @@ import { useLogin } from './common/hooks';
  * redirect-based) OAuth flow.
  *
  * The self-hosted backend redirects here after a successful Authentik
- * (or other OpenID Connect) login with the newly issued CompanyToken in
- * the `?token=` query string. We swap that token for a full CompanyUser
- * payload via POST /api/v1/refresh_react and hand it to the shared
- * `useLogin()` hook so the auth Redux slice ends up in exactly the same
- * shape as after a normal password login.
+ * (or other OpenID Connect) login with a short-lived `?code=` query-
+ * string value — a 64-char random exchange code, not the CompanyToken
+ * itself, so the real token never lands in browser history, Referer
+ * headers, or upstream access logs. We POST that code to the public
+ * one-shot `POST /api/v1/oidc/exchange` endpoint, receive the actual
+ * CompanyToken back, and then swap it for a full CompanyUser payload
+ * via `POST /api/v1/refresh_react` — same shared `useLogin()` hook and
+ * Redux shape as a normal password login.
  */
 export function OidcCallback() {
   const [searchParams] = useSearchParams();
@@ -36,7 +39,7 @@ export function OidcCallback() {
     if (ranRef.current) return;
     ranRef.current = true;
 
-    const token = searchParams.get('token');
+    const code = searchParams.get('code');
     const oauthError = searchParams.get('error');
 
     if (oauthError) {
@@ -44,17 +47,26 @@ export function OidcCallback() {
       return;
     }
 
-    if (!token) {
-      setError('Missing OIDC token in callback URL.');
+    if (!code) {
+      setError('Missing OIDC exchange code in callback URL.');
       return;
     }
 
-    request('POST', endpoint('/api/v1/refresh_react'), undefined, {
-      headers: { 'X-API-TOKEN': token },
-    })
-      .then((response) => {
-        login(response);
-        navigate('/dashboard', { replace: true });
+    request('POST', endpoint('/api/v1/oidc/exchange'), { code })
+      .then((exchangeResponse) => {
+        const token = exchangeResponse?.data?.token as string | undefined;
+
+        if (!token) {
+          setError('OIDC exchange did not return a token.');
+          return;
+        }
+
+        return request('POST', endpoint('/api/v1/refresh_react'), undefined, {
+          headers: { 'X-API-TOKEN': token },
+        }).then((response) => {
+          login(response);
+          navigate('/dashboard', { replace: true });
+        });
       })
       .catch((err) => {
         setError(
