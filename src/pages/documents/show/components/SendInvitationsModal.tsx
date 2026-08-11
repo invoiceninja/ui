@@ -1,4 +1,3 @@
-import collect from 'collect.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
@@ -7,7 +6,10 @@ import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { Document } from '$app/common/interfaces/docuninja/api';
+import {
+  Document,
+  DocumentInvitation,
+} from '$app/common/interfaces/docuninja/api';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
@@ -62,12 +64,23 @@ export function SendInvitationsModal({
       .finally(() => setIsFormBusy(false));
   };
 
-  const pending = collect(document.invitations).filter(
-    (i) => i.signed_date === null
-  );
-  const signed = collect(document.invitations).filter(
-    (i) => i.signed_date !== null
-  );
+  const getRecipient = (invitation: DocumentInvitation) => {
+    const name =
+      invitation.entity === 'contact'
+        ? `${invitation.contact?.first_name ?? ''} ${
+            invitation.contact?.last_name ?? ''
+          }`.trim()
+        : `${invitation.user?.first_name ?? ''} ${
+            invitation.user?.last_name ?? ''
+          }`.trim();
+
+    const email =
+      invitation.entity === 'contact'
+        ? invitation.contact?.email
+        : invitation.user?.email;
+
+    return name ? `${name} (${email})` : email;
+  };
 
   return (
     <>
@@ -103,7 +116,20 @@ export function SendInvitationsModal({
           visible={isModalOpen}
           onClose={() => setIsModalOpen(false)}
         >
-          <div className="w-full pt-3">
+          <div className="w-full pt-3 space-y-4">
+            <div>
+              <p>{t('send_emails_to_following')}</p>
+
+              <ul className="mt-2">
+                {(document.invitations || []).map((invitation) => (
+                  <li key={invitation.id} className="flex items-center gap-1">
+                    <span>-</span>
+                    <span>{getRecipient(invitation)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
             <Button
               className="w-full"
               behavior="button"
