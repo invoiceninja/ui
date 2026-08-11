@@ -22,7 +22,7 @@ import { useFormik } from 'formik';
 import { useState } from 'react';
 import { DollarSign, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import visa from '/gateway-card-images/visa.png?url';
 import mc from '/gateway-card-images/mastercard.png?url';
 

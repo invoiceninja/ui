@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { Tab } from '$app/components/Tabs';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 
 export function useTabs() {
   const [t] = useTranslation();

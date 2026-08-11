@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
@@ -15,7 +16,6 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { useExpenseQuery } from '$app/common/queries/expenses';
 import { Link } from '$app/components/forms';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
-import { useTranslation } from 'react-i18next';
 
 interface Props {
   expenseId: string;

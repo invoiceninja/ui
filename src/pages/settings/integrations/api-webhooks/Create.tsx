@@ -8,33 +8,33 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
+import classNames from 'classnames';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
 import {
-  ApiWebhook,
   ApiWebHookHeader,
+  ApiWebhook,
 } from '$app/common/interfaces/api-webhook';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankApiWebhookQuery } from '$app/common/queries/api-webhooks';
-import { Settings } from '$app/components/layouts/Settings';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useHandleChange } from './common/hooks';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useEvents } from './common/hooks/useEvents';
-import { useColorScheme } from '$app/common/colors';
-import styled from 'styled-components';
-import { Plus } from '$app/components/icons/Plus';
-import classNames from 'classnames';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
+import { Plus } from '$app/components/icons/Plus';
+import { Settings } from '$app/components/layouts/Settings';
+import { useHandleChange } from './common/hooks';
+import { useEvents } from './common/hooks/useEvents';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};

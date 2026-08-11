@@ -7,16 +7,17 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { Card, Element } from '$app/components/cards';
+
 import { useTranslation } from 'react-i18next';
-import { SortableVariableList } from './SortableVariableList';
+import { useColorScheme } from '$app/common/colors';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCustomField } from '$app/components/CustomField';
+import { Card, Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
-import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
-import { useCustomField } from '$app/components/CustomField';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { useColorScheme } from '$app/common/colors';
 import { Cube } from '$app/components/icons/Cube';
+import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
+import { SortableVariableList } from './SortableVariableList';
 
 export default function ProductColumns() {
   const [t] = useTranslation();

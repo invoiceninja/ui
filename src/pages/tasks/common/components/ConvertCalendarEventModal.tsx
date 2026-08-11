@@ -8,7 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '$app/components/forms';
+import { useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import dayjs from 'dayjs';
+import {
+  Dispatch,
+  FormEvent,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
+import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -21,21 +31,11 @@ import {
 import { Task } from '$app/common/interfaces/task';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankTaskQuery } from '$app/common/queries/tasks';
+import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
+import { isOverlapping } from '../helpers/is-overlapping';
 import { TaskDetails } from './TaskDetails';
 import { TaskTable } from './TaskTable';
-import { isOverlapping } from '../helpers/is-overlapping';
-import dayjs from 'dayjs';
-import { AxiosError } from 'axios';
-import {
-  Dispatch,
-  FormEvent,
-  SetStateAction,
-  useEffect,
-  useState,
-} from 'react';
-import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 
 interface Props {
   visible: boolean;
@@ -134,7 +134,9 @@ export function ConvertCalendarEventModal(props: Props) {
       .then(() => {
         toast.success('created_task');
         $refetch(['tasks']);
-        queryClient.invalidateQueries(['calendar_events']);
+        queryClient.invalidateQueries({
+          queryKey: ['calendar_events'],
+        });
         props.setVisible(false);
       })
       .catch((error: AxiosError<ValidationBag>) => {

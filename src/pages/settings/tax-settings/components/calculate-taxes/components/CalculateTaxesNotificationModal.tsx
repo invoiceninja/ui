@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdOutlineWarning } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
@@ -18,9 +21,6 @@ import { $help } from '$app/components/HelpWidget';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { MdOutlineWarning } from 'react-icons/md';
 
 export function CalculateTaxesNotificationModal() {
   const { t } = useTranslation();

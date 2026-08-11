@@ -18,7 +18,7 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { Button } from '$app/components/forms';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 const ACCOUNT_USERS_ENDPOINT = '/api/client/account_management/v2/users';
 
@@ -56,14 +56,14 @@ export function AccountUsers() {
     data: users = [],
     isLoading,
     isError,
-  } = useQuery(
-    ['account_management', 'users'],
-    () =>
+  } = useQuery({
+    queryKey: ['account_management', 'users'],
+    queryFn: () =>
       request('POST', endpoint(ACCOUNT_USERS_ENDPOINT)).then(
         (response) => (response.data as AccountUsersResponse).users
       ),
-    { staleTime: Infinity }
-  );
+    staleTime: Infinity,
+  });
 
   if (isLoading) {
     return (

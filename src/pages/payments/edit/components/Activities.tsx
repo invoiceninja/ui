@@ -8,24 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 import { date, endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { AxiosResponse } from 'axios';
-import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
-import { useParams } from 'react-router-dom';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Card } from '$app/components/cards';
-import { Spinner } from '$app/components/Spinner';
-import { useGenerateActivityElement } from '$app/pages/payments/common/hooks/useGenerateActivityElement';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { PaymentActivity } from '$app/common/interfaces/payment-activity';
 import { usePaymentQuery } from '$app/common/queries/payments';
+import { Card } from '$app/components/cards';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
-import { useColorScheme } from '$app/common/colors';
-import styled from 'styled-components';
-import classNames from 'classnames';
+import { Spinner } from '$app/components/Spinner';
+import { useGenerateActivityElement } from '$app/pages/payments/common/hooks/useGenerateActivityElement';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};

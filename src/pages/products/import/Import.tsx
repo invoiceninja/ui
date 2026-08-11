@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
 import { UploadImport } from '$app/components/import/UploadImport';
 import { Default } from '$app/components/layouts/Default';
-import { useTranslation } from 'react-i18next';
 
 export default function Import() {
   const { t } = useTranslation();

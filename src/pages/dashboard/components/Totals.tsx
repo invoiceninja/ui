@@ -8,40 +8,40 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { SelectField } from '$app/components/forms';
-import { endpoint } from '$app/common/helpers';
-import { Chart } from '$app/pages/dashboard/components/Chart';
+import { useQuery } from '@tanstack/react-query';
+import { ConfigProvider } from 'antd';
+import collect from 'collect.js';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { useAtomValue } from 'jotai';
 import { useEffect, useMemo, useState } from 'react';
-import { Spinner } from '$app/components/Spinner';
-import {
-  DropdownDateRangePicker,
-  StyledRangePicker,
-} from '../../../components/DropdownDateRangePicker';
-import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Badge } from '$app/components/Badge';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 import {
   ChartsDefaultView,
   useReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { usePreferences } from '$app/common/hooks/usePreferences';
-import collect from 'collect.js';
-import { useColorScheme } from '$app/common/colors';
+import { Badge } from '$app/components/Badge';
 import { CurrencySelector } from '$app/components/CurrencySelector';
-import { useQuery } from 'react-query';
-import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import styled from 'styled-components';
+import { Card } from '$app/components/cards';
+import { antdLocaleAtom } from '$app/components/DropdownDateRangePicker';
+import { SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
+import { Spinner } from '$app/components/Spinner';
+import { Chart } from '$app/pages/dashboard/components/Chart';
+import {
+  DropdownDateRangePicker,
+  StyledRangePicker,
+} from '../../../components/DropdownDateRangePicker';
 import { DashboardCardSelector } from './DashboardCardSelector';
 import { PreferenceCardsGrid } from './PreferenceCardsGrid';
-import { ConfigProvider } from 'antd';
-import { useAtomValue } from 'jotai';
-import { antdLocaleAtom } from '$app/components/DropdownDateRangePicker';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };

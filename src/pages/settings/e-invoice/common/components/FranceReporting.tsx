@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtomValue } from 'jotai';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Card, Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
-import { useAtomValue } from 'jotai';
-import { useTranslation } from 'react-i18next';
 import { companySettingsErrorsAtom } from '../../../common/atoms';
 import { useHandleCurrentCompanyChangeProperty } from '../../../common/hooks/useHandleCurrentCompanyChange';
 

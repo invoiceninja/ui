@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
-import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { Card, ClickableElement } from '$app/components/cards';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 
 export function ImportCustomers() {
   const [t] = useTranslation();

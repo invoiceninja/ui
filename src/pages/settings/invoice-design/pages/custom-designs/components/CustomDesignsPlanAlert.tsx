@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
 import { MdInfoOutline } from 'react-icons/md';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { route } from '$app/common/helpers/route';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import CommonProps from '$app/common/interfaces/common-props.interface';
 import { Alert } from '$app/components/Alert';
 import { Link } from '$app/components/forms';
-import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
-import CommonProps from '$app/common/interfaces/common-props.interface';
 
 export function CustomDesignsPlanAlert(props?: CommonProps) {
   const [t] = useTranslation();

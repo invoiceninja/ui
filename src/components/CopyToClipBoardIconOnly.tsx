@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { toast } from '$app/common/helpers/toast/toast';
-import { MouseEvent } from 'react';
-import { CopyToClipboard } from './icons/CopyToClipboard';
-import { useColorScheme } from '$app/common/colors';
 import classNames from 'classnames';
+import { MouseEvent } from 'react';
+import { useColorScheme } from '$app/common/colors';
+import { toast } from '$app/common/helpers/toast/toast';
+import { CopyToClipboard } from './icons/CopyToClipboard';
 
 interface Props {
   text: string;

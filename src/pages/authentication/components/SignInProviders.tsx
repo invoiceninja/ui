@@ -8,10 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { PublicClientApplication } from '@azure/msal-browser';
+import { GoogleLogin } from '@react-oauth/google';
+import { useQueryClient } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import AppleSignin from 'react-apple-signin-auth';
+import { useDispatch } from 'react-redux';
+import { v4 } from 'uuid';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
   changeCurrentIndex,
@@ -19,14 +27,6 @@ import {
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
 import { authenticate } from '$app/common/stores/slices/user';
-import { useDispatch } from 'react-redux';
-import { useQueryClient } from 'react-query';
-import { ReactNode, useEffect, useRef, useState } from 'react';
-import { GoogleLogin } from '@react-oauth/google';
-import { toast } from '$app/common/helpers/toast/toast';
-import { PublicClientApplication } from '@azure/msal-browser';
-import { v4 } from 'uuid';
-import AppleSignin from 'react-apple-signin-auth';
 
 interface SignInProviderButtonProps {
   disabled?: boolean;
@@ -76,7 +76,9 @@ export function SignInProviders() {
     dispatch(changeCurrentIndex(currentIndex));
 
     // Trigger DocuNinja data fetch after successful login
-    queryClient.invalidateQueries(['/api/docuninja/login']);
+    queryClient.invalidateQueries({
+      queryKey: ['/api/docuninja/login'],
+    });
   };
 
   const handleGoogle = (token: string) => {

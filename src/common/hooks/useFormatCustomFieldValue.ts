@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { date } from '$app/common/helpers';
+import { AvailableTypes } from '$app/pages/settings/custom-fields/components';
 import { useCurrentCompany } from './useCurrentCompany';
 import { useCurrentCompanyDateFormats } from './useCurrentCompanyDateFormats';
-import { date } from '$app/common/helpers';
-import { useTranslation } from 'react-i18next';
-import { AvailableTypes } from '$app/pages/settings/custom-fields/components';
 
 export function useFormatCustomFieldValue() {
   const [t] = useTranslation();

@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import { Modal } from '$app/components/Modal';
 import { Dispatch, SetStateAction } from 'react';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { useColorScheme } from '$app/common/colors';
-import { LuCheckCircle2 } from 'react-icons/lu';
 import { CreditCard, Sliders } from 'react-feather';
-import { Icon } from '$app/components/icons/Icon';
-import { ArrowRight } from '$app/components/icons/ArrowRight';
+import { useTranslation } from 'react-i18next';
+import { LuCheckCircle2 } from 'react-icons/lu';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { ArrowRight } from '$app/components/icons/ArrowRight';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
 
 interface BoxTheme {
   backgroundColor: string;

@@ -8,33 +8,32 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputLabel } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { usePaymentQuery } from '$app/common/queries/payments';
 import { FormikProps, useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { usePaymentPageSaveAction } from '../common/hooks/usePaymentPageSaveAction';
-import { toast } from '$app/common/helpers/toast/toast';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { v4 } from 'uuid';
 import { useColorScheme } from '$app/common/colors';
-import { ErrorMessage } from '$app/components/ErrorMessage';
-import { DataTable } from '$app/components/DataTable';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { usePaymentQuery } from '$app/common/queries/payments';
+import { Card, Element } from '$app/components/cards';
+import { DataTable } from '$app/components/DataTable';
+import { ErrorMessage } from '$app/components/ErrorMessage';
+import { InputLabel } from '$app/components/forms';
+import { PaymentOnCreation } from '..';
 import {
   ApplyInvoice,
   useApplyInvoiceTableColumns,
 } from '../common/hooks/useApplyInvoiceTableColumns';
-import { PaymentOnCreation } from '..';
-import { v4 } from 'uuid';
+import { usePaymentPageSaveAction } from '../common/hooks/usePaymentPageSaveAction';
 
 export default function Apply() {
   const [t] = useTranslation();

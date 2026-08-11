@@ -8,24 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
 import { TaskStatus } from '$app/common/interfaces/task-status';
-import { useTranslation } from 'react-i18next';
-import { Modal } from '../Modal';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankTaskStatusQuery } from '$app/common/queries/task-statuses';
 import { Button, InputField, InputLabel } from '../forms';
 import { ColorPicker } from '../forms/ColorPicker';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
-import { useEffect, useState } from 'react';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useBlankTaskStatusQuery } from '$app/common/queries/task-statuses';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { toast } from '$app/common/helpers/toast/toast';
-import { AxiosError } from 'axios';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { request } from '$app/common/helpers/request';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { Modal } from '../Modal';
 
 interface Props extends GenericSelectorProps<TaskStatus> {
   withoutAction?: boolean;

@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { dateUTC } from '$app/common/helpers/payment';
-import { route } from '$app/common/helpers/route';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { PaymentStatus } from '$app/pages/payments/common/components/PaymentStatus';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { dateUTC } from '$app/common/helpers/payment';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { PaymentStatus } from '$app/pages/payments/common/components/PaymentStatus';
 import { InvoicePaymentAllocationRow } from '../helpers/invoicePaymentAllocations';
 
 const Box = styled.div`

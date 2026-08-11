@@ -9,14 +9,14 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Element } from '../../../../components/cards';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '$app/common/stores/store';
-import { updateChanges } from '$app/common/stores/slices/company-users';
-import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { RootState } from '$app/common/stores/store';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { Element } from '../../../../components/cards';
 
 export function Defaults() {
   const [t] = useTranslation();

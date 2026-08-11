@@ -8,6 +8,12 @@ import {
 } from '$tests/e2e/fixtures';
 import { request as playwrightRequest, type Page } from '@playwright/test';
 import { createClient } from './client-helpers';
+import {
+  clearStatusFilter,
+  expectStatusFilterEmpty,
+  expectStatusFilterValue,
+  setStatusFilter,
+} from './status-filter-helpers';
 
 resetAccountBeforeAll();
 
@@ -193,58 +199,3 @@ async function clickViewClientFromInvoice(page: Page) {
     page.getByRole('link', { name: 'View', exact: true }).click();
 }
 
-function statusFilterControl(page: Page) {
-  return page
-    .locator('[data-cy="dataTable"]')
-    .locator('div.flex.xl\\:space-x-1')
-    .filter({ has: page.locator('span', { hasText: /^Status:$/ }) })
-    .first();
-}
-
-function statusFilterMenu(page: Page) {
-  return page
-    .locator('[class*="-menu"]')
-    .filter({ has: page.getByRole('button', { name: 'Apply', exact: true }) })
-    .last();
-}
-
-async function openStatusFilter(page: Page) {
-  await statusFilterControl(page).click();
-
-  await expect(
-    statusFilterMenu(page).getByRole('button', { name: 'Apply', exact: true })
-  ).toBeVisible({ timeout: 5000 });
-}
-
-async function setStatusFilter(page: Page, label: string) {
-  await openStatusFilter(page);
-
-  const menu = statusFilterMenu(page);
-
-  await menu.getByRole('button', { name: 'Reset', exact: true }).click();
-  await menu.getByText(label, { exact: true }).click();
-  await menu.getByRole('button', { name: 'Apply', exact: true }).click();
-}
-
-async function clearStatusFilter(page: Page) {
-  await openStatusFilter(page);
-
-  const menu = statusFilterMenu(page);
-
-  await menu.getByRole('button', { name: 'Reset', exact: true }).click({ force: true });
-  await menu.getByRole('button', { name: 'Apply', exact: true }).click({ force: true });
-}
-
-async function expectStatusFilterValue(page: Page, value: string) {
-  await expect(statusFilterControl(page).locator('span.truncate')).toHaveText(
-    value,
-    { timeout: 10000 }
-  );
-}
-
-async function expectStatusFilterEmpty(page: Page) {
-  const statusValue = statusFilterControl(page).locator('span.truncate');
-
-  await expect(statusValue).toHaveText('', { timeout: 10000 });
-  await expect(statusFilterControl(page)).not.toContainText('Paid');
-}

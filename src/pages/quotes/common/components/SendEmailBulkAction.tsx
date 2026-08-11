@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Modal } from '$app/components/Modal';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
-import { Quote } from '$app/common/interfaces/quote';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
+import { Quote } from '$app/common/interfaces/quote';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
 import { SendEmailModal } from './SendEmailModal';
 
 interface Props {

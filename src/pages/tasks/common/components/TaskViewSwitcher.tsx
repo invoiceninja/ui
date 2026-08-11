@@ -8,10 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
-import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useSearchParams } from 'react-router-dom';
 import {
   BsCalendarDay,
   BsCalendarMonth,
@@ -19,7 +17,9 @@ import {
   BsKanban,
   BsListUl,
 } from 'react-icons/bs';
-import classNames from 'classnames';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { Link } from '$app/components/forms';
 
 // Query params we should carry between task views so the chosen context
 // survives a switch from e.g. Daily to Weekly.

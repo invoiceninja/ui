@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useParams } from 'react-router-dom';
 import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -17,7 +18,6 @@ import {
   useExpenseColumns,
   useExpenseFilters,
 } from '$app/pages/expenses/common/hooks';
-import { useParams } from 'react-router-dom';
 
 export default function Expenses() {
   const { id } = useParams();
