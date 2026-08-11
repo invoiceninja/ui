@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
+import { endpoint, trans } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
@@ -26,8 +26,8 @@ interface Props {
 }
 
 export function StepRecipient({ wizard }: Props) {
-  const [translate] = useTranslation();
-  const t = useTheme();
+  const [t] = useTranslation();
+  const theme = useTheme();
 
   const [name, setName] = useState('');
   const [showAddress, setShowAddress] = useState(false);
@@ -177,7 +177,7 @@ export function StepRecipient({ wizard }: Props) {
     }
 
     if (!name.trim()) {
-      setErrors({ name: 'Enter who this invoice is for.' });
+      setErrors({ name: t('enter_invoice_recipient') });
       return;
     }
 
@@ -208,7 +208,7 @@ export function StepRecipient({ wizard }: Props) {
 
         if (!bag) {
           setErrors({
-            general: 'This customer could not be saved. Try again.',
+            general: t('customer_not_saved'),
           });
 
           return;
@@ -237,20 +237,23 @@ export function StepRecipient({ wizard }: Props) {
 
         <div
           className="flex items-start justify-between gap-4 border px-4 py-3.5"
-          style={{ borderColor: t.line, borderRadius: radius.panel }}
+          style={{ borderColor: theme.line, borderRadius: radius.panel }}
         >
           <div className="min-w-0">
-            <p className="text-sm" style={{ color: t.text, fontWeight: 500 }}>
+            <p
+              className="text-sm"
+              style={{ color: theme.text, fontWeight: 500 }}
+            >
               {selected.display_name || selected.name}
             </p>
 
-            <p className="text-xs mt-0.5" style={{ color: t.muted }}>
-              {selected.contacts?.[0]?.email || 'No email address'}
+            <p className="text-xs mt-0.5" style={{ color: theme.muted }}>
+              {selected.contacts?.[0]?.email || t('no_email_address')}
             </p>
           </div>
 
           <Button type="secondary" behavior="button" onClick={reset}>
-            {translate('change')}
+            {t('change')}
           </Button>
         </div>
 
@@ -262,7 +265,7 @@ export function StepRecipient({ wizard }: Props) {
 
         <Footer>
           <Button behavior="button" disabled={busy} onClick={continueForward}>
-            {translate('continue')}
+            {t('continue')}
           </Button>
         </Footer>
       </div>
@@ -303,7 +306,7 @@ export function StepRecipient({ wizard }: Props) {
           }}
         >
           <InputLabel className="mb-1" for="iw-customer-name">
-            Customer or company name
+            {t('customer_or_company_name')}
             <span className="ml-1 text-red-600">*</span>
           </InputLabel>
 
@@ -312,7 +315,7 @@ export function StepRecipient({ wizard }: Props) {
               <InputField
                 id="iw-customer-name"
                 innerRef={nameInput}
-                placeholder="Jane Smith"
+                placeholder={t('name')}
                 required
                 value={name}
                 changeOverride
@@ -346,8 +349,8 @@ export function StepRecipient({ wizard }: Props) {
               className="absolute left-0 mt-1.5 z-20 border overflow-hidden"
               style={{
                 right: searching ? '1.875rem' : 0,
-                backgroundColor: t.surface,
-                borderColor: t.line,
+                backgroundColor: theme.surface,
+                borderColor: theme.line,
                 borderRadius: radius.control,
                 boxShadow: '0 12px 32px -12px rgba(9,9,11,0.28)',
               }}
@@ -362,15 +365,19 @@ export function StepRecipient({ wizard }: Props) {
                   onClick={() => choose(match)}
                   className="w-full text-left px-3.5 py-2.5 flex items-baseline justify-between gap-3"
                   style={{
-                    color: t.text,
-                    backgroundColor: active === index ? t.hover : 'transparent',
+                    color: theme.text,
+                    backgroundColor:
+                      active === index ? theme.hover : 'transparent',
                   }}
                   onMouseEnter={() => setActive(index)}
                 >
                   <span className="text-sm truncate">
                     {match.display_name || match.name}
                   </span>
-                  <span className="text-xs shrink-0" style={{ color: t.muted }}>
+                  <span
+                    className="text-xs shrink-0"
+                    style={{ color: theme.muted }}
+                  >
                     {match.contacts?.[0]?.email}
                   </span>
                 </button>
@@ -380,9 +387,9 @@ export function StepRecipient({ wizard }: Props) {
                 type="button"
                 onClick={() => setDismissedSearch(true)}
                 className="w-full text-left px-3.5 py-2.5 border-t text-xs"
-                style={{ borderColor: t.hairline, color: t.muted }}
+                style={{ borderColor: theme.hairline, color: theme.muted }}
               >
-                Add “{name.trim()}” as a new customer
+                {trans('add_value_as_new_customer', { value: name.trim() })}
               </button>
             </div>
           ) : null}
@@ -396,11 +403,11 @@ export function StepRecipient({ wizard }: Props) {
 
         {showAddress ? (
           <div className="space-y-3">
-            <Legend>Address</Legend>
+            <Legend>{t('address')}</Legend>
 
             <InputField
               id="iw-customer-address1"
-              label="Street address"
+              label={t('address1')}
               value={address.address1}
               changeOverride
               debounceTimeout={0}
@@ -412,7 +419,7 @@ export function StepRecipient({ wizard }: Props) {
             <div className="grid grid-cols-2 gap-3">
               <InputField
                 id="iw-customer-city"
-                label="City"
+                label={t('city')}
                 value={address.city}
                 changeOverride
                 debounceTimeout={0}
@@ -422,7 +429,7 @@ export function StepRecipient({ wizard }: Props) {
               />
               <InputField
                 id="iw-customer-postcode"
-                label="Postcode"
+                label={t('postal_code')}
                 value={address.postal_code}
                 changeOverride
                 debounceTimeout={0}
@@ -437,16 +444,16 @@ export function StepRecipient({ wizard }: Props) {
             type="button"
             onClick={() => setShowAddress(true)}
             className="text-sm"
-            style={{ color: t.accent, fontWeight: 500 }}
+            style={{ color: theme.accent, fontWeight: 500 }}
           >
-            Add an address
+            {t('add_an_address')}
           </button>
         )}
       </div>
 
       <Footer>
         <Button behavior="button" disabled={busy} onClick={continueForward}>
-          {translate('continue')}
+          {t('continue')}
         </Button>
       </Footer>
     </div>

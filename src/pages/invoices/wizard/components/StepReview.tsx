@@ -10,7 +10,7 @@
 
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { endpoint } from '$app/common/helpers';
+import { endpoint, trans } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -20,6 +20,7 @@ import { Client } from '$app/common/interfaces/client';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import dayjs from 'dayjs';
+import reactStringReplace from 'react-string-replace';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHref, useNavigate } from 'react-router-dom';
@@ -34,9 +35,9 @@ import { Wizard } from '../useWizard';
 import { BrandPrompts } from './BrandPrompts';
 
 const LOOKS: { label: string; design: string }[] = [
-  { label: 'Clean', design: 'Clean' },
-  { label: 'Modern', design: 'Modern' },
-  { label: 'Traditional', design: 'Plain' },
+  { label: 'clean', design: 'Clean' },
+  { label: 'modern', design: 'Modern' },
+  { label: 'traditional', design: 'Plain' },
 ];
 
 type AttachmentKey = 'pdf_email_attachment' | 'document_email_attachment';
@@ -47,8 +48,8 @@ interface Props {
 }
 
 export function StepReview({ wizard, money }: Props) {
-  const [translate] = useTranslation();
-  const t = useTheme();
+  const [t] = useTranslation();
+  const theme = useTheme();
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const navigate = useNavigate();
@@ -189,7 +190,7 @@ export function StepReview({ wizard, money }: Props) {
     const address = emailDraft.trim();
 
     if (!/^\S+@\S+\.\S+$/.test(address)) {
-      setEmailError('Enter a valid email address.');
+      setEmailError(t('enter_valid_email_address'));
       return;
     }
 
@@ -231,7 +232,7 @@ export function StepReview({ wizard, money }: Props) {
         return true;
       })
       .catch(() => {
-        setEmailError('This address could not be saved. Try again.');
+        setEmailError(t('email_address_not_saved'));
 
         return false;
       })
@@ -283,7 +284,7 @@ export function StepReview({ wizard, money }: Props) {
           };
 
           setEmailPreview(
-            `<div style="font:14px/1.6 -apple-system,Segoe UI,sans-serif;padding:12px 16px;border-bottom:1px solid #e4e4e7;color:#3f3f46"><strong>Subject:</strong> ${escapeHtml(
+            `<div style="font:14px/1.6 -apple-system,Segoe UI,sans-serif;padding:12px 16px;border-bottom:1px solid #e4e4e7;color:#3f3f46"><strong>${escapeHtml(t('subject'))}:</strong> ${escapeHtml(
               subject
             )}</div>${(wrapper || '$body').replace('$body', body)}`
           );
@@ -338,31 +339,34 @@ export function StepReview({ wizard, money }: Props) {
     <div className="iw-enter">
       <ErrorBanner errors={wizard.errors} />
 
-      <p className="text-xs mb-2" style={{ color: t.label, fontWeight: 500 }}>
-        Invoice summary
+      <p
+        className="text-xs mb-2"
+        style={{ color: theme.label, fontWeight: 500 }}
+      >
+        {`${t('invoice')} ${t('summary')}`}
       </p>
 
       <div
         className="px-4 py-1"
         style={{
           borderRadius: radius.panel,
-          backgroundColor: t.dark ? t.colors.$25 : t.colors.$2,
+          backgroundColor: theme.dark ? theme.colors.$25 : theme.colors.$2,
         }}
       >
         <Element
           className="border-b border-dashed"
-          leftSide="From"
+          leftSide={t('from')}
           pushContentToRight
           withoutWrappingLeftSide
           noExternalPadding
           style={{ borderColor: colors.$20 }}
         >
-          {company?.settings?.name || 'Your business'}
+          {company?.settings?.name || t('company_name')}
         </Element>
 
         <Element
           className="border-b border-dashed"
-          leftSide="Bill to"
+          leftSide={t('to')}
           pushContentToRight
           withoutWrappingLeftSide
           noExternalPadding
@@ -371,15 +375,15 @@ export function StepReview({ wizard, money }: Props) {
           <div>
             <p>{client?.display_name || client?.name || '—'}</p>
 
-            <p className="text-xs mt-0.5" style={{ color: t.muted }}>
-              {recipient || 'No email address'}
+            <p className="text-xs mt-0.5" style={{ color: theme.muted }}>
+              {recipient || t('no_email_address')}
             </p>
           </div>
         </Element>
 
         <Element
           className="border-b border-dashed"
-          leftSide="Items"
+          leftSide={t('items')}
           pushContentToRight
           withoutWrappingLeftSide
           noExternalPadding
@@ -390,7 +394,7 @@ export function StepReview({ wizard, money }: Props) {
 
         <Element
           className="border-b border-dashed"
-          leftSide="Total"
+          leftSide={t('total')}
           pushContentToRight
           withoutWrappingLeftSide
           noExternalPadding
@@ -400,14 +404,14 @@ export function StepReview({ wizard, money }: Props) {
         </Element>
 
         <Element
-          leftSide="Due"
+          leftSide={t('due')}
           pushContentToRight
           withoutWrappingLeftSide
           noExternalPadding
         >
           {invoice?.due_date
             ? invoice.due_date === invoice.date
-              ? 'On receipt'
+              ? t('due_on_receipt')
               : dayjs(invoice.due_date).format('D MMMM YYYY')
             : '—'}
         </Element>
@@ -415,31 +419,31 @@ export function StepReview({ wizard, money }: Props) {
 
       <p
         className="text-xs mt-6 mb-2"
-        style={{ color: t.label, fontWeight: 500 }}
+        style={{ color: theme.label, fontWeight: 500 }}
       >
-        Before you send
+        {t('before_you_send')}
       </p>
 
       <div
         className="border px-4 py-4"
         style={{
-          borderColor: t.line,
+          borderColor: theme.line,
           borderRadius: radius.panel,
-          backgroundColor: t.surface,
+          backgroundColor: theme.surface,
         }}
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <p
               className="text-[0.8125rem] mb-2.5"
-              style={{ color: t.label, fontWeight: 500 }}
+              style={{ color: theme.label, fontWeight: 500 }}
             >
-              How it looks
+              {t('how_it_looks')}
             </p>
 
             {designsFailed ? (
-              <p className="text-sm" style={{ color: t.muted }}>
-                Layouts could not be loaded. Your usual layout will be used.
+              <p className="text-sm" style={{ color: theme.muted }}>
+                {t('layouts_could_not_be_loaded')}
               </p>
             ) : (
               <div className="flex flex-wrap gap-2">
@@ -456,17 +460,17 @@ export function StepReview({ wizard, money }: Props) {
                       className="text-sm px-3.5 py-2 border"
                       style={{
                         borderRadius: radius.control,
-                        borderColor: active ? t.text : t.line,
-                        backgroundColor: active ? t.hover : t.surface,
-                        color: id ? t.text : t.muted,
+                        borderColor: active ? theme.text : theme.line,
+                        backgroundColor: active ? theme.hover : theme.surface,
+                        color: id ? theme.text : theme.muted,
                         fontWeight: 500,
                         boxShadow: active
-                          ? `inset 0 0 0 1px ${t.text}`
+                          ? `inset 0 0 0 1px ${theme.text}`
                           : 'none',
                         cursor: id ? 'pointer' : 'not-allowed',
                       }}
                     >
-                      {look.label}
+                      {t(look.label)}
                     </button>
                   );
                 })}
@@ -477,10 +481,10 @@ export function StepReview({ wizard, money }: Props) {
           <div className="shrink-0 space-y-2.5">
             <AttachmentOption
               id="iw-attach-pdf"
-              label="Attach PDF to email"
+              label={t('attach_pdf')}
               checked={Boolean(company?.settings?.pdf_email_attachment)}
               allowed={proPlan() || enterprisePlan()}
-              requirement="Pro plan"
+              requirement={t('pro_plan')}
               busy={savingAttachment !== null}
               onChange={(value) =>
                 saveAttachment('pdf_email_attachment', value)
@@ -489,18 +493,18 @@ export function StepReview({ wizard, money }: Props) {
 
             <AttachmentOption
               id="iw-attach-documents"
-              label="Attach Documents to email"
+              label={t('attach_documents')}
               checked={Boolean(company?.settings?.document_email_attachment)}
               allowed={enterprisePlan()}
-              requirement="Enterprise plan"
+              requirement={t('enterprise_plan')}
               busy={savingAttachment !== null}
               onChange={(value) =>
                 saveAttachment('document_email_attachment', value)
               }
             />
 
-            <p className="text-xs" style={{ color: t.muted }}>
-              Saved for all future emails.
+            <p className="text-xs" style={{ color: theme.muted }}>
+              {t('saved_for_all_future_emails')}
             </p>
           </div>
         </div>
@@ -513,7 +517,7 @@ export function StepReview({ wizard, money }: Props) {
       {previewable ? (
         <div
           className="iw-preview mt-6 border overflow-hidden"
-          style={{ borderColor: t.line, borderRadius: radius.panel }}
+          style={{ borderColor: theme.line, borderRadius: radius.panel }}
         >
           <style>
             {'.iw-preview .flex.flex-col.w-full{height:38rem !important;}'}
@@ -533,9 +537,9 @@ export function StepReview({ wizard, money }: Props) {
       {hasGateway === false && !wizard.dismissed('pay') ? (
         <div className="mt-8">
           <Callout
-            title="Would you like customers to pay online?"
+            title={t('would_you_like_customers_to_pay_online')}
             onDismiss={() => wizard.dismiss('pay')}
-            dismissLabel="Not now"
+            dismissLabel={t('not_now')}
           >
             {bankInstructions === null ? (
               <div className="flex flex-wrap items-center gap-2">
@@ -544,23 +548,24 @@ export function StepReview({ wizard, money }: Props) {
                   behavior="button"
                   onClick={() => window.open(gatewaysHref, '_blank')}
                 >
-                  Set up card payments
+                  {t('set_up_card_payments')}
                 </Button>
 
                 <Button
                   type="secondary"
                   behavior="button"
-                  onClick={() => setBankInstructions('')}
+                  onClick={() => setBankInstructions(invoice?.terms ?? '')}
                 >
-                  Add bank transfer instructions
+                  {t('add_bank_transfer_instructions')}
                 </Button>
               </div>
             ) : (
               <div className="space-y-3">
                 <InputField
                   element="textarea"
-                  textareaRows={3}
-                  placeholder="Bank name, account number, sort code"
+                  textareaRows={4}
+                  label={t('terms')}
+                  placeholder={t('bank_details_placeholder')}
                   value={bankInstructions}
                   changeOverride
                   debounceTimeout={0}
@@ -573,14 +578,14 @@ export function StepReview({ wizard, money }: Props) {
                     disabled={savingBank}
                     onClick={saveBankInstructions}
                   >
-                    Add to invoice
+                    {t('action_add_to_invoice')}
                   </Button>
                   <Button
                     type="secondary"
                     behavior="button"
                     onClick={() => setBankInstructions(null)}
                   >
-                    {translate('cancel')}
+                    {t('cancel')}
                   </Button>
                 </div>
               </div>
@@ -589,14 +594,21 @@ export function StepReview({ wizard, money }: Props) {
         </div>
       ) : null}
 
-      <p className="text-sm mt-8 leading-6" style={{ color: t.text }}>
+      <p className="text-sm mt-8 leading-6" style={{ color: theme.text }}>
         {recipient ? (
           <>
-            Your invoice is ready. We'll email it to{' '}
-            <strong style={{ fontWeight: 600 }}>{recipient}</strong>.
+            {reactStringReplace(
+              trans('invoice_ready_email_to', { value: ':recipient' }),
+              ':recipient',
+              () => (
+                <strong key="recipient" style={{ fontWeight: 600 }}>
+                  {recipient}
+                </strong>
+              )
+            )}
           </>
         ) : (
-          <>Your invoice is ready. We'll ask where to send it.</>
+          <>{t('invoice_ready_ask_where_to_send')}</>
         )}
       </p>
 
@@ -608,7 +620,7 @@ export function StepReview({ wizard, money }: Props) {
             disableWithoutIcon
             onClick={wizard.back}
           >
-            {translate('back')}
+            {t('back')}
           </Button>
         }
       >
@@ -618,7 +630,7 @@ export function StepReview({ wizard, money }: Props) {
           disabled={loadingEmailPreview}
           onClick={openEmailPreview}
         >
-          Preview email
+          {`${t('preview')} ${t('email').toLowerCase()}`}
         </Button>
 
         <Button
@@ -642,26 +654,26 @@ export function StepReview({ wizard, money }: Props) {
               .finally(() => setSavingDraft(false));
           }}
         >
-          Save draft
+          {t('save_draft')}
         </Button>
 
         <Button behavior="button" disabled={sending} onClick={send}>
-          Send invoice
+          {t('send_invoice')}
         </Button>
       </Footer>
 
       <Modal
         visible={askEmail}
         onClose={() => setAskEmail(false)}
-        title="Where should we send this invoice?"
+        title={t('where_should_we_send_this_invoice')}
         size="small"
       >
         <div className="space-y-4">
           <InputField
             id="iw-send-to"
-            label="Email address"
+            label={t('email_address')}
             type="email"
-            placeholder="jane@example.com"
+            placeholder={t('email_address')}
             value={emailDraft}
             changeOverride
             debounceTimeout={0}
@@ -675,14 +687,14 @@ export function StepReview({ wizard, money }: Props) {
               disabled={savingEmail || sending}
               onClick={saveEmailThenSend}
             >
-              Save and send
+              {t('save_and_send')}
             </Button>
             <Button
               type="secondary"
               behavior="button"
               onClick={() => setAskEmail(false)}
             >
-              {translate('cancel')}
+              {t('cancel')}
             </Button>
           </div>
         </div>
@@ -691,17 +703,17 @@ export function StepReview({ wizard, money }: Props) {
       <Modal
         visible={emailPreview !== null}
         onClose={() => setEmailPreview(null)}
-        title="What your customer receives"
+        title={t('what_your_customer_receives')}
         size="regular"
       >
         {emailPreview ? (
           <iframe
-            title="Email preview"
+            title={`${t('email')} ${t('preview').toLowerCase()}`}
             srcDoc={emailPreview}
             style={{
               width: '100%',
               height: '30rem',
-              border: `1px solid ${t.line}`,
+              border: `1px solid ${theme.line}`,
               borderRadius: radius.control,
               backgroundColor: '#ffffff',
             }}
@@ -733,7 +745,7 @@ function AttachmentOption({
   busy: boolean;
   onChange: (value: boolean) => void;
 }) {
-  const t = useTheme();
+  const theme = useTheme();
   const disabled = !allowed || busy;
 
   return (
@@ -749,14 +761,14 @@ function AttachmentOption({
         htmlFor={id}
         className="text-sm leading-5"
         style={{
-          color: allowed ? t.text : t.muted,
+          color: allowed ? theme.text : theme.muted,
           cursor: disabled ? 'not-allowed' : 'pointer',
         }}
       >
         {label}
 
         {allowed ? null : (
-          <span className="block text-xs" style={{ color: t.muted }}>
+          <span className="block text-xs" style={{ color: theme.muted }}>
             {requirement}
           </span>
         )}

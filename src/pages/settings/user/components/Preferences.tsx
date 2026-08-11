@@ -101,11 +101,8 @@ export function Preferences() {
       </Element>
 
       <Element
-        leftSide={t('show_advanced_invoice_editor', 'Detailed invoice editor')}
-        leftSideHelp={t(
-          'show_advanced_invoice_editor_help',
-          'Use the full invoice editor with every field instead of the guided steps.'
-        )}
+        leftSide={t('show_advanced_invoice_editor')}
+        leftSideHelp={t('show_advanced_invoice_editor_help')}
       >
         <Toggle
           checked={

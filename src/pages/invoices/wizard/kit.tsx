@@ -12,6 +12,7 @@ import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 export const radius = {
@@ -56,10 +57,13 @@ export function Motion() {
 }
 
 export function Legend({ children }: { children: ReactNode }) {
-  const t = useTheme();
+  const theme = useTheme();
 
   return (
-    <div className="text-sm mb-2" style={{ color: t.label, fontWeight: 500 }}>
+    <div
+      className="text-sm mb-2"
+      style={{ color: theme.label, fontWeight: 500 }}
+    >
       {children}
     </div>
   );
@@ -93,7 +97,7 @@ export function Choice({
   detail,
   trailing,
 }: ChoiceProps) {
-  const t = useTheme();
+  const theme = useTheme();
 
   return (
     <ChoiceButton
@@ -101,12 +105,12 @@ export function Choice({
       role="radio"
       aria-checked={selected}
       onClick={onSelect}
-      theme={{ hover: t.hover, focus: t.accent }}
+      theme={{ hover: theme.hover, focus: theme.accent }}
       className="w-full flex items-center gap-3 text-left px-3.5 py-2.5 border"
       style={{
         borderRadius: radius.control,
-        borderColor: selected ? t.colors.$3 : t.line,
-        backgroundColor: t.surface,
+        borderColor: selected ? theme.colors.$3 : theme.line,
+        backgroundColor: theme.surface,
       }}
     >
       <span
@@ -116,7 +120,7 @@ export function Choice({
           width: '1rem',
           height: '1rem',
           borderRadius: '999px',
-          border: `1px solid ${selected ? t.colors.$3 : t.colors.$5}`,
+          border: `1px solid ${selected ? theme.colors.$3 : theme.colors.$5}`,
         }}
       >
         {selected ? (
@@ -125,7 +129,7 @@ export function Choice({
               width: '0.5rem',
               height: '0.5rem',
               borderRadius: '999px',
-              backgroundColor: t.colors.$3,
+              backgroundColor: theme.colors.$3,
             }}
           />
         ) : null}
@@ -134,19 +138,19 @@ export function Choice({
       <span className="min-w-0 flex-1">
         <span
           className="block text-sm"
-          style={{ color: t.text, fontWeight: 500 }}
+          style={{ color: theme.text, fontWeight: 500 }}
         >
           {title}
         </span>
         {detail ? (
-          <span className="block text-xs mt-0.5" style={{ color: t.muted }}>
+          <span className="block text-xs mt-0.5" style={{ color: theme.muted }}>
             {detail}
           </span>
         ) : null}
       </span>
 
       {trailing ? (
-        <span className="shrink-0 text-xs" style={{ color: t.muted }}>
+        <span className="shrink-0 text-xs" style={{ color: theme.muted }}>
           {trailing}
         </span>
       ) : null}
@@ -179,7 +183,7 @@ const MAPPED_ERROR_KEYS = [
 ];
 
 export function ErrorBanner({ errors }: { errors?: ValidationBag }) {
-  const t = useTheme();
+  const theme = useTheme();
 
   if (!errors?.errors) {
     return null;
@@ -215,26 +219,27 @@ export function Callout({
   title,
   children,
   onDismiss,
-  dismissLabel = 'Skip',
+  dismissLabel,
 }: {
   title: ReactNode;
   children?: ReactNode;
   onDismiss?: () => void;
   dismissLabel?: string;
 }) {
-  const t = useTheme();
+  const [t] = useTranslation();
+  const theme = useTheme();
 
   return (
     <div
       className="border px-4 py-3.5"
       style={{
         borderRadius: radius.panel,
-        borderColor: t.line,
-        backgroundColor: t.dark ? t.colors.$25 : t.colors.$2,
+        borderColor: theme.line,
+        backgroundColor: theme.dark ? theme.colors.$25 : theme.colors.$2,
       }}
     >
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm" style={{ color: t.text, fontWeight: 500 }}>
+        <p className="text-sm" style={{ color: theme.text, fontWeight: 500 }}>
           {title}
         </p>
 
@@ -243,9 +248,9 @@ export function Callout({
             type="button"
             onClick={onDismiss}
             className="shrink-0 text-xs"
-            style={{ color: t.muted, fontWeight: 500 }}
+            style={{ color: theme.muted, fontWeight: 500 }}
           >
-            {dismissLabel}
+            {dismissLabel ?? t('skip')}
           </button>
         ) : null}
       </div>

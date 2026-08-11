@@ -20,8 +20,8 @@ import { useDispatch } from 'react-redux';
 import { radius, useTheme } from '../kit';
 
 export function BrandPrompts() {
-  const [translate] = useTranslation();
-  const t = useTheme();
+  const [t] = useTranslation();
+  const theme = useTheme();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
 
@@ -45,7 +45,7 @@ export function BrandPrompts() {
     }
 
     if (!name.trim()) {
-      setNameError('Enter the name your customers know you by.');
+      setNameError(t('enter_business_name'));
       return;
     }
 
@@ -61,7 +61,7 @@ export function BrandPrompts() {
       .then((response) =>
         dispatch(updateRecord({ object: 'company', data: response.data.data }))
       )
-      .catch(() => setNameError('This name could not be saved. Try again.'))
+      .catch(() => setNameError(t('business_name_not_saved')))
       .finally(() => setSavingName(false));
   };
 
@@ -96,9 +96,7 @@ export function BrandPrompts() {
           updateRecord({ object: 'company', data: response.data.data })
         );
       })
-      .catch(() =>
-        setLogoError('The image could not be uploaded. Use a PNG or JPG.')
-      )
+      .catch(() => setLogoError(t('logo_upload_failed')))
       .finally(() => setUploading(false));
   };
 
@@ -108,16 +106,16 @@ export function BrandPrompts() {
         <div>
           <p
             className="text-sm mb-2"
-            style={{ color: t.text, fontWeight: 500 }}
+            style={{ color: theme.text, fontWeight: 500 }}
           >
-            Your invoice needs a business name.
+            {t('invoice_needs_business_name')}
           </p>
 
           <div className="flex items-end gap-2">
             <div className="flex-1 min-w-0">
               <InputField
                 id="iw-business-name"
-                placeholder="Acme Studio"
+                placeholder={t('company_name')}
                 value={name}
                 changeOverride
                 debounceTimeout={0}
@@ -127,7 +125,7 @@ export function BrandPrompts() {
             </div>
 
             <Button behavior="button" disabled={savingName} onClick={saveName}>
-              {translate('save')}
+              {t('save')}
             </Button>
           </div>
         </div>
@@ -137,9 +135,9 @@ export function BrandPrompts() {
         <div>
           <p
             className="text-sm mb-2"
-            style={{ color: t.text, fontWeight: 500 }}
+            style={{ color: theme.text, fontWeight: 500 }}
           >
-            Add a logo to make this invoice look professional.
+            {t('add_logo_prompt')}
           </p>
 
           <div className="flex items-center gap-2">
@@ -149,7 +147,7 @@ export function BrandPrompts() {
               disabled={uploading}
               onClick={() => filePicker.current?.click()}
             >
-              Add a logo
+              {t('add_company_logo')}
             </Button>
 
             <Button
@@ -158,7 +156,7 @@ export function BrandPrompts() {
               disableWithoutIcon
               onClick={() => setLogoSkipped(true)}
             >
-              Skip
+              {t('skip')}
             </Button>
           </div>
         </div>
@@ -170,9 +168,9 @@ export function BrandPrompts() {
               style={{
                 width: '3rem',
                 height: '2.25rem',
-                borderColor: t.line,
+                borderColor: theme.line,
                 borderRadius: radius.control,
-                backgroundColor: t.surface,
+                backgroundColor: theme.surface,
               }}
             >
               <img
@@ -190,7 +188,7 @@ export function BrandPrompts() {
             disabled={uploading}
             onClick={() => filePicker.current?.click()}
           >
-            {hasLogo ? 'Update logo' : 'Add a logo'}
+            {hasLogo ? t('update_logo') : t('add_company_logo')}
           </Button>
         </div>
       )}

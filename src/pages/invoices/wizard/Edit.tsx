@@ -34,12 +34,12 @@ import { ErrorBanner, Motion, useTheme, radius } from './kit';
 import { useWizard } from './useWizard';
 
 export default function Edit() {
-  const [translate] = useTranslation();
+  const [t] = useTranslation();
 
   const { id } = useParams();
   const { documentTitle } = useTitle('edit_invoice');
 
-  const t = useTheme();
+  const theme = useTheme();
   const colors = useColorScheme();
   const navigate = useNavigate();
   const company = useCurrentCompany();
@@ -50,8 +50,8 @@ export default function Edit() {
   const [sending, setSending] = useState(false);
 
   const pages: Page[] = [
-    { name: translate('invoices'), href: '/invoices' },
-    { name: translate('edit_invoice'), href: `/invoices/wizard/edit/${id}` },
+    { name: t('invoices'), href: '/invoices' },
+    { name: t('edit_invoice'), href: `/invoices/wizard/edit/${id}` },
   ];
 
   const money = (value: number) =>
@@ -119,8 +119,8 @@ export default function Edit() {
           className="shadow-sm"
           title={
             wizard.invoice?.number
-              ? `${translate('invoice')} ${wizard.invoice.number}`
-              : translate('invoice')
+              ? `${t('invoice')} ${wizard.invoice.number}`
+              : t('invoice')
           }
           childrenClassName="px-4 sm:px-6 pb-4 sm:pb-6"
           style={{ borderColor: colors.$24 }}
@@ -128,8 +128,8 @@ export default function Edit() {
         >
           {wizard.loadFailed ? (
             <div className="py-14 text-center">
-              <p className="text-sm mb-4" style={{ color: t.text }}>
-                {translate('error_title')}
+              <p className="text-sm mb-4" style={{ color: theme.text }}>
+                {t('error_title')}
               </p>
 
               <Button
@@ -138,7 +138,7 @@ export default function Edit() {
                 disableWithoutIcon
                 onClick={wizard.retryLoad}
               >
-                {translate('refresh')}
+                {t('refresh')}
               </Button>
             </div>
           ) : !wizard.ready ? (
@@ -149,44 +149,53 @@ export default function Edit() {
             <div className="pt-4">
               <ErrorBanner errors={wizard.errors} />
 
-              <Section label={translate('client')}>
+              <Section label={t('client')}>
                 <div
                   className="flex items-start justify-between gap-4 border px-4 py-3.5"
-                  style={{ borderColor: t.line, borderRadius: radius.panel }}
+                  style={{
+                    borderColor: theme.line,
+                    borderRadius: radius.panel,
+                  }}
                 >
                   <div className="min-w-0">
                     <p
                       className="text-sm"
-                      style={{ color: t.text, fontWeight: 500 }}
+                      style={{ color: theme.text, fontWeight: 500 }}
                     >
                       {wizard.client?.display_name || wizard.client?.name}
                     </p>
 
-                    <p className="text-xs mt-0.5" style={{ color: t.muted }}>
-                      {recipient || 'No email address'}
+                    <p
+                      className="text-xs mt-0.5"
+                      style={{ color: theme.muted }}
+                    >
+                      {recipient || t('no_email_address')}
                     </p>
                   </div>
                 </div>
               </Section>
 
-              <Section label={translate('items')}>
+              <Section label={t('items')}>
                 <StepItems wizard={wizard} money={money} embedded />
               </Section>
 
-              <Section label={translate('payment')}>
+              <Section label={t('payment')}>
                 <StepTiming wizard={wizard} embedded />
               </Section>
 
-              <Section label={translate('notes')}>
+              <Section label={t('notes')}>
                 <StepNotes wizard={wizard} embedded />
               </Section>
 
-              <Section label={translate('preview')} last>
+              <Section label={t('preview')} last>
                 <BrandPrompts />
 
                 <div
                   className="iw-preview mt-4 border overflow-hidden"
-                  style={{ borderColor: t.line, borderRadius: radius.panel }}
+                  style={{
+                    borderColor: theme.line,
+                    borderRadius: radius.panel,
+                  }}
                 >
                   <style>
                     {
@@ -212,11 +221,11 @@ export default function Edit() {
                   disabled={saving}
                   onClick={save}
                 >
-                  {translate('save')}
+                  {t('save')}
                 </Button>
 
                 <Button behavior="button" disabled={sending} onClick={send}>
-                  Send invoice
+                  {t('send_invoice')}
                 </Button>
               </div>
             </div>
@@ -236,14 +245,19 @@ function Section({
   children: React.ReactNode;
   last?: boolean;
 }) {
-  const t = useTheme();
+  const theme = useTheme();
 
   return (
     <section
       className={last ? '' : 'pb-6 mb-6'}
-      style={last ? undefined : { borderBottom: `1px dashed ${t.colors.$5}` }}
+      style={
+        last ? undefined : { borderBottom: `1px dashed ${theme.colors.$5}` }
+      }
     >
-      <h4 className="text-sm mb-3" style={{ color: t.label, fontWeight: 500 }}>
+      <h4
+        className="text-sm mb-3"
+        style={{ color: theme.label, fontWeight: 500 }}
+      >
         {label}
       </h4>
 

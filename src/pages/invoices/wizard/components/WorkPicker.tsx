@@ -23,6 +23,7 @@ import { Spinner } from '$app/components/Spinner';
 import { InputField } from '$app/components/forms';
 import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceProject';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme, radius } from '../kit';
 
 export type WorkSource = 'saved' | 'work';
@@ -53,7 +54,8 @@ export function WorkPicker({
   onClose,
   onPick,
 }: Props) {
-  const t = useTheme();
+  const [t] = useTranslation();
+  const theme = useTheme();
 
   const [query, setQuery] = useState('');
   const [rows, setRows] = useState<Row[]>([]);
@@ -89,7 +91,9 @@ export function WorkPicker({
       visible={open}
       onClose={onClose}
       title={
-        source === 'saved' ? 'Choose a saved item' : 'Add from existing work'
+        source === 'saved'
+          ? t('choose_a_saved_item')
+          : t('add_from_existing_work')
       }
       size="small"
     >
@@ -97,7 +101,7 @@ export function WorkPicker({
         <div className="mb-3">
           <InputField
             id="iw-item-search"
-            placeholder="Search products"
+            placeholder={t('search_products')}
             value={query}
             changeOverride
             onValueChange={setQuery}
@@ -110,8 +114,8 @@ export function WorkPicker({
           <Spinner />
         </div>
       ) : rows.length === 0 ? (
-        <p className="text-sm py-10 text-center" style={{ color: t.muted }}>
-          {emptyCopy(source, Boolean(clientId))}
+        <p className="text-sm py-10 text-center" style={{ color: theme.muted }}>
+          {t(emptyCopy(source, Boolean(clientId)))}
         </p>
       ) : (
         <div className="space-y-2">
@@ -125,35 +129,40 @@ export function WorkPicker({
               }}
               className="w-full text-left px-3.5 py-3 flex items-start justify-between gap-4 border"
               style={{
-                borderColor: t.line,
+                borderColor: theme.line,
                 borderRadius: radius.control,
-                backgroundColor: t.surface,
+                backgroundColor: theme.surface,
               }}
               onMouseEnter={(event) =>
-                (event.currentTarget.style.backgroundColor = t.hover)
+                (event.currentTarget.style.backgroundColor = theme.hover)
               }
               onMouseLeave={(event) =>
-                (event.currentTarget.style.backgroundColor = t.surface)
+                (event.currentTarget.style.backgroundColor = theme.surface)
               }
             >
               <span className="min-w-0">
-                <span className="block text-sm" style={{ color: t.text }}>
+                <span className="block text-sm" style={{ color: theme.text }}>
                   {row.title}
                 </span>
 
                 {row.detail || row.tag ? (
                   <span
                     className="block text-xs mt-0.5"
-                    style={{ color: t.muted }}
+                    style={{ color: theme.muted }}
                   >
-                    {[row.tag, row.detail].filter(Boolean).join(' · ')}
+                    {[row.tag ? t(row.tag) : '', row.detail]
+                      .filter(Boolean)
+                      .join(' · ')}
                   </span>
                 ) : null}
               </span>
 
               <span
                 className="text-sm shrink-0"
-                style={{ color: t.text, fontVariantNumeric: 'tabular-nums' }}
+                style={{
+                  color: theme.text,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
               >
                 {money(row.amount)}
               </span>
@@ -238,7 +247,7 @@ const load = (
         return {
           id: `task-${task.id}`,
           title: task.description || `Task ${task.number}`,
-          tag: 'Task',
+          tag: 'task',
           detail: `${hours} h`,
           amount: (task.rate || 0) * hours,
           build: () => ({
@@ -261,7 +270,7 @@ const load = (
         return {
           id: `expense-${expense.id}`,
           title: expense.public_notes || `Expense ${expense.number}`,
-          tag: 'Expense',
+          tag: 'expense',
           detail: expense.date,
           amount: cost,
           build: () => ({
@@ -315,12 +324,12 @@ const taxRateOf = (
 
 const emptyCopy = (source: WorkSource, hasClient: boolean): string => {
   if (source === 'saved') {
-    return 'No saved products.';
+    return 'no_saved_products';
   }
 
   if (!hasClient) {
-    return 'Choose a customer first.';
+    return 'choose_a_customer_first';
   }
 
-  return 'No unbilled tasks or expenses.';
+  return 'no_unbilled_work';
 };

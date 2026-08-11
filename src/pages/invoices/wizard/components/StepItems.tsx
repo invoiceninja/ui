@@ -39,8 +39,8 @@ interface Props {
 type TaxTarget = { scope: 'invoice' } | { scope: 'item'; index: number };
 
 export function StepItems({ wizard, money, embedded }: Props) {
-  const [translate] = useTranslation();
-  const t = useTheme();
+  const [t] = useTranslation();
+  const theme = useTheme();
   const company = useCurrentCompany();
 
   const items = wizard.invoice?.line_items ?? [];
@@ -131,25 +131,28 @@ export function StepItems({ wizard, money, embedded }: Props) {
       {embedded || !clientName ? null : (
         <div
           className="pb-5 mb-5 flex items-start justify-between gap-4"
-          style={{ borderBottom: `1px dashed ${t.colors.$5}` }}
+          style={{ borderBottom: `1px dashed ${theme.colors.$5}` }}
         >
           <div className="min-w-0">
             <p
               className="text-xs mb-1"
-              style={{ color: t.label, fontWeight: 500 }}
+              style={{ color: theme.label, fontWeight: 500 }}
             >
-              Bill to
+              {t('to')}
             </p>
 
             <p
               className="text-sm truncate"
-              style={{ color: t.text, fontWeight: 500 }}
+              style={{ color: theme.text, fontWeight: 500 }}
             >
               {clientName}
             </p>
 
-            <p className="text-xs mt-0.5 truncate" style={{ color: t.muted }}>
-              {recipientEmail || 'No email address'}
+            <p
+              className="text-xs mt-0.5 truncate"
+              style={{ color: theme.muted }}
+            >
+              {recipientEmail || t('no_email_address')}
             </p>
           </div>
 
@@ -157,9 +160,9 @@ export function StepItems({ wizard, money, embedded }: Props) {
             type="button"
             onClick={wizard.detachClient}
             className="shrink-0 text-sm"
-            style={{ color: t.accent, fontWeight: 500 }}
+            style={{ color: theme.accent, fontWeight: 500 }}
           >
-            {translate('change')}
+            {t('change')}
           </button>
         </div>
       )}
@@ -173,9 +176,11 @@ export function StepItems({ wizard, money, embedded }: Props) {
               key={key}
               className="relative border p-4"
               style={{
-                borderColor: t.line,
+                borderColor: theme.line,
                 borderRadius: radius.panel,
-                backgroundColor: t.dark ? t.colors.$25 : t.colors.$2,
+                backgroundColor: theme.dark
+                  ? theme.colors.$25
+                  : theme.colors.$2,
               }}
             >
               {items.length > 1 ? (
@@ -185,8 +190,8 @@ export function StepItems({ wizard, money, embedded }: Props) {
               <InputField
                 id={`iw-desc-${key}`}
                 width="100%"
-                label="Description"
-                placeholder="Website design"
+                label={t('description')}
+                placeholder={t('item_description')}
                 value={item.notes}
                 changeOverride
                 debounceTimeout={0}
@@ -198,7 +203,7 @@ export function StepItems({ wizard, money, embedded }: Props) {
                   <InputField
                     id={`iw-qty-${key}`}
                     width="100%"
-                    label="Qty"
+                    label={t('quantity')}
                     value={String(item.quantity ?? 0)}
                     changeOverride
                     debounceTimeout={0}
@@ -212,7 +217,7 @@ export function StepItems({ wizard, money, embedded }: Props) {
                   <InputField
                     id={`iw-price-${key}`}
                     width="100%"
-                    label="Price"
+                    label={t('price')}
                     value={String(item.cost ?? 0)}
                     changeOverride
                     debounceTimeout={0}
@@ -223,12 +228,12 @@ export function StepItems({ wizard, money, embedded }: Props) {
                 </div>
 
                 <div className="shrink-0 text-right">
-                  <InputLabel className="mb-1">{translate('total')}</InputLabel>
+                  <InputLabel className="mb-1">{t('total')}</InputLabel>
 
                   <div
                     className="text-sm whitespace-nowrap py-2"
                     style={{
-                      color: t.text,
+                      color: theme.text,
                       fontWeight: 500,
                       fontVariantNumeric: 'tabular-nums',
                     }}
@@ -258,48 +263,42 @@ export function StepItems({ wizard, money, embedded }: Props) {
 
       <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
         <Button type="secondary" behavior="button" onClick={() => addRow()}>
-          Add another item
+          {t('add_another_item')}
         </Button>
 
         <button
           type="button"
           onClick={() => setPicker('saved')}
           className="text-sm"
-          style={{ color: t.accent, fontWeight: 500 }}
+          style={{ color: theme.accent, fontWeight: 500 }}
         >
-          Choose a saved item
+          {t('choose_a_saved_item')}
         </button>
 
         <button
           type="button"
           onClick={() => setPicker('work')}
           className="text-sm"
-          style={{ color: t.accent, fontWeight: 500 }}
+          style={{ color: theme.accent, fontWeight: 500 }}
         >
-          Add from existing work
+          {t('add_from_existing_work')}
         </button>
       </div>
 
       <div
         className="mt-6 pt-6 space-y-2"
-        style={{ borderTop: `1px dashed ${t.colors.$5}` }}
+        style={{ borderTop: `1px dashed ${theme.colors.$5}` }}
       >
-        <MoneyRow
-          label={translate('subtotal')}
-          value={money(totals.subtotal)}
-        />
+        <MoneyRow label={t('subtotal')} value={money(totals.subtotal)} />
 
         {totals.discount ? (
-          <MoneyRow
-            label={translate('discount')}
-            value={money(totals.discount)}
-          />
+          <MoneyRow label={t('discount')} value={money(totals.discount)} />
         ) : null}
 
         {totals.surchargeRows.map((row, index) => (
           <MoneyRow
             key={`surcharge-${index}`}
-            label={row.name || translate('surcharge')}
+            label={row.name || t('surcharge')}
             value={money(row.total)}
           />
         ))}
@@ -307,24 +306,18 @@ export function StepItems({ wizard, money, embedded }: Props) {
         {totals.taxRows.map((row, index) => (
           <MoneyRow
             key={`${row.name}-${index}`}
-            label={
-              inclusive ? `${translate('includes')} ${row.name}` : row.name
-            }
+            label={inclusive ? `${t('includes')} ${row.name}` : row.name}
             value={money(row.total)}
           />
         ))}
 
-        <MoneyRow
-          label={translate('total')}
-          value={money(totals.total)}
-          strong
-        />
+        <MoneyRow label={t('total')} value={money(totals.total)} strong />
       </div>
 
       {taxesConfigured ? (
         <div
           className="mt-6 pt-6 flex items-center gap-2.5"
-          style={{ borderTop: `1px dashed ${t.colors.$5}` }}
+          style={{ borderTop: `1px dashed ${theme.colors.$5}` }}
         >
           <Checkbox
             id="iw-inclusive-taxes"
@@ -337,16 +330,16 @@ export function StepItems({ wizard, money, embedded }: Props) {
           <label
             htmlFor="iw-inclusive-taxes"
             className="text-sm cursor-pointer"
-            style={{ color: t.text }}
+            style={{ color: theme.text }}
           >
-            Prices include tax on this invoice
+            {t('prices_include_tax_on_this_invoice')}
           </label>
         </div>
       ) : null}
 
       {!taxesConfigured && !wizard.dismissed('tax') ? (
         <div className="mt-6">
-          <Callout title="Do you need to charge tax on this invoice?">
+          <Callout title={t('do_you_need_to_charge_tax')}>
             <div className="flex items-center gap-2">
               <Button
                 type="secondary"
@@ -356,14 +349,14 @@ export function StepItems({ wizard, money, embedded }: Props) {
                   setTaxOpen(true);
                 }}
               >
-                Yes, add tax
+                {`${t('yes')}, ${t('add_a_tax').toLowerCase()}`}
               </Button>
               <Button
                 type="secondary"
                 behavior="button"
                 onClick={() => wizard.dismiss('tax')}
               >
-                No
+                {t('no')}
               </Button>
             </div>
           </Callout>
@@ -373,8 +366,8 @@ export function StepItems({ wizard, money, embedded }: Props) {
       {embedded ? null : (
         <>
           {!described ? (
-            <p className="text-xs mt-6" style={{ color: t.muted }}>
-              Add a description to continue.
+            <p className="text-xs mt-6" style={{ color: theme.muted }}>
+              {t('add_description_to_continue')}
             </p>
           ) : null}
 
@@ -386,7 +379,7 @@ export function StepItems({ wizard, money, embedded }: Props) {
                 disableWithoutIcon
                 onClick={wizard.back}
               >
-                {translate('back')}
+                {t('back')}
               </Button>
             }
           >
@@ -396,7 +389,7 @@ export function StepItems({ wizard, money, embedded }: Props) {
               disableWithoutIcon
               onClick={wizard.next}
             >
-              {translate('continue')}
+              {t('continue')}
             </Button>
           </Footer>
         </>
@@ -445,14 +438,14 @@ function MoneyRow({
   value: string;
   strong?: boolean;
 }) {
-  const t = useTheme();
+  const theme = useTheme();
 
   return (
     <div className="flex items-baseline justify-between gap-4">
       <span
         className="text-sm"
         style={{
-          color: strong ? t.text : t.muted,
+          color: strong ? theme.text : theme.muted,
           fontWeight: strong ? 500 : 400,
         }}
       >
@@ -462,7 +455,7 @@ function MoneyRow({
       <span
         className={strong ? 'text-lg' : 'text-sm'}
         style={{
-          color: t.text,
+          color: theme.text,
           fontWeight: strong ? 600 : 400,
           fontVariantNumeric: 'tabular-nums',
         }}
@@ -496,7 +489,8 @@ function TaxChip({
   onChange: (changes: Partial<InvoiceItem>) => void;
   onCreate: () => void;
 }) {
-  const t = useTheme();
+  const [t] = useTranslation();
+  const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [placement, setPlacement] = useState<Placement>();
@@ -578,9 +572,9 @@ function TaxChip({
         className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 border"
         style={{
           borderRadius: radius.control,
-          borderColor: applied ? t.line : hexToRgba(t.accent, 0.35),
-          color: applied ? t.text : t.accent,
-          backgroundColor: applied ? t.hover : hexToRgba(t.accent, 0.1),
+          borderColor: applied ? theme.line : hexToRgba(theme.accent, 0.35),
+          color: applied ? theme.text : theme.accent,
+          backgroundColor: applied ? theme.hover : hexToRgba(theme.accent, 0.1),
           fontWeight: 500,
           opacity: hovered ? 0.75 : 1,
           transition: 'opacity 150ms ease',
@@ -588,8 +582,8 @@ function TaxChip({
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        {applied ? null : <Plus size="0.6875rem" color={t.accent} />}
-        {applied ? formatTaxName(item.tax_name1, item.tax_rate1) : 'Add tax'}
+        {applied ? null : <Plus size="0.6875rem" color={theme.accent} />}
+        {applied ? formatTaxName(item.tax_name1, item.tax_rate1) : t('add_tax')}
       </button>
 
       {open && placement
@@ -604,8 +598,8 @@ function TaxChip({
                 maxHeight: placement.maxHeight,
                 transform: placement.above ? 'translateY(-100%)' : undefined,
                 zIndex: 50,
-                backgroundColor: t.surface,
-                borderColor: t.line,
+                backgroundColor: theme.surface,
+                borderColor: theme.line,
                 borderRadius: radius.control,
                 boxShadow: '0 12px 32px -12px rgba(9,9,11,0.28)',
               }}
@@ -618,7 +612,7 @@ function TaxChip({
                       setOpen(false);
                     }}
                   >
-                    No tax
+                    {`${t('no')} ${t('tax').toLowerCase()}`}
                   </Option>
                 ) : null}
 
@@ -638,7 +632,7 @@ function TaxChip({
 
               <div
                 className="shrink-0"
-                style={{ borderTop: `1px solid ${t.hairline}` }}
+                style={{ borderTop: `1px solid ${theme.hairline}` }}
               >
                 <Option
                   onClick={() => {
@@ -647,7 +641,7 @@ function TaxChip({
                   }}
                   muted
                 >
-                  Add a different tax…
+                  {t('add_a_different_tax')}
                 </Option>
               </div>
             </div>,
@@ -669,7 +663,7 @@ function Option({
   muted?: boolean;
   selected?: boolean;
 }) {
-  const t = useTheme();
+  const theme = useTheme();
 
   return (
     <button
@@ -679,16 +673,16 @@ function Option({
       onClick={onClick}
       className="w-full text-left px-3 py-2 text-xs"
       style={{
-        color: muted ? t.muted : t.text,
-        backgroundColor: selected ? t.hover : 'transparent',
+        color: muted ? theme.muted : theme.text,
+        backgroundColor: selected ? theme.hover : 'transparent',
         fontWeight: selected ? 500 : 400,
       }}
       onMouseEnter={(event) =>
-        (event.currentTarget.style.backgroundColor = t.hover)
+        (event.currentTarget.style.backgroundColor = theme.hover)
       }
       onMouseLeave={(event) =>
         (event.currentTarget.style.backgroundColor = selected
-          ? t.hover
+          ? theme.hover
           : 'transparent')
       }
     >
@@ -698,13 +692,14 @@ function Option({
 }
 
 function RemoveButton({ onClick }: { onClick: () => void }) {
-  const t = useTheme();
+  const [t] = useTranslation();
+  const theme = useTheme();
 
   return (
     <button
       type="button"
       onClick={onClick}
-      aria-label="Remove item"
+      aria-label={`${t('remove')} ${t('item').toLowerCase()}`}
       className="absolute grid place-items-center leading-none"
       style={{
         top: '0.375rem',
@@ -712,16 +707,16 @@ function RemoveButton({ onClick }: { onClick: () => void }) {
         width: '1.5rem',
         height: '1.5rem',
         fontSize: '0.9375rem',
-        color: t.muted,
+        color: theme.muted,
         borderRadius: radius.control,
       }}
       onMouseEnter={(event) => {
-        event.currentTarget.style.backgroundColor = t.hover;
-        event.currentTarget.style.color = t.text;
+        event.currentTarget.style.backgroundColor = theme.hover;
+        event.currentTarget.style.color = theme.text;
       }}
       onMouseLeave={(event) => {
         event.currentTarget.style.backgroundColor = 'transparent';
-        event.currentTarget.style.color = t.muted;
+        event.currentTarget.style.color = theme.muted;
       }}
     >
       ✕

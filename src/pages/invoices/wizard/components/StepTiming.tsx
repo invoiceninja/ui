@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
+import { endpoint, trans } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -23,12 +23,12 @@ import { Wizard, addDays, today } from '../useWizard';
 
 type Term = 'receipt' | '7' | '14' | '30' | 'custom';
 
-const TERMS: { key: Term; label: string; days: number | null }[] = [
-  { key: 'receipt', label: 'Due on receipt', days: 0 },
-  { key: '7', label: 'In 7 days', days: 7 },
-  { key: '14', label: 'In 14 days', days: 14 },
-  { key: '30', label: 'In 30 days', days: 30 },
-  { key: 'custom', label: 'Choose a date', days: null },
+const TERMS: { key: Term; days: number | null }[] = [
+  { key: 'receipt', days: 0 },
+  { key: '7', days: 7 },
+  { key: '14', days: 14 },
+  { key: '30', days: 30 },
+  { key: 'custom', days: null },
 ];
 
 interface Props {
@@ -53,8 +53,8 @@ const termFromDates = (
 };
 
 export function StepTiming({ wizard, embedded }: Props) {
-  const [translate] = useTranslation();
-  const t = useTheme();
+  const [t] = useTranslation();
+  const theme = useTheme();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
 
@@ -119,13 +119,23 @@ export function StepTiming({ wizard, embedded }: Props) {
     <div className="iw-enter">
       {embedded ? null : <ErrorBanner errors={wizard.errors} />}
 
-      <div className="space-y-2" role="radiogroup" aria-label="Payment timing">
+      <div
+        className="space-y-2"
+        role="radiogroup"
+        aria-label={t('payment_timing')}
+      >
         {TERMS.map((option) => (
           <Choice
             key={option.key}
             selected={term === option.key}
             onSelect={() => choose(option.key)}
-            title={option.label}
+            title={
+              option.days === null
+                ? t('choose_a_date')
+                : option.days === 0
+                  ? t('due_on_receipt')
+                  : trans('in_count_days', { count: option.days })
+            }
             trailing={
               option.days !== null && option.days > 0
                 ? dayjs(addDays(invoiceDate, option.days)).format('D MMM')
@@ -139,7 +149,7 @@ export function StepTiming({ wizard, embedded }: Props) {
         <div className="mt-4">
           <InputField
             id="iw-due-date"
-            label={translate('due_date')}
+            label={t('due_date')}
             type="date"
             value={invoice?.due_date || ''}
             min={invoiceDate}
@@ -156,7 +166,7 @@ export function StepTiming({ wizard, embedded }: Props) {
           <div>
             <InputField
               id="iw-invoice-date"
-              label={translate('invoice_date')}
+              label={t('invoice_date')}
               type="date"
               value={invoiceDate}
               changeOverride
@@ -178,14 +188,16 @@ export function StepTiming({ wizard, embedded }: Props) {
             />
           </div>
         ) : (
-          <p className="text-sm" style={{ color: t.muted }}>
-            Invoice date {dayjs(invoiceDate).format('D MMMM YYYY')}.{' '}
+          <p className="text-sm" style={{ color: theme.muted }}>
+            {trans('invoice_dated_value', {
+              value: dayjs(invoiceDate).format('D MMMM YYYY'),
+            })}{' '}
             <button
               type="button"
               onClick={() => setShowDate(true)}
-              style={{ color: t.accent, fontWeight: 500 }}
+              style={{ color: theme.accent, fontWeight: 500 }}
             >
-              {translate('change')}
+              {t('change')}
             </button>
           </p>
         )}
@@ -197,9 +209,14 @@ export function StepTiming({ wizard, embedded }: Props) {
       !wizard.dismissed('terms') ? (
         <div className="mt-6">
           <Callout
-            title={`Use ${chosen.days === 0 ? 'due on receipt' : `${chosen.days} days`} for future invoices?`}
+            title={trans('use_for_future_invoices', {
+              value:
+                chosen.days === 0
+                  ? t('due_on_receipt')
+                  : trans('count_days', { count: chosen.days }),
+            })}
             onDismiss={() => wizard.dismiss('terms')}
-            dismissLabel="Not now"
+            dismissLabel={t('not_now')}
           >
             <Button
               type="secondary"
@@ -207,15 +224,15 @@ export function StepTiming({ wizard, embedded }: Props) {
               disabled={savingDefault}
               onClick={saveDefault}
             >
-              Yes, make it my default
+              {t('yes_make_it_my_default')}
             </Button>
           </Callout>
         </div>
       ) : null}
 
       {defaultSaved ? (
-        <p className="text-xs mt-6" style={{ color: t.muted }}>
-          New invoices will use this by default.
+        <p className="text-xs mt-6" style={{ color: theme.muted }}>
+          {t('new_invoices_use_this_by_default')}
         </p>
       ) : null}
 
@@ -228,7 +245,7 @@ export function StepTiming({ wizard, embedded }: Props) {
               disableWithoutIcon
               onClick={wizard.back}
             >
-              {translate('back')}
+              {t('back')}
             </Button>
           }
         >
@@ -241,7 +258,7 @@ export function StepTiming({ wizard, embedded }: Props) {
               wizard.next();
             }}
           >
-            {translate('continue')}
+            {t('continue')}
           </Button>
         </Footer>
       )}

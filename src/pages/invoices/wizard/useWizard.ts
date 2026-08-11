@@ -33,23 +33,23 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 export type StepKey = 'who' | 'what' | 'when' | 'notes' | 'send';
 
 export const STEPS: { key: StepKey; title: string; href: string }[] = [
-  { key: 'who', title: 'Who are you invoicing?', href: '/invoices/wizard' },
+  { key: 'who', title: 'who_are_you_invoicing', href: '/invoices/wizard' },
   {
     key: 'what',
-    title: 'What are you charging for?',
+    title: 'what_are_you_charging_for',
     href: '/invoices/wizard/items',
   },
   {
     key: 'when',
-    title: 'When should they pay?',
+    title: 'when_should_they_pay',
     href: '/invoices/wizard/payment',
   },
   {
     key: 'notes',
-    title: 'Anything else to add?',
+    title: 'anything_else_to_add',
     href: '/invoices/wizard/notes',
   },
-  { key: 'send', title: 'Review and send', href: '/invoices/wizard/send' },
+  { key: 'send', title: 'review_and_send', href: '/invoices/wizard/send' },
 ];
 
 export type SaveState = 'idle' | 'saving' | 'saved' | 'failed';

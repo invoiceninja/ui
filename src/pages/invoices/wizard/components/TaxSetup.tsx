@@ -37,8 +37,8 @@ interface Props {
 }
 
 export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
-  const [translate] = useTranslation();
-  const t = useTheme();
+  const [t] = useTranslation();
+  const theme = useTheme();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
 
@@ -97,12 +97,12 @@ export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
     setRateError(undefined);
 
     if (!name.trim()) {
-      setNameError('Enter a name for the tax.');
+      setNameError(t('enter_tax_name'));
       return;
     }
 
     if (!rateIsValid) {
-      setRateError('Enter the percentage as a number, for example 20.');
+      setRateError(t('enter_tax_percentage'));
       return;
     }
 
@@ -130,19 +130,13 @@ export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
             );
             onClose();
           })
-          .catch(() =>
-            setError(
-              'The tax rate was saved, but taxes could not be switched on for your company. Try again.'
-            )
-          );
+          .catch(() => setError(t('taxes_could_not_be_enabled')));
       })
       .catch((caught: AxiosError<ValidationBag>) => {
         const bag = caught.response?.data?.errors;
 
         if (!bag) {
-          setError(
-            'The tax rate could not be saved. Check the details and try again.'
-          );
+          setError(t('tax_rate_not_saved'));
 
           return;
         }
@@ -164,14 +158,14 @@ export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
     <Modal
       visible={open}
       onClose={onClose}
-      title={invoiceScope ? 'Charge tax on this invoice' : 'Add a tax'}
+      title={invoiceScope ? t('charge_tax_on_this_invoice') : t('add_a_tax')}
       size="small"
     >
       <div className="space-y-5">
         <InputField
           id="iw-tax-name"
-          label="What is it called?"
-          placeholder="GST, VAT, Sales tax"
+          label={t('what_is_it_called')}
+          placeholder={t('tax_name_examples')}
           value={name}
           changeOverride
           debounceTimeout={0}
@@ -181,7 +175,7 @@ export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
 
         <InputField
           id="iw-tax-rate"
-          label="What percentage is it?"
+          label={t('what_percentage_is_it')}
           placeholder="20"
           value={rate}
           changeOverride
@@ -192,26 +186,25 @@ export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
 
         {invoiceScope ? (
           <div>
-            <Legend>Is tax already included in your prices?</Legend>
+            <Legend>{t('is_tax_included_in_prices')}</Legend>
 
             <div className="space-y-2" role="radiogroup">
               <Choice
                 selected={inclusive === false}
                 onSelect={() => setInclusive(false)}
-                title="No, add it on top"
-                detail="A 100 item becomes 120 with 20% tax."
+                title={t('no_add_tax_on_top')}
+                detail={t('no_add_tax_on_top_help')}
               />
               <Choice
                 selected={inclusive === true}
                 onSelect={() => setInclusive(true)}
-                title="Yes, my prices already include it"
-                detail="A 100 item stays 100, and the tax is included in that."
+                title={t('yes_prices_include_tax')}
+                detail={t('yes_prices_include_tax_help')}
               />
             </div>
 
-            <p className="text-xs mt-2" style={{ color: t.muted }}>
-              This applies to the whole invoice and becomes the default for new
-              ones.
+            <p className="text-xs mt-2" style={{ color: theme.muted }}>
+              {t('tax_applies_to_whole_invoice')}
             </p>
           </div>
         ) : null}
@@ -229,16 +222,16 @@ export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
             disableWithoutIcon={!busy}
             onClick={apply}
           >
-            Apply tax
+            {`${t('apply')} ${t('tax')}`}
           </Button>
 
           <Button type="secondary" behavior="button" onClick={onClose}>
-            {translate('cancel')}
+            {t('cancel')}
           </Button>
         </div>
 
-        <p className="text-xs" style={{ color: t.muted }}>
-          This tax is saved for future invoices.
+        <p className="text-xs" style={{ color: theme.muted }}>
+          {t('tax_saved_for_future_invoices')}
         </p>
       </div>
     </Modal>

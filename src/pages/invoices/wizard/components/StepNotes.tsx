@@ -20,8 +20,8 @@ interface Props {
 }
 
 export function StepNotes({ wizard, embedded }: Props) {
-  const [translate] = useTranslation();
-  const t = useTheme();
+  const [t] = useTranslation();
+  const theme = useTheme();
 
   const invoice = wizard.invoice;
 
@@ -31,10 +31,10 @@ export function StepNotes({ wizard, embedded }: Props) {
 
       <div className="space-y-6">
         <div>
-          <Legend>{translate('public_notes')}</Legend>
+          <Legend>{t('public_notes')}</Legend>
 
-          <p className="text-xs -mt-1 mb-1" style={{ color: t.muted }}>
-            Shown on the invoice your customer receives.
+          <p className="text-xs -mt-1 mb-1" style={{ color: theme.muted }}>
+            {t('notes_shown_on_invoice')}
           </p>
 
           <MarkdownEditor
@@ -44,10 +44,10 @@ export function StepNotes({ wizard, embedded }: Props) {
         </div>
 
         <div>
-          <Legend>{translate('terms')}</Legend>
+          <Legend>{t('terms')}</Legend>
 
-          <p className="text-xs -mt-1 mb-1" style={{ color: t.muted }}>
-            Payment terms and conditions printed on the invoice.
+          <p className="text-xs -mt-1 mb-1" style={{ color: theme.muted }}>
+            {t('terms_printed_on_invoice')}
           </p>
 
           <MarkdownEditor
@@ -59,8 +59,8 @@ export function StepNotes({ wizard, embedded }: Props) {
 
       {embedded ? null : (
         <>
-          <p className="text-xs mt-6" style={{ color: t.muted }}>
-            Both are optional. You can leave them empty and carry on.
+          <p className="text-xs mt-6" style={{ color: theme.muted }}>
+            {t('notes_and_terms_optional')}
           </p>
 
           <Footer
@@ -71,7 +71,7 @@ export function StepNotes({ wizard, embedded }: Props) {
                 disableWithoutIcon
                 onClick={wizard.back}
               >
-                {translate('back')}
+                {t('back')}
               </Button>
             }
           >
@@ -83,7 +83,7 @@ export function StepNotes({ wizard, embedded }: Props) {
                 wizard.next();
               }}
             >
-              Review and send
+              {t('review_and_send')}
             </Button>
           </Footer>
         </>

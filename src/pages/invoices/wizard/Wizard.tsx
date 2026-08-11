@@ -25,11 +25,11 @@ import { Motion, useTheme } from './kit';
 import { STEPS, useWizard } from './useWizard';
 
 export default function Wizard() {
-  const [translate] = useTranslation();
+  const [t] = useTranslation();
 
   const { documentTitle } = useTitle('new_invoice');
 
-  const t = useTheme();
+  const theme = useTheme();
   const colors = useColorScheme();
   const location = useLocation();
   const company = useCurrentCompany();
@@ -43,8 +43,8 @@ export default function Wizard() {
   }, [wizard.step]);
 
   const pages: Page[] = [
-    { name: translate('invoices'), href: '/invoices' },
-    { name: translate('new_invoice'), href: '/invoices/wizard' },
+    { name: t('invoices'), href: '/invoices' },
+    { name: t('new_invoice'), href: '/invoices/wizard' },
   ];
 
   const money = (value: number) =>
@@ -100,7 +100,7 @@ export default function Wizard() {
       >
         <Card
           className="shadow-sm"
-          title={current.title}
+          title={t(current.title)}
           childrenClassName="px-4 sm:px-6 pb-4 sm:pb-6"
           style={{ borderColor: colors.$24 }}
           headerStyle={{ borderColor: colors.$20 }}
@@ -112,8 +112,8 @@ export default function Wizard() {
         >
           {wizard.loadFailed ? (
             <div className="py-14 text-center">
-              <p className="text-sm mb-4" style={{ color: t.text }}>
-                {translate('error_title')}
+              <p className="text-sm mb-4" style={{ color: theme.text }}>
+                {t('error_title')}
               </p>
 
               <Button
@@ -122,7 +122,7 @@ export default function Wizard() {
                 disableWithoutIcon
                 onClick={wizard.retryLoad}
               >
-                {translate('refresh')}
+                {t('refresh')}
               </Button>
             </div>
           ) : !wizard.ready ? (
@@ -150,8 +150,8 @@ function SaveState({
 }: {
   state: ReturnType<typeof useWizard>['saveState'];
 }) {
-  const t = useTheme();
-  const [translate] = useTranslation();
+  const theme = useTheme();
+  const [t] = useTranslation();
 
   if (state === 'idle') {
     return null;
@@ -164,13 +164,13 @@ function SaveState({
       role="status"
       aria-live="polite"
       className="text-xs"
-      style={{ color: failed ? '#DC2626' : t.muted }}
+      style={{ color: failed ? '#DC2626' : theme.muted }}
     >
       {state === 'saving'
-        ? `${translate('saving')}…`
+        ? `${t('saving')}…`
         : failed
-          ? 'Draft not saved'
-          : 'Draft saved'}
+          ? t('draft_not_saved')
+          : t('draft_saved')}
     </span>
   );
 }
