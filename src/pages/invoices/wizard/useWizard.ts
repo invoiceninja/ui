@@ -15,6 +15,7 @@ import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-in
 import { request } from '$app/common/helpers/request';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Client } from '$app/common/interfaces/client';
 import { Currency } from '$app/common/interfaces/currency';
@@ -100,6 +101,8 @@ export interface Wizard {
   refreshClient: (client: Client) => void;
 
   flush: () => Promise<string | null>;
+  saveDefaultTerms: boolean;
+  setSaveDefaultTerms: (value: boolean) => void;
 }
 
 export interface WizardContext {
@@ -144,6 +147,7 @@ const withRows = (items: InvoiceItem[]): InvoiceItem[] =>
 
 export function useWizard(existingId?: string): Wizard {
   const company = useCurrentCompany();
+  const refreshCompanyUsers = useRefreshCompanyUsers();
   const resolveCurrency = useResolveCurrency();
 
   const [invoice, setInvoice] = useState<Invoice>();
@@ -162,6 +166,7 @@ export function useWizard(existingId?: string): Wizard {
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [errors, setErrors] = useState<ValidationBag>();
   const [dismissals, setDismissals] = useState<Record<string, boolean>>({});
+  const [saveDefaultTerms, setSaveDefaultTerms] = useState(false);
 
   const latest = useRef<Invoice>();
   const persistedId = useRef<string | null>(null);
@@ -169,6 +174,8 @@ export function useWizard(existingId?: string): Wizard {
   const revision = useRef(0);
   const written = useRef(0);
   const createFailed = useRef(false);
+  const defaultTerms = useRef(false);
+  const defaultTermsSynced = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const alive = useRef(true);
 
@@ -332,12 +339,18 @@ export function useWizard(existingId?: string): Wizard {
     const payload = cloneDeep(current) as Invoice & { paymentables?: unknown };
     delete payload.paymentables;
 
+    const asDefault = defaultTerms.current;
+    const query = asDefault ? '?save_default_terms=true' : '';
+
     return (
       id
-        ? request('PUT', endpoint('/api/v1/invoices/:id', { id }), payload, {
-            skipIntercept: true,
-          })
-        : request('POST', endpoint('/api/v1/invoices'), payload, {
+        ? request(
+            'PUT',
+            endpoint(`/api/v1/invoices/:id${query}`, { id }),
+            payload,
+            { skipIntercept: true }
+          )
+        : request('POST', endpoint(`/api/v1/invoices${query}`), payload, {
             skipIntercept: true,
           })
     )
@@ -378,6 +391,12 @@ export function useWizard(existingId?: string): Wizard {
 
         if (created) {
           $refetch(['invoices']);
+        }
+
+        if (asDefault && !defaultTermsSynced.current) {
+          defaultTermsSynced.current = true;
+
+          void refreshCompanyUsers();
         }
 
         return saved.id;
@@ -600,6 +619,13 @@ export function useWizard(existingId?: string): Wizard {
     errors,
     clearErrors: () => setErrors(undefined),
     dismissed: (key: string) => Boolean(dismissals[key]),
+    saveDefaultTerms,
+    setSaveDefaultTerms: (value: boolean) => {
+      defaultTerms.current = value;
+      defaultTermsSynced.current = false;
+
+      setSaveDefaultTerms(value);
+    },
     dismiss: (key: string) =>
       setDismissals((current) => ({ ...current, [key]: true })),
     totals,

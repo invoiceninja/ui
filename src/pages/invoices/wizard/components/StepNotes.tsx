@@ -8,8 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Element } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
 import { ErrorBanner, Footer, Legend, useTheme } from '../kit';
 import { Wizard } from '../useWizard';
@@ -29,38 +31,37 @@ export function StepNotes({ wizard, embedded }: Props) {
     <div className="iw-enter">
       {embedded ? null : <ErrorBanner errors={wizard.errors} />}
 
-      <div className="space-y-6">
-        <div>
-          <Legend>{t('public_notes')}</Legend>
+      <div>
+        <Legend>{t('terms')}</Legend>
 
-          <p className="text-xs -mt-1 mb-1" style={{ color: theme.muted }}>
-            {t('notes_shown_on_invoice')}
-          </p>
+        <p className="text-xs -mt-1 mb-1" style={{ color: theme.muted }}>
+          {t('terms_printed_on_invoice')}
+        </p>
 
-          <MarkdownEditor
-            value={invoice?.public_notes ?? ''}
-            onChange={(value) => wizard.patch({ public_notes: value })}
-          />
-        </div>
+        <MarkdownEditor
+          value={invoice?.terms ?? ''}
+          onChange={(value) => wizard.patch({ terms: value })}
+        />
 
-        <div>
-          <Legend>{t('terms')}</Legend>
-
-          <p className="text-xs -mt-1 mb-1" style={{ color: theme.muted }}>
-            {t('terms_printed_on_invoice')}
-          </p>
-
-          <MarkdownEditor
-            value={invoice?.terms ?? ''}
-            onChange={(value) => wizard.patch({ terms: value })}
-          />
-        </div>
+        <Element
+          className="mt-4"
+          leftSide={
+            <Toggle
+              checked={wizard.saveDefaultTerms}
+              onValueChange={(value) => wizard.setSaveDefaultTerms(value)}
+            />
+          }
+          noExternalPadding
+          noVerticalPadding
+        >
+          <span className="font-medium">{t('save_as_default_terms')}</span>
+        </Element>
       </div>
 
       {embedded ? null : (
         <>
           <p className="text-xs mt-6" style={{ color: theme.muted }}>
-            {t('notes_and_terms_optional')}
+            {t('terms_optional')}
           </p>
 
           <Footer

@@ -183,7 +183,7 @@ export default function Edit() {
                 <StepTiming wizard={wizard} embedded />
               </Section>
 
-              <Section label={t('notes')}>
+              <Section label={t('terms')}>
                 <StepNotes wizard={wizard} embedded />
               </Section>
 

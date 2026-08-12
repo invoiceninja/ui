@@ -11,6 +11,7 @@
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { endpoint, trans } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -28,7 +29,6 @@ import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { Modal } from '$app/components/Modal';
 import { Element } from '$app/components/cards';
-import { Spinner } from '$app/components/Spinner';
 import { Button, Checkbox, InputField } from '$app/components/forms';
 import { Callout, ErrorBanner, Footer, useTheme, radius } from '../kit';
 import { Wizard } from '../useWizard';
@@ -72,15 +72,13 @@ export function StepReview({ wizard, money }: Props) {
   const [savingEmail, setSavingEmail] = useState(false);
   const [emailError, setEmailError] = useState<string>();
 
-  const [emailPreview, setEmailPreview] = useState<string | null>(null);
-  const [loadingEmailPreview, setLoadingEmailPreview] = useState(false);
-
   const [savingAttachment, setSavingAttachment] =
     useState<AttachmentKey | null>(null);
   const [hasGateway, setHasGateway] = useState<boolean | null>(null);
   const [bankInstructions, setBankInstructions] = useState<string | null>(null);
   const [savingBank, setSavingBank] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     request(
@@ -155,17 +153,9 @@ export function StepReview({ wizard, money }: Props) {
         return Promise.reject(new Error('draft not saved'));
       }
 
-      return request(
-        'POST',
-        endpoint('/api/v1/invoices/bulk'),
-        { action: 'email', ids: [id] },
-        { skipIntercept: true }
-      ).then(() => {
-        $refetch(['invoices']);
+      $refetch(['invoices']);
 
-        toast.success('emailed_invoice');
-        navigate('/invoices');
-      });
+      navigate(route('/invoices/:id/email', { id }));
     });
 
   const send = () => {
@@ -249,52 +239,6 @@ export function StepReview({ wizard, money }: Props) {
           .catch(() => toast.error())
           .finally(() => setSending(false));
       });
-  };
-
-  const openEmailPreview = () => {
-    const resolved = wizard.invoiceId
-      ? Promise.resolve(wizard.invoiceId)
-      : wizard.flush();
-
-    return resolved.then((id) => {
-      if (!id) {
-        return;
-      }
-
-      setLoadingEmailPreview(true);
-      setEmailPreview('');
-
-      return request(
-        'POST',
-        endpoint('/api/v1/templates'),
-        {
-          entity: 'invoice',
-          entity_id: id,
-          template: 'email_template_invoice',
-          subject: '',
-          body: '',
-        },
-        { skipIntercept: true }
-      )
-        .then((response) => {
-          const { body, wrapper, subject } = response.data as {
-            body: string;
-            wrapper: string;
-            subject: string;
-          };
-
-          setEmailPreview(
-            `<div style="font:14px/1.6 -apple-system,Segoe UI,sans-serif;padding:12px 16px;border-bottom:1px solid #e4e4e7;color:#3f3f46"><strong>${escapeHtml(t('subject'))}:</strong> ${escapeHtml(
-              subject
-            )}</div>${(wrapper || '$body').replace('$body', body)}`
-          );
-        })
-        .catch(() => {
-          setEmailPreview(null);
-          toast.error();
-        })
-        .finally(() => setLoadingEmailPreview(false));
-    });
   };
 
   const saveBankInstructions = () => {
@@ -515,23 +459,43 @@ export function StepReview({ wizard, money }: Props) {
       </div>
 
       {previewable ? (
-        <div
-          className="iw-preview mt-6 border overflow-hidden"
-          style={{ borderColor: theme.line, borderRadius: radius.panel }}
-        >
-          <style>
-            {'.iw-preview .flex.flex-col.w-full{height:38rem !important;}'}
-          </style>
+        <>
+          <div className="mt-6 flex items-center gap-2.5">
+            <Checkbox
+              id="iw-show-preview"
+              checked={showPreview}
+              onValueChange={(_, next) => setShowPreview(Boolean(next))}
+            />
 
-          <InvoicePreview
-            for="invoice"
-            resource={invoice as Invoice}
-            entity="invoice"
-            relationType="client_id"
-            endpoint="/api/v1/live_preview?entity=:entity"
-            initiallyVisible
-          />
-        </div>
+            <label
+              htmlFor="iw-show-preview"
+              className="text-sm cursor-pointer"
+              style={{ color: theme.text }}
+            >
+              {t('show_pdf_preview')}
+            </label>
+          </div>
+
+          {showPreview ? (
+            <div
+              className="iw-preview mt-3 border overflow-hidden"
+              style={{ borderColor: theme.line, borderRadius: radius.panel }}
+            >
+              <style>
+                {'.iw-preview .flex.flex-col.w-full{height:38rem !important;}'}
+              </style>
+
+              <InvoicePreview
+                for="invoice"
+                resource={invoice as Invoice}
+                entity="invoice"
+                relationType="client_id"
+                endpoint="/api/v1/live_preview?entity=:entity"
+                initiallyVisible
+              />
+            </div>
+          ) : null}
+        </>
       ) : null}
 
       {hasGateway === false && !wizard.dismissed('pay') ? (
@@ -627,15 +591,6 @@ export function StepReview({ wizard, money }: Props) {
         <Button
           type="secondary"
           behavior="button"
-          disabled={loadingEmailPreview}
-          onClick={openEmailPreview}
-        >
-          {`${t('preview')} ${t('email').toLowerCase()}`}
-        </Button>
-
-        <Button
-          type="secondary"
-          behavior="button"
           disabled={savingDraft}
           onClick={() => {
             setSavingDraft(true);
@@ -699,31 +654,6 @@ export function StepReview({ wizard, money }: Props) {
           </div>
         </div>
       </Modal>
-
-      <Modal
-        visible={emailPreview !== null}
-        onClose={() => setEmailPreview(null)}
-        title={t('what_your_customer_receives')}
-        size="regular"
-      >
-        {emailPreview ? (
-          <iframe
-            title={`${t('email')} ${t('preview').toLowerCase()}`}
-            srcDoc={emailPreview}
-            style={{
-              width: '100%',
-              height: '30rem',
-              border: `1px solid ${theme.line}`,
-              borderRadius: radius.control,
-              backgroundColor: '#ffffff',
-            }}
-          />
-        ) : (
-          <div className="py-10 flex justify-center">
-            <Spinner />
-          </div>
-        )}
-      </Modal>
     </div>
   );
 }
@@ -776,6 +706,3 @@ function AttachmentOption({
     </div>
   );
 }
-
-const escapeHtml = (value: string): string =>
-  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
