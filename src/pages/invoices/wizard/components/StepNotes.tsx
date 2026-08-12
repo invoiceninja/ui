@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import Toggle from '$app/components/forms/Toggle';
@@ -43,19 +42,16 @@ export function StepNotes({ wizard, embedded }: Props) {
           onChange={(value) => wizard.patch({ terms: value })}
         />
 
-        <Element
-          className="mt-4"
-          leftSide={
-            <Toggle
-              checked={wizard.saveDefaultTerms}
-              onValueChange={(value) => wizard.setSaveDefaultTerms(value)}
-            />
-          }
-          noExternalPadding
-          noVerticalPadding
-        >
-          <span className="font-medium">{t('save_as_default_terms')}</span>
-        </Element>
+        <div className="mt-4 flex items-center space-x-2">
+          <Toggle
+            checked={wizard.saveDefaultTerms}
+            onValueChange={(value) => wizard.setSaveDefaultTerms(value)}
+          />
+
+          <span className="text-sm" style={{ color: theme.text }}>
+            {t('save_as_default_terms')}
+          </span>
+        </div>
       </div>
 
       {embedded ? null : (
