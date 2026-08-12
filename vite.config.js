@@ -76,6 +76,12 @@ function sentrySourceMapOptions(command, environment, release) {
 
   return {
     authToken: environment.SENTRY_AUTH_TOKEN,
+    errorHandler(error) {
+      console.warn(
+        'Sentry source-map upload failed; continuing the build.',
+        error
+      );
+    },
     org: environment.SENTRY_ORG,
     project: environment.SENTRY_PROJECT,
     release: {
