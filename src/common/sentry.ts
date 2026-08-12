@@ -46,17 +46,10 @@ function originPattern(value: string): RegExp | undefined {
   }
 }
 
-function tracePropagationTargets(): RegExp[] {
-  const configuredTargets =
-    import.meta.env.VITE_SENTRY_TRACE_PROPAGATION_TARGETS?.split(',')
-      .map((target) => target.trim())
-      .filter(Boolean);
-
-  const targets = configuredTargets?.length
-    ? configuredTargets
-    : [import.meta.env.VITE_HOSTED_API_URL || 'https://invoicing.co'];
-
-  return targets
+export function parseSentryTracePropagationTargets(value?: string): RegExp[] {
+  return (value?.split(',') || [])
+    .map((target) => target.trim())
+    .filter(Boolean)
     .map(originPattern)
     .filter((target): target is RegExp => Boolean(target));
 }
@@ -76,12 +69,13 @@ export async function initializeSentry(): Promise<boolean> {
 
   Sentry.init({
     dsn,
-    environment:
-      import.meta.env.VITE_SENTRY_ENVIRONMENT || import.meta.env.MODE,
+    environment: 'production',
     integrations: [Sentry.browserTracingIntegration()],
     release: import.meta.env.VITE_SENTRY_RELEASE || undefined,
     sendDefaultPii: false,
-    tracePropagationTargets: tracePropagationTargets(),
+    tracePropagationTargets: parseSentryTracePropagationTargets(
+      import.meta.env.VITE_SENTRY_TRACE_PROPAGATION_TARGETS
+    ),
     tracesSampleRate: parseSentryTracesSampleRate(
       import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE
     ),

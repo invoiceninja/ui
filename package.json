@@ -130,7 +130,7 @@
     "build": "concurrently --kill-others-on-fail \"tsc --noEmit --incremental\" \"vite build\"",
     "format": "biome format --write src/",
     "lint": "biome lint src/",
-"check": "biome check --write --unsafe src/",
+    "check": "biome check --write --unsafe src/",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test --workers=1",
