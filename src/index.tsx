@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import * as Sentry from '@sentry/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import i18n from 'i18next';
 import React from 'react';
@@ -18,6 +17,7 @@ import { Provider } from 'react-redux';
 import { BrowserRouter, HashRouter } from 'react-router-dom';
 import { ScrollToTop } from '$app/components/ScrollToTop';
 import { App } from './App';
+import { initializeSentry } from './common/sentry';
 import { store } from './common/stores/store';
 
 import './resources/css/app.css';
@@ -34,12 +34,6 @@ import { Events } from './common/events';
 import { GoogleOAuth } from './components/GoogleOAuth';
 import { ReactQueryDevtoolsPanel } from './components/ReactQueryDevtoolsPanel';
 import en from './resources/lang/en/en.json';
-
-Sentry.init({
-  dsn: import.meta.env.VITE_SENTRY_URL as unknown as string,
-  integrations: [new Sentry.BrowserTracing()],
-  tracesSampleRate: 1.0,
-});
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -93,21 +87,31 @@ loader.init().then(/* ... */);
 
 const container = document.getElementById('root') as HTMLElement;
 
-createRoot(container).render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <Provider store={store}>
-        <GoogleOAuth>
-          <Router>
-            <ScrollToTop>
-              <App />
-            </ScrollToTop>
-          </Router>
-        </GoogleOAuth>
-      </Provider>
-      <ReactQueryDevtoolsPanel />
-    </QueryClientProvider>
-  </React.StrictMode>
-);
+async function bootstrap() {
+  try {
+    await initializeSentry();
+  } catch (error) {
+    console.error('Sentry initialization failed.', error);
+  }
+
+  createRoot(container).render(
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>
+          <GoogleOAuth>
+            <Router>
+              <ScrollToTop>
+                <App />
+              </ScrollToTop>
+            </Router>
+          </GoogleOAuth>
+        </Provider>
+        <ReactQueryDevtoolsPanel />
+      </QueryClientProvider>
+    </React.StrictMode>
+  );
+}
+
+void bootstrap();
 
 export const emitter = mitt<Events>();
