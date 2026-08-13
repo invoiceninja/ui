@@ -60,7 +60,6 @@ const queryClient = new QueryClient({
       networkMode: 'offlineFirst',
       staleTime: Infinity,
       refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
     },
     mutations: {
       networkMode: 'offlineFirst',
