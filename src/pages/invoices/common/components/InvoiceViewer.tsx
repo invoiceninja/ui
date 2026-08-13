@@ -83,6 +83,8 @@ export function InvoiceViewer(props: Props) {
               }
 
               toast.dismiss();
+
+              return response;
             })
             .catch((error) => {
               if (props.onError) {
@@ -90,6 +92,8 @@ export function InvoiceViewer(props: Props) {
               }
 
               toast.dismiss();
+
+              throw error;
             })
             .finally(() => setIsLoading(false));
         },

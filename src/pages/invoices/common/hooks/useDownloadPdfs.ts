@@ -33,7 +33,11 @@ export function useDownloadPdfs({ entity }: Props) {
         request('POST', endpoint(`/api/v1/${entity}s/bulk`), {
           action: 'bulk_download',
           ids: resourceIds,
-        }).then(() => toast.success('downloaded_entities')),
+        }).then((response) => {
+          toast.success('downloaded_entities');
+
+          return response;
+        }),
     });
   };
 }

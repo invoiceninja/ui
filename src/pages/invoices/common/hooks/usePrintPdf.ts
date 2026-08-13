@@ -64,6 +64,8 @@ export const usePrintPdf = ({ entity }: Props) => {
           }
 
           toast.dismiss();
+
+          return response;
         }),
     });
   };

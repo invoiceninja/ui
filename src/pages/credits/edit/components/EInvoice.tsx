@@ -51,7 +51,7 @@ export interface Context {
   setTriggerValidationQuery: Dispatch<SetStateAction<boolean>>;
 }
 
-export const VALIDATION_ENTITIES = ['invoice', 'client', 'company'];
+export const VALIDATION_ENTITIES = ['credit', 'client', 'company'];
 const EINVOICE_ACTIVITY_TYPES = [145, 146, 147] as number[];
 
 export default function EInvoice() {
@@ -203,7 +203,7 @@ export default function EInvoice() {
                             ] as Array<EntityError>
                           ).map((message, index) => (
                             <span key={index}>
-                              {entity === 'invoice'
+                              {entity === 'credit'
                                 ? (message as unknown as string)
                                 : message.label
                                   ? `${message.label} (${t('required')})`
@@ -212,7 +212,7 @@ export default function EInvoice() {
                           ))}
                         </div>
 
-                        {entity === 'invoice' && (
+                        {entity === 'credit' && (
                           <Link
                             to={route('/credits/:id/edit', {
                               id: credit?.id,
@@ -245,7 +245,7 @@ export default function EInvoice() {
                       className="flex items-center space-x-4 border-l-2 border-green-600 pl-4 py-4"
                     >
                       <div className="whitespace-nowrap font-medium w-24">
-                        {entity === 'invoice' ? t('credit') : t(entity)}:
+                        {t(entity)}:
                       </div>
 
                       <div>
