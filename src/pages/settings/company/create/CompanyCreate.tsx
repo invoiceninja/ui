@@ -28,7 +28,6 @@ import { useColorScheme } from '$app/common/colors';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
-import { User } from '$app/common/interfaces/user';
 import { dropQueryCache } from '$app/common/queries/persistence';
 
 interface Props {
@@ -52,7 +51,7 @@ export function CompanyCreate(props: Props) {
 
   const switchCompany = (
     index: number,
-    passedUser: User,
+    passedUser: Record<string, unknown>,
     passedToken: string
   ) => {
     dispatch(

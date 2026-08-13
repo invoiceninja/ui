@@ -24,24 +24,24 @@ import { QueryClient } from 'react-query';
 
 export const REFRESH_QUERY_KEY = '/api/v1/refresh';
 
-const resolveCurrentIndex = (companyUsers: CompanyUser[]) => {
-  const storedIndex = localStorage.getItem('X-CURRENT-INDEX');
+const applyCompanyUsers = (dispatch: AppDispatch, companyUsers: any[]) => {
+  let currentIndex = 0;
 
-  const currentIndex = storedIndex
-    ? parseInt(storedIndex)
-    : companyUsers.findIndex(
-        (companyUser) =>
-          companyUser.company.id === companyUsers[0].account.default_company_id
-      );
+  if (localStorage.getItem('X-CURRENT-INDEX')) {
+    currentIndex = parseInt(localStorage.getItem('X-CURRENT-INDEX') || '0');
+  } else {
+    const defaultCompanyId = companyUsers[0].account.default_company_id;
 
-  return currentIndex === -1 ? 0 : currentIndex;
-};
+    currentIndex =
+      companyUsers.findIndex(
+        (companyUser: CompanyUser) =>
+          companyUser.company.id === defaultCompanyId
+      ) || 0;
+  }
 
-export const applyCompanyUsers = (
-  dispatch: AppDispatch,
-  companyUsers: CompanyUser[]
-) => {
-  const currentIndex = resolveCurrentIndex(companyUsers);
+  if (currentIndex === -1) {
+    currentIndex = 0;
+  }
 
   dispatch(
     authenticate({
@@ -60,8 +60,7 @@ export const restoreCompanyUsers = (
   queryClient: QueryClient,
   dispatch: AppDispatch
 ) => {
-  const companyUsers =
-    queryClient.getQueryData<CompanyUser[]>(REFRESH_QUERY_KEY);
+  const companyUsers = queryClient.getQueryData<any[]>(REFRESH_QUERY_KEY);
 
   if (!companyUsers?.length || !localStorage.getItem('X-NINJA-TOKEN')) {
     return false;
@@ -83,7 +82,7 @@ export const refreshCompanyUsers = (
         endpoint('/api/v1/refresh?updated_at=:updatedAt', {
           updatedAt: dayjs().unix(),
         })
-      ).then((response) => response.data.data as CompanyUser[]);
+      ).then((response) => response.data.data);
     })
     .then((companyUsers) => {
       applyCompanyUsers(dispatch, companyUsers);

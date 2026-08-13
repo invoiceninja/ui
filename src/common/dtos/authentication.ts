@@ -8,8 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { User } from '$app/common/interfaces/user';
-
 export interface LoginForm {
   email: string;
   password: string;
@@ -35,7 +33,7 @@ export enum AuthenticationTypes {
 
 export interface Authenticated {
   type: AuthenticationTypes;
-  user: User;
+  user: Record<string, unknown>;
   token: string;
 }
 export interface Registered {
