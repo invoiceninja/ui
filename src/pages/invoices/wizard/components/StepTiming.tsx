@@ -9,6 +9,8 @@
  */
 
 import { endpoint, trans } from '$app/common/helpers';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -18,7 +20,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Button, InputField } from '$app/components/forms';
-import { Callout, Choice, ErrorBanner, Footer, useTheme } from '../kit';
+import { Callout, Choice, ErrorBanner, Footer, StepTransition } from '../kit';
 import { Wizard, addDays, today } from '../useWizard';
 
 type Term = 'receipt' | '7' | '14' | '30' | 'custom';
@@ -53,8 +55,9 @@ const termFromDates = (
 };
 
 export function StepTiming({ wizard, embedded }: Props) {
+  const accentColor = useAccentColor();
+  const colors = useColorScheme();
   const [t] = useTranslation();
-  const theme = useTheme();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
 
@@ -116,7 +119,7 @@ export function StepTiming({ wizard, embedded }: Props) {
   const serverErrors = wizard.errors?.errors;
 
   return (
-    <div className="iw-enter">
+    <StepTransition>
       {embedded ? null : <ErrorBanner errors={wizard.errors} />}
 
       <div
@@ -188,14 +191,14 @@ export function StepTiming({ wizard, embedded }: Props) {
             />
           </div>
         ) : (
-          <p className="text-sm" style={{ color: theme.muted }}>
+          <p className="text-sm" style={{ color: colors.$17 }}>
             {trans('invoice_dated_value', {
               value: dayjs(invoiceDate).format('D MMMM YYYY'),
             })}{' '}
             <button
               type="button"
               onClick={() => setShowDate(true)}
-              style={{ color: theme.accent, fontWeight: 500 }}
+              style={{ color: accentColor, fontWeight: 500 }}
             >
               {t('change')}
             </button>
@@ -231,7 +234,7 @@ export function StepTiming({ wizard, embedded }: Props) {
       ) : null}
 
       {defaultSaved ? (
-        <p className="text-xs mt-6" style={{ color: theme.muted }}>
+        <p className="text-xs mt-6" style={{ color: colors.$17 }}>
           {t('new_invoices_use_this_by_default')}
         </p>
       ) : null}
@@ -262,6 +265,6 @@ export function StepTiming({ wizard, embedded }: Props) {
           </Button>
         </Footer>
       )}
-    </div>
+    </StepTransition>
   );
 }

@@ -13,7 +13,7 @@ import { StepItems } from '../components/StepItems';
 import { WizardContext } from '../useWizard';
 
 export default function Items() {
-  const { wizard, money } = useOutletContext<WizardContext>();
+  const { wizard } = useOutletContext<WizardContext>();
 
-  return <StepItems wizard={wizard} money={money} />;
+  return <StepItems wizard={wizard} />;
 }

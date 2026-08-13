@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { blankInvitation } from '$app/common/constants/blank-invitation';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { endpoint } from '$app/common/helpers';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
@@ -18,9 +19,11 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Client } from '$app/common/interfaces/client';
+import { Company } from '$app/common/interfaces/company.interface';
 import { Currency } from '$app/common/interfaces/currency';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
+import { Invitation } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { toast } from '$app/common/helpers/toast/toast';
 import { AxiosError } from 'axios';
@@ -65,12 +68,15 @@ const SERVER_OWNED = [
   'is_deleted',
 ] as const;
 
-export const today = (): string => dayjs().format('YYYY-MM-DD');
+export const today = (): string => {
+  return dayjs().format('YYYY-MM-DD');
+};
 
-export const addDays = (from: string, days: number): string =>
-  dayjs(from || today())
+export const addDays = (from: string, days: number): string => {
+  return dayjs(from || today())
     .add(days, 'day')
     .format('YYYY-MM-DD');
+};
 
 export interface Wizard {
   ready: boolean;
@@ -107,7 +113,6 @@ export interface Wizard {
 
 export interface WizardContext {
   wizard: Wizard;
-  money: (value: number) => string;
 }
 
 export interface TaxRow {
@@ -131,7 +136,21 @@ const EMPTY_TOTALS: Totals = {
   surchargeRows: [],
 };
 
-const SURCHARGES = [1, 2, 3, 4] as const;
+const SURCHARGES: {
+  field: keyof Pick<
+    Invoice,
+    | 'custom_surcharge1'
+    | 'custom_surcharge2'
+    | 'custom_surcharge3'
+    | 'custom_surcharge4'
+  >;
+  label: keyof Company['custom_fields'];
+}[] = [
+  { field: 'custom_surcharge1', label: 'surcharge1' },
+  { field: 'custom_surcharge2', label: 'surcharge2' },
+  { field: 'custom_surcharge3', label: 'surcharge3' },
+  { field: 'custom_surcharge4', label: 'surcharge4' },
+];
 
 const HANDOFF_ACTIONS = [
   'clone',
@@ -142,8 +161,11 @@ const HANDOFF_ACTIONS = [
   'invoice_transaction',
 ];
 
-const withRows = (items: InvoiceItem[]): InvoiceItem[] =>
-  items.length ? items : [{ ...blankLineItem(), quantity: 1, sort_id: 0 }];
+const withRows = (items: InvoiceItem[]): InvoiceItem[] => {
+  return items.length
+    ? items
+    : [{ ...blankLineItem(), quantity: 1, sort_id: 0 }];
+};
 
 export function useWizard(existingId?: string): Wizard {
   const company = useCurrentCompany();
@@ -203,8 +225,8 @@ export function useWizard(existingId?: string): Wizard {
     const action = searchParams.get('action') ?? '';
     const clientParam = searchParams.get('client') ?? '';
 
-    const adoptClient = (id: string) =>
-      request(
+    const adoptClient = (id: string) => {
+      return request(
         'GET',
         endpoint('/api/v1/clients/:id', { id }),
         {},
@@ -226,6 +248,7 @@ export function useWizard(existingId?: string): Wizard {
           detachClient();
         })
         .catch(() => !cancelled && detachClient());
+    };
 
     const handedOff =
       !existingId && HANDOFF_ACTIONS.includes(action)
@@ -427,7 +450,9 @@ export function useWizard(existingId?: string): Wizard {
   }, []);
 
   const save = useCallback((): Promise<string | null> => {
-    const outstanding = () => revision.current !== written.current;
+    const outstanding = () => {
+      return revision.current !== written.current;
+    };
 
     if (pending.current) {
       return pending.current.then(() =>
@@ -508,10 +533,12 @@ export function useWizard(existingId?: string): Wizard {
 
       patch({
         client_id: next.id,
-        invitations: contacts.map((contact) => ({
-          client_contact_id: contact.id,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        })) as any,
+        invitations: contacts.map((contact) => {
+          return {
+            ...(cloneDeep(blankInvitation) as unknown as Invitation),
+            client_contact_id: contact.id,
+          };
+        }),
       });
     },
     [patch]
@@ -519,8 +546,7 @@ export function useWizard(existingId?: string): Wizard {
 
   const detachClient = useCallback(() => {
     setClient(undefined);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    patch({ client_id: '', invitations: [] as any });
+    patch({ client_id: '', invitations: [] });
 
     if (location.pathname !== STEPS[0].href) {
       navigate(STEPS[0].href);
@@ -557,14 +583,16 @@ export function useWizard(existingId?: string): Wizard {
       ...sum.getTaxMap().all(),
     ].map((entry) => ({ name: entry.name, total: entry.total }));
 
-    const surchargeRows = SURCHARGES.map((position) => ({
-      name: String(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (company?.custom_fields as any)?.[`surcharge${position}`] ?? ''
-      ).split('|')[0],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      total: Number((invoice as any)[`custom_surcharge${position}`] ?? 0),
-    })).filter((row) => row.total !== 0);
+    const surchargeRows = SURCHARGES.map((surcharge) => {
+      return {
+        name: String(company?.custom_fields?.[surcharge.label] ?? '').split(
+          '|'
+        )[0],
+        total: Number(invoice[surcharge.field] ?? 0),
+      };
+    }).filter((row) => {
+      return row.total !== 0;
+    });
 
     return {
       subtotal: sum.getSubTotal(),

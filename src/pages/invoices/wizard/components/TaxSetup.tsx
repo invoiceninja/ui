@@ -9,6 +9,7 @@
  */
 
 import { endpoint } from '$app/common/helpers';
+import { useColorScheme } from '$app/common/colors';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { request } from '$app/common/helpers/request';
@@ -21,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Modal } from '$app/components/Modal';
 import { Button, InputField } from '$app/components/forms';
-import { Choice, Legend, useTheme } from '../kit';
+import { Choice, Legend } from '../kit';
 
 export interface AppliedTax {
   name: string;
@@ -37,8 +38,8 @@ interface Props {
 }
 
 export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
+  const colors = useColorScheme();
   const [t] = useTranslation();
-  const theme = useTheme();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
 
@@ -203,17 +204,13 @@ export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
               />
             </div>
 
-            <p className="text-xs mt-2" style={{ color: theme.muted }}>
+            <p className="text-xs mt-2" style={{ color: colors.$17 }}>
               {t('tax_applies_to_whole_invoice')}
             </p>
           </div>
         ) : null}
 
-        {error ? (
-          <p className="text-xs" style={{ color: '#DC2626' }}>
-            {error}
-          </p>
-        ) : null}
+        {error ? <p className="text-xs text-red-600">{error}</p> : null}
 
         <div className="flex items-center gap-2 pt-1">
           <Button
@@ -230,7 +227,7 @@ export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
           </Button>
         </div>
 
-        <p className="text-xs" style={{ color: theme.muted }}>
+        <p className="text-xs" style={{ color: colors.$17 }}>
           {t('tax_saved_for_future_invoices')}
         </p>
       </div>

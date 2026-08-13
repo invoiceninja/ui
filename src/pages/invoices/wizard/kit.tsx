@@ -9,60 +9,45 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-export const radius = {
-  panel: '0.375rem',
-  control: '0.375rem',
-  pill: '999px',
-};
+export const StepTransition = styled.div`
+  animation: stepTransitionIn 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
 
-export function useTheme() {
-  const colors = useColorScheme();
-  const accent = useAccentColor();
+  @keyframes stepTransitionIn {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 
-  return {
-    colors,
-    accent,
-    dark: colors.$0 === 'dark',
-    surface: colors.$1,
-    desk: colors.$23,
-    text: colors.$3,
-    muted: colors.$17,
-    label: colors.$22,
-    line: colors.$24,
-    hairline: colors.$20,
-    hover: colors.$25,
-  };
-}
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+`;
 
-export function Motion() {
-  return (
-    <style>{`
-      @keyframes iw-enter {
-        from { opacity: 0; transform: translateY(6px); }
-        to   { opacity: 1; transform: none; }
-      }
-      .iw-enter { animation: iw-enter 240ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-      @media (prefers-reduced-motion: reduce) {
-        .iw-enter { animation: none !important; }
-        * { transition-duration: 0.01ms !important; }
-      }
-    `}</style>
-  );
-}
+export const PreviewFrame = styled.div`
+  .flex.flex-col.w-full {
+    height: 38rem !important;
+  }
+`;
 
 export function Legend({ children }: { children: ReactNode }) {
-  const theme = useTheme();
+  const colors = useColorScheme();
 
   return (
     <div
       className="text-sm mb-2"
-      style={{ color: theme.label, fontWeight: 500 }}
+      style={{ color: colors.$22, fontWeight: 500 }}
     >
       {children}
     </div>
@@ -73,11 +58,11 @@ const ChoiceButton = styled.button`
   transition: border-color 150ms ease, background-color 150ms ease;
 
   &:hover:not(:disabled) {
-    background-color: ${(p) => p.theme.hover};
+    background-color: ${(props) => props.theme.hover};
   }
 
   &:focus-visible {
-    outline: 2px solid ${(p) => p.theme.focus};
+    outline: 2px solid ${(props) => props.theme.focus};
     outline-offset: 2px;
   }
 `;
@@ -97,7 +82,8 @@ export function Choice({
   detail,
   trailing,
 }: ChoiceProps) {
-  const theme = useTheme();
+  const accentColor = useAccentColor();
+  const colors = useColorScheme();
 
   return (
     <ChoiceButton
@@ -105,12 +91,12 @@ export function Choice({
       role="radio"
       aria-checked={selected}
       onClick={onSelect}
-      theme={{ hover: theme.hover, focus: theme.accent }}
+      theme={{ hover: colors.$25, focus: accentColor }}
       className="w-full flex items-center gap-3 text-left px-3.5 py-2.5 border"
       style={{
-        borderRadius: radius.control,
-        borderColor: selected ? theme.colors.$3 : theme.line,
-        backgroundColor: theme.surface,
+        borderRadius: '0.375rem',
+        borderColor: selected ? colors.$3 : colors.$24,
+        backgroundColor: colors.$1,
       }}
     >
       <span
@@ -120,7 +106,7 @@ export function Choice({
           width: '1rem',
           height: '1rem',
           borderRadius: '999px',
-          border: `1px solid ${selected ? theme.colors.$3 : theme.colors.$5}`,
+          border: `1px solid ${selected ? colors.$3 : colors.$5}`,
         }}
       >
         {selected ? (
@@ -129,7 +115,7 @@ export function Choice({
               width: '0.5rem',
               height: '0.5rem',
               borderRadius: '999px',
-              backgroundColor: theme.colors.$3,
+              backgroundColor: colors.$3,
             }}
           />
         ) : null}
@@ -138,19 +124,19 @@ export function Choice({
       <span className="min-w-0 flex-1">
         <span
           className="block text-sm"
-          style={{ color: theme.text, fontWeight: 500 }}
+          style={{ color: colors.$3, fontWeight: 500 }}
         >
           {title}
         </span>
         {detail ? (
-          <span className="block text-xs mt-0.5" style={{ color: theme.muted }}>
+          <span className="block text-xs mt-0.5" style={{ color: colors.$17 }}>
             {detail}
           </span>
         ) : null}
       </span>
 
       {trailing ? (
-        <span className="shrink-0 text-xs" style={{ color: theme.muted }}>
+        <span className="shrink-0 text-xs" style={{ color: colors.$17 }}>
           {trailing}
         </span>
       ) : null}
@@ -183,8 +169,6 @@ const MAPPED_ERROR_KEYS = [
 ];
 
 export function ErrorBanner({ errors }: { errors?: ValidationBag }) {
-  const theme = useTheme();
-
   if (!errors?.errors) {
     return null;
   }
@@ -200,13 +184,10 @@ export function ErrorBanner({ errors }: { errors?: ValidationBag }) {
   }
 
   return (
-    <div
-      className="border-l-4 py-2 mb-4"
-      style={{ borderColor: '#EF4444', backgroundColor: '#FEF2F2' }}
-    >
+    <div className="border-l-4 border-red-500 bg-red-50 py-2 mb-4">
       <div className="mx-4 space-y-1">
         {unmapped.map((message) => (
-          <p key={message} className="text-sm" style={{ color: '#B91C1C' }}>
+          <p key={message} className="text-sm text-red-700">
             {message}
           </p>
         ))}
@@ -226,20 +207,21 @@ export function Callout({
   onDismiss?: () => void;
   dismissLabel?: string;
 }) {
+  const reactSettings = useReactSettings();
+  const colors = useColorScheme();
   const [t] = useTranslation();
-  const theme = useTheme();
 
   return (
     <div
       className="border px-4 py-3.5"
       style={{
-        borderRadius: radius.panel,
-        borderColor: theme.line,
-        backgroundColor: theme.dark ? theme.colors.$25 : theme.colors.$2,
+        borderRadius: '0.375rem',
+        borderColor: colors.$24,
+        backgroundColor: reactSettings?.dark_mode ? colors.$25 : colors.$2,
       }}
     >
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm" style={{ color: theme.text, fontWeight: 500 }}>
+        <p className="text-sm" style={{ color: colors.$3, fontWeight: 500 }}>
           {title}
         </p>
 
@@ -248,7 +230,7 @@ export function Callout({
             type="button"
             onClick={onDismiss}
             className="shrink-0 text-xs"
-            style={{ color: theme.muted, fontWeight: 500 }}
+            style={{ color: colors.$17, fontWeight: 500 }}
           >
             {dismissLabel ?? t('skip')}
           </button>

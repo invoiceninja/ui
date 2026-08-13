@@ -9,6 +9,8 @@
  */
 
 import { blankLineItem } from '$app/common/constants/blank-line-item';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Expense } from '$app/common/interfaces/expense';
@@ -24,7 +26,6 @@ import { InputField } from '$app/components/forms';
 import { calculateTaskHours } from '$app/pages/projects/common/hooks/useInvoiceProject';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useTheme, radius } from '../kit';
 
 export type WorkSource = 'saved' | 'work';
 
@@ -32,7 +33,6 @@ interface Props {
   open: boolean;
   source: WorkSource;
   clientId: string;
-  money: (value: number) => string;
   onClose: () => void;
   onPick: (item: InvoiceItem) => void;
 }
@@ -46,16 +46,10 @@ interface Row {
   build: () => InvoiceItem;
 }
 
-export function WorkPicker({
-  open,
-  source,
-  clientId,
-  money,
-  onClose,
-  onPick,
-}: Props) {
+export function WorkPicker({ open, source, clientId, onClose, onPick }: Props) {
+  const colors = useColorScheme();
   const [t] = useTranslation();
-  const theme = useTheme();
+  const formatMoney = useFormatMoney();
 
   const [query, setQuery] = useState('');
   const [rows, setRows] = useState<Row[]>([]);
@@ -114,7 +108,7 @@ export function WorkPicker({
           <Spinner />
         </div>
       ) : rows.length === 0 ? (
-        <p className="text-sm py-10 text-center" style={{ color: theme.muted }}>
+        <p className="text-sm py-10 text-center" style={{ color: colors.$17 }}>
           {t(emptyCopy(source, Boolean(clientId)))}
         </p>
       ) : (
@@ -129,26 +123,26 @@ export function WorkPicker({
               }}
               className="w-full text-left px-3.5 py-3 flex items-start justify-between gap-4 border"
               style={{
-                borderColor: theme.line,
-                borderRadius: radius.control,
-                backgroundColor: theme.surface,
+                borderColor: colors.$24,
+                borderRadius: '0.375rem',
+                backgroundColor: colors.$1,
               }}
               onMouseEnter={(event) =>
-                (event.currentTarget.style.backgroundColor = theme.hover)
+                (event.currentTarget.style.backgroundColor = colors.$25)
               }
               onMouseLeave={(event) =>
-                (event.currentTarget.style.backgroundColor = theme.surface)
+                (event.currentTarget.style.backgroundColor = colors.$1)
               }
             >
               <span className="min-w-0">
-                <span className="block text-sm" style={{ color: theme.text }}>
+                <span className="block text-sm" style={{ color: colors.$3 }}>
                   {row.title}
                 </span>
 
                 {row.detail || row.tag ? (
                   <span
                     className="block text-xs mt-0.5"
-                    style={{ color: theme.muted }}
+                    style={{ color: colors.$17 }}
                   >
                     {[row.tag ? t(row.tag) : '', row.detail]
                       .filter(Boolean)
@@ -160,11 +154,11 @@ export function WorkPicker({
               <span
                 className="text-sm shrink-0"
                 style={{
-                  color: theme.text,
+                  color: colors.$3,
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
-                {money(row.amount)}
+                {formatMoney(row.amount, undefined, undefined, 2)}
               </span>
             </button>
           ))}

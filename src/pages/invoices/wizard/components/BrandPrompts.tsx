@@ -9,6 +9,7 @@
  */
 
 import { endpoint } from '$app/common/helpers';
+import { useColorScheme } from '$app/common/colors';
 import { compressImageFileForLogo } from '$app/common/helpers/logo-image';
 import { request } from '$app/common/helpers/request';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -17,11 +18,10 @@ import { Button, InputField } from '$app/components/forms';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { radius, useTheme } from '../kit';
 
 export function BrandPrompts() {
+  const colors = useColorScheme();
   const [t] = useTranslation();
-  const theme = useTheme();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
 
@@ -106,7 +106,7 @@ export function BrandPrompts() {
         <div>
           <p
             className="text-sm mb-2"
-            style={{ color: theme.text, fontWeight: 500 }}
+            style={{ color: colors.$3, fontWeight: 500 }}
           >
             {t('invoice_needs_business_name')}
           </p>
@@ -135,7 +135,7 @@ export function BrandPrompts() {
         <div>
           <p
             className="text-sm mb-2"
-            style={{ color: theme.text, fontWeight: 500 }}
+            style={{ color: colors.$3, fontWeight: 500 }}
           >
             {t('add_logo_prompt')}
           </p>
@@ -168,9 +168,9 @@ export function BrandPrompts() {
               style={{
                 width: '3rem',
                 height: '2.25rem',
-                borderColor: theme.line,
-                borderRadius: radius.control,
-                backgroundColor: theme.surface,
+                borderColor: colors.$24,
+                borderRadius: '0.375rem',
+                backgroundColor: colors.$1,
               }}
             >
               <img
@@ -193,11 +193,7 @@ export function BrandPrompts() {
         </div>
       )}
 
-      {logoError ? (
-        <p className="text-xs" style={{ color: '#DC2626' }}>
-          {logoError}
-        </p>
-      ) : null}
+      {logoError ? <p className="text-xs text-red-600">{logoError}</p> : null}
 
       <input
         ref={filePicker}

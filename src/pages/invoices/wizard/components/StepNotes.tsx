@@ -9,10 +9,11 @@
  */
 
 import { Button } from '$app/components/forms';
+import { useColorScheme } from '$app/common/colors';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
-import { ErrorBanner, Footer, Legend, useTheme } from '../kit';
+import { ErrorBanner, Footer, Legend, StepTransition } from '../kit';
 import { Wizard } from '../useWizard';
 
 interface Props {
@@ -21,19 +22,19 @@ interface Props {
 }
 
 export function StepNotes({ wizard, embedded }: Props) {
+  const colors = useColorScheme();
   const [t] = useTranslation();
-  const theme = useTheme();
 
   const invoice = wizard.invoice;
 
   return (
-    <div className="iw-enter">
+    <StepTransition>
       {embedded ? null : <ErrorBanner errors={wizard.errors} />}
 
       <div>
         <Legend>{t('terms')}</Legend>
 
-        <p className="text-xs -mt-1 mb-1" style={{ color: theme.muted }}>
+        <p className="text-xs -mt-1 mb-1" style={{ color: colors.$17 }}>
           {t('terms_printed_on_invoice')}
         </p>
 
@@ -48,7 +49,7 @@ export function StepNotes({ wizard, embedded }: Props) {
             onValueChange={(value) => wizard.setSaveDefaultTerms(value)}
           />
 
-          <span className="text-sm" style={{ color: theme.text }}>
+          <span className="text-sm" style={{ color: colors.$3 }}>
             {t('save_as_default_terms')}
           </span>
         </div>
@@ -56,7 +57,7 @@ export function StepNotes({ wizard, embedded }: Props) {
 
       {embedded ? null : (
         <>
-          <p className="text-xs mt-6" style={{ color: theme.muted }}>
+          <p className="text-xs mt-6" style={{ color: colors.$17 }}>
             {t('terms_optional')}
           </p>
 
@@ -85,6 +86,6 @@ export function StepNotes({ wizard, embedded }: Props) {
           </Footer>
         </>
       )}
-    </div>
+    </StepTransition>
   );
 }

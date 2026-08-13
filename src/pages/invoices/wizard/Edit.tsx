@@ -9,10 +9,7 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -32,7 +29,7 @@ import { BrandPrompts } from './components/BrandPrompts';
 import { StepItems } from './components/StepItems';
 import { StepNotes } from './components/StepNotes';
 import { StepTiming } from './components/StepTiming';
-import { ErrorBanner, Motion, useTheme, radius } from './kit';
+import { ErrorBanner, PreviewFrame } from './kit';
 import { useWizard } from './useWizard';
 
 export default function Edit() {
@@ -41,11 +38,9 @@ export default function Edit() {
   const { id } = useParams();
   const { documentTitle } = useTitle('edit_invoice');
 
-  const theme = useTheme();
   const colors = useColorScheme();
   const navigate = useNavigate();
   const company = useCurrentCompany();
-  const formatMoney = useFormatMoney();
   const wizard = useWizard(id);
 
   const [saving, setSaving] = useState(false);
@@ -55,16 +50,6 @@ export default function Edit() {
     { name: t('invoices'), href: '/invoices' },
     { name: t('edit_invoice'), href: `/invoices/wizard/edit/${id}` },
   ];
-
-  const money = (value: number) =>
-    String(
-      formatMoney(
-        value,
-        wizard.client?.country_id || company?.settings?.country_id,
-        wizard.client?.settings?.currency_id || company?.settings?.currency_id,
-        2
-      )
-    );
 
   const recipient = (wizard.client?.contacts ?? []).find(
     (contact) => contact.send_email !== false && contact.email
@@ -96,20 +81,14 @@ export default function Edit() {
           return Promise.reject(new Error('not saved'));
         }
 
-        return request(
-          'POST',
-          endpoint('/api/v1/invoices/bulk'),
-          { action: 'email', ids: [saved] },
-          { skipIntercept: true }
-        ).then(() => {
-          $refetch(['invoices']);
+        $refetch(['invoices']);
 
-          toast.success('emailed_invoice');
-          navigate('/invoices');
-        });
+        navigate(route('/invoices/:id/email', { id: saved }));
       })
       .catch(() => toast.error())
-      .finally(() => setSending(false));
+      .finally(() => {
+        return setSending(false);
+      });
   };
 
   return (
@@ -122,8 +101,6 @@ export default function Edit() {
         />
       }
     >
-      <Motion />
-
       <div className="mx-auto w-full" style={{ maxWidth: '54rem' }}>
         <Card
           className="shadow-sm"
@@ -138,7 +115,7 @@ export default function Edit() {
         >
           {wizard.loadFailed ? (
             <div className="py-14 text-center">
-              <p className="text-sm mb-4" style={{ color: theme.text }}>
+              <p className="text-sm mb-4" style={{ color: colors.$3 }}>
                 {t('error_title')}
               </p>
 
@@ -163,22 +140,19 @@ export default function Edit() {
                 <div
                   className="flex items-start justify-between gap-4 border px-4 py-3.5"
                   style={{
-                    borderColor: theme.line,
-                    borderRadius: radius.panel,
+                    borderColor: colors.$24,
+                    borderRadius: '0.375rem',
                   }}
                 >
                   <div className="min-w-0">
                     <p
                       className="text-sm"
-                      style={{ color: theme.text, fontWeight: 500 }}
+                      style={{ color: colors.$3, fontWeight: 500 }}
                     >
                       {wizard.client?.display_name || wizard.client?.name}
                     </p>
 
-                    <p
-                      className="text-xs mt-0.5"
-                      style={{ color: theme.muted }}
-                    >
+                    <p className="text-xs mt-0.5" style={{ color: colors.$17 }}>
                       {recipient || t('no_email_address')}
                     </p>
                   </div>
@@ -186,7 +160,7 @@ export default function Edit() {
               </Section>
 
               <Section label={t('items')}>
-                <StepItems wizard={wizard} money={money} embedded />
+                <StepItems wizard={wizard} embedded />
               </Section>
 
               <Section label={t('payment')}>
@@ -200,19 +174,13 @@ export default function Edit() {
               <Section label={t('preview')} last>
                 <BrandPrompts />
 
-                <div
-                  className="iw-preview mt-4 border overflow-hidden"
+                <PreviewFrame
+                  className="mt-4 border overflow-hidden"
                   style={{
-                    borderColor: theme.line,
-                    borderRadius: radius.panel,
+                    borderColor: colors.$24,
+                    borderRadius: '0.375rem',
                   }}
                 >
-                  <style>
-                    {
-                      '.iw-preview .flex.flex-col.w-full{height:38rem !important;}'
-                    }
-                  </style>
-
                   <InvoicePreview
                     for="invoice"
                     resource={wizard.invoice as Invoice}
@@ -221,7 +189,7 @@ export default function Edit() {
                     endpoint="/api/v1/live_preview?entity=:entity"
                     initiallyVisible
                   />
-                </div>
+                </PreviewFrame>
               </Section>
 
               <div className="mt-8 flex items-center justify-end gap-2">
@@ -255,18 +223,16 @@ function Section({
   children: React.ReactNode;
   last?: boolean;
 }) {
-  const theme = useTheme();
+  const colors = useColorScheme();
 
   return (
     <section
       className={last ? '' : 'pb-6 mb-6'}
-      style={
-        last ? undefined : { borderBottom: `1px dashed ${theme.colors.$5}` }
-      }
+      style={last ? undefined : { borderBottom: `1px dashed ${colors.$5}` }}
     >
       <h4
         className="text-sm mb-3"
-        style={{ color: theme.label, fontWeight: 500 }}
+        style={{ color: colors.$22, fontWeight: 500 }}
       >
         {label}
       </h4>

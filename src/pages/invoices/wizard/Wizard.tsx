@@ -9,7 +9,6 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { route } from '$app/common/helpers/route';
@@ -23,7 +22,6 @@ import { Default } from '$app/components/layouts/Default';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { Motion, useTheme } from './kit';
 import { STEPS, useWizard } from './useWizard';
 
 export default function Wizard() {
@@ -31,11 +29,9 @@ export default function Wizard() {
 
   const { documentTitle } = useTitle('new_invoice');
 
-  const theme = useTheme();
   const colors = useColorScheme();
   const location = useLocation();
   const company = useCurrentCompany();
-  const formatMoney = useFormatMoney();
   const wizard = useWizard();
 
   const heading = useRef<HTMLElement>(null);
@@ -48,16 +44,6 @@ export default function Wizard() {
     { name: t('invoices'), href: '/invoices' },
     { name: t('new_invoice'), href: '/invoices/wizard' },
   ];
-
-  const money = (value: number) =>
-    String(
-      formatMoney(
-        value,
-        wizard.client?.country_id || company?.settings?.country_id,
-        wizard.client?.settings?.currency_id || company?.settings?.currency_id,
-        2
-      )
-    );
 
   const current = STEPS[wizard.stepIndex] ?? STEPS[0];
   const wideStep = wizard.step === 'send' || wizard.step === 'notes';
@@ -103,8 +89,6 @@ export default function Wizard() {
         />
       }
     >
-      <Motion />
-
       <div
         className="mx-auto w-full"
         style={{ maxWidth: wideStep ? '54rem' : '40rem' }}
@@ -123,7 +107,7 @@ export default function Wizard() {
         >
           {wizard.loadFailed ? (
             <div className="py-14 text-center">
-              <p className="text-sm mb-4" style={{ color: theme.text }}>
+              <p className="text-sm mb-4" style={{ color: colors.$3 }}>
                 {t('error_title')}
               </p>
 
@@ -147,7 +131,7 @@ export default function Wizard() {
               tabIndex={-1}
               className="min-w-0 focus:outline-none pt-2"
             >
-              <Outlet context={{ wizard, money }} />
+              <Outlet context={{ wizard }} />
             </section>
           )}
         </Card>
@@ -161,7 +145,7 @@ function SaveState({
 }: {
   state: ReturnType<typeof useWizard>['saveState'];
 }) {
-  const theme = useTheme();
+  const colors = useColorScheme();
   const [t] = useTranslation();
 
   if (state === 'idle') {
@@ -174,8 +158,8 @@ function SaveState({
     <span
       role="status"
       aria-live="polite"
-      className="text-xs"
-      style={{ color: failed ? '#DC2626' : theme.muted }}
+      className={failed ? 'text-xs text-red-600' : 'text-xs'}
+      style={failed ? undefined : { color: colors.$17 }}
     >
       {state === 'saving'
         ? `${t('saving')}…`

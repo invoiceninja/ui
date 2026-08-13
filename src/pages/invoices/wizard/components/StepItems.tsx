@@ -9,6 +9,10 @@
  */
 
 import { blankLineItem } from '$app/common/constants/blank-line-item';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { formatTaxName } from '$app/common/helpers/invoices/round';
 import { request } from '$app/common/helpers/request';
@@ -25,22 +29,24 @@ import {
   InputField,
   InputLabel,
 } from '$app/components/forms';
-import { Callout, ErrorBanner, Footer, useTheme, radius } from '../kit';
+import { Callout, ErrorBanner, Footer, StepTransition } from '../kit';
 import { Wizard } from '../useWizard';
 import { AppliedTax, TaxSetup } from './TaxSetup';
 import { WorkPicker, WorkSource } from './WorkPicker';
 
 interface Props {
   wizard: Wizard;
-  money: (value: number) => string;
   embedded?: boolean;
 }
 
 type TaxTarget = { scope: 'invoice' } | { scope: 'item'; index: number };
 
-export function StepItems({ wizard, money, embedded }: Props) {
+export function StepItems({ wizard, embedded }: Props) {
+  const reactSettings = useReactSettings();
+  const accentColor = useAccentColor();
+  const colors = useColorScheme();
+  const formatMoney = useFormatMoney();
   const [t] = useTranslation();
-  const theme = useTheme();
   const company = useCurrentCompany();
 
   const items = wizard.invoice?.line_items ?? [];
@@ -125,32 +131,32 @@ export function StepItems({ wizard, money, embedded }: Props) {
   const inclusive = Boolean(wizard.invoice?.uses_inclusive_taxes);
 
   return (
-    <div className="iw-enter">
+    <StepTransition>
       {embedded ? null : <ErrorBanner errors={wizard.errors} />}
 
       {embedded || !clientName ? null : (
         <div
           className="pb-5 mb-5 flex items-start justify-between gap-4"
-          style={{ borderBottom: `1px dashed ${theme.colors.$5}` }}
+          style={{ borderBottom: `1px dashed ${colors.$5}` }}
         >
           <div className="min-w-0">
             <p
               className="text-xs mb-1"
-              style={{ color: theme.label, fontWeight: 500 }}
+              style={{ color: colors.$22, fontWeight: 500 }}
             >
               {t('to')}
             </p>
 
             <p
               className="text-sm truncate"
-              style={{ color: theme.text, fontWeight: 500 }}
+              style={{ color: colors.$3, fontWeight: 500 }}
             >
               {clientName}
             </p>
 
             <p
               className="text-xs mt-0.5 truncate"
-              style={{ color: theme.muted }}
+              style={{ color: colors.$17 }}
             >
               {recipientEmail || t('no_email_address')}
             </p>
@@ -160,7 +166,7 @@ export function StepItems({ wizard, money, embedded }: Props) {
             type="button"
             onClick={wizard.detachClient}
             className="shrink-0 text-sm"
-            style={{ color: theme.accent, fontWeight: 500 }}
+            style={{ color: accentColor, fontWeight: 500 }}
           >
             {t('change')}
           </button>
@@ -176,11 +182,11 @@ export function StepItems({ wizard, money, embedded }: Props) {
               key={key}
               className="relative border p-4"
               style={{
-                borderColor: theme.line,
-                borderRadius: radius.panel,
-                backgroundColor: theme.dark
-                  ? theme.colors.$25
-                  : theme.colors.$2,
+                borderColor: colors.$24,
+                borderRadius: '0.375rem',
+                backgroundColor: reactSettings?.dark_mode
+                  ? colors.$25
+                  : colors.$2,
               }}
             >
               {items.length > 1 ? (
@@ -233,12 +239,17 @@ export function StepItems({ wizard, money, embedded }: Props) {
                   <div
                     className="text-sm whitespace-nowrap py-2"
                     style={{
-                      color: theme.text,
+                      color: colors.$3,
                       fontWeight: 500,
                       fontVariantNumeric: 'tabular-nums',
                     }}
                   >
-                    {money((item.cost ?? 0) * (item.quantity ?? 0))}
+                    {formatMoney(
+                      (item.cost ?? 0) * (item.quantity ?? 0),
+                      wizard.client?.country_id,
+                      wizard.client?.settings?.currency_id,
+                      2
+                    )}
                   </div>
                 </div>
               </div>
@@ -270,7 +281,7 @@ export function StepItems({ wizard, money, embedded }: Props) {
           type="button"
           onClick={() => setPicker('saved')}
           className="text-sm"
-          style={{ color: theme.accent, fontWeight: 500 }}
+          style={{ color: accentColor, fontWeight: 500 }}
         >
           {t('choose_a_saved_item')}
         </button>
@@ -279,7 +290,7 @@ export function StepItems({ wizard, money, embedded }: Props) {
           type="button"
           onClick={() => setPicker('work')}
           className="text-sm"
-          style={{ color: theme.accent, fontWeight: 500 }}
+          style={{ color: accentColor, fontWeight: 500 }}
         >
           {t('add_from_existing_work')}
         </button>
@@ -287,19 +298,40 @@ export function StepItems({ wizard, money, embedded }: Props) {
 
       <div
         className="mt-6 pt-6 space-y-2"
-        style={{ borderTop: `1px dashed ${theme.colors.$5}` }}
+        style={{ borderTop: `1px dashed ${colors.$5}` }}
       >
-        <MoneyRow label={t('subtotal')} value={money(totals.subtotal)} />
+        <MoneyRow
+          label={t('subtotal')}
+          value={formatMoney(
+            totals.subtotal,
+            wizard.client?.country_id,
+            wizard.client?.settings?.currency_id,
+            2
+          )}
+        />
 
         {totals.discount ? (
-          <MoneyRow label={t('discount')} value={money(totals.discount)} />
+          <MoneyRow
+            label={t('discount')}
+            value={formatMoney(
+              totals.discount,
+              wizard.client?.country_id,
+              wizard.client?.settings?.currency_id,
+              2
+            )}
+          />
         ) : null}
 
         {totals.surchargeRows.map((row, index) => (
           <MoneyRow
             key={`surcharge-${index}`}
             label={row.name || t('surcharge')}
-            value={money(row.total)}
+            value={formatMoney(
+              row.total,
+              wizard.client?.country_id,
+              wizard.client?.settings?.currency_id,
+              2
+            )}
           />
         ))}
 
@@ -307,17 +339,31 @@ export function StepItems({ wizard, money, embedded }: Props) {
           <MoneyRow
             key={`${row.name}-${index}`}
             label={inclusive ? `${t('includes')} ${row.name}` : row.name}
-            value={money(row.total)}
+            value={formatMoney(
+              row.total,
+              wizard.client?.country_id,
+              wizard.client?.settings?.currency_id,
+              2
+            )}
           />
         ))}
 
-        <MoneyRow label={t('total')} value={money(totals.total)} strong />
+        <MoneyRow
+          label={t('total')}
+          value={formatMoney(
+            totals.total,
+            wizard.client?.country_id,
+            wizard.client?.settings?.currency_id,
+            2
+          )}
+          strong
+        />
       </div>
 
       {taxesConfigured ? (
         <div
           className="mt-6 pt-6 flex items-center gap-2.5"
-          style={{ borderTop: `1px dashed ${theme.colors.$5}` }}
+          style={{ borderTop: `1px dashed ${colors.$5}` }}
         >
           <Checkbox
             id="iw-inclusive-taxes"
@@ -330,7 +376,7 @@ export function StepItems({ wizard, money, embedded }: Props) {
           <label
             htmlFor="iw-inclusive-taxes"
             className="text-sm cursor-pointer"
-            style={{ color: theme.text }}
+            style={{ color: colors.$3 }}
           >
             {t('prices_include_tax_on_this_invoice')}
           </label>
@@ -366,7 +412,7 @@ export function StepItems({ wizard, money, embedded }: Props) {
       {embedded ? null : (
         <>
           {!described ? (
-            <p className="text-xs mt-6" style={{ color: theme.muted }}>
+            <p className="text-xs mt-6" style={{ color: colors.$17 }}>
               {t('add_description_to_continue')}
             </p>
           ) : null}
@@ -399,7 +445,6 @@ export function StepItems({ wizard, money, embedded }: Props) {
         open={picker !== null}
         source={picker ?? 'saved'}
         clientId={wizard.invoice?.client_id ?? ''}
-        money={money}
         onClose={() => setPicker(null)}
         onPick={(item) => {
           const blankIndex = items.findIndex(
@@ -425,7 +470,7 @@ export function StepItems({ wizard, money, embedded }: Props) {
         onClose={() => setTaxOpen(false)}
         onApplied={applyTax}
       />
-    </div>
+    </StepTransition>
   );
 }
 
@@ -435,17 +480,17 @@ function MoneyRow({
   strong,
 }: {
   label: string;
-  value: string;
+  value: string | number;
   strong?: boolean;
 }) {
-  const theme = useTheme();
+  const colors = useColorScheme();
 
   return (
     <div className="flex items-baseline justify-between gap-4">
       <span
         className="text-sm"
         style={{
-          color: strong ? theme.text : theme.muted,
+          color: strong ? colors.$3 : colors.$17,
           fontWeight: strong ? 500 : 400,
         }}
       >
@@ -455,7 +500,7 @@ function MoneyRow({
       <span
         className={strong ? 'text-lg' : 'text-sm'}
         style={{
-          color: theme.text,
+          color: colors.$3,
           fontWeight: strong ? 600 : 400,
           fontVariantNumeric: 'tabular-nums',
         }}
@@ -489,8 +534,9 @@ function TaxChip({
   onChange: (changes: Partial<InvoiceItem>) => void;
   onCreate: () => void;
 }) {
+  const accentColor = useAccentColor();
+  const colors = useColorScheme();
   const [t] = useTranslation();
-  const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [placement, setPlacement] = useState<Placement>();
@@ -571,10 +617,10 @@ function TaxChip({
         onClick={() => setOpen(!open)}
         className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 border"
         style={{
-          borderRadius: radius.control,
-          borderColor: applied ? theme.line : hexToRgba(theme.accent, 0.35),
-          color: applied ? theme.text : theme.accent,
-          backgroundColor: applied ? theme.hover : hexToRgba(theme.accent, 0.1),
+          borderRadius: '0.375rem',
+          borderColor: applied ? colors.$24 : hexToRgba(accentColor, 0.35),
+          color: applied ? colors.$3 : accentColor,
+          backgroundColor: applied ? colors.$25 : hexToRgba(accentColor, 0.1),
           fontWeight: 500,
           opacity: hovered ? 0.75 : 1,
           transition: 'opacity 150ms ease',
@@ -582,7 +628,7 @@ function TaxChip({
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        {applied ? null : <Plus size="0.6875rem" color={theme.accent} />}
+        {applied ? null : <Plus size="0.6875rem" color={accentColor} />}
         {applied ? formatTaxName(item.tax_name1, item.tax_rate1) : t('add_tax')}
       </button>
 
@@ -598,9 +644,9 @@ function TaxChip({
                 maxHeight: placement.maxHeight,
                 transform: placement.above ? 'translateY(-100%)' : undefined,
                 zIndex: 50,
-                backgroundColor: theme.surface,
-                borderColor: theme.line,
-                borderRadius: radius.control,
+                backgroundColor: colors.$1,
+                borderColor: colors.$24,
+                borderRadius: '0.375rem',
                 boxShadow: '0 12px 32px -12px rgba(9,9,11,0.28)',
               }}
             >
@@ -632,7 +678,7 @@ function TaxChip({
 
               <div
                 className="shrink-0"
-                style={{ borderTop: `1px solid ${theme.hairline}` }}
+                style={{ borderTop: `1px solid ${colors.$20}` }}
               >
                 <Option
                   onClick={() => {
@@ -663,7 +709,7 @@ function Option({
   muted?: boolean;
   selected?: boolean;
 }) {
-  const theme = useTheme();
+  const colors = useColorScheme();
 
   return (
     <button
@@ -673,16 +719,16 @@ function Option({
       onClick={onClick}
       className="w-full text-left px-3 py-2 text-xs"
       style={{
-        color: muted ? theme.muted : theme.text,
-        backgroundColor: selected ? theme.hover : 'transparent',
+        color: muted ? colors.$17 : colors.$3,
+        backgroundColor: selected ? colors.$25 : 'transparent',
         fontWeight: selected ? 500 : 400,
       }}
       onMouseEnter={(event) =>
-        (event.currentTarget.style.backgroundColor = theme.hover)
+        (event.currentTarget.style.backgroundColor = colors.$25)
       }
       onMouseLeave={(event) =>
         (event.currentTarget.style.backgroundColor = selected
-          ? theme.hover
+          ? colors.$25
           : 'transparent')
       }
     >
@@ -692,8 +738,8 @@ function Option({
 }
 
 function RemoveButton({ onClick }: { onClick: () => void }) {
+  const colors = useColorScheme();
   const [t] = useTranslation();
-  const theme = useTheme();
 
   return (
     <button
@@ -707,16 +753,16 @@ function RemoveButton({ onClick }: { onClick: () => void }) {
         width: '1.5rem',
         height: '1.5rem',
         fontSize: '0.9375rem',
-        color: theme.muted,
-        borderRadius: radius.control,
+        color: colors.$17,
+        borderRadius: '0.375rem',
       }}
       onMouseEnter={(event) => {
-        event.currentTarget.style.backgroundColor = theme.hover;
-        event.currentTarget.style.color = theme.text;
+        event.currentTarget.style.backgroundColor = colors.$25;
+        event.currentTarget.style.color = colors.$3;
       }}
       onMouseLeave={(event) => {
         event.currentTarget.style.backgroundColor = 'transparent';
-        event.currentTarget.style.color = theme.muted;
+        event.currentTarget.style.color = colors.$17;
       }}
     >
       ✕

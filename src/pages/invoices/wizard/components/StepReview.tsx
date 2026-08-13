@@ -8,7 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { blankInvitation } from '$app/common/constants/blank-invitation';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { endpoint, trans } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
@@ -19,10 +22,12 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { Client } from '$app/common/interfaces/client';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { Invitation } from '$app/common/interfaces/purchase-order';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import dayjs from 'dayjs';
+import { cloneDeep } from 'lodash';
 import reactStringReplace from 'react-string-replace';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHref, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -30,7 +35,13 @@ import { useColorScheme } from '$app/common/colors';
 import { Modal } from '$app/components/Modal';
 import { Element } from '$app/components/cards';
 import { Button, Checkbox, InputField } from '$app/components/forms';
-import { Callout, ErrorBanner, Footer, useTheme, radius } from '../kit';
+import {
+  Callout,
+  ErrorBanner,
+  Footer,
+  PreviewFrame,
+  StepTransition,
+} from '../kit';
 import { Wizard } from '../useWizard';
 import { BrandPrompts } from './BrandPrompts';
 
@@ -42,14 +53,16 @@ const LOOKS: { label: string; design: string }[] = [
 
 type AttachmentKey = 'pdf_email_attachment' | 'document_email_attachment';
 
+const STICKY_HEADER_OFFSET = 80;
+
 interface Props {
   wizard: Wizard;
-  money: (value: number) => string;
 }
 
-export function StepReview({ wizard, money }: Props) {
+export function StepReview({ wizard }: Props) {
+  const reactSettings = useReactSettings();
   const [t] = useTranslation();
-  const theme = useTheme();
+  const formatMoney = useFormatMoney();
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const navigate = useNavigate();
@@ -79,6 +92,8 @@ export function StepReview({ wizard, money }: Props) {
   const [savingBank, setSavingBank] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+
+  const preview = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     request(
@@ -147,8 +162,8 @@ export function StepReview({ wizard, money }: Props) {
       .finally(() => setSavingAttachment(null));
   };
 
-  const deliver = () =>
-    wizard.flush().then((id) => {
+  const deliver = () => {
+    return wizard.flush().then((id) => {
       if (!id) {
         return Promise.reject(new Error('draft not saved'));
       }
@@ -157,6 +172,7 @@ export function StepReview({ wizard, money }: Props) {
 
       navigate(route('/invoices/:id/email', { id }));
     });
+  };
 
   const send = () => {
     if (!recipient) {
@@ -211,10 +227,12 @@ export function StepReview({ wizard, money }: Props) {
 
         wizard.refreshClient(saved);
         wizard.patch({
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          invitations: (saved.contacts ?? [])
-            .slice(0, 1)
-            .map((entry) => ({ client_contact_id: entry.id })) as any,
+          invitations: (saved.contacts ?? []).slice(0, 1).map((entry) => {
+            return {
+              ...(cloneDeep(blankInvitation) as unknown as Invitation),
+              client_contact_id: entry.id,
+            };
+          }),
         });
 
         $refetch(['clients']);
@@ -280,12 +298,12 @@ export function StepReview({ wizard, money }: Props) {
   const previewable = Boolean(wizard.invoiceId) && Boolean(invoice?.client_id);
 
   return (
-    <div className="iw-enter">
+    <StepTransition>
       <ErrorBanner errors={wizard.errors} />
 
       <p
         className="text-xs mb-2"
-        style={{ color: theme.label, fontWeight: 500 }}
+        style={{ color: colors.$22, fontWeight: 500 }}
       >
         {`${t('invoice')} ${t('summary')}`}
       </p>
@@ -293,8 +311,8 @@ export function StepReview({ wizard, money }: Props) {
       <div
         className="px-4 py-1"
         style={{
-          borderRadius: radius.panel,
-          backgroundColor: theme.dark ? theme.colors.$25 : theme.colors.$2,
+          borderRadius: '0.375rem',
+          backgroundColor: reactSettings?.dark_mode ? colors.$25 : colors.$2,
         }}
       >
         <Element
@@ -319,7 +337,7 @@ export function StepReview({ wizard, money }: Props) {
           <div>
             <p>{client?.display_name || client?.name || '—'}</p>
 
-            <p className="text-xs mt-0.5" style={{ color: theme.muted }}>
+            <p className="text-xs mt-0.5" style={{ color: colors.$17 }}>
               {recipient || t('no_email_address')}
             </p>
           </div>
@@ -344,7 +362,12 @@ export function StepReview({ wizard, money }: Props) {
           noExternalPadding
           style={{ borderColor: colors.$20 }}
         >
-          {money(wizard.totals.total)}
+          {formatMoney(
+            wizard.totals.total,
+            client?.country_id,
+            client?.settings?.currency_id,
+            2
+          )}
         </Element>
 
         <Element
@@ -363,7 +386,7 @@ export function StepReview({ wizard, money }: Props) {
 
       <p
         className="text-xs mt-6 mb-2"
-        style={{ color: theme.label, fontWeight: 500 }}
+        style={{ color: colors.$22, fontWeight: 500 }}
       >
         {t('before_you_send')}
       </p>
@@ -371,22 +394,22 @@ export function StepReview({ wizard, money }: Props) {
       <div
         className="border px-4 py-4"
         style={{
-          borderColor: theme.line,
-          borderRadius: radius.panel,
-          backgroundColor: theme.surface,
+          borderColor: colors.$24,
+          borderRadius: '0.375rem',
+          backgroundColor: colors.$1,
         }}
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <p
               className="text-[0.8125rem] mb-2.5"
-              style={{ color: theme.label, fontWeight: 500 }}
+              style={{ color: colors.$22, fontWeight: 500 }}
             >
               {t('how_it_looks')}
             </p>
 
             {designsFailed ? (
-              <p className="text-sm" style={{ color: theme.muted }}>
+              <p className="text-sm" style={{ color: colors.$17 }}>
                 {t('layouts_could_not_be_loaded')}
               </p>
             ) : (
@@ -403,13 +426,13 @@ export function StepReview({ wizard, money }: Props) {
                       onClick={() => wizard.patch({ design_id: id })}
                       className="text-sm px-3.5 py-2 border"
                       style={{
-                        borderRadius: radius.control,
-                        borderColor: active ? theme.text : theme.line,
-                        backgroundColor: active ? theme.hover : theme.surface,
-                        color: id ? theme.text : theme.muted,
+                        borderRadius: '0.375rem',
+                        borderColor: active ? colors.$3 : colors.$24,
+                        backgroundColor: active ? colors.$25 : colors.$1,
+                        color: id ? colors.$3 : colors.$17,
                         fontWeight: 500,
                         boxShadow: active
-                          ? `inset 0 0 0 1px ${theme.text}`
+                          ? `inset 0 0 0 1px ${colors.$3}`
                           : 'none',
                         cursor: id ? 'pointer' : 'not-allowed',
                       }}
@@ -447,7 +470,7 @@ export function StepReview({ wizard, money }: Props) {
               }
             />
 
-            <p className="text-xs" style={{ color: theme.muted }}>
+            <p className="text-xs" style={{ color: colors.$17 }}>
               {t('saved_for_all_future_emails')}
             </p>
           </div>
@@ -464,27 +487,47 @@ export function StepReview({ wizard, money }: Props) {
             <Checkbox
               id="iw-show-preview"
               checked={showPreview}
-              onValueChange={(_, next) => setShowPreview(Boolean(next))}
+              onValueChange={(_, next) => {
+                const visible = Boolean(next);
+
+                setShowPreview(visible);
+
+                if (visible) {
+                  window.requestAnimationFrame(() => {
+                    const frame = preview.current;
+
+                    if (!frame) {
+                      return;
+                    }
+
+                    return window.scrollTo({
+                      top:
+                        frame.getBoundingClientRect().top +
+                        window.scrollY -
+                        STICKY_HEADER_OFFSET,
+                      behavior: 'smooth',
+                    });
+                  });
+                }
+              }}
             />
 
             <label
               htmlFor="iw-show-preview"
               className="text-sm cursor-pointer"
-              style={{ color: theme.text }}
+              style={{ color: colors.$3 }}
             >
               {t('show_pdf_preview')}
             </label>
           </div>
 
           {showPreview ? (
-            <div
-              className="iw-preview mt-3 border overflow-hidden"
-              style={{ borderColor: theme.line, borderRadius: radius.panel }}
+            <PreviewFrame
+              id="iw-preview"
+              ref={preview}
+              className="mt-3 border overflow-hidden"
+              style={{ borderColor: colors.$24, borderRadius: '0.375rem' }}
             >
-              <style>
-                {'.iw-preview .flex.flex-col.w-full{height:38rem !important;}'}
-              </style>
-
               <InvoicePreview
                 for="invoice"
                 resource={invoice as Invoice}
@@ -493,7 +536,7 @@ export function StepReview({ wizard, money }: Props) {
                 endpoint="/api/v1/live_preview?entity=:entity"
                 initiallyVisible
               />
-            </div>
+            </PreviewFrame>
           ) : null}
         </>
       ) : null}
@@ -558,7 +601,7 @@ export function StepReview({ wizard, money }: Props) {
         </div>
       ) : null}
 
-      <p className="text-sm mt-8 leading-6" style={{ color: theme.text }}>
+      <p className="text-sm mt-8 leading-6" style={{ color: colors.$3 }}>
         {recipient ? (
           <>
             {reactStringReplace(
@@ -654,7 +697,7 @@ export function StepReview({ wizard, money }: Props) {
           </div>
         </div>
       </Modal>
-    </div>
+    </StepTransition>
   );
 }
 
@@ -675,7 +718,7 @@ function AttachmentOption({
   busy: boolean;
   onChange: (value: boolean) => void;
 }) {
-  const theme = useTheme();
+  const colors = useColorScheme();
   const disabled = !allowed || busy;
 
   return (
@@ -691,14 +734,14 @@ function AttachmentOption({
         htmlFor={id}
         className="text-sm leading-5"
         style={{
-          color: allowed ? theme.text : theme.muted,
+          color: allowed ? colors.$3 : colors.$17,
           cursor: disabled ? 'not-allowed' : 'pointer',
         }}
       >
         {label}
 
         {allowed ? null : (
-          <span className="block text-xs" style={{ color: theme.muted }}>
+          <span className="block text-xs" style={{ color: colors.$17 }}>
             {requirement}
           </span>
         )}

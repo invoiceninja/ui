@@ -13,7 +13,7 @@ import { StepReview } from '../components/StepReview';
 import { WizardContext } from '../useWizard';
 
 export default function Send() {
-  const { wizard, money } = useOutletContext<WizardContext>();
+  const { wizard } = useOutletContext<WizardContext>();
 
-  return <StepReview wizard={wizard} money={money} />;
+  return <StepReview wizard={wizard} />;
 }

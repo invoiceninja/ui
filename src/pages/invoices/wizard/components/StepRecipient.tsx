@@ -9,6 +9,8 @@
  */
 
 import { endpoint, trans } from '$app/common/helpers';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
@@ -18,7 +20,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Spinner } from '$app/components/Spinner';
 import { Button, InputField, InputLabel } from '$app/components/forms';
-import { ErrorBanner, Footer, Legend, useTheme, radius } from '../kit';
+import { ErrorBanner, Footer, Legend, StepTransition } from '../kit';
 import { Wizard } from '../useWizard';
 
 interface Props {
@@ -26,8 +28,9 @@ interface Props {
 }
 
 export function StepRecipient({ wizard }: Props) {
+  const accentColor = useAccentColor();
+  const colors = useColorScheme();
   const [t] = useTranslation();
-  const theme = useTheme();
 
   const [name, setName] = useState('');
   const [showAddress, setShowAddress] = useState(false);
@@ -232,22 +235,22 @@ export function StepRecipient({ wizard }: Props) {
 
   if (selected) {
     return (
-      <div className="iw-enter">
+      <StepTransition>
         <ErrorBanner errors={wizard.errors} />
 
         <div
           className="flex items-start justify-between gap-4 border px-4 py-3.5"
-          style={{ borderColor: theme.line, borderRadius: radius.panel }}
+          style={{ borderColor: colors.$24, borderRadius: '0.375rem' }}
         >
           <div className="min-w-0">
             <p
               className="text-sm"
-              style={{ color: theme.text, fontWeight: 500 }}
+              style={{ color: colors.$3, fontWeight: 500 }}
             >
               {selected.display_name || selected.name}
             </p>
 
-            <p className="text-xs mt-0.5" style={{ color: theme.muted }}>
+            <p className="text-xs mt-0.5" style={{ color: colors.$17 }}>
               {selected.contacts?.[0]?.email || t('no_email_address')}
             </p>
           </div>
@@ -258,7 +261,7 @@ export function StepRecipient({ wizard }: Props) {
         </div>
 
         {wizard.errors?.errors?.client_id ? (
-          <p className="text-xs mt-2" style={{ color: '#DC2626' }}>
+          <p className="text-xs mt-2 text-red-600">
             {wizard.errors.errors.client_id[0]}
           </p>
         ) : null}
@@ -268,14 +271,14 @@ export function StepRecipient({ wizard }: Props) {
             {t('continue')}
           </Button>
         </Footer>
-      </div>
+      </StepTransition>
     );
   }
 
   const serverErrors = wizard.errors?.errors;
 
   return (
-    <div className="iw-enter">
+    <StepTransition>
       <ErrorBanner errors={wizard.errors} />
 
       <div className="space-y-4">
@@ -349,9 +352,9 @@ export function StepRecipient({ wizard }: Props) {
               className="absolute left-0 mt-1.5 z-20 border overflow-hidden"
               style={{
                 right: searching ? '1.875rem' : 0,
-                backgroundColor: theme.surface,
-                borderColor: theme.line,
-                borderRadius: radius.control,
+                backgroundColor: colors.$1,
+                borderColor: colors.$24,
+                borderRadius: '0.375rem',
                 boxShadow: '0 12px 32px -12px rgba(9,9,11,0.28)',
               }}
             >
@@ -365,9 +368,9 @@ export function StepRecipient({ wizard }: Props) {
                   onClick={() => choose(match)}
                   className="w-full text-left px-3.5 py-2.5 flex items-baseline justify-between gap-3"
                   style={{
-                    color: theme.text,
+                    color: colors.$3,
                     backgroundColor:
-                      active === index ? theme.hover : 'transparent',
+                      active === index ? colors.$25 : 'transparent',
                   }}
                   onMouseEnter={() => setActive(index)}
                 >
@@ -376,7 +379,7 @@ export function StepRecipient({ wizard }: Props) {
                   </span>
                   <span
                     className="text-xs shrink-0"
-                    style={{ color: theme.muted }}
+                    style={{ color: colors.$17 }}
                   >
                     {match.contacts?.[0]?.email}
                   </span>
@@ -387,7 +390,7 @@ export function StepRecipient({ wizard }: Props) {
                 type="button"
                 onClick={() => setDismissedSearch(true)}
                 className="w-full text-left px-3.5 py-2.5 border-t text-xs"
-                style={{ borderColor: theme.hairline, color: theme.muted }}
+                style={{ borderColor: colors.$20, color: colors.$17 }}
               >
                 {trans('add_value_as_new_customer', { value: name.trim() })}
               </button>
@@ -396,9 +399,7 @@ export function StepRecipient({ wizard }: Props) {
         </div>
 
         {errors.general ? (
-          <p className="text-xs" style={{ color: '#DC2626' }}>
-            {errors.general}
-          </p>
+          <p className="text-xs text-red-600">{errors.general}</p>
         ) : null}
 
         {showAddress ? (
@@ -444,7 +445,7 @@ export function StepRecipient({ wizard }: Props) {
             type="button"
             onClick={() => setShowAddress(true)}
             className="text-sm"
-            style={{ color: theme.accent, fontWeight: 500 }}
+            style={{ color: accentColor, fontWeight: 500 }}
           >
             {t('add_an_address')}
           </button>
@@ -456,6 +457,6 @@ export function StepRecipient({ wizard }: Props) {
           {t('continue')}
         </Button>
       </Footer>
-    </div>
+    </StepTransition>
   );
 }
