@@ -20,7 +20,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Spinner } from '$app/components/Spinner';
 import { Button, InputField, InputLabel } from '$app/components/forms';
-import { ErrorBanner, Footer, Legend, StepTransition } from '../kit';
+import { ErrorBanner } from '$app/components/ErrorBanner';
+import { StepFooter } from '$app/components/StepFooter';
+import { Legend } from '$app/components/Legend';
+import { StepTransition } from '$app/components/StepTransition';
 import { Wizard } from '../useWizard';
 
 interface Props {
@@ -266,11 +269,11 @@ export function StepRecipient({ wizard }: Props) {
           </p>
         ) : null}
 
-        <Footer>
+        <StepFooter>
           <Button behavior="button" disabled={busy} onClick={continueForward}>
             {t('continue')}
           </Button>
-        </Footer>
+        </StepFooter>
       </StepTransition>
     );
   }
@@ -452,11 +455,11 @@ export function StepRecipient({ wizard }: Props) {
         )}
       </div>
 
-      <Footer>
+      <StepFooter>
         <Button behavior="button" disabled={busy} onClick={continueForward}>
           {t('continue')}
         </Button>
-      </Footer>
+      </StepFooter>
     </StepTransition>
   );
 }

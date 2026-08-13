@@ -29,7 +29,8 @@ import { BrandPrompts } from './components/BrandPrompts';
 import { StepItems } from './components/StepItems';
 import { StepNotes } from './components/StepNotes';
 import { StepTiming } from './components/StepTiming';
-import { ErrorBanner, PreviewFrame } from './kit';
+import { ErrorBanner } from '$app/components/ErrorBanner';
+import { PreviewFrame } from '$app/components/PreviewFrame';
 import { useWizard } from './useWizard';
 
 export default function Edit() {

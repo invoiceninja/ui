@@ -13,7 +13,10 @@ import { useColorScheme } from '$app/common/colors';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
-import { ErrorBanner, Footer, Legend, StepTransition } from '../kit';
+import { ErrorBanner } from '$app/components/ErrorBanner';
+import { StepFooter } from '$app/components/StepFooter';
+import { Legend } from '$app/components/Legend';
+import { StepTransition } from '$app/components/StepTransition';
 import { Wizard } from '../useWizard';
 
 interface Props {
@@ -61,7 +64,7 @@ export function StepNotes({ wizard, embedded }: Props) {
             {t('terms_optional')}
           </p>
 
-          <Footer
+          <StepFooter
             back={
               <Button
                 type="secondary"
@@ -83,7 +86,7 @@ export function StepNotes({ wizard, embedded }: Props) {
             >
               {t('review_and_send')}
             </Button>
-          </Footer>
+          </StepFooter>
         </>
       )}
     </StepTransition>

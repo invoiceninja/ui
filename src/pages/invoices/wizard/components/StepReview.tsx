@@ -35,13 +35,11 @@ import { useColorScheme } from '$app/common/colors';
 import { Modal } from '$app/components/Modal';
 import { Element } from '$app/components/cards';
 import { Button, Checkbox, InputField } from '$app/components/forms';
-import {
-  Callout,
-  ErrorBanner,
-  Footer,
-  PreviewFrame,
-  StepTransition,
-} from '../kit';
+import { Callout } from '$app/components/Callout';
+import { ErrorBanner } from '$app/components/ErrorBanner';
+import { StepFooter } from '$app/components/StepFooter';
+import { PreviewFrame } from '$app/components/PreviewFrame';
+import { StepTransition } from '$app/components/StepTransition';
 import { Wizard } from '../useWizard';
 import { BrandPrompts } from './BrandPrompts';
 
@@ -619,7 +617,7 @@ export function StepReview({ wizard }: Props) {
         )}
       </p>
 
-      <Footer
+      <StepFooter
         back={
           <Button
             type="secondary"
@@ -658,7 +656,7 @@ export function StepReview({ wizard }: Props) {
         <Button behavior="button" disabled={sending} onClick={send}>
           {t('send_invoice')}
         </Button>
-      </Footer>
+      </StepFooter>
 
       <Modal
         visible={askEmail}

@@ -29,7 +29,10 @@ import {
   InputField,
   InputLabel,
 } from '$app/components/forms';
-import { Callout, ErrorBanner, Footer, StepTransition } from '../kit';
+import { Callout } from '$app/components/Callout';
+import { ErrorBanner } from '$app/components/ErrorBanner';
+import { StepFooter } from '$app/components/StepFooter';
+import { StepTransition } from '$app/components/StepTransition';
 import { Wizard } from '../useWizard';
 import { AppliedTax, TaxSetup } from './TaxSetup';
 import { WorkPicker, WorkSource } from './WorkPicker';
@@ -417,7 +420,7 @@ export function StepItems({ wizard, embedded }: Props) {
             </p>
           ) : null}
 
-          <Footer
+          <StepFooter
             back={
               <Button
                 type="secondary"
@@ -437,7 +440,7 @@ export function StepItems({ wizard, embedded }: Props) {
             >
               {t('continue')}
             </Button>
-          </Footer>
+          </StepFooter>
         </>
       )}
 

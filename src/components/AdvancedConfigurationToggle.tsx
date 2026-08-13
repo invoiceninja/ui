@@ -19,7 +19,6 @@ import { debounce } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-// Module scope so switching editors mid-debounce still reaches the endpoint.
 const persist = debounce((flush: () => Promise<unknown>) => void flush(), 300);
 
 interface Props {

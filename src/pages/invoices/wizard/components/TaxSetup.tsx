@@ -22,7 +22,8 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Modal } from '$app/components/Modal';
 import { Button, InputField } from '$app/components/forms';
-import { Choice, Legend } from '../kit';
+import { Choice } from '$app/components/Choice';
+import { Legend } from '$app/components/Legend';
 
 export interface AppliedTax {
   name: string;

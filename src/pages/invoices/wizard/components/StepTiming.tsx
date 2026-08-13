@@ -20,7 +20,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Button, InputField } from '$app/components/forms';
-import { Callout, Choice, ErrorBanner, Footer, StepTransition } from '../kit';
+import { Callout } from '$app/components/Callout';
+import { Choice } from '$app/components/Choice';
+import { ErrorBanner } from '$app/components/ErrorBanner';
+import { StepFooter } from '$app/components/StepFooter';
+import { StepTransition } from '$app/components/StepTransition';
 import { Wizard, addDays, today } from '../useWizard';
 
 type Term = 'receipt' | '7' | '14' | '30' | 'custom';
@@ -240,7 +244,7 @@ export function StepTiming({ wizard, embedded }: Props) {
       ) : null}
 
       {embedded ? null : (
-        <Footer
+        <StepFooter
           back={
             <Button
               type="secondary"
@@ -263,7 +267,7 @@ export function StepTiming({ wizard, embedded }: Props) {
           >
             {t('continue')}
           </Button>
-        </Footer>
+        </StepFooter>
       )}
     </StepTransition>
   );
