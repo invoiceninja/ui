@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { QueryClient } from '@tanstack/react-query';
+import dayjs from 'dayjs';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -19,10 +21,8 @@ import {
 } from '$app/common/stores/slices/company-users';
 import { authenticate } from '$app/common/stores/slices/user';
 import { AppDispatch } from '$app/common/stores/store';
-import dayjs from 'dayjs';
-import { QueryClient } from 'react-query';
 
-export const REFRESH_QUERY_KEY = '/api/v1/refresh';
+const REFRESH_QUERY_KEY = ['/api/v1/refresh'];
 
 const applyCompanyUsers = (dispatch: AppDispatch, companyUsers: any[]) => {
   let currentIndex = 0;
@@ -76,17 +76,21 @@ export const refreshCompanyUsers = (
   dispatch: AppDispatch
 ) => {
   return queryClient
-    .fetchQuery(REFRESH_QUERY_KEY, () => {
-      return request(
-        'POST',
-        endpoint('/api/v1/refresh?updated_at=:updatedAt', {
-          updatedAt: dayjs().unix(),
-        })
-      ).then((response) => response.data.data);
+    .fetchQuery({
+      queryKey: REFRESH_QUERY_KEY,
+      queryFn: () =>
+        request(
+          'POST',
+          endpoint('/api/v1/refresh?updated_at=:updatedAt', {
+            updatedAt: dayjs().unix(),
+          })
+        ).then((response) => response.data.data),
     })
     .then((companyUsers) => {
       applyCompanyUsers(dispatch, companyUsers);
 
-      queryClient.invalidateQueries(['/api/docuninja/login']);
+      queryClient.invalidateQueries({
+        queryKey: ['/api/docuninja/login'],
+      });
     });
 };

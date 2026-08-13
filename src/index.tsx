@@ -8,43 +8,37 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from 'react';
-import { App } from './App';
-import { BrowserRouter, HashRouter } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { store } from './common/stores/store';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import * as Sentry from '@sentry/react';
-import { ScrollToTop } from '$app/components/ScrollToTop';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { initReactI18next } from 'react-i18next';
+import { Provider } from 'react-redux';
+import { BrowserRouter, HashRouter } from 'react-router-dom';
+import { ScrollToTop } from '$app/components/ScrollToTop';
+import { App } from './App';
+import { initializeSentry } from './common/sentry';
+import { store } from './common/stores/store';
+
+import './resources/css/app.css';
+
+import { loader } from '@monaco-editor/react';
+import mitt from 'mitt';
+import * as monaco from 'monaco-editor';
+import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
+import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
+import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
+import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+import { Events } from './common/events';
 import { restoreQueryCache } from './common/queries/persistence';
 import {
   refreshCompanyUsers,
   restoreCompanyUsers,
 } from './common/queries/refresh';
-
-import './resources/css/app.css';
-import en from './resources/lang/en/en.json';
 import { GoogleOAuth } from './components/GoogleOAuth';
-import mitt from 'mitt';
-import { Events } from './common/events';
-
-import { loader } from '@monaco-editor/react';
-
-import * as monaco from 'monaco-editor';
-import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
-import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
-import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
-
-Sentry.init({
-  dsn: import.meta.env.VITE_SENTRY_URL as unknown as string,
-  integrations: [new Sentry.BrowserTracing()],
-  tracesSampleRate: 1.0,
-});
+import { ReactQueryDevtoolsPanel } from './components/ReactQueryDevtoolsPanel';
+import en from './resources/lang/en/en.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -66,6 +60,10 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
+      networkMode: 'offlineFirst',
+    },
+    mutations: {
+      networkMode: 'offlineFirst',
     },
   },
 });
@@ -94,7 +92,15 @@ loader.init().then(/* ... */);
 
 const container = document.getElementById('root') as HTMLElement;
 
-restoreQueryCache(queryClient).then(() => {
+async function bootstrap() {
+  try {
+    await initializeSentry();
+  } catch (error) {
+    console.error('Sentry initialization failed.', error);
+  }
+
+  await restoreQueryCache(queryClient);
+
   if (restoreCompanyUsers(queryClient, store.dispatch)) {
     refreshCompanyUsers(queryClient, store.dispatch).catch(console.error);
   }
@@ -111,9 +117,12 @@ restoreQueryCache(queryClient).then(() => {
             </Router>
           </GoogleOAuth>
         </Provider>
+        <ReactQueryDevtoolsPanel />
       </QueryClientProvider>
     </React.StrictMode>
   );
-});
+}
+
+void bootstrap();
 
 export const emitter = mitt<Events>();

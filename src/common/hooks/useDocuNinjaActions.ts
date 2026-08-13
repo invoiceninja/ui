@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 
 // This hook ONLY provides actions, no data fetching
 export function useDocuNinjaActions() {
@@ -31,12 +31,16 @@ export function useDocuNinjaActions() {
       { skipIntercept: true }
     ).then(() => {
       // Refetch the data after creating account
-      return queryClient.invalidateQueries(['/api/docuninja/login']);
+      return queryClient.invalidateQueries({
+        queryKey: ['/api/docuninja/login'],
+      });
     });
   };
 
   const refresh = () => {
-    return queryClient.invalidateQueries(['/api/docuninja/login']);
+    return queryClient.invalidateQueries({
+      queryKey: ['/api/docuninja/login'],
+    });
   };
 
   const flushData = () => {

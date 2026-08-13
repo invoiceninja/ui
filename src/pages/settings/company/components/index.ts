@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 export * from './Address';
+export { CustomFields as CompanyDetailsCustomFields } from './CustomFields';
 export * from './Defaults';
 export * from './Details';
 export * from './Documents';
 export * from './Logo';
-export { CustomFields as CompanyDetailsCustomFields } from './CustomFields';

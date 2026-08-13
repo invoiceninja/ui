@@ -9,9 +9,9 @@
  */
 
 import dayjs from 'dayjs';
-import { parseTimeLog } from './helpers/calculate-time';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { LogPosition } from './components/TaskTable';
+import { parseTimeLog } from './helpers/calculate-time';
 
 export function parseTimeToDate(timestamp: number) {
   if (timestamp === 0) {

@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
 import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { Badge, BadgeVariant } from '$app/components/Badge';
 import { DataTableColumns } from '$app/components/DataTable';
 import { Link } from '$app/components/forms';
-import { useTranslation } from 'react-i18next';
 
 export function useTableColumns() {
   const [t] = useTranslation();

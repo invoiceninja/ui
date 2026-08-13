@@ -8,10 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+import { QueryClient } from '@tanstack/react-query';
+import {
+  persistQueryClient,
+  removeOldestQuery,
+} from '@tanstack/react-query-persist-client';
 import { version } from '$app/common/helpers/version';
-import { QueryClient } from 'react-query';
-import { createWebStoragePersistor } from 'react-query/createWebStoragePersistor-experimental';
-import { persistQueryClient } from 'react-query/persistQueryClient-experimental';
 
 const QUERY_CACHE_KEY = 'X-NINJA-QUERY-CACHE';
 
@@ -30,19 +33,22 @@ export const restoreQueryCache = async (queryClient: QueryClient) => {
     dropQueryCache();
   }
 
-  await persistQueryClient({
+  const [, restored] = persistQueryClient({
     queryClient,
-    persistor: createWebStoragePersistor({
+    persister: createSyncStoragePersister({
       storage: window.localStorage,
       key: QUERY_CACHE_KEY,
       throttleTime: THROTTLE_TIME,
+      retry: removeOldestQuery,
     }),
     maxAge: MAX_AGE,
     buster: version,
     dehydrateOptions: {
-      dehydrateMutations: false,
+      shouldDehydrateMutation: () => false,
     },
   });
+
+  await restored;
 
   queryClient.invalidateQueries();
 };

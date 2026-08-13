@@ -8,31 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { Divider } from '$app/components/cards/Divider';
-import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import classNames from 'classnames';
+import { useAtom } from 'jotai';
+import { debounce } from 'lodash';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { freePlan } from '$app/common/guards/guards/free-plan';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { Divider } from '$app/components/cards/Divider';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
+import { Spinner } from '$app/components/Spinner';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { Element } from '../../../../components/cards';
 import { InputField, Link, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
-import { useAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
-import { request } from '$app/common/helpers/request';
-import { useRef, useState } from 'react';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import classNames from 'classnames';
-import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
-import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
-import { SettingsLabel } from '$app/components/SettingsLabel';
-import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
-import { freePlan } from '$app/common/guards/guards/free-plan';
-import { useColorScheme } from '$app/common/colors';
-import { Spinner } from '$app/components/Spinner';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { debounce } from 'lodash';
 
 export function Settings() {
   const [t] = useTranslation();

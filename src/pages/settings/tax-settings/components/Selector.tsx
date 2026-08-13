@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { TaxRate } from '$app/common/interfaces/tax-rate';
+import { useAtomValue } from 'jotai';
+import { cloneDeep } from 'lodash';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useColorScheme } from '$app/common/colors';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { TaxRate } from '$app/common/interfaces/tax-rate';
+import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
+import { Card, Element } from '$app/components/cards';
+import { SelectField } from '$app/components/forms';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
+import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
-import { cloneDeep } from 'lodash';
-import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
-import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   title?: string;

@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useWebAuthnSupport } from '$app/common/hooks/useWebAuthnSupport';
 import { Element } from '$app/components/cards';
 import { Button } from '$app/components/forms';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useTranslation } from 'react-i18next';
-import { TwoFactorAuthenticationModals } from '../common/components/TwoFactorAuthenticationModals';
-import { useState } from 'react';
 import { PasskeyAuthenticationModal } from '../common/components/PasskeyAuthenticationModal';
-import { useWebAuthnSupport } from '$app/common/hooks/useWebAuthnSupport';
+import { TwoFactorAuthenticationModals } from '../common/components/TwoFactorAuthenticationModals';
 
 export function TwoFactorAuthentication() {
   const [t] = useTranslation();

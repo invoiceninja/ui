@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import Toggle from '$app/components/forms/Toggle';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { useColorScheme } from '$app/common/colors';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
 import { Link } from '$app/components/forms';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import Toggle from '$app/components/forms/Toggle';
 import { TabGroup } from '$app/components/TabGroup';
-import { Invoice } from '$app/common/interfaces/invoice';
 import { ChangeHandler } from '$app/pages/invoices/create/Create';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { Dispatch, SetStateAction } from 'react';
-import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   invoice?: Invoice;

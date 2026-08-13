@@ -8,28 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import Tippy from '@tippyjs/react/headless';
+import { Dispatch, SetStateAction, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useClickAway } from 'react-use';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import {
   hexToRGB,
   isColorLight,
   useAdjustColorDarkness,
 } from '$app/common/hooks/useAdjustColorDarkness';
-import { useRef, useState } from 'react';
-import { useClickAway } from 'react-use';
-import { useColorScheme } from '$app/common/colors';
 import { Expense } from '$app/common/interfaces/expense';
-import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
-import Tippy from '@tippyjs/react/headless';
-import { Dispatch, SetStateAction } from 'react';
-import { useSave } from '../../edit/hooks/useSave';
-import { useTranslation } from 'react-i18next';
-import { CreateExpenseCategoryModal } from '$app/pages/settings/expense-categories/components/CreateExpenseCategoryModal';
 import { ExpenseCategory as ExpenseCategoryType } from '$app/common/interfaces/expense-category';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import styled from 'styled-components';
+import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
+import { ChevronDown } from '$app/components/icons/ChevronDown';
+import { Plus } from '$app/components/icons/Plus';
 import { RadioChecked } from '$app/components/icons/RadioChecked';
 import { RadioUnchecked } from '$app/components/icons/RadioUnchecked';
-import { Plus } from '$app/components/icons/Plus';
-import { ChevronDown } from '$app/components/icons/ChevronDown';
+import { CreateExpenseCategoryModal } from '$app/pages/settings/expense-categories/components/CreateExpenseCategoryModal';
+import { useSave } from '../../edit/hooks/useSave';
 
 interface DropdownProps {
   visible: boolean;

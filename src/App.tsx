@@ -8,48 +8,48 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
+import dayjs from 'dayjs';
+import { atom, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { routes } from './common/routes';
-import { RootState } from './common/stores/store';
-import dayjs from 'dayjs';
-import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
-import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
-import { atom, useSetAtom } from 'jotai';
-import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
-import { dayJSLocaleAtom } from './components/forms';
-import { antdLocaleAtom } from './components/DropdownDateRangePicker';
-import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
+import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
+import { darkColorScheme, lightColorScheme } from './common/colors';
+import { toast } from './common/helpers/toast/toast';
 import {
   useAdmin,
   useHasPermission,
 } from './common/hooks/permissions/useHasPermission';
-import { darkColorScheme, lightColorScheme } from './common/colors';
-import { useCurrentUser } from './common/hooks/useCurrentUser';
-import { $refetch, useRefetch } from './common/hooks/useRefetch';
-import { toast } from './common/helpers/toast/toast';
-import { PreventNavigationModal } from './components/PreventNavigationModal';
 import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavigationEvents';
-import { useSockets } from './common/hooks/useSockets';
-import {
-  usePrivateSocketEvents,
-  useSocketEvent,
-} from './common/queries/sockets';
-import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
-import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
-import { useSystemFonts } from './common/hooks/useSystemFonts';
+import { useCompanyTranslations } from './common/hooks/useCompanyTranslations';
+import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
+import { useCurrentUser } from './common/hooks/useCurrentUser';
+import { useKeyboardShortcuts } from './common/hooks/useKeyboardShortcuts';
 import {
   useFetchReactSettings,
   useReactSettings,
 } from './common/hooks/useReactSettings';
-import { useKeyboardShortcuts } from './common/hooks/useKeyboardShortcuts';
-import { useCompanyTranslations } from './common/hooks/useCompanyTranslations';
+import { $refetch, useRefetch } from './common/hooks/useRefetch';
+import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
+import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
+import { useSockets } from './common/hooks/useSockets';
+import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
+import { useSystemFonts } from './common/hooks/useSystemFonts';
+import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
+import {
+  usePrivateSocketEvents,
+  useSocketEvent,
+} from './common/queries/sockets';
+import { routes } from './common/routes';
+import { RootState } from './common/stores/store';
+import { antdLocaleAtom } from './components/DropdownDateRangePicker';
+import { dayJSLocaleAtom } from './components/forms';
+import { PreventNavigationModal } from './components/PreventNavigationModal';
+import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
 
 interface RefreshEntityData {
   entity: 'invoices' | 'recurring_invoices';

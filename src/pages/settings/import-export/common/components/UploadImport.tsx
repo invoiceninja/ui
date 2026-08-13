@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { MdClose } from 'react-icons/md';
-import { useColorScheme } from '$app/common/colors';
-import { ImportedFile } from './Import';
-import { toast } from '$app/common/helpers/toast/toast';
-import { CloudUpload } from '$app/components/icons/CloudUpload';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { toast } from '$app/common/helpers/toast/toast';
+import { Element } from '$app/components/cards';
+import { CloudUpload } from '$app/components/icons/CloudUpload';
+import { ImportedFile } from './Import';
 
 interface Props {
   group: string;

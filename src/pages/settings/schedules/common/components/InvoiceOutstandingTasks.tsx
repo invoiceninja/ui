@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
+import { atom, useAtomValue } from 'jotai';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Client } from '$app/common/interfaces/client';
 import { Parameters, Schedule } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useClientsQuery } from '$app/common/queries/clients';
+import { Element } from '$app/components/cards';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
-import Toggle from '$app/components/forms/Toggle';
-import { atom, useAtomValue } from 'jotai';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { CircleXMark } from '$app/components/icons/CircleXMark';
-import { useColorScheme } from '$app/common/colors';
 import { SelectField } from '$app/components/forms/SelectField';
+import Toggle from '$app/components/forms/Toggle';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 interface Props {
   schedule: Schedule;

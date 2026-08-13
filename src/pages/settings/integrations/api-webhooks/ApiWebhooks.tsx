@@ -7,10 +7,11 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Settings } from '$app/components/layouts/Settings';
+
 import { useTranslation } from 'react-i18next';
+import { useTitle } from '$app/common/hooks/useTitle';
 import { DataTable } from '$app/components/DataTable';
+import { Settings } from '$app/components/layouts/Settings';
 import { useColumns } from './common/hooks/useColumns';
 
 export function ApiWebhooks() {

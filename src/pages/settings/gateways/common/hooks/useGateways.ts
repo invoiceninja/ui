@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useEffect, useState } from 'react';
 import { Gateway } from '$app/common/interfaces/statics';
 import { useStaticsQuery } from '$app/common/queries/statics';
-import { useEffect, useState } from 'react';
 
 export function useGateways() {
   const [gateways, setGateways] = useState<Gateway[]>([]);

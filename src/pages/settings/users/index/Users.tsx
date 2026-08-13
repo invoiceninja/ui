@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { User } from '$app/common/interfaces/user';
-import { DataTable, DataTableColumns } from '$app/components/DataTable';
-import { Settings } from '$app/components/layouts/Settings';
-import { useTranslation } from 'react-i18next';
-import { route } from '$app/common/helpers/route';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { useState } from 'react';
-import { useBulk } from '$app/common/queries/users';
-import { UsersPlanAlert } from '../common/components/UsersPlanAlert';
+import { useTranslation } from 'react-i18next';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { isHosted } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { User } from '$app/common/interfaces/user';
+import { useBulk } from '$app/common/queries/users';
+import { DataTable, DataTableColumns } from '$app/components/DataTable';
+import { Link } from '$app/components/forms';
+import { Settings } from '$app/components/layouts/Settings';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
+import { UsersPlanAlert } from '../common/components/UsersPlanAlert';
 
 export function Users() {
   useTitle('user_management');

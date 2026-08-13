@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Badge } from '$app/components/Badge';
-import { useTranslation } from 'react-i18next';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
 import dayjs from 'dayjs';
-import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
+import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
 import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Badge } from '$app/components/Badge';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {
   entity: Invoice;

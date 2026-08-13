@@ -20,7 +20,7 @@ import type { AxiosError, AxiosResponse } from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 
 export interface ResponsePaymentIntent {
@@ -234,8 +234,10 @@ export function PaymentMethodForm({
       return;
     }
 
-    queryClient.invalidateQueries('/api/client/account_management/methods');
-    queryClient.invalidateQueries('/api/docuninja/login');
+    queryClient.invalidateQueries({
+      queryKey: ['/api/client/account_management/methods'],
+    });
+    queryClient.invalidateQueries({ queryKey: ['/api/docuninja/login'] });
     refresh();
   };
 

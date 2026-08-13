@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { invoiceAtom } from '$app/pages/invoices/common/atoms';
-import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useSetAtom } from 'jotai';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { Invoice } from '$app/common/interfaces/invoice';
+import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { useBulkAction } from '$app/pages/projects/common/hooks/useBulkAction';
+import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 
 export const calculateTaskHours = (timeLog: string, precision?: number) => {
   const parsedTimeLogs = parseTimeLog(timeLog);

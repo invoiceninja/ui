@@ -1,31 +1,30 @@
-import { Invoice } from '$app/common/interfaces/invoice';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Card } from '$app/components/cards';
-import { EInvoiceComponent } from '$app/pages/settings';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
 import { Dispatch, ReactNode, RefObject, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdCheckCircle } from 'react-icons/md';
 import { useLocation, useOutletContext } from 'react-router-dom';
+import reactStringReplace from 'react-string-replace';
+import { useColorScheme } from '$app/common/colors';
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { endpoint, trans } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useSendCooldown } from '$app/common/hooks/useSendCooldown';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Card, Element } from '$app/components/cards';
+import { Button, Link } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { EInvoiceComponent } from '$app/pages/settings';
 import {
   EntityError,
   ValidationEntityResponse,
 } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
-import { Button, Link } from '$app/components/forms';
-import { route } from '$app/common/helpers/route';
-import { Icon } from '$app/components/icons/Icon';
-import { MdCheckCircle } from 'react-icons/md';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
-import { toast } from '$app/common/helpers/toast/toast';
-import { request } from '$app/common/helpers/request';
-import { endpoint, trans } from '$app/common/helpers';
-import { AxiosResponse } from 'axios';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
-import { useQuery, useQueryClient } from 'react-query';
-import { useColorScheme } from '$app/common/colors';
-import reactStringReplace from 'react-string-replace';
-import { Element } from '$app/components/cards';
-import { useSendCooldown } from '$app/common/hooks/useSendCooldown';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -63,7 +62,9 @@ export default function Verifactu() {
 
   const { send, isBusy, secondsRemaining } = useSendCooldown({
     onElapsed: async () => {
-      queryClient.invalidateQueries(['/api/v1/activities/entity']);
+      queryClient.invalidateQueries({
+        queryKey: ['/api/v1/activities/entity'],
+      });
 
       if (!invoice?.id) return;
 

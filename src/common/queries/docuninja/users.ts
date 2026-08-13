@@ -8,19 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useQuery, useQueryClient } from 'react-query';
-import { Params } from '../common/params.interface';
-import { request } from '$app/common/helpers/request';
-import { docuNinjaEndpoint } from '$app/common/helpers';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { docuNinjaEndpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Params } from '../common/params.interface';
 
 export function useUsersQuery(params: Params) {
-  return useQuery(
-    ['/api/users', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/users', params],
+
+    queryFn: () =>
       request(
         'GET',
         docuNinjaEndpoint(
@@ -43,14 +44,17 @@ export function useUsersQuery(params: Params) {
           },
         }
       ),
-    { staleTime: Infinity, enabled: true }
-  );
+
+    staleTime: Infinity,
+    enabled: true,
+  });
 }
 
 export function useBlankDocuNinjaUserQuery() {
-  return useQuery(
-    ['/api/users/docuninja/blank'],
-    () =>
+  return useQuery({
+    queryKey: ['/api/users/docuninja/blank'],
+
+    queryFn: () =>
       request(
         'GET',
         docuNinjaEndpoint('/api/users/create'),
@@ -63,8 +67,9 @@ export function useBlankDocuNinjaUserQuery() {
           },
         }
       ).then((res) => res.data.data),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 }
 
 interface UserParams {
@@ -72,9 +77,10 @@ interface UserParams {
 }
 
 export function useDocuNinjaUserQuery(params: UserParams) {
-  return useQuery(
-    ['/api/users', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/users', params],
+
+    queryFn: () =>
       request(
         'GET',
         docuNinjaEndpoint('/api/users/:id', {
@@ -89,8 +95,10 @@ export function useDocuNinjaUserQuery(params: UserParams) {
           },
         }
       ).then((res) => res.data.data),
-    { staleTime: Infinity, enabled: Boolean(params.id) }
-  );
+
+    staleTime: Infinity,
+    enabled: Boolean(params.id),
+  });
 }
 
 export function useBulk() {
@@ -119,7 +127,9 @@ export function useBulk() {
       toast.success(message);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
 
       $refetch(['docuninja_users']);
     });

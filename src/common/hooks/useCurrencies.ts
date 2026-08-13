@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useEffect, useState } from 'react';
 import { Currency } from '$app/common/interfaces/currency';
 import { useStaticsQuery } from '$app/common/queries/statics';
-import { useEffect, useState } from 'react';
 
 export function useCurrencies(): Currency[] {
   const { data: statics } = useStaticsQuery();

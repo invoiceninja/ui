@@ -8,32 +8,32 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import colors from '$app/common/constants/colors';
-import { Design } from '$app/common/interfaces/design';
-import { useDesignsQuery, useTemplateQuery } from '$app/common/queries/designs';
-import { Divider } from '$app/components/cards/Divider';
-import { ColorPicker } from '$app/components/forms/ColorPicker';
+import classNames from 'classnames';
 import { useAtom, useAtomValue } from 'jotai';
 import { range } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { updatingRecordsAtom as updatingRecordsAtom } from '../../../common/atoms';
-import { Card, Element } from '$app/components/cards';
-import { Radio, SelectField } from '$app/components/forms';
-import Toggle from '$app/components/forms/Toggle';
-import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { Company } from '$app/common/interfaces/company.interface';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { companySettingsErrorsAtom } from '$app/pages/settings/common/atoms';
-import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
-import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
-import { SettingsLabel } from '$app/components/SettingsLabel';
-import classNames from 'classnames';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { useColorScheme } from '$app/common/colors';
+import colors from '$app/common/constants/colors';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { Company } from '$app/common/interfaces/company.interface';
+import { Design } from '$app/common/interfaces/design';
+import { useDesignsQuery, useTemplateQuery } from '$app/common/queries/designs';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { Card, Element } from '$app/components/cards';
+import { Divider } from '$app/components/cards/Divider';
+import { Radio, SelectField } from '$app/components/forms';
+import { ColorPicker } from '$app/components/forms/ColorPicker';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import Toggle from '$app/components/forms/Toggle';
 import { Toggle as ToggleIcon } from '$app/components/icons/Toggle';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
+import { companySettingsErrorsAtom } from '$app/pages/settings/common/atoms';
+import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
+import { updatingRecordsAtom as updatingRecordsAtom } from '../../../common/atoms';
 
 const fonts = [
   { value: 'ABeeZee', label: 'ABeeZee' },

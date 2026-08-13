@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { defaultRule } from '$app/common/constants/rules';
 import {
   Rule,
   TransactionRule,
 } from '$app/common/interfaces/transaction-rules';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useHandleChange } from '../hooks/useHandleChange';
 import { useCreditRuleFields } from '../hooks/useCreditRuleFields';
+import { useHandleChange } from '../hooks/useHandleChange';
 
 interface Props {
   visible: boolean;

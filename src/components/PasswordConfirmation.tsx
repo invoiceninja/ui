@@ -7,13 +7,14 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
+import { useAtomValue } from 'jotai';
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { isPasswordRequiredAtom } from '$app/common/atoms/password-confirmation';
 import { Button, InputField } from './forms';
 import { Modal } from './Modal';
-import { useAtomValue } from 'jotai';
-import { isPasswordRequiredAtom } from '$app/common/atoms/password-confirmation';
 
 interface Props {
   show?: boolean;
