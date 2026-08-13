@@ -12,6 +12,8 @@ import { useColorScheme } from '$app/common/colors';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { route } from '$app/common/helpers/route';
+import { AdvancedConfigurationToggle } from '$app/components/AdvancedConfigurationToggle';
 import { Badge } from '$app/components/Badge';
 import { Page } from '$app/components/Breadcrumbs';
 import { Spinner } from '$app/components/Spinner';
@@ -91,6 +93,15 @@ export default function Wizard() {
       title={documentTitle}
       breadcrumbs={pages}
       navigationTopRight={<SaveState state={wizard.saveState} />}
+      topRight={
+        <AdvancedConfigurationToggle
+          counterpart={
+            wizard.invoiceId
+              ? route('/invoices/:id/edit', { id: wizard.invoiceId })
+              : '/invoices/create'
+          }
+        />
+      }
     >
       <Motion />
 

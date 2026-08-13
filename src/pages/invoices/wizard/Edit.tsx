@@ -17,6 +17,8 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { route } from '$app/common/helpers/route';
+import { AdvancedConfigurationToggle } from '$app/components/AdvancedConfigurationToggle';
 import { Page } from '$app/components/Breadcrumbs';
 import { Spinner } from '$app/components/Spinner';
 import { Card } from '$app/components/cards';
@@ -111,7 +113,15 @@ export default function Edit() {
   };
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      topRight={
+        <AdvancedConfigurationToggle
+          counterpart={route('/invoices/:id/edit', { id })}
+        />
+      }
+    >
       <Motion />
 
       <div className="mx-auto w-full" style={{ maxWidth: '54rem' }}>

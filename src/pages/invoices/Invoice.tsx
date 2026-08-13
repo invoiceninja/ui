@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { AdvancedConfigurationToggle } from '$app/components/AdvancedConfigurationToggle';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
@@ -180,6 +181,11 @@ export default function Invoice() {
       <Default
         title={documentTitle}
         breadcrumbs={pages}
+        topRight={
+          <AdvancedConfigurationToggle
+            counterpart={route('/invoices/wizard/edit/:id', { id })}
+          />
+        }
         {...((hasPermission('edit_invoice') || entityAssigned(invoice)) &&
           invoice && {
             navigationTopRight: (
