@@ -32,10 +32,7 @@ import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import { Events } from './common/events';
 import { restoreQueryCache } from './common/queries/persistence';
-import {
-  refreshCompanyUsers,
-  restoreCompanyUsers,
-} from './common/queries/refresh';
+import { restoreCompanyUsers } from './common/queries/refresh';
 import { GoogleOAuth } from './components/GoogleOAuth';
 import { ReactQueryDevtoolsPanel } from './components/ReactQueryDevtoolsPanel';
 import en from './resources/lang/en/en.json';
@@ -61,6 +58,9 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       networkMode: 'offlineFirst',
+      staleTime: Infinity,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     },
     mutations: {
       networkMode: 'offlineFirst',
@@ -101,9 +101,7 @@ async function bootstrap() {
 
   await restoreQueryCache(queryClient);
 
-  if (restoreCompanyUsers(queryClient, store.dispatch)) {
-    refreshCompanyUsers(queryClient, store.dispatch).catch(console.error);
-  }
+  restoreCompanyUsers(queryClient, store.dispatch);
 
   createRoot(container).render(
     <React.StrictMode>

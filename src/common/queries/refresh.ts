@@ -9,10 +9,7 @@
  */
 
 import { QueryClient } from '@tanstack/react-query';
-import dayjs from 'dayjs';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
   changeCurrentIndex,
@@ -69,28 +66,4 @@ export const restoreCompanyUsers = (
   applyCompanyUsers(dispatch, companyUsers);
 
   return true;
-};
-
-export const refreshCompanyUsers = (
-  queryClient: QueryClient,
-  dispatch: AppDispatch
-) => {
-  return queryClient
-    .fetchQuery({
-      queryKey: REFRESH_QUERY_KEY,
-      queryFn: () =>
-        request(
-          'POST',
-          endpoint('/api/v1/refresh?updated_at=:updatedAt', {
-            updatedAt: dayjs().unix(),
-          })
-        ).then((response) => response.data.data),
-    })
-    .then((companyUsers) => {
-      applyCompanyUsers(dispatch, companyUsers);
-
-      queryClient.invalidateQueries({
-        queryKey: ['/api/docuninja/login'],
-      });
-    });
 };
