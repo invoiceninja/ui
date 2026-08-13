@@ -9,6 +9,7 @@
  */
 
 import { QueryClient } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
@@ -57,7 +58,9 @@ export const restoreCompanyUsers = (
   queryClient: QueryClient,
   dispatch: AppDispatch
 ) => {
-  const companyUsers = queryClient.getQueryData<any[]>(REFRESH_QUERY_KEY);
+  const response = queryClient.getQueryData<AxiosResponse>(REFRESH_QUERY_KEY);
+
+  const companyUsers = response?.data?.data;
 
   if (!companyUsers?.length || !localStorage.getItem('X-NINJA-TOKEN')) {
     return false;

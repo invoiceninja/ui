@@ -87,7 +87,7 @@ export function useAuthenticated(): boolean {
             queryKey: ['/api/docuninja/login'],
           });
 
-          return response.data.data;
+          return response;
         }),
     })
     .catch((e) => {
