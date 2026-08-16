@@ -256,8 +256,8 @@ export function SelectWithApplyButton(props: any) {
         </div>
       </components.Menu>
     );
-  }, []);
-
+  }, [colors.$3, onChange, reactSettings?.dark_mode, t]);
+  
   const handleChange = (newValue: any) => {
     setTempValue(newValue);
   };

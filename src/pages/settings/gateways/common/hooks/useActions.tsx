@@ -61,11 +61,13 @@ export function useActions() {
       $refetch(['company_gateways']);
 
 
-      invalidateQueryValue &&
+      if (invalidateQueryValue) {
         queryClient.invalidateQueries({
           queryKey: [invalidateQueryValue],
         });
-    });
+      }
+      
+      });
   };
 
   const actions: Action<CompanyGateway>[] = [
