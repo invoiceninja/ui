@@ -261,6 +261,7 @@ export function Login() {
                 value={email}
                 onValueChange={(value) => setEmail(value)}
                 changeOverride
+                readOnly={!isEmailStep}
               />
             </div>
 
