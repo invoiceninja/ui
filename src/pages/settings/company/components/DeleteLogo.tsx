@@ -8,27 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { AxiosResponse } from 'axios';
+import { useFormik } from 'formik';
+import { useAtomValue } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import {
   resetChanges,
   updateRecord,
 } from '$app/common/stores/slices/company-users';
-import { Button } from '$app/components/forms/Button';
-import { useFormik } from 'formik';
-import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { Element } from '$app/components/cards';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useAtomValue } from 'jotai';
-import { activeSettingsAtom } from '$app/common/atoms/settings';
-import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { Button } from '$app/components/forms/Button';
 import { Trash } from '$app/components/icons/Trash';
+import { useConfigureClientSettings } from '$app/pages/clients/common/hooks/useConfigureClientSettings';
+import { useConfigureGroupSettings } from '../../group-settings/common/hooks/useConfigureGroupSettings';
 
 interface Props {
   isSettingsPage?: boolean;

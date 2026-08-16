@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { ReactNode, isValidElement } from 'react';
-import { Entry } from './forms/Combobox';
-import { v4 } from 'uuid';
+import { merge } from 'lodash';
+import React, { isValidElement, ReactNode } from 'react';
 import Select, { StylesConfig } from 'react-select';
-import { InputLabel } from './forms';
+import { v4 } from 'uuid';
 import { useColorScheme } from '$app/common/colors';
 import { SelectOption } from './datatables/Actions';
-import { merge } from 'lodash';
 import { ErrorMessage } from './ErrorMessage';
+import { InputLabel } from './forms';
+import { Entry } from './forms/Combobox';
 
 interface Props {
   children: ReactNode;

@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
-import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../../common/atoms';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
-import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { SettingsLabel } from '$app/components/SettingsLabel';
-import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
+import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 
 export const COUNTER_PADDINGS = [
   '1',
@@ -58,7 +58,7 @@ export function Settings() {
   const disableSettingsField = useDisableSettingsField();
   const handleChange = useHandleCurrentCompanyChangeProperty();
   const verifactuEnabled = useCompanyVerifactu();
-  
+
   const errors = useAtomValue(companySettingsErrorsAtom);
 
   return (
@@ -104,9 +104,11 @@ export function Settings() {
             companyChanges?.settings?.counter_number_applied || 'when_saved'
           }
           onValueChange={(value) =>
-            handleChange('settings.counter_number_applied', value) 
+            handleChange('settings.counter_number_applied', value)
           }
-          disabled={disableSettingsField('counter_number_applied') || verifactuEnabled}
+          disabled={
+            disableSettingsField('counter_number_applied') || verifactuEnabled
+          }
           errorMessage={errors?.errors['settings.counter_number_applied']}
           customSelector
           dismissable={false}

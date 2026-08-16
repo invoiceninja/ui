@@ -33,14 +33,14 @@ jobs:
       CACHE_DRIVER: redis
       QUEUE_CONNECTION: redis
       SESSION_DRIVER: redis
-      NINJA_ENVIRONMENT: hosted
+      NINJA_ENVIRONMENT: selfhost
       MULTI_DB_ENABLED: false
       NINJA_LICENSE: ${{ secrets.ninja_license }}
       TRAVIS: true
       MAIL_MAILER: log
       VITE_IS_TEST: true
       VITE_ROUTER: browser
-      VITE_API_URL: http://ninja.test:8000
+      VITE_API_URL: http://127.0.0.1:8000
 
     services:
       mariadb:
@@ -94,7 +94,7 @@ jobs:
           git clone --depth 1 https://${{secrets.commit_secret}}@github.com/invoiceninja/invoiceninja.git -b v5-develop
           cd invoiceninja
           composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
-          composer install
+          composer install --no-interaction --prefer-dist
           cp .env.ci .env
 
       - name: Prepare Laravel Application
@@ -109,7 +109,7 @@ jobs:
           vendor/bin/snappdf download
           sudo find ./vendor/bin/ -type f -exec chmod +x {} \;
           sudo find ./ -type d -exec chmod 755 {} \;
-          php artisan migrate:fresh --seed
+          php artisan migrate --seed
           php artisan db:seed --class=RandomDataSeeder
           php artisan serve --port=8000 &
 
@@ -118,19 +118,19 @@ jobs:
         with:
           repository: invoiceninja/ui
           ref: ${{ github.head_ref || github.ref_name }}
-          token: ${{ secrets.commit_secret }}
           path: ui
 
-      - name: Prepare React FrontEnd
+      - name: Prepare React FrontEnd + Run Tests
         run: |
           cd ui
           cp .env.example .env
           npm ci
           npx playwright install --with-deps
-          npx playwright test --max-failures=1
+          # npx playwright test --max-failures=1
+          npx playwright test --project=chromium --workers=1
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          VITE_API_URL: http://ninja.test:8000
+          VITE_API_URL: http://127.0.0.1:8000
           PLAYWRIGHT_BASE_URL: http://localhost:4173
           PLAYWRIGHT_TEST_BASE_URL: http://localhost:4173
           VITE_IS_TEST: true

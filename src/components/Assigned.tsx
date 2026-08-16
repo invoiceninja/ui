@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { ReactNode, useEffect, useState } from 'react';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Project } from '$app/common/interfaces/project';
 
 type EntityType = Project;
@@ -42,21 +42,23 @@ export function Assigned({
   >();
 
   useEffect(() => {
-  // If preCheck is explicitly false, don't make the API call
-  if (preCheck === false) {
-    return;
-  }
+    // If preCheck is explicitly false, don't make the API call
+    if (preCheck === false) {
+      return;
+    }
 
-  if (user && entityId && !isAssigned) {
-    (async () => {
-      const entityResponse = await queryClient.fetchQuery(
-          [cacheEndpoint, entityId],
-          () =>
+    if (user && entityId && !isAssigned) {
+      (async () => {
+        const entityResponse = await queryClient.fetchQuery({
+          queryKey: [cacheEndpoint, entityId],
+
+          queryFn: () =>
             request('GET', endpoint(apiEndpoint, { id: entityId })).then(
               (response) => response.data.data
             ),
-          { staleTime: Infinity }
-        );
+
+          staleTime: Infinity,
+        });
 
         if (
           entityResponse &&

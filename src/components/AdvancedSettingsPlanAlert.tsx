@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
+import { MdInfoOutline } from 'react-icons/md';
+import { route } from '$app/common/helpers/route';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
+import CommonProps from '../common/interfaces/common-props.interface';
 import { Alert } from './Alert';
 import { Link } from './forms';
-import CommonProps from '../common/interfaces/common-props.interface';
-import { MdInfoOutline } from 'react-icons/md';
 import { Icon } from './icons/Icon';
-import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
-import { route } from '$app/common/helpers/route';
 
 interface Props extends CommonProps {
   message?: string;

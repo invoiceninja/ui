@@ -1,17 +1,33 @@
+import {
+  Builder as Builder$,
+  BuilderContext,
+  CreateBlueprintSignatoryProps,
+  CreateClientTabProps,
+  CreateDialogProps,
+  SendDialogButtonProps,
+  SendDialogProps,
+  SignatorySelectorProps,
+} from '@docuninja/builder2.0';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useMediaQuery } from 'react-responsive';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useDriverTour } from '$app/common/hooks/useDriverTour';
+import { usePreferences } from '$app/common/hooks/usePreferences';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Document } from '$app/common/interfaces/docuninja/api';
 import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useClientsQuery } from '$app/common/queries/clients';
 import { useBlueprintQuery } from '$app/common/queries/docuninja/blueprints';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
 import { Modal } from '$app/components/Modal';
 import { ResourceActions } from '$app/components/ResourceActions';
@@ -43,23 +59,10 @@ import {
   UploadDialog,
   ValidationErrors,
 } from '$app/pages/documents/builder/components';
-import {
-  Builder as Builder$,
-  BuilderContext,
-  CreateClientTabProps,
-  CreateDialogProps,
-  SendDialogButtonProps,
-  SendDialogProps,
-  SignatorySelectorProps,
-  CreateBlueprintSignatoryProps,
-} from '@docuninja/builder2.0';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
-import { useMediaQuery } from 'react-responsive';
-import { useNavigate, useParams } from 'react-router-dom';
+import { AsyncSignatorySelector } from '$app/pages/documents/common/components/AsyncSignatorySelector';
 import { useActions } from '../common/hooks/useActions';
 import { EditBlueprintModal } from '../edit/components/EditBlueprintModal';
+import { SignatorySwap } from './Elements';
 
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
@@ -201,67 +204,13 @@ function SignatorySelector({
   value,
   setCreateDialogOpen,
 }: SignatorySelectorProps) {
-  const [t] = useTranslation();
-
-  const { data: clients } = useClientsQuery({ status: ['active'] });
-
-  const handleSelect = (v: string | undefined) => {
-    if (!v) {
-      return;
-    }
-
-    if (v === 'create') {
-      setCreateDialogOpen(true);
-
-      return;
-    }
-
-    const [type, value] = v.split('|');
-    let entity = clients?.find(
-      (client) => client.contacts?.[0]?.contact_key === value
-    );
-
-    if (!entity) {
-      entity = results.find((r: any) => r.value === value) as unknown as any;
-    }
-
-    if (!entity) {
-      return;
-    }
-
-    onSelect(value, type as 'user', entity as any);
-  };
-
   return (
-    <SelectField
-      placeholder={t('select_user_or_client')}
-      value={value}
-      onValueChange={handleSelect}
-      customSelector
-      menuPosition="fixed"
-    >
-      <option value="create">{t('create_client_or_user')}</option>
-
-      {clients
-        ?.filter(
-          (client) =>
-            client.contacts.length > 0 && client.contacts[0].contact_key
-        )
-        .map((client) => (
-          <option
-            value={`client|${client.contacts[0].contact_key}`}
-            key={client.id}
-          >
-            {client.name}
-          </option>
-        ))}
-
-      {results.map((result: any) => (
-        <option value={`${result.type}|${result.value}`} key={result.id}>
-          {result.label}
-        </option>
-      ))}
-    </SelectField>
+    <AsyncSignatorySelector
+      results={results}
+      onSelect={onSelect}
+      setCreateDialogOpen={setCreateDialogOpen}
+      valuePrefix="client"
+    />
   );
 }
 
@@ -362,6 +311,46 @@ function BlueprintBuilder() {
     };
   }, []);
 
+  const { preferences, update, save } = usePreferences();
+
+  useDriverTour({
+    show: !preferences.blueprint_builder_tour_shown,
+    steps: [
+      {
+        element: '.builder-rightSide',
+        popover: {
+          description: t('tour_signatory_selector') as string,
+          nextBtnText: t('tour_continue_select_signatory') as string,
+        },
+      },
+      {
+        element: '.builder-central',
+        popover: {
+          description: t('tour_document_canvas') as string,
+        },
+      },
+      {
+        element: '.builder-save-button',
+        popover: {
+          description: t('tour_save_document') as string,
+        },
+      },
+    ],
+    eventName: 'builder:loaded',
+    options: {
+      showProgress: true,
+      allowClose: false,
+      showButtons: ['next'],
+      disableActiveInteraction: true,
+      onDestroyed: () => {
+        if (!preferences.blueprint_builder_tour_shown) {
+          update('preferences.blueprint_builder_tour_shown', true);
+          save({ silent: true });
+        }
+      },
+    },
+  });
+
   const navigate = useNavigate();
 
   return (
@@ -451,7 +440,7 @@ function BlueprintBuilder() {
                 },
               },
               signatorySelector: SignatorySelector,
-              signatorySwap: () => null,
+              signatorySwap: SignatorySwap,
               uninvite: {
                 dialog: UninviteDialog,
                 button: UninviteButton,

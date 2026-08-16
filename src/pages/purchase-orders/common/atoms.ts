@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { atom } from 'jotai';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 
 export const purchaseOrderAtom = atom<PurchaseOrder | undefined>(undefined);

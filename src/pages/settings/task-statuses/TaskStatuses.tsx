@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
-import { TaskStatus } from '$app/common/interfaces/task-status';
-import { DataTable, DataTableColumns } from '$app/components/DataTable';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
+import { TaskStatus } from '$app/common/interfaces/task-status';
+import { DataTable, DataTableColumns } from '$app/components/DataTable';
+import { Link } from '$app/components/forms';
 
 export function TaskStatuses() {
   const [t] = useTranslation();
@@ -47,7 +47,7 @@ export function TaskStatuses() {
     <DataTable
       resource="task_status"
       columns={columns}
-      endpoint="/api/v1/task_statuses?sort=id|desc"
+      endpoint="/api/v1/task_statuses?sort=id|asc"
       bulkRoute="/api/v1/task_statuses/bulk"
       linkToCreate="/settings/task_statuses/create"
       linkToEdit="/settings/task_statuses/:id/edit"

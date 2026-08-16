@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { ReactNode } from 'react';
-import CommonProps from '../../common/interfaces/common-props.interface';
+import { ReactNode } from 'react';
 import { useColorScheme } from '$app/common/colors';
+import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   for?: string;

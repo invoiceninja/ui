@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InputField } from '$app/components/forms';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SearchInput } from './ListBox';
 import { useColorScheme } from '$app/common/colors';
+import { InputField } from '$app/components/forms';
+import { SearchInput } from './ListBox';
 
 interface Props {
   searchParams: SearchInput;

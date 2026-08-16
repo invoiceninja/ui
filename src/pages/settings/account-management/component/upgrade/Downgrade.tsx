@@ -1,16 +1,18 @@
-
-import { useTranslation } from "react-i18next";
-import { useState } from "react";
-import { DowngradeConfirmModal } from "./DowngradeConfirmModal";
-import { ChangeDocuNinjaPlanModal } from "./ChangeDocuNinjaPlanModal";
-import { useCurrentAccount } from "$app/common/hooks/useCurrentAccount";
-import { toast } from "$app/common/helpers/toast/toast";
-import { endpoint } from "$app/common/helpers";
+import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
+import { DowngradeConfirmModal } from './DowngradeConfirmModal';
+import { ChangeDocuNinjaPlanModal } from './ChangeDocuNinjaPlanModal';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { toast } from '$app/common/helpers/toast/toast';
+import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { isAxiosError } from "axios";
+import { ValidationBag } from "$app/common/interfaces/validation-bag";
+import { extractValidationErrorMessage } from "./helpers";
 
 interface Props {
-    docuninja_num_users?: number;
+  docuninja_num_users?: number;
 }
 
 export function Downgrade({ docuninja_num_users = 0 }: Props) {
@@ -19,8 +21,13 @@ export function Downgrade({ docuninja_num_users = 0 }: Props) {
     const [showDowngradeModal, setShowDowngradeModal] = useState(false);
     const [showChangeDocuNinjaModal, setShowChangeDocuNinjaModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [docuNinjaError, setDocuNinjaError] = useState<string | null>(null);
     const account = useCurrentAccount();
     const refresh = useRefreshCompanyUsers();
+
+    const openContactModal = () => {
+        window.dispatchEvent(new CustomEvent('open-contact-modal'));
+    };
 
     async function handleDowngradeConfirm() {
         setIsLoading(true);
@@ -41,6 +48,7 @@ export function Downgrade({ docuninja_num_users = 0 }: Props) {
     
     async function handleDocuNinjaChange(newUserCount: number) {
         setIsLoading(true);
+        setDocuNinjaError(null);
         
         try {
             await request('POST', endpoint('/api/client/account_management/docuninja/downgrade'), {
@@ -51,6 +59,15 @@ export function Downgrade({ docuninja_num_users = 0 }: Props) {
             refresh();
             setShowChangeDocuNinjaModal(false);
         } catch (error) {
+            if (isAxiosError<ValidationBag>(error) && error.response?.status === 422) {
+                setDocuNinjaError(
+                    extractValidationErrorMessage(error.response.data, 'num_users') ||
+                    (t('validation_errors') as string)
+                );
+
+                return;
+            }
+
             console.error('DocuNinja plan change failed:', error);
             toast.error();
         } finally {
@@ -58,55 +75,74 @@ export function Downgrade({ docuninja_num_users = 0 }: Props) {
         }
     }
 
-    return (
+    const handleOpenChangeDocuNinjaModal = () => {
+        setDocuNinjaError(null);
+        setShowChangeDocuNinjaModal(true);
+    };
+
+    const handleCloseChangeDocuNinjaModal = () => {
+        setDocuNinjaError(null);
+        setShowChangeDocuNinjaModal(false);
+    };
+
+  return (
     <div className="space-y-2">
-        
-        <div className="mt-4">
-            <div className="flex flex-col items-center  ">
-                <h4 className="text-lg font-semibold">{t('downgrade')}</h4>
-            </div>
+      <div className="mt-4">
+        <div className="flex flex-col items-center  ">
+          <h4 className="text-lg font-semibold">{t('downgrade')}</h4>
+        </div>
 
-            <div className="flex flex-row items-center justify-center mt-4 gap-6">
-
-                <button
-                    type="button"
-                    className="bg-red-500 p-4 rounded-md text-center hover:bg-red-900 transition duration-150 cursor-pointer"
-                    onClick={() => setShowDowngradeModal(true)}
-                >
-                    <p className="text-white hover:text-red-600">{t('downgrade_to_free')}</p>
-                </button>
+        <div className="flex flex-row items-center justify-center mt-4 gap-6">
+          <button
+            type="button"
+            className="bg-red-500 p-4 rounded-md text-center hover:bg-red-900 transition duration-150 cursor-pointer"
+            onClick={() => setShowDowngradeModal(true)}
+          >
+            <p className="text-white hover:text-red-600">
+              {t('downgrade_to_free')}
+            </p>
+          </button>
 
                 {account?.docuninja_num_users >= 1 && (
                     <button
                         type="button"
                         className="bg-red-500 p-4 rounded-md text-center hover:bg-red-900 transition duration-150 cursor-pointer"
-                        onClick={() => setShowChangeDocuNinjaModal(true)}
+                        onClick={handleOpenChangeDocuNinjaModal}
                     >
                         <p className="text-white hover:text-red-600">{t('change_docuninja_plan')}</p>
                     </button>
                 )}
             </div>
-            <div className="flex flex-col text-center justify-between">
-                <p className="text-sm">Need help? Please use the in app message feature to raise a support request.</p>
+            <div className="flex flex-col text-center justify-between mt-6">
+                <button
+                    type="button"
+                    className="text-sm underline cursor-pointer hover:text-gray-600"
+                    onClick={openContactModal}
+                >
+                    Need help? Please use the in app message feature to raise a support request.
+                </button>
             </div>
         </div>
 
-        {/* Modals */}
-        <DowngradeConfirmModal
-            visible={showDowngradeModal}
-            onClose={() => setShowDowngradeModal(false)}
-            onConfirm={handleDowngradeConfirm}
-            isLoading={isLoading}
-        />
+      {/* Modals */}
+      <DowngradeConfirmModal
+        visible={showDowngradeModal}
+        onClose={() => setShowDowngradeModal(false)}
+        onConfirm={handleDowngradeConfirm}
+        isLoading={isLoading}
+      />
 
         <ChangeDocuNinjaPlanModal
             visible={showChangeDocuNinjaModal}
-            onClose={() => setShowChangeDocuNinjaModal(false)}
+            onClose={handleCloseChangeDocuNinjaModal}
             onConfirm={handleDocuNinjaChange}
             currentUserCount={account?.docuninja_num_users || 0}
             isLoading={isLoading}
+            error={docuNinjaError}
+            onErrorClear={() => setDocuNinjaError(null)}
         />
         
     </div>
-    )
+  );
 }
+

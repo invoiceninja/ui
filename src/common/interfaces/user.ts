@@ -46,6 +46,8 @@ export interface User extends Timestamps {
   last_name: string;
   google_2fa_secret: boolean;
   has_password: boolean;
+  passkey_enabled?: boolean;
+  passkey_count?: number;
   is_deleted: boolean;
   last_confirmed_email_address: string;
   last_login: number;

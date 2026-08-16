@@ -8,29 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosResponse } from 'axios';
+import { useTranslation } from 'react-i18next';
+import {
+  MdArchive,
+  MdCreate,
+  MdDelete,
+  MdRestore,
+  MdSettings,
+} from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
+import { EntityState } from '$app/common/enums/entity-state';
+import { docuNinjaEndpoint, getEntityState } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import {
+  Document,
+  GenericSingleResponse,
+} from '$app/common/interfaces/docuninja/api';
+import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
+import { useBulk } from '$app/common/queries/docuninja/blueprints';
+import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
-import { useTranslation } from 'react-i18next';
-import { MdCreate, MdSettings } from 'react-icons/md';
-import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
-import { GenericSingleResponse } from '$app/common/interfaces/docuninja/api';
-import { AxiosResponse } from 'axios';
-import { docuNinjaEndpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { useNavigate } from 'react-router-dom';
-import { route } from '$app/common/helpers/route';
-import { Document } from '$app/common/interfaces/docuninja/api';
-import { toast } from '$app/common/helpers/toast/toast';
-import {
-  MdArchive,
-  MdDelete,
-  MdRestore,
-} from 'react-icons/md';
-import { getEntityState } from '$app/common/helpers';
-import { useBulk } from '$app/common/queries/docuninja/blueprints';
-import { Divider } from '$app/components/cards/Divider';
-import { EntityState } from '$app/common/enums/entity-state';
 
 interface UseActionsParams {
   onSettingsClick: (blueprint: Blueprint) => void;
@@ -56,17 +58,23 @@ export function useActions(params: UseActionsParams) {
     const signatoryOrder: string[] = [];
 
     blueprint.document.files.forEach((file) => {
-      if (file.metadata?.rectangles && Array.isArray(file.metadata.rectangles)) {
+      if (
+        file.metadata?.rectangles &&
+        Array.isArray(file.metadata.rectangles)
+      ) {
         file.metadata.rectangles.forEach((rectangle: any) => {
-          if (rectangle.signatory_id && rectangle.signatory_id.startsWith('blueprint|')) {
+          if (
+            rectangle.signatory_id &&
+            rectangle.signatory_id.startsWith('blueprint|')
+          ) {
             const signatoryId = rectangle.signatory_id;
-            
+
             // Only add to signatoryOrder if we haven't seen this ID before
             if (!signatoryIds.has(signatoryId)) {
               signatoryIds.add(signatoryId);
               signatoryOrder.push(signatoryId);
             }
-            
+
             // Store or update the color for this signatory
             signatoryInfo[signatoryId] = {
               id: signatoryId,
@@ -90,9 +98,12 @@ export function useActions(params: UseActionsParams) {
 
     if (signatoryIds.length > 0) {
       // Navigate to signatory mapping page
-      navigate(route('/docuninja/templates/:id/map-signatories', { id: blueprint.id }), {
-        state: { blueprint, signatoryIds, signatoryInfo },
-      });
+      navigate(
+        route('/docuninja/templates/:id/map-signatories', { id: blueprint.id }),
+        {
+          state: { blueprint, signatoryIds, signatoryInfo },
+        }
+      );
     } else {
       // No signatories to map, proceed directly
       request(
@@ -105,27 +116,34 @@ export function useActions(params: UseActionsParams) {
           },
         }
       ).then((response: AxiosResponse<GenericSingleResponse<Document>>) =>
-        navigate(route('/docuninja/:id/builder', { id: response.data.data.id }))
+        navigate(
+          route('/docuninja/:id/builder?from_template=true', {
+            id: response.data.data.id,
+          })
+        )
       );
     }
   };
-  
+
   const handleUseTemplateNoMapping = (blueprint: Blueprint) => {
     toast.processing();
 
-      request(
-        'POST',
-        docuNinjaEndpoint(`/api/blueprints/${blueprint.id}/action`),
-        { action: 'make_document' },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
-          },
-        }
-      ).then((response: AxiosResponse<GenericSingleResponse<Document>>) =>
-        navigate(route('/docuninja/:id/builder', { id: response.data.data.id }))
-      );
-
+    request(
+      'POST',
+      docuNinjaEndpoint(`/api/blueprints/${blueprint.id}/action`),
+      { action: 'make_document' },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+        },
+      }
+    ).then((response: AxiosResponse<GenericSingleResponse<Document>>) =>
+      navigate(
+        route('/docuninja/:id/builder?from_template=true', {
+          id: response.data.data.id,
+        })
+      )
+    );
   };
 
   const actions: Action<Blueprint>[] = [

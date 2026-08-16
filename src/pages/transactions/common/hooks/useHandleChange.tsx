@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction } from 'react';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Dispatch, SetStateAction } from 'react';
 import { useResolveCurrencySeparator } from './useResolveCurrencySeparator';
 
 interface Params {
@@ -35,7 +35,7 @@ export function useHandleChange(params: Params) {
 
     if (property === 'currency_id') {
       const resolvedCurrencySeparator = resolveCurrencySeparator(
-        value.toString()
+        (value ?? '').toString()
       );
 
       if (resolvedCurrencySeparator) {

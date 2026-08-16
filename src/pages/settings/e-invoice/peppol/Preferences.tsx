@@ -8,31 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { useTranslation } from 'react-i18next';
-import { Disconnect } from './Onboarding';
-import Toggle from '$app/components/forms/Toggle';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useFormik } from 'formik';
-import { request } from '$app/common/helpers/request';
-import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
-import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-import { InputField, Link, Button } from '$app/components/forms';
-import { Modal } from '$app/components/Modal';
-import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
-import { companySettingsErrorsAtom } from '../../common/atoms';
-import { useEffect, useState } from 'react';
-import { useAtomValue } from 'jotai';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { useStaticsQuery } from '$app/common/queries/statics';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError, AxiosResponse } from 'axios';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useFormik } from 'formik';
+import { useAtomValue } from 'jotai';
 import { get } from 'lodash';
-import { useColorScheme } from '$app/common/colors';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MdRefresh } from 'react-icons/md';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useStaticsQuery } from '$app/common/queries/statics';
+import { Card, Element } from '$app/components/cards';
+import { Button, InputField, Link } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { Modal } from '$app/components/Modal';
+import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { Disconnect } from './Onboarding';
 
 export function Preferences() {
   const { t } = useTranslation();
@@ -224,8 +224,10 @@ export function Preferences() {
         )}
 
         {company.legal_entity_id && (
-          <Element leftSide={t('e_invoice_forward_email')}
-          leftSideHelp={t('e_invoice_forward_email_help')}>
+          <Element
+            leftSide={t('e_invoice_forward_email')}
+            leftSideHelp={t('e_invoice_forward_email_help')}
+          >
             <InputField
               value={company?.settings.e_invoice_forward_email || ''}
               onValueChange={(value) =>
@@ -237,8 +239,10 @@ export function Preferences() {
         )}
 
         {company.legal_entity_id && (
-          <Element leftSide={t('e_expense_forward_email')}
-          leftSideHelp={t('e_expense_forward_email_help')}>
+          <Element
+            leftSide={t('e_expense_forward_email')}
+            leftSideHelp={t('e_expense_forward_email_help')}
+          >
             <InputField
               value={company?.settings.e_expense_forward_email || ''}
               onValueChange={(value) =>
@@ -250,10 +254,14 @@ export function Preferences() {
         )}
 
         {company.legal_entity_id && (
-          <Element leftSide={t('skip_automatic_email_with_peppol')}
-          leftSideHelp={t('skip_automatic_email_with_peppol_help')}>
+          <Element
+            leftSide={t('skip_automatic_email_with_peppol')}
+            leftSideHelp={t('skip_automatic_email_with_peppol_help')}
+          >
             <Toggle
-              checked={Boolean(company?.settings.skip_automatic_email_with_peppol)}
+              checked={Boolean(
+                company?.settings.skip_automatic_email_with_peppol
+              )}
               onValueChange={(value) =>
                 handleChange('settings.skip_automatic_email_with_peppol', value)
               }

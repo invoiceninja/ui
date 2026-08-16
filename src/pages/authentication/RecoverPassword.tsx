@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ForgotPasswordForm } from '../../common/dtos/authentication';
-import { endpoint, isHosted } from '../../common/helpers';
-import { ForgotPasswordValidation } from './common/ValidationInterface';
-import { InputField } from '../../components/forms/InputField';
-import { Button } from '../../components/forms/Button';
-import { HostedLinks } from './components/HostedLinks';
-import { Link } from '../../components/forms/Link';
-import { Header } from './components/Header';
+import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { useColorScheme } from '$app/common/colors';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { ForgotPasswordForm } from '../../common/dtos/authentication';
+import { endpoint, isHosted } from '../../common/helpers';
+import { Button } from '../../components/forms/Button';
+import { InputField } from '../../components/forms/InputField';
+import { Link } from '../../components/forms/Link';
+import { ForgotPasswordValidation } from './common/ValidationInterface';
+import { Header } from './components/Header';
+import { HostedLinks } from './components/HostedLinks';
 
 interface Response {
   message: string;
@@ -50,7 +50,9 @@ export function RecoverPassword() {
       setErrors(undefined);
       setMessage(undefined);
 
-      request('POST', endpoint('/api/v1/reset_password'), values, { skipIntercept: true })
+      request('POST', endpoint('/api/v1/reset_password'), values, {
+        skipIntercept: true,
+      })
         .then((response: AxiosResponse) => {
           setMessage(response.data);
           setIsDisabled(true);
@@ -60,7 +62,7 @@ export function RecoverPassword() {
           if (error.response?.status === 422) {
             setErrors(error.response?.data as ForgotPasswordValidation);
           } else if (error.response?.status === 429) {
-            setMessage({ message: "Too many requests.", status: false });
+            setMessage({ message: 'Too many requests.', status: false });
             setIsDisabled(true);
             setTimeout(() => setIsDisabled(false), 30000);
           } else {
@@ -102,7 +104,11 @@ export function RecoverPassword() {
 
             <ErrorMessage className="mt-4">{message?.message}</ErrorMessage>
 
-            <Button disabled={isFormBusy || isDisabled} className="mt-4" variant="block">
+            <Button
+              disabled={isFormBusy || isDisabled}
+              className="mt-4"
+              variant="block"
+            >
               {t('send_email')}
             </Button>
           </form>

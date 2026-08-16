@@ -20,7 +20,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { date, endpoint, trans } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
@@ -45,11 +45,12 @@ import {
   openClientPortal,
 } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { EmailRecord } from '$app/components/EmailRecord';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
 import { QuoteActivity } from '$app/common/interfaces/quote-activity';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { InvoiceStatus } from '$app/pages/invoices/common/components/InvoiceStatus';
+import { ViewLineItem } from '$app/pages/invoices/common/components/ViewLineItem';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import Toggle from '$app/components/forms/Toggle';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
@@ -69,6 +70,11 @@ import { History } from '$app/components/icons/History';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { ChevronRight } from 'react-feather';
 import { Icon } from '$app/components/icons/Icon';
+import { TagPills } from '$app/components/tags/TagPills';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -195,15 +201,15 @@ export function QuoteSlider() {
 
   const fetchEmailHistory = async () => {
     const response = await queryClient
-      .fetchQuery(
-        ['/api/v1/quotes', quote?.id, 'emailHistory'],
-        () =>
+      .fetchQuery({
+        queryKey: ['/api/v1/quotes', quote?.id, 'emailHistory'],
+        queryFn: () =>
           request('POST', endpoint('/api/v1/emails/entityHistory'), {
             entity: 'quote',
             entity_id: quote?.id,
           }),
-        { staleTime: Infinity }
-      )
+        staleTime: Infinity,
+      })
       .then((response) => response.data);
 
     setEmailRecords(response);
@@ -217,7 +223,7 @@ export function QuoteSlider() {
 
   return (
     <Slider
-      size="regular"
+      size="large"
       visible={isVisible}
       onClose={() => {
         setIsSliderVisible(false);
@@ -237,8 +243,24 @@ export function QuoteSlider() {
       withoutHeaderBorder
     >
       <TabGroup
-        tabs={[t('overview'), t('history'), t('activity'), t('email_history')]}
+        tabs={[
+          t('overview'),
+          t('history'),
+          t('activity'),
+          t('email_history'),
+          t('documents'),
+        ]}
         width="full"
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 4) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={quote?.documents?.length}
+                textCenter
+              />
+            );
+          }
+        }}
         withHorizontalPadding
         horizontalPaddingWidth="1.5rem"
       >
@@ -299,12 +321,26 @@ export function QuoteSlider() {
             </Element>
 
             <Element
+              className={classNames({
+                'border-b border-dashed': Boolean(quote?.tags?.length),
+              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {quote ? <QuoteStatus entity={quote} /> : null}
             </Element>
+
+            {Boolean(quote?.tags?.length) && (
+              <Element
+                leftSide={t('tags')}
+                pushContentToRight
+                noExternalPadding
+              >
+                <TagPills tags={quote?.tags} />
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />
@@ -375,7 +411,7 @@ export function QuoteSlider() {
             <>
               <div className="space-y-2 whitespace-nowrap px-6">
                 <Tooltip
-                  size="regular"
+                  size="large"
                   width="auto"
                   tooltipElement={
                     <article
@@ -508,6 +544,24 @@ export function QuoteSlider() {
                   <InvoiceStatus entity={invoiceResponse} />
                 </div>
               </Box>
+            </div>
+          )}
+
+          {Boolean(quote?.line_items?.length) && (
+            <Divider withoutPadding borderColor={colors.$20} />
+          )}
+
+          {quote && Boolean(quote.line_items?.length) && (
+            <div className="flex flex-col space-y-3 px-6 py-5">
+              {quote.line_items.map((lineItem, index) => (
+                <ViewLineItem
+                  key={index}
+                  lineItem={lineItem}
+                  lineItemIndex={index}
+                  client={quote.client}
+                  editHref={route('/quotes/:id/edit', { id: quote.id })}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -697,6 +751,27 @@ export function QuoteSlider() {
               withAllBorders
             />
           ))}
+        </div>
+
+        <div className="px-4">
+          <Upload
+            endpoint={endpoint('/api/v1/quotes/:id/upload', {
+              id: quote?.id,
+            })}
+            onSuccess={() => $refetch(['quotes'])}
+            widgetOnly
+            disableUpload={
+              !hasPermission('edit_quote') && !entityAssigned(quote)
+            }
+          />
+
+          <DocumentsTable
+            documents={quote?.documents || []}
+            onDocumentDelete={() => $refetch(['quotes'])}
+            disableEditableOptions={
+              !entityAssigned(quote, true) && !hasPermission('edit_quote')
+            }
+          />
         </div>
       </TabGroup>
     </Slider>

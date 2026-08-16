@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ChangeEvent, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { TaxSetting } from '$app/common/interfaces/company.interface';
 import { Element } from '$app/components/cards';
 import { Button, Checkbox, SelectField } from '$app/components/forms';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
-import { ChangeEvent, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { EditSubRegionModal } from './EditSubRegionModal';
 
 export function USRegions() {
@@ -102,7 +102,7 @@ export function USRegions() {
                 if (e.target instanceof HTMLInputElement) {
                   return;
                 }
-                
+
                 divClickIntercept(
                   `tax_data.regions.US.subregions.${value[0]}.apply_tax`
                 );

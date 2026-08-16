@@ -8,27 +8,29 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from '$app/common/hooks/useTitle';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
-import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
+import { useActions } from './common/hooks/useActions';
 import { useTableColumns } from './common/hooks/useTableColumns';
 import { EditBlueprintModal } from './edit/components/EditBlueprintModal';
-import { useState } from 'react';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
-import { useActions } from './common/hooks/useActions';
 
 export default function Blueprints() {
   useTitle('blueprints');
-  
+
   const [t] = useTranslation();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedBlueprint, setSelectedBlueprint] = useState<Blueprint | null>(null);
+  const [selectedBlueprint, setSelectedBlueprint] = useState<Blueprint | null>(
+    null
+  );
 
   const columns = useTableColumns();
-  
+
   // Get token from unified actions (NO QUERY!)
   const { getToken } = useDocuNinjaActions();
 

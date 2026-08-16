@@ -24,6 +24,8 @@ import { ClientCard } from '$app/pages/clients/show/components/ClientCard';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useColorScheme } from '$app/common/colors';
 import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 interface Context {
   errors: ValidationBag | undefined;
@@ -52,7 +54,7 @@ export default function Edit() {
 
   const handleChange = <
     TField extends keyof Payment,
-    TValue extends Payment[TField]
+    TValue extends Payment[TField],
   >(
     field: TField,
     value: TValue
@@ -132,6 +134,15 @@ export default function Edit() {
           value={payment?.private_notes}
           onValueChange={(value) => handleChange('private_notes', value)}
           errorMessage={errors?.errors.private_notes}
+        />
+      </Element>
+
+      <Element leftSide={t('tags')}>
+        <TagPillSelector
+          entityType={TAG_ENTITY_TYPES.payment}
+          value={payment?.tags || []}
+          onChange={(tags) => handleChange('tags', tags)}
+          errorMessage={errors?.errors.tags}
         />
       </Element>
 

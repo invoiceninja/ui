@@ -10,11 +10,11 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal } from '$app/components/Modal';
-import { InputField } from '$app/components/forms/InputField';
-import { Button } from '$app/components/forms/Button';
-import { Icon } from '$app/components/icons/Icon';
 import { MdOutlineWarning } from 'react-icons/md';
+import { Button } from '$app/components/forms/Button';
+import { InputField } from '$app/components/forms/InputField';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
 
 interface Props {
   visible: boolean;
@@ -37,14 +37,12 @@ export function CancelInvoiceModal({ visible, onClose, onConfirm }: Props) {
   };
 
   return (
-    <Modal
-    title={t('cancel')}
-    visible={visible}
-      onClose={handleClose}
-    >
+    <Modal title={t('cancel')} visible={visible} onClose={handleClose}>
       <div className="flex items-center">
         <Icon element={MdOutlineWarning} color="red" size={48} />
-        <span className="font-medium text-sm ml-2 text-red-500">Esto cancelará la factura y creará una factura rectificativa por el importe total de la factura
+        <span className="font-medium text-sm ml-2 text-red-500">
+          Esto cancelará la factura y creará una factura rectificativa por el
+          importe total de la factura
         </span>
       </div>
       <InputField
@@ -55,16 +53,10 @@ export function CancelInvoiceModal({ visible, onClose, onConfirm }: Props) {
         required
       />
       <div className="flex justify-end space-x-2 mt-4">
-        <Button
-          type="secondary"
-          onClick={handleClose}
-        >
+        <Button type="secondary" onClick={handleClose}>
           {t('cancel')}
         </Button>
-        <Button
-          onClick={handleConfirm}
-          disabled={!cancellationReason.trim()}
-        >
+        <Button onClick={handleConfirm} disabled={!cancellationReason.trim()}>
           {t('confirm')}
         </Button>
       </div>

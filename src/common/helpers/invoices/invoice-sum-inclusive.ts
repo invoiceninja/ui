@@ -7,22 +7,24 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { InvoiceItemSumInclusive } from './invoice-item-sum-inclusive';
-import { Invoice } from '$app/common/interfaces/invoice';
+
 import collect from 'collect.js';
 import { Credit } from '$app/common/interfaces/credit';
+import { Currency } from '$app/common/interfaces/currency';
+import { Invoice } from '$app/common/interfaces/invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
-import { TaxItem } from './invoice-sum';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { Currency } from '$app/common/interfaces/currency';
 import { NumberFormatter } from '../number-formatter';
+import { InvoiceItemSumInclusive } from './invoice-item-sum-inclusive';
+import { TaxItem } from './invoice-sum';
 import {
   formatTaxName,
   percentageOf,
   precisionOrDefault,
   roundToPrecision,
 } from './round';
+import { InclusiveTax } from './inclusive-tax';
 
 export class InvoiceSumInclusive {
   protected taxMap = collect<TaxItem>();
@@ -102,23 +104,39 @@ export class InvoiceSumInclusive {
 
     amount += this.getTaxableSurchargeTotal();
 
+    const { net, components } = InclusiveTax.backout(
+      amount,
+      [this.invoice.tax_rate1, this.invoice.tax_rate2, this.invoice.tax_rate3],
+      2
+    );
+
     [
-      { name: this.invoice.tax_name1, rate: this.invoice.tax_rate1 },
-      { name: this.invoice.tax_name2, rate: this.invoice.tax_rate2 },
-      { name: this.invoice.tax_name3, rate: this.invoice.tax_rate3 },
-    ].forEach(({ name, rate }) => {
+      {
+        name: this.invoice.tax_name1,
+        rate: this.invoice.tax_rate1,
+        tax: components[0],
+      },
+      {
+        name: this.invoice.tax_name2,
+        rate: this.invoice.tax_rate2,
+        tax: components[1],
+      },
+      {
+        name: this.invoice.tax_name3,
+        rate: this.invoice.tax_rate3,
+        tax: components[2],
+      },
+    ].forEach(({ name, rate, tax }) => {
       if (name.length <= 1 || rate <= 0) {
         return;
       }
-
-      const tax = this.calcInclusiveLineTax(amount, rate);
 
       this.totalTaxes += tax;
       this.totalTaxMap.push({
         name: formatTaxName(name, rate),
         total: tax,
         tax_rate: rate,
-        base_amount: amount - tax,
+        base_amount: net,
       });
     });
 
@@ -162,7 +180,10 @@ export class InvoiceSumInclusive {
   }
 
   public getNetSubtotal() {
-    return this.getSubTotal() - this.getTotalDiscount();
+    return roundToPrecision(
+      this.getSubTotal() - this.getTotalTaxes() - this.getTotalDiscount(),
+      2
+    );
   }
 
   protected calculateCustomValues() {
@@ -318,13 +339,5 @@ export class InvoiceSumInclusive {
     }
 
     return 0;
-  }
-
-  protected calcInclusiveLineTax(amount: number, rate: number) {
-    if (!rate) {
-      return 0;
-    }
-
-    return roundToPrecision(amount - amount / (1 + rate / 100), 2);
   }
 }

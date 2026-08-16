@@ -8,8 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
+import { useDispatch } from 'react-redux';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
   changeCurrentIndex,
@@ -17,8 +21,23 @@ import {
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
 import { authenticate } from '$app/common/stores/slices/user';
-import { useDispatch } from 'react-redux';
-import { useQueryClient } from 'react-query';
+
+export type LoginMethod = 'password' | 'totp' | 'passkey';
+
+export interface LoginPrecheck {
+  methods?: LoginMethod[];
+  secret_required?: boolean;
+}
+
+export function useLoginPrecheck() {
+  return (email: string) => {
+    return request('POST', endpoint('/api/v1/login/precheck'), { email }).then(
+      (response: AxiosResponse<LoginPrecheck>) => {
+        return response.data;
+      }
+    );
+  };
+}
 
 export function useLogin() {
   const dispatch = useDispatch();
@@ -53,6 +72,8 @@ export function useLogin() {
     dispatch(changeCurrentIndex(currentIndex));
 
     // Trigger DocuNinja data fetch after successful login
-    queryClient.invalidateQueries(['/api/docuninja/login']);
+    queryClient.invalidateQueries({
+      queryKey: ['/api/docuninja/login'],
+    });
   };
 }

@@ -8,7 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-
+import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { cloneDeep } from 'lodash';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -24,11 +28,6 @@ import { TabGroup } from '$app/components/TabGroup';
 import { ValidationAlert } from '$app/components/ValidationAlert';
 import { variables } from '$app/pages/settings/invoice-design/customize/common/variables';
 import { Variable } from '$app/pages/settings/templates-and-reminders/common/components/Variable';
-import { AxiosError } from 'axios';
-import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
 
 function EmailTemplates() {
   const [t] = useTranslation();
@@ -159,8 +158,8 @@ function EmailTemplates() {
         )}
 
         {!isLoading && currentTemplates.length > 0 && (
-          <TabGroup 
-            tabs={currentTemplates.map(template => template.name)}
+          <TabGroup
+            tabs={currentTemplates.map((template) => template.name)}
             horizontalPaddingWidth="1.5rem"
             withHorizontalPadding
             fullRightPadding

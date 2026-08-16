@@ -9,13 +9,13 @@
  */
 
 import classNames from 'classnames';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import React, { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import CommonProps from '../../common/interfaces/common-props.interface';
-import { Spinner } from '../Spinner';
 import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import CommonProps from '../../common/interfaces/common-props.interface';
+import { Spinner } from '../Spinner';
 
 interface Props extends CommonProps {
   children?: ReactNode;
@@ -62,8 +62,8 @@ export function Button(props: Props) {
       props.type === 'primary'
         ? accentColor
         : props.noBackgroundColor
-        ? 'transparent'
-        : 'white',
+          ? 'transparent'
+          : 'white',
     color:
       props.type !== 'primary' && props.type !== 'secondary' ? accentColor : '',
   };

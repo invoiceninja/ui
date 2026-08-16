@@ -8,34 +8,34 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { RegisterForm } from '../../common/dtos/authentication';
-import { apiEndpoint, isHosted } from '../../common/helpers';
-import { register } from '../../common/stores/slices/user';
-import { RegisterValidation } from './common/ValidationInterface';
-import { Header } from './components/Header';
-import { InputField } from '../../components/forms/InputField';
-import { Button } from '../../components/forms/Button';
-import { HostedLinks } from './components/HostedLinks';
-import { Link } from '../../components/forms/Link';
+import { useSearchParams } from 'react-router-dom';
+import { useTurnstile } from 'react-turnstile';
+import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
-import { SignInProviders } from './components/SignInProviders';
+import { useTitle } from '$app/common/hooks/useTitle';
 import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
 import {
   changeCurrentIndex,
   resetChanges,
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { useColorScheme } from '$app/common/colors';
-import { useSearchParams } from 'react-router-dom';
-import { TurnstileWidget } from './components/TurnstileWidget';
-import { useTurnstile } from 'react-turnstile';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { RegisterForm } from '../../common/dtos/authentication';
+import { apiEndpoint, isHosted } from '../../common/helpers';
+import { register } from '../../common/stores/slices/user';
+import { Button } from '../../components/forms/Button';
+import { InputField } from '../../components/forms/InputField';
+import { Link } from '../../components/forms/Link';
+import { RegisterValidation } from './common/ValidationInterface';
+import { Header } from './components/Header';
+import { HostedLinks } from './components/HostedLinks';
+import { SignInProviders } from './components/SignInProviders';
+import { TurnstileWidget } from './components/TurnstileWidget';
 
 export function Register() {
   useTitle('register');
@@ -147,10 +147,10 @@ export function Register() {
 
   return (
     <>
-      <div className="h-screen">
+      <div className="min-h-screen flex flex-col items-center justify-center py-8">
         <Header />
 
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center w-full">
           <div
             className="mx-4 max-w-md w-full p-8 rounded md:shadow-lg border"
             style={{ backgroundColor: colors.$1, borderColor: colors.$5 }}
@@ -159,31 +159,43 @@ export function Register() {
               {t('register_label')}
             </h2>
 
-            <div className="space-y-5 my-6">
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                setIsTrunstileVisible(true);
+              }}
+              className="space-y-5 my-6"
+            >
               <InputField
                 type="email"
-                autoComplete="on"
+                autoComplete="username"
                 label={t('email_address')}
                 id="email"
+                name="email"
                 onChange={form.handleChange}
+                changeOverride
                 errorMessage={errors?.email}
               />
 
               <InputField
                 type="password"
-                autoComplete="on"
+                autoComplete="new-password"
                 label={t('password')}
                 id="password"
+                name="password"
                 onChange={form.handleChange}
+                changeOverride
                 errorMessage={errors?.password}
               />
 
               <InputField
                 type="password"
-                autoComplete="on"
+                autoComplete="new-password"
                 label={t('password_confirmation')}
                 id="password_confirmation"
+                name="password_confirmation"
                 onChange={form.handleChange}
+                changeOverride
                 errorMessage={errors?.password_confirmation}
               />
 
@@ -197,15 +209,10 @@ export function Register() {
                 </div>
               )}
 
-              <Button
-                disabled={isFormBusy}
-                className="mt-4"
-                variant="block"
-                onClick={() => setIsTrunstileVisible(true)}
-              >
+              <Button disabled={isFormBusy} className="mt-4" variant="block">
                 {t('register')}
               </Button>
-            </div>
+            </form>
 
             <div className="flex justify-center">
               {isHosted() && <Link to="/login">{t('login')}</Link>}

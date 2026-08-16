@@ -9,16 +9,17 @@
  */
 
 import { endpoint } from '$app/common/helpers';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { ComboboxAsync, Entry } from '../forms/Combobox';
 
 interface Props extends GenericSelectorProps<Invoice> {
   clearButton?: boolean;
   onClearButtonClick?: () => void;
   errorMessage?: string | string[];
   clientId?: string;
+  endpoint?: string;
 }
 
 export function InvoiceSelector(props: Props) {
@@ -37,11 +38,14 @@ export function InvoiceSelector(props: Props) {
       inputOptions={{
         value: props.value ?? null,
       }}
-      endpoint={endpoint(
-        `/api/v1/invoices?include=client&filter_deleted_clients=true&status=active${
-          props.clientId ? `&client_id=${props.clientId}` : ''
-        }`
-      )}
+      endpoint={
+        props.endpoint ??
+        endpoint(
+          `/api/v1/invoices?include=client&filter_deleted_clients=true&status=active${
+            props.clientId ? `&client_id=${props.clientId}` : ''
+          }`
+        )
+      }
       onChange={(invoice: Entry<Invoice>) =>
         invoice.resource && props.onChange?.(invoice.resource)
       }

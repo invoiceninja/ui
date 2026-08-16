@@ -24,7 +24,6 @@ export function useQuickbooksReconnect() {
 
     request('POST', endpoint('/api/v1/quickbooks/reconnect_url'), {})
       .then((response) => {
-
         const reconnectUrl = response.data.reconnect_url;
         toast.dismiss();
 

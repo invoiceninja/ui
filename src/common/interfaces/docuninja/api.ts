@@ -82,7 +82,6 @@ export interface DocuNinjaData {
   phone_number?: string;
   phone_number_verified?: number;
   updated_at?: string;
-
 }
 export interface Account {
   id: string;
@@ -210,8 +209,8 @@ export interface Metadata {
   entity_type: string;
   invitation_key: string;
   company_key: string;
-  is_ninja: boolean; 
-  is_sent: boolean; 
+  is_ninja: boolean;
+  is_sent: boolean;
   design_id: string;
 }
 
@@ -284,6 +283,7 @@ export interface DocumentInvitation {
   message_id: string | null;
   email_error: string | null;
   entity: 'contact' | 'user';
+  signing_order?: number | null;
   sent_date: string | null; // ISO 8601 date string
   viewed_date: string | null; // ISO 8601 date string
   opened_date: string | null; // ISO 8601 date string

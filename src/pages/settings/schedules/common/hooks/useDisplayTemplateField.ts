@@ -8,7 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export type Template = 'email_statement' | 'email_record' | 'email_report' | 'invoice_outstanding_tasks' | 'payment_schedule';
+export type Template =
+  | 'email_statement'
+  | 'email_record'
+  | 'email_report'
+  | 'invoice_outstanding_tasks'
+  | 'payment_schedule';
 
 type TemplateField = 'template' | 'next_run' | 'frequency' | 'remaining_cycles';
 

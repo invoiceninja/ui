@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { injectInChangesWithData } from '$app/common/stores/slices/user';
-import { RootState } from '$app/common/stores/store';
 import { cloneDeep, set } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { Element } from '../../../../components/cards';
-import { SelectField } from '$app/components/forms';
-import { useNotificationOptions } from '../common/hooks/useNotificationOptions';
-import { Divider } from '$app/components/cards/Divider';
-import Toggle from '$app/components/forms/Toggle';
-import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
 import { useColorScheme } from '$app/common/colors';
+import { useHandleCurrentUserChangeProperty } from '$app/common/hooks/useHandleCurrentUserChange';
+import { injectInChangesWithData } from '$app/common/stores/slices/user';
+import { RootState } from '$app/common/stores/store';
+import { Divider } from '$app/components/cards/Divider';
+import { SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { Element } from '../../../../components/cards';
+import { useNotificationOptions } from '../common/hooks/useNotificationOptions';
 
 export function Notifications() {
   const [t] = useTranslation();
@@ -128,7 +128,6 @@ export function Notifications() {
     dispatch(injectInChangesWithData(user));
   };
 
-
   const handleDisableRecurringPaymentNotificationChange = (value: boolean) => {
     const emailNotifications = userChanges?.company_user?.notifications?.email;
 
@@ -136,15 +135,20 @@ export function Notifications() {
 
     if (!value) {
       updatedNotifications = updatedNotifications.filter(
-        (notificationKey) => notificationKey !== 'disable_recurring_payment_notification'
+        (notificationKey) =>
+          notificationKey !== 'disable_recurring_payment_notification'
       );
     } else {
       const isAlreadyAdded = updatedNotifications.find(
-        (notificationKey) => notificationKey === 'disable_recurring_payment_notification'
+        (notificationKey) =>
+          notificationKey === 'disable_recurring_payment_notification'
       );
 
       if (!isAlreadyAdded) {
-        updatedNotifications = [...updatedNotifications, 'disable_recurring_payment_notification'];
+        updatedNotifications = [
+          ...updatedNotifications,
+          'disable_recurring_payment_notification',
+        ];
       }
     }
 
@@ -162,15 +166,20 @@ export function Notifications() {
 
     if (!value) {
       updatedNotifications = updatedNotifications.filter(
-        (notificationKey) => notificationKey !== 'enable_e_invoice_received_notification'
+        (notificationKey) =>
+          notificationKey !== 'enable_e_invoice_received_notification'
       );
     } else {
       const isAlreadyAdded = updatedNotifications.find(
-        (notificationKey) => notificationKey === 'enable_e_invoice_received_notification'
+        (notificationKey) =>
+          notificationKey === 'enable_e_invoice_received_notification'
       );
 
       if (!isAlreadyAdded) {
-        updatedNotifications = [...updatedNotifications, 'enable_e_invoice_received_notification'];
+        updatedNotifications = [
+          ...updatedNotifications,
+          'enable_e_invoice_received_notification',
+        ];
       }
     }
 
@@ -221,7 +230,7 @@ export function Notifications() {
               (key: string) => key === 'task_assigned'
             )
           )}
-            onChange={(value) => handleTaskAssignedNotificationChange(value)}
+          onChange={(value) => handleTaskAssignedNotificationChange(value)}
         />
       </Element>
 

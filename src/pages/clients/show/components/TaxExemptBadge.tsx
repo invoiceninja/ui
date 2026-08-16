@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
+import { Badge } from '$app/components/Badge';
 
 interface Props {
   isTaxExempt: boolean;

@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { useBlueprintQuery } from '$app/common/queries/docuninja/blueprints';
@@ -16,9 +19,6 @@ import { Card, Element } from '$app/components/cards';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 import { useActions } from '../common/hooks/useActions';
 import { EditBlueprintModal } from './components/EditBlueprintModal';
 
@@ -29,9 +29,9 @@ export default function Edit() {
   const colors = useColorScheme();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
-  
+
   const { data: blueprintResponse, isLoading } = useBlueprintQuery({ id });
-  
+
   const actions = useActions({
     onSettingsClick: () => {
       setIsEditModalOpen(true);
@@ -55,7 +55,10 @@ export default function Edit() {
       title={t('edit_template')}
       breadcrumbs={pages}
       navigationTopRight={
-        <ResourceActions resource={blueprintResponse?.data?.data} actions={actions} />
+        <ResourceActions
+          resource={blueprintResponse?.data?.data}
+          actions={actions}
+        />
       }
     >
       <div className="flex justify-center">
@@ -72,24 +75,31 @@ export default function Edit() {
           ) : (
             <div className="space-y-4">
               <Element leftSide={t('name')}>
-                <div className="text-sm text-gray-600">{blueprintResponse?.data.data.name}</div>
+                <div className="text-sm text-gray-600">
+                  {blueprintResponse?.data.data.name}
+                </div>
               </Element>
               <Element leftSide={t('description')}>
                 <div className="text-sm text-gray-600">
-                  {blueprintResponse?.data.data.description || t('no_description')}
+                  {blueprintResponse?.data.data.description ||
+                    t('no_description')}
                 </div>
               </Element>
               <Element leftSide={t('created_at')}>
                 <div className="text-sm text-gray-600">
                   {blueprintResponse?.data.data.created_at
-                    ? new Date(blueprintResponse?.data.data.created_at).toLocaleDateString()
+                    ? new Date(
+                        blueprintResponse?.data.data.created_at
+                      ).toLocaleDateString()
                     : '-'}
                 </div>
               </Element>
               <Element leftSide={t('updated_at')}>
                 <div className="text-sm text-gray-600">
                   {blueprintResponse?.data.data.updated_at
-                    ? new Date(blueprintResponse?.data.data.updated_at).toLocaleDateString()
+                    ? new Date(
+                        blueprintResponse?.data.data.updated_at
+                      ).toLocaleDateString()
                     : '-'}
                 </div>
               </Element>

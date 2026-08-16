@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { EntityState } from '$app/common/enums/entity-state';
 import { getEntityState } from '$app/common/helpers';
 import { Badge } from '$app/components/Badge';
-import { useTranslation } from 'react-i18next';
 
 interface Props {
   entity: unknown;

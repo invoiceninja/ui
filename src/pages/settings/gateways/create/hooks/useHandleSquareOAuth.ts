@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 
 export function useHandleSquareOAuth() {

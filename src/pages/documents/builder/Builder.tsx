@@ -8,17 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { docuNinjaAtom } from '$app/common/atoms/docuninja';
-import { useColorScheme } from '$app/common/colors';
-import { route, routeWithOrigin } from '$app/common/helpers/route';
-import { toast } from '$app/common/helpers/toast/toast';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { Page } from '$app/components/Breadcrumbs';
-import { Card } from '$app/components/cards';
-import { Button } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
-import { Default } from '$app/components/layouts/Default';
-import { Modal } from '$app/components/Modal';
 import {
   Builder as Builder$,
   BuilderContext,
@@ -26,20 +15,36 @@ import {
   Document,
   SendDialogButtonProps,
   SendDialogProps,
+  useBuilderStore,
 } from '@docuninja/builder2.0';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FaFileSignature } from 'react-icons/fa';
 import { MdSend } from 'react-icons/md';
 import { useMediaQuery } from 'react-responsive';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { useColorScheme } from '$app/common/colors';
+import { docuNinjaEndpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route, routeWithOrigin } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useDriverTour } from '$app/common/hooks/useDriverTour';
+import { usePreferences } from '$app/common/hooks/usePreferences';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
+import { Page } from '$app/components/Breadcrumbs';
+import { Card } from '$app/components/cards';
+import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Default } from '$app/components/layouts/Default';
+import { Modal } from '$app/components/Modal';
+import { ClientCreate } from '$app/pages/invoices/common/components/ClientCreate';
 import {
   SignatorySelector,
   SignatorySwap,
 } from '../pages/blueprints/builder/Elements';
-import { FaFileSignature } from 'react-icons/fa';
-import { ClientCreate } from '$app/pages/invoices/common/components/ClientCreate';
 import {
   Alertbox,
   ConfirmationDialog,
@@ -67,8 +72,6 @@ import {
   UploadDialog,
   ValidationErrors,
 } from './components';
-import { useDriverTour } from '$app/common/hooks/useDriverTour';
-import { usePreferences } from '$app/common/hooks/usePreferences';
 
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
@@ -126,21 +129,30 @@ function Builder() {
   const { t, i18n } = useTranslation();
 
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const isFromTemplate = searchParams.get('from_template') === 'true';
 
   const colors = useColorScheme();
 
   const docuninjaAccount = useAtomValue(docuNinjaAtom);
 
+  const navigate = useNavigate();
+
   const [entity, setEntity] = useState<Document | null>(null);
+
+  const isNinjaDocument = entity?.metadata?.is_ninja === true;
+
+  useBuilderStore((state) => state.rectangles);
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
   const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
+  const [hasBeenSent, setHasBeenSent] = useState<boolean>(false);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
   const { preferences, update, save } = usePreferences();
 
   useDriverTour({
-    show: !preferences.document_builder_tour_shown,
+    show: Boolean(!isFromTemplate && !preferences.document_builder_tour_shown),
     steps: [
       {
         element: '.builder-rightSide',
@@ -177,6 +189,46 @@ function Builder() {
     },
   });
 
+  useDriverTour({
+    show: Boolean(
+      isFromTemplate && !preferences.blueprint_use_template_tour_shown
+    ),
+    steps: [
+      {
+        element: '.builder-rightSide',
+        popover: {
+          description: t('tour_template_signatory_swap') as string,
+          nextBtnText: t('tour_continue_select_signatory') as string,
+        },
+      },
+      {
+        element: '.builder-save-button',
+        popover: {
+          description: t('tour_template_save_document') as string,
+        },
+      },
+      {
+        element: '.builder-send-button',
+        popover: {
+          description: t('tour_template_send_document') as string,
+        },
+      },
+    ],
+    eventName: 'builder:loaded',
+    options: {
+      showProgress: true,
+      allowClose: false,
+      showButtons: ['next'],
+      disableActiveInteraction: true,
+      onDestroyed: () => {
+        if (!preferences.blueprint_use_template_tour_shown) {
+          update('preferences.blueprint_use_template_tour_shown', true);
+          save({ silent: true });
+        }
+      },
+    },
+  });
+
   const pages: Page[] = [
     { name: t('docuninja'), href: '/docuninja' },
     {
@@ -194,24 +246,87 @@ function Builder() {
   };
 
   const handleSend = () => {
-    window.dispatchEvent(new CustomEvent('builder:open.send.confirmation'));
+    if (!hasRealSignatories() || !entity?.id) {
+      return;
+    }
+
+    toast.processing();
+    setIsDocumentSaving(true);
+
+    const onSaveSuccess = () => {
+      window.removeEventListener(
+        'builder:document.successfully.saved',
+        onSaveSuccess
+      );
+      window.removeEventListener('builder:save.error', onSaveError);
+
+      setIsDocumentSaving(false);
+      setIsDocumentSending(true);
+
+      request(
+        'POST',
+        docuNinjaEndpoint(`/api/documents/${entity.id}/send`),
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+          },
+        }
+      )
+        .then(() => {
+          setIsDocumentSending(false);
+          setHasBeenSent(true);
+
+          window.dispatchEvent(
+            new CustomEvent('builder:document.sent', {
+              detail: { documentId: entity.id },
+            })
+          );
+
+          toast.success('document_queued_for_sending');
+          $refetch(['docuninja_documents', 'docuninja_document_timeline']);
+        })
+        .catch(() => {
+          setIsDocumentSending(false);
+          toast.error('something_went_wrong');
+
+          window.dispatchEvent(new CustomEvent('builder:send.error'));
+        });
+    };
+
+    const onSaveError = () => {
+      window.removeEventListener(
+        'builder:document.successfully.saved',
+        onSaveSuccess
+      );
+      window.removeEventListener('builder:save.error', onSaveError);
+
+      setIsDocumentSaving(false);
+    };
+
+    window.addEventListener(
+      'builder:document.successfully.saved',
+      onSaveSuccess
+    );
+    window.addEventListener('builder:save.error', onSaveError);
+    window.dispatchEvent(new CustomEvent('builder:save'));
   };
 
   const doesDocumentHaveSignatories = () => {
-    const rectangles =
-      entity?.files?.flatMap((file) => file.metadata?.rectangles ?? []) ?? [];
+    const storeState = useBuilderStore.getState();
+    const rectangles = Object.values(storeState.rectangles).flat();
 
     return rectangles.length > 0;
   };
 
   const hasRealSignatories = () => {
-    const rectangles =
-      entity?.files?.flatMap((file) => file.metadata?.rectangles ?? []) ?? [];
+    const storeState = useBuilderStore.getState();
+    const rectangles = Object.values(storeState.rectangles).flat();
 
     return rectangles.every(
       (rectangle: any) =>
         rectangle.signatory_id &&
-        !rectangle.signatory_id.startsWith('blueprint|')
+        !rectangle.signatory_id.startsWith('blueprint')
     );
   };
 
@@ -259,6 +374,20 @@ function Builder() {
       setIsDocumentSaving(false);
     };
 
+    const handleDocumentSent = () => {
+      setIsDocumentSending(false);
+    };
+
+    const handleSendError = () => {
+      setIsDocumentSending(false);
+    };
+
+    const handleSingleSignatorySent = () => {
+      toast.success('document_queued_for_sending');
+
+      navigate('/docuninja');
+    };
+
     window.addEventListener(
       'refetch.docuninja.document',
       refetchDocuninjaDocument
@@ -280,6 +409,14 @@ function Builder() {
       'builder:document.updated',
       refetchDocuninjaDocument
     );
+
+    window.addEventListener(
+      'builder:single-signatory-sent',
+      handleSingleSignatorySent
+    );
+
+    window.addEventListener('builder:document.sent', handleDocumentSent);
+    window.addEventListener('builder:send.error', handleSendError);
 
     return () => {
       window.removeEventListener(
@@ -303,6 +440,15 @@ function Builder() {
         'builder:document.updated',
         refetchDocuninjaDocument
       );
+
+      window.removeEventListener(
+        'builder:single-signatory-sent',
+        handleSingleSignatorySent
+      );
+
+      window.removeEventListener('builder:document.sent', handleDocumentSent);
+
+      window.removeEventListener('builder:send.error', handleSendError);
     };
   }, []);
 
@@ -351,9 +497,13 @@ function Builder() {
               behavior="button"
               onClick={handleSend}
               disabled={
-                isDocumentSaving || isDocumentSending || !hasRealSignatories()
+                isDocumentSaving ||
+                isDocumentSending ||
+                hasBeenSent ||
+                !hasRealSignatories()
               }
               disableWithoutIcon
+              className="builder-send-button"
             >
               <div>
                 <Icon element={MdSend} />
@@ -369,7 +519,7 @@ function Builder() {
             disableWithoutIcon
             className="builder-save-button"
           >
-            {t('save')}
+            {t('save_for_later')}
           </Button>
         </div>
       }
@@ -492,6 +642,9 @@ function Builder() {
             options: {
               header: {
                 sticky: false,
+              },
+              leftSidebar: {
+                visible: !isNinjaDocument,
               },
               widgets: {
                 showLabel: getDocuNinjaCompany()?.settings?.widget_show_label,

@@ -9,10 +9,10 @@
  */
 
 import { useTranslation } from 'react-i18next';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Field } from '../components/Field';
-import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
 export function Expenses() {
   useTitle('custom_fields');

@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Spinner } from '$app/components/Spinner';
-import { Element } from '$app/components/cards';
-import { SelectOption } from '$app/components/datatables/Actions';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MultiValue } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
 import { useProjectsQuery } from '$app/common/queries/projects';
-import { useSelectorCustomStyles } from '../hooks/useSelectorCustomStyles';
-import { CustomMultiSelect } from '$app/components/forms/CustomMultiSelect';
+import { Element } from '$app/components/cards';
+import { SelectOption } from '$app/components/datatables/Actions';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { CustomMultiSelect } from '$app/components/forms/CustomMultiSelect';
+import { Spinner } from '$app/components/Spinner';
+import { useSelectorCustomStyles } from '../hooks/useSelectorCustomStyles';
 
 interface Props {
   value?: string;

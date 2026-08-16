@@ -86,10 +86,10 @@ export function useSendCooldown({
           if (!isMountedRef.current) return;
           setState('idle');
         });
-        
-        return () => {
-          abort.abort();
-        };
+
+      return () => {
+        abort.abort();
+      };
     },
     [durationMs, state, clearTicker]
   );

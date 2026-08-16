@@ -11,6 +11,11 @@
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
 import { DataTable } from '$app/components/DataTable';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { ImportButton } from '$app/components/import/ImportButton';
@@ -69,6 +74,17 @@ export default function RecurringInvoices() {
   const { footerColumns, allFooterColumns } = useFooterColumns();
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
 
+  const selectedColumns =
+    reactSettings?.react_table_columns?.recurringInvoice || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.recurringInvoice,
+    'recurring_invoice_tag_ids',
+    { enabled: shouldShowTagFilter }
+  );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'recurring_invoice_tag_ids');
+
   const [recurringInvoiceSlider, setRecurringInvoiceSlider] = useAtom(
     recurringInvoiceSliderAtom
   );
@@ -97,7 +113,11 @@ export default function RecurringInvoices() {
         resource="recurring_invoice"
         columns={columns}
         footerColumns={footerColumns}
-        endpoint="/api/v1/recurring_invoices?include=client&without_deleted_clients=true&sort=id|desc"
+        endpoint={`/api/v1/recurring_invoices?include=client${
+          shouldShowTagFilter ? ',tags' : ''
+        }&without_deleted_clients=true&sort=id|desc${
+          shouldShowTagFilter ? '' : '&tag_ids='
+        }`}
         linkToCreate="/recurring_invoices/create"
         linkToEdit="/recurring_invoices/:id/edit"
         bulkRoute="/api/v1/recurring_invoices/bulk"
@@ -105,6 +125,7 @@ export default function RecurringInvoices() {
         customFilters={filters}
         customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         withResourcefulActions
         rightSide={
           <div className="flex items-center space-x-2">

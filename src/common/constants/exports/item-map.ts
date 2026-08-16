@@ -13,6 +13,11 @@ import { Record } from './client-map';
 export const itemMap: Record[] = [
   { trans: 'quantity', value: 'item.quantity', map: '' },
   { trans: 'discount', value: 'item.discount', map: '' },
+  {
+    trans: 'is_amount_discount',
+    value: 'item.is_amount_discount',
+    map: '',
+  },
   { trans: 'cost', value: 'item.cost', map: '' },
   { trans: 'product_key', value: 'item.product_key', map: '' },
   { trans: 'notes', value: 'item.notes', map: '' },

@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Tag } from './tag';
 import { VendorContact } from './vendor-contact';
 
 export interface Vendor {
@@ -45,4 +46,6 @@ export interface Vendor {
   classification: string;
   routing_id: string;
   is_tax_exempt: boolean;
+  tags?: Tag[];
+  vendor_tag_ids?: string[];
 }

@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { cloneDeep, set } from 'lodash';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useColorScheme } from '$app/common/colors';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { injectInChanges } from '$app/common/stores/slices/company-users';
 import { useCustomField } from '$app/components/CustomField';
 import { Card } from '$app/components/cards';
-import { useTranslation } from 'react-i18next';
-import { SortableVariableList } from './SortableVariableList';
-import { useColorScheme } from '$app/common/colors';
 import { Files } from '$app/components/icons/Files';
-import { useEffect } from 'react';
-import { cloneDeep, set } from 'lodash';
-import { injectInChanges } from '$app/common/stores/slices/company-users';
-import { useDispatch } from 'react-redux';
+import { SortableVariableList } from './SortableVariableList';
 
 export default function ProductQuoteColumns() {
   const [t] = useTranslation();

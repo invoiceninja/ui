@@ -1,5 +1,7 @@
-import { login, logout } from '$tests/e2e/helpers';
-import { test, expect } from '$tests/e2e/fixtures';
+import { login } from '$tests/e2e/helpers';
+import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
+
+resetAccountBeforeAll();
 
 test('API URL correct Reachable', () => {
   const endpoint = process.env.VITE_API_URL;
@@ -39,5 +41,4 @@ test('Connecting Nordigen', async ({ page }) => {
 
   await nordigenConnectionTab.waitForURL('**/nordigen/connect/**');
 
-  await logout(page);
 });

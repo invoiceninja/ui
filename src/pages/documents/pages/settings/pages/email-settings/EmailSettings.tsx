@@ -1,3 +1,10 @@
+import { AxiosError } from 'axios';
+import { useAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { useColorScheme } from '$app/common/colors';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -7,13 +14,6 @@ import { Card, Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { ValidationAlert } from '$app/components/ValidationAlert';
-import { useAtom } from 'jotai';
-import { docuNinjaAtom } from '$app/common/atoms/docuninja';
-import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { AxiosError } from 'axios';
-import { useColorScheme } from '$app/common/colors';
 
 function EmailSettings() {
   const [t] = useTranslation();
@@ -41,7 +41,7 @@ function EmailSettings() {
       toast.processing();
 
       const updatedCompany = cloneDeep(docuCompany);
-      
+
       if (updatedCompany) {
         updatedCompany.settings.email_from_name = emailFromName || null;
         updatedCompany.settings.reply_to_email = replyToEmail || null;
@@ -68,7 +68,8 @@ function EmailSettings() {
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
             setErrors(error.response.data);
-            const errorMessage = error.response.data.message || 'validation_errors';
+            const errorMessage =
+              error.response.data.message || 'validation_errors';
             toast.error(errorMessage);
           } else {
             toast.error('error_title');
@@ -99,9 +100,7 @@ function EmailSettings() {
         <Element
           leftSide={
             <div className="flex flex-col">
-              <span className="text-sm font-medium">
-                {t('from_name')}
-              </span>
+              <span className="text-sm font-medium">{t('from_name')}</span>
               <span className="text-xs text-gray-500">
                 Custom sender name for outgoing document emails.
               </span>
@@ -119,9 +118,7 @@ function EmailSettings() {
         <Element
           leftSide={
             <div className="flex flex-col">
-              <span className="text-sm font-medium">
-                {t('reply_to_email')}
-              </span>
+              <span className="text-sm font-medium">{t('reply_to_email')}</span>
               <span className="text-xs text-gray-500">
                 Custom reply-to email address for outgoing document emails.
               </span>

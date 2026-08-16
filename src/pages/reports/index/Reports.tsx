@@ -29,7 +29,7 @@ import {
 } from '../common/components/SortableColumns';
 import { Identifier, Payload, Report, useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
-import { useQueryClient } from 'react-query';
+import { isCancelledError, useQueryClient } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
 import {
   Cell,
@@ -50,11 +50,13 @@ import { MultiExpenseCategorySelector } from '../common/components/MultiExpenseC
 import { MultiProjectSelector } from '../common/components/MultiProjectSelector';
 import { MultiTagSelector } from '../common/components/MultiTagSelector';
 import { MultiVendorSelector } from '../common/components/MultiVendorSelector';
-import { useShowReportField } from '../common/hooks/useShowReportField';
+import {
+  REPORT_TAG_ENTITY_TYPES,
+  useShowReportField,
+} from '../common/hooks/useShowReportField';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { ReportsPlanAlert } from '../common/components/ReportsPlanAlert';
-import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { extractTextFromHTML } from '$app/common/helpers/html-string';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { cloneDeep } from 'lodash';
@@ -68,6 +70,9 @@ interface Range {
   label: string;
   scheduleIdentifier: string;
 }
+
+const PREVIEW_POLL_RETRIES = 10;
+const PREVIEW_POLL_DELAY_MS = import.meta.env.DEV ? 1000 : 5000;
 
 export const ranges: Range[] = [
   { identifier: 'all', label: 'all', scheduleIdentifier: 'all' },
@@ -210,7 +215,6 @@ export default function Reports() {
 
   const scheduleReport = useScheduleReport();
   const { save, preferences, update } = usePreferences();
-  const numericFormatter = useNumericFormatter();
 
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
@@ -227,6 +231,8 @@ export default function Reports() {
 
   const handleReportChange = (identifier: Identifier) => {
     const report = reports.find((report) => report.identifier === identifier);
+
+    queryClient.cancelQueries({ queryKey: ['reports'] });
 
     setShowCustomColumns(false);
 
@@ -434,6 +440,8 @@ export default function Reports() {
     setErrors(undefined);
     setPreview(null);
 
+    queryClient.cancelQueries({ queryKey: ['reports'] });
+
     toast.processing();
 
     const { client_id } = report.payload;
@@ -459,8 +467,8 @@ export default function Reports() {
               request('POST', endpoint(`/api/v1/reports/preview/${hash}`)).then(
                 (response) => response.data
               ),
-            retry: 10,
-            retryDelay: import.meta.env.DEV ? 1000 : 5000,
+            retry: PREVIEW_POLL_RETRIES,
+            retryDelay: PREVIEW_POLL_DELAY_MS,
           })
           .then((response) => {
             const { columns, ...rows } = response;
@@ -477,15 +485,19 @@ export default function Reports() {
 
             toast.success();
 
-            requestAnimationFrame(() => {
+            setTimeout(() => {
               document.getElementById('preview-table')?.scrollIntoView({
                 behavior: 'smooth',
-                block: 'center',
+                block: 'start',
               });
-            });
+            }, 100);
           })
-          .catch((e) => {
-            console.error(e);
+          .catch((error) => {
+            if (isCancelledError(error)) {
+              return;
+            }
+
+            console.error(error);
 
             toast.info('report_too_large_to_preview');
           });
@@ -497,7 +509,7 @@ export default function Reports() {
 
   useEffect(() => {
     return () => {
-      queryClient.cancelQueries(['reports']);
+      queryClient.cancelQueries({ queryKey: ['reports'] });
 
       toast.dismiss();
 
@@ -718,9 +730,8 @@ export default function Reports() {
             <MultiTagSelector
               key={report.identifier}
               entityType={
-                report.identifier === 'task'
-                  ? TAG_ENTITY_TYPES.task
-                  : TAG_ENTITY_TYPES.project
+                REPORT_TAG_ENTITY_TYPES[report.identifier] ??
+                TAG_ENTITY_TYPES.invoice
               }
               value={report.payload.tag_ids}
               onValueChange={(tagIds) => handlePayloadChange('tag_ids', tagIds)}
@@ -837,6 +848,7 @@ export default function Reports() {
                 onValueChange={(value) => {
                   setShowCustomColumns(Boolean(value));
                 }}
+                cypressRef="customizeReportColumns"
               />
             </Element>
           )}

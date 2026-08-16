@@ -8,27 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { AxiosError } from 'axios';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { request } from '$app/common/helpers/request';
+import { MdInfoOutline } from 'react-icons/md';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { isHosted } from '$app/common/helpers';
-import { Alert } from '$app/components/Alert';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { Link } from '$app/components/forms';
-import { toast } from '$app/common/helpers/toast/toast';
-import { MdInfoOutline } from 'react-icons/md';
-import { useColorScheme } from '$app/common/colors';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { AxiosError } from 'axios';
+import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
-import { CloudUpload } from '$app/components/icons/CloudUpload';
-import styled from 'styled-components';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Alert } from '$app/components/Alert';
+import { Card, Element } from '$app/components/cards';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { Link } from '$app/components/forms';
+import { CloudUpload } from '$app/components/icons/CloudUpload';
 
 interface Props {
   endpoint: string;

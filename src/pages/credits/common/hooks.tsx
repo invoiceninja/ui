@@ -54,6 +54,7 @@ import {
   MdDelete,
   MdDesignServices,
   MdDownload,
+  MdEdit,
   MdMarkEmailRead,
   MdPaid,
   MdPictureAsPdf,
@@ -62,6 +63,8 @@ import {
   MdSchedule,
   MdSend,
 } from 'react-icons/md';
+import { Icon } from '$app/components/icons/Icon';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
@@ -98,6 +101,7 @@ import classNames from 'classnames';
 import { Dispatch, SetStateAction } from 'react';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { TagPills } from '$app/components/tags/TagPills';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -118,7 +122,6 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
   const handleChange: ChangeHandler = (property, value) => {
     setCredit((current) => current && { ...current, [property]: value });
   };
-
 
   const handleInvitationChange = (id: string, checked: boolean) => {
     let invitations = [...credit!.invitations];
@@ -184,9 +187,6 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     );
   };
 
-
-
-
   const handleDeleteLineItem = (index: number) => {
     const lineItems = credit?.line_items || [];
 
@@ -211,44 +211,47 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     }
   };
 
-
-
   const handleContactCanSignChange = (id: string, checked: boolean) => {
     const clientContacts = credit?.client?.contacts || props.client?.contacts;
 
-    if(!clientContacts) return;
+    if (!clientContacts) return;
 
     // Find the contact by id
-    const contact = clientContacts.find(c => c.id === id);
+    const contact = clientContacts.find((c) => c.id === id);
     if (!contact) return;
 
     // Check if contact is invited - if not, don't allow can_sign changes
-    const isInvited = credit?.invitations?.some(inv => inv.client_contact_id === contact.id) || false;
+    const isInvited =
+      credit?.invitations?.some(
+        (inv) => inv.client_contact_id === contact.id
+      ) || false;
     if (!isInvited) return;
 
     // Update the invitations array with the can_sign property
     const invitations = [...(credit?.invitations || [])];
-    
+
     // Find existing invitation for this contact
-    const existingInvitationIndex = invitations.findIndex(inv => inv.client_contact_id === contact.id);
-    
+    const existingInvitationIndex = invitations.findIndex(
+      (inv) => inv.client_contact_id === contact.id
+    );
+
     if (existingInvitationIndex >= 0) {
       // Update existing invitation
       invitations[existingInvitationIndex] = {
         ...invitations[existingInvitationIndex],
-        can_sign: checked
+        can_sign: checked,
       };
     }
 
     // Update the credit with the modified invitations
-    setCredit((current) => 
-      current && {
-        ...current,
-        invitations: invitations,
-      }
+    setCredit(
+      (current) =>
+        current && {
+          ...current,
+          invitations: invitations,
+        }
     );
   };
-  
 
   return {
     handleChange,
@@ -396,6 +399,8 @@ export function useSave(props: CreateProps) {
 }
 
 interface Params {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
   dropdown?: boolean;
 }
 
@@ -404,7 +409,11 @@ export function useActions(params?: Params) {
 
   const hasPermission = useHasPermission();
 
-  const { dropdown = true } = params || {};
+  const {
+    showEditAction,
+    showCommonBulkAction,
+    dropdown = true,
+  } = params || {};
 
   const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
     useDisplayRunTemplateActions();
@@ -433,6 +442,16 @@ export function useActions(params?: Params) {
   } = useChangeTemplate();
 
   const actions: Action<Credit>[] = [
+    (credit) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/credits/:id/edit', { id: credit.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (credit) => (
       <EntityActionElement
         {...(!dropdown && {
@@ -658,9 +677,12 @@ export function useActions(params?: Params) {
         credit={credit}
       />
     ),
-    () => Boolean(isEditPage && dropdown) && <Divider withoutPadding />,
+    () =>
+      Boolean(
+        (isEditPage || Boolean(showCommonBulkAction)) && dropdown
+      ) && <Divider withoutPadding />,
     (credit) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       credit.archived_at === 0 && (
         <EntityActionElement
           {...(!dropdown && {
@@ -679,7 +701,7 @@ export function useActions(params?: Params) {
         </EntityActionElement>
       ),
     (credit) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       credit.archived_at > 0 && (
         <EntityActionElement
           {...(!dropdown && {
@@ -698,7 +720,7 @@ export function useActions(params?: Params) {
         </EntityActionElement>
       ),
     (credit) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       !credit?.is_deleted && (
         <EntityActionElement
           {...(!dropdown && {
@@ -773,6 +795,7 @@ export function useAllCreditColumns() {
     'tax_amount',
     'updated_at',
     'valid_until',
+    'tags',
     // 'vendor', @Todo: Need to fetch the relationship
   ] as const;
 
@@ -1100,6 +1123,12 @@ export function useCreditColumns() {
       id: 'due_date',
       label: t('valid_until'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'tags',
+      id: 'credit_tag_ids',
+      label: t('tags'),
+      format: (value, credit) => <TagPills tags={credit.tags} />,
     },
   ];
 
