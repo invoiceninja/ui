@@ -70,8 +70,17 @@ export async function initializeSentry(): Promise<boolean> {
   Sentry.init({
     dsn,
     environment: 'production',
-    integrations: [Sentry.browserTracingIntegration()],
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration({
+        blockAllMedia: true,
+        maskAllInputs: true,
+        maskAllText: true,
+      }),
+    ],
     release: import.meta.env.VITE_SENTRY_RELEASE || undefined,
+    replaysOnErrorSampleRate: 1,
+    replaysSessionSampleRate: 0.1,
     sendDefaultPii: false,
     tracePropagationTargets: parseSentryTracePropagationTargets(
       import.meta.env.VITE_SENTRY_TRACE_PROPAGATION_TARGETS
