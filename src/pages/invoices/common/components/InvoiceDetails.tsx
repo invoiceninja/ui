@@ -19,6 +19,8 @@ import { useTranslation } from 'react-i18next';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useColorScheme } from '$app/common/colors';
 import { PaymentTermsTooltip } from '$app/components/PaymentTermsTooltip';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 interface Props {
   invoice?: Invoice;
@@ -90,6 +92,15 @@ export function InvoiceDetails(props: Props) {
             />
           </Element>
         )}
+
+        <Element leftSide={t('tags')}>
+          <TagPillSelector
+            entityType={TAG_ENTITY_TYPES.invoice}
+            value={invoice?.tags || []}
+            onChange={(tags) => handleChange('tags', tags)}
+            errorMessage={props.errors?.errors.tags}
+          />
+        </Element>
 
         {invoice && company?.custom_fields?.invoice1 && (
           <CustomField

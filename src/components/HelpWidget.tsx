@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { ExternalLink, Layers, X } from 'react-feather';
-import Markdown from 'react-markdown';
-import { useQuery } from 'react-query';
-import rehypeRaw from 'rehype-raw';
-import { Link } from './forms';
-import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { ExternalLink, Layers, X } from 'react-feather';
+import { useTranslation } from 'react-i18next';
+import Markdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import { useColorScheme } from '$app/common/colors';
+import { Link } from './forms';
 
 interface Props {
   id: string;

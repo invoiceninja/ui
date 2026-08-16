@@ -19,7 +19,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { date, endpoint, trans } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
@@ -37,6 +37,7 @@ import {
 } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { RecurringInvoiceStatus } from './RecurringInvoiceStatus';
+import { ViewLineItem } from '$app/pages/invoices/common/components/ViewLineItem';
 import { RecurringInvoiceActivity } from '$app/common/interfaces/recurring-invoice-activity';
 import frequencies from '$app/common/constants/frequency';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -60,6 +61,11 @@ import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
 import { ChevronRight } from 'react-feather';
 import { Icon } from '$app/components/icons/Icon';
+import { TagPills } from '$app/components/tags/TagPills';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const recurringInvoiceSliderAtom = atom<RecurringInvoice | null>(null);
 export const recurringInvoiceSliderVisibilityAtom = atom(false);
@@ -190,7 +196,7 @@ export const RecurringInvoiceSlider = () => {
         setIsSliderVisible(false);
         setRecurringInvoice(null);
       }}
-      size="regular"
+      size="large"
       title={`${t('recurring_invoice')} ${recurringInvoice?.number || ''}`}
       topRight={
         recurringInvoice &&
@@ -207,8 +213,24 @@ export const RecurringInvoiceSlider = () => {
       withoutHeaderBorder
     >
       <TabGroup
-        tabs={[t('overview'), t('history'), t('schedule'), t('activity')]}
+        tabs={[
+          t('overview'),
+          t('history'),
+          t('schedule'),
+          t('activity'),
+          t('documents'),
+        ]}
         width="full"
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 4) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={recurringInvoice?.documents?.length}
+                textCenter
+              />
+            );
+          }
+        }}
         withHorizontalPadding
         horizontalPaddingWidth="1.5rem"
       >
@@ -318,6 +340,18 @@ export const RecurringInvoiceSlider = () => {
               ) : null}
             </Element>
 
+            {recurringInvoice && Boolean(recurringInvoice.tags?.length) && (
+              <Element
+                className="border-b border-dashed"
+                leftSide={t('tags')}
+                pushContentToRight
+                noExternalPadding
+                style={{ borderColor: colors.$20 }}
+              >
+                <TagPills tags={recurringInvoice.tags} />
+              </Element>
+            )}
+
             {(resource?.recurring_dates || [])?.length > 0 && (
               <Element
                 leftSide={t('due_date')}
@@ -392,6 +426,26 @@ export const RecurringInvoiceSlider = () => {
               </Box>
             ) : null}
           </div>
+
+          {Boolean(recurringInvoice?.line_items?.length) && (
+            <Divider withoutPadding borderColor={colors.$20} />
+          )}
+
+          {recurringInvoice && Boolean(recurringInvoice.line_items?.length) && (
+            <div className="flex flex-col space-y-3 px-6 py-5">
+              {recurringInvoice.line_items.map((lineItem, index) => (
+                <ViewLineItem
+                  key={index}
+                  lineItem={lineItem}
+                  lineItemIndex={index}
+                  client={recurringInvoice.client}
+                  editHref={route('/recurring_invoices/:id/edit', {
+                    id: recurringInvoice.id,
+                  })}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         <div>
@@ -592,6 +646,29 @@ export const RecurringInvoiceSlider = () => {
                 </Box>
               ))}
           </div>
+        </div>
+
+        <div className="px-4">
+          <Upload
+            endpoint={endpoint('/api/v1/recurring_invoices/:id/upload', {
+              id: recurringInvoice?.id,
+            })}
+            onSuccess={() => $refetch(['recurring_invoices'])}
+            widgetOnly
+            disableUpload={
+              !hasPermission('edit_recurring_invoice') &&
+              !entityAssigned(recurringInvoice)
+            }
+          />
+
+          <DocumentsTable
+            documents={recurringInvoice?.documents || []}
+            onDocumentDelete={() => $refetch(['recurring_invoices'])}
+            disableEditableOptions={
+              !entityAssigned(recurringInvoice, true) &&
+              !hasPermission('edit_recurring_invoice')
+            }
+          />
         </div>
       </TabGroup>
     </Slider>

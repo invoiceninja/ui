@@ -8,17 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useQuery } from 'react-query';
-import { Params } from '../common/params.interface';
-import { request } from '$app/common/helpers/request';
+import { useQuery } from '@tanstack/react-query';
 import { docuNinjaEndpoint } from '$app/common/helpers';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { request } from '$app/common/helpers/request';
 import { Client } from '$app/common/interfaces/docuninja/api';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Params } from '../common/params.interface';
 
 export function useClientsQuery(params: Params) {
-  return useQuery(
-    ['/api/clients/docuninja', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/clients/docuninja', params],
+
+    queryFn: () =>
       request(
         'GET',
         docuNinjaEndpoint(
@@ -38,8 +39,9 @@ export function useClientsQuery(params: Params) {
           },
         }
       ),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 }
 
 interface ClientParams {
@@ -47,9 +49,10 @@ interface ClientParams {
 }
 
 export function useClientQuery(params: ClientParams) {
-  return useQuery(
-    ['/api/clients/docuninja', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/clients/docuninja', params],
+
+    queryFn: () =>
       request(
         'GET',
         docuNinjaEndpoint('/api/clients/:id', {
@@ -66,14 +69,17 @@ export function useClientQuery(params: ClientParams) {
       ).then(
         (response: GenericSingleResourceResponse<Client>) => response.data.data
       ),
-    { staleTime: Infinity, enabled: Boolean(params.id) }
-  );
+
+    staleTime: Infinity,
+    enabled: Boolean(params.id),
+  });
 }
 
 export function useBlankClientQuery() {
-  return useQuery(
-    '/api/clients/docuninja/create',
-    () =>
+  return useQuery({
+    queryKey: ['/api/clients/docuninja/create'],
+
+    queryFn: () =>
       request(
         'GET',
         docuNinjaEndpoint('/api/clients/create'),
@@ -86,6 +92,7 @@ export function useBlankClientQuery() {
           },
         }
       ).then((response) => response.data.data),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 }

@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { MdInfoOutline } from 'react-icons/md';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { route } from '$app/common/helpers/route';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Alert } from '$app/components/Alert';
 import { Link } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
-import { useTranslation } from 'react-i18next';
-import { MdInfoOutline } from 'react-icons/md';
-import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { route } from '$app/common/helpers/route';
 
 export function PEPPOLPlanBanner() {
   const [t] = useTranslation();
@@ -45,11 +45,7 @@ export function PEPPOLPlanBanner() {
         </div>
 
         {currentUser?.company_user && (
-          <Link
-            className="ml-10"
-            
-            to={route('/settings/account_management')}
-          >
+          <Link className="ml-10" to={route('/settings/account_management')}>
             {t('plan_change')}
           </Link>
         )}

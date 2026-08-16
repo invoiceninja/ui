@@ -8,24 +8,29 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Dispatch, SetStateAction, useEffect, useRef } from 'react';
 import { useAtomValue } from 'jotai';
-import { reactSettingsAtom } from './useReactSettings';
-import { SelectOption } from '$app/components/datatables/Actions';
-import { useDataTablePreference } from './useDataTablePreference';
-import { PerPage } from '$app/components/DataTable';
 import { isEqual } from 'lodash';
-import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
+import { Dispatch, SetStateAction, useEffect, useRef } from 'react';
+import { PerPage } from '$app/components/DataTable';
+import { SelectOption } from '$app/components/datatables/Actions';
 import { useCurrentUser } from './useCurrentUser';
+import { useDataTablePreference } from './useDataTablePreference';
 import {
+  ScopedTableFilters,
+  useScopedTableFilters,
+} from './useScopedTableFilters';
+import {
+  reactSettingsAtom,
   useReactSettings,
   useSaveReactSettings,
   useUpdateReactSettings,
 } from './useReactSettings';
+import { useStoreSessionTableFilters } from './useStoreSessionTableFilters';
 
 interface Params {
   apiEndpoint: URL;
   customFilters?: SelectOption[];
+  defaultCustomFilterValues?: string[];
   tableKey: string | undefined;
   isInitialConfiguration: boolean;
   customFilter: string[] | undefined;
@@ -41,7 +46,7 @@ interface Params {
   enableSavingFilterPreference?: boolean;
   withoutStoringPage?: boolean;
   withoutStoringPreferences?: boolean;
-  withoutStoringStatusPreferences?: boolean;
+  withRecordScopedFilters?: boolean;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -53,6 +58,7 @@ export function useDataTablePreferences(params: Params) {
   const {
     apiEndpoint,
     customFilters,
+    defaultCustomFilterValues,
     tableKey,
     isInitialConfiguration,
     customFilter,
@@ -68,11 +74,18 @@ export function useDataTablePreferences(params: Params) {
     enableSavingFilterPreference,
     withoutStoringPage,
     withoutStoringPreferences,
-    withoutStoringStatusPreferences,
+    withRecordScopedFilters,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
   const storeSessionTableFilters = useStoreSessionTableFilters({ tableKey });
+  const { scopeId, storedFilters, storeFilters } = useScopedTableFilters({
+    tableKey,
+  });
+
+  // The global toggle only gates server-side persistence. The session text
+  // filter always flows so it can bubble down to sub-tables (client overview).
+  const persistTableFilters = reactSettings.persist_table_filters !== false;
 
   const handleUpdateTableFilters = (
     filter: string,
@@ -82,7 +95,21 @@ export function useDataTablePreferences(params: Params) {
     status: string[],
     perPage: PerPage
   ) => {
-    if (withoutStoringPreferences || withoutStoringStatusPreferences) {
+    if (withoutStoringPreferences) {
+      return;
+    }
+
+    if (withRecordScopedFilters) {
+      storeFilters({
+        filter,
+        customFilter,
+        status,
+        sort,
+        sortedBy,
+        perPage,
+        currentPage,
+      });
+
       return;
     }
 
@@ -94,10 +121,20 @@ export function useDataTablePreferences(params: Params) {
       return;
     }
 
+    // Session text filter already stored above; the toggle only skips the
+    // server-persisted status/sort/perPage/customFilter.
+    if (!persistTableFilters) {
+      return;
+    }
+
     const currentTableFilters = reactSettings.table_filters?.[tableKey];
+    const defaultCustomFilter = defaultCustomFilterValues ?? [];
+    const currentCustomFilter = customFilter.length
+      ? customFilter
+      : defaultCustomFilter;
 
     const defaultFilters = {
-      ...(customFilters && { customFilter: [] }),
+      ...(customFilters && { customFilter: defaultCustomFilter }),
       sort: apiEndpoint.searchParams.get('sort') || 'id|asc',
       status: ['active'],
       ...(!withoutStoringPerPage && { perPage: '10' }),
@@ -105,13 +142,26 @@ export function useDataTablePreferences(params: Params) {
 
     const cleanedUpFilters = {
       ...(sortedBy && { sortedBy }),
-      ...(customFilters && { customFilter }),
+      ...(customFilters && { customFilter: currentCustomFilter }),
       sort,
       status,
       ...(!withoutStoringPerPage && { perPage }),
     };
 
-    if (isEqual(defaultFilters, cleanedUpFilters) && !currentTableFilters) {
+    if (isEqual(defaultFilters, cleanedUpFilters)) {
+      if (currentTableFilters && user?.id) {
+        const tableFilters = { ...(reactSettings.table_filters ?? {}) };
+
+        Object.keys(tableFilters).forEach((key) => {
+          if (key.includes('/')) {
+            delete tableFilters[key];
+          }
+        });
+
+        delete tableFilters[tableKey];
+        saveSettings('table_filters', tableFilters);
+      }
+
       return;
     }
 
@@ -136,63 +186,99 @@ export function useDataTablePreferences(params: Params) {
   const appliedRef = useRef<boolean>(false);
   useEffect(() => {
     appliedRef.current = false;
-  }, [tableKey]);
+  }, [tableKey, scopeId]);
 
   const rawAtom = useAtomValue(reactSettingsAtom);
   const isHydrated = rawAtom !== null;
+
+  const applyServerPreferences = () => {
+    if (customFilters) {
+      if ((getPreference('customFilter') as string[]).length) {
+        setCustomFilter(getPreference('customFilter') as string[]);
+      } else {
+        setCustomFilter(defaultCustomFilterValues ?? []);
+      }
+    } else {
+      setCustomFilter([]);
+    }
+    if (!withoutStoringPerPage) {
+      setPerPage((getPreference('perPage') as PerPage) || '10');
+    }
+    if (!withoutStoringPage) {
+      setCurrentPage((getPreference('currentPage') as number) || 1);
+    }
+    setSort(
+      (getPreference('sort') as string) ||
+        apiEndpoint.searchParams.get('sort') ||
+        'id|asc'
+    );
+    setSortedBy((getPreference('sortedBy') as string) || undefined);
+    if ((getPreference('status') as string[]).length) {
+      setStatus(getPreference('status') as string[]);
+    } else {
+      setStatus(['active']);
+    }
+  };
+
+  const applyScopedFilters = (filters: ScopedTableFilters) => {
+    setFilter(filters.filter ?? '');
+    setCustomFilter(filters.customFilter ?? defaultCustomFilterValues ?? []);
+    setSort(filters.sort || apiEndpoint.searchParams.get('sort') || 'id|asc');
+    setSortedBy(filters.sortedBy);
+    setStatus(filters.status?.length ? filters.status : ['active']);
+
+    if (!withoutStoringPerPage) {
+      setPerPage(filters.perPage ?? '10');
+    }
+    if (!withoutStoringPage) {
+      setCurrentPage(filters.currentPage ?? 1);
+    }
+  };
 
   useEffect(() => {
     // Guards logout/unmount races where the atom has been reset to null.
     if (!isHydrated || appliedRef.current) return;
 
-    if (withoutStoringPreferences) {
+    const markAsApplied = () => {
       setArePreferencesApplied(true);
       appliedRef.current = true;
+    };
+
+    if (withoutStoringPreferences) {
+      markAsApplied();
       return;
     }
 
-    if (withoutStoringStatusPreferences) {
+    if (withRecordScopedFilters) {
+      if (storedFilters) {
+        applyScopedFilters(storedFilters);
+      } else {
+        setFilter((getPreference('filter') as string) || '');
+
+        if (persistTableFilters) {
+          applyServerPreferences();
+        } else {
+          setCustomFilter(defaultCustomFilterValues ?? []);
+        }
+      }
+
+      markAsApplied();
+      return;
+    }
+
+    if (!persistTableFilters) {
       setFilter((getPreference('filter') as string) || '');
       setCustomFilter([]);
-      setArePreferencesApplied(true);
-      appliedRef.current = true;
+      markAsApplied();
       return;
     }
 
-    if (!isInitialConfiguration && !customFilter) {
+    if (!isInitialConfiguration) {
       setFilter((getPreference('filter') as string) || '');
-
-      if (customFilters) {
-        if ((getPreference('customFilter') as string[]).length) {
-          setCustomFilter(getPreference('customFilter') as string[]);
-        } else {
-          setCustomFilter([]);
-        }
-      } else {
-        setCustomFilter([]);
-      }
-      if (!withoutStoringPerPage) {
-        setPerPage((getPreference('perPage') as PerPage) || '10');
-      }
-      if (!withoutStoringPage) {
-        setCurrentPage((getPreference('currentPage') as number) || 1);
-      }
-      setSort(
-        (getPreference('sort') as string) ||
-          apiEndpoint.searchParams.get('sort') ||
-          'id|asc'
-      );
-      setSortedBy((getPreference('sortedBy') as string) || undefined);
-      if ((getPreference('status') as string[]).length) {
-        setStatus(getPreference('status') as string[]);
-      } else {
-        setStatus(['active']);
-      }
-
-      setArePreferencesApplied(true);
-      appliedRef.current = true;
+      applyServerPreferences();
+      markAsApplied();
     }
-  }, [isInitialConfiguration, isHydrated, tableKey]);
+  }, [isInitialConfiguration, isHydrated, tableKey, scopeId]);
 
   return { handleUpdateTableFilters };
 }

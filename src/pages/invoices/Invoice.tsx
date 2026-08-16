@@ -8,47 +8,47 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { Tabs } from '$app/components/Tabs';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import { cloneDeep } from 'lodash';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
-import { useActions } from './edit/components/Actions';
-import { useHandleSave } from './edit/hooks/useInvoiceSave';
-import { invoiceAtom } from './common/atoms';
-import { useEffect, useRef, useState } from 'react';
-import { CommonActions } from './edit/components/CommonActions';
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useTabs } from './common/hooks/useTabs';
-import { useInvoiceQuery } from '$app/common/queries/invoices';
-import { cloneDeep } from 'lodash';
 import { v4 } from 'uuid';
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useSaveKeyboardShortcut } from '$app/common/hooks/useSaveKeyboardShortcut';
+import { useTitle } from '$app/common/hooks/useTitle';
 import { Client } from '$app/common/interfaces/client';
-import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
-import { Spinner } from '$app/components/Spinner';
-import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
-import { EInvoiceComponent } from '../settings';
+import { Invoice as InvoiceType } from '$app/common/interfaces/invoice';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useInvoiceQuery } from '$app/common/queries/invoices';
 import {
   socketId,
   useSocketEvent,
   WithSocketId,
 } from '$app/common/queries/sockets';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 import { Banner } from '$app/components/Banner';
-import { QuickbooksDepositDisabledAlert } from '$app/components/QuickbooksDepositDisabledAlert';
-import { Invoice as InvoiceType } from '$app/common/interfaces/invoice';
-import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
-import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
-import { useSaveKeyboardShortcut } from '$app/common/hooks/useSaveKeyboardShortcut';
+import { QuickbooksDepositDisabledAlert } from '$app/components/QuickbooksDepositDisabledAlert';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Spinner } from '$app/components/Spinner';
+import { Tabs } from '$app/components/Tabs';
+import { EInvoiceComponent } from '../settings';
+import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
+import { invoiceAtom } from './common/atoms';
+import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
+import { useTabs } from './common/hooks/useTabs';
+import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
+import { useActions } from './edit/components/Actions';
+import { CommonActions } from './edit/components/CommonActions';
+import { useHandleSave } from './edit/hooks/useInvoiceSave';
 
 dayjs.extend(utc);
 

@@ -8,14 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Alert } from '$app/components/Alert';
-import { Dropdown } from '$app/components/dropdown/Dropdown';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import {Button, InputField, SelectField} from '$app/components/forms';
-import Toggle from '$app/components/forms/Toggle';
-import { Settings } from '$app/components/icons/Settings';
-import { Modal } from '$app/components/Modal';
-import { Spinner } from '$app/components/Spinner';
 import {
   AlertProps,
   ConfirmationDialogButtonProps,
@@ -25,15 +17,15 @@ import {
   DeleteDialogButtonProps,
   DeleteDialogProps,
   ImportFromButtonProps,
-  RectangleSettingsDialogProps,
+  RectangleSettingsCheckboxProps,
   RectangleSettingsDialogButtonProps,
+  RectangleSettingsDialogProps,
   RectangleSettingsInputProps,
   RectangleSettingsLabelProps,
-  RectangleSettingsCheckboxProps,
-  RectangleSettingsSelectProps,
-  RectangleSettingsRemoveButtonProps,
   RectangleSettingsOptionItemProps,
   RectangleSettingsOptionsListProps,
+  RectangleSettingsRemoveButtonProps,
+  RectangleSettingsSelectProps,
   ToolboxContextProps,
   UninviteDialogButtonProps,
   UninviteDialogProps,
@@ -44,6 +36,14 @@ import {
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { LuTrash } from 'react-icons/lu';
+import { Alert } from '$app/components/Alert';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Button, InputField, SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { Settings } from '$app/components/icons/Settings';
+import { Modal } from '$app/components/Modal';
+import { Spinner } from '$app/components/Spinner';
 
 export function Loading() {
   return (
@@ -315,9 +315,26 @@ export function RectangleSettingsButton({
   onClick,
   label,
   id,
+  variant,
+  icon,
 }: RectangleSettingsDialogButtonProps) {
+  const buttonTypes = {
+    primary: 'primary',
+    danger: 'secondary',
+  };
+
   return (
-    <Button behavior="button" onClick={onClick} id={id} type="secondary">
+    <Button
+      behavior="button"
+      onClick={onClick}
+      id={id}
+      type={buttonTypes[variant as keyof typeof Button]}
+    >
+      {icon && (
+        <span style={{ display: 'inline-flex', marginRight: '0.375rem' }}>
+          {icon}
+        </span>
+      )}
       {label}
     </Button>
   );
@@ -379,10 +396,10 @@ export function RectangleSettingsSelect({
   children,
 }: RectangleSettingsSelectProps) {
   return (
-      <SelectField id={id} defaultValue={value} onValueChange={onChange}>
-        {children}
-      </SelectField>
-  )
+    <SelectField id={id} defaultValue={value} onValueChange={onChange}>
+      {children}
+    </SelectField>
+  );
 }
 
 export function RectangleSettingsRemoveButton({

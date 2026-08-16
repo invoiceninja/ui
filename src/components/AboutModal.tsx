@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import dayjs from 'dayjs';
+import { Dispatch, SetStateAction, useState } from 'react';
 import {
   Activity,
   CheckCircle,
@@ -18,26 +20,24 @@ import {
   Twitter,
   Youtube,
 } from 'react-feather';
-import { Modal } from './Modal';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
-import { Dispatch, SetStateAction, useState } from 'react';
-import { Button } from './forms';
-import { request } from '$app/common/helpers/request';
-import { endpoint, isSelfHosted } from '$app/common/helpers';
-import { toast } from '$app/common/helpers/toast/toast';
-import { Icon } from './icons/Icon';
 import { MdInfo, MdWarning } from 'react-icons/md';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
-import {
-  updateCompanyUsers,
-  resetChanges,
-} from '$app/common/stores/slices/company-users';
-import { useDispatch } from 'react-redux';
-import { PasswordConfirmation } from './PasswordConfirmation';
+import { endpoint, isSelfHosted } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
-import dayjs from 'dayjs';
+import {
+  resetChanges,
+  updateCompanyUsers,
+} from '$app/common/stores/slices/company-users';
+import { Button } from './forms';
+import { Icon } from './icons/Icon';
+import { Modal } from './Modal';
+import { PasswordConfirmation } from './PasswordConfirmation';
 
 interface SystemInfo {
   system_health: boolean;
@@ -109,6 +109,7 @@ export function AboutModal(props: Props) {
   const [systemInfo, setSystemInfo] = useState<SystemInfo | undefined>(
     currentSystemInfo
   );
+  const [lastError, setLastError] = useState<string>('');
 
   const handleHealthCheck = (allowAction?: boolean) => {
     if (!isFormBusy || allowAction) {
@@ -122,6 +123,12 @@ export function AboutModal(props: Props) {
           toast.dismiss();
         })
         .finally(() => setIsFormBusy(false));
+
+      request('GET', endpoint('/api/v1/last_error'))
+        .then((response) => {
+          setLastError(response.data?.last_error ?? '');
+        })
+        .catch(() => setLastError(''));
     }
   };
 
@@ -327,25 +334,40 @@ export function AboutModal(props: Props) {
             <div className="flex flex-col">
               <span className="font-medium text-base mb-1">PHP</span>
               <span>
-                {t('web')}: {systemInfo?.php_version.current_php_version}
+                {t('web')}: {systemInfo?.php_version?.current_php_version}
               </span>
               <span>
-                {t('cli')}: {systemInfo?.php_version.current_php_cli_version}
+                {t('cli')}: {systemInfo?.php_version?.current_php_cli_version}
               </span>
-              <span>Memory: {systemInfo?.php_version.memory_limit}</span>
+              <span>Memory: {systemInfo?.php_version?.memory_limit}</span>
               <span>API: {systemInfo?.api_version}</span>
             </div>
 
             <div>
               <Icon
                 element={
-                  systemInfo?.php_version.is_okay ? CheckCircle : MdWarning
+                  systemInfo?.php_version?.is_okay ? CheckCircle : MdWarning
                 }
-                color={systemInfo?.php_version.is_okay ? 'green' : 'red'}
+                color={systemInfo?.php_version?.is_okay ? 'green' : 'red'}
                 size={25}
               />
             </div>
           </div>
+
+          {Boolean(lastError) && (
+            <div className="flex justify-between items-center py-1 px-3">
+              <div className="flex flex-col">
+                <span className="font-medium text-base mb-1">
+                  {t('recent_errors')}
+                </span>
+                <span className="break-all">{lastError}</span>
+              </div>
+
+              <div>
+                <Icon element={MdWarning} color="red" size={25} />
+              </div>
+            </div>
+          )}
 
           {(Boolean(!systemInfo?.env_writable) ||
             Boolean(systemInfo?.file_permissions !== 'Ok')) &&

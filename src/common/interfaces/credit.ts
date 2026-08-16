@@ -9,12 +9,12 @@
  */
 import { EInvoiceType } from '$app/pages/settings';
 import { Client } from './client';
-import { Activity, Backup } from './invoice';
+import { Activity, Backup, Sync } from './invoice';
 import { InvoiceItem } from './invoice-item';
 import { Payment } from './payment';
-import { ScheduleItem } from './schedule';
 import { Invitation } from './purchase-order';
-import { Sync } from './invoice';
+import { ScheduleItem } from './schedule';
+import { Tag } from './tag';
 
 export interface Credit {
   id: string;
@@ -89,5 +89,7 @@ export interface Credit {
   location_id: string;
   schedule?: ScheduleItem[];
   backup?: Backup;
+  tags?: Tag[];
+  credit_tag_ids?: string[];
   sync?: Sync;
 }

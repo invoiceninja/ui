@@ -1,23 +1,22 @@
-import { login, logout, permissions } from '$tests/e2e/helpers';
-import { test, expect } from '$tests/e2e/fixtures';
-import { chromium } from '@playwright/test';
+import { login } from '$tests/e2e/helpers';
+import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
+import { createApiContext, setPermissions } from './api-helpers';
 
-test.beforeAll(async () => {
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
+resetAccountBeforeAll();
 
-  const { clear, save, set } = permissions(page);
+test.beforeAll(async ({ account }) => {
+  const api = await createApiContext(
+    account.apiUrl,
+    account.ownerEmail,
+    account.password
+  );
 
-  await login(page);
-  await clear();
-  await set('create_all');
-  await save();
-  await logout(page);
+  await setPermissions(api, 'permissions@example.com', ['create_all']);
 });
 
-test.beforeEach(
-  async ({ page }) => await login(page, 'permissions@example.com', 'password')
-);
+test.beforeEach(async ({ page }) => {
+  await login(page, 'permissions@example.com', 'password');
+});
 
 test('can create a client', async ({ page }) => {
   await page.getByRole('link', { name: 'Clients', exact: true }).click();

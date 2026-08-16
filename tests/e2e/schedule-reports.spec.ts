@@ -1,5 +1,5 @@
 import { login } from '$tests/e2e/helpers';
-import { test, expect, uniqueName, extractIdFromUrl } from '$tests/e2e/fixtures';
+import { resetAccountBeforeAll, test, expect, uniqueName, extractIdFromUrl } from '$tests/e2e/fixtures';
 import {
   createClientViaApi,
   createProductViaApi,
@@ -10,6 +10,8 @@ import {
 } from '$tests/e2e/api-helpers';
 import dayjs from 'dayjs';
 import { Locator, Page } from '@playwright/test';
+
+resetAccountBeforeAll();
 
 function trackScheduleFromUrl(page: { url: () => string }, api: { trackEntity: (type: EntityType, id: string) => void }) {
   const id = extractIdFromUrl(page.url(), 'schedules');

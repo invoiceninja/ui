@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Expense } from '$app/common/interfaces/expense';
-import { useBlankInvoiceQuery } from '$app/common/queries/invoices';
-import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
-import { route } from '$app/common/helpers/route';
-import { Invoice } from '$app/common/interfaces/invoice';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
+import { route } from '$app/common/helpers/route';
+import { Expense } from '$app/common/interfaces/expense';
+import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { useBlankInvoiceQuery } from '$app/common/queries/invoices';
+import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 
 interface Params {
   onlyAddToInvoice?: boolean;

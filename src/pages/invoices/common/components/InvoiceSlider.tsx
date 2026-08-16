@@ -25,7 +25,7 @@ import { date, endpoint, trans } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../../edit/components/Actions';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
@@ -53,6 +53,7 @@ import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import Toggle from '$app/components/forms/Toggle';
 import { useColorScheme } from '$app/common/colors';
+import { ViewLineItem } from './ViewLineItem';
 import { ViewLineItemExpense } from './ViewLineItemExpense';
 import { ViewLineItemTask } from './ViewLineItemTask';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
@@ -70,6 +71,11 @@ import { History } from '$app/components/icons/History';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { Icon } from '$app/components/icons/Icon';
 import { ChevronRight } from 'react-feather';
+import { TagPills } from '$app/components/tags/TagPills';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { $refetch } from '$app/common/hooks/useRefetch';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -238,15 +244,15 @@ export function InvoiceSlider() {
 
   const fetchEmailHistory = async () => {
     const response = await queryClient
-      .fetchQuery(
-        ['/api/v1/invoices', invoice?.id, 'emailHistory'],
-        () =>
+      .fetchQuery({
+        queryKey: ['/api/v1/invoices', invoice?.id, 'emailHistory'],
+        queryFn: () =>
           request('POST', endpoint('/api/v1/emails/entityHistory'), {
             entity: 'invoice',
             entity_id: invoice?.id,
           }),
-        { staleTime: Infinity }
-      )
+        staleTime: Infinity,
+      })
       .then((response) => response.data);
 
     setEmailRecords(response);
@@ -279,7 +285,7 @@ export function InvoiceSlider() {
         setIsSliderVisible(false);
         setInvoice(null);
       }}
-      size="regular"
+      size="large"
       title={`${t('invoice')} ${invoice?.number}`}
       topRight={
         invoice &&
@@ -295,8 +301,24 @@ export function InvoiceSlider() {
       withoutHeaderBorder
     >
       <TabGroup
-        tabs={[t('overview'), t('history'), t('activity'), t('email_history')]}
+        tabs={[
+          t('overview'),
+          t('history'),
+          t('activity'),
+          t('email_history'),
+          t('documents'),
+        ]}
         width="full"
+        formatTabLabel={(tabIndex) => {
+          if (tabIndex === 4) {
+            return (
+              <DocumentsTabLabel
+                numberOfDocuments={invoice?.documents?.length}
+                textCenter
+              />
+            );
+          }
+        }}
         withHorizontalPadding
         horizontalPaddingWidth="1.5rem"
       >
@@ -356,13 +378,45 @@ export function InvoiceSlider() {
               {invoice ? date(invoice.due_date, dateFormat) : null}
             </Element>
 
+            {invoice && invoice.recurring_id ? (
+              <Element
+                className="border-b border-dashed"
+                leftSide={t('recurring_invoice')}
+                pushContentToRight
+                noExternalPadding
+                style={{ borderColor: colors.$20 }}
+              >
+                <Link
+                  to={route('/recurring_invoices/:id/edit', {
+                    id: invoice.recurring_id,
+                  })}
+                >
+                  {t('view')}
+                </Link>
+              </Element>
+            ) : null}
+
             <Element
+              className={classNames({
+                'border-b border-dashed': Boolean(invoice?.tags?.length),
+              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {invoice ? <InvoiceStatus entity={invoice} /> : null}
             </Element>
+
+            {Boolean(invoice?.tags?.length) && (
+              <Element
+                leftSide={t('tags')}
+                pushContentToRight
+                noExternalPadding
+              >
+                <TagPills tags={invoice?.tags} />
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />
@@ -433,7 +487,7 @@ export function InvoiceSlider() {
             <>
               <div className="space-y-2 whitespace-nowrap px-6">
                 <Tooltip
-                  size="regular"
+                  size="large"
                   width="auto"
                   tooltipElement={
                     <article
@@ -558,6 +612,24 @@ export function InvoiceSlider() {
                     </React.Fragment>
                   )
               )}
+            </div>
+          )}
+
+          {Boolean(invoice?.line_items?.length) && (
+            <Divider withoutPadding borderColor={colors.$20} />
+          )}
+
+          {invoice && Boolean(invoice.line_items?.length) && (
+            <div className="flex flex-col space-y-3 px-6 py-5">
+              {invoice.line_items.map((lineItem, index) => (
+                <ViewLineItem
+                  key={index}
+                  lineItem={lineItem}
+                  lineItemIndex={index}
+                  client={invoice.client}
+                  editHref={route('/invoices/:id/edit', { id: invoice.id })}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -747,6 +819,27 @@ export function InvoiceSlider() {
               withAllBorders
             />
           ))}
+        </div>
+
+        <div className="px-4">
+          <Upload
+            endpoint={endpoint('/api/v1/invoices/:id/upload', {
+              id: invoice?.id,
+            })}
+            onSuccess={() => $refetch(['invoices'])}
+            widgetOnly
+            disableUpload={
+              !hasPermission('edit_invoice') && !entityAssigned(invoice)
+            }
+          />
+
+          <DocumentsTable
+            documents={invoice?.documents || []}
+            onDocumentDelete={() => $refetch(['invoices'])}
+            disableEditableOptions={
+              !entityAssigned(invoice, true) && !hasPermission('edit_invoice')
+            }
+          />
         </div>
       </TabGroup>
 

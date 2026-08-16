@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { BlueprintWizard } from './components/BlueprintWizard';
 
 export default function Create() {
@@ -44,10 +44,7 @@ export default function Create() {
   };
 
   return (
-    <Default
-      title={t('new_template')}
-      breadcrumbs={pages}
-    >
+    <Default title={t('new_template')} breadcrumbs={pages}>
       <BlueprintWizard
         onComplete={handleWizardComplete}
         onCancel={handleWizardCancel}

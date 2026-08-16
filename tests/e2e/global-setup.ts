@@ -6,37 +6,18 @@
  */
 
 import { config } from 'dotenv';
-import {
-  createApiContext,
-  purgeAllEntities,
-  purgeSchedules,
-  purgeGroupSettings,
-  resetPermissionUser,
-  restoreDeletedUsers,
-  resetCompanySettings,
-  ensurePermissionUserExists,
-} from './api-helpers';
+import { getAccountOffset, getConfiguredTestAccounts } from './accounts';
+import { resetTestAccount } from './account-reset';
 
 config({ path: '.env.testing', override: true });
 config();
 
-const PERMISSION_EMAILS = [
-  'permissions@example.com',
-  'invoices@example.com',
-  'clients@example.com',
-  'products@example.com',
-  'projects@example.com',
-  'vendors@example.com',
-  'expenses@example.com',
-  'credits@example.com',
-  'tasks@example.com',
-  'quotes@example.com',
-  'payments@example.com',
-  'purchase_orders@example.com',
-  'bank_transactions@example.com',
-];
-
 async function globalSetup() {
+  if (process.env.PLAYWRIGHT_SKIP_GLOBAL_SETUP === '1') {
+    console.log('\nSkipping API state reset before test suite.\n');
+    return;
+  }
+
   const apiUrl = process.env.VITE_API_URL;
 
   if (!apiUrl) {
@@ -49,30 +30,26 @@ async function globalSetup() {
   console.log(`  API URL: ${apiUrl}`);
 
   try {
-    const api = await createApiContext(apiUrl);
+    const accounts = getConfiguredTestAccounts(apiUrl);
+    const scopedAccountCount = optionalPositiveInt(
+      process.env.PLAYWRIGHT_GLOBAL_SETUP_ACCOUNT_COUNT
+    );
+    const accountsToReset = scopedAccountCount
+      ? accounts.slice(
+          getAccountOffset(),
+          getAccountOffset() + scopedAccountCount
+        )
+      : accounts;
 
-    // 1. Reset company settings modified by tests
-    await resetCompanySettings(api);
-
-    // 2. Purge schedules and group settings
-    await purgeSchedules(api);
-    await purgeGroupSettings(api);
-
-    // 3. Restore any deleted seed users
-    await restoreDeletedUsers(api);
-
-    // 4. Ensure all permission users exist (create if missing from seed)
-    for (const email of PERMISSION_EMAILS) {
-      await ensurePermissionUserExists(api, email);
+    if (accountsToReset.length === 0) {
+      throw new Error(
+        'No account lanes selected for Playwright global setup. Check PLAYWRIGHT_ACCOUNT_OFFSET and PLAYWRIGHT_GLOBAL_SETUP_ACCOUNT_COUNT.'
+      );
     }
 
-    // 5. Reset permissions for all test users
-    for (const email of PERMISSION_EMAILS) {
-      await resetPermissionUser(api, email);
-    }
-
-    // 6. Purge all entities to get a clean state
-    await purgeAllEntities(api);
+    await Promise.all(
+      accountsToReset.map((account) => resetTestAccount(account, 'suite setup'))
+    );
 
     console.log('API state reset complete.\n');
   } catch (error) {
@@ -86,3 +63,13 @@ async function globalSetup() {
 }
 
 export default globalSetup;
+
+function optionalPositiveInt(value: string | undefined) {
+  if (!value) {
+    return undefined;
+  }
+
+  const parsed = Number.parseInt(value, 10);
+
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+}

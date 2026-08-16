@@ -8,44 +8,43 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField, InputLabel, SelectField } from '$app/components/forms';
 import collect from 'collect.js';
+import { useAtom } from 'jotai';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
+import { v4 } from 'uuid';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
 import { useCreditResolver } from '$app/common/hooks/credits/useCreditResolver';
 import { useInvoiceResolver } from '$app/common/hooks/invoices/useInvoiceResolver';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Payment } from '$app/common/interfaces/payment';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankPaymentQuery } from '$app/common/queries/payments';
-import { Divider } from '$app/components/cards/Divider';
+import { Banner } from '$app/components/Banner';
 import { Container } from '$app/components/Container';
 import { ConvertCurrency } from '$app/components/ConvertCurrency';
 import { CustomField } from '$app/components/CustomField';
-
-import Toggle from '$app/components/forms/Toggle';
-import { Default } from '$app/components/layouts/Default';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
-import { useSave } from './hooks/useSave';
+import { Card, Element } from '$app/components/cards';
+import { Divider } from '$app/components/cards/Divider';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
-import { useAtom } from 'jotai';
-import { paymentAtom } from '../common/atoms';
-import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { Banner } from '$app/components/Banner';
-import { useColorScheme } from '$app/common/colors';
-import { ErrorMessage } from '$app/components/ErrorMessage';
-import { Client } from '$app/common/interfaces/client';
-import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { DataTable } from '$app/components/DataTable';
+import { ErrorMessage } from '$app/components/ErrorMessage';
+import { InputField, InputLabel, SelectField } from '$app/components/forms';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import Toggle from '$app/components/forms/Toggle';
+import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
+import { Default } from '$app/components/layouts/Default';
+import { paymentAtom } from '../common/atoms';
 import { useApplyInvoiceTableColumns } from '../common/hooks/useApplyInvoiceTableColumns';
-import { useCreditColumns } from './hooks/useCreditColumns';
 import { TableTotalFooter } from './components/TableTotalFooter';
-import { v4 } from 'uuid';
+import { useCreditColumns } from './hooks/useCreditColumns';
+import { useSave } from './hooks/useSave';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -71,6 +70,9 @@ export default function Create() {
   const [t] = useTranslation();
   const [searchParams] = useSearchParams();
 
+  const hasCapturedPreSelection = useRef<boolean>(false);
+  const hasInvoiceTableSelection = useRef<boolean>(false);
+
   const pages = [
     { name: t('payments'), href: '/payments' },
     { name: t('new_payment'), href: '/payments/create' },
@@ -79,7 +81,6 @@ export default function Create() {
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const creditResolver = useCreditResolver();
-  const clientResolver = useClientResolver();
   const invoiceResolver = useInvoiceResolver();
 
   const paymentTypes = usePaymentTypes();
@@ -91,7 +92,6 @@ export default function Create() {
     company?.settings?.client_manual_payment_notification
   );
   const [convertCurrency, setConvertCurrency] = useState(false);
-  const [client, setClient] = useState<Client>();
 
   const [initialEndpoints, setInitialEndpoints] = useState<{
     invoices: string;
@@ -100,6 +100,10 @@ export default function Create() {
     invoices: '',
     credits: '',
   });
+
+  const [preSelectedInvoiceIds, setPreSelectedInvoiceIds] = useState<string[]>(
+    []
+  );
 
   const { data: blankPayment } = useBlankPaymentQuery();
 
@@ -196,18 +200,40 @@ export default function Create() {
   }, [blankPayment]);
 
   useEffect(() => {
+    if (hasCapturedPreSelection.current) {
+      return;
+    }
+
+    if (searchParams.has('invoice')) {
+      hasCapturedPreSelection.current = true;
+
+      setPreSelectedInvoiceIds([searchParams.get('invoice') as string]);
+
+      return;
+    }
+
+    if (searchParams.get('action') === 'enter' && payment?.invoices.length) {
+      hasCapturedPreSelection.current = true;
+
+      setPreSelectedInvoiceIds(
+        payment.invoices.map((invoice) => invoice.invoice_id)
+      );
+    }
+  }, [payment?.invoices, searchParams]);
+
+  useEffect(() => {
     if (
       payment?.client_id &&
       (searchParams.get('client') === payment?.client_id ||
         !searchParams.get('client'))
     ) {
+      const withInvoices = preSelectedInvoiceIds.join(',');
+
       setInitialEndpoints({
         invoices: `/api/v1/invoices?include=client&payable=${
           payment?.client_id
         }&per_page=100&sort=date|desc&per_page=1000${
-          searchParams.get('invoice')
-            ? `&with=${searchParams.get('invoice')}`
-            : ''
+          withInvoices ? `&with=${withInvoices}` : ''
         }`,
         credits: `/api/v1/credits?include=client&client_id=${
           payment?.client_id
@@ -218,7 +244,7 @@ export default function Create() {
         }`,
       });
     }
-  }, [payment?.client_id, searchParams]);
+  }, [payment?.client_id, searchParams, preSelectedInvoiceIds]);
 
   useEffect(() => {
     return () => {
@@ -233,7 +259,7 @@ export default function Create() {
 
   const handleChange = <
     TField extends keyof PaymentOnCreation,
-    TValue extends PaymentOnCreation[TField]
+    TValue extends PaymentOnCreation[TField],
   >(
     field: TField,
     value: TValue
@@ -243,13 +269,23 @@ export default function Create() {
 
   const onSubmit = useSave({ setErrors, setIsFormBusy, isFormBusy });
 
-  useEffect(() => {
-    if (payment?.client_id && payment.client_id !== client?.id) {
-      clientResolver
-        .find(payment.client_id)
-        .then((client) => setClient(client));
-    }
-  }, [payment?.client_id]);
+  const isPrefilledFlow = useMemo(() => {
+    const action = searchParams.get('action');
+
+    return (
+      searchParams.has('invoice') || action === 'enter' || action === 'apply'
+    );
+  }, [searchParams]);
+
+  const invoiceSelectorEndpoint = useMemo(
+    () =>
+      endpoint(
+        `/api/v1/invoices?include=client&filter_deleted_clients=true&sort=date|desc${
+          payment?.client_id ? `&payable=${payment.client_id}` : '&payable=true'
+        }`
+      ),
+    [payment?.client_id]
+  );
 
   return (
     <Default
@@ -280,6 +316,9 @@ export default function Create() {
                   credits: '',
                 });
 
+                hasInvoiceTableSelection.current = false;
+                setPreSelectedInvoiceIds([]);
+
                 setTimeout(() => {
                   handleChange('client_id', client?.id as string);
                   handleChange(
@@ -291,8 +330,7 @@ export default function Create() {
                 }, 25);
               }}
               onClearButtonClick={() => {
-                setClient(undefined);
-
+                setPreSelectedInvoiceIds([]);
                 handleChange('client_id', '');
                 handleChange('currency_id', '');
                 handleChange('invoices', []);
@@ -301,12 +339,63 @@ export default function Create() {
               errorMessage={errors?.errors.client_id}
               defaultValue={payment?.client_id}
               value={payment?.client_id}
-              readonly={
-                searchParams.has('invoice') ||
-                searchParams.get('action') === 'enter' ||
-                searchParams.get('action') === 'apply'
-              }
+              readonly={isPrefilledFlow}
               initiallyVisible={!payment?.client_id}
+            />
+          </Element>
+
+          <div className="flex items-center px-5 sm:px-6 py-1">
+            <div
+              className="flex-1 border-b"
+              style={{ borderColor: colors.$21 }}
+            />
+            <span
+              className="px-4 text-xs font-medium uppercase"
+              style={{ color: colors.$22, opacity: 0.8 }}
+            >
+              {t('or')}
+            </span>
+            <div
+              className="flex-1 border-b"
+              style={{ borderColor: colors.$21 }}
+            />
+          </div>
+
+          <Element leftSide={t('invoice')}>
+            <InvoiceSelector
+              value={preSelectedInvoiceIds[0] ?? ''}
+              endpoint={invoiceSelectorEndpoint}
+              onChange={(invoice) => {
+                setInitialEndpoints({
+                  invoices: '',
+                  credits: '',
+                });
+
+                hasInvoiceTableSelection.current = false;
+                setPreSelectedInvoiceIds([invoice.id]);
+
+                setTimeout(() => {
+                  handleChange('client_id', invoice.client_id);
+                  handleChange(
+                    'currency_id',
+                    invoice.client?.settings.currency_id || '1'
+                  );
+                  handleChange('credits', []);
+                  handleChange('invoices', [
+                    {
+                      _id: v4(),
+                      invoice_id: invoice.id,
+                      amount:
+                        invoice.balance > 0 ? invoice.balance : invoice.amount,
+                    },
+                  ]);
+                }, 25);
+              }}
+              onClearButtonClick={() => {
+                setPreSelectedInvoiceIds([]);
+                handleChange('invoices', []);
+              }}
+              clearButton={Boolean(preSelectedInvoiceIds.length)}
             />
           </Element>
 
@@ -350,17 +439,25 @@ export default function Create() {
                         amount: existingInvoice
                           ? existingInvoice.amount
                           : resource.balance > 0
-                          ? resource.balance
-                          : resource.amount,
+                            ? resource.balance
+                            : resource.amount,
                         invoice_id: resource.id,
                       });
                     });
+
+                    hasInvoiceTableSelection.current = true;
 
                     setPayment(
                       (current) =>
                         current && { ...current, invoices: newInvoices }
                     );
                   } else {
+                    if (hasInvoiceTableSelection.current) {
+                      setPreSelectedInvoiceIds([]);
+                    }
+
+                    hasInvoiceTableSelection.current = false;
+
                     setPayment(
                       (current) => current && { ...current, invoices: [] }
                     );
@@ -369,11 +466,7 @@ export default function Create() {
                 withoutPagination
                 withoutStatusFilter
                 withoutAllBulkActions
-                preSelected={
-                  searchParams.get('invoice')
-                    ? [searchParams.get('invoice') as string]
-                    : []
-                }
+                preSelected={preSelectedInvoiceIds}
                 emptyState={
                   <div className="flex items-center justify-center pt-2">
                     <span className="text-sm" style={{ color: colors.$17 }}>
@@ -424,8 +517,8 @@ export default function Create() {
                         amount: existingCredit
                           ? existingCredit.amount
                           : resource.balance > 0
-                          ? resource.balance
-                          : resource.amount,
+                            ? resource.balance
+                            : resource.amount,
                         credit_id: resource.id,
                       });
                     });

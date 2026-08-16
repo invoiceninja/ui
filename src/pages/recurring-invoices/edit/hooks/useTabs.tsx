@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -15,8 +17,6 @@ import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Tab } from '$app/components/Tabs';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 
 interface Params {
   recurringInvoice: RecurringInvoice | undefined;
@@ -46,7 +46,9 @@ export function useTabs(params: Params) {
     {
       name: t('e_invoice'),
       href: route('/recurring_invoices/:id/e_invoice', { id }),
-      enabled: company?.settings.enable_e_invoice === true || company?.settings.e_invoice_type === 'PEPPOL',
+      enabled:
+        company?.settings.enable_e_invoice === true ||
+        company?.settings.e_invoice_type === 'PEPPOL',
     },
     {
       name: t('documents'),

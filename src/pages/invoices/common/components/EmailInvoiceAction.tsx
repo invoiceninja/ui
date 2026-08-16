@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
-import { Client } from '$app/common/interfaces/client';
-import { Invoice } from '$app/common/interfaces/invoice';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
-import { Button } from '$app/components/forms';
 import { useNavigate } from 'react-router-dom';
-import { Modal } from '$app/components/Modal';
+import { route } from '$app/common/helpers/route';
+import { Client } from '$app/common/interfaces/client';
+import { Invoice } from '$app/common/interfaces/invoice';
 import { EntityActionElement } from '$app/components/EntityActionElement';
+import { Button } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
 
 interface Props {
   invoice: Invoice;

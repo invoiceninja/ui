@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
-import { SortableVariableList } from './SortableVariableList';
-import { useCustomField } from '$app/components/CustomField';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useColorScheme } from '$app/common/colors';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCustomField } from '$app/components/CustomField';
+import { Card } from '$app/components/cards';
 import { ClipboardCheck } from '$app/components/icons/ClipboardCheck';
+import { SortableVariableList } from './SortableVariableList';
 
 export default function TaskColumns() {
   const [t] = useTranslation();
@@ -24,7 +24,7 @@ export default function TaskColumns() {
   const colors = useColorScheme();
   const company = useCurrentCompany();
 
-  let defaultVariables = [
+  const defaultVariables = [
     { value: '$task.service', label: t('service') },
     { value: '$task.description', label: t('description') },
     { value: '$task.hours', label: t('hours') },
@@ -52,12 +52,9 @@ export default function TaskColumns() {
     { value: '$task.gross_line_total', label: t('gross_line_total') },
   ];
 
-  if (!company?.enabled_item_tax_rates) {
-    defaultVariables = defaultVariables.filter(
-      (variable) =>
-        variable.value !== '$task.tax_amount' && variable.value !== '$task.tax'
-    );
-  }
+  const excludedVariables = !company?.enabled_item_tax_rates
+    ? ['$task.tax_amount', '$task.tax']
+    : [];
 
   return (
     <Card
@@ -78,6 +75,7 @@ export default function TaskColumns() {
       <SortableVariableList
         for="task_columns"
         defaultVariables={defaultVariables}
+        excludedVariables={excludedVariables}
       />
     </Card>
   );

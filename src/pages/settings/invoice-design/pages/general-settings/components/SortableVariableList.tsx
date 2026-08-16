@@ -8,30 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
-import { arrayMoveImmutable } from 'array-move';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { injectInChanges } from '$app/common/stores/slices/company-users';
-import { cloneDeep, set } from 'lodash';
-import { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
 } from '@hello-pangea/dnd';
+import { arrayMoveImmutable } from 'array-move';
+import classNames from 'classnames';
+import { cloneDeep, set } from 'lodash';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
 import { useColorScheme } from '$app/common/colors';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { injectInChanges } from '$app/common/stores/slices/company-users';
+import { Element } from '$app/components/cards';
+import { SelectField } from '$app/components/forms';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
-import classNames from 'classnames';
+import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
 
 interface Props {
   defaultVariables: { value: string; label: string }[];
   for: string;
   disabled?: boolean;
+  excludedVariables?: string[];
 }
 
 export function SortableVariableList(props: Props) {
@@ -39,7 +40,7 @@ export function SortableVariableList(props: Props) {
   const company = useCompanyChanges();
   const dispatch = useDispatch();
 
-  const { disabled } = props;
+  const { disabled, excludedVariables } = props;
 
   const colors = useColorScheme();
 
@@ -52,9 +53,13 @@ export function SortableVariableList(props: Props) {
     const variables = company?.settings?.pdf_variables?.[props.for] ?? [];
 
     setDefaultVariablesFiltered(
-      defaultVariables.filter((label) => !variables.includes(label.value))
+      defaultVariables.filter(
+        (label) =>
+          !variables.includes(label.value) &&
+          !excludedVariables?.includes(label.value)
+      )
     );
-  }, [company]);
+  }, [company, excludedVariables]);
 
   const resolveTranslation = (key: string) => {
     return defaultVariables.find((field) => field.value === key);
@@ -131,8 +136,11 @@ export function SortableVariableList(props: Props) {
           <Droppable droppableId={props.for} isDropDisabled={disabled}>
             {(provided) => (
               <div {...provided.droppableProps} ref={provided.innerRef}>
-                {company?.settings?.pdf_variables?.[props.for]?.map(
-                  (label: string, index: number) => (
+                {company?.settings?.pdf_variables?.[props.for]
+                  ?.filter(
+                    (label: string) => !excludedVariables?.includes(label)
+                  )
+                  ?.map((label: string, index: number) => (
                     <Draggable
                       key={label}
                       draggableId={label}
@@ -176,8 +184,7 @@ export function SortableVariableList(props: Props) {
                         </div>
                       )}
                     </Draggable>
-                  )
-                )}
+                  ))}
 
                 {provided.placeholder}
               </div>

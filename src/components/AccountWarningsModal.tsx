@@ -11,9 +11,9 @@
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { Button } from './forms';
 import { Modal } from './Modal';
-import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   visible: boolean;
@@ -37,8 +37,13 @@ export function AccountWarningsModal(props: Props) {
       visible={props.visible}
       onClose={() => props.setVisible(false)}
     >
-      <div className=""
-        style={{ backgroundColor: colors.$2, color: colors.$3, colorScheme: colors.$0 }}
+      <div
+        className=""
+        style={{
+          backgroundColor: colors.$2,
+          color: colors.$3,
+          colorScheme: colors.$0,
+        }}
       >
         <p>
           {props.type === 'activity'

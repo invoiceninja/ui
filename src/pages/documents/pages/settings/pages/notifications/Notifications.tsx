@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
+import { useAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { useColorScheme } from '$app/common/colors';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Settings } from '$app/common/interfaces/docuninja/api';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
 import Toggle from '$app/components/forms/Toggle';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { ValidationAlert } from '$app/components/ValidationAlert';
-import { useAtom } from 'jotai';
-import { docuNinjaAtom } from '$app/common/atoms/docuninja';
-import { cloneDeep } from 'lodash';
-import { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { AxiosError } from 'axios';
-import { Settings } from '$app/common/interfaces/docuninja/api';
-import { useColorScheme } from '$app/common/colors';
 
 function Notifications() {
   const [t] = useTranslation();
@@ -63,7 +63,6 @@ function Notifications() {
     settingsRef.current = settings;
   }, [settings]);
 
-
   const handleSave = () => {
     if (!isFormBusy) {
       setIsFormBusy(true);
@@ -97,7 +96,8 @@ function Notifications() {
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
             setErrors(error.response.data);
-            const errorMessage = error.response.data.message || 'validation_errors';
+            const errorMessage =
+              error.response.data.message || 'validation_errors';
             toast.error(errorMessage);
           } else {
             toast.error('error_title');
@@ -108,12 +108,11 @@ function Notifications() {
   };
 
   const handleSettingsChange = (property: keyof Settings, value: boolean) => {
-    setSettings(prev => ({
+    setSettings((prev) => ({
       ...prev,
       [property]: value,
     }));
   };
-
 
   useSaveBtn(
     {
@@ -126,133 +125,140 @@ function Notifications() {
   return (
     <>
       {errors && <ValidationAlert errors={errors} />}
-      
+
       <Card
         title={t('notifications')}
         className="shadow-sm"
         style={{ borderColor: colors.$24 }}
         headerStyle={{ borderColor: colors.$20 }}
       >
-      <Element
-        leftSide={
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">
-              {t('quote_signed_notification')}
-            </span>
-            <span className="text-xs text-gray-500">
-              {t('email_client_when_quote_signed_description')}
-            </span>
-          </div>
-        }
-      >
-        <Toggle
-          checked={settings.ninja_quote_notification}
-          onChange={(value: boolean) => handleSettingsChange('ninja_quote_notification', value)}
-          disabled={isFormBusy}
-        />
-      </Element>
+        <Element
+          leftSide={
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">
+                {t('quote_signed_notification')}
+              </span>
+              <span className="text-xs text-gray-500">
+                {t('email_client_when_quote_signed_description')}
+              </span>
+            </div>
+          }
+        >
+          <Toggle
+            checked={settings.ninja_quote_notification}
+            onChange={(value: boolean) =>
+              handleSettingsChange('ninja_quote_notification', value)
+            }
+            disabled={isFormBusy}
+          />
+        </Element>
 
-      <Element
-        leftSide={
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">
-              {t('invoice_signed_notification')}
-            </span>
-            <span className="text-xs text-gray-500">
-              {t('email_client_when_invoice_signed_description')}
-            </span>
-          </div>
-        }
-      >
-        <Toggle
-          checked={settings.ninja_invoice_notification}
-          onChange={(value: boolean) => handleSettingsChange('ninja_invoice_notification', value)}
-          disabled={isFormBusy}
-        />
-      </Element>
+        <Element
+          leftSide={
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">
+                {t('invoice_signed_notification')}
+              </span>
+              <span className="text-xs text-gray-500">
+                {t('email_client_when_invoice_signed_description')}
+              </span>
+            </div>
+          }
+        >
+          <Toggle
+            checked={settings.ninja_invoice_notification}
+            onChange={(value: boolean) =>
+              handleSettingsChange('ninja_invoice_notification', value)
+            }
+            disabled={isFormBusy}
+          />
+        </Element>
 
-      <Element
+        <Element
+          leftSide={
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">
+                {t('credit_signed_notification')}
+              </span>
+              <span className="text-xs text-gray-500">
+                {t('email_client_when_credit_signed_description')}
+              </span>
+            </div>
+          }
+        >
+          <Toggle
+            checked={settings.ninja_credit_notification}
+            onChange={(value: boolean) =>
+              handleSettingsChange('ninja_credit_notification', value)
+            }
+            disabled={isFormBusy}
+          />
+        </Element>
 
-        leftSide={
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">
-              {t('credit_signed_notification')}
-            </span>
-            <span className="text-xs text-gray-500">
-              {t('email_client_when_credit_signed_description')}
-            </span>
-          </div>
-        }
-      >
-        <Toggle
-          checked={settings.ninja_credit_notification}
-          onChange={(value: boolean) => handleSettingsChange('ninja_credit_notification', value)}
-          disabled={isFormBusy}
-        />
-      </Element>
+        <Element
+          leftSide={
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">
+                {t('purchase_order_signed_notification')}
+              </span>
+              <span className="text-xs text-gray-500">
+                {t('email_vendor_when_purchase_order_signed_description')}
+              </span>
+            </div>
+          }
+        >
+          <Toggle
+            checked={settings.ninja_purchase_order_notification}
+            onChange={(value: boolean) =>
+              handleSettingsChange('ninja_purchase_order_notification', value)
+            }
+            disabled={isFormBusy}
+          />
+        </Element>
 
-      <Element
+        <Element
+          leftSide={
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">
+                {t('custom_document_completed')}
+              </span>
+              <span className="text-xs text-gray-500">
+                {t('email_client_when_custom_document_completed')}
+              </span>
+            </div>
+          }
+        >
+          <Toggle
+            checked={settings.email_client_when_completed}
+            onChange={(value: boolean) =>
+              handleSettingsChange('email_client_when_completed', value)
+            }
+            disabled={isFormBusy}
+          />
+        </Element>
 
-        leftSide={
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">
-              {t('purchase_order_signed_notification')}
-            </span>
-            <span className="text-xs text-gray-500">
-              {t('email_vendor_when_purchase_order_signed_description')}
-            </span>
-          </div>
-        }
-      >
-        <Toggle
-          checked={settings.ninja_purchase_order_notification}
-          onChange={(value: boolean) => handleSettingsChange('ninja_purchase_order_notification', value)}
-          disabled={isFormBusy}
-        />
-      </Element>
-
-
-      <Element
-
-        leftSide={
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">
-              {t('custom_document_completed')}
-            </span>
-            <span className="text-xs text-gray-500">
-              {t('email_client_when_custom_document_completed')}
-            </span>
-          </div>
-        }
-      >
-        <Toggle
-          checked={settings.email_client_when_completed}
-          onChange={(value: boolean) => handleSettingsChange('email_client_when_completed', value)}
-          disabled={isFormBusy}
-        />
-      </Element>
-
-      <Element
-
-      leftSide={
-        <div className="flex flex-col">
-          <span className="text-sm font-medium">
-            {t('attach_audit_log_to_completed_email')}
-          </span>
-          <span className="text-xs text-gray-500">
-            {t('attach_audit_log_to_completed_email_help')}
-          </span>
-        </div>
-      }
-      >
-      <Toggle
-        checked={settings.attach_audit_log_to_completed_email}
-        onChange={(value: boolean) => handleSettingsChange('attach_audit_log_to_completed_email', value)}
-        disabled={isFormBusy}
-      />
-      </Element>
-    </Card>
-  </>
+        <Element
+          leftSide={
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">
+                {t('attach_audit_log_to_completed_email')}
+              </span>
+              <span className="text-xs text-gray-500">
+                {t('attach_audit_log_to_completed_email_help')}
+              </span>
+            </div>
+          }
+        >
+          <Toggle
+            checked={settings.attach_audit_log_to_completed_email}
+            onChange={(value: boolean) =>
+              handleSettingsChange('attach_audit_log_to_completed_email', value)
+            }
+            disabled={isFormBusy}
+          />
+        </Element>
+      </Card>
+    </>
   );
 }
 

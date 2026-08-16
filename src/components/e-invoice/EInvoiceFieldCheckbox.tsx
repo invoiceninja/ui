@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { Payload } from './EInvoiceGenerator';
-import { Checkbox } from '../forms';
 import classNames from 'classnames';
-import { useColorScheme } from '$app/common/colors';
 import { cloneDeep } from 'lodash';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { updateChanges } from '$app/common/stores/slices/company-users';
+import { useColorScheme } from '$app/common/colors';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { Checkbox } from '../forms';
+import { Payload } from './EInvoiceGenerator';
 
 interface Props {
   fieldKey: string;
@@ -57,13 +57,13 @@ export function EInvoiceFieldCheckbox(props: Props) {
   const [isInitialized, setInitialized] = useState<boolean>(false);
 
   useEffect(() => {
-    if (checked && Boolean(payload?.[fieldKey] === undefined)) {
+    if (checked && payload?.[fieldKey] === undefined) {
       const defaultValue =
         fieldType === 'boolean'
           ? false
           : fieldType === 'decimal' || fieldType === 'number'
-          ? 0
-          : '';
+            ? 0
+            : '';
 
       setPayload((currentPayload) => ({
         ...currentPayload,
@@ -71,7 +71,7 @@ export function EInvoiceFieldCheckbox(props: Props) {
       }));
     }
 
-    if (!checked && Boolean(payload?.[fieldKey] !== undefined)) {
+    if (!checked && payload?.[fieldKey] !== undefined) {
       delete payload[fieldKey];
 
       const keysLength = fieldKey.split('|').length;

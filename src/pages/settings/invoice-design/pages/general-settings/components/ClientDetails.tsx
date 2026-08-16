@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
-import { SortableVariableList } from './SortableVariableList';
-import { useCustomField } from '$app/components/CustomField';
-import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
-import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { useColorScheme } from '$app/common/colors';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { useCustomField } from '$app/components/CustomField';
+import { Card } from '$app/components/cards';
 import { MsgBubbleUser } from '$app/components/icons/MsgBubbleUser';
+import { SortableVariableList } from './SortableVariableList';
 
 export default function ClientDetails() {
   const [t] = useTranslation();

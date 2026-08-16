@@ -43,7 +43,13 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useNavigate } from 'react-router-dom';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
-import { Classification, PEPPOL_COUNTRIES, PEPPOL_CLASSIFICATIONS } from '$app/common/helpers/peppol-countries';
+import {
+  Classification,
+  PEPPOL_COUNTRIES,
+  PEPPOL_CLASSIFICATIONS,
+} from '$app/common/helpers/peppol-countries';
+import { TagPills } from '$app/components/tags/TagPills';
+import { calculateNetAmount } from '$app/common/helpers/invoices/net-amount';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -124,6 +130,8 @@ export function useAllInvoiceColumns() {
     'created_at',
     'updated_at',
     'project',
+    'tags',
+    'recurring_invoice',
   ] as const;
 
   return invoiceColumns.map((column) => normalizeColumnName(column));
@@ -162,11 +170,15 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
     if (reactSettings?.preferences?.hide_peppol_sent_status) {
       return false;
     }
-    
+
     return (
-      currentCompany.settings.e_invoice_type === 'PEPPOL' && 
+      currentCompany.settings.e_invoice_type === 'PEPPOL' &&
       PEPPOL_COUNTRIES.includes(currentInvoice.client?.country_id || '') &&
-      PEPPOL_CLASSIFICATIONS[currentInvoice.client?.country_id as keyof typeof PEPPOL_CLASSIFICATIONS]?.includes((currentInvoice.client?.classification || 'business') as Classification)
+      PEPPOL_CLASSIFICATIONS[
+        currentInvoice.client?.country_id as keyof typeof PEPPOL_CLASSIFICATIONS
+      ]?.includes(
+        (currentInvoice.client?.classification || 'business') as Classification
+      )
     );
   };
 
@@ -181,9 +193,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   };
 
   const peppolSendingSuccess = (currentInvoice: Invoice) => {
-    return (
-      isPeppolEnabled(currentInvoice) && currentInvoice.backup?.guid
-    );
+    return isPeppolEnabled(currentInvoice) && currentInvoice.backup?.guid;
   };
 
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
@@ -193,7 +203,6 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('status'),
       format: (_value, invoice) => (
         <div className="flex items-center gap-x-2">
-
           <InvoiceStatus entity={invoice} />
 
           {peppolSendingFailed(invoice) && (
@@ -205,27 +214,27 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
               }}
             >
               <Tooltip
-                message={
-                  t('peppol_sending_failed') as string
-                }
+                message={t('peppol_sending_failed') as string}
                 width="auto"
                 placement="top"
               >
                 <MdWarning color="red" size={20} />
-              </Tooltip>        
+              </Tooltip>
             </button>
           )}
 
           {peppolSendingSuccess(invoice) && (
             <Tooltip
-              message={
-                t('peppol_sending_success') as string
-              }
+              message={t('peppol_sending_success') as string}
               width="auto"
               placement="top"
             >
-              <MdSend color="#22c55e" size={18} style={{ transform: 'rotate(-45deg)' }} />
-            </Tooltip>   
+              <MdSend
+                color="#22c55e"
+                size={18}
+                style={{ transform: 'rotate(-45deg)' }}
+              />
+            </Tooltip>
           )}
 
           {['R1', 'R2'].includes(invoice.backup?.document_type ?? '') && (
@@ -308,7 +317,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('net_amount'),
       format: (value, invoice) =>
         formatMoney(
-          Number(value) - Number(invoice.total_taxes || 0),
+          calculateNetAmount(invoice),
           invoice.client?.country_id,
           invoice.client?.settings.currency_id
         ),
@@ -339,6 +348,22 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
           {invoice?.project?.name ?? ''}
         </DynamicLink>
       ),
+    },
+    {
+      column: 'recurring_invoice',
+      id: 'recurring_id',
+      label: t('recurring_invoice'),
+      format: (value, invoice) =>
+        invoice.recurring_id ? (
+          <DynamicLink
+            to={route('/recurring_invoices/:id/edit', {
+              id: invoice.recurring_id,
+            })}
+            renderSpan={disableNavigation('recurring_invoice', undefined)}
+          >
+            {t('recurring_invoice')}
+          </DynamicLink>
+        ) : null,
     },
     {
       column: 'balance',
@@ -641,6 +666,12 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'updated_at',
       label: t('last_updated'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'tags',
+      id: 'invoice_tag_ids',
+      label: t('tags'),
+      format: (value, invoice) => <TagPills tags={invoice.tags} />,
     },
   ];
 

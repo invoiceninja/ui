@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtom } from 'jotai';
+import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Client } from '$app/common/interfaces/client';
+import { Invoice } from '$app/common/interfaces/invoice';
 import {
   InvoiceItem,
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
 import { Invitation } from '$app/common/interfaces/purchase-order';
-import { blankLineItem } from '$app/common/constants/blank-line-item';
-import { useAtom } from 'jotai';
 import { invoiceAtom, invoiceSumAtom } from '$app/pages/invoices/common/atoms';
 import { ChangeHandler } from '../Create';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 
 interface Props {
   client?: Client;
@@ -66,43 +66,49 @@ export function useInvoiceUtilities(props: Props) {
   const handleContactCanSignChange = (id: string, checked: boolean) => {
     // Use props.client if invoice.client is not available
     const clientContacts = invoice?.client?.contacts || props.client?.contacts;
-    
+
     if (!clientContacts) {
       return;
     }
 
     // Find the contact by id
-    const contact = clientContacts.find(c => c.id === id);
+    const contact = clientContacts.find((c) => c.id === id);
     if (!contact) {
       return;
     }
 
     // Check if contact is invited - if not, don't allow can_sign changes
-    const isInvited = invoice?.invitations?.some(inv => inv.client_contact_id === contact.id) || false;
+    const isInvited =
+      invoice?.invitations?.some(
+        (inv) => inv.client_contact_id === contact.id
+      ) || false;
     if (!isInvited) {
       return;
     }
 
     // Update the invitations array with the can_sign property
     const invitations = [...(invoice?.invitations || [])];
-    
+
     // Find existing invitation for this contact
-    const existingInvitationIndex = invitations.findIndex(inv => inv.client_contact_id === contact.id);
-    
+    const existingInvitationIndex = invitations.findIndex(
+      (inv) => inv.client_contact_id === contact.id
+    );
+
     if (existingInvitationIndex >= 0) {
       // Update existing invitation
       invitations[existingInvitationIndex] = {
         ...invitations[existingInvitationIndex],
-        can_sign: checked
+        can_sign: checked,
       };
     }
 
     // Update the invoice with the modified invitations
-    setInvoice((current) => 
-      current && {
-        ...current,
-        invitations: invitations,
-      }
+    setInvoice(
+      (current) =>
+        current && {
+          ...current,
+          invitations: invitations,
+        }
     );
   };
 

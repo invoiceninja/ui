@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint, isSelfHosted } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
-import { Modal } from '$app/components/Modal';
-import { Button, Link } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdLink } from 'react-icons/md';
-import yodleeLogo from '/dap-logos/yodlee.svg';
-import goCardlessLogo from '/dap-logos/goCardless.png';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useClickAway } from 'react-use';
 import { useColorScheme } from '$app/common/colors';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { endpoint, isSelfHosted } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { Button, Link } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
+import goCardlessLogo from '/dap-logos/goCardless.png';
+import yodleeLogo from '/dap-logos/yodlee.svg';
 
 export function ConnectAccounts() {
   const [t] = useTranslation();

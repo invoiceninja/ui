@@ -8,26 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { Card } from '$app/components/cards';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
-import { useTranslation } from 'react-i18next';
-import { Card } from '$app/components/cards';
 import { ClientSelector } from '../../common/components/ClientSelector';
 import { InvoiceDetails } from '../../common/components/InvoiceDetails';
+import { InvoiceFooter } from '../../common/components/InvoiceFooter';
+import { InvoicePreview } from '../../common/components/InvoicePreview';
+import { InvoiceTotals } from '../../common/components/InvoiceTotals';
 import { ProductsTable } from '../../common/components/ProductsTable';
+import { TasksTabLabel } from '../../common/components/TasksTabLabel';
 import { useProductColumns } from '../../common/hooks/useProductColumns';
 import { useTaskColumns } from '../../common/hooks/useTaskColumns';
-import { useInvoiceUtilities } from '../hooks/useInvoiceUtilities';
-import { InvoiceFooter } from '../../common/components/InvoiceFooter';
-import { InvoiceTotals } from '../../common/components/InvoiceTotals';
-import { InvoicePreview } from '../../common/components/InvoicePreview';
 import { CreateInvoiceContext } from '../Create';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
-import { useColorScheme } from '$app/common/colors';
-import { TasksTabLabel } from '../../common/components/TasksTabLabel';
+import { useInvoiceUtilities } from '../hooks/useInvoiceUtilities';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,

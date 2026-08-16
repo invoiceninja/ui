@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { resolveKey } from '$app/pages/invoices/common/helpers/resolve-key';
-import { useTranslation } from 'react-i18next';
 
 interface Params {
   type?: 'product' | 'task';
@@ -34,7 +34,7 @@ export function useResolveTranslation(params?: Params) {
   };
 
   return (key: string, delimiter = '.') => {
-    if (Object.prototype.hasOwnProperty.call(aliases, key)) {
+    if (Object.hasOwn(aliases, key)) {
       return aliases[key];
     }
 

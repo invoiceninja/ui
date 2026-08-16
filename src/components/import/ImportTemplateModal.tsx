@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import { Button, InputField } from '../forms';
-import { ImportMap } from './UploadImport';
+import { cloneDeep, isEqual } from 'lodash';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import {
   useReactSettings,
   useSaveReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { cloneDeep, isEqual } from 'lodash';
+import { Button, InputField } from '../forms';
 import { Modal } from '../Modal';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { useNavigate } from 'react-router-dom';
+import { ImportMap } from './UploadImport';
 
 interface Props {
   entity: string;
@@ -107,13 +107,11 @@ export function ImportTemplateModal(props: Props) {
         {};
 
       if (!Array.isArray(currentEntityImportTemplates)) {
-        Object.entries(currentEntityImportTemplates).forEach(
-          ([key, value]) => {
-            if (!key || !value || !Array.isArray(value)) return;
+        Object.entries(currentEntityImportTemplates).forEach(([key, value]) => {
+          if (!key || !value || !Array.isArray(value)) return;
 
-            updatedEntityImportTemplates[key] = value;
-          }
-        );
+          updatedEntityImportTemplates[key] = value;
+        });
       }
 
       updatedEntityImportTemplates[templateName] = Object.values(

@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import toast from 'react-hot-toast';
 import { useColorScheme } from '$app/common/colors';
 import { trans } from '$app/common/helpers';
-import toast from 'react-hot-toast';
 
 interface Props {
   children: string;
@@ -21,7 +21,12 @@ export function Variable(props: Props) {
 
   return (
     <span
-      style={{ color: colors.$3, colorScheme: colors.$0, backgroundColor: colors.$1, borderColor: colors.$4 }}
+      style={{
+        color: colors.$3,
+        colorScheme: colors.$0,
+        backgroundColor: colors.$1,
+        borderColor: colors.$4,
+      }}
       className="px-2 py-1 rounded m-1 inline-flex items-center space-x-2 hover:cursor-pointer"
       onClick={() => {
         navigator.clipboard.writeText(props.children);

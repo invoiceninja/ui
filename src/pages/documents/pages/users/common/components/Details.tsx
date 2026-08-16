@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Element } from '$app/components/cards';
-import { Button, InputField } from '$app/components/forms';
 import { cloneDeep, set } from 'lodash';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  User,
+  compressInitials,
+  compressSignature,
+} from '$app/common/helpers/image-compression';
+import {
   Permission as PermissionType,
+  User,
 } from '$app/common/interfaces/docuninja/api';
-import { DefaultSignature } from './DefaultSignature';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Element } from '$app/components/cards';
+import { Button, InputField } from '$app/components/forms';
 import { SignatureFontSelector } from '$app/components/SignatureFontSelector';
 import { NotificationValue } from '../constants/notifications';
-import {
-  compressSignature,
-  compressInitials,
-} from '$app/common/helpers/image-compression';
+import { DefaultSignature } from './DefaultSignature';
 export interface DocuninjaUserProps {
   user: User;
   setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
@@ -153,9 +153,8 @@ export default function Details(props?: DocuninjaUserProps) {
                               const reader = new FileReader();
                               reader.onload = async (event) => {
                                 const base64 = event.target?.result as string;
-                                const compressed = await compressSignature(
-                                  base64
-                                );
+                                const compressed =
+                                  await compressSignature(base64);
                                 setUser(
                                   (user) =>
                                     user && {
@@ -256,9 +255,8 @@ export default function Details(props?: DocuninjaUserProps) {
                             const reader = new FileReader();
                             reader.onload = async (event) => {
                               const base64 = event.target?.result as string;
-                              const compressed = await compressSignature(
-                                base64
-                              );
+                              const compressed =
+                                await compressSignature(base64);
                               setUser(
                                 (user) =>
                                   user && {
@@ -396,9 +394,8 @@ export default function Details(props?: DocuninjaUserProps) {
 
                                 const initialsImage =
                                   canvas.toDataURL('image/png');
-                                const compressed = await compressInitials(
-                                  initialsImage
-                                );
+                                const compressed =
+                                  await compressInitials(initialsImage);
                                 setUser(
                                   (user) =>
                                     user && {
@@ -499,9 +496,8 @@ export default function Details(props?: DocuninjaUserProps) {
                             ctx.fillText(initials, x, y);
 
                             const initialsImage = canvas.toDataURL('image/png');
-                            const compressed = await compressInitials(
-                              initialsImage
-                            );
+                            const compressed =
+                              await compressInitials(initialsImage);
                             setUser(
                               (user) =>
                                 user && {

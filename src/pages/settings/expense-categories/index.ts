@@ -7,6 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-export * from './ExpenseCategories';
+
 export { Create as CreateExpenseCategory } from './Create';
 export { Edit as EditExpenseCategory } from './Edit';
+export * from './ExpenseCategories';

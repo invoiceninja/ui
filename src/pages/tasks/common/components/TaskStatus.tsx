@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Badge } from '$app/components/Badge';
+import classNames from 'classnames';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Task } from '$app/common/interfaces/task';
-import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
+import { useClickAway } from 'react-use';
+import { useColorScheme } from '$app/common/colors';
 import {
   hexToRGB,
   isColorLight,
   useAdjustColorDarkness,
 } from '$app/common/hooks/useAdjustColorDarkness';
-import { useRef, useState } from 'react';
-import { useClickAway } from 'react-use';
-import { TaskStatusesDropdown } from './TaskStatusesDropdown';
-import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { Task } from '$app/common/interfaces/task';
+import { Badge } from '$app/components/Badge';
 import { ChevronDown } from '$app/components/icons/ChevronDown';
-import { useColorScheme } from '$app/common/colors';
-import classNames from 'classnames';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
+import { TaskStatusesDropdown } from './TaskStatusesDropdown';
 
 interface Props {
   entity: Task;

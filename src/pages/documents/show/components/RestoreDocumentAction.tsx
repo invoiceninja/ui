@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdRestore } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -18,9 +21,6 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { MdRestore } from 'react-icons/md';
 
 interface Props {
   document: Document;
@@ -85,7 +85,11 @@ export function RestoreDocumentAction({ document }: Props) {
             {t('restore_document_description')}.
           </span>
 
-          <Button behavior="button" onClick={handleSubmit} disabled={isFormBusy}>
+          <Button
+            behavior="button"
+            onClick={handleSubmit}
+            disabled={isFormBusy}
+          >
             {t('continue')}
           </Button>
         </Modal>

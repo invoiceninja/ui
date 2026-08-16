@@ -8,29 +8,30 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Calendar } from 'react-feather';
+import classNames from 'classnames';
 import { useState } from 'react';
+import { Calendar } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { toast } from '$app/common/helpers/toast/toast';
-import { Badge } from '$app/components/Badge';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { date, docuNinjaEndpoint } from '$app/common/helpers';
-import {
-  type Document as DocumentType,
-  type DocumentInvitation,
-  DocumentStatus,
-} from '$app/common/interfaces/docuninja/api';
-import { route, routeWithOrigin } from '$app/common/helpers/route';
+import { MdSend } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
-import { Plus } from '$app/components/icons/Plus';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '$app/components/forms';
-import { MdSend } from 'react-icons/md';
-import { Icon } from '$app/components/icons/Icon';
+import { date, docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { route, routeWithOrigin } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import classNames from 'classnames';
+import {
+  type DocumentInvitation,
+  DocumentStatus,
+  type Document as DocumentType,
+} from '$app/common/interfaces/docuninja/api';
+import { Badge } from '$app/components/Badge';
+import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Plus } from '$app/components/icons/Plus';
+import { Modal } from '$app/components/Modal';
 
 type InvitationsProps = {
   document: DocumentType;
@@ -98,6 +99,29 @@ function Invitation({ invitation, document }: InvitationProps) {
   const [isSendingInvitation, setIsSendingInvitation] =
     useState<boolean>(false);
 
+  const [isSendConfirmOpen, setIsSendConfirmOpen] =
+    useState<boolean>(false);
+
+  const canSendInvitation = (invitation: DocumentInvitation) => {
+    const invitations = document.invitations || [];
+
+    const usesOrderedSigning = invitations.some(
+      (i) => i.signing_order != null
+    );
+
+    if (!usesOrderedSigning) {
+      return true;
+    }
+
+    const current = [...invitations]
+      .filter((i) => !i.signed_date)
+      .sort(
+        (a, b) => (a.signing_order ?? 0) - (b.signing_order ?? 0)
+      )[0];
+
+    return current?.id === invitation.id;
+  };
+
   const getInvitationStatus = (invitation: DocumentInvitation) => {
     if (invitation.signed_date) {
       return <Badge variant="green">{t('signed')}</Badge>;
@@ -159,8 +183,28 @@ function Invitation({ invitation, document }: InvitationProps) {
     }
   };
 
+  const getRecipient = (invitation: DocumentInvitation) => {
+    const name =
+      invitation.entity === 'contact'
+        ? `${invitation.contact?.first_name ?? ''} ${
+            invitation.contact?.last_name ?? ''
+          }`.trim()
+        : `${invitation.user?.first_name ?? ''} ${
+            invitation.user?.last_name ?? ''
+          }`.trim();
+
+    const email =
+      invitation.entity === 'contact'
+        ? invitation.contact?.email
+        : invitation.user?.email;
+
+    return name ? `${name} (${email})` : email;
+  };
+
   const handleCopyLink = () => {
-    const link = routeWithOrigin(`/docuninja/sign/${document.id}/${invitation.id}`);
+    const link = routeWithOrigin(
+      `/docuninja/sign/${document.id}/${invitation.id}`
+    );
     navigator.clipboard.writeText(link);
     toast.success(t('link_copied') || 'Link copied to clipboard');
   };
@@ -190,6 +234,7 @@ function Invitation({ invitation, document }: InvitationProps) {
           $refetch(['docuninja_documents']);
 
           toast.success('document_queued_for_sending');
+          setIsSendConfirmOpen(false);
         })
         .finally(() => setIsSendingInvitation(false));
     }
@@ -270,8 +315,8 @@ function Invitation({ invitation, document }: InvitationProps) {
           <Button
             type="minimal"
             behavior="button"
-            onClick={handleSendInvitation}
-            disabled={isSendingInvitation}
+            onClick={() => setIsSendConfirmOpen(true)}
+            disabled={isSendingInvitation || !canSendInvitation(invitation)}
             disableWithoutIcon
           >
             <div className="flex items-center space-x-2">
@@ -284,6 +329,36 @@ function Invitation({ invitation, document }: InvitationProps) {
           </Button>
         </div>
       )}
+
+      <Modal
+        title={t('send_confirmation')}
+        visible={isSendConfirmOpen}
+        onClose={() => setIsSendConfirmOpen(false)}
+        size="small"
+      >
+        <div className="space-y-4 pt-3">
+          <div>
+            <p>{t('send_emails_to_following')}</p>
+
+            <ul className="mt-2">
+              <li className="flex items-center gap-1">
+                <span>-</span>
+                <span>{getRecipient(invitation)}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="flex justify-end">
+            <Button
+              behavior="button"
+              disabled={isSendingInvitation}
+              onClick={handleSendInvitation}
+            >
+              {isSendingInvitation ? t('sending') : t('send')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -20,9 +23,6 @@ import {
 } from '$app/common/stores/slices/company-users';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 
 export interface TaxDataPayload {
   geoPostalCode: string;

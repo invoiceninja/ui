@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ChangeEvent } from 'react';
-import CommonProps from '../../common/interfaces/common-props.interface';
 import classNames from 'classnames';
+import { ChangeEvent } from 'react';
 import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   options: {
@@ -57,8 +57,8 @@ export function Radio(props: Props) {
                 borderColor: reactSettings?.dark_mode
                   ? 'white'
                   : option.value === props.defaultSelected
-                  ? ''
-                  : colors.$5,
+                    ? ''
+                    : colors.$5,
               }}
             />
 

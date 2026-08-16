@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ChangeEvent, ReactNode, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { TaxSetting } from '$app/common/interfaces/company.interface';
 import { Element } from '$app/components/cards';
 import { Button, Checkbox, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
-import { ChangeEvent, ReactNode, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { EditSubRegionModal } from './EditSubRegionModal';
 
 interface RegionComponentProps {
@@ -69,9 +69,9 @@ export function RegionComponent({
 
     if (checkbox && !checkbox.disabled) {
       const newChecked = !checkbox.checked;
-    
+
       checkbox.checked = newChecked;
-    
+
       handleChange(
         `tax_data.regions.${regionCode}.subregions.${subregionKey}.apply_tax`,
         newChecked
@@ -187,7 +187,9 @@ export function RegionComponent({
       {showSalesAboveThreshold && (
         <Element
           leftSide={
-            <p className="lg:pl-5">({regionCode}) {t('sales_above_threshold')}</p>
+            <p className="lg:pl-5">
+              ({regionCode}) {t('sales_above_threshold')}
+            </p>
           }
         >
           <Toggle

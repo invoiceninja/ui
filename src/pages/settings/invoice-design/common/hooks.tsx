@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useDispatch } from 'react-redux';
 import { Settings } from '$app/common/interfaces/company.interface';
 import { updateChanges } from '$app/common/stores/slices/company-users';
-import { useDispatch } from 'react-redux';
 
 export function useHandleSettingsValueChange() {
   const dispatch = useDispatch();

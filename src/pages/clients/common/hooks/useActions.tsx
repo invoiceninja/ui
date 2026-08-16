@@ -8,14 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { EntityState } from '$app/common/enums/entity-state';
-import { getEntityState } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
-import { Client } from '$app/common/interfaces/client';
-import { Divider } from '$app/components/cards/Divider';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
-import { Action } from '$app/components/ResourceActions';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
@@ -23,31 +16,40 @@ import {
   MdComment,
   MdDelete,
   MdDesignServices,
+  MdEdit,
   MdPictureAsPdf,
   MdRestore,
   MdSettings,
 } from 'react-icons/md';
-import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { useConfigureClientSettings } from './useConfigureClientSettings';
+import { EntityState } from '$app/common/enums/entity-state';
+import { getEntityState } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { PurgeClientAction } from '../components/PurgeClientAction';
-import { MergeClientAction } from '../components/MergeClientAction';
-import { Dispatch, SetStateAction } from 'react';
-import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { useBulk } from '$app/common/queries/clients';
-import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
-import { EntityCreationModalAction } from '../components/EntityCreationModalAction';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { Client } from '$app/common/interfaces/client';
+import { useBulk } from '$app/common/queries/clients';
+import { Divider } from '$app/components/cards/Divider';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
+import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
+import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { CloneAction } from '../components/CloneAction';
+import { EntityCreationModalAction } from '../components/EntityCreationModalAction';
+import { MergeClientAction } from '../components/MergeClientAction';
+import { PurgeClientAction } from '../components/PurgeClientAction';
+import { useConfigureClientSettings } from './useConfigureClientSettings';
 
 interface Params {
+  showEditAction?: boolean;
   setIsPurgeOrMergeActionCalled?: Dispatch<SetStateAction<boolean>>;
 }
 export function useActions(params?: Params) {
   const [t] = useTranslation();
   const bulk = useBulk();
 
-  const { setIsPurgeOrMergeActionCalled } = params || {};
+  const { showEditAction, setIsPurgeOrMergeActionCalled } = params || {};
 
   const { isAdmin, isOwner } = useAdmin();
   const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
@@ -66,6 +68,16 @@ export function useActions(params?: Params) {
   } = useChangeTemplate();
 
   const actions: Action<Client>[] = [
+    (client) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/clients/:id/edit', { id: client.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
     (client) =>
       !client.is_deleted && (
         <DropdownElement

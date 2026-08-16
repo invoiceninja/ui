@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import { useEffect, useRef, useState } from 'react';
+import { useColorScheme } from '$app/common/colors';
 import { Task } from '$app/common/interfaces/task';
 import { isTaskRunning } from '$app/pages/tasks/common/helpers/calculate-entity-state';
 import { calculateTime } from '$app/pages/tasks/common/helpers/calculate-time';
-import dayjs from 'dayjs';
-import { useEffect, useRef, useState } from 'react';
-import duration from 'dayjs/plugin/duration';
-import { useColorScheme } from '$app/common/colors';
-import classNames from 'classnames';
 
 dayjs.extend(duration);
 

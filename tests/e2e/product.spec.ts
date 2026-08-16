@@ -4,13 +4,14 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
-import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { resetAccountBeforeAll, test, expect, uniqueName } from '$tests/e2e/fixtures';
 import type { Page } from '@playwright/test';
 import { Action } from './clients.spec';
+
+resetAccountBeforeAll();
 
 interface Params {
   permissions: Permission[];
@@ -143,31 +144,21 @@ const checkEditPage = async (
 };
 
 test("can't view products without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('products@example.com');
-  await save();
-  await logout(page);
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'products@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Products'
   );
 
-  await logout(page);
 });
 
 test('can view product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const productName = uniqueName('test-view-product');
 
   await login(page);
-  await clear('products@example.com');
-  await set('view_product');
-  await save();
+  await api.setPermissions('products@example.com', ['view_product']);
 
   await createProduct({
     page,
@@ -195,11 +186,9 @@ test('can view product', async ({ page, api }) => {
 
   await checkEditPage(page, false, false);
 
-  await logout(page);
 });
 
 test('can edit product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const productName = uniqueName('test-edit-product');
 
@@ -208,9 +197,7 @@ test('can edit product', async ({ page, api }) => {
   });
 
   await login(page);
-  await clear('products@example.com');
-  await set('edit_product');
-  await save();
+  await api.setPermissions('products@example.com', ['edit_product']);
 
   await createProduct({ page, name: productName });
 
@@ -250,11 +237,9 @@ test('can edit product', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can create a product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const productName = uniqueName('test-create-product');
 
@@ -262,11 +247,7 @@ test('can create a product', async ({ page, api }) => {
     permissions: ['create_product'],
   });
 
-  await login(page);
-  await clear('products@example.com');
-  await set('create_product');
-  await save();
-  await logout(page);
+  await api.setPermissions('products@example.com', ['create_product']);
 
   await login(page, 'products@example.com', 'password');
 
@@ -294,17 +275,11 @@ test('can create a product', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('deleting product with edit_product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('products@example.com');
-  await set('create_product', 'edit_product');
-  await save();
-  await logout(page);
+  await api.setPermissions('products@example.com', ['create_product', 'edit_product']);
 
   await login(page, 'products@example.com', 'password');
 
@@ -349,13 +324,8 @@ test('deleting product with edit_product', async ({ page, api }) => {
 });
 
 test('archiving product withe edit_product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('products@example.com');
-  await set('create_product', 'edit_product');
-  await save();
-  await logout(page);
+  await api.setPermissions('products@example.com', ['create_product', 'edit_product']);
 
   await login(page, 'products@example.com', 'password');
 
@@ -401,13 +371,8 @@ test('archiving product withe edit_product', async ({ page, api }) => {
 });
 
 test('product documents preview with edit_product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('products@example.com');
-  await set('create_product', 'edit_product');
-  await save();
-  await logout(page);
+  await api.setPermissions('products@example.com', ['create_product', 'edit_product']);
 
   await login(page, 'products@example.com', 'password');
 
@@ -453,43 +418,17 @@ test('product documents preview with edit_product', async ({ page, api }) => {
 });
 
 test('product documents uploading with edit_product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('products@example.com');
-  await set('create_product', 'edit_product');
-  await save();
-  await logout(page);
+  await api.setPermissions('products@example.com', ['create_product', 'edit_product']);
 
   await login(page, 'products@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  const docUploadName = uniqueName('test-doc-upload-product');
 
-  await page.getByRole('link', { name: 'Products', exact: true }).click();
+  await createProduct({ page, name: docUploadName });
 
-  await page.waitForURL('**/products');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    const docUploadName = uniqueName('test-doc-upload-product');
-
-    await createProduct({ page, withNavigation: false, name: docUploadName });
-
-    const docUploadId = page.url().match(/products\/([^/]+)/)?.[1];
-    if (docUploadId) api.trackEntity('products', docUploadId);
-  } else {
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
-
-    await moreActionsButton.click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  const docUploadId = page.url().match(/products\/([^/]+)/)?.[1];
+  if (docUploadId) api.trackEntity('products', docUploadId);
 
   await page.waitForURL('**/products/**/edit');
 
@@ -500,6 +439,10 @@ test('product documents uploading with edit_product', async ({ page, api }) => {
     .click();
 
   await page.waitForURL('**/products/**/documents');
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')
@@ -517,7 +460,6 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const productName = uniqueName('test-dropdown-product');
 
@@ -525,11 +467,7 @@ test('all actions in dropdown displayed with admin permission', async ({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('products@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('products@example.com', ['admin']);
 
   await login(page, 'products@example.com', 'password');
 
@@ -544,14 +482,12 @@ test('all actions in dropdown displayed with admin permission', async ({
 
   await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('New Invoice, New Purchase Order, and Clone displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const productName = uniqueName('test-actions-product');
 
@@ -559,11 +495,7 @@ test('New Invoice, New Purchase Order, and Clone displayed with creation permiss
     permissions: ['create_invoice', 'create_purchase_order', 'create_product'],
   });
 
-  await login(page);
-  await clear('products@example.com');
-  await set('create_invoice', 'create_purchase_order', 'create_product');
-  await save();
-  await logout(page);
+  await api.setPermissions('products@example.com', ['create_invoice', 'create_purchase_order', 'create_product']);
 
   await login(page, 'products@example.com', 'password');
 
@@ -582,17 +514,11 @@ test('New Invoice, New Purchase Order, and Clone displayed with creation permiss
 
   await checkDropdownActions(page, actions, 'productActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('cloning product with edit_product', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('products@example.com');
-  await set('create_product', 'edit_product');
-  await save();
-  await logout(page);
+  await api.setPermissions('products@example.com', ['create_product', 'edit_product']);
 
   await login(page, 'products@example.com', 'password');
 
@@ -662,7 +588,6 @@ test('all custom actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const productName = uniqueName('test-bulk-actions-product');
 
@@ -670,11 +595,7 @@ test('all custom actions in dropdown displayed with admin permission', async ({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('products@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('products@example.com', ['admin']);
 
   await login(page, 'products@example.com', 'password');
 
@@ -709,14 +630,12 @@ test('all custom actions in dropdown displayed with admin permission', async ({
     }
   }
 
-  await logout(page);
 });
 
 test('New Invoice and New Purchase Order displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const productName = uniqueName('test-bulk-actions-product');
 
@@ -724,16 +643,12 @@ test('New Invoice and New Purchase Order displayed with creation permissions', a
     permissions: ['create_invoice', 'create_purchase_order'],
   });
 
-  await login(page);
-  await clear('products@example.com');
-  await set(
+  await api.setPermissions('products@example.com', [
     'create_invoice',
     'create_purchase_order',
     'edit_product',
     'create_product'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'products@example.com', 'password');
 
@@ -768,7 +683,6 @@ test('New Invoice and New Purchase Order displayed with creation permissions', a
     }
   }
 
-  await logout(page);
 });
 
 test('rendering documents and product_fields tabs with admin permission', async ({
@@ -812,7 +726,6 @@ test('rendering documents and product_fields tabs with admin permission', async 
 
   await expect(page.getByRole('link', { name: 'Documents' })).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('Product selector list gets updated on the report page when it is created', async ({
@@ -853,5 +766,4 @@ test('Product selector list gets updated on the report page when it is created',
     page.getByText(productName, { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });

@@ -10,7 +10,8 @@
 
 import { Guard } from '$app/common/guards/Guard';
 import { admin, owner } from '$app/common/guards/guards/admin';
-import { Outlet, Route } from 'react-router-dom';
+import { companySettings } from '$app/common/guards/guards/company-settings';
+import { Navigate, Outlet, Route } from 'react-router-dom';
 import { plan } from '$app/common/guards/guards/plan';
 import * as Settings from './index';
 import { isDemo } from '$app/common/helpers';
@@ -60,13 +61,22 @@ export const settingsRoutes = (
       <Route path="product_settings" element={<Settings.ProductSettings />} />
       <Route path="task_settings" element={<Settings.TaskSettings />} />
       <Route path="tags">
-        <Route element={<Settings.Tags />}>
-          <Route path="" element={<Settings.TaskTags />} />
-          <Route path="projects" element={<Settings.ProjectTags />} />
-        </Route>
-        <Route path="tasks/create" element={<Settings.CreateTaskTag />} />
+        <Route path="" element={<Settings.Tags />} />
+        <Route path="create" element={<Settings.CreateTag />} />
+        <Route path=":id/edit" element={<Settings.EditTag />} />
+        <Route
+          path="projects"
+          element={<Navigate to="/settings/tags" replace />}
+        />
+        <Route
+          path="tasks/create"
+          element={<Navigate to="/settings/tags/create" replace />}
+        />
         <Route path="tasks/:id/edit" element={<Settings.EditTaskTag />} />
-        <Route path="projects/create" element={<Settings.CreateProjectTag />} />
+        <Route
+          path="projects/create"
+          element={<Navigate to="/settings/tags/create" replace />}
+        />
         <Route path="projects/:id/edit" element={<Settings.EditProjectTag />} />
       </Route>
       <Route path="expense_settings" element={<Settings.ExpenseSettings />} />
@@ -76,13 +86,10 @@ export const settingsRoutes = (
         <Route
           path=""
           element={
-            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
-            isHosted() ? (
-              // import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
-
+            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' || isHosted() ? (
               <Guard
                 guards={[owner()]}
-                component={<Settings.Plan2 />}
+                component={<Settings.Plan3 />}
                 type="subPage"
               />
             ) : (
@@ -95,6 +102,30 @@ export const settingsRoutes = (
           path="overview"
           element={<Settings.AccountManagementOverview />}
         />
+        {(import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' || isHosted()) && (
+          <>
+        <Route
+          path="users"
+          element={
+            <Guard
+              guards={[owner()]}
+              component={<Settings.AccountUsers />}
+              type="subPage"
+            />
+          }
+        />
+        <Route
+          path="billing_history"
+          element={
+            <Guard
+              guards={[owner()]}
+              component={<Settings.BillingHistory />}
+              type="subPage"
+            />
+          }
+        />
+        </>
+        )}
         <Route path="enabled_modules" element={<Settings.EnabledModules />} />
         <Route path="integrations" element={<Settings.Integrations />} />
         <Route
@@ -167,7 +198,15 @@ export const settingsRoutes = (
         <Route path="messages" element={<Settings.Messages />} />
         <Route path="customize" element={<Settings.Customize />} />
       </Route>
-      <Route path="e_invoice" element={<Settings.EInvoice />} />
+      <Route
+        path="e_invoice"
+        element={
+          <Guard
+            guards={[companySettings()]}
+            component={<Settings.EInvoice />}
+          />
+        }
+      />
       <Route path="email_settings" element={<Settings.EmailSettings />} />
       <Route
         path="templates_and_reminders"

@@ -8,35 +8,37 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import CommonProps from '../../common/interfaces/common-props.interface';
-import { InputField } from '../forms/InputField';
-import Select, {
-  components,
-  MultiValue,
-  SingleValue,
-  StylesConfig,
-  MenuProps,
-  OptionProps,
-  ControlProps,
-  ValueContainerProps,
-} from 'react-select';
+import classNames from 'classnames';
+import collect from 'collect.js';
 import React, {
-  ReactNode,
   Dispatch,
+  ReactNode,
   SetStateAction,
+  useCallback,
+  useEffect,
   useRef,
   useState,
-  useCallback,
 } from 'react';
-import { useColorScheme } from '$app/common/colors';
-import collect from 'collect.js';
-import { Button, Checkbox } from '../forms';
-import { ChevronDown } from '../icons/ChevronDown';
-import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
+import Select, {
+  ControlProps,
+  components,
+  MenuProps,
+  MultiValue,
+  OptionProps,
+  SingleValue,
+  StylesConfig,
+  ValueContainerProps,
+} from 'react-select';
 import { useClickAway } from 'react-use';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import CommonProps from '../../common/interfaces/common-props.interface';
+import { Button, Checkbox } from '../forms';
+import { InputField } from '../forms/InputField';
+import { ChevronDown } from '../icons/ChevronDown';
+import { getMultiSelectDefaultValueKey } from './multiSelectDefaultValueKey';
 
 export interface SelectOption {
   value: string;
@@ -193,6 +195,17 @@ export function SelectWithApplyButton(props: any) {
   } = props;
 
   const [tempValue, setTempValue] = useState(defaultValue);
+  const defaultValueKey = getMultiSelectDefaultValueKey(defaultValue);
+  const previousDefaultValueKey = useRef(defaultValueKey);
+
+  useEffect(() => {
+    if (previousDefaultValueKey.current === defaultValueKey) {
+      return;
+    }
+
+    previousDefaultValueKey.current = defaultValueKey;
+    setTempValue(defaultValue ?? []);
+  }, [defaultValue, defaultValueKey]);
 
   const CustomMenu = useCallback((menuProps: MenuProps<SelectOption, true>) => {
     const [t] = useTranslation();
@@ -220,6 +233,7 @@ export function SelectWithApplyButton(props: any) {
               className={classNames('w-1/2 rounded-md text-sm font-medium', {
                 border: reactSettings?.dark_mode,
               })}
+              type="button"
               onClick={handleReset}
               theme={{
                 textColor: colors.$3,
@@ -231,6 +245,7 @@ export function SelectWithApplyButton(props: any) {
 
             <Button
               className="w-1/2 rounded-md font-medium"
+              behavior="button"
               onClick={handleApply}
             >
               {t('apply')}

@@ -16,33 +16,53 @@ php artisan db:seed --class=RandomDataSeeder
 ```
 
 ## Running
-- Build React app (Playwright uses production build):
+
+Playwright uses the production Vite build from `.env.testing`.
+
+Serial run:
 
 ```bash
-npm run build
+npm run test:e2e
 ```
 
-Running tests:
+Equivalent direct command:
 
-```
+```bash
 npx playwright test --workers=1
 ```
 
-> Don't forget `--workers=1` to prevent race conditions and tests possibly randomly failing.
+> Keep `--workers=1` for direct Playwright runs. The tests share seeded backend state, permission users, and company settings, so in-process workers can race each other.
 
-This will run tests using Chromium & Firefox.
+For local development, run Chromium only:
 
-For local development testing, you'll most likely want to test only in Chrome:
-
-```
+```bash
 npx playwright test --project=chromium --workers=1
 ```
 
-To run tests in headed mode:
+For headed debugging:
 
-```
+```bash
 npx playwright test --project=chromium --workers=1 --headed
 ```
+
+### Isolated Parallel Run
+
+The isolated parallel runner executes multiple spec files at the same time while keeping each spec process on one Playwright worker:
+
+```bash
+npm run test:e2e:parallel
+```
+
+Useful variants:
+
+```bash
+npm run test:e2e:parallel -- --concurrency=4
+npm run test:e2e:parallel -- tests/e2e/clients.spec.ts
+npm run test:e2e:parallel -- --project=firefox --concurrency=2
+npm run test:e2e:parallel -- tests/e2e/clients.spec.ts -- --headed
+```
+
+The runner builds with `vite build --mode testing --outDir dist-testing`, starts or reuses Vite preview on port `4173`, and prefixes output per isolated spec lane. Set `PLAYWRIGHT_VITE_OUT_DIR` to override the test build directory. Because `package.json` now exposes this runner, `scripts/playwright-spec-orchestrator.mjs` should be committed with the test changes.
 
 ## Test Idempotency
 
@@ -52,18 +72,38 @@ produce consistent results regardless of prior test runs or failures.
 ### How it works
 
 1. **Global setup** (`tests/e2e/global-setup.ts`) runs before the suite and
-   resets the API to a clean state: purges entities, restores deleted seed users,
-   resets permissions, and resets company settings.
+   calls `resetTestAccount` for each account lane: purges entities, restores
+   deleted seed users, clears permission users via API (`permissions: ''`), and
+   resets company settings.
 
-2. **Per-test cleanup** via fixtures (`tests/e2e/fixtures.ts`). Tests use the
+2. **Per-spec reset** — every spec calls `resetAccountBeforeAll()` from
+   `tests/e2e/fixtures.ts`. That registers a `beforeAll` which runs the same
+   `resetTestAccount` again for the worker’s lane before the file’s tests.
+   This is intentional isolation (and duplicates global setup); keep it until a
+   later remediation removes one of the layers.
+
+3. **Per-test cleanup** via fixtures (`tests/e2e/fixtures.ts`). Tests use the
    `api` fixture to track entities they create; tracked entities are
    automatically deleted (archive + delete) on teardown, even if the test fails.
 
-3. **Unique names** — every entity created by a test uses `uniqueName('prefix')`
+4. **Unique names** — every entity created by a test uses `uniqueName('prefix')`
    to generate a timestamped name, avoiding collisions across runs.
 
-4. **Settings guard** — tests that modify company settings call
+5. **Settings guard** — tests that modify company settings call
    `settingsGuard.snapshot()` before changes. Settings are restored on teardown.
+
+### Permission users
+
+After account reset, the seeded permission users (e.g. `clients@example.com`,
+`permissions@example.com`) start with empty permissions. For a “no permission”
+assertion you can log in as that user directly. If a prior test in the same file
+assigned permissions, reset them with `api.setPermissions(email, [])` first.
+
+Tests assign permissions through `api.setPermissions(email, permissions)`.
+The helper replaces the complete permission state and maps `admin` to the
+company-user administrator flag. Do not leave permissions dirty for later tests
+in the same file: call `api.setPermissions` again when the next test needs a
+different permission state (there is no permission teardown).
 
 ### Writing idempotent tests
 

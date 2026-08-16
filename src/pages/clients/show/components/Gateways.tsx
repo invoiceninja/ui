@@ -8,31 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Client } from '$app/common/interfaces/client';
+import classNames from 'classnames';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdChevronRight, MdDelete, MdLaunch, MdPayment } from 'react-icons/md';
-import { route } from '$app/common/helpers/route';
-import { GatewayLogoName, GatewayTypeIcon } from './GatewayTypeIcon';
-import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
-import { useEffect, useMemo, useState } from 'react';
-import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { Button, Link } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
-import { useColorScheme } from '$app/common/colors';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { toast } from '$app/common/helpers/toast/toast';
-import classNames from 'classnames';
-import { $refetch } from '$app/common/hooks/useRefetch';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Client } from '$app/common/interfaces/client';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { ChevronDown } from '$app/components/icons/ChevronDown';
+import { Button, Link } from '$app/components/forms';
 import { InfoCard } from '$app/components/InfoCard';
+import { ChevronDown } from '$app/components/icons/ChevronDown';
+import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
-import { useGetSetting } from '$app/common/hooks/useGetSetting';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { GatewayLogoName, GatewayTypeIcon } from './GatewayTypeIcon';
 
 interface Props {
   client: Client;

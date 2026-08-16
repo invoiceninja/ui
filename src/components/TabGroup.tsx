@@ -16,8 +16,8 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { useColorScheme } from '$app/common/colors';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   children: ReactElement[];
@@ -98,12 +98,14 @@ export function TabGroup(props: Props) {
             >
               <StyledButton
                 className={classNames(
-                  'whitespace-nowrap font-medium text-sm py-3 px-4',
+                  'whitespace-nowrap font-medium text-sm py-3 px-4 focus:outline-none',
                   {
                     'w-full': props.width === 'full',
                   }
                 )}
                 type="button"
+                tabIndex={-1}
+                onMouseDown={(event) => event.preventDefault()}
                 onClick={() => handleTabChange(index)}
                 theme={{
                   textColor: currentIndex === index ? colors.$3 : colors.$17,

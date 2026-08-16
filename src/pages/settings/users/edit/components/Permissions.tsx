@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { Checkbox } from '$app/components/forms';
-import { User } from '$app/common/interfaces/user';
-import Toggle from '$app/components/forms/Toggle';
 import { clone } from 'lodash';
 import { useTranslation } from 'react-i18next';
-import { Permissions as PermissionsType } from '$app/common/hooks/permissions/useHasPermission';
 import { useColorScheme } from '$app/common/colors';
+import { Permissions as PermissionsType } from '$app/common/hooks/permissions/useHasPermission';
+import { User } from '$app/common/interfaces/user';
+import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
+import { Checkbox } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
 
 interface Props {
   user: User;

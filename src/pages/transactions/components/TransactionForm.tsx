@@ -24,6 +24,8 @@ import { EntityStatus } from './EntityStatus';
 import { CurrencySelector } from '$app/components/CurrencySelector';
 import { useColorScheme } from '$app/common/colors';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
 interface Props {
   transaction: Transaction;
@@ -130,6 +132,15 @@ export function TransactionForm(props: Props) {
           value={props.transaction.description}
           onValueChange={(value) => props.handleChange('description', value)}
           errorMessage={props.errors?.errors.description}
+        />
+      </Element>
+
+      <Element leftSide={t('tags')}>
+        <TagPillSelector
+          entityType={TAG_ENTITY_TYPES.bankTransaction}
+          value={props.transaction.tags || []}
+          onChange={(tags) => props.handleChange('tags', tags)}
+          errorMessage={props.errors?.errors.tags}
         />
       </Element>
 

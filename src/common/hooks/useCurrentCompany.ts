@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { createSelector } from '@reduxjs/toolkit';
+import { isEqual } from 'lodash';
+import { shallowEqual, useSelector } from 'react-redux';
 import { Company } from '$app/common/interfaces/company.interface';
 import { RootState } from '$app/common/stores/store';
-import { useSelector, shallowEqual } from 'react-redux';
 import { useCompanyChanges } from './useCompanyChanges';
-import { isEqual } from 'lodash';
-import { createSelector } from '@reduxjs/toolkit';
 
 // Memoized selector using createSelector from Redux Toolkit
 // This prevents re-renders when the company object hasn't actually changed
@@ -28,10 +28,7 @@ const selectCurrentCompany = createSelector(
 export function useCurrentCompany(): Company {
   // Use the memoized selector with shallowEqual to prevent unnecessary re-renders
   // Only re-renders when the company object actually changes
-  return useSelector(
-    selectCurrentCompany,
-    shallowEqual
-  );
+  return useSelector(selectCurrentCompany, shallowEqual);
 }
 
 export function useShouldUpdateCompany() {

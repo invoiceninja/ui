@@ -8,34 +8,34 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { cloneDeep, flatMapDeep, get, isObject, keys, set } from 'lodash';
+import RandExp from 'randexp';
 import React, {
   Dispatch,
+  forwardRef,
   ReactNode,
   SetStateAction,
-  forwardRef,
   useEffect,
   useImperativeHandle,
   useState,
 } from 'react';
-import { InputField, SelectField } from '../forms';
 import { useTranslation } from 'react-i18next';
-import { Element } from '../cards';
-import { Icon } from '../icons/Icon';
 import { MdAdd, MdDelete } from 'react-icons/md';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import RandExp from 'randexp';
-import { cloneDeep, flatMapDeep, get, isObject, keys, set } from 'lodash';
+import { useLocation } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { EInvoiceComponent, EInvoiceType } from '$app/pages/settings';
-import { Spinner } from '../Spinner';
+import { Element } from '../cards';
+import { InputField, SelectField } from '../forms';
+import { NumberInputField } from '../forms/NumberInputField';
 import Toggle from '../forms/Toggle';
+import { Icon } from '../icons/Icon';
+import { Spinner } from '../Spinner';
 import { EInvoiceBreadcrumbs } from './EInvoiceBreadcrumbs';
 import { EInvoiceFieldCheckbox } from './EInvoiceFieldCheckbox';
 import { EInvoiceValidationAlert } from './EInvoiceValidationAlert';
-import { useLocation } from 'react-router-dom';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { useColorScheme } from '$app/common/colors';
-import { NumberInputField } from '../forms/NumberInputField';
 
 export type Country = 'italy';
 
@@ -411,8 +411,8 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
           element.base_type === 'boolean'
             ? false
             : element.base_type === 'decimal' || element.base_type === 'number'
-            ? 0
-            : '';
+              ? 0
+              : '';
 
         if (
           ((currentFieldValue as string | number) ||
@@ -866,9 +866,9 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
                                 'number'
                                   ? 0
                                   : typeof currentPayload[choiceFieldKey] ===
-                                    'boolean'
-                                  ? false
-                                  : '',
+                                      'boolean'
+                                    ? false
+                                    : '',
                             }));
                           }
                         }
@@ -1600,17 +1600,13 @@ export const EInvoiceGenerator = forwardRef<EInvoiceComponent, Props>(
       }
     }, [currentEInvoice, allAvailableGroups]);
 
-    useImperativeHandle(
-      ref,
-      () => {
-        return {
-          saveEInvoice() {
-            return handleSave();
-          },
-        };
-      },
-      [payload]
-    );
+    useImperativeHandle(ref, () => {
+      return {
+        saveEInvoice() {
+          return handleSave();
+        },
+      };
+    }, [payload]);
 
     return (
       <div className="flex flex-col mt-5">

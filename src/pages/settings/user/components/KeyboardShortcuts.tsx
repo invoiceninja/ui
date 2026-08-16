@@ -8,13 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
-import {
-  KeyboardShortcutOverride,
-  useDraftOrCommittedReactSettings,
-  useUpdateDraftOrReactSettings,
-} from '$app/common/hooks/useReactSettings';
 import {
   keyboardShortcutGroups,
   keyboardShortcuts,
@@ -24,10 +20,14 @@ import {
   formatBinding,
   formatRecorderPreview,
 } from '$app/common/helpers/keyboard-shortcuts';
+import {
+  KeyboardShortcutOverride,
+  useDraftOrCommittedReactSettings,
+  useUpdateDraftOrReactSettings,
+} from '$app/common/hooks/useReactSettings';
 import { useShortcutRecorder } from '$app/common/hooks/useShortcutRecorder';
-import { useMemo, useState } from 'react';
-import { CircleXMark } from '$app/components/icons/CircleXMark';
 import { InputField } from '$app/components/forms';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 type Overrides = Record<string, KeyboardShortcutOverride | null>;
 
@@ -286,8 +286,8 @@ function ShortcutDetail({
           borderColor: recorder.isRecording
             ? colors.$8
             : hasConflict
-            ? '#ef4444'
-            : colors.$5,
+              ? '#ef4444'
+              : colors.$5,
           backgroundColor: colors.$1,
         }}
         title={hasConflict ? (t('shortcut_conflict') as string) : undefined}

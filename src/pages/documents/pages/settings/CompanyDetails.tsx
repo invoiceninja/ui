@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { classNames } from '$app/common/helpers';
 import { Page } from '$app/components/Breadcrumbs';
 import { SelectField } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
-import { useTranslation } from 'react-i18next';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { styled } from 'styled-components';
 import { useSettingsTabs } from './common/hooks/useSettingsTabs';
 
 const LinkStyled = styled(Link)`
@@ -47,7 +47,6 @@ function CompanyDetails() {
 
   return (
     <Default title={t('settings')} breadcrumbs={pages}>
-
       <div className="grid grid-cols-12 lg:gap-6">
         <div className="col-span-12 lg:col-span-3">
           <a className="flex items-center mb-3 mt-4 px-0 lg:px-3 text-sm font-medium">
@@ -84,7 +83,9 @@ function CompanyDetails() {
                     )}
                     aria-current={item.current ? 'page' : undefined}
                     theme={{
-                      backgroundColor: item.current ? colors.$20 : 'transparent',
+                      backgroundColor: item.current
+                        ? colors.$20
+                        : 'transparent',
                       color: item.current ? colors.$3 : colors.$3,
                       hoverColor: colors.$20,
                     }}

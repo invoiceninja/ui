@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isDemo } from '$app/common/helpers';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { atom, useAtom } from 'jotai';
 import { ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
+import { isDemo } from '$app/common/helpers';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export interface SettingsRoute {
   name: string;
@@ -150,7 +150,7 @@ export function useSettingsRoutes() {
       name: t('e_invoicing'),
       href: '/settings/e_invoice',
       current: location.pathname.startsWith('/settings/e_invoice'),
-      enabled: isAdmin || isOwner || false,
+      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
     },
     {
       name: t('email_settings'),

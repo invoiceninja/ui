@@ -8,6 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
+import classNames from 'classnames';
+import { ChangeEvent, ReactNode, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useClickAway } from 'react-use';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -17,6 +22,7 @@ import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Tag, TagEntityType } from '$app/common/interfaces/tag';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTagsQuery } from '$app/common/queries/tags';
 import { ErrorMessage } from '$app/components/ErrorMessage';
 import { InputLabel } from '$app/components/forms';
@@ -27,12 +33,6 @@ import {
   tagPillBackgroundColor,
   tagPillColor,
 } from '$app/components/tags/TagPills';
-import { AxiosError } from 'axios';
-import classNames from 'classnames';
-import { ChangeEvent, ReactNode, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useClickAway } from 'react-use';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   entityType: TagEntityType;
@@ -182,6 +182,7 @@ export function TagPillSelector(props: Props) {
 
           {!props.readonly && (
             <input
+              data-cy="tagSelectorInput"
               className="min-w-[8rem] flex-1 border-0 bg-transparent p-0 text-sm focus:outline-none focus:ring-0"
               style={{ color: colors.$3 }}
               value={query}
@@ -200,6 +201,7 @@ export function TagPillSelector(props: Props) {
             {availableTags.map((tag) => (
               <button
                 key={tag.id}
+                data-cy="tagOption"
                 type="button"
                 className="flex w-full items-center gap-2 rounded-[0.1875rem] px-3 py-2 text-left text-sm"
                 style={{ color: colors.$3 }}
@@ -216,6 +218,7 @@ export function TagPillSelector(props: Props) {
 
             {canCreateTag && (
               <button
+                data-cy="createTagOption"
                 type="button"
                 className="flex w-full items-center gap-2 rounded-[0.1875rem] px-3 py-2 text-left text-sm font-medium"
                 style={{ color: colors.$3 }}

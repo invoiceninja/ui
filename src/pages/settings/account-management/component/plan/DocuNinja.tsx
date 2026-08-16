@@ -1,17 +1,17 @@
-import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-import { Card } from '$app/components/cards';
-import { useTranslation } from 'react-i18next';
-import { Plan } from './Plan';
-import { UpgradeModal } from '$app/pages/documents/common/components/UpgradeModal';
-import { Button } from '$app/components/forms';
+import { useAtom } from 'jotai';
 import { useState } from 'react';
 import { Check } from 'react-feather';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { useColorScheme } from '$app/common/colors';
-import { useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { useColorScheme } from '$app/common/colors';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 import { Alert } from '$app/components/Alert';
+import { Card } from '$app/components/cards';
+import { Button } from '$app/components/forms';
+import { UpgradeModal } from '$app/pages/documents/common/components/UpgradeModal';
+import { Plan } from './Plan';
 
 export function DocuNinja() {
   const accentColor = useAccentColor();
@@ -23,7 +23,7 @@ export function DocuNinja() {
   const [isCreating, setIsCreating] = useState(false);
 
   const [docuData] = useAtom(docuNinjaAtom);
-  
+
   const { createAccount, flushData } = useDocuNinjaActions();
 
   function createDocuNinjaAccount() {
@@ -44,7 +44,7 @@ export function DocuNinja() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const docuAccount = docuData?.account;
-  
+
   return (
     <Card>
       <div className="px-7 py-3 space-y-4">
