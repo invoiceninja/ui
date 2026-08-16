@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { AppleSignin } from '$app/components/AppleSignin';
+import { QRCode } from '$app/components/QRCode';
 import { VerificationInput } from '$app/components/VerificationInput';
 
 function VerificationInputFixture() {
@@ -21,6 +23,26 @@ function VerificationInputFixture() {
 
   return (
     <main>
+      <section aria-label="CommonJS component adapters">
+        <QRCode
+          aria-label="Two-factor QR code"
+          size={156}
+          value="otpauth://totp/InvoiceNinja:test"
+        />
+
+        <AppleSignin
+          authOptions={{
+            clientId: 'com.invoiceninja.client',
+            redirectURI: 'https://invoicing.co/auth/apple',
+            scope: 'email name',
+          }}
+          onError={() => undefined}
+          onSuccess={() => undefined}
+          skipScript
+          uiType="dark"
+        />
+      </section>
+
       <button type="button" onClick={sendCode}>
         Send Code
       </button>
