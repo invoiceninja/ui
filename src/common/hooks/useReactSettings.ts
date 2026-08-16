@@ -35,13 +35,6 @@ import { endpoint } from '../helpers';
 import { request } from '../helpers/request';
 import type { User } from '../interfaces/user';
 import { useCurrentUser } from './useCurrentUser';
-import {
-  KeyboardShortcutOverride,
-  resolveShortcutBindings,
-} from '../constants/keyboard-shortcuts';
-
-export type { KeyboardShortcutOverride };
-export { resolveShortcutBindings };
 
 export type { KeyboardShortcutOverride };
 export { resolveShortcutBindings };
