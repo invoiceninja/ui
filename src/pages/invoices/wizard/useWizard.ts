@@ -37,7 +37,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 export type StepKey = 'who' | 'what' | 'when' | 'notes' | 'send';
 
 export const STEPS: { key: StepKey; title: string; href: string }[] = [
-  { key: 'who', title: 'who_are_you_invoicing', href: '/invoices/wizard' },
+  { key: 'who', title: 'client_details', href: '/invoices/wizard' },
   {
     key: 'what',
     title: 'what_are_you_charging_for',
@@ -45,12 +45,12 @@ export const STEPS: { key: StepKey; title: string; href: string }[] = [
   },
   {
     key: 'when',
-    title: 'when_should_they_pay',
+    title: 'payment_terms',
     href: '/invoices/wizard/payment',
   },
   {
     key: 'notes',
-    title: 'anything_else_to_add',
+    title: 'additional_notes',
     href: '/invoices/wizard/notes',
   },
   { key: 'send', title: 'review_and_send', href: '/invoices/wizard/send' },

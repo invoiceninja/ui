@@ -183,7 +183,7 @@ export function StepRecipient({ wizard }: Props) {
     }
 
     if (!name.trim()) {
-      setErrors({ name: t('enter_invoice_recipient') });
+      setErrors({ name: t('field_is_required') });
       return;
     }
 
@@ -254,7 +254,7 @@ export function StepRecipient({ wizard }: Props) {
             </p>
 
             <p className="text-xs mt-0.5" style={{ color: colors.$17 }}>
-              {selected.contacts?.[0]?.email || t('no_email_address')}
+              {selected.contacts?.[0]?.email || t('client_email_not_set')}
             </p>
           </div>
 
@@ -312,7 +312,7 @@ export function StepRecipient({ wizard }: Props) {
           }}
         >
           <InputLabel className="mb-1" for="iw-customer-name">
-            {t('customer_or_company_name')}
+            {t('client_name')}
             <span className="ml-1 text-red-600">*</span>
           </InputLabel>
 
@@ -395,7 +395,7 @@ export function StepRecipient({ wizard }: Props) {
                 className="w-full text-left px-3.5 py-2.5 border-t text-xs"
                 style={{ borderColor: colors.$20, color: colors.$17 }}
               >
-                {trans('add_value_as_new_customer', { value: name.trim() })}
+                {trans('add_value_as_new_client', { value: name.trim() })}
               </button>
             </div>
           ) : null}
@@ -450,7 +450,7 @@ export function StepRecipient({ wizard }: Props) {
             className="text-sm"
             style={{ color: accentColor, fontWeight: 500 }}
           >
-            {t('add_an_address')}
+            {t('billing_address')}
           </button>
         )}
       </div>

@@ -138,10 +138,10 @@ export function StepTiming({ wizard, embedded }: Props) {
             onSelect={() => choose(option.key)}
             title={
               option.days === null
-                ? t('choose_a_date')
+                ? t('custom')
                 : option.days === 0
                   ? t('due_on_receipt')
-                  : trans('in_count_days', { count: option.days })
+                  : trans('count_days', { count: option.days })
             }
             trailing={
               option.days !== null && option.days > 0
@@ -196,7 +196,7 @@ export function StepTiming({ wizard, embedded }: Props) {
           </div>
         ) : (
           <p className="text-sm" style={{ color: colors.$17 }}>
-            {trans('invoice_dated_value', {
+            {trans('invoice_date', {
               value: dayjs(invoiceDate).format('D MMMM YYYY'),
             })}{' '}
             <button

@@ -277,7 +277,7 @@ export function StepItems({ wizard, embedded }: Props) {
 
       <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
         <Button type="secondary" behavior="button" onClick={() => addRow()}>
-          {t('add_another_item')}
+          {t('add_item')}
         </Button>
 
         <button
@@ -286,7 +286,7 @@ export function StepItems({ wizard, embedded }: Props) {
           className="text-sm"
           style={{ color: accentColor, fontWeight: 500 }}
         >
-          {t('choose_a_saved_item')}
+          {t('product_list', { defaultValue: 'Product List' })}
         </button>
 
         <button
@@ -295,7 +295,7 @@ export function StepItems({ wizard, embedded }: Props) {
           className="text-sm"
           style={{ color: accentColor, fontWeight: 500 }}
         >
-          {t('add_from_existing_work')}
+          {t('add_from_existing_work', { defaultValue: 'Add From Tasks' })}
         </button>
       </div>
 
@@ -381,7 +381,7 @@ export function StepItems({ wizard, embedded }: Props) {
             className="text-sm cursor-pointer"
             style={{ color: colors.$3 }}
           >
-            {t('prices_include_tax_on_this_invoice')}
+            {t('uses_inclusive_taxes', { defaultValue: 'Prices include tax on this invoice' })}
           </label>
         </div>
       ) : null}
@@ -690,7 +690,7 @@ function TaxChip({
                   }}
                   muted
                 >
-                  {t('add_a_different_tax')}
+                  {t('create_tax_rate')}
                 </Option>
               </div>
             </div>,
