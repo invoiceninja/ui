@@ -35,6 +35,10 @@ export function useActions() {
   const [t] = useTranslation();
 
   const bulk = useBulk();
+
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+  
   const handleImportCustomers = (companyGatewayId: string) => {
     toast.processing();
 
@@ -56,13 +60,14 @@ export function useActions() {
       toast.success(response.data.message);
       $refetch(['company_gateways']);
 
-      const queryClient = useQueryClient();
-      const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
-      invalidateQueryValue &&
+
+      if (invalidateQueryValue) {
         queryClient.invalidateQueries({
           queryKey: [invalidateQueryValue],
         });
-    });
+      }
+      
+      });
   };
 
   const actions: Action<CompanyGateway>[] = [

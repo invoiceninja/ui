@@ -1,16 +1,13 @@
-import { login } from '$tests/e2e/helpers';
+import { Page } from '@playwright/test';
+import { bulkAction, type EntityType } from '$tests/e2e/api-helpers';
 import {
-  bulkAction,
-  type EntityType,
-} from '$tests/e2e/api-helpers';
-import {
+  expect,
   extractIdFromUrl,
   resetAccountBeforeAll,
   test,
-  expect,
   uniqueName,
 } from '$tests/e2e/fixtures';
-import { Page } from '@playwright/test';
+import { login } from '$tests/e2e/helpers';
 
 resetAccountBeforeAll();
 
@@ -34,8 +31,18 @@ test.afterEach(async ({ api }) => {
   if (!createdGatewayIds.length) return;
 
   try {
-    await bulkAction(api.context, COMPANY_GATEWAYS, createdGatewayIds, 'archive');
-    await bulkAction(api.context, COMPANY_GATEWAYS, createdGatewayIds, 'delete');
+    await bulkAction(
+      api.context,
+      COMPANY_GATEWAYS,
+      createdGatewayIds,
+      'archive'
+    );
+    await bulkAction(
+      api.context,
+      COMPANY_GATEWAYS,
+      createdGatewayIds,
+      'delete'
+    );
   } catch {
     // Best-effort cleanup.
   }
@@ -98,7 +105,9 @@ const trackGatewayFromUrl = (url: string) => {
 const createCustomGateway = async (page: Page) => {
   const label = uniqueName('custom-gateway');
 
-  await page.getByRole('link', { name: ADD_GATEWAY_LABEL, exact: true }).click();
+  await page
+    .getByRole('link', { name: ADD_GATEWAY_LABEL, exact: true })
+    .click();
   await page.waitForURL('**/settings/gateways/create');
   await page.waitForLoadState('networkidle');
 
@@ -133,7 +142,9 @@ const createCustomGateway = async (page: Page) => {
 
   await navigateToOnlinePayments(page);
 
-  await expect(page.getByRole('link', { name: label, exact: true })).toBeVisible({
+  await expect(
+    page.getByRole('link', { name: label, exact: true })
+  ).toBeVisible({
     timeout: 10000,
   });
 
@@ -191,8 +202,15 @@ const statusFilterMenu = (page: Page) =>
     has: page.getByRole('option', { name: 'Active', exact: true }),
   });
 
-const applyStatusFilter = async (page: Page, status: 'Active' | 'Archived') => {
-  const response = waitForCompanyGateways(page, status.toLowerCase());
+const applyStatusFilter = async (
+  page: Page,
+  status: 'Active' | 'Archived',
+  config: { waitForNetwork?: boolean } = {}
+) => {
+  const { waitForNetwork = true } = config;
+  const response = waitForNetwork
+    ? waitForCompanyGateways(page, status.toLowerCase())
+    : undefined;
 
   await openStatusFilterMenu(page);
 
@@ -227,7 +245,11 @@ const applyStatusFilter = async (page: Page, status: 'Active' | 'Archived') => {
   await response;
 };
 
-test('gateways status filter renders without throwing', async ({ page }) => {
+test('gateways status filter applies across rerenders without throwing', async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+
   const pageErrors: string[] = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
 
@@ -238,11 +260,73 @@ test('gateways status filter renders without throwing', async ({ page }) => {
     page.getByRole('link', { name: ADD_GATEWAY_LABEL, exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await expect(gatewaysToolbar(page).getByText('Status:', { exact: true })).toBeVisible();
+  await expect(
+    gatewaysToolbar(page).getByText('Status:', { exact: true })
+  ).toBeVisible();
   await expect(
     gatewaysToolbar(page).getByText('Active', { exact: true }).first()
   ).toBeVisible();
 
+  await applyStatusFilter(page, 'Archived');
+
+  await expect(
+    gatewaysToolbar(page).getByText('Archived', { exact: true }).first()
+  ).toBeVisible();
+
+  await applyStatusFilter(page, 'Active', { waitForNetwork: false });
+
+  await expect(
+    gatewaysToolbar(page).getByText('Active', { exact: true }).first()
+  ).toBeVisible();
+
+  expect(pageErrors).toEqual([]);
+});
+
+test('cloning a gateway completes without calling hooks from the callback', async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+
+  const pageErrors: string[] = [];
+  let cloneRequests = 0;
+
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+
+  await page.route('**/api/v1/company_gateways/*/clone', async (route) => {
+    if (route.request().method() !== 'POST') {
+      await route.fallback();
+      return;
+    }
+
+    cloneRequests++;
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'Gateway cloned for Playwright' }),
+    });
+  });
+
+  await login(page);
+  const label = await ensureCustomGateway(page);
+
+  await page.getByRole('link', { name: label, exact: true }).click();
+  await page.waitForURL('**/settings/gateways/**/edit**');
+
+  const topNavbar = page.locator('[data-cy="topNavbar"]');
+
+  await expect(
+    topNavbar.getByRole('button', { name: 'Save', exact: true })
+  ).toBeVisible({ timeout: 10000 });
+
+  await topNavbar.locator('[data-cy="chevronDownButton"]').click();
+  await page.getByRole('button', { name: 'Clone', exact: true }).click();
+
+  await expect(
+    page.getByText('Gateway cloned for Playwright', { exact: true })
+  ).toBeVisible({ timeout: 10000 });
+
+  expect(cloneRequests).toBe(1);
   expect(pageErrors).toEqual([]);
 });
 
@@ -284,13 +368,17 @@ test('gateways can archive and restore via bulk actions', async ({ page }) => {
     page.getByText('Successfully archived gateway', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await expect(page.getByRole('link', { name: label, exact: true })).not.toBeVisible({
+  await expect(
+    page.getByRole('link', { name: label, exact: true })
+  ).not.toBeVisible({
     timeout: 10000,
   });
 
   await applyStatusFilter(page, 'Archived');
 
-  await expect(page.getByRole('link', { name: label, exact: true })).toBeVisible({
+  await expect(
+    page.getByRole('link', { name: label, exact: true })
+  ).toBeVisible({
     timeout: 10000,
   });
 
@@ -304,7 +392,9 @@ test('gateways can archive and restore via bulk actions', async ({ page }) => {
 
   await applyStatusFilter(page, 'Active');
 
-  await expect(page.getByRole('link', { name: label, exact: true })).toBeVisible({
+  await expect(
+    page.getByRole('link', { name: label, exact: true })
+  ).toBeVisible({
     timeout: 10000,
   });
 });
