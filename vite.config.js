@@ -20,6 +20,14 @@ export default defineConfig(({ command, mode }) => {
       chunkSizeWarningLimit: 1500,
       sourcemap: sentry.sourcemap,
       rolldownOptions: {
+        input:
+          mode === 'testing'
+            ? {
+                app: 'index.html',
+                verificationInput:
+                  'tests/e2e/fixtures/verification-input/index.html',
+              }
+            : undefined,
         output: {
           manualChunks(id) {
             if (id.includes('node_modules')) {
