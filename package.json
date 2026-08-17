@@ -1,6 +1,6 @@
 {
   "name": "@invoiceninja/ui",
-  "version": "17.08.2026.1",
+  "version": "17.08.2026.2",
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^3.28.1",
