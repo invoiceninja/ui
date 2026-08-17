@@ -13,7 +13,6 @@ import { GoogleLogin } from '@react-oauth/google';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
 import { ReactNode, useEffect, useRef, useState } from 'react';
-import AppleSignin from 'react-apple-signin-auth';
 import { useDispatch } from 'react-redux';
 import { v4 } from 'uuid';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
@@ -27,6 +26,7 @@ import {
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
 import { authenticate } from '$app/common/stores/slices/user';
+import { AppleSignin } from '$app/components/AppleSignin';
 
 interface SignInProviderButtonProps {
   disabled?: boolean;

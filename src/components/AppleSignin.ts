@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import VerificationInputImport from 'react-verification-input';
+import AppleSigninImport from 'react-apple-signin-auth';
 import { unwrapDefault } from '$app/common/helpers/unwrap-default';
 
-export const VerificationInput = unwrapDefault(VerificationInputImport);
+export const AppleSignin = unwrapDefault(AppleSigninImport);

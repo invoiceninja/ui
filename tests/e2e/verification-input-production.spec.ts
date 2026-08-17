@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('production bundle renders the verification input after a successful request', async ({
+test('production bundle renders all CommonJS component adapters', async ({
   page,
 }) => {
   const pageErrors: string[] = [];
@@ -21,6 +21,12 @@ test('production bundle renders the verification input after a successful reques
   });
 
   await page.goto('/tests/e2e/fixtures/verification-input/index.html');
+
+  await expect(page.getByLabel('Two-factor QR code')).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Signin with apple ID' })
+  ).toBeVisible();
+
   await page.getByRole('button', { name: 'Send Code', exact: true }).click();
 
   await expect(page.getByRole('region', { name: 'SMS Code' })).toBeVisible();

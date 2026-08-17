@@ -8,7 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import VerificationInputImport from 'react-verification-input';
-import { unwrapDefault } from '$app/common/helpers/unwrap-default';
+type MaybeDefault<T> = T | { default: T };
 
-export const VerificationInput = unwrapDefault(VerificationInputImport);
+export function unwrapDefault<T>(candidate: MaybeDefault<T>): T {
+  if (candidate && 'default' in (candidate as object)) {
+    return (candidate as { default: T }).default;
+  }
+
+  return candidate as T;
+}
