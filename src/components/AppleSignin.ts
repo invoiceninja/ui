@@ -9,17 +9,6 @@
  */
 
 import AppleSigninImport from 'react-apple-signin-auth';
+import { unwrapDefault } from '$app/common/helpers/unwrap-default';
 
-type AppleSigninComponent = typeof AppleSigninImport;
-
-const imported = AppleSigninImport as unknown as
-  | AppleSigninComponent
-  | { default: AppleSigninComponent };
-
-export function resolveAppleSignin(
-  candidate: AppleSigninComponent | { default: AppleSigninComponent }
-): AppleSigninComponent {
-  return 'default' in candidate ? candidate.default : candidate;
-}
-
-export const AppleSignin = resolveAppleSignin(imported);
+export const AppleSignin = unwrapDefault(AppleSigninImport);

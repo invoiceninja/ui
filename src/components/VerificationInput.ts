@@ -9,19 +9,6 @@
  */
 
 import VerificationInputImport from 'react-verification-input';
+import { unwrapDefault } from '$app/common/helpers/unwrap-default';
 
-type VerificationInputComponent = typeof VerificationInputImport;
-
-const imported = VerificationInputImport as unknown as
-  | VerificationInputComponent
-  | { default: VerificationInputComponent };
-
-export function resolveVerificationInput(
-  candidate:
-    | VerificationInputComponent
-    | { default: VerificationInputComponent }
-): VerificationInputComponent {
-  return 'default' in candidate ? candidate.default : candidate;
-}
-
-export const VerificationInput = resolveVerificationInput(imported);
+export const VerificationInput = unwrapDefault(VerificationInputImport);

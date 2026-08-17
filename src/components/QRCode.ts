@@ -9,17 +9,6 @@
  */
 
 import QRCodeImport from 'react-qr-code';
+import { unwrapDefault } from '$app/common/helpers/unwrap-default';
 
-type QRCodeComponent = typeof QRCodeImport;
-
-const imported = QRCodeImport as unknown as
-  | QRCodeComponent
-  | { default: QRCodeComponent };
-
-export function resolveQRCode(
-  candidate: QRCodeComponent | { default: QRCodeComponent }
-): QRCodeComponent {
-  return 'default' in candidate ? candidate.default : candidate;
-}
-
-export const QRCode = resolveQRCode(imported);
+export const QRCode = unwrapDefault(QRCodeImport);
