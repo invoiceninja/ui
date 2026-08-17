@@ -59,6 +59,8 @@ export function useDownloadPdf(props: Props) {
             document.body.removeChild(link);
 
             toast.dismiss();
+
+            return response;
           }),
       });
     }

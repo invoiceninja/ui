@@ -40,7 +40,10 @@ export function Edit() {
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('schedules'), href: '/settings/schedules' },
-    { name: t('edit_schedule'), href: route('/settings/schedules/:id/edit') },
+    {
+      name: t('edit_schedule'),
+      href: route('/settings/schedules/:id/edit', { id }),
+    },
   ];
 
   const { data: scheduleResponse } = useScheduleQuery({ id });

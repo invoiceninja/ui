@@ -140,6 +140,8 @@ function Builder() {
 
   const [entity, setEntity] = useState<Document | null>(null);
 
+  const isNinjaDocument = entity?.metadata?.is_ninja === true;
+
   useBuilderStore((state) => state.rectangles);
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
   const [isDocumentSending, setIsDocumentSending] = useState<boolean>(false);
@@ -640,6 +642,9 @@ function Builder() {
             options: {
               header: {
                 sticky: false,
+              },
+              leftSidebar: {
+                visible: !isNinjaDocument,
               },
               widgets: {
                 showLabel: getDocuNinjaCompany()?.settings?.widget_show_label,

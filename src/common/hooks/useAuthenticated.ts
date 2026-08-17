@@ -40,16 +40,16 @@ export function useAuthenticated(): boolean {
     return true;
   }
 
-  queryClient.fetchQuery({
-    queryKey: ['/api/v1/refresh'],
-    queryFn: () =>
-      request(
-        'POST',
-        endpoint('/api/v1/refresh?updated_at=:updatedAt', {
-          updatedAt: dayjs().unix(),
-        })
-      )
-        .then((response) => {
+  queryClient
+    .fetchQuery({
+      queryKey: ['/api/v1/refresh'],
+      queryFn: () =>
+        request(
+          'POST',
+          endpoint('/api/v1/refresh?updated_at=:updatedAt', {
+            updatedAt: dayjs().unix(),
+          })
+        ).then((response) => {
           let currentIndex = 0;
 
           if (localStorage.getItem('X-CURRENT-INDEX')) {
@@ -86,15 +86,17 @@ export function useAuthenticated(): boolean {
           queryClient.invalidateQueries({
             queryKey: ['/api/docuninja/login'],
           });
-        })
-        .catch((e) => {
-          console.error(e);
 
-          localStorage.removeItem('X-NINJA-TOKEN');
-
-          navigate('/login');
+          return response;
         }),
-  });
+    })
+    .catch((e) => {
+      console.error(e);
+
+      localStorage.removeItem('X-NINJA-TOKEN');
+
+      navigate('/login');
+    });
 
   return true;
 }

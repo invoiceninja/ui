@@ -10,9 +10,9 @@
 
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import VerificationInput from 'react-verification-input';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
+import { VerificationInput } from '$app/components/VerificationInput';
 
 interface Props {
   visible: boolean;

@@ -66,6 +66,8 @@ export function useDownloadEInvoice(props: Props) {
             document.body.removeChild(link);
 
             toast.dismiss();
+
+            return response;
           }),
       });
     }
