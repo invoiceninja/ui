@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import VerificationInputImport from 'react-verification-input';
+import QRCodeImport from 'react-qr-code';
 import { unwrapDefault } from '$app/common/helpers/unwrap-default';
 
-export const VerificationInput = unwrapDefault(VerificationInputImport);
+export const QRCode = unwrapDefault(QRCodeImport);
