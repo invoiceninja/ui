@@ -2,22 +2,11 @@ import { createElement } from 'react';
 import { act, create, type ReactTestRenderer } from 'react-test-renderer';
 import VerificationInputImport from 'react-verification-input';
 import { describe, expect, test } from 'vitest';
-import {
-  resolveVerificationInput,
-  VerificationInput,
-} from '../../../src/components/VerificationInput';
+import { VerificationInput } from '../../../src/components/VerificationInput';
 
-describe('VerificationInput compatibility adapter', () => {
-  test('preserves an already-unwrapped component', () => {
-    expect(resolveVerificationInput(VerificationInputImport)).toBe(
-      VerificationInputImport
-    );
-  });
-
-  test('unwraps the nested default produced by Rolldown', () => {
-    expect(resolveVerificationInput({ default: VerificationInputImport })).toBe(
-      VerificationInputImport
-    );
+describe('VerificationInput', () => {
+  test('resolves the actual package component', () => {
+    expect(VerificationInput).toBe(VerificationInputImport);
   });
 
   test('exports a renderable verification input', () => {

@@ -2,15 +2,11 @@ import { createElement } from 'react';
 import QRCodeImport from 'react-qr-code';
 import { act, create, type ReactTestRenderer } from 'react-test-renderer';
 import { describe, expect, test } from 'vitest';
-import { QRCode, resolveQRCode } from '../../../src/components/QRCode';
+import { QRCode } from '../../../src/components/QRCode';
 
-describe('QRCode compatibility adapter', () => {
-  test('preserves an already-unwrapped component', () => {
-    expect(resolveQRCode(QRCodeImport)).toBe(QRCodeImport);
-  });
-
-  test('unwraps the nested default produced by Rolldown', () => {
-    expect(resolveQRCode({ default: QRCodeImport })).toBe(QRCodeImport);
+describe('QRCode', () => {
+  test('resolves the actual package component', () => {
+    expect(QRCode).toBe(QRCodeImport);
   });
 
   test('exports a renderable QR code', () => {

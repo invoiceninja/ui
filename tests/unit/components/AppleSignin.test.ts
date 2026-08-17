@@ -2,20 +2,11 @@ import { createElement } from 'react';
 import AppleSigninImport from 'react-apple-signin-auth';
 import { act, create, type ReactTestRenderer } from 'react-test-renderer';
 import { describe, expect, test } from 'vitest';
-import {
-  AppleSignin,
-  resolveAppleSignin,
-} from '../../../src/components/AppleSignin';
+import { AppleSignin } from '../../../src/components/AppleSignin';
 
-describe('AppleSignin compatibility adapter', () => {
-  test('preserves an already-unwrapped component', () => {
-    expect(resolveAppleSignin(AppleSigninImport)).toBe(AppleSigninImport);
-  });
-
-  test('unwraps the nested default produced by Rolldown', () => {
-    expect(resolveAppleSignin({ default: AppleSigninImport })).toBe(
-      AppleSigninImport
-    );
+describe('AppleSignin', () => {
+  test('resolves the actual package component', () => {
+    expect(AppleSignin).toBe(AppleSigninImport);
   });
 
   test('exports a renderable Apple sign-in button', () => {
