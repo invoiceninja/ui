@@ -314,6 +314,7 @@ export function Login() {
                     <InputField
                       type="password"
                       autoComplete="current-password"
+                      autoFocus
                       id="password"
                       errorMessage={errors?.password}
                       name="password"
