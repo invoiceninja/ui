@@ -237,10 +237,7 @@ export function InfoBlockProperties({
                     fontWeight={block.properties.titleFontWeight || 'bold'}
                     fontStyle={block.properties.titleFontStyle || 'normal'}
                     onFontWeightChange={(value) =>
-                      updateProperty(
-                        'titleFontWeight',
-                        value === 'bold' ? 'bold' : undefined
-                      )
+                      updateProperty('titleFontWeight', value)
                     }
                     onFontStyleChange={(value) =>
                       updateProperty(
