@@ -259,7 +259,7 @@ function loadDayJSLocale(appLanguage: string): Promise<unknown> {
     case 'sl':
       return import('dayjs/locale/sl');
     case 'sq':
-      return import('dayjs/locale/en');
+      return import('dayjs/locale/sq');
     case 'sr-cyrl':
       return import('dayjs/locale/sr-cyrl');
     case 'sr':
