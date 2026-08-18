@@ -31,6 +31,7 @@ import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Payment } from '$app/common/interfaces/payment';
 import {
+  DownloadAvailable,
   GenericMessage,
   socketId,
   useSocketEvent,
@@ -41,6 +42,7 @@ import { Slider } from './cards/Slider';
 import { Button, Link } from './forms';
 import { CardChange } from './icons/CardChange';
 import { CardCheck } from './icons/CardCheck';
+import { Download } from './icons/Download';
 import { FileAdd } from './icons/FileAdd';
 import { FileEdit } from './icons/FileEdit';
 import { FileSearch } from './icons/FileSearch';
@@ -52,7 +54,8 @@ type NotificationType =
   | 'creditWasCreated'
   | 'creditWasUpdated'
   | 'paymentWasUpdated'
-  | 'genericMessage';
+  | 'genericMessage'
+  | 'downloadAvailable';
 
 interface DisplayLabel {
   notificationType: NotificationType;
@@ -65,6 +68,7 @@ interface DisplayLabel {
   creditNumber?: string;
   paymentId?: string;
   paymentNumber?: string;
+  url?: string;
 }
 
 export interface Notification {
@@ -205,6 +209,22 @@ export function Notifications() {
       );
     }
 
+    if (currentDisplayLabel.notificationType === 'downloadAvailable') {
+      return (
+        <div className="flex flex-wrap items-center gap-x-1">
+          <span>{currentDisplayLabel.message}</span>
+
+          <Link
+            to={currentDisplayLabel.url as string}
+            external
+            withoutExternalIcon
+          >
+            {t('download')}
+          </Link>
+        </div>
+      );
+    }
+
     return currentDisplayLabel.message;
   };
 
@@ -264,6 +284,17 @@ export function Notifications() {
       );
     }
 
+    if (notificationType === 'downloadAvailable') {
+      return (
+        <div
+          className="p-2 rounded-full"
+          style={{ backgroundColor: colors.$15 }}
+        >
+          <Download size="1.3rem" color={colors.$16} />
+        </div>
+      );
+    }
+
     return null;
   };
 
@@ -290,6 +321,7 @@ export function Notifications() {
       'App\\Events\\Credit\\CreditWasCreated',
       'App\\Events\\Credit\\CreditWasUpdated',
       'App\\Events\\Payment\\PaymentWasUpdated',
+      'App\\Events\\Socket\\DownloadAvailable',
     ],
     callback: ({ event, data }) => {
       if (event === 'App\\Events\\Invoice\\InvoiceWasPaid') {
@@ -456,6 +488,28 @@ export function Notifications() {
           notifications.some((n) => n.label === notification.label) ||
           notifications.some((n) => n.link === notification.link)
         ) {
+          return;
+        }
+
+        setNotifications((notifications) => [...notifications, notification]);
+      }
+
+      if (event === 'App\\Events\\Socket\\DownloadAvailable') {
+        const download = data as DownloadAvailable;
+
+        const notification = {
+          label: download.message,
+          displayLabel: {
+            notificationType: 'downloadAvailable' as const,
+            message: download.message,
+            url: download.url,
+          },
+          date: dayjs().unix(),
+          link: download.url,
+          readAt: null,
+        };
+
+        if (notifications.some((n) => n.link === notification.link)) {
           return;
         }
 

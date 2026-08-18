@@ -22,6 +22,7 @@ export const events = [
   'App\\Events\\Credit\\CreditWasCreated',
   'App\\Events\\Credit\\CreditWasUpdated',
   'App\\Events\\Socket\\RefreshEntity',
+  'App\\Events\\Socket\\DownloadAvailable',
   'App\\Events\\Document\\DocumentWasSigned',
   'App\\Events\\DocumentFile\\DocumentFilePreviewGenerated',
   'App\\Events\\User\\UserWasVerified',
@@ -42,6 +43,7 @@ export function usePrivateSocketEvents() {
     'App\\Events\\Credit\\CreditWasCreated': () => {},
     'App\\Events\\Credit\\CreditWasUpdated': () => {},
     'App\\Events\\Socket\\RefreshEntity': () => {},
+    'App\\Events\\Socket\\DownloadAvailable': () => {},
     'App\\Events\\Document\\DocumentWasSigned': () => {},
     'App\\Events\\DocumentFile\\DocumentFilePreviewGenerated': () => {},
     'App\\Events\\User\\UserWasVerified': () => {},
@@ -148,4 +150,9 @@ export function socketId() {
 export interface GenericMessage {
   message: string;
   link: string | null;
+}
+
+export interface DownloadAvailable {
+  message: string;
+  url: string;
 }
