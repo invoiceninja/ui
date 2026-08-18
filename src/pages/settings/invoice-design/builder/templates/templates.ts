@@ -275,7 +275,7 @@ export const templates: InvoiceTemplate[] = [
         type: 'text',
         gridPosition: { x: 8, y: 0, w: 4, h: 2 },
         properties: {
-          content: 'number',
+          content: '$number',
           fontSize: '18px',
           fontWeight: '500',
           color: '#000000',
@@ -383,25 +383,6 @@ export const templates: InvoiceTemplate[] = [
           thickness: '1px',
           color: '#E5E7EB',
           style: 'solid',
-        },
-      },
-      {
-        id: 'total-section-2',
-        type: 'total',
-        gridPosition: { x: 7, y: 21, w: 5, h: 4 },
-        properties: {
-          items: [
-            { label: '$subtotal_label', field: '$subtotal' },
-            {
-              label: '$total_label',
-              field: '$total',
-              isTotal: true,
-              labelStyle: { fontWeight: 'bold' },
-              valueStyle: { fontWeight: 'bold' },
-            },
-          ],
-          align: 'right',
-          spacing: '8px',
         },
       },
     ],
