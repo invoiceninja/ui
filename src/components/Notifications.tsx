@@ -14,7 +14,7 @@ import dayjs from 'dayjs';
 import { useAtom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { useEffect, useState } from 'react';
-import { Bell } from 'react-feather';
+import { Bell, Download } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { GoDotFill } from 'react-icons/go';
 import { useColorScheme } from '$app/common/colors';
@@ -42,7 +42,6 @@ import { Slider } from './cards/Slider';
 import { Button, Link } from './forms';
 import { CardChange } from './icons/CardChange';
 import { CardCheck } from './icons/CardCheck';
-import { Download } from './icons/Download';
 import { FileAdd } from './icons/FileAdd';
 import { FileEdit } from './icons/FileEdit';
 import { FileSearch } from './icons/FileSearch';
@@ -290,7 +289,7 @@ export function Notifications() {
           className="p-2 rounded-full"
           style={{ backgroundColor: colors.$15 }}
         >
-          <Download size="1.3rem" color={colors.$16} />
+          <Icon className="w-5 h-5" element={Download} color={colors.$16} />
         </div>
       );
     }
