@@ -295,6 +295,38 @@ export function StepReview({ wizard }: Props) {
 
   const previewable = Boolean(wizard.invoiceId) && Boolean(invoice?.client_id);
 
+  const revealPreview = () => {
+    if (!previewable || showPreview) {
+      return;
+    }
+
+    setShowPreview(true);
+
+    window.requestAnimationFrame(() => {
+      const frame = preview.current;
+
+      if (!frame) {
+        return;
+      }
+
+      return window.scrollTo({
+        top:
+          frame.getBoundingClientRect().top +
+          window.scrollY -
+          STICKY_HEADER_OFFSET,
+        behavior: 'smooth',
+      });
+    });
+  };
+
+  const chooseDesign = (id: string) => {
+    if (invoice?.design_id !== id) {
+      wizard.patch({ design_id: id });
+    }
+
+    revealPreview();
+  };
+
   return (
     <StepTransition>
       <ErrorBanner errors={wizard.errors} />
@@ -421,7 +453,7 @@ export function StepReview({ wizard }: Props) {
                       key={look.label}
                       type="button"
                       disabled={!id}
-                      onClick={() => wizard.patch({ design_id: id })}
+                      onClick={() => chooseDesign(id)}
                       className="text-sm px-3.5 py-2 border"
                       style={{
                         borderRadius: '0.375rem',
@@ -486,27 +518,11 @@ export function StepReview({ wizard }: Props) {
               id="iw-show-preview"
               checked={showPreview}
               onValueChange={(_, next) => {
-                const visible = Boolean(next);
-
-                setShowPreview(visible);
-
-                if (visible) {
-                  window.requestAnimationFrame(() => {
-                    const frame = preview.current;
-
-                    if (!frame) {
-                      return;
-                    }
-
-                    return window.scrollTo({
-                      top:
-                        frame.getBoundingClientRect().top +
-                        window.scrollY -
-                        STICKY_HEADER_OFFSET,
-                      behavior: 'smooth',
-                    });
-                  });
+                if (next) {
+                  return revealPreview();
                 }
+
+                return setShowPreview(false);
               }}
             />
 

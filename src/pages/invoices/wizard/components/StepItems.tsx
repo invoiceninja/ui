@@ -57,6 +57,9 @@ export function StepItems({ wizard, embedded }: Props) {
   const [picker, setPicker] = useState<WorkSource | null>(null);
   const [taxSetup, setTaxSetup] = useState<TaxTarget | null>(null);
   const [taxOpen, setTaxOpen] = useState(false);
+  const [missingDescription, setMissingDescription] = useState<string | null>(
+    null
+  );
   const [rates, setRates] = useState<TaxRate[]>([]);
 
   const itemTaxesEnabled = (company?.enabled_item_tax_rates ?? 0) > 0;
@@ -79,6 +82,10 @@ export function StepItems({ wizard, embedded }: Props) {
   }, [taxesConfigured]);
 
   const update = (index: number, changes: Partial<InvoiceItem>) => {
+    if (typeof changes.notes === 'string') {
+      setMissingDescription(null);
+    }
+
     wizard.setLineItems(
       items.map((item, position) =>
         position === index ? { ...item, ...changes } : item
@@ -123,6 +130,20 @@ export function StepItems({ wizard, embedded }: Props) {
   };
 
   const described = items.some((item) => item.notes || item.product_key);
+
+  const continueForward = () => {
+    if (!described) {
+      const key = items[0]?._id ?? '0';
+
+      setMissingDescription(key);
+      document.getElementById(`iw-desc-${key}`)?.focus();
+
+      return;
+    }
+
+    setMissingDescription(null);
+    wizard.next();
+  };
   const clientName = wizard.client?.display_name || wizard.client?.name || '';
   const contacts = wizard.client?.contacts ?? [];
   const recipientEmail =
@@ -199,12 +220,18 @@ export function StepItems({ wizard, embedded }: Props) {
               <InputField
                 id={`iw-desc-${key}`}
                 width="100%"
+                required
                 label={t('description')}
                 placeholder={t('item_description')}
                 value={item.notes}
                 changeOverride
                 debounceTimeout={0}
                 onValueChange={(value) => update(index, { notes: value })}
+                errorMessage={
+                  missingDescription === key
+                    ? t('field_is_required')
+                    : undefined
+                }
               />
 
               <div className="mt-3 flex items-end gap-3">
@@ -381,7 +408,9 @@ export function StepItems({ wizard, embedded }: Props) {
             className="text-sm cursor-pointer"
             style={{ color: colors.$3 }}
           >
-            {t('uses_inclusive_taxes', { defaultValue: 'Prices include tax on this invoice' })}
+            {t('uses_inclusive_taxes', {
+              defaultValue: 'Prices include tax on this invoice',
+            })}
           </label>
         </div>
       ) : null}
@@ -414,12 +443,6 @@ export function StepItems({ wizard, embedded }: Props) {
 
       {embedded ? null : (
         <>
-          {!described ? (
-            <p className="text-xs mt-6" style={{ color: colors.$17 }}>
-              {t('add_description_to_continue')}
-            </p>
-          ) : null}
-
           <StepFooter
             back={
               <Button
@@ -432,12 +455,7 @@ export function StepItems({ wizard, embedded }: Props) {
               </Button>
             }
           >
-            <Button
-              behavior="button"
-              disabled={!described}
-              disableWithoutIcon
-              onClick={wizard.next}
-            >
+            <Button behavior="button" onClick={continueForward}>
               {t('continue')}
             </Button>
           </StepFooter>

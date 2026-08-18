@@ -14,7 +14,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useSearchParams } from 'react-router-dom';
 import { blankInvitation } from '$app/common/constants/blank-invitation';
-import { AdvancedConfigurationToggle } from '$app/components/AdvancedConfigurationToggle';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
@@ -262,9 +261,6 @@ export default function Create() {
         disableSaveButton={invoice?.client_id.length === 0 || isFormBusy}
         aboveMainContainer={
           invoice && <QuickbooksDepositDisabledAlert resource={invoice} />
-        }
-        topRight={
-          <AdvancedConfigurationToggle counterpart="/invoices/wizard" />
         }
       >
         {!isLoading ? (

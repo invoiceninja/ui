@@ -35,6 +35,10 @@ export function AdvancedConfigurationToggle({ counterpart }: Props) {
   const updateSettings = useUpdateReactSettings();
   const flushSettings = useFlushReactSettings();
 
+  if (detailed) {
+    return null;
+  }
+
   return (
     <div className="flex items-center justify-end space-x-2">
       <span className="text-sm whitespace-nowrap" style={{ color: colors.$3 }}>
