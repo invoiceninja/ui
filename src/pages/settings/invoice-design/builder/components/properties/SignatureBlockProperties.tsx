@@ -93,8 +93,12 @@ export function SignatureBlockProperties({
         label={String(t('text_style', { defaultValue: 'Text style' }))}
         fontWeight={block.properties.fontWeight || 'normal'}
         fontStyle={block.properties.fontStyle || 'normal'}
-        onFontWeightChange={(value) => updateProperty('fontWeight', value)}
-        onFontStyleChange={(value) => updateProperty('fontStyle', value)}
+        onFontWeightChange={(value) =>
+          updateProperty('fontWeight', value === 'normal' ? undefined : value)
+        }
+        onFontStyleChange={(value) =>
+          updateProperty('fontStyle', value === 'normal' ? undefined : value)
+        }
       />
 
       <ColorInput
