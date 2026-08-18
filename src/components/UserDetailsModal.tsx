@@ -29,7 +29,7 @@ import { PasswordConfirmation } from './PasswordConfirmation';
 
 interface Props {
   visible: boolean;
-  onClose?: () => void;
+  onClose: () => void;
 }
 
 export function UserDetailsModal({ visible, onClose }: Props) {
@@ -122,30 +122,37 @@ export function UserDetailsModal({ visible, onClose }: Props) {
       <Modal
         title={t('user_details')!}
         visible={visible}
-        onClose={() => onClose?.()}
+        onClose={onClose}
         size="small"
-        disableClosing={isFormBusy || !onClose}
+        disableClosing={isFormBusy}
+        withoutVerticalMargin
       >
-        <InputField
-          label={t('first_name')}
-          value={firstName}
-          onValueChange={setFirstName}
-          errorMessage={errors?.errors?.first_name}
-          required
-        />
+        <div className="space-y-4 mt-4">
+          <InputField
+            label={t('first_name')}
+            value={firstName}
+            onValueChange={setFirstName}
+            errorMessage={errors?.errors?.first_name}
+            required
+          />
 
-        <InputField
-          label={t('last_name')}
-          value={lastName}
-          onValueChange={setLastName}
-          errorMessage={errors?.errors?.last_name}
-          required
-        />
+          <InputField
+            label={t('last_name')}
+            value={lastName}
+            onValueChange={setLastName}
+            errorMessage={errors?.errors?.last_name}
+            required
+          />
 
-        <div className="flex justify-end">
-          <Button behavior="button" onClick={handleSave} disabled={isFormBusy}>
-            {t('save')}
-          </Button>
+          <div className="flex justify-end">
+            <Button
+              behavior="button"
+              onClick={handleSave}
+              disabled={isFormBusy}
+            >
+              {t('save')}
+            </Button>
+          </div>
         </div>
       </Modal>
 

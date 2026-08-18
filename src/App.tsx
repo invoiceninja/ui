@@ -109,6 +109,11 @@ export function App() {
 
   const [isCompanyEditModalOpened, setIsCompanyEditModalOpened] =
     useState(false);
+  const [isUserDetailsModalDismissed, setIsUserDetailsModalDismissed] =
+    useState(false);
+
+  const isUserDetailsModalVisible =
+    requiresUserDetails && !isUserDetailsModalDismissed;
 
   const resolvedLanguage = company
     ? resolveLanguage(
@@ -200,14 +205,14 @@ export function App() {
 
     if (
       company &&
-      !requiresUserDetails &&
+      !isUserDetailsModalVisible &&
       (!companyName || companyName === t('untitled_company')) &&
       localStorage.getItem('COMPANY-EDIT-OPENED') !== 'true'
     ) {
       localStorage.setItem('COMPANY-EDIT-OPENED', 'true');
       setIsCompanyEditModalOpened(true);
     }
-  }, [company, requiresUserDetails]);
+  }, [company, isUserDetailsModalVisible]);
 
   useEffect(() => {
     if (
@@ -286,7 +291,10 @@ export function App() {
         {routes}
       </div>
 
-      <UserDetailsModal visible={requiresUserDetails} />
+      <UserDetailsModal
+        visible={isUserDetailsModalVisible}
+        onClose={() => setIsUserDetailsModalDismissed(true)}
+      />
 
       <CompanyEdit
         isModalOpen={isCompanyEditModalOpened && isOwner}
