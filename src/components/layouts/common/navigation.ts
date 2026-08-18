@@ -37,12 +37,12 @@ const $cache = atom<NavigationItem[] | null>(null);
 const $navigationLanguage = atom<string | null>(null);
 
 export function useNavigation() {
-  const invoicePaths = useInvoiceEditorPaths();
   const [t, i18n] = useTranslation();
   const enabled = useEnabled();
   const hasPermission = useHasPermission();
   const companyUser = useCurrentCompanyUser();
   const company = useCurrentCompany();
+  const invoicePaths = useInvoiceEditorPaths();
 
   const [cache, setCache] = useAtom($cache);
   const [cachedLanguage, setCachedLanguage] = useAtom($navigationLanguage);

@@ -24,9 +24,9 @@ export const DETAILED_INVOICE_PATHS = {
   edit: '/invoices/:id/edit',
 };
 
-export function useShowGuidedInvoiceEditor(): boolean {
-  const preference = useReactSettingsField('show_advanced_invoice_editor');
+export function useShowGuidedInvoiceEditor() {
   const user = useCurrentUser();
+  const preference = useReactSettingsField('show_advanced_invoice_editor');
 
   if (typeof preference === 'boolean') {
     return !preference;
