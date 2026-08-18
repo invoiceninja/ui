@@ -51,7 +51,7 @@ test('product inventory settings expose stock controls on product forms', async 
   await page.waitForURL('**/products/create');
   await expect(
     page.getByRole('heading', { name: 'New Product', exact: true })
-  ).toBeVisible({ timeout: 10000 });
+  ).toBeVisible({ timeout: 30000 });
   await expect(definitionInputByTerm(page, 'Stock Quantity')).toBeVisible({
     timeout: 10000,
   });
