@@ -81,7 +81,7 @@ export const LOCALE_EXPECTATIONS = {
   ru_RU: { antdLocale: 'ru', antdPickerLocale: 'ru_RU', dayjsLocale: 'ru' },
   sk: { antdLocale: 'sk', antdPickerLocale: 'sk_SK', dayjsLocale: 'sk' },
   sl: { antdLocale: 'sl', antdPickerLocale: 'sl', dayjsLocale: 'sl' },
-  sq: { antdLocale: 'en', antdPickerLocale: 'en_US', dayjsLocale: 'en' },
+  sq: { antdLocale: 'en', antdPickerLocale: 'en_US', dayjsLocale: 'sq' },
   sr: { antdLocale: 'sr', antdPickerLocale: 'sr_RS', dayjsLocale: 'sr' },
   sv: { antdLocale: 'sv', antdPickerLocale: 'sv_SE', dayjsLocale: 'sv' },
   th: { antdLocale: 'th', antdPickerLocale: 'th_TH', dayjsLocale: 'th' },

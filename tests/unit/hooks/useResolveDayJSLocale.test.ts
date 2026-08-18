@@ -31,6 +31,7 @@ describe('Dayjs locale resolution', () => {
     ['nb_NO', 'nb'],
     ['pt_PT', 'pt'],
     ['ru_RU', 'ru'],
+    ['sq', 'sq'],
     ['tr_TR', 'tr'],
   ])('maps shipped region locale %s to Dayjs %s', async (appLocale, name) => {
     await expect(useResolveDayJSLocale()(appLocale)).resolves.toMatchObject({
@@ -38,14 +39,12 @@ describe('Dayjs locale resolution', () => {
     });
   });
 
-  it.each([
-    'af_ZA',
-    'lo_LA',
-    'sq',
-    'not-a-locale',
-  ])('falls back to English for unsupported Ant locale %s', async (appLocale) => {
-    await expect(useResolveDayJSLocale()(appLocale)).resolves.toMatchObject({
-      name: 'en',
-    });
-  });
+  it.each(['af_ZA', 'lo_LA', 'not-a-locale'])(
+    'falls back to English for unsupported Ant locale %s',
+    async (appLocale) => {
+      await expect(useResolveDayJSLocale()(appLocale)).resolves.toMatchObject({
+        name: 'en',
+      });
+    }
+  );
 });
