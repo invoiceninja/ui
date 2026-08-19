@@ -3,7 +3,7 @@ import type { Channel } from 'pusher-js';
 import type {
   SocketClientLike,
   SocketConnectionLike,
-} from '../../../src/common/queries/socketSubscription';
+} from '../../../../src/common/queries/socketSubscription';
 
 type ChannelHandler = (data: unknown) => void;
 type GlobalHandler = (eventName: string, data: unknown) => void;
