@@ -14,7 +14,7 @@ import dayjs from 'dayjs';
 import { useAtom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { useEffect, useState } from 'react';
-import { Bell } from 'react-feather';
+import { Bell, Download } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { GoDotFill } from 'react-icons/go';
 import { useColorScheme } from '$app/common/colors';
@@ -31,11 +31,15 @@ import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Payment } from '$app/common/interfaces/payment';
 import {
+  buildGeneralChannelName,
+  DownloadAvailable,
   GenericMessage,
   socketId,
   useSocketEvent,
   WithSocketId,
 } from '$app/common/queries/sockets';
+import { bindChannelLogging, logSocketDebug } from '$app/common/queries/socketLogging';
+import { subscribeWhenConnected } from '$app/common/queries/socketSubscription';
 import { NonClickableElement } from './cards/NonClickableElement';
 import { Slider } from './cards/Slider';
 import { Button, Link } from './forms';
@@ -52,7 +56,8 @@ type NotificationType =
   | 'creditWasCreated'
   | 'creditWasUpdated'
   | 'paymentWasUpdated'
-  | 'genericMessage';
+  | 'genericMessage'
+  | 'downloadAvailable';
 
 interface DisplayLabel {
   notificationType: NotificationType;
@@ -65,6 +70,7 @@ interface DisplayLabel {
   creditNumber?: string;
   paymentId?: string;
   paymentNumber?: string;
+  url?: string;
 }
 
 export interface Notification {
@@ -205,6 +211,22 @@ export function Notifications() {
       );
     }
 
+    if (currentDisplayLabel.notificationType === 'downloadAvailable') {
+      return (
+        <div className="flex flex-wrap items-center gap-x-1">
+          <span>{currentDisplayLabel.message}</span>
+
+          <Link
+            to={currentDisplayLabel.url as string}
+            external
+            withoutExternalIcon
+          >
+            {t('download')}
+          </Link>
+        </div>
+      );
+    }
+
     return currentDisplayLabel.message;
   };
 
@@ -264,6 +286,17 @@ export function Notifications() {
       );
     }
 
+    if (notificationType === 'downloadAvailable') {
+      return (
+        <div
+          className="p-2 rounded-full"
+          style={{ backgroundColor: colors.$15 }}
+        >
+          <Icon className="w-5 h-5" element={Download} color={colors.$16} />
+        </div>
+      );
+    }
+
     return null;
   };
 
@@ -290,8 +323,11 @@ export function Notifications() {
       'App\\Events\\Credit\\CreditWasCreated',
       'App\\Events\\Credit\\CreditWasUpdated',
       'App\\Events\\Payment\\PaymentWasUpdated',
+      'App\\Events\\Socket\\DownloadAvailable',
     ],
     callback: ({ event, data }) => {
+      logSocketDebug(`notification received: ${event}`, data);
+
       if (event === 'App\\Events\\Invoice\\InvoiceWasPaid') {
         const $invoice = data as Invoice;
 
@@ -461,6 +497,28 @@ export function Notifications() {
 
         setNotifications((notifications) => [...notifications, notification]);
       }
+
+      if (event === 'App\\Events\\Socket\\DownloadAvailable') {
+        const download = data as DownloadAvailable;
+
+        const notification = {
+          label: download.message,
+          displayLabel: {
+            notificationType: 'downloadAvailable' as const,
+            message: download.message,
+            url: download.url,
+          },
+          date: dayjs().unix(),
+          link: download.url,
+          readAt: null,
+        };
+
+        if (notifications.some((n) => n.link === notification.link)) {
+          return;
+        }
+
+        setNotifications((notifications) => [...notifications, notification]);
+      }
     },
   });
 
@@ -472,33 +530,50 @@ export function Notifications() {
       return;
     }
 
-    if (sockets) {
-      const channelName = isHosted() ? 'general_hosted' : 'general_selfhosted';
+    if (!sockets) {
+      return;
+    }
+
+    return subscribeWhenConnected(sockets, () => {
+      const channelName = buildGeneralChannelName(isHosted());
+
+      logSocketDebug(`subscribing to ${channelName}`, {
+        connectionState: sockets.connection.state,
+        socketId: sockets.connection.socket_id,
+      });
+
       const channel = sockets.subscribe(channelName);
+      const unbindChannelLogging = bindChannelLogging(channel);
 
-      channel.bind(
-        'App\\Events\\General\\GenericMessage',
-        (message: GenericMessage) => {
-          const notification = {
-            label: message.message,
-            displayLabel: {
-              notificationType: 'genericMessage' as const,
-              message: message.message,
-            },
-            date: dayjs().unix(),
-            link: message.link,
-            readAt: null,
-          };
+      const onGenericMessage = (message: GenericMessage) => {
+        logSocketDebug(
+          'notification received: App\\Events\\General\\GenericMessage',
+          message
+        );
 
-          setNotifications((notifications) => [...notifications, notification]);
-        }
-      );
+        const notification = {
+          label: message.message,
+          displayLabel: {
+            notificationType: 'genericMessage' as const,
+            message: message.message,
+          },
+          date: dayjs().unix(),
+          link: message.link,
+          readAt: null,
+        };
+
+        setNotifications((notifications) => [...notifications, notification]);
+      };
+
+      channel.bind('App\\Events\\General\\GenericMessage', onGenericMessage);
 
       return () => {
-        channel.unbind('App\\Events\\General\\GenericMessage');
+        unbindChannelLogging();
+        channel.unbind('App\\Events\\General\\GenericMessage', onGenericMessage);
+        sockets.unsubscribe(channel.name);
       };
-    }
-  }, [sockets, reactSettings.preferences.enable_public_notifications]);
+    });
+  }, [sockets, reactSettings.preferences.enable_public_notifications, setNotifications]);
 
   if (
     isSelfHosted() &&
