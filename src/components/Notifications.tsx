@@ -31,12 +31,15 @@ import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Payment } from '$app/common/interfaces/payment';
 import {
+  buildGeneralChannelName,
   DownloadAvailable,
   GenericMessage,
   socketId,
   useSocketEvent,
   WithSocketId,
 } from '$app/common/queries/sockets';
+import { bindChannelLogging, logSocketDebug } from '$app/common/queries/socketLogging';
+import { subscribeWhenConnected } from '$app/common/queries/socketSubscription';
 import { NonClickableElement } from './cards/NonClickableElement';
 import { Slider } from './cards/Slider';
 import { Button, Link } from './forms';
@@ -323,6 +326,8 @@ export function Notifications() {
       'App\\Events\\Socket\\DownloadAvailable',
     ],
     callback: ({ event, data }) => {
+      logSocketDebug(`notification received: ${event}`, data);
+
       if (event === 'App\\Events\\Invoice\\InvoiceWasPaid') {
         const $invoice = data as Invoice;
 
@@ -525,33 +530,50 @@ export function Notifications() {
       return;
     }
 
-    if (sockets) {
-      const channelName = isHosted() ? 'general_hosted' : 'general_selfhosted';
+    if (!sockets) {
+      return;
+    }
+
+    return subscribeWhenConnected(sockets, () => {
+      const channelName = buildGeneralChannelName(isHosted());
+
+      logSocketDebug(`subscribing to ${channelName}`, {
+        connectionState: sockets.connection.state,
+        socketId: sockets.connection.socket_id,
+      });
+
       const channel = sockets.subscribe(channelName);
+      const unbindChannelLogging = bindChannelLogging(channel);
 
-      channel.bind(
-        'App\\Events\\General\\GenericMessage',
-        (message: GenericMessage) => {
-          const notification = {
-            label: message.message,
-            displayLabel: {
-              notificationType: 'genericMessage' as const,
-              message: message.message,
-            },
-            date: dayjs().unix(),
-            link: message.link,
-            readAt: null,
-          };
+      const onGenericMessage = (message: GenericMessage) => {
+        logSocketDebug(
+          'notification received: App\\Events\\General\\GenericMessage',
+          message
+        );
 
-          setNotifications((notifications) => [...notifications, notification]);
-        }
-      );
+        const notification = {
+          label: message.message,
+          displayLabel: {
+            notificationType: 'genericMessage' as const,
+            message: message.message,
+          },
+          date: dayjs().unix(),
+          link: message.link,
+          readAt: null,
+        };
+
+        setNotifications((notifications) => [...notifications, notification]);
+      };
+
+      channel.bind('App\\Events\\General\\GenericMessage', onGenericMessage);
 
       return () => {
-        channel.unbind('App\\Events\\General\\GenericMessage');
+        unbindChannelLogging();
+        channel.unbind('App\\Events\\General\\GenericMessage', onGenericMessage);
+        sockets.unsubscribe(channel.name);
       };
-    }
-  }, [sockets, reactSettings.preferences.enable_public_notifications]);
+    });
+  }, [sockets, reactSettings.preferences.enable_public_notifications, setNotifications]);
 
   if (
     isSelfHosted() &&
