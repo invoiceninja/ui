@@ -134,7 +134,7 @@
     "lint": "biome lint src/",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test --workers=1",
+    "test:e2e": "node node_modules/@playwright/test/cli.js test --workers=1",
     "test:e2e:parallel": "node scripts/playwright-spec-orchestrator.mjs",
     "test:e2e:isolated": "node scripts/playwright-spec-orchestrator.mjs",
     "prepare": "husky install",

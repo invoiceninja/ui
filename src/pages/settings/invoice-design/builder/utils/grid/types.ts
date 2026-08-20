@@ -31,8 +31,7 @@ export const LEGACY_GRID_METRICS: GridMetrics = {
 };
 
 export const CONTENT_GROW_BLOCK_TYPES = new Set<Block['type']>([
-  'table',
-  'tasks-table',
+  // Tables scroll inside the grid cell; h is a viewport, not content height.
   'company-info',
   'client-info',
   'client-shipping-info',

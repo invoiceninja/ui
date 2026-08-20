@@ -19,6 +19,7 @@ import {
   repairGridPositionCollisions,
 } from '../utils/grid/collisions';
 import {
+  gridItemContentOverflows,
   shouldGrowBlockToContent,
   syncGridItemContentMinimum,
 } from '../utils/grid/content-height';
@@ -53,6 +54,7 @@ export function useGridStackCanvas({
   const isSyncingGridRef = useRef(false);
   const isDraggingGridRef = useRef(false);
   const isResizingGridRef = useRef(false);
+  const isLayoutHydratingRef = useRef(false);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
   const [isDraggingBlock, setIsDraggingBlock] = useState(false);
@@ -172,15 +174,6 @@ export function useGridStackCanvas({
     };
     const handleResizeStop = (_event: Event, el: GridItemHTMLElement) => {
       requestAnimationFrame(() => {
-        const blockId = el.getAttribute('data-block-id');
-        const block = builderStateRef.current.blocks.find(
-          (currentBlock) => currentBlock.id === blockId
-        );
-
-        if (block && shouldGrowBlockToContent(block)) {
-          syncGridItemContentMinimum(grid, el, { grow: true });
-        }
-
         isResizingGridRef.current = false;
         setIsResizing(false);
         syncBlocksFromGrid();
@@ -225,6 +218,7 @@ export function useGridStackCanvas({
       return;
     }
 
+    isLayoutHydratingRef.current = true;
     isSyncingGridRef.current = true;
     grid.batchUpdate();
 
@@ -273,6 +267,7 @@ export function useGridStackCanvas({
 
     requestAnimationFrame(() => {
       if (isDraggingGridRef.current || isResizingGridRef.current) {
+        isLayoutHydratingRef.current = false;
         return;
       }
 
@@ -280,25 +275,27 @@ export function useGridStackCanvas({
         shouldFitLoadedContentHeightRef.current;
       let didResizeToContent = false;
 
-      blocks.forEach((block) => {
-        if (!shouldGrowBlockToContent(block)) {
-          return;
-        }
-
-        const item = findGridStackElement(container, block.id);
-
-        if (item) {
-          didResizeToContent =
-            syncGridItemContentMinimum(grid, item, {
-              grow: true,
-              shrink: shouldFitLoadedContentHeight,
-            }) || didResizeToContent;
-        }
-      });
-
       if (shouldFitLoadedContentHeight) {
+        blocks.forEach((block) => {
+          if (!shouldGrowBlockToContent(block)) {
+            return;
+          }
+
+          const item = findGridStackElement(container, block.id);
+
+          if (item) {
+            didResizeToContent =
+              syncGridItemContentMinimum(grid, item, {
+                grow: true,
+                shrink: true,
+              }) || didResizeToContent;
+          }
+        });
+
         shouldFitLoadedContentHeightRef.current = false;
       }
+
+      isLayoutHydratingRef.current = false;
 
       if (didResizeToContent) {
         syncBlocksFromGrid();
@@ -330,6 +327,7 @@ export function useGridStackCanvas({
     const observer = new ResizeObserver((entries) => {
       requestAnimationFrame(() => {
         if (
+          isLayoutHydratingRef.current ||
           isDraggingGridRef.current ||
           isResizingGridRef.current ||
           isSyncingGridRef.current
@@ -360,6 +358,10 @@ export function useGridStackCanvas({
 
         let didGrow = false;
         itemsToGrow.forEach((item) => {
+          if (!gridItemContentOverflows(grid, item)) {
+            return;
+          }
+
           didGrow =
             syncGridItemContentMinimum(grid, item, { grow: true }) || didGrow;
         });

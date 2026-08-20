@@ -82,6 +82,28 @@ export function getContentGridRows(grid: GridStack, el: GridItemHTMLElement): nu
   );
 }
 
+export function gridItemContentOverflows(
+  grid: GridStack,
+  el: GridItemHTMLElement
+): boolean {
+  const node = el.gridstackNode;
+
+  if (!node?.h) {
+    return false;
+  }
+
+  const contentPx = measureGridItemContentHeight(el);
+
+  if (!contentPx) {
+    return false;
+  }
+
+  const cellHeight = grid.getCellHeight(true);
+  const allocatedPx = node.h * cellHeight;
+
+  return contentPx + GRIDSTACK_CONTENT_HEIGHT_BUFFER > allocatedPx;
+}
+
 export function syncGridItemContentMinimum(
   grid: GridStack,
   el: GridItemHTMLElement,

@@ -120,7 +120,7 @@ export default defineConfig({
             ' && npx vite preview --outDir ' +
             viteTestOutDir,
           port: 4173,
-          reuseExistingServer: true,
+          reuseExistingServer: false,
           timeout: 180_000, // give the build ~3 min to settle
         },
       }),

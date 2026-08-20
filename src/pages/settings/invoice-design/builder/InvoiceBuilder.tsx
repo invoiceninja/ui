@@ -69,7 +69,9 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Design } from '$app/common/interfaces/design';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useDesignQuery } from '$app/common/queries/designs';
+import { AxiosError } from 'axios';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
@@ -81,6 +83,10 @@ import {
 } from './utils/custom-css';
 import 'gridstack/dist/gridstack.min.css';
 import './InvoiceBuilder.css';
+
+function designNameValidationError(errors?: ValidationBag | null) {
+  return errors?.errors?.name?.[0];
+}
 
 export function InvoiceBuilder() {
   const [t] = useTranslation();
@@ -99,15 +105,22 @@ export function InvoiceBuilder() {
   const company = useCurrentCompany();
   const designSettings = company?.settings;
 
-  const [state, setState] = useState<BuilderState>({
-    blocks: [],
+  const initialTemplate = templateId ? getTemplateById(templateId) : undefined;
+
+  const [state, setState] = useState<BuilderState>(() => ({
+    blocks: initialTemplate
+      ? normalizeSavedBlocksForBuilder(
+          initialTemplate.blocks,
+          initialTemplate.layout
+        )
+      : [],
     customCss: '',
     selectedBlockId: null,
     zoom: 100,
-    templateId: templateId || undefined,
+    templateId: initialTemplate?.id ?? templateId ?? undefined,
     documentSettings: createDefaultDocumentSettings(designSettings),
     panelMode: 'document',
-  });
+  }));
 
   const documentSettingsInitialized = useRef(false);
   useEffect(() => {
@@ -128,6 +141,9 @@ export function InvoiceBuilder() {
 
   const [designName, setDesignName] = useState<string>('');
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isTemplateReady, setIsTemplateReady] = useState(
+    () => !templateId || Boolean(initialTemplate)
+  );
   const shouldFitLoadedContentHeightRef = useRef(false);
 
   const builderStateRef = useRef(state);
@@ -157,7 +173,6 @@ export function InvoiceBuilder() {
             existingDesign.design as { documentSettings?: DocumentSettings }
           )?.documentSettings;
 
-          shouldFitLoadedContentHeightRef.current = true;
           setState((prev) => ({
             ...prev,
             blocks,
@@ -180,25 +195,31 @@ export function InvoiceBuilder() {
   }, [designId, designSettings, existingDesign, navigate]);
 
   useLayoutEffect(() => {
-    if (templateId) {
-      const template = getTemplateById(templateId);
-      if (template) {
-        shouldFitLoadedContentHeightRef.current = true;
-        setState((prev) => ({
-          ...prev,
-          blocks: normalizeSavedBlocksForBuilder(
-            template.blocks,
-            template.layout
-          ),
-          templateId: template.id,
-        }));
-      }
+    if (!templateId || isTemplateReady) {
+      return;
     }
-  }, [templateId]);
+
+    const template = getTemplateById(templateId);
+    if (template) {
+      const templateBlocks = normalizeSavedBlocksForBuilder(
+        template.blocks,
+        template.layout
+      );
+
+      shouldFitLoadedContentHeightRef.current = true;
+      setState((prev) => ({
+        ...prev,
+        blocks: templateBlocks,
+        templateId: template.id,
+      }));
+    }
+
+    setIsTemplateReady(true);
+  }, [isTemplateReady, templateId]);
 
   const isCanvasMounted = !(
     (isLoadingDesign && Boolean(designId) && state.blocks.length === 0) ||
-    (Boolean(templateId) && !designId && state.blocks.length === 0)
+    (Boolean(templateId) && !designId && !isTemplateReady)
   );
 
   const {
@@ -408,6 +429,9 @@ export function InvoiceBuilder() {
   const [showPreview, setShowPreview] = useState(false);
   const [showNameModal, setShowNameModal] = useState(false);
   const [designNameInput, setDesignNameInput] = useState<string>('');
+  const [designNameErrors, setDesignNameErrors] = useState<ValidationBag | null>(
+    null
+  );
 
   const handleSave = useCallback(async () => {
     if (!state.blocks.length) {
@@ -418,6 +442,7 @@ export function InvoiceBuilder() {
     if (!isEditMode && !designName) {
       const defaultName = 'Visual Design ' + new Date().toLocaleDateString();
       setDesignNameInput(defaultName);
+      setDesignNameErrors(null);
       setShowNameModal(true);
       return;
     }
@@ -473,6 +498,7 @@ export function InvoiceBuilder() {
         );
         $refetch(['designs']);
         toast.success('updated_design');
+        setDesignNameErrors(null);
       } else {
         const designPayload = {
           name: nameToUse,
@@ -495,28 +521,30 @@ export function InvoiceBuilder() {
         );
         setIsEditMode(true);
         setDesignName(nameToUse);
+        setDesignNameErrors(null);
         setShowNameModal(false);
       }
     } catch (error: unknown) {
-      const errorResponse = (
-        error as {
-          response?: {
-            status?: number;
-            data?: { errors?: Record<string, string[]>; message?: string };
-          };
-        }
-      )?.response;
-      const errorMessage =
-        errorResponse?.data?.message ||
-        (error instanceof Error ? error.message : undefined);
+      const axiosError = error as AxiosError<ValidationBag>;
+      const validationErrors = axiosError.response?.data;
 
-      if (errorResponse?.status === 422) {
-        setShowNameModal(true);
-        toast.error(errorMessage || 'error_saving_design');
-      } else {
-        setShowNameModal(false);
-        toast.error(errorMessage || 'error_saving_design');
+      if (axiosError.response?.status === 422 && validationErrors) {
+        setDesignNameErrors(validationErrors);
+
+        if (!isEditMode) {
+          setShowNameModal(true);
+        }
+
+        toast.dismiss();
+        return;
       }
+
+      setDesignNameErrors(null);
+      setShowNameModal(false);
+      toast.error(
+        validationErrors?.message ||
+          (error instanceof Error ? error.message : 'error_saving_design')
+      );
     } finally {
       setSaving(false);
     }
@@ -602,7 +630,11 @@ export function InvoiceBuilder() {
 
             <InputField
               value={designName || ''}
-              onValueChange={(value) => setDesignName(value)}
+              onValueChange={(value) => {
+                setDesignName(value);
+                setDesignNameErrors(null);
+              }}
+              errorMessage={designNameValidationError(designNameErrors)}
               placeholder={t('design_name')}
               className="w-64 !border-0 !bg-transparent focus:ring-0 focus:border-b"
               style={{ borderColor: colors.$24 }}
@@ -945,6 +977,9 @@ ${sanitizedCustomCss}
         visible={showNameModal}
         onClose={(status) => {
           setShowNameModal(false);
+          if (!status) {
+            setDesignNameErrors(null);
+          }
           if (!status && !designName) {
             return;
           }
@@ -963,7 +998,11 @@ ${sanitizedCustomCss}
             <InputField
               id="design-name"
               value={designNameInput}
-              onValueChange={(value) => setDesignNameInput(value)}
+              onValueChange={(value) => {
+                setDesignNameInput(value);
+                setDesignNameErrors(null);
+              }}
+              errorMessage={designNameValidationError(designNameErrors)}
               placeholder={String(t('design_name'))}
             />
           </div>
