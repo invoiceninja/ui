@@ -65,6 +65,8 @@ import {
   RectangleSettingsRemoveButton,
   RectangleSettingsSaveButton,
   RectangleSettingsSelect,
+  SingleSignatoryFlowButton,
+  SingleSignatoryFlowDialog,
   ToolboxContext,
   UninviteButton,
   UninviteDialog,
@@ -569,6 +571,10 @@ function Builder() {
               },
               signatorySelector: SignatorySelector,
               signatorySwap: SignatorySwap,
+              singleSignatoryFlow: {
+                dialog: SingleSignatoryFlowDialog,
+                button: SingleSignatoryFlowButton,
+              },
               uninvite: {
                 dialog: UninviteDialog,
                 button: UninviteButton,
