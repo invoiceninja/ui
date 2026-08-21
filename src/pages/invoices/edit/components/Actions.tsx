@@ -31,6 +31,7 @@ import {
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { EntityState } from '$app/common/enums/entity-state';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
@@ -84,6 +85,7 @@ interface Params {
 }
 
 export function useActions(params?: Params) {
+  const invoicePaths = useInvoiceEditorPaths();
   const { t } = useTranslation();
 
   const {
@@ -178,14 +180,14 @@ export function useActions(params?: Params) {
     };
 
     setInvoice(negativeInvoice);
-    navigate('/invoices/create?action=clone');
+    navigate(`${invoicePaths.create}?action=clone`);
   };
 
   const actions = [
     (invoice: Invoice) =>
       Boolean(showEditAction) && (
         <DropdownElement
-          to={route('/invoices/:id/edit', { id: invoice.id })}
+          to={route(invoicePaths.edit, { id: invoice.id })}
           icon={<Icon element={MdEdit} />}
         >
           {t('edit')}

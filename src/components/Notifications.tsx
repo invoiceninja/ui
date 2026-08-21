@@ -17,6 +17,7 @@ import { Bell } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { GoDotFill } from 'react-icons/go';
 import { useColorScheme } from '$app/common/colors';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { date, isHosted, isSelfHosted, trans } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
@@ -114,6 +115,7 @@ export function appendNotification(
 }
 
 export function Notifications() {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const queryClient = useQueryClient();
@@ -145,7 +147,7 @@ export function Notifications() {
         {
           invoice: (
             <Link
-              to={route('/invoices/:id/edit', {
+              to={route(invoicePaths.edit, {
                 id: currentDisplayLabel.invoiceId,
               })}
             >
@@ -170,7 +172,7 @@ export function Notifications() {
         {
           invoice: (
             <Link
-              to={route('/invoices/:id/edit', {
+              to={route(invoicePaths.edit, {
                 id: currentDisplayLabel.invoiceId,
               })}
             >
@@ -346,7 +348,7 @@ export function Notifications() {
             clientId: $invoice.client_id,
           },
           date: dayjs().unix(),
-          link: route('/invoices/:id/edit', { id: $invoice.id }),
+          link: route(invoicePaths.edit, { id: $invoice.id }),
           readAt: null,
         };
 
@@ -397,7 +399,7 @@ export function Notifications() {
             clientId: $invoice.client_id,
           },
           date: dayjs().unix(),
-          link: route('/invoices/:id/edit', { id: $invoice.id }),
+          link: route(invoicePaths.edit, { id: $invoice.id }),
           readAt: null,
         };
 

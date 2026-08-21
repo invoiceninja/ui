@@ -26,6 +26,7 @@ import {
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { EntityState } from '$app/common/enums/entity-state';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import {
@@ -134,6 +135,7 @@ export function useAllTaskColumns() {
 }
 
 export function useTaskColumns() {
+  const invoicePaths = useInvoiceEditorPaths();
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
   const accentColor = useAccentColor();
@@ -207,7 +209,7 @@ export function useTaskColumns() {
                 fontSize={19}
                 color={accentColor}
                 onClick={() =>
-                  navigate(route('/invoices/:id/edit', { id: task.invoice_id }))
+                  navigate(route(invoicePaths.edit, { id: task.invoice_id }))
                 }
               />
             </Tooltip>

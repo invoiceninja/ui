@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { toast } from '$app/common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
@@ -39,6 +40,7 @@ export const calculateTaskHours = (timeLog: string, precision?: number) => {
 };
 
 export function useInvoiceProject() {
+  const invoicePaths = useInvoiceEditorPaths();
   const navigate = useNavigate();
 
   const bulk = useBulkAction();
@@ -54,7 +56,7 @@ export function useInvoiceProject() {
 
         navigate(
           route(
-            '/invoices/create?table=tasks&project=true&action=invoice_project'
+            `${invoicePaths.create}?table=tasks&project=true&action=invoice_project`
           )
         );
       }
