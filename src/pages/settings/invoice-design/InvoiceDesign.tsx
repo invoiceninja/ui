@@ -11,7 +11,8 @@
 import axios, { AxiosPromise } from 'axios';
 import classNames from 'classnames';
 import { useAtomValue } from 'jotai';
-import { useEffect, useState } from 'react';
+import { isEqual } from 'lodash';
+import { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
 import { activeSettingsAtom } from '$app/common/atoms/settings';
@@ -21,6 +22,7 @@ import { route } from '$app/common/helpers/route';
 import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { $refetch, RefetchKey } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Settings } from '$app/common/interfaces/company.interface';
@@ -34,16 +36,25 @@ import {
   isCompanySettingsFormBusy,
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
-import { updatingRecordsAtom } from './common/atoms';
+import {
+  buildLiveDesignPayload,
+  isLiveDesignPreviewEnabled,
+  livePreviewEntityTypeAtom,
+  LivePreviewEntityType,
+  resolveEffectiveLivePreviewEntityType,
+  serializeLiveDesignPreviewKey,
+  updatingRecordsAtom,
+} from './common/atoms';
 import { useTabs } from './pages/general-settings/hooks/useTabs';
 
 export interface GeneralSettingsPayload {
   client_id: string;
-  entity_type: 'invoice';
+  entity_type: LivePreviewEntityType;
   group_id: string;
   settings: Settings | null;
   settings_type: 'company';
 }
+
 export default function InvoiceDesign() {
   const [t] = useTranslation();
   const { documentTitle } = useTitle('invoice_design');
@@ -52,6 +63,7 @@ export default function InvoiceDesign() {
 
   const tabs = useTabs();
   const location = useLocation();
+  useInjectCompanyChanges();
   const company = useCompanyChanges();
   const activeSettings = useActiveSettingsDetails();
   const { isClientSettingsActive, isGroupSettingsActive } =
@@ -105,15 +117,47 @@ export default function InvoiceDesign() {
     },
   ];
 
-  const [payload, setPayload] = useState<GeneralSettingsPayload>({
-    client_id: '-1',
-    entity_type: 'invoice',
-    group_id: '-1',
-    settings: null,
-    settings_type: 'company',
-  });
+  const designPreviewEntityType = useAtomValue(livePreviewEntityTypeAtom);
+
+  const livePreviewEntityType = useMemo(
+    () =>
+      resolveEffectiveLivePreviewEntityType(
+        location.pathname,
+        designPreviewEntityType
+      ),
+    [location.pathname, designPreviewEntityType]
+  );
 
   const updatingRecords = useAtomValue(updatingRecordsAtom);
+
+  const stableSettingsRef = useRef<Settings | null>(null);
+
+  const stableSettings = useMemo(() => {
+    const next = company?.settings ?? null;
+
+    if (isEqual(stableSettingsRef.current, next)) {
+      return stableSettingsRef.current;
+    }
+
+    stableSettingsRef.current = next;
+
+    return next;
+  }, [company?.settings]);
+
+  const payload = useMemo(
+    () => buildLiveDesignPayload(livePreviewEntityType, stableSettings),
+    [livePreviewEntityType, stableSettings]
+  );
+
+  const previewEnabled = useMemo(
+    () => isLiveDesignPreviewEnabled(livePreviewEntityType, stableSettings),
+    [livePreviewEntityType, stableSettings]
+  );
+
+  const previewResourceKey = useMemo(
+    () => serializeLiveDesignPreviewKey(payload),
+    [payload]
+  );
 
   const handleSave = () => {
     onSave();
@@ -142,14 +186,6 @@ export default function InvoiceDesign() {
       });
     });
   };
-
-  useEffect(() => {
-    if (company?.settings) {
-      setPayload(
-        (current) => current && { ...current, settings: company.settings }
-      );
-    }
-  }, [company?.settings]);
 
   useSaveBtn(
     {
@@ -188,8 +224,10 @@ export default function InvoiceDesign() {
             <InvoiceViewer
               link={endpoint('/api/v1/live_design')}
               resource={payload}
+              resourceKey={previewResourceKey}
               method="POST"
               withToast
+              enabled={previewEnabled}
             />
           </div>
         )}
