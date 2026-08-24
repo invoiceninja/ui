@@ -12,7 +12,7 @@ import axios, { AxiosPromise } from 'axios';
 import classNames from 'classnames';
 import { useAtomValue } from 'jotai';
 import { isEqual } from 'lodash';
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
 import { activeSettingsAtom } from '$app/common/atoms/settings';
