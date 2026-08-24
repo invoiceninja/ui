@@ -56,7 +56,7 @@ export function InvoiceViewer(props: Props) {
       return props.resourceKey;
     }
 
-    return JSON.stringify(props.resource);
+    return JSON.stringify(props.resource ?? null);
   }, [props.resource, props.resourceKey]);
 
   useEffect(() => {
