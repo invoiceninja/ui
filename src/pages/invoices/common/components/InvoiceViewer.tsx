@@ -136,7 +136,9 @@ export function InvoiceViewer(props: Props) {
                 props.onLink && props.onLink(url);
               }
 
-              toast.dismiss();
+              if (props.withToast) {
+                toast.dismiss();
+              }
 
               return response;
             })
@@ -149,7 +151,9 @@ export function InvoiceViewer(props: Props) {
                 props.onError(error);
               }
 
-              toast.dismiss();
+              if (props.withToast) {
+                toast.dismiss();
+              }
 
               throw error;
             })
@@ -167,7 +171,10 @@ export function InvoiceViewer(props: Props) {
 
     return () => {
       queryClient.cancelQueries({ queryKey: [props.link, fetchKey] });
-      toast.dismiss();
+
+      if (props.withToast) {
+        toast.dismiss();
+      }
 
       if (fetchKey !== activeResourceKeyRef.current) {
         setIsLoading(false);
