@@ -48,7 +48,6 @@ export function InvoiceViewer(props: Props) {
   const [debouncedResourceKey, setDebouncedResourceKey] = useState('');
 
   const lastFetchedKeyRef = useRef<string | null>(null);
-  const inFlightAbortRef = useRef<AbortController | null>(null);
   const activeResourceKeyRef = useRef('');
 
   const resourceKey = useMemo(() => {
@@ -92,15 +91,10 @@ export function InvoiceViewer(props: Props) {
     setIsLoading(true);
 
     const fetchKey = debouncedResourceKey;
-    inFlightAbortRef.current?.abort();
-    inFlightAbortRef.current = null;
 
     if (props.withToast) {
       toast.processing();
     }
-
-    const abortController = new AbortController();
-    inFlightAbortRef.current = abortController;
 
     queryClient
       .fetchQuery({
@@ -115,14 +109,11 @@ export function InvoiceViewer(props: Props) {
 
           return request(props.method, props.link, props.resource, {
             responseType: 'arraybuffer',
-            signal: signal ?? abortController.signal,
+            signal,
             ...(props.headers && { headers: props.headers }),
           })
             .then((response) => {
-              if (
-                abortController.signal.aborted ||
-                fetchKey !== activeResourceKeyRef.current
-              ) {
+              if (signal.aborted || fetchKey !== activeResourceKeyRef.current) {
                 return response;
               }
 
@@ -150,10 +141,7 @@ export function InvoiceViewer(props: Props) {
               return response;
             })
             .catch((error) => {
-              if (
-                abortController.signal.aborted ||
-                fetchKey !== activeResourceKeyRef.current
-              ) {
+              if (signal.aborted || fetchKey !== activeResourceKeyRef.current) {
                 return;
               }
 
@@ -167,7 +155,7 @@ export function InvoiceViewer(props: Props) {
             })
             .finally(() => {
               if (
-                !abortController.signal.aborted &&
+                !signal.aborted &&
                 fetchKey === activeResourceKeyRef.current
               ) {
                 setIsLoading(false);
@@ -178,7 +166,7 @@ export function InvoiceViewer(props: Props) {
       .catch(() => undefined);
 
     return () => {
-      abortController.abort();
+      queryClient.cancelQueries({ queryKey: [props.link, fetchKey] });
       toast.dismiss();
 
       if (fetchKey !== activeResourceKeyRef.current) {
