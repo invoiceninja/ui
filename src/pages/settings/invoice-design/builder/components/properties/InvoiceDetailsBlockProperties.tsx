@@ -201,7 +201,7 @@ export function InvoiceDetailsBlockProperties({
       {/* Show Labels - Toggle to hide/show all prefixes */}
       <CheckboxInput
         id="showLabels"
-        label={String(t('show_labels'))}
+        label={String(t('show_label'))}
         checked={showLabels}
         onChange={(value) => updateProperty('showLabels', value)}
       />

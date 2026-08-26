@@ -103,7 +103,7 @@ export function DocumentSettingsPanel({
       </div>
 
       <div className="space-y-4">
-        <SectionDivider label={t('page_margin') || 'Page Margin (px)'} />
+        <SectionDivider label={t('margin') || ''} />
 
         <div className="grid grid-cols-2 gap-3">
           {(
@@ -147,7 +147,7 @@ export function DocumentSettingsPanel({
       </div>
 
       <div className="space-y-4">
-        <SectionDivider label={t('page_padding') || 'Page Padding (px)'} />
+        <SectionDivider label={t('padding')} />
 
         <div className="grid grid-cols-2 gap-3">
           {(

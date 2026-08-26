@@ -669,7 +669,7 @@ export function InvoiceBuilder() {
               className="flex items-center gap-2"
             >
               <Code2 className="w-4 h-4" />
-              {t('css') || 'CSS'}
+              {t('custom_css')}
             </Button>
             <Button
               type="secondary"
@@ -851,7 +851,7 @@ ${sanitizedCustomCss}
                                     2
                                   );
                                   navigator.clipboard.writeText(blockJson);
-                                  toast.success('block_copied_to_clipboard');
+                                  toast.success('copied_to_clipboard');
                                 }}
                                 onMouseDown={(e) => e.stopPropagation()}
                                 className="p-1 rounded transition-colors text-white/80 hover:text-white hover:bg-white/20"

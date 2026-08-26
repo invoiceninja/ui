@@ -278,7 +278,7 @@ export function ReorderableFieldList({
                     style={{ color: colors.$17 }}
                   >
                     <Settings2 className="w-3 h-3" />
-                    {t('field_options')}
+                    {t('options')}
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
@@ -295,7 +295,6 @@ export function ReorderableFieldList({
                         onChange={(e) =>
                           updateField(index, { prefix: e.target.value })
                         }
-                        placeholder={String(t('prefix_placeholder'))}
                         className="w-full px-2 py-1.5 text-sm rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         style={{
                           backgroundColor: colors.$1,
@@ -317,7 +316,6 @@ export function ReorderableFieldList({
                         onChange={(e) =>
                           updateField(index, { suffix: e.target.value })
                         }
-                        placeholder={String(t('suffix_placeholder'))}
                         className="w-full px-2 py-1.5 text-sm rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         style={{
                           backgroundColor: colors.$1,
