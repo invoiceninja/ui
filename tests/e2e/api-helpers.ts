@@ -65,6 +65,8 @@ export interface ApiContext {
   baseUrl: string;
   token: string;
   headers: Record<string, string>;
+  /** Hashed user id from the login payload; required for /company_users/:id/preferences. */
+  userId?: string;
 }
 
 async function apiRequest(api: ApiContext) {
@@ -97,6 +99,7 @@ export async function createApiContext(
   const body = await response.json();
   const token =
     body.data?.[0]?.token?.token || body.data?.token?.token || body.token;
+  const userId = body.data?.[0]?.user?.id || body.data?.user?.id;
 
   if (!token) {
     throw new Error(
@@ -111,6 +114,7 @@ export async function createApiContext(
   return {
     baseUrl: apiUrl,
     token,
+    userId,
     headers: {
       'X-Api-Token': token,
       'X-Requested-With': 'XMLHttpRequest',
@@ -469,6 +473,61 @@ export async function resetPermissionUser(
   email: string
 ): Promise<void> {
   await setPermissions(api, email, []);
+}
+
+/**
+ * Default react_settings written by the preferences endpoint after a reset.
+ * table_filters / column prefs are the cross-test leak; other keys match app defaults.
+ */
+const CLEAN_USER_REACT_SETTINGS = {
+  show_pdf_preview: true,
+  react_notification_link: true,
+  persist_table_filters: true,
+  table_filters: {},
+  react_table_columns: {},
+  table_footer_columns: {},
+};
+
+/**
+ * Clear persisted list filters and table-column prefs for the authenticated user.
+ * The preferences endpoint only authorizes `auth()->id === route user id`;
+ * updating any other user returns 401.
+ */
+export async function resetUserReactSettings(
+  api: ApiContext,
+  options?: { quiet?: boolean }
+): Promise<void> {
+  if (!api.userId) {
+    throw new Error(
+      'Cannot reset react settings: login response did not include user.id'
+    );
+  }
+
+  const context = await apiRequest(api);
+
+  try {
+    const update = await context.put(
+      `/api/v1/company_users/${api.userId}/preferences`,
+      {
+        headers: api.headers,
+        data: { react_settings: CLEAN_USER_REACT_SETTINGS },
+      }
+    );
+
+    if (!update.ok()) {
+      throw new Error(
+        `Failed to reset react settings (${update.status()}): ${(
+          await update.text()
+        ).slice(0, 200)}`
+      );
+    }
+
+    if (!options?.quiet) {
+      console.log('  Reset react settings');
+    }
+  } finally {
+    await context.dispose();
+  }
 }
 
 /**

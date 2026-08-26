@@ -7,6 +7,7 @@ import {
   purgeUnsuffixedPermissionUsers,
   resetCompanySettings,
   resetPermissionUser,
+  resetUserReactSettings,
   restoreDeletedUsers,
 } from './api-helpers';
 import {
@@ -27,6 +28,7 @@ export async function resetTestAccount(account: TestAccount, label?: string) {
     account.password
   );
 
+  await resetUserReactSettings(api);
   await resetCompanySettings(api);
   await purgeSchedules(api);
   await purgeGroupSettings(api);
