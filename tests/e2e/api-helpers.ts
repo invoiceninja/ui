@@ -15,6 +15,7 @@ import {
   permissionBaseEmails,
   type TestAccount,
 } from './accounts';
+import { e2eLog } from './log';
 
 const ENTITY_ENDPOINTS = [
   'invoices',
@@ -331,7 +332,7 @@ export async function purgeAllEntities(api: ApiContext): Promise<void> {
       if (ids.length > 0) {
         await bulkAction(api, entityType, ids, 'archive');
         await bulkAction(api, entityType, ids, 'delete');
-        console.log(`  Purged ${ids.length} ${entityType}`);
+        e2eLog(`  Purged ${ids.length} ${entityType}`);
       }
     } catch (e) {
       console.warn(`  Failed to purge ${entityType}: ${e}`);
@@ -345,7 +346,7 @@ export async function purgeSchedules(api: ApiContext): Promise<void> {
     if (ids.length > 0) {
       await bulkAction(api, 'task_schedulers', ids, 'archive');
       await bulkAction(api, 'task_schedulers', ids, 'delete');
-      console.log(`  Purged ${ids.length} task_schedulers`);
+      e2eLog(`  Purged ${ids.length} task_schedulers`);
     }
   } catch {
     // task_schedulers may not support bulk — try individual delete
@@ -358,7 +359,7 @@ export async function purgeGroupSettings(api: ApiContext): Promise<void> {
     if (ids.length > 0) {
       await bulkAction(api, 'group_settings', ids, 'archive');
       await bulkAction(api, 'group_settings', ids, 'delete');
-      console.log(`  Purged ${ids.length} group_settings`);
+      e2eLog(`  Purged ${ids.length} group_settings`);
     }
   } catch {
     // best effort
@@ -523,7 +524,7 @@ export async function resetUserReactSettings(
     }
 
     if (!options?.quiet) {
-      console.log('  Reset react settings');
+      e2eLog('  Reset react settings');
     }
   } finally {
     await context.dispose();
@@ -557,7 +558,7 @@ export async function restoreDeletedUsers(api: ApiContext): Promise<void> {
 
   if (deletedIds.length > 0) {
     await bulkAction(api, 'users' as EntityType, deletedIds, 'restore');
-    console.log(`  Restored ${deletedIds.length} deleted seed users`);
+    e2eLog(`  Restored ${deletedIds.length} deleted seed users`);
   }
 }
 
@@ -593,7 +594,7 @@ export async function purgeUnsuffixedPermissionUsers(
 
   await bulkAction(api, 'users' as EntityType, orphanIds, 'archive');
   await bulkAction(api, 'users' as EntityType, orphanIds, 'delete');
-  console.log(
+  e2eLog(
     `  Purged ${orphanIds.length} unsuffixed permission users on lane ${account.id}`
   );
 }
@@ -621,7 +622,7 @@ export async function ensurePermissionUserExists(
   if (existing) {
     if (existing.is_deleted) {
       await bulkAction(api, 'users' as EntityType, [existing.id], 'restore');
-      console.log(`  Restored deleted user ${email}`);
+      e2eLog(`  Restored deleted user ${email}`);
     }
 
     if (
@@ -635,7 +636,7 @@ export async function ensurePermissionUserExists(
       });
 
       if (response.ok()) {
-        console.log(
+        e2eLog(
           `  Updated user name ${email} (${derivedFirst} ${derivedLast})`
         );
       } else {
@@ -669,7 +670,7 @@ export async function ensurePermissionUserExists(
     );
   }
 
-  console.log(
+  e2eLog(
     `  Created missing user ${email} (${derivedFirst} ${derivedLast})`
   );
   return userId;
@@ -797,7 +798,7 @@ export async function resetCompanySettings(api: ApiContext): Promise<void> {
         military_time: false,
       },
     });
-    console.log('  Reset company settings');
+    e2eLog('  Reset company settings');
   } catch (e) {
     console.warn(`  Failed to reset company settings: ${e}`);
   }

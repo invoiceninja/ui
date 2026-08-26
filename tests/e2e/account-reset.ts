@@ -15,10 +15,11 @@ import {
   permissionBaseEmails,
   type TestAccount,
 } from './accounts';
+import { e2eLog } from './log';
 
 export async function resetTestAccount(account: TestAccount, label?: string) {
   const suffix = label ? ` (${label})` : '';
-  console.log(
+  e2eLog(
     `  Reset account lane ${account.id}${suffix}: ${account.ownerEmail}`
   );
 

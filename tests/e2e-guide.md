@@ -60,7 +60,13 @@ npm run test:e2e:parallel -- --concurrency=4
 npm run test:e2e:parallel -- tests/e2e/clients.spec.ts
 npm run test:e2e:parallel -- --project=firefox --concurrency=2
 npm run test:e2e:parallel -- tests/e2e/clients.spec.ts -- --headed
+npm run test:e2e:parallel -- --verbose
+npm run test:e2e:parallel -- --fail-fast
 ```
+
+By default the runner only prints Playwright pass/fail lines and the final spec summary. Setup, preview, and account-reset logs stay hidden unless you pass `--verbose` (`-v`) or set `E2E_VERBOSE=1`. The same env var also unlocks those helper logs during a serial `npm run test:e2e` run.
+
+`--fail-fast` (or `--max-failures=1`, or `E2E_FAIL_FAST=1`) stops the whole parallel run after the first failed test: the failing spec exits immediately, other in-flight specs are cancelled, and queued specs are skipped.
 
 The runner builds with `vite build --mode testing --outDir dist-testing`, starts or reuses Vite preview on port `4173`, and prefixes output per isolated spec lane. Set `PLAYWRIGHT_VITE_OUT_DIR` to override the test build directory. Because `package.json` now exposes this runner, `scripts/playwright-spec-orchestrator.mjs` should be committed with the test changes.
 
