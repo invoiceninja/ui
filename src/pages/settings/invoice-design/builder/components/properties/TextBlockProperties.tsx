@@ -35,7 +35,6 @@ import {
   mergePxOrOmit,
 } from './DesignerPxNumberInput';
 import { useColorScheme } from '$app/common/colors';
-import { trans } from '$app/common/helpers';
 
 export function TextBlockProperties({
   block,
