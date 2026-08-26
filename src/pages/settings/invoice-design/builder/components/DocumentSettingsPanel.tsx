@@ -191,7 +191,7 @@ export function DocumentSettingsPanel({
       </div>
 
       <div className="space-y-3">
-        <SectionDivider label={t('document_options') || 'Document Options'} />
+        <SectionDivider label={t('options') || 'Document Options'} />
 
         <CheckboxInput
           label={t('show_paid_stamp') || 'Show Paid Stamp'}

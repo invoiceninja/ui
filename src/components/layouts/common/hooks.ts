@@ -223,13 +223,11 @@ export function useSaveBtn(options?: SaveButton, deps: unknown[] = []) {
   const { displayButton = true } = options || {};
 
   useEffect(() => {
-    if (options && displayButton) {
-      setSaveBtn(options);
+    if (!options || !displayButton) {
+      return;
     }
 
-    if (options && !displayButton) {
-      setSaveBtn(null);
-    }
+    setSaveBtn(options);
 
     return () => {
       setSaveBtn(null);

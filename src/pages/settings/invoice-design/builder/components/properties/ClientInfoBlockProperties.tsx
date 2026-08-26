@@ -161,7 +161,6 @@ export function ClientInfoBlockProperties({
       block={block}
       onChange={(updated) => onChange(updated as ClientInfoBlock)}
       availableFields={availableFields}
-      title={String(t('client_details'))}
       showTitleOption
     />
   );

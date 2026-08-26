@@ -160,9 +160,9 @@ function WidgetDefaults() {
             customSelector
             dismissable={false}
           >
-            <option value="hidden">{t('hidden')}</option>
-            <option value="dotted">{t('dotted')}</option>
-            <option value="solid">{t('solid')}</option>
+            <option value="hidden">hidden</option>
+            <option value="dotted">dotted</option>
+            <option value="solid">solid</option>
           </SelectField>
         </Element>
 

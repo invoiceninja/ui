@@ -131,15 +131,26 @@ export function PropertyPanel({
         className="space-y-3 border-t pt-4"
         style={{ borderColor: colors.$24 }}
       >
-        <div>
-          <h4 className="text-sm font-medium" style={{ color: colors.$3 }}>
-            {String(t('css_classes', { defaultValue: 'CSS classes' }))}
-          </h4>
-          <p className="mt-1 text-xs leading-5" style={{ color: colors.$17 }}>
-            Built-in selectors remain available on this widget. Add class names
-            without a leading dot, separated by spaces.
-          </p>
-        </div>
+       
+
+
+        <TextInput
+          label={String(
+            t('additional_css_classes', {
+              defaultValue: 'CSS classes (optional)',
+            })
+          )}
+          value={block.properties.cssClasses}
+          placeholder="compact highlighted"
+          changeOverride
+          debounceTimeout={0}
+          onChange={(cssClasses) =>
+            onChange({
+              ...block,
+              properties: { ...block.properties, cssClasses },
+            })
+          }
+        />
 
         <div className="flex flex-wrap gap-1.5">
           {[INVOICE_WIDGET_CLASS, INVOICE_WIDGET_CLASS_BY_TYPE[block.type]].map(
@@ -155,23 +166,6 @@ export function PropertyPanel({
           )}
         </div>
 
-        <TextInput
-          label={String(
-            t('additional_css_classes', {
-              defaultValue: 'Additional CSS classes',
-            })
-          )}
-          value={block.properties.cssClasses}
-          placeholder="compact highlighted"
-          changeOverride
-          debounceTimeout={0}
-          onChange={(cssClasses) =>
-            onChange({
-              ...block,
-              properties: { ...block.properties, cssClasses },
-            })
-          }
-        />
       </div>
 
       {/* Actions */}
@@ -233,9 +227,9 @@ function DividerProperties({ block, onChange }: DividerPropertiesProps) {
           })
         }
         options={[
-          { value: 'solid', label: String(t('solid')) },
-          { value: 'dashed', label: String(t('dashed')) },
-          { value: 'dotted', label: String(t('dotted')) },
+          { value: 'solid', label: 'solid' },
+          { value: 'dashed', label: 'dashed' },
+          { value: 'dotted', label: 'dotted' },
         ]}
       />
     </div>

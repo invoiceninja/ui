@@ -117,7 +117,6 @@ export function ClientShippingInfoBlockProperties({
       block={block}
       onChange={(updated) => onChange(updated as ClientShippingInfoBlock)}
       availableFields={availableFields}
-      title={String(t('ship_to'))}
       showTitleOption
     />
   );

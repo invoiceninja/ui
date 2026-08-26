@@ -23,7 +23,6 @@ import {
   isCompanySettingsFormBusy,
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
-import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
 import { useTabs } from './pages/general-settings/hooks/useTabs';
 import { Settings } from '$app/common/interfaces/company.interface';
@@ -56,10 +55,6 @@ export default function InvoiceDesign() {
   const activeSettings = useActiveSettingsDetails();
   const { isClientSettingsActive, isGroupSettingsActive } =
     useCurrentSettingsLevel();
-  const displaySaveButtonAndPreview =
-    !location.pathname.includes('custom_designs') &&
-    !location.pathname.includes('builder');
-
   const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
   const activeSettingsValue = useAtomValue(activeSettingsAtom);
 
@@ -70,6 +65,10 @@ export default function InvoiceDesign() {
   const showsMainTabs = location.pathname.includes('custom_designs')
     ? location.pathname.endsWith('/custom_designs')
     : !location.pathname.includes('builder');
+
+  const displaySaveButtonAndPreview =
+    !location.pathname.includes('custom_designs') &&
+    !location.pathname.includes('builder');
 
   const isBuilderRoute = location.pathname.includes('builder');
 
@@ -156,15 +155,6 @@ export default function InvoiceDesign() {
     }
   }, [company?.settings]);
 
-  useSaveBtn(
-    {
-      onClick: handleSave,
-      displayButton: displaySaveButtonAndPreview,
-      disableSaveButton: isFormBusy,
-    },
-    [company, updatingRecords, location, isFormBusy]
-  );
-
   const handleCancel = () => {
     if (isBuilderRoute) {
       navigate(route('/settings/invoice_design/custom_designs'));
@@ -172,9 +162,11 @@ export default function InvoiceDesign() {
   };
 
   return (
-    <Default 
-      title={documentTitle} 
+    <Default
+      title={documentTitle}
       breadcrumbs={showsMainTabs ? pages : pages2}
+      onSaveClick={displaySaveButtonAndPreview ? handleSave : undefined}
+      disableSaveButton={displaySaveButtonAndPreview && isFormBusy}
       onCancelClick={isBuilderRoute ? handleCancel : undefined}
     >
       <Tabs

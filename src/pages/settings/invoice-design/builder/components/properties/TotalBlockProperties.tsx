@@ -128,7 +128,7 @@ export function TotalBlockProperties({
           className="block text-sm font-medium"
           style={{ color: colors.$3 }}
         >
-          {t('items_to_display')}
+          {t('fields')}
         </label>
 
         <div className="space-y-2">
@@ -304,13 +304,13 @@ export function TotalBlockProperties({
       <SectionDivider label={String(t('columns'))} />
 
       <AlignmentInput
-        label={String(t('label_alignment'))}
+        label={String(`${t('label')} ${t('alignment')}`)}
         value={block.properties.labelAlign || 'right'}
         onChange={(value) => updateProperty('labelAlign', value)}
       />
 
       <AlignmentInput
-        label={String(t('value_alignment'))}
+        label={String(`${t('value')} ${t('alignment')}`)}
         value={block.properties.valueAlign || 'right'}
         onChange={(value) => updateProperty('valueAlign', value)}
       />

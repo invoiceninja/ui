@@ -107,10 +107,10 @@ export function ImageBlockProperties({
         value={block.properties.objectFit || 'contain'}
         onChange={(value) => updateProperty('objectFit', value)}
         options={[
-          { value: 'contain', label: String(t('contain')) },
-          { value: 'cover', label: String(t('cover')) },
-          { value: 'fill', label: String(t('fill')) },
-          { value: 'none', label: String(t('none')) },
+          { value: 'contain', label: 'contain' },
+          { value: 'cover', label: 'cover' },
+          { value: 'fill', label: 'fill' },
+          { value: 'none', label: 'none' },
         ]}
       />
 

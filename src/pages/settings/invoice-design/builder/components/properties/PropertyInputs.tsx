@@ -77,11 +77,7 @@ export function FontSizeInput({
           </Button>
         ))}
       </div>
-      {isInherited && (
-        <div className="text-xs mt-1.5" style={{ color: colors.$17 }}>
-          {t('inheriting_from_document_default') || 'Inheriting from document default'}
-        </div>
-      )}
+      
     </div>
   );
 }
@@ -462,11 +458,11 @@ export function BorderStyleInput({
       value={value || 'solid'}
       onValueChange={(val) => onChange(val)}
     >
-      <option value="solid">{t('solid')}</option>
-      <option value="dashed">{t('dashed')}</option>
-      <option value="dotted">{t('dotted')}</option>
-      <option value="double">{t('double')}</option>
-      <option value="none">{t('none')}</option>
+      <option value="solid">solid</option>
+      <option value="dashed">dashed</option>
+      <option value="dotted">dotted</option>
+      <option value="double">double</option>
+      <option value="none">none</option>
     </SelectField>
   );
 }

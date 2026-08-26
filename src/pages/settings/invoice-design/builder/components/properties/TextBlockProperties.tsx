@@ -35,6 +35,7 @@ import {
   mergePxOrOmit,
 } from './DesignerPxNumberInput';
 import { useColorScheme } from '$app/common/colors';
+import { trans } from '$app/common/helpers';
 
 export function TextBlockProperties({
   block,
@@ -91,7 +92,7 @@ export function TextBlockProperties({
             style={{ color: colors.$3 }}
           >
             <Code className="w-3 h-3" />
-            {String(t('insert_variable'))}
+            {String(t('variables'))}
           </button>
         </div>
         <textarea
@@ -104,11 +105,9 @@ export function TextBlockProperties({
             color: colors.$3,
           }}
           rows={4}
-          placeholder={String(t('enter_your_text'))}
+          placeholder={String(t('text'))}
         />
-        <p className="text-xs mt-1" style={{ color: colors.$17 }}>
-          {String(t('use_variables_like'))} $company.name, $invoice.number
-        </p>
+        
       </div>
 
       {showVariablePicker && (
@@ -133,7 +132,7 @@ export function TextBlockProperties({
 
       {/* Font Weight & Style */}
       <FontStyleInput
-        label={String(t('text_style'))}
+        label={String(t('font_style'))}
         fontWeight={block.properties.fontWeight || 'normal'}
         fontStyle={block.properties.fontStyle || 'normal'}
         onFontWeightChange={(value) => updateProperty('fontWeight', value)}

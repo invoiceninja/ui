@@ -105,7 +105,7 @@ export function useBlockLibrary(): BlockDefinition[] {
         align: 'left',
         color: DEFAULT_VALUE_TEXT_COLOR,
         showTitle: false,
-        title: t('company_details'),
+        title: String(t('company_details')),
         titleFontWeight: 'bold',
       },
       category: 'branding',

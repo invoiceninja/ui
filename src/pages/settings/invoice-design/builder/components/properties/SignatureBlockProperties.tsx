@@ -90,7 +90,7 @@ export function SignatureBlockProperties({
       />
 
       <FontStyleInput
-        label={String(t('text_style', { defaultValue: 'Text style' }))}
+        label={String(t('font_style'))}
         fontWeight={block.properties.fontWeight || 'normal'}
         fontStyle={block.properties.fontStyle || 'normal'}
         onFontWeightChange={(value) =>
@@ -145,15 +145,15 @@ export function SignatureBlockProperties({
             options={[
               {
                 value: 'solid',
-                label: String(t('solid', { defaultValue: 'Solid' })),
+                label: 'solid',
               },
               {
                 value: 'dashed',
-                label: String(t('dashed', { defaultValue: 'Dashed' })),
+                label: 'dashed',
               },
               {
                 value: 'dotted',
-                label: String(t('dotted', { defaultValue: 'Dotted' })),
+                label: 'dotted',
               },
             ]}
           />

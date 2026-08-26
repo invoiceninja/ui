@@ -582,7 +582,7 @@ export function TableBlockProperties({
 
       {renderBorderControls('headerBorders')}
 
-      <SectionDivider label={String(t('row'))} />
+      <SectionDivider label={String(t('rows'))} />
 
       {/* Alternate Rows */}
       <CheckboxInput

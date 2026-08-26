@@ -212,7 +212,7 @@ export function InvoiceDetailsBlockProperties({
           className="block text-sm font-medium"
           style={{ color: colors.$3 }}
         >
-          {t('field_order')}
+          {t('fields')}
         </label>
 
         <div className="space-y-2">
@@ -453,13 +453,13 @@ export function InvoiceDetailsBlockProperties({
       <SectionDivider label={String(t('columns'))} />
 
       <AlignmentInput
-        label={String(t('w'))}
+        label={String(`${t('label')} ${t('alignment')}`)}
         value={block.properties.labelAlign || 'right'}
         onChange={(value) => updateProperty('labelAlign', value)}
       />
 
       <AlignmentInput
-        label={String(t('value_alignment'))}
+        label={String(`${t('value')} ${t('alignment')}`)}
         value={block.properties.valueAlign || 'right'}
         onChange={(value) => updateProperty('valueAlign', value)}
       />

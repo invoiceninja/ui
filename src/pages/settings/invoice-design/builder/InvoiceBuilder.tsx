@@ -188,7 +188,7 @@ export function InvoiceBuilder() {
           navigate(route('/settings/invoice_design/custom_designs'));
         }
       } catch {
-        toast.error('error_loading_design');
+        toast.error('error');
         navigate(route('/settings/invoice_design/custom_designs'));
       }
     }
@@ -635,7 +635,7 @@ export function InvoiceBuilder() {
                 setDesignNameErrors(null);
               }}
               errorMessage={designNameValidationError(designNameErrors)}
-              placeholder={t('design_name')}
+              placeholder={t('design')}
               className="w-64 !border-0 !bg-transparent focus:ring-0 focus:border-b"
               style={{ borderColor: colors.$24 }}
               debounceTimeout={0}
@@ -709,9 +709,6 @@ export function InvoiceBuilder() {
             className="p-4"
             style={{ borderBottom: `1px solid ${colors.$24}` }}
           >
-            <h2 className="font-semibold text-lg" style={{ color: colors.$3 }}>
-              {t('components')}
-            </h2>
             <p className="text-sm mt-1" style={{ color: colors.$17 }}>
               {t('drag_and_drop_to_add')}
             </p>
@@ -1003,7 +1000,7 @@ ${sanitizedCustomCss}
                 setDesignNameErrors(null);
               }}
               errorMessage={designNameValidationError(designNameErrors)}
-              placeholder={String(t('design_name'))}
+              placeholder={String(t('name'))}
             />
           </div>
           <div className="flex justify-end gap-2">

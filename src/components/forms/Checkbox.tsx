@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useId } from 'react';
 import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
 import CommonProps from '../../common/interfaces/common-props.interface';
@@ -46,6 +47,8 @@ const getCheckmarkSvgUrl = (color: string): string => {
 
 export function Checkbox(props: Props) {
   const colors = useColorScheme();
+  const generatedId = useId();
+  const checkboxId = props.id ?? generatedId;
 
   const checkmarkDataUrl = getCheckmarkSvgUrl(colors.$9);
 
@@ -55,7 +58,7 @@ export function Checkbox(props: Props) {
         <Input
           ref={props.innerRef}
           value={props.value}
-          id={props.id}
+          id={checkboxId}
           aria-describedby="comments-description"
           type="checkbox"
           className={classNames(
@@ -88,7 +91,9 @@ export function Checkbox(props: Props) {
 
       {props.label && (
         <div className="ml-3 text-sm">
-          <InputLabel>{props.label}</InputLabel>
+          <InputLabel for={checkboxId} className="cursor-pointer">
+            {props.label}
+          </InputLabel>
         </div>
       )}
     </div>
