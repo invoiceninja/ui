@@ -8,58 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { MdEdit } from 'react-icons/md';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { Design } from '$app/common/interfaces/design';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { DataTable } from '$app/components/DataTable';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Inline } from '$app/components/Inline';
-import { Button } from '$app/components/forms';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
-import { Paintbrush, Plus } from 'lucide-react';
-import { route } from '$app/common/helpers/route';
-import { Design } from '$app/common/interfaces/design';
-import { MdEdit } from 'react-icons/md';
-
-/**
- * Check if a design was created with the visual builder
- */
-function isVisualBuilderDesign(design: Design): boolean {
-  return Array.isArray(design.design?.blocks) && design.design.blocks.length > 0;
-}
+import {
+  getDesignEditRoute,
+  isVisualBuilderDesign,
+} from '$app/pages/settings/invoice-design/common/helpers/design-editor';
 
 export default function CustomDesigns() {
-  const navigate = useNavigate();
   const [t] = useTranslation();
 
   return (
     <>
       <AdvancedSettingsPlanAlert />
-
-      {/* Create buttons */}
-      <div className="flex gap-3 mb-6">
-        <Button
-          type="secondary"
-          behavior="button"
-          onClick={() => navigate(route('/settings/invoice_design/custom_designs/create'))}
-          className="flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          {t('new_design')}
-        </Button>
-        <Button
-          type="primary"
-          behavior="button"
-          onClick={() => navigate(route('/settings/invoice_design/builder/new'))}
-          className="flex items-center gap-2"
-        >
-          <Paintbrush className="w-4 h-4" />
-          {t('visual_builder')}
-        </Button>
-      </div>
 
       <DataTable
         endpoint="/api/v1/designs?custom=true"
@@ -71,9 +41,13 @@ export default function CustomDesigns() {
               <Inline>
                 <EntityStatus entity={resource} />
                 <p>{field}</p>
-                {isVisualBuilderDesign(resource) && (
+                {isVisualBuilderDesign(resource) ? (
                   <span className="ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded">
                     Visual
+                  </span>
+                ) : (
+                  <span className="ml-2 px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
+                    {t('legacy_design', { defaultValue: 'Legacy Design' })}
                   </span>
                 )}
               </Inline>
@@ -94,11 +68,7 @@ export default function CustomDesigns() {
           (resource: Design) => (
             <DropdownElement
               key="edit"
-              to={
-                isVisualBuilderDesign(resource)
-                  ? route('/settings/invoice_design/builder/:id', { id: resource.id })
-                  : route('/settings/invoice_design/custom_designs/:id/edit', { id: resource.id })
-              }
+              to={getDesignEditRoute(resource)}
               icon={<Icon element={MdEdit} />}
             >
               {t('edit')}

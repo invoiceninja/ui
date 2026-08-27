@@ -8,13 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { route } from '$app/common/helpers/route';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { Tab } from '$app/components/Tabs';
-import { useTranslation } from 'react-i18next';
 
 export function useTabs() {
   const [t] = useTranslation();
@@ -22,27 +21,8 @@ export function useTabs() {
   const company = useCompanyChanges();
   const { isCompanySettingsActive } = useCurrentSettingsLevel();
 
-  const tabs: Tab[] = [
-    { name: t('general_settings'), href: '/settings/invoice_design' },
-    {
-      name: t('custom_designs'),
-      href: '/settings/invoice_design/custom_designs',
-      matcher: [
-        () => '/settings/invoice_design/custom_designs/create',
-        (params) =>
-          route('/settings/invoice_design/custom_designs/:id/edit', params),
-      ],
-      enabled: isCompanySettingsActive,
-    },
-    {
-      name: t('visual_builder'),
-      href: '/settings/invoice_design/builder/templates',
-      matcher: [
-        () => '/settings/invoice_design/builder/templates',
-        () => '/settings/invoice_design/builder/new',
-      ],
-      enabled: isCompanySettingsActive,
-    },
+  const settingsTabs: Tab[] = [
+    { name: t('defaults'), href: '/settings/invoice_design' },
     {
       name: t('client'),
       href: '/settings/invoice_design/client_details',
@@ -110,5 +90,14 @@ export function useTabs() {
     },
   ];
 
-  return tabs;
+  const primaryTabs: Tab[] = [
+    { name: t('general_settings'), href: '/settings/invoice_design' },
+    {
+      name: t('designs'),
+      href: '/settings/invoice_design/custom_designs',
+      enabled: isCompanySettingsActive,
+    },
+  ];
+
+  return { primaryTabs, settingsTabs };
 }

@@ -23,6 +23,9 @@ const CustomDesigns = lazy(
   () => import('./pages/custom-designs/index/CustomDesigns')
 );
 const Create = lazy(() => import('./pages/custom-designs/pages/create/Create'));
+const ChooseDesignType = lazy(
+  () => import('./pages/custom-designs/pages/create/ChooseDesignType')
+);
 const ClientDetails = lazy(
   () => import('./pages/general-settings/components/ClientDetails')
 );
@@ -85,6 +88,7 @@ export const invoiceDesignRoutes = (
   <Route path="invoice_design" element={<InvoiceDesign />}>
     <Route path="" element={<GeneralSettings />} />
     <Route path="custom_designs" element={<CustomDesigns />} />
+    <Route path="custom_designs/new" element={<ChooseDesignType />} />
     <Route
       path="builder/templates"
       element={

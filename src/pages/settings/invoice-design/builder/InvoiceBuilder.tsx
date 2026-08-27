@@ -55,9 +55,9 @@ import {
 import { repairGridPositionCollisions } from './utils/grid/collisions';
 import { shouldGrowBlockToContent } from './utils/grid/content-height';
 import {
-  clampGridValue,
-  GRIDSTACK_CELL_HEIGHT,
-} from './utils/grid/grid-stack-widgets';
+  computeSidebarDropGridPosition,
+  sidebarDropGridPositionToPixels,
+} from './utils/grid/sidebar-drop';
 import {
   documentSettingsToGeneratorShape,
   mergeDesignParts,
@@ -163,6 +163,22 @@ export function InvoiceBuilder() {
 
   const [currentDragDefinition, setCurrentDragDefinition] =
     useState<BlockDefinition | null>(null);
+  const [isCanvasDragOver, setIsCanvasDragOver] = useState(false);
+  const [sidebarDropPreview, setSidebarDropPreview] = useState<{
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    label: string;
+  } | null>(null);
+  const canvasDragDepthRef = useRef(0);
+
+  const clearSidebarDragState = useCallback(() => {
+    canvasDragDepthRef.current = 0;
+    setCurrentDragDefinition(null);
+    setIsCanvasDragOver(false);
+    setSidebarDropPreview(null);
+  }, []);
 
   useLayoutEffect(() => {
     if (existingDesign && designId) {
@@ -310,8 +326,75 @@ export function InvoiceBuilder() {
   }, []);
 
   const handleSidebarDragEnd = useCallback(() => {
-    setCurrentDragDefinition(null);
-  }, []);
+    clearSidebarDragState();
+  }, [clearSidebarDragState]);
+
+  const updateSidebarDropPreview = useCallback(
+    (event: ReactDragEvent<HTMLDivElement>) => {
+      if (!currentDragDefinition) {
+        return;
+      }
+
+      const gridElement = gridContainerRef.current;
+
+      if (!gridElement) {
+        return;
+      }
+
+      const size = getContentConstrainedGridSize(currentDragDefinition, {
+        inheritedFontSize: state.documentSettings.globalFontSize,
+      });
+      const gridPosition = computeSidebarDropGridPosition(
+        event.clientX,
+        event.clientY,
+        gridElement,
+        size,
+        state.zoom
+      );
+
+      setSidebarDropPreview({
+        ...gridPosition,
+        label: currentDragDefinition.label,
+      });
+    },
+    [
+      currentDragDefinition,
+      gridContainerRef,
+      state.documentSettings.globalFontSize,
+      state.zoom,
+    ]
+  );
+
+  const handleCanvasDragEnter = useCallback(
+    (event: ReactDragEvent<HTMLDivElement>) => {
+      if (!currentDragDefinition) {
+        return;
+      }
+
+      event.preventDefault();
+      canvasDragDepthRef.current += 1;
+      setIsCanvasDragOver(true);
+      updateSidebarDropPreview(event);
+    },
+    [currentDragDefinition, updateSidebarDropPreview]
+  );
+
+  const handleCanvasDragLeave = useCallback(
+    (event: ReactDragEvent<HTMLDivElement>) => {
+      if (!currentDragDefinition) {
+        return;
+      }
+
+      event.preventDefault();
+      canvasDragDepthRef.current = Math.max(0, canvasDragDepthRef.current - 1);
+
+      if (canvasDragDepthRef.current === 0) {
+        setIsCanvasDragOver(false);
+        setSidebarDropPreview(null);
+      }
+    },
+    [currentDragDefinition]
+  );
 
   const handleCanvasDragOver = useCallback(
     (event: ReactDragEvent<HTMLDivElement>) => {
@@ -321,8 +404,9 @@ export function InvoiceBuilder() {
 
       event.preventDefault();
       event.dataTransfer.dropEffect = 'copy';
+      updateSidebarDropPreview(event);
     },
-    [currentDragDefinition]
+    [currentDragDefinition, updateSidebarDropPreview]
   );
 
   const handleCanvasDrop = useCallback(
@@ -348,7 +432,7 @@ export function InvoiceBuilder() {
 
       if (!definition) {
         toast.error('error_dropping_block');
-        setCurrentDragDefinition(null);
+        clearSidebarDragState();
         return;
       }
 
@@ -356,26 +440,31 @@ export function InvoiceBuilder() {
 
       if (!gridElement) {
         toast.error('error_dropping_block');
-        setCurrentDragDefinition(null);
+        clearSidebarDragState();
         return;
       }
 
       const size = getContentConstrainedGridSize(definition, {
         inheritedFontSize: state.documentSettings.globalFontSize,
       });
-      const gridRect = gridElement.getBoundingClientRect();
-      const scale = state.zoom / 100 || 1;
-      const relativeX = (event.clientX - gridRect.left) / scale;
-      const relativeY = (event.clientY - gridRect.top) / scale;
-      const unscaledGridWidth = gridRect.width / scale;
-      const columnWidth = unscaledGridWidth / GRID_CONFIG.cols;
-      const rowUnit = GRIDSTACK_CELL_HEIGHT;
-      const x = clampGridValue(
-        Math.floor(relativeX / columnWidth),
-        0,
-        GRID_CONFIG.cols - size.w
-      );
-      const y = Math.max(0, Math.floor(relativeY / rowUnit));
+      const gridPosition =
+        sidebarDropPreview &&
+        sidebarDropPreview.w === size.w &&
+        sidebarDropPreview.h === size.h
+          ? {
+              x: sidebarDropPreview.x,
+              y: sidebarDropPreview.y,
+              w: sidebarDropPreview.w,
+              h: sidebarDropPreview.h,
+            }
+          : computeSidebarDropGridPosition(
+              event.clientX,
+              event.clientY,
+              gridElement,
+              size,
+              state.zoom
+            );
+      const { x, y, w, h } = gridPosition;
       const newBlockId = generateBlockId(definition.type);
 
       const seededProperties = { ...definition.defaultProperties };
@@ -410,12 +499,14 @@ export function InvoiceBuilder() {
         selectedBlockId: null,
       }));
 
-      setCurrentDragDefinition(null);
+      clearSidebarDragState();
     },
     [
+      clearSidebarDragState,
       currentDragDefinition,
       designSettings?.primary_color,
       gridContainerRef,
+      sidebarDropPreview,
       state.documentSettings.globalFontSize,
       state.zoom,
     ]
@@ -729,7 +820,7 @@ export function InvoiceBuilder() {
           >
             <div
               className={`invoice-gridstack-page mx-auto bg-white shadow-2xl relative transition-all canvas-drop-target ${
-                currentDragDefinition ? 'drag-over' : ''
+                isCanvasDragOver && currentDragDefinition ? 'drag-over' : ''
               }`}
               style={{
                 width: pageDimensions.width,
@@ -743,6 +834,8 @@ export function InvoiceBuilder() {
                 transform: `scale(${state.zoom / 100})`,
                 transformOrigin: 'top center',
               }}
+              onDragEnter={handleCanvasDragEnter}
+              onDragLeave={handleCanvasDragLeave}
               onDragOver={handleCanvasDragOver}
               onDrop={handleCanvasDrop}
               onClick={(e) => {
@@ -904,6 +997,34 @@ ${sanitizedCustomCss}
                       </div>
                     </div>
                   ))}
+
+                  {sidebarDropPreview &&
+                    (() => {
+                      const gridWidth =
+                        pageDimensions.pixels -
+                        GRID_CONFIG.containerPadding[0] * 2;
+                      const previewRect = sidebarDropGridPositionToPixels(
+                        sidebarDropPreview,
+                        gridWidth
+                      );
+
+                      return (
+                        <div
+                          className="sidebar-drop-preview"
+                          style={{
+                            left: previewRect.left,
+                            top: previewRect.top,
+                            width: previewRect.width,
+                            height: previewRect.height,
+                          }}
+                          aria-hidden
+                        >
+                          <span className="sidebar-drop-preview__label">
+                            {sidebarDropPreview.label}
+                          </span>
+                        </div>
+                      );
+                    })()}
                 </div>
 
                 {state.blocks.length === 0 && (

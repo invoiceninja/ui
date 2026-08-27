@@ -8,33 +8,40 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import axios, { AxiosPromise } from 'axios';
+import classNames from 'classnames';
+import { useAtomValue } from 'jotai';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { $refetch, RefetchKey } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { Tabs } from '$app/components/Tabs';
+import { Settings } from '$app/common/interfaces/company.interface';
+import { Page } from '$app/components/Breadcrumbs';
+import { Button } from '$app/components/forms';
+import { Sparkle } from '$app/components/icons/Sparkle';
 import { Default } from '$app/components/layouts/Default';
-import axios, { AxiosPromise } from 'axios';
-import { useAtomValue } from 'jotai';
-import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { updatingRecordsAtom } from './common/atoms';
-import { useEffect, useState } from 'react';
+import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
 import {
   isCompanySettingsFormBusy,
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
-import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
+import { updatingRecordsAtom } from './common/atoms';
+import { InvoiceDesignNavigation } from './common/components/InvoiceDesignNavigation';
+import {
+  getInvoiceDesignRouteKind,
+  invoiceDesignsPath,
+  isInvoiceDesignBuilderRoute,
+  isInvoiceDesignCreateRoute,
+} from './common/routes';
 import { useTabs } from './pages/general-settings/hooks/useTabs';
-import { Settings } from '$app/common/interfaces/company.interface';
-import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
-import { route } from '$app/common/helpers/route';
-import { Page } from '$app/components/Breadcrumbs';
-import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { activeSettingsAtom } from '$app/common/atoms/settings';
-import { $refetch, RefetchKey } from '$app/common/hooks/useRefetch';
-import { Sparkle } from '$app/components/icons/Sparkle';
 
 export interface GeneralSettingsPayload {
   client_id: string;
@@ -47,9 +54,7 @@ export default function InvoiceDesign() {
   const [t] = useTranslation();
   const { documentTitle } = useTitle('invoice_design');
 
-  const { id } = useParams();
-
-  const tabs = useTabs();
+  const { primaryTabs, settingsTabs } = useTabs();
   const location = useLocation();
   const company = useCompanyChanges();
   const activeSettings = useActiveSettingsDetails();
@@ -62,15 +67,14 @@ export default function InvoiceDesign() {
 
   const navigate = useNavigate();
 
-  const showsMainTabs = location.pathname.includes('custom_designs')
-    ? location.pathname.endsWith('/custom_designs')
-    : !location.pathname.includes('builder');
-
-  const displaySaveButtonAndPreview =
-    !location.pathname.includes('custom_designs') &&
-    !location.pathname.includes('builder');
-
-  const isBuilderRoute = location.pathname.includes('builder');
+  const routeKind = getInvoiceDesignRouteKind(location.pathname);
+  const showsNavigation = routeKind === 'settings' || routeKind === 'designs';
+  const displaySaveButtonAndPreview = routeKind === 'settings';
+  const isBuilderRoute = isInvoiceDesignBuilderRoute(routeKind);
+  const isDesignWorkflow =
+    routeKind !== 'settings' &&
+    routeKind !== 'designs' &&
+    routeKind !== 'unknown';
 
   const ProBadge = () => (
     <div className="flex space-x-0.5 items-center text-xs py-1 px-2 bg-[#2176FF26] rounded">
@@ -93,18 +97,18 @@ export default function InvoiceDesign() {
     },
   ];
 
-  const pages2: Page[] = [
+  const designPages: Page[] = [
     { name: t('settings'), href: '/settings' },
     { name: t('invoice_design'), href: '/settings/invoice_design' },
     {
-      name: t('custom_designs'),
-      href: '/settings/invoice_design/custom_designs',
+      name: t('designs'),
+      href: invoiceDesignsPath,
     },
     {
-      name: t('design'),
-      href: id
-        ? route('/settings/invoice_design/custom_designs/:id/edit', { id })
-        : '/settings/invoice_design/custom_designs/create',
+      name: isInvoiceDesignCreateRoute(routeKind)
+        ? t('new_design')
+        : t('design'),
+      href: location.pathname,
       afterName: <ProBadge />,
     },
   ];
@@ -164,22 +168,33 @@ export default function InvoiceDesign() {
   return (
     <Default
       title={documentTitle}
-      breadcrumbs={showsMainTabs ? pages : pages2}
+      breadcrumbs={isDesignWorkflow ? designPages : pages}
       onSaveClick={displaySaveButtonAndPreview ? handleSave : undefined}
       disableSaveButton={displaySaveButtonAndPreview && isFormBusy}
       onCancelClick={isBuilderRoute ? handleCancel : undefined}
     >
-      <Tabs
-        tabs={tabs}
-        visible={showsMainTabs}
-        withoutDefaultTabSpace
-        fullRightPadding
-        paddingTabsHeight="2.9rem"
-      />
+      {showsNavigation && (
+        <InvoiceDesignNavigation
+          primaryTabs={primaryTabs}
+          settingsTabs={settingsTabs}
+          routeKind={routeKind}
+          rightSide={
+            routeKind === 'designs' ? (
+              <Button
+                type="primary"
+                to={`${invoiceDesignsPath}/new`}
+                className="whitespace-nowrap"
+              >
+                {t('new_design')}
+              </Button>
+            ) : undefined
+          }
+        />
+      )}
 
       <div
         className={classNames('flex flex-col lg:flex-row gap-4', {
-          'my-4': showsMainTabs,
+          'my-4': showsNavigation,
         })}
       >
         <div

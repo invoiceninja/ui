@@ -23,6 +23,8 @@ import {
   shouldGrowBlockToContent,
   syncGridItemContentMinimum,
 } from '../utils/grid/content-height';
+import { DEDICATED_FIELD_CONTENT_BLOCK_TYPES } from '../utils/field-content-size';
+import { DEDICATED_PROSE_CONTENT_BLOCK_TYPES } from '../utils/text-content-size';
 import {
   blockToGridStackWidget,
   findGridStackElement,
@@ -294,6 +296,25 @@ export function useGridStackCanvas({
 
         shouldFitLoadedContentHeightRef.current = false;
       }
+
+      blocks.forEach((block) => {
+        if (
+          !DEDICATED_FIELD_CONTENT_BLOCK_TYPES.has(block.type) &&
+          !DEDICATED_PROSE_CONTENT_BLOCK_TYPES.has(block.type)
+        ) {
+          return;
+        }
+
+        const item = findGridStackElement(container, block.id);
+
+        if (item) {
+          didResizeToContent =
+            syncGridItemContentMinimum(grid, item, {
+              grow: true,
+              shrink: true,
+            }) || didResizeToContent;
+        }
+      });
 
       isLayoutHydratingRef.current = false;
 

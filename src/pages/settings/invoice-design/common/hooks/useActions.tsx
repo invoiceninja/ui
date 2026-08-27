@@ -8,13 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { EntityState } from '$app/common/enums/entity-state';
-import { endpoint, getEntityState } from '$app/common/helpers';
-import { Design } from '$app/common/interfaces/design';
-import { useBulkAction } from '$app/common/queries/invoice-design';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
-import { Action } from '$app/components/ResourceActions';
+import { useSetAtom } from 'jotai';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
@@ -24,16 +19,21 @@ import {
   MdRestore,
 } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useExportInvoiceDesign } from '../../pages/custom-designs/hooks/useExportInvoiceDesign';
-import { Divider } from '$app/components/cards/Divider';
-import { useRefetch } from '$app/common/hooks/useRefetch';
+import { EntityState } from '$app/common/enums/entity-state';
+import { endpoint, getEntityState } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { route } from '$app/common/helpers/route';
-import { useState } from 'react';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useSetAtom } from 'jotai';
+import { useRefetch } from '$app/common/hooks/useRefetch';
+import { Design } from '$app/common/interfaces/design';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useBulkAction } from '$app/common/queries/invoice-design';
+import { Divider } from '$app/components/cards/Divider';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
+import { useExportInvoiceDesign } from '../../pages/custom-designs/hooks/useExportInvoiceDesign';
 import { designPreviewPropertiesAtom } from '../../pages/custom-designs/pages/edit/components/Settings';
+import { getDesignEditRoute } from '../helpers/design-editor';
 
 interface Params {
   withoutExportAction?: boolean;
@@ -68,11 +68,7 @@ export function useActions({ withoutExportAction = false }: Params = {}) {
 
           refetch(['designs']);
 
-          navigate(
-            route('/settings/invoice_design/custom_designs/:id/edit', {
-              id: response.data.data.id,
-            })
-          );
+          navigate(getDesignEditRoute(response.data.data));
         })
         .finally(() => setIsFormBusy(false));
     }

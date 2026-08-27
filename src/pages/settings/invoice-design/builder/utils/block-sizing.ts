@@ -14,12 +14,20 @@ import type {
   BlockType,
   FieldConfig,
 } from '../types';
+import {
+  measureStackedFieldContentSize,
+  measureTableFieldContentSize,
+} from './field-content-size';
+import { measureProseTextContentSize } from './text-content-size';
 import { GRID_CONFIG } from './grid-converter';
 import { SAMPLE_INVOICE_DATA, replaceVariables } from './variable-replacer';
 
-const EDITOR_CONTENT_PADDING_X = 24;
 const SIZE_BUFFER = 4;
 const AVERAGE_CHARACTER_WIDTH = 0.55;
+
+interface BlockContentSizeContext {
+  blockGridWidth?: number;
+}
 
 interface ContentSize {
   width: number;
@@ -66,50 +74,8 @@ function parseCssNumber(value: unknown, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-function lineHeightPixels(lineHeight: unknown, fontSize: number): number {
-  if (!lineHeight) {
-    return fontSize * 1.4;
-  }
-
-  const lineHeightString = String(lineHeight);
-  const parsed = parseFloat(lineHeightString);
-
-  if (!Number.isFinite(parsed)) {
-    return fontSize * 1.4;
-  }
-
-  if (lineHeightString.includes('px')) {
-    return parsed;
-  }
-
-  if (lineHeightString.includes('%')) {
-    return fontSize * (parsed / 100);
-  }
-
-  return fontSize * parsed;
-}
-
-function columnWidth(): number {
-  const { canvasWidth, cols, margin, containerPadding } = GRID_CONFIG;
-
-  return (
-    (canvasWidth - containerPadding[0] * 2 - margin[0] * (cols - 1)) / cols
-  );
-}
-
-function widthForGridUnits(w: number): number {
-  const colWidth = columnWidth();
-  const marginX = GRID_CONFIG.margin[0];
-
-  return colWidth * w + marginX * (w - 1);
-}
-
-function gridWidthForPixels(width: number): number {
-  const colWidth = columnWidth();
-  const marginX = GRID_CONFIG.margin[0];
-  const gridWidth = Math.ceil((width + marginX) / (colWidth + marginX));
-
-  return clamp(gridWidth, 1, GRID_CONFIG.cols);
+function textWidth(text: string, fontSize: number): number {
+  return text.length * fontSize * AVERAGE_CHARACTER_WIDTH;
 }
 
 function gridHeightForPixels(height: number): number {
@@ -119,106 +85,24 @@ function gridHeightForPixels(height: number): number {
   return Math.max(1, Math.ceil((height + marginY) / (rowHeight + marginY)));
 }
 
-function textWidth(text: string, fontSize: number): number {
-  return text.length * fontSize * AVERAGE_CHARACTER_WIDTH;
-}
-
-function wrappedLineCount(
-  lines: string[],
-  fontSize: number,
-  availableWidth: number
-): number {
-  const usableWidth = Math.max(availableWidth, fontSize * 4);
-
-  return lines.reduce((count, line) => {
-    const lineWidth = textWidth(line || ' ', fontSize);
-
-    return count + Math.max(1, Math.ceil(lineWidth / usableWidth));
-  }, 0);
-}
-
-function textContentSize(
-  text: string,
-  properties: { fontSize?: string; lineHeight?: string },
-  inheritedFontSize: number
-): ContentSize {
-  const fontSize = parseCssNumber(properties.fontSize, inheritedFontSize);
-  const lineHeight = lineHeightPixels(properties.lineHeight, fontSize);
-  const lines = String(text || ' ').split('\n');
-  const width = Math.max(...lines.map((line) => textWidth(line, fontSize)));
-  const initialGridWidth = gridWidthForPixels(
-    width + EDITOR_CONTENT_PADDING_X + SIZE_BUFFER
-  );
-  const availableWidth =
-    widthForGridUnits(initialGridWidth) -
-    EDITOR_CONTENT_PADDING_X -
-    SIZE_BUFFER;
-  const linesToRender = wrappedLineCount(lines, fontSize, availableWidth);
-
-  return {
-    width,
-    height: linesToRender * lineHeight,
-  };
-}
-
-function visibleFieldLines(
-  fieldConfigs: FieldConfig[] | undefined,
-  includeLabels: boolean
-): string[] {
-  if (!fieldConfigs || fieldConfigs.length === 0) {
-    return [];
-  }
-
-  return fieldConfigs.reduce<string[]>((lines, config) => {
-    const value = replaceVariables(config.variable, SAMPLE_INVOICE_DATA);
-
-    if (config.hideIfEmpty !== false && (!value || value.trim() === '')) {
-      return lines;
-    }
-
-    lines.push(
-      `${includeLabels ? config.prefix || '' : ''}${value}${
-        config.suffix || ''
-      }`
-    );
-
-    return lines;
-  }, []);
-}
-
-function fieldContentSize(
-  properties: {
-    fieldConfigs?: FieldConfig[];
-    content?: string;
-    fontSize?: string;
-    lineHeight?: string;
-  },
+function proseBlockContentSize(
+  props: Record<string, unknown>,
   inheritedFontSize: number,
-  options: { title?: string; includeLabels?: boolean } = {}
+  context: BlockContentSizeContext,
+  contentFallback: string
 ): ContentSize {
-  const fieldConfigs = Array.isArray(properties.fieldConfigs)
-    ? properties.fieldConfigs
-    : undefined;
-  const fieldLines = visibleFieldLines(
-    fieldConfigs,
-    options.includeLabels !== false
-  );
-  const fallbackContent = replaceVariables(
-    properties.content || '',
-    SAMPLE_INVOICE_DATA
-  )
-    .split('\n')
-    .filter((line) => line.trim());
-  const lines = fieldLines.length ? fieldLines : fallbackContent;
-
-  if (options.title) {
-    lines.unshift(options.title);
-  }
-
-  return textContentSize(
-    lines.join('\n') || ' ',
-    properties,
-    inheritedFontSize
+  return measureProseTextContentSize(
+    {
+      content: replaceVariables(
+        String(props.content || contentFallback),
+        SAMPLE_INVOICE_DATA
+      ),
+      fontSize: props.fontSize as string | undefined,
+      lineHeight: props.lineHeight as string | undefined,
+      padding: props.padding as string | undefined,
+    },
+    inheritedFontSize,
+    { blockGridWidth: context.blockGridWidth }
   );
 }
 
@@ -311,66 +195,82 @@ function imageContentSize(
 function blockContentSize(
   type: BlockType,
   properties: BlockProperties,
-  inheritedFontSize: number
+  inheritedFontSize: number,
+  context: BlockContentSizeContext = {}
 ): ContentSize {
   const props = properties as Record<string, unknown>;
 
   switch (type) {
     case 'text':
-      return textContentSize(
-        replaceVariables(String(props.content || 'Text'), SAMPLE_INVOICE_DATA),
-        {
-          fontSize: props.fontSize as string | undefined,
-          lineHeight: props.lineHeight as string | undefined,
-        },
-        inheritedFontSize
+      return proseBlockContentSize(
+        props,
+        inheritedFontSize,
+        context,
+        'Text'
       );
     case 'public-notes':
     case 'footer':
     case 'terms':
-      return textContentSize(
-        replaceVariables(String(props.content || ' '), SAMPLE_INVOICE_DATA),
-        {
-          fontSize: props.fontSize as string | undefined,
-          lineHeight: props.lineHeight as string | undefined,
-        },
-        inheritedFontSize
-      );
+      return proseBlockContentSize(props, inheritedFontSize, context, ' ');
     case 'company-info':
-      return fieldContentSize(
+      return measureStackedFieldContentSize(
         {
           fieldConfigs: props.fieldConfigs as FieldConfig[] | undefined,
           content: props.content as string | undefined,
           fontSize: props.fontSize as string | undefined,
           lineHeight: props.lineHeight as string | undefined,
-        },
-        inheritedFontSize
-      );
-    case 'client-info':
-    case 'client-shipping-info':
-      return fieldContentSize(
-        {
-          fieldConfigs: props.fieldConfigs as FieldConfig[] | undefined,
-          content: props.content as string | undefined,
-          fontSize: props.fontSize as string | undefined,
-          lineHeight: props.lineHeight as string | undefined,
+          padding: props.padding as string | undefined,
+          titleFontSize: props.titleFontSize as string | undefined,
         },
         inheritedFontSize,
         {
+          blockGridWidth: context.blockGridWidth,
+          title: props.showTitle ? (props.title as string | undefined) : undefined,
+        }
+      );
+    case 'client-info':
+      return measureStackedFieldContentSize(
+        {
+          fieldConfigs: props.fieldConfigs as FieldConfig[] | undefined,
+          content: props.content as string | undefined,
+          fontSize: props.fontSize as string | undefined,
+          lineHeight: props.lineHeight as string | undefined,
+          padding: props.padding as string | undefined,
+          titleFontSize: props.titleFontSize as string | undefined,
+        },
+        inheritedFontSize,
+        {
+          blockGridWidth: context.blockGridWidth,
+          title: props.showTitle ? (props.title as string | undefined) : undefined,
+        }
+      );
+    case 'client-shipping-info':
+      return measureStackedFieldContentSize(
+        {
+          fieldConfigs: props.fieldConfigs as FieldConfig[] | undefined,
+          content: props.content as string | undefined,
+          fontSize: props.fontSize as string | undefined,
+          lineHeight: props.lineHeight as string | undefined,
+          padding: props.padding as string | undefined,
+          titleFontSize: props.titleFontSize as string | undefined,
+        },
+        inheritedFontSize,
+        {
+          blockGridWidth: context.blockGridWidth,
           title: props.showTitle ? (props.title as string | undefined) : undefined,
         }
       );
     case 'invoice-details':
-      return fieldContentSize(
+      return measureTableFieldContentSize(
         {
           fieldConfigs: props.fieldConfigs as FieldConfig[] | undefined,
           fontSize: props.fontSize as string | undefined,
-          lineHeight: props.lineHeight as string | undefined,
+          padding: props.padding as string | undefined,
+          rowSpacing: props.rowSpacing as string | undefined,
+          labelValueGap: props.labelValueGap as string | undefined,
+          showLabels: props.showLabels !== false,
         },
-        inheritedFontSize,
-        {
-          includeLabels: props.showLabels !== false,
-        }
+        inheritedFontSize
       );
     case 'table':
     case 'tasks-table':
@@ -455,7 +355,7 @@ function blockContentSize(
     }
     default:
       return {
-        width: widthForGridUnits(2),
+        width: GRID_CONFIG.canvasWidth / GRID_CONFIG.cols,
         height: GRID_CONFIG.rowHeight,
       };
   }
@@ -469,14 +369,15 @@ export function getContentConstrainedGridSize(
 ): GridSize {
   const inheritedFontSize = options.inheritedFontSize || 16;
   const fallbackSize = FALLBACK_GRID_SIZES[definition.type];
-  const contentSize = blockContentSize(
-    definition.type,
-    definition.defaultProperties,
-    inheritedFontSize
-  );
   const defaultWidth = parseCssNumber(
     definition.defaultSize?.w,
     fallbackSize.w
+  );
+  const contentSize = blockContentSize(
+    definition.type,
+    definition.defaultProperties,
+    inheritedFontSize,
+    { blockGridWidth: defaultWidth }
   );
   const width = contentSize.fullWidth
     ? GRID_CONFIG.cols

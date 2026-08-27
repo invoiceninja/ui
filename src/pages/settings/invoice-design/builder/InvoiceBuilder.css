@@ -14,6 +14,7 @@
 }
 
 .invoice-gridstack-grid {
+  position: relative;
   width: 100%;
   min-width: 0;
 }
@@ -78,6 +79,28 @@
   background: rgba(59, 130, 246, 0.05);
   border: 2px dashed rgba(59, 130, 246, 0.3);
   border-radius: 4px;
+}
+
+.sidebar-drop-preview {
+  position: absolute;
+  box-sizing: border-box;
+  pointer-events: none;
+  z-index: 60;
+  border: 2px dashed rgba(59, 130, 246, 0.65);
+  background: rgba(59, 130, 246, 0.14);
+  border-radius: 8px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 6px 8px;
+}
+
+.sidebar-drop-preview__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(37, 99, 235, 0.9);
+  line-height: 1.2;
+  user-select: none;
 }
 
 .invoice-gridstack-grid .ui-resizable-handle {

@@ -52,7 +52,7 @@ export async function navigateToInvoiceDesign(page: Page) {
 
 export async function navigateToCustomDesigns(page: Page) {
   await navigateToInvoiceDesign(page);
-  await page.getByRole('link', { name: 'Custom Designs', exact: true }).click();
+  await page.getByRole('link', { name: 'Designs', exact: true }).click();
   await expect(page.getByRole('main')).toBeVisible({ timeout: 10000 });
 }
 

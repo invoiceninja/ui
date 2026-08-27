@@ -573,12 +573,45 @@ test.describe('Invoice designer general settings', () => {
     await expect(page.getByText('Page Size', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Font Size', { exact: true }).first()).toBeVisible();
 
-    await page.getByRole('link', { name: 'Custom Designs', exact: true }).click();
+    const primaryNavigation = page.locator(
+      '[data-cy="invoice-design-primary-navigation"]'
+    );
+    const settingsNavigation = page.locator(
+      '[data-cy="invoice-design-settings-navigation"]'
+    );
+
+    await expect(
+      primaryNavigation.getByRole('link', {
+        name: 'General Settings',
+        exact: true,
+      })
+    ).toBeVisible();
+    await expect(
+      primaryNavigation.getByRole('link', { name: 'Designs', exact: true })
+    ).toBeVisible();
+    await expect(
+      settingsNavigation.getByRole('link', { name: 'Defaults', exact: true })
+    ).toBeVisible();
+    await expect(
+      settingsNavigation.getByRole('link', { name: 'Client', exact: true })
+    ).toBeVisible();
+    await expect(
+      primaryNavigation.getByRole('link', { name: 'Designer', exact: true })
+    ).toHaveCount(0);
+
+    await primaryNavigation
+      .getByRole('link', { name: 'Designs', exact: true })
+      .click();
+
+    await expect(settingsNavigation).toHaveCount(0);
     await expect(
       page.getByRole('button', { name: 'New Design', exact: true })
     ).toBeVisible();
     await expect(
-      page.getByRole('button', { name: /visual[_ ]builder/i })
+      page.getByRole('button', { name: 'Templates', exact: true })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Legacy Design', exact: true })
     ).toBeVisible();
   });
 });
