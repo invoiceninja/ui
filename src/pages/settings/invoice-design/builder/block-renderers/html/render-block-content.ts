@@ -620,8 +620,12 @@ function renderTableBlock(
   });
   rowsHTML += '</tbody>';
 
+  const wrapperStyle = globals.fullDocument
+    ? 'width: 100%;'
+    : 'width: 100%; height: 100%; overflow: auto;';
+
   return `
-    <div style="width: 100%; height: 100%; overflow: auto;">
+    <div style="${wrapperStyle}">
       <table style="width: 100%; border-collapse: collapse; ${tableFontSizeStyle}">
         ${headerHTML}
         ${rowsHTML}

@@ -9,6 +9,7 @@
  */
 
 import type {
+  Block,
   BlockDefinition,
   BlockProperties,
   BlockType,
@@ -20,13 +21,18 @@ import {
 } from './field-content-size';
 import { measureProseTextContentSize } from './text-content-size';
 import { GRID_CONFIG } from './grid-converter';
-import { SAMPLE_INVOICE_DATA, replaceVariables } from './variable-replacer';
+import {
+  InvoiceData,
+  SAMPLE_INVOICE_DATA,
+  replaceVariables,
+} from './variable-replacer';
 
 const SIZE_BUFFER = 4;
 const AVERAGE_CHARACTER_WIDTH = 0.55;
 
 interface BlockContentSizeContext {
   blockGridWidth?: number;
+  layoutData?: InvoiceData;
 }
 
 interface ContentSize {
@@ -108,12 +114,13 @@ function proseBlockContentSize(
 
 function tableContentSize(
   properties: { fontSize?: string; padding?: string },
-  inheritedFontSize: number
+  inheritedFontSize: number,
+  layoutData: InvoiceData = SAMPLE_INVOICE_DATA
 ): ContentSize {
   const fontSize = parseCssNumber(properties.fontSize, inheritedFontSize);
   const padding = parseCssNumber(properties.padding, 8);
   const rowHeight = fontSize * 1.2 + padding * 2;
-  const rowCount = Math.max(1, SAMPLE_INVOICE_DATA.line_items.length);
+  const rowCount = Math.max(1, layoutData.line_items.length);
 
   return {
     width: GRID_CONFIG.canvasWidth,
@@ -279,7 +286,8 @@ function blockContentSize(
           fontSize: props.fontSize as string | undefined,
           padding: props.padding as string | undefined,
         },
-        inheritedFontSize
+        inheritedFontSize,
+        context.layoutData
       );
     case 'total':
       return totalContentSize(
@@ -359,6 +367,36 @@ function blockContentSize(
         height: GRID_CONFIG.rowHeight,
       };
   }
+}
+
+function gridHeightForBlock(block: Block): number {
+  const { rowHeight, margin } = GRID_CONFIG;
+  const { h } = block.gridPosition;
+
+  return Math.max(0, h * rowHeight + (h - 1) * margin[1]);
+}
+
+/** Pixel height for preview layout; save/export paths do not call this. */
+export function getBlockContentPixelHeight(
+  block: Block,
+  layoutData: InvoiceData,
+  inheritedFontSize: number,
+  canvasWidth: number = GRID_CONFIG.canvasWidth,
+  horizontalPadding: number = GRID_CONFIG.containerPadding[0] * 2
+): number {
+  const { w } = block.gridPosition;
+  const { cols, margin } = GRID_CONFIG;
+  const availableWidth = canvasWidth - horizontalPadding;
+  const colWidth = availableWidth / cols;
+  const blockGridWidth = w * colWidth + Math.max(0, w - 1) * margin[0];
+  const contentSize = blockContentSize(
+    block.type,
+    block.properties,
+    inheritedFontSize,
+    { blockGridWidth, layoutData }
+  );
+
+  return Math.max(gridHeightForBlock(block), contentSize.height);
 }
 
 export function getContentConstrainedGridSize(

@@ -99,9 +99,11 @@ export default function ChooseDesignType() {
       <div
         className="grid grid-cols-1 md:grid-cols-3 gap-4"
         role="radiogroup"
-        aria-label={t('choose_design_type', {
-          defaultValue: 'Choose how to create your design',
-        })}
+        aria-label={
+          t('choose_design_type', {
+            defaultValue: 'Choose how to create your design',
+          }) as string
+        }
       >
         {options.map((option) => {
           const isSelected = option.id === selectedType;
@@ -116,16 +118,14 @@ export default function ChooseDesignType() {
               className={classNames(
                 'relative min-h-56 rounded-lg border p-6 text-left transition-all duration-150',
                 {
-                  'shadow-md ring-1': isSelected,
+                  'shadow-md': isSelected,
                   'hover:shadow-sm': !isSelected,
                 }
               )}
               style={{
                 backgroundColor: colors.$1,
                 borderColor: isSelected ? colors.$3 : colors.$24,
-                boxShadow: isSelected
-                  ? `0 0 0 1px ${colors.$3}`
-                  : undefined,
+                boxShadow: isSelected ? `0 0 0 1px ${colors.$3}` : undefined,
               }}
               data-cy={`design-type-${option.id}`}
             >

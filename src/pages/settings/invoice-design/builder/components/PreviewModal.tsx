@@ -39,12 +39,15 @@ export function PreviewModal({
   const [zoom, setZoom] = useState(80);
   const colors = useColorScheme();
   const sampleData = useSampleInvoiceData();
-  const html = generateInvoiceHTML(
+  const preview = generateInvoiceHTML(
     blocks,
     sampleData,
     designSettings,
-    customCss
+    customCss ?? '',
+    { fullDocument: true }
   );
+  const html = preview.html;
+  const documentHeight = preview.documentHeight;
   const dimensions = getGeneratorPageDimensions(
     designSettings?.page_size,
     designSettings?.page_layout
@@ -155,8 +158,8 @@ export function PreviewModal({
               className="border-0 block"
               style={{
                 width: `${dimensions.width}px`,
-                height: `${dimensions.height}px`,
-                minHeight: `${dimensions.height}px`,
+                height: `${documentHeight}px`,
+                minHeight: `${documentHeight}px`,
                 backgroundColor: colors.$1,
               }}
               title={String(t('preview'))}

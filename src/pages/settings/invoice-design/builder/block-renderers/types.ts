@@ -22,6 +22,8 @@ export interface GeneratorGlobals {
   primaryColor: string;
   secondaryColor: string;
   showPaidStamp: boolean;
+  /** Preview-only: expandable blocks render full content instead of scrolling. */
+  fullDocument?: boolean;
 }
 
 export interface BlockRenderContext {

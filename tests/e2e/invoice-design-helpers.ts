@@ -497,6 +497,9 @@ export async function createLegacyInvoiceDesign(
   await expect(page.getByRole('heading', { name: 'New Design' })).toBeVisible({
     timeout: 15000,
   });
+  await expect(
+    page.getByRole('main').getByText('Type', { exact: true })
+  ).toHaveCount(0);
 
   const nameInput = page
     .getByRole('main')
@@ -514,8 +517,10 @@ export async function createLegacyInvoiceDesign(
     .getByTestId('combobox-input-field')
     .first();
   await expect(designCombobox).toBeVisible({ timeout: 30000 });
-  await designCombobox.click();
-  await page.getByRole('option').first().click();
+  await expect(designCombobox).not.toHaveValue('', { timeout: 30000 });
+  await expect(page.getByRole('main').locator('iframe')).toBeVisible({
+    timeout: 30000,
+  });
 
   await page.getByRole('button', { name: 'Save' }).click();
 

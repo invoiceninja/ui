@@ -604,14 +604,64 @@ test.describe('Invoice designer general settings', () => {
       .click();
 
     await expect(settingsNavigation).toHaveCount(0);
+    const newDesignButton = page.getByRole('link', {
+      name: 'New Design',
+      exact: true,
+    });
+
+    await expect(newDesignButton).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Templates' })).toHaveCount(0);
     await expect(
-      page.getByRole('button', { name: 'New Design', exact: true })
-    ).toBeVisible();
+      page.getByRole('button', { name: 'Legacy Design' })
+    ).toHaveCount(0);
+
+    await newDesignButton.click();
+    await page.waitForURL('**/settings/invoice_design/custom_designs/new');
+
+    const legacyOption = page.getByRole('radio', { name: /Legacy/ });
+    const twigOption = page.getByRole('radio', { name: /Twig Template/ });
+    const guiOption = page.getByRole('radio', { name: /GUI Designer/ });
+
+    await expect(legacyOption).toBeVisible();
+    await expect(twigOption).toBeVisible();
+    await expect(guiOption).toBeVisible();
+    await expect(guiOption).toHaveAttribute('aria-checked', 'true');
+    await expect(page.getByText('Recommended', { exact: true })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Next', exact: true }).click();
+    await page.waitForURL('**/settings/invoice_design/builder/templates');
+  });
+
+  test('Twig selection forces template mode without showing the type control', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+
+    await login(page);
+    await page.goto(
+      '/settings/invoice_design/custom_designs/new?redirect=false'
+    );
+
+    await page.getByRole('radio', { name: /Twig Template/ }).click();
+    await page.getByRole('button', { name: 'Next', exact: true }).click();
+    await page.waitForURL(
+      /\/settings\/invoice_design\/custom_designs\/create\?type=template$/
+    );
+
     await expect(
-      page.getByRole('button', { name: 'Templates', exact: true })
-    ).toBeVisible();
+      page.getByRole('heading', { name: 'New Twig Template', exact: true })
+    ).toBeVisible({ timeout: 15000 });
     await expect(
-      page.getByRole('button', { name: 'Legacy Design', exact: true })
+      page.getByRole('main').getByText('Type', { exact: true })
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole('main').getByText('Resource', { exact: true })
     ).toBeVisible();
+    await expect(page.locator('.monaco-editor')).toBeVisible({
+      timeout: 30000,
+    });
+    await expect(page.getByRole('main').locator('iframe')).toBeVisible({
+      timeout: 30000,
+    });
   });
 });

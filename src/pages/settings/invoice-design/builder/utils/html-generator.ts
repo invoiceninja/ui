@@ -11,6 +11,7 @@
 import { Block } from '../types';
 import { GRID_CONFIG } from './grid-converter';
 import { InvoiceData, SAMPLE_INVOICE_DATA } from './variable-replacer';
+import { getBlockContentPixelHeight } from './block-sizing';
 import { getInvoiceWidgetClassName } from '../constants/widget-classes';
 import { sanitizeCustomCss } from './custom-css';
 import { sanitizeHTML } from '$app/common/helpers/html-string';
@@ -29,6 +30,23 @@ export { ensurePx, getGeneratorPageDimensions };
 export type { GeneratorPageDimensions };
 
 /**
+ * Grid rows occupied by a block's vertical span (y .. y+h-1).
+ */
+function buildOccupiedGridRows(blocks: Block[]): Set<number> {
+  const occupiedRows = new Set<number>();
+
+  blocks.forEach((block) => {
+    const { y, h } = block.gridPosition;
+
+    for (let row = y; row < y + h; row += 1) {
+      occupiedRows.add(row);
+    }
+  });
+
+  return occupiedRows;
+}
+
+/**
  * Group blocks by their Y position (row)
  */
 function groupBlocksByRow(blocks: Block[]): Map<number, Block[]> {
@@ -45,20 +63,52 @@ function groupBlocksByRow(blocks: Block[]): Map<number, Block[]> {
 
 /**
  * Calculate row heights based on builder grid dimensions.
+ * Preview mode uses content-aware heights so tall blocks expand their row.
  */
-function calculateRowHeights(rows: Map<number, Block[]>): Map<number, number> {
+function calculateRowHeights(
+  rows: Map<number, Block[]>,
+  options: {
+    fullDocument: boolean;
+    layoutData: InvoiceData;
+    inheritedFontSize: number;
+    canvasWidth: number;
+    horizontalPadding: number;
+  }
+): Map<number, number> {
   const rowHeights = new Map<number, number>();
   const { rowHeight, margin } = GRID_CONFIG;
+  const {
+    fullDocument,
+    layoutData,
+    inheritedFontSize,
+    canvasWidth,
+    horizontalPadding,
+  } = options;
 
   rows.forEach((blocks, y) => {
     const maxGridHeight = Math.max(
-      ...blocks.map((block) =>
-        Math.max(
+      ...blocks.map((block) => {
+        const gridHeight = Math.max(
           0,
           block.gridPosition.h * rowHeight +
             (block.gridPosition.h - 1) * margin[1]
-        )
-      )
+        );
+
+        if (!fullDocument) {
+          return gridHeight;
+        }
+
+        return Math.max(
+          gridHeight,
+          getBlockContentPixelHeight(
+            block,
+            layoutData,
+            inheritedFontSize,
+            canvasWidth,
+            horizontalPadding
+          )
+        );
+      })
     );
 
     rowHeights.set(y, maxGridHeight);
@@ -69,19 +119,46 @@ function calculateRowHeights(rows: Map<number, Block[]>): Map<number, number> {
 
 /**
  * Calculate top positions for each row based on grid coordinates.
- * Matches builder grid positioning exactly.
+ * Preview mode stacks rows cumulatively using measured row heights.
  */
 function calculateRowPositions(
   rowHeights: Map<number, number>,
-  topPadding: number = GRID_CONFIG.containerPadding[1]
+  topPadding: number = GRID_CONFIG.containerPadding[1],
+  fullDocument: boolean = false,
+  blocks: Block[] = []
 ): Map<number, number> {
   const rowPositions = new Map<number, number>();
   const { rowHeight, margin } = GRID_CONFIG;
 
-  rowHeights.forEach((_, y) => {
-    const top = topPadding + y * (rowHeight + margin[1]);
-    rowPositions.set(y, top);
-  });
+  if (!fullDocument) {
+    rowHeights.forEach((_, y) => {
+      const top = topPadding + y * (rowHeight + margin[1]);
+      rowPositions.set(y, top);
+    });
+
+    return rowPositions;
+  }
+
+  const occupiedRows = buildOccupiedGridRows(blocks);
+  const maxRow = Math.max(
+    ...blocks.map((block) => block.gridPosition.y + block.gridPosition.h - 1),
+    0
+  );
+  let currentTop = topPadding;
+
+  for (let y = 0; y <= maxRow; y += 1) {
+    if (rowHeights.has(y)) {
+      rowPositions.set(y, currentTop);
+      currentTop += rowHeights.get(y)! + margin[1];
+      continue;
+    }
+
+    // Only advance through rows that are genuinely empty — not spanned by a
+    // taller block starting on an earlier row (which caused massive gaps).
+    if (!occupiedRows.has(y)) {
+      currentTop += rowHeight + margin[1];
+    }
+  }
 
   return rowPositions;
 }
@@ -118,6 +195,32 @@ export interface GeneratorDesignSettings {
   page_padding_left?: number;
 }
 
+export interface GenerateInvoiceHTMLOptions {
+  /** Preview-only: expand content and stack rows to the full document height. */
+  fullDocument?: boolean;
+}
+
+export interface GenerateInvoiceHTMLPreviewResult {
+  html: string;
+  documentHeight: number;
+}
+
+export function generateInvoiceHTML(
+  blocks: Block[],
+  previewData?: InvoiceData,
+  designSettings?: GeneratorDesignSettings,
+  customCss?: string,
+  options?: GenerateInvoiceHTMLOptions & { fullDocument?: false | undefined }
+): string;
+
+export function generateInvoiceHTML(
+  blocks: Block[],
+  previewData: InvoiceData | undefined,
+  designSettings: GeneratorDesignSettings | undefined,
+  customCss: string,
+  options: GenerateInvoiceHTMLOptions & { fullDocument: true }
+): GenerateInvoiceHTMLPreviewResult;
+
 /**
  * Generate complete HTML document from blocks using row-based height calculation
  * This ensures content-driven heights and eliminates wasted vertical space
@@ -126,9 +229,11 @@ export function generateInvoiceHTML(
   blocks: Block[],
   previewData?: InvoiceData,
   designSettings?: GeneratorDesignSettings,
-  customCss: string = ''
-): string {
+  customCss: string = '',
+  options: GenerateInvoiceHTMLOptions = {}
+): string | GenerateInvoiceHTMLPreviewResult {
   customCss = sanitizeCustomCss(customCss);
+  const fullDocument = options.fullDocument === true;
   // Layout/height calculations always need a concrete data shape.
   // Variable substitution is gated on previewData — when absent, tokens stay literal.
   const layoutData = previewData || SAMPLE_INVOICE_DATA;
@@ -160,6 +265,7 @@ export function generateInvoiceHTML(
     primaryColor,
     secondaryColor,
     showPaidStamp: Boolean(designSettings?.show_paid_stamp),
+    fullDocument,
   };
 
   // Sort blocks by Y position, then by X position for same row
@@ -210,8 +316,21 @@ export function generateInvoiceHTML(
 
   // Group blocks by row and calculate row-based heights
   const rows = groupBlocksByRow(blocks);
-  const rowHeights = calculateRowHeights(rows);
-  const rowPositions = calculateRowPositions(rowHeights, effectivePadding.top);
+  const horizontalPadding =
+    effectivePadding.left + effectivePadding.right;
+  const rowHeights = calculateRowHeights(rows, {
+    fullDocument,
+    layoutData,
+    inheritedFontSize: fontSize,
+    canvasWidth: pageDimensions.width,
+    horizontalPadding,
+  });
+  const rowPositions = calculateRowPositions(
+    rowHeights,
+    effectivePadding.top,
+    fullDocument,
+    blocks
+  );
 
   // Render blocks with row-based positioning
   const blocksHTML = sortedBlocks
@@ -224,37 +343,78 @@ export function generateInvoiceHTML(
         rowPositions,
         globals,
         effectivePadding,
-        pageDimensions.width
+        pageDimensions.width,
+        fullDocument,
+        fontSize,
+        horizontalPadding
       )
     )
     .join('\n');
 
   // Calculate container height from actual block positions and grid heights
-  let maxBottom = 0;
+  let containerHeight = pageDimensions.height;
+
   if (blocks.length > 0) {
-    const { rowHeight, margin } = GRID_CONFIG;
-    maxBottom = Math.max(
-      ...blocks.map((block) => {
-        const { y, h } = block.gridPosition;
-        const top = effectivePadding.top + y * (rowHeight + margin[1]);
-        const gridHeight = Math.max(0, h * rowHeight + (h - 1) * margin[1]);
-        return top + gridHeight;
-      })
-    );
+    if (fullDocument) {
+      const { rowHeight, margin } = GRID_CONFIG;
+      const maxBottom = Math.max(
+        ...blocks.map((block) => {
+          const { y, h } = block.gridPosition;
+          const top = rowPositions.get(y) ?? effectivePadding.top;
+          const gridHeight = Math.max(
+            0,
+            h * rowHeight + (h - 1) * margin[1]
+          );
+          const blockHeight = Math.max(
+            gridHeight,
+            getBlockContentPixelHeight(
+              block,
+              layoutData,
+              fontSize,
+              pageDimensions.width,
+              horizontalPadding
+            )
+          );
+
+          return top + blockHeight;
+        })
+      );
+
+      containerHeight = maxBottom + effectivePadding.bottom;
+    } else {
+      const { rowHeight, margin } = GRID_CONFIG;
+      const maxBottom = Math.max(
+        ...blocks.map((block) => {
+          const { y, h } = block.gridPosition;
+          const top = effectivePadding.top + y * (rowHeight + margin[1]);
+          const gridHeight = Math.max(
+            0,
+            h * rowHeight + (h - 1) * margin[1]
+          );
+
+          return top + gridHeight;
+        })
+      );
+
+      containerHeight = Math.max(
+        maxBottom + effectivePadding.bottom,
+        pageDimensions.height
+      );
+    }
   } else {
-    maxBottom = effectivePadding.top;
+    containerHeight = fullDocument
+      ? effectivePadding.top + effectivePadding.bottom
+      : pageDimensions.height;
   }
 
-  // Add bottom inset
-  maxBottom += effectivePadding.bottom;
-
-  // Ensure the document is at least one configured page tall.
-  const containerHeight = Math.max(
-    maxBottom || pageDimensions.height,
-    pageDimensions.height
-  );
-
   const showPageNumbering = designSettings?.page_numbering;
+  const bodyOverflow = fullDocument ? 'visible' : 'hidden';
+  const bodyHeight = fullDocument ? 'auto' : `${containerHeight}px`;
+  const containerHeightStyle = fullDocument ? 'auto' : `${containerHeight}px`;
+  const containerMinHeight = fullDocument
+    ? `${pageDimensions.height}px`
+    : undefined;
+  const containerOverflow = fullDocument ? 'visible' : 'hidden';
 
   const generatedHtml = `
 <!DOCTYPE html>
@@ -282,8 +442,8 @@ export function generateInvoiceHTML(
       margin: 0;
       padding: 0;
       width: ${pageDimensions.width}px;
-      height: ${containerHeight}px;
-      overflow: hidden; /* Prevent scrollbars */
+      height: ${bodyHeight};
+      overflow: ${bodyOverflow}; /* Prevent scrollbars in save/export output */
       font-family: ${globals.fontFamilyPrimary};
       font-size: ${fontSize}px;
       color: ${primaryColor};
@@ -297,14 +457,15 @@ export function generateInvoiceHTML(
 
     .invoice-container {
       width: 100%;
-      height: ${containerHeight}px;
+      height: ${containerHeightStyle};
+      ${containerMinHeight ? `min-height: ${containerMinHeight};` : ''}
       background: white;
       margin: 0;
       padding: ${effectivePadding.top}px ${effectivePadding.right}px ${
     effectivePadding.bottom
   }px ${effectivePadding.left}px;
       position: relative;
-      overflow: hidden; /* Prevent any visual artifacts from extending beyond container */
+      overflow: ${containerOverflow};
       box-sizing: border-box; /* Include padding in width calculation */
     }
 
@@ -404,7 +565,16 @@ export function generateInvoiceHTML(
 </html>
   `.trim();
 
-  return sanitizeGeneratedInvoiceHtml(generatedHtml);
+  const sanitizedHtml = sanitizeGeneratedInvoiceHtml(generatedHtml);
+
+  if (fullDocument) {
+    return {
+      html: sanitizedHtml,
+      documentHeight: containerHeight,
+    };
+  }
+
+  return sanitizedHtml;
 }
 
 /**
@@ -424,7 +594,10 @@ function renderBlockWithRowHeight(
     bottom: number;
     left: number;
   },
-  canvasWidth: number
+  canvasWidth: number,
+  fullDocument: boolean,
+  inheritedFontSize: number,
+  horizontalPadding: number
 ): string {
   const content = renderBlockContent(block, previewData, layoutData, globals);
 
@@ -448,6 +621,18 @@ function renderBlockWithRowHeight(
   const top = rowPositions.get(y) || effectivePadding.top;
 
   const gridHeight = Math.max(0, h * rowHeight + (h - 1) * margin[1]);
+  const blockHeight = fullDocument
+    ? Math.max(
+        gridHeight,
+        getBlockContentPixelHeight(
+          block,
+          layoutData,
+          inheritedFontSize,
+          canvasWidth,
+          horizontalPadding
+        )
+      )
+    : gridHeight;
 
   // Ensure blocks never exceed container bounds
   const maxLeft = effectivePadding.left;
@@ -458,7 +643,7 @@ function renderBlockWithRowHeight(
   const constrainedWidthPercent = (constrainedWidth / canvasWidth) * 100;
 
   // Use min-height so content can grow if taller than the grid cell
-  const heightStyle = `min-height: ${gridHeight}px;`;
+  const heightStyle = `min-height: ${blockHeight}px;`;
 
   // Page-break behaviour for the totals block:
   //   keepTogether === true  → force a page break before this block
