@@ -95,9 +95,7 @@ export function InvoiceDesignNavigation({
                   }
                   style={{
                     backgroundColor:
-                      location.pathname === tab.href
-                        ? colors.$25
-                        : 'transparent',
+                      location.pathname === tab.href ? colors.$25 : colors.$1,
                     color:
                       location.pathname === tab.href ? colors.$3 : colors.$17,
                     borderColor:
