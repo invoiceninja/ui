@@ -155,4 +155,65 @@ describe('generateInvoiceHTML', () => {
     expect(html).toContain('height: 100%; overflow: auto;');
     expect(typeof html).toBe('string');
   });
+
+  it('does not add gap rows already spanned by a taller block in fullDocument preview', () => {
+    const tallTable: TableBlock = {
+      id: 'table-top',
+      type: 'table',
+      gridPosition: { x: 0, y: 0, w: 12, h: 8 },
+      properties: {
+        columns: [
+          {
+            id: 'item',
+            header: 'Item',
+            align: 'left',
+            width: '100%',
+            field: '$line_item.product_key',
+          },
+        ],
+        headerBg: '#000000',
+        headerColor: '#ffffff',
+        headerFontWeight: '600',
+        padding: '8px',
+        rowBg: '#ffffff',
+        alternateRowBg: '#f9fafb',
+        alternateRows: true,
+        rowColor: '#111827',
+      },
+    };
+    const footer: TextBlock = {
+      id: 'footer-text',
+      type: 'text',
+      gridPosition: { x: 0, y: 10, w: 12, h: 2 },
+      properties: { content: 'Footer note' },
+    };
+
+    const preview = generateInvoiceHTML(
+      [tallTable, footer],
+      SAMPLE_INVOICE_DATA,
+      { font_size: 16, page_size: 'A4', page_layout: 'portrait' },
+      '',
+      { fullDocument: true }
+    );
+
+    const footerTopMatch = preview.html.match(
+      /id="footer-text"[^>]*style="[^"]*top:\s*([0-9.]+)px/
+    );
+    const tableTopMatch = preview.html.match(
+      /id="table-top"[^>]*style="[^"]*top:\s*([0-9.]+)px/
+    );
+
+    expect(tableTopMatch).not.toBeNull();
+    expect(footerTopMatch).not.toBeNull();
+
+    const tableTop = Number(tableTopMatch?.[1]);
+    const footerTop = Number(footerTopMatch?.[1]);
+    const tableHeightMatch = preview.html.match(
+      /id="table-top"[^>]*style="[^"]*min-height:\s*([0-9.]+)px/
+    );
+    const tableHeight = Number(tableHeightMatch?.[1]);
+
+    expect(footerTop).toBeLessThan(tableTop + tableHeight + 80);
+    expect(footerTop).toBeGreaterThan(tableTop + tableHeight);
+  });
 });
