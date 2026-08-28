@@ -9,7 +9,7 @@
  */
 
 import classNames from 'classnames';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { range } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,7 +33,15 @@ import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { companySettingsErrorsAtom } from '$app/pages/settings/common/atoms';
 import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
-import { updatingRecordsAtom as updatingRecordsAtom } from '../../../common/atoms';
+import {
+  DESIGN_SETTING_ENTITY_MAP,
+  DesignSettingKey,
+  getDesignChangeEntityType,
+  isOptionalDesignSetting,
+  livePreviewEntityTypeAtom,
+  shouldPreviewLiveDesign,
+  updatingRecordsAtom as updatingRecordsAtom,
+} from '../../../common/atoms';
 
 const fonts = [
   { value: 'ABeeZee', label: 'ABeeZee' },
@@ -783,6 +791,7 @@ export default function GeneralSettings() {
   const errors = useAtomValue(companySettingsErrorsAtom);
 
   const [updatingRecords, setUpdatingRecords] = useAtom(updatingRecordsAtom);
+  const setLivePreviewEntityType = useSetAtom(livePreviewEntityTypeAtom);
   const [logoSizeType, setLogoSizeType] = useState<'%' | 'px'>('%');
 
   const { data: designs } = useDesignsQuery();
@@ -800,7 +809,40 @@ export default function GeneralSettings() {
     return Boolean(updatingRecords?.find((value) => value.entity === property));
   };
 
-  const handleChange = useHandleSettingsValueChange();
+  const saveSetting = useHandleSettingsValueChange();
+
+  const handleChange = <T extends keyof Company['settings'], R extends Company['settings'][T]>(
+    property: T,
+    value: R
+  ) => {
+    setLivePreviewEntityType((current) => {
+      if (!shouldPreviewLiveDesign(current, company?.settings ?? null)) {
+        return 'invoice';
+      }
+
+      return current;
+    });
+    saveSetting(property, value);
+  };
+
+  const handleDesignChange = (
+    setting: DesignSettingKey,
+    value: string
+  ) => {
+    const nextEntityType = getDesignChangeEntityType(setting, value);
+
+    if (nextEntityType === null) {
+      if (isOptionalDesignSetting(setting)) {
+        setLivePreviewEntityType(DESIGN_SETTING_ENTITY_MAP[setting]);
+      }
+
+      saveSetting(setting, value);
+      return;
+    }
+
+    setLivePreviewEntityType(nextEntityType);
+    saveSetting(setting, value);
+  };
 
   const handleUpdateAllRecordsChange = (
     property: 'invoice' | 'quote' | 'credit' | 'purchase_order',
@@ -904,7 +946,7 @@ export default function GeneralSettings() {
               id="settings.invoice_design_id"
               value={company?.settings?.invoice_design_id || 'VolejRejNm'}
               onValueChange={(value) =>
-                handleChange('invoice_design_id', value)
+                handleDesignChange('invoice_design_id', value)
               }
               disabled={disableSettingsField('invoice_design_id')}
               errorMessage={errors?.errors['settings.invoice_design_id']}
@@ -957,7 +999,7 @@ export default function GeneralSettings() {
             <SelectField
               id="settings.quote_design_id"
               value={company?.settings?.quote_design_id || 'VolejRejNm'}
-              onValueChange={(value) => handleChange('quote_design_id', value)}
+              onValueChange={(value) => handleDesignChange('quote_design_id', value)}
               disabled={disableSettingsField('quote_design_id')}
               errorMessage={errors?.errors['settings.quote_design_id']}
               customSelector
@@ -1009,7 +1051,7 @@ export default function GeneralSettings() {
             <SelectField
               id="settings.credit_design_id"
               value={company?.settings?.credit_design_id || 'VolejRejNm'}
-              onValueChange={(value) => handleChange('credit_design_id', value)}
+              onValueChange={(value) => handleDesignChange('credit_design_id', value)}
               disabled={disableSettingsField('credit_design_id')}
               errorMessage={errors?.errors['settings.credit_design_id']}
               customSelector
@@ -1066,7 +1108,7 @@ export default function GeneralSettings() {
                 company?.settings?.purchase_order_design_id || 'VolejRejNm'
               }
               onValueChange={(value) =>
-                handleChange('purchase_order_design_id', value)
+                handleDesignChange('purchase_order_design_id', value)
               }
               disabled={disableSettingsField('purchase_order_design_id')}
               errorMessage={errors?.errors['settings.purchase_order_design_id']}
@@ -1124,7 +1166,7 @@ export default function GeneralSettings() {
               id="settings.statement_design_id"
               value={company?.settings?.statement_design_id || ''}
               onValueChange={(value) =>
-                handleChange('statement_design_id', value)
+                handleDesignChange('statement_design_id', value)
               }
               disabled={disableSettingsField('statement_design_id')}
               errorMessage={errors?.errors['settings.statement_design_id']}
@@ -1155,7 +1197,7 @@ export default function GeneralSettings() {
               id="settings.delivery_note_design_id"
               value={company?.settings?.delivery_note_design_id || ''}
               onValueChange={(value) =>
-                handleChange('delivery_note_design_id', value)
+                handleDesignChange('delivery_note_design_id', value)
               }
               disabled={disableSettingsField('delivery_note_design_id')}
               errorMessage={errors?.errors['settings.delivery_note_design_id']}
@@ -1188,7 +1230,7 @@ export default function GeneralSettings() {
               id="settings.payment_receipt_design_id"
               value={company?.settings?.payment_receipt_design_id || ''}
               onValueChange={(value) =>
-                handleChange('payment_receipt_design_id', value)
+                handleDesignChange('payment_receipt_design_id', value)
               }
               disabled={disableSettingsField('payment_receipt_design_id')}
               errorMessage={
@@ -1223,7 +1265,7 @@ export default function GeneralSettings() {
               id="settings.payment_refund_design_id"
               value={company?.settings?.payment_refund_design_id || ''}
               onValueChange={(value) =>
-                handleChange('payment_refund_design_id', value)
+                handleDesignChange('payment_refund_design_id', value)
               }
               disabled={disableSettingsField('payment_refund_design_id')}
               errorMessage={errors?.errors['settings.payment_refund_design_id']}
