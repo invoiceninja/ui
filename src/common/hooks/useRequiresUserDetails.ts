@@ -18,5 +18,5 @@ export function useRequiresUserDetails() {
     return false;
   }
 
-  return !user.first_name?.trim() || !user.last_name?.trim();
+  return !user.first_name || !user.last_name;
 }
