@@ -177,7 +177,7 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
           ) : (
             <div className="flex items-center gap-3">
               {hasLogo && !logoFailed ? (
-                <span
+                <div
                   className="shrink-0 grid place-items-center border overflow-hidden"
                   style={{
                     width: '3rem',
@@ -193,7 +193,7 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
                     style={{ maxWidth: '2.5rem', maxHeight: '1.75rem' }}
                     onError={() => setLogoFailed(true)}
                   />
-                </span>
+                </div>
               ) : null}
 
               <Button

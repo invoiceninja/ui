@@ -52,7 +52,7 @@ export function Choice({ selected, onSelect, title, detail, trailing }: Props) {
         backgroundColor: colors.$1,
       }}
     >
-      <span
+      <div
         aria-hidden
         className="shrink-0 grid place-items-center"
         style={{
@@ -63,7 +63,7 @@ export function Choice({ selected, onSelect, title, detail, trailing }: Props) {
         }}
       >
         {selected ? (
-          <span
+          <div
             style={{
               width: '0.5rem',
               height: '0.5rem',
@@ -72,9 +72,9 @@ export function Choice({ selected, onSelect, title, detail, trailing }: Props) {
             }}
           />
         ) : null}
-      </span>
+      </div>
 
-      <span className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1">
         <span
           className="block text-sm"
           style={{ color: colors.$3, fontWeight: 500 }}
@@ -86,7 +86,7 @@ export function Choice({ selected, onSelect, title, detail, trailing }: Props) {
             {detail}
           </span>
         ) : null}
-      </span>
+      </div>
 
       {trailing ? (
         <span className="shrink-0 text-xs" style={{ color: colors.$17 }}>

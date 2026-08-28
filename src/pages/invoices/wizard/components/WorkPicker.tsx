@@ -134,7 +134,7 @@ export function WorkPicker({ open, source, clientId, onClose, onPick }: Props) {
                 (event.currentTarget.style.backgroundColor = colors.$1)
               }
             >
-              <span className="min-w-0">
+              <div className="min-w-0">
                 <span className="block text-sm" style={{ color: colors.$3 }}>
                   {row.title}
                 </span>
@@ -149,7 +149,7 @@ export function WorkPicker({ open, source, clientId, onClose, onPick }: Props) {
                       .join(' · ')}
                   </span>
                 ) : null}
-              </span>
+              </div>
 
               <span
                 className="text-sm shrink-0"
