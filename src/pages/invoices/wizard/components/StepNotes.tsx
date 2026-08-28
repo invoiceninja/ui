@@ -13,10 +13,10 @@ import { useColorScheme } from '$app/common/colors';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
-import { ErrorBanner } from '$app/components/ErrorBanner';
-import { StepFooter } from '$app/components/StepFooter';
-import { Legend } from '$app/components/Legend';
-import { StepTransition } from '$app/components/StepTransition';
+import { ErrorBanner } from './ErrorBanner';
+import { StepFooter } from './StepFooter';
+import { Legend } from './Legend';
+import { StepTransition } from './StepTransition';
 import { Wizard } from '../useWizard';
 
 interface Props {
@@ -60,10 +60,6 @@ export function StepNotes({ wizard, embedded }: Props) {
 
       {embedded ? null : (
         <>
-          <p className="text-xs mt-6" style={{ color: colors.$17 }}>
-            {t('terms_optional')}
-          </p>
-
           <StepFooter
             back={
               <Button

@@ -29,10 +29,10 @@ import {
   InputField,
   InputLabel,
 } from '$app/components/forms';
-import { Callout } from '$app/components/Callout';
-import { ErrorBanner } from '$app/components/ErrorBanner';
-import { StepFooter } from '$app/components/StepFooter';
-import { StepTransition } from '$app/components/StepTransition';
+import { Callout } from './Callout';
+import { ErrorBanner } from './ErrorBanner';
+import { StepFooter } from './StepFooter';
+import { StepTransition } from './StepTransition';
 import { Wizard } from '../useWizard';
 import { AppliedTax, TaxSetup } from './TaxSetup';
 import { WorkPicker, WorkSource } from './WorkPicker';

@@ -20,11 +20,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Button, InputField } from '$app/components/forms';
-import { Callout } from '$app/components/Callout';
-import { Choice } from '$app/components/Choice';
-import { ErrorBanner } from '$app/components/ErrorBanner';
-import { StepFooter } from '$app/components/StepFooter';
-import { StepTransition } from '$app/components/StepTransition';
+import { Callout } from './Callout';
+import { Choice } from './Choice';
+import { ErrorBanner } from './ErrorBanner';
+import { StepFooter } from './StepFooter';
+import { StepTransition } from './StepTransition';
 import { Wizard, addDays, today } from '../useWizard';
 
 type Term = 'receipt' | '7' | '14' | '30' | 'custom';
@@ -196,9 +196,7 @@ export function StepTiming({ wizard, embedded }: Props) {
           </div>
         ) : (
           <p className="text-sm" style={{ color: colors.$17 }}>
-            {trans('invoice_date', {
-              value: dayjs(invoiceDate).format('D MMMM YYYY'),
-            })}{' '}
+            {`${t('invoice_date')}: ${dayjs(invoiceDate).format('D MMMM YYYY')}`}{' '}
             <button
               type="button"
               onClick={() => setShowDate(true)}

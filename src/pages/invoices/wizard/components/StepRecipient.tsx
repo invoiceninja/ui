@@ -20,10 +20,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Spinner } from '$app/components/Spinner';
 import { Button, InputField, InputLabel } from '$app/components/forms';
-import { ErrorBanner } from '$app/components/ErrorBanner';
-import { StepFooter } from '$app/components/StepFooter';
-import { Legend } from '$app/components/Legend';
-import { StepTransition } from '$app/components/StepTransition';
+import { ErrorBanner } from './ErrorBanner';
+import { StepFooter } from './StepFooter';
+import { Legend } from './Legend';
+import { StepTransition } from './StepTransition';
 import { Wizard } from '../useWizard';
 
 interface Props {

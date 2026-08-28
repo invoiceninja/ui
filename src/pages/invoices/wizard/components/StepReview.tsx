@@ -34,13 +34,13 @@ import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { Modal } from '$app/components/Modal';
 import { Element } from '$app/components/cards';
-import { Button, Checkbox, InputField } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
-import { Callout } from '$app/components/Callout';
-import { ErrorBanner } from '$app/components/ErrorBanner';
-import { StepFooter } from '$app/components/StepFooter';
-import { PreviewFrame } from '$app/components/PreviewFrame';
-import { StepTransition } from '$app/components/StepTransition';
+import { Callout } from './Callout';
+import { ErrorBanner } from './ErrorBanner';
+import { StepFooter } from './StepFooter';
+import { PreviewFrame } from './PreviewFrame';
+import { StepTransition } from './StepTransition';
 import { Wizard } from '../useWizard';
 import { BrandPrompts } from './BrandPrompts';
 
@@ -354,7 +354,7 @@ export function StepReview({ wizard }: Props) {
           noExternalPadding
           style={{ borderColor: colors.$20 }}
         >
-          {company?.settings?.name || t('company_name')}
+          {company?.settings?.name || '—'}
         </Element>
 
         <Element
@@ -430,39 +430,31 @@ export function StepReview({ wizard }: Props) {
           backgroundColor: colors.$1,
         }}
       >
-        <div className="space-y-2.5">
-          <AttachmentOption
-            id="iw-attach-pdf"
-            label={t('attach_pdf')}
-            checked={Boolean(company?.settings?.pdf_email_attachment)}
-            allowed={proPlan() || enterprisePlan()}
-            requirement={t('pro_plan')}
-            busy={savingAttachment !== null}
-            onChange={(value) => saveAttachment('pdf_email_attachment', value)}
-          />
+        <AttachmentOption
+          label={t('attach_pdf')}
+          checked={Boolean(company?.settings?.pdf_email_attachment)}
+          allowed={proPlan() || enterprisePlan()}
+          requirement={t('pro_plan')}
+          busy={savingAttachment !== null}
+          onChange={(value) => saveAttachment('pdf_email_attachment', value)}
+        />
 
-          <AttachmentOption
-            id="iw-attach-documents"
-            label={t('attach_documents')}
-            checked={Boolean(company?.settings?.document_email_attachment)}
-            allowed={enterprisePlan()}
-            requirement={t('enterprise_plan')}
-            busy={savingAttachment !== null}
-            onChange={(value) =>
-              saveAttachment('document_email_attachment', value)
-            }
-          />
+        <AttachmentOption
+          label={t('attach_documents')}
+          checked={Boolean(company?.settings?.document_email_attachment)}
+          allowed={enterprisePlan()}
+          requirement={t('enterprise_plan')}
+          busy={savingAttachment !== null}
+          onChange={(value) =>
+            saveAttachment('document_email_attachment', value)
+          }
+        />
 
-          <p className="text-xs" style={{ color: colors.$17 }}>
-            {t('saved_for_all_future_emails')}
-          </p>
-
-          <BrandPrompts
-            section="name"
-            logoSkipped={wizard.dismissed('logo')}
-            onSkipLogo={() => wizard.dismiss('logo')}
-          />
-        </div>
+        <BrandPrompts
+          section="name"
+          logoSkipped={wizard.dismissed('logo')}
+          onSkipLogo={() => wizard.dismiss('logo')}
+        />
       </div>
 
       {previewable ? (
@@ -621,23 +613,19 @@ export function StepReview({ wizard }: Props) {
         </div>
       ) : null}
 
-      <p className="text-sm mt-8 leading-6" style={{ color: colors.$3 }}>
-        {recipient ? (
-          <>
-            {reactStringReplace(
-              trans('invoice_ready_email_to', { value: ':recipient' }),
-              ':recipient',
-              () => (
-                <strong key="recipient" style={{ fontWeight: 600 }}>
-                  {recipient}
-                </strong>
-              )
-            )}
-          </>
-        ) : (
-          <>{t('invoice_ready_ask_where_to_send')}</>
-        )}
-      </p>
+      {recipient ? (
+        <p className="text-sm mt-8 leading-6" style={{ color: colors.$3 }}>
+          {reactStringReplace(
+            trans('invoice_ready_email_to', { value: ':recipient' }),
+            ':recipient',
+            () => (
+              <strong key="recipient" style={{ fontWeight: 600 }}>
+                {recipient}
+              </strong>
+            )
+          )}
+        </p>
+      ) : null}
 
       <StepFooter
         back={
@@ -722,7 +710,6 @@ export function StepReview({ wizard }: Props) {
 }
 
 function AttachmentOption({
-  id,
   label,
   checked,
   allowed,
@@ -730,7 +717,6 @@ function AttachmentOption({
   busy,
   onChange,
 }: {
-  id: string;
   label: string;
   checked: boolean;
   allowed: boolean;
@@ -738,34 +724,23 @@ function AttachmentOption({
   busy: boolean;
   onChange: (value: boolean) => void;
 }) {
-  const colors = useColorScheme();
-  const disabled = !allowed || busy;
+  const [t] = useTranslation();
 
   return (
-    <div className="flex items-start gap-2.5">
-      <Checkbox
-        id={id}
+    <Element
+      leftSide={label}
+      leftSideHelp={allowed ? t('saved_for_all_future_emails') : requirement}
+      pushContentToRight
+      noExternalPadding
+      twoGridColumns
+    >
+      <Toggle
         checked={checked}
-        disabled={disabled}
-        onValueChange={(_, next) => onChange(Boolean(next))}
-      />
-
-      <label
-        htmlFor={id}
-        className="text-sm leading-5"
-        style={{
-          color: allowed ? colors.$3 : colors.$17,
-          cursor: disabled ? 'not-allowed' : 'pointer',
+        disabled={!allowed || busy}
+        onValueChange={(value) => {
+          return onChange(value);
         }}
-      >
-        {label}
-
-        {allowed ? null : (
-          <span className="block text-xs" style={{ color: colors.$17 }}>
-            {requirement}
-          </span>
-        )}
-      </label>
-    </div>
+      />
+    </Element>
   );
 }
