@@ -24,6 +24,8 @@ export default defineConfig(({ command, mode }) => {
           mode === 'testing'
             ? {
                 app: 'index.html',
+                dateRangePicker:
+                  'tests/e2e/fixtures/date-range-picker/index.html',
                 verificationInput:
                   'tests/e2e/fixtures/verification-input/index.html',
               }
