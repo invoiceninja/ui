@@ -19,7 +19,13 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
-export function BrandPrompts() {
+interface Props {
+  section?: 'name' | 'brand';
+  logoSkipped: boolean;
+  onSkipLogo: () => void;
+}
+
+export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
   const colors = useColorScheme();
   const [t] = useTranslation();
   const company = useCurrentCompany();
@@ -31,13 +37,15 @@ export function BrandPrompts() {
 
   const [uploading, setUploading] = useState(false);
   const [logoFailed, setLogoFailed] = useState(false);
-  const [logoSkipped, setLogoSkipped] = useState(false);
   const [logoError, setLogoError] = useState<string>();
 
   const filePicker = useRef<HTMLInputElement>(null);
 
   const businessName: string = company?.settings?.name ?? '';
   const hasLogo = Boolean(company?.settings?.company_logo);
+
+  const showName = section !== 'brand' && !businessName;
+  const showBrand = section !== 'name';
 
   const saveName = () => {
     if (!company?.id) {
@@ -100,9 +108,13 @@ export function BrandPrompts() {
       .finally(() => setUploading(false));
   };
 
+  if (!showName && !showBrand) {
+    return null;
+  }
+
   return (
     <div className="space-y-3">
-      {businessName ? null : (
+      {showName ? (
         <div>
           <p
             className="text-sm mb-2"
@@ -129,87 +141,93 @@ export function BrandPrompts() {
             </Button>
           </div>
         </div>
-      )}
+      ) : null}
 
-      {!hasLogo && !logoSkipped ? (
-        <div>
-          <p
-            className="text-sm mb-2"
-            style={{ color: colors.$3, fontWeight: 500 }}
-          >
-            {t('add_logo_prompt')}
-          </p>
+      {showBrand ? (
+        <>
+          {!hasLogo && !logoSkipped ? (
+            <div>
+              <p
+                className="text-sm mb-2"
+                style={{ color: colors.$3, fontWeight: 500 }}
+              >
+                {t('add_logo_prompt')}
+              </p>
 
-          <div className="flex items-center gap-2">
-            <Button
-              type="secondary"
-              behavior="button"
-              disabled={uploading}
-              onClick={() => filePicker.current?.click()}
-            >
-              {t('add_company_logo')}
-            </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="secondary"
+                  behavior="button"
+                  disabled={uploading}
+                  onClick={() => filePicker.current?.click()}
+                >
+                  {t('add_company_logo')}
+                </Button>
 
-            <Button
-              type="secondary"
-              behavior="button"
-              disableWithoutIcon
-              onClick={() => setLogoSkipped(true)}
-            >
-              {t('skip')}
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <div className="flex items-center gap-3">
-          {hasLogo && !logoFailed ? (
-            <span
-              className="shrink-0 grid place-items-center border overflow-hidden"
-              style={{
-                width: '3rem',
-                height: '2.25rem',
-                borderColor: colors.$24,
-                borderRadius: '0.375rem',
-                backgroundColor: colors.$1,
-              }}
-            >
-              <img
-                src={company?.settings?.company_logo}
-                alt=""
-                style={{ maxWidth: '2.5rem', maxHeight: '1.75rem' }}
-                onError={() => setLogoFailed(true)}
-              />
-            </span>
+                <Button
+                  type="secondary"
+                  behavior="button"
+                  disableWithoutIcon
+                  onClick={onSkipLogo}
+                >
+                  {t('skip')}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              {hasLogo && !logoFailed ? (
+                <span
+                  className="shrink-0 grid place-items-center border overflow-hidden"
+                  style={{
+                    width: '3rem',
+                    height: '2.25rem',
+                    borderColor: colors.$24,
+                    borderRadius: '0.375rem',
+                    backgroundColor: colors.$1,
+                  }}
+                >
+                  <img
+                    src={company?.settings?.company_logo}
+                    alt=""
+                    style={{ maxWidth: '2.5rem', maxHeight: '1.75rem' }}
+                    onError={() => setLogoFailed(true)}
+                  />
+                </span>
+              ) : null}
+
+              <Button
+                type="secondary"
+                behavior="button"
+                disabled={uploading}
+                onClick={() => filePicker.current?.click()}
+              >
+                {hasLogo ? t('update_logo') : t('add_company_logo')}
+              </Button>
+            </div>
+          )}
+
+          {logoError ? (
+            <p className="text-xs text-red-600">{logoError}</p>
           ) : null}
 
-          <Button
-            type="secondary"
-            behavior="button"
-            disabled={uploading}
-            onClick={() => filePicker.current?.click()}
-          >
-            {hasLogo ? t('update_logo') : t('add_company_logo')}
-          </Button>
-        </div>
-      )}
+          <input
+            ref={filePicker}
+            type="file"
+            accept="image/png,image/jpeg"
+            className="hidden"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
 
-      {logoError ? <p className="text-xs text-red-600">{logoError}</p> : null}
+              if (file) {
+                uploadLogo(file);
+              }
 
-      <input
-        ref={filePicker}
-        type="file"
-        accept="image/png,image/jpeg"
-        className="hidden"
-        onChange={(event) => {
-          const file = event.target.files?.[0];
-
-          if (file) {
-            uploadLogo(file);
-          }
-
-          event.target.value = '';
-        }}
-      />
+              event.target.value = '';
+            }}
+          />
+        </>
+      ) : null}
     </div>
   );
 }

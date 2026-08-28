@@ -35,6 +35,7 @@ import { useColorScheme } from '$app/common/colors';
 import { Modal } from '$app/components/Modal';
 import { Element } from '$app/components/cards';
 import { Button, Checkbox, InputField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
 import { Callout } from '$app/components/Callout';
 import { ErrorBanner } from '$app/components/ErrorBanner';
 import { StepFooter } from '$app/components/StepFooter';
@@ -320,11 +321,11 @@ export function StepReview({ wizard }: Props) {
   };
 
   const chooseDesign = (id: string) => {
-    if (invoice?.design_id !== id) {
-      wizard.patch({ design_id: id });
+    if (invoice?.design_id === id) {
+      return;
     }
 
-    revealPreview();
+    wizard.patch({ design_id: id });
   };
 
   return (
@@ -429,130 +430,135 @@ export function StepReview({ wizard }: Props) {
           backgroundColor: colors.$1,
         }}
       >
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0">
-            <p
-              className="text-[0.8125rem] mb-2.5"
-              style={{ color: colors.$22, fontWeight: 500 }}
-            >
-              {t('how_it_looks')}
-            </p>
+        <div className="space-y-2.5">
+          <AttachmentOption
+            id="iw-attach-pdf"
+            label={t('attach_pdf')}
+            checked={Boolean(company?.settings?.pdf_email_attachment)}
+            allowed={proPlan() || enterprisePlan()}
+            requirement={t('pro_plan')}
+            busy={savingAttachment !== null}
+            onChange={(value) => saveAttachment('pdf_email_attachment', value)}
+          />
 
-            {designsFailed ? (
-              <p className="text-sm" style={{ color: colors.$17 }}>
-                {t('layouts_could_not_be_loaded')}
-              </p>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {LOOKS.map((look) => {
-                  const id = designs[look.design];
-                  const active = Boolean(id) && invoice?.design_id === id;
+          <AttachmentOption
+            id="iw-attach-documents"
+            label={t('attach_documents')}
+            checked={Boolean(company?.settings?.document_email_attachment)}
+            allowed={enterprisePlan()}
+            requirement={t('enterprise_plan')}
+            busy={savingAttachment !== null}
+            onChange={(value) =>
+              saveAttachment('document_email_attachment', value)
+            }
+          />
 
-                  return (
-                    <button
-                      key={look.label}
-                      type="button"
-                      disabled={!id}
-                      onClick={() => chooseDesign(id)}
-                      className="text-sm px-3.5 py-2 border"
-                      style={{
-                        borderRadius: '0.375rem',
-                        borderColor: active ? colors.$3 : colors.$24,
-                        backgroundColor: active ? colors.$25 : colors.$1,
-                        color: id ? colors.$3 : colors.$17,
-                        fontWeight: 500,
-                        boxShadow: active
-                          ? `inset 0 0 0 1px ${colors.$3}`
-                          : 'none',
-                        cursor: id ? 'pointer' : 'not-allowed',
-                      }}
-                    >
-                      {t(look.label)}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          <p className="text-xs" style={{ color: colors.$17 }}>
+            {t('saved_for_all_future_emails')}
+          </p>
 
-          <div className="shrink-0 space-y-2.5">
-            <AttachmentOption
-              id="iw-attach-pdf"
-              label={t('attach_pdf')}
-              checked={Boolean(company?.settings?.pdf_email_attachment)}
-              allowed={proPlan() || enterprisePlan()}
-              requirement={t('pro_plan')}
-              busy={savingAttachment !== null}
-              onChange={(value) =>
-                saveAttachment('pdf_email_attachment', value)
-              }
-            />
-
-            <AttachmentOption
-              id="iw-attach-documents"
-              label={t('attach_documents')}
-              checked={Boolean(company?.settings?.document_email_attachment)}
-              allowed={enterprisePlan()}
-              requirement={t('enterprise_plan')}
-              busy={savingAttachment !== null}
-              onChange={(value) =>
-                saveAttachment('document_email_attachment', value)
-              }
-            />
-
-            <p className="text-xs" style={{ color: colors.$17 }}>
-              {t('saved_for_all_future_emails')}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <BrandPrompts />
+          <BrandPrompts
+            section="name"
+            logoSkipped={wizard.dismissed('logo')}
+            onSkipLogo={() => wizard.dismiss('logo')}
+          />
         </div>
       </div>
 
       {previewable ? (
-        <>
-          <div className="mt-6 flex items-center gap-2.5">
-            <Checkbox
-              id="iw-show-preview"
-              checked={showPreview}
-              onValueChange={(_, next) => {
-                if (next) {
-                  return revealPreview();
-                }
+        <div className="mt-6">
+          <Toggle
+            checked={showPreview}
+            label={t('show_pdf_preview')}
+            onValueChange={(value) => {
+              if (value) {
+                return revealPreview();
+              }
 
-                return setShowPreview(false);
-              }}
-            />
-
-            <label
-              htmlFor="iw-show-preview"
-              className="text-sm cursor-pointer"
-              style={{ color: colors.$3 }}
-            >
-              {t('show_pdf_preview')}
-            </label>
-          </div>
+              return setShowPreview(false);
+            }}
+          />
 
           {showPreview ? (
-            <PreviewFrame
-              id="iw-preview"
+            <div
+              id="iw-preview-panel"
               ref={preview}
               className="mt-3 border overflow-hidden"
-              style={{ borderColor: colors.$24, borderRadius: '0.375rem' }}
+              style={{
+                borderColor: colors.$24,
+                borderRadius: '0.375rem',
+                backgroundColor: colors.$1,
+              }}
             >
-              <InvoicePreview
-                for="invoice"
-                resource={invoice as Invoice}
-                entity="invoice"
-                relationType="client_id"
-                endpoint="/api/v1/live_preview?entity=:entity"
-                initiallyVisible
-              />
-            </PreviewFrame>
+              <div
+                className="px-4 py-4 border-b"
+                style={{ borderColor: colors.$24 }}
+              >
+                <p
+                  className="text-[0.8125rem] mb-2.5"
+                  style={{ color: colors.$22, fontWeight: 500 }}
+                >
+                  {t('how_it_looks')}
+                </p>
+
+                {designsFailed ? (
+                  <p className="text-sm" style={{ color: colors.$17 }}>
+                    {t('layouts_could_not_be_loaded')}
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {LOOKS.map((look) => {
+                      const id = designs[look.design];
+                      const active = Boolean(id) && invoice?.design_id === id;
+
+                      return (
+                        <button
+                          key={look.label}
+                          type="button"
+                          disabled={!id}
+                          onClick={() => chooseDesign(id)}
+                          className="text-sm px-3.5 py-2 border"
+                          style={{
+                            borderRadius: '0.375rem',
+                            borderColor: active ? colors.$3 : colors.$24,
+                            backgroundColor: active ? colors.$25 : colors.$1,
+                            color: id ? colors.$3 : colors.$17,
+                            fontWeight: 500,
+                            boxShadow: active
+                              ? `inset 0 0 0 1px ${colors.$3}`
+                              : 'none',
+                            cursor: id ? 'pointer' : 'not-allowed',
+                          }}
+                        >
+                          {t(look.label)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <div className="mt-4">
+                  <BrandPrompts
+                    section="brand"
+                    logoSkipped={wizard.dismissed('logo')}
+                    onSkipLogo={() => wizard.dismiss('logo')}
+                  />
+                </div>
+              </div>
+
+              <PreviewFrame id="iw-preview">
+                <InvoicePreview
+                  for="invoice"
+                  resource={invoice as Invoice}
+                  entity="invoice"
+                  relationType="client_id"
+                  endpoint="/api/v1/live_preview?entity=:entity"
+                  initiallyVisible
+                />
+              </PreviewFrame>
+            </div>
           ) : null}
-        </>
+        </div>
       ) : null}
 
       {hasGateway === false && !wizard.dismissed('pay') ? (

@@ -173,7 +173,10 @@ export default function Edit() {
               </Section>
 
               <Section label={t('preview')} last>
-                <BrandPrompts />
+                <BrandPrompts
+                  logoSkipped={wizard.dismissed('logo')}
+                  onSkipLogo={() => wizard.dismiss('logo')}
+                />
 
                 <PreviewFrame
                   className="mt-4 border overflow-hidden"
