@@ -48,7 +48,6 @@ import {
 import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
 import { antdLocaleAtom } from './components/DropdownDateRangePicker';
-import { dayJSLocaleAtom } from './components/forms';
 import { PreventNavigationModal } from './components/PreventNavigationModal';
 import { UserDetailsModal } from './components/UserDetailsModal';
 import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
@@ -102,7 +101,6 @@ export function App() {
   const setRefreshEntityDataBanner = useSetAtom(refreshEntityDataBannerAtom);
 
   const updateAntdLocale = useSetAtom(antdLocaleAtom);
-  const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
 
   const { isCompanySettingsActive, isGroupSettingsActive } =
     useCurrentSettingsLevel();
@@ -153,7 +151,6 @@ export function App() {
   useEffect(() => {
     if (resolvedLanguage?.locale) {
       resolveDayJSLocale(resolvedLanguage.locale).then((resolvedLocale) => {
-        updateDayJSLocale(resolvedLocale);
         dayjs.locale(resolvedLocale);
       });
 

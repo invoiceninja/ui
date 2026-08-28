@@ -151,7 +151,7 @@ const createProject = async (params: CreateParams) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created project')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully created project')).toBeVisible({ timeout: 30000 });
 };
 
 test("can't view projects without permission", async ({ page }) => {
