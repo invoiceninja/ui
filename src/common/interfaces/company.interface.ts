@@ -136,6 +136,8 @@ export interface Settings {
   custom_value4: string;
   default_task_rate: number;
   payment_terms: string;
+  cash_discount_days?: string;
+  cash_discount_percent?: string;
   send_reminders: boolean;
   custom_message_dashboard: string;
   custom_message_unpaid_invoice: string;

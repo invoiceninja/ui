@@ -57,6 +57,7 @@ export function useAllPaymentColumns() {
     'number',
     'client',
     'amount',
+    'cash_discount',
     'invoice_number',
     'date',
     'type',
@@ -117,6 +118,12 @@ export function usePaymentColumns() {
     return payment.amount;
   };
 
+  const calculateCashDiscount = (payment: Payment) => {
+    return payment.paymentables?.reduce((carry, paymentable) => {
+      return carry + paymentable.cash_discount
+    }, 0);
+  }
+
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
       entity: 'payment',
@@ -162,6 +169,17 @@ export function usePaymentColumns() {
       format: (value, payment) =>
         formatMoney(
           value,
+          payment.client?.country_id,
+          payment.client?.settings.currency_id
+        ),
+    },
+    {
+      column: 'cash_discount',
+      id: 'cash_discount',
+      label: t('cash_discount'),
+      format: (value, payment) =>
+        formatMoney(
+          calculateCashDiscount(payment),
           payment.client?.country_id,
           payment.client?.settings.currency_id
         ),

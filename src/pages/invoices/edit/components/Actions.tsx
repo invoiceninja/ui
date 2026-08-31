@@ -161,6 +161,7 @@ export function useActions(params?: Params) {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      applied_cash_discount: 0,
       partial: 0,
       partial_due_date: '',
       // Reverse monetary amounts for credit note
@@ -340,6 +341,27 @@ export function useActions(params?: Params) {
           disablePreventNavigation
         >
           {t('mark_paid')}
+        </EntityActionElement>
+      ),
+    (invoice: Invoice) =>
+      parseInt(invoice.status_id) < parseInt(InvoiceStatus.Paid) &&
+      !invoice.is_deleted &&
+      Boolean(invoice.cash_discount) && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'mark_paid_with_cash_discount',
+          })}
+          entity="invoice"
+          actionKey="mark_paid_with_cash_discount"
+          isCommonActionSection={!dropdown}
+          tooltipText={`${t('mark_paid_with_cash_discount')}`}
+          onClick={() =>
+            markPaid(currentInvoice || invoice, { applyCashDiscount: true })
+          }
+          icon={MdPaid}
+          disablePreventNavigation
+        >
+          {t('mark_paid_with_cash_discount')}
         </EntityActionElement>
       ),
     (invoice: Invoice) =>

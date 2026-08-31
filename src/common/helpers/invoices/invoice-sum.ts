@@ -65,6 +65,12 @@ export class InvoiceSum {
     return this.eInvoiceType === 'PEPPOL';
   }
 
+  public isCashDiscountEntity(
+    entity: Invoice | RecurringInvoice | PurchaseOrder | Credit | Quote
+  ): entity is Invoice {
+    return entity.entity_type === 'invoice';
+  }
+
   public build() {
     this.calculateLineItems()
       .calculateDiscount()
@@ -108,6 +114,22 @@ export class InvoiceSum {
 
   public getSubtotalWithSurcharges() {
     return this.getSubTotal() + this.getTotalSurcharges();
+  }
+
+  public getCashDiscount() {
+    if (!this.isCashDiscountEntity(this.invoice)) {
+      return 0;
+    }
+
+    if (!this.invoice.cash_discount_percent) {
+      return 0;
+    }
+
+    return percentageOf(
+      this.getTotal(),
+      this.invoice.cash_discount_percent,
+      this.precision
+    );
   }
 
   public getNetSubtotal() {
@@ -260,7 +282,11 @@ export class InvoiceSum {
 
     const balance = this.shouldZeroBalance()
       ? 0
-      : this.invoice.amount - (this.invoice.paid_to_date ?? 0);
+      : this.invoice.amount -
+        (this.invoice.paid_to_date ?? 0) -
+        (this.isCashDiscountEntity(this.invoice)
+          ? (this.invoice.applied_cash_discount ?? 0)
+          : 0);
 
     this.invoice.balance = parseFloat(
       NumberFormatter.formatValue(balance, this.precision)
@@ -269,6 +295,12 @@ export class InvoiceSum {
     this.invoice.total_taxes = parseFloat(
       NumberFormatter.formatValue(this.totalTaxes, this.precision)
     );
+
+    if (this.isCashDiscountEntity(this.invoice)) {
+      this.invoice.cash_discount = parseFloat(
+        NumberFormatter.formatValue(this.getCashDiscount(), this.precision)
+      );
+    }
 
     return this;
   }
@@ -296,6 +328,23 @@ export class InvoiceSum {
     return this.invoice.partial && this.invoice.partial > 0
       ? Math.min(this.invoice.partial, this.invoice.balance)
       : this.invoice.balance;
+  }
+
+  public getBalanceWithCashDiscount() {
+    const balance = this.getBalanceDue();
+
+    if (!this.isCashDiscountEntity(this.invoice) || balance === 0) {
+      return balance;
+    }
+
+    const applicableDiscount = Math.min(
+      Math.abs(this.invoice.cash_discount ?? 0),
+      Math.abs(balance)
+    );
+    const signedDiscount =
+      balance < 0 ? -applicableDiscount : applicableDiscount;
+
+    return roundToPrecision(balance - signedDiscount, this.precision);
   }
 
   /////////////

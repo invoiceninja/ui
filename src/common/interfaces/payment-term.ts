@@ -11,6 +11,8 @@
 export interface PaymentTerm {
   id: string;
   num_days: number;
+  cash_discount_percent: number;
+  cash_discount_days: number;
   name: string;
   is_deleted: boolean;
   created_at: number;

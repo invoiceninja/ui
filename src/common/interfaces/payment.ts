@@ -18,6 +18,7 @@ export interface Payment {
   user_id: string;
   assigned_user_id: string;
   amount: number;
+  cash_discount: number;
   refunded: number;
   applied: number;
   transaction_reference: string;
@@ -59,6 +60,7 @@ export interface Paymentable {
   invoice_id: string;
   credit_id: string;
   amount: number;
+  cash_discount: number;
   refunded: number;
   created_at: number;
   updated_at: number;

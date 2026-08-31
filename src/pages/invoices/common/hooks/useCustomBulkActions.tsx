@@ -125,6 +125,13 @@ export const useCustomBulkActions = () => {
     );
   };
 
+  const showMarkPaidWithCashDiscountOption = (invoices: Invoice[]) => {
+    return (
+      showMarkPaidOption(invoices) &&
+      invoices.some(({ cash_discount }) => Boolean(cash_discount))
+    );
+  };
+
   const showReverseOption = (invoices: Invoice[]) => {
     return !invoices.some(
       ({ status_id, is_deleted, archived_at }) =>
@@ -261,6 +268,18 @@ export const useCustomBulkActions = () => {
           icon={<Icon element={MdPaid} />}
         >
           {t('mark_paid')}
+        </DropdownElement>
+      ),
+    ({ selectedIds, selectedResources, setSelected }) =>
+      showMarkPaidWithCashDiscountOption(selectedResources) && (
+        <DropdownElement
+          onClick={() => {
+            bulk(selectedIds, 'mark_paid_with_cash_discount');
+            setSelected([]);
+          }}
+          icon={<Icon element={MdPaid} />}
+        >
+          {t('mark_paid_with_cash_discount')}
         </DropdownElement>
       ),
     ({ selectedResources, setSelected }) =>

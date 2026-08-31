@@ -9,6 +9,8 @@
  */
 
 import collect from 'collect.js';
+import { Credit } from '$app/common/interfaces/credit';
+import { Quote } from '$app/common/interfaces/quote';
 import { Client } from '../interfaces/client';
 import { Expense } from '../interfaces/expense';
 import { Invoice } from '../interfaces/invoice';
@@ -23,6 +25,8 @@ import { useUserNumberPrecision } from './useUserNumberPrecision';
 
 type Resource =
   | Invoice
+  | Quote
+  | Credit
   | Client
   | RecurringInvoice
   | Payment

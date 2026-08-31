@@ -21,6 +21,7 @@ import { useColorScheme } from '$app/common/colors';
 import { PaymentTermsTooltip } from '$app/components/PaymentTermsTooltip';
 import { TagPillSelector } from '$app/components/tags/TagPillSelector';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 
 interface Props {
   invoice?: Invoice;
@@ -69,6 +70,50 @@ export function InvoiceDetails(props: Props) {
             value={invoice?.due_date || ''}
             errorMessage={props.errors?.errors.due_date}
           />
+        </Element>
+
+        <Element
+          leftSide={
+            <div className="flex items-center space-x-2">
+              <span>{t('cash_discount')}</span>
+
+              <PaymentTermsTooltip
+                client={invoice?.client}
+                clientId={invoice?.client_id}
+              />
+            </div>
+          }
+        >
+          <div className="space-y-2">
+            <div className="flex space-x-2">
+              <div className="w-full lg:w-1/3">
+                <NumberInputField
+                  value={invoice?.cash_discount_percent || ''}
+                  onValueChange={(value) =>
+                    handleChange(
+                      'cash_discount_percent',
+                      parseFloat(value) || 0
+                    )
+                  }
+                />
+              </div>
+
+              <div className="w-full lg:w-2/3">
+                <InputField
+                  type="date"
+                  onValueChange={(value) =>
+                    handleChange('cash_discount_due_date', value)
+                  }
+                  value={invoice?.cash_discount_due_date || ''}
+                />
+              </div>
+            </div>
+
+            <ErrorMessage>
+              {props.errors?.errors.cash_discount_percent ||
+                props.errors?.errors.cash_discount_due_date}
+            </ErrorMessage>
+          </div>
         </Element>
 
         <Element leftSide={t('partial')}>

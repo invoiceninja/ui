@@ -14,9 +14,11 @@ import { atom, useSetAtom } from 'jotai';
 import { AlignJustify, Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
@@ -28,7 +30,12 @@ import {
 } from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
 
-export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
+export type ProductTableResource =
+  | Invoice
+  | RecurringInvoice
+  | PurchaseOrder
+  | Credit
+  | Quote;
 export type RelationType = 'client_id' | 'vendor_id';
 
 export const isDeleteActionTriggeredAtom = atom<boolean | undefined>(undefined);

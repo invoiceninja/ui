@@ -205,6 +205,7 @@ interface Props<T> extends CommonProps {
   filterColumns?: FilterColumn[];
   withoutAllBulkActions?: boolean;
   onSelectedResourcesChange?: (selectedResources: T[]) => void;
+  onDataLoaded?: (resources: T[]) => void;
   preSelected?: string[];
   emptyState?: ReactNode;
   beforeFilterInput?: ReactNode;
@@ -311,6 +312,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     withRecordScopedFilters = false,
     filterColumns,
     onSelectedResourcesChange,
+    onDataLoaded,
     preSelected = [],
     emptyState,
     beforeFilterInput,
@@ -840,10 +842,11 @@ export function DataTable<T extends object>(props: Props<T>) {
     () => {
       if (data && !isFetching) {
         setCurrentData(data.data.data);
+        onDataLoaded?.(data.data.data);
       }
     },
     10,
-    [data, isFetching]
+    [data, isFetching, onDataLoaded]
   );
 
   useEffect(() => {
