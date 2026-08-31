@@ -75,6 +75,7 @@ export function useAllProductColumns() {
     'quantity',
     'archived_at',
     // 'assigned_to', @Todo: Relationship not included.
+    'cost',
     'created_at',
     // 'created_by', @Todo: Relationship not included.
     firstCustom,
@@ -184,6 +185,17 @@ export function useProductColumns() {
       id: 'archived_at',
       label: t('archived_at'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'cost',
+      id: 'cost',
+      label: t('cost'),
+      format: (value, product) =>
+        formatMoney(
+          value,
+          product.company?.settings.country_id,
+          product.company?.settings.currency_id
+        ),
     },
     {
       column: 'created_at',

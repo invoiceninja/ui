@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^3.28.1",
-    "@docuninja/builder2.0": "^0.0.107",
+    "@docuninja/builder2.0": "^0.0.108",
     "@fontsource/alex-brush": "^5.2.6",
     "@fontsource/dancing-script": "^5.2.6",
     "@fontsource/great-vibes": "^5.2.6",
