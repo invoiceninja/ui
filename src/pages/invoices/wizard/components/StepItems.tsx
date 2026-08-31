@@ -23,12 +23,7 @@ import { Plus } from '$app/components/icons/Plus';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Checkbox,
-  InputField,
-  InputLabel,
-} from '$app/components/forms';
+import { Button, InputField, InputLabel } from '$app/components/forms';
 import { Callout } from './Callout';
 import { ErrorBanner } from './ErrorBanner';
 import { StepFooter } from './StepFooter';
@@ -61,6 +56,7 @@ export function StepItems({ wizard, embedded }: Props) {
     null
   );
   const [rates, setRates] = useState<TaxRate[]>([]);
+  const [inclusiveAnswered, setInclusiveAnswered] = useState(false);
 
   const itemTaxesEnabled = (company?.enabled_item_tax_rates ?? 0) > 0;
   const taxesConfigured =
@@ -111,16 +107,32 @@ export function StepItems({ wizard, embedded }: Props) {
         : [...current, { name: tax.name, rate: tax.rate } as TaxRate]
     );
 
+    const applied =
+      typeof tax.inclusive === 'boolean'
+        ? { uses_inclusive_taxes: tax.inclusive }
+        : {};
+
+    if (typeof tax.inclusive === 'boolean') {
+      setInclusiveAnswered(true);
+    }
+
     if (taxSetup?.scope === 'item') {
-      update(taxSetup.index, { tax_name1: tax.name, tax_rate1: tax.rate });
+      const index = taxSetup.index;
+
+      wizard.patch({
+        ...applied,
+        line_items: items.map((item, position) =>
+          position === index
+            ? { ...item, tax_name1: tax.name, tax_rate1: tax.rate }
+            : item
+        ),
+      });
 
       return;
     }
 
     wizard.patch({
-      ...(typeof tax.inclusive === 'boolean'
-        ? { uses_inclusive_taxes: tax.inclusive }
-        : {}),
+      ...applied,
       line_items: items.map((item) => ({
         ...item,
         tax_name1: tax.name,
@@ -390,31 +402,6 @@ export function StepItems({ wizard, embedded }: Props) {
         />
       </div>
 
-      {taxesConfigured ? (
-        <div
-          className="mt-6 pt-6 flex items-center gap-2.5"
-          style={{ borderTop: `1px dashed ${colors.$5}` }}
-        >
-          <Checkbox
-            id="iw-inclusive-taxes"
-            checked={inclusive}
-            onValueChange={(_, next) =>
-              wizard.patch({ uses_inclusive_taxes: Boolean(next) })
-            }
-          />
-
-          <label
-            htmlFor="iw-inclusive-taxes"
-            className="text-sm cursor-pointer"
-            style={{ color: colors.$3 }}
-          >
-            {t('uses_inclusive_taxes', {
-              defaultValue: 'Prices include tax on this invoice',
-            })}
-          </label>
-        </div>
-      ) : null}
-
       {!taxesConfigured && !wizard.dismissed('tax') ? (
         <div className="mt-6">
           <Callout title={t('do_you_need_to_charge_tax')}>
@@ -488,6 +475,7 @@ export function StepItems({ wizard, embedded }: Props) {
       <TaxSetup
         open={taxOpen}
         scope={taxSetup?.scope ?? 'invoice'}
+        askInclusive={rates.length === 0 && !inclusiveAnswered}
         onClose={() => setTaxOpen(false)}
         onApplied={applyTax}
       />

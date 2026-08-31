@@ -34,11 +34,18 @@ export interface AppliedTax {
 interface Props {
   open: boolean;
   scope: 'invoice' | 'item';
+  askInclusive: boolean;
   onClose: () => void;
   onApplied: (tax: AppliedTax) => void;
 }
 
-export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
+export function TaxSetup({
+  open,
+  scope,
+  askInclusive,
+  onClose,
+  onApplied,
+}: Props) {
   const colors = useColorScheme();
   const [t] = useTranslation();
   const company = useCurrentCompany();
@@ -47,6 +54,7 @@ export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
   const [name, setName] = useState('');
   const [rate, setRate] = useState('');
   const [inclusive, setInclusive] = useState<boolean | null>(null);
+  const [asking, setAsking] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
   const [nameError, setNameError] = useState<string>();
@@ -57,10 +65,12 @@ export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
       setName('');
       setRate('');
       setInclusive(null);
+      setAsking(askInclusive);
       setError(undefined);
       setNameError(undefined);
       setRateError(undefined);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const parsedRate = Number(rate.replace(',', '.'));
@@ -70,7 +80,7 @@ export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
   const invoiceScope = scope === 'invoice';
 
   const enableTaxesForCompany = () => {
-    if (!invoiceScope || !company?.id) {
+    if ((!invoiceScope && !asking) || !company?.id) {
       return Promise.resolve();
     }
 
@@ -79,7 +89,7 @@ export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
       enabled_item_tax_rates: Math.max(1, company.enabled_item_tax_rates ?? 0),
       settings: {
         ...company.settings,
-        inclusive_taxes: Boolean(inclusive),
+        ...(asking ? { inclusive_taxes: Boolean(inclusive) } : {}),
       },
     };
 
@@ -124,11 +134,11 @@ export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
             onApplied({
               name: name.trim(),
               rate: parsedRate,
-              ...(invoiceScope ? { inclusive: Boolean(inclusive) } : {}),
+              ...(asking ? { inclusive: Boolean(inclusive) } : {}),
             });
 
             toast.success(
-              invoiceScope ? 'updated_settings' : 'created_tax_rate'
+              invoiceScope || asking ? 'updated_settings' : 'created_tax_rate'
             );
             onClose();
           })
@@ -186,7 +196,7 @@ export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
           errorMessage={rateError}
         />
 
-        {invoiceScope ? (
+        {asking ? (
           <div>
             <Legend>{t('is_tax_included_in_prices')}</Legend>
 
@@ -216,7 +226,7 @@ export function TaxSetup({ open, scope, onClose, onApplied }: Props) {
         <div className="flex items-center gap-2 pt-1">
           <Button
             behavior="button"
-            disabled={busy || (invoiceScope && inclusive === null)}
+            disabled={busy || (asking && inclusive === null)}
             disableWithoutIcon={!busy}
             onClick={apply}
           >

@@ -46,8 +46,8 @@ import { BrandPrompts } from './BrandPrompts';
 
 const LOOKS: { label: string; design: string }[] = [
   { label: 'clean', design: 'Clean' },
-  { label: 'modern', design: 'Modern' },
-  { label: 'traditional', design: 'Plain' },
+  { label: 'business', design: 'Business' },
+  { label: 'playful', design: 'Playful' },
 ];
 
 type AttachmentKey = 'pdf_email_attachment' | 'document_email_attachment';
@@ -159,6 +159,13 @@ export function StepReview({ wizard }: Props) {
       )
       .catch(() => toast.error())
       .finally(() => setSavingAttachment(null));
+  };
+
+  const upgrade = () => {
+    wizard
+      .flush()
+      .catch(() => undefined)
+      .finally(() => navigate('/settings/account_management'));
   };
 
   const deliver = () => {
@@ -294,6 +301,15 @@ export function StepReview({ wizard }: Props) {
     (item) => item.notes || item.product_key
   ).length;
 
+  const money = (value: number) => {
+    return formatMoney(
+      value,
+      client?.country_id,
+      client?.settings?.currency_id,
+      2
+    );
+  };
+
   const previewable = Boolean(wizard.invoiceId) && Boolean(invoice?.client_id);
 
   const revealPreview = () => {
@@ -382,8 +398,64 @@ export function StepReview({ wizard }: Props) {
           noExternalPadding
           style={{ borderColor: colors.$20 }}
         >
-          {`${itemCount} ${itemCount === 1 ? 'item' : 'items'}`}
+          {trans('count_items', { count: itemCount })}
         </Element>
+
+        <Element
+          className="border-b border-dashed"
+          leftSide={t('subtotal')}
+          pushContentToRight
+          withoutWrappingLeftSide
+          noExternalPadding
+          style={{ borderColor: colors.$20 }}
+        >
+          {money(wizard.totals.subtotal)}
+        </Element>
+
+        {wizard.totals.discount ? (
+          <Element
+            className="border-b border-dashed"
+            leftSide={t('discount')}
+            pushContentToRight
+            withoutWrappingLeftSide
+            noExternalPadding
+            style={{ borderColor: colors.$20 }}
+          >
+            {money(wizard.totals.discount)}
+          </Element>
+        ) : null}
+
+        {wizard.totals.surchargeRows.map((row, index) => (
+          <Element
+            key={`surcharge-${index}`}
+            className="border-b border-dashed"
+            leftSide={row.name || t('surcharge')}
+            pushContentToRight
+            withoutWrappingLeftSide
+            noExternalPadding
+            style={{ borderColor: colors.$20 }}
+          >
+            {money(row.total)}
+          </Element>
+        ))}
+
+        {wizard.totals.taxRows.map((row, index) => (
+          <Element
+            key={`${row.name}-${index}`}
+            className="border-b border-dashed"
+            leftSide={
+              invoice?.uses_inclusive_taxes
+                ? `${t('includes')} ${row.name}`
+                : row.name
+            }
+            pushContentToRight
+            withoutWrappingLeftSide
+            noExternalPadding
+            style={{ borderColor: colors.$20 }}
+          >
+            {money(row.total)}
+          </Element>
+        ))}
 
         <Element
           className="border-b border-dashed"
@@ -393,12 +465,7 @@ export function StepReview({ wizard }: Props) {
           noExternalPadding
           style={{ borderColor: colors.$20 }}
         >
-          {formatMoney(
-            wizard.totals.total,
-            client?.country_id,
-            client?.settings?.currency_id,
-            2
-          )}
+          {money(wizard.totals.total)}
         </Element>
 
         <Element
@@ -437,6 +504,7 @@ export function StepReview({ wizard }: Props) {
           requirement={t('pro_plan')}
           busy={savingAttachment !== null}
           onChange={(value) => saveAttachment('pdf_email_attachment', value)}
+          onUpgrade={upgrade}
         />
 
         <AttachmentOption
@@ -448,6 +516,7 @@ export function StepReview({ wizard }: Props) {
           onChange={(value) =>
             saveAttachment('document_email_attachment', value)
           }
+          onUpgrade={upgrade}
         />
 
         <BrandPrompts
@@ -716,6 +785,7 @@ function AttachmentOption({
   requirement,
   busy,
   onChange,
+  onUpgrade,
 }: {
   label: string;
   checked: boolean;
@@ -723,6 +793,7 @@ function AttachmentOption({
   requirement: string;
   busy: boolean;
   onChange: (value: boolean) => void;
+  onUpgrade: () => void;
 }) {
   const [t] = useTranslation();
 
@@ -734,13 +805,19 @@ function AttachmentOption({
       noExternalPadding
       twoGridColumns
     >
-      <Toggle
-        checked={checked}
-        disabled={!allowed || busy}
-        onValueChange={(value) => {
-          return onChange(value);
-        }}
-      />
+      <div className="flex items-center justify-end gap-3">
+        {allowed ? null : (
+          <Button type="secondary" behavior="button" onClick={onUpgrade}>
+            {t('upgrade')}
+          </Button>
+        )}
+
+        <Toggle
+          checked={checked}
+          disabled={!allowed || busy}
+          onValueChange={(value) => onChange(value)}
+        />
+      </div>
     </Element>
   );
 }

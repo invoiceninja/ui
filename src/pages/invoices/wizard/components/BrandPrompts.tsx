@@ -45,7 +45,7 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
   const hasLogo = Boolean(company?.settings?.company_logo);
 
   const showName = section !== 'brand' && !businessName;
-  const showBrand = section !== 'name';
+  const showBrand = section !== 'name' && (hasLogo || !logoSkipped);
 
   const saveName = () => {
     if (!company?.id) {
@@ -145,7 +145,38 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
 
       {showBrand ? (
         <>
-          {!hasLogo && !logoSkipped ? (
+          {hasLogo ? (
+            <div className="flex items-center gap-3">
+              {logoFailed ? null : (
+                <div
+                  className="shrink-0 grid place-items-center border overflow-hidden"
+                  style={{
+                    width: '3rem',
+                    height: '2.25rem',
+                    borderColor: colors.$24,
+                    borderRadius: '0.375rem',
+                    backgroundColor: colors.$1,
+                  }}
+                >
+                  <img
+                    src={company?.settings?.company_logo}
+                    alt=""
+                    style={{ maxWidth: '2.5rem', maxHeight: '1.75rem' }}
+                    onError={() => setLogoFailed(true)}
+                  />
+                </div>
+              )}
+
+              <Button
+                type="secondary"
+                behavior="button"
+                disabled={uploading}
+                onClick={() => filePicker.current?.click()}
+              >
+                {t('update_logo')}
+              </Button>
+            </div>
+          ) : (
             <div>
               <p
                 className="text-sm mb-2"
@@ -173,37 +204,6 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
                   {t('skip')}
                 </Button>
               </div>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              {hasLogo && !logoFailed ? (
-                <div
-                  className="shrink-0 grid place-items-center border overflow-hidden"
-                  style={{
-                    width: '3rem',
-                    height: '2.25rem',
-                    borderColor: colors.$24,
-                    borderRadius: '0.375rem',
-                    backgroundColor: colors.$1,
-                  }}
-                >
-                  <img
-                    src={company?.settings?.company_logo}
-                    alt=""
-                    style={{ maxWidth: '2.5rem', maxHeight: '1.75rem' }}
-                    onError={() => setLogoFailed(true)}
-                  />
-                </div>
-              ) : null}
-
-              <Button
-                type="secondary"
-                behavior="button"
-                disabled={uploading}
-                onClick={() => filePicker.current?.click()}
-              >
-                {hasLogo ? t('update_logo') : t('add_company_logo')}
-              </Button>
             </div>
           )}
 
