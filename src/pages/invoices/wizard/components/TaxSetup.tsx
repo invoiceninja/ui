@@ -176,8 +176,9 @@ export function TaxSetup({
       <div className="space-y-5">
         <InputField
           id="iw-tax-name"
-          label={t('what_is_it_called')}
-          placeholder={t('tax_name_examples')}
+          type="text"
+          required
+          label={t('name')}
           value={name}
           changeOverride
           debounceTimeout={0}
@@ -187,8 +188,8 @@ export function TaxSetup({
 
         <InputField
           id="iw-tax-rate"
-          label={t('what_percentage_is_it')}
-          placeholder="20"
+          required
+          label={t('tax_rate')}
           value={rate}
           changeOverride
           debounceTimeout={0}
@@ -223,7 +224,11 @@ export function TaxSetup({
 
         {error ? <p className="text-xs text-red-600">{error}</p> : null}
 
-        <div className="flex items-center gap-2 pt-1">
+        <div className="flex items-center justify-end gap-2 pt-1">
+          <Button type="secondary" behavior="button" onClick={onClose}>
+            {t('cancel')}
+          </Button>
+
           <Button
             behavior="button"
             disabled={busy || (asking && inclusive === null)}
@@ -232,15 +237,7 @@ export function TaxSetup({
           >
             {`${t('apply')} ${t('tax')}`}
           </Button>
-
-          <Button type="secondary" behavior="button" onClick={onClose}>
-            {t('cancel')}
-          </Button>
         </div>
-
-        <p className="text-xs" style={{ color: colors.$17 }}>
-          {t('tax_saved_for_future_invoices')}
-        </p>
       </div>
     </Modal>
   );
