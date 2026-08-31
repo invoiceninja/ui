@@ -120,7 +120,6 @@ export default function Apply() {
   });
 
   const handleDataLoaded = useCallback((invoices: Invoice[]) => {
-    console.log(invoices);
     setHasCashDiscount(
       invoices.some((invoice) => Boolean(invoice.cash_discount))
     );
