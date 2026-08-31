@@ -25,6 +25,8 @@ export default function ReminderSchedules() {
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [errors, setErrors] = useState<ValidationBag | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [scheduleToDelete, setScheduleToDelete] =
+    useState<ReminderSchedule | null>(null);
   const [editingSchedule, setEditingSchedule] =
     useState<ReminderSchedule | null>(null);
   const [formData, setFormData] = useState({
@@ -53,6 +55,12 @@ export default function ReminderSchedules() {
       ).then((res) => res.data.data),
     staleTime: Infinity,
   });
+
+  const activeSchedules =
+    schedules?.filter(
+      (schedule: ReminderSchedule) =>
+        !schedule.is_deleted && !schedule.archived_at
+    ) ?? [];
 
   const openAddModal = () => {
     setEditingSchedule(null);
@@ -160,6 +168,7 @@ export default function ReminderSchedules() {
         toast.success('deleted_reminder_schedule');
 
         $refetch(['docuninja_reminder_schedules']);
+        setScheduleToDelete(null);
       })
       .catch(() => toast.error('error_title'))
       .finally(() => setIsFormBusy(false));
@@ -205,15 +214,15 @@ export default function ReminderSchedules() {
           </div>
         )}
 
-        {!isLoading && (!schedules || schedules.length === 0) && (
+        {!isLoading && activeSchedules.length === 0 && (
           <div className="flex justify-center items-center py-2 px-4 sm:px-6 font-medium">
             {t('no_reminder_schedules_found')}.
           </div>
         )}
 
-        {!isLoading && schedules && schedules.length > 0 && (
+        {!isLoading && activeSchedules.length > 0 && (
           <div className="divide-y" style={{ borderColor: colors.$20 }}>
-            {schedules.map((schedule: ReminderSchedule) => (
+            {activeSchedules.map((schedule: ReminderSchedule) => (
               <div
                 key={schedule.id}
                 className="flex items-center justify-between px-4 sm:px-6 py-4"
@@ -252,7 +261,7 @@ export default function ReminderSchedules() {
                   <Button
                     type="secondary"
                     behavior="button"
-                    onClick={() => handleDelete(schedule)}
+                    onClick={() => setScheduleToDelete(schedule)}
                   >
                     <MdDelete className="mr-2 h-4 w-4" />
                     {t('delete')}
@@ -356,6 +365,25 @@ export default function ReminderSchedules() {
             </Button>
           </div>
         </div>
+      </Modal>
+
+      <Modal
+        title={t('are_you_sure')}
+        visible={Boolean(scheduleToDelete)}
+        onClose={() => setScheduleToDelete(null)}
+        disableClosing={isFormBusy}
+      >
+        <span className="font-medium">
+          {t('delete_reminder_schedule_confirmation')}
+        </span>
+
+        <Button
+          behavior="button"
+          onClick={() => scheduleToDelete && handleDelete(scheduleToDelete)}
+          disabled={isFormBusy}
+        >
+          {t('continue')}
+        </Button>
       </Modal>
     </>
   );
