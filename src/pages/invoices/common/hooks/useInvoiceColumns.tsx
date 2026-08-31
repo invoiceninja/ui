@@ -50,6 +50,7 @@ import {
 } from '$app/common/helpers/peppol-countries';
 import { TagPills } from '$app/components/tags/TagPills';
 import { calculateNetAmount } from '$app/common/helpers/invoices/net-amount';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -156,6 +157,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
 
   const formatNumber = useFormatNumber();
   const disableNavigation = useDisableNavigation();
+  const defaultTabUrl = useDefaultTabUrl();
 
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
@@ -252,9 +254,11 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
                   color={accentColor}
                   onClick={() =>
                     navigate(
-                      route('/invoices/:id/edit', {
-                        id: invoice.backup?.parent_invoice_id,
-                      })
+                      defaultTabUrl(
+                        route('/invoices/:id/edit', {
+                          id: invoice.backup?.parent_invoice_id,
+                        })
+                      )
                     )
                   }
                 />
@@ -278,7 +282,9 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
                     fontSize={19}
                     color={accentColor}
                     onClick={() =>
-                      navigate(route('/invoices/:id/edit', { id }))
+                      navigate(
+                        defaultTabUrl(route('/invoices/:id/edit', { id }))
+                      )
                     }
                   />
                 }
@@ -293,7 +299,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('number'),
       format: (value, invoice) => (
         <DynamicLink
-          to={route('/invoices/:id/edit', { id: invoice.id })}
+          to={defaultTabUrl(route('/invoices/:id/edit', { id: invoice.id }))}
           renderSpan={disableNavigation('invoice', invoice)}
         >
           {value}
@@ -356,9 +362,11 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) =>
         invoice.recurring_id ? (
           <DynamicLink
-            to={route('/recurring_invoices/:id/edit', {
-              id: invoice.recurring_id,
-            })}
+            to={defaultTabUrl(
+              route('/recurring_invoices/:id/edit', {
+                id: invoice.recurring_id,
+              })
+            )}
             renderSpan={disableNavigation('recurring_invoice', undefined)}
           >
             {t('recurring_invoice')}

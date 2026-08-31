@@ -90,6 +90,7 @@ import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { SendNowAction } from './components/SendNowAction';
 import { TagPills } from '$app/components/tags/TagPills';
 import { calculateNetAmount } from '$app/common/helpers/invoices/net-amount';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -325,6 +326,7 @@ export function useActions(params?: Params) {
 
   const bulk = useBulkAction();
   const toggleStartStop = useToggleStartStop();
+  const defaultTabUrl = useDefaultTabUrl();
 
   const {
     showEditAction,
@@ -341,9 +343,11 @@ export function useActions(params?: Params) {
     (recurringInvoice) =>
       Boolean(showEditAction) && (
         <DropdownElement
-          to={route('/recurring_invoices/:id/edit', {
-            id: recurringInvoice.id,
-          })}
+          to={defaultTabUrl(
+            route('/recurring_invoices/:id/edit', {
+              id: recurringInvoice.id,
+            })
+          )}
           icon={<Icon element={MdEdit} />}
         >
           {t('edit')}
@@ -543,6 +547,7 @@ export function useCreate({
   isFormBusy,
 }: RecurringInvoiceSaveProps) {
   const navigate = useNavigate();
+  const defaultTabUrl = useDefaultTabUrl();
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
@@ -569,9 +574,11 @@ export function useCreate({
         $refetch(['recurring_invoices']);
 
         navigate(
-          route('/recurring_invoices/:id/edit', {
-            id: response.data.data.id,
-          })
+          defaultTabUrl(
+            route('/recurring_invoices/:id/edit', {
+              id: response.data.data.id,
+            })
+          )
         );
       })
       .catch((error: AxiosError<ValidationBag>) => {
@@ -655,6 +662,7 @@ export function useRecurringInvoiceColumns() {
   const getTimezone = useGetTimezone();
   const formatNumber = useFormatNumber();
   const disableNavigation = useDisableNavigation();
+  const defaultTabUrl = useDefaultTabUrl();
   const dateTime = useDateTime({ withTimezone: true });
 
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
@@ -700,9 +708,11 @@ export function useRecurringInvoiceColumns() {
       label: t('number'),
       format: (value, recurringInvoice) => (
         <DynamicLink
-          to={route('/recurring_invoices/:id/edit', {
-            id: recurringInvoice.id,
-          })}
+          to={defaultTabUrl(
+            route('/recurring_invoices/:id/edit', {
+              id: recurringInvoice.id,
+            })
+          )}
           renderSpan={disableNavigation('recurring_invoice', recurringInvoice)}
         >
           {value}

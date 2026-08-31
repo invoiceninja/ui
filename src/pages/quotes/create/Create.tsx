@@ -31,6 +31,7 @@ import { Tab, Tabs } from '$app/components/Tabs';
 import { invoiceSumAtom, quoteAtom } from '../common/atoms';
 import { useCreate, useQuoteUtilities } from '../common/hooks';
 import { useBlankQuoteQuery } from '../common/queries';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export interface QuoteContext {
   quote: Quote | undefined;
@@ -48,11 +49,13 @@ export default function Create() {
   const { documentTitle } = useTitle('new_quote');
   const [t] = useTranslation();
 
+  const defaultTabUrl = useDefaultTabUrl();
+
   const pages: Page[] = [
     { name: t('quotes'), href: '/quotes' },
     {
       name: t('new_quote'),
-      href: '/quotes/create',
+      href: defaultTabUrl('/quotes/create'),
     },
   ];
 

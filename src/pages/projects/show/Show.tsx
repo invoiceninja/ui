@@ -61,6 +61,7 @@ import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOpti
 import { useActions as useProjectsActions } from '../common/hooks';
 import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
 import { ProjectPublicNotes } from './components/ProjectPublicNotes';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 dayjs.extend(duration);
 
@@ -72,6 +73,7 @@ export default function Show() {
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
+  const defaultTabUrl = useDefaultTabUrl();
 
   const enabled = useEnabled();
 
@@ -193,7 +195,9 @@ export default function Show() {
               {project.invoices?.map((invoice: Invoice, index: number) => (
                 <Link
                   key={index}
-                  to={route('/invoices/:id/edit', { id: invoice.id })}
+                  to={defaultTabUrl(
+                    route('/invoices/:id/edit', { id: invoice.id })
+                  )}
                 >
                   {t('invoice')} #{invoice.number}
                 </Link>
@@ -202,7 +206,9 @@ export default function Show() {
               {project.quotes?.map((quote: Quote, index: number) => (
                 <Link
                   key={index}
-                  to={route('/quotes/:id/edit', { id: quote.id })}
+                  to={defaultTabUrl(
+                    route('/quotes/:id/edit', { id: quote.id })
+                  )}
                 >
                   {t('quote')} #{quote.number}
                 </Link>

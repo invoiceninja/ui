@@ -27,6 +27,7 @@ import { Card } from '$app/components/cards';
 import { Link } from '$app/components/forms';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { Spinner } from '$app/components/Spinner';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
@@ -38,6 +39,8 @@ const Box = styled.div`
 
 export function useGenerateActivityElement() {
   const [t] = useTranslation();
+
+  const defaultTabUrl = useDefaultTabUrl();
 
   return (activity: InvoiceActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
@@ -52,9 +55,11 @@ export function useGenerateActivityElement() {
       user: activity.user?.label ?? t('system'),
       invoice: (
         <Link
-          to={route('/invoices/:id/edit', {
-            id: activity.invoice?.hashed_id,
-          })}
+          to={defaultTabUrl(
+            route('/invoices/:id/edit', {
+              id: activity.invoice?.hashed_id,
+            })
+          )}
         >
           {activity?.invoice?.label}
         </Link>
@@ -62,9 +67,11 @@ export function useGenerateActivityElement() {
 
       recurring_invoice: (
         <Link
-          to={route('/recurring_invoices/:id/edit', {
-            id: activity?.recurring_invoice?.hashed_id,
-          })}
+          to={defaultTabUrl(
+            route('/recurring_invoices/:id/edit', {
+              id: activity?.recurring_invoice?.hashed_id,
+            })
+          )}
         >
           {activity?.recurring_invoice?.label}
         </Link>

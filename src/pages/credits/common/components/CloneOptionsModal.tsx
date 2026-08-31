@@ -34,6 +34,7 @@ import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { creditAtom } from '../atoms';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 interface Props {
   credit: Credit;
@@ -47,6 +48,7 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
   const company = useCompanyChanges();
 
   const navigate = useNavigate();
+  const defaultTabUrl = useDefaultTabUrl();
   const hasPermission = useHasPermission();
 
   const setQuote = useSetAtom(quoteAtom);
@@ -109,7 +111,7 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
     setIsModalVisible(false);
 
     setTimeout(() => {
-      navigate('/invoices/create?action=clone');
+      navigate(defaultTabUrl('/invoices/create?action=clone'));
     }, 150);
   };
 
@@ -138,7 +140,7 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
     setIsModalVisible(false);
 
     setTimeout(() => {
-      navigate('/quotes/create?action=clone');
+      navigate(defaultTabUrl('/quotes/create?action=clone'));
     }, 150);
   };
 
@@ -167,7 +169,7 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
     setIsModalVisible(false);
 
     setTimeout(() => {
-      navigate('/recurring_invoices/create?action=clone');
+      navigate(defaultTabUrl('/recurring_invoices/create?action=clone'));
     }, 150);
   };
 

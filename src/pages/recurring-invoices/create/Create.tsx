@@ -37,6 +37,7 @@ import {
 } from '../common/components/ConfirmActionModal';
 import { useCreate, useRecurringInvoiceUtilities } from '../common/hooks';
 import { useBlankRecurringInvoiceQuery } from '../common/queries';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export interface RecurringInvoiceContext {
   recurringInvoice: RecurringInvoice | undefined;
@@ -62,11 +63,13 @@ export default function Create() {
     enabled: typeof recurringInvoice === 'undefined',
   });
 
+  const defaultTabUrl = useDefaultTabUrl();
+
   const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
     {
       name: t('new_recurring_invoice'),
-      href: '/recurring_invoices/create',
+      href: defaultTabUrl('/recurring_invoices/create'),
     },
   ];
 

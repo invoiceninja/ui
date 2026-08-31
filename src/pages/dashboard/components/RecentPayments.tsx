@@ -24,6 +24,7 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { ArrowDown } from '$app/components/icons/ArrowDown';
 import { ArrowUp } from '$app/components/icons/ArrowUp';
 import { CreditCardChecked } from '$app/components/icons/CreditCardChecked';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export function RecentPayments() {
   const [t] = useTranslation();
@@ -34,6 +35,7 @@ export function RecentPayments() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const disableNavigation = useDisableNavigation();
+  const defaultTabUrl = useDefaultTabUrl();
 
   const columns: DataTableColumns<Payment> = [
     {
@@ -69,9 +71,11 @@ export function RecentPayments() {
         payment.invoices &&
         payment.invoices[0] && (
           <DynamicLink
-            to={generatePath('/invoices/:id/edit', {
-              id: payment.invoices[0].id,
-            })}
+            to={defaultTabUrl(
+              generatePath('/invoices/:id/edit', {
+                id: payment.invoices[0].id,
+              })
+            )}
             renderSpan={disableNavigation('invoice', payment.invoices[0])}
           >
             {payment.invoices[0].number}

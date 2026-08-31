@@ -83,6 +83,7 @@ import { shouldShowStartTaskButton } from './helpers/task';
 import { useInvoiceTask } from './hooks/useInvoiceTask';
 import { useStart } from './hooks/useStart';
 import { useStop } from './hooks/useStop';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export const defaultColumns: string[] = [
   'status',
@@ -147,6 +148,7 @@ export function useTaskColumns() {
 
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
+  const defaultTabUrl = useDefaultTabUrl();
 
   const taskColumns = useAllTaskColumns();
   type TaskColumns = (typeof taskColumns)[number];
@@ -207,7 +209,11 @@ export function useTaskColumns() {
                 fontSize={19}
                 color={accentColor}
                 onClick={() =>
-                  navigate(route('/invoices/:id/edit', { id: task.invoice_id }))
+                  navigate(
+                    defaultTabUrl(
+                      route('/invoices/:id/edit', { id: task.invoice_id })
+                    )
+                  )
                 }
               />
             </Tooltip>

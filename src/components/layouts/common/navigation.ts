@@ -31,6 +31,7 @@ import { Wallet } from '$app/components/icons/Wallet';
 import { ModuleBitmask } from '$app/pages/settings';
 import { Invoice as InvoiceIcon } from '../../icons/Invoice';
 import { NavigationItem } from '../components/DesktopSidebar';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 const $cache = atom<NavigationItem[] | null>(null);
 const $navigationLanguage = atom<string | null>(null);
@@ -46,6 +47,7 @@ export function useNavigation() {
   const [cachedLanguage, setCachedLanguage] = useAtom($navigationLanguage);
 
   const shortcutBindings = useResolvedShortcuts();
+  const defaultTabUrl = useDefaultTabUrl();
 
   const tooltipFor = (id: ShortcutId): string | undefined => {
     const binding = shortcutBindings[id];
@@ -102,7 +104,7 @@ export function useNavigation() {
           hasPermission('edit_invoice')),
       rightButton: {
         icon: Plus,
-        to: '/invoices/create',
+        to: defaultTabUrl('/invoices/create'),
         label: t('new_invoice'),
         visible: hasPermission('create_invoice'),
         tooltipLabel: tooltipFor('create_invoice'),
@@ -119,7 +121,7 @@ export function useNavigation() {
           hasPermission('edit_recurring_invoice')),
       rightButton: {
         icon: Plus,
-        to: '/recurring_invoices/create',
+        to: defaultTabUrl('/recurring_invoices/create'),
         label: t('new_recurring_invoice'),
         visible: hasPermission('create_recurring_invoice'),
         tooltipLabel: tooltipFor('create_recurring_invoice'),
@@ -152,7 +154,7 @@ export function useNavigation() {
           hasPermission('edit_quote')),
       rightButton: {
         icon: Plus,
-        to: '/quotes/create',
+        to: defaultTabUrl('/quotes/create'),
         label: t('new_quote'),
         visible: hasPermission('create_quote'),
         tooltipLabel: tooltipFor('create_quote'),
@@ -358,7 +360,7 @@ export function useNavigation() {
     }
 
     setCache(initialNavigation);
-  }, [i18n.language, company?.settings?.translations]);
+  }, [i18n.language, company?.settings?.translations, defaultTabUrl]);
 
   useEffect(() => {
     window.addEventListener('navigation.changeVisibility', (event) => {

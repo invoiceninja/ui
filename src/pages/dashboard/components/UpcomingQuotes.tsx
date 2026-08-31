@@ -22,6 +22,7 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { ArrowDown } from '$app/components/icons/ArrowDown';
 import { ArrowUp } from '$app/components/icons/ArrowUp';
 import { CalendarCheckOut } from '$app/components/icons/CalendarCheckOut';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export function UpcomingQuotes() {
   const [t] = useTranslation();
@@ -30,6 +31,7 @@ export function UpcomingQuotes() {
 
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
+  const defaultTabUrl = useDefaultTabUrl();
 
   const columns: DataTableColumns<Quote> = [
     {
@@ -37,7 +39,7 @@ export function UpcomingQuotes() {
       label: t('number'),
       format: (value, quote) => (
         <DynamicLink
-          to={route('/quotes/:id/edit', { id: quote.id })}
+          to={defaultTabUrl(route('/quotes/:id/edit', { id: quote.id }))}
           renderSpan={disableNavigation('quote', quote)}
         >
           {quote.number}

@@ -75,6 +75,7 @@ import { DocumentsTable } from '$app/components/DocumentsTable';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export const quoteSliderAtom = atom<Quote | null>(null);
 export const quoteSliderVisibilityAtom = atom(false);
@@ -92,6 +93,8 @@ const Box = styled.div`
 export function useGenerateActivityElement() {
   const [t] = useTranslation();
 
+  const defaultTabUrl = useDefaultTabUrl();
+
   return (activity: QuoteActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
@@ -104,9 +107,11 @@ export function useGenerateActivityElement() {
       user: activity.user?.label ?? t('system'),
       quote: (
         <Link
-          to={route('/quotes/:id/edit', {
-            id: activity.quote?.hashed_id,
-          })}
+          to={defaultTabUrl(
+            route('/quotes/:id/edit', {
+              id: activity.quote?.hashed_id,
+            })
+          )}
         >
           {activity?.quote?.label}
         </Link>
@@ -161,6 +166,7 @@ export function QuoteSlider() {
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
   const activityElement = useGenerateActivityElement();
+  const defaultTabUrl = useDefaultTabUrl();
 
   const [quote, setQuote] = useAtom(quoteSliderAtom);
   const [isVisible, setIsSliderVisible] = useAtom(quoteSliderVisibilityAtom);
@@ -506,9 +512,11 @@ export function QuoteSlider() {
                 onClick={() => {
                   !disableNavigation('invoice', invoiceResponse) &&
                     navigate(
-                      route('/invoices/:id/edit', {
-                        id: invoiceResponse.id,
-                      })
+                      defaultTabUrl(
+                        route('/invoices/:id/edit', {
+                          id: invoiceResponse.id,
+                        })
+                      )
                     );
                 }}
                 style={{
@@ -559,7 +567,9 @@ export function QuoteSlider() {
                   lineItem={lineItem}
                   lineItemIndex={index}
                   client={quote.client}
-                  editHref={route('/quotes/:id/edit', { id: quote.id })}
+                  editHref={defaultTabUrl(
+                    route('/quotes/:id/edit', { id: quote.id })
+                  )}
                 />
               ))}
             </div>

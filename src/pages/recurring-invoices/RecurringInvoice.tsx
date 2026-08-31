@@ -42,6 +42,7 @@ import {
 } from './common/hooks';
 import { useRecurringInvoiceQuery } from './common/queries';
 import { useTabs } from './edit/hooks/useTabs';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export default function RecurringInvoice() {
   const { documentTitle } = useTitle('edit_recurring_invoice');
@@ -57,11 +58,13 @@ export default function RecurringInvoice() {
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
+  const defaultTabUrl = useDefaultTabUrl();
+
   const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
     {
       name: t('edit_recurring_invoice'),
-      href: route('/recurring_invoices/:id/edit', { id }),
+      href: defaultTabUrl(route('/recurring_invoices/:id/edit', { id })),
     },
   ];
 

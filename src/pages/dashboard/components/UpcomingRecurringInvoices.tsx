@@ -24,6 +24,7 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { ArrowDown } from '$app/components/icons/ArrowDown';
 import { ArrowUp } from '$app/components/icons/ArrowUp';
 import { CalendarCheckOut } from '$app/components/icons/CalendarCheckOut';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export function UpcomingRecurringInvoices() {
   const [t] = useTranslation();
@@ -34,6 +35,7 @@ export function UpcomingRecurringInvoices() {
   const formatMoney = useFormatMoney();
   const getTimezone = useGetTimezone();
   const disableNavigation = useDisableNavigation();
+  const defaultTabUrl = useDefaultTabUrl();
   const dateTime = useDateTime({ withTimezone: true });
 
   const columns: DataTableColumns<RecurringInvoice> = [
@@ -43,9 +45,11 @@ export function UpcomingRecurringInvoices() {
       format: (_, recurringInvoice) => {
         return (
           <DynamicLink
-            to={route('/recurring_invoices/:id/edit', {
-              id: recurringInvoice.id,
-            })}
+            to={defaultTabUrl(
+              route('/recurring_invoices/:id/edit', {
+                id: recurringInvoice.id,
+              })
+            )}
             renderSpan={disableNavigation(
               'recurring_invoice',
               recurringInvoice

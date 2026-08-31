@@ -16,6 +16,7 @@ import {
   scheduleRelatedEntityRoute,
 } from '../helpers/related-entity';
 import { useEntityNumber } from '../hooks/useEntityNumber';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 interface Props {
   schedule: Schedule;
@@ -23,6 +24,8 @@ interface Props {
 
 export function ScheduleEntityLink({ schedule }: Props) {
   const [t] = useTranslation();
+
+  const defaultTabUrl = useDefaultTabUrl();
 
   const relatedEntity = scheduleRelatedEntity(schedule);
 
@@ -37,7 +40,7 @@ export function ScheduleEntityLink({ schedule }: Props) {
   }
 
   return (
-    <DynamicLink to={scheduleRelatedEntityRoute(relatedEntity)}>
+    <DynamicLink to={defaultTabUrl(scheduleRelatedEntityRoute(relatedEntity))}>
       {entityNumber
         ? `${t(relatedEntity.entity)} #${entityNumber}`
         : t(relatedEntity.entity)}

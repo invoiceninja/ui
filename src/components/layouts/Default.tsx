@@ -47,6 +47,7 @@ import { AccountPlanExpired } from '../banners/AccountPlanExpired';
 import { useNavigation } from './common/navigation';
 import { DesktopSidebar } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export interface SaveOption {
   label: string;
@@ -79,6 +80,7 @@ export function Default(props: Props) {
   const user = useCurrentUser();
   const companyUser = useCurrentCompanyUser();
   const reactSettings = useReactSettings();
+  const defaultTabUrl = useDefaultTabUrl();
 
   const isMiniSidebar = Boolean(reactSettings.show_mini_sidebar);
 
@@ -119,7 +121,9 @@ export function Default(props: Props) {
           </span>
 
           <div className="flex justify-center">
-            <Link to={`/invoices/${data.id}/edit`}>{t('view_invoice')}</Link>
+            <Link to={defaultTabUrl(`/invoices/${data.id}/edit`)}>
+              {t('view_invoice')}
+            </Link>
           </div>
         </div>,
         {

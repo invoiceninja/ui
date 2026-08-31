@@ -46,6 +46,7 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterColumnsPicker';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export default function RecurringInvoices() {
   useTitle('recurring_invoices');
@@ -70,6 +71,7 @@ export default function RecurringInvoices() {
   const reactSettings = useReactSettings();
   const filters = useRecurringInvoiceFilters();
   const columns = useRecurringInvoiceColumns();
+  const defaultTabUrl = useDefaultTabUrl();
   const customBulkActions = useCustomBulkActions();
   const { footerColumns, allFooterColumns } = useFooterColumns();
   const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
@@ -118,8 +120,8 @@ export default function RecurringInvoices() {
         }&without_deleted_clients=true&sort=id|desc${
           shouldShowTagFilter ? '' : '&tag_ids='
         }`}
-        linkToCreate="/recurring_invoices/create"
-        linkToEdit="/recurring_invoices/:id/edit"
+        linkToCreate={defaultTabUrl('/recurring_invoices/create')}
+        linkToEdit={defaultTabUrl('/recurring_invoices/:id/edit')}
         bulkRoute="/api/v1/recurring_invoices/bulk"
         customActions={actions}
         customFilters={filters}

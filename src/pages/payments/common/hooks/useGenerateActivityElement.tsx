@@ -14,9 +14,12 @@ import { trans } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { PaymentActivity } from '$app/common/interfaces/payment-activity';
 import { Link } from '$app/components/forms';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export function useGenerateActivityElement() {
   const [t] = useTranslation();
+
+  const defaultTabUrl = useDefaultTabUrl();
 
   return (activity: PaymentActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
@@ -32,9 +35,11 @@ export function useGenerateActivityElement() {
       adjustment: activity?.adjustment?.label,
       invoice: (
         <Link
-          to={route('/invoices/:id/edit', {
-            id: activity.invoice?.hashed_id,
-          })}
+          to={defaultTabUrl(
+            route('/invoices/:id/edit', {
+              id: activity.invoice?.hashed_id,
+            })
+          )}
         >
           {activity?.invoice?.label}
         </Link>

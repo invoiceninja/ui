@@ -66,6 +66,7 @@ import { DocumentsTable } from '$app/components/DocumentsTable';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export const recurringInvoiceSliderAtom = atom<RecurringInvoice | null>(null);
 export const recurringInvoiceSliderVisibilityAtom = atom(false);
@@ -83,6 +84,8 @@ const Box = styled.div`
 export const useGenerateActivityElement = () => {
   const [t] = useTranslation();
 
+  const defaultTabUrl = useDefaultTabUrl();
+
   return (activity: RecurringInvoiceActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
@@ -94,7 +97,9 @@ export const useGenerateActivityElement = () => {
       ),
       invoice: (
         <Link
-          to={route('/invoices/:id/edit', { id: activity?.invoice?.hashed_id })}
+          to={defaultTabUrl(
+            route('/invoices/:id/edit', { id: activity?.invoice?.hashed_id })
+          )}
         >
           {activity?.invoice?.label}
         </Link>
@@ -102,9 +107,11 @@ export const useGenerateActivityElement = () => {
       user: activity.user?.label ?? t('system'),
       recurring_invoice: (
         <Link
-          to={route('/recurring_invoices/:id/edit', {
-            id: activity.recurring_invoice?.hashed_id,
-          })}
+          to={defaultTabUrl(
+            route('/recurring_invoices/:id/edit', {
+              id: activity.recurring_invoice?.hashed_id,
+            })
+          )}
         >
           {activity?.recurring_invoice?.label}
         </Link>
@@ -144,6 +151,7 @@ export const RecurringInvoiceSlider = () => {
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
   const activityElement = useGenerateActivityElement();
+  const defaultTabUrl = useDefaultTabUrl();
   const dateTime = useDateTime({ withTimezone: true });
 
   const formatMoney = useFormatMoney();
@@ -439,9 +447,11 @@ export const RecurringInvoiceSlider = () => {
                   lineItem={lineItem}
                   lineItemIndex={index}
                   client={recurringInvoice.client}
-                  editHref={route('/recurring_invoices/:id/edit', {
-                    id: recurringInvoice.id,
-                  })}
+                  editHref={defaultTabUrl(
+                    route('/recurring_invoices/:id/edit', {
+                      id: recurringInvoice.id,
+                    })
+                  )}
                 />
               ))}
             </div>

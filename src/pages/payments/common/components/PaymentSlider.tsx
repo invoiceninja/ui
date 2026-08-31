@@ -47,6 +47,7 @@ import { DocumentsTable } from '$app/components/DocumentsTable';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export const paymentSliderAtom = atom<Payment | null>(null);
 export const paymentSliderVisibilityAtom = atom(false);
@@ -78,6 +79,7 @@ export function PaymentSlider() {
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
+  const defaultTabUrl = useDefaultTabUrl();
   const activityElement = useGenerateActivityElement();
 
   const [payment, setPayment] = useAtom(paymentSliderAtom);
@@ -225,9 +227,11 @@ export function PaymentSlider() {
                 onClick={() => {
                   !disableNavigation('invoice', invoice) &&
                     navigate(
-                      route('/invoices/:id/edit', {
-                        id: invoice.id,
-                      })
+                      defaultTabUrl(
+                        route('/invoices/:id/edit', {
+                          id: invoice.id,
+                        })
+                      )
                     );
                 }}
                 style={{

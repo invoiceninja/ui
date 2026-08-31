@@ -37,6 +37,7 @@ import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { useInvoiceExpense } from '../useInvoiceExpense';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 interface Props {
   expenses: Expense[];
@@ -55,6 +56,7 @@ export function AddToInvoiceAction(props: Props) {
   const { expenses, bulkAction } = props;
 
   const navigate = useNavigate();
+  const defaultTabUrl = useDefaultTabUrl();
   const formatMoney = useFormatMoney();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
@@ -138,9 +140,11 @@ export function AddToInvoiceAction(props: Props) {
     );
 
     navigate(
-      route('/invoices/:id/edit?action=invoice_expense', {
-        id: invoice.id,
-      })
+      defaultTabUrl(
+        route('/invoices/:id/edit?action=invoice_expense', {
+          id: invoice.id,
+        })
+      )
     );
   };
 

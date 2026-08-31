@@ -25,6 +25,7 @@ import { Invoice } from '$app/components/icons/Invoice';
 import { Refresh } from '$app/components/icons/Refresh';
 import { Wallet } from '$app/components/icons/Wallet';
 import { Modal } from '$app/components/Modal';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 interface Props {
   client: Client;
@@ -38,6 +39,7 @@ export function EntityCreationModalAction({ client, dropdown }: Props) {
 
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
+  const defaultTabUrl = useDefaultTabUrl();
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
@@ -45,7 +47,9 @@ export function EntityCreationModalAction({ client, dropdown }: Props) {
     setIsModalVisible(false);
 
     setTimeout(() => {
-      navigate(route('/invoices/create?client=:id', { id: client.id }));
+      navigate(
+        defaultTabUrl(route('/invoices/create?client=:id', { id: client.id }))
+      );
     }, 150);
   };
 
@@ -54,7 +58,9 @@ export function EntityCreationModalAction({ client, dropdown }: Props) {
 
     setTimeout(() => {
       navigate(
-        route('/recurring_invoices/create?client=:id', { id: client.id })
+        defaultTabUrl(
+          route('/recurring_invoices/create?client=:id', { id: client.id })
+        )
       );
     }, 150);
   };
@@ -71,7 +77,9 @@ export function EntityCreationModalAction({ client, dropdown }: Props) {
     setIsModalVisible(false);
 
     setTimeout(() => {
-      navigate(route('/quotes/create?client=:id', { id: client.id }));
+      navigate(
+        defaultTabUrl(route('/quotes/create?client=:id', { id: client.id }))
+      );
     }, 150);
   };
 

@@ -35,6 +35,7 @@ import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { buildCreditFromInvoice } from '../helpers/credit-note';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 interface Props {
   invoice: Invoice;
@@ -45,6 +46,7 @@ interface Props {
 export function CloneOptionsModal(props: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
+  const defaultTabUrl = useDefaultTabUrl();
 
   const colors = useColorScheme();
 
@@ -81,7 +83,7 @@ export function CloneOptionsModal(props: Props) {
       client: undefined,
     });
 
-    navigate('/invoices/create?action=clone');
+    navigate(defaultTabUrl('/invoices/create?action=clone'));
   };
 
   const cloneToQuote = () => {
@@ -105,7 +107,7 @@ export function CloneOptionsModal(props: Props) {
       client: undefined,
     });
 
-    navigate('/quotes/create?action=clone');
+    navigate(defaultTabUrl('/quotes/create?action=clone'));
   };
 
   const cloneToCredit = () => {
@@ -141,7 +143,7 @@ export function CloneOptionsModal(props: Props) {
       client: undefined,
     });
 
-    navigate('/recurring_invoices/create?action=clone');
+    navigate(defaultTabUrl('/recurring_invoices/create?action=clone'));
   };
 
   const cloneToPurchaseOrder = () => {

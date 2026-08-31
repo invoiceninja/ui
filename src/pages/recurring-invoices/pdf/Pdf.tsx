@@ -17,6 +17,7 @@ import { Default } from '$app/components/layouts/Default';
 import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from '$app/pages/invoices/common/hooks/useGeneratePdfUrl';
 import { useRecurringInvoiceQuery } from '../common/queries';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export default function Pdf() {
   const { documentTitle } = useTitle('view_pdf');
@@ -26,11 +27,13 @@ export default function Pdf() {
 
   const url = useGeneratePdfUrl({ resourceType: 'recurring_invoice' });
 
+  const defaultTabUrl = useDefaultTabUrl();
+
   const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
     {
       name: t('edit_recurring_invoice'),
-      href: route('/recurring_invoices/:id/edit', { id }),
+      href: defaultTabUrl(route('/recurring_invoices/:id/edit', { id })),
     },
     {
       name: t('pdf'),

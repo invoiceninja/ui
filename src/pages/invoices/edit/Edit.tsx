@@ -54,6 +54,7 @@ import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
 import { TaxDataBadge } from './components/TaxDataBadge';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -88,6 +89,7 @@ export default function Edit() {
   const taskColumns = useTaskColumns();
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
+  const defaultTabUrl = useDefaultTabUrl();
 
   useScrollToLineItem(Boolean(invoice && client));
 
@@ -169,9 +171,11 @@ export default function Edit() {
                 </span>
 
                 <Link
-                  to={route('/recurring_invoices/:id/edit', {
-                    id: invoice.recurring_id,
-                  })}
+                  to={defaultTabUrl(
+                    route('/recurring_invoices/:id/edit', {
+                      id: invoice.recurring_id,
+                    })
+                  )}
                 >
                   {t('view')}
                 </Link>

@@ -25,6 +25,7 @@ import {
   EntityError,
   ValidationEntityResponse,
 } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -57,6 +58,7 @@ export default function Verifactu() {
   const colors = useColorScheme();
   const location = useLocation();
   const queryClient = useQueryClient();
+  const defaultTabUrl = useDefaultTabUrl();
 
   const VALIDATION_ENTITIES = ['invoice', 'client', 'company'];
 
@@ -116,7 +118,9 @@ export default function Verifactu() {
       {}
     ) as unknown as ReactNode[];
     const invoiceElement = (
-      <Link to={route('/invoices/:id/edit', { id: invoice?.id })}>
+      <Link
+        to={defaultTabUrl(route('/invoices/:id/edit', { id: invoice?.id }))}
+      >
         {invoice?.number}
       </Link>
     );
@@ -191,9 +195,11 @@ export default function Verifactu() {
 
                       {entity === 'invoice' && (
                         <Link
-                          to={route('/invoices/:id/edit', {
-                            id: invoice?.id,
-                          })}
+                          to={defaultTabUrl(
+                            route('/invoices/:id/edit', {
+                              id: invoice?.id,
+                            })
+                          )}
                         >
                           {t('edit_invoice')}
                         </Link>
@@ -304,9 +310,11 @@ export default function Verifactu() {
             {invoice.backup?.parent_invoice_id && (
               <Element leftSide={t('linked_to')}>
                 <Link
-                  to={route('/invoices/:id/edit', {
-                    id: invoice.backup?.parent_invoice_id,
-                  })}
+                  to={defaultTabUrl(
+                    route('/invoices/:id/edit', {
+                      id: invoice.backup?.parent_invoice_id,
+                    })
+                  )}
                 >
                   {t('invoice')} {invoice.backup?.parent_invoice_number}
                 </Link>
@@ -323,7 +331,11 @@ export default function Verifactu() {
                     {invoice.backup?.child_invoice_ids.map((id) => (
                       <li key={id}>
                         <div className="flex items-start">
-                          <Link to={route('/invoices/:id/edit', { id })}>
+                          <Link
+                            to={defaultTabUrl(
+                              route('/invoices/:id/edit', { id })
+                            )}
+                          >
                             {t('invoice')}
                           </Link>
                         </div>

@@ -76,6 +76,7 @@ import { DocumentsTable } from '$app/components/DocumentsTable';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Upload } from '$app/pages/settings/company/documents/components';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export const invoiceSliderAtom = atom<Invoice | null>(null);
 export const invoiceSliderVisibilityAtom = atom(false);
@@ -109,6 +110,8 @@ const ActivityBox = styled.div`
 export function useGenerateActivityElement() {
   const [t] = useTranslation();
 
+  const defaultTabUrl = useDefaultTabUrl();
+
   return (activity: InvoiceActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
@@ -130,9 +133,11 @@ export function useGenerateActivityElement() {
       user: activity.user?.label ?? t('system'),
       invoice: (
         <Link
-          to={route('/invoices/:id/edit', {
-            id: activity.invoice?.hashed_id,
-          })}
+          to={defaultTabUrl(
+            route('/invoices/:id/edit', {
+              id: activity.invoice?.hashed_id,
+            })
+          )}
         >
           {activity?.invoice?.label}
         </Link>
@@ -140,9 +145,11 @@ export function useGenerateActivityElement() {
 
       recurring_invoice: (
         <Link
-          to={route('/recurring_invoices/:id/edit', {
-            id: activity?.recurring_invoice?.hashed_id,
-          })}
+          to={defaultTabUrl(
+            route('/recurring_invoices/:id/edit', {
+              id: activity?.recurring_invoice?.hashed_id,
+            })
+          )}
         >
           {activity?.recurring_invoice?.label}
         </Link>
@@ -210,6 +217,7 @@ export function InvoiceSlider() {
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
   const activityElement = useGenerateActivityElement();
+  const defaultTabUrl = useDefaultTabUrl();
 
   const [commentsOnly, setCommentsOnly] = useState<boolean>(false);
   const [emailRecords, setEmailRecords] = useState<EmailRecordType[]>([]);
@@ -387,9 +395,11 @@ export function InvoiceSlider() {
                 style={{ borderColor: colors.$20 }}
               >
                 <Link
-                  to={route('/recurring_invoices/:id/edit', {
-                    id: invoice.recurring_id,
-                  })}
+                  to={defaultTabUrl(
+                    route('/recurring_invoices/:id/edit', {
+                      id: invoice.recurring_id,
+                    })
+                  )}
                 >
                   {t('view')}
                 </Link>
@@ -627,7 +637,9 @@ export function InvoiceSlider() {
                   lineItem={lineItem}
                   lineItemIndex={index}
                   client={invoice.client}
-                  editHref={route('/invoices/:id/edit', { id: invoice.id })}
+                  editHref={defaultTabUrl(
+                    route('/invoices/:id/edit', { id: invoice.id })
+                  )}
                 />
               ))}
             </div>

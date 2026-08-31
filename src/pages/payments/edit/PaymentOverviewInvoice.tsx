@@ -20,6 +20,7 @@ import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Payment, Paymentable } from '$app/common/interfaces/payment';
 import { ExternalLink } from '$app/components/icons/ExternalLink';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 interface Props {
   payment: Payment;
@@ -53,6 +54,7 @@ export function PaymentOverviewInvoice(props: Props) {
 
   const colors = useColorScheme();
   const accentColor = useAccentColor();
+  const defaultTabUrl = useDefaultTabUrl();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   return (
@@ -67,9 +69,11 @@ export function PaymentOverviewInvoice(props: Props) {
               <span style={{ color: colors.$3 }}>{t('invoice')}</span>
 
               <Link
-                to={route('/invoices/:id/edit', {
-                  id: props.paymentable.invoice_id,
-                })}
+                to={defaultTabUrl(
+                  route('/invoices/:id/edit', {
+                    id: props.paymentable.invoice_id,
+                  })
+                )}
               >
                 <div
                   className="flex items-center gap-2"

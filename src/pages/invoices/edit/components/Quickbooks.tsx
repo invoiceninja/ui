@@ -40,6 +40,7 @@ import {
   type QuickbooksInvoiceCheck,
 } from '../../common/helpers/quickbooks';
 import type { Context } from '../Edit';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 const actionLabels: Record<QuickbooksInvoiceAction, string> = {
   check_record: 'Check Record',
@@ -65,6 +66,7 @@ export default function Quickbooks() {
   const company = useCurrentCompany();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const defaultTabUrl = useDefaultTabUrl();
   const dateTime = useDateTime({ withTimezone: true });
   const formatMoney = useFormatMoney();
   const { id } = useParams();
@@ -99,7 +101,9 @@ export default function Quickbooks() {
   if (!hasQuickbooksConnection(company)) {
     return (
       <Navigate
-        to={route('/invoices/:id/edit', { id: id || invoice?.id })}
+        to={defaultTabUrl(
+          route('/invoices/:id/edit', { id: id || invoice?.id })
+        )}
         replace
       />
     );
@@ -186,7 +190,9 @@ export default function Quickbooks() {
 
     if (action === 'change_invoice_number') {
       navigate(
-        `${route('/invoices/:id/edit', { id: invoice?.id })}?focus=number`
+        defaultTabUrl(
+          `${route('/invoices/:id/edit', { id: invoice?.id })}?focus=number`
+        )
       );
       return;
     }

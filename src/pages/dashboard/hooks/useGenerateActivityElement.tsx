@@ -29,6 +29,7 @@ import { Button, InputField, Link } from '$app/components/forms';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { Modal } from '$app/components/Modal';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 const Box = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};
@@ -40,6 +41,8 @@ const Box = styled.div`
 
 export function useGenerateActivityElement() {
   const [t] = useTranslation();
+
+  const defaultTabUrl = useDefaultTabUrl();
 
   const colors = useColorScheme();
 
@@ -106,7 +109,11 @@ export function useGenerateActivityElement() {
         </Link>
       ),
       quote: (
-        <Link to={route('/quotes/:id/edit', { id: activity.quote?.hashed_id })}>
+        <Link
+          to={defaultTabUrl(
+            route('/quotes/:id/edit', { id: activity.quote?.hashed_id })
+          )}
+        >
           {activity.quote?.label}
         </Link>
       ),
@@ -120,9 +127,11 @@ export function useGenerateActivityElement() {
       ),
       recurring_invoice: (
         <Link
-          to={route('/recurring_invoices/:id/edit', {
-            id: activity.recurring_invoice?.hashed_id,
-          })}
+          to={defaultTabUrl(
+            route('/recurring_invoices/:id/edit', {
+              id: activity.recurring_invoice?.hashed_id,
+            })
+          )}
         >
           {activity?.recurring_invoice?.label}
         </Link>
@@ -147,7 +156,9 @@ export function useGenerateActivityElement() {
       ),
       invoice: (
         <Link
-          to={route('/invoices/:id/edit', { id: activity.invoice?.hashed_id })}
+          to={defaultTabUrl(
+            route('/invoices/:id/edit', { id: activity.invoice?.hashed_id })
+          )}
         >
           {activity?.invoice?.label}
         </Link>

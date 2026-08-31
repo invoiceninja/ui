@@ -23,6 +23,7 @@ import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceView
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import { useGeneratePdfUrl } from '$app/pages/invoices/common/hooks/useGeneratePdfUrl';
 import { useQuoteQuery } from '../common/queries';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export default function Pdf() {
   const [t] = useTranslation();
@@ -39,11 +40,13 @@ export default function Pdf() {
   const url = useGeneratePdfUrl({ resourceType: 'quote' });
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
 
+  const defaultTabUrl = useDefaultTabUrl();
+
   const pages: Page[] = [
     { name: t('quotes'), href: '/quotes' },
     {
       name: t('edit_quote'),
-      href: route('/quotes/:id/edit', { id }),
+      href: defaultTabUrl(route('/quotes/:id/edit', { id })),
     },
     {
       name: t('pdf'),

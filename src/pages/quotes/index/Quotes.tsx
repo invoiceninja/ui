@@ -52,6 +52,7 @@ import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
 import { useDateRangeColumns } from '../common/hooks/useDateRangeColumns';
 import { useFooterColumns } from '../common/hooks/useFooterColumns';
 import { useQuoteQuery } from '../common/queries';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -69,6 +70,7 @@ export default function Quotes() {
   const actions = useActions();
   const filters = useQuoteFilters();
   const columns = useQuoteColumns();
+  const defaultTabUrl = useDefaultTabUrl();
   const reactSettings = useReactSettings();
   const quoteColumns = useAllQuoteColumns();
   const dateRangeColumns = useDateRangeColumns();
@@ -117,8 +119,8 @@ export default function Quotes() {
         }&without_deleted_clients=true&sort=id|desc${
           shouldShowTagFilter ? '' : '&tag_ids='
         }`}
-        linkToEdit="/quotes/:id/edit"
-        linkToCreate="/quotes/create"
+        linkToEdit={defaultTabUrl('/quotes/:id/edit')}
+        linkToCreate={defaultTabUrl('/quotes/create')}
         bulkRoute="/api/v1/quotes/bulk"
         customActions={actions}
         customBulkActions={customBulkActions}

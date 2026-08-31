@@ -35,6 +35,7 @@ import { invoiceAtom, invoiceSumAtom } from '../common/atoms';
 import { AddUninvoicedItemsButton } from '../common/components/AddUninvoicedItemsButton';
 import { useHandleCreate } from './hooks/useHandleCreate';
 import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
+import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -75,11 +76,13 @@ export default function Create() {
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
 
+  const defaultTabUrl = useDefaultTabUrl();
+
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
     {
       name: t('new_invoice'),
-      href: '/invoices/create',
+      href: defaultTabUrl('/invoices/create'),
     },
   ];
 
