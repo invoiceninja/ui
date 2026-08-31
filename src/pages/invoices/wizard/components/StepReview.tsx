@@ -1,0 +1,823 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
+import { blankInvitation } from '$app/common/constants/blank-invitation';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { endpoint, trans } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { updateRecord } from '$app/common/stores/slices/company-users';
+import { Client } from '$app/common/interfaces/client';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Invitation } from '$app/common/interfaces/purchase-order';
+import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
+import dayjs from 'dayjs';
+import { cloneDeep } from 'lodash';
+import reactStringReplace from 'react-string-replace';
+import { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useHref, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { Modal } from '$app/components/Modal';
+import { Element } from '$app/components/cards';
+import { Button, InputField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { Callout } from './Callout';
+import { ErrorBanner } from './ErrorBanner';
+import { StepFooter } from './StepFooter';
+import { PreviewFrame } from './PreviewFrame';
+import { StepTransition } from './StepTransition';
+import { Wizard } from '../useWizard';
+import { BrandPrompts } from './BrandPrompts';
+
+const LOOKS: { label: string; design: string }[] = [
+  { label: 'clean', design: 'Clean' },
+  { label: 'business', design: 'Business' },
+  { label: 'playful', design: 'Playful' },
+];
+
+type AttachmentKey = 'pdf_email_attachment' | 'document_email_attachment';
+
+const STICKY_HEADER_OFFSET = 80;
+
+interface Props {
+  wizard: Wizard;
+}
+
+export function StepReview({ wizard }: Props) {
+  const reactSettings = useReactSettings();
+  const [t] = useTranslation();
+  const formatMoney = useFormatMoney();
+  const colors = useColorScheme();
+  const company = useCurrentCompany();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const gatewaysHref = useHref('/settings/gateways/create');
+
+  const invoice = wizard.invoice;
+  const client = wizard.client;
+  const emailable = (client?.contacts ?? []).filter(
+    (entry) => entry.send_email !== false && entry.email
+  );
+  const contact = emailable[0] ?? client?.contacts?.[0];
+  const recipient = contact?.email ?? '';
+
+  const [designs, setDesigns] = useState<Record<string, string>>({});
+  const [designsFailed, setDesignsFailed] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [askEmail, setAskEmail] = useState(false);
+  const [emailDraft, setEmailDraft] = useState('');
+  const [savingEmail, setSavingEmail] = useState(false);
+  const [emailError, setEmailError] = useState<string>();
+
+  const [savingAttachment, setSavingAttachment] =
+    useState<AttachmentKey | null>(null);
+  const [hasGateway, setHasGateway] = useState<boolean | null>(null);
+  const [bankInstructions, setBankInstructions] = useState<string | null>(null);
+  const [savingBank, setSavingBank] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+
+  const preview = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    request(
+      'GET',
+      endpoint('/api/v1/designs?status=active&per_page=100&sort=name|asc'),
+      {},
+      { skipIntercept: true }
+    )
+      .then((response) => {
+        const map: Record<string, string> = {};
+
+        (response.data.data as { id: string; name: string }[]).forEach(
+          (design) => {
+            map[design.name] = design.id;
+          }
+        );
+
+        setDesigns(map);
+
+        if (!wizard.invoice?.design_id) {
+          const fallback = LOOKS.map((look) => map[look.design]).find(Boolean);
+
+          if (fallback) {
+            wizard.patch({ design_id: fallback });
+          }
+        }
+      })
+      .catch(() => setDesignsFailed(true));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    request(
+      'GET',
+      endpoint('/api/v1/company_gateways?status=active&per_page=1'),
+      {},
+      { skipIntercept: true }
+    )
+      .then((response) => setHasGateway((response.data.data ?? []).length > 0))
+      .catch(() => {
+        const configured = String(
+          company?.settings?.company_gateway_ids ?? ''
+        ).replace(/0|,/g, '');
+
+        setHasGateway(configured.length > 0);
+      });
+  }, []);
+
+  const saveAttachment = (key: AttachmentKey, value: boolean) => {
+    if (!company?.id) {
+      return;
+    }
+
+    setSavingAttachment(key);
+
+    request(
+      'PUT',
+      endpoint('/api/v1/companies/:id', { id: company.id }),
+      { ...company, settings: { ...company.settings, [key]: value } },
+      { skipIntercept: true }
+    )
+      .then((response) =>
+        dispatch(updateRecord({ object: 'company', data: response.data.data }))
+      )
+      .catch(() => toast.error())
+      .finally(() => setSavingAttachment(null));
+  };
+
+  const upgrade = () => {
+    wizard
+      .flush()
+      .catch(() => undefined)
+      .finally(() => navigate('/settings/account_management'));
+  };
+
+  const deliver = () => {
+    return wizard.flush().then((id) => {
+      if (!id) {
+        return Promise.reject(new Error('draft not saved'));
+      }
+
+      $refetch(['invoices']);
+
+      navigate(route('/invoices/:id/email', { id }));
+    });
+  };
+
+  const send = () => {
+    if (!recipient) {
+      setEmailDraft('');
+      setAskEmail(true);
+      return;
+    }
+
+    setSending(true);
+
+    deliver()
+      .catch(() => toast.error())
+      .finally(() => setSending(false));
+  };
+
+  const saveEmailThenSend = () => {
+    if (!client?.id) {
+      return;
+    }
+
+    const address = emailDraft.trim();
+
+    if (!/^\S+@\S+\.\S+$/.test(address)) {
+      setEmailError(t('enter_valid_email_address'));
+      return;
+    }
+
+    setEmailError(undefined);
+    setSavingEmail(true);
+
+    const contacts = (client.contacts ?? []).length
+      ? client.contacts.map((entry, index) =>
+          index === 0 ? { ...entry, email: address, send_email: true } : entry
+        )
+      : [
+          {
+            first_name: client.name,
+            last_name: '',
+            email: address,
+            send_email: true,
+          },
+        ];
+
+    request(
+      'PUT',
+      endpoint('/api/v1/clients/:id', { id: client.id }),
+      { ...client, contacts, documents: [] },
+      { skipIntercept: true }
+    )
+      .then((response) => {
+        const saved = response.data.data as Client;
+
+        wizard.refreshClient(saved);
+        wizard.patch({
+          invitations: (saved.contacts ?? []).slice(0, 1).map((entry) => {
+            return {
+              ...(cloneDeep(blankInvitation) as unknown as Invitation),
+              client_contact_id: entry.id,
+            };
+          }),
+        });
+
+        $refetch(['clients']);
+
+        return true;
+      })
+      .catch(() => {
+        setEmailError(t('email_address_not_saved'));
+
+        return false;
+      })
+      .finally(() => setSavingEmail(false))
+      .then((stored) => {
+        if (!stored) {
+          return;
+        }
+
+        setAskEmail(false);
+        setSending(true);
+
+        return deliver()
+          .catch(() => toast.error())
+          .finally(() => setSending(false));
+      });
+  };
+
+  const saveBankInstructions = () => {
+    if (!bankInstructions?.trim() || !company?.id) {
+      return;
+    }
+
+    setSavingBank(true);
+
+    wizard.patch({ terms: bankInstructions.trim() });
+
+    request(
+      'PUT',
+      endpoint('/api/v1/companies/:id', { id: company.id }),
+      {
+        ...company,
+        settings: {
+          ...company.settings,
+          invoice_terms: bankInstructions.trim(),
+        },
+      },
+      { skipIntercept: true }
+    )
+      .then((response) => {
+        dispatch(updateRecord({ object: 'company', data: response.data.data }));
+
+        setBankInstructions(null);
+        wizard.dismiss('pay');
+        toast.success('updated_settings');
+      })
+      .catch(() => toast.error())
+      .finally(() => setSavingBank(false));
+  };
+
+  const itemCount = (invoice?.line_items ?? []).filter(
+    (item) => item.notes || item.product_key
+  ).length;
+
+  const money = (value: number) => {
+    return formatMoney(
+      value,
+      client?.country_id,
+      client?.settings?.currency_id,
+      2
+    );
+  };
+
+  const previewable = Boolean(wizard.invoiceId) && Boolean(invoice?.client_id);
+
+  const revealPreview = () => {
+    if (!previewable || showPreview) {
+      return;
+    }
+
+    setShowPreview(true);
+
+    window.requestAnimationFrame(() => {
+      const frame = preview.current;
+
+      if (!frame) {
+        return;
+      }
+
+      return window.scrollTo({
+        top:
+          frame.getBoundingClientRect().top +
+          window.scrollY -
+          STICKY_HEADER_OFFSET,
+        behavior: 'smooth',
+      });
+    });
+  };
+
+  const chooseDesign = (id: string) => {
+    if (invoice?.design_id === id) {
+      return;
+    }
+
+    wizard.patch({ design_id: id });
+  };
+
+  return (
+    <StepTransition>
+      <ErrorBanner errors={wizard.errors} />
+
+      <p
+        className="text-xs mb-2"
+        style={{ color: colors.$22, fontWeight: 500 }}
+      >
+        {`${t('invoice')} ${t('summary')}`}
+      </p>
+
+      <div
+        className="px-4 py-1"
+        style={{
+          borderRadius: '0.375rem',
+          backgroundColor: reactSettings?.dark_mode ? colors.$25 : colors.$2,
+        }}
+      >
+        <Element
+          className="border-b border-dashed"
+          leftSide={t('from')}
+          pushContentToRight
+          withoutWrappingLeftSide
+          noExternalPadding
+          style={{ borderColor: colors.$20 }}
+        >
+          {company?.settings?.name || '—'}
+        </Element>
+
+        <Element
+          className="border-b border-dashed"
+          leftSide={t('to')}
+          pushContentToRight
+          withoutWrappingLeftSide
+          noExternalPadding
+          style={{ borderColor: colors.$20 }}
+        >
+          <div>
+            <p>{client?.display_name || client?.name || '—'}</p>
+
+            <p className="text-xs mt-0.5" style={{ color: colors.$17 }}>
+              {recipient || t('no_email_address')}
+            </p>
+          </div>
+        </Element>
+
+        <Element
+          className="border-b border-dashed"
+          leftSide={t('items')}
+          pushContentToRight
+          withoutWrappingLeftSide
+          noExternalPadding
+          style={{ borderColor: colors.$20 }}
+        >
+          {trans('count_items', { count: itemCount })}
+        </Element>
+
+        <Element
+          className="border-b border-dashed"
+          leftSide={t('subtotal')}
+          pushContentToRight
+          withoutWrappingLeftSide
+          noExternalPadding
+          style={{ borderColor: colors.$20 }}
+        >
+          {money(wizard.totals.subtotal)}
+        </Element>
+
+        {wizard.totals.discount ? (
+          <Element
+            className="border-b border-dashed"
+            leftSide={t('discount')}
+            pushContentToRight
+            withoutWrappingLeftSide
+            noExternalPadding
+            style={{ borderColor: colors.$20 }}
+          >
+            {money(wizard.totals.discount)}
+          </Element>
+        ) : null}
+
+        {wizard.totals.surchargeRows.map((row, index) => (
+          <Element
+            key={`surcharge-${index}`}
+            className="border-b border-dashed"
+            leftSide={row.name || t('surcharge')}
+            pushContentToRight
+            withoutWrappingLeftSide
+            noExternalPadding
+            style={{ borderColor: colors.$20 }}
+          >
+            {money(row.total)}
+          </Element>
+        ))}
+
+        {wizard.totals.taxRows.map((row, index) => (
+          <Element
+            key={`${row.name}-${index}`}
+            className="border-b border-dashed"
+            leftSide={
+              invoice?.uses_inclusive_taxes
+                ? `${t('includes')} ${row.name}`
+                : row.name
+            }
+            pushContentToRight
+            withoutWrappingLeftSide
+            noExternalPadding
+            style={{ borderColor: colors.$20 }}
+          >
+            {money(row.total)}
+          </Element>
+        ))}
+
+        <Element
+          className="border-b border-dashed"
+          leftSide={t('total')}
+          pushContentToRight
+          withoutWrappingLeftSide
+          noExternalPadding
+          style={{ borderColor: colors.$20 }}
+        >
+          {money(wizard.totals.total)}
+        </Element>
+
+        <Element
+          leftSide={t('due')}
+          pushContentToRight
+          withoutWrappingLeftSide
+          noExternalPadding
+        >
+          {invoice?.due_date
+            ? invoice.due_date === invoice.date
+              ? t('due_on_receipt')
+              : dayjs(invoice.due_date).format('D MMMM YYYY')
+            : '—'}
+        </Element>
+      </div>
+
+      <p
+        className="text-xs mt-6 mb-2"
+        style={{ color: colors.$22, fontWeight: 500 }}
+      >
+        {t('before_you_send')}
+      </p>
+
+      <div
+        className="border px-4 py-4"
+        style={{
+          borderColor: colors.$24,
+          borderRadius: '0.375rem',
+          backgroundColor: colors.$1,
+        }}
+      >
+        <AttachmentOption
+          label={t('attach_pdf')}
+          checked={Boolean(company?.settings?.pdf_email_attachment)}
+          allowed={proPlan() || enterprisePlan()}
+          requirement={t('pro_plan')}
+          busy={savingAttachment !== null}
+          onChange={(value) => saveAttachment('pdf_email_attachment', value)}
+          onUpgrade={upgrade}
+        />
+
+        <AttachmentOption
+          label={t('attach_documents')}
+          checked={Boolean(company?.settings?.document_email_attachment)}
+          allowed={enterprisePlan()}
+          requirement={t('enterprise_plan')}
+          busy={savingAttachment !== null}
+          onChange={(value) =>
+            saveAttachment('document_email_attachment', value)
+          }
+          onUpgrade={upgrade}
+        />
+
+        <BrandPrompts
+          section="name"
+          logoSkipped={wizard.dismissed('logo')}
+          onSkipLogo={() => wizard.dismiss('logo')}
+        />
+      </div>
+
+      {previewable ? (
+        <div className="mt-6">
+          <Toggle
+            checked={showPreview}
+            label={t('show_pdf_preview')}
+            onValueChange={(value) => {
+              if (value) {
+                return revealPreview();
+              }
+
+              return setShowPreview(false);
+            }}
+          />
+
+          {showPreview ? (
+            <div
+              id="iw-preview-panel"
+              ref={preview}
+              className="mt-3 border overflow-hidden"
+              style={{
+                borderColor: colors.$24,
+                borderRadius: '0.375rem',
+                backgroundColor: colors.$1,
+              }}
+            >
+              <div
+                className="px-4 py-4 border-b"
+                style={{ borderColor: colors.$24 }}
+              >
+                <p
+                  className="text-[0.8125rem] mb-2.5"
+                  style={{ color: colors.$22, fontWeight: 500 }}
+                >
+                  {t('how_it_looks')}
+                </p>
+
+                {designsFailed ? (
+                  <p className="text-sm" style={{ color: colors.$17 }}>
+                    {t('layouts_could_not_be_loaded')}
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {LOOKS.map((look) => {
+                      const id = designs[look.design];
+                      const active = Boolean(id) && invoice?.design_id === id;
+
+                      return (
+                        <button
+                          key={look.label}
+                          type="button"
+                          disabled={!id}
+                          onClick={() => chooseDesign(id)}
+                          className="text-sm px-3.5 py-2 border"
+                          style={{
+                            borderRadius: '0.375rem',
+                            borderColor: active ? colors.$3 : colors.$24,
+                            backgroundColor: active ? colors.$25 : colors.$1,
+                            color: id ? colors.$3 : colors.$17,
+                            fontWeight: 500,
+                            boxShadow: active
+                              ? `inset 0 0 0 1px ${colors.$3}`
+                              : 'none',
+                            cursor: id ? 'pointer' : 'not-allowed',
+                          }}
+                        >
+                          {t(look.label)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <div className="mt-4">
+                  <BrandPrompts
+                    section="brand"
+                    logoSkipped={wizard.dismissed('logo')}
+                    onSkipLogo={() => wizard.dismiss('logo')}
+                  />
+                </div>
+              </div>
+
+              <PreviewFrame id="iw-preview">
+                <InvoicePreview
+                  for="invoice"
+                  resource={invoice as Invoice}
+                  entity="invoice"
+                  relationType="client_id"
+                  endpoint="/api/v1/live_preview?entity=:entity"
+                  initiallyVisible
+                />
+              </PreviewFrame>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {hasGateway === false && !wizard.dismissed('pay') ? (
+        <div className="mt-8">
+          <Callout
+            title={t('would_you_like_customers_to_pay_online')}
+            onDismiss={() => wizard.dismiss('pay')}
+            dismissLabel={t('not_now')}
+          >
+            {bankInstructions === null ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  type="secondary"
+                  behavior="button"
+                  onClick={() => window.open(gatewaysHref, '_blank')}
+                >
+                  {t('set_up_card_payments')}
+                </Button>
+
+                <Button
+                  type="secondary"
+                  behavior="button"
+                  onClick={() => setBankInstructions(invoice?.terms ?? '')}
+                >
+                  {t('add_bank_transfer_instructions')}
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <InputField
+                  element="textarea"
+                  textareaRows={4}
+                  label={t('terms')}
+                  placeholder={t('bank_details_placeholder')}
+                  value={bankInstructions}
+                  changeOverride
+                  debounceTimeout={0}
+                  onValueChange={setBankInstructions}
+                />
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    behavior="button"
+                    disabled={savingBank}
+                    onClick={saveBankInstructions}
+                  >
+                    {t('action_add_to_invoice')}
+                  </Button>
+                  <Button
+                    type="secondary"
+                    behavior="button"
+                    onClick={() => setBankInstructions(null)}
+                  >
+                    {t('cancel')}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </Callout>
+        </div>
+      ) : null}
+
+      {recipient ? (
+        <p className="text-sm mt-8 leading-6" style={{ color: colors.$3 }}>
+          {reactStringReplace(
+            trans('invoice_ready_email_to', { value: ':recipient' }),
+            ':recipient',
+            () => (
+              <strong key="recipient" style={{ fontWeight: 600 }}>
+                {recipient}
+              </strong>
+            )
+          )}
+        </p>
+      ) : null}
+
+      <StepFooter
+        back={
+          <Button
+            type="secondary"
+            behavior="button"
+            disableWithoutIcon
+            onClick={wizard.back}
+          >
+            {t('back')}
+          </Button>
+        }
+      >
+        <Button
+          type="secondary"
+          behavior="button"
+          disabled={savingDraft}
+          onClick={() => {
+            setSavingDraft(true);
+
+            wizard
+              .flush()
+              .then((id) => {
+                if (!id) {
+                  toast.error();
+                  return;
+                }
+
+                toast.success('created_invoice');
+                navigate('/invoices');
+              })
+              .finally(() => setSavingDraft(false));
+          }}
+        >
+          {t('save_draft')}
+        </Button>
+
+        <Button behavior="button" disabled={sending} onClick={send}>
+          {t('send_invoice')}
+        </Button>
+      </StepFooter>
+
+      <Modal
+        visible={askEmail}
+        onClose={() => setAskEmail(false)}
+        title={t('where_should_we_send_this_invoice')}
+        size="small"
+      >
+        <div className="space-y-4">
+          <InputField
+            id="iw-send-to"
+            label={t('email_address')}
+            type="email"
+            placeholder={t('email_address')}
+            value={emailDraft}
+            changeOverride
+            debounceTimeout={0}
+            onValueChange={setEmailDraft}
+            errorMessage={emailError}
+          />
+
+          <div className="flex items-center gap-2">
+            <Button
+              behavior="button"
+              disabled={savingEmail || sending}
+              onClick={saveEmailThenSend}
+            >
+              {t('save_and_send')}
+            </Button>
+            <Button
+              type="secondary"
+              behavior="button"
+              onClick={() => setAskEmail(false)}
+            >
+              {t('cancel')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    </StepTransition>
+  );
+}
+
+function AttachmentOption({
+  label,
+  checked,
+  allowed,
+  requirement,
+  busy,
+  onChange,
+  onUpgrade,
+}: {
+  label: string;
+  checked: boolean;
+  allowed: boolean;
+  requirement: string;
+  busy: boolean;
+  onChange: (value: boolean) => void;
+  onUpgrade: () => void;
+}) {
+  const [t] = useTranslation();
+
+  return (
+    <Element
+      leftSide={label}
+      leftSideHelp={allowed ? t('saved_for_all_future_emails') : requirement}
+      pushContentToRight
+      noExternalPadding
+      twoGridColumns
+    >
+      <div className="flex items-center justify-end gap-3">
+        {allowed ? null : (
+          <Button type="secondary" behavior="button" onClick={onUpgrade}>
+            {t('upgrade')}
+          </Button>
+        )}
+
+        <Toggle
+          checked={checked}
+          disabled={!allowed || busy}
+          onValueChange={(value) => onChange(value)}
+        />
+      </div>
+    </Element>
+  );
+}

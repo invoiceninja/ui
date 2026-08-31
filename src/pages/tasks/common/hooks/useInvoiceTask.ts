@@ -14,6 +14,7 @@ import { useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
@@ -38,6 +39,7 @@ interface Params {
 }
 
 export function useInvoiceTask(params?: Params) {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const { onlyAddToInvoice } = params || {};
@@ -248,7 +250,7 @@ export function useInvoiceTask(params?: Params) {
 
         navigate(
           route(
-            '/invoices/create?table=tasks&project=:projectAssigned&action=invoice_task',
+            `${invoicePaths.create}?table=tasks&project=:projectAssigned&action=invoice_task`,
             {
               projectAssigned: Boolean(tasks[0].project_id),
             }
