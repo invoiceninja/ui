@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { updateChanges } from '$app/common/stores/slices/company-users';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
+import { SettingsLabel } from '$app/components/SettingsLabel';
 import { Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';
-import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
-import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
-import { SettingsLabel } from '$app/components/SettingsLabel';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function Quotes() {
   const [t] = useTranslation();

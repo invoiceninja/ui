@@ -8,16 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
-import { Params } from './common/params.interface';
 import { toast } from '../helpers/toast/toast';
+import { Params } from './common/params.interface';
 
 export function useDocumentsQuery(params: Params) {
-  return useQuery(
-    ['/api/v1/documents', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/documents', params],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint(
@@ -29,8 +30,9 @@ export function useDocumentsQuery(params: Params) {
           }
         )
       ),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 }
 
 export const useDocumentsBulk = () => {

@@ -29,7 +29,7 @@ import {
 } from '../common/components/SortableColumns';
 import { Identifier, Payload, Report, useReports } from '../common/useReports';
 import { usePreferences } from '$app/common/hooks/usePreferences';
-import { isCancelledError, useQueryClient } from 'react-query';
+import { isCancelledError, useQueryClient } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
 import {
   Cell,
@@ -232,7 +232,7 @@ export default function Reports() {
   const handleReportChange = (identifier: Identifier) => {
     const report = reports.find((report) => report.identifier === identifier);
 
-    queryClient.cancelQueries(['reports']);
+    queryClient.cancelQueries({ queryKey: ['reports'] });
 
     setShowCustomColumns(false);
 
@@ -440,7 +440,7 @@ export default function Reports() {
     setErrors(undefined);
     setPreview(null);
 
-    queryClient.cancelQueries(['reports']);
+    queryClient.cancelQueries({ queryKey: ['reports'] });
 
     toast.processing();
 
@@ -509,7 +509,7 @@ export default function Reports() {
 
   useEffect(() => {
     return () => {
-      queryClient.cancelQueries(['reports']);
+      queryClient.cancelQueries({ queryKey: ['reports'] });
 
       toast.dismiss();
 
@@ -848,6 +848,7 @@ export default function Reports() {
                 onValueChange={(value) => {
                   setShowCustomColumns(Boolean(value));
                 }}
+                cypressRef="customizeReportColumns"
               />
             </Element>
           )}

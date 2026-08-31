@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { cloneDeep } from 'lodash';
 import { useMemo } from 'react';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export function useTotalVariables() {
   const company = useCurrentCompany();

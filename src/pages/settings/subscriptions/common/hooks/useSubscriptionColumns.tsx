@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Subscription } from '$app/common/interfaces/subscription';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { DataTableColumns } from '$app/components/DataTable';
 import { Link } from '$app/components/forms';
-import { useTranslation } from 'react-i18next';
 
 export const useSubscriptionColumns = () => {
   const [t] = useTranslation();

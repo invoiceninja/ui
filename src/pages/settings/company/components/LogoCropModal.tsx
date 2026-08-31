@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import {
-  LOGO_MAX_DIMENSION,
-  compressCanvasToMaxSize,
-} from '$app/common/helpers/logo-image';
-import { Button } from '$app/components/forms';
-import { Modal } from '$app/components/Modal';
-import { Spinner } from '$app/components/Spinner';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactCrop, {
   Crop,
-  PixelCrop,
   convertToPixelCrop,
+  PixelCrop,
 } from 'react-image-crop';
+import { useColorScheme } from '$app/common/colors';
+import {
+  compressCanvasToMaxSize,
+  LOGO_MAX_DIMENSION,
+} from '$app/common/helpers/logo-image';
+import { Button } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
+import { Spinner } from '$app/components/Spinner';
 import 'react-image-crop/dist/ReactCrop.css';
 
 interface Props {

@@ -9,12 +9,12 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Element } from '../../../../components/cards';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateChanges } from '$app/common/stores/slices/user';
-import { RootState } from '../../../../common/stores/store';
 import colors from '$app/common/constants/colors';
+import { updateChanges } from '$app/common/stores/slices/user';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
+import { RootState } from '../../../../common/stores/store';
+import { Element } from '../../../../components/cards';
 
 export function AccentColor() {
   const [t] = useTranslation();

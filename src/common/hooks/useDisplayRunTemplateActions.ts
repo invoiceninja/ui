@@ -8,17 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useQuery } from 'react-query';
-import { request } from '../helpers/request';
-import { endpoint } from '../helpers';
+import { useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
-import { GenericManyResponse } from '../interfaces/generic-many-response';
+import { endpoint } from '../helpers';
+import { request } from '../helpers/request';
 import { Design } from '../interfaces/design';
+import { GenericManyResponse } from '../interfaces/generic-many-response';
 
 export function useDisplayRunTemplateActions() {
-  const { data } = useQuery(
-    ['/api/v1/designs', '?template=true&status=active&sort=name|asc'],
-    () =>
+  const { data } = useQuery({
+    queryKey: ['/api/v1/designs', '?template=true&status=active&sort=name|asc'],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/designs?template=true&status=active&sort=name|asc')
@@ -26,8 +27,9 @@ export function useDisplayRunTemplateActions() {
         (response: AxiosResponse<GenericManyResponse<Design>>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 
   return {
     shouldBeVisible: typeof data !== 'undefined' ? data.length > 0 : false,

@@ -4,7 +4,7 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -131,8 +131,7 @@ const createPurchaseOrder = async (params: CreateParams) => {
       .first()
       .getByRole('link', { name: 'Settings', exact: true })
       .click();
-    await page.getByLabel('User').first().click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    await selectAssignedUser(page, assignTo, page.getByLabel('User').first());
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
@@ -143,31 +142,21 @@ const createPurchaseOrder = async (params: CreateParams) => {
 };
 
 test("can't view purchase_orders without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('purchase_orders@example.com');
-  await save();
-  await logout(page);
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'purchase_orders@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Purchase Orders'
   );
 
-  await logout(page);
 });
 
 test('can view purchase_order', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('po-vendor');
 
   await login(page);
-  await clear('purchase_orders@example.com');
-  await set('view_purchase_order', 'view_vendor');
-  await save();
+  await api.setPermissions('purchase_orders@example.com', ['view_purchase_order', 'view_vendor']);
 
   await createPurchaseOrder({ page, vendorName });
 
@@ -192,11 +181,9 @@ test('can view purchase_order', async ({ page, api }) => {
 
   await checkEditPage(page, false);
 
-  await logout(page);
 });
 
 test('can edit purchase_order', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('po-vendor');
 
@@ -205,9 +192,7 @@ test('can edit purchase_order', async ({ page, api }) => {
   });
 
   await login(page);
-  await clear('purchase_orders@example.com');
-  await set('edit_purchase_order', 'view_vendor');
-  await save();
+  await api.setPermissions('purchase_orders@example.com', ['edit_purchase_order', 'view_vendor']);
 
   await createPurchaseOrder({ page, vendorName });
 
@@ -251,11 +236,9 @@ test('can edit purchase_order', async ({ page, api }) => {
     true
   );
 
-  await logout(page);
 });
 
 test('can create a purchase_order', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('po-vendor');
 
@@ -263,11 +246,7 @@ test('can create a purchase_order', async ({ page, api }) => {
     permissions: ['create_purchase_order'],
   });
 
-  await login(page);
-  await clear('purchase_orders@example.com');
-  await set('create_purchase_order', 'create_vendor');
-  await save();
-  await logout(page);
+  await api.setPermissions('purchase_orders@example.com', ['create_purchase_order', 'create_vendor']);
 
   await login(page, 'purchase_orders@example.com', 'password');
 
@@ -298,14 +277,12 @@ test('can create a purchase_order', async ({ page, api }) => {
     true
   );
 
-  await logout(page);
 });
 
 test('can view and edit own purchase_order with create_purchase_order', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('po-vendor');
 
@@ -313,11 +290,7 @@ test('can view and edit own purchase_order with create_purchase_order', async ({
     permissions: ['create_purchase_order'],
   });
 
-  await login(page);
-  await clear('purchase_orders@example.com');
-  await set('create_purchase_order', 'create_vendor');
-  await save();
-  await logout(page);
+  await api.setPermissions('purchase_orders@example.com', ['create_purchase_order', 'create_vendor']);
 
   await login(page, 'purchase_orders@example.com', 'password');
 
@@ -365,22 +338,16 @@ test('can view and edit own purchase_order with create_purchase_order', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('deleting purchase_order with edit_purchase_order', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('po-vendor');
 
-  await login(page);
-  await clear('purchase_orders@example.com');
-  await set('create_purchase_order', 'edit_purchase_order', 'create_vendor');
-  await save();
-  await logout(page);
+  await api.setPermissions('purchase_orders@example.com', ['create_purchase_order', 'edit_purchase_order', 'create_vendor']);
 
   await login(page, 'purchase_orders@example.com', 'password');
 
@@ -429,20 +396,15 @@ test('archiving purchase_order with edit_purchase_order', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('po-vendor');
 
-  await login(page);
-  await clear('purchase_orders@example.com');
-  await set(
+  await api.setPermissions('purchase_orders@example.com', [
     'create_purchase_order',
     'edit_purchase_order',
     'view_vendor',
     'create_vendor'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'purchase_orders@example.com', 'password');
 
@@ -495,20 +457,15 @@ test('purchase_order documents preview with edit_purchase_order', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('po-vendor');
 
-  await login(page);
-  await clear('purchase_orders@example.com');
-  await set(
+  await api.setPermissions('purchase_orders@example.com', [
     'create_purchase_order',
     'edit_purchase_order',
     'view_vendor',
     'create_vendor'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'purchase_orders@example.com', 'password');
 
@@ -555,50 +512,22 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
-  const vendorName = uniqueName('po-vendor');
+  const vendorName = uniqueName('po-doc-upload-vendor');
 
-  await login(page);
-  await clear('purchase_orders@example.com');
-  await set(
+  await api.setPermissions('purchase_orders@example.com', [
     'create_purchase_order',
     'edit_purchase_order',
     'view_vendor',
     'create_vendor'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'purchase_orders@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  await createPurchaseOrder({ page, vendorName });
 
-  await page
-    .getByRole('link', { name: 'Purchase Orders', exact: true })
-    .click();
-
-  await page.waitForURL('**/purchase_orders');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    await createPurchaseOrder({ page, vendorName });
-
-    await page.waitForURL('**/purchase_orders/**/edit');
-    const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
-    if (createdId) api.trackEntity('purchase_orders', createdId);
-  } else {
-    await tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first()
-      .click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  const createdId = page.url().match(/purchase_orders\/([^/]+)/)?.[1];
+  if (createdId) api.trackEntity('purchase_orders', createdId);
 
   await page.waitForURL('**/purchase_orders/**/edit');
 
@@ -608,7 +537,9 @@ test('purchase_order documents uploading with edit_purchase_order', async ({
     .getByRole('link', { name: 'Documents' })
     .click();
 
-    await expect(page.getByText('Drop files or click to upload')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')
@@ -626,7 +557,6 @@ test('all actions in dropdown displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('po-vendor');
 
@@ -634,11 +564,7 @@ test('all actions in dropdown displayed with admin permission', async ({
     permissions: ['admin'],
   });
 
-  await login(page);
-  await clear('purchase_orders@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('purchase_orders@example.com', ['admin']);
 
   await login(page, 'purchase_orders@example.com', 'password');
 
@@ -660,14 +586,12 @@ test('all actions in dropdown displayed with admin permission', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('all clone actions displayed with creation permissions', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('po-vendor');
 
@@ -681,18 +605,14 @@ test('all clone actions displayed with creation permissions', async ({
     ],
   });
 
-  await login(page);
-  await clear('purchase_orders@example.com');
-  await set(
+  await api.setPermissions('purchase_orders@example.com', [
     'create_invoice',
     'create_quote',
     'create_recurring_invoice',
     'create_credit',
     'create_purchase_order',
     'create_vendor'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'purchase_orders@example.com', 'password');
 
@@ -714,19 +634,13 @@ test('all clone actions displayed with creation permissions', async ({
     true
   );
 
-  await logout(page);
 });
 
 test('cloning purchase_order', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const vendorName = uniqueName('po-vendor');
 
-  await login(page);
-  await clear('purchase_orders@example.com');
-  await set('create_purchase_order', 'edit_purchase_order', 'create_vendor');
-  await save();
-  await logout(page);
+  await api.setPermissions('purchase_orders@example.com', ['create_purchase_order', 'edit_purchase_order', 'create_vendor']);
 
   await login(page, 'purchase_orders@example.com', 'password');
 

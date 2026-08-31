@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useParams } from 'react-router-dom';
 import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -18,7 +19,6 @@ import {
   usePurchaseOrderFilters,
 } from '$app/pages/purchase-orders/common/hooks';
 import { useCustomBulkActions } from '$app/pages/purchase-orders/common/hooks/useCustomBulkActions';
-import { useParams } from 'react-router-dom';
 
 export default function PurchaseOrders() {
   const { id } = useParams();
@@ -55,7 +55,7 @@ export default function PurchaseOrders() {
       linkToCreateGuards={[permission('create_purchase_order')]}
       hideEditableOptions={!hasPermission('edit_purchase_order')}
       withoutPageAsPreference
-      withFilterTextOnly
+      withRecordScopedFilters
     />
   );
 }

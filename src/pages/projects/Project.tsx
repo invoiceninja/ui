@@ -9,33 +9,33 @@
  */
 
 import { AxiosError } from 'axios';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Outlet, useParams } from 'react-router-dom';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Project as ProjectEntity } from '$app/common/interfaces/project';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useProjectQuery } from '$app/common/queries/projects';
 import { Page } from '$app/components/Breadcrumbs';
 import { Container } from '$app/components/Container';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { InputLabel } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Tab, Tabs } from '$app/components/Tabs';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Outlet, useParams } from 'react-router-dom';
-import { useActions } from './common/hooks';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
-import { InputLabel } from '$app/components/forms';
+import { useActions } from './common/hooks';
 
 export default function Project() {
   const { documentTitle, setDocumentTitle } = useTitle('project');

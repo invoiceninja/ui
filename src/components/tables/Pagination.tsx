@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import CommonProps from '../../common/interfaces/common-props.interface';
-import { useColorScheme } from '$app/common/colors';
-import { SelectField } from '../forms';
-import { PerPage } from '../DataTable';
-import { ChevronLeft } from '../icons/ChevronLeft';
-import { DoubleChevronLeft } from '../icons/DoubleChevronLeft';
-import { ChevronRight } from '../icons/ChevronRight';
-import { DoubleChevronRight } from '../icons/DoubleChevronRight';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 import {
   getPageNavigationState,
   PageNavigationAction,
   resolvePageNavigation,
 } from '$app/common/helpers/pagination';
 import { PaginationMeta } from '$app/common/interfaces/generic-many-response';
+import CommonProps from '../../common/interfaces/common-props.interface';
+import { PerPage } from '../DataTable';
+import { SelectField } from '../forms';
+import { ChevronLeft } from '../icons/ChevronLeft';
+import { ChevronRight } from '../icons/ChevronRight';
+import { DoubleChevronLeft } from '../icons/DoubleChevronLeft';
+import { DoubleChevronRight } from '../icons/DoubleChevronRight';
 
 const PaginationButton = styled.button`
   background-color: ${(props) => props.theme.backgroundColor};

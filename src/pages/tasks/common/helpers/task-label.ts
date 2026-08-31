@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Task } from '$app/common/interfaces/task';
 import {
   extractTextFromHTML,
   sanitizeHTML,
 } from '$app/common/helpers/html-string';
+import { Task } from '$app/common/interfaces/task';
 
 const bracket = (task: Task): string => {
   if (task.project?.name) return task.project.name;

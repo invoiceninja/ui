@@ -367,6 +367,7 @@ export interface Settings {
   e_expense_forward_email: string;
   skip_automatic_email_with_peppol: boolean;
   global_tag_inheritance: boolean;
+  documents_public_by_default: boolean;
 }
 
 export interface TaxData {

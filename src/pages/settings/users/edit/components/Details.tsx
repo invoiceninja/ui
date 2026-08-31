@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { User } from '$app/common/interfaces/user';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { CustomField } from '$app/components/CustomField';
 import { Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
-import { User } from '$app/common/interfaces/user';
-import { useTranslation } from 'react-i18next';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { CustomField } from '$app/components/CustomField';
 import Toggle from '$app/components/forms/Toggle';
 
 interface Props {

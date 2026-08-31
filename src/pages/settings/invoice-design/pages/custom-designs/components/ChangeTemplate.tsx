@@ -8,6 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import collect from 'collect.js';
+import { atom, useAtom } from 'jotai';
+import { ReactNode, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { emitter } from '$app';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
@@ -16,14 +21,13 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { Client } from '$app/common/interfaces/client';
 import { Credit } from '$app/common/interfaces/credit';
 import { Design } from '$app/common/interfaces/design';
+import { Expense } from '$app/common/interfaces/expense';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Payment } from '$app/common/interfaces/payment';
 import { Project } from '$app/common/interfaces/project';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { Task } from '$app/common/interfaces/task';
-import { Expense } from '$app/common/interfaces/expense';
-import { Modal } from '$app/components/Modal';
 import {
   Button,
   Checkbox,
@@ -31,11 +35,7 @@ import {
   SelectProps,
 } from '$app/components/forms';
 import { ComboboxAsync } from '$app/components/forms/Combobox';
-import collect from 'collect.js';
-import { atom, useAtom } from 'jotai';
-import { ReactNode, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useQuery, useQueryClient } from 'react-query';
+import { Modal } from '$app/components/Modal';
 
 type ChangeTemplateResource =
   | Invoice

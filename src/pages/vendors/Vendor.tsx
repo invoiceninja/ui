@@ -33,6 +33,7 @@ import { Tooltip } from '$app/components/Tooltip';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { FormattedAddress } from '$app/components/FormattedAddress';
 import { TagPills } from '$app/components/tags/TagPills';
+import { useRecordFiltersScope } from '$app/common/hooks/useScopedTableFilters';
 
 export default function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
@@ -46,6 +47,8 @@ export default function Vendor() {
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
+
+  useRecordFiltersScope(id);
 
   useEffect(() => {
     if (vendor && vendor.name.length >= 1) {

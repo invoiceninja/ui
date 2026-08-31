@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { Credit } from '$app/common/interfaces/credit';
+import { useQueryClient } from '@tanstack/react-query';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
-import { useQueryClient } from 'react-query';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { Credit } from '$app/common/interfaces/credit';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 
 interface Params {
   resource: Invoice | RecurringInvoice | Credit | undefined;
-  entity?: 'invoice' | 'recurring_invoice';
+  entity?: 'invoice' | 'recurring_invoice' | 'credit';
   enableQuery: boolean;
   onFinished?: () => void;
 }
@@ -32,6 +32,7 @@ export interface EntityError {
 export interface ValidationEntityResponse {
   passes: boolean;
   invoice: string[];
+  credit: string[];
   client: EntityError[];
   company: EntityError[];
 }
@@ -50,22 +51,25 @@ export function useCheckEInvoiceValidation(params: Params) {
   >();
 
   const handleCheckValidation = async () => {
-    const validationResponse = await queryClient.fetchQuery(
-      ['/api/v1/einvoice/validateEntity', resource?.id],
-      () =>
+    const validationResponse = await queryClient.fetchQuery({
+      queryKey: ['/api/v1/einvoice/validateEntity', resource?.id],
+
+      queryFn: () =>
         request('POST', endpoint('/api/v1/einvoice/validateEntity'), {
           entity: `${entity}s`,
           entity_id: resource?.id,
         })
           .then((response) => response)
           .catch((error) => error.response),
-      { staleTime: Infinity }
-    );
+
+      staleTime: Infinity,
+    });
 
     let currentValidationResult = {
       client: [],
       company: [],
       invoice: [],
+      credit: [],
       passes: true,
     };
 
@@ -74,6 +78,7 @@ export function useCheckEInvoiceValidation(params: Params) {
         company: validationResponse.data.company ?? [],
         client: validationResponse.data.client ?? [],
         invoice: validationResponse.data.invoice ?? [],
+        credit: validationResponse.data.credit ?? [],
         passes: false,
       };
     }

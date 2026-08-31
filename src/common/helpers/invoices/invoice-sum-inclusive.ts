@@ -7,16 +7,17 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { InvoiceItemSumInclusive } from './invoice-item-sum-inclusive';
-import { Invoice } from '$app/common/interfaces/invoice';
+
 import collect from 'collect.js';
 import { Credit } from '$app/common/interfaces/credit';
+import { Currency } from '$app/common/interfaces/currency';
+import { Invoice } from '$app/common/interfaces/invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
-import { TaxItem } from './invoice-sum';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { Currency } from '$app/common/interfaces/currency';
 import { NumberFormatter } from '../number-formatter';
+import { InvoiceItemSumInclusive } from './invoice-item-sum-inclusive';
+import { TaxItem } from './invoice-sum';
 import {
   formatTaxName,
   percentageOf,

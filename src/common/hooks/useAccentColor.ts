@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useSelector } from 'react-redux';
 import colors from '$app/common/constants/colors';
 import { RootState } from '$app/common/stores/store';
-import { useSelector } from 'react-redux';
 import { useCurrentUser } from './useCurrentUser';
 
 export function useAccentColor() {

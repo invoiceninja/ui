@@ -8,14 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Alert } from '$app/components/Alert';
-import { Dropdown } from '$app/components/dropdown/Dropdown';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button, InputField, SelectField } from '$app/components/forms';
-import Toggle from '$app/components/forms/Toggle';
-import { Settings } from '$app/components/icons/Settings';
-import { Modal } from '$app/components/Modal';
-import { Spinner } from '$app/components/Spinner';
 import {
   AlertProps,
   ConfirmationDialogButtonProps,
@@ -25,15 +17,17 @@ import {
   DeleteDialogButtonProps,
   DeleteDialogProps,
   ImportFromButtonProps,
-  RectangleSettingsDialogProps,
+  RectangleSettingsCheckboxProps,
   RectangleSettingsDialogButtonProps,
+  RectangleSettingsDialogProps,
   RectangleSettingsInputProps,
   RectangleSettingsLabelProps,
-  RectangleSettingsCheckboxProps,
-  RectangleSettingsSelectProps,
-  RectangleSettingsRemoveButtonProps,
   RectangleSettingsOptionItemProps,
   RectangleSettingsOptionsListProps,
+  RectangleSettingsRemoveButtonProps,
+  RectangleSettingsSelectProps,
+  SingleSignatoryFlowButtonProps,
+  SingleSignatoryFlowDialogProps,
   ToolboxContextProps,
   UninviteDialogButtonProps,
   UninviteDialogProps,
@@ -44,6 +38,14 @@ import {
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { LuTrash } from 'react-icons/lu';
+import { Alert } from '$app/components/Alert';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Button, InputField, SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { Settings } from '$app/components/icons/Settings';
+import { Modal } from '$app/components/Modal';
+import { Spinner } from '$app/components/Spinner';
 
 export function Loading() {
   return (
@@ -75,6 +77,41 @@ export function DeleteButton({ isSubmitting }: DeleteDialogButtonProps) {
   return (
     <Button behavior="submit" disabled={isSubmitting} className="w-full">
       {t('delete')}
+    </Button>
+  );
+}
+
+export function SingleSignatoryFlowDialog({
+  open,
+  onOpenChange,
+  title,
+  content,
+  action,
+}: SingleSignatoryFlowDialogProps) {
+  return (
+    <Modal title={title} visible={open} onClose={onOpenChange} overflowVisible>
+      {content}
+
+      {action}
+    </Modal>
+  );
+}
+
+export function SingleSignatoryFlowButton({
+  disabled,
+  onClick,
+}: SingleSignatoryFlowButtonProps) {
+  const [t] = useTranslation();
+
+  return (
+    <Button
+      behavior="button"
+      onClick={onClick}
+      disabled={disabled}
+      disableWithoutIcon
+      className="w-full"
+    >
+      {t('continue')}
     </Button>
   );
 }

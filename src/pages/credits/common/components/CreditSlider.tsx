@@ -24,7 +24,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { date, endpoint } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
@@ -152,15 +152,15 @@ export function CreditSlider() {
 
   const fetchEmailHistory = async () => {
     const response = await queryClient
-      .fetchQuery(
-        ['/api/v1/credits', credit?.id, 'emailHistory'],
-        () =>
+      .fetchQuery({
+        queryKey: ['/api/v1/credits', credit?.id, 'emailHistory'],
+        queryFn: () =>
           request('POST', endpoint('/api/v1/emails/entityHistory'), {
             entity: 'credit',
             entity_id: credit?.id,
           }),
-        { staleTime: Infinity }
-      )
+        staleTime: Infinity,
+      })
       .then((response) => response.data);
 
     setEmailRecords(response);

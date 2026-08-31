@@ -8,26 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ButtonOption, Card, CardContainer } from '$app/components/cards';
 import { AxiosError, AxiosResponse } from 'axios';
+import { FormEvent, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { BiPlusCircle } from 'react-icons/bi';
+import { useNavigate } from 'react-router-dom';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankPaymentTermQuery } from '$app/common/queries/payment-terms';
 import { Container } from '$app/components/Container';
+import { ButtonOption, Card, CardContainer } from '$app/components/cards';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { Icon } from '$app/components/icons/Icon';
 import { Settings } from '$app/components/layouts/Settings';
-import { FormEvent, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { BiPlusCircle } from 'react-icons/bi';
-import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks/useHandleChange';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 export function Create() {
   const { documentTitle } = useTitle('create_payment_term');

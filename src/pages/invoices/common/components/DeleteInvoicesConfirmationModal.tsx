@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useSetAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
 import { emitter } from '$app';
 import { useBulk } from '$app/common/queries/invoices';
 import {
   ConfirmActionModal,
   confirmActionModalAtom,
 } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
-import { useSetAtom } from 'jotai';
-import { useTranslation } from 'react-i18next';
 
 interface Props {
   selectedInvoiceIds: string[];

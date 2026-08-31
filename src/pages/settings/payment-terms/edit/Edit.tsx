@@ -8,27 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, CardContainer, Element } from '$app/components/cards';
+import { ValidationBag } from '@docuninja/builder2.0';
 import { AxiosError } from 'axios';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { route } from '$app/common/helpers/route';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { PaymentTerm } from '$app/common/interfaces/payment-term';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { usePaymentTermQuery } from '$app/common/queries/payment-terms';
-import { Badge } from '$app/components/Badge';
-import { Container } from '$app/components/Container';
-import { Settings } from '$app/components/layouts/Settings';
-import { Spinner } from '$app/components/Spinner';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { Actions } from './components/Actions';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { usePaymentTermQuery } from '$app/common/queries/payment-terms';
+import { Badge } from '$app/components/Badge';
+import { Container } from '$app/components/Container';
+import { Card, CardContainer, Element } from '$app/components/cards';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { Settings } from '$app/components/layouts/Settings';
+import { Spinner } from '$app/components/Spinner';
+import { Actions } from './components/Actions';
 
 export function Edit() {
   useTitle('payment_terms');

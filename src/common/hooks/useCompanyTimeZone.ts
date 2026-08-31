@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useStaticsQuery } from '$app/common/queries/statics';
 import { useEffect, useState } from 'react';
-import { useCurrentCompany } from './useCurrentCompany';
+import { useStaticsQuery } from '$app/common/queries/statics';
 import { Timezone } from '../interfaces/statics';
+import { useCurrentCompany } from './useCurrentCompany';
 
 export function useCompanyTimeZone() {
   const company = useCurrentCompany();

@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Spinner } from '$app/components/Spinner';
-import { Default } from '$app/components/layouts/Default';
 import { Suspense } from 'react';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
 
 interface Props {
   children: JSX.Element;

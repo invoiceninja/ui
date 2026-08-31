@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Expense } from '$app/common/interfaces/expense';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import classNames from 'classnames';
 import { Dispatch, SetStateAction } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { Expense } from '$app/common/interfaces/expense';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useHandleChange } from '../common/hooks';
 import { AdditionalInfo } from '../create/components/AdditionalInfo';
 import { Details } from '../create/components/Details';
 import { Notes } from '../create/components/Notes';
 import { TaxSettings } from '../create/components/Taxes';
-import classNames from 'classnames';
 
 export interface Context {
   errors: ValidationBag | undefined;

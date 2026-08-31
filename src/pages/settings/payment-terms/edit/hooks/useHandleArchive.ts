@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { bulk } from '$app/common/queries/payment-terms';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { bulk } from '$app/common/queries/payment-terms';
 
 export function useHandleArchive() {
   return (id: string) => {

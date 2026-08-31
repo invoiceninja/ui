@@ -8,47 +8,46 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField, InputLabel, SelectField } from '$app/components/forms';
 import collect from 'collect.js';
+import { useAtom } from 'jotai';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
+import { v4 } from 'uuid';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
 import { useCreditResolver } from '$app/common/hooks/credits/useCreditResolver';
 import { useInvoiceResolver } from '$app/common/hooks/invoices/useInvoiceResolver';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Payment } from '$app/common/interfaces/payment';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankPaymentQuery } from '$app/common/queries/payments';
-import { Divider } from '$app/components/cards/Divider';
+import { Banner } from '$app/components/Banner';
 import { Container } from '$app/components/Container';
 import { ConvertCurrency } from '$app/components/ConvertCurrency';
 import { CustomField } from '$app/components/CustomField';
-
-import Toggle from '$app/components/forms/Toggle';
-import { Default } from '$app/components/layouts/Default';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
-import { useSave } from './hooks/useSave';
+import { Card, Element } from '$app/components/cards';
+import { Divider } from '$app/components/cards/Divider';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
-import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
-import { useAtom } from 'jotai';
-import { paymentAtom } from '../common/atoms';
-import { usePaymentTypes } from '$app/common/hooks/usePaymentTypes';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { Banner } from '$app/components/Banner';
-import { useColorScheme } from '$app/common/colors';
-import { endpoint } from '$app/common/helpers';
-import { ErrorMessage } from '$app/components/ErrorMessage';
 import { DataTable } from '$app/components/DataTable';
+import { ErrorMessage } from '$app/components/ErrorMessage';
+import { InputField, InputLabel, SelectField } from '$app/components/forms';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import Toggle from '$app/components/forms/Toggle';
+import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
+import { Default } from '$app/components/layouts/Default';
+import { paymentAtom } from '../common/atoms';
 import {
   isCashDiscountExpired,
   useApplyInvoiceTableColumns,
 } from '../common/hooks/useApplyInvoiceTableColumns';
-import { useCreditColumns } from './hooks/useCreditColumns';
 import { TableTotalFooter } from './components/TableTotalFooter';
-import { v4 } from 'uuid';
+import { useCreditColumns } from './hooks/useCreditColumns';
+import { useSave } from './hooks/useSave';
 
 export interface PaymentOnCreation
   extends Omit<Payment, 'invoices' | 'credits'> {
@@ -445,9 +444,7 @@ export default function Create() {
                 queryIdentificator="/api/v1/invoices"
                 endpoint={initialEndpoints.invoices}
                 columns={invoiceColumns}
-                excludeColumns={
-                  hasCashDiscount ? undefined : ['cash_discount']
-                }
+                excludeColumns={hasCashDiscount ? undefined : ['cash_discount']}
                 onDataLoaded={handleInvoiceDataLoaded}
                 onSelectedResourcesChange={(selectedResources) => {
                   if (selectedResources.length > 0) {

@@ -8,28 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { TaxRate } from '$app/common/interfaces/tax-rate';
+import classNames from 'classnames';
+import { Fragment, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
-import { useTotalVariables } from '../hooks/useTotalVariables';
-import { CustomSurchargeField } from '$app/components/CustomSurchargeField';
-import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
-import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
-import { ProductTableResource, RelationType } from './ProductsTable';
-import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
-import { Entry } from '$app/components/forms/Combobox';
-import { Link } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
 import { MdWarning } from 'react-icons/md';
 import reactStringReplace from 'react-string-replace';
-import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 import { useColorScheme } from '$app/common/colors';
-import { Fragment, useRef } from 'react';
-import classNames from 'classnames';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
 import useDoesTaxRateExistByComboValue from '$app/common/hooks/tax-rates/useDoesTaxRateExistByComboValue';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { TaxRate } from '$app/common/interfaces/tax-rate';
+import { CustomSurchargeField } from '$app/components/CustomSurchargeField';
+import { Card, Element } from '$app/components/cards';
+import { Link } from '$app/components/forms';
+import { Entry } from '$app/components/forms/Combobox';
+import { Icon } from '$app/components/icons/Icon';
+import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
+import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
+import { useTotalVariables } from '../hooks/useTotalVariables';
+import { ProductTableResource, RelationType } from './ProductsTable';
 
 interface Props {
   resource: ProductTableResource;

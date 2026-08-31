@@ -10,13 +10,13 @@
 
 export {
   AccentColor,
-  Details as UserDetailsComponent,
-  Notifications,
-  Password,
-  TwoFactorAuthentication,
   Connect,
   CustomFields as UserCustomFields,
-  Preferences,
+  Details as UserDetailsComponent,
   KeyboardShortcuts,
+  Notifications,
+  Password,
+  Preferences,
+  TwoFactorAuthentication,
 } from '././components/index';
 export { UserDetails } from './UserDetails';

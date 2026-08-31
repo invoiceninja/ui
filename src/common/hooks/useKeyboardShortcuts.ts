@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useCallback } from 'react';
-import { usePreventNavigation } from './usePreventNavigation';
-import { useResolvedShortcuts } from './useReactSettings';
+import { useCallback, useEffect } from 'react';
 import { keyboardShortcuts } from '../constants/keyboard-shortcuts';
 import { eventMatchesBinding } from '../helpers/keyboard-shortcuts';
-import { isShortcutRecordingActive } from './useShortcutRecorder';
 import { getHeldKeys, useTrackHeldKeys } from './useHeldKeys';
+import { usePreventNavigation } from './usePreventNavigation';
+import { useResolvedShortcuts } from './useReactSettings';
+import { isShortcutRecordingActive } from './useShortcutRecorder';
 
 export function useKeyboardShortcuts() {
   const preventNavigation = usePreventNavigation();

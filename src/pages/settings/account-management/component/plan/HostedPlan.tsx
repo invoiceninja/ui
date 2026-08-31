@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useState } from 'react';
+import { Check } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { date, trans } from '$app/common/helpers';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button } from '$app/components/forms';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { useEnterpriseUtils } from '../../common/hooks/useEnterpriseUtils';
-import { Check } from 'react-feather';
-import { StartTrial } from './StartTrial';
-import { UpgradeModal } from '$app/pages/documents/common/components/UpgradeModal';
 import { usePlansQuery } from '$app/common/queries/plans';
+import { Button } from '$app/components/forms';
+import { UpgradeModal } from '$app/pages/documents/common/components/UpgradeModal';
+import { useEnterpriseUtils } from '../../common/hooks/useEnterpriseUtils';
+import { StartTrial } from './StartTrial';
 
 export function HostedPlan() {
   const accentColor = useAccentColor();

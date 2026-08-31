@@ -9,7 +9,9 @@ export function useShouldDisplayClientGatewaysAndAutoBill() {
 
     const currentCompanyGatewayIds = getSetting(client, 'company_gateway_ids');
 
-    if (currentCompanyGatewayIds === '0') return false;
+    if (currentCompanyGatewayIds === '0' || currentCompanyGatewayIds === null) {
+      return false;
+    }
 
     const shouldDisplayClientGatewaysAndAutoBill =
       typeof currentCompanyGatewayIds === 'undefined' ||

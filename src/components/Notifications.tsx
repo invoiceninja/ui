@@ -8,43 +8,42 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Bell } from 'react-feather';
-import { Slider } from './cards/Slider';
+import { useQueryClient } from '@tanstack/react-query';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
+import { atom, useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
+import { Bell } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { atomWithStorage } from 'jotai/utils';
-import { useAtom } from 'jotai';
+import { GoDotFill } from 'react-icons/go';
+import { useColorScheme } from '$app/common/colors';
+import { date, isHosted, isSelfHosted, trans } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useReplaceVariables } from '$app/common/hooks/useReplaceTranslationVariables';
+import { useSockets } from '$app/common/hooks/useSockets';
+import { Credit } from '$app/common/interfaces/credit';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Payment } from '$app/common/interfaces/payment';
 import {
   GenericMessage,
   socketId,
   useSocketEvent,
   WithSocketId,
 } from '$app/common/queries/sockets';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { route } from '$app/common/helpers/route';
-import { date, isHosted, isSelfHosted, trans } from '$app/common/helpers';
 import { NonClickableElement } from './cards/NonClickableElement';
-import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
-import { Credit } from '$app/common/interfaces/credit';
-import { Payment } from '$app/common/interfaces/payment';
-import classNames from 'classnames';
-import { useSockets } from '$app/common/hooks/useSockets';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { Icon } from './icons/Icon';
-import { useColorScheme } from '$app/common/colors';
+import { Slider } from './cards/Slider';
 import { Button, Link } from './forms';
-import { useReplaceVariables } from '$app/common/hooks/useReplaceTranslationVariables';
-import { CardCheck } from './icons/CardCheck';
-import { GoDotFill } from 'react-icons/go';
 import { CardChange } from './icons/CardChange';
-import { FileSearch } from './icons/FileSearch';
+import { CardCheck } from './icons/CardCheck';
 import { FileAdd } from './icons/FileAdd';
 import { FileEdit } from './icons/FileEdit';
-import dayjs from 'dayjs';
-import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useQueryClient } from 'react-query';
+import { FileSearch } from './icons/FileSearch';
+import { Icon } from './icons/Icon';
 
 type NotificationType =
   | 'invoiceWasPaid'
@@ -75,10 +74,44 @@ export interface Notification {
   readAt: string | null;
 }
 
-export const notificationsAtom = atomWithStorage<Notification[]>(
-  'notifications',
-  []
-);
+const MAX_NOTIFICATIONS = 100;
+
+export const notificationsAtom = atom<Notification[]>([]);
+
+function getNotificationIdentity(notification: Notification) {
+  const { displayLabel } = notification;
+
+  switch (displayLabel.notificationType) {
+    case 'invoiceWasPaid':
+    case 'invoiceWasViewed':
+      return `${displayLabel.notificationType}:${displayLabel.invoiceId}`;
+    case 'creditWasCreated':
+    case 'creditWasUpdated':
+      return `${displayLabel.notificationType}:${displayLabel.creditId}`;
+    case 'paymentWasUpdated':
+      return `${displayLabel.notificationType}:${displayLabel.paymentId}`;
+    case 'genericMessage':
+      return `${displayLabel.notificationType}:${notification.link ?? ''}:${displayLabel.message ?? ''}`;
+  }
+}
+
+export function appendNotification(
+  notifications: Notification[],
+  notification: Notification
+) {
+  const identity = getNotificationIdentity(notification);
+
+  if (
+    notifications.some(
+      (currentNotification) =>
+        getNotificationIdentity(currentNotification) === identity
+    )
+  ) {
+    return notifications;
+  }
+
+  return [...notifications, notification].slice(-MAX_NOTIFICATIONS);
+}
 
 export function Notifications() {
   const [t] = useTranslation();
@@ -96,6 +129,14 @@ export function Notifications() {
   const companyUser = useCurrentCompanyUser();
   const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  useEffect(() => {
+    try {
+      localStorage.removeItem('notifications');
+    } catch {
+      // Notifications are transient, so legacy storage cleanup is best-effort.
+    }
+  }, []);
 
   const generateDisplayLabel = (currentDisplayLabel: DisplayLabel) => {
     if (currentDisplayLabel.notificationType === 'invoiceWasPaid') {
@@ -310,21 +351,12 @@ export function Notifications() {
         };
 
         if (
-          notifications.some((n) => n.label === notification.label) ||
-          notifications.some((n) => n.link === notification.link)
-        ) {
-          return;
-        }
-
-        if (
           socketId()?.toString() !==
           (data as WithSocketId<Invoice>)['x-socket-id']
         ) {
-          queryClient.invalidateQueries([
-            '/api/v1/invoices',
-            'detail',
-            $invoice.id,
-          ]);
+          queryClient.invalidateQueries({
+            queryKey: ['/api/v1/invoices', 'detail', $invoice.id],
+          });
 
           queryClient.invalidateQueries({
             predicate: (query) => {
@@ -337,7 +369,9 @@ export function Notifications() {
           });
         }
 
-        setNotifications((notifications) => [...notifications, notification]);
+        setNotifications((notifications) =>
+          appendNotification(notifications, notification)
+        );
       }
 
       if (event === 'App\\Events\\Invoice\\InvoiceWasViewed') {
@@ -368,20 +402,15 @@ export function Notifications() {
         };
 
         if (
-          notifications.some((n) => n.label === notification.label) ||
-          notifications.some((n) => n.link === notification.link)
-        ) {
-          return;
-        }
-
-        if (
           socketId()?.toString() !==
           (data as WithSocketId<Invoice>)['x-socket-id']
         ) {
           $refetch(['invoices']);
         }
 
-        setNotifications((notifications) => [...notifications, notification]);
+        setNotifications((notifications) =>
+          appendNotification(notifications, notification)
+        );
       }
 
       if (event === 'App\\Events\\Credit\\CreditWasCreated') {
@@ -404,14 +433,9 @@ export function Notifications() {
           readAt: null,
         };
 
-        if (
-          notifications.some((n) => n.label === notification.label) ||
-          notifications.some((n) => n.link === notification.link)
-        ) {
-          return;
-        }
-
-        setNotifications((notifications) => [...notifications, notification]);
+        setNotifications((notifications) =>
+          appendNotification(notifications, notification)
+        );
       }
 
       if (event === 'App\\Events\\Credit\\CreditWasUpdated') {
@@ -429,14 +453,9 @@ export function Notifications() {
           readAt: null,
         };
 
-        if (
-          notifications.some((n) => n.label === notification.label) ||
-          notifications.some((n) => n.link === notification.link)
-        ) {
-          return;
-        }
-
-        setNotifications((notifications) => [...notifications, notification]);
+        setNotifications((notifications) =>
+          appendNotification(notifications, notification)
+        );
       }
 
       if (event === 'App\\Events\\Payment\\PaymentWasUpdated') {
@@ -454,14 +473,9 @@ export function Notifications() {
           readAt: null,
         };
 
-        if (
-          notifications.some((n) => n.label === notification.label) ||
-          notifications.some((n) => n.link === notification.link)
-        ) {
-          return;
-        }
-
-        setNotifications((notifications) => [...notifications, notification]);
+        setNotifications((notifications) =>
+          appendNotification(notifications, notification)
+        );
       }
     },
   });
@@ -492,7 +506,9 @@ export function Notifications() {
             readAt: null,
           };
 
-          setNotifications((notifications) => [...notifications, notification]);
+          setNotifications((notifications) =>
+            appendNotification(notifications, notification)
+          );
         }
       );
 

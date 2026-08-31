@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useEffect, useState } from 'react';
 import { Language } from '$app/common/interfaces/language';
 import { useStaticsQuery } from '$app/common/queries/statics';
-import { useEffect, useState } from 'react';
 
 export function useLanguages(): Language[] {
   const { data: statics } = useStaticsQuery();

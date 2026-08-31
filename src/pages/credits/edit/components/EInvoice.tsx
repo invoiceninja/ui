@@ -8,36 +8,35 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Card, Element } from '$app/components/cards';
-import { useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+import { cloneDeep, get, set } from 'lodash';
 import { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdCheckCircle } from 'react-icons/md';
 import { useLocation, useOutletContext } from 'react-router-dom';
+import reactStringReplace from 'react-string-replace';
+import { useColorScheme } from '$app/common/colors';
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { endpoint, trans } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useSendCooldown } from '$app/common/hooks/useSendCooldown';
+import { Credit } from '$app/common/interfaces/credit';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Card, Element } from '$app/components/cards';
+import { Button, Link } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
 import {
   EntityError,
   ValidationEntityResponse,
 } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
-import { Button, Link } from '$app/components/forms';
-import { route } from '$app/common/helpers/route';
-import { Icon } from '$app/components/icons/Icon';
-import { MdCheckCircle } from 'react-icons/md';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { InvoiceStatus } from '$app/common/enums/invoice-status';
-import { toast } from '$app/common/helpers/toast/toast';
-import { request } from '$app/common/helpers/request';
-import { endpoint, trans } from '$app/common/helpers';
-import { AxiosResponse } from 'axios';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
-import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
-import { useQuery } from 'react-query';
-import reactStringReplace from 'react-string-replace';
-import { useColorScheme } from '$app/common/colors';
-import { cloneDeep, get, set } from 'lodash';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useSendCooldown } from '$app/common/hooks/useSendCooldown';
-import { Credit } from '$app/common/interfaces/credit';
-import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
 
 export interface Context {
   credit: Credit | undefined;
@@ -52,7 +51,7 @@ export interface Context {
   setTriggerValidationQuery: Dispatch<SetStateAction<boolean>>;
 }
 
-export const VALIDATION_ENTITIES = ['invoice', 'client', 'company'];
+export const VALIDATION_ENTITIES = ['credit', 'client', 'company'];
 const EINVOICE_ACTIVITY_TYPES = [145, 146, 147] as number[];
 
 export default function EInvoice() {
@@ -98,7 +97,9 @@ export default function EInvoice() {
 
   const { send, isBusy, secondsRemaining } = useSendCooldown({
     onElapsed: async () => {
-      queryClient.invalidateQueries(['/api/v1/activities/entity']);
+      queryClient.invalidateQueries({
+        queryKey: ['/api/v1/activities/entity'],
+      });
 
       if (!credit?.id) return;
 
@@ -202,7 +203,7 @@ export default function EInvoice() {
                             ] as Array<EntityError>
                           ).map((message, index) => (
                             <span key={index}>
-                              {entity === 'invoice'
+                              {entity === 'credit'
                                 ? (message as unknown as string)
                                 : message.label
                                   ? `${message.label} (${t('required')})`
@@ -211,7 +212,7 @@ export default function EInvoice() {
                           ))}
                         </div>
 
-                        {entity === 'invoice' && (
+                        {entity === 'credit' && (
                           <Link
                             to={route('/credits/:id/edit', {
                               id: credit?.id,
@@ -244,7 +245,7 @@ export default function EInvoice() {
                       className="flex items-center space-x-4 border-l-2 border-green-600 pl-4 py-4"
                     >
                       <div className="whitespace-nowrap font-medium w-24">
-                        {entity === 'invoice' ? t('credit') : t(entity)}:
+                        {t(entity)}:
                       </div>
 
                       <div>

@@ -8,27 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+import classNames from 'classnames';
+import { atom, useSetAtom } from 'jotai';
 import { AlignJustify, Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { Credit } from '$app/common/interfaces/credit';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { InvoiceItem } from '$app/common/interfaces/invoice-item';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Quote } from '$app/common/interfaces/quote';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
+import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { resolveColumnWidth } from '../helpers/resolve-column-width';
+import { useHandleSortingRows } from '../hooks/useHandleSortingRows';
 import {
   isLineItemEmpty,
   useResolveInputField,
 } from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
-import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-import { useHandleSortingRows } from '../hooks/useHandleSortingRows';
-import { resolveColumnWidth } from '../helpers/resolve-column-width';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { InvoiceItem } from '$app/common/interfaces/invoice-item';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import { Credit } from '$app/common/interfaces/credit';
-import { Quote } from '$app/common/interfaces/quote';
-import { atom, useSetAtom } from 'jotai';
-import classNames from 'classnames';
-import { useColorScheme } from '$app/common/colors';
-import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export type ProductTableResource =
   | Invoice

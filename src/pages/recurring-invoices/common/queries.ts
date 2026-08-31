@@ -8,29 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { useAtomValue } from 'jotai';
+import { Dispatch, SetStateAction } from 'react';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { GenericQueryOptions } from '$app/common/queries/invoices';
-import { useQuery, useQueryClient } from 'react-query';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useAtomValue } from 'jotai';
-import { invalidationQueryAtom } from '$app/common/atoms/data-table';
-import { AxiosError } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Dispatch, SetStateAction } from 'react';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { GenericQueryOptions } from '$app/common/queries/invoices';
+import { resolveBlankQueryEnabled } from '$app/common/queries/blank-query-options';
 
 interface RecurringInvoiceQueryParams {
   id: string;
 }
 
 export function useRecurringInvoiceQuery(params: RecurringInvoiceQueryParams) {
-  return useQuery<RecurringInvoice>(
-    ['/api/v1/recurring_invoices', params.id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/recurring_invoices', params.id],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/recurring_invoices/:id?include=client', {
@@ -40,28 +42,31 @@ export function useRecurringInvoiceQuery(params: RecurringInvoiceQueryParams) {
         (response: GenericSingleResourceResponse<RecurringInvoice>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: Boolean(params.id) }
-  );
+
+    staleTime: Infinity,
+    enabled: Boolean(params.id),
+  });
 }
 
 export function useBlankRecurringInvoiceQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();
 
-  return useQuery<RecurringInvoice>(
-    ['/api/v1/recurring_invoices', 'create'],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/recurring_invoices', 'create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/recurring_invoices/create')).then(
         (response: GenericSingleResourceResponse<RecurringInvoice>) =>
           response.data.data
       ),
-    {
-      ...options,
-      staleTime: Infinity,
-      enabled: hasPermission('create_recurring_invoice')
-        ? (options?.enabled ?? true)
-        : false,
-    }
-  );
+
+    staleTime: Infinity,
+
+    enabled: resolveBlankQueryEnabled(
+      options,
+      hasPermission('create_recurring_invoice')
+    ),
+  });
 }
 
 type Action =
@@ -115,7 +120,9 @@ export function useBulkAction(params?: Params) {
         onSuccess?.();
 
         invalidateQueryValue &&
-          queryClient.invalidateQueries([invalidateQueryValue]);
+          queryClient.invalidateQueries({
+            queryKey: [invalidateQueryValue],
+          });
 
         $refetch(['recurring_invoices']);
       })

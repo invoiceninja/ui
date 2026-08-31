@@ -10,9 +10,9 @@
 
 import { atom, useAtom } from 'jotai';
 import Pusher from 'pusher-js';
-import { defaultHeaders } from '../queries/common/headers';
-import { apiEndpoint, isSelfHosted } from '../helpers';
 import { useEffect } from 'react';
+import { apiEndpoint, isSelfHosted } from '../helpers';
+import { defaultHeaders } from '../queries/common/headers';
 import { useCurrentCompany } from './useCurrentCompany';
 import { useReactSettings } from './useReactSettings';
 

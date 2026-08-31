@@ -8,50 +8,50 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { resolveProperty } from '$app/pages/invoices/common/helpers/resolve-property';
-import { useHandleProductChange } from './useHandleProductChange';
-import { InputField } from '$app/components/forms';
-import { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import { useFormatMoney } from './useFormatMoney';
-import {
-  InvoiceItem,
-  InvoiceItemType,
-} from '$app/common/interfaces/invoice-item';
-import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
-import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
-import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
-import { ProductSelector } from '$app/components/products/ProductSelector';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { CustomField } from '$app/components/CustomField';
-import {
-  ProductTableResource,
-  RelationType,
-  isDeleteActionTriggeredAtom,
-} from '../components/ProductsTable';
-import { useHandleTaxRateChange } from './useHandleTaxRateChange';
-import { Product } from '$app/common/interfaces/product';
-import { useAtom } from 'jotai';
 import collect from 'collect.js';
-import {
-  TaxCategorySelector,
-  useTaxCategories,
-} from '$app/components/tax-rates/TaxCategorySelector';
-import { Inline } from '$app/components/Inline';
-import { FiRepeat } from 'react-icons/fi';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useLocation } from 'react-router-dom';
+import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
-import { usePreferences } from '$app/common/hooks/usePreferences';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { FiRepeat } from 'react-icons/fi';
+import { MdWarning } from 'react-icons/md';
+import { useLocation } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import {
   getTaxRateComboValue,
   TaxNamePropertyType,
 } from '$app/common/helpers/tax-rates/tax-rates-combo';
-import { Icon } from '$app/components/icons/Icon';
-import { MdWarning } from 'react-icons/md';
-import { useTranslation } from 'react-i18next';
 import useDoesTaxRateExistByComboValue from '$app/common/hooks/tax-rates/useDoesTaxRateExistByComboValue';
-import { useColorScheme } from '$app/common/colors';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
+import { usePreferences } from '$app/common/hooks/usePreferences';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
+import {
+  InvoiceItem,
+  InvoiceItemType,
+} from '$app/common/interfaces/invoice-item';
+import { Product } from '$app/common/interfaces/product';
+import { CustomField } from '$app/components/CustomField';
+import { InputField } from '$app/components/forms';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { Inline } from '$app/components/Inline';
+import { Icon } from '$app/components/icons/Icon';
+import { ProductSelector } from '$app/components/products/ProductSelector';
+import {
+  TaxCategorySelector,
+  useTaxCategories,
+} from '$app/components/tax-rates/TaxCategorySelector';
+import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
+import { resolveProperty } from '$app/pages/invoices/common/helpers/resolve-property';
+import {
+  isDeleteActionTriggeredAtom,
+  ProductTableResource,
+  RelationType,
+} from '../components/ProductsTable';
+import { useFormatMoney } from './useFormatMoney';
+import { useHandleProductChange } from './useHandleProductChange';
+import { useHandleTaxRateChange } from './useHandleTaxRateChange';
 
 const numberInputs = [
   'discount',
