@@ -40,9 +40,12 @@ import {
   UploadDialogProps,
   UploadProps,
   ValidationErrorsProps,
+  PreviewToggleProps,
+  PreviewRefreshProps,
 } from '@docuninja/builder2.0';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { MdRefresh, MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import { LuTrash } from 'react-icons/lu';
 
 export function Loading() {
@@ -263,6 +266,50 @@ export function Alertbox({ children }: AlertProps) {
     <Alert className="m-5" type="danger">
       {children}
     </Alert>
+  );
+}
+
+export function PreviewToggle({
+  isPreviewVisible,
+  onToggle,
+}: PreviewToggleProps) {
+  const [t] = useTranslation();
+
+  return (
+    <Button
+      behavior="button"
+      type="secondary"
+      onClick={onToggle}
+      className="flex items-center gap-2"
+    >
+      {isPreviewVisible ? (
+        <MdVisibilityOff size={16} />
+      ) : (
+        <MdVisibility size={16} />
+      )}
+      {isPreviewVisible ? t('hide_preview') : t('show_pdf_preview')}
+    </Button>
+  );
+}
+
+export function PreviewRefresh({
+  onClick,
+  disabled,
+}: PreviewRefreshProps) {
+  const [t] = useTranslation();
+
+  return (
+    <Button
+      behavior="button"
+      type="secondary"
+      onClick={onClick}
+      disabled={disabled}
+      className="flex items-center gap-2"
+      disableWithoutIcon
+    >
+      <MdRefresh size={16} />
+      {t('refresh')}
+    </Button>
   );
 }
 
