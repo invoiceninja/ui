@@ -16,7 +16,7 @@ import { AxiosError } from 'axios';
 import { MdDelete, MdEdit } from 'react-icons/md';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 export default function ReminderSchedules() {
   const [t] = useTranslation();
