@@ -88,6 +88,7 @@ export default function ReminderSchedules() {
     }
 
     setIsFormBusy(true);
+    setErrors(null);
 
     if (!editingSchedule) {
       toast.processing();
@@ -127,9 +128,7 @@ export default function ReminderSchedules() {
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
-          toast.error(
-            error.response.data.message || 'validation_errors'
-          );
+          toast.dismiss();
         } else {
           toast.error('error_title');
         }
@@ -189,8 +188,6 @@ export default function ReminderSchedules() {
 
   return (
     <>
-      {errors && <ValidationAlert errors={errors} />}
-
       <Card
         title={t('reminder_schedules')}
         className="shadow-sm"
@@ -274,24 +271,33 @@ export default function ReminderSchedules() {
             : t('add_reminder_schedule')
         }
         visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setErrors(null);
+        }}
       >
+        {errors && <ValidationAlert errors={errors} />}
+
         <div className="space-y-4">
           <InputField
             label={t('name')}
             value={formData.name}
-            onValueChange={(value) =>
-              setFormData((prev) => ({ ...prev, name: value }))
-            }
+            errorMessage={errors?.errors.name}
+            onValueChange={(value) => {
+              setErrors(null);
+              setFormData((prev) => ({ ...prev, name: value }));
+            }}
             disabled={isFormBusy}
           />
 
           <InputField
             label={t('subject')}
             value={formData.subject}
-            onValueChange={(value) =>
-              setFormData((prev) => ({ ...prev, subject: value }))
-            }
+            errorMessage={errors?.errors.subject}
+            onValueChange={(value) => {
+              setErrors(null);
+              setFormData((prev) => ({ ...prev, subject: value }));
+            }}
             disabled={isFormBusy}
           />
 
@@ -299,21 +305,26 @@ export default function ReminderSchedules() {
             id="body"
             label={t('body')}
             value={formData.body}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-              setFormData((prev) => ({ ...prev, body: e.target.value }))
-            }
+            errorMessage={errors?.errors.body}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+              setErrors(null);
+              setFormData((prev) => ({ ...prev, body: e.target.value }));
+            }}
+            disabled={isFormBusy}
           />
 
           <InputField
             label={t('num_days')}
             type="number"
             value={String(formData.num_days)}
-            onValueChange={(value) =>
+            errorMessage={errors?.errors.num_days}
+            onValueChange={(value) => {
+              setErrors(null);
               setFormData((prev) => ({
                 ...prev,
                 num_days: parseInt(value) || 0,
-              }))
-            }
+              }));
+            }}
             disabled={isFormBusy}
           />
 
