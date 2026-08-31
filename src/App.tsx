@@ -34,6 +34,7 @@ import {
   useReactSettings,
 } from './common/hooks/useReactSettings';
 import { $refetch, useRefetch } from './common/hooks/useRefetch';
+import { useRequiresUserDetails } from './common/hooks/useRequiresUserDetails';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
 import { useSockets } from './common/hooks/useSockets';
@@ -48,6 +49,7 @@ import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
 import { antdLocaleAtom } from './components/DropdownDateRangePicker';
 import { PreventNavigationModal } from './components/PreventNavigationModal';
+import { UserDetailsModal } from './components/UserDetailsModal';
 import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
 
 interface RefreshEntityData {
@@ -90,6 +92,7 @@ export function App() {
   const resolveAntdLocale = useResolveAntdLocale();
   const resolveDayJSLocale = useResolveDayJSLocale();
   const switchToCompanySettings = useSwitchToCompanySettings();
+  const requiresUserDetails = useRequiresUserDetails();
 
   useFetchReactSettings();
 
@@ -104,6 +107,11 @@ export function App() {
 
   const [isCompanyEditModalOpened, setIsCompanyEditModalOpened] =
     useState(false);
+  const [isUserDetailsModalDismissed, setIsUserDetailsModalDismissed] =
+    useState(false);
+
+  const isUserDetailsModalVisible =
+    requiresUserDetails && !isUserDetailsModalDismissed;
 
   const resolvedLanguage = company
     ? resolveLanguage(
@@ -194,13 +202,14 @@ export function App() {
 
     if (
       company &&
+      !isUserDetailsModalVisible &&
       (!companyName || companyName === t('untitled_company')) &&
       localStorage.getItem('COMPANY-EDIT-OPENED') !== 'true'
     ) {
       localStorage.setItem('COMPANY-EDIT-OPENED', 'true');
       setIsCompanyEditModalOpened(true);
     }
-  }, [company]);
+  }, [company, isUserDetailsModalVisible]);
 
   useEffect(() => {
     if (
@@ -278,6 +287,11 @@ export function App() {
         <Toaster position="top-center" />
         {routes}
       </div>
+
+      <UserDetailsModal
+        visible={isUserDetailsModalVisible}
+        onClose={() => setIsUserDetailsModalDismissed(true)}
+      />
 
       <CompanyEdit
         isModalOpen={isCompanyEditModalOpened && isOwner}
