@@ -37,7 +37,6 @@ import { $refetch, useRefetch } from './common/hooks/useRefetch';
 import { useRequiresUserDetails } from './common/hooks/useRequiresUserDetails';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
-import { useSockets } from './common/hooks/useSockets';
 import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
 import { useSystemFonts } from './common/hooks/useSystemFonts';
 import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
@@ -238,34 +237,12 @@ export function App() {
     }
   }, [location, user]);
 
-  const sockets = useSockets();
-
   usePrivateSocketEvents();
-
-  useEffect(() => {
-    if (company && sockets) {
-      sockets.connection.bind('disconnected', () => {
-        console.log('Disconnected from Pusher');
-      });
-
-      sockets.connection.bind('error', () => {
-        console.error('Error from Pusher');
-      });
-
-      sockets.connect();
-    }
-
-    return () => {
-      if (sockets && company) {
-        sockets.disconnect();
-      }
-    };
-  }, [company?.company_key]);
 
   useSystemFonts();
 
   useSocketEvent({
-    on: 'App\\Events\\Socket\\RefreshEntity',
+    on: 'App\\Events\\Socket\\RefetchEntity',
     callback: ({ data }) => {
       const currentData = data as RefreshEntityData;
 
