@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InputField } from '$app/components/forms';
+import { Dispatch, SetStateAction, useState } from 'react';
+import { useColorScheme } from '$app/common/colors';
 import { trans } from '$app/common/helpers';
 import { ExpenseCategorySelector } from '$app/components/expense-categories/ExpenseCategorySelector';
+import { InputField } from '$app/components/forms';
+import { Plus } from '$app/components/icons/Plus';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
-import { Dispatch, SetStateAction, useState } from 'react';
 import { FilterModal } from './FilterModal';
 import { SearchInput } from './ListBox';
-import { useColorScheme } from '$app/common/colors';
-import { Plus } from '$app/components/icons/Plus';
 
 interface Props {
   searchParams: SearchInput;

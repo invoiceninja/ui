@@ -8,6 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { BiGitMerge } from 'react-icons/bi';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -19,10 +23,6 @@ import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
-import { AxiosError } from 'axios';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { BiGitMerge } from 'react-icons/bi';
 
 interface Props {
   mergeFromVendorId: string;

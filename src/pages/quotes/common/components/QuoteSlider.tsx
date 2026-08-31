@@ -20,7 +20,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { date, endpoint, trans } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
@@ -70,6 +70,7 @@ import { History } from '$app/components/icons/History';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { ChevronRight } from 'react-feather';
 import { Icon } from '$app/components/icons/Icon';
+import { TagPills } from '$app/components/tags/TagPills';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Upload } from '$app/pages/settings/company/documents/components';
@@ -200,15 +201,15 @@ export function QuoteSlider() {
 
   const fetchEmailHistory = async () => {
     const response = await queryClient
-      .fetchQuery(
-        ['/api/v1/quotes', quote?.id, 'emailHistory'],
-        () =>
+      .fetchQuery({
+        queryKey: ['/api/v1/quotes', quote?.id, 'emailHistory'],
+        queryFn: () =>
           request('POST', endpoint('/api/v1/emails/entityHistory'), {
             entity: 'quote',
             entity_id: quote?.id,
           }),
-        { staleTime: Infinity }
-      )
+        staleTime: Infinity,
+      })
       .then((response) => response.data);
 
     setEmailRecords(response);
@@ -320,12 +321,26 @@ export function QuoteSlider() {
             </Element>
 
             <Element
+              className={classNames({
+                'border-b border-dashed': Boolean(quote?.tags?.length),
+              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {quote ? <QuoteStatus entity={quote} /> : null}
             </Element>
+
+            {Boolean(quote?.tags?.length) && (
+              <Element
+                leftSide={t('tags')}
+                pushContentToRight
+                noExternalPadding
+              >
+                <TagPills tags={quote?.tags} />
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />
@@ -396,7 +411,7 @@ export function QuoteSlider() {
             <>
               <div className="space-y-2 whitespace-nowrap px-6">
                 <Tooltip
-                  size="regular"
+                  size="large"
                   width="auto"
                   tooltipElement={
                     <article

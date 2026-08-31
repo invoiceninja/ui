@@ -18,6 +18,11 @@ import {
   useAllClientColumns,
   useClientColumns,
 } from '../common/hooks/useClientColumns';
+import {
+  useEntityTagFilterColumns,
+  useTagFilterCleanup,
+} from '$app/common/hooks/useEntityTagFilters';
+import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
 import { useActions } from '../common/hooks/useActions';
@@ -32,6 +37,7 @@ import {
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { Client } from '$app/common/interfaces/client';
 import { InputLabel } from '$app/components/forms';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { useClientQuery } from '$app/common/queries/clients';
@@ -53,8 +59,20 @@ export default function Clients() {
 
   const actions = useActions();
   const columns = useClientColumns();
+  const reactSettings = useReactSettings();
   const clientColumns = useAllClientColumns();
   const customBulkActions = useCustomBulkActions();
+
+  const selectedColumns =
+    reactSettings?.react_table_columns?.client || defaultColumns;
+  const shouldShowTagFilter = selectedColumns.includes('tags');
+  const filterColumns = useEntityTagFilterColumns(
+    TAG_ENTITY_TYPES.client,
+    'client_tag_ids',
+    { enabled: shouldShowTagFilter }
+  );
+
+  useTagFilterCleanup(shouldShowTagFilter, 'client_tag_ids');
 
   const [sliderClientId, setSliderClientId] = useState<string>('');
   const [clientSlider, setClientSlider] = useAtom(clientSliderAtom);
@@ -93,7 +111,9 @@ export default function Clients() {
     <Default breadcrumbs={pages} title={t('clients')} docsLink="en/clients">
       <DataTable
         resource="client"
-        endpoint="/api/v1/clients?include=group_settings&sort=id|desc"
+        endpoint={`/api/v1/clients?include=group_settings${
+          shouldShowTagFilter ? ',tags' : ''
+        }&sort=id|desc${shouldShowTagFilter ? '' : '&tag_ids='}`}
         bulkRoute="/api/v1/clients/bulk"
         columns={columns}
         linkToCreate="/clients/create"
@@ -102,6 +122,7 @@ export default function Clients() {
         customActions={actions}
         bottomActionsKeys={['purge']}
         customBulkActions={customBulkActions}
+        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         rightSide={
           <div className="flex items-center space-x-2">
             <DataTableColumnsPicker

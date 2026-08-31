@@ -25,7 +25,7 @@ import { date, endpoint, trans } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../../edit/components/Actions';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';
@@ -71,6 +71,7 @@ import { History } from '$app/components/icons/History';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { Icon } from '$app/components/icons/Icon';
 import { ChevronRight } from 'react-feather';
+import { TagPills } from '$app/components/tags/TagPills';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Upload } from '$app/pages/settings/company/documents/components';
@@ -243,15 +244,15 @@ export function InvoiceSlider() {
 
   const fetchEmailHistory = async () => {
     const response = await queryClient
-      .fetchQuery(
-        ['/api/v1/invoices', invoice?.id, 'emailHistory'],
-        () =>
+      .fetchQuery({
+        queryKey: ['/api/v1/invoices', invoice?.id, 'emailHistory'],
+        queryFn: () =>
           request('POST', endpoint('/api/v1/emails/entityHistory'), {
             entity: 'invoice',
             entity_id: invoice?.id,
           }),
-        { staleTime: Infinity }
-      )
+        staleTime: Infinity,
+      })
       .then((response) => response.data);
 
     setEmailRecords(response);
@@ -396,12 +397,26 @@ export function InvoiceSlider() {
             ) : null}
 
             <Element
+              className={classNames({
+                'border-b border-dashed': Boolean(invoice?.tags?.length),
+              })}
               leftSide={t('status')}
               pushContentToRight
               noExternalPadding
+              style={{ borderColor: colors.$20 }}
             >
               {invoice ? <InvoiceStatus entity={invoice} /> : null}
             </Element>
+
+            {Boolean(invoice?.tags?.length) && (
+              <Element
+                leftSide={t('tags')}
+                pushContentToRight
+                noExternalPadding
+              >
+                <TagPills tags={invoice?.tags} />
+              </Element>
+            )}
           </div>
 
           <Divider withoutPadding borderColor={colors.$20} />
@@ -472,7 +487,7 @@ export function InvoiceSlider() {
             <>
               <div className="space-y-2 whitespace-nowrap px-6">
                 <Tooltip
-                  size="regular"
+                  size="large"
                   width="auto"
                   tooltipElement={
                     <article

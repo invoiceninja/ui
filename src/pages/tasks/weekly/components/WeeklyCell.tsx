@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Checkbox } from '$app/components/forms';
-import { useColorScheme } from '$app/common/colors';
 import { Popover, Transition } from '@headlessui/react';
-import { Message } from '$app/components/icons/Message';
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { Checkbox } from '$app/components/forms';
+import { Message } from '$app/components/icons/Message';
 
 export interface CellEdit {
   duration?: string;
@@ -135,7 +135,6 @@ export function WeeklyCell({
           cursor: disabled ? 'not-allowed' : 'text',
         }}
       />
-
       <Popover className="absolute inset-y-0 right-0 flex items-center pr-1">
         {({ open, close }) => {
           if (open && !panelPos) reposition();

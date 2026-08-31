@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { Button, InputField } from '$app/components/forms';
-import { Table, Tbody, Td, Thead, Tr } from '$app/components/tables';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
+import { Button, InputField } from '$app/components/forms';
+import { Table, Tbody, Td, Thead, Tr } from '$app/components/tables';
+import { isSummableColumn } from '../constants/columns';
 import {
-  sortRows,
-  SortConfig,
   detectSortType,
+  extractDisplayValue,
   groupRows,
   parseNumericValue,
-  extractDisplayValue,
+  SortConfig,
+  sortRows,
 } from '../utils/sortingUtils';
-import { isSummableColumn } from '../constants/columns';
-import { useNumericFormatter } from '$app/common/hooks/useNumericFormatter';
 import { ColumnGroup, PreviewCell, PreviewTh, usePreview } from './Preview';
 
 interface EnhancedPreviewProps {

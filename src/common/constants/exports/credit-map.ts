@@ -59,4 +59,5 @@ export const creditMap: Record[] = [
   { trans: 'tax_name3', value: 'credit.tax_name3', map: 'credit' },
   { trans: 'tax_rate3', value: 'credit.tax_rate3', map: 'credit' },
   { trans: 'subtotal', value: 'credit.subtotal', map: 'credit' },
+  { trans: 'tags', value: 'credit.tags', map: 'credit' },
 ];

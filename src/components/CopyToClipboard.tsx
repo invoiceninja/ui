@@ -8,11 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { toast } from '$app/common/helpers/toast/toast';
 import { MouseEvent, useState } from 'react';
+import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import { MdOutlineContentCopy } from 'react-icons/md';
-import { AiFillEyeInvisible } from 'react-icons/ai';
-import { AiFillEye } from 'react-icons/ai';
+import { toast } from '$app/common/helpers/toast/toast';
 import { Icon } from './icons/Icon';
 
 interface Props {

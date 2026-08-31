@@ -1,14 +1,14 @@
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import {
+  Permission as PermissionType,
+  User,
+} from '$app/common/interfaces/docuninja/api';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import { Checkbox } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
-import { useTranslation } from 'react-i18next';
-import {
-  User,
-  Permission as PermissionType,
-} from '$app/common/interfaces/docuninja/api';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { NotificationValue } from '../constants/notifications';
 
 // Legacy props interface for backward compatibility

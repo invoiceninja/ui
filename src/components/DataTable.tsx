@@ -8,13 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import {
-  docuNinjaEndpoint,
-  endpoint,
-  getEntityState,
-  isProduction,
-} from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
+import { useQuery } from '@tanstack/react-query';
+import classNames from 'classnames';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { cloneDeep, get, isEqual } from 'lodash';
 import React, {
   CSSProperties,
   Dispatch,
@@ -27,15 +24,46 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { toast } from '$app/common/helpers/toast/toast';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
+import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
+import { useDebounce } from 'react-use';
+import { emitter } from '$app';
+import {
+  fullTableLatestDataAtom,
+  invalidationQueryAtom,
+} from '$app/common/atoms/data-table';
+import { useColorScheme } from '$app/common/colors';
+import { EntityState } from '$app/common/enums/entity-state';
+import { Guard } from '$app/common/guards/Guard';
+import {
+  docuNinjaEndpoint,
+  endpoint,
+  getEntityState,
+  isProduction,
+} from '$app/common/helpers';
+import {
+  buildDateRangeQueryParameter,
+  normalizeColumnName,
+} from '$app/common/helpers/data-table';
+import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
+import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
+import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { refetchByUrl } from '$app/common/hooks/useRefetch';
+import CommonProps from '$app/common/interfaces/common-props.interface';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Divider } from './cards/Divider';
 import { Actions, SelectOption } from './datatables/Actions';
+import { DateRangePicker } from './datatables/DateRangePicker';
 import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
+import { FilterColumn } from './FilterColumn';
 import { Button, Checkbox } from './forms';
+import { Icon } from './icons/Icon';
+import { Resource } from './PreviousNextNavigation';
 import { Spinner } from './Spinner';
 import {
   ColumnSortPayload,
@@ -47,32 +75,7 @@ import {
   Th,
   Thead,
 } from './tables';
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { Icon } from './icons/Icon';
-import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
-import {
-  fullTableLatestDataAtom,
-  invalidationQueryAtom,
-} from '$app/common/atoms/data-table';
-import CommonProps from '$app/common/interfaces/common-props.interface';
-import classNames from 'classnames';
-import { Guard } from '$app/common/guards/Guard';
-import { EntityState } from '$app/common/enums/entity-state';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { refetchByUrl } from '$app/common/hooks/useRefetch';
-import { useDataTableOptions } from '$app/common/hooks/useDataTableOptions';
-import { useDataTableUtilities } from '$app/common/hooks/useDataTableUtilities';
-import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
-import { DateRangePicker } from './datatables/DateRangePicker';
-import { emitter } from '$app';
 import { TFooter } from './tables/TFooter';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useColorScheme } from '$app/common/colors';
-import { useDebounce } from 'react-use';
-import { cloneDeep, get, isEqual } from 'lodash';
-import { FilterColumn } from './FilterColumn';
-import { buildDateRangeQueryParameter } from '$app/common/helpers/data-table';
-import { Resource } from './PreviousNextNavigation';
 
 export interface DateRangeColumn {
   column: string;
@@ -88,6 +91,7 @@ export interface DateRangeEntry {
 }
 
 export type DataTableColumns<T = any> = {
+  column?: string;
   id: string;
   label: string;
   format?: (field: string | number, resource: T) => unknown;
@@ -95,6 +99,7 @@ export type DataTableColumns<T = any> = {
 }[];
 
 export type FooterColumns<T = any> = {
+  column: string;
   id: string;
   label: string;
   format: (
@@ -190,8 +195,8 @@ interface Props<T> extends CommonProps {
   footerColumns?: FooterColumns;
   withoutPerPageAsPreference?: boolean;
   withoutPageAsPreference?: boolean;
-  withoutStoringSearchFilter?: boolean;
   withoutStoringPreferences?: boolean;
+  withRecordScopedFilters?: boolean;
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
   enableSavingFilterPreference?: boolean;
@@ -302,8 +307,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     totalRecordsPropPath,
     onDeleteBulkAction,
     withoutPageAsPreference = false,
-    withoutStoringSearchFilter = false,
     withoutStoringPreferences = false,
+    withRecordScopedFilters = false,
     filterColumns,
     onSelectedResourcesChange,
     preSelected = [],
@@ -395,8 +400,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     defaultCustomFilterValues,
     withoutStoringPerPage: withoutPerPageAsPreference,
     withoutStoringPage: withoutPageAsPreference,
-    withoutStoringSearchFilter,
     withoutStoringPreferences,
+    withRecordScopedFilters,
     enableSavingFilterPreference,
   });
 
@@ -410,7 +415,9 @@ export function DataTable<T extends object>(props: Props<T>) {
     tableKey: `${props.resource}s`,
     customFilter,
     customFilters,
+    defaultCustomFilterValues,
     withoutStoringPreferences,
+    withRecordScopedFilters,
   });
 
   const normalizeNumericCommas = (value: string): string => {
@@ -589,8 +596,8 @@ export function DataTable<T extends object>(props: Props<T>) {
     };
   }, []);
 
-  const { data, isLoading, isFetching, isError } = useQuery(
-    [
+  const { data, isLoading, isFetching, isError } = useQuery({
+    queryKey: [
       ...(queryIdentificator ? [queryIdentificator] : []),
       apiEndpoint.pathname,
       props.endpoint,
@@ -603,18 +610,18 @@ export function DataTable<T extends object>(props: Props<T>) {
       ...(dateRangeQueryParameter.length > 0 ? [dateRangeQueryParameter] : []),
       filterColumnsValues,
     ],
-    () =>
+
+    queryFn: () =>
       request(
         methodType,
         apiEndpoint.href,
         {},
         { headers: props.endpointHeaders }
       ),
-    {
-      staleTime: props.staleTime ?? Infinity,
-      enabled: !disableQuery && arePreferencesApplied,
-    }
-  );
+
+    staleTime: props.staleTime ?? Infinity,
+    enabled: !disableQuery && arePreferencesApplied,
+  });
 
   useEffect(() => {
     if (!selected?.length) {
@@ -774,14 +781,22 @@ export function DataTable<T extends object>(props: Props<T>) {
     [dateRangeEntries]
   );
 
-  const getFooterColumn = (columnId: string) => {
-    return footerColumns.find((footerColumn) => footerColumn.id === columnId);
+  const getFooterColumn = (columnKey: string | undefined) => {
+    if (!columnKey) {
+      return undefined;
+    }
+
+    return footerColumns.find(
+      (footerColumn) =>
+        normalizeColumnName(footerColumn.column) ===
+        normalizeColumnName(columnKey)
+    );
   };
 
   const getColumnValues = (columnId: string) => {
     return currentData.map(
       (resource: T) => resource[columnId as keyof typeof resource]
-    );
+    ) as (string | number)[];
   };
 
   const handleCheckboxClick = useCallback(
@@ -1254,8 +1269,16 @@ export function DataTable<T extends object>(props: Props<T>) {
                             },
                             styleOptions?.tdClassName
                           )}
-                          onClick={() => {
+                          onClick={(event: React.MouseEvent<HTMLTableCellElement>) => {
                             if (index < 3) {
+                              if (
+                                (event.target as HTMLElement).closest(
+                                  'a, button, input, select, textarea, [role="button"]'
+                                )
+                              ) {
+                                return;
+                              }
+
                               props.onTableRowClick
                                 ? props.onTableRowClick(resource)
                                 : document.getElementById(resource.id)?.click();
@@ -1364,18 +1387,20 @@ export function DataTable<T extends object>(props: Props<T>) {
               <TFooter>
                 {!props.withoutActions && !hideEditableOptions && <Th></Th>}
 
-                {props.columns.map(
-                  (column, index) =>
+                {props.columns.map((column, index) => {
+                  const footerColumn = getFooterColumn(column.column);
+
+                  return (
                     Boolean(!excludeColumns.includes(column.id)) && (
                       <Td
                         key={index}
                         customizeTextColor
                         resizable={`${apiEndpoint.pathname}.${column.id}`}
                       >
-                        {getFooterColumn(column.id) ? (
+                        {footerColumn ? (
                           <div className="flex items-center space-x-3">
-                            {getFooterColumn(column.id)?.format(
-                              getColumnValues(column.id) as (string | number)[],
+                            {footerColumn.format(
+                              getColumnValues(footerColumn.id),
                               currentData || []
                             ) ?? '-/-'}
                           </div>
@@ -1384,7 +1409,8 @@ export function DataTable<T extends object>(props: Props<T>) {
                         )}
                       </Td>
                     )
-                )}
+                  );
+                })}
 
                 {props.withResourcefulActions && !hideEditableOptions && (
                   <Th></Th>

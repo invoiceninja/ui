@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
+import { route } from '$app/common/helpers/route';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { DataTable, DataTableColumns } from '$app/components/DataTable';
 import { Link } from '$app/components/forms';
-import { route } from '$app/common/helpers/route';
-import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { Settings } from '$app/components/layouts/Settings';
 
 export function PaymentTerms() {
   const { documentTitle } = useTitle('payment_terms');

@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { Button, InputField } from '$app/components/forms';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Modal } from '$app/components/Modal';
-import { Dispatch, SetStateAction, useState, useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Schedule, ScheduleParams } from '$app/common/interfaces/schedule';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { Schedule, ScheduleParams } from '$app/common/interfaces/schedule';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Button, InputField } from '$app/components/forms';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 import Toggle from '$app/components/forms/Toggle';
+import { Modal } from '$app/components/Modal';
 
 interface Props {
   visible: boolean;

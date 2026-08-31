@@ -26,7 +26,7 @@ import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { RecurringExpenseStatus } from '$app/common/enums/recurring-expense-status';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { expenseAtom } from '$app/pages/expenses/common/atoms';
 import paymentType from '$app/common/constants/payment-type';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
@@ -37,6 +37,7 @@ import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
+  MdEdit,
   MdNotStarted,
   MdRestore,
   MdStopCircle,
@@ -67,6 +68,7 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import dayjs from 'dayjs';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'status',
@@ -128,6 +130,7 @@ export function useAllRecurringExpenseColumns() {
     'frequency',
     'remaining_cycles',
     'next_send_date',
+    'tags',
   ] as const;
 
   return recurringExpenseColumns.map((column) => normalizeColumnName(column));
@@ -448,6 +451,14 @@ export function useRecurringExpenseColumns() {
         return <span>{value}</span>;
       },
     },
+    {
+      column: 'tags',
+      id: 'recurring_expense_tag_ids',
+      label: t('tags'),
+      format: (value, recurringExpense) => (
+        <TagPills tags={recurringExpense.tags} />
+      ),
+    },
   ];
 
   const list: string[] =
@@ -482,15 +493,22 @@ export function useToggleStartStop() {
       $refetch(['recurring_expenses']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({ queryKey: [invalidateQueryValue] });
 
       toast.success(action === 'start' ? 'start' : 'stop');
     });
   };
 }
 
-export function useActions() {
+interface ActionsParams {
+  showEditAction?: boolean;
+  showCommonBulkAction?: boolean;
+}
+
+export function useActions(params?: ActionsParams) {
   const [t] = useTranslation();
+
+  const { showEditAction, showCommonBulkAction } = params || {};
 
   const navigate = useNavigate();
 
@@ -535,6 +553,18 @@ export function useActions() {
 
   const actions: Action<RecurringExpense>[] = [
     (recurringExpense) =>
+      Boolean(showEditAction) && (
+        <DropdownElement
+          to={route('/recurring_expenses/:id/edit', {
+            id: recurringExpense.id,
+          })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    () => Boolean(showEditAction) && <Divider withoutPadding />,
+    (recurringExpense) =>
       (recurringExpense.status_id === RecurringExpenseStatus.Draft ||
         recurringExpense.status_id === RecurringExpenseStatus.Paused) && (
         <DropdownElement
@@ -572,9 +602,12 @@ export function useActions() {
           {t('clone_to_expense')}
         </DropdownElement>
       ),
-    () => isEditPage && <Divider withoutPadding />,
+    () =>
+      (isEditPage || Boolean(showCommonBulkAction)) && (
+        <Divider withoutPadding />
+      ),
     (recurringExpense) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       getEntityState(recurringExpense) === EntityState.Active && (
         <DropdownElement
           onClick={() => bulk([recurringExpense.id], 'archive')}
@@ -584,7 +617,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (recurringExpense) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       (getEntityState(recurringExpense) === EntityState.Archived ||
         getEntityState(recurringExpense) === EntityState.Deleted) && (
         <DropdownElement
@@ -595,7 +628,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (recurringExpense) =>
-      isEditPage &&
+      (isEditPage || Boolean(showCommonBulkAction)) &&
       (getEntityState(recurringExpense) === EntityState.Active ||
         getEntityState(recurringExpense) === EntityState.Archived) && (
         <DropdownElement

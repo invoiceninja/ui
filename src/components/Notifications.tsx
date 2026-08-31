@@ -8,43 +8,46 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Bell } from 'react-feather';
-import { Slider } from './cards/Slider';
+import { useQueryClient } from '@tanstack/react-query';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
+import { atom, useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
+import { Bell, Download } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { atomWithStorage } from 'jotai/utils';
-import { useAtom } from 'jotai';
+import { GoDotFill } from 'react-icons/go';
+import { useColorScheme } from '$app/common/colors';
+import { date, isHosted, isSelfHosted, trans } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useReplaceVariables } from '$app/common/hooks/useReplaceTranslationVariables';
+import { useSockets } from '$app/common/hooks/useSockets';
+import { Credit } from '$app/common/interfaces/credit';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Payment } from '$app/common/interfaces/payment';
 import {
+  buildGeneralChannelName,
+  DownloadAvailable,
   GenericMessage,
   socketId,
   useSocketEvent,
   WithSocketId,
 } from '$app/common/queries/sockets';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { route } from '$app/common/helpers/route';
-import { date, isHosted, isSelfHosted, trans } from '$app/common/helpers';
+import { bindChannelLogging, logSocketDebug } from '$app/common/queries/socketLogging';
+import { subscribeWhenConnected } from '$app/common/queries/socketSubscription';
 import { NonClickableElement } from './cards/NonClickableElement';
-import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
-import { Credit } from '$app/common/interfaces/credit';
-import { Payment } from '$app/common/interfaces/payment';
-import classNames from 'classnames';
-import { useSockets } from '$app/common/hooks/useSockets';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { Icon } from './icons/Icon';
-import { useColorScheme } from '$app/common/colors';
+import { Slider } from './cards/Slider';
 import { Button, Link } from './forms';
-import { useReplaceVariables } from '$app/common/hooks/useReplaceTranslationVariables';
-import { CardCheck } from './icons/CardCheck';
-import { GoDotFill } from 'react-icons/go';
 import { CardChange } from './icons/CardChange';
-import { FileSearch } from './icons/FileSearch';
+import { CardCheck } from './icons/CardCheck';
 import { FileAdd } from './icons/FileAdd';
 import { FileEdit } from './icons/FileEdit';
-import dayjs from 'dayjs';
-import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useQueryClient } from 'react-query';
+import { FileSearch } from './icons/FileSearch';
+import { Icon } from './icons/Icon';
 
 type NotificationType =
   | 'invoiceWasPaid'
@@ -52,7 +55,8 @@ type NotificationType =
   | 'creditWasCreated'
   | 'creditWasUpdated'
   | 'paymentWasUpdated'
-  | 'genericMessage';
+  | 'genericMessage'
+  | 'downloadAvailable';
 
 interface DisplayLabel {
   notificationType: NotificationType;
@@ -65,6 +69,7 @@ interface DisplayLabel {
   creditNumber?: string;
   paymentId?: string;
   paymentNumber?: string;
+  url?: string;
 }
 
 export interface Notification {
@@ -75,10 +80,46 @@ export interface Notification {
   readAt: string | null;
 }
 
-export const notificationsAtom = atomWithStorage<Notification[]>(
-  'notifications',
-  []
-);
+const MAX_NOTIFICATIONS = 100;
+
+export const notificationsAtom = atom<Notification[]>([]);
+
+function getNotificationIdentity(notification: Notification) {
+  const { displayLabel } = notification;
+
+  switch (displayLabel.notificationType) {
+    case 'invoiceWasPaid':
+    case 'invoiceWasViewed':
+      return `${displayLabel.notificationType}:${displayLabel.invoiceId}`;
+    case 'creditWasCreated':
+    case 'creditWasUpdated':
+      return `${displayLabel.notificationType}:${displayLabel.creditId}`;
+    case 'paymentWasUpdated':
+      return `${displayLabel.notificationType}:${displayLabel.paymentId}`;
+    case 'genericMessage':
+      return `${displayLabel.notificationType}:${notification.link ?? ''}:${displayLabel.message ?? ''}`;
+    case 'downloadAvailable':
+      return `${displayLabel.notificationType}:${displayLabel.url ?? ''}`;
+  }
+}
+
+export function appendNotification(
+  notifications: Notification[],
+  notification: Notification
+) {
+  const identity = getNotificationIdentity(notification);
+
+  if (
+    notifications.some(
+      (currentNotification) =>
+        getNotificationIdentity(currentNotification) === identity
+    )
+  ) {
+    return notifications;
+  }
+
+  return [...notifications, notification].slice(-MAX_NOTIFICATIONS);
+}
 
 export function Notifications() {
   const [t] = useTranslation();
@@ -96,6 +137,14 @@ export function Notifications() {
   const companyUser = useCurrentCompanyUser();
   const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  useEffect(() => {
+    try {
+      localStorage.removeItem('notifications');
+    } catch {
+      // Notifications are transient, so legacy storage cleanup is best-effort.
+    }
+  }, []);
 
   const generateDisplayLabel = (currentDisplayLabel: DisplayLabel) => {
     if (currentDisplayLabel.notificationType === 'invoiceWasPaid') {
@@ -205,6 +254,22 @@ export function Notifications() {
       );
     }
 
+    if (currentDisplayLabel.notificationType === 'downloadAvailable') {
+      return (
+        <div className="flex flex-wrap items-center gap-x-1">
+          <span>{currentDisplayLabel.message}</span>
+
+          <Link
+            to={currentDisplayLabel.url as string}
+            external
+            withoutExternalIcon
+          >
+            {t('download')}
+          </Link>
+        </div>
+      );
+    }
+
     return currentDisplayLabel.message;
   };
 
@@ -264,6 +329,17 @@ export function Notifications() {
       );
     }
 
+    if (notificationType === 'downloadAvailable') {
+      return (
+        <div
+          className="p-2 rounded-full"
+          style={{ backgroundColor: colors.$15 }}
+        >
+          <Icon className="w-5 h-5" element={Download} color={colors.$16} />
+        </div>
+      );
+    }
+
     return null;
   };
 
@@ -290,8 +366,11 @@ export function Notifications() {
       'App\\Events\\Credit\\CreditWasCreated',
       'App\\Events\\Credit\\CreditWasUpdated',
       'App\\Events\\Payment\\PaymentWasUpdated',
+      'App\\Events\\Socket\\DownloadAvailable',
     ],
     callback: ({ event, data }) => {
+      logSocketDebug(`notification received: ${event}`, data);
+
       if (event === 'App\\Events\\Invoice\\InvoiceWasPaid') {
         const $invoice = data as Invoice;
 
@@ -310,21 +389,12 @@ export function Notifications() {
         };
 
         if (
-          notifications.some((n) => n.label === notification.label) ||
-          notifications.some((n) => n.link === notification.link)
-        ) {
-          return;
-        }
-
-        if (
           socketId()?.toString() !==
           (data as WithSocketId<Invoice>)['x-socket-id']
         ) {
-          queryClient.invalidateQueries([
-            '/api/v1/invoices',
-            'detail',
-            $invoice.id,
-          ]);
+          queryClient.invalidateQueries({
+            queryKey: ['/api/v1/invoices', 'detail', $invoice.id],
+          });
 
           queryClient.invalidateQueries({
             predicate: (query) => {
@@ -337,7 +407,9 @@ export function Notifications() {
           });
         }
 
-        setNotifications((notifications) => [...notifications, notification]);
+        setNotifications((notifications) =>
+          appendNotification(notifications, notification)
+        );
       }
 
       if (event === 'App\\Events\\Invoice\\InvoiceWasViewed') {
@@ -368,20 +440,15 @@ export function Notifications() {
         };
 
         if (
-          notifications.some((n) => n.label === notification.label) ||
-          notifications.some((n) => n.link === notification.link)
-        ) {
-          return;
-        }
-
-        if (
           socketId()?.toString() !==
           (data as WithSocketId<Invoice>)['x-socket-id']
         ) {
           $refetch(['invoices']);
         }
 
-        setNotifications((notifications) => [...notifications, notification]);
+        setNotifications((notifications) =>
+          appendNotification(notifications, notification)
+        );
       }
 
       if (event === 'App\\Events\\Credit\\CreditWasCreated') {
@@ -404,14 +471,9 @@ export function Notifications() {
           readAt: null,
         };
 
-        if (
-          notifications.some((n) => n.label === notification.label) ||
-          notifications.some((n) => n.link === notification.link)
-        ) {
-          return;
-        }
-
-        setNotifications((notifications) => [...notifications, notification]);
+        setNotifications((notifications) =>
+          appendNotification(notifications, notification)
+        );
       }
 
       if (event === 'App\\Events\\Credit\\CreditWasUpdated') {
@@ -429,14 +491,9 @@ export function Notifications() {
           readAt: null,
         };
 
-        if (
-          notifications.some((n) => n.label === notification.label) ||
-          notifications.some((n) => n.link === notification.link)
-        ) {
-          return;
-        }
-
-        setNotifications((notifications) => [...notifications, notification]);
+        setNotifications((notifications) =>
+          appendNotification(notifications, notification)
+        );
       }
 
       if (event === 'App\\Events\\Payment\\PaymentWasUpdated') {
@@ -454,14 +511,29 @@ export function Notifications() {
           readAt: null,
         };
 
-        if (
-          notifications.some((n) => n.label === notification.label) ||
-          notifications.some((n) => n.link === notification.link)
-        ) {
-          return;
-        }
+        setNotifications((notifications) =>
+          appendNotification(notifications, notification)
+        );
+      }
 
-        setNotifications((notifications) => [...notifications, notification]);
+      if (event === 'App\\Events\\Socket\\DownloadAvailable') {
+        const download = data as DownloadAvailable;
+
+        const notification = {
+          label: download.message,
+          displayLabel: {
+            notificationType: 'downloadAvailable' as const,
+            message: download.message,
+            url: download.url,
+          },
+          date: dayjs().unix(),
+          link: download.url,
+          readAt: null,
+        };
+
+        setNotifications((notifications) =>
+          appendNotification(notifications, notification)
+        );
       }
     },
   });
@@ -474,33 +546,52 @@ export function Notifications() {
       return;
     }
 
-    if (sockets) {
-      const channelName = isHosted() ? 'general_hosted' : 'general_selfhosted';
+    if (!sockets) {
+      return;
+    }
+
+    return subscribeWhenConnected(sockets, () => {
+      const channelName = buildGeneralChannelName(isHosted());
+
+      logSocketDebug(`subscribing to ${channelName}`, {
+        connectionState: sockets.connection.state,
+        socketId: sockets.connection.socket_id,
+      });
+
       const channel = sockets.subscribe(channelName);
+      const unbindChannelLogging = bindChannelLogging(channel);
 
-      channel.bind(
-        'App\\Events\\General\\GenericMessage',
-        (message: GenericMessage) => {
-          const notification = {
-            label: message.message,
-            displayLabel: {
-              notificationType: 'genericMessage' as const,
-              message: message.message,
-            },
-            date: dayjs().unix(),
-            link: message.link,
-            readAt: null,
-          };
+      const onGenericMessage = (message: GenericMessage) => {
+        logSocketDebug(
+          'notification received: App\\Events\\General\\GenericMessage',
+          message
+        );
 
-          setNotifications((notifications) => [...notifications, notification]);
-        }
-      );
+        const notification = {
+          label: message.message,
+          displayLabel: {
+            notificationType: 'genericMessage' as const,
+            message: message.message,
+          },
+          date: dayjs().unix(),
+          link: message.link,
+          readAt: null,
+        };
+
+        setNotifications((notifications) =>
+          appendNotification(notifications, notification)
+        );
+      };
+
+      channel.bind('App\\Events\\General\\GenericMessage', onGenericMessage);
 
       return () => {
-        channel.unbind('App\\Events\\General\\GenericMessage');
+        unbindChannelLogging();
+        channel.unbind('App\\Events\\General\\GenericMessage', onGenericMessage);
+        sockets.unsubscribe(channel.name);
       };
-    }
-  }, [sockets, reactSettings.preferences.enable_public_notifications]);
+    });
+  }, [sockets, reactSettings.preferences.enable_public_notifications, setNotifications]);
 
   if (
     isSelfHosted() &&

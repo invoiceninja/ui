@@ -53,6 +53,7 @@ import {
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -74,6 +75,7 @@ export function useAllProductColumns() {
     'quantity',
     'archived_at',
     // 'assigned_to', @Todo: Relationship not included.
+    'cost',
     'created_at',
     // 'created_by', @Todo: Relationship not included.
     firstCustom,
@@ -92,6 +94,7 @@ export function useAllProductColumns() {
     'tax_rate2',
     'tax_rate3',
     'updated_at',
+    'tags',
   ] as const;
 
   return productColumns.map((column) => normalizeColumnName(column));
@@ -182,6 +185,17 @@ export function useProductColumns() {
       id: 'archived_at',
       label: t('archived_at'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'cost',
+      id: 'cost',
+      label: t('cost'),
+      format: (value, product) =>
+        formatMoney(
+          value,
+          product.company?.settings.country_id,
+          product.company?.settings.currency_id
+        ),
     },
     {
       column: 'created_at',
@@ -279,6 +293,12 @@ export function useProductColumns() {
       id: 'updated_at',
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'tags',
+      id: 'product_tag_ids',
+      label: t('tags'),
+      format: (value, product) => <TagPills tags={product.tags} />,
     },
   ];
 

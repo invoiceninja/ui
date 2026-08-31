@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { useQueryClient } from 'react-query';
-import { toast } from '$app/common/helpers/toast/toast';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Invoice } from '$app/common/interfaces/invoice';
 
 export function useMarkSent() {
   const queryClient = useQueryClient();
@@ -35,7 +35,9 @@ export function useMarkSent() {
       $refetch(['invoices']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
     });
   };
 }

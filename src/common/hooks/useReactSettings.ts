@@ -8,33 +8,33 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { RootState } from '$app/common/stores/store';
 import { atom, getDefaultStore, useAtomValue, useSetAtom } from 'jotai';
 import { selectAtom } from 'jotai/utils';
 import {
   cloneDeep,
+  isEqual,
   get as lodashGet,
   has as lodashHas,
-  isEqual,
-  mergeWith,
   set as lodashSet,
   unset as lodashUnset,
+  mergeWith,
 } from 'lodash';
 import { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { endpoint } from '../helpers';
-import { request } from '../helpers/request';
-import type { User } from '../interfaces/user';
-import { Record as ClientMapRecord } from '../constants/exports/client-map';
+import { RootState } from '$app/common/stores/store';
 import { Entity } from '$app/components/CommonActionsPreferenceModal';
 import { PerPage } from '$app/components/DataTable';
-import { ThemeColorField } from '$app/pages/settings/user/components/StatusColorTheme';
 import { ClientShowCard } from '$app/pages/clients/show/components/CardsCustomizationModal';
-import { useCurrentUser } from './useCurrentUser';
+import { ThemeColorField } from '$app/pages/settings/user/components/StatusColorTheme';
+import { Record as ClientMapRecord } from '../constants/exports/client-map';
 import {
   KeyboardShortcutOverride,
   resolveShortcutBindings,
 } from '../constants/keyboard-shortcuts';
+import { endpoint } from '../helpers';
+import { request } from '../helpers/request';
+import type { User } from '../interfaces/user';
+import { useCurrentUser } from './useCurrentUser';
 
 export type { KeyboardShortcutOverride };
 export { resolveShortcutBindings };
@@ -95,6 +95,7 @@ export interface ReactSettings {
   show_document_preview?: boolean;
   preferences: Preferences;
   table_filters?: Record<string, TableFiltersPreference>;
+  persist_table_filters?: boolean;
   common_actions?: Record<Entity, string[]>;
   show_mini_sidebar?: boolean;
   import_templates?: ImportTemplates;
@@ -160,6 +161,7 @@ function withDefaults(settings: ReactSettings | null): ReactSettings {
   const base: ReactSettings = {
     show_pdf_preview: true,
     react_notification_link: true,
+    persist_table_filters: true,
     react_table_columns: {} as Record<ReactTableColumns, string[]>,
     preferences: cloneDeep(preferencesDefaults),
   };

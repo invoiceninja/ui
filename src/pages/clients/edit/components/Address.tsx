@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { Client } from '$app/common/interfaces/client';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Card } from '$app/components/cards';
 import { TabGroup } from '$app/components/TabGroup';
 import { BillingAddress } from './address/BillingAddress';
 import { ShippingAddress } from './address/ShippingAddress';
-import { Client } from '$app/common/interfaces/client';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Dispatch, SetStateAction } from 'react';
-import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   client: Client | undefined;

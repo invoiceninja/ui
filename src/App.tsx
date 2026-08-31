@@ -8,48 +8,48 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
+import dayjs from 'dayjs';
+import { atom, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { routes } from './common/routes';
-import { RootState } from './common/stores/store';
-import dayjs from 'dayjs';
-import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
-import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
-import { atom, useSetAtom } from 'jotai';
-import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
-import { dayJSLocaleAtom } from './components/forms';
-import { antdLocaleAtom } from './components/DropdownDateRangePicker';
-import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
+import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
+import { darkColorScheme, lightColorScheme } from './common/colors';
+import { toast } from './common/helpers/toast/toast';
 import {
   useAdmin,
   useHasPermission,
 } from './common/hooks/permissions/useHasPermission';
-import { darkColorScheme, lightColorScheme } from './common/colors';
-import { useCurrentUser } from './common/hooks/useCurrentUser';
-import { $refetch, useRefetch } from './common/hooks/useRefetch';
-import { toast } from './common/helpers/toast/toast';
-import { PreventNavigationModal } from './components/PreventNavigationModal';
 import { useAddPreventNavigationEvents } from './common/hooks/useAddPreventNavigationEvents';
-import { useSockets } from './common/hooks/useSockets';
-import {
-  usePrivateSocketEvents,
-  useSocketEvent,
-} from './common/queries/sockets';
-import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
-import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
-import { useSystemFonts } from './common/hooks/useSystemFonts';
+import { useCompanyTranslations } from './common/hooks/useCompanyTranslations';
+import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
+import { useCurrentUser } from './common/hooks/useCurrentUser';
+import { useKeyboardShortcuts } from './common/hooks/useKeyboardShortcuts';
 import {
   useFetchReactSettings,
   useReactSettings,
 } from './common/hooks/useReactSettings';
-import { useKeyboardShortcuts } from './common/hooks/useKeyboardShortcuts';
-import { useCompanyTranslations } from './common/hooks/useCompanyTranslations';
+import { $refetch, useRefetch } from './common/hooks/useRefetch';
+import { useRequiresUserDetails } from './common/hooks/useRequiresUserDetails';
+import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
+import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
+import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
+import { useSystemFonts } from './common/hooks/useSystemFonts';
+import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
+import {
+  usePrivateSocketEvents,
+  useSocketEvent,
+} from './common/queries/sockets';
+import { routes } from './common/routes';
+import { RootState } from './common/stores/store';
+import { antdLocaleAtom } from './components/DropdownDateRangePicker';
+import { PreventNavigationModal } from './components/PreventNavigationModal';
+import { UserDetailsModal } from './components/UserDetailsModal';
+import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
 
 interface RefreshEntityData {
   entity: 'invoices' | 'recurring_invoices';
@@ -91,6 +91,7 @@ export function App() {
   const resolveAntdLocale = useResolveAntdLocale();
   const resolveDayJSLocale = useResolveDayJSLocale();
   const switchToCompanySettings = useSwitchToCompanySettings();
+  const requiresUserDetails = useRequiresUserDetails();
 
   useFetchReactSettings();
 
@@ -99,13 +100,17 @@ export function App() {
   const setRefreshEntityDataBanner = useSetAtom(refreshEntityDataBannerAtom);
 
   const updateAntdLocale = useSetAtom(antdLocaleAtom);
-  const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
 
   const { isCompanySettingsActive, isGroupSettingsActive } =
     useCurrentSettingsLevel();
 
   const [isCompanyEditModalOpened, setIsCompanyEditModalOpened] =
     useState(false);
+  const [isUserDetailsModalDismissed, setIsUserDetailsModalDismissed] =
+    useState(false);
+
+  const isUserDetailsModalVisible =
+    requiresUserDetails && !isUserDetailsModalDismissed;
 
   const resolvedLanguage = company
     ? resolveLanguage(
@@ -145,7 +150,6 @@ export function App() {
   useEffect(() => {
     if (resolvedLanguage?.locale) {
       resolveDayJSLocale(resolvedLanguage.locale).then((resolvedLocale) => {
-        updateDayJSLocale(resolvedLocale);
         dayjs.locale(resolvedLocale);
       });
 
@@ -197,13 +201,14 @@ export function App() {
 
     if (
       company &&
+      !isUserDetailsModalVisible &&
       (!companyName || companyName === t('untitled_company')) &&
       localStorage.getItem('COMPANY-EDIT-OPENED') !== 'true'
     ) {
       localStorage.setItem('COMPANY-EDIT-OPENED', 'true');
       setIsCompanyEditModalOpened(true);
     }
-  }, [company]);
+  }, [company, isUserDetailsModalVisible]);
 
   useEffect(() => {
     if (
@@ -232,34 +237,12 @@ export function App() {
     }
   }, [location, user]);
 
-  const sockets = useSockets();
-
   usePrivateSocketEvents();
-
-  useEffect(() => {
-    if (company && sockets) {
-      sockets.connection.bind('disconnected', () => {
-        console.log('Disconnected from Pusher');
-      });
-
-      sockets.connection.bind('error', () => {
-        console.error('Error from Pusher');
-      });
-
-      sockets.connect();
-    }
-
-    return () => {
-      if (sockets && company) {
-        sockets.disconnect();
-      }
-    };
-  }, [company?.company_key]);
 
   useSystemFonts();
 
   useSocketEvent({
-    on: 'App\\Events\\Socket\\RefreshEntity',
+    on: 'App\\Events\\Socket\\RefetchEntity',
     callback: ({ data }) => {
       const currentData = data as RefreshEntityData;
 
@@ -281,6 +264,11 @@ export function App() {
         <Toaster position="top-center" />
         {routes}
       </div>
+
+      <UserDetailsModal
+        visible={isUserDetailsModalVisible}
+        onClose={() => setIsUserDetailsModalDismissed(true)}
+      />
 
       <CompanyEdit
         isModalOpen={isCompanyEditModalOpened && isOwner}

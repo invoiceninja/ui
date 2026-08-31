@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
-import { Field } from '$app/pages/settings/custom-fields/components';
-import { useTranslation } from 'react-i18next';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { Field } from '$app/pages/settings/custom-fields/components';
 
 export function CustomFields() {
   const [t] = useTranslation();

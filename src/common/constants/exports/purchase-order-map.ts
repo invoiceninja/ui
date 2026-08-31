@@ -68,10 +68,26 @@ export const purchaseorderMap: Record[] = [
     value: 'purchase_order.partial_due_date',
     map: 'purchase_order',
   },
-  // { trans: 'custom_value1', value: "purchase_order.custom_value1", map: 'purchase_order' },
-  // { trans: 'custom_value2', value: "purchase_order.custom_value2", map: 'purchase_order' },
-  // { trans: 'custom_value3', value: "purchase_order.custom_value3", map: 'purchase_order' },
-  // { trans: 'custom_value4', value: "purchase_order.custom_value4", map: 'purchase_order' },
+  {
+    trans: 'custom_value1',
+    value: 'purchase_order.custom_value1',
+    map: 'purchase_order',
+  },
+  {
+    trans: 'custom_value2',
+    value: 'purchase_order.custom_value2',
+    map: 'purchase_order',
+  },
+  {
+    trans: 'custom_value3',
+    value: 'purchase_order.custom_value3',
+    map: 'purchase_order',
+  },
+  {
+    trans: 'custom_value4',
+    value: 'purchase_order.custom_value4',
+    map: 'purchase_order',
+  },
   {
     trans: 'surcharge1',
     value: 'purchase_order.custom_surcharge1',
@@ -143,4 +159,5 @@ export const purchaseorderMap: Record[] = [
     value: 'purchase_order.subtotal',
     map: 'purchase_order',
   },
+  { trans: 'tags', value: 'purchase_order.tags', map: 'purchase_order' },
 ];

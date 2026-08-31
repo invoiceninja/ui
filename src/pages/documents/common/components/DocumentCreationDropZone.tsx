@@ -8,6 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import {
+  getPasswordForPdf,
+  isPdfPasswordProtected,
+} from '@docuninja/builder2.0';
+import { useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -18,17 +27,8 @@ import { Document } from '$app/common/interfaces/docuninja/api';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ErrorMessage } from '$app/components/ErrorMessage';
-import { getDocumentNameFromFile } from '../helpers';
 import { CloudUpload } from '$app/components/icons/CloudUpload';
-import {
-  getPasswordForPdf,
-  isPdfPasswordProtected,
-} from '@docuninja/builder2.0';
-import { useState } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import { getDocumentNameFromFile } from '../helpers';
 
 const Box = styled.div`
   border-color: ${(props) => props.theme.borderColor};

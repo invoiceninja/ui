@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import Toggle from '$app/components/forms/Toggle';
+import { get } from 'lodash';
+import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Element } from '../../../../components/cards';
+import { useColorScheme } from '$app/common/colors';
 import {
   preferencesDefaults,
   useDraftOrCommittedReactSettings,
   useUpdateDraftOrReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { get } from 'lodash';
-import { ReactNode } from 'react';
-import { StatusColorTheme } from './StatusColorTheme';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { useColorScheme } from '$app/common/colors';
 import { Divider } from '$app/components/cards/Divider';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import Toggle from '$app/components/forms/Toggle';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
+import { Element } from '../../../../components/cards';
+import { StatusColorTheme } from './StatusColorTheme';
 
 export function Preferences() {
   const [t] = useTranslation();
@@ -115,6 +115,21 @@ export function Preferences() {
           checked={Boolean(reactSettings?.show_table_footer)}
           onValueChange={(value) =>
             handleChange('company_user.react_settings.show_table_footer', value)
+          }
+        />
+      </Element>
+
+      <Element
+        leftSide={t('persist_table_filters')}
+        leftSideHelp={t('persist_table_filters_help')}
+      >
+        <Toggle
+          checked={reactSettings?.persist_table_filters !== false}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.persist_table_filters',
+              value
+            )
           }
         />
       </Element>

@@ -43,6 +43,7 @@ import CardsCustomizationModal, {
   ClientShowCard,
 } from './components/CardsCustomizationModal';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useRecordFiltersScope } from '$app/common/hooks/useScopedTableFilters';
 import { useShouldDisplayClientGatewaysAndAutoBill } from './hooks/useShouldDisplayClientGatewaysAndAutoBill';
 
 export default function Client() {
@@ -59,6 +60,8 @@ export default function Client() {
   });
 
   const reactSettings = useReactSettings();
+
+  useRecordFiltersScope(id);
 
   const pages: Page[] = [
     { name: t('clients'), href: '/clients' },

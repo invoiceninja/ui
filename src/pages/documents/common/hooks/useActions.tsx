@@ -8,13 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { EntityState } from '$app/common/enums/entity-state';
-import { getEntityState } from '$app/common/helpers';
-import { Document, DocumentStatus } from '$app/common/interfaces/docuninja/api';
-import { Divider } from '$app/components/cards/Divider';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
-import { Action } from '$app/components/ResourceActions';
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import {
   MdDownload,
@@ -22,22 +16,26 @@ import {
   MdSettings,
   MdTimer,
 } from 'react-icons/md';
-
-import { docuNinjaEndpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useAtomValue } from 'jotai';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
-import { DeleteDocumentAction } from '../../show/components/DeleteDocumentAction';
+import { EntityState } from '$app/common/enums/entity-state';
+import { docuNinjaEndpoint, getEntityState } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { Document, DocumentStatus } from '$app/common/interfaces/docuninja/api';
+import { Divider } from '$app/components/cards/Divider';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
 import { ArchiveDocumentAction } from '../../show/components/ArchiveDocumentAction';
+import { DeleteDocumentAction } from '../../show/components/DeleteDocumentAction';
 import { RestoreDocumentAction } from '../../show/components/RestoreDocumentAction';
 import { SendInvitationsModal } from '../../show/components/SendInvitationsModal';
-import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { route } from '$app/common/helpers/route';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { VoidAction } from '../components/VoidAction';
 import { CloneAction } from '../components/CloneAction';
 import { MakeTemplateAction } from '../components/MakeTemplateAction';
+import { VoidAction } from '../components/VoidAction';
 
 interface Params {
   onSettingsClick?: (doc: Document) => void;

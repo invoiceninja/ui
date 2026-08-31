@@ -1,15 +1,16 @@
+import Editor from '@monaco-editor/react';
+import grapesjs from 'grapesjs';
+import * as beautify from 'js-beautify';
+import * as monaco from 'monaco-editor';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '$app/components/forms';
 import { useColorScheme } from '$app/common/colors';
-import Editor from '@monaco-editor/react';
-import * as monaco from 'monaco-editor';
-import * as beautify from 'js-beautify';
-import grapesjs from 'grapesjs';
+import { Button } from '$app/components/forms';
 import 'grapesjs/dist/css/grapes.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import './grapejs-styles.css';
 import { grapejsConfig } from './grapejs-config';
+
 interface GrapeJSEditorProps {
   initialHtml: string;
   onSave: (html: string, projectData: string) => void;

@@ -15,7 +15,7 @@ export const quoteMap: Record[] = [
   { trans: 'amount', value: 'quote.amount', map: 'quote' },
   { trans: 'balance', value: 'quote.balance', map: 'quote' },
   { trans: 'paid_to_date', value: 'quote.paid_to_date', map: 'quote' },
-  { trans: 'discount', value: 'invoice.discount', map: 'quote' },
+  { trans: 'discount', value: 'quote.discount', map: 'quote' },
   { trans: 'po_number', value: 'quote.po_number', map: 'quote' },
   { trans: 'date', value: 'quote.date', map: 'quote' },
   { trans: 'due_date', value: 'quote.due_date', map: 'quote' },
@@ -55,4 +55,5 @@ export const quoteMap: Record[] = [
   { trans: 'tax_name3', value: 'quote.tax_name3', map: 'quote' },
   { trans: 'tax_rate3', value: 'quote.tax_rate3', map: 'quote' },
   { trans: 'subtotal', value: 'quote.subtotal', map: 'quote' },
+  { trans: 'tags', value: 'quote.tags', map: 'quote' },
 ];

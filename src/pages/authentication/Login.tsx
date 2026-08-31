@@ -8,35 +8,35 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useMemo, useState } from 'react';
-import { endpoint, isHosted, isSelfHosted } from '../../common/helpers';
 import { AxiosError } from 'axios';
-import { LoginValidation } from './common/ValidationInterface';
-import { useTranslation } from 'react-i18next';
-import { InputField } from '../../components/forms/InputField';
-import { Button } from '../../components/forms/Button';
-import { Link } from '../../components/forms/Link';
-import { InputLabel } from '../../components/forms/InputLabel';
-import { HostedLinks } from './components/HostedLinks';
-import { Header } from './components/Header';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { request } from '$app/common/helpers/request';
-import { SignInProviders } from './components/SignInProviders';
-import { LoginMethod, useLogin, useLoginPrecheck } from './common/hooks';
-import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { Disable2faModal } from './components/Disable2faModal';
-import { useColorScheme } from '$app/common/colors';
-import { version } from '$app/common/helpers/version';
-import { toast } from '$app/common/helpers/toast/toast';
 import classNames from 'classnames';
-import { ErrorMessage } from '$app/components/ErrorMessage';
-import { useWebAuthnSupport } from '$app/common/hooks/useWebAuthnSupport';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import {
   authenticatePasskey,
   PublicKeyCredentialRequestOptionsJSON,
 } from '$app/common/helpers/passkeys';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { version } from '$app/common/helpers/version';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { useWebAuthnSupport } from '$app/common/hooks/useWebAuthnSupport';
+import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
+import { ErrorMessage } from '$app/components/ErrorMessage';
+import { endpoint, isHosted, isSelfHosted } from '../../common/helpers';
+import { Button } from '../../components/forms/Button';
+import { InputField } from '../../components/forms/InputField';
+import { InputLabel } from '../../components/forms/InputLabel';
+import { Link } from '../../components/forms/Link';
+import { LoginMethod, useLogin, useLoginPrecheck } from './common/hooks';
+import { LoginValidation } from './common/ValidationInterface';
+import { Disable2faModal } from './components/Disable2faModal';
+import { Header } from './components/Header';
+import { HostedLinks } from './components/HostedLinks';
 import { OrDivider } from './components/OrDivider';
+import { SignInProviders } from './components/SignInProviders';
 
 type Step = 'email' | 'credentials';
 
@@ -53,6 +53,7 @@ export function Login() {
 
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState<string>('');
+  const [confirmedEmail, setConfirmedEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [oneTimePassword, setOneTimePassword] = useState<string>('');
   const [methods, setMethods] = useState<LoginMethod[]>([]);
@@ -96,6 +97,7 @@ export function Login() {
       .then((response) => {
         setMethods(response.methods ?? []);
         setSecretRequired(response.secret_required ?? false);
+        setConfirmedEmail(email);
         setStep('credentials');
       })
       .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
@@ -148,7 +150,7 @@ export function Login() {
   };
 
   const handlePasskeyLogin = async () => {
-    if (!email) {
+    if (!confirmedEmail) {
       setErrors({ email: [t('provide_email') as string] });
       return;
     }
@@ -161,7 +163,7 @@ export function Login() {
       const optionsResponse = await request(
         'POST',
         endpoint('/api/v1/passkeys/login/options'),
-        { email }
+        { email: confirmedEmail }
       );
 
       const publicKey = optionsResponse.data.data
@@ -176,7 +178,7 @@ export function Login() {
       const assertion = await authenticatePasskey(publicKey);
 
       const response = await request('POST', endpoint('/api/v1/login'), {
-        email,
+        email: confirmedEmail,
         passkey_challenge_token: challengeToken,
         passkey_authentication: {
           id: assertion.id,
@@ -223,6 +225,7 @@ export function Login() {
     setOneTimePassword('');
     setMethods([]);
     setSecretRequired(false);
+    setConfirmedEmail('');
     setStep('email');
   };
 
@@ -251,7 +254,7 @@ export function Login() {
             }}
             className="my-6 space-y-4"
           >
-            <div className={classNames({ hidden: !isEmailStep })}>
+            {isEmailStep && (
               <InputField
                 type="email"
                 autoComplete="username"
@@ -262,10 +265,18 @@ export function Login() {
                 onValueChange={(value) => setEmail(value)}
                 changeOverride
               />
-            </div>
+            )}
 
             {!isEmailStep && (
               <>
+                <input
+                  type="hidden"
+                  name="email"
+                  value={confirmedEmail}
+                  readOnly
+                  autoComplete="username"
+                />
+
                 <div
                   className="flex items-center justify-between rounded px-3 py-2 border"
                   style={{ borderColor: colors.$5 }}
@@ -274,7 +285,7 @@ export function Login() {
                     className="truncate text-sm"
                     style={{ color: colors.$3 }}
                   >
-                    {email}
+                    {confirmedEmail}
                   </span>
 
                   <div
@@ -303,6 +314,7 @@ export function Login() {
                     <InputField
                       type="password"
                       autoComplete="current-password"
+                      autoFocus
                       id="password"
                       errorMessage={errors?.password}
                       name="password"

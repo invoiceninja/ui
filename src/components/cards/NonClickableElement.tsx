@@ -9,9 +9,9 @@
  */
 
 import classNames from 'classnames';
-import CommonProps from '$app/common/interfaces/common-props.interface';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import CommonProps from '$app/common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   className?: string;

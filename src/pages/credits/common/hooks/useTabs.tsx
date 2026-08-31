@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -16,8 +18,6 @@ import { Credit } from '$app/common/interfaces/credit';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Tab } from '$app/components/Tabs';
 import { ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 
 interface Params {
   credit: Credit | undefined;
@@ -56,13 +56,13 @@ export function useTabs({ credit, eInvoiceValidationResponse }: Params) {
           {Boolean(
             eInvoiceValidationResponse?.client.length ||
               eInvoiceValidationResponse?.company.length ||
-              eInvoiceValidationResponse?.invoice.length
+              eInvoiceValidationResponse?.credit.length
           ) && (
             <span className="font-bold">
               (
               {(eInvoiceValidationResponse?.client.length || 0) +
                 (eInvoiceValidationResponse?.company.length || 0) +
-                (eInvoiceValidationResponse?.invoice.length || 0)}
+                (eInvoiceValidationResponse?.credit.length || 0)}
               )
             </span>
           )}

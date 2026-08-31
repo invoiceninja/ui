@@ -1,17 +1,20 @@
-import { login, logout, permissions } from '$tests/e2e/helpers';
+import { login } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
+import { createApiContext, setPermissions } from './api-helpers';
 
 resetAccountBeforeAll();
 
+test.beforeAll(async ({ account }) => {
+  const api = await createApiContext(
+    account.apiUrl,
+    account.ownerEmail,
+    account.password
+  );
+
+  await setPermissions(api, 'permissions@example.com', ['create_all']);
+});
+
 test.beforeEach(async ({ page }) => {
-  const { clear, save, set } = permissions(page);
-
-  await login(page);
-  await clear();
-  await set('create_all');
-  await save();
-  await logout(page);
-
   await login(page, 'permissions@example.com', 'password');
 });
 

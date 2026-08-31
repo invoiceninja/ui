@@ -197,7 +197,7 @@ export function ProductSlider() {
 
   return (
     <Slider
-      size="regular"
+      size="large"
       visible={isVisible}
       onClose={() => {
         setIsSliderVisible(false);

@@ -8,11 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date, endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Document } from '$app/common/interfaces/document.interface';
+import { useQueryClient } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
 import prettyBytes from 'pretty-bytes';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,22 +20,25 @@ import {
   MdOutlineLockOpen,
   MdPageview,
 } from 'react-icons/md';
+import { useColorScheme } from '$app/common/colors';
+import { date, endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { Document } from '$app/common/interfaces/document.interface';
+import { defaultHeaders } from '$app/common/queries/common/headers';
+import { useSetDocumentVisibility } from '$app/common/queries/documents';
 import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
 import { FileIcon } from './FileIcon';
 import { Icon } from './icons/Icon';
-import { PasswordConfirmation } from './PasswordConfirmation';
-import { Table, Tbody, Td, Th, Thead, Tr } from './tables';
-import { defaultHeaders } from '$app/common/queries/common/headers';
-import { useQueryClient } from 'react-query';
-import { Spinner } from './Spinner';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { AxiosResponse } from 'axios';
-import { useSetDocumentVisibility } from '$app/common/queries/documents';
-import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
-import { useColorScheme } from '$app/common/colors';
-import { LockOpen } from './icons/LockOpen';
 import { Lock } from './icons/Lock';
+import { LockOpen } from './icons/LockOpen';
+import { PasswordConfirmation } from './PasswordConfirmation';
+import { Spinner } from './Spinner';
+import { Table, Tbody, Td, Th, Thead, Tr } from './tables';
 
 interface Props {
   documents: Document[];
@@ -81,17 +81,19 @@ export function DocumentsTable(props: Props) {
     toast.processing();
 
     queryClient
-      .fetchQuery(
-        ['/api/v1/documents', doc.hash],
-        () =>
+      .fetchQuery({
+        queryKey: ['/api/v1/documents', doc.hash],
+
+        queryFn: () =>
           request(
             'GET',
             endpoint('/documents/:hash', { hash: doc.hash }),
             { headers: defaultHeaders() },
             { responseType: 'arraybuffer' }
           ),
-        { staleTime: Infinity }
-      )
+
+        staleTime: Infinity,
+      })
       .then((response) => {
         const blob = new Blob([response.data], {
           type: response.headers['content-type'],
@@ -148,17 +150,19 @@ export function DocumentsTable(props: Props) {
         );
 
         if (!alreadyExist && (type === 'png' || type === 'jpg')) {
-          const response: AxiosResponse = await queryClient.fetchQuery(
-            ['documents', hash],
-            () =>
+          const response: AxiosResponse = await queryClient.fetchQuery({
+            queryKey: ['documents', hash],
+
+            queryFn: () =>
               request(
                 'GET',
                 endpoint('/documents/:hash', { hash }),
                 { headers: defaultHeaders() },
                 { responseType: 'arraybuffer' }
               ),
-            { staleTime: Infinity }
-          );
+
+            staleTime: Infinity,
+          });
 
           const blob = new Blob([response.data], {
             type: response.headers['content-type'],

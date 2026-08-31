@@ -8,37 +8,37 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
-import { Payment as PaymentEntity } from '$app/common/interfaces/payment';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { usePaymentQuery } from '$app/common/queries/payments';
-import { Page } from '$app/components/Breadcrumbs';
-import { Container } from '$app/components/Container';
-import { Default } from '$app/components/layouts/Default';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { Tabs } from '$app/components/Tabs';
+import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
-import { useActions } from './common/hooks/useActions';
-import { useSave } from './edit/hooks/useSave';
-import { useTabs } from './edit/hooks/useTabs';
+import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import {
-  ChangeTemplateModal,
-  useChangeTemplate,
-} from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { Banner } from '$app/components/Banner';
+import { Payment as PaymentEntity } from '$app/common/interfaces/payment';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { usePaymentQuery } from '$app/common/queries/payments';
 import {
   socketId,
   useSocketEvent,
   WithSocketId,
 } from '$app/common/queries/sockets';
-import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { Banner } from '$app/components/Banner';
+import { Page } from '$app/components/Breadcrumbs';
+import { Container } from '$app/components/Container';
 import { InputLabel } from '$app/components/forms';
-import { useAtomValue } from 'jotai';
+import { Default } from '$app/components/layouts/Default';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Tabs } from '$app/components/Tabs';
+import {
+  ChangeTemplateModal,
+  useChangeTemplate,
+} from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { useActions } from './common/hooks/useActions';
 import { paymentPageSaveActionAtom } from './common/hooks/usePaymentPageSaveAction';
+import { useSave } from './edit/hooks/useSave';
+import { useTabs } from './edit/hooks/useTabs';
 
 export default function Payment() {
   const [t] = useTranslation();

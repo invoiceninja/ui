@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { toast } from '$app/common/helpers/toast/toast';
-import { request } from '$app/common/helpers/request';
-import { endpoint, isHosted } from '$app/common/helpers';
 import { Popover } from '@headlessui/react';
+import { useTranslation } from 'react-i18next';
+import { endpoint, isHosted } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 
 export const buttonStyles =
   'font-medium text-xs md:text-sm underline cursor-pointer';

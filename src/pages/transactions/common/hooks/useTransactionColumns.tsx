@@ -33,6 +33,7 @@ import {
 } from './useAllTransactionColumns';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import classNames from 'classnames';
+import { TagPills } from '$app/components/tags/TagPills';
 
 export function useTransactionColumns() {
   const { t } = useTranslation();
@@ -196,6 +197,12 @@ export function useTransactionColumns() {
           </div>
         );
       },
+    },
+    {
+      column: 'tags',
+      id: 'bank_transaction_tag_ids',
+      label: t('tags'),
+      format: (value, transaction) => <TagPills tags={transaction.tags} />,
     },
   ];
 

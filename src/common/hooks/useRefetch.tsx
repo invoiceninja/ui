@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const keys = {
   invoices: {
@@ -17,6 +17,8 @@ export const keys = {
       '/api/v1/clients',
       '/api/v1/charts/totals_v2',
       '/api/v1/charts/chart_summary_v2',
+      '/api/v1/charts/project_burnup',
+      '/api/v1/charts/project_analytics',
       '/api/v1/activities/entity',
       '/api/v1/activities',
       '/api/v1/documents',
@@ -65,6 +67,8 @@ export const keys = {
     dependencies: [
       '/api/v1/charts/totals_v2',
       '/api/v1/charts/chart_summary_v2',
+      '/api/v1/charts/project_burnup',
+      '/api/v1/charts/project_analytics',
       '/api/v1/documents',
     ],
   },
@@ -80,6 +84,8 @@ export const keys = {
       '/api/v1/clients',
       '/api/v1/charts/totals_v2',
       '/api/v1/charts/chart_summary_v2',
+      '/api/v1/charts/project_burnup',
+      '/api/v1/charts/project_analytics',
       '/api/v1/activities',
       '/api/v1/documents',
     ],
@@ -102,7 +108,12 @@ export const keys = {
   },
   tasks: {
     path: '/api/v1/tasks',
-    dependencies: ['/api/v1/projects', '/api/v1/documents'],
+    dependencies: [
+      '/api/v1/projects',
+      '/api/v1/documents',
+      '/api/v1/charts/project_burnup',
+      '/api/v1/charts/project_analytics',
+    ],
   },
   tax_rates: {
     path: '/api/v1/tax_rates',
@@ -143,6 +154,8 @@ export const keys = {
   users: {
     path: '/api/v1/users',
     dependencies: [
+      '/api/v1/users/docuninja-eligible',
+      '/api/users',
       '/api/v1/tasks',
       '/api/v1/invoices',
       '/api/v1/quotes',
@@ -154,6 +167,10 @@ export const keys = {
       '/api/v1/tasks',
       '/api/v1/users/docuninja-eligible',
     ],
+  },
+  docuninja_eligible_users: {
+    path: '/api/v1/users/docuninja-eligible',
+    dependencies: [],
   },
   company_users: {
     path: '/api/v1/company_users',
@@ -184,7 +201,12 @@ export const keys = {
   },
   projects: {
     path: '/api/v1/projects',
-    dependencies: ['/api/v1/tasks', '/api/v1/documents'],
+    dependencies: [
+      '/api/v1/tasks',
+      '/api/v1/documents',
+      '/api/v1/charts/project_burnup',
+      '/api/v1/charts/project_analytics',
+    ],
   },
   quotes: {
     path: '/api/v1/quotes',
@@ -279,10 +301,14 @@ export function useRefetch() {
         return;
       }
 
-      queryClient.invalidateQueries(keys[key].path);
+      queryClient.invalidateQueries({
+        queryKey: [keys[key].path],
+      });
 
       keys[key].dependencies.map((dependency) => {
-        queryClient.invalidateQueries(dependency);
+        queryClient.invalidateQueries({
+          queryKey: [dependency],
+        });
       });
     });
   };
@@ -299,13 +325,17 @@ export function $refetch(property: Array<RefetchKey>) {
 }
 
 export function getRefetchKeyByUrl(endpoint: string) {
-  const key = Object.keys(keys).find(
+  const matchingKeys = Object.keys(keys).filter(
     (key) =>
       keys[key as keyof typeof keys].path.startsWith(endpoint) ||
       endpoint.startsWith(keys[key as keyof typeof keys].path)
   );
 
-  return key;
+  return matchingKeys.sort(
+    (a, b) =>
+      keys[b as keyof typeof keys].path.length -
+      keys[a as keyof typeof keys].path.length
+  )[0];
 }
 
 /**
