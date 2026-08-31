@@ -53,6 +53,8 @@ import {
   DeleteDialog,
   ImportFromGoogleDrive,
   Loading,
+  PreviewRefresh,
+  PreviewToggle,
   RectangleSettingsButton,
   RectangleSettingsCheckbox,
   RectangleSettingsDialog,
@@ -576,6 +578,8 @@ function Builder() {
               toolboxContext: ToolboxContext,
               helper: () => null,
               alert: Alertbox,
+              previewToggle: PreviewToggle,
+              previewRefresh: PreviewRefresh,
               imports: {
                 googleDrive: ImportFromGoogleDrive,
               },
