@@ -10,11 +10,14 @@
 
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputLabel } from './InputLabel';
+import { ErrorMessage } from '../ErrorMessage';
 
 interface Props extends CommonProps {
   label?: string;
   placeholder?: string;
   rows?: number | undefined;
+  errorMessage?: string | string[];
+  disabled?: boolean;
 }
 
 export function Textarea(props: Props) {
@@ -33,9 +36,12 @@ export function Textarea(props: Props) {
         placeholder={props.placeholder}
         onChange={props.onChange}
         value={props.value}
+        disabled={props.disabled}
       >
         {props.children}
       </textarea>
+
+      <ErrorMessage className="mt-2">{props.errorMessage}</ErrorMessage>
     </section>
   );
 }
