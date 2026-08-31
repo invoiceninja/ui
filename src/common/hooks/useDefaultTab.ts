@@ -12,8 +12,14 @@ import { useCallback } from 'react';
 import { DEFAULT_TAB } from '../constants/default-tab';
 import { useReactSettings } from './useReactSettings';
 
-const DEFAULT_TAB_ROUTES =
-  /^\/(invoices|recurring_invoices|quotes)\/(create|[^/]+\/edit)$/;
+const DEFAULT_TAB_ENTITIES = ['/invoices/', '/recurring_invoices/', '/quotes/'];
+
+const isDefaultTabRoute = (path: string) => {
+  return (
+    DEFAULT_TAB_ENTITIES.some((entity) => path.startsWith(entity)) &&
+    (path.endsWith('/create') || path.endsWith('/edit'))
+  );
+};
 
 export const useDefaultTab = () => {
   const reactSettings = useReactSettings();
@@ -30,7 +36,7 @@ export const useDefaultTabUrl = () => {
 
       if (
         defaultTab === DEFAULT_TAB ||
-        !DEFAULT_TAB_ROUTES.test(path) ||
+        !isDefaultTabRoute(path) ||
         /(^|&)table=/.test(query)
       ) {
         return url;
