@@ -29,29 +29,30 @@ interface Props {
   onClick: () => void;
 }
 
-export function CheckMailer(props: Props) {
+export function CheckMailer({
+  mailer,
+  disabled,
+  isFormBusy,
+  missingFields,
+  secondsRemaining,
+  recipient,
+  result,
+  onClick,
+}: Props) {
   const [t] = useTranslation();
-
-  const {
-    mailer,
-    disabled,
-    isFormBusy,
-    missingFields,
-    secondsRemaining,
-    recipient,
-    result,
-    onClick,
-  } = props;
-
-  const missingFieldsLabel = missingFields.length
-    ? `${t('required_fields')}: ${missingFields
-        .map((field) => t(MAILER_CHECK_FIELD_LABELS[field]))
-        .join(', ')}`
-    : undefined;
 
   return (
     <>
-      <Element pushContentToRight leftSideHelp={missingFieldsLabel}>
+      <Element
+        pushContentToRight
+        leftSideHelp={
+          missingFields.length
+            ? `${t('required_fields')}: ${missingFields
+                .map((field) => t(MAILER_CHECK_FIELD_LABELS[field]))
+                .join(', ')}`
+            : undefined
+        }
+      >
         <Button
           behavior="button"
           onClick={onClick}
