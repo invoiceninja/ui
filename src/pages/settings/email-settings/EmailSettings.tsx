@@ -40,8 +40,10 @@ import {
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
+import { CheckMailer } from './common/components/CheckMailer';
 import { SendTimeModal } from './common/components/SendTimeModal';
 import { SMTPMailDriver } from './common/components/SMTPMailDriver';
+import { useCheckMailer } from './common/hooks/useCheckMailer';
 import { useEmailProviders } from './common/hooks/useEmailProviders';
 
 export function EmailSettings() {
@@ -70,6 +72,17 @@ export function EmailSettings() {
   const onSave = useHandleCompanySave();
   const disableSettingsField = useDisableSettingsField();
   const handleChange = useHandleCurrentCompanyChangeProperty();
+
+  const {
+    handleCheckMailer,
+    isFormBusy: isCheckFormBusy,
+    isAvailable: isCheckAvailable,
+    missingFields,
+    secondsRemaining,
+    errors: checkErrors,
+    result: checkResult,
+    recipient,
+  } = useCheckMailer();
 
   const handleOnSaveClick = () => {
     if (
@@ -208,7 +221,10 @@ export function EmailSettings() {
                 disableSettingsField('email_sending_method') ||
                 (!proPlan() && !enterprisePlan())
               }
-              errorMessage={errors?.errors['settings.email_sending_method']}
+              errorMessage={
+                errors?.errors['settings.email_sending_method'] ??
+                checkErrors?.errors.mailer
+              }
               customSelector
               dismissable={false}
             >
@@ -269,7 +285,10 @@ export function EmailSettings() {
                   handleChange('settings.postmark_secret', value)
                 }
                 disabled={disableSettingsField('postmark_secret')}
-                errorMessage={errors?.errors['settings.postmark_secret']}
+                errorMessage={
+                  errors?.errors['settings.postmark_secret'] ??
+                  checkErrors?.errors.postmark_secret
+                }
               />
             </Element>
           )}
@@ -290,7 +309,10 @@ export function EmailSettings() {
                     handleChange('settings.ses_secret_key', value)
                   }
                   disabled={disableSettingsField('ses_secret_key')}
-                  errorMessage={errors?.errors['settings.ses_secret_key']}
+                  errorMessage={
+                    errors?.errors['settings.ses_secret_key'] ??
+                    checkErrors?.errors.ses_secret_key
+                  }
                 />
               </Element>
 
@@ -308,7 +330,10 @@ export function EmailSettings() {
                     handleChange('settings.ses_access_key', value)
                   }
                   disabled={disableSettingsField('ses_access_key')}
-                  errorMessage={errors?.errors['settings.ses_access_key']}
+                  errorMessage={
+                    errors?.errors['settings.ses_access_key'] ??
+                    checkErrors?.errors.ses_access_key
+                  }
                 />
               </Element>
 
@@ -327,7 +352,10 @@ export function EmailSettings() {
                     handleChange('settings.ses_region', value)
                   }
                   disabled={disableSettingsField('ses_region')}
-                  errorMessage={errors?.errors['settings.ses_region']}
+                  errorMessage={
+                    errors?.errors['settings.ses_region'] ??
+                    checkErrors?.errors.ses_region
+                  }
                 />
               </Element>
 
@@ -348,7 +376,10 @@ export function EmailSettings() {
                     handleChange('settings.ses_from_address', value)
                   }
                   disabled={disableSettingsField('ses_from_address')}
-                  errorMessage={errors?.errors['settings.ses_from_address']}
+                  errorMessage={
+                    errors?.errors['settings.ses_from_address'] ??
+                    checkErrors?.errors.from_address
+                  }
                 />
               </Element>
 
@@ -367,7 +398,10 @@ export function EmailSettings() {
                     handleChange('settings.ses_topic_arn', value)
                   }
                   disabled={disableSettingsField('ses_topic_arn')}
-                  errorMessage={errors?.errors['settings.ses_topic_arn']}
+                  errorMessage={
+                    errors?.errors['settings.ses_topic_arn'] ??
+                    checkErrors?.errors.ses_topic_arn
+                  }
                 />
               </Element>
             </>
@@ -389,7 +423,10 @@ export function EmailSettings() {
                     handleChange('settings.mailgun_secret', value)
                   }
                   disabled={disableSettingsField('mailgun_secret')}
-                  errorMessage={errors?.errors['settings.mailgun_secret']}
+                  errorMessage={
+                    errors?.errors['settings.mailgun_secret'] ??
+                    checkErrors?.errors.mailgun_secret
+                  }
                 />
               </Element>
 
@@ -407,7 +444,10 @@ export function EmailSettings() {
                     handleChange('settings.mailgun_domain', value)
                   }
                   disabled={disableSettingsField('mailgun_domain')}
-                  errorMessage={errors?.errors['settings.mailgun_domain']}
+                  errorMessage={
+                    errors?.errors['settings.mailgun_domain'] ??
+                    checkErrors?.errors.mailgun_domain
+                  }
                 />
               </Element>
 
@@ -428,7 +468,10 @@ export function EmailSettings() {
                     handleChange('settings.mailgun_endpoint', value)
                   }
                   disabled={disableSettingsField('mailgun_endpoint')}
-                  errorMessage={errors?.errors['settings.mailgun_endpoint']}
+                  errorMessage={
+                    errors?.errors['settings.mailgun_endpoint'] ??
+                    checkErrors?.errors.mailgun_endpoint
+                  }
                   customSelector
                   dismissable={false}
                 >
@@ -456,7 +499,10 @@ export function EmailSettings() {
                   handleChange('settings.brevo_secret', value)
                 }
                 disabled={disableSettingsField('brevo_secret')}
-                errorMessage={errors?.errors['settings.brevo_secret']}
+                errorMessage={
+                  errors?.errors['settings.brevo_secret'] ??
+                  checkErrors?.errors.brevo_secret
+                }
               />
             </Element>
           )}
@@ -479,7 +525,10 @@ export function EmailSettings() {
                   handleChange('settings.custom_sending_email', value)
                 }
                 disabled={disableSettingsField('custom_sending_email')}
-                errorMessage={errors?.errors['settings.custom_sending_email']}
+                errorMessage={
+                  errors?.errors['settings.custom_sending_email'] ??
+                  checkErrors?.errors.from_address
+                }
               />
             </Element>
           )}
@@ -498,7 +547,10 @@ export function EmailSettings() {
                 handleChange('settings.email_from_name', value)
               }
               disabled={disableSettingsField('email_from_name')}
-              errorMessage={errors?.errors['settings.email_from_name']}
+              errorMessage={
+                errors?.errors['settings.email_from_name'] ??
+                checkErrors?.errors.from_name
+              }
             />
           </Element>
 
@@ -598,7 +650,25 @@ export function EmailSettings() {
           )}
 
           {company?.settings.email_sending_method === 'smtp' && (
-            <SMTPMailDriver />
+            <SMTPMailDriver errors={checkErrors} isFormBusy={isCheckFormBusy} />
+          )}
+
+          {isCheckAvailable && (
+            <CheckMailer
+              mailer={company?.settings.email_sending_method}
+              disabled={
+                isFormBusy ||
+                isCheckFormBusy ||
+                secondsRemaining > 0 ||
+                missingFields.length > 0
+              }
+              isFormBusy={isCheckFormBusy}
+              missingFields={missingFields}
+              secondsRemaining={secondsRemaining}
+              recipient={recipient}
+              result={checkResult}
+              onClick={handleCheckMailer}
+            />
           )}
 
           <div className="px-4 sm:px-6 py-4">
