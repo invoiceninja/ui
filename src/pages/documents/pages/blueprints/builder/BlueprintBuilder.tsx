@@ -1,5 +1,6 @@
 import {
   type AuthoredDocumentData,
+  blobToBase64,
   Builder as Builder$,
   BuilderContext,
   CreateBlueprintSignatoryProps,
@@ -66,25 +67,6 @@ import { AsyncSignatorySelector } from '$app/pages/documents/common/components/A
 import { useActions } from '../common/hooks/useActions';
 import { EditBlueprintModal } from '../edit/components/EditBlueprintModal';
 import { SignatorySwap } from './Elements';
-
-function blobToBase64(blob: Blob) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onerror = () => reject(reader.error);
-    reader.onload = () => {
-      const result = reader.result;
-
-      if (typeof result !== 'string') {
-        reject(new Error('Unable to encode generated PDF'));
-        return;
-      }
-
-      resolve(result.slice(result.indexOf(',') + 1));
-    };
-    reader.readAsDataURL(blob);
-  });
-}
 
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
