@@ -305,7 +305,11 @@ export function Login() {
                           {t('password')}
                         </InputLabel>
 
-                        <Link className="truncate" to="/recover_password">
+                        <Link
+                          className="truncate"
+                          to="/recover_password"
+                          state={{ email: confirmedEmail }}
+                        >
                           {t('forgot_password')}
                         </Link>
                       </div>
