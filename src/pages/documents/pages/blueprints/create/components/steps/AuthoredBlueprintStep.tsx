@@ -9,6 +9,7 @@
  */
 
 import {
+  blobToBase64,
   createAuthoredDocumentData,
   renderAuthoredDocumentPdf,
 } from '@docuninja/builder2.0';
@@ -124,25 +125,9 @@ export function AuthoredBlueprintStep({
           disabled={isCreating}
         >
           {t('create_template')}
-        </Button>
+         </Button>
       </div>
     </CardContainer>
   );
 }
 
-function blobToBase64(blob: Blob) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onerror = () => reject(reader.error);
-    reader.onload = () => {
-      if (typeof reader.result !== 'string') {
-        reject(new Error('Unable to encode generated PDF'));
-        return;
-      }
-
-      resolve(reader.result.slice(reader.result.indexOf(',') + 1));
-    };
-    reader.readAsDataURL(blob);
-  });
-}
