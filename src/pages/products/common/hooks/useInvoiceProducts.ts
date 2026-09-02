@@ -17,7 +17,6 @@ import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Product } from '$app/common/interfaces/product';
 import { useBlankInvoiceQuery } from '$app/common/queries/invoices';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 interface Params {
   onlyAddToInvoice?: boolean;
@@ -27,7 +26,6 @@ export const useInvoiceProducts = (params?: Params) => {
   const { onlyAddToInvoice } = params || {};
 
   const navigate = useNavigate();
-  const defaultTabUrl = useDefaultTabUrl();
 
   const company = useCurrentCompany();
   const userNumberPrecision = useUserNumberPrecision();
@@ -66,7 +64,7 @@ export const useInvoiceProducts = (params?: Params) => {
       if (!onlyAddToInvoice) {
         setInvoice({ ...blankInvoice, line_items: lineItems });
 
-        navigate(defaultTabUrl('/invoices/create?action=invoice_product'));
+        navigate('/invoices/create?action=invoice_product');
       } else {
         setInvoice(
           (current) =>

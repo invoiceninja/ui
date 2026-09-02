@@ -54,7 +54,6 @@ import { confirmActionModalAtom } from '$app/pages/recurring-invoices/common/com
 import { DeleteInvoicesConfirmationModal } from '../common/components/DeleteInvoicesConfirmationModal';
 import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -81,7 +80,6 @@ export default function Invoices() {
 
   const filters = useInvoiceFilters();
   const columns = useInvoiceColumns();
-  const defaultTabUrl = useDefaultTabUrl();
   const reactSettings = useReactSettings();
   const invoiceColumns = useAllInvoiceColumns();
   const dateRangeColumns = useDateRangeColumns();
@@ -128,8 +126,8 @@ export default function Invoices() {
         columns={columns}
         footerColumns={footerColumns}
         bulkRoute="/api/v1/invoices/bulk"
-        linkToCreate={defaultTabUrl('/invoices/create')}
-        linkToEdit={defaultTabUrl('/invoices/:id/edit')}
+        linkToCreate="/invoices/create"
+        linkToEdit="/invoices/:id/edit"
         withResourcefulActions
         withoutDefaultBulkActions
         customActions={actions}

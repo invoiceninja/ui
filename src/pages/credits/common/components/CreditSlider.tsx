@@ -73,7 +73,6 @@ import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { ChevronRight } from 'react-feather';
 import { Icon } from '$app/components/icons/Icon';
 import { useGenerateActivityElement } from '../../edit/components/Activities';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export const creditSliderAtom = atom<Credit | null>(null);
 export const creditSliderVisibilityAtom = atom(false);
@@ -112,7 +111,6 @@ export function CreditSlider() {
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
   const disableNavigation = useDisableNavigation();
-  const defaultTabUrl = useDefaultTabUrl();
   const activityElement = useGenerateActivityElement();
 
   const [credit, setCredit] = useAtom(creditSliderAtom);
@@ -445,11 +443,9 @@ export function CreditSlider() {
                 onClick={() => {
                   !disableNavigation('invoice', invoiceResponse) &&
                     navigate(
-                      defaultTabUrl(
-                        route('/invoices/:id/edit', {
-                          id: invoiceResponse.id,
-                        })
-                      )
+                      route('/invoices/:id/edit', {
+                        id: invoiceResponse.id,
+                      })
                     );
                 }}
                 style={{

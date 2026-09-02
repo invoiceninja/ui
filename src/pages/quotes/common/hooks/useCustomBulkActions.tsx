@@ -37,13 +37,11 @@ import { ConvertToInvoiceBulkAction } from '../components/ConvertToInoviceBulkAc
 import { ConvertToProjectBulkAction } from '../components/ConvertToProjectBulkAction';
 import { SendEmailBulkAction } from '../components/SendEmailBulkAction';
 import { useBulkAction } from './useBulkAction';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export function useCustomBulkActions() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-  const defaultTabUrl = useDefaultTabUrl();
 
   const hasPermission = useHasPermission();
 
@@ -144,11 +142,9 @@ export function useCustomBulkActions() {
             <DropdownElement
               onClick={() =>
                 navigate(
-                  defaultTabUrl(
-                    route('/invoices/:id/edit', {
-                      id: selectedResources[0].invoice_id,
-                    })
-                  )
+                  route('/invoices/:id/edit', {
+                    id: selectedResources[0].invoice_id,
+                  })
                 )
               }
               icon={<Icon element={MdContactPage} />}

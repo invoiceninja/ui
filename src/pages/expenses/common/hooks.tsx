@@ -78,7 +78,6 @@ import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 import { Frequency } from '$app/common/enums/frequency';
 import { TagPills } from '$app/components/tags/TagPills';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 interface ActionsParams {
   showEditAction?: boolean;
@@ -315,7 +314,6 @@ export function useExpenseColumns() {
   const reactSettings = useReactSettings();
   const formatCustomFieldValue = useFormatCustomFieldValue();
   const calculateExpenseAmount = useCalculateExpenseAmount();
-  const defaultTabUrl = useDefaultTabUrl();
   const calculateExpenseExclusiveAmount = useCalculateExpenseExclusiveAmount();
   const expenseColumns = useAllExpenseColumns();
   type ExpenseColumns = (typeof expenseColumns)[number];
@@ -361,9 +359,7 @@ export function useExpenseColumns() {
                   size={19}
                   onClick={() =>
                     navigate(
-                      defaultTabUrl(
-                        route('/invoices/:id/edit', { id: expense.invoice_id })
-                      )
+                      route('/invoices/:id/edit', { id: expense.invoice_id })
                     )
                   }
                 />

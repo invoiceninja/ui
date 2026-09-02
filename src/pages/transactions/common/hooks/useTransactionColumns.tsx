@@ -34,7 +34,6 @@ import {
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import classNames from 'classnames';
 import { TagPills } from '$app/components/tags/TagPills';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export function useTransactionColumns() {
   const { t } = useTranslation();
@@ -48,7 +47,6 @@ export function useTransactionColumns() {
 
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
-  const defaultTabUrl = useDefaultTabUrl();
   const cleanDescriptionText = useCleanDescriptionText();
 
   const columns: DataTableColumnsExtended<Transaction, TransactionColumns> = [
@@ -168,10 +166,7 @@ export function useTransactionColumns() {
         return (
           <div className="flex space-x-2">
             {ids.map((id, index) => (
-              <Link
-                key={id}
-                to={defaultTabUrl(route('/invoices/:id/edit', { id }))}
-              >
+              <Link key={id} to={route('/invoices/:id/edit', { id })}>
                 {t('invoice')} #{index + 1}
               </Link>
             ))}

@@ -49,7 +49,6 @@ import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
 import { useActions } from './edit/components/Actions';
 import { CommonActions } from './edit/components/CommonActions';
 import { useHandleSave } from './edit/hooks/useInvoiceSave';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 dayjs.extend(utc);
 
@@ -113,14 +112,9 @@ export default function Invoice() {
     eInvoiceValidationResponse: validationResponse,
   });
 
-  const defaultTabUrl = useDefaultTabUrl();
-
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
-    {
-      name: t('edit_invoice'),
-      href: defaultTabUrl(route('/invoices/:id/edit', { id })),
-    },
+    { name: t('edit_invoice'), href: route('/invoices/:id/edit', { id }) },
   ];
 
   useEffect(() => {

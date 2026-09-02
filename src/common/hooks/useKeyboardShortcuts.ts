@@ -11,7 +11,6 @@
 import { useCallback, useEffect } from 'react';
 import { keyboardShortcuts } from '../constants/keyboard-shortcuts';
 import { eventMatchesBinding } from '../helpers/keyboard-shortcuts';
-import { useDefaultTabUrl } from './useDefaultTab';
 import { getHeldKeys, useTrackHeldKeys } from './useHeldKeys';
 import { usePreventNavigation } from './usePreventNavigation';
 import { useResolvedShortcuts } from './useReactSettings';
@@ -20,7 +19,6 @@ import { isShortcutRecordingActive } from './useShortcutRecorder';
 export function useKeyboardShortcuts() {
   const preventNavigation = usePreventNavigation();
   const bindings = useResolvedShortcuts();
-  const defaultTabUrl = useDefaultTabUrl();
 
   useTrackHeldKeys();
 
@@ -46,12 +44,12 @@ export function useKeyboardShortcuts() {
         if (eventMatchesBinding(event, binding, heldKeys)) {
           event.preventDefault();
           event.stopPropagation();
-          preventNavigation({ url: defaultTabUrl(definition.action.to) });
+          preventNavigation({ url: definition.action.to });
           return;
         }
       }
     },
-    [preventNavigation, bindings, defaultTabUrl]
+    [preventNavigation, bindings]
   );
 
   useEffect(() => {

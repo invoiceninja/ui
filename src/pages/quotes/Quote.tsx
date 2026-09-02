@@ -38,7 +38,6 @@ import { invoiceSumAtom, quoteAtom } from './common/atoms';
 import { useActions, useQuoteUtilities, useSave } from './common/hooks';
 import { useQuoteQuery } from './common/queries';
 import { useTabs } from './edit/hooks/useTabs';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -50,13 +49,11 @@ export default function Edit() {
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
-  const defaultTabUrl = useDefaultTabUrl();
-
   const pages: Page[] = [
     { name: t('quotes'), href: '/quotes' },
     {
       name: t('edit_quote'),
-      href: defaultTabUrl(route('/quotes/:id/edit', { id })),
+      href: route('/quotes/:id/edit', { id }),
     },
   ];
 

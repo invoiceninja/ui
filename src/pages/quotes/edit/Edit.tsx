@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Link, useOutletContext, useSearchParams } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
@@ -36,11 +36,10 @@ import { QuoteFooter } from '../common/components/QuoteFooter';
 import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
 import { useQuoteUtilities } from '../common/hooks';
 import { QuoteContext } from '../create/Create';
+import { useDefaultTabIndex } from '$app/common/hooks/useDefaultTabIndex';
 
 export default function Edit() {
   const [t] = useTranslation();
-
-  const [searchParams] = useSearchParams();
 
   const company = useCurrentCompany();
   const reactSettings = useReactSettings();
@@ -61,6 +60,7 @@ export default function Edit() {
   const taskColumns = useTaskColumns();
   const productColumns = useProductColumns();
   const productQuoteColumns = useProductQuoteColumns();
+  const defaultTabIndex = useDefaultTabIndex();
   const statusThemeColors = useStatusThemeColorScheme();
 
   useScrollToLineItem(Boolean(quote && client));
@@ -145,7 +145,7 @@ export default function Edit() {
 
           <TabGroup
             tabs={[t('products'), t('tasks')]}
-            defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+            defaultTabIndex={defaultTabIndex}
             formatTabLabel={(index) => {
               if (index === 1) {
                 return <TasksTabLabel lineItems={quote?.line_items || []} />;

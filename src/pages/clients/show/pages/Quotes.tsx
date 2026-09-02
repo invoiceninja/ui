@@ -20,13 +20,11 @@ import {
 } from '$app/pages/quotes/common/hooks';
 import { useCustomBulkActions } from '$app/pages/quotes/common/hooks/useCustomBulkActions';
 import { useFooterColumns } from '$app/pages/quotes/common/hooks/useFooterColumns';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export default function Quotes() {
   const { id } = useParams();
 
   const hasPermission = useHasPermission();
-  const defaultTabUrl = useDefaultTabUrl();
 
   const actions = useActions();
   const columns = useQuoteColumns();
@@ -49,8 +47,8 @@ export default function Quotes() {
       customFilterPlaceholder="status"
       withResourcefulActions
       bulkRoute="/api/v1/quotes/bulk"
-      linkToCreate={defaultTabUrl(route('/quotes/create?client=:id', { id }))}
-      linkToEdit={defaultTabUrl('/quotes/:id/edit')}
+      linkToCreate={route('/quotes/create?client=:id', { id })}
+      linkToEdit="/quotes/:id/edit"
       excludeColumns={['client_id']}
       linkToCreateGuards={[permission('create_quote')]}
       hideEditableOptions={!hasPermission('edit_quote')}

@@ -26,7 +26,6 @@ import {
   ValidationEntityResponse,
 } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { RecurringInvoiceContext } from '../../create/Create';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export default function EInvoice() {
   const [t] = useTranslation();
@@ -34,7 +33,6 @@ export default function EInvoice() {
   const colors = useColorScheme();
 
   const company = useCurrentCompany();
-  const defaultTabUrl = useDefaultTabUrl();
 
   const displayEInvoiceAndStatusCard =
     company?.settings.e_invoice_type === 'PEPPOL' &&
@@ -126,11 +124,9 @@ export default function EInvoice() {
 
                         {entity === 'invoice' && (
                           <Link
-                            to={defaultTabUrl(
-                              route('/recurring_invoices/:id/edit', {
-                                id: recurringInvoice?.id,
-                              })
-                            )}
+                            to={route('/recurring_invoices/:id/edit', {
+                              id: recurringInvoice?.id,
+                            })}
                           >
                             {t('edit_recurring_invoice')}
                           </Link>

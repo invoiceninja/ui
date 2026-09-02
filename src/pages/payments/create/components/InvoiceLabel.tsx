@@ -8,7 +8,6 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { InputLabel } from '$app/components/forms';
 import { Spinner } from '$app/components/Spinner';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 interface Props {
   className?: string;
@@ -19,7 +18,6 @@ export function InvoiceLabel({ invoiceId, className }: Props) {
   const [t] = useTranslation();
 
   const disableNavigation = useDisableNavigation();
-  const defaultTabUrl = useDefaultTabUrl();
 
   const { find: findInvoice } = useInvoiceResolver();
 
@@ -37,7 +35,7 @@ export function InvoiceLabel({ invoiceId, className }: Props) {
 
       {currentInvoice ? (
         <DynamicLink
-          to={defaultTabUrl(route('/invoices/:id/edit', { id: invoiceId }))}
+          to={route('/invoices/:id/edit', { id: invoiceId })}
           renderSpan={disableNavigation('invoice', currentInvoice)}
         >
           #{currentInvoice.number}

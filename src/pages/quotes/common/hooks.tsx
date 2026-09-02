@@ -105,7 +105,6 @@ import { ConvertOptionsModal } from './components/ConvertOptionsModal';
 import { useApprove } from './hooks/useApprove';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useMarkSent } from './hooks/useMarkSent';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -286,7 +285,6 @@ export function useCreate(props: CreateProps) {
   const refreshCompanyUsers = useRefreshCompanyUsers();
 
   const navigate = useNavigate();
-  const defaultTabUrl = useDefaultTabUrl();
 
   const saveCompany = useHandleCompanySave();
 
@@ -324,11 +322,7 @@ export function useCreate(props: CreateProps) {
 
         $refetch(['quotes']);
 
-        navigate(
-          defaultTabUrl(
-            route('/quotes/:id/edit', { id: response.data.data.id })
-          )
-        );
+        navigate(route('/quotes/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
@@ -434,7 +428,6 @@ export function useActions(params?: Params) {
     useDisplayRunTemplateActions();
 
   const company = useCurrentCompany();
-  const defaultTabUrl = useDefaultTabUrl();
   const { isAdmin, isOwner } = useAdmin();
   const { isEditPage } = useEntityPageIdentifier({
     entity: 'quote',
@@ -467,7 +460,7 @@ export function useActions(params?: Params) {
     (quote: Quote) =>
       Boolean(showEditAction) && (
         <DropdownElement
-          to={defaultTabUrl(route('/quotes/:id/edit', { id: quote.id }))}
+          to={route('/quotes/:id/edit', { id: quote.id })}
           icon={<Icon element={MdEdit} />}
         >
           {t('edit')}
@@ -825,7 +818,6 @@ export function useQuoteColumns() {
   const navigate = useNavigate();
   const formatNumber = useFormatNumber();
   const hasPermission = useHasPermission();
-  const defaultTabUrl = useDefaultTabUrl();
   const disableNavigation = useDisableNavigation();
 
   const formatMoney = useFormatMoney();
@@ -874,9 +866,7 @@ export function useQuoteColumns() {
                   color={accentColor}
                   onClick={() =>
                     navigate(
-                      defaultTabUrl(
-                        route('/invoices/:id/edit', { id: quote.invoice_id })
-                      )
+                      route('/invoices/:id/edit', { id: quote.invoice_id })
                     )
                   }
                 />
@@ -893,7 +883,7 @@ export function useQuoteColumns() {
       format: (field, quote) => (
         <div className="flex space-x-2">
           <DynamicLink
-            to={defaultTabUrl(route('/quotes/:id/edit', { id: quote.id }))}
+            to={route('/quotes/:id/edit', { id: quote.id })}
             renderSpan={disableNavigation('quote', quote)}
           >
             {field}

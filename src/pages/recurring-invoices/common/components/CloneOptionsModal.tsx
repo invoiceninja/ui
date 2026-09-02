@@ -35,7 +35,6 @@ import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from '../atoms';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 interface Props {
   recurringInvoice: RecurringInvoice;
@@ -45,7 +44,6 @@ interface Props {
 export function CloneOptionsModal({ recurringInvoice, dropdown }: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const defaultTabUrl = useDefaultTabUrl();
   const hasPermission = useHasPermission();
 
   const colors = useColorScheme();
@@ -68,7 +66,7 @@ export function CloneOptionsModal({ recurringInvoice, dropdown }: Props) {
       client: undefined,
     });
 
-    navigate(defaultTabUrl('/recurring_invoices/create?action=clone'));
+    navigate('/recurring_invoices/create?action=clone');
   };
 
   const cloneToInvoice = () => {
@@ -91,7 +89,7 @@ export function CloneOptionsModal({ recurringInvoice, dropdown }: Props) {
       client: undefined,
     });
 
-    navigate(defaultTabUrl('/invoices/create?action=clone'));
+    navigate('/invoices/create?action=clone');
   };
 
   const cloneToQuote = () => {
@@ -112,7 +110,7 @@ export function CloneOptionsModal({ recurringInvoice, dropdown }: Props) {
       design_id: company.settings.quote_design_id,
     });
 
-    navigate(defaultTabUrl('/quotes/create?action=clone'));
+    navigate('/quotes/create?action=clone');
   };
 
   const cloneToCredit = () => {

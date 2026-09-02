@@ -37,7 +37,6 @@ import {
   EntityError,
   ValidationEntityResponse,
 } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -64,7 +63,6 @@ export default function EInvoice() {
   const location = useLocation();
   const colors = useColorScheme();
   const company = useCurrentCompany();
-  const defaultTabUrl = useDefaultTabUrl();
 
   const context: Context = useOutletContext();
 
@@ -142,9 +140,7 @@ export default function EInvoice() {
       {}
     ) as unknown as ReactNode[];
     const invoiceElement = (
-      <Link
-        to={defaultTabUrl(route('/invoices/:id/edit', { id: invoice?.id }))}
-      >
+      <Link to={route('/invoices/:id/edit', { id: invoice?.id })}>
         {invoice?.number}
       </Link>
     );
@@ -242,11 +238,9 @@ export default function EInvoice() {
 
                         {entity === 'invoice' && (
                           <Link
-                            to={defaultTabUrl(
-                              route('/invoices/:id/edit', {
-                                id: invoice?.id,
-                              })
-                            )}
+                            to={route('/invoices/:id/edit', {
+                              id: invoice?.id,
+                            })}
                           >
                             {t('edit_invoice')}
                           </Link>

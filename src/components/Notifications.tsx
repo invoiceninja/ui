@@ -48,7 +48,6 @@ import { FileAdd } from './icons/FileAdd';
 import { FileEdit } from './icons/FileEdit';
 import { FileSearch } from './icons/FileSearch';
 import { Icon } from './icons/Icon';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 type NotificationType =
   | 'invoiceWasPaid'
@@ -135,7 +134,6 @@ export function Notifications() {
   const sockets = useSockets();
   const colors = useColorScheme();
   const reactSettings = useReactSettings();
-  const defaultTabUrl = useDefaultTabUrl();
   const companyUser = useCurrentCompanyUser();
   const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -155,11 +153,9 @@ export function Notifications() {
         {
           invoice: (
             <Link
-              to={defaultTabUrl(
-                route('/invoices/:id/edit', {
-                  id: currentDisplayLabel.invoiceId,
-                })
-              )}
+              to={route('/invoices/:id/edit', {
+                id: currentDisplayLabel.invoiceId,
+              })}
             >
               {`#${currentDisplayLabel.invoiceNumber}`}
             </Link>
@@ -182,11 +178,9 @@ export function Notifications() {
         {
           invoice: (
             <Link
-              to={defaultTabUrl(
-                route('/invoices/:id/edit', {
-                  id: currentDisplayLabel.invoiceId,
-                })
-              )}
+              to={route('/invoices/:id/edit', {
+                id: currentDisplayLabel.invoiceId,
+              })}
             >
               {`#${currentDisplayLabel.invoiceNumber}`}
             </Link>
@@ -390,7 +384,7 @@ export function Notifications() {
             clientId: $invoice.client_id,
           },
           date: dayjs().unix(),
-          link: defaultTabUrl(route('/invoices/:id/edit', { id: $invoice.id })),
+          link: route('/invoices/:id/edit', { id: $invoice.id }),
           readAt: null,
         };
 
@@ -441,7 +435,7 @@ export function Notifications() {
             clientId: $invoice.client_id,
           },
           date: dayjs().unix(),
-          link: defaultTabUrl(route('/invoices/:id/edit', { id: $invoice.id })),
+          link: route('/invoices/:id/edit', { id: $invoice.id }),
           readAt: null,
         };
 

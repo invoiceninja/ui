@@ -34,7 +34,6 @@ import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import classNames from 'classnames';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { TagPills } from '$app/components/tags/TagPills';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export const defaultColumns: string[] = [
   'status',
@@ -92,7 +91,6 @@ export function usePaymentColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const disableNavigation = useDisableNavigation();
-  const defaultTabUrl = useDefaultTabUrl();
 
   const paymentColumns = useAllPaymentColumns();
   type PaymentColumns = (typeof paymentColumns)[number];
@@ -180,11 +178,9 @@ export function usePaymentColumns() {
               {payment.invoices?.map((invoice) => (
                 <DynamicLink
                   key={invoice.id}
-                  to={defaultTabUrl(
-                    route('/invoices/:id/edit', {
-                      id: invoice.id,
-                    })
-                  )}
+                  to={route('/invoices/:id/edit', {
+                    id: invoice.id,
+                  })}
                   renderSpan={disableNavigation('invoice', invoice)}
                 >
                   {invoice.number}
@@ -201,11 +197,9 @@ export function usePaymentColumns() {
                 index < 3 && (
                   <DynamicLink
                     key={invoice.id}
-                    to={defaultTabUrl(
-                      route('/invoices/:id/edit', {
-                        id: invoice.id,
-                      })
-                    )}
+                    to={route('/invoices/:id/edit', {
+                      id: invoice.id,
+                    })}
                     renderSpan={disableNavigation('invoice', invoice)}
                   >
                     {invoice.number}

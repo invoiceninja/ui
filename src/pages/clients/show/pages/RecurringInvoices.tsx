@@ -19,13 +19,11 @@ import {
   useRecurringInvoiceFilters,
 } from '$app/pages/recurring-invoices/common/hooks';
 import { useFooterColumns } from '$app/pages/recurring-invoices/common/hooks/useFooterColumns';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export default function RecurringInvoices() {
   const { id } = useParams();
 
   const hasPermission = useHasPermission();
-  const defaultTabUrl = useDefaultTabUrl();
 
   const actions = useActions();
   const columns = useRecurringInvoiceColumns();
@@ -48,12 +46,10 @@ export default function RecurringInvoices() {
       customFilterPlaceholder="status"
       withResourcefulActions
       bulkRoute="/api/v1/recurring_invoices/bulk"
-      linkToCreate={defaultTabUrl(
-        route('/recurring_invoices/create?client=:id', {
-          id,
-        })
-      )}
-      linkToEdit={defaultTabUrl('/recurring_invoices/:id/edit')}
+      linkToCreate={route('/recurring_invoices/create?client=:id', {
+        id,
+      })}
+      linkToEdit="/recurring_invoices/:id/edit"
       excludeColumns={['client_id']}
       linkToCreateGuards={[permission('create_recurring_invoice')]}
       hideEditableOptions={!hasPermission('edit_recurring_invoice')}

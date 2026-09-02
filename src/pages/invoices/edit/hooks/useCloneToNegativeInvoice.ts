@@ -13,11 +13,9 @@ import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { invoiceAtom } from '../../common/atoms';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export function useCloneToNegativeInvoice() {
   const navigate = useNavigate();
-  const defaultTabUrl = useDefaultTabUrl();
   const setInvoice = useSetAtom(invoiceAtom);
 
   const cloneToNegativeInvoice = (invoice: Invoice, reason?: string) => {
@@ -60,7 +58,7 @@ export function useCloneToNegativeInvoice() {
     setInvoice(negativeInvoice);
     console.log('Set invoice in atom, navigating to create page');
 
-    navigate(defaultTabUrl('/invoices/create?action=clone'));
+    navigate('/invoices/create?action=clone');
   };
 
   return cloneToNegativeInvoice;

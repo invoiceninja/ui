@@ -23,7 +23,6 @@ import { DynamicLink } from '$app/components/DynamicLink';
 import { ArrowDown } from '$app/components/icons/ArrowDown';
 import { ArrowUp } from '$app/components/icons/ArrowUp';
 import { CalendarCheckOut } from '$app/components/icons/CalendarCheckOut';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export function UpcomingInvoices() {
   const [t] = useTranslation();
@@ -34,7 +33,6 @@ export function UpcomingInvoices() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const disableNavigation = useDisableNavigation();
-  const defaultTabUrl = useDefaultTabUrl();
 
   const columns: DataTableColumns<Invoice> = [
     {
@@ -43,7 +41,7 @@ export function UpcomingInvoices() {
       format: (value, invoice) => {
         return (
           <DynamicLink
-            to={defaultTabUrl(route('/invoices/:id/edit', { id: invoice.id }))}
+            to={route('/invoices/:id/edit', { id: invoice.id })}
             renderSpan={disableNavigation('invoice', invoice)}
           >
             {invoice.number}

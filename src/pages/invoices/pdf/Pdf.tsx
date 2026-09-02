@@ -20,7 +20,6 @@ import { Spinner } from '$app/components/Spinner';
 import { InvoiceViewer } from '../common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from '../common/hooks/useGeneratePdfUrl';
 import { Actions } from './components/Actions';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export default function Pdf() {
   const { id } = useParams();
@@ -55,13 +54,11 @@ export default function Pdf() {
 
   const onLink = (url: string) => setBlobUrl(url);
 
-  const defaultTabUrl = useDefaultTabUrl();
-
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
     {
       name: t('edit_invoice'),
-      href: defaultTabUrl(route('/invoices/:id/edit', { id })),
+      href: route('/invoices/:id/edit', { id }),
     },
     {
       name: t('pdf'),

@@ -21,7 +21,6 @@ import { ModuleBitmask } from '$app/pages/settings/account-management/component'
 import { useBankAccountsQuery } from '$app/pages/settings/bank-accounts/common/queries';
 import { useAdmin, useHasPermission } from '../permissions/useHasPermission';
 import { useCurrentCompany } from '../useCurrentCompany';
-import { useDefaultTabUrl } from '../useDefaultTab';
 
 interface EntityAction {
   key: string;
@@ -35,7 +34,6 @@ export function useQuickCreateActions() {
   const currentCompany = useCurrentCompany();
   const hasPermission = useHasPermission();
   const enabled = useEnabled();
-  const defaultTabUrl = useDefaultTabUrl();
 
   const { isAdmin, isOwner } = useAdmin();
 
@@ -76,14 +74,14 @@ export function useQuickCreateActions() {
     },
     {
       key: 'invoice',
-      url: defaultTabUrl('/invoices/create'),
+      url: '/invoices/create',
       section: 'income',
       visible:
         hasPermission('create_invoice') && enabled(ModuleBitmask.Invoices),
     },
     {
       key: 'recurring_invoice',
-      url: defaultTabUrl('/recurring_invoices/create'),
+      url: '/recurring_invoices/create',
       section: 'income',
       visible:
         hasPermission('create_recurring_invoice') &&
@@ -91,7 +89,7 @@ export function useQuickCreateActions() {
     },
     {
       key: 'quote',
-      url: defaultTabUrl('/quotes/create'),
+      url: '/quotes/create',
       section: 'income',
       visible: hasPermission('create_quote') && enabled(ModuleBitmask.Quotes),
     },

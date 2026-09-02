@@ -37,7 +37,6 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { date as formatDate } from '$app/common/helpers';
 import { useTransactionQuery } from '$app/common/queries/transactions';
 import { useColorScheme } from '$app/common/colors';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 interface Props {
   transactionId: string;
@@ -48,7 +47,6 @@ export function Details(props: Props) {
   const [t] = useTranslation();
 
   const company = useCurrentCompany();
-  const defaultTabUrl = useDefaultTabUrl();
 
   const formatMoney = useFormatMoney();
 
@@ -203,11 +201,9 @@ export function Details(props: Props) {
               className="cursor-pointer"
             >
               <Link
-                to={defaultTabUrl(
-                  route('/invoices/:id/edit', {
-                    id,
-                  })
-                )}
+                to={route('/invoices/:id/edit', {
+                  id,
+                })}
               >
                 {number}
               </Link>

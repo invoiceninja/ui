@@ -66,7 +66,6 @@ import { useMarkPaid } from '../hooks/useMarkPaid';
 import { useRectifyInvoiceModal } from '../hooks/useRectifyInvoiceModal';
 import { CancelInvoiceModal } from './CancelInvoiceModal';
 import { RectifyInvoiceModal } from './RectifyInvoiceModal';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export const isInvoiceAutoBillable = (invoice: Invoice) => {
   return (
@@ -117,7 +116,6 @@ export function useActions(params?: Params) {
   const bulk = useBulk();
   const markPaid = useMarkPaid();
   const navigate = useNavigate();
-  const defaultTabUrl = useDefaultTabUrl();
   const {
     openModal: openCancelModal,
     isCancelModalOpen,
@@ -180,14 +178,14 @@ export function useActions(params?: Params) {
     };
 
     setInvoice(negativeInvoice);
-    navigate(defaultTabUrl('/invoices/create?action=clone'));
+    navigate('/invoices/create?action=clone');
   };
 
   const actions = [
     (invoice: Invoice) =>
       Boolean(showEditAction) && (
         <DropdownElement
-          to={defaultTabUrl(route('/invoices/:id/edit', { id: invoice.id }))}
+          to={route('/invoices/:id/edit', { id: invoice.id })}
           icon={<Icon element={MdEdit} />}
         >
           {t('edit')}

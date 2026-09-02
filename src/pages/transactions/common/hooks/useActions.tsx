@@ -32,14 +32,12 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export function useActions() {
   const [t] = useTranslation();
 
   const bulk = useBulk();
   const navigate = useNavigate();
-  const defaultTabUrl = useDefaultTabUrl();
 
   const { isEditPage } = useEntityPageIdentifier({ entity: 'transaction' });
 
@@ -65,7 +63,7 @@ export function useActions() {
       })
     );
 
-    navigate(defaultTabUrl('/invoices/create?action=invoice_transaction'));
+    navigate('/invoices/create?action=invoice_transaction');
   };
 
   const actions: Action<Transaction>[] = [

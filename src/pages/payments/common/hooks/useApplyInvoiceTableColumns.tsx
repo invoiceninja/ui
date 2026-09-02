@@ -27,7 +27,6 @@ import {
 } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { PaymentOnCreation } from '../..';
 import { TableNumberInputField } from '../components/TableNumberInputField';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export interface ApplyInvoice {
   _id: string;
@@ -61,7 +60,6 @@ export function useApplyInvoiceTableColumns({
 
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
-  const defaultTabUrl = useDefaultTabUrl();
 
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
     {
@@ -70,7 +68,7 @@ export function useApplyInvoiceTableColumns({
       label: t('number'),
       format: (value, invoice) => (
         <DynamicLink
-          to={defaultTabUrl(route('/invoices/:id/edit', { id: invoice.id }))}
+          to={route('/invoices/:id/edit', { id: invoice.id })}
           renderSpan={disableNavigation('invoice', invoice)}
         >
           {value}

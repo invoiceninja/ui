@@ -24,13 +24,11 @@ import { useInvoiceColumns } from '$app/pages/invoices/common/hooks/useInvoiceCo
 import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
 import { useActions } from '$app/pages/invoices/edit/components/Actions';
 import { confirmActionModalAtom } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
-import { useDefaultTabUrl } from '$app/common/hooks/useDefaultTab';
 
 export default function Invoices() {
   const { id } = useParams();
 
   const hasPermission = useHasPermission();
-  const defaultTabUrl = useDefaultTabUrl();
 
   const { actions } = useActions();
   const columns = useInvoiceColumns();
@@ -60,10 +58,8 @@ export default function Invoices() {
         withResourcefulActions
         withoutDefaultBulkActions
         bulkRoute="/api/v1/invoices/bulk"
-        linkToCreate={defaultTabUrl(
-          route('/invoices/create?client=:id', { id })
-        )}
-        linkToEdit={defaultTabUrl('/invoices/:id/edit')}
+        linkToCreate={route('/invoices/create?client=:id', { id })}
+        linkToEdit="/invoices/:id/edit"
         excludeColumns={['client_id']}
         linkToCreateGuards={[permission('create_invoice')]}
         hideEditableOptions={!hasPermission('edit_invoice')}
