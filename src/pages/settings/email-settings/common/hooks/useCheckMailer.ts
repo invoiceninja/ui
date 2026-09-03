@@ -156,16 +156,23 @@ export function useCheckMailer() {
 
         if (status === 422 && error.response) {
           const bag = error.response.data;
-          const unboundMessages = getUnboundErrorMessages(bag);
+          const hasFieldErrors = Boolean(
+            bag.errors && Object.keys(bag.errors).length
+          );
+          const alertMessage = hasFieldErrors
+            ? getUnboundErrorMessages(bag).join(' ')
+            : bag.message;
 
           if (isMounted.current) {
-            setErrors({ mailer: requestedMailer, bag });
+            if (hasFieldErrors) {
+              setErrors({ mailer: requestedMailer, bag });
+            }
 
-            if (unboundMessages.length) {
+            if (alertMessage) {
               setResult({
                 mailer: requestedMailer,
                 status: 'failure',
-                message: unboundMessages.join(' '),
+                message: alertMessage,
                 wasDirty: false,
               });
             }
@@ -196,30 +203,25 @@ export function useCheckMailer() {
           return;
         }
 
-        if (status === 400) {
-          if (isMounted.current) {
-            setResult({
-              mailer: requestedMailer,
-              status: 'failure',
-              message: '',
-              wasDirty: false,
-            });
-          }
-
-          toast.error('error_title');
-
-          return;
-        }
-
         if (error.code === 'ERR_NETWORK') {
           toast.error('server_not_reachable');
 
           return;
         }
 
-        console.error(error);
+        const message =
+          status && status < 500 ? error.response?.data?.message : undefined;
 
-        toast.error();
+        if (isMounted.current) {
+          setResult({
+            mailer: requestedMailer,
+            status: 'failure',
+            message: message || '',
+            wasDirty: false,
+          });
+        }
+
+        toast.error(message || 'error_title');
       })
       .finally(() => {
         if (isMounted.current) {
