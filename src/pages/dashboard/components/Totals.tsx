@@ -22,6 +22,7 @@ import {
   type DayjsRange,
   serializeOrderedDateRange,
 } from '$app/common/helpers/dateRange';
+import { decodeDashboardField } from '$app/common/helpers/react-settings';
 import { request } from '$app/common/helpers/request';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -43,6 +44,8 @@ import {
   DropdownDateRangePicker,
   StyledRangePicker,
 } from '../../../components/DropdownDateRangePicker';
+import { TASK_METRIC_FIELDS } from '../helpers/dashboard-card-fields';
+import { useTaskMetricFieldsSupport } from '../hooks/useTaskMetricFieldsSupport';
 import { DashboardCardSelector } from './DashboardCardSelector';
 import { PreferenceCardsGrid } from './PreferenceCardsGrid';
 
@@ -132,6 +135,7 @@ export function Totals() {
   const settings = useReactSettings();
   const { dateFormat } = useCurrentCompanyDateFormats();
   const antdLocale = useAtomValue(antdLocaleAtom);
+  const supportsTaskMetrics = useTaskMetricFieldsSupport();
 
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
@@ -143,7 +147,17 @@ export function Totals() {
   const includeDrafts = preferences.dashboard_charts?.include_drafts || false;
   const customStartDate = preferences.dashboard_charts?.custom_start_date;
   const customEndDate = preferences.dashboard_charts?.custom_end_date;
-  const currentDashboardFields = settings?.dashboard_fields ?? [];
+  const currentDashboardFields = useMemo(() => {
+    const storedFields = settings?.dashboard_fields ?? [];
+
+    if (supportsTaskMetrics) {
+      return storedFields;
+    }
+
+    return storedFields.filter(
+      (key) => !TASK_METRIC_FIELDS.includes(decodeDashboardField(key).field)
+    );
+  }, [settings?.dashboard_fields, supportsTaskMetrics]);
 
   const resolvedRange = useMemo(() => {
     if (dateRange === 'custom') {

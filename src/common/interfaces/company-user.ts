@@ -26,7 +26,13 @@ export type Field =
   | 'logged_expenses'
   | 'pending_expenses'
   | 'invoiced_expenses'
-  | 'invoice_paid_expenses';
+  | 'invoice_paid_expenses'
+  | 'task_estimated_duration'
+  | 'task_remaining_estimated_duration'
+  | 'unestimated_tasks'
+  | 'tasks_over_estimate'
+  | 'overdue_tasks'
+  | 'tasks_due';
 
 export type Period = 'current' | 'previous' | 'total';
 
@@ -34,12 +40,14 @@ export type Calculate = 'sum' | 'avg' | 'count';
 
 export type Format = 'money' | 'time';
 
+export type StoredFormat = Format | '';
+
 export interface DashboardCardField {
   key: string;
   field: Field;
   period: Period;
   calculate: Calculate;
-  format: Format;
+  format: StoredFormat;
 }
 
 export interface CompanyUser {
