@@ -20,6 +20,7 @@ import { Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 import { Field } from '../components';
+import { DesignVariables } from '../components/DesignVariables';
 
 export function Invoices() {
   const [t] = useTranslation();
@@ -53,56 +54,62 @@ export function Invoices() {
   }
 
   return (
-    <div className="px-4 sm:px-6">
-      {['invoice1', 'invoice2', 'invoice3', 'invoice4'].map((field) => (
-        <Field
-          key={field}
-          field={field}
-          placeholder={t('invoice_field')}
-          onChange={(value) => handleChange(field, value)}
-          initialValue={company.custom_fields[field]}
-          withArrowAsSeparator
-        />
-      ))}
-
-      <div className="py-4">
-        <Divider
-          className="border-dashed"
-          borderColor={colors.$20}
-          withoutPadding
-        />
+    <>
+      <div className="px-4 sm:px-6">
+        {['invoice1', 'invoice2', 'invoice3', 'invoice4'].map((field) => (
+          <Field
+            key={field}
+            field={field}
+            placeholder={t('invoice_field')}
+            onChange={(value) => handleChange(field, value)}
+            initialValue={company.custom_fields[field]}
+            withArrowAsSeparator
+          />
+        ))}
       </div>
 
-      {company &&
-        ['surcharge1', 'surcharge2', 'surcharge3', 'surcharge4'].map(
-          (field, index) => (
-            <Element
-              key={index}
-              leftSide={
-                <InputField
-                  className="w-full sm:w-4/6"
-                  id={field}
-                  value={company.custom_fields[field]}
-                  placeholder={t('surcharge_field')}
-                  onValueChange={(value) =>
-                    handleCustomSurchargeFieldChange(field, value)
-                  }
-                  disabled={disabledCustomFields}
-                />
-              }
-              noExternalPadding
-              twoGridColumns
-            >
-              {Boolean(company?.enabled_tax_rates) && (
-                <Toggle
-                  label={t('charge_taxes')}
-                  checked={surchargeValue(index)}
-                  onChange={() => setSurchargeTaxValue(index)}
-                />
-              )}
-            </Element>
-          )
-        )}
-    </div>
+      <DesignVariables entity="invoice" />
+
+      <div className="px-4 sm:px-6">
+        <div className="py-4">
+          <Divider
+            className="border-dashed"
+            borderColor={colors.$20}
+            withoutPadding
+          />
+        </div>
+
+        {company &&
+          ['surcharge1', 'surcharge2', 'surcharge3', 'surcharge4'].map(
+            (field, index) => (
+              <Element
+                key={index}
+                leftSide={
+                  <InputField
+                    className="w-full sm:w-4/6"
+                    id={field}
+                    value={company.custom_fields[field]}
+                    placeholder={t('surcharge_field')}
+                    onValueChange={(value) =>
+                      handleCustomSurchargeFieldChange(field, value)
+                    }
+                    disabled={disabledCustomFields}
+                  />
+                }
+                noExternalPadding
+                twoGridColumns
+              >
+                {Boolean(company?.enabled_tax_rates) && (
+                  <Toggle
+                    label={t('charge_taxes')}
+                    checked={surchargeValue(index)}
+                    onChange={() => setSurchargeTaxValue(index)}
+                  />
+                )}
+              </Element>
+            )
+          )}
+      </div>
+    </>
   );
 }

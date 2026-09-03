@@ -98,12 +98,25 @@ export function SortableVariableList(props: Props) {
   };
 
   const onDragEnd = (result: DropResult) => {
+    const { source, destination } = result;
+
+    if (!destination) {
+      return;
+    }
+
     const companyClone = cloneDeep(company);
 
+    const variables: string[] =
+      companyClone.settings.pdf_variables?.[props.for] ?? [];
+
+    const visibleIndexes = [...variables.keys()].filter(
+      (index) => !excludedVariables?.includes(variables[index])
+    );
+
     const filtered = arrayMoveImmutable(
-      companyClone.settings.pdf_variables?.[props.for],
-      result.source.index,
-      result.destination?.index as unknown as number
+      variables,
+      visibleIndexes[source.index],
+      visibleIndexes[destination.index]
     );
 
     set(companyClone, `settings.pdf_variables.${props.for}`, filtered);

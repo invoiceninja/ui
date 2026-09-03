@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { DesignVariables } from '../components/DesignVariables';
 import { Field } from '../components/Field';
 
 export function Products() {
@@ -27,17 +28,21 @@ export function Products() {
   }
 
   return (
-    <div className="px-4 sm:px-6">
-      {['product1', 'product2', 'product3', 'product4'].map((field) => (
-        <Field
-          key={field}
-          field={field}
-          placeholder={t('product_field')}
-          onChange={(value) => handleChange(field, value)}
-          initialValue={company.custom_fields[field]}
-          withArrowAsSeparator
-        />
-      ))}
-    </div>
+    <>
+      <div className="px-4 sm:px-6">
+        {['product1', 'product2', 'product3', 'product4'].map((field) => (
+          <Field
+            key={field}
+            field={field}
+            placeholder={t('product_field')}
+            onChange={(value) => handleChange(field, value)}
+            initialValue={company.custom_fields[field]}
+            withArrowAsSeparator
+          />
+        ))}
+      </div>
+
+      <DesignVariables entity="product" />
+    </>
   );
 }
