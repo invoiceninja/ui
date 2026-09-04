@@ -11,6 +11,7 @@
 import {
   DragDropContext,
   Draggable,
+  DraggableProvided,
   Droppable,
   DropResult,
 } from '@hello-pangea/dnd';
@@ -33,6 +34,7 @@ interface Props {
   for: string;
   disabled?: boolean;
   excludedVariables?: string[];
+  withDragPortal?: boolean;
 }
 
 export function SortableVariableList(props: Props) {
@@ -40,7 +42,7 @@ export function SortableVariableList(props: Props) {
   const company = useCompanyChanges();
   const dispatch = useDispatch();
 
-  const { disabled, excludedVariables } = props;
+  const { disabled, excludedVariables, withDragPortal } = props;
 
   const colors = useColorScheme();
 
@@ -124,6 +126,42 @@ export function SortableVariableList(props: Props) {
     dispatch(injectInChanges({ object: 'company', data: companyClone }));
   };
 
+  const renderVariable = (label: string, provided: DraggableProvided) => {
+    return (
+      <div
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        ref={provided.innerRef}
+        className="flex items-center justify-between text-sm"
+        style={{ ...provided.draggableProps.style, color: colors.$3 }}
+      >
+        <div className="flex items-center space-x-2 py-2">
+          <div>
+            <GridDotsVertical size="1.2rem" color={colors.$17} />
+          </div>
+
+          <span>{resolveTranslation(label)?.label}</span>
+        </div>
+
+        <div
+          className={classNames({
+            'cursor-not-allowed opacity-75': disabled,
+            'cursor-pointer': !disabled,
+          })}
+          onClick={() => !disabled && remove(label)}
+        >
+          <CircleXMark
+            color={colors.$16}
+            hoverColor={colors.$3}
+            borderColor={colors.$5}
+            hoverBorderColor={colors.$17}
+            size="1.5rem"
+          />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <Element leftSide={t('fields')}>
@@ -146,7 +184,16 @@ export function SortableVariableList(props: Props) {
 
       <Element leftSide={t('variables')} textVerticalAlign="top">
         <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId={props.for} isDropDisabled={disabled}>
+          <Droppable
+            droppableId={props.for}
+            isDropDisabled={disabled}
+            renderClone={
+              withDragPortal
+                ? (provided, _, rubric) =>
+                    renderVariable(rubric.draggableId, provided)
+                : undefined
+            }
+          >
             {(provided) => (
               <div {...provided.droppableProps} ref={provided.innerRef}>
                 {company?.settings?.pdf_variables?.[props.for]
@@ -160,42 +207,7 @@ export function SortableVariableList(props: Props) {
                       index={index}
                       isDragDisabled={disabled}
                     >
-                      {(provided) => (
-                        <div
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          ref={provided.innerRef}
-                          className="flex items-center justify-between"
-                          key={label}
-                        >
-                          <div className="flex items-center space-x-2 py-2">
-                            <div>
-                              <GridDotsVertical
-                                size="1.2rem"
-                                color={colors.$17}
-                              />
-                            </div>
-
-                            <span>{resolveTranslation(label)?.label}</span>
-                          </div>
-
-                          <div
-                            className={classNames({
-                              'cursor-not-allowed opacity-75': disabled,
-                              'cursor-pointer': !disabled,
-                            })}
-                            onClick={() => !disabled && remove(label)}
-                          >
-                            <CircleXMark
-                              color={colors.$16}
-                              hoverColor={colors.$3}
-                              borderColor={colors.$5}
-                              hoverBorderColor={colors.$17}
-                              size="1.5rem"
-                            />
-                          </div>
-                        </div>
-                      )}
+                      {(provided) => renderVariable(label, provided)}
                     </Draggable>
                   ))}
 

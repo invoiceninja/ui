@@ -9,11 +9,16 @@
  */
 
 import { useAtomValue } from 'jotai';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useShouldDisableCustomFields } from '$app/common/hooks/useShouldDisableCustomFields';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { store } from '$app/common/stores/store';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { customField } from '$app/components/CustomField';
 import { Card } from '$app/components/cards';
 import { Tabs } from '$app/components/Tabs';
 import { Settings } from '../../../components/layouts/Settings';
@@ -22,6 +27,31 @@ import {
   isCompanySettingsFormBusy,
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
+import { AddFieldsToDesignModal } from './components/AddFieldsToDesignModal';
+
+const designCustomFields = [
+  'invoice1',
+  'invoice2',
+  'invoice3',
+  'invoice4',
+  'product1',
+  'product2',
+  'product3',
+  'product4',
+];
+
+const savedCustomFields = () => {
+  const { api, currentIndex } = store.getState().companyUsers;
+
+  return (api?.[currentIndex]?.company?.custom_fields ?? {}) as Record<
+    string,
+    string
+  >;
+};
+
+const hasLabel = (value: string | undefined) => {
+  return Boolean(value && customField(value).label().trim());
+};
 
 export function CustomFields() {
   useTitle('custom_fields');
@@ -54,14 +84,37 @@ export function CustomFields() {
   const save = useHandleCompanySave();
   const cancel = useDiscardChanges();
 
+  const disabledCustomFields = useShouldDisableCustomFields();
+  const { isCompanySettingsActive } = useCurrentSettingsLevel();
+
   const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
+
+  const [addedFields, setAddedFields] = useState<string[]>([]);
+
+  const handleSave = async () => {
+    const before = savedCustomFields();
+
+    await save();
+
+    if (disabledCustomFields || !isCompanySettingsActive) {
+      return;
+    }
+
+    const after = savedCustomFields();
+
+    setAddedFields(
+      designCustomFields.filter(
+        (field) => !hasLabel(before[field]) && hasLabel(after[field])
+      )
+    );
+  };
 
   return (
     <Settings
       title={t('custom_fields')}
       breadcrumbs={pages}
       docsLink="en/advanced-settings/#custom_fields"
-      onSaveClick={save}
+      onSaveClick={handleSave}
       onCancelClick={cancel}
       disableSaveButton={isFormBusy}
     >
@@ -90,6 +143,12 @@ export function CustomFields() {
           <Outlet />
         </div>
       </Card>
+
+      <AddFieldsToDesignModal
+        fields={addedFields}
+        onSave={save}
+        onClose={() => setAddedFields([])}
+      />
     </Settings>
   );
 }
