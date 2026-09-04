@@ -25,6 +25,7 @@ import {
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useActions } from '../common/hooks/useActions';
+import { showDeletePaymentAction } from '../common/helpers/show-delete-payment-action';
 import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
 import { Payment } from '$app/common/interfaces/payment';
 import { permission } from '$app/common/guards/guards/permission';
@@ -133,6 +134,7 @@ export default function Payments() {
         customFilterPlaceholder="status"
         filterColumns={shouldShowTagFilter ? filterColumns : undefined}
         showRestore={(resource: Payment) => !resource.is_deleted}
+        showDelete={(resource: Payment) => showDeletePaymentAction(resource)}
         rightSide={
           <div className="flex items-center space-x-2">
             <DataTableColumnsPicker
