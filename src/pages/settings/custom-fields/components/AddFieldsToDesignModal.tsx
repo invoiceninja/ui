@@ -11,7 +11,7 @@
 import classNames from 'classnames';
 import { useAtomValue } from 'jotai';
 import { cloneDeep, isEqual, set } from 'lodash';
-import { useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
@@ -22,7 +22,6 @@ import {
   injectInChanges,
   updateChanges,
 } from '$app/common/stores/slices/company-users';
-import { store } from '$app/common/stores/store';
 import { CustomFields, useCustomField } from '$app/components/CustomField';
 import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
@@ -48,31 +47,27 @@ interface Entry {
   fallback: string;
 }
 
-const invoiceEntries: Entry[] = [
-  { field: 'invoice1', variable: '$invoice.custom1', fallback: 'custom1' },
-  { field: 'invoice2', variable: '$invoice.custom2', fallback: 'custom2' },
-  { field: 'invoice3', variable: '$invoice.custom3', fallback: 'custom3' },
-  { field: 'invoice4', variable: '$invoice.custom4', fallback: 'custom4' },
-];
+interface CaptionProps {
+  icon: ReactNode;
+  label: string;
+}
 
-const productEntries: Entry[] = [
-  { field: 'product1', variable: '$product.product1', fallback: 'custom1' },
-  { field: 'product2', variable: '$product.product2', fallback: 'custom2' },
-  { field: 'product3', variable: '$product.product3', fallback: 'custom3' },
-  { field: 'product4', variable: '$product.product4', fallback: 'custom4' },
-];
+function Caption(props: CaptionProps) {
+  const colors = useColorScheme();
 
-const productTaxVariables = ['$product.tax_amount', '$product.tax'];
+  return (
+    <div className="flex items-center space-x-2 px-5 sm:px-6 pb-2">
+      <div className="flex items-center">{props.icon}</div>
 
-const noExcludedVariables: string[] = [];
-
-const entityIconColor = '#2176FF';
-
-const savedCompany = () => {
-  const { api, currentIndex } = store.getState().companyUsers;
-
-  return api?.[currentIndex]?.company;
-};
+      <span
+        className="text-xs font-medium uppercase tracking-wide"
+        style={{ color: colors.$22 }}
+      >
+        {props.label}
+      </span>
+    </div>
+  );
+}
 
 export function AddFieldsToDesignModal(props: Props) {
   const [t] = useTranslation();
@@ -92,6 +87,7 @@ export function AddFieldsToDesignModal(props: Props) {
   const [step, setStep] = useState<'fields' | 'sort'>('fields');
 
   const isFinished = useRef<boolean>(false);
+  const isSaving = useRef<boolean>(false);
   const snapshot = useRef<Record<string, string[]> | null>(null);
 
   const invoiceVariables = [
@@ -152,6 +148,20 @@ export function AddFieldsToDesignModal(props: Props) {
     { value: '$product.tax_amount', label: t('tax_amount') },
   ];
 
+  const invoiceEntries: Entry[] = [
+    { field: 'invoice1', variable: '$invoice.custom1', fallback: 'custom1' },
+    { field: 'invoice2', variable: '$invoice.custom2', fallback: 'custom2' },
+    { field: 'invoice3', variable: '$invoice.custom3', fallback: 'custom3' },
+    { field: 'invoice4', variable: '$invoice.custom4', fallback: 'custom4' },
+  ];
+
+  const productEntries: Entry[] = [
+    { field: 'product1', variable: '$product.product1', fallback: 'custom1' },
+    { field: 'product2', variable: '$product.product2', fallback: 'custom2' },
+    { field: 'product3', variable: '$product.product3', fallback: 'custom3' },
+    { field: 'product4', variable: '$product.product4', fallback: 'custom4' },
+  ];
+
   const resolveEntries = (entries: Entry[]) => {
     return entries
       .filter((entry) => fields.includes(entry.field))
@@ -165,10 +175,10 @@ export function AddFieldsToDesignModal(props: Props) {
     {
       target: 'invoice_details',
       caption: t('invoice_details'),
-      icon: <Invoice size="1.1rem" color={entityIconColor} />,
+      icon: <Invoice size="1.1rem" color="#2176FF" />,
       dragHelp: t('invoice_fields_help'),
       defaultVariables: invoiceVariables,
-      excludedVariables: noExcludedVariables,
+      excludedVariables: [],
       entries: resolveEntries(invoiceEntries),
     },
     {
@@ -176,12 +186,12 @@ export function AddFieldsToDesignModal(props: Props) {
       caption: company?.settings?.sync_invoice_quote_columns
         ? t('product_columns')
         : t('invoice_product_columns'),
-      icon: <Cube size="1.1rem" color={entityIconColor} />,
+      icon: <Cube size="1.1rem" color="#2176FF" />,
       dragHelp: t('product_fields_help'),
       defaultVariables: productVariables,
       excludedVariables: company?.enabled_item_tax_rates
-        ? noExcludedVariables
-        : productTaxVariables,
+        ? []
+        : ['$product.tax_amount', '$product.tax'],
       entries: resolveEntries(productEntries),
     },
   ].filter((group) => group.entries.length > 0);
@@ -210,21 +220,6 @@ export function AddFieldsToDesignModal(props: Props) {
 
   const isSideBySide =
     step === 'sort' && isLargeScreen && renderedSortGroups.current.length > 1;
-
-  const renderCaption = (group: (typeof groups)[number]) => {
-    return (
-      <div className="flex items-center space-x-2 px-5 sm:px-6 pb-2">
-        <div className="flex items-center">{group.icon}</div>
-
-        <span
-          className="text-xs font-medium uppercase tracking-wide"
-          style={{ color: colors.$22 }}
-        >
-          {group.caption}
-        </span>
-      </div>
-    );
-  };
 
   const handleToggle = (target: string, variable: string, value: boolean) => {
     const companyClone = cloneDeep(companyChanges);
@@ -258,7 +253,7 @@ export function AddFieldsToDesignModal(props: Props) {
     props.onClose();
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     isFinished.current = true;
 
     if (
@@ -272,16 +267,15 @@ export function AddFieldsToDesignModal(props: Props) {
       return;
     }
 
-    await props.onSave();
+    isSaving.current = true;
 
-    if (savedCompany() !== company) {
-      props.onClose();
-    }
+    return props.onSave();
   };
 
   useEffect(() => {
     if (fields.length) {
       isFinished.current = false;
+      isSaving.current = false;
       snapshot.current = null;
 
       setStep('fields');
@@ -323,6 +317,16 @@ export function AddFieldsToDesignModal(props: Props) {
     dispatch(injectInChanges({ object: 'company', data: companyClone }));
   }, [fields, company, companyChanges]);
 
+  useEffect(() => {
+    if (!isSaving.current) {
+      return;
+    }
+
+    isSaving.current = false;
+
+    props.onClose();
+  }, [company]);
+
   return (
     <Modal
       title={t('invoice_design')}
@@ -337,7 +341,7 @@ export function AddFieldsToDesignModal(props: Props) {
       <div className="flex flex-col pt-5 sm:pt-6">
         {step === 'fields' ? (
           renderedGroups.current.map((group, index) => (
-            <div key={group.target} className="flex flex-col">
+            <div key={index} className="flex flex-col">
               {Boolean(index) && (
                 <div className="px-5 sm:px-6 py-4">
                   <Divider
@@ -348,11 +352,11 @@ export function AddFieldsToDesignModal(props: Props) {
                 </div>
               )}
 
-              {renderCaption(group)}
+              <Caption icon={group.icon} label={group.caption} />
 
-              {group.entries.map((entry) => (
+              {group.entries.map((entry, entryIndex) => (
                 <Element
-                  key={entry.variable}
+                  key={entryIndex}
                   leftSide={
                     <span style={{ color: colors.$3 }}>{entry.label}</span>
                   }
@@ -376,9 +380,9 @@ export function AddFieldsToDesignModal(props: Props) {
               'lg:grid-cols-2 lg:gap-y-0': isSideBySide,
             })}
           >
-            {renderedSortGroups.current.map((group) => (
-              <div key={group.target} className="flex flex-col">
-                {renderCaption(group)}
+            {renderedSortGroups.current.map((group, index) => (
+              <div key={index} className="flex flex-col">
+                <Caption icon={group.icon} label={group.caption} />
 
                 <div className="px-5 sm:px-6 pb-1">
                   <span className="text-xs" style={{ color: colors.$22 }}>

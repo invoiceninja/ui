@@ -37,14 +37,59 @@ interface Props {
   withDragPortal?: boolean;
 }
 
+interface VariableProps {
+  label: string | undefined;
+  provided: DraggableProvided;
+  disabled?: boolean;
+  onRemove: () => void;
+}
+
+function Variable(props: VariableProps) {
+  const colors = useColorScheme();
+
+  const { label, provided, disabled, onRemove } = props;
+
+  return (
+    <div
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+      ref={provided.innerRef}
+      className="flex items-center justify-between text-sm"
+      style={{ ...provided.draggableProps.style, color: colors.$3 }}
+    >
+      <div className="flex items-center space-x-2 py-2">
+        <div>
+          <GridDotsVertical size="1.2rem" color={colors.$17} />
+        </div>
+
+        <span>{label}</span>
+      </div>
+
+      <div
+        className={classNames({
+          'cursor-not-allowed opacity-75': disabled,
+          'cursor-pointer': !disabled,
+        })}
+        onClick={() => !disabled && onRemove()}
+      >
+        <CircleXMark
+          color={colors.$16}
+          hoverColor={colors.$3}
+          borderColor={colors.$5}
+          hoverBorderColor={colors.$17}
+          size="1.5rem"
+        />
+      </div>
+    </div>
+  );
+}
+
 export function SortableVariableList(props: Props) {
   const [t] = useTranslation();
   const company = useCompanyChanges();
   const dispatch = useDispatch();
 
   const { disabled, excludedVariables, withDragPortal } = props;
-
-  const colors = useColorScheme();
 
   const defaultVariables = props.defaultVariables;
 
@@ -126,42 +171,6 @@ export function SortableVariableList(props: Props) {
     dispatch(injectInChanges({ object: 'company', data: companyClone }));
   };
 
-  const renderVariable = (label: string, provided: DraggableProvided) => {
-    return (
-      <div
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-        ref={provided.innerRef}
-        className="flex items-center justify-between text-sm"
-        style={{ ...provided.draggableProps.style, color: colors.$3 }}
-      >
-        <div className="flex items-center space-x-2 py-2">
-          <div>
-            <GridDotsVertical size="1.2rem" color={colors.$17} />
-          </div>
-
-          <span>{resolveTranslation(label)?.label}</span>
-        </div>
-
-        <div
-          className={classNames({
-            'cursor-not-allowed opacity-75': disabled,
-            'cursor-pointer': !disabled,
-          })}
-          onClick={() => !disabled && remove(label)}
-        >
-          <CircleXMark
-            color={colors.$16}
-            hoverColor={colors.$3}
-            borderColor={colors.$5}
-            hoverBorderColor={colors.$17}
-            size="1.5rem"
-          />
-        </div>
-      </div>
-    );
-  };
-
   return (
     <>
       <Element leftSide={t('fields')}>
@@ -189,8 +198,14 @@ export function SortableVariableList(props: Props) {
             isDropDisabled={disabled}
             renderClone={
               withDragPortal
-                ? (provided, _, rubric) =>
-                    renderVariable(rubric.draggableId, provided)
+                ? (provided, _, rubric) => (
+                    <Variable
+                      label={resolveTranslation(rubric.draggableId)?.label}
+                      provided={provided}
+                      disabled={disabled}
+                      onRemove={() => remove(rubric.draggableId)}
+                    />
+                  )
                 : undefined
             }
           >
@@ -207,7 +222,14 @@ export function SortableVariableList(props: Props) {
                       index={index}
                       isDragDisabled={disabled}
                     >
-                      {(provided) => renderVariable(label, provided)}
+                      {(provided) => (
+                        <Variable
+                          label={resolveTranslation(label)?.label}
+                          provided={provided}
+                          disabled={disabled}
+                          onRemove={() => remove(label)}
+                        />
+                      )}
                     </Draggable>
                   ))}
 

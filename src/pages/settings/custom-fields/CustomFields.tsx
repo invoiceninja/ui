@@ -9,14 +9,14 @@
  */
 
 import { useAtomValue } from 'jotai';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useShouldDisableCustomFields } from '$app/common/hooks/useShouldDisableCustomFields';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { store } from '$app/common/stores/store';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { customField } from '$app/components/CustomField';
 import { Card } from '$app/components/cards';
@@ -39,15 +39,6 @@ const designCustomFields = [
   'product3',
   'product4',
 ];
-
-const savedCustomFields = () => {
-  const { api, currentIndex } = store.getState().companyUsers;
-
-  return (api?.[currentIndex]?.company?.custom_fields ?? {}) as Record<
-    string,
-    string
-  >;
-};
 
 const hasLabel = (value: string | undefined) => {
   return Boolean(value && customField(value).label().trim());
@@ -81,6 +72,7 @@ export function CustomFields() {
   ];
 
   const location = useLocation();
+  const company = useCurrentCompany();
   const save = useHandleCompanySave();
   const cancel = useDiscardChanges();
 
@@ -91,23 +83,35 @@ export function CustomFields() {
 
   const [addedFields, setAddedFields] = useState<string[]>([]);
 
-  const handleSave = async () => {
-    const before = savedCustomFields();
+  const savedCustomFields = useRef<Record<string, string> | null>(null);
 
-    await save();
+  const handleSave = () => {
+    savedCustomFields.current = company?.custom_fields ?? {};
+
+    return save();
+  };
+
+  useEffect(() => {
+    const before = savedCustomFields.current;
+
+    if (!before) {
+      return;
+    }
+
+    savedCustomFields.current = null;
 
     if (disabledCustomFields || !isCompanySettingsActive) {
       return;
     }
 
-    const after = savedCustomFields();
+    const after = company?.custom_fields ?? {};
 
     setAddedFields(
       designCustomFields.filter(
         (field) => !hasLabel(before[field]) && hasLabel(after[field])
       )
     );
-  };
+  }, [company]);
 
   return (
     <Settings
