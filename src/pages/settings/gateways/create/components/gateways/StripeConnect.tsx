@@ -31,7 +31,7 @@ export function StripeConnect(props: Props) {
   const config = useResolveConfigValue(props.companyGateway);
 
   const accountId = config('account_id');
-  const isConnected = isHosted() && Boolean(accountId);
+  const isConnected = isHosted() && accountId?.length > 0;
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isWarningModalOpen, setIsWarningModalOpen] = useState<boolean>(false);
