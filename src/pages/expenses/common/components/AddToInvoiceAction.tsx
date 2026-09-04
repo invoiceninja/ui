@@ -138,7 +138,7 @@ export function AddToInvoiceAction(props: Props) {
     );
 
     navigate(
-      route('/invoices/:id/edit?action=invoice_expense', {
+      route('/invoices/:id/edit?action=invoice_expense&table=products', {
         id: invoice.id,
       })
     );

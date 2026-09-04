@@ -63,7 +63,7 @@ export function useActions() {
       })
     );
 
-    navigate('/invoices/create?action=invoice_transaction');
+    navigate('/invoices/create?action=invoice_transaction&table=products');
   };
 
   const actions: Action<Transaction>[] = [

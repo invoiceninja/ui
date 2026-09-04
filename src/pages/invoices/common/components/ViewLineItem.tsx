@@ -53,10 +53,10 @@ export function ViewLineItem({
     const params = new URLSearchParams();
 
     params.set('line_item', lineItemIndex.toString());
-
-    if (lineItem.type_id === InvoiceItemType.Task) {
-      params.set('table', 'tasks');
-    }
+    params.set(
+      'table',
+      lineItem.type_id === InvoiceItemType.Task ? 'tasks' : 'products'
+    );
 
     navigate(`${editHref}?${params.toString()}`);
   }, [editHref, lineItemIndex, lineItem.type_id, navigate]);
