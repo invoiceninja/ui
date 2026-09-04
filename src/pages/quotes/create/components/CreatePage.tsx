@@ -56,7 +56,7 @@ export default function CreatePage() {
   const taskColumns = useTaskColumns();
   const productColumns = useProductColumns();
   const productQuoteColumns = useProductQuoteColumns();
-  const defaultTabIndex = useDefaultTabIndex();
+  const { defaultTabIndex, handleTabChange } = useDefaultTabIndex();
 
   const {
     handleChange,
@@ -97,6 +97,7 @@ export default function CreatePage() {
           <TabGroup
             tabs={[t('products'), t('tasks')]}
             defaultTabIndex={defaultTabIndex}
+            onTabChange={handleTabChange}
             formatTabLabel={(index) => {
               if (index === 1) {
                 return <TasksTabLabel lineItems={quote?.line_items || []} />;

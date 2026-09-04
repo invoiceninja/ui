@@ -13,7 +13,7 @@ import { DEFAULT_TAB, DEFAULT_TABS } from '../constants/default-tab';
 import { useReactSettings } from './useReactSettings';
 
 export const useDefaultTabIndex = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const reactSettings = useReactSettings();
 
@@ -21,5 +21,23 @@ export const useDefaultTabIndex = () => {
   const currentTab = searchParams.get('table') ?? defaultTab;
   const currentTabIndex = DEFAULT_TABS.findIndex((tab) => tab === currentTab);
 
-  return currentTabIndex === -1 ? 0 : currentTabIndex;
+  const handleTabChange = (index: number) => {
+    const tab = DEFAULT_TABS[index];
+
+    if (!tab) {
+      return;
+    }
+
+    const params = new URLSearchParams(searchParams);
+
+    params.set('table', tab);
+    params.delete('line_item');
+
+    setSearchParams(params, { replace: true });
+  };
+
+  return {
+    defaultTabIndex: currentTabIndex === -1 ? 0 : currentTabIndex,
+    handleTabChange,
+  };
 };

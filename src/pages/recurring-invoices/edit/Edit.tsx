@@ -47,7 +47,7 @@ export default function Edit() {
   const taskColumns = useTaskColumns();
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
-  const defaultTabIndex = useDefaultTabIndex();
+  const { defaultTabIndex, handleTabChange } = useDefaultTabIndex();
 
   const context: RecurringInvoiceContext = useOutletContext();
 
@@ -136,6 +136,7 @@ export default function Edit() {
           <TabGroup
             tabs={[t('products'), t('tasks')]}
             defaultTabIndex={defaultTabIndex}
+            onTabChange={handleTabChange}
             formatTabLabel={(index) => {
               if (index === 1) {
                 return (

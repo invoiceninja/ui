@@ -60,7 +60,7 @@ export default function Edit() {
   const taskColumns = useTaskColumns();
   const productColumns = useProductColumns();
   const productQuoteColumns = useProductQuoteColumns();
-  const defaultTabIndex = useDefaultTabIndex();
+  const { defaultTabIndex, handleTabChange } = useDefaultTabIndex();
   const statusThemeColors = useStatusThemeColorScheme();
 
   useScrollToLineItem(Boolean(quote && client));
@@ -146,6 +146,7 @@ export default function Edit() {
           <TabGroup
             tabs={[t('products'), t('tasks')]}
             defaultTabIndex={defaultTabIndex}
+            onTabChange={handleTabChange}
             formatTabLabel={(index) => {
               if (index === 1) {
                 return <TasksTabLabel lineItems={quote?.line_items || []} />;
