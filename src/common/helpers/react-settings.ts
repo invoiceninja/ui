@@ -2,15 +2,15 @@ import {
   Calculate,
   DashboardCardField,
   Field,
-  Format,
   Period,
+  StoredFormat,
 } from '../interfaces/company-user';
 
 export function encodeDashboardField(
   field: Field,
   period: Period,
   calculate: Calculate,
-  format: Format,
+  format: StoredFormat,
   index: number
 ): string {
   return `${field}|${period}|${calculate}|${format}|${index}`;
@@ -23,6 +23,6 @@ export function decodeDashboardField(key: string): DashboardCardField {
     field: field as Field,
     period: period as Period,
     calculate: calculate as Calculate,
-    format: format as Format,
+    format: format as StoredFormat,
   };
 }

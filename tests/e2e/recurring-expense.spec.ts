@@ -2,6 +2,7 @@ import {
   Permission,
   checkDropdownActions,
   checkTableEditability,
+  fillDebounced,
   login,
   logout,
   selectAssignedUser,
@@ -799,9 +800,8 @@ test('Checking the gross amount by rate', async ({ page, api }) => {
   await taxOption2.waitFor({ state: 'visible', timeout: 5000 });
   await taxOption2.click();
 
-  // Amount field uses NumericFormat (type="text"), find via label
   const amountInput = page.locator('dt:has-text("Amount")').locator('..').locator('input').first();
-  await amountInput.fill('12222');
+  await fillDebounced(amountInput, '12222', { kind: 'number' });
 
   await page
     .locator('[data-cy="topNavbar"]')
@@ -869,9 +869,8 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
   await taxOption2.waitFor({ state: 'visible', timeout: 5000 });
   await taxOption2.click();
 
-  // Amount field uses NumericFormat (type="text"), find via label
   const amountInput = page.locator('dt:has-text("Amount")').locator('..').locator('input').first();
-  await amountInput.fill('12222');
+  await fillDebounced(amountInput, '12222', { kind: 'number' });
 
   await page.locator('[data-cy="inclusiveTaxesToggle"]').first().check();
 
@@ -927,9 +926,8 @@ test('Checking the gross amount by amount', async ({ page, api }) => {
   await page.locator('[data-cy="taxNameByAmount2"]').fill('tax_name_2');
   await page.locator('[data-cy="taxNameByAmount2"]').locator('xpath=ancestor::section/following-sibling::section//input').fill('200');
 
-  // Amount field uses NumericFormat (type="text"), find via label
   const amountInput = page.locator('dt:has-text("Amount")').locator('..').locator('input').first();
-  await amountInput.fill('12222');
+  await fillDebounced(amountInput, '12222', { kind: 'number' });
 
   await page
     .locator('[data-cy="topNavbar"]')
