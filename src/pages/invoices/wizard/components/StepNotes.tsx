@@ -37,10 +37,6 @@ export function StepNotes({ wizard, embedded }: Props) {
       <div>
         <Legend>{t('terms')}</Legend>
 
-        <p className="text-xs -mt-1 mb-1" style={{ color: colors.$17 }}>
-          {t('terms_printed_on_invoice')}
-        </p>
-
         <MarkdownEditor
           value={invoice?.terms ?? ''}
           onChange={(value) => wizard.patch({ terms: value })}

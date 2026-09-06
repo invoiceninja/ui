@@ -70,7 +70,6 @@ export function TaxSetup({
       setNameError(undefined);
       setRateError(undefined);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const parsedRate = Number(rate.replace(',', '.'));

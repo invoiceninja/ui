@@ -241,6 +241,7 @@ export function useWizard(existingId?: string): Wizard {
 
           if (adopted?.id) {
             attachClient(adopted);
+            navigate(STEPS[1].href, { replace: true });
 
             return;
           }
@@ -273,7 +274,6 @@ export function useWizard(existingId?: string): Wizard {
       setHandoff(undefined);
 
       if (seeded.client_id) {
-        navigate(STEPS[1].href, { replace: true });
         void adoptClient(seeded.client_id);
       }
 
@@ -317,14 +317,12 @@ export function useWizard(existingId?: string): Wizard {
           date: loaded.date || today(),
           uses_inclusive_taxes: Boolean(company?.settings?.inclusive_taxes),
           line_items: [{ ...blankLineItem(), quantity: 1, sort_id: 0 }],
-          ...(clientParam ? { client_id: clientParam } : {}),
         };
 
         latest.current = seeded;
         setInvoice(seeded);
 
         if (clientParam) {
-          navigate(STEPS[1].href, { replace: true });
           void adoptClient(clientParam);
         }
       })
@@ -333,7 +331,6 @@ export function useWizard(existingId?: string): Wizard {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadAttempt, existingId]);
 
   const retryLoad = useCallback(() => setLoadAttempt((n) => n + 1), []);
@@ -401,7 +398,6 @@ export function useWizard(existingId?: string): Wizard {
           const merged = { ...previous };
 
           SERVER_OWNED.forEach((key) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (merged as any)[key] = (saved as any)[key];
           });
 
@@ -522,6 +518,8 @@ export function useWizard(existingId?: string): Wizard {
   const attachClient = useCallback(
     (next: Client) => {
       setClient(next);
+      setErrors(undefined);
+      createFailed.current = false;
 
       const emailable = (next.contacts ?? []).filter(
         (contact) => contact.send_email !== false
@@ -546,6 +544,8 @@ export function useWizard(existingId?: string): Wizard {
 
   const detachClient = useCallback(() => {
     setClient(undefined);
+    setErrors(undefined);
+    createFailed.current = false;
     patch({ client_id: '', invitations: [] });
 
     if (location.pathname !== STEPS[0].href) {

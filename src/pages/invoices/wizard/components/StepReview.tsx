@@ -121,7 +121,6 @@ export function StepReview({ wizard }: Props) {
         }
       })
       .catch(() => setDesignsFailed(true));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

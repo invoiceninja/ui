@@ -16,14 +16,18 @@ import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { formatTaxName } from '$app/common/helpers/invoices/round';
 import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { updateRecord } from '$app/common/stores/slices/company-users';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { Plus } from '$app/components/icons/Plus';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { Button, InputField, InputLabel } from '$app/components/forms';
+import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 import { Callout } from './Callout';
 import { ErrorBanner } from './ErrorBanner';
 import { StepFooter } from './StepFooter';
@@ -37,7 +41,43 @@ interface Props {
   embedded?: boolean;
 }
 
-type TaxTarget = { scope: 'invoice' } | { scope: 'item'; index: number };
+type TaxTarget =
+  | { scope: 'invoice' }
+  | { scope: 'item'; index: number; slot: TaxSlot };
+
+const TAX_SLOTS = [1, 2, 3] as const;
+
+type TaxSlot = (typeof TAX_SLOTS)[number];
+
+const TAX_FIELDS: Record<
+  TaxSlot,
+  {
+    name: 'tax_name1' | 'tax_name2' | 'tax_name3';
+    rate: 'tax_rate1' | 'tax_rate2' | 'tax_rate3';
+  }
+> = {
+  1: { name: 'tax_name1', rate: 'tax_rate1' },
+  2: { name: 'tax_name2', rate: 'tax_rate2' },
+  3: { name: 'tax_name3', rate: 'tax_rate3' },
+};
+
+const visibleSlots = (item: InvoiceItem, enabled: number) => {
+  const applied = TAX_SLOTS.filter(
+    (slot) => slot <= enabled && Boolean(item[TAX_FIELDS[slot].name])
+  );
+
+  const free = TAX_SLOTS.find(
+    (slot) => slot <= enabled && !item[TAX_FIELDS[slot].name]
+  );
+
+  return free ? [...applied, free] : applied;
+};
+
+const SLOT_LABELS: Record<TaxSlot, string> = {
+  1: 'one_tax_rate',
+  2: 'two_tax_rates',
+  3: 'three_tax_rates',
+};
 
 export function StepItems({ wizard, embedded }: Props) {
   const reactSettings = useReactSettings();
@@ -46,6 +86,7 @@ export function StepItems({ wizard, embedded }: Props) {
   const formatMoney = useFormatMoney();
   const [t] = useTranslation();
   const company = useCurrentCompany();
+  const dispatch = useDispatch();
 
   const items = wizard.invoice?.line_items ?? [];
 
@@ -57,10 +98,11 @@ export function StepItems({ wizard, embedded }: Props) {
   );
   const [rates, setRates] = useState<TaxRate[]>([]);
   const [inclusiveAnswered, setInclusiveAnswered] = useState(false);
+  const [enablingTaxes, setEnablingTaxes] = useState(false);
 
-  const itemTaxesEnabled = (company?.enabled_item_tax_rates ?? 0) > 0;
+  const enabledTaxSlots = company?.enabled_item_tax_rates ?? 0;
   const taxesConfigured =
-    itemTaxesEnabled || (company?.enabled_tax_rates ?? 0) > 0;
+    enabledTaxSlots > 0 || (company?.enabled_tax_rates ?? 0) > 0;
 
   useEffect(() => {
     if (!taxesConfigured) {
@@ -117,13 +159,14 @@ export function StepItems({ wizard, embedded }: Props) {
     }
 
     if (taxSetup?.scope === 'item') {
-      const index = taxSetup.index;
+      const { index, slot } = taxSetup;
+      const field = TAX_FIELDS[slot];
 
       wizard.patch({
         ...applied,
         line_items: items.map((item, position) =>
           position === index
-            ? { ...item, tax_name1: tax.name, tax_rate1: tax.rate }
+            ? { ...item, [field.name]: tax.name, [field.rate]: tax.rate }
             : item
         ),
       });
@@ -139,6 +182,26 @@ export function StepItems({ wizard, embedded }: Props) {
         tax_rate1: tax.rate,
       })),
     });
+  };
+
+  const enableTaxSlots = (count: number) => {
+    if (!company?.id) {
+      return;
+    }
+
+    setEnablingTaxes(true);
+
+    request(
+      'PUT',
+      endpoint('/api/v1/companies/:id', { id: company.id }),
+      { ...company, enabled_item_tax_rates: count },
+      { skipIntercept: true }
+    )
+      .then((response) =>
+        dispatch(updateRecord({ object: 'company', data: response.data.data }))
+      )
+      .catch(() => toast.error())
+      .finally(() => setEnablingTaxes(false));
   };
 
   const described = items.some((item) => item.notes || item.product_key);
@@ -208,6 +271,10 @@ export function StepItems({ wizard, embedded }: Props) {
           </button>
         </div>
       )}
+
+      {wizard.invoice ? (
+        <HiddenResourceTaxesAlert className="mb-4" resource={wizard.invoice} />
+      ) : null}
 
       <div className="space-y-5">
         {items.map((item, index) => {
@@ -296,19 +363,28 @@ export function StepItems({ wizard, embedded }: Props) {
                 </div>
               </div>
 
-              {itemTaxesEnabled ? (
-                <div className="mt-3">
-                  <TaxChip
-                    item={item}
-                    rates={rates}
-                    onChange={(changes) => update(index, changes)}
-                    onCreate={() => {
-                      setTaxSetup({ scope: 'item', index });
-                      setTaxOpen(true);
-                    }}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {enabledTaxSlots === 0 ? (
+                  <TaxSlotsChip
+                    busy={enablingTaxes}
+                    onSelect={enableTaxSlots}
                   />
-                </div>
-              ) : null}
+                ) : (
+                  visibleSlots(item, enabledTaxSlots).map((slot) => (
+                    <TaxChip
+                      key={slot}
+                      item={item}
+                      slot={slot}
+                      rates={rates}
+                      onChange={(changes) => update(index, changes)}
+                      onCreate={() => {
+                        setTaxSetup({ scope: 'item', index, slot });
+                        setTaxOpen(true);
+                      }}
+                    />
+                  ))
+                )}
+              </div>
             </div>
           );
         })}
@@ -532,20 +608,19 @@ interface Placement {
   above: boolean;
 }
 
-function TaxChip({
-  item,
-  rates,
-  onChange,
-  onCreate,
+function ChipMenu({
+  label,
+  applied,
+  disabled,
+  children,
 }: {
-  item: InvoiceItem;
-  rates: TaxRate[];
-  onChange: (changes: Partial<InvoiceItem>) => void;
-  onCreate: () => void;
+  label: ReactNode;
+  applied: boolean;
+  disabled?: boolean;
+  children: ReactNode;
 }) {
   const accentColor = useAccentColor();
   const colors = useColorScheme();
-  const [t] = useTranslation();
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [placement, setPlacement] = useState<Placement>();
@@ -614,13 +689,12 @@ function TaxChip({
     };
   }, [open, reposition]);
 
-  const applied = Boolean(item.tax_name1);
-
   return (
     <div className="inline-block">
       <button
         ref={chip}
         type="button"
+        disabled={disabled}
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen(!open)}
@@ -631,20 +705,22 @@ function TaxChip({
           color: applied ? colors.$3 : accentColor,
           backgroundColor: applied ? colors.$25 : hexToRgba(accentColor, 0.1),
           fontWeight: 500,
-          opacity: hovered ? 0.75 : 1,
+          opacity: disabled ? 0.6 : hovered ? 0.75 : 1,
+          cursor: disabled ? 'not-allowed' : 'pointer',
           transition: 'opacity 150ms ease',
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
         {applied ? null : <Plus size="0.6875rem" color={accentColor} />}
-        {applied ? formatTaxName(item.tax_name1, item.tax_rate1) : t('add_tax')}
+        {label}
       </button>
 
       {open && placement
         ? createPortal(
             <div
               ref={panel}
+              onClick={() => setOpen(false)}
               className="fixed flex flex-col border overflow-hidden"
               style={{
                 left: placement.left,
@@ -659,51 +735,94 @@ function TaxChip({
                 boxShadow: '0 12px 32px -12px rgba(9,9,11,0.28)',
               }}
             >
-              <div className="overflow-y-auto" role="listbox">
-                {applied ? (
-                  <Option
-                    onClick={() => {
-                      onChange({ tax_name1: '', tax_rate1: 0 });
-                      setOpen(false);
-                    }}
-                  >
-                    {`${t('no')} ${t('tax').toLowerCase()}`}
-                  </Option>
-                ) : null}
-
-                {rates.map((rate) => (
-                  <Option
-                    key={rate.id ?? rate.name}
-                    selected={applied && item.tax_name1 === rate.name}
-                    onClick={() => {
-                      onChange({ tax_name1: rate.name, tax_rate1: rate.rate });
-                      setOpen(false);
-                    }}
-                  >
-                    {formatTaxName(rate.name, rate.rate)}
-                  </Option>
-                ))}
-              </div>
-
-              <div
-                className="shrink-0"
-                style={{ borderTop: `1px solid ${colors.$20}` }}
-              >
-                <Option
-                  onClick={() => {
-                    setOpen(false);
-                    onCreate();
-                  }}
-                  muted
-                >
-                  {t('create_tax_rate')}
-                </Option>
-              </div>
+              {children}
             </div>,
             document.body
           )
         : null}
     </div>
+  );
+}
+
+function TaxChip({
+  item,
+  slot,
+  rates,
+  onChange,
+  onCreate,
+}: {
+  item: InvoiceItem;
+  slot: TaxSlot;
+  rates: TaxRate[];
+  onChange: (changes: Partial<InvoiceItem>) => void;
+  onCreate: () => void;
+}) {
+  const colors = useColorScheme();
+  const [t] = useTranslation();
+
+  const field = TAX_FIELDS[slot];
+  const name = item[field.name] ?? '';
+  const rate = item[field.rate] ?? 0;
+  const applied = Boolean(name);
+
+  return (
+    <ChipMenu
+      applied={applied}
+      label={applied ? formatTaxName(name, rate) : t('add_tax')}
+    >
+      <div className="overflow-y-auto" role="listbox">
+        {applied ? (
+          <Option
+            onClick={() => onChange({ [field.name]: '', [field.rate]: 0 })}
+          >
+            {t('none')}
+          </Option>
+        ) : null}
+
+        {rates.map((entry) => (
+          <Option
+            key={entry.id ?? entry.name}
+            selected={applied && name === entry.name}
+            onClick={() =>
+              onChange({ [field.name]: entry.name, [field.rate]: entry.rate })
+            }
+          >
+            {formatTaxName(entry.name, entry.rate)}
+          </Option>
+        ))}
+      </div>
+
+      <div
+        className="shrink-0"
+        style={{ borderTop: `1px solid ${colors.$20}` }}
+      >
+        <Option onClick={onCreate} muted>
+          {t('create_tax_rate')}
+        </Option>
+      </div>
+    </ChipMenu>
+  );
+}
+
+function TaxSlotsChip({
+  busy,
+  onSelect,
+}: {
+  busy: boolean;
+  onSelect: (count: TaxSlot) => void;
+}) {
+  const [t] = useTranslation();
+
+  return (
+    <ChipMenu applied={false} disabled={busy} label={t('add_tax')}>
+      <div className="overflow-y-auto" role="listbox">
+        {TAX_SLOTS.map((slot) => (
+          <Option key={slot} onClick={() => onSelect(slot)}>
+            {t(SLOT_LABELS[slot])}
+          </Option>
+        ))}
+      </div>
+    </ChipMenu>
   );
 }
 

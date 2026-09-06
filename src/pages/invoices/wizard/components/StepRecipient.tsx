@@ -19,6 +19,7 @@ import { AxiosError } from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Spinner } from '$app/components/Spinner';
+import { Modal } from '$app/components/Modal';
 import { Button, InputField, InputLabel } from '$app/components/forms';
 import { ErrorBanner } from './ErrorBanner';
 import { StepFooter } from './StepFooter';
@@ -52,8 +53,20 @@ export function StepRecipient({ wizard }: Props) {
     general?: string;
   }>({});
   const [active, setActive] = useState(-1);
+  const [contactOpen, setContactOpen] = useState(false);
+  const [contact, setContact] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+  });
+  const [savingContact, setSavingContact] = useState(false);
+  const [contactErrors, setContactErrors] = useState<{
+    email?: string;
+    general?: string;
+  }>({});
 
   const timer = useRef<ReturnType<typeof setTimeout>>();
+  const lastMatches = useRef<Client[]>([]);
   const searchBox = useRef<HTMLDivElement>(null);
   const nameInput = useRef<HTMLInputElement>(null);
   const selected = wizard.client;
@@ -125,7 +138,10 @@ export function StepRecipient({ wizard }: Props) {
             return;
           }
 
-          setMatches(response.data.data ?? []);
+          const found = (response.data.data ?? []) as Client[];
+
+          lastMatches.current = found;
+          setMatches(found);
           setActive(-1);
         })
         .catch(() => {
@@ -133,6 +149,7 @@ export function StepRecipient({ wizard }: Props) {
             return;
           }
 
+          lastMatches.current = [];
           setMatches([]);
           setActive(-1);
         })
@@ -162,6 +179,143 @@ export function StepRecipient({ wizard }: Props) {
     setErrors({});
   };
 
+  const applyServerErrors = (caught: AxiosError<ValidationBag>) => {
+    const bag = caught.response?.data?.errors;
+
+    if (!bag) {
+      setErrors({ general: t('customer_not_saved') });
+
+      return;
+    }
+
+    const next: { name?: string; general?: string } = {};
+
+    Object.entries(bag).forEach(([key, messages]) => {
+      const message = messages[0];
+
+      if (key === 'name') {
+        next.name = message;
+      } else {
+        next.general = message;
+      }
+    });
+
+    setErrors(next);
+  };
+
+  const createClient = (): Promise<Client | null> => {
+    if (!name.trim()) {
+      setErrors({ name: t('field_is_required') });
+
+      return Promise.resolve(null);
+    }
+
+    setErrors({});
+    wizard.clearErrors();
+    setBusy(true);
+
+    return request(
+      'POST',
+      endpoint('/api/v1/clients'),
+      {
+        name: name.trim(),
+        address1: address.address1,
+        city: address.city,
+        postal_code: address.postal_code,
+      },
+      { skipIntercept: true }
+    )
+      .then((response) => {
+        const created = response.data.data as Client;
+
+        choose(created);
+        $refetch(['clients']);
+
+        return created;
+      })
+      .catch((caught: AxiosError<ValidationBag>) => {
+        applyServerErrors(caught);
+
+        return null;
+      })
+      .finally(() => setBusy(false));
+  };
+
+  const openContact = () => {
+    const existing = selected?.contacts?.[0];
+
+    setContact({
+      first_name: existing?.first_name ?? '',
+      last_name: existing?.last_name ?? '',
+      email: existing?.email ?? '',
+    });
+    setContactErrors({});
+    setContactOpen(true);
+  };
+
+  const saveContact = () => {
+    if (!selected?.id) {
+      return;
+    }
+
+    const email = contact.email.trim();
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setContactErrors({ email: t('enter_valid_email_address') });
+
+      return;
+    }
+
+    setContactErrors({});
+    setSavingContact(true);
+
+    const contacts = (selected.contacts ?? []).length
+      ? selected.contacts.map((entry, index) =>
+          index === 0
+            ? {
+                ...entry,
+                first_name: contact.first_name.trim(),
+                last_name: contact.last_name.trim(),
+                email,
+                send_email: true,
+              }
+            : entry
+        )
+      : [
+          {
+            first_name: contact.first_name.trim(),
+            last_name: contact.last_name.trim(),
+            email,
+            send_email: true,
+          },
+        ];
+
+    request(
+      'PUT',
+      endpoint('/api/v1/clients/:id', { id: selected.id }),
+      { ...selected, contacts, documents: [] },
+      { skipIntercept: true }
+    )
+      .then((response) => {
+        const saved = response.data.data as Client;
+
+        wizard.attachClient(saved);
+        $refetch(['clients']);
+        setContactOpen(false);
+      })
+      .catch((caught: AxiosError<ValidationBag>) => {
+        const bag = caught.response?.data?.errors;
+        const emailError = bag?.['contacts.0.email']?.[0];
+
+        setContactErrors(
+          emailError
+            ? { email: emailError }
+            : { general: t('email_address_not_saved') }
+        );
+      })
+      .finally(() => setSavingContact(false));
+  };
+
   const proceed = () => {
     setBusy(true);
 
@@ -178,62 +332,34 @@ export function StepRecipient({ wizard }: Props) {
     setErrors({});
 
     if (selected) {
-      proceed();
-      return;
+      return proceed();
     }
 
     if (!name.trim()) {
       setErrors({ name: t('field_is_required') });
+
       return;
     }
 
-    setBusy(true);
+    const typed = name.trim().toLowerCase();
+    const collides = lastMatches.current.some((match) => {
+      return (
+        (match.display_name || match.name || '').trim().toLowerCase() === typed
+      );
+    });
 
-    request(
-      'POST',
-      endpoint('/api/v1/clients'),
-      {
-        name: name.trim(),
-        address1: address.address1,
-        city: address.city,
-        postal_code: address.postal_code,
-      },
-      { skipIntercept: true }
-    )
-      .then((response) => {
-        choose(response.data.data as Client);
+    if (collides) {
+      setErrors({ name: t('please_select_a_client') });
+      setDismissedSearch(false);
 
-        $refetch(['clients']);
+      return;
+    }
 
+    return createClient().then((created) => {
+      if (created) {
         return proceed();
-      })
-      .catch((caught: AxiosError<ValidationBag>) => {
-        const bag = caught.response?.data?.errors;
-
-        setBusy(false);
-
-        if (!bag) {
-          setErrors({
-            general: t('customer_not_saved'),
-          });
-
-          return;
-        }
-
-        const next: { name?: string; general?: string } = {};
-
-        Object.entries(bag).forEach(([key, messages]) => {
-          const message = messages[0];
-
-          if (key === 'name') {
-            next.name = message;
-          } else {
-            next.general = message;
-          }
-        });
-
-        setErrors(next);
-      });
+      }
+    });
   };
 
   if (selected) {
@@ -253,9 +379,17 @@ export function StepRecipient({ wizard }: Props) {
               {selected.display_name || selected.name}
             </p>
 
-            <p className="text-xs mt-0.5" style={{ color: colors.$17 }}>
-              {selected.contacts?.[0]?.email || t('client_email_not_set')}
-            </p>
+            <div className="mt-0.5 flex flex-wrap items-center gap-2">
+              <span className="text-xs" style={{ color: colors.$17 }}>
+                {selected.contacts?.[0]?.email || t('client_email_not_set')}
+              </span>
+
+              {selected.contacts?.[0]?.email ? null : (
+                <Button type="minimal" behavior="button" onClick={openContact}>
+                  {t('edit_client')}
+                </Button>
+              )}
+            </div>
           </div>
 
           <Button type="secondary" behavior="button" onClick={reset}>
@@ -274,6 +408,16 @@ export function StepRecipient({ wizard }: Props) {
             {t('continue')}
           </Button>
         </StepFooter>
+
+        <ContactModal
+          open={contactOpen}
+          contact={contact}
+          errors={contactErrors}
+          busy={savingContact}
+          onChange={setContact}
+          onClose={() => setContactOpen(false)}
+          onSave={saveContact}
+        />
       </StepTransition>
     );
   }
@@ -330,6 +474,8 @@ export function StepRecipient({ wizard }: Props) {
                   setName(value);
                   setDismissedSearch(false);
                   setActive(-1);
+                  setErrors({});
+                  wizard.clearErrors();
                 }}
                 errorMessage={errors.name ?? serverErrors?.client_id?.[0]}
               />
@@ -391,9 +537,20 @@ export function StepRecipient({ wizard }: Props) {
 
               <button
                 type="button"
-                onClick={() => setDismissedSearch(true)}
+                disabled={busy}
+                onClick={() => {
+                  setMatches([]);
+                  setActive(-1);
+                  setDismissedSearch(true);
+
+                  void createClient();
+                }}
                 className="w-full text-left px-3.5 py-2.5 border-t text-xs"
-                style={{ borderColor: colors.$20, color: colors.$17 }}
+                style={{
+                  borderColor: colors.$20,
+                  color: colors.$17,
+                  cursor: busy ? 'not-allowed' : 'pointer',
+                }}
               >
                 {trans('add_value_as_new_client', { value: name.trim() })}
               </button>
@@ -461,5 +618,95 @@ export function StepRecipient({ wizard }: Props) {
         </Button>
       </StepFooter>
     </StepTransition>
+  );
+}
+
+function ContactModal({
+  open,
+  contact,
+  errors,
+  busy,
+  onChange,
+  onClose,
+  onSave,
+}: {
+  open: boolean;
+  contact: { first_name: string; last_name: string; email: string };
+  errors: { email?: string; general?: string };
+  busy: boolean;
+  onChange: (next: {
+    first_name: string;
+    last_name: string;
+    email: string;
+  }) => void;
+  onClose: () => void;
+  onSave: () => void;
+}) {
+  const [t] = useTranslation();
+
+  return (
+    <Modal
+      visible={open}
+      onClose={onClose}
+      title={t('edit_client')}
+      size="small"
+    >
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <InputField
+            id="iw-contact-first-name"
+            label={t('first_name')}
+            value={contact.first_name}
+            changeOverride
+            debounceTimeout={0}
+            onValueChange={(value) =>
+              onChange({ ...contact, first_name: value })
+            }
+          />
+
+          <InputField
+            id="iw-contact-last-name"
+            label={t('last_name')}
+            value={contact.last_name}
+            changeOverride
+            debounceTimeout={0}
+            onValueChange={(value) =>
+              onChange({ ...contact, last_name: value })
+            }
+          />
+        </div>
+
+        <InputField
+          id="iw-contact-email"
+          type="email"
+          required
+          label={t('email_address')}
+          value={contact.email}
+          changeOverride
+          debounceTimeout={0}
+          onValueChange={(value) => onChange({ ...contact, email: value })}
+          errorMessage={errors.email}
+        />
+
+        {errors.general ? (
+          <p className="text-xs text-red-600">{errors.general}</p>
+        ) : null}
+
+        <div className="flex items-center justify-end gap-2 pt-1">
+          <Button type="secondary" behavior="button" onClick={onClose}>
+            {t('cancel')}
+          </Button>
+
+          <Button
+            behavior="button"
+            disabled={busy}
+            disableWithoutIcon={!busy}
+            onClick={onSave}
+          >
+            {t('save')}
+          </Button>
+        </div>
+      </div>
+    </Modal>
   );
 }
