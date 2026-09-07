@@ -32,6 +32,7 @@ import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
+import { showDeletePaymentAction } from '$app/pages/payments/common/helpers/show-delete-payment-action';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 
 interface Params {
@@ -153,7 +154,8 @@ export function useActions(params?: Params) {
     (payment: Payment) =>
       (getEntityState(payment) === EntityState.Active ||
         getEntityState(payment) === EntityState.Archived) &&
-      (isEditPage || showCommonBulkAction) && (
+      (isEditPage || showCommonBulkAction) &&
+      showDeletePaymentAction(payment) && (
         <DropdownElement
           onClick={() => bulk([payment.id], 'delete')}
           icon={<Icon element={MdDelete} />}
