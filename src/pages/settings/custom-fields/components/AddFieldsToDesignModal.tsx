@@ -18,19 +18,15 @@ import { useMediaQuery } from 'react-responsive';
 import { useColorScheme } from '$app/common/colors';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import {
-  injectInChanges,
-  updateChanges,
-} from '$app/common/stores/slices/company-users';
+import { Company } from '$app/common/interfaces/company.interface';
+import { injectInChanges } from '$app/common/stores/slices/company-users';
 import { CustomFields, useCustomField } from '$app/components/CustomField';
 import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
-import { ChevronLeft } from '$app/components/icons/ChevronLeft';
 import { Cube } from '$app/components/icons/Cube';
 import { Invoice } from '$app/components/icons/Invoice';
-import { OppositeArrows } from '$app/components/icons/OppositeArrows';
 import { Modal } from '$app/components/Modal';
 import { SortableVariableList } from '$app/pages/settings/invoice-design/pages/general-settings/components/SortableVariableList';
 import { isCompanySettingsFormBusy } from '../../common/hooks/useHandleCompanySave';
@@ -84,11 +80,10 @@ export function AddFieldsToDesignModal(props: Props) {
   const isFormBusy = useAtomValue(isCompanySettingsFormBusy);
   const isLargeScreen = useMediaQuery({ query: '(min-width: 1024px)' });
 
-  const [step, setStep] = useState<'fields' | 'sort'>('fields');
+  const [isSortStep, setIsSortStep] = useState<boolean>(false);
 
-  const isFinished = useRef<boolean>(false);
   const isSaving = useRef<boolean>(false);
-  const snapshot = useRef<Record<string, string[]> | null>(null);
+  const snapshot = useRef<Company | null>(null);
 
   const invoiceVariables = [
     { value: '$invoice.number', label: t('invoice_number') },
@@ -208,18 +203,18 @@ export function AddFieldsToDesignModal(props: Props) {
     );
   };
 
-  const sortGroups = renderedGroups.current.filter((group) =>
+  const selectedGroups = renderedGroups.current.filter((group) =>
     group.entries.some((entry) => isChecked(group.target, entry.variable))
   );
 
   const renderedSortGroups = useRef<typeof groups>([]);
 
-  if (step === 'fields' && sortGroups.length) {
-    renderedSortGroups.current = sortGroups;
+  if (!isSortStep && selectedGroups.length) {
+    renderedSortGroups.current = selectedGroups;
   }
 
   const isSideBySide =
-    step === 'sort' && isLargeScreen && renderedSortGroups.current.length > 1;
+    isSortStep && isLargeScreen && renderedSortGroups.current.length > 1;
 
   const handleToggle = (target: string, variable: string, value: boolean) => {
     const companyClone = cloneDeep(companyChanges);
@@ -239,23 +234,13 @@ export function AddFieldsToDesignModal(props: Props) {
   };
 
   const handleClose = () => {
-    isFinished.current = true;
-
     snapshot.current &&
-      dispatch(
-        updateChanges({
-          object: 'company',
-          property: 'settings.pdf_variables',
-          value: snapshot.current,
-        })
-      );
+      dispatch(injectInChanges({ object: 'company', data: snapshot.current }));
 
     props.onClose();
   };
 
   const handleSave = () => {
-    isFinished.current = true;
-
     if (
       isEqual(
         company?.settings?.pdf_variables,
@@ -274,35 +259,25 @@ export function AddFieldsToDesignModal(props: Props) {
 
   useEffect(() => {
     if (fields.length) {
-      isFinished.current = false;
       isSaving.current = false;
       snapshot.current = null;
 
-      setStep('fields');
+      setIsSortStep(false);
     }
   }, [fields]);
 
   useEffect(() => {
-    if (
-      !fields.length ||
-      !company ||
-      isFinished.current ||
-      companyChanges !== company
-    ) {
+    if (!fields.length || !company || companyChanges !== company) {
       return;
     }
 
-    const companyClone = cloneDeep(company);
+    snapshot.current = companyChanges;
 
-    if (!companyClone.settings.pdf_variables) {
-      set(companyClone, 'settings.pdf_variables', {});
-    }
-
-    snapshot.current = cloneDeep(companyClone.settings.pdf_variables);
+    const companyClone = cloneDeep(companyChanges);
 
     groups.forEach((group) => {
       const variables: string[] =
-        companyClone.settings.pdf_variables[group.target] ?? [];
+        companyClone?.settings?.pdf_variables?.[group.target] ?? [];
 
       const additions = group.entries
         .map((entry) => entry.variable)
@@ -329,17 +304,43 @@ export function AddFieldsToDesignModal(props: Props) {
 
   return (
     <Modal
-      title={t('invoice_design')}
+      title={isSortStep ? t('invoice_design') : t('add_custom_fields_to_pdf')}
       visible={Boolean(fields.length)}
       onClose={handleClose}
-      size={isSideBySide ? 'large' : 'regular'}
+      size={isSortStep ? (isSideBySide ? 'large' : 'regular') : 'small'}
       disableClosing={isFormBusy}
       overflowVisible
       withoutHorizontalPadding
       withoutVerticalMargin
     >
       <div className="flex flex-col pt-5 sm:pt-6">
-        {step === 'fields' ? (
+        {isSortStep ? (
+          <div
+            className={classNames('grid grid-cols-1 gap-y-6', {
+              'lg:grid-cols-2 lg:gap-y-0': isSideBySide,
+            })}
+          >
+            {renderedSortGroups.current.map((group, index) => (
+              <div key={index} className="flex flex-col">
+                <Caption icon={group.icon} label={group.caption} />
+
+                <div className="px-5 sm:px-6 pb-1">
+                  <span className="text-xs" style={{ color: colors.$22 }}>
+                    {group.dragHelp}
+                  </span>
+                </div>
+
+                <SortableVariableList
+                  for={group.target}
+                  defaultVariables={group.defaultVariables}
+                  excludedVariables={group.excludedVariables}
+                  disabled={isFormBusy}
+                  withDragPortal
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
           renderedGroups.current.map((group, index) => (
             <div key={index} className="flex flex-col">
               {Boolean(index) && (
@@ -374,80 +375,27 @@ export function AddFieldsToDesignModal(props: Props) {
               ))}
             </div>
           ))
-        ) : (
-          <div
-            className={classNames('grid grid-cols-1 gap-y-6', {
-              'lg:grid-cols-2 lg:gap-y-0': isSideBySide,
-            })}
-          >
-            {renderedSortGroups.current.map((group, index) => (
-              <div key={index} className="flex flex-col">
-                <Caption icon={group.icon} label={group.caption} />
-
-                <div className="px-5 sm:px-6 pb-1">
-                  <span className="text-xs" style={{ color: colors.$22 }}>
-                    {group.dragHelp}
-                  </span>
-                </div>
-
-                <SortableVariableList
-                  for={group.target}
-                  defaultVariables={group.defaultVariables}
-                  excludedVariables={group.excludedVariables}
-                  disabled={isFormBusy}
-                  withDragPortal
-                />
-              </div>
-            ))}
-          </div>
         )}
 
-        <div className="flex items-center justify-between px-5 sm:px-6 pt-4">
-          {step === 'fields' ? (
-            <Button
-              behavior="button"
-              type="secondary"
-              onClick={() => setStep('sort')}
-              disabled={isFormBusy || !sortGroups.length}
-              disableWithoutIcon
-            >
-              <OppositeArrows size="1.1rem" color={colors.$3} />
+        <div className="flex items-center justify-end space-x-4 px-5 sm:px-6 pt-4">
+          <Button
+            behavior="button"
+            type="secondary"
+            onClick={handleClose}
+            disabled={isFormBusy}
+            disableWithoutIcon
+          >
+            {isSortStep ? t('cancel') : t('no')}
+          </Button>
 
-              <span>{t('sort')}</span>
-            </Button>
-          ) : (
-            <Button
-              behavior="button"
-              type="secondary"
-              onClick={() => setStep('fields')}
-              disabled={isFormBusy}
-              disableWithoutIcon
-            >
-              <ChevronLeft size="1.1rem" color={colors.$3} />
-
-              <span>{t('back')}</span>
-            </Button>
-          )}
-
-          <div className="flex items-center space-x-4">
-            <Button
-              behavior="button"
-              type="secondary"
-              onClick={handleClose}
-              disabled={isFormBusy}
-              disableWithoutIcon
-            >
-              {t('cancel')}
-            </Button>
-
-            <Button
-              behavior="button"
-              onClick={handleSave}
-              disabled={isFormBusy}
-            >
-              {t('save')}
-            </Button>
-          </div>
+          <Button
+            behavior="button"
+            onClick={isSortStep ? handleSave : () => setIsSortStep(true)}
+            disabled={isFormBusy || (!isSortStep && !selectedGroups.length)}
+            disableWithoutIcon={!isSortStep}
+          >
+            {isSortStep ? t('save') : t('yes')}
+          </Button>
         </div>
       </div>
     </Modal>
