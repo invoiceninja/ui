@@ -187,6 +187,67 @@ export function useHasPermission({
 }
 
 /**
+ * InputField (`react-debounce-input`) default. NumberInputField uses 500ms
+ * when `changeOverride` is set.
+ */
+export const INPUT_FIELD_DEBOUNCE_MS = 300;
+export const NUMBER_INPUT_DEBOUNCE_MS = 500;
+
+/** Extra time after the debounce window so React/Jotai can commit. */
+const DEBOUNCE_FLUSH_BUFFER_MS = 50;
+
+export type DebouncedInputKind = 'input' | 'number';
+
+function debounceMsForKind(kind: DebouncedInputKind = 'input') {
+  return kind === 'number' ? NUMBER_INPUT_DEBOUNCE_MS : INPUT_FIELD_DEBOUNCE_MS;
+}
+
+function debounceWaitMs(kind: DebouncedInputKind = 'input', overrideMs?: number) {
+  return (overrideMs ?? debounceMsForKind(kind)) + DEBOUNCE_FLUSH_BUFFER_MS;
+}
+
+/**
+ * Fill an InputField / NumberInputField and wait until parent state has the value.
+ *
+ * Playwright's fill() is faster than the 300ms/500ms debounce. Clicking Save
+ * (or triggering a re-render) in the same turn sends the previous atom value,
+ * or wipes the visible input because the field is still controlled by stale state.
+ *
+ * Blur commits immediately when `changeOverride` is off. We still wait just past
+ * the debounce window so changeOverride fields and a missed blur still land,
+ * without stacking multi-second sleeps.
+ *
+ * Do not use this on comboboxes — blur closes the dropdown.
+ */
+export async function fillDebounced(
+  locator: Locator,
+  value: string,
+  options?: { kind?: DebouncedInputKind; debounceMs?: number }
+) {
+  await locator.fill(value);
+  await locator.blur();
+  await locator
+    .page()
+    .waitForTimeout(debounceWaitMs(options?.kind, options?.debounceMs));
+}
+
+/**
+ * Flush the focused debounced input before Save. Use when several fields were
+ * filled and only the last one may still be pending — one wait, not one per field.
+ */
+export async function waitForDebouncedCommit(
+  page: Page,
+  options?: { kind?: DebouncedInputKind; debounceMs?: number }
+) {
+  const focused = page.locator(':focus');
+  if (await focused.count()) {
+    await focused.blur().catch(() => {});
+  }
+
+  await page.waitForTimeout(debounceWaitMs(options?.kind, options?.debounceMs));
+}
+
+/**
  * Select an assigned user from a UserSelector / Settings "User" combobox.
  * Filters by first name and requires exactly one matching option so duplicate
  * display names (lane orphans) fail loudly instead of assigning the wrong user.
