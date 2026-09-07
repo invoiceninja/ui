@@ -50,7 +50,7 @@ export const STEPS: { key: StepKey; title: string; href: string }[] = [
   },
   {
     key: 'notes',
-    title: 'additional_notes',
+    title: 'notes',
     href: '/invoices/wizard/notes',
   },
   { key: 'send', title: 'review_and_send', href: '/invoices/wizard/send' },

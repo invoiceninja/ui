@@ -129,7 +129,7 @@ export function StepTiming({ wizard, embedded }: Props) {
       <div
         className="space-y-2"
         role="radiogroup"
-        aria-label={t('payment_timing')}
+        aria-label={t('payment_terms')}
       >
         {TERMS.map((option) => (
           <Choice
@@ -221,7 +221,7 @@ export function StepTiming({ wizard, embedded }: Props) {
                   : trans('count_days', { count: chosen.days }),
             })}
             onDismiss={() => wizard.dismiss('terms')}
-            dismissLabel={t('not_now')}
+            dismissLabel={t('no_not_now')}
           >
             <Button
               type="secondary"
@@ -229,7 +229,7 @@ export function StepTiming({ wizard, embedded }: Props) {
               disabled={savingDefault}
               onClick={saveDefault}
             >
-              {t('yes_make_it_my_default')}
+              {t('save_as_default')}
             </Button>
           </Callout>
         </div>

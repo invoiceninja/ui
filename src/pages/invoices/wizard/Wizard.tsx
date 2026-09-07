@@ -164,8 +164,8 @@ function SaveState({
       {state === 'saving'
         ? `${t('saving')}…`
         : failed
-          ? t('draft_not_saved')
-          : t('draft_saved')}
+          ? t('invoice_save_error')
+          : t('successfully_saved')}
     </span>
   );
 }

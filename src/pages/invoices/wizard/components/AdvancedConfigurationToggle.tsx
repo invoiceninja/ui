@@ -42,7 +42,7 @@ export function AdvancedConfigurationToggle({ counterpart }: Props) {
   return (
     <div className="flex items-center justify-end space-x-2">
       <span className="text-sm whitespace-nowrap" style={{ color: colors.$3 }}>
-        {t('advance_configuration')}
+        {t('advanced_settings')}
       </span>
 
       <Toggle

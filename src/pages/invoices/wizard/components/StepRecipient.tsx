@@ -261,7 +261,7 @@ export function StepRecipient({ wizard }: Props) {
     const email = contact.email.trim();
 
     if (!/^\S+@\S+\.\S+$/.test(email)) {
-      setContactErrors({ email: t('enter_valid_email_address') });
+      setContactErrors({ email: t('provide_email') });
 
       return;
     }

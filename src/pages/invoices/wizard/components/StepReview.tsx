@@ -201,7 +201,7 @@ export function StepReview({ wizard }: Props) {
     const address = emailDraft.trim();
 
     if (!/^\S+@\S+\.\S+$/.test(address)) {
-      setEmailError(t('enter_valid_email_address'));
+      setEmailError(t('provide_email'));
       return;
     }
 
@@ -558,7 +558,7 @@ export function StepReview({ wizard }: Props) {
                   className="text-[0.8125rem] mb-2.5"
                   style={{ color: colors.$22, fontWeight: 500 }}
                 >
-                  {t('how_it_looks')}
+                  {t('invoice_design')}
                 </p>
 
                 {designsFailed ? (
@@ -626,7 +626,7 @@ export function StepReview({ wizard }: Props) {
           <Callout
             title={t('would_you_like_customers_to_pay_online')}
             onDismiss={() => wizard.dismiss('pay')}
-            dismissLabel={t('not_now')}
+            dismissLabel={t('no_not_now')}
           >
             {bankInstructions === null ? (
               <div className="flex flex-wrap items-center gap-2">
@@ -732,7 +732,7 @@ export function StepReview({ wizard }: Props) {
         </Button>
 
         <Button behavior="button" disabled={sending} onClick={send}>
-          {t('send_invoice')}
+          {t('email_invoice')}
         </Button>
       </StepFooter>
 
@@ -761,7 +761,7 @@ export function StepReview({ wizard }: Props) {
               disabled={savingEmail || sending}
               onClick={saveEmailThenSend}
             >
-              {t('save_and_send')}
+              {t('save_and_email')}
             </Button>
             <Button
               type="secondary"

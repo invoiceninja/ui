@@ -46,7 +46,7 @@ export function Callout({ title, children, onDismiss, dismissLabel }: Props) {
             className="shrink-0 text-xs"
             style={{ color: colors.$17, fontWeight: 500 }}
           >
-            {dismissLabel ?? t('skip')}
+            {dismissLabel ?? t('dismiss')}
           </button>
         ) : null}
       </div>

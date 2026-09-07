@@ -108,7 +108,7 @@ export function TaxSetup({
     setRateError(undefined);
 
     if (!name.trim()) {
-      setNameError(t('enter_tax_name'));
+      setNameError(t('field_is_required'));
       return;
     }
 
@@ -169,7 +169,7 @@ export function TaxSetup({
     <Modal
       visible={open}
       onClose={onClose}
-      title={invoiceScope ? t('charge_tax_on_this_invoice') : t('add_a_tax')}
+      title={invoiceScope ? t('charge_taxes') : t('add_tax')}
       size="small"
     >
       <div className="space-y-5">

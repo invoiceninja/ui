@@ -53,7 +53,7 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
     }
 
     if (!name.trim()) {
-      setNameError(t('enter_business_name'));
+      setNameError(t('field_is_required'));
       return;
     }
 
@@ -104,7 +104,7 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
           updateRecord({ object: 'company', data: response.data.data })
         );
       })
-      .catch(() => setLogoError(t('logo_upload_failed')))
+      .catch(() => setLogoError(t('upload_failed')))
       .finally(() => setUploading(false));
   };
 
@@ -173,7 +173,7 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
                 disabled={uploading}
                 onClick={() => filePicker.current?.click()}
               >
-                {t('update_logo')}
+                {t('upload_logo_short')}
               </Button>
             </div>
           ) : (
@@ -182,7 +182,7 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
                 className="text-sm mb-2"
                 style={{ color: colors.$3, fontWeight: 500 }}
               >
-                {t('add_logo_prompt')}
+                {t('setup_wizard_logo')}
               </p>
 
               <div className="flex items-center gap-2">
@@ -201,7 +201,7 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
                   disableWithoutIcon
                   onClick={onSkipLogo}
                 >
-                  {t('skip')}
+                  {t('dismiss')}
                 </Button>
               </div>
             </div>

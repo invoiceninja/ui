@@ -207,7 +207,7 @@ export default function Edit() {
                 </Button>
 
                 <Button behavior="button" disabled={sending} onClick={send}>
-                  {t('send_invoice')}
+                  {t('email_invoice')}
                 </Button>
               </div>
             </div>

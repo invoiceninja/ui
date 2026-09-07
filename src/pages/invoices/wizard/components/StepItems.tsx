@@ -401,7 +401,7 @@ export function StepItems({ wizard, embedded }: Props) {
           className="text-sm"
           style={{ color: accentColor, fontWeight: 500 }}
         >
-          {t('product_list', { defaultValue: 'Product List' })}
+          {t('products')}
         </button>
 
         <button
@@ -490,7 +490,7 @@ export function StepItems({ wizard, embedded }: Props) {
                   setTaxOpen(true);
                 }}
               >
-                {`${t('yes')}, ${t('add_a_tax').toLowerCase()}`}
+                {`${t('yes')}, ${t('add_tax').toLowerCase()}`}
               </Button>
               <Button
                 type="secondary"
