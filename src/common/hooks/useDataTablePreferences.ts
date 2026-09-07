@@ -117,7 +117,7 @@ export function useDataTablePreferences(params: Params) {
       storeSessionTableFilters(filter, currentPage, withoutStoringPage);
     }
 
-    if (!customFilter || !tableKey || !enableSavingFilterPreference) {
+    if (!tableKey || !enableSavingFilterPreference) {
       return;
     }
 
@@ -129,7 +129,7 @@ export function useDataTablePreferences(params: Params) {
 
     const currentTableFilters = reactSettings.table_filters?.[tableKey];
     const defaultCustomFilter = defaultCustomFilterValues ?? [];
-    const currentCustomFilter = customFilter.length
+    const currentCustomFilter = customFilter?.length
       ? customFilter
       : defaultCustomFilter;
 
