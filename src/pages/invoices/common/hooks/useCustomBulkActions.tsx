@@ -21,6 +21,7 @@ import {
   MdPaid,
   MdPrint,
   MdRestore,
+  MdSwitchRight,
 } from 'react-icons/md';
 import { EntityState } from '$app/common/enums/entity-state';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
@@ -40,6 +41,7 @@ import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/cust
 import { isInvoiceAutoBillable } from '../../edit/components/Actions';
 import { CancelInvoiceBulkAction } from '../components/CancelInvoiceBulkAction';
 import { SendEmailBulkAction } from '../components/SendEmailBulkAction';
+import { useConvertToPurchaseOrder } from './useConvertToPurchaseOrder';
 import { useDownloadPdfs } from './useDownloadPdfs';
 import { useEnterPayment } from './useEnterPayment';
 import { usePrintPdf } from './usePrintPdf';
@@ -63,6 +65,8 @@ export const useCustomBulkActions = () => {
   const bulk = useBulk();
 
   const reverseInvoice = useReverseInvoice();
+
+  const convertToPurchaseOrder = useConvertToPurchaseOrder();
 
   const getDocumentsIds = (invoices: Invoice[]) => {
     return invoices.flatMap(({ documents }) => documents.map(({ id }) => id));
@@ -274,6 +278,18 @@ export const useCustomBulkActions = () => {
           icon={<Icon element={MdDownload} />}
         >
           {t('documents')}
+        </DropdownElement>
+      ),
+    ({ selectedIds, setSelected }) =>
+      hasPermission('create_purchase_order') && (
+        <DropdownElement
+          onClick={() => {
+            convertToPurchaseOrder(selectedIds);
+            setSelected([]);
+          }}
+          icon={<Icon element={MdSwitchRight} />}
+        >
+          {t('convert_to_purchase_order')}
         </DropdownElement>
       ),
     // ({ selectedResources, setSelected }) =>

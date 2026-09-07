@@ -119,7 +119,8 @@ export default function Create() {
 
       if (
         searchParams.get('action') !== 'clone' &&
-        searchParams.get('action') !== 'purchase_order_product'
+        searchParams.get('action') !== 'purchase_order_product' &&
+        searchParams.get('action') !== 'convert_to_purchase_order'
       ) {
         value = undefined;
       }
