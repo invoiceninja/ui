@@ -9,7 +9,7 @@
  */
 
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Spinner } from '$app/components/Spinner';
@@ -17,9 +17,12 @@ import { GeneralSettingsPayload } from '$app/pages/settings/invoice-design/Invoi
 import { PreviewPayload } from '$app/pages/settings/invoice-design/pages/custom-designs/CustomDesign';
 import { Resource } from './InvoicePreview';
 
+const PREVIEW_DEBOUNCE_MS = 300;
+
 interface Props {
   link: string;
   resource?: Resource | GeneralSettingsPayload | PreviewPayload;
+  resourceKey?: string;
   method: 'GET' | 'POST';
   onLink?: (url: string) => unknown;
   withToast?: boolean;
@@ -42,17 +45,62 @@ export function InvoiceViewer(props: Props) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [debouncedResourceKey, setDebouncedResourceKey] = useState('');
+
+  const lastFetchedKeyRef = useRef<string | null>(null);
+  const activeResourceKeyRef = useRef('');
+
+  const resourceKey = useMemo(() => {
+    if (props.resourceKey) {
+      return props.resourceKey;
+    }
+
+    return JSON.stringify(props.resource ?? null);
+  }, [props.resource, props.resourceKey]);
 
   useEffect(() => {
-    if (props.enabled !== false) {
-      if (props.withToast) {
-        toast.processing();
-      }
+    if (props.enabled === false || !resourceKey) {
+      setDebouncedResourceKey('');
+      return;
+    }
 
-      setIsLoading(true);
+    const timeoutId = globalThis.setTimeout(() => {
+      setDebouncedResourceKey(resourceKey);
+    }, PREVIEW_DEBOUNCE_MS);
 
-      queryClient.fetchQuery({
-        queryKey: [props.link, JSON.stringify(props.resource)],
+    return () => {
+      globalThis.clearTimeout(timeoutId);
+    };
+  }, [resourceKey, props.enabled]);
+
+  useEffect(() => {
+    activeResourceKeyRef.current = debouncedResourceKey;
+  }, [debouncedResourceKey]);
+
+  useEffect(() => {
+    if (props.enabled === false || !debouncedResourceKey) {
+      setIsLoading(false);
+      return;
+    }
+
+    if (debouncedResourceKey === lastFetchedKeyRef.current) {
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+
+    const fetchKey = debouncedResourceKey;
+
+    if (props.withToast) {
+      toast.processing();
+    }
+
+    queryClient
+      .fetchQuery({
+        queryKey: [props.link, fetchKey],
+        staleTime: 0,
+        gcTime: 0,
         retry: 0,
         queryFn: ({ signal }) => {
           if (props.onRequest) {
@@ -65,6 +113,12 @@ export function InvoiceViewer(props: Props) {
             ...(props.headers && { headers: props.headers }),
           })
             .then((response) => {
+              if (signal.aborted || fetchKey !== activeResourceKeyRef.current) {
+                return response;
+              }
+
+              lastFetchedKeyRef.current = fetchKey;
+
               const blob = new Blob([response.data], {
                 type: renderAsHTML ? 'text/html' : 'application/pdf',
               });
@@ -82,28 +136,58 @@ export function InvoiceViewer(props: Props) {
                 props.onLink && props.onLink(url);
               }
 
-              toast.dismiss();
+              if (props.withToast) {
+                toast.dismiss();
+              }
 
               return response;
             })
             .catch((error) => {
+              if (signal.aborted || fetchKey !== activeResourceKeyRef.current) {
+                return;
+              }
+
               if (props.onError) {
                 props.onError(error);
               }
 
-              toast.dismiss();
+              if (props.withToast) {
+                toast.dismiss();
+              }
 
               throw error;
             })
-            .finally(() => setIsLoading(false));
+            .finally(() => {
+              if (
+                !signal.aborted &&
+                fetchKey === activeResourceKeyRef.current
+              ) {
+                setIsLoading(false);
+              }
+            });
         },
-      });
-    }
+      })
+      .catch(() => undefined);
 
     return () => {
-      toast.dismiss();
+      queryClient.cancelQueries({ queryKey: [props.link, fetchKey] });
+
+      if (props.withToast) {
+        toast.dismiss();
+      }
+
+      if (fetchKey !== activeResourceKeyRef.current) {
+        setIsLoading(false);
+      }
     };
-  }, [props.link, props.resource, props.enabled]);
+  }, [
+    props.link,
+    debouncedResourceKey,
+    props.enabled,
+    props.method,
+    props.resource,
+    props.withToast,
+  ]);
 
   if (android) {
     return (

@@ -19,6 +19,7 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Card } from '$app/components/cards';
 import { Spinner } from '$app/components/Spinner';
+import { formatDurationFromSeconds } from '../helpers/dashboard-card-fields';
 import { FIELDS_LABELS } from './DashboardCardSelector';
 
 export const PERIOD_LABELS: Record<string, string> = {
@@ -72,7 +73,7 @@ export function DashboardCard({
         field: field.field,
         calculation: field.calculate,
         period: field.period,
-        format: field.format,
+        ...(field.format ? { format: field.format } : {}),
         currency_id: currencyId,
       }).then((response) => response.data),
     staleTime: Infinity,
@@ -92,9 +93,13 @@ export function DashboardCard({
           </span>
 
           <span className="w-full truncate text-center text-xl font-semibold">
-            {field.format === 'money' && field.calculate !== 'count'
-              ? formatMoney(value ?? 0, '', currencyId)
-              : value}
+            {field.calculate === 'count'
+              ? value
+              : field.format === 'money'
+                ? formatMoney(value ?? 0, '', currencyId)
+                : field.format === 'time'
+                  ? formatDurationFromSeconds(Number(value ?? 0))
+                  : value}
           </span>
 
           <span

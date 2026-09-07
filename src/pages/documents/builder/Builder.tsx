@@ -65,6 +65,8 @@ import {
   RectangleSettingsRemoveButton,
   RectangleSettingsSaveButton,
   RectangleSettingsSelect,
+  SingleSignatoryFlowButton,
+  SingleSignatoryFlowDialog,
   ToolboxContext,
   UninviteButton,
   UninviteDialog,
@@ -139,6 +141,8 @@ function Builder() {
   const navigate = useNavigate();
 
   const [entity, setEntity] = useState<Document | null>(null);
+
+  const isNinjaDocument = entity?.metadata?.is_ninja === true;
 
   useBuilderStore((state) => state.rectangles);
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
@@ -567,6 +571,10 @@ function Builder() {
               },
               signatorySelector: SignatorySelector,
               signatorySwap: SignatorySwap,
+              singleSignatoryFlow: {
+                dialog: SingleSignatoryFlowDialog,
+                button: SingleSignatoryFlowButton,
+              },
               uninvite: {
                 dialog: UninviteDialog,
                 button: UninviteButton,
@@ -640,6 +648,9 @@ function Builder() {
             options: {
               header: {
                 sticky: false,
+              },
+              leftSidebar: {
+                visible: !isNinjaDocument,
               },
               widgets: {
                 showLabel: getDocuNinjaCompany()?.settings?.widget_show_label,

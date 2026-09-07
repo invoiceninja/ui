@@ -14,6 +14,8 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { useQuery } from '@tanstack/react-query';
 import { GatewayToken } from '$app/common/interfaces/client';
+import { useRequiresUserDetails } from '$app/common/hooks/useRequiresUserDetails';
+import { UserDetailsModal } from '$app/components/UserDetailsModal';
 import { canActivateUpgradeButton } from '../helpers';
 
 interface Props {
@@ -57,6 +59,7 @@ type PlanType = 'pro' | 'enterprise' | 'docuninja';
 export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     const [t] = useTranslation();
     const account = useCurrentAccount();
+    const requiresUserDetails = useRequiresUserDetails();
     const [isLoading, setIsLoading] = useState(false);
     const [selectedMainPlan, setSelectedMainPlan] = useState<'pro' | 'enterprise' | null>(null);
     const [docuNinjaSelected, setDocuNinjaSelected] = useState(false);
@@ -526,6 +529,10 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
 
     if (!visible) {
         return null;
+    }
+
+    if (requiresUserDetails) {
+        return <UserDetailsModal visible onClose={onClose} />;
     }
 
     return (

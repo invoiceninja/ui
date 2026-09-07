@@ -3,78 +3,103 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2026. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 import { useEffect } from 'react';
+import type { Channel } from 'pusher-js';
 import { isHosted } from '../helpers';
+import { useCurrentAccount } from '../hooks/useCurrentAccount';
 import { useCurrentCompany } from '../hooks/useCurrentCompany';
+import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useSockets } from '../hooks/useSockets';
+import { attachPrivateChannelEventHandlers } from './socketChannelHandlers';
+import { socketEvents, type SocketEvent } from './socketEvents';
+import { bindChannelLogging, logSocketDebug } from './socketLogging';
+import { subscribeWhenConnected } from './socketSubscription';
 
 // This file defines global events system for query invalidation.
 
-export const events = [
-  'App\\Events\\Invoice\\InvoiceWasPaid',
-  'App\\Events\\Invoice\\InvoiceWasViewed',
-  'App\\Events\\Payment\\PaymentWasUpdated',
-  'App\\Events\\Credit\\CreditWasCreated',
-  'App\\Events\\Credit\\CreditWasUpdated',
-  'App\\Events\\Socket\\RefreshEntity',
-  'App\\Events\\Document\\DocumentWasSigned',
-  'App\\Events\\DocumentFile\\DocumentFilePreviewGenerated',
-  'App\\Events\\User\\UserWasVerified',
-] as const;
-
-export type Event = (typeof events)[number];
-
+export const events = socketEvents;
+export type Event = SocketEvent;
 export type Callbacks = Record<Event, (data: unknown) => unknown>;
+
+export function buildPrivateChannelNames(options: {
+  companyKey?: string;
+  accountKey?: string;
+  userId?: string;
+}): string[] {
+  const channelNames: string[] = [];
+
+  if (options.companyKey) {
+    channelNames.push(`private-company-${options.companyKey}`);
+  }
+
+  if (options.accountKey && options.userId) {
+    channelNames.push(`private-user-${options.accountKey}-${options.userId}`);
+  }
+
+  return channelNames;
+}
+
+export function buildGeneralChannelName(hosted: boolean): string {
+  return hosted ? 'general_hosted' : 'general_selfhosted';
+}
 
 export function usePrivateSocketEvents() {
   const sockets = useSockets();
   const company = useCurrentCompany();
-
-  const callbacks: Callbacks = {
-    'App\\Events\\Invoice\\InvoiceWasPaid': () => {},
-    'App\\Events\\Invoice\\InvoiceWasViewed': () => {},
-    'App\\Events\\Payment\\PaymentWasUpdated': () => {},
-    'App\\Events\\Credit\\CreditWasCreated': () => {},
-    'App\\Events\\Credit\\CreditWasUpdated': () => {},
-    'App\\Events\\Socket\\RefreshEntity': () => {},
-    'App\\Events\\Document\\DocumentWasSigned': () => {},
-    'App\\Events\\DocumentFile\\DocumentFilePreviewGenerated': () => {},
-    'App\\Events\\User\\UserWasVerified': () => {},
-  };
+  const account = useCurrentAccount();
+  const user = useCurrentUser();
 
   useEffect(() => {
-    if (!sockets || !company || !isHosted()) {
+    if (!sockets || !isHosted()) {
       return;
     }
 
-    console.log(`Subscribing to private-company-${company.company_key}`);
+    return subscribeWhenConnected(sockets, () => {
+      const channels: Channel[] = [];
+      const unbindChannelLogging: Array<() => void> = [];
 
-    const channel = sockets.subscribe(`private-company-${company.company_key}`);
+      logSocketDebug('setting up private channels', {
+        connectionState: sockets.connection.state,
+        socketId: sockets.connection.socket_id,
+        companyKey: company?.company_key,
+        accountKey: account?.key,
+        userId: user?.id,
+      });
 
-    channel.bind_global((eventName: Event, data: unknown) => {
-      console.log(`channel: ${eventName}`);
+      buildPrivateChannelNames({
+        companyKey: company?.company_key,
+        accountKey: account?.key,
+        userId: user?.id,
+      }).forEach((channelName) => {
+        logSocketDebug(`subscribing to ${channelName}`);
 
-      const callback = callbacks[eventName];
+        const channel = sockets.subscribe(channelName);
 
-      if (callback) {
-        callback(data);
+        unbindChannelLogging.push(bindChannelLogging(channel));
+        channels.push(channel);
+      });
 
-        window.dispatchEvent(
-          new CustomEvent(`pusher::${eventName}`, {
-            detail: {
-              event: eventName,
-              data: data,
-            },
-          })
-        );
+      if (channels.length === 0) {
+        return;
       }
+
+      channels.forEach((channel) => attachPrivateChannelEventHandlers(channel));
+
+      return () => {
+        unbindChannelLogging.forEach((unbind) => unbind());
+
+        channels.forEach((channel) => {
+          channel.unbind_all();
+          sockets.unsubscribe(channel.name);
+        });
+      };
     });
-  }, [sockets, company]);
+  }, [sockets, company?.company_key, account?.key, user?.id]);
 
   return null;
 }
@@ -148,4 +173,9 @@ export function socketId() {
 export interface GenericMessage {
   message: string;
   link: string | null;
+}
+
+export interface DownloadAvailable {
+  message: string;
+  url: string;
 }

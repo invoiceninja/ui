@@ -47,15 +47,14 @@ export interface DocuninjaUserProps {
 
 export default function Details(props?: DocuninjaUserProps) {
   const [t] = useTranslation();
+  const [showStoredInitials, setShowStoredInitials] = useState<boolean>(true);
+  const [showStoredSignature, setShowStoredSignature] = useState<boolean>(true);
 
   if (!props) {
     return null; // Early return if no props available
   }
 
   const { user, setUser, errors, editPage } = props;
-
-  const [showStoredInitials, setShowStoredInitials] = useState<boolean>(true);
-  const [showStoredSignature, setShowStoredSignature] = useState<boolean>(true);
 
   const handleChange = (key: keyof User, value: string) => {
     const updatedUser = cloneDeep(user) as User;

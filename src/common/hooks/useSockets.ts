@@ -13,6 +13,12 @@ import Pusher from 'pusher-js';
 import { useEffect } from 'react';
 import { apiEndpoint, isSelfHosted } from '../helpers';
 import { defaultHeaders } from '../queries/common/headers';
+import {
+  bindSocketConnectionLogging,
+  exposeSocketDebug,
+  isSocketDebugEnabled,
+  logSocketDebug,
+} from '../queries/socketLogging';
 import { useCurrentCompany } from './useCurrentCompany';
 import { useReactSettings } from './useReactSettings';
 
@@ -44,6 +50,10 @@ export function useSockets() {
       return;
     }
 
+    if (isSocketDebugEnabled()) {
+      Pusher.logToConsole = true;
+    }
+
     const client = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY ?? '', {
       cluster: 'eu',
       authEndpoint: apiEndpoint() + '/broadcasting/auth',
@@ -59,14 +69,26 @@ export function useSockets() {
     });
 
     setPusher(client);
+    exposeSocketDebug(client);
 
-    client.connection.bind('connected', () => {
+    const unbindConnectionLogging = bindSocketConnectionLogging(client);
+
+    const onConnected = () => {
       localStorage.setItem('X-SOCKET-ID', client.connection.socket_id);
 
+      logSocketDebug('socket id stored', {
+        socketId: client.connection.socket_id,
+      });
+
       setConnections((connections) => [...connections, client]);
-    });
+    };
+
+    client.connection.bind('connected', onConnected);
+    client.connect();
 
     return () => {
+      client.connection.unbind('connected', onConnected);
+      unbindConnectionLogging();
       client.disconnect();
     };
   }, [company, reactSettings.preferences.enable_public_notifications]);
@@ -74,24 +96,26 @@ export function useSockets() {
   return pusher;
 }
 
+export function cleanupStaleSocketConnections(
+  connections: Array<{ disconnect: () => void }>
+) {
+  if (connections.length <= 1) {
+    return;
+  }
+
+  connections.slice(0, -1).forEach((connection) => {
+    connection.disconnect();
+  });
+}
+
 export function useCleanupConnections() {
   const [connections] = useAtom(connectionsAtom);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      if (connections.length > 1) {
-        connections.map((connection) => {
-          if (connection === connections[connections.length - 1]) {
-            return;
-          }
-
-          connection.disconnect();
-        });
-
-        // setConnections([connections[connections.length - 1]]);
-      }
-
-      return () => clearTimeout(timeout);
+      cleanupStaleSocketConnections(connections);
     }, 5000);
+
+    return () => clearTimeout(timeout);
   }, [connections]);
 }

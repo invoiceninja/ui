@@ -11,13 +11,16 @@
 import Tippy from '@tippyjs/react/headless';
 import { ConfigProvider, DatePicker } from 'antd';
 import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useAtomValue } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
 import { Calendar } from 'react-feather';
 import { useClickAway } from 'react-use';
 import { emitter } from '$app';
 import { useColorScheme } from '$app/common/colors';
+import {
+  type DayjsRange,
+  serializeDateRange,
+} from '$app/common/helpers/dateRange';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { antdLocaleAtom } from '../DropdownDateRangePicker';
 import { Icon } from '../icons/Icon';
@@ -65,26 +68,8 @@ export function DateRangePicker({
     isVisible && !isCalendarVisible && setIsVisible(false);
   });
 
-  const handleChangeValue = (value: [string, string]) => {
-    dayjs.extend(customParseFormat);
-
-    const unsupportedFormats = ['DD. MMM. YYYY', 'ddd MMM D, YYYY'];
-
-    const start = value[0]
-      ? dayjs(
-          value[0],
-          !unsupportedFormats.includes(dateFormat) ? dateFormat : undefined,
-          antdLocale?.locale
-        ).format('YYYY-MM-DD')
-      : '';
-
-    const end = value[1]
-      ? dayjs(
-          value[1],
-          !unsupportedFormats.includes(dateFormat) ? dateFormat : undefined,
-          antdLocale?.locale
-        ).format('YYYY-MM-DD')
-      : '';
+  const handleChangeValue = (value: DayjsRange) => {
+    const [start, end] = serializeDateRange(value);
 
     setInternalStartDate(start);
     setInternalEndDate(end);
@@ -124,7 +109,7 @@ export function DateRangePicker({
             }}
             onClick={(event) => event.stopPropagation()}
           >
-            <ConfigProvider locale={antdLocale?.default}>
+            <ConfigProvider locale={antdLocale ?? undefined}>
               <RangePicker
                 size="large"
                 value={[
@@ -134,9 +119,7 @@ export function DateRangePicker({
                   internalEndDate.length > 0 ? dayjs(internalEndDate) : null,
                 ]}
                 format={dateFormat}
-                onCalendarChange={(_, dateString) =>
-                  handleChangeValue(dateString)
-                }
+                onCalendarChange={handleChangeValue}
                 onOpenChange={(value) => setIsCalendarVisible(value)}
               />
             </ConfigProvider>

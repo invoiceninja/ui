@@ -20,7 +20,6 @@ import { AxiosError } from 'axios';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { useDispatch } from 'react-redux';
-import VerificationInput from 'react-verification-input';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -37,6 +36,7 @@ import {
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
 import { ErrorMessage } from '../ErrorMessage';
+import { VerificationInput } from '../VerificationInput';
 
 interface VerificationProps {
   visible: boolean;

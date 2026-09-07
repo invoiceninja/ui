@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
+import { waitForDebouncedCommit } from '$tests/e2e/helpers';
 
 interface ClientCreateParams {
   page: Page;
@@ -52,6 +53,7 @@ export const createClient = async (params: ClientCreateParams) => {
   await page.locator('#last_name_0').fill('Last Name');
   await page.locator('#email_0').fill(contactEmail);
 
+  await waitForDebouncedCommit(page);
   await page.getByRole('button', { name: 'Save' }).click();
 
   await expect(

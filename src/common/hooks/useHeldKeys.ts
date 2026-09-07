@@ -23,6 +23,10 @@ export function useTrackHeldKeys() {
     const store = getDefaultStore();
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (typeof event.key !== 'string' || event.key.length === 0) {
+        return;
+      }
+
       if (isModifierKey(event.key)) {
         return;
       }
@@ -35,6 +39,11 @@ export function useTrackHeldKeys() {
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
+      if (typeof event.key !== 'string' || event.key.length === 0) {
+        store.set(heldKeysAtom, []);
+        return;
+      }
+
       if (isModifierKey(event.key)) {
         return;
       }

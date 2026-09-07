@@ -43,6 +43,7 @@ interface Props extends CommonProps {
   readOnly?: boolean;
   width?: string | number;
   clearable?: boolean;
+  autoFocus?: boolean;
 }
 
 export function InputField(props: Props) {
@@ -90,6 +91,7 @@ export function InputField(props: Props) {
           min={props.min}
           max={props.type === 'date' ? '9999-12-31' : undefined}
           maxLength={props.maxLength}
+          autoFocus={props.autoFocus}
           autoComplete={props.autoComplete || 'new-password'}
           disabled={props.disabled}
           element={props.element || 'input'}

@@ -194,6 +194,10 @@ export function SelectWithApplyButton(props: any) {
     ...restProps
   } = props;
 
+  const [t] = useTranslation();
+  const colors = useColorScheme();
+  const reactSettings = useReactSettings();
+  
   const [tempValue, setTempValue] = useState(defaultValue);
   const defaultValueKey = getMultiSelectDefaultValueKey(defaultValue);
   const previousDefaultValueKey = useRef(defaultValueKey);
@@ -208,9 +212,7 @@ export function SelectWithApplyButton(props: any) {
   }, [defaultValue, defaultValueKey]);
 
   const CustomMenu = useCallback((menuProps: MenuProps<SelectOption, true>) => {
-    const [t] = useTranslation();
-    const colors = useColorScheme();
-    const reactSettings = useReactSettings();
+
 
     const handleReset = () => {
       menuProps.clearValue();
@@ -254,8 +256,8 @@ export function SelectWithApplyButton(props: any) {
         </div>
       </components.Menu>
     );
-  }, []);
-
+  }, [colors.$3, onChange, reactSettings?.dark_mode, t]);
+  
   const handleChange = (newValue: any) => {
     setTempValue(newValue);
   };

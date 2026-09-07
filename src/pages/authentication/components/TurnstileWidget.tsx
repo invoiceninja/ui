@@ -10,6 +10,9 @@
 
 import Turnstile from 'react-turnstile';
 
+const TurnstileComponent =
+  (Turnstile as { default?: typeof Turnstile }).default ?? Turnstile;
+
 interface Props {
   onVerified: (token: string) => void;
 }
@@ -19,7 +22,7 @@ export function TurnstileWidget(props: Props) {
   const siteKey = import.meta.env.VITE_CLOUDFLARE_SITE_ID;
 
   return (
-    <Turnstile
+    <TurnstileComponent
       appearance="interaction-only"
       sitekey={siteKey}
       onVerify={(token) => onVerified(token)}

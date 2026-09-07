@@ -47,6 +47,12 @@ export function useSettingsTabs() {
       current: location.pathname === '/docuninja/settings/widget_defaults',
       enabled: true,
     },
+    {
+      name: t('reminder_schedules'),
+      href: '/docuninja/settings/reminder_schedules',
+      current: location.pathname === '/docuninja/settings/reminder_schedules',
+      enabled: true,
+    },
   ];
 
   return routes;

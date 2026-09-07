@@ -161,6 +161,7 @@ export function CloneOptionsModal(props: Props) {
       paid_to_date: 0,
       due_date: '',
       partial_due_date: '',
+      expense_id: '',
       design_id: company.settings.purchase_order_design_id,
       vendor: undefined,
     });

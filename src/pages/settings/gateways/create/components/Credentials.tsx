@@ -117,7 +117,7 @@ export function Credentials(props: Props) {
       )}
 
       {props.gateway && props.gateway.key === STRIPE_CONNECT && (
-        <StripeConnect />
+        <StripeConnect companyGateway={props.companyGateway} />
       )}
 
       {props.gateway && props.gateway.key === WEPAY && <WePay />}

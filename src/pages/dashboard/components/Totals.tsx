@@ -12,13 +12,17 @@ import { useQuery } from '@tanstack/react-query';
 import { ConfigProvider } from 'antd';
 import collect from 'collect.js';
 import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useAtomValue } from 'jotai';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
+import {
+  type DayjsRange,
+  serializeOrderedDateRange,
+} from '$app/common/helpers/dateRange';
+import { decodeDashboardField } from '$app/common/helpers/react-settings';
 import { request } from '$app/common/helpers/request';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -40,6 +44,8 @@ import {
   DropdownDateRangePicker,
   StyledRangePicker,
 } from '../../../components/DropdownDateRangePicker';
+import { TASK_METRIC_FIELDS } from '../helpers/dashboard-card-fields';
+import { useTaskMetricFieldsSupport } from '../hooks/useTaskMetricFieldsSupport';
 import { DashboardCardSelector } from './DashboardCardSelector';
 import { PreferenceCardsGrid } from './PreferenceCardsGrid';
 
@@ -129,6 +135,7 @@ export function Totals() {
   const settings = useReactSettings();
   const { dateFormat } = useCurrentCompanyDateFormats();
   const antdLocale = useAtomValue(antdLocaleAtom);
+  const supportsTaskMetrics = useTaskMetricFieldsSupport();
 
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
@@ -140,7 +147,17 @@ export function Totals() {
   const includeDrafts = preferences.dashboard_charts?.include_drafts || false;
   const customStartDate = preferences.dashboard_charts?.custom_start_date;
   const customEndDate = preferences.dashboard_charts?.custom_end_date;
-  const currentDashboardFields = settings?.dashboard_fields ?? [];
+  const currentDashboardFields = useMemo(() => {
+    const storedFields = settings?.dashboard_fields ?? [];
+
+    if (supportsTaskMetrics) {
+      return storedFields;
+    }
+
+    return storedFields.filter(
+      (key) => !TASK_METRIC_FIELDS.includes(decodeDashboardField(key).field)
+    );
+  }, [settings?.dashboard_fields, supportsTaskMetrics]);
 
   const resolvedRange = useMemo(() => {
     if (dateRange === 'custom') {
@@ -262,26 +279,14 @@ export function Totals() {
     }
   }, [chart.data]);
 
-  const handlePreferencesCustomRangeChange = (value: [string, string]) => {
-    dayjs.extend(customParseFormat);
+  const handlePreferencesCustomRangeChange = (value: DayjsRange) => {
+    const range = serializeOrderedDateRange(value);
 
-    if (!value[0] || !value[1]) {
+    if (!range) {
       return;
     }
 
-    const unsupportedFormats = ['DD. MMM. YYYY', 'ddd MMM D, YYYY'];
-
-    const parsed = value.map((date) =>
-      dayjs(
-        date,
-        !unsupportedFormats.includes(dateFormat) ? dateFormat : undefined,
-        antdLocale?.locale
-      ).format('YYYY-MM-DD')
-    );
-
-    const [start, end] = dayjs(parsed[0]).isAfter(parsed[1])
-      ? [parsed[1], parsed[0]]
-      : [parsed[0], parsed[1]];
+    const [start, end] = range;
 
     update('preferences.dashboard_charts.custom_start_date', start);
     update('preferences.dashboard_charts.custom_end_date', end);
@@ -466,7 +471,7 @@ export function Totals() {
                     {t('custom_range')}
                   </span>
 
-                  <ConfigProvider locale={antdLocale?.default}>
+                  <ConfigProvider locale={antdLocale ?? undefined}>
                     <StyledRangePicker
                       size="large"
                       className="rounded-md"
@@ -476,9 +481,7 @@ export function Totals() {
                         dayjs(resolvedRange.end),
                       ]}
                       format={dateFormat}
-                      onChange={(_, dateString) =>
-                        handlePreferencesCustomRangeChange(dateString)
-                      }
+                      onChange={handlePreferencesCustomRangeChange}
                       separator={<span style={{ color: colors.$4 }}>—</span>}
                       allowClear={false}
                     />
