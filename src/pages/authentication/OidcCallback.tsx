@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -29,6 +30,7 @@ import { useLogin } from './common/hooks';
  * Redux shape as a normal password login.
  */
 export function OidcCallback() {
+  const [t] = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const login = useLogin();
@@ -48,21 +50,31 @@ export function OidcCallback() {
     }
 
     if (!code) {
-      setError('Missing OIDC exchange code in callback URL.');
+      setError(t('oidc_missing_code') as string);
       return;
     }
 
-    request('POST', endpoint('/api/v1/oidc/exchange'), { code })
+    // skipIntercept on both hops: without it, a 401/429/404 from the exchange
+    // or refresh trips the global interceptor into clearLocalStorage() +
+    // window.location.reload(), which lands us right back on /oidc/callback
+    // with the same failing code and loops forever.
+    request(
+      'POST',
+      endpoint('/api/v1/oidc/exchange'),
+      { code },
+      { skipIntercept: true }
+    )
       .then((exchangeResponse) => {
         const token = exchangeResponse?.data?.token as string | undefined;
 
         if (!token) {
-          setError('OIDC exchange did not return a token.');
+          setError(t('oidc_no_token') as string);
           return;
         }
 
         return request('POST', endpoint('/api/v1/refresh_react'), undefined, {
           headers: { 'X-API-TOKEN': token },
+          skipIntercept: true,
         }).then((response) => {
           login(response);
           navigate('/dashboard', { replace: true });
@@ -70,22 +82,22 @@ export function OidcCallback() {
       })
       .catch((err) => {
         setError(
-          err?.response?.data?.message ?? 'Failed to complete OIDC login.'
+          err?.response?.data?.message ?? (t('oidc_login_failed') as string)
         );
       });
-  }, [login, navigate, searchParams]);
+  }, [login, navigate, searchParams, t]);
 
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-screen space-y-4 px-4 text-center">
-        <h1 className="text-xl font-semibold">Sign-in failed</h1>
+        <h1 className="text-xl font-semibold">{t('sign_in_failed')}</h1>
         <p className="text-sm text-gray-600 max-w-md">{error}</p>
         <button
           type="button"
           className="rounded px-4 py-2 bg-white border border-gray-200 text-sm hover:bg-gray-50"
           onClick={() => navigate('/login', { replace: true })}
         >
-          Back to login
+          {t('back_to_login')}
         </button>
       </div>
     );
@@ -93,7 +105,7 @@ export function OidcCallback() {
 
   return (
     <div className="flex items-center justify-center h-screen text-sm text-gray-600">
-      Signing you in…
+      {t('signing_you_in')}
     </div>
   );
 }

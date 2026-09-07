@@ -8,7 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { apiEndpoint, endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { SignInProviderButton } from './SignInProviders';
@@ -29,28 +30,21 @@ interface OidcConfig {
  * authorization code flow.
  */
 export function OidcSignIn() {
-  const [config, setConfig] = useState<OidcConfig | null>(null);
+  const [t] = useTranslation();
 
-  useEffect(() => {
-    let cancelled = false;
-
-    request('GET', endpoint('/api/v1/oidc/config'))
-      .then((response) => {
-        if (!cancelled) {
-          setConfig(response.data as OidcConfig);
-        }
-      })
-      .catch(() => {
-        // Endpoint may not exist on older backends – silently hide the button.
-        if (!cancelled) {
-          setConfig({ oidc_enabled: false, oidc_provider_label: 'OIDC' });
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // skipIntercept + no retry: older self-hosted backends don't ship this
+  // endpoint yet; a 404 must silently hide the button rather than trip the
+  // global interceptor (toast, clear-localstorage, or reload loop). Cached
+  // via react-query so parent re-renders don't refire the request.
+  const { data: config } = useQuery({
+    queryKey: ['/api/v1/oidc/config'],
+    queryFn: () =>
+      request('GET', endpoint('/api/v1/oidc/config'), undefined, {
+        skipIntercept: true,
+      }).then((response) => response.data as OidcConfig),
+    staleTime: Infinity,
+    retry: false,
+  });
 
   if (!config?.oidc_enabled) {
     return null;
@@ -79,7 +73,7 @@ export function OidcSignIn() {
           >
             <path d="M12 2l3 6 6 .9-4.5 4.3 1 6.3L12 16.9 6.5 19.5l1-6.3L3 8.9 9 8z" />
           </svg>
-          <p>Sign in with {label}</p>
+          <p>{t('sign_in_with', { provider: label })}</p>
         </SignInProviderButton>
       </div>
     </div>
