@@ -59,9 +59,6 @@ const Builder = lazy(() => import('$app/pages/documents/builder/Builder'));
 const BlueprintBuilder = lazy(
   () => import('$app/pages/documents/pages/blueprints/builder/BlueprintBuilder')
 );
-const SignatoryMapping = lazy(
-  () => import('$app/pages/documents/pages/blueprints/mapping/SignatoryMapping')
-);
 const EmailTemplates = lazy(
   () =>
     import(
@@ -255,21 +252,6 @@ const routes = (
                     }),
                   ]}
                   component={<BlueprintBuilder />}
-                />
-              }
-            />
-
-            <Route
-              path="templates/:id/map-signatories"
-              element={
-                <DocuNinjaGuard
-                  guards={[
-                    docuNinjaPermission({
-                      model: 'blueprints',
-                      action: 'view',
-                    }),
-                  ]}
-                  component={<SignatoryMapping />}
                 />
               }
             />
