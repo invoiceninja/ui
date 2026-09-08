@@ -10,6 +10,16 @@
 
 import { Block } from '../types';
 import { GRID_CONFIG } from './grid-converter';
+import {
+  clampChromeHeight,
+  DEFAULT_FOOTER_HEIGHT,
+  DEFAULT_HEADER_HEIGHT,
+  normalizeChromeBackground,
+  normalizePagination,
+  paginationIncludesFooter,
+  paginationIncludesHeader,
+  partitionBlocksByRegion,
+} from './page-regions';
 import { InvoiceData, SAMPLE_INVOICE_DATA } from './variable-replacer';
 import { getBlockContentPixelHeight } from './block-sizing';
 import { getInvoiceWidgetClassName } from '../constants/widget-classes';
@@ -185,6 +195,11 @@ export interface GeneratorDesignSettings {
   embed_documents?: boolean;
   hide_empty_columns?: boolean;
   page_numbering?: boolean;
+  pagination?: string;
+  header_height?: number;
+  footer_height?: number;
+  header_background?: string;
+  footer_background?: string;
   page_margin_top?: number;
   page_margin_right?: number;
   page_margin_bottom?: number;
@@ -332,24 +347,146 @@ export function generateInvoiceHTML(
     blocks
   );
 
-  // Render blocks with row-based positioning
-  const blocksHTML = sortedBlocks
-    .map((block) =>
-      renderBlockWithRowHeight(
-        block,
-        previewData,
-        layoutData,
-        rowHeights,
-        rowPositions,
-        globals,
-        effectivePadding,
-        pageDimensions.width,
-        fullDocument,
-        fontSize,
-        horizontalPadding
+  const pagination = normalizePagination(designSettings?.pagination);
+  const headerHeight = clampChromeHeight(
+    designSettings?.header_height,
+    DEFAULT_HEADER_HEIGHT
+  );
+  const footerHeight = clampChromeHeight(
+    designSettings?.footer_height,
+    DEFAULT_FOOTER_HEIGHT
+  );
+  const headerBackground = normalizeChromeBackground(
+    designSettings?.header_background
+  );
+  const footerBackground = normalizeChromeBackground(
+    designSettings?.footer_background
+  );
+  const regions = partitionBlocksByRegion(blocks, pagination);
+
+  const chromeCellStyle = (height: number, background: string) =>
+    `min-height: ${height}px;${
+      background ? ` background-color: ${background};` : ''
+    }`;
+
+  const renderRegionHtml = (
+    regionBlocks: Block[],
+    padding: {
+      top: number;
+      right: number;
+      bottom: number;
+      left: number;
+    }
+  ) => {
+    const regionRows = groupBlocksByRow(regionBlocks);
+    const regionRowHeights = calculateRowHeights(regionRows, {
+      fullDocument,
+      layoutData,
+      inheritedFontSize: fontSize,
+      canvasWidth: pageDimensions.width,
+      horizontalPadding: padding.left + padding.right,
+    });
+    const regionRowPositions = calculateRowPositions(
+      regionRowHeights,
+      padding.top,
+      fullDocument,
+      regionBlocks
+    );
+
+    return [...regionBlocks]
+      .sort((a, b) => {
+        if (a.gridPosition.y !== b.gridPosition.y) {
+          return a.gridPosition.y - b.gridPosition.y;
+        }
+        return a.gridPosition.x - b.gridPosition.x;
+      })
+      .map((block) =>
+        renderBlockWithRowHeight(
+          block,
+          previewData,
+          layoutData,
+          regionRowHeights,
+          regionRowPositions,
+          globals,
+          padding,
+          pageDimensions.width,
+          fullDocument,
+          fontSize,
+          padding.left + padding.right
+        )
       )
-    )
-    .join('\n');
+      .join('\n');
+  };
+
+  const chromePadding = {
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  };
+
+  // Render blocks with row-based positioning
+  const bodyBlocksHTML =
+    pagination === 'none'
+      ? sortedBlocks
+          .map((block) =>
+            renderBlockWithRowHeight(
+              block,
+              previewData,
+              layoutData,
+              rowHeights,
+              rowPositions,
+              globals,
+              effectivePadding,
+              pageDimensions.width,
+              fullDocument,
+              fontSize,
+              horizontalPadding
+            )
+          )
+          .join('\n')
+      : renderRegionHtml(regions.body, chromePadding);
+
+  const blocksHTML =
+    pagination === 'none'
+      ? bodyBlocksHTML
+      : `<table class="invoice-pagination">
+  ${
+    paginationIncludesHeader(pagination)
+      ? `<thead>
+    <tr>
+      <td class="invoice-page-header" style="${chromeCellStyle(
+        headerHeight,
+        headerBackground
+      )}">
+        ${renderRegionHtml(regions.header, chromePadding)}
+      </td>
+    </tr>
+  </thead>`
+      : ''
+  }
+  <tbody>
+    <tr>
+      <td class="invoice-page-body">
+        ${bodyBlocksHTML}
+      </td>
+    </tr>
+  </tbody>
+  ${
+    paginationIncludesFooter(pagination)
+      ? `<tfoot>
+    <tr>
+      <td class="invoice-page-footer" style="${chromeCellStyle(
+        footerHeight,
+        footerBackground
+      )}">
+        ${renderRegionHtml(regions.footer, chromePadding)}
+      </td>
+    </tr>
+  </tfoot>`
+      : ''
+  }
+</table>`;
 
   // Calculate container height from actual block positions and grid heights
   let containerHeight = pageDimensions.height;
@@ -381,6 +518,12 @@ export function generateInvoiceHTML(
       );
 
       containerHeight = maxBottom + effectivePadding.bottom;
+      if (paginationIncludesHeader(pagination)) {
+        containerHeight += headerHeight;
+      }
+      if (paginationIncludesFooter(pagination)) {
+        containerHeight += footerHeight;
+      }
     } else {
       const { rowHeight, margin } = GRID_CONFIG;
       const maxBottom = Math.max(
@@ -475,7 +618,40 @@ export function generateInvoiceHTML(
       overflow: visible;
     }
 
+    .block.invoice-widget--twig,
+    .invoice-twig-content {
+      max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    .invoice-twig-content {
+      position: relative;
+      width: 100%;
+    }
+
+    .invoice-twig-content table {
+      width: 100%;
+      max-width: 100%;
+    }
+
     /* Tables should expand to fit content */
+    ${
+      pagination === 'none'
+        ? ''
+        : `.invoice-pagination {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .invoice-page-header,
+    .invoice-page-body,
+    .invoice-page-footer {
+      position: relative;
+      vertical-align: top;
+    }`
+    }
+
     .block table {
       width: 100%;
       border-collapse: collapse;

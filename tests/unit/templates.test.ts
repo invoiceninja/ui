@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { templates } from '../../src/pages/settings/invoice-design/builder/templates/templates';
+import { createTemplates } from '../../src/pages/settings/invoice-design/builder/templates/templates';
 import { gridPositionsOverlap } from '../../src/pages/settings/invoice-design/builder/utils/grid/collisions';
 import {
   replaceVariables,
   SAMPLE_INVOICE_DATA,
 } from '../../src/pages/settings/invoice-design/builder/utils/variable-replacer';
+
+const { templates } = createTemplates((key) => key);
 
 const KNOWN_LABEL_TOKEN = /^\$[\w.]+_label$/;
 const VARIABLE_TOKEN = /\$[\w.]+/g;

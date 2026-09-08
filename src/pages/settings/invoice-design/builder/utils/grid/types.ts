@@ -40,6 +40,7 @@ export const CONTENT_GROW_BLOCK_TYPES = new Set<Block['type']>([
   'public-notes',
   'terms',
   'text',
+  'twig',
   'total',
   'qrcode',
   'signature',

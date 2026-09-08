@@ -10,6 +10,7 @@
 
 import { Design } from '$app/common/interfaces/design';
 import { Block, generateBlockId } from '../../types';
+import { normalizeBlockRegion } from '../page-regions';
 import { GRID_CONFIG } from '../grid-converter';
 import { repairGridPositionCollisions } from './collisions';
 import {
@@ -162,6 +163,8 @@ export function normalizeSavedBlocksForBuilder(
     const type = (block.type || 'text') as Block['type'];
     const gridPosition = normalizeSavedGridPosition(block);
 
+    const region = normalizeBlockRegion(block.region);
+
     return {
       id: String(block.id || generateBlockId(type)),
       type,
@@ -170,6 +173,7 @@ export function normalizeSavedBlocksForBuilder(
         : normalizeGridPosition(gridPosition),
       properties: normalizeSavedBlockProperties(type, block.properties),
       ...(block.locked ? { locked: block.locked } : {}),
+      ...(region !== 'body' ? { region } : {}),
     } satisfies Block;
   });
 

@@ -9,6 +9,7 @@ describe('mergeDesignParts', () => {
       type: 'text',
       gridPosition: { x: 8, y: 0, w: 4, h: 2 },
       properties: { content: '$company.name' },
+      region: 'header',
     };
 
     const merged = mergeDesignParts(
@@ -33,6 +34,11 @@ describe('mergeDesignParts', () => {
         embedDocuments: false,
         hideEmptyColumns: false,
         pageNumbering: false,
+        pagination: 'none',
+        headerHeight: 100,
+        footerHeight: 100,
+        headerBackground: '',
+        footerBackground: '',
         pageMarginTop: 0,
         pageMarginRight: 0,
         pageMarginBottom: 0,
@@ -52,9 +58,15 @@ describe('mergeDesignParts', () => {
     expect(merged.customCss).toContain('invoice-widget');
     expect(merged.blocks?.[0]).toMatchObject({
       id: 'text-save',
+      region: 'header',
       rowAlign: 'right',
       colStart: 9,
       colSpan: 4,
+    });
+    expect(merged.documentSettings).toMatchObject({
+      pagination: 'none',
+      headerHeight: 100,
+      footerHeight: 100,
     });
   });
 });

@@ -13,6 +13,7 @@ import type { MutableRefObject } from 'react';
 import { GridStack } from 'gridstack';
 import type { GridItemHTMLElement } from 'gridstack';
 import { Block, BuilderState, DocumentSettings } from '../types';
+import { clientPointFromEvent } from '../utils/page-regions';
 import { GRID_CONFIG } from '../utils/grid-converter';
 import {
   applyGridPositionsToBlocks,
@@ -41,6 +42,12 @@ interface UseGridStackCanvasOptions {
   documentSettings: Pick<DocumentSettings, 'globalFontSize' | 'primaryFont'>;
   builderStateRef: MutableRefObject<BuilderState>;
   shouldFitLoadedContentHeightRef: MutableRefObject<boolean>;
+  /** Return true when the widget was moved into header/footer and should leave the grid. */
+  onDragRelease?: (info: {
+    blockId: string;
+    clientX: number;
+    clientY: number;
+  }) => boolean;
 }
 
 export function useGridStackCanvas({
@@ -50,6 +57,7 @@ export function useGridStackCanvas({
   documentSettings,
   builderStateRef,
   shouldFitLoadedContentHeightRef,
+  onDragRelease,
 }: UseGridStackCanvasOptions) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const gridRef = useRef<GridStack | null>(null);
@@ -58,6 +66,9 @@ export function useGridStackCanvas({
   const isResizingGridRef = useRef(false);
   const isLayoutHydratingRef = useRef(false);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const lastPointerRef = useRef({ clientX: 0, clientY: 0 });
+  const onDragReleaseRef = useRef(onDragRelease);
+  onDragReleaseRef.current = onDragRelease;
 
   const [isDraggingBlock, setIsDraggingBlock] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -152,13 +163,39 @@ export function useGridStackCanvas({
 
       syncBlocksFromGrid();
     };
+    const handlePointerMove = (event: PointerEvent) => {
+      lastPointerRef.current = {
+        clientX: event.clientX,
+        clientY: event.clientY,
+      };
+    };
     const handleDragStart = () => {
       isDraggingGridRef.current = true;
       setIsDraggingBlock(true);
+      window.addEventListener('pointermove', handlePointerMove);
     };
-    const handleDragStop = () => {
+    const handleDragStop = (event: Event, el: GridItemHTMLElement) => {
+      window.removeEventListener('pointermove', handlePointerMove);
       isDraggingGridRef.current = false;
       setIsDraggingBlock(false);
+
+      const point =
+        clientPointFromEvent(event) ?? lastPointerRef.current;
+      const blockId =
+        el.getAttribute('data-block-id') ||
+        (el.gridstackNode ? getGridStackBlockId(el.gridstackNode) : null);
+
+      if (
+        blockId &&
+        onDragReleaseRef.current?.({
+          blockId,
+          clientX: point.clientX,
+          clientY: point.clientY,
+        })
+      ) {
+        return;
+      }
+
       syncBlocksFromGrid();
     };
     const handleResizeStart = (_event: Event, el: GridItemHTMLElement) => {
@@ -189,6 +226,7 @@ export function useGridStackCanvas({
     grid.on('resizestop', handleResizeStop);
 
     return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
       resizeObserverRef.current?.disconnect();
       resizeObserverRef.current = null;
       grid.offAll();

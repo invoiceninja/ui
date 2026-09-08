@@ -20,6 +20,7 @@ export const DEDICATED_PROSE_CONTENT_BLOCK_TYPES = new Set<BlockType>([
   'public-notes',
   'terms',
   'text',
+  'twig',
 ]);
 
 export interface ProseTextContentSize {

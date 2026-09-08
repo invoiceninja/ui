@@ -12,8 +12,17 @@ import { useTranslation } from 'react-i18next';
 import { range } from 'lodash';
 import { DocumentSettings } from '../types';
 import {
+  clampChromeHeight,
+  DEFAULT_FOOTER_HEIGHT,
+  DEFAULT_HEADER_HEIGHT,
+  normalizeChromeBackground,
+  paginationIncludesFooter,
+  paginationIncludesHeader,
+} from '../utils/page-regions';
+import {
   SectionDivider,
   CheckboxInput,
+  ColorInput,
   SelectInput,
 } from './properties/PropertyInputs';
 import { useColorScheme } from '$app/common/colors';
@@ -64,10 +73,10 @@ export function DocumentSettingsPanel({
         <SelectInput
           label={t('page_layout') || 'Page Layout'}
           value={settings.pageLayout}
-          onChange={(v) => update('pageLayout', v as 'portrait' | 'landscape')}
+          onChange={() => update('pageLayout', 'portrait')}
+          disabled
           options={[
             { value: 'portrait', label: t('portrait') || 'Portrait' },
-            { value: 'landscape', label: t('landscape') || 'Landscape' },
           ]}
         />
 
@@ -77,6 +86,108 @@ export function DocumentSettingsPanel({
           onChange={(v) => update('pageSize', v)}
           options={PAGE_SIZE_OPTIONS}
         />
+
+        <SelectInput
+          label={t('repeating_header_footer') || 'Repeating header / footer'}
+          value={settings.pagination}
+          onChange={(v) => update('pagination', v as DocumentSettings['pagination'])}
+          options={[
+            { value: 'none', label: t('none') || 'None' },
+            { value: 'header', label: t('header') || 'Header' },
+            { value: 'footer', label: t('footer') || 'Footer' },
+            { value: 'both', label: t('header_and_footer') || 'Header and footer' },
+          ]}
+        />
+
+        {paginationIncludesHeader(settings.pagination) && (
+          <>
+            <label
+              className="flex flex-col text-xs gap-1"
+              style={{ color: colors.$3 }}
+            >
+              <span>{t('header_height') || 'Header height (px)'}</span>
+              <input
+                type="number"
+                min={24}
+                max={400}
+                value={settings.headerHeight}
+                onChange={(e) =>
+                  update(
+                    'headerHeight',
+                    clampChromeHeight(e.target.value, DEFAULT_HEADER_HEIGHT)
+                  )
+                }
+                className="px-2 py-1 rounded border text-sm"
+                style={{
+                  borderColor: colors.$5,
+                  background: colors.$1,
+                  color: colors.$3,
+                }}
+              />
+            </label>
+            <CheckboxInput
+              label={t('header_background') || 'Header background'}
+              checked={Boolean(settings.headerBackground)}
+              onChange={(enabled) =>
+                update('headerBackground', enabled ? '#FFFFFF' : '')
+              }
+            />
+            {settings.headerBackground ? (
+              <ColorInput
+                label={t('header_background_color') || 'Header color'}
+                value={settings.headerBackground}
+                onChange={(value) =>
+                  update('headerBackground', normalizeChromeBackground(value) || '#FFFFFF')
+                }
+              />
+            ) : null}
+          </>
+        )}
+
+        {paginationIncludesFooter(settings.pagination) && (
+          <>
+            <label
+              className="flex flex-col text-xs gap-1"
+              style={{ color: colors.$3 }}
+            >
+              <span>{t('footer_height') || 'Footer height (px)'}</span>
+              <input
+                type="number"
+                min={24}
+                max={400}
+                value={settings.footerHeight}
+                onChange={(e) =>
+                  update(
+                    'footerHeight',
+                    clampChromeHeight(e.target.value, DEFAULT_FOOTER_HEIGHT)
+                  )
+                }
+                className="px-2 py-1 rounded border text-sm"
+                style={{
+                  borderColor: colors.$5,
+                  background: colors.$1,
+                  color: colors.$3,
+                }}
+              />
+            </label>
+            <CheckboxInput
+              label={t('footer_background') || 'Footer background'}
+              checked={Boolean(settings.footerBackground)}
+              onChange={(enabled) =>
+                update('footerBackground', enabled ? '#FFFFFF' : '')
+              }
+            />
+            {settings.footerBackground ? (
+              <ColorInput
+                label={t('footer_background_color') || 'Footer color'}
+                value={settings.footerBackground}
+                onChange={(value) =>
+                  update('footerBackground', normalizeChromeBackground(value) || '#FFFFFF')
+                }
+              />
+            ) : null}
+          </>
+        )}
       </div>
 
       <div className="space-y-4">

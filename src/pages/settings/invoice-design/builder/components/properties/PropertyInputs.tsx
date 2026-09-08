@@ -330,6 +330,7 @@ export function CheckboxInput({
  * Select Input - Using existing SelectField component
  */
 interface SelectInputProps extends BaseInputProps {
+  disabled?: boolean;
   options: { value: string; label: string }[];
   placeholder?: string;
 }
@@ -340,6 +341,7 @@ export function SelectInput({
   onChange,
   options,
   placeholder,
+  disabled,
 }: SelectInputProps) {
   return (
     <SelectField
@@ -347,6 +349,7 @@ export function SelectInput({
       value={value}
       onValueChange={(val) => onChange(val)}
       placeholder={placeholder}
+      disabled={disabled}
     >
       {options.map((opt) => (
         <option key={opt.value} value={opt.value}>

@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { replaceLabelVariables } from '../../utils/label-variables';
 import { memo } from 'react';
 import { SAMPLE_INVOICE_DATA } from '../../utils/variable-replacer';
 import { TableBlock as TableBlockModel, TasksTableBlock } from '../../types';
@@ -22,6 +24,7 @@ interface TableBlockProps {
 }
 
 export const TableBlock = memo(function TableBlock({ block }: TableBlockProps) {
+  const [t] = useTranslation();
   const {
     columns = [],
     headerBg,
@@ -102,7 +105,7 @@ export const TableBlock = memo(function TableBlock({ block }: TableBlockProps) {
                     ),
                   }}
                 >
-                  {col.header}
+                  {replaceLabelVariables(col.header, t)}
                 </th>
               )
             )}

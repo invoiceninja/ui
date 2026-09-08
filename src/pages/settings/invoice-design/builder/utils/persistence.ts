@@ -16,6 +16,7 @@ import { omitBlockLevelFontSizeWhenElementSized } from './grid/block-normalizati
 import { repairGridPositionCollisions } from './grid/collisions';
 import { BUILDER_GRID_VERSION } from './grid/types';
 import { annotateBlocksWithRowLayout } from './row-layout';
+import { unwrapNinjaTags } from './twig-block';
 
 /** Merge visual-builder output into the API `design` shape without wiping server fields. */
 export function mergeDesignParts(
@@ -29,9 +30,19 @@ export function mergeDesignParts(
   // colSpan) so the API can place blocks within their flex-row correctly —
   // the API otherwise loses `gridPosition.x` and packs every block left.
   const annotatedBlocks = annotateBlocksWithRowLayout(
-    repairGridPositionCollisions(blocks).map(
-      omitBlockLevelFontSizeWhenElementSized
-    )
+    repairGridPositionCollisions(blocks)
+      .map(omitBlockLevelFontSizeWhenElementSized)
+      .map((block) =>
+        block.type === 'twig'
+          ? {
+              ...block,
+              properties: {
+                ...block.properties,
+                content: unwrapNinjaTags(block.properties.content),
+              },
+            }
+          : block
+      )
   );
 
   return {
@@ -72,6 +83,11 @@ export function documentSettingsToGeneratorShape(ds: DocumentSettings) {
     embed_documents: ds.embedDocuments,
     hide_empty_columns: ds.hideEmptyColumns,
     page_numbering: ds.pageNumbering,
+    pagination: ds.pagination,
+    header_height: ds.headerHeight,
+    footer_height: ds.footerHeight,
+    header_background: ds.headerBackground,
+    footer_background: ds.footerBackground,
     page_margin_top: ds.pageMarginTop,
     page_margin_right: ds.pageMarginRight,
     page_margin_bottom: ds.pageMarginBottom,

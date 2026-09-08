@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { Button } from '$app/components/forms';
 import { Card } from '$app/components/cards';
-import { templates } from './templates/templates';
+import { createTemplates } from './templates/templates';
 import { route } from '$app/common/helpers/route';
 import { useColorScheme } from '$app/common/colors';
 import classNames from 'classnames';
@@ -206,6 +206,7 @@ function TemplatePreview({
 
 export function TemplateGallery() {
   const [t] = useTranslation();
+  const { templates } = useMemo(() => createTemplates(t), [t]);
   const navigate = useNavigate();
   const colors = useColorScheme();
 

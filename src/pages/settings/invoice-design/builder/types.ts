@@ -10,9 +10,14 @@
 
 import { ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import type {
+  BlockRegion,
+  PaginationMode,
+} from '$app/common/interfaces/design';
 
 export type BlockType =
   | 'text'
+  | 'twig'
   | 'image'
   | 'logo'
   | 'table'
@@ -51,6 +56,11 @@ export interface TextBlockProperties extends WidgetCssClassesHint {
   align?: string;
   fontStyle?: string;
   padding?: string;
+}
+
+/** Raw Twig source. The API wraps this in a `<ninja>` element for PdfBuilder. */
+export interface TwigBlockProperties extends WidgetCssClassesHint {
+  content?: string;
 }
 
 export interface ImageBlockProperties extends WidgetCssClassesHint {
@@ -289,11 +299,18 @@ export interface BaseBlock {
   id: string;
   gridPosition: GridPosition;
   locked?: boolean;
+  /** Repeating chrome assignment. Missing / unknown → body. */
+  region?: BlockRegion;
 }
 
 export interface TextBlock extends BaseBlock {
   type: 'text';
   properties: TextBlockProperties;
+}
+
+export interface TwigBlock extends BaseBlock {
+  type: 'twig';
+  properties: TwigBlockProperties;
 }
 
 export interface ImageBlock extends BaseBlock {
@@ -378,6 +395,7 @@ export interface TermsBlock extends BaseBlock {
 
 export type Block =
   | TextBlock
+  | TwigBlock
   | ImageBlock
   | LogoBlock
   | TableBlock
@@ -442,8 +460,19 @@ export interface VariableGroup {
   variables: Variable[];
 }
 
-export type { DocumentSettings } from '$app/common/interfaces/design';
+export type {
+  BlockRegion,
+  DocumentSettings,
+  PaginationMode,
+} from '$app/common/interfaces/design';
 import type { DocumentSettings } from '$app/common/interfaces/design';
+import {
+  DEFAULT_FOOTER_HEIGHT,
+  DEFAULT_HEADER_HEIGHT,
+  clampChromeHeight,
+  normalizeChromeBackground,
+  normalizePagination,
+} from './utils/page-regions';
 
 interface CompanyDesignSettingsLike {
   page_layout?: string;
@@ -464,8 +493,7 @@ export function createDefaultDocumentSettings(
   const fontSize = companySettings?.font_size;
 
   return {
-    pageLayout:
-      (companySettings?.page_layout as 'portrait' | 'landscape') || 'portrait',
+    pageLayout: 'portrait',
     pageSize: companySettings?.page_size || 'A4',
     globalFontSize:
       typeof fontSize === 'string' ? parseInt(fontSize, 10) || 16 : fontSize || 16,
@@ -476,6 +504,11 @@ export function createDefaultDocumentSettings(
     embedDocuments: Boolean(companySettings?.embed_documents),
     hideEmptyColumns: Boolean(companySettings?.hide_empty_columns_on_pdf),
     pageNumbering: Boolean(companySettings?.page_numbering),
+    pagination: 'none',
+    headerHeight: DEFAULT_HEADER_HEIGHT,
+    footerHeight: DEFAULT_FOOTER_HEIGHT,
+    headerBackground: '',
+    footerBackground: '',
     pageMarginTop: 0,
     pageMarginRight: 0,
     pageMarginBottom: 0,
@@ -484,6 +517,34 @@ export function createDefaultDocumentSettings(
     pagePaddingRight: 30,
     pagePaddingBottom: 30,
     pagePaddingLeft: 30,
+  };
+}
+
+export function normalizeDocumentSettings(
+  settings?: Partial<DocumentSettings> | null,
+  companySettings?: CompanyDesignSettingsLike | null
+): DocumentSettings {
+  const defaults = createDefaultDocumentSettings(companySettings);
+
+  if (!settings) {
+    return defaults;
+  }
+
+  return {
+    ...defaults,
+    ...settings,
+    pageLayout: 'portrait',
+    pagination: normalizePagination(settings.pagination),
+    headerHeight: clampChromeHeight(
+      settings.headerHeight,
+      defaults.headerHeight
+    ),
+    footerHeight: clampChromeHeight(
+      settings.footerHeight,
+      defaults.footerHeight
+    ),
+    headerBackground: normalizeChromeBackground(settings.headerBackground),
+    footerBackground: normalizeChromeBackground(settings.footerBackground),
   };
 }
 
@@ -507,6 +568,7 @@ export interface PropertyPanelProps {
   onChange: (block: Block) => void;
   onDelete?: () => void;
   onDuplicate?: () => void;
+  pagination?: PaginationMode;
 }
 
 export function generateBlockId(type: string): string {

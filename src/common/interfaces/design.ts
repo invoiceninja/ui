@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+export type PaginationMode = 'none' | 'header' | 'footer' | 'both';
+export type BlockRegion = 'header' | 'body' | 'footer';
+
 export interface DocumentSettings {
   pageLayout: 'portrait' | 'landscape';
   pageSize: string;
@@ -19,6 +22,19 @@ export interface DocumentSettings {
   embedDocuments: boolean;
   hideEmptyColumns: boolean;
   pageNumbering: boolean;
+  /**
+   * Repeating page chrome. `none` keeps today's single-flow JSON template.
+   * Header / footer / both wrap those regions in thead / tfoot.
+   */
+  pagination: PaginationMode;
+  /** Reserved min-height (px) for the repeating header cell. */
+  headerHeight: number;
+  /** Reserved min-height (px) for the repeating footer cell. */
+  footerHeight: number;
+  /** Repeating header fill. Empty string means no background. */
+  headerBackground: string;
+  /** Repeating footer fill. Empty string means no background. */
+  footerBackground: string;
   // Per-side page margin in px — drives @page { margin } in the rendered PDF.
   pageMarginTop: number;
   pageMarginRight: number;

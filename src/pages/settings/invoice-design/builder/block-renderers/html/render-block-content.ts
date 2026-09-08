@@ -29,6 +29,7 @@ import {
   TextBlock,
   TotalBlock,
   TotalItem,
+  TwigBlock,
 } from '../../types';
 import {
   InvoiceData,
@@ -47,6 +48,7 @@ import {
   DEFAULT_VALUE_TEXT_COLOR,
 } from '../../constants/design-colors';
 import { ensurePx, escapeHtml, pick } from '../shared/style-utils';
+import { twigSourceToPreviewHtml } from '../../utils/twig-block';
 import { resolveFlexJustifyContent } from '../shared/field-configs';
 import { GeneratorGlobals } from '../types';
 
@@ -65,6 +67,8 @@ export function renderBlockContent(
     case 'footer':
     case 'terms':
       return renderTextBlock(block, previewData, globals);
+    case 'twig':
+      return renderTwigBlock(block);
     case 'logo':
     case 'image':
       return renderImageBlock(block, previewData);
@@ -102,7 +106,10 @@ function renderTextBlock(
 ): string {
   const { content, fontSize, fontWeight, color, align, lineHeight, padding } =
     block.properties;
-  const replacedContent = replaceVariables(content || '', data);
+  const replacedContent = replaceVariables(
+    data ? replaceLabelVariables(content || '', t) : content || '',
+    data
+  );
   const paddingCss = padding ? `padding: ${padding};` : '';
   const fontSizeCss = fontSize ? `font-size: ${fontSize};` : '';
 
@@ -118,9 +125,19 @@ function renderTextBlock(
       display: flex;
       align-items: center;
     ">
-      ${escapeHtml(replacedContent)}
+      <div style="width: 100%; min-width: 0;">${escapeHtml(replacedContent)}</div>
     </div>
   `;
+}
+
+function renderTwigBlock(block: TwigBlock): string {
+  const html = twigSourceToPreviewHtml(block.properties.content);
+
+  if (!html.trim()) {
+    return `<div class="invoice-twig-content" style="width:100%;min-width:0;color:#9ca3af;font-size:12px;">Twig template</div>`;
+  }
+
+  return `<div class="invoice-twig-content" style="width:100%;max-width:100%;min-width:0;box-sizing:border-box;position:relative;">${html}</div>`;
 }
 
 function renderImageBlock(
@@ -190,7 +207,8 @@ function renderCompanyInfoBlock(
     : '';
   const titleTextColor = pick(titleColor, blockColor);
   const titleTextAlign = titleAlign || align || 'left';
-  const titleText = `${titlePrefix || ''}${title || ''}${titleSuffix || ''}`;
+  const rawTitle = `${titlePrefix || ''}${title || ''}${titleSuffix || ''}`;
+  const titleText = data ? replaceLabelVariables(rawTitle, t) : rawTitle;
   const titleHtml = showTitle
     ? `<div style="font-family:${
         globals.fontFamilySecondary
@@ -263,7 +281,10 @@ function renderCompanyInfoBlock(
     `;
   }
 
-  const replacedContent = replaceVariables(content || '', data);
+  const replacedContent = replaceVariables(
+    data ? replaceLabelVariables(content || '', t) : content || '',
+    data
+  );
 
   return `
     <div style="
@@ -359,7 +380,10 @@ function renderClientInfoBlock(
 
     contentHtml = fieldsHtml || '<div>&nbsp;</div>';
   } else {
-    const replacedContent = replaceVariables(content || '', data);
+    const replacedContent = replaceVariables(
+    data ? replaceLabelVariables(content || '', t) : content || '',
+    data
+  );
     contentHtml = escapeHtml(replacedContent);
   }
 
@@ -372,7 +396,8 @@ function renderClientInfoBlock(
     : '';
   const titleTextColor = pick(titleColor, blockColor);
   const titleTextAlign = titleAlign || align || 'left';
-  const titleText = `${titlePrefix || ''}${title || ''}${titleSuffix || ''}`;
+  const rawTitle = `${titlePrefix || ''}${title || ''}${titleSuffix || ''}`;
+  const titleText = data ? replaceLabelVariables(rawTitle, t) : rawTitle;
 
   return `
     <div style="${paddingStyle}">
@@ -580,7 +605,7 @@ function renderTableBlock(
         width: ${col.width};
         ${headerBorderCss}
       ">
-        ${escapeHtml(col.header)}
+        ${escapeHtml(previewData ? replaceLabelVariables(col.header, t) : col.header)}
       </th>
     `;
     }

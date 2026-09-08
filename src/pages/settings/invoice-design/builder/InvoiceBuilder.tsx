@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
+import { useMemo, useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import type { DragEvent as ReactDragEvent, KeyboardEvent } from 'react';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -35,8 +35,19 @@ import {
   DocumentSettings,
   createDefaultDocumentSettings,
   generateBlockId,
+  normalizeDocumentSettings,
 } from './types';
-import { getTemplateById } from './templates/templates';
+import { PageChromeZone } from './components/PageChromeZone';
+import {
+  assignBlockToRegion,
+  EXISTING_BLOCK_DRAG_TYPE,
+  pageRegionFromClientPoint,
+  paginationIncludesFooter,
+  paginationIncludesHeader,
+  partitionBlocksByRegion,
+  type BlockRegion,
+} from './utils/page-regions';
+import { createTemplates } from './templates/templates';
 import { ComponentLibrary } from './components/ComponentLibrary';
 import { PropertyPanel } from './components/PropertyPanel';
 import { DocumentSettingsPanel } from './components/DocumentSettingsPanel';
@@ -90,6 +101,7 @@ function designNameValidationError(errors?: ValidationBag | null) {
 
 export function InvoiceBuilder() {
   const [t] = useTranslation();
+  const { getTemplateById } = useMemo(() => createTemplates(t), [t]);
   const navigate = useNavigate();
   const colors = useColorScheme();
   const accentColor = useAccentColor();
@@ -163,6 +175,8 @@ export function InvoiceBuilder() {
 
   const [currentDragDefinition, setCurrentDragDefinition] =
     useState<BlockDefinition | null>(null);
+  const [draggingBlockId, setDraggingBlockId] = useState<string | null>(null);
+  const [hoverRegion, setHoverRegion] = useState<BlockRegion | null>(null);
   const [isCanvasDragOver, setIsCanvasDragOver] = useState(false);
   const [sidebarDropPreview, setSidebarDropPreview] = useState<{
     x: number;
@@ -193,8 +207,10 @@ export function InvoiceBuilder() {
             ...prev,
             blocks,
             customCss: unwrapCustomCssFromApi(existingDesign.design.customCss),
-            documentSettings:
-              savedDocSettings || createDefaultDocumentSettings(designSettings),
+            documentSettings: normalizeDocumentSettings(
+              savedDocSettings,
+              designSettings
+            ),
           }));
           documentSettingsInitialized.current = true;
           setDesignName(existingDesign.name);
@@ -231,11 +247,97 @@ export function InvoiceBuilder() {
     }
 
     setIsTemplateReady(true);
-  }, [isTemplateReady, templateId]);
+  }, [getTemplateById, isTemplateReady, templateId]);
 
   const isCanvasMounted = !(
     (isLoadingDesign && Boolean(designId) && state.blocks.length === 0) ||
     (Boolean(templateId) && !designId && !isTemplateReady)
+  );
+
+  const canvasRegions = partitionBlocksByRegion(
+    state.blocks,
+    state.documentSettings.pagination
+  );
+
+  const moveBlockToRegion = useCallback(
+    (blockId: string, region: BlockRegion, clientX: number, clientY: number) => {
+      const currentBlocks = builderStateRef.current.blocks;
+      const block = currentBlocks.find((item) => item.id === blockId);
+
+      if (!block) {
+        return false;
+      }
+
+      const dropZone =
+        document.querySelector<HTMLElement>(
+          `[data-page-region="${region}"]`
+        ) ||
+        (region === 'body'
+          ? document.querySelector<HTMLElement>('.invoice-gridstack-grid')
+          : null);
+
+      if (!dropZone) {
+        return false;
+      }
+
+      const size = {
+        w: block.gridPosition.w,
+        h:
+          region === 'body'
+            ? block.gridPosition.h
+            : Math.min(block.gridPosition.h, 4),
+      };
+      const gridPosition = computeSidebarDropGridPosition(
+        clientX,
+        clientY,
+        dropZone,
+        size,
+        builderStateRef.current.zoom
+      );
+
+      setState((prev) => ({
+        ...prev,
+        blocks: repairGridPositionCollisions(
+          prev.blocks.map((item) =>
+            item.id === blockId
+              ? assignBlockToRegion(item, region, {
+                  ...item.gridPosition,
+                  x: gridPosition.x,
+                  y: region === 'body' ? gridPosition.y : 0,
+                  w: size.w,
+                  h: size.h,
+                })
+              : item
+          )
+        ),
+        selectedBlockId: blockId,
+      }));
+
+      return true;
+    },
+    []
+  );
+
+  const handleGridDragRelease = useCallback(
+    ({
+      blockId,
+      clientX,
+      clientY,
+    }: {
+      blockId: string;
+      clientX: number;
+      clientY: number;
+    }) => {
+      const region = pageRegionFromClientPoint(clientX, clientY);
+      setHoverRegion(null);
+
+      if (region === 'body') {
+        return false;
+      }
+
+      return moveBlockToRegion(blockId, region, clientX, clientY);
+    },
+    [moveBlockToRegion]
   );
 
   const {
@@ -244,13 +346,31 @@ export function InvoiceBuilder() {
     isResizing,
     getBlocksWithCurrentGridPositions,
   } = useGridStackCanvas({
-    blocks: state.blocks,
+    blocks: canvasRegions.body,
     isCanvasMounted,
     setBlocks,
     documentSettings: state.documentSettings,
     builderStateRef,
     shouldFitLoadedContentHeightRef,
+    onDragRelease: handleGridDragRelease,
   });
+
+  useEffect(() => {
+    if (!isDraggingBlock) {
+      return;
+    }
+
+    const onMove = (event: PointerEvent) => {
+      setHoverRegion(pageRegionFromClientPoint(event.clientX, event.clientY));
+    };
+
+    window.addEventListener('pointermove', onMove);
+
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      setHoverRegion(null);
+    };
+  }, [isDraggingBlock]);
 
   const handleUpdateBlock = useCallback((updatedBlock: Block) => {
     setState((prev) => ({
@@ -365,23 +485,33 @@ export function InvoiceBuilder() {
     ]
   );
 
+  const isLibraryOrBlockDrag = Boolean(
+    currentDragDefinition || draggingBlockId
+  );
+
   const handleCanvasDragEnter = useCallback(
     (event: ReactDragEvent<HTMLDivElement>) => {
-      if (!currentDragDefinition) {
+      if (!isLibraryOrBlockDrag) {
         return;
       }
 
       event.preventDefault();
       canvasDragDepthRef.current += 1;
       setIsCanvasDragOver(true);
-      updateSidebarDropPreview(event);
+      const region = pageRegionFromClientPoint(event.clientX, event.clientY);
+      setHoverRegion(region);
+      if (currentDragDefinition && region === 'body') {
+        updateSidebarDropPreview(event);
+      } else {
+        setSidebarDropPreview(null);
+      }
     },
-    [currentDragDefinition, updateSidebarDropPreview]
+    [currentDragDefinition, isLibraryOrBlockDrag, updateSidebarDropPreview]
   );
 
   const handleCanvasDragLeave = useCallback(
     (event: ReactDragEvent<HTMLDivElement>) => {
-      if (!currentDragDefinition) {
+      if (!isLibraryOrBlockDrag) {
         return;
       }
 
@@ -391,31 +521,59 @@ export function InvoiceBuilder() {
       if (canvasDragDepthRef.current === 0) {
         setIsCanvasDragOver(false);
         setSidebarDropPreview(null);
+        setHoverRegion(null);
       }
     },
-    [currentDragDefinition]
+    [isLibraryOrBlockDrag]
   );
 
   const handleCanvasDragOver = useCallback(
     (event: ReactDragEvent<HTMLDivElement>) => {
-      if (!currentDragDefinition) {
+      if (!isLibraryOrBlockDrag) {
         return;
       }
 
       event.preventDefault();
-      event.dataTransfer.dropEffect = 'copy';
-      updateSidebarDropPreview(event);
+      event.dataTransfer.dropEffect = currentDragDefinition ? 'copy' : 'move';
+      const region = pageRegionFromClientPoint(event.clientX, event.clientY);
+      setHoverRegion(region);
+      if (currentDragDefinition && region === 'body') {
+        updateSidebarDropPreview(event);
+      } else {
+        setSidebarDropPreview(null);
+      }
     },
-    [currentDragDefinition, updateSidebarDropPreview]
+    [currentDragDefinition, isLibraryOrBlockDrag, updateSidebarDropPreview]
   );
 
   const handleCanvasDrop = useCallback(
     (event: ReactDragEvent<HTMLDivElement>) => {
-      if (!currentDragDefinition) {
+      const existingBlockId =
+        draggingBlockId ||
+        event.dataTransfer.getData(EXISTING_BLOCK_DRAG_TYPE);
+
+      if (!currentDragDefinition && !existingBlockId) {
         return;
       }
 
       event.preventDefault();
+      const dropRegion = pageRegionFromClientPoint(
+        event.clientX,
+        event.clientY
+      );
+      setHoverRegion(null);
+
+      if (existingBlockId) {
+        moveBlockToRegion(
+          existingBlockId,
+          dropRegion,
+          event.clientX,
+          event.clientY
+        );
+        setDraggingBlockId(null);
+        clearSidebarDragState();
+        return;
+      }
 
       let data: BlockDefinition | null = null;
 
@@ -436,9 +594,14 @@ export function InvoiceBuilder() {
         return;
       }
 
-      const gridElement = gridContainerRef.current;
+      const dropZone =
+        dropRegion === 'body'
+          ? gridContainerRef.current
+          : document.querySelector<HTMLElement>(
+              `[data-page-region="${dropRegion}"]`
+            );
 
-      if (!gridElement) {
+      if (!dropZone) {
         toast.error('error_dropping_block');
         clearSidebarDragState();
         return;
@@ -448,6 +611,7 @@ export function InvoiceBuilder() {
         inheritedFontSize: state.documentSettings.globalFontSize,
       });
       const gridPosition =
+        dropRegion === 'body' &&
         sidebarDropPreview &&
         sidebarDropPreview.w === size.w &&
         sidebarDropPreview.h === size.h
@@ -460,11 +624,13 @@ export function InvoiceBuilder() {
           : computeSidebarDropGridPosition(
               event.clientX,
               event.clientY,
-              gridElement,
+              dropZone,
               size,
               state.zoom
             );
-      const { x, y, w, h } = gridPosition;
+      const { x } = gridPosition;
+      const y = dropRegion === 'body' ? gridPosition.y : 0;
+      const h = dropRegion === 'body' ? gridPosition.h : Math.min(size.h, 4);
       const newBlockId = generateBlockId(definition.type);
 
       const seededProperties = { ...definition.defaultProperties };
@@ -488,9 +654,10 @@ export function InvoiceBuilder() {
           x,
           y,
           w: size.w,
-          h: size.h,
+          h,
         },
         properties: seededProperties,
+        ...(dropRegion !== 'body' ? { region: dropRegion } : {}),
       } as Block;
 
       setState((prev) => ({
@@ -505,7 +672,9 @@ export function InvoiceBuilder() {
       clearSidebarDragState,
       currentDragDefinition,
       designSettings?.primary_color,
+      draggingBlockId,
       gridContainerRef,
+      moveBlockToRegion,
       sidebarDropPreview,
       state.documentSettings.globalFontSize,
       state.zoom,
@@ -844,7 +1013,8 @@ export function InvoiceBuilder() {
                   target === e.currentTarget ||
                   target.classList.contains('invoice-gridstack-page') ||
                   target.classList.contains('invoice-gridstack-stage') ||
-                  target.classList.contains('invoice-gridstack-grid')
+                  target.classList.contains('invoice-gridstack-grid') ||
+                  target.classList.contains('invoice-page-chrome-zone')
                 ) {
                   handleSelectBlock(null);
                 }
@@ -857,8 +1027,32 @@ export function InvoiceBuilder() {
 ${sanitizedCustomCss}
 }`}</style>
               )}
+              {paginationIncludesHeader(state.documentSettings.pagination) && (
+                <PageChromeZone
+                  region="header"
+                  height={state.documentSettings.headerHeight}
+                  backgroundColor={state.documentSettings.headerBackground}
+                  blocks={canvasRegions.header}
+                  selectedBlockId={state.selectedBlockId}
+                  isDragOver={hoverRegion === 'header'}
+                  onHeightChange={(headerHeight) =>
+                    handleUpdateDocumentSettings({
+                      ...state.documentSettings,
+                      headerHeight,
+                    })
+                  }
+                  onSelectBlock={handleSelectBlock}
+                  onDeleteBlock={handleDeleteBlock}
+                  onBlockDragStart={setDraggingBlockId}
+                  onBlockDragEnd={() => {
+                    setDraggingBlockId(null);
+                    setHoverRegion(null);
+                  }}
+                />
+              )}
               <div
                 className="invoice-gridstack-stage"
+                data-page-region="body"
                 style={{
                   padding: `${GRID_CONFIG.containerPadding[1]}px ${GRID_CONFIG.containerPadding[0]}px`,
                 }}
@@ -874,7 +1068,7 @@ ${sanitizedCustomCss}
                     }px)`,
                   }}
                 >
-                  {state.blocks.map((block) => (
+                  {canvasRegions.body.map((block) => (
                     <div
                       key={block.id}
                       className={`grid-stack-item ${
@@ -1027,7 +1221,7 @@ ${sanitizedCustomCss}
                     })()}
                 </div>
 
-                {state.blocks.length === 0 && (
+                {canvasRegions.body.length === 0 && (
                   <div
                     className="invoice-gridstack-empty-state pointer-events-none flex items-center justify-center"
                     style={{ color: colors.$17 }}
@@ -1044,6 +1238,29 @@ ${sanitizedCustomCss}
                   </div>
                 )}
               </div>
+              {paginationIncludesFooter(state.documentSettings.pagination) && (
+                <PageChromeZone
+                  region="footer"
+                  height={state.documentSettings.footerHeight}
+                  backgroundColor={state.documentSettings.footerBackground}
+                  blocks={canvasRegions.footer}
+                  selectedBlockId={state.selectedBlockId}
+                  isDragOver={hoverRegion === 'footer'}
+                  onHeightChange={(footerHeight) =>
+                    handleUpdateDocumentSettings({
+                      ...state.documentSettings,
+                      footerHeight,
+                    })
+                  }
+                  onSelectBlock={handleSelectBlock}
+                  onDeleteBlock={handleDeleteBlock}
+                  onBlockDragStart={setDraggingBlockId}
+                  onBlockDragEnd={() => {
+                    setDraggingBlockId(null);
+                    setHoverRegion(null);
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -1062,6 +1279,7 @@ ${sanitizedCustomCss}
                 onChange={handleUpdateBlock}
                 onDelete={() => handleDeleteBlock(selectedBlock.id)}
                 onDuplicate={() => handleDuplicateBlock(selectedBlock.id)}
+                pagination={state.documentSettings.pagination}
               />
             ) : state.panelMode === 'css' ? (
               <CustomCssPanel

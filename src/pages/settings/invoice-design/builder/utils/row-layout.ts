@@ -9,6 +9,7 @@
  */
 
 import { Block } from '../types';
+import { blockRegion } from './page-regions';
 
 /**
  * Per-block annotations the API needs to position a block within its
@@ -75,20 +76,21 @@ function deriveRowAlign(
 export function annotateBlocksWithRowLayout<T extends Block>(
   blocks: T[]
 ): (T & RowLayout)[] {
-  const rowMap = new Map<number, T[]>();
+  const rowMap = new Map<string, T[]>();
 
   for (const block of blocks) {
-    const y = block.gridPosition.y;
-    const list = rowMap.get(y);
+    const key = `${blockRegion(block)}:${block.gridPosition.y}`;
+    const list = rowMap.get(key);
     if (list) {
       list.push(block);
     } else {
-      rowMap.set(y, [block]);
+      rowMap.set(key, [block]);
     }
   }
 
   return blocks.map((block) => {
-    const blocksInRow = rowMap.get(block.gridPosition.y) ?? [block];
+    const blocksInRow =
+      rowMap.get(`${blockRegion(block)}:${block.gridPosition.y}`) ?? [block];
     const { x, w } = block.gridPosition;
 
     return {

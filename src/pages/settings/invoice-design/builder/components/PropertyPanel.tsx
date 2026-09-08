@@ -12,9 +12,15 @@ import { useTranslation } from 'react-i18next';
 import { Trash2 } from 'lucide-react';
 import { Button } from '$app/components/forms';
 import { PropertyPanelProps, Block, DividerBlock, SpacerBlock } from '../types';
+import {
+  canvasRegionForBlock,
+  paginationIncludesFooter,
+  paginationIncludesHeader,
+} from '../utils/page-regions';
 import { useBlockLabel, useBlockDescription } from '../block-library';
 import { useColorScheme } from '$app/common/colors';
 import { TextBlockProperties } from './properties/TextBlockProperties';
+import { TwigBlockProperties } from './properties/TwigBlockProperties';
 import { ImageBlockProperties } from './properties/ImageBlockProperties';
 import { TableBlockProperties } from './properties/TableBlockProperties';
 import { TotalBlockProperties } from './properties/TotalBlockProperties';
@@ -34,11 +40,21 @@ export function PropertyPanel({
   block,
   onChange,
   onDelete,
+  pagination = 'none',
 }: PropertyPanelProps) {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const blockLabel = useBlockLabel(block.type);
   const blockDescription = useBlockDescription(block.type);
+  const regionOptions = [
+    { value: 'body', label: t('body') || 'Body' },
+    ...(paginationIncludesHeader(pagination)
+      ? [{ value: 'header', label: t('header') || 'Header' }]
+      : []),
+    ...(paginationIncludesFooter(pagination)
+      ? [{ value: 'footer', label: t('footer') || 'Footer' }]
+      : []),
+  ];
 
   return (
     <div className="p-4 space-y-6">
@@ -70,6 +86,24 @@ export function PropertyPanel({
         */}
       </div>
 
+      {pagination !== 'none' && (
+        <SelectInput
+          label={t('page_region') || 'Page region'}
+          value={canvasRegionForBlock(block, pagination)}
+          onChange={(region) =>
+            onChange({
+              ...block,
+              region: region === 'body' ? undefined : (region as Block['region']),
+              gridPosition:
+                region === 'body'
+                  ? block.gridPosition
+                  : { ...block.gridPosition, y: 0 },
+            })
+          }
+          options={regionOptions}
+        />
+      )}
+
       {/* Block-specific properties */}
       <div className="space-y-4">
         {(block.type === 'text' ||
@@ -77,6 +111,10 @@ export function PropertyPanel({
           block.type === 'footer' ||
           block.type === 'terms') && (
           <TextBlockProperties block={block} onChange={onChange} />
+        )}
+
+        {block.type === 'twig' && (
+          <TwigBlockProperties block={block} onChange={onChange} />
         )}
 
         {block.type === 'company-info' && (

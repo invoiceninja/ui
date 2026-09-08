@@ -10,7 +10,7 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { TFunction } from 'i18next';
+import { replaceLabelVariables } from '../../utils/label-variables';
 import { ChevronUp, ChevronDown, Settings2, Trash2 } from 'lucide-react';
 import { PropertyEditorProps, TableBlock, TasksTableBlock } from '../../types';
 
@@ -52,80 +52,86 @@ function mergeTableRegion(raw?: TableRegionBordersHint) {
 
 // Available columns that can be added to the table
 // Maps field to canonical ID for consistent matching
-const getAvailableColumns = (isTasksTable: boolean, t: TFunction) => [
+const getAvailableColumns = (isTasksTable: boolean) => [
   {
     id: 'product_key',
-    header: isTasksTable ? 'Service' : 'Item',
+    header: isTasksTable ? '$task.service_label' : '$product.product_key_label',
     field: 'item.product_key',
     width: '25%',
     align: 'left' as const,
   },
   {
     id: 'notes',
-    header: 'Description',
+    header: isTasksTable
+      ? '$task.description_label'
+      : '$product.description_label',
     field: 'item.notes',
     width: '30%',
     align: 'left' as const,
   },
   {
     id: 'quantity',
-    header: isTasksTable ? 'Hours' : 'Qty',
+    header: isTasksTable ? '$task.hours_label' : '$product.quantity_label',
     field: 'item.quantity',
     width: '10%',
     align: 'center' as const,
   },
   {
     id: 'cost',
-    header: isTasksTable ? 'Rate' : 'Rate',
+    header: isTasksTable ? '$task.rate_label' : '$product.unit_cost_label',
     field: 'item.cost',
     width: '15%',
     align: 'right' as const,
   },
   {
     id: 'net_cost',
-    header: 'Net Cost',
+    header: '$product.net_cost_label',
     field: 'item.net_cost',
     width: '15%',
     align: 'right' as const,
   },
   {
     id: 'line_total',
-    header: String(t('line_total')),
+    header: isTasksTable
+      ? '$task.line_total_label'
+      : '$product.line_total_label',
     field: 'item.line_total',
     width: '15%',
     align: 'right' as const,
   },
   {
     id: 'gross_line_total',
-    header: String(t('gross_line_total')),
+    header: isTasksTable
+      ? '$task.gross_line_total_label'
+      : '$product.gross_line_total_label',
     field: 'item.gross_line_total',
     width: '15%',
     align: 'right' as const,
   },
   {
     id: 'discount',
-    header: 'Discount',
+    header: isTasksTable ? '$task.discount_label' : '$product.discount_label',
     field: 'item.discount',
     width: '10%',
     align: 'right' as const,
   },
   {
     id: 'tax_rate1',
-    header: 'Tax',
+    header: isTasksTable ? '$task.tax_label' : '$product.tax_label',
     field: 'item.tax_rate1',
     width: '10%',
     align: 'right' as const,
   },
   {
     id: 'custom_value1',
-    header: 'Custom 1',
+    header: '$product.product1_label',
     field: 'item.custom_value1',
     width: '15%',
     align: 'left' as const,
   },
   {
     id: 'custom_value2',
-    header: 'Custom 2',
+    header: '$product.product2_label',
     field: 'item.custom_value2',
     width: '15%',
     align: 'left' as const,
@@ -142,7 +148,7 @@ export function TableBlockProperties({
 
   const isTasksTable = block.type === 'tasks-table';
 
-  const AVAILABLE_COLUMNS = getAvailableColumns(isTasksTable, t);
+  const AVAILABLE_COLUMNS = getAvailableColumns(isTasksTable);
 
   const updateProperty = (key: string, value: any) => {
     onChange({
@@ -373,7 +379,7 @@ export function TableBlockProperties({
                       className="text-sm font-medium truncate block"
                       style={{ color: colors.$3 }}
                     >
-                      {column.header}
+                      {replaceLabelVariables(column.header, t)}
                     </span>
                     <span className="text-xs" style={{ color: colors.$17 }}>
                       {column.width} · {column.align}
@@ -433,7 +439,7 @@ export function TableBlockProperties({
                       </label>
                       <input
                         type="text"
-                        value={column.header}
+                        value={replaceLabelVariables(column.header, t)}
                         onChange={(e) =>
                           updateColumnProp(index, 'header', e.target.value)
                         }
@@ -533,7 +539,7 @@ export function TableBlockProperties({
                   e.currentTarget.style.backgroundColor = 'transparent';
                 }}
               >
-                + {colDef.header}
+                + {replaceLabelVariables(colDef.header, t)}
               </button>
             ))}
           </div>

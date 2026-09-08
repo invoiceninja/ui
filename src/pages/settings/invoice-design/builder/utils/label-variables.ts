@@ -11,6 +11,10 @@
 import { useTranslation } from 'react-i18next';
 
 export const LABEL_TRANSLATION_MAP: Record<string, string> = {
+  '$bill_to_label': 'bill_to',
+  '$ship_to_label': 'ship_to',
+  '$footer_label': 'footer',
+
   // Core Entity Labels
   '$number_label': 'invoice_number',
   '$date_label': 'invoice_date',
@@ -75,10 +79,10 @@ export const LABEL_TRANSLATION_MAP: Record<string, string> = {
   '$company.custom4_label': 'custom4',
   
   // Product/Item Labels
-  '$product.product_key_label': 'item',
+  '$product.product_key_label': 'product_key',
   '$product.description_label': 'description',
   '$product.notes_label': 'description',
-  '$product.quantity_label': 'qty',
+  '$product.quantity_label': 'quantity',
   '$product.unit_cost_label': 'unit_cost',
   '$product.line_total_label': 'line_total',
   '$product.discount_label': 'discount',
@@ -86,6 +90,15 @@ export const LABEL_TRANSLATION_MAP: Record<string, string> = {
   '$product.tax_name2_label': 'tax',
   '$product.tax_name3_label': 'tax',
   
+  '$product.net_cost_label': 'unit_cost',
+  '$product.gross_line_total_label': 'gross_line_total',
+  '$product.tax_label': 'tax',
+  '$product.product1_label': 'product1',
+  '$product.product2_label': 'product2',
+  '$task.discount_label': 'discount',
+  '$task.tax_label': 'tax',
+  '$task.gross_line_total_label': 'gross_line_total',
+
   // Contact Labels
   '$contact.first_name_label': 'first_name',
   '$contact.last_name_label': 'last_name',

@@ -30,8 +30,10 @@ import {
   TextBlock,
   TotalBlock,
   TotalItem,
+  TwigBlock,
 } from '../../types';
 import { useBlockLabel } from '../../block-library';
+import { twigSourceToPreviewHtml } from '../../utils/twig-block';
 import { InvoiceData, replaceVariables } from '../../utils/variable-replacer';
 import { useSampleInvoiceData } from '../../hooks/useSampleInvoiceData';
 import {
@@ -126,6 +128,9 @@ export const CanvasBlockContent = memo(function CanvasBlockContent({
     case 'text':
       return <TextBlockRenderer block={block} />;
 
+    case 'twig':
+      return <TwigBlockRenderer block={block} />;
+
     case 'logo':
     case 'image':
       return <ImageBlockRenderer block={block} />;
@@ -188,7 +193,10 @@ function TextBlockRenderer({ block }: { block: TextLikeBlock }) {
   const sampleData = useSampleInvoiceData();
   const { content, fontSize, fontWeight, color, align, lineHeight } =
     block.properties;
-  const displayContent = replaceVariables(content || t('text'), sampleData);
+  const displayContent = replaceVariables(
+    replaceLabelVariables(content || t('text'), t),
+    sampleData
+  );
 
   return (
     <div
@@ -203,8 +211,33 @@ function TextBlockRenderer({ block }: { block: TextLikeBlock }) {
         alignItems: 'center',
       }}
     >
-      {displayContent}
+      <div style={{ width: '100%', minWidth: 0 }}>{displayContent}</div>
     </div>
+  );
+}
+
+function TwigBlockRenderer({ block }: { block: TwigBlock }) {
+  const { t } = useTranslation();
+  const colors = useColorScheme();
+  const html = twigSourceToPreviewHtml(block.properties.content);
+
+  if (!html.trim()) {
+    return (
+      <div
+        className="flex h-full items-center text-xs"
+        style={{ color: colors.$17 }}
+      >
+        {t('twig_template')}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="invoice-twig-content h-full min-h-0 min-w-0 w-full overflow-auto"
+      style={{ color: colors.$3 }}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
   );
 }
 
@@ -258,6 +291,7 @@ function ImageBlockRenderer({ block }: { block: ImageLikeBlock }) {
 }
 
 function CompanyInfoRenderer({ block }: { block: CompanyInfoBlock }) {
+  const [t] = useTranslation();
   const sampleData = useSampleInvoiceData();
   const {
     fieldConfigs,
@@ -291,9 +325,10 @@ function CompanyInfoRenderer({ block }: { block: CompanyInfoBlock }) {
             marginBottom: '8px',
           }}
         >
-          {titlePrefix}
-          {title}
-          {titleSuffix}
+          {replaceLabelVariables(
+            `${titlePrefix || ''}${title || ''}${titleSuffix || ''}`,
+            t
+          )}
         </div>
       )}
 
@@ -322,6 +357,7 @@ function CompanyInfoRenderer({ block }: { block: CompanyInfoBlock }) {
 }
 
 function ClientInfoRenderer({ block }: { block: ClientLikeBlock }) {
+  const [t] = useTranslation();
   const sampleData = useSampleInvoiceData();
   const {
     fieldConfigs,
@@ -355,9 +391,10 @@ function ClientInfoRenderer({ block }: { block: ClientLikeBlock }) {
             marginBottom: '8px',
           }}
         >
-          {titlePrefix}
-          {title}
-          {titleSuffix}
+          {replaceLabelVariables(
+            `${titlePrefix || ''}${title || ''}${titleSuffix || ''}`,
+            t
+          )}
         </div>
       )}
 
@@ -604,6 +641,7 @@ function TermsRenderer({ block }: { block: TermsBlock }) {
 }
 
 function TableBlockRenderer({ block }: { block: TableLikeBlock }) {
+  const [t] = useTranslation();
   const sampleData = useSampleInvoiceData();
   const {
     columns = [],
@@ -661,7 +699,7 @@ function TableBlockRenderer({ block }: { block: TableLikeBlock }) {
                     ),
                   }}
                 >
-                  {col.header}
+                  {replaceLabelVariables(col.header, t)}
                 </th>
               )
             )}

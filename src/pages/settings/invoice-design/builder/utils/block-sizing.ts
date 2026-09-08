@@ -50,6 +50,7 @@ const FALLBACK_GRID_SIZES: Record<BlockType, GridSize> = {
   logo: { w: 4, h: 4 },
   image: { w: 3, h: 3 },
   text: { w: 6, h: 2 },
+  twig: { w: 12, h: 4 },
   'company-info': { w: 6, h: 4 },
   'client-info': { w: 6, h: 4 },
   'client-shipping-info': { w: 6, h: 4 },
@@ -214,6 +215,13 @@ function blockContentSize(
         inheritedFontSize,
         context,
         'Text'
+      );
+    case 'twig':
+      return proseBlockContentSize(
+        props,
+        inheritedFontSize,
+        context,
+        '{% %}'
       );
     case 'public-notes':
     case 'footer':

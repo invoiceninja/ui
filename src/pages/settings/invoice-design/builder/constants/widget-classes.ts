@@ -10,6 +10,7 @@ export const INVOICE_WIDGET_CLASS = 'invoice-widget';
 
 export const INVOICE_WIDGET_CLASS_BY_TYPE = {
   text: 'invoice-widget--text',
+  twig: 'invoice-widget--twig',
   image: 'invoice-widget--image',
   logo: 'invoice-widget--logo',
   table: 'invoice-widget--table',

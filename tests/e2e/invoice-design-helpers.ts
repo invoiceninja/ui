@@ -36,6 +36,7 @@ export type DesignApiRecord = {
 
 export const BUILDER_TEMPLATES = [
   'modern-professional',
+  'clean-lined',
   'minimalist',
   'blank',
 ] as const;

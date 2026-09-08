@@ -9,6 +9,7 @@
  */
 
 import { Block } from '../../types';
+import { blockRegion } from '../page-regions';
 import { normalizeGridPosition } from './normalize';
 
 export function isSameGridPosition(
@@ -30,7 +31,7 @@ export function gridPositionsOverlap(
   );
 }
 
-export function repairGridPositionCollisions(blocks: Block[]): Block[] {
+function repairRegionCollisions(blocks: Block[]): Block[] {
   if (blocks.length <= 1) {
     return blocks;
   }
@@ -108,6 +109,46 @@ export function repairGridPositionCollisions(blocks: Block[]): Block[] {
       gridPosition,
     };
   });
+}
+
+export function repairGridPositionCollisions(blocks: Block[]): Block[] {
+  if (blocks.length <= 1) {
+    return blocks;
+  }
+
+  const byRegion = new Map<string, Block[]>();
+
+  blocks.forEach((block) => {
+    const region = blockRegion(block);
+    const list = byRegion.get(region);
+
+    if (list) {
+      list.push(block);
+    } else {
+      byRegion.set(region, [block]);
+    }
+  });
+
+  const repairedById = new Map<string, Block>();
+  let changed = false;
+
+  byRegion.forEach((regionBlocks) => {
+    const repaired = repairRegionCollisions(regionBlocks);
+
+    if (repaired !== regionBlocks) {
+      changed = true;
+    }
+
+    repaired.forEach((block) => {
+      repairedById.set(block.id, block);
+    });
+  });
+
+  if (!changed) {
+    return blocks;
+  }
+
+  return blocks.map((block) => repairedById.get(block.id) ?? block);
 }
 
 export function applyGridPositionsToBlocks(
