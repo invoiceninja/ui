@@ -578,7 +578,7 @@ function BlueprintBuilder() {
               header: {
                 sticky: false,
               },
-              files: {
+              leftSidebar: {
                 visible: !isAuthoredDocument,
               },
             },
