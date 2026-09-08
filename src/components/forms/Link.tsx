@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { ReactNode } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import CommonProps from '../../common/interfaces/common-props.interface';
-import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import classNames from 'classnames';
 import { useAtomValue } from 'jotai';
-import { preventLeavingPageAtom } from '$app/common/hooks/useAddPreventNavigationEvents';
-import { ExternalLink } from '../icons/ExternalLink';
+import React, { ReactNode } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { preventLeavingPageAtom } from '$app/common/hooks/useAddPreventNavigationEvents';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import CommonProps from '../../common/interfaces/common-props.interface';
+import { ExternalLink } from '../icons/ExternalLink';
 
 interface Props extends CommonProps {
   to: string;
@@ -27,6 +27,7 @@ interface Props extends CommonProps {
   disableHoverUnderline?: boolean;
   withoutExternalIcon?: boolean;
   withoutAdjustedHref?: boolean;
+  state?: unknown;
 }
 
 export function Link(props: Props) {
@@ -102,6 +103,7 @@ export function Link(props: Props) {
       })}
       style={!withoutDefaultStyling ? css : undefined}
       to={props.to}
+      state={props.state}
       onClick={(event) => {
         if (preventLeavingPage) {
           event.preventDefault();

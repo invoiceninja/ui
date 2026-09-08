@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useTranslation } from 'react-i18next';
-import { Payment } from '$app/common/interfaces/payment';
-import { PaymentOverviewInvoice } from './PaymentOverviewInvoice';
-import { PaymentStatus } from '../common/components/PaymentStatus';
-import { useColorScheme } from '$app/common/colors';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { Payment } from '$app/common/interfaces/payment';
 import { Divider } from '$app/components/cards/Divider';
+import { PaymentStatus } from '../common/components/PaymentStatus';
+import { PaymentOverviewInvoice } from './PaymentOverviewInvoice';
 
 interface Props {
   payment: Payment;

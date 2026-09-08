@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
 import { useEffect, useState } from 'react';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Entity } from '$app/common/hooks/useEntityCustomFields';
 import { Element } from './cards';
+import { InputLabel } from './forms';
 import {
   InputCustomField,
   Props as InputCustomFieldProps,
 } from './forms/InputCustomField';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Entity } from '$app/common/hooks/useEntityCustomFields';
-import { InputLabel } from './forms';
-import classNames from 'classnames';
 
 interface Props extends InputCustomFieldProps {
   fieldOnly?: boolean;

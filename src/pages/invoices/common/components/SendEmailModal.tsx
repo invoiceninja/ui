@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
 import { trans } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useBulk } from '$app/common/queries/invoices';
 import { Modal } from '$app/components/Modal';
-import { Dispatch, SetStateAction } from 'react';
-import { useTranslation } from 'react-i18next';
 
 interface Props {
   visible: boolean;

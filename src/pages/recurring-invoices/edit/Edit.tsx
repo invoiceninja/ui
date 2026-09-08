@@ -8,36 +8,36 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtomValue } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { MdInfo } from 'react-icons/md';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useScrollToLineItem } from '$app/common/hooks/useScrollToLineItem';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { Card } from '$app/components/cards';
+import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
+import { Icon } from '$app/components/icons/Icon';
 import { Spinner } from '$app/components/Spinner';
-import { useAtomValue } from 'jotai';
+import { TabGroup } from '$app/components/TabGroup';
+import { Tooltip } from '$app/components/Tooltip';
+import { TaxExemptBadge } from '$app/pages/clients/show/components/TaxExemptBadge';
 import { ClientSelector } from '$app/pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
+import { TasksTabLabel } from '$app/pages/invoices/common/components/TasksTabLabel';
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
-import { useTranslation } from 'react-i18next';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
+import { TaxDataBadge } from '$app/pages/invoices/edit/components/TaxDataBadge';
 import { invoiceSumAtom } from '../common/atoms';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
-import { useRecurringInvoiceUtilities } from '../common/hooks';
-import { Card } from '$app/components/cards';
 import { RecurringInvoiceStatus as RecurringInvoiceStatusBadge } from '../common/components/RecurringInvoiceStatus';
-import { TabGroup } from '$app/components/TabGroup';
-import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
-import { useColorScheme } from '$app/common/colors';
+import { useRecurringInvoiceUtilities } from '../common/hooks';
 import { RecurringInvoiceContext } from '../create/Create';
-import { TasksTabLabel } from '$app/pages/invoices/common/components/TasksTabLabel';
-import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
-import { Tooltip } from '$app/components/Tooltip';
-import { Icon } from '$app/components/icons/Icon';
-import { MdInfo } from 'react-icons/md';
-import { TaxExemptBadge } from '$app/pages/clients/show/components/TaxExemptBadge';
-import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
-import { TaxDataBadge } from '$app/pages/invoices/edit/components/TaxDataBadge';
 
 export default function Edit() {
   const [t] = useTranslation();

@@ -18,10 +18,13 @@ import {
   bulkAction,
   createApiContext,
   fetchEntityByName,
-  getCompanySettings,
-  putCompanySettings,
+  getCompany,
+  resetUserReactSettings,
+  updateCompany,
+  setPermissions as setUserPermissions,
   type ApiContext,
   type EntityType,
+  type Permission,
 } from './api-helpers';
 import {
   accountForParallelIndex,
@@ -100,6 +103,10 @@ export interface ApiFixture {
     type: EntityType,
     data: Record<string, unknown>
   ) => Promise<Record<string, unknown>>;
+  /**
+   * Replace a permission user's permissions through the API.
+   */
+  setPermissions: (email: string, permissions: Permission[]) => Promise<void>;
 }
 
 export interface SettingsFixture {
@@ -120,6 +127,7 @@ export const test = base.extend<
   }
 >({
   account: [
+    // biome-ignore lint/correctness/noEmptyPattern: Playwright requires fixture dependencies to use object destructuring.
     async ({}, use, workerInfo) => {
       const account = accountForParallelIndex(workerInfo.parallelIndex);
       setCurrentTestAccount(account);
@@ -173,6 +181,10 @@ export const test = base.extend<
         await reqContext.dispose();
         return entity;
       },
+
+      async setPermissions(email, permissions) {
+        await setUserPermissions(context, email, permissions);
+      },
     };
 
     await use(fixture);
@@ -183,7 +195,7 @@ export const test = base.extend<
   settingsGuard: async ({ account }, use) => {
     let savedCompanyId: string | undefined;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let savedSettings: Record<string, any> | undefined;
+    let savedCompany: Record<string, any> | undefined;
 
     const fixture: SettingsFixture = {
       async snapshot() {
@@ -192,23 +204,23 @@ export const test = base.extend<
           account.ownerEmail,
           account.password
         );
-        const { companyId, settings } = await getCompanySettings(api);
+        const { companyId, company } = await getCompany(api);
         savedCompanyId = companyId;
-        savedSettings = { ...settings };
+        savedCompany = structuredClone(company);
       },
     };
 
     await use(fixture);
 
-    // Restore settings on teardown if a snapshot was taken
-    if (savedCompanyId && savedSettings) {
+    // Restore company state on teardown if a snapshot was taken
+    if (savedCompanyId && savedCompany) {
       try {
         const api = await createApiContext(
           account.apiUrl,
           account.ownerEmail,
           account.password
         );
-        await putCompanySettings(api, savedCompanyId, savedSettings);
+        await updateCompany(api, savedCompanyId, savedCompany);
       } catch {
         // Best effort
       }
@@ -265,6 +277,15 @@ export function resetAccountBeforeAll(timeout = RESET_ACCOUNT_TIMEOUT) {
   test.beforeAll(async ({ account }, testInfo) => {
     test.setTimeout(timeout);
     await resetTestAccount(account, 'before ' + testInfo.file);
+  });
+
+  test.beforeEach(async ({ account }) => {
+    const api = await createApiContext(
+      account.apiUrl,
+      account.ownerEmail,
+      account.password
+    );
+    await resetUserReactSettings(api, { quiet: true });
   });
 }
 

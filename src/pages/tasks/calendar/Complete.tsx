@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import {
-  isCalendarProvider,
-  useCompleteCalendarConnection,
-} from '$app/common/queries/calendar';
-import type { CalendarProvider, User } from '$app/common/interfaces/user';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { updateUser } from '$app/common/stores/slices/user';
-import { Spinner } from '$app/components/Spinner';
-import { Button } from '$app/components/forms';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaGoogle, FaMicrosoft } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import type { CalendarProvider, User } from '$app/common/interfaces/user';
+import {
+  isCalendarProvider,
+  useCompleteCalendarConnection,
+} from '$app/common/queries/calendar';
+import { updateUser } from '$app/common/stores/slices/user';
+import { Button } from '$app/components/forms';
+import { Spinner } from '$app/components/Spinner';
 
 // The connected state lives on the calendar page (read from Redux). This
 // OAuth-return page only needs to do one of two things: bounce straight back

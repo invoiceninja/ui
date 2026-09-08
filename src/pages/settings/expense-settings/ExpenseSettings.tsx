@@ -8,12 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtomValue } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useColorScheme } from '$app/common/colors';
+import { isSelfHosted } from '$app/common/helpers';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { Divider } from '$app/components/cards/Divider';
-import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../components/cards';
 import { InputField, Radio } from '../../../components/forms';
 import Toggle from '../../../components/forms/Toggle';
@@ -23,12 +27,8 @@ import {
   isCompanySettingsFormBusy,
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
-import { ExpenseCategories } from '../expense-categories';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { isSelfHosted } from '$app/common/helpers';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
-import { useColorScheme } from '$app/common/colors';
-import { useAtomValue } from 'jotai';
+import { ExpenseCategories } from '../expense-categories';
 
 export function ExpenseSettings() {
   useTitle('expense_settings');

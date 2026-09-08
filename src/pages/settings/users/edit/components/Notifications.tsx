@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
-import { User } from '$app/common/interfaces/user';
 import { cloneDeep } from 'lodash';
 import { useTranslation } from 'react-i18next';
+import { User } from '$app/common/interfaces/user';
+import { Element } from '$app/components/cards';
+import { SelectField } from '$app/components/forms';
 
 interface Props {
   user: User;

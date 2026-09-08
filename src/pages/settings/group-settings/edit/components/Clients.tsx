@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useParams } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { DataTable } from '$app/components/DataTable';
 import { useActions } from '$app/pages/clients/common/hooks/useActions';
 import { useClientColumns } from '$app/pages/clients/common/hooks/useClientColumns';
 import { useCustomBulkActions } from '$app/pages/clients/common/hooks/useCustomBulkActions';
-import { useParams } from 'react-router-dom';
 
 export function Clients() {
   const { id } = useParams();

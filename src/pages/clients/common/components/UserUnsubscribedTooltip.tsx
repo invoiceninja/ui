@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Tooltip } from '$app/components/Tooltip';
-import { Link } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 import { MdWarning } from 'react-icons/md';
 import reactStringReplace from 'react-string-replace';
+import { Link } from '$app/components/forms';
+import { Tooltip } from '$app/components/Tooltip';
 
 interface Props {
   size?: number;

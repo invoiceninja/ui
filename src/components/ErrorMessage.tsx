@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
 import { ReactNode, useEffect } from 'react';
 import { Alert } from './Alert';
-import classNames from 'classnames';
 
 interface Props {
   className?: string;

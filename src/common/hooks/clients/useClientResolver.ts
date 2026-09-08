@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Client } from '$app/common/interfaces/client';
-import { useQueryClient } from 'react-query';
 
 export function useClientResolver() {
   const queryClient = useQueryClient();

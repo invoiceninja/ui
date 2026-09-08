@@ -8,27 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { useTranslation } from 'react-i18next';
-import { Settings } from '$app/components/layouts/Settings';
-import { InputField } from '$app/components/forms';
-import { useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
-import { endpoint } from '$app/common/helpers';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
-import { useTitle } from '$app/common/hooks/useTitle';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { ApiToken } from '$app/common/interfaces/api-token';
-import { useBlankApiTokenQuery } from '$app/common/queries/api-tokens';
-import { useHandleChange } from './common/hooks/hooks';
 import { toast } from '$app/common/helpers/toast/toast';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { $refetch } from '$app/common/hooks/useRefetch';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
-import { useColorScheme } from '$app/common/colors';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { ApiToken } from '$app/common/interfaces/api-token';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankApiTokenQuery } from '$app/common/queries/api-tokens';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { Settings } from '$app/components/layouts/Settings';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
+import { useHandleChange } from './common/hooks/hooks';
 
 export function Create() {
   const [t] = useTranslation();

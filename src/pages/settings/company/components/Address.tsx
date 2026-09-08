@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { updateChanges } from '$app/common/stores/slices/company-users';
+import { useAtomValue } from 'jotai';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Element } from '../../../../components/cards';
-import { InputField } from '../../../../components/forms';
-import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../../common/atoms';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { CountrySelector } from '$app/components/CountrySelector';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
-import { CountrySelector } from '$app/components/CountrySelector';
+import { Element } from '../../../../components/cards';
+import { InputField } from '../../../../components/forms';
+import { companySettingsErrorsAtom } from '../../common/atoms';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
 export function Address() {
   const [t] = useTranslation();

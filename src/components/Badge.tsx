@@ -10,12 +10,12 @@
 
 import classNames from 'classnames';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import CommonProps from '../common/interfaces/common-props.interface';
 import {
   hexToRGB,
   isColorLight,
   useAdjustColorDarkness,
 } from '$app/common/hooks/useAdjustColorDarkness';
+import CommonProps from '../common/interfaces/common-props.interface';
 
 export type BadgeVariant =
   | 'primary'

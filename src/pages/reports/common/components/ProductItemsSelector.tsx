@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Spinner } from '$app/components/Spinner';
-import { Element } from '$app/components/cards';
-import { SelectOption } from '$app/components/datatables/Actions';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MultiValue } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
-import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
-import { Product } from '$app/common/interfaces/product';
-import { useQuery, useQueryClient } from 'react-query';
+import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { CustomMultiSelect } from '$app/components/forms/CustomMultiSelect';
+import { Product } from '$app/common/interfaces/product';
+import { Element } from '$app/components/cards';
+import { SelectOption } from '$app/components/datatables/Actions';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { CustomMultiSelect } from '$app/components/forms/CustomMultiSelect';
+import { Spinner } from '$app/components/Spinner';
 
 interface Props {
   value?: string;
@@ -114,9 +114,15 @@ export function ProductItemsSelector(props: Props) {
           const currentFilter =
             value.split("',")[index]?.trim().replace(/'/g, '') || '';
 
-          const productsResponse = await queryClient.fetchQuery<Product[]>(
-            ['/api/v1/products', 'perPage=500', 'status=active', currentFilter],
-            () =>
+          const productsResponse = await queryClient.fetchQuery({
+            queryKey: [
+              '/api/v1/products',
+              'perPage=500',
+              'status=active',
+              currentFilter,
+            ],
+
+            queryFn: () =>
               request(
                 'GET',
                 endpoint(
@@ -130,8 +136,9 @@ export function ProductItemsSelector(props: Props) {
                 (response: GenericSingleResourceResponse<Product[]>) =>
                   response.data.data
               ),
-            { staleTime: Infinity }
-          );
+
+            staleTime: Infinity,
+          });
 
           setProductItems((currentProductItems) => {
             const productItemsList = currentProductItems || [];
@@ -216,7 +223,6 @@ export function ProductItemsSelector(props: Props) {
           <Spinner />
         </div>
       )}
-
       <ErrorMessage className="mt-2">{errorMessage}</ErrorMessage>
     </>
   );

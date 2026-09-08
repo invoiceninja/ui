@@ -1,104 +1,70 @@
-import { login, logout, permissions } from '$tests/e2e/helpers';
-import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
-import { emailForCurrentAccount } from '$tests/e2e/accounts';
+import { login } from '$tests/e2e/helpers';
 import {
-  createApiContext,
-  bulkAction,
-  type EntityType,
-} from '$tests/e2e/api-helpers';
+  resetAccountBeforeAll,
+  test,
+  expect,
+  uniqueName,
+} from '$tests/e2e/fixtures';
+import { emailForCurrentAccount } from '$tests/e2e/accounts';
+import type { ApiContext } from '$tests/e2e/api-helpers';
+import { request, type Page } from '@playwright/test';
 
 resetAccountBeforeAll();
 
 /**
- * Helper: find a user by display name via API and return their ID.
- * Searches all users including deleted/archived so we can restore them.
+ * Create a fresh, active company user for mutation tests.
+ * Do not reuse seed permission users — they are often already deleted
+ * and are shared with other specs.
  */
-async function findUserId(userName: string): Promise<string | null> {
-  const api = await createApiContext(process.env.VITE_API_URL!);
-  const { request } = await import('@playwright/test');
+async function createActiveUser(
+  api: ApiContext,
+  prefix: string
+): Promise<string> {
   const context = await request.newContext({ baseURL: api.baseUrl });
 
-  const response = await context.get(
-    `/api/v1/users?per_page=100&include_deleted=true`,
-    { headers: api.headers }
-  );
+  try {
+    const response = await context.post('/api/v1/users', {
+      headers: api.headers,
+      data: {
+        first_name: prefix,
+        last_name: 'Target',
+        email: `${uniqueName(prefix)}@example.test`,
+      },
+    });
 
-  if (!response.ok()) {
+    const body = await response.json();
+    const user = body.data as
+      | { id?: string; is_deleted?: boolean; archived_at?: number }
+      | undefined;
+
+    if (!response.ok() || !user?.id) {
+      throw new Error(
+        `Failed to create an active ${prefix} user (${response.status()}): ${JSON.stringify(
+          body
+        ).slice(0, 200)}`
+      );
+    }
+
+    if (user.is_deleted || user.archived_at) {
+      throw new Error(
+        `Created ${prefix} user ${user.id} is not active (is_deleted=${String(
+          user.is_deleted
+        )}, archived_at=${String(user.archived_at)})`
+      );
+    }
+
+    return user.id;
+  } finally {
     await context.dispose();
-    return null;
   }
-
-  const body = await response.json();
-  await context.dispose();
-
-  const user = (body.data || []).find(
-    (u: { first_name: string; last_name: string }) =>
-      `${u.first_name} ${u.last_name}`.trim() === userName
-  );
-
-  return user?.id || null;
-}
-
-/**
- * Helper: restore a user by ID via API (undoes delete/archive).
- */
-async function restoreUser(userId: string): Promise<void> {
-  const api = await createApiContext(process.env.VITE_API_URL!);
-  await bulkAction(api, 'users' as EntityType, [userId], 'restore');
-}
-
-/**
- * Helper: ensure a user exists and is active before a test runs.
- * If they were deleted/archived in a prior failed run, restore them.
- * If they don't exist at all, create them via API.
- */
-async function ensureUserExists(userName: string): Promise<string> {
-  let userId = await findUserId(userName);
-
-  if (userId) {
-    await restoreUser(userId);
-    return userId;
-  }
-
-  // User doesn't exist — create them
-  const [firstName, ...lastParts] = userName.split(' ');
-  const lastName = lastParts.join(' ');
-  const email = `${firstName.toLowerCase()}@example.com`;
-
-  const api = await createApiContext(process.env.VITE_API_URL!);
-  const { request } = await import('@playwright/test');
-  const context = await request.newContext({ baseURL: api.baseUrl });
-
-  const response = await context.post('/api/v1/users', {
-    headers: api.headers,
-    data: {
-      first_name: firstName,
-      last_name: lastName,
-      email,
-    },
-  });
-
-  const body = await response.json();
-  await context.dispose();
-
-  userId = body.data?.id;
-  if (!userId) {
-    throw new Error(`Failed to create user "${userName}": ${JSON.stringify(body).slice(0, 200)}`);
-  }
-
-  return userId;
 }
 
 test("Can't see owner of the account in the list of users", async ({
   page,
+  api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear();
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('permissions@example.com', ['admin']);
 
   await login(page, 'permissions@example.com', 'password');
 
@@ -123,28 +89,33 @@ test("Can't see owner of the account in the list of users", async ({
 
   await expect(page.getByText(ownerEmail)).not.toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
-test('deleting user', async ({ page }) => {
-  // Ensure the user exists (restore if deleted by a prior failed run)
-  const userId = await ensureUserExists('Quotes Example');
-
-  await login(page);
-
-  await page.getByRole('link', { name: 'Settings', exact: true }).click();
-
-  await page
-    .getByRole('link', { name: 'User Management', exact: true })
-    .click();
-
-  await page.getByRole('link', { name: 'Quotes Example', exact: true }).click();
+/**
+ * Open a user edit page by ID, confirming password if prompted.
+ * Prefer this over matching display names — duplicate names break strict mode.
+ */
+async function openUserById(page: Page, userId: string) {
+  await page.goto(`/settings/users/${userId}/edit`);
 
   const passwordField = page.getByLabel('Password');
   if (await passwordField.isVisible({ timeout: 2000 }).catch(() => false)) {
     await passwordField.fill('password');
     await passwordField.press('Enter');
   }
+
+  await page.waitForURL(`**/settings/users/${userId}/edit`);
+}
+
+function userRowLink(page: Page, userId: string) {
+  return page.locator(`a[href*="/settings/users/${userId}/edit"]`);
+}
+
+test('deleting user', async ({ page, api }) => {
+  const userId = await createActiveUser(api.context, 'Delete');
+
+  await login(page);
+  await openUserById(page, userId);
 
   const moreActionsButton = page
     .locator('[data-cy="chevronDownButton"]')
@@ -154,41 +125,23 @@ test('deleting user', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
-  await expect(page.getByText('Successfully deleted user')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully deleted user')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .getByRole('link', { name: 'User Management', exact: true })
     .first()
     .click();
 
-  await expect(
-    page.getByRole('link', { name: 'Quotes Example', exact: true })
-  ).not.toBeVisible({ timeout: 10000 });
-
-  // Restore the user so subsequent runs still work
-  await restoreUser(userId);
+  await expect(userRowLink(page, userId)).not.toBeVisible({ timeout: 10000 });
 });
 
-test('archiving user', async ({ page }) => {
-  const userId = await ensureUserExists('Expenses Example');
+test('archiving user', async ({ page, api }) => {
+  const userId = await createActiveUser(api.context, 'Archive');
 
   await login(page);
-
-  await page.getByRole('link', { name: 'Settings', exact: true }).click();
-
-  await page
-    .getByRole('link', { name: 'User Management', exact: true })
-    .click();
-
-  await page
-    .getByRole('link', { name: 'Expenses Example', exact: true })
-    .click();
-
-  const passwordField = page.getByLabel('Password');
-  if (await passwordField.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await passwordField.fill('password');
-    await passwordField.press('Enter');
-  }
+  await openUserById(page, userId);
 
   const moreActionsButton = page
     .locator('[data-cy="chevronDownButton"]')
@@ -198,41 +151,23 @@ test('archiving user', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
-  await expect(page.getByText('Successfully deleted user')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully deleted user')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .getByRole('link', { name: 'User Management', exact: true })
     .first()
     .click();
 
-  await expect(
-    page.getByRole('link', { name: 'Expenses Example', exact: true })
-  ).not.toBeVisible({ timeout: 10000 });
-
-  // Restore the user so subsequent runs still work
-  await restoreUser(userId);
+  await expect(userRowLink(page, userId)).not.toBeVisible({ timeout: 10000 });
 });
 
-test('removing user', async ({ page }) => {
-  const userId = await ensureUserExists('Tasks Example');
+test('removing user', async ({ page, api }) => {
+  const userId = await createActiveUser(api.context, 'Remove');
 
   await login(page);
-
-  await page.getByRole('link', { name: 'Settings', exact: true }).click();
-
-  await page
-    .getByRole('link', { name: 'User Management', exact: true })
-    .click();
-
-  await page
-    .getByRole('link', { name: 'Tasks Example', exact: true })
-    .click();
-
-  const passwordField = page.getByLabel('Password');
-  if (await passwordField.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await passwordField.fill('password');
-    await passwordField.press('Enter');
-  }
+  await openUserById(page, userId);
 
   const moreActionsButton = page
     .locator('[data-cy="chevronDownButton"]')
@@ -242,17 +177,14 @@ test('removing user', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Remove', exact: true }).click();
 
-  await expect(page.getByText('Successfully removed user')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully removed user')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .getByRole('link', { name: 'User Management', exact: true })
     .first()
     .click();
 
-  await expect(
-    page.getByRole('link', { name: 'Tasks Example', exact: true })
-  ).not.toBeVisible({ timeout: 10000 });
-
-  // Restore the user so subsequent runs still work
-  await restoreUser(userId);
+  await expect(userRowLink(page, userId)).not.toBeVisible({ timeout: 10000 });
 });

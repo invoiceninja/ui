@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { request } from '../helpers/request';
+import dayjs from 'dayjs';
+import { useDispatch } from 'react-redux';
 import { endpoint } from '../helpers';
+import { request } from '../helpers/request';
 import {
   resetChanges,
   updateCompanyUsers,
 } from '../stores/slices/company-users';
-import { useDispatch } from 'react-redux';
-import dayjs from 'dayjs';
 
 export function useRefreshCompanyUsers() {
   const dispatch = useDispatch();

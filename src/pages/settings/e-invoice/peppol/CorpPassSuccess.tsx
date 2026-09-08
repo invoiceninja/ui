@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { Button } from '$app/components/forms';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { Button } from '$app/components/forms';
 
 export function CorpPassSuccess() {
   const { t } = useTranslation();

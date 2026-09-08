@@ -10,9 +10,9 @@ import {
   SendDialogProps,
   SignatorySelectorProps,
 } from '@docuninja/builder2.0';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
 import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
@@ -56,6 +56,8 @@ import {
   RectangleSettingsRemoveButton,
   RectangleSettingsSaveButton,
   RectangleSettingsSelect,
+  SingleSignatoryFlowButton,
+  SingleSignatoryFlowDialog,
   ToolboxContext,
   UninviteButton,
   UninviteDialog,
@@ -501,6 +503,10 @@ function BlueprintBuilder() {
               },
               signatorySelector: SignatorySelector,
               signatorySwap: SignatorySwap,
+              singleSignatoryFlow: {
+                dialog: SingleSignatoryFlowDialog,
+                button: SingleSignatoryFlowButton,
+              },
               uninvite: {
                 dialog: UninviteDialog,
                 button: UninviteButton,

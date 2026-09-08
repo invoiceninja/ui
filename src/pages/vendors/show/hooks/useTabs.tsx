@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { route } from '$app/common/helpers/route';
 import { Vendor } from '$app/common/interfaces/vendor';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Tab } from '$app/components/Tabs';
 import { modules } from '$app/pages/settings';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 
 interface Params {
   vendor: Vendor | undefined;

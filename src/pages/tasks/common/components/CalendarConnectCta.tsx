@@ -8,33 +8,35 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { FaCalendarCheck, FaGoogle, FaMicrosoft } from 'react-icons/fa';
+import { MdInfoOutline } from 'react-icons/md';
+import { useQueryClient } from '@tanstack/react-query';
+import { useDispatch } from 'react-redux';
 import { useColorScheme } from '$app/common/colors';
 import {
   isCalendarConnectionAvailable,
   isDevCalendarEnabled,
   isHosted,
 } from '$app/common/helpers';
-import { toast } from '$app/common/helpers/toast/toast';
 import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useIsPaid } from '$app/common/hooks/usePaidOrSelfhost';
+import type { CalendarProvider } from '$app/common/interfaces/user';
 import {
+  invalidateCalendarDisconnectCache,
   useConnectCalendar,
   useDisconnectCalendar,
 } from '$app/common/queries/calendar';
-import type { CalendarProvider } from '$app/common/interfaces/user';
 import { updateUser } from '$app/common/stores/slices/user';
-import { useDispatch } from 'react-redux';
+import { Alert } from '$app/components/Alert';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Modal } from '$app/components/Modal';
-import { Alert } from '$app/components/Alert';
 import { Button, Link } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { FaCalendarCheck, FaGoogle, FaMicrosoft } from 'react-icons/fa';
-import { MdInfoOutline } from 'react-icons/md';
+import { Modal } from '$app/components/Modal';
 
 export function CalendarConnectCta() {
   const [t] = useTranslation();
@@ -53,6 +55,7 @@ export function CalendarConnectCta() {
 
   const connect = useConnectCalendar();
   const disconnect = useDisconnectCalendar();
+  const queryClient = useQueryClient();
 
   const [disconnectVisible, setDisconnectVisible] = useState(false);
 
@@ -61,7 +64,7 @@ export function CalendarConnectCta() {
 
     // Guard against double-click: the one_time_token is single-use, so a
     // second mutation would waste the first hash and could race the redirect.
-    if (connect.isLoading) return;
+    if (connect.isPending) return;
 
     toast.processing();
 
@@ -82,6 +85,8 @@ export function CalendarConnectCta() {
     toast.processing();
     disconnect.mutate(undefined, {
       onSuccess: () => {
+        invalidateCalendarDisconnectCache(queryClient);
+
         // Redux holds the current user; flip the status locally so the chip
         // returns to the connect CTA immediately without waiting on refetch.
         if (user) {
@@ -124,7 +129,7 @@ export function CalendarConnectCta() {
             <Button
               behavior="button"
               onClick={handleDisconnect}
-              disabled={disconnect.isLoading}
+              disabled={disconnect.isPending}
               disableWithoutIcon
             >
               {t('continue')}
@@ -148,7 +153,7 @@ export function CalendarConnectCta() {
           <button
             type="button"
             onClick={() => setDisconnectVisible(true)}
-            disabled={disconnect.isLoading}
+            disabled={disconnect.isPending}
             aria-label={t('disconnect') as string}
             className="ml-1 p-1 leading-none text-base"
             style={{ color: colors.$17 }}

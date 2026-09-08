@@ -8,16 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
-import { Project } from '$app/common/interfaces/project';
-
-import { CreateProjectModal } from '$app/pages/projects/common/components/CreateProjectModal';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ComboboxAsync } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
+import { Project } from '$app/common/interfaces/project';
+import { CreateProjectModal } from '$app/pages/projects/common/components/CreateProjectModal';
 import { ErrorMessage } from '../ErrorMessage';
+import { ComboboxAsync } from '../forms/Combobox';
 
 interface Props extends GenericSelectorProps<Project> {
   clientId?: string;

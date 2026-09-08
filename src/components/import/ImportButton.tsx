@@ -10,9 +10,9 @@
 
 import { useTranslation } from 'react-i18next';
 import { Link as ReactRouterLink } from 'react-router-dom';
-import { Import } from '../icons/Import';
-import { useColorScheme } from '$app/common/colors';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { Import } from '../icons/Import';
 
 interface Props {
   route: string;

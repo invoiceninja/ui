@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Guard } from '$app/common/guards/Guard';
-import { permission } from '$app/common/guards/guards/permission';
-import { Route } from 'react-router-dom';
-import { enabled } from '$app/common/guards/guards/enabled';
-import { ModuleBitmask } from '$app/pages/settings/account-management/component';
-import { or } from '$app/common/guards/guards/or';
-import { assigned } from '$app/common/guards/guards/assigned';
 import { lazy } from 'react';
+import { Route } from 'react-router-dom';
+import { Guard } from '$app/common/guards/Guard';
+import { assigned } from '$app/common/guards/guards/assigned';
+import { enabled } from '$app/common/guards/guards/enabled';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
+import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 
 const Invoices = lazy(() => import('$app/pages/invoices/index/Invoices'));
 const Invoice = lazy(() => import('$app/pages/invoices/Invoice'));
@@ -29,6 +29,9 @@ const EInvoice = lazy(
 );
 const Verifactu = lazy(
   () => import('$app/pages/invoices/edit/components/Verifactu')
+);
+const Quickbooks = lazy(
+  () => import('$app/pages/invoices/edit/components/Quickbooks')
 );
 const Documents = lazy(
   () => import('$app/pages/invoices/edit/components/Documents')
@@ -125,6 +128,7 @@ export const invoiceRoutes = (
       <Route path="edit" element={<Edit />} />
       <Route path="e_invoice" element={<EInvoice />} />
       <Route path="verifactu" element={<Verifactu />} />
+      <Route path="quickbooks" element={<Quickbooks />} />
       <Route path="documents" element={<Documents />} />
       <Route path="settings" element={<Settings />} />
       <Route path="activity" element={<Activities />} />

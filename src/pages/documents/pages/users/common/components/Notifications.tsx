@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Element } from '$app/components/cards';
+import { SelectField } from '$app/components/forms';
 import {
   NOTIFICATION_TYPES,
   NOTIFICATION_VALUES,
+  NotificationValue,
 } from '../constants/notifications';
-import { NotificationValue } from '../constants/notifications';
 
 interface NotificationsProps {
   notifications: Record<string, string>;

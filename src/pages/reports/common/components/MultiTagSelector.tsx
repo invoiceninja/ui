@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MultiValue } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
 import { TagEntityType } from '$app/common/interfaces/tag';
 import { useTagsQuery } from '$app/common/queries/tags';
@@ -17,9 +20,6 @@ import { ErrorMessage } from '$app/components/ErrorMessage';
 import { CustomMultiSelect } from '$app/components/forms/CustomMultiSelect';
 import { Spinner } from '$app/components/Spinner';
 import { isActiveTag } from '$app/components/tags/TagPills';
-import { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { MultiValue } from 'react-select';
 
 interface Props {
   entityType: TagEntityType;

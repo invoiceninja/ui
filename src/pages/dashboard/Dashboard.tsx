@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtomValue } from 'jotai';
+import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useEnabled } from '$app/common/guards/guards/enabled';
+import { useOpenFeedbackSlider } from '$app/common/hooks/useOpenFeedbackSlider';
+import { reactSettingsAtom } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Activity } from '$app/pages/dashboard/components/Activity';
 import { PastDueInvoices } from '$app/pages/dashboard/components/PastDueInvoices';
 import { RecentPayments } from '$app/pages/dashboard/components/RecentPayments';
 import { Totals } from '$app/pages/dashboard/components/Totals';
 import { UpcomingInvoices } from '$app/pages/dashboard/components/UpcomingInvoices';
-import { useTranslation } from 'react-i18next';
 import { Default } from '../../components/layouts/Default';
+import { ModuleBitmask } from '../settings';
 import { ExpiredQuotes } from './components/ExpiredQuotes';
 import { UpcomingQuotes } from './components/UpcomingQuotes';
-import { useEnabled } from '$app/common/guards/guards/enabled';
-import { ModuleBitmask } from '../settings';
 import { UpcomingRecurringInvoices } from './components/UpcomingRecurringInvoices';
-import { useOpenFeedbackSlider } from '$app/common/hooks/useOpenFeedbackSlider';
-import { useEffect, useRef } from 'react';
-import { useAtomValue } from 'jotai';
-import { reactSettingsAtom } from '$app/common/hooks/useReactSettings';
 
 export default function Dashboard() {
   useTitle('dashboard');

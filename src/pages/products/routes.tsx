@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { lazy } from 'react';
+import { Route } from 'react-router-dom';
 import { Guard } from '$app/common/guards/Guard';
+import { admin } from '$app/common/guards/guards/admin';
 import { assigned } from '$app/common/guards/guards/assigned';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
-import { Route } from 'react-router-dom';
-import { lazy } from 'react';
-import { admin } from '$app/common/guards/guards/admin';
 
 const Product = lazy(() => import('$app/pages/products/Product'));
 const Import = lazy(() => import('$app/pages/products/import/Import'));

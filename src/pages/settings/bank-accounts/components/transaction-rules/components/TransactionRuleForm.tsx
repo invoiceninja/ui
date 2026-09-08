@@ -8,25 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
-import { SelectField } from '$app/components/forms';
-import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
-import { TransactionRule } from '$app/common/interfaces/transaction-rules';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { ExpenseCategorySelector } from '$app/components/expense-categories/ExpenseCategorySelector';
-import Toggle from '$app/components/forms/Toggle';
-import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHandleChange } from '../hooks/useHandleChange';
-import { useCreditRuleFields } from '../hooks/useCreditRuleFields';
-import { RuleModal } from './RuleModal';
-import { useColorScheme } from '$app/common/colors';
 import styled from 'styled-components';
-import { Plus } from '$app/components/icons/Plus';
+import { useColorScheme } from '$app/common/colors';
+import { TransactionRule } from '$app/common/interfaces/transaction-rules';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Card, Element } from '$app/components/cards';
+import { ExpenseCategorySelector } from '$app/components/expense-categories/ExpenseCategorySelector';
+import { InputField, SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
 import { Pencil } from '$app/components/icons/Pencil';
+import { Plus } from '$app/components/icons/Plus';
 import { Trash } from '$app/components/icons/Trash';
+import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
+import { VendorSelector } from '$app/components/vendors/VendorSelector';
+import { useCreditRuleFields } from '../hooks/useCreditRuleFields';
+import { useHandleChange } from '../hooks/useHandleChange';
+import { RuleModal } from './RuleModal';
 
 interface Props {
   transactionRule: TransactionRule;

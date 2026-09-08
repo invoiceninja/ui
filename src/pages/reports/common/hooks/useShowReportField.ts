@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { TAG_ENTITY_TYPES, TagEntityType } from '$app/common/interfaces/tag';
 import { Identifier } from '../useReports';
 
 type Field =
@@ -162,6 +163,26 @@ const ReportFields: Record<Identifier, Field[]> = {
   user_sales_report: ['group_by'],
 };
 
+export const REPORT_TAG_ENTITY_TYPES: Partial<Record<Identifier, TagEntityType>> =
+  {
+    client: TAG_ENTITY_TYPES.client,
+    invoice: TAG_ENTITY_TYPES.invoice,
+    invoice_item: TAG_ENTITY_TYPES.invoice,
+    quote: TAG_ENTITY_TYPES.quote,
+    quote_item: TAG_ENTITY_TYPES.quote,
+    credit: TAG_ENTITY_TYPES.credit,
+    payment: TAG_ENTITY_TYPES.payment,
+    expense: TAG_ENTITY_TYPES.expense,
+    task: TAG_ENTITY_TYPES.task,
+    product: TAG_ENTITY_TYPES.product,
+    vendor: TAG_ENTITY_TYPES.vendor,
+    purchase_order: TAG_ENTITY_TYPES.purchaseOrder,
+    purchase_order_item: TAG_ENTITY_TYPES.purchaseOrder,
+    recurring_invoice: TAG_ENTITY_TYPES.recurringInvoice,
+    recurring_invoice_item: TAG_ENTITY_TYPES.recurringInvoice,
+    project: TAG_ENTITY_TYPES.project,
+  };
+
 interface Params {
   report: Identifier;
 }
@@ -170,6 +191,10 @@ export function useShowReportField(params: Params) {
   const { report } = params;
 
   return (field: Field) => {
+    if (field === 'tags') {
+      return report in REPORT_TAG_ENTITY_TYPES;
+    }
+
     return Boolean(ReportFields[report].includes(field));
   };
 }

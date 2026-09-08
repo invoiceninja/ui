@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction } from 'react';
 import { trans } from '$app/common/helpers';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { Invoice } from '$app/common/interfaces/invoice';
 import { Task } from '$app/common/interfaces/task';
 import { Modal } from '$app/components/Modal';
-import { Dispatch, SetStateAction } from 'react';
 import { useAddTasksOnInvoice } from '../hooks/useAddTasksOnInvoice';
-import { Invoice } from '$app/common/interfaces/invoice';
 
 interface Props {
   visible: boolean;

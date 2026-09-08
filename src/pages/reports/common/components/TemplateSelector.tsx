@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
-import { ComboboxAsync } from '$app/components/forms/Combobox';
-import { endpoint } from '$app/common/helpers';
-import { ErrorMessage } from '$app/components/ErrorMessage';
-import { Design } from '$app/common/interfaces/design';
 import { useTranslation } from 'react-i18next';
+import { endpoint } from '$app/common/helpers';
+import { Design } from '$app/common/interfaces/design';
+import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
+import { ErrorMessage } from '$app/components/ErrorMessage';
+import { ComboboxAsync } from '$app/components/forms/Combobox';
 
 export interface TemplateSelectorProps extends GenericSelectorProps<Design> {
   initiallyVisible?: boolean;

@@ -8,28 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { CurrencySelector } from '$app/components/CurrencySelector';
+import { cloneDeep, set } from 'lodash';
 import { useTranslation } from 'react-i18next';
-import { ClientContext } from '../../edit/Edit';
 import { useOutletContext } from 'react-router-dom';
-import { cloneDeep } from 'lodash';
-import { set } from 'lodash';
-import { useCurrencies } from '$app/common/hooks/useCurrencies';
-import { useLanguages } from '$app/common/hooks/useLanguages';
-import { SelectField } from '$app/components/forms/SelectField';
-import { Link } from '$app/components/forms';
-import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
-import { LanguageSelector } from '$app/components/LanguageSelector';
-import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { useColorScheme } from '$app/common/colors';
 import {
   isUniquePaymentTerm,
   shouldPaymentTermBeVisible,
 } from '$app/common/helpers/payment-terms/payment-term-filters';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { useCurrencies } from '$app/common/hooks/useCurrencies';
+import { useLanguages } from '$app/common/hooks/useLanguages';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
 import { useStaticsQuery } from '$app/common/queries/statics';
-import { useColorScheme } from '$app/common/colors';
+import { CurrencySelector } from '$app/components/CurrencySelector';
+import { Card, Element } from '$app/components/cards';
+import { Link } from '$app/components/forms';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { SelectField } from '$app/components/forms/SelectField';
+import { LanguageSelector } from '$app/components/LanguageSelector';
+import { ClientContext } from '../../edit/Edit';
 
 export default function Settings() {
   const [t] = useTranslation();

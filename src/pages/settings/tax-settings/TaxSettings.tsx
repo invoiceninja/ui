@@ -8,36 +8,36 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { updateChanges } from '$app/common/stores/slices/company-users';
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { TaxRates } from '..';
+import { useColorScheme } from '$app/common/colors';
+import { useCalculateTaxesRegion } from '$app/common/hooks/useCalculateTaxesRegion';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { usePaidOrSelfHost } from '$app/common/hooks/usePaidOrSelfhost';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { Divider } from '$app/components/cards/Divider';
+import Toggle from '$app/components/forms/Toggle';
+import { HelpWidget } from '$app/components/HelpWidget';
 import { Card, Element } from '../../../components/cards';
 import { SelectField } from '../../../components/forms';
-import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
+import { TaxRates } from '..';
+import { companySettingsErrorsAtom } from '../common/atoms';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import {
   isCompanySettingsFormBusy,
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
-import { Selector } from './components';
-import { Divider } from '$app/components/cards/Divider';
-import { usePaidOrSelfHost } from '$app/common/hooks/usePaidOrSelfhost';
-import { CalculateTaxes } from './components/calculate-taxes/CalculateTaxes';
-import { useCalculateTaxesRegion } from '$app/common/hooks/useCalculateTaxesRegion';
-import { useAtomValue } from 'jotai';
-import { companySettingsErrorsAtom } from '../common/atoms';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { HelpWidget } from '$app/components/HelpWidget';
-import { CalculateTaxesNotificationModal } from './components/calculate-taxes/components/CalculateTaxesNotificationModal';
-import { useColorScheme } from '$app/common/colors';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
+import { Selector } from './components';
+import { CalculateTaxes } from './components/calculate-taxes/CalculateTaxes';
+import { CalculateTaxesNotificationModal } from './components/calculate-taxes/components/CalculateTaxesNotificationModal';
 import { DefaultLineItemTaxes } from './components/DefaultLineItemTaxes';
-import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 
 export function TaxSettings() {
   const [t] = useTranslation();

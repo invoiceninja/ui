@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Currency } from '$app/common/interfaces/currency';
 import { useStaticsQuery } from '$app/common/queries/statics';
 
 export function useCurrencyResolver() {
@@ -16,7 +17,9 @@ export function useCurrencyResolver() {
   const find = (id: string) => {
     if (statics) {
       return Promise.resolve(
-        statics.data?.currencies.find((currency) => currency.id === id)
+        statics.data?.currencies.find(
+          (currency: Currency) => currency.id === id
+        )
       );
     }
 
@@ -31,7 +34,9 @@ export function useResolveCurrency() {
 
   return (id: string) => {
     if (statics) {
-      return statics.data?.currencies.find((currency) => currency.id === id);
+      return statics.data?.currencies.find(
+        (currency: Currency) => currency.id === id
+      );
     }
 
     return undefined;

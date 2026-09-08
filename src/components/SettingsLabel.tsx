@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
 import { ReactNode } from 'react';
+import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   label: string | ReactNode;

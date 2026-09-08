@@ -1,6 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import { Badge } from '$app/components/Badge';
 import { Tooltip } from '$app/components/Tooltip';
-import { useTranslation } from 'react-i18next';
 
 interface Props {
   payment_terms: string | undefined;

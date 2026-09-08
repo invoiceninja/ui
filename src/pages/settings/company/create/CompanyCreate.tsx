@@ -8,26 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '$app/components/forms';
+import { useQueryClient } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
+import dayjs from 'dayjs';
+import { Dispatch, SetStateAction, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 import {
   resetChanges,
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
 import { authenticate } from '$app/common/stores/slices/user';
+import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { useState, SetStateAction, Dispatch } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
-import { useDispatch } from 'react-redux';
-import { useColorScheme } from '$app/common/colors';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import dayjs from 'dayjs';
-import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 
 interface Props {
   isModalOpen: boolean;

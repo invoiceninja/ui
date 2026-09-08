@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
+import { Link } from '$app/components/forms';
 
 interface Params {
   entity?: 'client';

@@ -8,30 +8,30 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { User } from '$app/common/interfaces/user';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { defaultHeaders } from '$app/common/queries/common/headers';
 import { useBlankUserQuery } from '$app/common/queries/users';
+import { Card } from '$app/components/cards';
 import { Settings } from '$app/components/layouts/Settings';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { TabGroup } from '$app/components/TabGroup';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { UsersPlanAlert } from '../common/components/UsersPlanAlert';
 import { Details } from '../edit/components/Details';
 import { Notifications } from '../edit/components/Notifications';
 import { Permissions } from '../edit/components/Permissions';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
-import { UsersPlanAlert } from '../common/components/UsersPlanAlert';
-import { Card } from '$app/components/cards';
-import { useColorScheme } from '$app/common/colors';
 
 export function Create() {
   useTitle('new_user');

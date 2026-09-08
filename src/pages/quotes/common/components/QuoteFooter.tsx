@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import Toggle from '$app/components/forms/Toggle';
+import { useAtomValue } from 'jotai';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { useColorScheme } from '$app/common/colors';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
 import { Link } from '$app/components/forms';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import Toggle from '$app/components/forms/Toggle';
 import { TabGroup } from '$app/components/TabGroup';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { Dispatch, SetStateAction } from 'react';
-import { useAtomValue } from 'jotai';
 import { quoteAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
-import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   handleChange: ChangeHandler;

@@ -8,27 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
+import dayjs from 'dayjs';
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Task } from '$app/common/interfaces/task';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankTaskQuery, useTasksQuery } from '$app/common/queries/tasks';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
 import {
   Button,
   Checkbox,
   InputField,
   InputLabel,
 } from '$app/components/forms';
-import { useColorScheme } from '$app/common/colors';
 import { Modal } from '$app/components/Modal';
-import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useBlankTaskQuery, useTasksQuery } from '$app/common/queries/tasks';
-import { Task } from '$app/common/interfaces/task';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { AxiosError } from 'axios';
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import dayjs from 'dayjs';
 import { parseDurationToSeconds } from '../helpers';
 
 interface Defaults {

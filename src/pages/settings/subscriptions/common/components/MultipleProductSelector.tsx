@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useEffect, useState } from 'react';
+import { BsBox } from 'react-icons/bs';
+import { useNavigate } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Product } from '$app/common/interfaces/product';
 import { Subscription } from '$app/common/interfaces/subscription';
 import { Link, SelectField } from '$app/components/forms';
-import { useEffect, useState } from 'react';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { route } from '$app/common/helpers/route';
-import { BsBox } from 'react-icons/bs';
-import { useNavigate } from 'react-router-dom';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
-import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   type:

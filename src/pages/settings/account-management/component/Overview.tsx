@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { updateChanges } from '$app/common/stores/slices/company-users';
+import { Divider } from 'antd';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Element } from '../../../../components/cards';
-import Toggle from '../../../../components/forms/Toggle';
-import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { endpoint } from '$app/common/helpers';
-import { Button } from '$app/components/forms';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useState } from 'react';
-import { Divider } from 'antd';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { Button } from '$app/components/forms';
+import { Element } from '../../../../components/cards';
+import Toggle from '../../../../components/forms/Toggle';
 
 export function Overview() {
   const [t] = useTranslation();

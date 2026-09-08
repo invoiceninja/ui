@@ -8,17 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { cloneDeep } from 'lodash';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useColorScheme } from '$app/common/colors';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import {
   injectInChanges,
   updateChanges,
 } from '$app/common/stores/slices/company-users';
 import { Divider } from '$app/components/cards/Divider';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
 import { Modal } from '$app/components/Modal';
-import { cloneDeep } from 'lodash';
-import { ChangeEvent, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { Element } from '../../../../components/cards';
 import {
   Button,
@@ -26,8 +28,6 @@ import {
   Link,
   SelectField,
 } from '../../../../components/forms';
-import { useColorScheme } from '$app/common/colors';
-import { CircleXMark } from '$app/components/icons/CircleXMark';
 
 export function CustomLabels() {
   const [t] = useTranslation();

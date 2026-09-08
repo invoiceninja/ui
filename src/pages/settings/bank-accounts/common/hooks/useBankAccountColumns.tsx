@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
+import { useTranslation } from 'react-i18next';
+import { MdWarning } from 'react-icons/md';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { DataTableColumns } from '$app/components/DataTable';
-import { useTranslation } from 'react-i18next';
-import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { MdWarning } from 'react-icons/md';
+import { Link } from '$app/components/forms';
 import { Tooltip } from '$app/components/Tooltip';
 
 enum IntegrationType {

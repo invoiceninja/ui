@@ -9,15 +9,15 @@
  */
 
 import { AxiosError } from 'axios';
+import { Dispatch, FormEvent, SetStateAction } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Dispatch, FormEvent, SetStateAction } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { $refetch } from '$app/common/hooks/useRefetch';
 
 export function useHandleCreate(
   bankAccount: BankAccount | undefined,

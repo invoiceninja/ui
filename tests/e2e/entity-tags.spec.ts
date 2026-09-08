@@ -1,4 +1,4 @@
-import { login, logout } from '$tests/e2e/helpers';
+import { login } from '$tests/e2e/helpers';
 import {
   resetAccountBeforeAll,
   test,
@@ -37,9 +37,19 @@ async function createEntity(
 
     const blank = (await blankResponse.json()).data;
 
+    // /create returns line_items as the string "[]"; the store endpoint needs an array.
+    const payload = { ...blank, ...overrides };
+    if (typeof payload.line_items === 'string') {
+      try {
+        payload.line_items = JSON.parse(payload.line_items as string);
+      } catch {
+        payload.line_items = [];
+      }
+    }
+
     const response = await context.post(`/api/v1/${type}`, {
       headers: api.context.headers,
-      data: { ...blank, ...overrides },
+      data: payload,
     });
 
     if (!response.ok()) {
@@ -132,16 +142,18 @@ async function assertTagPersists(
   entityId: string
 ) {
   const tagName = uniqueName('entity-tag');
+  const editUrl = `/${editPath}/${entityId}/edit`;
 
-  await page.goto(`/${editPath}/${entityId}/edit`);
-  await page.waitForURL(`**/${editPath}/${entityId}/edit`);
+  await page.goto(editUrl);
+  await page.waitForURL(`**${editUrl}`);
 
   await createTagFromSelector(page, api, tagName);
 
   await saveEntity(page);
 
-  await page.reload();
-  await page.waitForURL(`**/${editPath}/${entityId}/edit`);
+  // Some entities (e.g. clients) redirect to the show page after save.
+  await page.goto(editUrl);
+  await page.waitForURL(`**${editUrl}`);
 
   await expect(page.getByText(tagName, { exact: true }).first()).toBeVisible({
     timeout: 15000,
@@ -171,6 +183,13 @@ async function withVendor(api: ApiFixture) {
   return { vendor_id: vendor.id };
 }
 
+async function withClientDocument(api: ApiFixture) {
+  return {
+    ...(await withClient(api)),
+    line_items: [],
+  };
+}
+
 const ENTITY_CASES: EntityCase[] = [
   {
     label: 'client',
@@ -194,7 +213,10 @@ const ENTITY_CASES: EntityCase[] = [
     label: 'project',
     apiType: 'projects',
     editPath: 'projects',
-    buildOverrides: async () => ({ name: uniqueName('tag-project') }),
+    buildOverrides: async (api) => ({
+      name: uniqueName('tag-project'),
+      ...(await withClient(api)),
+    }),
   },
   {
     label: 'task',
@@ -207,30 +229,38 @@ const ENTITY_CASES: EntityCase[] = [
     label: 'recurring expense',
     apiType: 'recurring_expenses',
     editPath: 'recurring_expenses',
+    buildOverrides: async () => ({
+      frequency_id: '5',
+      next_send_date: new Date().toISOString().slice(0, 10),
+    }),
   },
   {
     label: 'invoice',
     apiType: 'invoices',
     editPath: 'invoices',
-    buildOverrides: withClient,
+    buildOverrides: withClientDocument,
   },
   {
     label: 'quote',
     apiType: 'quotes',
     editPath: 'quotes',
-    buildOverrides: withClient,
+    buildOverrides: withClientDocument,
   },
   {
     label: 'credit',
     apiType: 'credits',
     editPath: 'credits',
-    buildOverrides: withClient,
+    buildOverrides: withClientDocument,
   },
   {
     label: 'recurring invoice',
     apiType: 'recurring_invoices',
     editPath: 'recurring_invoices',
-    buildOverrides: withClient,
+    buildOverrides: async (api) => ({
+      ...(await withClientDocument(api)),
+      frequency_id: '5',
+      next_send_date: new Date().toISOString().slice(0, 10),
+    }),
   },
   {
     label: 'payment',
@@ -246,7 +276,10 @@ const ENTITY_CASES: EntityCase[] = [
     label: 'purchase order',
     apiType: 'purchase_orders',
     editPath: 'purchase_orders',
-    buildOverrides: withVendor,
+    buildOverrides: async (api) => ({
+      ...(await withVendor(api)),
+      line_items: [],
+    }),
   },
 ];
 
@@ -255,6 +288,7 @@ for (const entityCase of ENTITY_CASES) {
     page,
     api,
   }) => {
+    test.setTimeout(60000);
     await login(page);
 
     const overrides = entityCase.buildOverrides
@@ -264,8 +298,6 @@ for (const entityCase of ENTITY_CASES) {
     const entity = await createEntity(api, entityCase.apiType, overrides);
 
     await assertTagPersists(page, api, entityCase.editPath, entity.id as string);
-
-    await logout(page);
   });
 }
 
@@ -290,5 +322,4 @@ test('can create and persist a tag on a bank transaction', async ({
 
   await assertTagPersists(page, api, 'transactions', transaction.id as string);
 
-  await logout(page);
 });

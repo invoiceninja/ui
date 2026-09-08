@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { Lock, Smartphone, Book } from 'react-feather';
+import { Book, Lock, Smartphone } from 'react-feather';
 import { styled } from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 
 const StyledLink = styled.a`
   &:hover {

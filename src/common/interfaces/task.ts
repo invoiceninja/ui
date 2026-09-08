@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Project } from './project';
 import { Client } from './client';
-import { TaskStatus } from './task-status';
+import { Project } from './project';
 import { Tag } from './tag';
+import { TaskStatus } from './task-status';
 import { User } from './user';
 
 export interface TaskMeta {

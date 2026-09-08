@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Credit } from '$app/common/interfaces/credit';
-import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 import { CreditStatus as CreditStatusEnum } from '$app/common/enums/credit-status';
+import { Credit } from '$app/common/interfaces/credit';
+import { Badge } from '$app/components/Badge';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {

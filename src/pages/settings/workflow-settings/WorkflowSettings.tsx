@@ -8,11 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtomValue } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { Card } from '$app/components/cards';
 import { TabGroup } from '$app/components/TabGroup';
-
-import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import {
@@ -20,9 +22,6 @@ import {
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
 import { Invoices, Quotes } from './components';
-import { Card } from '$app/components/cards';
-import { useColorScheme } from '$app/common/colors';
-import { useAtomValue } from 'jotai';
 
 export function WorkflowSettings() {
   const [t] = useTranslation();

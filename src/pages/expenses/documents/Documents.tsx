@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
-import { DocumentsTable } from '$app/components/DocumentsTable';
-import { Upload } from '$app/pages/settings/company/documents/components';
+import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
-import { Context } from '../edit/Edit';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { useTranslation } from 'react-i18next';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { Card } from '$app/components/cards';
-import { useColorScheme } from '$app/common/colors';
-import classNames from 'classnames';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { Context } from '../edit/Edit';
 
 export default function Documents() {
   const [t] = useTranslation();

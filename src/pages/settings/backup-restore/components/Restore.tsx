@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { UploadCompanyImport } from '$app/components/import/UploadCompanyImport';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { UploadCompanyImport } from '$app/components/import/UploadCompanyImport';
 
 export function Restore() {
   const [t] = useTranslation();

@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
-import { useQueryClient } from 'react-query';
 import { invalidationQueryAtom } from '../atoms/data-table';
-import { toast } from '../helpers/toast/toast';
-import { request } from '../helpers/request';
 import { endpoint } from '../helpers';
+import { request } from '../helpers/request';
+import { toast } from '../helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
 
 export function useBulkAction() {
@@ -32,7 +32,9 @@ export function useBulkAction() {
       $refetch(['designs']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
     });
   };
 }

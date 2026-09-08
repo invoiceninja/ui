@@ -16,6 +16,7 @@ export default {
   [PaymentType.AMERICAN_EXPRESS]: 'payment_type_American Express',
   [PaymentType.BANCONTACT]: 'bancontact',
   [PaymentType.BACS]: 'payment_type_BACS',
+  [PaymentType.STRIPE_BANK_TRANSFER]: 'payment_type_Stripe Bank Transfer',
   [PaymentType.BECS]: 'becs',
   [PaymentType.BANK_TRANSFER]: 'payment_type_Bank Transfer',
   [PaymentType.CARTE_BLANCHE]: 'payment_type_Carte Blanche',

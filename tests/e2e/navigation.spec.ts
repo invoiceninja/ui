@@ -1,4 +1,4 @@
-import { login, logout, permissions } from '$tests/e2e/helpers';
+import { login } from '$tests/e2e/helpers';
 import { createInvoice } from '$tests/helpers/invoice';
 import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
 import dayjs from 'dayjs';
@@ -8,13 +8,7 @@ resetAccountBeforeAll();
 test('Can not add a company and navigate to account management', async ({
   page,
 }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear();
-  await save();
-  await logout(page);
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'permissions@example.com', 'password');
 
   await page.locator('[data-cy="companyDropdown"]').click();
@@ -87,7 +81,6 @@ test('Prevent transaction quick popover navigation', async ({ page }) => {
 
   await page.waitForURL('**/transactions/create');
 
-  await logout(page);
 });
 
 test('Prevent quote quick popover navigation', async ({ page }) => {
@@ -149,7 +142,6 @@ test('Prevent quote quick popover navigation', async ({ page }) => {
 
   await page.waitForURL('**/quotes/create');
 
-  await logout(page);
 });
 
 test('Prevent back browser button navigation', async ({ page }) => {
@@ -212,7 +204,6 @@ test('Prevent back browser button navigation', async ({ page }) => {
 
   await page.waitForURL('**/invoices/create');
 
-  await logout(page);
 });
 
 test('Prevent account management navigation', async ({ page }) => {
@@ -282,7 +273,6 @@ test('Prevent account management navigation', async ({ page }) => {
     }).first()
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 // This test must be LAST in the file because it creates a new company

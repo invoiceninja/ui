@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { endpoint } from '$app/common/helpers';
-import { Vendor } from '$app/common/interfaces/vendor';
-import { useBlankVendorQuery } from '$app/common/queries/vendor';
-import { Form } from '$app/pages/vendors/edit/components/Form';
+import classNames from 'classnames';
+import { set } from 'lodash';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
-import { set } from 'lodash';
-import { VendorContact } from '$app/common/interfaces/vendor-contact';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import classNames from 'classnames';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { VendorContact } from '$app/common/interfaces/vendor-contact';
+import { useBlankVendorQuery } from '$app/common/queries/vendor';
+import { Button } from '$app/components/forms';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { Form } from '$app/pages/vendors/edit/components/Form';
 
 interface Props {
   setVisible: Dispatch<SetStateAction<boolean>>;

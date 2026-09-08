@@ -8,6 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { useAtomValue } from 'jotai';
+import { cloneDeep } from 'lodash';
+import { Dispatch, SetStateAction } from 'react';
+import { useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { defaultSettings } from '$app/common/constants/blank-company-settings';
@@ -23,13 +30,6 @@ import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { setActiveSettings } from '$app/common/stores/slices/settings';
-import { AxiosError } from 'axios';
-import { useAtomValue } from 'jotai';
-import { cloneDeep } from 'lodash';
-import { Dispatch, SetStateAction } from 'react';
-import { useQueryClient } from 'react-query';
-import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
 
 interface Params {
   groupSettings?: GroupSettings;
@@ -143,7 +143,9 @@ export function useHandleUpdate(params: Params) {
           }
 
           invalidateQueryValue &&
-            queryClient.invalidateQueries([invalidateQueryValue]);
+            queryClient.invalidateQueries({
+              queryKey: [invalidateQueryValue],
+            });
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {

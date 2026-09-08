@@ -1,13 +1,13 @@
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdControlPointDuplicate } from 'react-icons/md';
-import { Modal } from '$app/components/Modal';
-import { useState } from 'react';
-import { Button } from '$app/components/forms';
-import { useBulk } from '$app/common/queries/clients';
-import { Client } from '$app/common/interfaces/client';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Client } from '$app/common/interfaces/client';
+import { useBulk } from '$app/common/queries/clients';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
 
 interface Props {
   client: Client;

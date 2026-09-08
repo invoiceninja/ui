@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
+import invoiceStatus from '$app/common/constants/invoice-status';
+import paymentStatus from '$app/common/constants/payment-status';
+import { date as formatDate } from '$app/common/helpers';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Checkbox } from '$app/components/forms';
 import { StatusBadge } from '$app/components/StatusBadge';
-import invoiceStatus from '$app/common/constants/invoice-status';
-import { ResourceItem } from './ListBox';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import paymentStatus from '$app/common/constants/payment-status';
 import { ExpenseStatus } from '$app/pages/expenses/common/components/ExpenseStatus';
-import { date as formatDate } from '$app/common/helpers';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useColorScheme } from '$app/common/colors';
+import { ResourceItem } from './ListBox';
 
 interface Props {
   resourceItem: ResourceItem;

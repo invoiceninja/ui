@@ -10,11 +10,11 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal } from '$app/components/Modal';
+import { MdOutlineWarning } from 'react-icons/md';
 import { Button } from '$app/components/forms';
 import { InputField } from '$app/components/forms/InputField';
-import { MdOutlineWarning } from 'react-icons/md';
 import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
 
 interface Props {
   visible: boolean;

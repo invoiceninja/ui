@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
-import { useProductQuery } from '$app/common/queries/products';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useOutletContext, useParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Product } from '$app/common/interfaces/product';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useProductQuery } from '$app/common/queries/products';
+import { Card } from '$app/components/cards';
+import { Spinner } from '$app/components/Spinner';
 import { ProductForm } from '../common/components/ProductForm';
 import { useHandleChange } from '../common/hooks';
-import { Spinner } from '$app/components/Spinner';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Product } from '$app/common/interfaces/product';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { useColorScheme } from '$app/common/colors';
 
 interface Context {
   errors: ValidationBag | undefined;

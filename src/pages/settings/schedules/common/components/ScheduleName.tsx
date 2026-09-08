@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Schedule } from '$app/common/interfaces/schedule';
 import { useTranslation } from 'react-i18next';
+import { Schedule } from '$app/common/interfaces/schedule';
 import { useEntityNumber } from '../hooks/useEntityNumber';
 import { Templates } from './ScheduleForm';
 

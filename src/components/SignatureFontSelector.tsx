@@ -9,8 +9,8 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { useSignStore } from '$app/_builder/SignStore';
 import { useTranslation } from 'react-i18next';
+import { useSignStore } from '$app/_builder/SignStore';
 import { compressSignature } from '$app/common/helpers/image-compression';
 
 import '@fontsource/dancing-script';
@@ -19,8 +19,8 @@ import '@fontsource/pacifico';
 import '@fontsource/satisfy';
 import '@fontsource/alex-brush';
 import classNames from 'classnames';
-import { Modal } from './Modal';
 import { Button, InputField } from './forms';
+import { Modal } from './Modal';
 
 const SIGNATURE_FONTS = [
   {

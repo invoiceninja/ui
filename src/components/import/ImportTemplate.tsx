@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { MdDelete } from 'react-icons/md';
-import { Element } from '../cards';
-import { Icon } from '../icons/Icon';
+import classNames from 'classnames';
 import { cloneDeep } from 'lodash';
-import { toast } from '$app/common/helpers/toast/toast';
 import { useState } from 'react';
+import { MdDelete } from 'react-icons/md';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import {
   useReactSettings,
   useSaveReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import classNames from 'classnames';
+import { Element } from '../cards';
+import { Icon } from '../icons/Icon';
 
 interface Props {
   entity: string;

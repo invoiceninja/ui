@@ -8,6 +8,7 @@ import {
 } from '$tests/e2e/fixtures';
 import { request as playwrightRequest, type Page } from '@playwright/test';
 import { type EntityType } from '$tests/e2e/api-helpers';
+import { ensureInvoicesStatusFilterCleared } from './status-filter-helpers';
 
 resetAccountBeforeAll();
 
@@ -54,6 +55,8 @@ test('client show tabs list related sales, project, task, and expense records', 
   });
 
   await login(page);
+
+  await ensureInvoicesStatusFilterCleared(page);
 
   await expectRelatedTable(page, `/clients/${client.id}`, invoice.number);
   await expectRelatedTable(page, `/clients/${client.id}/quotes`, quote.number);

@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useOutletContext } from 'react-router-dom';
-import { Context } from '../Edit';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
+import { useOutletContext } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Card } from '$app/components/cards';
-import { useColorScheme } from '$app/common/colors';
-import classNames from 'classnames';
 import { InvoicePaymentAllocationBox } from '../../common/components/InvoicePaymentAllocationBox';
 import { getInvoicePaymentAllocationRows } from '../../common/helpers/invoicePaymentAllocations';
+import { Context } from '../Edit';
 
 function Payments() {
   const [t] = useTranslation();

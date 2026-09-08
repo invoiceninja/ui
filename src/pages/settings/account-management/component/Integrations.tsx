@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Divider } from '$app/components/cards/Divider';
 import { useTranslation } from 'react-i18next';
-import { isHosted, isSelfHosted } from '$app/common/helpers';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { isHosted, isSelfHosted } from '$app/common/helpers';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { usePaidOrSelfHost } from '$app/common/hooks/usePaidOrSelfhost';
+import { Divider } from '$app/components/cards/Divider';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
-import { useNavigate } from 'react-router-dom';
-import { CircleLock } from '$app/components/icons/CircleLock';
 import { ArrowsOppositeDirection } from '$app/components/icons/ArrowsOppositeDirection';
 import { BookOpen } from '$app/components/icons/BookOpen';
-import { ConnectedDots } from '$app/components/icons/ConnectedDots';
 import { ChartLine } from '$app/components/icons/ChartLine';
+import { CircleLock } from '$app/components/icons/CircleLock';
+import { ConnectedDots } from '$app/components/icons/ConnectedDots';
 import { QuickBooks } from './QuickBooks';
-import { usePaidOrSelfHost } from '$app/common/hooks/usePaidOrSelfhost';
 
 interface BoxTheme {
   backgroundColor: string;

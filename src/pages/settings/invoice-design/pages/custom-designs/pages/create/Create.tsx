@@ -8,6 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Editor } from '@monaco-editor/react';
+import { AxiosError } from 'axios';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
@@ -20,17 +26,11 @@ import { Design } from '$app/common/interfaces/design';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankDesignQuery } from '$app/common/queries/designs';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { Container } from '$app/components/Container';
 import { Card, Element } from '$app/components/cards';
 import { Checkbox, InputField, Radio } from '$app/components/forms';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
-import { AxiosError } from 'axios';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { Editor } from '@monaco-editor/react';
-import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
-import { useColorScheme } from '$app/common/colors';
 
 export const templateEntites = [
   'invoice',

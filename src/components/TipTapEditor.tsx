@@ -1,64 +1,62 @@
-import { useCallback, useState, useEffect, useRef } from 'react';
-import styled from 'styled-components';
-import {
-  FaBold,
-  FaItalic,
-  FaUnderline,
-  FaStrikethrough,
-  FaSubscript,
-  FaSuperscript,
-  FaLink,
-  FaUnlink,
-  FaQuoteRight,
-  FaCode,
-  FaAlignLeft,
-  FaAlignCenter,
-  FaAlignRight,
-  FaAlignJustify,
-  FaUndo,
-  FaRedo,
-  FaParagraph,
-  FaFont,
-  FaTextHeight,
-  FaChevronDown,
-  FaImage,
-  FaFileCode,
-  FaTable,
-} from 'react-icons/fa';
-import { MdFormatListBulleted, MdFormatListNumbered } from 'react-icons/md';
-import { PiPencilSimpleFill } from 'react-icons/pi';
-
+import { Extension } from '@tiptap/core';
 import Color from '@tiptap/extension-color';
 import FontFamily from '@tiptap/extension-font-family';
+import HardBreak from '@tiptap/extension-hard-break';
 import Highlight from '@tiptap/extension-highlight';
+import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
+import { Paragraph } from '@tiptap/extension-paragraph';
+import Placeholder from '@tiptap/extension-placeholder';
+import Strike from '@tiptap/extension-strike';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
-import Strike from '@tiptap/extension-strike';
+import { Table } from '@tiptap/extension-table';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import TableRow from '@tiptap/extension-table-row';
 import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
 import TextAlign from '@tiptap/extension-text-align';
-import { Table } from '@tiptap/extension-table';
-import TableRow from '@tiptap/extension-table-row';
-import TableCell from '@tiptap/extension-table-cell';
-import TableHeader from '@tiptap/extension-table-header';
-import { Paragraph } from '@tiptap/extension-paragraph';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Underline from '@tiptap/extension-underline';
-import Placeholder from '@tiptap/extension-placeholder';
-import Image from '@tiptap/extension-image';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Extension } from '@tiptap/core';
-
-import { InputLabel, InputField, Button } from './forms';
+import classNames from 'classnames';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  FaAlignCenter,
+  FaAlignJustify,
+  FaAlignLeft,
+  FaAlignRight,
+  FaBold,
+  FaChevronDown,
+  FaCode,
+  FaFileCode,
+  FaFont,
+  FaImage,
+  FaItalic,
+  FaLink,
+  FaParagraph,
+  FaQuoteRight,
+  FaRedo,
+  FaStrikethrough,
+  FaSubscript,
+  FaSuperscript,
+  FaTable,
+  FaTextHeight,
+  FaUnderline,
+  FaUndo,
+  FaUnlink,
+} from 'react-icons/fa';
+import { MdFormatListBulleted, MdFormatListNumbered } from 'react-icons/md';
+import { PiPencilSimpleFill } from 'react-icons/pi';
+import { useClickAway, useDebounce } from 'react-use';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { Button, InputField, InputLabel } from './forms';
 import { Icon } from './icons/Icon';
 import { Modal } from './Modal';
-import { useColorScheme } from '$app/common/colors';
-import { useTranslation } from 'react-i18next';
-import { useClickAway, useDebounce } from 'react-use';
-import HardBreak from '@tiptap/extension-hard-break';
-import classNames from 'classnames';
 
 interface ThemeProps {
   backgroundColor: string;

@@ -9,7 +9,6 @@
  */
 
 import classNames from 'classnames';
-import { Spinner } from '$app/components/Spinner';
 import {
   CSSProperties,
   FormEvent,
@@ -18,14 +17,15 @@ import {
   RefObject,
   useState,
 } from 'react';
+import { ChevronDown, ChevronUp } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { CardContainer } from '.';
-import { Button } from '../forms';
+import { useColorScheme } from '$app/common/colors';
 import { Element } from '$app/components/cards/Element';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { ChevronDown, ChevronUp } from 'react-feather';
-import { useColorScheme } from '$app/common/colors';
+import { Spinner } from '$app/components/Spinner';
+import { Button } from '../forms';
+import { CardContainer } from '.';
 
 export interface ButtonOption {
   text: string;

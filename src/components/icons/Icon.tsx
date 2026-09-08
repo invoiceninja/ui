@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { isValidElement, cloneElement, createElement } from 'react';
-import { IconType } from 'react-icons';
+import { cloneElement, createElement, isValidElement } from 'react';
 import { Icon as ReactFeatherIcon } from 'react-feather';
-import CommonProps from '$app/common/interfaces/common-props.interface';
+import { IconType } from 'react-icons';
 import { useColorScheme } from '$app/common/colors';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import CommonProps from '$app/common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   element: IconType | ReactFeatherIcon;

@@ -7,13 +7,14 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
+import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
+import { Dispatch, SetStateAction } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
-import { Dispatch, SetStateAction } from 'react';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 
 interface Params {

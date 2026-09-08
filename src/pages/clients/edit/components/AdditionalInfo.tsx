@@ -8,35 +8,35 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
-import { endpoint } from '$app/common/helpers';
-import { useCurrencies } from '$app/common/hooks/useCurrencies';
-import { useLanguages } from '$app/common/hooks/useLanguages';
-import { Client } from '$app/common/interfaces/client';
-import { PaymentTerm } from '$app/common/interfaces/payment-term';
-import { useStaticsQuery } from '$app/common/queries/statics';
-import { DocumentsTable } from '$app/components/DocumentsTable';
-import { TabGroup } from '$app/components/TabGroup';
-import { Upload } from '$app/pages/settings/company/documents/components';
+import { cloneDeep, set } from 'lodash';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { cloneDeep, set } from 'lodash';
-import { CurrencySelector } from '$app/components/CurrencySelector';
-import { LanguageSelector } from '$app/components/LanguageSelector';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
+import { endpoint } from '$app/common/helpers';
 import {
   isUniquePaymentTerm,
   shouldPaymentTermBeVisible,
 } from '$app/common/helpers/payment-terms/payment-term-filters';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrencies } from '$app/common/hooks/useCurrencies';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useLanguages } from '$app/common/hooks/useLanguages';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Client } from '$app/common/interfaces/client';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
+import { useStaticsQuery } from '$app/common/queries/statics';
+import { CurrencySelector } from '$app/components/CurrencySelector';
+import { Card, Element } from '$app/components/cards';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { SelectField } from '$app/components/forms';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { LanguageSelector } from '$app/components/LanguageSelector';
+import { TabGroup } from '$app/components/TabGroup';
+import { Upload } from '$app/pages/settings/company/documents/components';
 
 interface Props {
   client: Client | undefined;

@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdInfoOutline } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { Client } from '$app/common/interfaces/client';
-import { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { MdInfoOutline } from 'react-icons/md';
+import { Link } from './forms';
 import { Icon } from './icons/Icon';
 import { Tooltip } from './Tooltip';
-import { Link } from './forms';
 
 interface Props {
   client?: Client;

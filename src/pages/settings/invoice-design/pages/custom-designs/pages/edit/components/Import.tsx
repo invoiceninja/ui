@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { toast } from '$app/common/helpers/toast/toast';
-import { Parts } from '$app/common/interfaces/design';
-import { Modal } from '$app/components/Modal';
-import { Button, InputField } from '$app/components/forms';
 import { atom, useAtom } from 'jotai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from '$app/common/helpers/toast/toast';
+import { Parts } from '$app/common/interfaces/design';
+import { Button, InputField } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
 
 interface Props {
   onImport: (parts: Parts) => unknown;

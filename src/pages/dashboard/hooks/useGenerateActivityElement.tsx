@@ -8,27 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import dayjs from 'dayjs';
+import { ReactNode, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import reactStringReplace from 'react-string-replace';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 import { date, endpoint, trans } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import {
   ActivityRecord,
   ActivityRecordBase,
 } from '$app/common/interfaces/activity-record';
-import { route } from '$app/common/helpers/route';
-import reactStringReplace from 'react-string-replace';
 import { Button, InputField, Link } from '$app/components/forms';
-import { useColorScheme } from '$app/common/colors';
-import { Modal } from '$app/components/Modal';
-import { useTranslation } from 'react-i18next';
-import { ReactNode, useState } from 'react';
-import { toast } from '$app/common/helpers/toast/toast';
-import { request } from '$app/common/helpers/request';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
-import dayjs from 'dayjs';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
-import styled from 'styled-components';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
+import { Modal } from '$app/components/Modal';
 
 const Box = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};

@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { lazy } from 'react';
+import { Route } from 'react-router-dom';
 import { Guard } from '$app/common/guards/Guard';
 import { companySettings } from '$app/common/guards/guards/company-settings';
 import { or } from '$app/common/guards/guards/or';
 import { plan } from '$app/common/guards/guards/plan';
-import { lazy } from 'react';
-import { Route } from 'react-router-dom';
 
 const InvoiceDesign = lazy(() => import('./InvoiceDesign'));
 const GeneralSettings = lazy(

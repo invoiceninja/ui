@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
-import { ReactElement, useEffect, useState } from 'react';
-import { Checkbox } from './forms';
-import { cloneDeep } from 'lodash';
-import { Settings } from '$app/common/interfaces/company.interface';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import classNames from 'classnames';
+import { cloneDeep } from 'lodash';
+import { ReactElement, useEffect, useState } from 'react';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { Settings } from '$app/common/interfaces/company.interface';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { Checkbox } from './forms';
 
 type DefaultValueType = string | boolean | number;
 

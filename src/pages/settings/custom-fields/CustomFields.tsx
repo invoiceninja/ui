@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { Settings } from '../../../components/layouts/Settings';
-import { useTitle } from '$app/common/hooks/useTitle';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { Card } from '$app/components/cards';
 import { Tabs } from '$app/components/Tabs';
+import { Settings } from '../../../components/layouts/Settings';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import {
   isCompanySettingsFormBusy,
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
-import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
-import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
-import { Card } from '$app/components/cards';
-import { useColorScheme } from '$app/common/colors';
-import { useAtomValue } from 'jotai';
 
 export function CustomFields() {
   useTitle('custom_fields');

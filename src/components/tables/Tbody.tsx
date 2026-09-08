@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Spinner } from '$app/components/Spinner';
 import { useTranslation } from 'react-i18next';
-import { Td, Tr } from '.';
+import { Spinner } from '$app/components/Spinner';
 import CommonProps from '../../common/interfaces/common-props.interface';
+import { Td, Tr } from '.';
 
 interface Props extends CommonProps {
   data?: any;

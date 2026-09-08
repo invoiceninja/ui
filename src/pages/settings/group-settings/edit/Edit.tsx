@@ -8,34 +8,34 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useHandleChange } from '../common/hooks/useHandleChange';
+import classNames from 'classnames';
 import { useEffect, useState } from 'react';
+import { Settings as SettingsIcon } from 'react-feather';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useTitle } from '$app/common/hooks/useTitle';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { GroupSettingsForm } from '../common/components/GroupSettingsForm';
-import { Settings } from '$app/components/layouts/Settings';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { useTranslation } from 'react-i18next';
-import { route } from '$app/common/helpers/route';
-import { useParams } from 'react-router-dom';
 import { useGroupQuery } from '$app/common/queries/group-settings';
-import { useHandleUpdate } from '../common/hooks/useHandleUpdate';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { useActions } from '../common/hooks/useActions';
-import { Upload } from '../../company/documents/components';
-import { endpoint } from '$app/common/helpers';
-import { DocumentsTable } from '$app/components/DocumentsTable';
-import { TabGroup } from '$app/components/TabGroup';
 import { Card } from '$app/components/cards';
-import { Clients } from './components/Clients';
+import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { DocumentsTable } from '$app/components/DocumentsTable';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
-import { Settings as SettingsIcon } from 'react-feather';
+import { Settings } from '$app/components/layouts/Settings';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { TabGroup } from '$app/components/TabGroup';
+import { Upload } from '../../company/documents/components';
+import { GroupSettingsForm } from '../common/components/GroupSettingsForm';
+import { useActions } from '../common/hooks/useActions';
 import { useConfigureGroupSettings } from '../common/hooks/useConfigureGroupSettings';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
-import { useColorScheme } from '$app/common/colors';
-import classNames from 'classnames';
+import { useHandleChange } from '../common/hooks/useHandleChange';
+import { useHandleUpdate } from '../common/hooks/useHandleUpdate';
+import { Clients } from './components/Clients';
 
 export function Edit() {
   const [t] = useTranslation();

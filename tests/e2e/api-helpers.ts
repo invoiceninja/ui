@@ -6,12 +6,16 @@
  */
 
 import { request as playwrightRequest } from '@playwright/test';
+import type { Permissions as AppPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 import {
   baseEmailForAccount,
   emailForCurrentAccount,
   passwordForCurrentAccount,
+  permissionBaseEmails,
+  type TestAccount,
 } from './accounts';
+import { e2eLog } from './log';
 
 const ENTITY_ENDPOINTS = [
   'invoices',
@@ -36,6 +40,7 @@ const ENTITY_ENDPOINTS = [
 ] as const;
 
 export type EntityType = (typeof ENTITY_ENDPOINTS)[number];
+export type Permission = AppPermission | 'admin';
 
 const RESET_PURGE_ENDPOINTS: EntityType[] = [
   'invoices',
@@ -61,6 +66,8 @@ export interface ApiContext {
   baseUrl: string;
   token: string;
   headers: Record<string, string>;
+  /** Hashed user id from the login payload; required for /company_users/:id/preferences. */
+  userId?: string;
 }
 
 async function apiRequest(api: ApiContext) {
@@ -93,6 +100,7 @@ export async function createApiContext(
   const body = await response.json();
   const token =
     body.data?.[0]?.token?.token || body.data?.token?.token || body.token;
+  const userId = body.data?.[0]?.user?.id || body.data?.user?.id;
 
   if (!token) {
     throw new Error(
@@ -107,6 +115,7 @@ export async function createApiContext(
   return {
     baseUrl: apiUrl,
     token,
+    userId,
     headers: {
       'X-Api-Token': token,
       'X-Requested-With': 'XMLHttpRequest',
@@ -323,7 +332,7 @@ export async function purgeAllEntities(api: ApiContext): Promise<void> {
       if (ids.length > 0) {
         await bulkAction(api, entityType, ids, 'archive');
         await bulkAction(api, entityType, ids, 'delete');
-        console.log(`  Purged ${ids.length} ${entityType}`);
+        e2eLog(`  Purged ${ids.length} ${entityType}`);
       }
     } catch (e) {
       console.warn(`  Failed to purge ${entityType}: ${e}`);
@@ -337,7 +346,7 @@ export async function purgeSchedules(api: ApiContext): Promise<void> {
     if (ids.length > 0) {
       await bulkAction(api, 'task_schedulers', ids, 'archive');
       await bulkAction(api, 'task_schedulers', ids, 'delete');
-      console.log(`  Purged ${ids.length} task_schedulers`);
+      e2eLog(`  Purged ${ids.length} task_schedulers`);
     }
   } catch {
     // task_schedulers may not support bulk — try individual delete
@@ -350,7 +359,7 @@ export async function purgeGroupSettings(api: ApiContext): Promise<void> {
     if (ids.length > 0) {
       await bulkAction(api, 'group_settings', ids, 'archive');
       await bulkAction(api, 'group_settings', ids, 'delete');
-      console.log(`  Purged ${ids.length} group_settings`);
+      e2eLog(`  Purged ${ids.length} group_settings`);
     }
   } catch {
     // best effort
@@ -389,36 +398,143 @@ async function fetchAllUsers(api: ApiContext): Promise<ApiUser[]> {
 }
 
 /**
+ * Assign permissions to a permission user through the API.
+ * The `admin` test permission maps to company_user.is_admin, matching the UI.
+ */
+export async function setPermissions(
+  api: ApiContext,
+  email: string,
+  permissions: Permission[]
+): Promise<void> {
+  const resolvedEmail = emailForCurrentAccount(email);
+  const users = await fetchAllUsers(api);
+  const user = users.find((candidate) => candidate.email === resolvedEmail);
+
+  if (!user) {
+    throw new Error(`Could not find permission user ${resolvedEmail}`);
+  }
+
+  const isAdmin = permissions.includes('admin');
+  const assignedPermissions = permissions.filter(
+    (permission) => permission !== 'admin'
+  );
+
+  if (isAdmin && assignedPermissions.length > 0) {
+    throw new Error(
+      `Administrator permission cannot be combined with granular permissions for ${resolvedEmail}`
+    );
+  }
+
+  const context = await apiRequest(api);
+
+  try {
+    const detailResponse = await context.get(
+      `/api/v1/users/${user.id}?include=company_user`,
+      { headers: api.headers }
+    );
+
+    if (!detailResponse.ok()) {
+      throw new Error(
+        `Failed to load user ${resolvedEmail} for permission assignment (${detailResponse.status()}): ${await detailResponse.text()}`
+      );
+    }
+
+    const fullUser = (await detailResponse.json()).data;
+    const response = await context.put(
+      `/api/v1/users/${user.id}?include=company_user`,
+      {
+        headers: api.headers,
+        data: {
+          ...fullUser,
+          company_user: {
+            ...fullUser.company_user,
+            permissions: isAdmin ? '' : assignedPermissions.join(','),
+            is_admin: isAdmin,
+          },
+        },
+      }
+    );
+
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to assign permissions to ${resolvedEmail} (${response.status()}): ${await response.text()}`
+      );
+    }
+  } finally {
+    await context.dispose();
+  }
+}
+
+/**
  * Reset permission user back to no permissions.
+ * Permissions live on company_user (not the top-level user payload).
  */
 export async function resetPermissionUser(
   api: ApiContext,
   email: string
 ): Promise<void> {
-  const users = await fetchAllUsers(api);
-  const user = users.find((u) => u.email === email);
+  await setPermissions(api, email, []);
+}
 
-  if (!user) return;
+/**
+ * Default react_settings written by the preferences endpoint after a reset.
+ * table_filters / column prefs are the cross-test leak; other keys match app defaults.
+ */
+const CLEAN_USER_REACT_SETTINGS = {
+  show_pdf_preview: true,
+  react_notification_link: true,
+  persist_table_filters: true,
+  table_filters: {},
+  react_table_columns: {},
+  table_footer_columns: {},
+};
 
-  const context = await apiRequest(api);
-  const response = await context.put(`/api/v1/users/${user.id}`, {
-    headers: api.headers,
-    data: { ...user, permissions: '' },
-  });
-
-  if (response.ok()) {
-    console.log(`  Reset permissions for ${email}`);
-  } else {
-    console.warn(
-      `  Failed to reset permissions for ${email}: ${response.status()}`
+/**
+ * Clear persisted list filters and table-column prefs for the authenticated user.
+ * The preferences endpoint only authorizes `auth()->id === route user id`;
+ * updating any other user returns 401.
+ */
+export async function resetUserReactSettings(
+  api: ApiContext,
+  options?: { quiet?: boolean }
+): Promise<void> {
+  if (!api.userId) {
+    throw new Error(
+      'Cannot reset react settings: login response did not include user.id'
     );
   }
 
-  await context.dispose();
+  const context = await apiRequest(api);
+
+  try {
+    const update = await context.put(
+      `/api/v1/company_users/${api.userId}/preferences`,
+      {
+        headers: api.headers,
+        data: { react_settings: CLEAN_USER_REACT_SETTINGS },
+      }
+    );
+
+    if (!update.ok()) {
+      throw new Error(
+        `Failed to reset react settings (${update.status()}): ${(
+          await update.text()
+        ).slice(0, 200)}`
+      );
+    }
+
+    if (!options?.quiet) {
+      e2eLog('  Reset react settings');
+    }
+  } finally {
+    await context.dispose();
+  }
 }
 
 /**
  * Restore any deleted/archived seed users that tests may have removed.
+ * Skips unsuffixed permission-base emails (tasks@example.com, …) so this
+ * cannot undo purgeUnsuffixedPermissionUsers on parallel account lanes.
  */
 export async function restoreDeletedUsers(api: ApiContext): Promise<void> {
   const seedUserNames = [
@@ -426,6 +542,7 @@ export async function restoreDeletedUsers(api: ApiContext): Promise<void> {
     'Products Example',
     'Credits Example',
   ];
+  const unsuffixedEmails = new Set<string>(permissionBaseEmails);
 
   const users = await fetchAllUsers(api);
   const deletedIds = users
@@ -433,14 +550,53 @@ export async function restoreDeletedUsers(api: ApiContext): Promise<void> {
       (u) =>
         seedUserNames.some(
           (name) => `${u.first_name} ${u.last_name}`.trim() === name
-        ) && u.is_deleted
+        ) &&
+        u.is_deleted &&
+        !unsuffixedEmails.has(u.email)
     )
     .map((u) => u.id);
 
   if (deletedIds.length > 0) {
     await bulkAction(api, 'users' as EntityType, deletedIds, 'restore');
-    console.log(`  Restored ${deletedIds.length} deleted seed users`);
+    e2eLog(`  Restored ${deletedIds.length} deleted seed users`);
   }
+}
+
+/**
+ * Remove leftover unsuffixed permission users (e.g. tasks@example.com) from
+ * this company. Parallel lanes use tasks1@ / tasks2@ / … with the same display
+ * name ("Tasks Example"); keeping the unsuffixed orphan makes assignee
+ * combobox `.first()` picks ambiguous and flaky across workers.
+ *
+ * Safe under parallel lanes: each reset is company-scoped via that lane's
+ * owner token, and only exact base emails from permissionBaseEmails are
+ * removed — never the lane-scoped `{base}{id}@…` users.
+ */
+export async function purgeUnsuffixedPermissionUsers(
+  api: ApiContext,
+  account: TestAccount
+): Promise<void> {
+  const unsuffixedEmails = new Set<string>(permissionBaseEmails);
+  const users = await fetchAllUsers(api);
+
+  const orphanIds = users
+    .filter(
+      (user) =>
+        unsuffixedEmails.has(user.email) &&
+        user.email !== account.ownerEmail &&
+        !user.is_deleted
+    )
+    .map((user) => user.id);
+
+  if (orphanIds.length === 0) {
+    return;
+  }
+
+  await bulkAction(api, 'users' as EntityType, orphanIds, 'archive');
+  await bulkAction(api, 'users' as EntityType, orphanIds, 'delete');
+  e2eLog(
+    `  Purged ${orphanIds.length} unsuffixed permission users on lane ${account.id}`
+  );
 }
 
 /**
@@ -466,7 +622,7 @@ export async function ensurePermissionUserExists(
   if (existing) {
     if (existing.is_deleted) {
       await bulkAction(api, 'users' as EntityType, [existing.id], 'restore');
-      console.log(`  Restored deleted user ${email}`);
+      e2eLog(`  Restored deleted user ${email}`);
     }
 
     if (
@@ -480,7 +636,7 @@ export async function ensurePermissionUserExists(
       });
 
       if (response.ok()) {
-        console.log(
+        e2eLog(
           `  Updated user name ${email} (${derivedFirst} ${derivedLast})`
         );
       } else {
@@ -514,7 +670,7 @@ export async function ensurePermissionUserExists(
     );
   }
 
-  console.log(
+  e2eLog(
     `  Created missing user ${email} (${derivedFirst} ${derivedLast})`
   );
   return userId;
@@ -530,9 +686,10 @@ export interface CompanySettings {
   settings: Record<string, any>;
 }
 
-export async function getCompanySettings(
+export async function getCompany(
   api: ApiContext
-): Promise<CompanySettings> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Promise<{ companyId: string; company: Record<string, any> }> {
   const context = await apiRequest(api);
   const response = await context.get('/api/v1/companies', {
     headers: api.headers,
@@ -553,8 +710,56 @@ export async function getCompanySettings(
 
   return {
     companyId: company.id,
+    company,
+  };
+}
+
+export async function getCompanySettings(
+  api: ApiContext
+): Promise<CompanySettings> {
+  const { companyId, company } = await getCompany(api);
+
+  return {
+    companyId,
     settings: company.settings || {},
   };
+}
+
+export async function updateCompany(
+  api: ApiContext,
+  companyId: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  company: Record<string, any>
+): Promise<void> {
+  const context = await apiRequest(api);
+  const response = await context.put(`/api/v1/companies/${companyId}`, {
+    headers: api.headers,
+    data: company,
+  });
+
+  if (!response.ok()) {
+    const text = await response.text();
+    await context.dispose();
+    throw new Error(
+      `Failed to update company: ${response.status()} ${text.slice(0, 300)}`
+    );
+  }
+
+  await context.dispose();
+}
+
+export async function updateCompanyFields(
+  api: ApiContext,
+  companyId: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fields: Record<string, any>
+): Promise<void> {
+  const { company } = await getCompany(api);
+
+  await updateCompany(api, companyId, {
+    ...company,
+    ...fields,
+  });
 }
 
 export async function putCompanySettings(
@@ -563,18 +768,15 @@ export async function putCompanySettings(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   settings: Record<string, any>
 ): Promise<void> {
-  const context = await apiRequest(api);
+  const { company } = await getCompany(api);
 
-  const response = await context.put(`/api/v1/companies/${companyId}`, {
-    headers: api.headers,
-    data: { settings },
+  await updateCompany(api, companyId, {
+    ...company,
+    settings: {
+      ...(company.settings || {}),
+      ...settings,
+    },
   });
-
-  if (!response.ok()) {
-    console.warn(`Failed to update company settings: ${response.status()}`);
-  }
-
-  await context.dispose();
 }
 
 /**
@@ -582,20 +784,21 @@ export async function putCompanySettings(
  */
 export async function resetCompanySettings(api: ApiContext): Promise<void> {
   try {
-    const { companyId, settings } = await getCompanySettings(api);
+    const { companyId, company } = await getCompany(api);
 
-    const resetSettings = {
-      ...settings,
+    await updateCompany(api, companyId, {
+      ...company,
       enabled_expense_tax_rates: 0,
-      should_be_invoiced: false,
+      mark_expenses_invoiceable: false,
       mark_expenses_paid: false,
       convert_expense_currency: false,
-      add_documents_to_invoice: false,
-      military_time: false,
-    };
-
-    await putCompanySettings(api, companyId, resetSettings);
-    console.log('  Reset company settings');
+      invoice_expense_documents: false,
+      settings: {
+        ...(company.settings || {}),
+        military_time: false,
+      },
+    });
+    e2eLog('  Reset company settings');
   } catch (e) {
     console.warn(`  Failed to reset company settings: ${e}`);
   }

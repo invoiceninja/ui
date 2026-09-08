@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
+import { Dispatch, SetStateAction, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Modal } from '$app/components/Modal';
 import { Button, InputField } from '$app/components/forms';
-import { AxiosError } from 'axios';
-import { Dispatch, SetStateAction, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import VerificationInput from 'react-verification-input';
+import { Modal } from '$app/components/Modal';
+import { VerificationInput } from '$app/components/VerificationInput';
 
 interface Props {
   visible: boolean;

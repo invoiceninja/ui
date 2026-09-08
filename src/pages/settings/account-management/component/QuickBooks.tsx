@@ -8,31 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtomValue } from 'jotai';
 import { useState } from 'react';
-import { Modal } from '$app/components/Modal';
-import { TabGroup } from '$app/components/TabGroup';
-import { Button } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { usePaidOrSelfHost } from '$app/common/hooks/usePaidOrSelfhost';
 import { QuickbooksSettings } from '$app/common/interfaces/quickbooks';
-import { useQuickbooksConnection } from '../common/hooks/useQuickbooksConnection';
-import { useQuickbooksConnect } from '../common/hooks/useQuickbooksConnect';
-import { useQuickbooksDisconnect } from '../common/hooks/useQuickbooksDisconnect';
-import { QuickBooksDetails } from './QuickBooksDetails';
-import { QuickBooksImportTab } from './QuickBooksImportTab';
-import { QuickBooksSyncTab } from './QuickBooksSyncTab';
-import { ConnectedDots } from '$app/components/icons/ConnectedDots';
-import { ArrowRight } from '$app/components/icons/ArrowRight';
+import { Button } from '$app/components/forms';
 import { IncomeAccountSelector } from '$app/components/IncomeAccountSelector';
+import { ArrowRight } from '$app/components/icons/ArrowRight';
+import { ConnectedDots } from '$app/components/icons/ConnectedDots';
+import { Modal } from '$app/components/Modal';
+import { TabGroup } from '$app/components/TabGroup';
 import {
   isCompanySettingsFormBusy,
   useHandleCompanySave,
 } from '../../common/hooks/useHandleCompanySave';
-import { useAtomValue } from 'jotai';
-import styled from 'styled-components';
-import { usePaidOrSelfHost } from '$app/common/hooks/usePaidOrSelfhost';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
+import { useQuickbooksConnect } from '../common/hooks/useQuickbooksConnect';
+import { useQuickbooksConnection } from '../common/hooks/useQuickbooksConnection';
+import { useQuickbooksDisconnect } from '../common/hooks/useQuickbooksDisconnect';
+import { QuickBooksDetails } from './QuickBooksDetails';
+import { QuickBooksImportTab } from './QuickBooksImportTab';
+import { QuickBooksSyncTab } from './QuickBooksSyncTab';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};

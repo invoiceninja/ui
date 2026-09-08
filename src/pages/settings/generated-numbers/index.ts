@@ -7,17 +7,18 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-export * from './GeneratedNumbers';
+
 export { Clients as ClientsGeneratedNumbers } from './clients/Clients';
-export { Invoices as InvoicesGeneratedNumbers } from './invoices/Invoices';
-export { RecurringInvoices as RecurringInvoicesGeneratedNumbers } from './recurring-invoices/RecurringInvoices';
-export { Payments as PaymentsGeneratedNumbers } from './payments/Payments';
-export { Quotes as QuotesGeneratedNumbers } from './quotes/Quotes';
+export { Settings as GeneratedNumbersSettings } from './components/Settings';
 export { Credits as CreditsGeneratedNumbers } from './credits/Credits';
+export { Expenses as ExpensesGeneratedNumbers } from './expenses/Expenses';
+export * from './GeneratedNumbers';
+export { Invoices as InvoicesGeneratedNumbers } from './invoices/Invoices';
+export { Payments as PaymentsGeneratedNumbers } from './payments/Payments';
 export { Projects as ProjectsGeneratedNumbers } from './projects/Projects';
+export { PurchaseOrders as PurchaseOrdersGeneratedNumbers } from './purchase-orders/PurchaseOrders';
+export { Quotes as QuotesGeneratedNumbers } from './quotes/Quotes';
+export { RecurringExpenses as RecurringExpensesGeneratedNumbers } from './recurring-expenses/RecurringExpenses';
+export { RecurringInvoices as RecurringInvoicesGeneratedNumbers } from './recurring-invoices/RecurringInvoices';
 export { Tasks as TasksGeneratedNumbers } from './tasks/Tasks';
 export { Vendors as VendorsGeneratedNumbers } from './vendors/Vendors';
-export { PurchaseOrders as PurchaseOrdersGeneratedNumbers } from './purchase-orders/PurchaseOrders';
-export { Expenses as ExpensesGeneratedNumbers } from './expenses/Expenses';
-export { RecurringExpenses as RecurringExpensesGeneratedNumbers } from './recurring-expenses/RecurringExpenses';
-export { Settings as GeneratedNumbersSettings } from './components/Settings';

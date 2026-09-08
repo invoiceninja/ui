@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date } from '$app/common/helpers';
-import { useTaskQuery } from '$app/common/queries/tasks';
 import { useSetAtom } from 'jotai';
-import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { currentTaskAtom, isKanbanViewSliderVisibleAtom } from './atoms';
+import { date } from '$app/common/helpers';
 import { useDateTime } from '$app/common/hooks/useDateTime';
+import { useTaskQuery } from '$app/common/queries/tasks';
+import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
+import { currentTaskAtom, isKanbanViewSliderVisibleAtom } from './atoms';
 
 export function useHandleCurrentTask(id: string | undefined) {
   const setCurrentTask = useSetAtom(currentTaskAtom);

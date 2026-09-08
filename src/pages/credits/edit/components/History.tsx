@@ -8,31 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date, endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
-import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
-import { Card } from '$app/components/cards';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { DynamicLink } from '$app/components/DynamicLink';
-import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useQuery } from '@tanstack/react-query';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { Spinner } from '$app/components/Spinner';
-import { Credit } from '$app/common/interfaces/credit';
-import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { ChevronRight } from 'react-feather';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
-import classNames from 'classnames';
-import { History as HistoryIcon } from '$app/components/icons/History';
+import { date, endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { Credit } from '$app/common/interfaces/credit';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Card } from '$app/components/cards';
+import { DynamicLink } from '$app/components/DynamicLink';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
-import { CreditsContext } from '../../create/Create';
-import { ChevronRight } from 'react-feather';
+import { History as HistoryIcon } from '$app/components/icons/History';
 import { Icon } from '$app/components/icons/Icon';
+import { Spinner } from '$app/components/Spinner';
+import { CreditsContext } from '../../create/Create';
 
 const Box = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};

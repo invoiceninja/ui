@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Stripe, StripeCardElement, StripeElements } from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js/pure';
+import { useQueryClient } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { wait } from '$app/common/helpers/wait';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-import { Button } from '$app/components/forms';
-import { loadStripe } from '@stripe/stripe-js/pure';
-import { Stripe, StripeCardElement, StripeElements } from '@stripe/stripe-js';
-import { AxiosResponse } from 'axios';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { Button } from '$app/components/forms';
 
 export interface PopupProps {
   visible: boolean;
@@ -131,9 +131,9 @@ export function AddCreditCard({ onClose, startTrial }: NewCardProps) {
             }
 
             refresh();
-            queryClient.invalidateQueries(
-              '/api/client/account_management/methods'
-            );
+            queryClient.invalidateQueries({
+              queryKey: ['/api/client/account_management/methods'],
+            });
             setIsSubmitting(false);
             onClose();
           });

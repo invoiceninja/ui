@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { updateChanges } from '$app/common/stores/slices/company-users';
 import { ChangeEvent } from 'react';
 import { useDispatch } from 'react-redux';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 
 export function useHandleCurrentCompanyChange() {
   const dispatch = useDispatch();

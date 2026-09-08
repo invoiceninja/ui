@@ -131,7 +131,7 @@ export default function Invoices() {
         withResourcefulActions
         withoutDefaultBulkActions
         customActions={actions}
-        bottomActionsKeys={['cancel_invoice']}
+        bottomActionsKeys={['cancel_invoice', 'credit_note']}
         customBulkActions={customBulkActions}
         customFilters={filters}
         customFilterPlaceholder="status"

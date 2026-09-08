@@ -8,29 +8,29 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useOutletContext, useParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { date, endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
-import { Card } from '$app/components/cards';
-import { useTranslation } from 'react-i18next';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { ActivityRecord } from '$app/common/interfaces/activity-record';
-import React, { useEffect, useState } from 'react';
+import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { Card } from '$app/components/cards';
+import { EmailRecord } from '$app/components/EmailRecord';
+import { InputField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { Search as SearchIcon } from '$app/components/icons/Search';
+import { Spinner } from '$app/components/Spinner';
 import {
   AddActivityComment,
   useGenerateActivityElement,
 } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
-import { AxiosResponse } from 'axios';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Context } from './Documents';
-import Toggle from '$app/components/forms/Toggle';
-import { useColorScheme } from '$app/common/colors';
-import { EmailRecord } from '$app/components/EmailRecord';
-import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
-import { Spinner } from '$app/components/Spinner';
-import { InputField } from '$app/components/forms';
-import { Search as SearchIcon } from '$app/components/icons/Search';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 export default function HistoryAndActivities() {
   const [t] = useTranslation();

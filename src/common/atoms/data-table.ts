@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Resource } from '$app/components/PreviousNextNavigation';
 import { atom } from 'jotai';
+import { Resource } from '$app/components/PreviousNextNavigation';
 
 interface FullTableLatestData {
   type: string;

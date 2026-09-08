@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Credit } from '$app/common/interfaces/credit';
-import { useBlankPaymentQuery } from '$app/common/queries/payments';
-import { paymentAtom } from '$app/pages/payments/common/atoms';
 import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { Credit } from '$app/common/interfaces/credit';
+import { useBlankPaymentQuery } from '$app/common/queries/payments';
+import { paymentAtom } from '$app/pages/payments/common/atoms';
 
 export const useApplyCredits = () => {
   const navigate = useNavigate();

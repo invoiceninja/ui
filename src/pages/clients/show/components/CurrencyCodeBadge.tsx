@@ -1,7 +1,7 @@
+import { useTranslation } from 'react-i18next';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Badge } from '$app/components/Badge';
 import { Tooltip } from '$app/components/Tooltip';
-import { useTranslation } from 'react-i18next';
 
 interface Props {
   currency_id: string | undefined;

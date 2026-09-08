@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { MdWarning } from 'react-icons/md';
-import { Icon } from './icons/Icon';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { Credit } from '$app/common/interfaces/credit';
-import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import reactStringReplace from 'react-string-replace';
-import { useTranslation } from 'react-i18next';
-import { Link } from './forms';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
+import { MdWarning } from 'react-icons/md';
+import reactStringReplace from 'react-string-replace';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Credit } from '$app/common/interfaces/credit';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { Link } from './forms';
+import { Icon } from './icons/Icon';
 
 interface Props {
   className?: string;

@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { InputField } from '$app/components/forms';
+import { useTranslation } from 'react-i18next';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useTranslation } from 'react-i18next';
+import { Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
 import { formatLabel } from '../../helpers/format-label';
 import { useHandleCredentialsChange } from '../../hooks/useHandleCredentialsChange';
 import { useResolveConfigValue } from '../../hooks/useResolveConfigValue';

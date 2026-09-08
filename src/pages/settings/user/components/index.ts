@@ -9,10 +9,10 @@
  */
 export * from './AccentColor';
 export * from './Connect';
+export * from './CustomFields';
 export * from './Details';
+export * from './KeyboardShortcuts';
 export * from './Notifications';
 export * from './Password';
-export * from './TwoFactorAuthentication';
-export * from './CustomFields';
 export * from './Preferences';
-export * from './KeyboardShortcuts';
+export * from './TwoFactorAuthentication';

@@ -8,17 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ConfigProvider, DatePicker } from 'antd';
+import type { Locale } from 'antd/es/locale';
 import dayjs from 'dayjs';
+import { atom, useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ConfigProvider, DatePicker } from 'antd';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { SelectField } from './forms';
-import { atom, useAtomValue } from 'jotai';
-import { Calendar } from './icons/Calendar';
-import { useColorScheme } from '$app/common/colors';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import {
+  type DayjsRange,
+  serializeCompleteDateRange,
+} from '$app/common/helpers/dateRange';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { SelectField } from './forms';
+import { Calendar } from './icons/Calendar';
 
 type Props = {
   value?: string;
@@ -28,7 +32,7 @@ type Props = {
   handleDateRangeChange: (value: string) => unknown;
 };
 
-export const antdLocaleAtom = atom<any | null>(null);
+export const antdLocaleAtom = atom<Locale | null>(null);
 
 const { RangePicker } = DatePicker;
 
@@ -157,27 +161,14 @@ export function DropdownDateRangePicker(props: Props) {
   const [customEndDate, setCustomEndDate] = useState<string>();
   const [customStartDate, setCustomStartDate] = useState<string>();
 
-  const handleCustomDateChange = (value: [string, string]) => {
-    dayjs.extend(customParseFormat);
-    if (value[0] === '' || value[1] === '') {
+  const handleCustomDateChange = (value: DayjsRange) => {
+    const range = serializeCompleteDateRange(value);
+
+    if (!range) {
       return;
     }
 
-    const unsupportedFormats = ['DD. MMM. YYYY', 'ddd MMM D, YYYY'];
-
-    props.handleDateChange(
-      dayjs(
-        value[0],
-        !unsupportedFormats.includes(dateFormat) ? dateFormat : undefined,
-        antdLocale?.locale
-      ).format('YYYY-MM-DD') +
-        ',' +
-        dayjs(
-          value[1],
-          !unsupportedFormats.includes(dateFormat) ? dateFormat : undefined,
-          antdLocale?.locale
-        ).format('YYYY-MM-DD')
-    );
+    props.handleDateChange(range.join(','));
   };
 
   useEffect(() => {
@@ -246,7 +237,7 @@ export function DropdownDateRangePicker(props: Props) {
             } as React.CSSProperties
           }
         >
-          <ConfigProvider locale={antdLocale?.default}>
+          <ConfigProvider locale={antdLocale ?? undefined}>
             <StyledRangePicker
               size="large"
               className="rounded-md"
@@ -255,7 +246,7 @@ export function DropdownDateRangePicker(props: Props) {
                 customEndDate ? dayjs(customEndDate) : null,
               ]}
               format={dateFormat}
-              onChange={(_, dateString) => handleCustomDateChange(dateString)}
+              onChange={handleCustomDateChange}
               style={{
                 borderTopLeftRadius: '0',
                 borderBottomLeftRadius: '0',

@@ -1,6 +1,6 @@
 import { endpoint } from '$app/common/helpers';
 import { wait } from '$app/common/helpers/wait';
-import { GatewayToken } from '$app/common/interfaces/client';
+import type { GatewayToken as ClientGatewayToken } from '$app/common/interfaces/client';
 import { request } from '$app/common/helpers/request';
 import { RadioGroup } from '@headlessui/react';
 import { Alert } from '$app/components/Alert';
@@ -20,59 +20,56 @@ import type { AxiosError, AxiosResponse } from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
 
 export interface ResponsePaymentIntent {
-  id: string;
+  requires_payment: boolean;
   client_secret: string;
-  amount: number;
-  currency: string;
-  upgraded: boolean;
+  payment_hash?: string;
 }
 
 interface ApiError {
   message: string;
 }
 
-export interface PaymentIntent {
-  id: string;
-  client_secret: string;
-  amount: number;
-  currency: string;
-  upgraded: boolean;
-}
-
-type PaymentSuccessResult =
-  | StripePaymentIntent
-  | PaymentIntent
-  | { status: 'succeeded' };
+type PaymentSuccessResult = StripePaymentIntent | { status: 'succeeded' };
 
 export interface PaymentProps {
-  tokens: GatewayToken[];
-  num_users?: number;
+  tokens: ClientGatewayToken[];
   amount_string?: string;
-  amount_raw?: number;
-  plan?: string;
-  docuninja_users?: number;
-  term?: string;
-  hash?: string;
+  paymentIntent?: ResponsePaymentIntent | null;
+  onCreatePaymentIntent?: () => Promise<ResponsePaymentIntent>;
+  onFinalizeStripePayment?: (
+    paymentIntent: StripePaymentIntent
+  ) => Promise<void> | void;
   onPaymentSuccess?: (result: PaymentSuccessResult) => void;
   onPaymentComplete?: () => void;
   onCancel?: () => void;
 }
 
-type PaymentMethod = 'new_card' | string; // string will be gateway token id
+type PaymentMethod = 'new_card' | string;
+
+type PaymentUiState =
+  | 'payment_intent_pending'
+  | 'stripe_confirmation_pending'
+  | 'finalizing_payment'
+  | 'payment_failed';
+
+function getApiErrorMessage(error: unknown, fallback: string) {
+  return (error as AxiosError<ApiError>).response?.data?.message || fallback;
+}
+
+function getStripePaymentMethodId(token: ClientGatewayToken) {
+  return token.token;
+}
 
 export function PaymentMethodForm({
   tokens,
-  num_users,
-  plan,
-  docuninja_users,
-  term,
-  hash,
   amount_string,
-  amount_raw,
+  paymentIntent,
+  onCreatePaymentIntent,
+  onFinalizeStripePayment,
   onPaymentSuccess,
   onPaymentComplete,
   onCancel,
@@ -87,11 +84,12 @@ export function PaymentMethodForm({
     useState<PaymentMethod>('new_card');
   const [errors, setErrors] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [amount, setAmount] = useState<number>(0);
   const [intent, setIntent] = useState<{
-    intent: string;
     secret: string;
   } | null>(null);
+  const [confirmedPaymentIntent, setConfirmedPaymentIntent] =
+    useState<StripePaymentIntent | null>(null);
+  const [paymentState, setPaymentState] = useState<PaymentUiState | null>(null);
 
   const [context, setContext] = useState<{
     stripe: Stripe;
@@ -99,67 +97,98 @@ export function PaymentMethodForm({
     card: StripeCardElement;
   } | null>(null);
 
-  // Initial token selection
+  const externalIntentSecret = paymentIntent?.client_secret;
+
   useEffect(() => {
-    if (tokens?.length > 0) {
-      const defaultToken = tokens.find((token) => token.is_default);
-      if (defaultToken) {
-        setSelectedMethod(defaultToken.id);
+    setSelectedMethod((current) => {
+      if (
+        current !== 'new_card' &&
+        tokens?.some((token) => token.id === current)
+      ) {
+        return current;
       }
-    } else {
-      setSelectedMethod('new_card');
-    }
+
+      return tokens?.find((token) => token.is_default)?.id || 'new_card';
+    });
   }, [tokens]);
 
-  // Stripe initialization and intent creation only when new_card is selected
+  useEffect(() => {
+    if (externalIntentSecret) {
+      setIntent({ secret: externalIntentSecret });
+      setConfirmedPaymentIntent(null);
+      setPaymentState(null);
+      setErrors(null);
+    }
+  }, [externalIntentSecret]);
+
+  const createIntent = () => {
+    if (onCreatePaymentIntent) {
+      return onCreatePaymentIntent();
+    }
+
+    return request(
+      'POST',
+      endpoint('/api/client/account_management/payment/intent'),
+      {}
+    ).then((response: AxiosResponse<ResponsePaymentIntent>) => response.data);
+  };
+
+  const resolvePaymentIntent = async () => {
+    if (intent?.secret) {
+      return intent;
+    }
+
+    setPaymentState('payment_intent_pending');
+
+    try {
+      const response = await createIntent();
+
+      if (!response?.requires_payment || !response?.client_secret) {
+        setErrors(t('no_payment_required') as string);
+        setPaymentState('payment_failed');
+        return null;
+      }
+
+      const resolvedIntent = { secret: response.client_secret };
+
+      setIntent(resolvedIntent);
+      setPaymentState(null);
+
+      return resolvedIntent;
+    } catch (error) {
+      setErrors(
+        getApiErrorMessage(error, t('payment_failed') as string) ||
+          (t('payment_failed') as string)
+      );
+      setPaymentState('payment_failed');
+      return null;
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
 
     if (selectedMethod === 'new_card') {
       if (!context) {
         wait('#card-element').then(() => {
-          if (!mounted) return;
+          if (!mounted) {
+            return;
+          }
 
           loadStripe(import.meta.env.VITE_HOSTED_STRIPE_PK).then((stripe) => {
-            if (!stripe || !mounted) return;
+            if (!stripe || !mounted) {
+              return;
+            }
 
             const elements = stripe.elements();
             const card = elements.create('card');
             card.mount('#card-element');
+            isDestroyed.current = false;
             setContext({ stripe, elements, card });
 
-            // Only create payment intent for new cards
-            request(
-              'POST',
-              endpoint('/api/client/account_management/payment/intent'),
-              {
-                amount: amount_raw ?? 0,
-                hash: hash,
-              }
-            )
-              .then((response: AxiosResponse<ResponsePaymentIntent>) => {
-                if (!mounted) return;
-
-                if (response.data?.upgraded === true) {
-                  if (onPaymentSuccess) {
-                    onPaymentSuccess(response.data);
-                  }
-                  return;
-                }
-
-                setIntent({
-                  intent: response.data.id,
-                  secret: response.data.client_secret,
-                });
-                setAmount(response.data.amount);
-              })
-              .catch((error: AxiosError<ApiError>) => {
-                if (!mounted) return;
-                setErrors(
-                  error.response?.data?.message ||
-                    'Failed to initialize payment'
-                );
-              });
+            if (externalIntentSecret) {
+              setIntent({ secret: externalIntentSecret });
+            }
           });
         });
       }
@@ -169,150 +198,231 @@ export function PaymentMethodForm({
 
     return () => {
       mounted = false;
+
       if (selectedMethod !== 'new_card') {
         cleanupStripe();
       }
     };
-  }, [selectedMethod]);
+  }, [selectedMethod, externalIntentSecret]);
 
   const handleMethodChange = (method: PaymentMethod) => {
     setSelectedMethod(method);
-    if (method !== 'new_card') {
-      // Set the amount directly for token payments
-      setAmount(amount_raw ?? 0);
-    }
+    setErrors(null);
   };
 
   const cleanupStripe = () => {
     if (context?.card && !isDestroyed.current && !isSubmitting) {
       try {
         context.card.destroy();
-      } catch (e) {
-        console.error('Error destroying card:', e);
+      } catch (error) {
+        console.error('Error destroying card:', error);
       }
+
       isDestroyed.current = true;
     }
+
     if (!isSubmitting) {
       setContext(null);
-      setIntent(null);
+      setIntent(externalIntentSecret ? { secret: externalIntentSecret } : null);
       setErrors(null);
+      setPaymentState(null);
     }
   };
 
-  const handleSubmit = () => {
-    if (selectedMethod === 'new_card') {
-      if (!context || !intent) {
+  const runAccountPaymentSuccessSideEffects = () => {
+    if (onFinalizeStripePayment) {
+      return;
+    }
+
+    queryClient.invalidateQueries({
+      queryKey: ['/api/client/account_management/methods'],
+    });
+    queryClient.invalidateQueries({ queryKey: ['/api/docuninja/login'] });
+    refresh();
+  };
+
+  const handleSuccessfulPayment = (result: PaymentSuccessResult) => {
+    toast.success(t('payment_successful') as string);
+    setIsSubmitting(false);
+    setPaymentState(null);
+    setConfirmedPaymentIntent(null);
+
+    if (onPaymentSuccess) {
+      onPaymentSuccess(result);
+    }
+
+    if (onPaymentComplete) {
+      onPaymentComplete();
+    }
+
+    runAccountPaymentSuccessSideEffects();
+  };
+
+  const finalizeStripePayment = async (
+    stripePaymentIntent: StripePaymentIntent
+  ) => {
+    if (onFinalizeStripePayment) {
+      await onFinalizeStripePayment(stripePaymentIntent);
+      return;
+    }
+
+    await request(
+      'POST',
+      endpoint('/api/client/account_management/v2/payment'),
+      {
+        payment_intent: stripePaymentIntent.id,
+      }
+    );
+  };
+
+  const handleStripePaymentIntent = async (
+    stripePaymentIntent: StripePaymentIntent
+  ) => {
+    setConfirmedPaymentIntent(stripePaymentIntent);
+    setPaymentState('finalizing_payment');
+
+    try {
+      await finalizeStripePayment(stripePaymentIntent);
+      handleSuccessfulPayment(stripePaymentIntent);
+    } catch (error) {
+      setErrors(
+        getApiErrorMessage(error, t('failed_payment') as string) ||
+          'Failed to confirm payment'
+      );
+      setIsSubmitting(false);
+      setPaymentState('payment_failed');
+    }
+  };
+
+  const confirmNewCardPayment = async () => {
+    const resolvedIntent = await resolvePaymentIntent();
+
+    if (!context || !resolvedIntent) {
+      setIsSubmitting(false);
+      return;
+    }
+
+    setPaymentState('stripe_confirmation_pending');
+
+    const result = await context.stripe.confirmCardPayment(
+      resolvedIntent.secret,
+      {
+        payment_method: {
+          card: context.card,
+        },
+      }
+    );
+
+    if (result.error) {
+      setErrors(result.error.message || 'Payment failed');
+      setIsSubmitting(false);
+      setPaymentState('payment_failed');
+      return;
+    }
+
+    if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
+      await handleStripePaymentIntent(result.paymentIntent);
+      return;
+    }
+
+    setErrors('Payment was not completed');
+    setIsSubmitting(false);
+    setPaymentState('payment_failed');
+  };
+
+  const confirmSavedTokenPaymentWithStripe = async (
+    token: ClientGatewayToken
+  ) => {
+    const paymentMethodId = getStripePaymentMethodId(token);
+
+    if (!paymentMethodId) {
+      setErrors(t('payment_failed') as string);
+      setIsSubmitting(false);
+      setPaymentState('payment_failed');
+      return;
+    }
+
+    const resolvedIntent = await resolvePaymentIntent();
+
+    if (!resolvedIntent) {
+      setIsSubmitting(false);
+      return;
+    }
+
+    const stripe =
+      context?.stripe ||
+      (await loadStripe(import.meta.env.VITE_HOSTED_STRIPE_PK));
+
+    if (!stripe) {
+      setErrors(t('payment_failed') as string);
+      setIsSubmitting(false);
+      setPaymentState('payment_failed');
+      return;
+    }
+
+    setPaymentState('stripe_confirmation_pending');
+
+    const result = await stripe.confirmCardPayment(resolvedIntent.secret, {
+      payment_method: paymentMethodId,
+    });
+
+    if (result.error) {
+      setErrors(result.error.message || 'Payment failed');
+      setIsSubmitting(false);
+      setPaymentState('payment_failed');
+      return;
+    }
+
+    if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
+      await handleStripePaymentIntent(result.paymentIntent);
+      return;
+    }
+
+    setErrors('Payment was not completed');
+    setIsSubmitting(false);
+    setPaymentState('payment_failed');
+  };
+
+  const handleSubmit = async () => {
+    setErrors(null);
+    setIsSubmitting(true);
+
+    try {
+      if (confirmedPaymentIntent) {
+        await handleStripePaymentIntent(confirmedPaymentIntent);
         return;
       }
 
-      setErrors(null);
-      setIsSubmitting(true);
+      if (selectedMethod === 'new_card') {
+        await confirmNewCardPayment();
+        return;
+      }
 
-      context.stripe
-        .confirmCardPayment(intent.secret, {
-          payment_method: {
-            card: context.card,
-          },
-        })
-        .then((result) => {
-          if (result.error) {
-            setErrors(result.error.message || 'Payment failed');
-            setIsSubmitting(false);
-            return;
-          }
+      const token = tokens.find(({ id }) => id === selectedMethod);
 
-          if (
-            result.paymentIntent &&
-            result.paymentIntent.status === 'succeeded'
-          ) {
-            request(
-              'POST',
-              endpoint('/api/client/account_management/v2/payment'),
-              {
-                payment_intent: result.paymentIntent.id,
-                amount: amount_raw ?? 0,
-                hash: hash,
-              }
-            )
-              .then(() => {
-                toast.success(t('payment_successful') as string);
-                if (onPaymentSuccess) {
-                  onPaymentSuccess(result.paymentIntent);
-                }
-                if (onPaymentComplete) {
-                  onPaymentComplete();
-                }
-                setIsSubmitting(false);
-                queryClient.invalidateQueries(
-                  '/api/client/account_management/methods'
-                );
-                // Invalidate DocuNinja login query to refresh account data
-                queryClient.invalidateQueries('/api/docuninja/login');
-                // Force DocuNinja service to reinitialize
-                refresh();
-              })
-              .catch((error: AxiosError<ApiError>) => {
-                setErrors(
-                  error.response?.data?.message || 'Failed to confirm payment'
-                );
-                setIsSubmitting(false);
-              });
-          }
-        })
-        .catch(() => {
-          setErrors('An unexpected error occurred');
-          setIsSubmitting(false);
-        });
-    } else {
-      // Using existing payment method
-      setIsSubmitting(true);
-      request(
-        'POST',
-        endpoint('/api/client/account_management/v2/payment/token'),
-        {
-          gateway_token_id: selectedMethod,
-          amount: amount_raw ?? 0,
-          hash: hash,
-        }
-      )
-        .then(() => {
-          toast.success(t('payment_successful') as string);
-          if (onPaymentSuccess) {
-            onPaymentSuccess({ status: 'succeeded' });
-          }
-          if (onPaymentComplete) {
-            onPaymentComplete();
-          }
-          setIsSubmitting(false);
-          // Invalidate DocuNinja login query to refresh account data
-          queryClient.invalidateQueries('/api/docuninja/login');
-          // Force DocuNinja service to reinitialize
-          refresh();
-        })
-        .catch((error: AxiosError<ApiError>) => {
-          setErrors(
-            error.response?.data?.message || 'Failed to process payment'
-          );
-          setIsSubmitting(false);
-        });
+      if (!token) {
+        setErrors(t('payment_failed') as string);
+        setIsSubmitting(false);
+        setPaymentState('payment_failed');
+        return;
+      }
+
+      await confirmSavedTokenPaymentWithStripe(token);
+    } catch {
+      setErrors('An unexpected error occurred');
+      setIsSubmitting(false);
+      setPaymentState('payment_failed');
     }
   };
+
+  const isWaitingForIntent = paymentState === 'payment_intent_pending';
+  const isPaymentReady = selectedMethod !== 'new_card' || Boolean(context);
 
   return (
     <div className="pl-4 pr-4">
       <div className="text-lg font-semibold">
         <p className="text-sm text-gray-500">{t('payment_amount')}</p>
-        {selectedMethod === 'new_card' ? (
-          amount === 0 ? (
-            <div className="flex items-center justify-center">
-              <Spinner variant="dark" />
-            </div>
-          ) : (
-            <p className="text-lg font-semibold">{amount_string}</p>
-          )
-        ) : (
-          <p className="text-lg font-semibold">{amount_string}</p>
-        )}
+        <p className="text-lg font-semibold">{amount_string}</p>
       </div>
 
       {errors && <Alert type="error">{errors}</Alert>}
@@ -323,7 +433,7 @@ export function PaymentMethodForm({
             Payment Method
           </RadioGroup.Label>
           <div className="space-y-2">
-            {tokens?.map((token: GatewayToken) => (
+            {tokens?.map((token: ClientGatewayToken) => (
               <RadioGroup.Option key={token.id} value={token.id}>
                 {({ active, checked }) => (
                   <div
@@ -464,8 +574,13 @@ export function PaymentMethodForm({
         >
           {t('cancel')}
         </button>
-        <Button type="primary" onClick={handleSubmit} disabled={isSubmitting}>
-          {isSubmitting ? (
+        <Button
+          type="primary"
+          behavior="button"
+          onClick={handleSubmit}
+          disabled={isSubmitting || isWaitingForIntent || !isPaymentReady}
+        >
+          {isSubmitting || isWaitingForIntent ? (
             <div className="flex items-center space-x-2">
               <Spinner variant="dark" />
               <span>{t('processing')}</span>

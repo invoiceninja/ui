@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { ReactNode } from 'react';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 
 interface Props {
   children: ReactNode;

@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Modal } from '$app/components/Modal';
-import { Button } from '$app/components/forms';
 import { atom, useAtom } from 'jotai';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
 
 export const confirmActionModalAtom = atom(false);
 

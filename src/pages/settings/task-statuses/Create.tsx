@@ -8,28 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ButtonOption, Card, CardContainer } from '$app/components/cards';
-import { InputField, InputLabel } from '$app/components/forms';
 import { AxiosError } from 'axios';
+import { FormEvent, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { BiPlusCircle } from 'react-icons/bi';
+import { useNavigate } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { TaskStatus } from '$app/common/interfaces/task-status';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankTaskStatusQuery } from '$app/common/queries/task-statuses';
+import { ButtonOption, Card, CardContainer } from '$app/components/cards';
+import { InputField, InputLabel } from '$app/components/forms';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { Icon } from '$app/components/icons/Icon';
 import { Settings } from '$app/components/layouts/Settings';
-import { FormEvent, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { BiPlusCircle } from 'react-icons/bi';
-import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useColorScheme } from '$app/common/colors';
 
 export function Create() {
   const { documentTitle } = useTitle('new_task_status');

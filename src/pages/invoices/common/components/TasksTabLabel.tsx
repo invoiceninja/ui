@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   InvoiceItem,
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
-import { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 
 interface Props {
   lineItems: InvoiceItem[];

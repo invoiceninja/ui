@@ -8,29 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtomValue } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { MdEdit } from 'react-icons/md';
+import { useColorScheme } from '$app/common/colors';
+import { route } from '$app/common/helpers/route';
+import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useTitle } from '$app/common/hooks/useTitle';
 import {
-  TAG_ENTITY_TYPES,
+  resolveTagEntityType,
   TAG_ENTITY_TYPE_OPTIONS,
   TAG_ENTITY_TYPE_VALUES,
+  TAG_ENTITY_TYPES,
   Tag,
   TagEntityType,
-  resolveTagEntityType,
 } from '$app/common/interfaces/tag';
 import { Badge } from '$app/components/Badge';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { SelectOption } from '$app/components/datatables/Actions';
-import { Icon } from '$app/components/icons/Icon';
-import { route } from '$app/common/helpers/route';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { DataTable, DataTableColumns } from '$app/components/DataTable';
-import { Link } from '$app/components/forms';
-import { Settings } from '$app/components/layouts/Settings';
-import { useTranslation } from 'react-i18next';
 import { Card, Element } from '$app/components/cards';
+import { DataTable, DataTableColumns } from '$app/components/DataTable';
+import { SelectOption } from '$app/components/datatables/Actions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Link } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
-import { useColorScheme } from '$app/common/colors';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
+import { Icon } from '$app/components/icons/Icon';
+import { Settings } from '$app/components/layouts/Settings';
 import { PropertyCheckbox } from '$app/components/PropertyCheckbox';
 import { SettingsLabel } from '$app/components/SettingsLabel';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
@@ -39,8 +41,6 @@ import {
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
-import { useAtomValue } from 'jotai';
-import { MdEdit } from 'react-icons/md';
 
 function TagsTable() {
   const [t] = useTranslation();

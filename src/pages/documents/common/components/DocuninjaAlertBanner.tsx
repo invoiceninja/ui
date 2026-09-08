@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
-import { isPaidDocuninjaUserAtom } from '$app/pages/documents/atoms';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert } from '$app/components/Alert';
 import { Button } from '$app/components/forms';
-import { useState } from 'react';
+import { isPaidDocuninjaUserAtom } from '$app/pages/documents/atoms';
 import { UpgradeModal } from './UpgradeModal';
-import { useQueryClient } from 'react-query';
 
 export function DocuninjaAlertBanner() {
   const [t] = useTranslation();
@@ -39,12 +39,13 @@ export function DocuninjaAlertBanner() {
           </div>
         </Alert>
       )}
-
       <UpgradeModal
         visible={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
         onPaymentComplete={() => {
-          queryClient.invalidateQueries(['/api/docuninja/login']);
+          queryClient.invalidateQueries({
+            queryKey: ['/api/docuninja/login'],
+          });
           setShowUpgradeModal(false);
         }}
       />

@@ -8,31 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { Link, SelectField } from '$app/components/forms';
+import { atom, useAtom } from 'jotai';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdWarning } from 'react-icons/md';
+import reactStringReplace from 'react-string-replace';
+import { useColorScheme } from '$app/common/colors';
+import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import {
   CompanyGateway,
   FeesAndLimitsEntry,
 } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
+import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
+import { Link, SelectField } from '$app/components/forms';
+import { Entry } from '$app/components/forms/Combobox';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 import Toggle from '$app/components/forms/Toggle';
-import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Icon } from '$app/components/icons/Icon';
+import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
 import { useHandleFeesAndLimitsEntryChange } from '../hooks/useHandleFeesAndLimitsEntryChange';
 import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
-import { atom, useAtom } from 'jotai';
-import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
-import { Entry } from '$app/components/forms/Combobox';
-import { TaxRate } from '$app/common/interfaces/tax-rate';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { Icon } from '$app/components/icons/Icon';
-import { MdWarning } from 'react-icons/md';
-import reactStringReplace from 'react-string-replace';
-import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-combo';
-import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   gateway: Gateway;

@@ -8,34 +8,34 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
-import { Client } from '$app/common/interfaces/client';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { Project } from '$app/common/interfaces/project';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import classNames from 'classnames';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { Product } from '$app/common/interfaces/product';
-import { Payment } from '$app/common/interfaces/payment';
-import { Quote } from '$app/common/interfaces/quote';
-import { Credit } from '$app/common/interfaces/credit';
-import { Task } from '$app/common/interfaces/task';
-import { Vendor } from '$app/common/interfaces/vendor';
-import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import { Expense } from '$app/common/interfaces/expense';
-import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
-import { Transaction } from '$app/common/interfaces/transactions';
-import { Tooltip } from './Tooltip';
-import { useTranslation } from 'react-i18next';
-import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
-import styled from 'styled-components';
-import { ChevronLeft } from './icons/ChevronLeft';
-import { useColorScheme } from '$app/common/colors';
-import { ChevronRight } from './icons/ChevronRight';
 import { useAtomValue } from 'jotai';
-import { fullTableLatestDataAtom } from '$app/common/atoms/data-table';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+import styled from 'styled-components';
+import { fullTableLatestDataAtom } from '$app/common/atoms/data-table';
+import { useColorScheme } from '$app/common/colors';
+import { route } from '$app/common/helpers/route';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import { Client } from '$app/common/interfaces/client';
+import { Credit } from '$app/common/interfaces/credit';
+import { Expense } from '$app/common/interfaces/expense';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Payment } from '$app/common/interfaces/payment';
+import { Product } from '$app/common/interfaces/product';
+import { Project } from '$app/common/interfaces/project';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Quote } from '$app/common/interfaces/quote';
+import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { Task } from '$app/common/interfaces/task';
+import { Transaction } from '$app/common/interfaces/transactions';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { ChevronLeft } from './icons/ChevronLeft';
+import { ChevronRight } from './icons/ChevronRight';
+import { Tooltip } from './Tooltip';
 
 const Button = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};
@@ -86,10 +86,6 @@ interface Props {
 export function PreviousNextNavigation({ entity }: Props) {
   const { id } = useParams();
 
-  if (!id) {
-    return null;
-  }
-
   const [t] = useTranslation();
   const navigate = useNavigate();
   const preventNavigation = usePreventNavigation();
@@ -100,8 +96,12 @@ export function PreviousNextNavigation({ entity }: Props) {
   const navigationData = useAtomValue(fullTableLatestDataAtom);
 
   const currentList = useMemo(() => {
-    return navigationData?.resources as Resource[] | undefined;
-  }, [navigationData]);
+    if (navigationData?.type !== entity) {
+      return undefined;
+    }
+
+    return navigationData.resources as Resource[] | undefined;
+  }, [navigationData, entity]);
 
   const getPreviousIndex = () => {
     const currentIndex =
@@ -147,6 +147,7 @@ export function PreviousNextNavigation({ entity }: Props) {
   };
 
   if (
+    !id ||
     !currentList?.length ||
     currentList.length === 1 ||
     !currentList.find((resource) => resource.id === id)

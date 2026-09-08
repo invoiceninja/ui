@@ -8,32 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { Card } from '$app/components/cards';
-import { Button, InputField } from '$app/components/forms';
-import { Icon } from '$app/components/icons/Icon';
-import { Modal } from '$app/components/Modal';
 import {
   type DateInputProps,
   type MinimizeButtonProps,
   type NavigateButtonProps,
   Sign,
-  type SignCardProps,
-  SignContext,
   type SignatureSelectorButtonProps,
   type SignatureSelectorDialogProps,
   type SignatureSelectorInputProps,
+  type SignCardProps,
+  SignContext,
   type StartSigningButtonProps,
   type SubmitButtonProps,
 } from '@docuninja/builder2.0';
 import classNames from 'classnames';
-import { Check, ChevronLeft, ChevronRight } from 'react-feather';
 import type { LegacyRef } from 'react';
+import { Check, ChevronLeft, ChevronRight } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { FiMinimize2 } from 'react-icons/fi';
-
 import { useParams } from 'react-router';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { Card } from '$app/components/cards';
+import { Button, InputField } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
 
 const Div = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};

@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction } from 'react';
 import { ApiWebhook } from '$app/common/interfaces/api-webhook';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Dispatch, SetStateAction } from 'react';
 
 interface HandleChangeWebHookParams {
   setApiWebHook: Dispatch<SetStateAction<ApiWebhook | undefined>>;

@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { Element } from '$app/components/cards';
-import { useTranslation } from 'react-i18next';
 
 export function ReferralProgram() {
   const [t] = useTranslation();

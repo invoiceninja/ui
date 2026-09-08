@@ -8,31 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, CardContainer, Element } from '$app/components/cards';
-import { InputField, InputLabel } from '$app/components/forms';
 import { AxiosError } from 'axios';
+import { FormEvent, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { TaskStatus } from '$app/common/interfaces/task-status';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTaskStatusQuery } from '$app/common/queries/task-statuses';
 import { Badge } from '$app/components/Badge';
+import { Card, CardContainer, Element } from '$app/components/cards';
+import { InputField, InputLabel } from '$app/components/forms';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { Settings } from '$app/components/layouts/Settings';
+import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
-import { FormEvent, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 import {
   useActions,
   useHandleChange,
 } from '$app/pages/settings/task-statuses/common/hooks';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useColorScheme } from '$app/common/colors';
 
 export function Edit() {
   const [t] = useTranslation();

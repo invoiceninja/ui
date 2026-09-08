@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { cloneDeep, set } from 'lodash';
+import { Dispatch, SetStateAction } from 'react';
+import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -16,9 +19,6 @@ import {
   Invitation,
   PurchaseOrder,
 } from '$app/common/interfaces/purchase-order';
-import { blankLineItem } from '$app/common/constants/blank-line-item';
-import { cloneDeep, set } from 'lodash';
-import { Dispatch, SetStateAction } from 'react';
 import { useResolveCurrency } from './useResolveCurrency';
 
 interface Props {

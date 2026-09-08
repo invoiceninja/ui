@@ -9,8 +9,8 @@
  */
 
 export * from './File';
+export * from './Flutter';
 export * from './Jpg';
 export * from './Pdf';
 export * from './Png';
 export * from './Svg';
-export * from './Flutter';

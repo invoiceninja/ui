@@ -8,25 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
 import classNames from 'classnames';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdTextSnippet } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 import { styled } from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 import { date, endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import CommonProps from '$app/common/interfaces/common-props.interface';
-import { Icon } from './icons/Icon';
-import { MdTextSnippet } from 'react-icons/md';
-import { route } from '$app/common/helpers/route';
-import { useNavigate } from 'react-router-dom';
+import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
 import { Button } from './forms';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { EnvelopArrowRight } from './icons/EnvelopArrowRight';
 import { ChevronDown } from './icons/ChevronDown';
 import { ChevronUp } from './icons/ChevronUp';
+import { EnvelopArrowRight } from './icons/EnvelopArrowRight';
+import { Icon } from './icons/Icon';
 
 interface Props extends CommonProps {
   emailRecord: EmailRecordType;

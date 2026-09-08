@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
+import { useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
+import { Params, useParams } from 'react-router-dom';
+import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { CompanyUser } from '$app/common/interfaces/company-user';
+import { DocuNinjaData } from '$app/common/interfaces/docuninja/api';
+import { User } from '$app/common/interfaces/user';
 import { Fallback } from '$app/components/Fallback';
 import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { SubPageUnauthorized, Unauthorized } from '$app/pages/errors/401';
-import { useEffect, useState } from 'react';
-import { QueryClient, useQueryClient } from 'react-query';
-import { Params, useParams } from 'react-router-dom';
-import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { CompanyUser } from '$app/common/interfaces/company-user';
-import { User } from '$app/common/interfaces/user';
-import { SettingsLevel } from '../stores/slices/settings';
 import { useActiveSettingsDetails } from '../hooks/useActiveSettingsDetails';
-import { DocuNinjaData } from '$app/common/interfaces/docuninja/api';
-import { useAtom } from 'jotai';
-import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { SettingsLevel } from '../stores/slices/settings';
 
 export type DocuNinjaGuard = (ctx: DocuNinjaContext) => Promise<boolean>;
 

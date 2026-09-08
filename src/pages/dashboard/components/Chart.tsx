@@ -8,27 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { date as formatDate, useParseDayjs } from '$app/common/helpers';
-import { ChartData } from './Totals';
 import {
-  Line,
   CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  TooltipProps,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
 } from 'recharts';
-import dayjs from 'dayjs';
+import { useColorScheme } from '$app/common/colors';
+import { date as formatDate, useParseDayjs } from '$app/common/helpers';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useColorScheme } from '$app/common/colors';
-import { useGenerateWeekDateRange } from '../hooks/useGenerateWeekDateRange';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { ensureUniqueDates, generateMonthDateRange } from '../helpers/helpers';
-import { TooltipProps } from 'recharts';
+import { useGenerateWeekDateRange } from '../hooks/useGenerateWeekDateRange';
+import { ChartData } from './Totals';
 
 interface PayloadItem {
   color: string;

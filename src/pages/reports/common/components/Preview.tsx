@@ -8,11 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { Button, InputField, Link } from '$app/components/forms';
-import { Table, Tbody, Td, Thead, Tr } from '$app/components/tables';
-import { Tooltip } from '$app/components/Tooltip';
-import { currentWidthAtom } from '$app/common/hooks/useResizeColumn';
 import { atom, getDefaultStore, useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import React, {
@@ -26,15 +21,20 @@ import React, {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { currentWidthAtom } from '$app/common/hooks/useResizeColumn';
+import { Button, InputField, Link } from '$app/components/forms';
+import { Tooltip } from '$app/components/Tooltip';
+import { Table, Tbody, Td, Thead, Tr } from '$app/components/tables';
+import {
+  isTruncatedColumn,
+  resolveMinColumnWidth,
+} from '../constants/column-widths';
 import {
   compareValues,
   detectSortType,
   extractDisplayValue,
 } from '../utils/sortingUtils';
-import {
-  isTruncatedColumn,
-  resolveMinColumnWidth,
-} from '../constants/column-widths';
 
 export const previewAtom = atom<Preview | null>(null);
 

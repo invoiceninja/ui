@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { Tab } from '$app/components/Tabs';
-import { useTranslation } from 'react-i18next';
 
 export function useLocalizationTabs() {
   const [t] = useTranslation();

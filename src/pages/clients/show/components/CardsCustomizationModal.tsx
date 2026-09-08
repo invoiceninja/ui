@@ -8,17 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { Button, SelectField } from '$app/components/forms';
-import { CircleXMark } from '$app/components/icons/CircleXMark';
-import { Gear } from '$app/components/icons/Gear';
-import { Modal } from '$app/components/Modal';
-import { cloneDeep, isEqual } from 'lodash';
-import { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { toast } from '$app/common/helpers/toast/toast';
 import {
   DragDropContext,
   Draggable,
@@ -26,11 +15,22 @@ import {
   DropResult,
 } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
-import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
+import { cloneDeep, isEqual } from 'lodash';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import {
   useReactSettings,
   useSaveReactSettings,
 } from '$app/common/hooks/useReactSettings';
+import { Button, SelectField } from '$app/components/forms';
+import { CircleXMark } from '$app/components/icons/CircleXMark';
+import { Gear } from '$app/components/icons/Gear';
+import { GridDotsVertical } from '$app/components/icons/GridDotsVertical';
+import { Modal } from '$app/components/Modal';
 
 const Box = styled.div`
   background-color: ${(props) => props.theme.backgroundColor};

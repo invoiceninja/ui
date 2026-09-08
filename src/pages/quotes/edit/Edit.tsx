@@ -8,34 +8,34 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { Link, useOutletContext, useSearchParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useScrollToLineItem } from '$app/common/hooks/useScrollToLineItem';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { Badge } from '$app/components/Badge';
+import { Card } from '$app/components/cards';
+import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 import { Spinner } from '$app/components/Spinner';
+import { TabGroup } from '$app/components/TabGroup';
+import { TaxExemptBadge } from '$app/pages/clients/show/components/TaxExemptBadge';
 import { ClientSelector } from '$app/pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
+import { TasksTabLabel } from '$app/pages/invoices/common/components/TasksTabLabel';
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
-import { useTranslation } from 'react-i18next';
-import { Link, useOutletContext, useSearchParams } from 'react-router-dom';
+import { useProductQuoteColumns } from '$app/pages/invoices/common/hooks/useProductQuoteColumns';
+import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
+import { TaxDataBadge } from '$app/pages/invoices/edit/components/TaxDataBadge';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { QuoteDetails } from '../common/components/QuoteDetails';
 import { QuoteFooter } from '../common/components/QuoteFooter';
-import { useQuoteUtilities } from '../common/hooks';
-import { Card } from '$app/components/cards';
 import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
-import { TabGroup } from '$app/components/TabGroup';
-import { useTaskColumns } from '$app/pages/invoices/common/hooks/useTaskColumns';
-import { useColorScheme } from '$app/common/colors';
+import { useQuoteUtilities } from '../common/hooks';
 import { QuoteContext } from '../create/Create';
-import { TasksTabLabel } from '$app/pages/invoices/common/components/TasksTabLabel';
-import { useProductQuoteColumns } from '$app/pages/invoices/common/hooks/useProductQuoteColumns';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
-import { Badge } from '$app/components/Badge';
-import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import { TaxDataBadge } from '$app/pages/invoices/edit/components/TaxDataBadge';
-import { TaxExemptBadge } from '$app/pages/clients/show/components/TaxExemptBadge';
 
 export default function Edit() {
   const [t] = useTranslation();

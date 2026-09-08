@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Config, driver, DriveStep } from 'driver.js';
+import { Config, DriveStep, driver } from 'driver.js';
 import { useEffect } from 'react';
 import 'driver.js/dist/driver.css';
 

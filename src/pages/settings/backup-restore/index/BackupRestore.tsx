@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Settings } from '$app/components/layouts/Settings';
-import { Tabs } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
-import { useCompanyBackupRestoreTabs } from '../common/hooks/useCompanyBackupRestoreTabs';
-import { Card } from '$app/components/cards';
 import { useColorScheme } from '$app/common/colors';
+import { Card } from '$app/components/cards';
+import { Settings } from '$app/components/layouts/Settings';
+import { Tabs } from '$app/components/Tabs';
+import { useCompanyBackupRestoreTabs } from '../common/hooks/useCompanyBackupRestoreTabs';
 
 export function BackupRestore() {
   const [t] = useTranslation();

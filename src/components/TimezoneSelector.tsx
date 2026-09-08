@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { SelectField } from './forms';
-import { useStaticsQuery } from '$app/common/queries/statics';
 import { Timezone } from '$app/common/interfaces/statics';
+import { useStaticsQuery } from '$app/common/queries/statics';
+import { SelectField } from './forms';
 
 interface Props {
   value: string;
@@ -45,7 +45,7 @@ export function TimezoneSelector({
       readOnly={readOnly}
     >
       {statics?.timezones
-        .sort((a, b) => a.name.localeCompare(b.name))
+        .sort((a: Timezone, b: Timezone) => a.name.localeCompare(b.name))
         .map((timezone: Timezone) => (
           <option value={timezone.id} key={timezone.id}>
             {timezone.name}

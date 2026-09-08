@@ -8,38 +8,38 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useMediaQuery } from 'react-responsive';
+import { Outlet, useParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Expense as ExpenseType } from '$app/common/interfaces/expense';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useExpenseQuery } from '$app/common/queries/expenses';
 import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { Tab, Tabs } from '$app/components/Tabs';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Outlet, useParams } from 'react-router-dom';
-import { useActions } from './common/hooks';
-import { useSave } from './edit/hooks/useSave';
-import { Spinner } from '$app/components/Spinner';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { Divider } from '$app/components/cards/Divider';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
+import { InputLabel } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
+import { Default } from '$app/components/layouts/Default';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
+import { ResourceActions } from '$app/components/ResourceActions';
 import { Panel } from '$app/components/resizable-panels/Panel';
 import { PanelGroup } from '$app/components/resizable-panels/PanelGroup';
 import { PanelResizeHandle } from '$app/components/resizable-panels/PanelResizeHandle';
-import { DocumentPreview } from './common/components/DocumentPreview';
-import { useMediaQuery } from 'react-responsive';
-import { Divider } from '$app/components/cards/Divider';
-import { useColorScheme } from '$app/common/colors';
-import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
-import { InputLabel } from '$app/components/forms';
+import { Spinner } from '$app/components/Spinner';
+import { Tab, Tabs } from '$app/components/Tabs';
 import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { DocumentPreview } from './common/components/DocumentPreview';
+import { useActions } from './common/hooks';
+import { useSave } from './edit/hooks/useSave';
 
 export default function Expense() {
   const [t] = useTranslation();

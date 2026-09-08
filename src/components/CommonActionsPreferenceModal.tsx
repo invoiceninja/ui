@@ -8,28 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from '@hello-pangea/dnd';
+import { arrayMoveImmutable } from 'array-move';
+import { isEqual } from 'lodash';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
-import { Modal } from './Modal';
-import { Button, SelectField } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useAllCommonActions } from '$app/common/hooks/useCommonActions';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { toast } from '$app/common/helpers/toast/toast';
-import { isEqual } from 'lodash';
 import {
   useReactSettings,
   useSaveReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import {
-  DragDropContext,
-  Draggable,
-  DropResult,
-  Droppable,
-} from '@hello-pangea/dnd';
-import { arrayMoveImmutable } from 'array-move';
-import { GridDotsVertical } from './icons/GridDotsVertical';
-import { useColorScheme } from '$app/common/colors';
+import { Button, SelectField } from '$app/components/forms';
 import { CircleXMark } from './icons/CircleXMark';
+import { GridDotsVertical } from './icons/GridDotsVertical';
+import { Modal } from './Modal';
 
 export interface CommonAction {
   value: string;

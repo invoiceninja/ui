@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Task } from '$app/common/interfaces/task';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { parseTimeLog } from './calculate-time';
+import { Task } from '$app/common/interfaces/task';
 import { isTaskRunning } from './calculate-entity-state';
+import { parseTimeLog } from './calculate-time';
 
 dayjs.extend(utc);
 

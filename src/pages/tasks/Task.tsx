@@ -8,29 +8,29 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Outlet, useParams } from 'react-router-dom';
+import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Task as TaskType } from '$app/common/interfaces/task';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTaskQuery } from '$app/common/queries/tasks';
+import { Page } from '$app/components/Breadcrumbs';
+import { InputLabel } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
-import { useEffect, useState } from 'react';
-import { Outlet, useParams } from 'react-router-dom';
+import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { useActions } from './common/hooks';
-import { useUpdateTask } from './common/hooks/useUpdateTask';
-import { Tab, Tabs } from '$app/components/Tabs';
 import { Spinner } from '$app/components/Spinner';
-import { useTranslation } from 'react-i18next';
-import { route } from '$app/common/helpers/route';
+import { Tab, Tabs } from '$app/components/Tabs';
 import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import { Page } from '$app/components/Breadcrumbs';
-import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
-import { InputLabel } from '$app/components/forms';
+import { useActions } from './common/hooks';
+import { useUpdateTask } from './common/hooks/useUpdateTask';
 
 export default function Task() {
   const { documentTitle } = useTitle('edit_task');

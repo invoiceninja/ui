@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from '$app/common/helpers';
-import { useBlankProductQuery } from '$app/common/queries/products';
-import { Modal } from '$app/components/Modal';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Product } from '$app/common/interfaces/product';
+import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useHandleChange } from '$app/pages/products/common/hooks';
 import { toast } from '$app/common/helpers/toast/toast';
-import { ProductForm } from '$app/pages/products/common/components/ProductForm';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Product } from '$app/common/interfaces/product';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankProductQuery } from '$app/common/queries/products';
+import { Button } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
+import { ProductForm } from '$app/pages/products/common/components/ProductForm';
+import { useHandleChange } from '$app/pages/products/common/hooks';
 
 interface Props {
   isModalOpen: boolean;

@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useDispatch } from 'react-redux';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { updateChanges } from '$app/common/stores/slices/company-users';
-import { useDispatch } from 'react-redux';
 
 export function useSetSurchageTaxValue() {
   const dispatch = useDispatch();

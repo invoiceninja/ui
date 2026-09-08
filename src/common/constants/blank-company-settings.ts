@@ -187,4 +187,5 @@ export const defaultSettings = {
   brevo_secret: '',
   france_reporting_enabled: true,
   france_reporting_schedule: 'ten_day',
+  documents_public_by_default: true,
 };

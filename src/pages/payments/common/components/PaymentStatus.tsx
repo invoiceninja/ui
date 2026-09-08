@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
-import { Payment } from '$app/common/interfaces/payment';
 import { PaymentStatus as PaymentStatusEnum } from '$app/common/enums/payment-status';
+import { Payment } from '$app/common/interfaces/payment';
+import { Badge } from '$app/components/Badge';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Props {

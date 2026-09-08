@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
+import classNames from 'classnames';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQueryClient } from 'react-query';
-import { useParams } from 'react-router-dom';
-import { EmailRecord } from '$app/components/EmailRecord';
 import { EmailRecord as EmailRecordType } from '$app/common/interfaces/email-history';
-import { Spinner } from '$app/components/Spinner';
 import { Card } from '$app/components/cards';
-import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
-import { useColorScheme } from '$app/common/colors';
-import classNames from 'classnames';
+import { EmailRecord } from '$app/components/EmailRecord';
+import { Spinner } from '$app/components/Spinner';
 
 export default function EmailHistory() {
   const [t] = useTranslation();
@@ -33,15 +33,17 @@ export default function EmailHistory() {
 
   const fetchEmailHistory = async () => {
     const response = await queryClient
-      .fetchQuery(
-        ['/api/v1/purchase_orders', id, 'emailHistory'],
-        () =>
+      .fetchQuery({
+        queryKey: ['/api/v1/purchase_orders', id, 'emailHistory'],
+
+        queryFn: () =>
           request('POST', endpoint('/api/v1/emails/entityHistory'), {
             entity: 'purchase_order',
             entity_id: id,
           }),
-        { staleTime: Infinity }
-      )
+
+        staleTime: Infinity,
+      })
       .then((response) => response.data);
 
     setIsLoading(false);

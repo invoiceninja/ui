@@ -8,19 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { resolveTotalVariable } from '../helpers/resolve-total-variable';
-import { useFormatMoney } from './useFormatMoney';
-import { CustomField } from '$app/components/CustomField';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Element } from '$app/components/cards';
-import { useResolveTranslation } from './useResolveTranslation';
+import { useColorScheme } from '$app/common/colors';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { CustomField } from '$app/components/CustomField';
+import { Element } from '$app/components/cards';
 import {
   ProductTableResource,
   RelationType,
 } from '../components/ProductsTable';
-import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
-import { useColorScheme } from '$app/common/colors';
+import { resolveTotalVariable } from '../helpers/resolve-total-variable';
+import { useFormatMoney } from './useFormatMoney';
+import { useResolveTranslation } from './useResolveTranslation';
+
 interface Props {
   resource?: ProductTableResource;
   relationType: RelationType;

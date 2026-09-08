@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtom } from 'jotai';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card } from '$app/components/cards';
+import { useColorScheme } from '$app/common/colors';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useAtom } from 'jotai';
+import { Card } from '$app/components/cards';
 import { productAtom } from '../atoms';
 import { useHandleChange } from '../hooks';
 import { ProductForm } from './ProductForm';
-import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   errors: ValidationBag | undefined;

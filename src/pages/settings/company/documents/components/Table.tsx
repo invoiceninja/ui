@@ -8,29 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import {
-  Pagination,
-  Table as TableElement,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from '$app/components/tables';
-import { date, endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Document } from '$app/common/interfaces/document.interface';
-import {
-  useDocumentsQuery,
-  useSetDocumentVisibility,
-} from '$app/common/queries/documents';
-import { Dropdown } from '$app/components/dropdown/Dropdown';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { FileIcon } from '$app/components/FileIcon';
-import { Icon } from '$app/components/icons/Icon';
-import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
-import { Spinner } from '$app/components/Spinner';
+import { useQueryClient } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+import classNames from 'classnames';
 import prettyBytes from 'pretty-bytes';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -41,18 +21,38 @@ import {
   MdOutlineLockOpen,
   MdPageview,
 } from 'react-icons/md';
-import { useQueryClient } from 'react-query';
+import { useColorScheme } from '$app/common/colors';
+import { date, endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { defaultHeaders } from '$app/common/queries/common/headers';
-import { AxiosResponse } from 'axios';
-import { DocumentUrl } from '$app/components/DocumentsTable';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
-import { useColorScheme } from '$app/common/colors';
-import { LockOpen } from '$app/components/icons/LockOpen';
+import { Document } from '$app/common/interfaces/document.interface';
+import { defaultHeaders } from '$app/common/queries/common/headers';
+import {
+  useDocumentsQuery,
+  useSetDocumentVisibility,
+} from '$app/common/queries/documents';
+import { DocumentUrl } from '$app/components/DocumentsTable';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { FileIcon } from '$app/components/FileIcon';
+import { Icon } from '$app/components/icons/Icon';
 import { Lock } from '$app/components/icons/Lock';
-import classNames from 'classnames';
+import { LockOpen } from '$app/components/icons/LockOpen';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
+import { Spinner } from '$app/components/Spinner';
+import {
+  Pagination,
+  Table as TableElement,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from '$app/components/tables';
 
 export function Table() {
   const [t] = useTranslation();
@@ -90,17 +90,19 @@ export function Table() {
   const downloadDocument = async (doc: Document, inline: boolean) => {
     toast.processing();
 
-    const response: AxiosResponse = await queryClient.fetchQuery(
-      ['/api/v1/documents', doc.hash],
-      () =>
+    const response: AxiosResponse = await queryClient.fetchQuery({
+      queryKey: ['/api/v1/documents', doc.hash],
+
+      queryFn: () =>
         request(
           'GET',
           endpoint('/documents/:hash', { hash: doc.hash }),
           { headers: defaultHeaders() },
           { responseType: 'arraybuffer' }
         ),
-      { staleTime: Infinity }
-    );
+
+      staleTime: Infinity,
+    });
 
     toast.dismiss();
 
@@ -154,17 +156,19 @@ export function Table() {
         );
 
         if (!alreadyExist && (type === 'png' || type === 'jpg')) {
-          const response: AxiosResponse = await queryClient.fetchQuery(
-            ['/api/v1/documents', hash],
-            () =>
+          const response: AxiosResponse = await queryClient.fetchQuery({
+            queryKey: ['/api/v1/documents', hash],
+
+            queryFn: () =>
               request(
                 'GET',
                 endpoint('/documents/:hash', { hash }),
                 { headers: defaultHeaders() },
                 { responseType: 'arraybuffer' }
               ),
-            { staleTime: Infinity }
-          );
+
+            staleTime: Infinity,
+          });
 
           const blob = new Blob([response.data], {
             type: response.headers['content-type'],

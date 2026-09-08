@@ -9,10 +9,10 @@
  */
 
 import { useOutletContext } from 'react-router-dom';
-import { ClientContext } from '$app/pages/clients/edit/Edit';
 import { Address } from '$app/pages/clients/edit/components/Address';
-import { Details } from '$app/pages/clients/edit/components/Details';
 import { Contacts } from '$app/pages/clients/edit/components/Contacts';
+import { Details } from '$app/pages/clients/edit/components/Details';
+import { ClientContext } from '$app/pages/clients/edit/Edit';
 
 export default function CreatePage() {
   const context: ClientContext = useOutletContext();

@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { lazy } from 'react';
+import { Route } from 'react-router-dom';
 import { Guard } from '$app/common/guards/Guard';
 import { assigned } from '$app/common/guards/guards/assigned';
 import { enabled } from '$app/common/guards/guards/enabled';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
-import { Route } from 'react-router-dom';
-import { lazy } from 'react';
 
 const Projects = lazy(() => import('$app/pages/projects/index/Projects'));
 const Create = lazy(() => import('$app/pages/projects/create/Create'));

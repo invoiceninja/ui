@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Params } from '$app/common/queries/common/params.interface';
-import { useQuery } from 'react-query';
 
 interface InvoiceParams extends Params {
   clientStatus?: string;
@@ -26,9 +26,10 @@ interface InvoiceParams extends Params {
 }
 
 export function useInvoicesQuery(params: InvoiceParams) {
-  return useQuery<Invoice[]>(
-    ['/api/v1/invoices', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/invoices', params],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint(
@@ -49,6 +50,8 @@ export function useInvoicesQuery(params: InvoiceParams) {
         (response: GenericSingleResourceResponse<Invoice[]>) =>
           response.data.data
       ),
-    { enabled: params.enabled ?? true, staleTime: Infinity }
-  );
+
+    enabled: params.enabled ?? true,
+    staleTime: Infinity,
+  });
 }

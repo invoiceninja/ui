@@ -9,15 +9,15 @@
  */
 
 export * from './CustomFields';
-export { Company as CompanyCustomFields } from './company/Company';
 export { Clients as ClientsCustomFields } from './clients/Clients';
-export { Products as ProductsCustomFields } from './products/Products';
+export { Company as CompanyCustomFields } from './company/Company';
+export { Credits as CreditCustomFields } from './credits/Credits';
+export { Expenses as ExpensesCustomFields } from './expenses/Expenses';
 export { Invoices as InvoicesCustomFields } from './invoices/Invoices';
 export { Payments as PaymentsCustomFields } from './payments/Payments';
+export { Products as ProductsCustomFields } from './products/Products';
 export { Projects as ProjectsCustomFields } from './projects/Projects';
-export { Tasks as TasksCustomFields } from './tasks/Tasks';
-export { Vendors as VendorsCustomFields } from './vendors/Vendors';
-export { Expenses as ExpensesCustomFields } from './expenses/Expenses';
-export { Users as UsersCustomFields } from './users/Users';
 export { Quotes as QuotesCustomFields } from './quotes/Quotes';
-export { Credits as CreditCustomFields } from './credits/Credits';
+export { Tasks as TasksCustomFields } from './tasks/Tasks';
+export { Users as UsersCustomFields } from './users/Users';
+export { Vendors as VendorsCustomFields } from './vendors/Vendors';

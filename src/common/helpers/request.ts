@@ -10,11 +10,11 @@
 
 import axios, { AxiosError, AxiosRequestConfig, Method } from 'axios';
 import { defaultHeaders } from '$app/common/queries/common/headers';
-import { ValidationBag } from '../interfaces/validation-bag';
-import { toast } from './toast/toast';
-import { $refetch } from '../hooks/useRefetch';
 import { checkJsonObject } from '../helpers';
+import { $refetch } from '../hooks/useRefetch';
+import { ValidationBag } from '../interfaces/validation-bag';
 import { clearLocalStorage } from './local-storage';
+import { toast } from './toast/toast';
 
 const client = axios.create();
 

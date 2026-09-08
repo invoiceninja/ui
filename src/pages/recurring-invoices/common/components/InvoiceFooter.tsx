@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
-import { TabGroup } from '$app/components/TabGroup';
 import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Card } from '$app/components/cards';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { TabGroup } from '$app/components/TabGroup';
 import { recurringInvoiceAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
-import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useColorScheme } from '$app/common/colors';
 
 interface Props {
   handleChange: ChangeHandler;

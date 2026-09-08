@@ -1,4 +1,4 @@
-import { login, logout } from '$tests/e2e/helpers';
+import { login } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect } from '$tests/e2e/fixtures';
 
 resetAccountBeforeAll();
@@ -41,5 +41,4 @@ test('Connecting Nordigen', async ({ page }) => {
 
   await nordigenConnectionTab.waitForURL('**/nordigen/connect/**');
 
-  await logout(page);
 });

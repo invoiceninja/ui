@@ -8,12 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Modal } from '$app/components/Modal';
-import { useTranslation } from 'react-i18next';
 import { Dispatch, SetStateAction, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Element } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
-import { Element } from '$app/components/cards';
+import { Modal } from '$app/components/Modal';
+
 interface SendTimeModalProps {
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;

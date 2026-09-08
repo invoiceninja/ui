@@ -32,7 +32,7 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, recurringInvoiceAtom } from './atoms';
 import { route } from '$app/common/helpers/route';
@@ -89,6 +89,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { SendNowAction } from './components/SendNowAction';
 import { TagPills } from '$app/components/tags/TagPills';
+import { calculateNetAmount } from '$app/common/helpers/invoices/net-amount';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -302,7 +303,7 @@ export function useToggleStartStop() {
       $refetch(['recurring_invoices']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({ queryKey: [invalidateQueryValue] });
 
       toast.success(
         action === 'start'
@@ -738,7 +739,7 @@ export function useRecurringInvoiceColumns() {
       label: t('net_amount'),
       format: (value, recurringInvoice) =>
         formatMoney(
-          Number(value) - Number(recurringInvoice.total_taxes || 0),
+          calculateNetAmount(recurringInvoice),
           recurringInvoice.client?.country_id,
           recurringInvoice.client?.settings.currency_id
         ),

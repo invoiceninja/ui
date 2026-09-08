@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { Button, SelectField } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import {
   Quickbooks,
   QuickbooksSettings,
 } from '$app/common/interfaces/quickbooks';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Alert } from '$app/components/Alert';
+import { Element } from '$app/components/cards';
+import { Button, SelectField } from '$app/components/forms';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 import { useQuickbooksReconnect } from '../common/hooks/useQuickbooksReconnect';
 
 interface QuickBooksDetailsProps {

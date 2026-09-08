@@ -8,6 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdControlPointDuplicate } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -18,13 +22,9 @@ import { CreditCard } from '$app/components/icons/CreditCard';
 import { Files } from '$app/components/icons/Files';
 import { Icon } from '$app/components/icons/Icon';
 import { Invoice } from '$app/components/icons/Invoice';
+import { Refresh } from '$app/components/icons/Refresh';
 import { Wallet } from '$app/components/icons/Wallet';
 import { Modal } from '$app/components/Modal';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { MdControlPointDuplicate } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
-import { Refresh } from '$app/components/icons/Refresh';
 
 interface Props {
   client: Client;

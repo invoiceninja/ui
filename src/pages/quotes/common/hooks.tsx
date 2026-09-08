@@ -86,6 +86,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
 import { Tooltip } from '$app/components/Tooltip';
 import { TagPills } from '$app/components/tags/TagPills';
+import { calculateNetAmount } from '$app/common/helpers/invoices/net-amount';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
@@ -932,7 +933,7 @@ export function useQuoteColumns() {
       label: t('net_amount'),
       format: (value, quote) =>
         formatMoney(
-          Number(value) - Number(quote.total_taxes || 0),
+          calculateNetAmount(quote),
           quote.client?.country_id,
           quote.client?.settings.currency_id
         ),

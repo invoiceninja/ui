@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { SelectOption } from '$app/components/datatables/Actions';
+import { merge } from 'lodash';
 import { StylesConfig } from 'react-select';
 import { useColorScheme } from '$app/common/colors';
-import { merge } from 'lodash';
+import { SelectOption } from '$app/components/datatables/Actions';
 
 export function useSelectorCustomStyles() {
   const colors = useColorScheme();

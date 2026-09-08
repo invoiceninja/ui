@@ -12,6 +12,7 @@ export interface Record {
   trans: string;
   value: string;
   map: string;
+  origin?: string;
 }
 
 export const clientMap: Record[] = [

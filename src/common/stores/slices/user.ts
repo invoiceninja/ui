@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { set } from 'lodash';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { set } from 'lodash';
 import { Authenticated, Registered } from '../../dtos/authentication';
 
 interface UserState {

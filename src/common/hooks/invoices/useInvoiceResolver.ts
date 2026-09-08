@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { useQueryClient } from 'react-query';
 
 export function useInvoiceResolver() {
   const queryClient = useQueryClient();
 
   const find = (id: string) => {
-    return queryClient.fetchQuery<Invoice>(
-      ['/api/v1/invoices', id],
-      () =>
+    return queryClient.fetchQuery({
+      queryKey: ['/api/v1/invoices', id],
+
+      queryFn: () =>
         request(
           'GET',
           endpoint(
@@ -27,8 +27,9 @@ export function useInvoiceResolver() {
             { id }
           )
         ).then((response) => response.data.data),
-      { staleTime: Infinity }
-    );
+
+      staleTime: Infinity,
+    });
   };
 
   return { find };

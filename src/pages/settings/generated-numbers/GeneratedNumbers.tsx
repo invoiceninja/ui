@@ -8,12 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtomValue } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { Outlet } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { Card } from '$app/components/cards';
 import { Tabs } from '$app/components/Tabs';
-import { useTranslation } from 'react-i18next';
-import { Outlet } from 'react-router-dom';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import {
@@ -21,10 +25,6 @@ import {
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
 import { useGeneratedNumbersTabs } from './common/hooks/useGeneratedNumbersTabs';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { Card } from '$app/components/cards';
-import { useColorScheme } from '$app/common/colors';
-import { useAtomValue } from 'jotai';
 
 export function GeneratedNumbers() {
   useTitle('generated_numbers');

@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Quote } from '$app/common/interfaces/quote';
-import { Badge } from '$app/components/Badge';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { QuoteStatus as QuoteStatusEnum } from '$app/common/enums/quote-status';
+import { Quote } from '$app/common/interfaces/quote';
+import { Badge } from '$app/components/Badge';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import dayjs from 'dayjs';
 
 interface Props {
   entity: Quote;

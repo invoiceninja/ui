@@ -8,45 +8,44 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { Button, Link, SelectField } from '$app/components/forms';
+import { arrayMoveImmutable } from 'array-move';
+import classNames from 'classnames';
+import { useEffect, useState } from 'react';
+import { HelpCircle } from 'react-feather';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint, isHosted } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import {
   useBlankCompanyGatewayQuery,
   useCompanyGatewaysQuery,
 } from '$app/common/queries/company-gateways';
+import { Card, Element } from '$app/components/cards';
+import { Button, Link, SelectField } from '$app/components/forms';
+import { $help, HelpWidget } from '$app/components/HelpWidget';
 import { Settings } from '$app/components/layouts/Settings';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useGateways } from '../common/hooks/useGateways';
-import { Credentials } from './components/Credentials';
-import { LimitsAndFees } from './components/LimitsAndFees';
-import { RequiredFields } from './components/RequiredFields';
-import { Settings as GatewaySettings } from './components/Settings';
-import { useHandleCreate } from './hooks/useHandleCreate';
-import { blankFeesAndLimitsRecord } from './hooks/useHandleMethodToggle';
 import { TabGroup } from '$app/components/TabGroup';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import {
   availableGatewayLogos,
   GatewayLogoName,
   GatewayTypeIcon,
 } from '$app/pages/clients/show/components/GatewayTypeIcon';
-import { isHosted } from '$app/common/helpers';
-import { endpoint } from '$app/common/helpers';
-import { route } from '$app/common/helpers/route';
-import { request } from '$app/common/helpers/request';
-import { arrayMoveImmutable } from 'array-move';
 import { useHandleGoCardless } from '$app/pages/settings/gateways/create/hooks/useHandleGoCardless';
 import { useHandleSquareOAuth } from '$app/pages/settings/gateways/create/hooks/useHandleSquareOAuth';
-import classNames from 'classnames';
-import { $help, HelpWidget } from '$app/components/HelpWidget';
+import { useGateways } from '../common/hooks/useGateways';
+import { Credentials } from './components/Credentials';
 import { DuplicatingGatewayModal } from './components/DuplicatingGatewayModal';
-import { useColorScheme } from '$app/common/colors';
-import { HelpCircle } from 'react-feather';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { LimitsAndFees } from './components/LimitsAndFees';
+import { RequiredFields } from './components/RequiredFields';
+import { Settings as GatewaySettings } from './components/Settings';
+import { useHandleCreate } from './hooks/useHandleCreate';
+import { blankFeesAndLimitsRecord } from './hooks/useHandleMethodToggle';
 
 const gatewaysStyles = [
   { name: 'paypal_ppcp', width: 110 },

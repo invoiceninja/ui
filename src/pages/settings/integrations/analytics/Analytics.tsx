@@ -8,9 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { InputField, Link } from '$app/components/forms';
 import { AxiosError } from 'axios';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -24,11 +26,9 @@ import {
   updateChanges,
   updateRecord,
 } from '$app/common/stores/slices/company-users';
+import { Card, Element } from '$app/components/cards';
+import { InputField, Link } from '$app/components/forms';
 import { Settings } from '$app/components/layouts/Settings';
-import { ChangeEvent, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { useColorScheme } from '$app/common/colors';
 
 export function Analytics() {
   const [t] = useTranslation();

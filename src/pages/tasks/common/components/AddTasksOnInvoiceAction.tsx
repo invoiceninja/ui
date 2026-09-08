@@ -8,24 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint, trans } from '$app/common/helpers';
-import { Task } from '$app/common/interfaces/task';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MdAddCircleOutline } from 'react-icons/md';
-import { AddTasksOnInvoiceModal } from './AddTasksOnInvoiceModal';
-import { toast } from '$app/common/helpers/toast/toast';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint, trans } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { useQueryClient } from 'react-query';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
-import { Modal } from '$app/components/Modal';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Task } from '$app/common/interfaces/task';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
-import { useColorScheme } from '$app/common/colors';
-import { useTranslation } from 'react-i18next';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
+import { AddTasksOnInvoiceModal } from './AddTasksOnInvoiceModal';
 
 interface Props {
   tasks: Task[];
@@ -76,9 +76,10 @@ export function AddTasksOnInvoiceAction({ tasks, isBulkAction }: Props) {
     toast.processing();
 
     queryClient
-      .fetchQuery(
-        ['/api/v1/invoices', 'client_id', tasks[0].client_id],
-        () =>
+      .fetchQuery({
+        queryKey: ['/api/v1/invoices', 'client_id', tasks[0].client_id],
+
+        queryFn: () =>
           request(
             'GET',
             endpoint(
@@ -88,8 +89,9 @@ export function AddTasksOnInvoiceAction({ tasks, isBulkAction }: Props) {
               }
             )
           ),
-        { staleTime: Infinity }
-      )
+
+        staleTime: Infinity,
+      })
       .then((response: GenericSingleResourceResponse<Invoice[]>) => {
         toast.dismiss();
 

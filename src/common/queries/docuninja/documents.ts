@@ -8,20 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useQuery } from 'react-query';
-import { Params } from '../common/params.interface';
-import { request } from '$app/common/helpers/request';
-import { docuNinjaEndpoint } from '$app/common/helpers';
-import { GenericQueryOptions } from '../invoices';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { Client, Document, User } from '$app/common/interfaces/docuninja/api';
-import { TimelineItemType } from '$app/pages/documents/show/components/TimelineLayout';
+import { useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
+import { docuNinjaEndpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { Client, Document, User } from '$app/common/interfaces/docuninja/api';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { TimelineItemType } from '$app/pages/documents/show/components/TimelineLayout';
+import { Params } from '../common/params.interface';
+import { GenericQueryOptions } from '../invoices';
 
 export function useDocumentsQuery(params: Params) {
-  return useQuery(
-    ['/api/documents/docuninja', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/documents/docuninja', params],
+
+    queryFn: () =>
       request(
         'GET',
         docuNinjaEndpoint(
@@ -41,14 +42,17 @@ export function useDocumentsQuery(params: Params) {
           },
         }
       ),
-    { staleTime: Infinity, enabled: true }
-  );
+
+    staleTime: Infinity,
+    enabled: true,
+  });
 }
 
 export function useDocumentQuery({ id, enabled }: GenericQueryOptions) {
-  return useQuery(
-    ['/api/documents/docuninja', id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/documents/docuninja', id],
+
+    queryFn: () =>
       request(
         'GET',
         docuNinjaEndpoint(
@@ -70,17 +74,17 @@ export function useDocumentQuery({ id, enabled }: GenericQueryOptions) {
         (response: GenericSingleResourceResponse<Document>) =>
           response.data.data
       ),
-    {
-      enabled: enabled ?? true,
-      staleTime: Infinity,
-    }
-  );
+
+    enabled: enabled ?? true,
+    staleTime: Infinity,
+  });
 }
 
 export function useDocumentTimelineQuery({ id, enabled }: GenericQueryOptions) {
-  return useQuery(
-    ['/api/documents/docuninja/timeline', id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/documents/docuninja/timeline', id],
+
+    queryFn: () =>
       request(
         'POST',
         docuNinjaEndpoint('/api/documents/:id/timeline', { id }),
@@ -94,17 +98,17 @@ export function useDocumentTimelineQuery({ id, enabled }: GenericQueryOptions) {
           skipIntercept: true,
         }
       ).then((response: AxiosResponse<TimelineItemType[]>) => response.data),
-    {
-      enabled: enabled ?? true,
-      staleTime: Infinity,
-    }
-  );
+
+    enabled: enabled ?? true,
+    staleTime: Infinity,
+  });
 }
 
 export function useUserQuery({ id, enabled }: GenericQueryOptions) {
-  return useQuery(
-    ['/api/users', id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/users', id],
+
+    queryFn: () =>
       request(
         'GET',
         docuNinjaEndpoint('/api/users/:id', { id }),
@@ -119,17 +123,17 @@ export function useUserQuery({ id, enabled }: GenericQueryOptions) {
       ).then(
         (response: GenericSingleResourceResponse<User>) => response.data.data
       ),
-    {
-      enabled: enabled ?? true,
-      staleTime: Infinity,
-    }
-  );
+
+    enabled: enabled ?? true,
+    staleTime: Infinity,
+  });
 }
 
 export function useClientQuery({ id, enabled }: GenericQueryOptions) {
-  return useQuery(
-    ['/api/clients', id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/clients', id],
+
+    queryFn: () =>
       request(
         'GET',
         docuNinjaEndpoint('/api/clients/:id', { id }),
@@ -144,9 +148,8 @@ export function useClientQuery({ id, enabled }: GenericQueryOptions) {
       ).then(
         (response: GenericSingleResourceResponse<Client>) => response.data.data
       ),
-    {
-      enabled: enabled ?? true,
-      staleTime: Infinity,
-    }
-  );
+
+    enabled: enabled ?? true,
+    staleTime: Infinity,
+  });
 }

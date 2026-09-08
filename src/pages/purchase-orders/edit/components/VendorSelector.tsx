@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Checkbox, InputLabel, Link } from '$app/components/forms';
+import classNames from 'classnames';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Vendor } from '$app/common/interfaces/vendor';
-import { VendorSelector as Selector } from '$app/components/vendors/VendorSelector';
-import { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { route } from '$app/common/helpers/route';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useColorScheme } from '$app/common/colors';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import classNames from 'classnames';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
+import { Checkbox, InputLabel, Link } from '$app/components/forms';
 import { Tooltip } from '$app/components/Tooltip';
+import { VendorSelector as Selector } from '$app/components/vendors/VendorSelector';
 
 interface Props {
   resource?: PurchaseOrder;

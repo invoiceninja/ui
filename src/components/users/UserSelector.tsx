@@ -8,15 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
-import { User } from '$app/common/interfaces/user';
-
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ComboboxAsync } from '../forms/Combobox';
 import { endpoint } from '$app/common/helpers';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
+import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
+import { User } from '$app/common/interfaces/user';
+import { ComboboxAsync } from '../forms/Combobox';
 
 interface UserSelectorProps extends GenericSelectorProps<User> {
   endpoint?: string;

@@ -8,10 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction } from 'react';
 import { SearchRecord } from '$app/common/interfaces/search';
 import { Entry } from '$app/components/forms/Combobox';
-import { SetStateAction } from 'react';
-import { Dispatch } from 'react';
 import { SearchGroupTitle } from './SearchGroupTitle';
 import { SearchItem } from './SearchItem';
 

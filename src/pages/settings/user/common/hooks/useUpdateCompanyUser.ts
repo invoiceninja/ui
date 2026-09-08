@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { set } from 'lodash';
+import { useDispatch } from 'react-redux';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -15,8 +17,6 @@ import { CompanyUser } from '$app/common/interfaces/company-user';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { User } from '$app/common/interfaces/user';
 import { resetChanges, updateUser } from '$app/common/stores/slices/user';
-import { set } from 'lodash';
-import { useDispatch } from 'react-redux';
 
 export function useUpdateCompanyUser() {
   const dispatch = useDispatch();

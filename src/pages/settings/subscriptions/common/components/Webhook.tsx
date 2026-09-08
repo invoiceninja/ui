@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { Subscription } from '$app/common/interfaces/subscription';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SubscriptionProps } from './Overview';
-import { Plus } from '$app/components/icons/Plus';
 import { useColorScheme } from '$app/common/colors';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { Subscription } from '$app/common/interfaces/subscription';
+import { Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
+import { Plus } from '$app/components/icons/Plus';
+import { SubscriptionProps } from './Overview';
 
 export function Webhook(props: SubscriptionProps) {
   const [t] = useTranslation();

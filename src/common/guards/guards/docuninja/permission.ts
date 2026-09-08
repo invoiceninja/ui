@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { DocuNinjaGuard } from '../../DocuNinjaGuard';
-import { DocuNinjaData } from '$app/common/interfaces/docuninja/api';
 import { useAtom } from 'jotai';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { DocuNinjaData } from '$app/common/interfaces/docuninja/api';
+import { DocuNinjaGuard } from '../../DocuNinjaGuard';
 
 export type DocuNinjaPermission = {
   model:

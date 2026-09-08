@@ -60,7 +60,13 @@ npm run test:e2e:parallel -- --concurrency=4
 npm run test:e2e:parallel -- tests/e2e/clients.spec.ts
 npm run test:e2e:parallel -- --project=firefox --concurrency=2
 npm run test:e2e:parallel -- tests/e2e/clients.spec.ts -- --headed
+npm run test:e2e:parallel -- --verbose
+npm run test:e2e:parallel -- --fail-fast
 ```
+
+By default the runner only prints Playwright pass/fail lines and the final spec summary. Setup, preview, and account-reset logs stay hidden unless you pass `--verbose` (`-v`) or set `E2E_VERBOSE=1`. The same env var also unlocks those helper logs during a serial `npm run test:e2e` run.
+
+`--fail-fast` (or `--max-failures=1`, or `E2E_FAIL_FAST=1`) stops the whole parallel run after the first failed test: the failing spec exits immediately, other in-flight specs are cancelled, and queued specs are skipped.
 
 The runner builds with `vite build --mode testing --outDir dist-testing`, starts or reuses Vite preview on port `4173`, and prefixes output per isolated spec lane. Set `PLAYWRIGHT_VITE_OUT_DIR` to override the test build directory. Because `package.json` now exposes this runner, `scripts/playwright-spec-orchestrator.mjs` should be committed with the test changes.
 
@@ -72,18 +78,38 @@ produce consistent results regardless of prior test runs or failures.
 ### How it works
 
 1. **Global setup** (`tests/e2e/global-setup.ts`) runs before the suite and
-   resets the API to a clean state: purges entities, restores deleted seed users,
-   resets permissions, and resets company settings.
+   calls `resetTestAccount` for each account lane: purges entities, restores
+   deleted seed users, clears permission users via API (`permissions: ''`), and
+   resets company settings.
 
-2. **Per-test cleanup** via fixtures (`tests/e2e/fixtures.ts`). Tests use the
+2. **Per-spec reset** — every spec calls `resetAccountBeforeAll()` from
+   `tests/e2e/fixtures.ts`. That registers a `beforeAll` which runs the same
+   `resetTestAccount` again for the worker’s lane before the file’s tests.
+   This is intentional isolation (and duplicates global setup); keep it until a
+   later remediation removes one of the layers.
+
+3. **Per-test cleanup** via fixtures (`tests/e2e/fixtures.ts`). Tests use the
    `api` fixture to track entities they create; tracked entities are
    automatically deleted (archive + delete) on teardown, even if the test fails.
 
-3. **Unique names** — every entity created by a test uses `uniqueName('prefix')`
+4. **Unique names** — every entity created by a test uses `uniqueName('prefix')`
    to generate a timestamped name, avoiding collisions across runs.
 
-4. **Settings guard** — tests that modify company settings call
+5. **Settings guard** — tests that modify company settings call
    `settingsGuard.snapshot()` before changes. Settings are restored on teardown.
+
+### Permission users
+
+After account reset, the seeded permission users (e.g. `clients@example.com`,
+`permissions@example.com`) start with empty permissions. For a “no permission”
+assertion you can log in as that user directly. If a prior test in the same file
+assigned permissions, reset them with `api.setPermissions(email, [])` first.
+
+Tests assign permissions through `api.setPermissions(email, permissions)`.
+The helper replaces the complete permission state and maps `admin` to the
+company-user administrator flag. Do not leave permissions dirty for later tests
+in the same file: call `api.setPermissions` again when the next test needs a
+different permission state (there is no permission teardown).
 
 ### Writing idempotent tests
 

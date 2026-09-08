@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useAtomValue } from 'jotai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Element } from '../../../../components/cards';
 import { Button, SelectField } from '../../../../components/forms';
-import { useAtomValue } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
-import { useNavigate } from 'react-router-dom';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { toast } from '$app/common/helpers/toast/toast';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 
 export function SecuritySettings() {

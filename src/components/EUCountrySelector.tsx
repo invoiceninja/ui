@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { GenericSelectorProps } from './CountrySelector';
 import { euCountries } from '$app/common/constants/eu-countries';
+import { GenericSelectorProps } from './CountrySelector';
 import { SelectField } from './forms';
 
 export function EUCountrySelector(props: GenericSelectorProps) {

@@ -7,10 +7,11 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-export * from './Product';
-export * from './index/Products';
-export * from './edit/Edit';
+
 export * from './create/Create';
-export * from './show/Show';
 export * from './documents/Documents';
+export * from './edit/Edit';
 export * from './edit/ProductFields';
+export * from './index/Products';
+export * from './Product';
+export * from './show/Show';

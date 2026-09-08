@@ -10,17 +10,17 @@
 
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
-import { CreditsContext } from '../../create/Create';
-import { useCreditUtilities } from '../../common/hooks';
-import { UserSelector } from '$app/components/users/UserSelector';
-import { VendorSelector } from '$app/components/vendors/VendorSelector';
+import { useColorScheme } from '$app/common/colors';
 import { DesignSelector } from '$app/common/generic/DesignSelector';
-import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import Toggle from '$app/components/forms/Toggle';
 import { Card } from '$app/components/cards';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
-import { useColorScheme } from '$app/common/colors';
+import Toggle from '$app/components/forms/Toggle';
+import { ProjectSelector } from '$app/components/projects/ProjectSelector';
+import { UserSelector } from '$app/components/users/UserSelector';
+import { VendorSelector } from '$app/components/vendors/VendorSelector';
+import { useCreditUtilities } from '../../common/hooks';
+import { CreditsContext } from '../../create/Create';
 
 export default function Settings() {
   const [t] = useTranslation();

@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { NavigationItem } from './DesktopSidebar';
+import classNames from 'classnames';
+import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import classNames from 'classnames';
 import { Link } from '$app/components/forms';
-import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { Tooltip } from '$app/components/Tooltip';
+import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { NavigationItem } from './DesktopSidebar';
 
 const Div = styled.div`
   background-color: ${(props) => props.theme.color};

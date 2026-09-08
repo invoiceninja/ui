@@ -1,13 +1,13 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-  useMemo,
-} from 'react';
 import { useAtom } from 'jotai';
-import { get } from 'lodash';
 import { atomWithStorage } from 'jotai/utils';
+import { get } from 'lodash';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 export const currentWidthAtom = atomWithStorage<Record<string, number>>(
   'columnWidths',

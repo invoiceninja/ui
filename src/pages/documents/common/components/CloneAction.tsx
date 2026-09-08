@@ -1,12 +1,12 @@
-import { Document } from '$app/common/interfaces/docuninja/api';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdControlPointDuplicate } from 'react-icons/md';
-import { useCloneDocument } from '../../show/hooks/useCloneDocument';
-import { Modal } from '$app/components/Modal';
-import { useState } from 'react';
+import { Document } from '$app/common/interfaces/docuninja/api';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
+import { useCloneDocument } from '../../show/hooks/useCloneDocument';
 
 interface Props {
   document: Document;

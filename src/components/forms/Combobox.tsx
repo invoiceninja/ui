@@ -8,24 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { request } from '$app/common/helpers/request';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Combobox as HeadlessCombobox } from '@headlessui/react';
+import { useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
 import classNames from 'classnames';
 import { KeyboardEvent, MouseEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
 import { useClickAway, useDebounce } from 'react-use';
-import { useColorScheme } from '$app/common/colors';
 import { styled } from 'styled-components';
-import { Spinner } from '../Spinner';
+import { useColorScheme } from '$app/common/colors';
+import { request } from '$app/common/helpers/request';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { ChevronDown } from '../icons/ChevronDown';
-import { XMark } from '../icons/XMark';
-import { Plus } from '../icons/Plus';
-import { Check } from '../icons/Check';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { ErrorMessage } from '../ErrorMessage';
+import { Check } from '../icons/Check';
+import { ChevronDown } from '../icons/ChevronDown';
+import { Plus } from '../icons/Plus';
+import { XMark } from '../icons/XMark';
+import { Spinner } from '../Spinner';
 
 export interface Entry<T = any> {
   id: number | string;
@@ -920,9 +920,13 @@ export function ComboboxAsync<T = any>({
     return true;
   };
 
-  const { data, isLoading } = useQuery(
-    [new URL(url).pathname, new URL(url).pathname + new URL(url).search],
-    () =>
+  const { data, isLoading } = useQuery({
+    queryKey: [
+      new URL(url).pathname,
+      new URL(url).pathname + new URL(url).search,
+    ],
+
+    queryFn: () =>
       request('GET', new URL(url).href, {}, { headers: headers || {} }).then(
         (response: AxiosResponse<GenericManyResponse<any>>) => {
           const data: Entry<T>[] = [];
@@ -948,11 +952,10 @@ export function ComboboxAsync<T = any>({
           return data;
         }
       ),
-    {
-      staleTime: staleTime ?? Infinity,
-      enabled: enableQuery,
-    }
-  );
+
+    staleTime: staleTime ?? Infinity,
+    enabled: enableQuery,
+  });
 
   useEffect(() => {
     if (url.includes('/api/v1/products')) {

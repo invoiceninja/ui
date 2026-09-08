@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-import { usePlansQuery } from '$app/common/queries/plans';
 import { get } from 'lodash';
-import { Plan } from '../../component/plan/Popup';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { Account } from '$app/common/interfaces/account';
+import { usePlansQuery } from '$app/common/queries/plans';
+import { Plan } from '../../component/plan/Popup';
 
 interface Rules {
   [key: string]: {

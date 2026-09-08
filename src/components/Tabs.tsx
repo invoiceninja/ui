@@ -8,8 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { route } from '$app/common/helpers/route';
 import classNames from 'classnames';
 import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import {
@@ -21,6 +19,8 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { route } from '$app/common/helpers/route';
 import { SelectField } from './forms';
 
 interface Props {

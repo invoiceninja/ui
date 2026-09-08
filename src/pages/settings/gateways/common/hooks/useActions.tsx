@@ -8,16 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { EntityState } from '$app/common/enums/entity-state';
-import { endpoint, getEntityState } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { useBulk } from '$app/common/queries/company-gateways';
-import { Divider } from '$app/components/cards/Divider';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
-import { Action } from '$app/components/ResourceActions';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
@@ -26,15 +18,27 @@ import {
   MdFileUpload,
   MdRestore,
 } from 'react-icons/md';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
-import { useQueryClient } from 'react-query';
+import { EntityState } from '$app/common/enums/entity-state';
+import { endpoint, getEntityState } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { useBulk } from '$app/common/queries/company-gateways';
+import { Divider } from '$app/components/cards/Divider';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
 
 export function useActions() {
   const [t] = useTranslation();
 
   const bulk = useBulk();
+
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+  
   const handleImportCustomers = (companyGatewayId: string) => {
     toast.processing();
 
@@ -56,11 +60,14 @@ export function useActions() {
       toast.success(response.data.message);
       $refetch(['company_gateways']);
 
-      const queryClient = useQueryClient();
-      const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
-      invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
-    });
+
+      if (invalidateQueryValue) {
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
+      }
+      
+      });
   };
 
   const actions: Action<CompanyGateway>[] = [

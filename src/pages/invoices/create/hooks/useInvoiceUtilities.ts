@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAtom } from 'jotai';
+import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Client } from '$app/common/interfaces/client';
+import { Invoice } from '$app/common/interfaces/invoice';
 import {
   InvoiceItem,
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
 import { Invitation } from '$app/common/interfaces/purchase-order';
-import { blankLineItem } from '$app/common/constants/blank-line-item';
-import { useAtom } from 'jotai';
 import { invoiceAtom, invoiceSumAtom } from '$app/pages/invoices/common/atoms';
 import { ChangeHandler } from '../Create';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 
 interface Props {
   client?: Client;

@@ -10,6 +10,7 @@
 
 import { Guard } from '$app/common/guards/Guard';
 import { admin, owner } from '$app/common/guards/guards/admin';
+import { companySettings } from '$app/common/guards/guards/company-settings';
 import { Navigate, Outlet, Route } from 'react-router-dom';
 import { plan } from '$app/common/guards/guards/plan';
 import * as Settings from './index';
@@ -85,13 +86,10 @@ export const settingsRoutes = (
         <Route
           path=""
           element={
-            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
-            isHosted() ? (
-              // import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' &&
-
+            import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' || isHosted() ? (
               <Guard
                 guards={[owner()]}
-                component={<Settings.Plan2 />}
+                component={<Settings.Plan3 />}
                 type="subPage"
               />
             ) : (
@@ -104,6 +102,30 @@ export const settingsRoutes = (
           path="overview"
           element={<Settings.AccountManagementOverview />}
         />
+        {(import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true' || isHosted()) && (
+          <>
+        <Route
+          path="users"
+          element={
+            <Guard
+              guards={[owner()]}
+              component={<Settings.AccountUsers />}
+              type="subPage"
+            />
+          }
+        />
+        <Route
+          path="billing_history"
+          element={
+            <Guard
+              guards={[owner()]}
+              component={<Settings.BillingHistory />}
+              type="subPage"
+            />
+          }
+        />
+        </>
+        )}
         <Route path="enabled_modules" element={<Settings.EnabledModules />} />
         <Route path="integrations" element={<Settings.Integrations />} />
         <Route
@@ -176,7 +198,15 @@ export const settingsRoutes = (
         <Route path="messages" element={<Settings.Messages />} />
         <Route path="customize" element={<Settings.Customize />} />
       </Route>
-      <Route path="e_invoice" element={<Settings.EInvoice />} />
+      <Route
+        path="e_invoice"
+        element={
+          <Guard
+            guards={[companySettings()]}
+            component={<Settings.EInvoice />}
+          />
+        }
+      />
       <Route path="email_settings" element={<Settings.EmailSettings />} />
       <Route
         path="templates_and_reminders"

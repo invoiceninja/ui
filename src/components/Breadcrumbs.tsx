@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
+import classNames from 'classnames';
 import { ReactNode } from 'react';
+import { useColorScheme } from '$app/common/colors';
 import { Link } from './forms';
 import { House } from './icons/House';
-import classNames from 'classnames';
 
 export type Page = { name: string; href: string; afterName?: ReactNode };
 

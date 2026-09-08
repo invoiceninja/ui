@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { isDemo, isHosted } from '$app/common/helpers';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { useTranslation } from 'react-i18next';
 
 interface Provider {
   value: string;

@@ -8,6 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
+import { cloneDeep, set } from 'lodash';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -21,11 +25,6 @@ import { Button } from '$app/components/forms';
 import { InputField } from '$app/components/forms/InputField';
 import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
-import { AxiosError } from 'axios';
-import { set } from 'lodash';
-import { cloneDeep } from 'lodash';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 interface Props {
   isModalOpen: boolean;

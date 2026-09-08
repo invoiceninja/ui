@@ -1,5 +1,5 @@
-import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { useEffect, useRef, useState } from 'react';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 
 interface Props {
   value: number;

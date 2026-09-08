@@ -8,6 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
+import { useDispatch } from 'react-redux';
 import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { defaultSettings } from '$app/common/constants/blank-company-settings';
 import { endpoint } from '$app/common/helpers';
@@ -21,10 +25,6 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { setActiveSettings } from '$app/common/stores/slices/settings';
 import { companySettingsErrorsAtom } from '$app/pages/settings/common/atoms';
-import { AxiosError } from 'axios';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { cloneDeep } from 'lodash';
-import { useDispatch } from 'react-redux';
 
 export function useUpdateClientSettings() {
   const dispatch = useDispatch();

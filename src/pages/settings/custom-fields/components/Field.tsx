@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useShouldDisableCustomFields } from '$app/common/hooks/useShouldDisableCustomFields';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { useShouldDisableCustomFields } from '$app/common/hooks/useShouldDisableCustomFields';
+import { ArrowDown } from '$app/components/icons/ArrowDown';
+import { ArrowRight } from '$app/components/icons/ArrowRight';
 import { CardContainer, Element } from '../../../../components/cards';
 import { InputField, SelectField } from '../../../../components/forms';
-import { ArrowRight } from '$app/components/icons/ArrowRight';
-import { useColorScheme } from '$app/common/colors';
-import { ArrowDown } from '$app/components/icons/ArrowDown';
 
 export enum AvailableTypes {
   SingleLineText = 'single_line_text',

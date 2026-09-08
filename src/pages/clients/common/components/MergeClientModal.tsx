@@ -8,27 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '$app/components/forms';
 import { AxiosError, AxiosResponse } from 'axios';
+import dayjs from 'dayjs';
+import { Dispatch, SetStateAction, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import {
   resetChanges,
   updateCompanyUsers,
 } from '$app/common/stores/slices/company-users';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
-import { useState } from 'react';
-import { Dispatch, SetStateAction } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { $refetch } from '$app/common/hooks/useRefetch';
-import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
-import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
-import dayjs from 'dayjs';
 
 interface Props {
   visible: boolean;

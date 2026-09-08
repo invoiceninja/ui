@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { transactionStatuses } from '$app/common/constants/transactions';
 import { TransactionStatus } from '$app/common/enums/transactions';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { Badge } from '$app/components/Badge';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import { useTranslation } from 'react-i18next';
 
 interface Props {
   transaction: Transaction;

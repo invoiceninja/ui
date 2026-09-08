@@ -8,27 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { useAtom } from 'jotai';
 import { ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { classNames } from '../../common/helpers';
-import { SelectField } from '../forms';
-import { Default } from './Default';
-import { companySettingsErrorsAtom } from '../../pages/settings/common/atoms';
-import { ValidationAlert } from '$app/components/ValidationAlert';
-import { useSettingsRoutes } from './common/hooks';
-import { Icon } from '../icons/Icon';
-import { MdGroup } from 'react-icons/md';
 import { FaObjectGroup } from 'react-icons/fa';
-import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
-import { useSwitchToCompanySettings } from '$app/common/hooks/useSwitchToCompanySettings';
-import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
-import { useColorScheme } from '$app/common/colors';
+import { MdGroup } from 'react-icons/md';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { styled } from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useSwitchToCompanySettings } from '$app/common/hooks/useSwitchToCompanySettings';
+import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
+import { ValidationAlert } from '$app/components/ValidationAlert';
+import { classNames } from '../../common/helpers';
+import { companySettingsErrorsAtom } from '../../pages/settings/common/atoms';
+import { SelectField } from '../forms';
+import { Icon } from '../icons/Icon';
 import { Sparkle } from '../icons/Sparkle';
 import { XMark } from '../icons/XMark';
+import { useSettingsRoutes } from './common/hooks';
+import { Default } from './Default';
 
 interface Props {
   title: string;

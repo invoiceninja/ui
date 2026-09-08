@@ -8,35 +8,35 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import collect from 'collect.js';
+import { isEqual } from 'lodash';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useCompanyGatewayQuery } from '$app/common/queries/company-gateways';
+import { Card, Element } from '$app/components/cards';
+import { $help, HelpWidget } from '$app/components/HelpWidget';
+import { CircleQuestion } from '$app/components/icons/CircleQuestion';
 import { Settings } from '$app/components/layouts/Settings';
+import { ResourceActions } from '$app/components/ResourceActions';
 import { TabGroup } from '$app/components/TabGroup';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useActions } from '../common/hooks/useActions';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from '../create/components/Credentials';
 import { LimitsAndFees } from '../create/components/LimitsAndFees';
 import { RequiredFields } from '../create/components/RequiredFields';
 import { Settings as GatewaySettings } from '../create/components/Settings';
-import { useHandleUpdate } from './hooks/useHandleUpdate';
+import { HelperModal } from './components/stripe/HelperModal';
 import { ImportCustomers } from './components/stripe/ImportCustomers';
 import { WebhookConfiguration } from './components/WebhookConfiguration';
-import collect from 'collect.js';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { useActions } from '../common/hooks/useActions';
-import { isEqual } from 'lodash';
-import { $help, HelpWidget } from '$app/components/HelpWidget';
-import { useColorScheme } from '$app/common/colors';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { CircleQuestion } from '$app/components/icons/CircleQuestion';
-import { HelperModal } from './components/stripe/HelperModal';
+import { useHandleUpdate } from './hooks/useHandleUpdate';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_gateway');

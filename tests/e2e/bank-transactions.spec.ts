@@ -2,7 +2,6 @@ import {
   checkTableEditability,
   login,
   logout,
-  permissions,
   waitForTableData,
 } from '$tests/e2e/helpers';
 import { resetAccountBeforeAll, test, expect, uniqueName, extractIdFromUrl } from '$tests/e2e/fixtures';
@@ -157,29 +156,19 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("can't view transactions without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('bank_transactions@example.com');
-  await save();
-  await logout(page);
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'bank_transactions@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Transactions'
   );
 
-  await logout(page);
 });
 
 test('can view transaction', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('bank_transactions@example.com');
-  await set('view_bank_transaction');
-  await save();
+  await api.setPermissions('bank_transactions@example.com', ['view_bank_transaction']);
 
   await createBankTransaction({ page });
 
@@ -203,16 +192,12 @@ test('can view transaction', async ({ page, api }) => {
 
   await checkEditPage(page, false);
 
-  await logout(page);
 });
 
 test('can edit transaction', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('bank_transactions@example.com');
-  await set('edit_bank_transaction');
-  await save();
+  await api.setPermissions('bank_transactions@example.com', ['edit_bank_transaction']);
 
   await createBankTransaction({ page });
 
@@ -249,17 +234,11 @@ test('can edit transaction', async ({ page, api }) => {
     page.getByText('Successfully updated transaction', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('can create a transaction', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
-  await login(page);
-  await clear('bank_transactions@example.com');
-  await set('create_bank_transaction');
-  await save();
-  await logout(page);
+  await api.setPermissions('bank_transactions@example.com', ['create_bank_transaction']);
 
   await login(page, 'bank_transactions@example.com', 'password');
 
@@ -284,18 +263,14 @@ test('can create a transaction', async ({ page, api }) => {
     page.getByText('Successfully updated transaction', { exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 // @todothis test is broken because the toast shows successfully deleted invoice
 // test('deleting transaction with edit_bank_transaction', async ({ page, api }) => {
-//   const { clear, save, set } = permissions(page);
-
-//   await login(page);
-//   await clear('bank_transactions@example.com');
-//   await set('create_bank_transaction', 'edit_bank_transaction');
-//   await save();
-//   await logout(page);
+//   await api.setPermissions('bank_transactions@example.com', [
+//     'create_bank_transaction',
+//     'edit_bank_transaction',
+//   ]);
 
 //   await login(page, 'bank_transactions@example.com', 'password');
 
@@ -348,13 +323,10 @@ test('can create a transaction', async ({ page, api }) => {
 
 //@todo wrong toast string!
 // test('archiving transaction withe edit_bank_transaction', async ({ page, api }) => {
-//   const { clear, save, set } = permissions(page);
-
-//   await login(page);
-//   await clear('bank_transactions@example.com');
-//   await set('create_bank_transaction', 'edit_bank_transaction');
-//   await save();
-//   await logout(page);
+//   await api.setPermissions('bank_transactions@example.com', [
+//     'create_bank_transaction',
+//     'edit_bank_transaction',
+//   ]);
 
 //   await login(page, 'bank_transactions@example.com', 'password');
 
@@ -410,14 +382,9 @@ test('archiving transaction with edit_bank_transaction removes it from active li
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
   const notes = uniqueName('txn-archive');
 
-  await login(page);
-  await clear('bank_transactions@example.com');
-  await set('create_bank_transaction', 'edit_bank_transaction');
-  await save();
-  await logout(page);
+  await api.setPermissions('bank_transactions@example.com', ['create_bank_transaction', 'edit_bank_transaction']);
 
   await login(page, 'bank_transactions@example.com', 'password');
 
@@ -445,21 +412,15 @@ test('archiving transaction with edit_bank_transaction removes it from active li
     )
     .toBeGreaterThan(0);
 
-  await logout(page);
 });
 
 test('restoring an archived transaction returns it to active list', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
   const notes = uniqueName('txn-restore');
 
-  await login(page);
-  await clear('bank_transactions@example.com');
-  await set('create_bank_transaction', 'edit_bank_transaction');
-  await save();
-  await logout(page);
+  await api.setPermissions('bank_transactions@example.com', ['create_bank_transaction', 'edit_bank_transaction']);
 
   await login(page, 'bank_transactions@example.com', 'password');
 
@@ -491,21 +452,15 @@ test('restoring an archived transaction returns it to active list', async ({
     page.locator('[data-cy="topNavbar"]').getByRole('button', { name: 'Restore', exact: true })
   ).not.toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('deleting transaction with edit_bank_transaction removes it from active list', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
   const notes = uniqueName('txn-delete');
 
-  await login(page);
-  await clear('bank_transactions@example.com');
-  await set('create_bank_transaction', 'edit_bank_transaction');
-  await save();
-  await logout(page);
+  await api.setPermissions('bank_transactions@example.com', ['create_bank_transaction', 'edit_bank_transaction']);
 
   await login(page, 'bank_transactions@example.com', 'password');
 
@@ -530,27 +485,23 @@ test('deleting transaction with edit_bank_transaction removes it from active lis
     )
     .toBeGreaterThan(0);
 
-  await logout(page);
 });
 
 test('link withdrawal on list to existing expense via match slider', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
   const marker = uniqueName('tx-match');
   const matchAmount = 77.77;
   const amountStr = String(matchAmount);
 
   await login(page);
-  await clear('bank_transactions@example.com');
-  await set(
+  await api.setPermissions('bank_transactions@example.com', [
     'create_bank_transaction',
     'edit_bank_transaction',
     'view_expense',
     'create_expense'
-  );
-  await save();
+  ]);
 
   const adminApi = await createApiContext(process.env.VITE_API_URL!);
   const category = await createExpenseCategoryViaApi(adminApi, {
@@ -623,27 +574,23 @@ test('link withdrawal on list to existing expense via match slider', async ({
     )
     .toContain(String(expense.id));
 
-  await logout(page);
 });
 
 test('link credit transaction on list to existing payment via match slider', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
   const marker = uniqueName('tx-match-credit');
   const matchAmount = 66.66;
   const amountStr = String(matchAmount);
 
   await login(page);
-  await clear('bank_transactions@example.com');
-  await set(
+  await api.setPermissions('bank_transactions@example.com', [
     'create_bank_transaction',
     'edit_bank_transaction',
     'view_payment',
     'create_payment'
-  );
-  await save();
+  ]);
 
   const adminApi = await createApiContext(process.env.VITE_API_URL!);
   const client = await createClientViaApi(adminApi, {
@@ -715,7 +662,6 @@ test('link credit transaction on list to existing payment via match slider', asy
     )
     .toContain(String(payment.id));
 
-  await logout(page);
 });
 
 test('Create expense bulk action', async ({ page, api }) => {
@@ -825,5 +771,4 @@ test('Create expense bulk action', async ({ page, api }) => {
     'Converted'
   );
 
-  await logout(page);
 });

@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { route } from '$app/common/helpers/route';
+import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { Client } from '$app/common/interfaces/client';
 import { ClientContact } from '$app/common/interfaces/client-contact';
-import { useTranslation } from 'react-i18next';
-import { UserUnsubscribedTooltip } from '../../common/components/UserUnsubscribedTooltip';
-import { Tooltip } from '$app/components/Tooltip';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
-import { route } from '$app/common/helpers/route';
-import { Link } from '$app/components/forms';
-import { useColorScheme } from '$app/common/colors';
-import { InfoCard } from '$app/components/InfoCard';
 import { CustomFields, useCustomField } from '$app/components/CustomField';
-import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
+import { Link } from '$app/components/forms';
+import { InfoCard } from '$app/components/InfoCard';
+import { Tooltip } from '$app/components/Tooltip';
+import { UserUnsubscribedTooltip } from '../../common/components/UserUnsubscribedTooltip';
 
 interface Props {
   client: Client;

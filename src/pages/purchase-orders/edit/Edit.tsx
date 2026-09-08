@@ -8,26 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
+import { Link, useOutletContext } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Badge } from '$app/components/Badge';
+import { Card } from '$app/components/cards';
+import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 import { Spinner } from '$app/components/Spinner';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
-import { useTranslation } from 'react-i18next';
-import { Link, useOutletContext } from 'react-router-dom';
+import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
+import { PurchaseOrderContext } from '../create/Create';
 import { Details } from './components/Details';
 import { Footer } from './components/Footer';
 import { VendorSelector } from './components/VendorSelector';
-import { Card } from '$app/components/cards';
-import { PurchaseOrderStatus } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
-import { useColorScheme } from '$app/common/colors';
-import { PurchaseOrderContext } from '../create/Create';
 import { usePurchaseOrderUtilities } from './hooks/usePurchaseOrderUtilities';
-import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
-import { Badge } from '$app/components/Badge';
-import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 export default function Edit() {
   const [t] = useTranslation();

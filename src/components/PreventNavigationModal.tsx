@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import { Modal } from './Modal';
-import { Button } from './forms';
 import { useAtom, useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
-import {
-  blockedNavigationActionAtom,
-  isNavigationModalVisibleAtom,
-} from '$app/common/hooks/usePreventNavigation';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   lastHistoryLocationAtom,
   preventLeavingPageAtom,
 } from '$app/common/hooks/useAddPreventNavigationEvents';
 import { changesAtom } from '$app/common/hooks/useAtomWithPrevent';
+import {
+  blockedNavigationActionAtom,
+  isNavigationModalVisibleAtom,
+} from '$app/common/hooks/usePreventNavigation';
+import { Button } from './forms';
+import { Modal } from './Modal';
 
 export function PreventNavigationModal() {
   const [t] = useTranslation();

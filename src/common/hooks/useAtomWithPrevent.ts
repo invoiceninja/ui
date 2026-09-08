@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { diff } from 'deep-object-diff';
 import {
   atom,
   PrimitiveAtom,
@@ -15,15 +16,14 @@ import {
   useAtom,
   useSetAtom,
 } from 'jotai';
-import { Invoice } from '../interfaces/invoice';
-import { useEffect, useState } from 'react';
 import { cloneDeep, flatMapDeep, isEqual, isObject, keys, unset } from 'lodash';
-import { preventLeavingPageAtom } from './useAddPreventNavigationEvents';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { diff } from 'deep-object-diff';
 import { useDebounce } from 'react-use';
-import { Quote } from '../interfaces/quote';
+import { Invoice } from '../interfaces/invoice';
 import { PurchaseOrder } from '../interfaces/purchase-order';
+import { Quote } from '../interfaces/quote';
+import { preventLeavingPageAtom } from './useAddPreventNavigationEvents';
 import { useReactSettings } from './useReactSettings';
 
 type Entity = Invoice | Quote | PurchaseOrder;

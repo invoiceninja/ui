@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import { Modal } from './Modal';
 import { Dispatch, SetStateAction, useState } from 'react';
-import { Button } from './forms';
-import { request } from '$app/common/helpers/request';
+import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
-import { PasswordConfirmation } from './PasswordConfirmation';
+import { request } from '$app/common/helpers/request';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
+import { Button } from './forms';
+import { Modal } from './Modal';
+import { PasswordConfirmation } from './PasswordConfirmation';
 
 interface Props {
   isVisible: boolean;

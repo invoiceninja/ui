@@ -8,21 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
-import { endpoint } from '$app/common/helpers';
-import { NonClickableElement } from '$app/components/cards/NonClickableElement';
-import { Spinner } from '$app/components/Spinner';
-import { SystemLogRecord } from '$app/common/interfaces/system-log';
-import { date as formatDate } from '$app/common/helpers';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Card, Element } from '$app/components/cards';
-import { JSONTree } from 'react-json-tree';
-import { Badge } from '$app/components/Badge';
-import { Settings } from '$app/components/layouts/Settings';
-import { useColorScheme } from '$app/common/colors';
+import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
+import { JSONTree } from 'react-json-tree';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint, date as formatDate } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { SystemLogRecord } from '$app/common/interfaces/system-log';
+import { Badge } from '$app/components/Badge';
+import { Card, Element } from '$app/components/cards';
+import { NonClickableElement } from '$app/components/cards/NonClickableElement';
+import { Settings } from '$app/components/layouts/Settings';
+import { Spinner } from '$app/components/Spinner';
 
 interface Category {
   id: number;
@@ -61,17 +60,17 @@ export function SystemLog() {
   ];
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const { data, isLoading } = useQuery(
-    ['/api/v1/system_logs', 'per_page=200', 'sort=created_at|DESC'],
-    () =>
+  const { data, isLoading } = useQuery({
+    queryKey: ['/api/v1/system_logs', 'per_page=200', 'sort=created_at|DESC'],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/system_logs?per_page=200&sort=created_at|DESC')
       ),
-    {
-      staleTime: 3600000,
-    }
-  );
+
+    staleTime: 3600000,
+  });
 
   const categories: Category[] = [
     { id: 1, name: t('gateway_id') },

@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
 import { Client } from '$app/common/interfaces/client';
 import { FormattedAddress } from '$app/components/FormattedAddress';
 import { InfoCard } from '$app/components/InfoCard';
-import { useTranslation } from 'react-i18next';
 
 interface Props {
   client: Client;

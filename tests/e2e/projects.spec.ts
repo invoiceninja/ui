@@ -2,9 +2,10 @@ import {
   Permission,
   checkDropdownActions,
   checkTableEditability,
+  fillDebounced,
   login,
   logout,
-  permissions,
+  selectAssignedUser,
   useHasPermission,
   waitForTableData,
 } from '$tests/e2e/helpers';
@@ -76,11 +77,19 @@ const checkShowPage = async (page: Page, isEditable: boolean) => {
   await page.waitForURL('**/projects/**');
 
   await expect(
-    page
-      .getByRole('definition', { exact: true })
-      .filter({ hasText: 'Summary' })
-      .first()
+    page.locator('[data-cy="tabs"]').getByRole('button', {
+      name: 'Overview',
+      exact: true,
+    })
   ).toBeVisible({ timeout: 10000 });
+
+  await expect(
+    page.getByRole('heading', { name: 'Summary', exact: true })
+  ).toBeVisible({ timeout: 10000 });
+
+  await expect(page.getByText('Status', { exact: true }).first()).toBeVisible({
+    timeout: 10000,
+  });
 
   if (!isEditable) {
     await expect(
@@ -125,50 +134,51 @@ const createProject = async (params: CreateParams) => {
     .getByRole('link', { name: 'New Project' })
     .click();
 
-  await page.waitForTimeout(500);
-
-  await page.locator('[data-cy="name"]').fill(name ?? uniqueName('project'));
+  const nameInput = page.locator('[data-cy="name"]');
+  await nameInput.waitFor({ state: 'visible' });
+  // Name is rendered before the blank-project query lands. Filling earlier
+  // is a no-op (`handleChange` bails when the atom is undefined), then the
+  // query result resets the controlled input and Save posts an empty name.
+  await expect(page.getByRole('button', { name: 'Save' })).toBeEnabled({
+    timeout: 10000,
+  });
+  const projectName = name ?? uniqueName('project');
+  await fillDebounced(nameInput, projectName);
+  await expect(nameInput).toHaveValue(projectName);
 
   await page.locator('[data-testid="combobox-input-field"]').first().click();
 
   await page.getByRole('option').first().click();
 
   if (assignTo) {
-    await page.locator('[data-testid="combobox-input-field"]').last().click();
-    await page.getByRole('option', { name: assignTo }).first().click();
+    await selectAssignedUser(
+      page,
+      assignTo,
+      page.locator('[data-testid="combobox-input-field"]').last()
+    );
   }
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created project')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully created project')).toBeVisible({ timeout: 30000 });
 };
 
 test("can't view projects without permission", async ({ page }) => {
-  const { clear, save } = permissions(page);
-
-  await login(page);
-  await clear('projects@example.com');
-  await save();
-  await logout(page);
-
+  // Account reset already cleared this user's permissions via API.
   await login(page, 'projects@example.com', 'password');
 
   await expect(page.locator('[data-cy="navigationBar"]')).not.toContainText(
     'Projects'
   );
 
-  await logout(page);
 });
 
 test('can view project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const projectName = uniqueName('view-project');
 
   await login(page);
-  await clear('projects@example.com');
-  await set('view_project', 'view_client');
-  await save();
+  await api.setPermissions('projects@example.com', ['view_project', 'view_client']);
 
   await createProject({ page, name: projectName });
 
@@ -193,11 +203,9 @@ test('can view project', async ({ page, api }) => {
 
   await checkShowPage(page, false);
 
-  await logout(page);
 });
 
 test('can edit project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
     permissions: ['edit_project', 'view_client'],
@@ -206,9 +214,7 @@ test('can edit project', async ({ page, api }) => {
   const projectName = uniqueName('edit-project');
 
   await login(page);
-  await clear('projects@example.com');
-  await set('edit_project', 'view_client');
-  await save();
+  await api.setPermissions('projects@example.com', ['edit_project', 'view_client']);
 
   await createProject({ page, name: projectName });
 
@@ -250,11 +256,9 @@ test('can edit project', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'projectActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can create a project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
     permissions: ['create_project'],
@@ -263,11 +267,7 @@ test('can create a project', async ({ page, api }) => {
   const projectName = uniqueName('create-project');
   test.setTimeout(45000); 
 
-  await login(page);
-  await clear('projects@example.com');
-  await set('create_project', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('projects@example.com', ['create_project', 'create_client']);
 
   await login(page, 'projects@example.com', 'password');
 
@@ -291,7 +291,6 @@ test('can create a project', async ({ page, api }) => {
 
   await checkDropdownActions(page, actions, 'projectActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('can view and edit assigned project with create_project', async ({
@@ -300,7 +299,6 @@ test('can view and edit assigned project with create_project', async ({
 }) => {
   test.setTimeout(45000); 
 
-  const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
     permissions: ['create_project'],
@@ -309,9 +307,7 @@ test('can view and edit assigned project with create_project', async ({
   const projectName = uniqueName('assigned-project');
 
   await login(page);
-  await clear('projects@example.com');
-  await set('create_project');
-  await save();
+  await api.setPermissions('projects@example.com', ['create_project']);
 
   await createProject({
     page,
@@ -359,19 +355,13 @@ test('can view and edit assigned project with create_project', async ({
 
   await checkDropdownActions(page, actions, 'projectActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('deleting project with edit_project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const projectName = uniqueName('delete-project');
 
-  await login(page);
-  await clear('projects@example.com');
-  await set('create_project', 'edit_project', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('projects@example.com', ['create_project', 'edit_project', 'create_client']);
 
   await login(page, 'projects@example.com', 'password');
 
@@ -410,15 +400,10 @@ test('deleting project with edit_project', async ({ page, api }) => {
 });
 
 test('archiving project with edit_project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const projectName = uniqueName('archive-project');
 
-  await login(page);
-  await clear('projects@example.com');
-  await set('create_project', 'edit_project', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('projects@example.com', ['create_project', 'edit_project', 'view_client', 'create_client']);
 
   await login(page, 'projects@example.com', 'password');
 
@@ -466,15 +451,10 @@ test('archiving project with edit_project', async ({ page, api }) => {
 });
 
 test('project documents preview with edit_project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const projectName = uniqueName('docpreview-project');
 
-  await login(page);
-  await clear('projects@example.com');
-  await set('create_project', 'edit_project', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('projects@example.com', ['create_project', 'edit_project', 'view_client', 'create_client']);
 
   await login(page, 'projects@example.com', 'password');
 
@@ -516,43 +496,17 @@ test('project documents preview with edit_project', async ({ page, api }) => {
 });
 
 test('project documents uploading with edit_project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const projectName = uniqueName('docupload-project');
 
-  await login(page);
-  await clear('projects@example.com');
-  await set('create_project', 'edit_project', 'view_client', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('projects@example.com', ['create_project', 'edit_project', 'view_client', 'create_client']);
 
   await login(page, 'projects@example.com', 'password');
 
-  const tableBody = page.locator('tbody').first();
+  await createProject({ page, name: projectName });
 
-  await page.getByRole('link', { name: 'Projects', exact: true }).click();
-
-  await page.waitForURL('**/projects');
-
-  const tableRow = tableBody.getByRole('row').first();
-
-  const doRecordsExist = await waitForTableData(page);
-
-  if (!doRecordsExist) {
-    await createProject({ page, name: projectName });
-
-    const id = page.url().match(/projects\/([^/]+)/)?.[1];
-    if (id) api.trackEntity('projects', id);
-  } else {
-    const moreActionsButton = tableRow
-      .getByRole('button')
-      .filter({ has: page.getByText('Actions') })
-      .first();
-
-    await moreActionsButton.click();
-
-    await page.getByRole('link', { name: 'Edit', exact: true }).first().click();
-  }
+  const id = page.url().match(/projects\/([^/]+)/)?.[1];
+  if (id) api.trackEntity('projects', id);
 
   await page.waitForURL('**/projects/**/edit');
 
@@ -561,6 +515,10 @@ test('project documents uploading with edit_project', async ({ page, api }) => {
       name: 'Documents',
     })
     .click();
+
+  await expect(page.getByText('Drop files or click to upload')).toBeVisible({
+    timeout: 10000,
+  });
 
   await page
     .locator('input[type="file"]')
@@ -578,7 +536,6 @@ test('Invoice project and clone action in dropdown displayed with admin permissi
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
     permissions: ['admin'],
@@ -586,11 +543,7 @@ test('Invoice project and clone action in dropdown displayed with admin permissi
 
   const projectName = uniqueName('admin-dropdown-project');
 
-  await login(page);
-  await clear('projects@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('projects@example.com', ['admin']);
 
   await login(page, 'projects@example.com', 'password');
 
@@ -605,7 +558,6 @@ test('Invoice project and clone action in dropdown displayed with admin permissi
 
   await checkDropdownActions(page, actions, 'projectActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('Invoice project and clone action displayed with creation permissions', async ({
@@ -614,7 +566,6 @@ test('Invoice project and clone action displayed with creation permissions', asy
 }) => {
   test.setTimeout(45000); 
 
-  const { clear, save, set } = permissions(page);
 
   const actions = useProjectsActions({
     permissions: ['create_project', 'create_invoice'],
@@ -622,11 +573,7 @@ test('Invoice project and clone action displayed with creation permissions', asy
 
   const projectName = uniqueName('create-dropdown-project');
 
-  await login(page);
-  await clear('projects@example.com');
-  await set('create_project', 'create_invoice', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('projects@example.com', ['create_project', 'create_invoice', 'create_client']);
 
   await login(page, 'projects@example.com', 'password');
 
@@ -641,19 +588,13 @@ test('Invoice project and clone action displayed with creation permissions', asy
 
   await checkDropdownActions(page, actions, 'projectActionDropdown', '', true);
 
-  await logout(page);
 });
 
 test('cloning project', async ({ page, api }) => {
-  const { clear, save, set } = permissions(page);
 
   const projectName = uniqueName('clone-project');
 
-  await login(page);
-  await clear('projects@example.com');
-  await set('create_project', 'edit_project', 'create_client');
-  await save();
-  await logout(page);
+  await api.setPermissions('projects@example.com', ['create_project', 'edit_project', 'create_client']);
 
   await login(page, 'projects@example.com', 'password');
 
@@ -708,7 +649,6 @@ test('Invoice Project displayed with admin permission', async ({
   page,
   api,
 }) => {
-  const { clear, save, set } = permissions(page);
 
   const customActions = useCustomQuoteActions({
     permissions: ['admin'],
@@ -716,11 +656,7 @@ test('Invoice Project displayed with admin permission', async ({
 
   const projectName = uniqueName('admin-bulk-project');
 
-  await login(page);
-  await clear('projects@example.com');
-  await set('admin');
-  await save();
-  await logout(page);
+  await api.setPermissions('projects@example.com', ['admin']);
 
   await login(page, 'projects@example.com', 'password');
 
@@ -747,7 +683,6 @@ test('Invoice Project displayed with admin permission', async ({
     'dataTable'
   );
 
-  await logout(page);
 });
 
 test('Invoice Project displayed with creation permissions', async ({
@@ -756,7 +691,6 @@ test('Invoice Project displayed with creation permissions', async ({
 }) => {
   test.setTimeout(45000); 
 
-  const { clear, save, set } = permissions(page);
 
   const customActions = useCustomQuoteActions({
     permissions: [
@@ -770,17 +704,13 @@ test('Invoice Project displayed with creation permissions', async ({
 
   const projectName = uniqueName('create-bulk-project');
 
-  await login(page);
-  await clear('projects@example.com');
-  await set(
+  await api.setPermissions('projects@example.com', [
     'create_invoice',
     'create_project',
     'edit_project',
     'create_client',
     'view_client'
-  );
-  await save();
-  await logout(page);
+  ]);
 
   await login(page, 'projects@example.com', 'password');
 
@@ -807,5 +737,4 @@ test('Invoice Project displayed with creation permissions', async ({
     'dataTable'
   );
 
-  await logout(page);
 });

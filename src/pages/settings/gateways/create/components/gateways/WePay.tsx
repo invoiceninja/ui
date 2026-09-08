@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { Button } from '$app/components/forms';
+import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
+import { Element } from '$app/components/cards';
+import { Button } from '$app/components/forms';
 
 export function WePay() {
   const [t] = useTranslation();

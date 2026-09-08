@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { styled } from 'styled-components';
-import CommonProps from '../../common/interfaces/common-props.interface';
 import classNames from 'classnames';
+import { styled } from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputLabel } from './InputLabel';
 
 interface Props extends CommonProps {

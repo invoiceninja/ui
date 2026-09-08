@@ -11,10 +11,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/dist/query';
 import { companyDocumentSlice } from './slices/company-documents';
+import { companyUserSlice } from './slices/company-users';
 import { productsSlice } from './slices/products';
 import { settingsSlice } from './slices/settings';
 import { userSlice } from './slices/user';
-import { companyUserSlice } from './slices/company-users';
 
 export const store = configureStore({
   reducer: {

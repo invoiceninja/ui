@@ -8,29 +8,29 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { blankInvitation } from '$app/common/constants/blank-invitation';
-import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
-import { useTitle } from '$app/common/hooks/useTitle';
-import { Client } from '$app/common/interfaces/client';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
-import { Spinner } from '$app/components/Spinner';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useSearchParams } from 'react-router-dom';
+import { blankInvitation } from '$app/common/constants/blank-invitation';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Client } from '$app/common/interfaces/client';
+import { Invitation } from '$app/common/interfaces/purchase-order';
+import { Quote } from '$app/common/interfaces/quote';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
+import { Tab, Tabs } from '$app/components/Tabs';
 import { invoiceSumAtom, quoteAtom } from '../common/atoms';
 import { useCreate, useQuoteUtilities } from '../common/hooks';
 import { useBlankQuoteQuery } from '../common/queries';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Quote } from '$app/common/interfaces/quote';
-import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
-import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
-import { Tab, Tabs } from '$app/components/Tabs';
-import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
-import { Invitation } from '$app/common/interfaces/purchase-order';
 
 export interface QuoteContext {
   quote: Quote | undefined;

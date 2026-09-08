@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
+import { useLocation } from 'react-router-dom';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { Task } from '$app/common/interfaces/task';
-import { useQueryClient } from 'react-query';
-import { useAtomValue } from 'jotai';
-import { invalidationQueryAtom } from '$app/common/atoms/data-table';
-import { useLocation } from 'react-router-dom';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Task } from '$app/common/interfaces/task';
 
 export function useStart() {
   const queryClient = useQueryClient();
@@ -38,7 +38,9 @@ export function useStart() {
       $refetch(['tasks']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
     });
   };
 }

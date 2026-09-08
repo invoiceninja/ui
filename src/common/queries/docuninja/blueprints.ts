@@ -9,10 +9,10 @@
  */
 
 import type { AuthoredDocumentData } from '@docuninja/builder2.0';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
-import { useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { docuNinjaEndpoint } from '$app/common/helpers';
@@ -25,9 +25,10 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Params } from '../common/params.interface';
 
 export function useBlueprintsQuery(params: Params) {
-  return useQuery(
-    ['/api/blueprints', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/blueprints', params],
+
+    queryFn: () =>
       request(
         'GET',
         docuNinjaEndpoint(
@@ -48,8 +49,10 @@ export function useBlueprintsQuery(params: Params) {
           },
         }
       ),
-    { staleTime: Infinity, enabled: true }
-  );
+
+    staleTime: Infinity,
+    enabled: true,
+  });
 }
 
 interface BlueprintParams {
@@ -57,9 +60,10 @@ interface BlueprintParams {
 }
 
 export function useBlueprintQuery(params: BlueprintParams) {
-  return useQuery(
-    ['/api/blueprints', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/blueprints', params],
+
+    queryFn: () =>
       request(
         'GET',
         docuNinjaEndpoint('/api/blueprints/:id?template=true', {
@@ -74,8 +78,10 @@ export function useBlueprintQuery(params: BlueprintParams) {
           },
         }
       ),
-    { staleTime: Infinity, enabled: Boolean(params.id) }
-  );
+
+    staleTime: Infinity,
+    enabled: Boolean(params.id),
+  });
 }
 
 export function useBulk() {
@@ -103,7 +109,9 @@ export function useBulk() {
       toast.success(message);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
 
       $refetch(['blueprints']);
     });
@@ -134,7 +142,9 @@ export function useCreateBlueprint() {
       toast.success('template_created');
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
 
       $refetch(['blueprints']);
 

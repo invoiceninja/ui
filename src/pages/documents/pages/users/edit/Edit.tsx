@@ -8,30 +8,32 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { docuNinjaEndpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { User } from '$app/common/interfaces/docuninja/api';
-import { Card } from '$app/components/cards';
+import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
+import { docuNinjaEndpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { AxiosError } from 'axios';
-import { useParams } from 'react-router-dom';
-import { Spinner } from '$app/components/Spinner';
+import {
+  Permission as PermissionType,
+  User,
+} from '$app/common/interfaces/docuninja/api';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useDocuNinjaUserQuery } from '$app/common/queries/docuninja/users';
-import { Default } from '$app/components/layouts/Default';
-import { route } from '$app/common/helpers/route';
-import { useColorScheme } from '$app/common/colors';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { useActions } from '../common/hooks/useActions';
 import { useSocketEvent } from '$app/common/queries/sockets';
+import { Card } from '$app/components/cards';
+import { Default } from '$app/components/layouts/Default';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
-import Permissions from '../common/components/Permissions';
 import Details from '../common/components/Details';
-import { Permission as PermissionType } from '$app/common/interfaces/docuninja/api';
 import { Notifications } from '../common/components/Notifications';
+import Permissions from '../common/components/Permissions';
+import { useActions } from '../common/hooks/useActions';
 import { useNotifications } from '../common/hooks/useNotifications';
 
 function Edit() {

@@ -8,11 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import collect from 'collect.js';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useDataTableOptions } from './useDataTableOptions';
 import { useDataTablePreference } from './useDataTablePreference';
 import { useReactSettings } from './useReactSettings';
-import collect from 'collect.js';
+import { useScopedTableFilters } from './useScopedTableFilters';
 
 interface Params {
   apiEndpoint: URL;
@@ -22,7 +23,7 @@ interface Params {
   defaultCustomFilterValues?: string[];
   customFilter?: string[] | undefined;
   withoutStoringPreferences?: boolean;
-  withFilterTextOnly?: boolean;
+  withRecordScopedFilters?: boolean;
 }
 export function useDataTableUtilities(params: Params) {
   const options = useDataTableOptions();
@@ -36,27 +37,47 @@ export function useDataTableUtilities(params: Params) {
     apiEndpoint,
     customFilter,
     withoutStoringPreferences,
-    withFilterTextOnly,
+    withRecordScopedFilters,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
+  const { storedFilters } = useScopedTableFilters({ tableKey });
 
-  // Server-persisted status/customFilter dropdowns are skipped when the table
-  // opts out, only inherits the search text, or the global toggle is off.
-  const withoutServerPreferences =
-    withoutStoringPreferences ||
-    withFilterTextOnly ||
-    reactSettings.persist_table_filters === false;
+  const inheritsServerPreferences =
+    !withoutStoringPreferences &&
+    reactSettings.persist_table_filters !== false;
+
+  const scopedFilters = withRecordScopedFilters ? storedFilters : undefined;
+
+  const getSelectedStatuses = (): string[] => {
+    if (scopedFilters) {
+      return scopedFilters.status?.length ? scopedFilters.status : ['active'];
+    }
+
+    const preferenceStatuses = inheritsServerPreferences
+      ? (getPreference('status') as string[])
+      : [];
+
+    return preferenceStatuses?.length ? preferenceStatuses : ['active'];
+  };
+
+  const getSelectedCustomFilters = (): string[] => {
+    if (scopedFilters) {
+      return scopedFilters.customFilter ?? [];
+    }
+
+    const preferenceCustomFilters = inheritsServerPreferences
+      ? (getPreference('customFilter') as string[])
+      : [];
+
+    return preferenceCustomFilters?.length
+      ? preferenceCustomFilters
+      : (defaultCustomFilterValues ?? []);
+  };
 
   const getDefaultOptions = () => {
     if (!isInitialConfiguration) {
-      const preferenceStatuses = withoutServerPreferences
-        ? []
-        : (getPreference('status') as string[]);
-
-      const currentStatuses = preferenceStatuses?.length
-        ? preferenceStatuses
-        : ['active'];
+      const currentStatuses = getSelectedStatuses();
 
       return (
         options.filter(({ value }) => currentStatuses.includes(value)) || [
@@ -70,13 +91,7 @@ export function useDataTableUtilities(params: Params) {
 
   const getDefaultCustomFilterOptions = () => {
     if (!isInitialConfiguration && customFilters) {
-      const preferenceCustomFilters = withoutServerPreferences
-        ? []
-        : (getPreference('customFilter') as string[]);
-
-      const currentStatuses = preferenceCustomFilters?.length
-        ? preferenceCustomFilters
-        : (defaultCustomFilterValues ?? []);
+      const currentStatuses = getSelectedCustomFilters();
 
       return (
         customFilters.filter(({ value }) =>

@@ -9,7 +9,7 @@
  */
 
 export {
-  Settings as LocalizationSettings,
   CustomLabels,
+  Settings as LocalizationSettings,
 } from './components/index';
 export * from './Localization';

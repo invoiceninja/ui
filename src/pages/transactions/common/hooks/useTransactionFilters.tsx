@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { useBankAccountsQuery } from '$app/pages/settings/bank-accounts/common/queries';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
-import { useTranslation } from 'react-i18next';
 
 export function useTransactionFilters() {
   const [t] = useTranslation();

@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Modal } from '$app/components/Modal';
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { connectMailerAtom } from '../../components';
-import { Button } from '$app/components/forms';
-import { toast } from '$app/common/helpers/toast/toast';
-import { request } from '$app/common/helpers/request';
-import { endpoint, trans } from '$app/common/helpers';
 import { useDispatch } from 'react-redux';
+import { endpoint, trans } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 import {
   resetChanges,
   updateRecord,
 } from '$app/common/stores/slices/company-users';
-import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
+import { Button } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
+import { connectMailerAtom } from '../../components';
 
 export function SelectProviderModal() {
   const [t] = useTranslation();

@@ -8,31 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
-import { useTranslation } from 'react-i18next';
-import { Settings } from '$app/components/layouts/Settings';
-import { InputField } from '$app/components/forms';
-import { useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
-import { date, endpoint, isHosted } from '$app/common/helpers';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
-import { useApiTokenQuery } from '$app/common/queries/api-tokens';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Badge } from '$app/components/Badge';
-import { useTitle } from '$app/common/hooks/useTitle';
+import { useColorScheme } from '$app/common/colors';
+import { date, endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { ApiToken } from '$app/common/interfaces/api-token';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useHandleChange } from './common/hooks/hooks';
-import { ResourceActions } from '$app/components/ResourceActions';
-import { useActions } from './common/hooks/useActions';
-import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useOnWrongPasswordEnter } from '$app/common/hooks/useOnWrongPasswordEnter';
-import { useColorScheme } from '$app/common/colors';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { ApiToken } from '$app/common/interfaces/api-token';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useApiTokenQuery } from '$app/common/queries/api-tokens';
+import { Badge } from '$app/components/Badge';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { Settings } from '$app/components/layouts/Settings';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { useHandleChange } from './common/hooks/hooks';
+import { useActions } from './common/hooks/useActions';
 
 export function Edit() {
   const [t] = useTranslation();

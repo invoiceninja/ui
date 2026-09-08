@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
+import { useNavigate } from 'react-router-dom';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { endpoint, trans } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
-import { useAtomValue } from 'jotai';
-import { invalidationQueryAtom } from '$app/common/atoms/data-table';
-import { useNavigate } from 'react-router-dom';
+import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 
 const successMessages = {
@@ -69,7 +69,9 @@ export const useBulkAction = (params?: Params) => {
       $refetch(['quotes']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({
+          queryKey: [invalidateQueryValue],
+        });
 
       if (action === 'convert_to_invoice') {
         $refetch(['invoices']);

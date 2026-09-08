@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useState, useEffect } from 'react';
 import { clone } from 'lodash';
+import { useEffect, useState } from 'react';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { getColumnIndex, insertVariablesAtIndex } from './useProductColumns';
 
 export function useTaskColumns() {

@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date } from '$app/common/helpers';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { useOutletContext, useNavigate } from 'react-router-dom';
-import { Context } from '../Edit';
-import { Card } from '$app/components/cards';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
+import { date } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Spinner } from '$app/components/Spinner';
-import { useColorScheme } from '$app/common/colors';
-import { route } from '$app/common/helpers/route';
-import styled from 'styled-components';
-import classNames from 'classnames';
 import { Payment } from '$app/common/interfaces/payment';
-import { useUnappliedPayments } from '../hooks/useUnappliedPayments';
+import { Badge } from '$app/components/Badge';
+import { Card } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { CreditCard } from '$app/components/icons/CreditCard';
-import { Badge } from '$app/components/Badge';
+import { Spinner } from '$app/components/Spinner';
+import { Context } from '../Edit';
+import { useUnappliedPayments } from '../hooks/useUnappliedPayments';
 
 const Box = styled.div`
   display: flex;

@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Route } from 'react-router-dom';
 import { HostedRoute } from '$app/components/HostedRoute';
 import { PrivateRoute } from '$app/components/PrivateRoute';
 import { PublicRoute } from '$app/components/PublicRoute';
-import { Route } from 'react-router-dom';
 import { Demo } from './Demo';
 import { Login } from './Login';
 import { Logout } from './Logout';

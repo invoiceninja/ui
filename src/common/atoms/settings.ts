@@ -9,8 +9,8 @@
  */
 
 import { atom } from 'jotai';
-import { GroupSettings } from '../interfaces/group-settings';
 import { Client } from '../interfaces/client';
+import { GroupSettings } from '../interfaces/group-settings';
 
 export const activeSettingsAtom = atom<GroupSettings | Client | undefined>(
   undefined

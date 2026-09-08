@@ -37,7 +37,7 @@ import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { useActions } from '../hooks';
 

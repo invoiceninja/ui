@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Dispatch, SetStateAction, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdGroup } from 'react-icons/md';
 import { Client } from '$app/common/interfaces/client';
 import { useBulk } from '$app/common/queries/clients';
-import { Modal } from '$app/components/Modal';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
 import { GroupSettingsSelector } from '$app/components/group-settings/GroupSettingsSelector';
 import { Icon } from '$app/components/icons/Icon';
-import { Dispatch, SetStateAction, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { MdGroup } from 'react-icons/md';
+import { Modal } from '$app/components/Modal';
 
 interface Props {
   clients: Client[];

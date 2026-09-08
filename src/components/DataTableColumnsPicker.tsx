@@ -8,12 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { toast } from '$app/common/helpers/toast/toast';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button, InputLabel, SelectField } from './forms';
-import { Inline } from './Inline';
-import { Modal } from './Modal';
 import {
   DragDropContext,
   Draggable,
@@ -21,19 +15,25 @@ import {
   DropResult,
 } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
+import { isEqual } from 'lodash';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import {
   ReactTableColumns,
   useReactSettings,
   useSaveReactSettings,
   useUpdateReactSettings,
 } from '$app/common/hooks/useReactSettings';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { isEqual } from 'lodash';
-import { createPortal } from 'react-dom';
-import { TableColumns } from './icons/TableColumns';
-import { useColorScheme } from '$app/common/colors';
-import { GridDotsVertical } from './icons/GridDotsVertical';
+import { Button, InputLabel, SelectField } from './forms';
+import { Inline } from './Inline';
 import { CircleXMark } from './icons/CircleXMark';
+import { GridDotsVertical } from './icons/GridDotsVertical';
+import { TableColumns } from './icons/TableColumns';
+import { Modal } from './Modal';
 
 interface Props {
   columns: string[];

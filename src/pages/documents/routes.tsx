@@ -18,6 +18,7 @@ import {
   docuNinjaOwner,
   docuNinjaPermission,
 } from '$app/common/guards/guards/docuninja/permission';
+import { isHosted } from '$app/common/helpers';
 
 const Documents = lazy(() => import('$app/pages/documents/index/Documents'));
 const Document = lazy(() => import('$app/pages/documents/show/Document'));
@@ -44,6 +45,13 @@ const WidgetDefaults = lazy(
   () =>
     import(
       '$app/pages/documents/pages/settings/pages/widget-defaults/WidgetDefaults'
+    )
+);
+
+const ReminderSchedules = lazy(
+  () =>
+    import(
+      '$app/pages/documents/pages/settings/pages/reminder-schedules/ReminderSchedules'
     )
 );
 
@@ -78,12 +86,11 @@ const UserSelection = lazy(
 );
 const Sign = lazy(() => import('$app/pages/documents/sign/index/Sign'));
 const Pdf = lazy(() => import('$app/pages/documents/pdf/Pdf'));
-
-const Beta = lazy(() => import('$app/pages/documents/beta/Beta'));
+const Join = lazy(() => import('$app/pages/documents/join/Join'));
 
 const routes = (
   <>
-    <Route path="/docuninja/beta" element={<Beta />} />
+    <Route path="/docuninja/join" element={<Join />} />
 
     <Route
       path="docuninja/*"
@@ -171,6 +178,17 @@ const routes = (
                     guards={[]}
                     type="subPage"
                     component={<WidgetDefaults />}
+                  />
+                }
+              />
+
+              <Route
+                path="reminder_schedules"
+                element={
+                  <DocuNinjaGuard
+                    guards={[docuNinjaAdmin()]}
+                    type="subPage"
+                    component={<ReminderSchedules />}
                   />
                 }
               />
@@ -295,4 +313,6 @@ const routes = (
 );
 
 export const documentsRoutes =
-  import.meta.env.VITE_ENABLE_DOCUNINJA === 'true' ? routes : null;
+  isHosted() || import.meta.env.VITE_ENABLE_DOCUNINJA === 'true'
+    ? routes
+    : null;

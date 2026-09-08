@@ -10,8 +10,7 @@
 
 import { produce } from 'immer';
 import { create } from 'zustand';
-import { User } from '$app/common/interfaces/docuninja/api';
-import { ClientContact } from '$app/common/interfaces/docuninja/api';
+import { ClientContact, User } from '$app/common/interfaces/docuninja/api';
 
 type State = {
   temporarySignature: string | null;

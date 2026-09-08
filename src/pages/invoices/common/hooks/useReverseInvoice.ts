@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useSetAtom } from 'jotai';
+import { useNavigate } from 'react-router-dom';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { creditAtom } from '$app/pages/credits/common/atoms';
-import { useSetAtom } from 'jotai';
-import { useNavigate } from 'react-router-dom';
 
 export function useReverseInvoice() {
   const navigate = useNavigate();

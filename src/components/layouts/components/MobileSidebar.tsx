@@ -9,14 +9,14 @@
  */
 
 import { Dialog, Transition } from '@headlessui/react';
-import { CompanySwitcher } from '$app/components/CompanySwitcher';
 import { Fragment } from 'react';
 import { X } from 'react-feather';
-import { NavigationItem } from './DesktopSidebar';
-import { SidebarItem } from './SidebarItem';
 import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { CompanySwitcher } from '$app/components/CompanySwitcher';
 import { HelpSidebarIcons } from '$app/components/HelpSidebarIcons';
+import { NavigationItem } from './DesktopSidebar';
+import { SidebarItem } from './SidebarItem';
 
 interface Props {
   navigation: NavigationItem[];

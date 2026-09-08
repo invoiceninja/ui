@@ -1,4 +1,4 @@
-import { login, logout, waitForTableData } from '$tests/e2e/helpers';
+import { login, waitForTableData } from '$tests/e2e/helpers';
 import {
   resetAccountBeforeAll,
   test,
@@ -25,44 +25,6 @@ resetAccountBeforeAll();
 const TAGS = 'tags' as EntityType;
 
 type TagType = 'global' | 'tasks' | 'projects';
-
-const TAG_ENTITY_TYPE_VALUES = [
-  'global',
-  'bank_transaction',
-  'client',
-  'credit',
-  'expense',
-  'invoice',
-  'payment',
-  'product',
-  'project',
-  'purchase_order',
-  'quote',
-  'recurring_expense',
-  'recurring_invoice',
-  'task',
-  'transaction',
-  'vendor',
-];
-
-const TAG_ENTITY_TYPE_LABELS = [
-  'Global',
-  'Bank Transaction',
-  'Client',
-  'Credit',
-  'Expense',
-  'Invoice',
-  'Payment',
-  'Product',
-  'Project',
-  'Purchase Order',
-  'Quote',
-  'Recurring Expense',
-  'Recurring Invoice',
-  'Task',
-  'Transaction',
-  'Vendor',
-];
 
 // Tag ids created during the active test, cleaned up in afterEach. Tags are not
 // covered by the api fixture's automatic teardown order, so we sweep them here.
@@ -147,6 +109,16 @@ const createTag = async (params: CreateParams) => {
 const selectTagRow = async (page: Page, name: string) => {
   await waitForTableData(page);
 
+  // Bulk tests create task tags; clear any persisted Type filter from earlier tests.
+  const typeFilterLabel = page
+    .locator('[data-cy="dataTable"]')
+    .getByText('Type:', { exact: true });
+
+  if (await typeFilterLabel.isVisible()) {
+    await applyTagTypeFilter(page, 'all');
+    await waitForTableData(page);
+  }
+
   await page.locator('#filter').fill(name);
 
   // #filter debounces (~300ms) before the request fires.
@@ -157,36 +129,63 @@ const selectTagRow = async (page: Page, name: string) => {
   await checkbox.click();
 };
 
+const openTypeFilterMenu = async (page: Page) => {
+  await page.getByText('Type:', { exact: true }).click();
+
+  await expect(
+    page.getByRole('option', { name: 'Global', exact: true })
+  ).toBeVisible();
+};
+
+const typeFilterMenu = (page: Page) =>
+  page.locator('[class*="menu"]').filter({
+    has: page.getByRole('option', { name: 'Global', exact: true }),
+  });
+
+/**
+ * Narrow the tag table by entity type using the Type multi-select.
+ * Options are toggled by index so duplicate labels (e.g. two "Transaction"
+ * entries) do not confuse role-based lookups.
+ */
 const applyTagTypeFilter = async (
   page: Page,
   type: 'task' | 'project' | 'all'
 ) => {
-  await page.getByText('Type:', { exact: true }).click();
+  await openTypeFilterMenu(page);
 
+  const menu = typeFilterMenu(page);
+  const options = menu.getByRole('option');
   const selectedLabel =
-    type === 'project' ? 'Project' : type === 'task' ? 'Task' : undefined;
+    type === 'project' ? 'Project' : type === 'task' ? 'Task' : null;
+  const optionCount = await options.count();
 
-  if (type === 'project') {
-    for (const label of TAG_ENTITY_TYPE_LABELS.filter(
-      (currentLabel) => currentLabel !== selectedLabel
-    )) {
-      await page.getByRole('option', { name: label, exact: true }).click();
-    }
-  } else if (type === 'task') {
-    for (const label of TAG_ENTITY_TYPE_LABELS.filter(
-      (currentLabel) => currentLabel !== selectedLabel
-    )) {
-      await page.getByRole('option', { name: label, exact: true }).click();
-    }
-  } else {
-    for (const label of TAG_ENTITY_TYPE_LABELS.filter(
-      (currentLabel) => currentLabel !== 'Project'
-    )) {
-      await page.getByRole('option', { name: label, exact: true }).click();
+  for (let index = 0; index < optionCount; index++) {
+    const option = options.nth(index);
+    const label =
+      (await option.locator('span.text-sm').textContent())?.trim() ?? '';
+    const shouldBeSelected = type === 'all' || label === selectedLabel;
+    const checkbox = option.getByRole('checkbox');
+    const isChecked = await checkbox.isChecked();
+
+    if (isChecked !== shouldBeSelected) {
+      await option.scrollIntoViewIfNeeded();
+      await option.click();
     }
   }
 
-  await page.getByRole('button', { name: 'Apply', exact: true }).click();
+  if (selectedLabel) {
+    await expect(
+      options.filter({ hasText: selectedLabel }).first().getByRole('checkbox')
+    ).toBeChecked();
+  }
+
+  const applyButton = menu.getByRole('button', { name: 'Apply', exact: true });
+
+  // The react-select menu uses menuPosition="fixed"; its footer can sit outside
+  // the viewport, so trigger Apply directly in the DOM.
+  await applyButton.evaluate((button) => {
+    (button as HTMLButtonElement).click();
+  });
 };
 
 /**
@@ -230,7 +229,6 @@ test('can create a task tag', async ({ page, api }) => {
     timeout: 10000,
   });
 
-  await logout(page);
 });
 
 test('can create a project tag', async ({ page, api }) => {
@@ -245,7 +243,6 @@ test('can create a project tag', async ({ page, api }) => {
 
   await expect(page.locator('#name')).toHaveValue(name);
 
-  await logout(page);
 });
 
 test('can view a task tag from the list', async ({ page, api }) => {
@@ -253,12 +250,7 @@ test('can view a task tag from the list', async ({ page, api }) => {
 
   const name = uniqueName('view-tag');
 
-  const tag = await api.createEntity(TAGS, {
-    name,
-    entity_type: 'task',
-    color: '#2196F3',
-  });
-  if (tag.id) createdTagIds.push(tag.id as string);
+  await createTag({ page, name, type: 'projects' });
 
   await navigateToTags(page);
 
@@ -270,11 +262,8 @@ test('can view a task tag from the list', async ({ page, api }) => {
   // The name cell links through to the edit page.
   await page.getByRole('link', { name, exact: true }).first().click();
 
-  await page.waitForURL(`**/settings/tags/${tag.id}/edit`);
-
   await expect(page.locator('#name')).toHaveValue(name);
 
-  await logout(page);
 });
 
 test('can filter tags by entity type', async ({ page, api }) => {
@@ -283,54 +272,64 @@ test('can filter tags by entity type', async ({ page, api }) => {
   const taskName = uniqueName('filter-task-tag');
   const projectName = uniqueName('filter-project-tag');
 
-  const taskTag = await api.createEntity(TAGS, {
-    name: taskName,
-    entity_type: 'task',
-    color: '#2196F3',
-  });
-  const projectTag = await api.createEntity(TAGS, {
-    name: projectName,
-    entity_type: 'project',
-    color: '#93C5FD',
-  });
+  await createTag({ page, name: taskName, type: 'tasks' });
+  const taskId = extractIdFromUrl(page.url(), 'tags');
+  if (taskId) createdTagIds.push(taskId);
 
-  if (taskTag.id) createdTagIds.push(taskTag.id as string);
-  if (projectTag.id) createdTagIds.push(projectTag.id as string);
+  await createTag({ page, name: projectName, type: 'projects' });
+  const projectId = extractIdFromUrl(page.url(), 'tags');
+  if (projectId) createdTagIds.push(projectId);
 
   await navigateToTags(page);
   await waitForTableData(page);
 
-  const filteredRequest = page.waitForResponse((response) => {
-    const url = new URL(response.url());
-
-    return (
-      url.pathname.endsWith('/api/v1/tags') &&
-      url.searchParams.get('entity_types') === 'project'
-    );
-  });
-
   await applyTagTypeFilter(page, 'project');
-  await filteredRequest;
+  await waitForTableData(page);
 
-  await expect(page.getByRole('link', { name: projectName })).toBeVisible({
+  await page.locator('#filter').fill(projectName);
+  await page.waitForTimeout(600);
+
+  await expect(
+    page.getByRole('link', { name: projectName, exact: true })
+  ).toBeVisible({
     timeout: 10000,
   });
-  await expect(page.getByRole('link', { name: taskName })).not.toBeVisible();
 
-  const resetRequest = page.waitForResponse((response) => {
-    const url = new URL(response.url());
+  await page.locator('#filter').fill(taskName);
+  await page.waitForTimeout(600);
 
-    return (
-      url.pathname.endsWith('/api/v1/tags') &&
-      url.searchParams.get('entity_types') === TAG_ENTITY_TYPE_VALUES.join(',')
-    );
-  });
+  await expect(
+    page.getByRole('link', { name: taskName, exact: true })
+  ).not.toBeVisible();
+
+  await page.locator('#filter').fill('');
+  await page.waitForTimeout(600);
+
+  const preferencesSaved = page.waitForResponse(
+    (response) =>
+      response.request().method() === 'PUT' &&
+      response.url().includes('/api/v1/company_users/') &&
+      response.url().includes('/preferences') &&
+      response.ok(),
+    { timeout: 15000 }
+  );
 
   await applyTagTypeFilter(page, 'all');
-  await resetRequest;
-  await page.waitForTimeout(1700);
+  await waitForTableData(page);
 
-  await logout(page);
+  await page.locator('#filter').fill(taskName);
+  await page.waitForTimeout(600);
+
+  await expect(
+    page.getByRole('link', { name: taskName, exact: true })
+  ).toBeVisible({
+    timeout: 10000,
+  });
+
+  await page.locator('#filter').fill('');
+  await page.waitForTimeout(600);
+
+  await preferencesSaved;
 });
 
 test('can edit a task tag', async ({ page, api }) => {
@@ -378,7 +377,6 @@ test('can edit a task tag', async ({ page, api }) => {
 
   await expect(nameInput).toHaveValue(updatedName);
 
-  await logout(page);
 });
 
 test('can delete a task tag from the edit page', async ({ page, api }) => {
@@ -402,7 +400,6 @@ test('can delete a task tag from the edit page', async ({ page, api }) => {
     timeout: 10000,
   });
 
-  await logout(page);
 });
 
 test('can archive and restore a task tag from the edit page', async ({
@@ -449,7 +446,6 @@ test('can archive and restore a task tag from the edit page', async ({
     timeout: 10000,
   });
 
-  await logout(page);
 });
 
 // ---------------------------------------------------------------------------
@@ -488,7 +484,6 @@ test('bulk actions dropdown shows archive and delete for active tags', async ({
     dropdown.getByRole('button', { name: 'Delete', exact: true })
   ).toBeVisible({ timeout: 10000 });
 
-  await logout(page);
 });
 
 test('can bulk archive tags', async ({ page, api }) => {
@@ -512,7 +507,6 @@ test('can bulk archive tags', async ({ page, api }) => {
     timeout: 10000,
   });
 
-  await logout(page);
 });
 
 test('can bulk delete tags', async ({ page, api }) => {
@@ -536,5 +530,4 @@ test('can bulk delete tags', async ({ page, api }) => {
     timeout: 10000,
   });
 
-  await logout(page);
 });

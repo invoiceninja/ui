@@ -8,24 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+import { get } from 'lodash';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { FaCheck, FaCheckDouble, FaCheckSquare } from 'react-icons/fa';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
-import { AxiosResponse } from 'axios';
-import { get } from 'lodash';
-import { useEffect, useState } from 'react';
-import { FaCheck, FaCheckDouble, FaCheckSquare } from 'react-icons/fa';
-import { useQuery } from 'react-query';
+import { useEnterpriseUtils } from '../../common/hooks/useEnterpriseUtils';
 import { ChangePlan } from './ChangePlan';
 import { PopupProps } from './NewCreditCard';
-import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
-import { useEnterpriseUtils } from '../../common/hooks/useEnterpriseUtils';
-import { useTranslation } from 'react-i18next';
 
 export type Plan =
   | '' // Free

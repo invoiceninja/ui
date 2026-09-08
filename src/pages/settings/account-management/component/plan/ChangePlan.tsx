@@ -8,25 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useColorScheme } from '$app/common/colors';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
-import { CompanyGateway } from '$app/common/interfaces/company-gateway';
-import { NonClickableElement } from '$app/components/cards/NonClickableElement';
-import { Button, Radio } from '$app/components/forms';
+import { useQuery } from '@tanstack/react-query';
 import { AxiosError, AxiosResponse } from 'axios';
 import collect from 'collect.js';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
-import { Plan } from './Popup';
+import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { ErrorMessage } from '$app/components/ErrorMessage';
-import { $refetch } from '$app/common/hooks/useRefetch';
+import { Button, Radio } from '$app/components/forms';
+import { Plan } from './Popup';
 
 interface ChangePlanProps {
   plan: Plan;

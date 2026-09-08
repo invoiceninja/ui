@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useOutletContext, useParams } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
-import { useOutletContext, useParams } from 'react-router-dom';
+import { DataTable } from '$app/components/DataTable';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { useDocumentActions } from '../hooks/useDocumentActions';
 import {
   defaultColumns,
   useAllDocumentColumns,
   useDocumentColumns,
 } from '../hooks/useDocumentColumns';
-import { DataTable } from '$app/components/DataTable';
-import { useDocumentFilters } from '../hooks/useDocumentFilters';
-import { useDocumentActions } from '../hooks/useDocumentActions';
-import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useDocumentCustomBulkActions } from '../hooks/useDocumentCustomBulkActions';
+import { useDocumentFilters } from '../hooks/useDocumentFilters';
 
 export interface Document {
   archived_at: number;

@@ -7,9 +7,10 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import CommonProps from '$app/common/interfaces/common-props.interface';
+
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
+import CommonProps from '$app/common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   for: any;

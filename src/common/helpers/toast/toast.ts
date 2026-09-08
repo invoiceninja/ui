@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { trans } from '$app/common/helpers';
 import { t } from 'i18next';
 import React from 'react';
-import { MdInfoOutline } from 'react-icons/md';
 import { toast as helper } from 'react-hot-toast';
+import { MdInfoOutline } from 'react-icons/md';
+import { trans } from '$app/common/helpers';
 
 class Toast {
   protected declare currentId: string;

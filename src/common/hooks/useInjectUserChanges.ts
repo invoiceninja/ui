@@ -10,10 +10,10 @@
 
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { injectInChanges } from '../stores/slices/user';
-import { useCurrentUser } from './useCurrentUser';
-import { RootState } from '../stores/store';
 import { User } from '../interfaces/user';
+import { injectInChanges } from '../stores/slices/user';
+import { RootState } from '../stores/store';
+import { useCurrentUser } from './useCurrentUser';
 
 export function useUserChanges() {
   return useSelector((state: RootState) => state.user.changes) as

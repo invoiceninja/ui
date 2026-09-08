@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { date, endpoint } from '$app/common/helpers';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { AxiosResponse } from 'axios';

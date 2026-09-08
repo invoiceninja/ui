@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { BankAccount } from '$app/common/interfaces/bank-accounts';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
-import { Params } from '$app/common/queries/common/params.interface';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { BankAccount } from '$app/common/interfaces/bank-accounts';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Params } from '$app/common/queries/common/params.interface';
 
 interface BankAccountParams {
   id: string | undefined;
@@ -26,9 +26,10 @@ interface BankAccountParams {
 export function useBankAccountQuery(params: BankAccountParams) {
   const { isAdmin, isOwner } = useAdmin();
 
-  return useQuery<BankAccount>(
-    ['/api/v1/bank_integrations', params.id],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/bank_integrations', params.id],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/bank_integrations/:id', { id: params.id })
@@ -36,19 +37,19 @@ export function useBankAccountQuery(params: BankAccountParams) {
         (response: GenericSingleResourceResponse<BankAccount>) =>
           response.data.data
       ),
-    {
-      enabled: (params.enabled ?? true) && (isAdmin || isOwner),
-      staleTime: Infinity,
-    }
-  );
+
+    enabled: (params.enabled ?? true) && (isAdmin || isOwner),
+    staleTime: Infinity,
+  });
 }
 
 export function useBankAccountsQuery(params?: Params) {
   const { perPage } = params || {};
 
-  return useQuery<BankAccount[]>(
-    ['/api/v1/bank_integrations', params],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/bank_integrations', params],
+
+    queryFn: () =>
       request(
         'GET',
         endpoint('/api/v1/bank_integrations?per_page=:perPage&status=active', {
@@ -58,22 +59,26 @@ export function useBankAccountsQuery(params?: Params) {
         (response: GenericSingleResourceResponse<BankAccount[]>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
-  );
+
+    staleTime: Infinity,
+  });
 }
 
 export function useBlankBankAccountQuery() {
   const { isAdmin, isOwner } = useAdmin();
 
-  return useQuery<BankAccount>(
-    ['/api/v1/bank_integrations', 'create'],
-    () =>
+  return useQuery({
+    queryKey: ['/api/v1/bank_integrations', 'create'],
+
+    queryFn: () =>
       request('GET', endpoint('/api/v1/bank_integrations/create')).then(
         (response: GenericSingleResourceResponse<BankAccount>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: isAdmin || isOwner }
-  );
+
+    staleTime: Infinity,
+    enabled: isAdmin || isOwner,
+  });
 }
 
 export function useBulkAction() {

@@ -1,12 +1,12 @@
-import { Document, DocumentStatus } from '$app/common/interfaces/docuninja/api';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Icon } from '$app/components/icons/Icon';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCancel } from 'react-icons/md';
-import { useVoidDocument } from '../../show/hooks/useVoidDocument';
-import { Modal } from '$app/components/Modal';
-import { useState } from 'react';
+import { Document, DocumentStatus } from '$app/common/interfaces/docuninja/api';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Modal } from '$app/components/Modal';
+import { useVoidDocument } from '../../show/hooks/useVoidDocument';
 
 interface Props {
   document: Document;

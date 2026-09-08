@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { RootState } from '$app/common/stores/store';
 import { useSelector } from 'react-redux';
+import { RootState } from '$app/common/stores/store';
 
 export function useCurrentAccount() {
   const companyUserState = useSelector(

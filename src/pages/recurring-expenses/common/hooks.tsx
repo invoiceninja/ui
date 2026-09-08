@@ -26,7 +26,7 @@ import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { RecurringExpenseStatus } from '$app/common/enums/recurring-expense-status';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { expenseAtom } from '$app/pages/expenses/common/atoms';
 import paymentType from '$app/common/constants/payment-type';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
@@ -493,7 +493,7 @@ export function useToggleStartStop() {
       $refetch(['recurring_expenses']);
 
       invalidateQueryValue &&
-        queryClient.invalidateQueries([invalidateQueryValue]);
+        queryClient.invalidateQueries({ queryKey: [invalidateQueryValue] });
 
       toast.success(action === 'start' ? 'start' : 'stop');
     });

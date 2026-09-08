@@ -8,20 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { Project } from '$app/common/interfaces/project';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useBlankProjectQuery } from '$app/common/queries/projects';
-import { ClientSelector } from '$app/components/clients/ClientSelector';
-import { Modal } from '$app/components/Modal';
-import { Spinner } from '$app/components/Spinner';
 import {
   Dispatch,
   FormEvent,
@@ -30,10 +17,23 @@ import {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { UserSelector } from '$app/components/users/UserSelector';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Project } from '$app/common/interfaces/project';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankProjectQuery } from '$app/common/queries/projects';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { Button, InputField } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
+import { Spinner } from '$app/components/Spinner';
 import { TagPillSelector } from '$app/components/tags/TagPillSelector';
+import { UserSelector } from '$app/components/users/UserSelector';
 
 interface Props {
   visible: boolean;

@@ -9,11 +9,11 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Element } from './cards';
+import { CSSProperties } from 'styled-components';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Element } from './cards';
 import { InputField } from './forms';
 import { NumberInputField } from './forms/NumberInputField';
-import { CSSProperties } from 'styled-components';
 
 interface Props {
   elementClassName?: string;

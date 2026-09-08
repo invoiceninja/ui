@@ -8,32 +8,39 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ForgotPasswordForm } from '../../common/dtos/authentication';
-import { endpoint, isHosted } from '../../common/helpers';
-import { ForgotPasswordValidation } from './common/ValidationInterface';
-import { InputField } from '../../components/forms/InputField';
-import { Button } from '../../components/forms/Button';
-import { HostedLinks } from './components/HostedLinks';
-import { Link } from '../../components/forms/Link';
-import { Header } from './components/Header';
+import { useLocation } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { useColorScheme } from '$app/common/colors';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { ForgotPasswordForm } from '../../common/dtos/authentication';
+import { endpoint, isHosted } from '../../common/helpers';
+import { Button } from '../../components/forms/Button';
+import { InputField } from '../../components/forms/InputField';
+import { Link } from '../../components/forms/Link';
+import { ForgotPasswordValidation } from './common/ValidationInterface';
+import { Header } from './components/Header';
+import { HostedLinks } from './components/HostedLinks';
 
 interface Response {
   message: string;
   status: boolean;
 }
 
+interface LocationState {
+  email?: string;
+}
+
 export function RecoverPassword() {
   useTitle('recover_password');
 
   const [t] = useTranslation();
+  const location = useLocation();
+
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [message, setMessage] = useState<Response | undefined>(undefined);
@@ -41,9 +48,11 @@ export function RecoverPassword() {
     undefined
   );
 
+  const { email: prefilledEmail } = (location.state as LocationState) || {};
+
   const form = useFormik({
     initialValues: {
-      email: '',
+      email: prefilledEmail ?? '',
     },
     onSubmit: (values: ForgotPasswordForm) => {
       setIsFormBusy(true);
@@ -94,6 +103,7 @@ export function RecoverPassword() {
               label={t('email_address')}
               id="email"
               required
+              value={form.values.email}
               onValueChange={(value) => form.setFieldValue('email', value)}
               changeOverride
             />
