@@ -129,17 +129,6 @@ export function useBlockLibrary(): BlockDefinition[] {
       category: 'content',
     },
     {
-      type: 'twig',
-      label: t('twig_template'),
-      icon: <Code className="size-5" />,
-      description: t('twig_template_help'),
-      defaultSize: { w: 12, h: 4 },
-      defaultProperties: {
-        content: '',
-      },
-      category: 'content',
-    },
-    {
       type: 'client-info',
       label: t('client_details'),
       icon: <User className="w-5 h-5" />,
@@ -342,6 +331,17 @@ export function useBlockLibrary(): BlockDefinition[] {
         align: 'center',
         maxWidth: '200px',
         objectFit: 'contain',
+      },
+      category: 'content',
+    },
+    {
+      type: 'twig',
+      label: t('twig_template'),
+      icon: <Code className="size-5" />,
+      description: t('twig_template_help'),
+      defaultSize: { w: 12, h: 4 },
+      defaultProperties: {
+        content: '',
       },
       category: 'content',
     },
