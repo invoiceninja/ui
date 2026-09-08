@@ -55,6 +55,8 @@ import {
   DeleteDialog,
   ImportFromGoogleDrive,
   Loading,
+  MapSignatoriesFlowButton,
+  MapSignatoriesFlowDialog,
   PreviewRefresh,
   PreviewToggle,
   RectangleSettingsButton,
@@ -67,8 +69,6 @@ import {
   RectangleSettingsRemoveButton,
   RectangleSettingsSaveButton,
   RectangleSettingsSelect,
-  SingleSignatoryFlowButton,
-  SingleSignatoryFlowDialog,
   ToolboxContext,
   UninviteButton,
   UninviteDialog,
@@ -415,7 +415,7 @@ function Builder() {
     );
 
     window.addEventListener(
-      'builder:single-signatory-sent',
+      'builder:map-signatories-sent',
       handleSingleSignatorySent
     );
 
@@ -446,7 +446,7 @@ function Builder() {
       );
 
       window.removeEventListener(
-        'builder:single-signatory-sent',
+        'builder:map-signatories-sent',
         handleSingleSignatorySent
       );
 
@@ -573,9 +573,9 @@ function Builder() {
               },
               signatorySelector: SignatorySelector,
               signatorySwap: SignatorySwap,
-              singleSignatoryFlow: {
-                dialog: SingleSignatoryFlowDialog,
-                button: SingleSignatoryFlowButton,
+              mapSignatoriesFlow: {
+                dialog: MapSignatoriesFlowDialog,
+                button: MapSignatoriesFlowButton,
               },
               uninvite: {
                 dialog: UninviteDialog,
