@@ -128,7 +128,8 @@ export default function Create() {
       if (
         typeof data !== 'undefined' &&
         typeof value === 'undefined' &&
-        searchParams.get('action') !== 'clone'
+        searchParams.get('action') !== 'clone' &&
+        searchParams.get('action') !== 'convert_to_purchase_order'
       ) {
         const po = cloneDeep(data);
 
@@ -157,7 +158,10 @@ export default function Create() {
     });
 
     return () => {
-      if (searchParams.get('action') !== 'clone') {
+      if (
+        searchParams.get('action') !== 'clone' &&
+        searchParams.get('action') !== 'convert_to_purchase_order'
+      ) {
         setPurchaseOrder(undefined);
       }
     };
