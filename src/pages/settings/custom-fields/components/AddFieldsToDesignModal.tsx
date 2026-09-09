@@ -25,6 +25,7 @@ import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
+import { Calculator } from '$app/components/icons/Calculator';
 import { Cube } from '$app/components/icons/Cube';
 import { Invoice } from '$app/components/icons/Invoice';
 import { Modal } from '$app/components/Modal';
@@ -143,6 +144,33 @@ export function AddFieldsToDesignModal(props: Props) {
     { value: '$product.tax_amount', label: t('tax_amount') },
   ];
 
+  const totalVariables = [
+    { value: '$subtotal', label: t('subtotal') },
+    { value: '$discount', label: t('discount') },
+    { value: '$net_subtotal', label: t('net_subtotal') },
+    { value: '$line_taxes', label: t('line_taxes') },
+    { value: '$total_taxes', label: t('total_taxes') },
+    {
+      value: '$custom_surcharge1',
+      label: customField('surcharge1').label() || t('custom_surcharge1'),
+    },
+    {
+      value: '$custom_surcharge2',
+      label: customField('surcharge2').label() || t('custom_surcharge2'),
+    },
+    {
+      value: '$custom_surcharge3',
+      label: customField('surcharge3').label() || t('custom_surcharge3'),
+    },
+    {
+      value: '$custom_surcharge4',
+      label: customField('surcharge4').label() || t('custom_surcharge4'),
+    },
+    { value: '$paid_to_date', label: t('paid_to_date') },
+    { value: '$total', label: t('total') },
+    { value: '$outstanding', label: t('balance_due') },
+  ];
+
   const invoiceEntries: Entry[] = [
     { field: 'invoice1', variable: '$invoice.custom1', fallback: 'custom1' },
     { field: 'invoice2', variable: '$invoice.custom2', fallback: 'custom2' },
@@ -155,6 +183,29 @@ export function AddFieldsToDesignModal(props: Props) {
     { field: 'product2', variable: '$product.product2', fallback: 'custom2' },
     { field: 'product3', variable: '$product.product3', fallback: 'custom3' },
     { field: 'product4', variable: '$product.product4', fallback: 'custom4' },
+  ];
+
+  const surchargeEntries: Entry[] = [
+    {
+      field: 'surcharge1',
+      variable: '$custom_surcharge1',
+      fallback: 'custom_surcharge1',
+    },
+    {
+      field: 'surcharge2',
+      variable: '$custom_surcharge2',
+      fallback: 'custom_surcharge2',
+    },
+    {
+      field: 'surcharge3',
+      variable: '$custom_surcharge3',
+      fallback: 'custom_surcharge3',
+    },
+    {
+      field: 'surcharge4',
+      variable: '$custom_surcharge4',
+      fallback: 'custom_surcharge4',
+    },
   ];
 
   const resolveEntries = (entries: Entry[]) => {
@@ -188,6 +239,15 @@ export function AddFieldsToDesignModal(props: Props) {
         ? []
         : ['$product.tax_amount', '$product.tax'],
       entries: resolveEntries(productEntries),
+    },
+    {
+      target: 'total_columns',
+      caption: t('total_fields'),
+      icon: <Calculator size="1.1rem" color="#2176FF" />,
+      dragHelp: t('product_fields_help'),
+      defaultVariables: totalVariables,
+      excludedVariables: [],
+      entries: resolveEntries(surchargeEntries),
     },
   ].filter((group) => group.entries.length > 0);
 
@@ -317,7 +377,10 @@ export function AddFieldsToDesignModal(props: Props) {
         {isSortStep ? (
           <div
             className={classNames('grid grid-cols-1 gap-y-6', {
-              'lg:grid-cols-2 lg:gap-y-0': isSideBySide,
+              'lg:grid-cols-2 lg:gap-y-0':
+                isSideBySide && renderedSortGroups.current.length === 2,
+              'lg:grid-cols-3 lg:gap-y-0':
+                isSideBySide && renderedSortGroups.current.length > 2,
             })}
           >
             {renderedSortGroups.current.map((group, index) => (

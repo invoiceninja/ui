@@ -38,6 +38,10 @@ const designCustomFields = [
   'product2',
   'product3',
   'product4',
+  'surcharge1',
+  'surcharge2',
+  'surcharge3',
+  'surcharge4',
 ];
 
 const hasLabel = (value: string | undefined) => {
