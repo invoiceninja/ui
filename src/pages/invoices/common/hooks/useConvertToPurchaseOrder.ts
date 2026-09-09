@@ -19,7 +19,11 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 
-export function useConvertToPurchaseOrder() {
+interface Props {
+  entity: 'invoice' | 'quote';
+}
+
+export function useConvertToPurchaseOrder({ entity }: Props) {
   const navigate = useNavigate();
 
   const setPurchaseOrder = useSetAtom(purchaseOrderAtom);
@@ -27,7 +31,7 @@ export function useConvertToPurchaseOrder() {
   return (ids: string[]) => {
     toast.processing();
 
-    request('POST', endpoint('/api/v1/invoices/bulk'), {
+    request('POST', endpoint(`/api/v1/${entity}s/bulk`), {
       action: 'convert_to_purchase_order',
       ids,
     }).then((response: AxiosResponse<GenericManyResponse<PurchaseOrder>>) => {
