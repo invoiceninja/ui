@@ -25,10 +25,31 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+      - name: Checkout DocuNinja builder2.0 (main)
+        uses: actions/checkout@v4
+        with:
+          repository: DocuNinja/builder2.0
+          ref: main
+          token: ${{ secrets.BUILDER_ACCESS_TOKEN }}
+          path: builder2.0
+      - name: Build DocuNinja builder2.0
+        working-directory: builder2.0
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm install
+          npm run build
+          npm pack
       - name: Install dependencies
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm install
+      - name: Use built DocuNinja builder2.0 instead of npm package
+        run: |
+          TARBALL=$(ls builder2.0/*.tgz | head -n 1)
+          rm -rf node_modules/@docuninja/builder2.0
+          mkdir -p node_modules/@docuninja/builder2.0
+          tar -xzf "$TARBALL" -C node_modules/@docuninja/builder2.0 --strip-components=1
       - run: npm run build
       - name: Verify self-hosted bundle excludes Sentry
         run: |
