@@ -27,12 +27,13 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Button, InputField, InputLabel } from '$app/components/forms';
+import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 import { Callout } from './Callout';
 import { ErrorBanner } from './ErrorBanner';
 import { StepFooter } from './StepFooter';
 import { StepTransition } from './StepTransition';
-import { Wizard } from '../useWizard';
+import { contactEmail, emailableContact, Wizard } from '../useWizard';
 import { AppliedTax, TaxSetup } from './TaxSetup';
 import { WorkPicker, WorkSource } from './WorkPicker';
 
@@ -73,14 +74,14 @@ const visibleSlots = (item: InvoiceItem, enabled: number) => {
   return free ? [...applied, free] : applied;
 };
 
-const SLOT_LABELS: Record<TaxSlot, string> = {
-  1: 'one_tax_rate',
-  2: 'two_tax_rates',
-  3: 'three_tax_rates',
-};
-
 export function StepItems({ wizard, embedded }: Props) {
   const reactSettings = useReactSettings();
+  const precision =
+    reactSettings?.number_precision &&
+    reactSettings.number_precision > 0 &&
+    reactSettings.number_precision <= 100
+      ? reactSettings.number_precision
+      : 2;
   const accentColor = useAccentColor();
   const colors = useColorScheme();
   const formatMoney = useFormatMoney();
@@ -98,17 +99,13 @@ export function StepItems({ wizard, embedded }: Props) {
   );
   const [rates, setRates] = useState<TaxRate[]>([]);
   const [inclusiveAnswered, setInclusiveAnswered] = useState(false);
-  const [enablingTaxes, setEnablingTaxes] = useState(false);
 
   const enabledTaxSlots = company?.enabled_item_tax_rates ?? 0;
+  const taxSlotCount = Math.max(1, enabledTaxSlots);
   const taxesConfigured =
     enabledTaxSlots > 0 || (company?.enabled_tax_rates ?? 0) > 0;
 
   useEffect(() => {
-    if (!taxesConfigured) {
-      return;
-    }
-
     request(
       'GET',
       endpoint('/api/v1/tax_rates?status=active&per_page=50'),
@@ -117,7 +114,7 @@ export function StepItems({ wizard, embedded }: Props) {
     )
       .then((response) => setRates(response.data.data ?? []))
       .catch(() => setRates([]));
-  }, [taxesConfigured]);
+  }, []);
 
   const update = (index: number, changes: Partial<InvoiceItem>) => {
     if (typeof changes.notes === 'string') {
@@ -184,24 +181,21 @@ export function StepItems({ wizard, embedded }: Props) {
     });
   };
 
-  const enableTaxSlots = (count: number) => {
-    if (!company?.id) {
+  const ensureTaxSlot = () => {
+    if (!company?.id || enabledTaxSlots > 0) {
       return;
     }
-
-    setEnablingTaxes(true);
 
     request(
       'PUT',
       endpoint('/api/v1/companies/:id', { id: company.id }),
-      { ...company, enabled_item_tax_rates: count },
+      { ...company, enabled_item_tax_rates: 1 },
       { skipIntercept: true }
     )
       .then((response) =>
         dispatch(updateRecord({ object: 'company', data: response.data.data }))
       )
-      .catch(() => toast.error())
-      .finally(() => setEnablingTaxes(false));
+      .catch(() => toast.error());
   };
 
   const described = items.some((item) => item.notes || item.product_key);
@@ -220,12 +214,7 @@ export function StepItems({ wizard, embedded }: Props) {
     wizard.next();
   };
   const clientName = wizard.client?.display_name || wizard.client?.name || '';
-  const contacts = wizard.client?.contacts ?? [];
-  const recipientEmail =
-    contacts.find((entry) => entry.send_email !== false && entry.email)
-      ?.email ??
-    contacts[0]?.email ??
-    '';
+  const recipientEmail = contactEmail(emailableContact(wizard.client));
   const totals = wizard.totals;
   const inclusive = Boolean(wizard.invoice?.uses_inclusive_taxes);
 
@@ -306,22 +295,23 @@ export function StepItems({ wizard, embedded }: Props) {
                 changeOverride
                 debounceTimeout={0}
                 onValueChange={(value) => update(index, { notes: value })}
-                errorMessage={
-                  missingDescription === key
-                    ? t('field_is_required')
-                    : undefined
-                }
               />
+
+              {missingDescription === key ? (
+                <p role="alert" className="text-xs mt-1 text-red-600">
+                  {t('field_is_required')}
+                </p>
+              ) : null}
 
               <div className="mt-3 flex items-end gap-3">
                 <div className="flex-1 min-w-0">
-                  <InputField
+                  <NumberInputField
                     id={`iw-qty-${key}`}
                     width="100%"
-                    label={t('quantity')}
-                    value={String(item.quantity ?? 0)}
+                    precision={6}
                     changeOverride
-                    debounceTimeout={0}
+                    label={t('quantity')}
+                    value={item.quantity ?? 0}
                     onValueChange={(value) =>
                       update(index, { quantity: toNumber(value) })
                     }
@@ -329,13 +319,13 @@ export function StepItems({ wizard, embedded }: Props) {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <InputField
+                  <NumberInputField
                     id={`iw-price-${key}`}
                     width="100%"
-                    label={t('price')}
-                    value={String(item.cost ?? 0)}
+                    precision={precision}
                     changeOverride
-                    debounceTimeout={0}
+                    label={t('price')}
+                    value={item.cost ?? 0}
                     onValueChange={(value) =>
                       update(index, { cost: toNumber(value) })
                     }
@@ -364,26 +354,25 @@ export function StepItems({ wizard, embedded }: Props) {
               </div>
 
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                {enabledTaxSlots === 0 ? (
-                  <TaxSlotsChip
-                    busy={enablingTaxes}
-                    onSelect={enableTaxSlots}
+                {visibleSlots(item, taxSlotCount).map((slot) => (
+                  <TaxChip
+                    key={slot}
+                    item={item}
+                    slot={slot}
+                    rates={rates}
+                    onChange={(changes) => {
+                      update(index, changes);
+
+                      if (changes[TAX_FIELDS[slot].name]) {
+                        ensureTaxSlot();
+                      }
+                    }}
+                    onCreate={() => {
+                      setTaxSetup({ scope: 'item', index, slot });
+                      setTaxOpen(true);
+                    }}
                   />
-                ) : (
-                  visibleSlots(item, enabledTaxSlots).map((slot) => (
-                    <TaxChip
-                      key={slot}
-                      item={item}
-                      slot={slot}
-                      rates={rates}
-                      onChange={(changes) => update(index, changes)}
-                      onCreate={() => {
-                        setTaxSetup({ scope: 'item', index, slot });
-                        setTaxOpen(true);
-                      }}
-                    />
-                  ))
-                )}
+                ))}
               </div>
             </div>
           );
@@ -535,6 +524,10 @@ export function StepItems({ wizard, embedded }: Props) {
             (existing) =>
               !existing.notes && !existing.product_key && !existing.cost
           );
+
+          if (item.tax_name1 || item.tax_name2 || item.tax_name3) {
+            ensureTaxSlot();
+          }
 
           if (blankIndex >= 0) {
             wizard.setLineItems(
@@ -799,28 +792,6 @@ function TaxChip({
         <Option onClick={onCreate} muted>
           {t('create_tax_rate')}
         </Option>
-      </div>
-    </ChipMenu>
-  );
-}
-
-function TaxSlotsChip({
-  busy,
-  onSelect,
-}: {
-  busy: boolean;
-  onSelect: (count: TaxSlot) => void;
-}) {
-  const [t] = useTranslation();
-
-  return (
-    <ChipMenu applied={false} disabled={busy} label={t('add_tax')}>
-      <div className="overflow-y-auto" role="listbox">
-        {TAX_SLOTS.map((slot) => (
-          <Option key={slot} onClick={() => onSelect(slot)}>
-            {t(SLOT_LABELS[slot])}
-          </Option>
-        ))}
       </div>
     </ChipMenu>
   );

@@ -19,6 +19,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Client } from '$app/common/interfaces/client';
+import { ClientContact } from '$app/common/interfaces/client-contact';
 import { Company } from '$app/common/interfaces/company.interface';
 import { Currency } from '$app/common/interfaces/currency';
 import { Invoice } from '$app/common/interfaces/invoice';
@@ -67,6 +68,22 @@ const SERVER_OWNED = [
   'user_id',
   'is_deleted',
 ] as const;
+
+export const contactEmail = (contact: ClientContact | undefined): string => {
+  return (contact?.email ?? '').trim();
+};
+
+export const emailableContact = (
+  client: Client | undefined
+): ClientContact | undefined => {
+  const contacts = client?.contacts ?? [];
+
+  return (
+    contacts.find(
+      (entry) => entry.send_email !== false && contactEmail(entry)
+    ) ?? contacts[0]
+  );
+};
 
 export const today = (): string => {
   return dayjs().format('YYYY-MM-DD');
@@ -196,6 +213,7 @@ export function useWizard(existingId?: string): Wizard {
   const revision = useRef(0);
   const written = useRef(0);
   const createFailed = useRef(false);
+  const forced = useRef(false);
   const defaultTerms = useRef(false);
   const defaultTermsSynced = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
@@ -348,11 +366,11 @@ export function useWizard(existingId?: string): Wizard {
 
     const id = persistedId.current;
 
-    if (!id && createFailed.current) {
-      written.current = at;
-
+    if (!id && createFailed.current && !forced.current) {
       return Promise.resolve(null);
     }
+
+    forced.current = false;
 
     setSaveState('saving');
 
@@ -421,6 +439,10 @@ export function useWizard(existingId?: string): Wizard {
         return saved.id;
       })
       .catch((caught: AxiosError<ValidationBag>) => {
+        if (latest.current?.client_id !== current.client_id) {
+          return null;
+        }
+
         if (!id) {
           createFailed.current = true;
         }
@@ -504,7 +526,7 @@ export function useWizard(existingId?: string): Wizard {
       clearTimeout(timer.current);
     }
 
-    createFailed.current = false;
+    forced.current = true;
 
     return save();
   }, [save]);

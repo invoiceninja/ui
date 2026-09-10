@@ -10,28 +10,22 @@
 
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
-const MAPPED_ERROR_KEYS = [
-  'client_id',
-  'date',
-  'due_date',
-  'amount',
-  'contacts',
-  'name',
-];
+const TOASTED_ERROR_KEYS = ['amount'];
 
 interface Props {
   errors?: ValidationBag;
+  handled?: string[];
 }
 
-export function ErrorBanner({ errors }: Props) {
+export function ErrorBanner({ errors, handled }: Props) {
   if (!errors?.errors) {
     return null;
   }
 
+  const covered = [...TOASTED_ERROR_KEYS, ...(handled ?? [])];
+
   const unmapped = Object.entries(errors.errors)
-    .filter(
-      ([key]) => !MAPPED_ERROR_KEYS.some((known) => key.startsWith(known))
-    )
+    .filter(([key]) => !covered.some((known) => key.startsWith(known)))
     .flatMap(([, messages]) => messages);
 
   if (!unmapped.length) {

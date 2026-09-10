@@ -84,11 +84,7 @@ export function WorkPicker({ open, source, clientId, onClose, onPick }: Props) {
     <Modal
       visible={open}
       onClose={onClose}
-      title={
-        source === 'saved'
-          ? t('products')
-          : t('add_from_existing_work')
-      }
+      title={source === 'saved' ? t('products') : t('add_from_existing_work')}
       size="small"
     >
       {source === 'saved' ? (

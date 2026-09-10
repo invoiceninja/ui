@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { blankInvitation } from '$app/common/constants/blank-invitation';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
@@ -22,17 +21,14 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { Client } from '$app/common/interfaces/client';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { Invitation } from '$app/common/interfaces/purchase-order';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import dayjs from 'dayjs';
-import { cloneDeep } from 'lodash';
 import reactStringReplace from 'react-string-replace';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHref, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
-import { Modal } from '$app/components/Modal';
 import { Element } from '$app/components/cards';
 import { Button, InputField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
@@ -41,8 +37,9 @@ import { ErrorBanner } from './ErrorBanner';
 import { StepFooter } from './StepFooter';
 import { PreviewFrame } from './PreviewFrame';
 import { StepTransition } from './StepTransition';
-import { Wizard } from '../useWizard';
+import { contactEmail, emailableContact, Wizard } from '../useWizard';
 import { BrandPrompts } from './BrandPrompts';
+import { ClientContactModal } from './ClientContactModal';
 
 const LOOKS: { label: string; design: string }[] = [
   { label: 'clean', design: 'Clean' },
@@ -70,19 +67,12 @@ export function StepReview({ wizard }: Props) {
 
   const invoice = wizard.invoice;
   const client = wizard.client;
-  const emailable = (client?.contacts ?? []).filter(
-    (entry) => entry.send_email !== false && entry.email
-  );
-  const contact = emailable[0] ?? client?.contacts?.[0];
-  const recipient = contact?.email ?? '';
+  const recipient = contactEmail(emailableContact(client));
 
   const [designs, setDesigns] = useState<Record<string, string>>({});
   const [designsFailed, setDesignsFailed] = useState(false);
   const [sending, setSending] = useState(false);
   const [askEmail, setAskEmail] = useState(false);
-  const [emailDraft, setEmailDraft] = useState('');
-  const [savingEmail, setSavingEmail] = useState(false);
-  const [emailError, setEmailError] = useState<string>();
 
   const [savingAttachment, setSavingAttachment] =
     useState<AttachmentKey | null>(null);
@@ -93,6 +83,7 @@ export function StepReview({ wizard }: Props) {
   const [showPreview, setShowPreview] = useState(false);
 
   const preview = useRef<HTMLDivElement>(null);
+  const sendAfterContact = useRef(false);
 
   useEffect(() => {
     request(
@@ -181,8 +172,9 @@ export function StepReview({ wizard }: Props) {
 
   const send = () => {
     if (!recipient) {
-      setEmailDraft('');
+      sendAfterContact.current = true;
       setAskEmail(true);
+
       return;
     }
 
@@ -193,75 +185,19 @@ export function StepReview({ wizard }: Props) {
       .finally(() => setSending(false));
   };
 
-  const saveEmailThenSend = () => {
-    if (!client?.id) {
+  const contactSaved = (saved: Client) => {
+    wizard.attachClient(saved);
+
+    if (!sendAfterContact.current) {
       return;
     }
 
-    const address = emailDraft.trim();
+    sendAfterContact.current = false;
+    setSending(true);
 
-    if (!/^\S+@\S+\.\S+$/.test(address)) {
-      setEmailError(t('provide_email'));
-      return;
-    }
-
-    setEmailError(undefined);
-    setSavingEmail(true);
-
-    const contacts = (client.contacts ?? []).length
-      ? client.contacts.map((entry, index) =>
-          index === 0 ? { ...entry, email: address, send_email: true } : entry
-        )
-      : [
-          {
-            first_name: client.name,
-            last_name: '',
-            email: address,
-            send_email: true,
-          },
-        ];
-
-    request(
-      'PUT',
-      endpoint('/api/v1/clients/:id', { id: client.id }),
-      { ...client, contacts, documents: [] },
-      { skipIntercept: true }
-    )
-      .then((response) => {
-        const saved = response.data.data as Client;
-
-        wizard.refreshClient(saved);
-        wizard.patch({
-          invitations: (saved.contacts ?? []).slice(0, 1).map((entry) => {
-            return {
-              ...(cloneDeep(blankInvitation) as unknown as Invitation),
-              client_contact_id: entry.id,
-            };
-          }),
-        });
-
-        $refetch(['clients']);
-
-        return true;
-      })
-      .catch(() => {
-        setEmailError(t('email_address_not_saved'));
-
-        return false;
-      })
-      .finally(() => setSavingEmail(false))
-      .then((stored) => {
-        if (!stored) {
-          return;
-        }
-
-        setAskEmail(false);
-        setSending(true);
-
-        return deliver()
-          .catch(() => toast.error())
-          .finally(() => setSending(false));
-      });
+    deliver()
+      .catch(() => toast.error())
+      .finally(() => setSending(false));
   };
 
   const saveBankInstructions = () => {
@@ -383,9 +319,21 @@ export function StepReview({ wizard }: Props) {
           <div>
             <p>{client?.display_name || client?.name || '—'}</p>
 
-            <p className="text-xs mt-0.5" style={{ color: colors.$17 }}>
-              {recipient || t('no_email_address')}
-            </p>
+            <div className="mt-0.5 flex flex-wrap items-center justify-end gap-2">
+              <span className="text-xs" style={{ color: colors.$17 }}>
+                {recipient || t('no_email_address')}
+              </span>
+
+              {recipient ? null : (
+                <Button
+                  type="minimal"
+                  behavior="button"
+                  onClick={() => setAskEmail(true)}
+                >
+                  {t('edit_client')}
+                </Button>
+              )}
+            </div>
           </div>
         </Element>
 
@@ -736,43 +684,15 @@ export function StepReview({ wizard }: Props) {
         </Button>
       </StepFooter>
 
-      <Modal
-        visible={askEmail}
-        onClose={() => setAskEmail(false)}
-        title={t('where_should_we_send_this_invoice')}
-        size="small"
-      >
-        <div className="space-y-4">
-          <InputField
-            id="iw-send-to"
-            label={t('email_address')}
-            type="email"
-            placeholder={t('email_address')}
-            value={emailDraft}
-            changeOverride
-            debounceTimeout={0}
-            onValueChange={setEmailDraft}
-            errorMessage={emailError}
-          />
-
-          <div className="flex items-center gap-2">
-            <Button
-              behavior="button"
-              disabled={savingEmail || sending}
-              onClick={saveEmailThenSend}
-            >
-              {t('save_and_email')}
-            </Button>
-            <Button
-              type="secondary"
-              behavior="button"
-              onClick={() => setAskEmail(false)}
-            >
-              {t('cancel')}
-            </Button>
-          </div>
-        </div>
-      </Modal>
+      <ClientContactModal
+        open={askEmail}
+        client={client}
+        onClose={() => {
+          sendAfterContact.current = false;
+          setAskEmail(false);
+        }}
+        onSaved={contactSaved}
+      />
     </StepTransition>
   );
 }

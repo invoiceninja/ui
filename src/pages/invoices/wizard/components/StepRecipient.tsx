@@ -19,13 +19,13 @@ import { AxiosError } from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Spinner } from '$app/components/Spinner';
-import { Modal } from '$app/components/Modal';
 import { Button, InputField, InputLabel } from '$app/components/forms';
+import { ClientContactModal } from './ClientContactModal';
 import { ErrorBanner } from './ErrorBanner';
 import { StepFooter } from './StepFooter';
 import { Legend } from './Legend';
 import { StepTransition } from './StepTransition';
-import { Wizard } from '../useWizard';
+import { contactEmail, emailableContact, Wizard } from '../useWizard';
 
 interface Props {
   wizard: Wizard;
@@ -54,16 +54,6 @@ export function StepRecipient({ wizard }: Props) {
   }>({});
   const [active, setActive] = useState(-1);
   const [contactOpen, setContactOpen] = useState(false);
-  const [contact, setContact] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-  });
-  const [savingContact, setSavingContact] = useState(false);
-  const [contactErrors, setContactErrors] = useState<{
-    email?: string;
-    general?: string;
-  }>({});
 
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const lastMatches = useRef<Client[]>([]);
@@ -241,81 +231,6 @@ export function StepRecipient({ wizard }: Props) {
       .finally(() => setBusy(false));
   };
 
-  const openContact = () => {
-    const existing = selected?.contacts?.[0];
-
-    setContact({
-      first_name: existing?.first_name ?? '',
-      last_name: existing?.last_name ?? '',
-      email: existing?.email ?? '',
-    });
-    setContactErrors({});
-    setContactOpen(true);
-  };
-
-  const saveContact = () => {
-    if (!selected?.id) {
-      return;
-    }
-
-    const email = contact.email.trim();
-
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-      setContactErrors({ email: t('provide_email') });
-
-      return;
-    }
-
-    setContactErrors({});
-    setSavingContact(true);
-
-    const contacts = (selected.contacts ?? []).length
-      ? selected.contacts.map((entry, index) =>
-          index === 0
-            ? {
-                ...entry,
-                first_name: contact.first_name.trim(),
-                last_name: contact.last_name.trim(),
-                email,
-                send_email: true,
-              }
-            : entry
-        )
-      : [
-          {
-            first_name: contact.first_name.trim(),
-            last_name: contact.last_name.trim(),
-            email,
-            send_email: true,
-          },
-        ];
-
-    request(
-      'PUT',
-      endpoint('/api/v1/clients/:id', { id: selected.id }),
-      { ...selected, contacts, documents: [] },
-      { skipIntercept: true }
-    )
-      .then((response) => {
-        const saved = response.data.data as Client;
-
-        wizard.attachClient(saved);
-        $refetch(['clients']);
-        setContactOpen(false);
-      })
-      .catch((caught: AxiosError<ValidationBag>) => {
-        const bag = caught.response?.data?.errors;
-        const emailError = bag?.['contacts.0.email']?.[0];
-
-        setContactErrors(
-          emailError
-            ? { email: emailError }
-            : { general: t('email_address_not_saved') }
-        );
-      })
-      .finally(() => setSavingContact(false));
-  };
-
   const proceed = () => {
     setBusy(true);
 
@@ -342,30 +257,56 @@ export function StepRecipient({ wizard }: Props) {
     }
 
     const typed = name.trim().toLowerCase();
-    const collides = lastMatches.current.some((match) => {
-      return (
-        (match.display_name || match.name || '').trim().toLowerCase() === typed
-      );
-    });
 
-    if (collides) {
-      setErrors({ name: t('please_select_a_client') });
-      setDismissedSearch(false);
+    setBusy(true);
 
-      return;
-    }
+    return request(
+      'GET',
+      endpoint(
+        '/api/v1/clients?status=active&sort=display_name|asc&per_page=5&filter=:filter',
+        { filter: encodeURIComponent(name.trim()) }
+      ),
+      {},
+      { skipIntercept: true }
+    )
+      .then((response) => {
+        const found = (response.data.data ?? []) as Client[];
 
-    return createClient().then((created) => {
-      if (created) {
-        return proceed();
-      }
-    });
+        lastMatches.current = found;
+
+        const collides = found.some((match) => {
+          return (
+            (match.display_name || match.name || '').trim().toLowerCase() ===
+            typed
+          );
+        });
+
+        if (!collides) {
+          return createClient().then((created) => {
+            if (created) {
+              return proceed();
+            }
+          });
+        }
+
+        setBusy(false);
+        setErrors({ name: t('please_select_a_client') });
+        setMatches(found);
+        setActive(-1);
+        setDismissedSearch(false);
+      })
+      .catch(() => {
+        setBusy(false);
+        setErrors({ general: t('customer_not_saved') });
+      });
   };
+
+  const selectedEmail = contactEmail(emailableContact(selected));
 
   if (selected) {
     return (
       <StepTransition>
-        <ErrorBanner errors={wizard.errors} />
+        <ErrorBanner errors={wizard.errors} handled={['client_id', 'name']} />
 
         <div
           className="flex items-start justify-between gap-4 border px-4 py-3.5"
@@ -381,11 +322,15 @@ export function StepRecipient({ wizard }: Props) {
 
             <div className="mt-0.5 flex flex-wrap items-center gap-2">
               <span className="text-xs" style={{ color: colors.$17 }}>
-                {selected.contacts?.[0]?.email || t('client_email_not_set')}
+                {selectedEmail || t('client_email_not_set')}
               </span>
 
-              {selected.contacts?.[0]?.email ? null : (
-                <Button type="minimal" behavior="button" onClick={openContact}>
+              {selectedEmail ? null : (
+                <Button
+                  type="minimal"
+                  behavior="button"
+                  onClick={() => setContactOpen(true)}
+                >
                   {t('edit_client')}
                 </Button>
               )}
@@ -409,29 +354,29 @@ export function StepRecipient({ wizard }: Props) {
           </Button>
         </StepFooter>
 
-        <ContactModal
+        <ClientContactModal
           open={contactOpen}
-          contact={contact}
-          errors={contactErrors}
-          busy={savingContact}
-          onChange={setContact}
+          client={selected}
           onClose={() => setContactOpen(false)}
-          onSave={saveContact}
+          onSaved={(saved) => wizard.attachClient(saved)}
         />
       </StepTransition>
     );
   }
 
   const serverErrors = wizard.errors?.errors;
+  const nameError = errors.name ?? serverErrors?.client_id?.[0];
+  const showSuggestions = !dismissedSearch && matches.length > 0;
 
   return (
     <StepTransition>
-      <ErrorBanner errors={wizard.errors} />
+      <ErrorBanner errors={wizard.errors} handled={['client_id', 'name']} />
 
       <div className="space-y-4">
         <div
           className="relative"
           ref={searchBox}
+          onFocus={() => setDismissedSearch(false)}
           onKeyDown={(event) => {
             if (event.target !== nameInput.current || !matches.length) {
               return;
@@ -477,7 +422,6 @@ export function StepRecipient({ wizard }: Props) {
                   setErrors({});
                   wizard.clearErrors();
                 }}
-                errorMessage={errors.name ?? serverErrors?.client_id?.[0]}
               />
             </div>
 
@@ -494,7 +438,13 @@ export function StepRecipient({ wizard }: Props) {
             </span>
           </div>
 
-          {matches.length > 0 ? (
+          {nameError ? (
+            <p role="alert" className="text-xs mt-1 text-red-600">
+              {nameError}
+            </p>
+          ) : null}
+
+          {showSuggestions ? (
             <div
               id="iw-customer-suggestions"
               role="listbox"
@@ -618,95 +568,5 @@ export function StepRecipient({ wizard }: Props) {
         </Button>
       </StepFooter>
     </StepTransition>
-  );
-}
-
-function ContactModal({
-  open,
-  contact,
-  errors,
-  busy,
-  onChange,
-  onClose,
-  onSave,
-}: {
-  open: boolean;
-  contact: { first_name: string; last_name: string; email: string };
-  errors: { email?: string; general?: string };
-  busy: boolean;
-  onChange: (next: {
-    first_name: string;
-    last_name: string;
-    email: string;
-  }) => void;
-  onClose: () => void;
-  onSave: () => void;
-}) {
-  const [t] = useTranslation();
-
-  return (
-    <Modal
-      visible={open}
-      onClose={onClose}
-      title={t('edit_client')}
-      size="small"
-    >
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <InputField
-            id="iw-contact-first-name"
-            label={t('first_name')}
-            value={contact.first_name}
-            changeOverride
-            debounceTimeout={0}
-            onValueChange={(value) =>
-              onChange({ ...contact, first_name: value })
-            }
-          />
-
-          <InputField
-            id="iw-contact-last-name"
-            label={t('last_name')}
-            value={contact.last_name}
-            changeOverride
-            debounceTimeout={0}
-            onValueChange={(value) =>
-              onChange({ ...contact, last_name: value })
-            }
-          />
-        </div>
-
-        <InputField
-          id="iw-contact-email"
-          type="email"
-          required
-          label={t('email_address')}
-          value={contact.email}
-          changeOverride
-          debounceTimeout={0}
-          onValueChange={(value) => onChange({ ...contact, email: value })}
-          errorMessage={errors.email}
-        />
-
-        {errors.general ? (
-          <p className="text-xs text-red-600">{errors.general}</p>
-        ) : null}
-
-        <div className="flex items-center justify-end gap-2 pt-1">
-          <Button type="secondary" behavior="button" onClick={onClose}>
-            {t('cancel')}
-          </Button>
-
-          <Button
-            behavior="button"
-            disabled={busy}
-            disableWithoutIcon={!busy}
-            onClick={onSave}
-          >
-            {t('save')}
-          </Button>
-        </div>
-      </div>
-    </Modal>
   );
 }

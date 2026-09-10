@@ -124,7 +124,9 @@ export function StepTiming({ wizard, embedded }: Props) {
 
   return (
     <StepTransition>
-      {embedded ? null : <ErrorBanner errors={wizard.errors} />}
+      {embedded ? null : (
+        <ErrorBanner errors={wizard.errors} handled={['date', 'due_date']} />
+      )}
 
       <div
         className="space-y-2"

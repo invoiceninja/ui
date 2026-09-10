@@ -12,6 +12,7 @@ import { useColorScheme } from '$app/common/colors';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { Client } from '$app/common/interfaces/client';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { route } from '$app/common/helpers/route';
@@ -22,16 +23,17 @@ import { Card } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BrandPrompts } from './components/BrandPrompts';
+import { ClientContactModal } from './components/ClientContactModal';
 import { StepItems } from './components/StepItems';
 import { StepNotes } from './components/StepNotes';
 import { StepTiming } from './components/StepTiming';
 import { ErrorBanner } from './components/ErrorBanner';
 import { PreviewFrame } from './components/PreviewFrame';
-import { useWizard } from './useWizard';
+import { contactEmail, emailableContact, useWizard } from './useWizard';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -46,15 +48,16 @@ export default function Edit() {
 
   const [saving, setSaving] = useState(false);
   const [sending, setSending] = useState(false);
+  const [askEmail, setAskEmail] = useState(false);
+
+  const sendAfterContact = useRef(false);
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
     { name: t('edit_invoice'), href: `/invoices/wizard/edit/${id}` },
   ];
 
-  const recipient = (wizard.client?.contacts ?? []).find(
-    (contact) => contact.send_email !== false && contact.email
-  )?.email;
+  const recipient = contactEmail(emailableContact(wizard.client));
 
   const save = () => {
     setSaving(true);
@@ -63,16 +66,17 @@ export default function Edit() {
       .flush()
       .then((saved) => {
         if (!saved) {
-          return;
+          return toast.error();
         }
 
         toast.success('updated_invoice');
         $refetch(['invoices']);
       })
+      .catch(() => toast.error())
       .finally(() => setSaving(false));
   };
 
-  const send = () => {
+  const deliver = () => {
     setSending(true);
 
     wizard
@@ -90,6 +94,28 @@ export default function Edit() {
       .finally(() => {
         return setSending(false);
       });
+  };
+
+  const send = () => {
+    if (!recipient) {
+      sendAfterContact.current = true;
+      setAskEmail(true);
+
+      return;
+    }
+
+    deliver();
+  };
+
+  const contactSaved = (saved: Client) => {
+    wizard.attachClient(saved);
+
+    if (!sendAfterContact.current) {
+      return;
+    }
+
+    sendAfterContact.current = false;
+    deliver();
   };
 
   return (
@@ -153,9 +179,21 @@ export default function Edit() {
                       {wizard.client?.display_name || wizard.client?.name}
                     </p>
 
-                    <p className="text-xs mt-0.5" style={{ color: colors.$17 }}>
-                      {recipient || t('no_email_address')}
-                    </p>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-2">
+                      <span className="text-xs" style={{ color: colors.$17 }}>
+                        {recipient || t('no_email_address')}
+                      </span>
+
+                      {recipient ? null : (
+                        <Button
+                          type="minimal"
+                          behavior="button"
+                          onClick={() => setAskEmail(true)}
+                        >
+                          {t('edit_client')}
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </Section>
@@ -214,6 +252,16 @@ export default function Edit() {
           )}
         </Card>
       </div>
+
+      <ClientContactModal
+        open={askEmail}
+        client={wizard.client}
+        onClose={() => {
+          sendAfterContact.current = false;
+          setAskEmail(false);
+        }}
+        onSaved={contactSaved}
+      />
     </Default>
   );
 }

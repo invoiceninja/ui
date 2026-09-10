@@ -79,7 +79,7 @@ export function TaxSetup({
   const invoiceScope = scope === 'invoice';
 
   const enableTaxesForCompany = () => {
-    if ((!invoiceScope && !asking) || !company?.id) {
+    if (!company?.id) {
       return Promise.resolve();
     }
 
