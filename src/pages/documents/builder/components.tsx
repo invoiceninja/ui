@@ -17,6 +17,8 @@ import {
   DeleteDialogButtonProps,
   DeleteDialogProps,
   ImportFromButtonProps,
+  MapSignatoriesFlowButtonProps,
+  MapSignatoriesFlowDialogProps,
   RectangleSettingsCheckboxProps,
   RectangleSettingsDialogButtonProps,
   RectangleSettingsDialogProps,
@@ -26,8 +28,6 @@ import {
   RectangleSettingsOptionsListProps,
   RectangleSettingsRemoveButtonProps,
   RectangleSettingsSelectProps,
-  SingleSignatoryFlowButtonProps,
-  SingleSignatoryFlowDialogProps,
   ToolboxContextProps,
   UninviteDialogButtonProps,
   UninviteDialogProps,
@@ -81,13 +81,13 @@ export function DeleteButton({ isSubmitting }: DeleteDialogButtonProps) {
   );
 }
 
-export function SingleSignatoryFlowDialog({
+export function MapSignatoriesFlowDialog({
   open,
   onOpenChange,
   title,
   content,
   action,
-}: SingleSignatoryFlowDialogProps) {
+}: MapSignatoriesFlowDialogProps) {
   return (
     <Modal title={title} visible={open} onClose={onOpenChange} overflowVisible>
       {content}
@@ -97,10 +97,10 @@ export function SingleSignatoryFlowDialog({
   );
 }
 
-export function SingleSignatoryFlowButton({
+export function MapSignatoriesFlowButton({
   disabled,
   onClick,
-}: SingleSignatoryFlowButtonProps) {
+}: MapSignatoriesFlowButtonProps) {
   const [t] = useTranslation();
 
   return (
