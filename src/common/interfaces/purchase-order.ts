@@ -75,6 +75,7 @@ export interface PurchaseOrder {
   paid_to_date: number;
   subscription_id: string;
   expense_id: string;
+  invoice_id: string;
   invitations: Invitation[];
   documents: any[];
   vendor?: Vendor;
