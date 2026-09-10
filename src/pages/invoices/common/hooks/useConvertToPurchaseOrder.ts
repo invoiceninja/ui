@@ -8,14 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosResponse } from 'axios';
 import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 
@@ -34,8 +33,8 @@ export function useConvertToPurchaseOrder({ entity }: Props) {
     request('POST', endpoint(`/api/v1/${entity}s/bulk`), {
       action: 'convert_to_purchase_order',
       ids,
-    }).then((response: AxiosResponse<GenericManyResponse<PurchaseOrder>>) => {
-      const purchaseOrder = response.data.data[0];
+    }).then((response: GenericSingleResourceResponse<PurchaseOrder>) => {
+      const purchaseOrder = response.data.data;
 
       purchaseOrder.line_items.forEach((lineItem) => (lineItem._id = v4()));
 
