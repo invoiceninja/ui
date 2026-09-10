@@ -9,18 +9,21 @@
  */
 
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 
 export function isAccountPlanExpired(
   plan?: string | null,
   planExpires?: string | null
 ) {
-  const expiry = dayjs(planExpires);
+  const expiry = dayjs.utc(planExpires).add(1, 'day');
 
   return (
     Boolean(plan) &&
     Boolean(planExpires) &&
     expiry.isValid() &&
-    expiry.isBefore(dayjs())
+    expiry.isBefore(dayjs.utc())
   );
 }
 
