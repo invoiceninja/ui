@@ -26,6 +26,7 @@ import { Entity } from '$app/components/CommonActionsPreferenceModal';
 import { PerPage } from '$app/components/DataTable';
 import { ClientShowCard } from '$app/pages/clients/show/components/CardsCustomizationModal';
 import { ThemeColorField } from '$app/pages/settings/user/components/StatusColorTheme';
+import { DEFAULT_TAB, type DefaultTab } from '../constants/default-tab';
 import { Record as ClientMapRecord } from '../constants/exports/client-map';
 import {
   KeyboardShortcutOverride,
@@ -70,6 +71,7 @@ export interface Preferences {
   };
   keyboard_shortcuts?: Record<string, KeyboardShortcutOverride | null>;
   auto_expand_product_table_notes: boolean;
+  default_tab: DefaultTab;
   enable_public_notifications: boolean | null;
   use_system_fonts: boolean;
   use_legacy_editor: boolean;
@@ -140,6 +142,7 @@ export const preferencesDefaults: Preferences = {
     columns: {},
   },
   auto_expand_product_table_notes: false,
+  default_tab: DEFAULT_TAB,
   enable_public_notifications: null,
   use_system_fonts: false,
   use_legacy_editor: false,

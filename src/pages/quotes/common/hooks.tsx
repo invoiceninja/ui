@@ -30,7 +30,7 @@ import {
   MdSend,
   MdTextSnippet,
 } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { EntityState } from '$app/common/enums/entity-state';
 import { QuoteStatus } from '$app/common/enums/quote-status';
@@ -285,6 +285,7 @@ export function useCreate(props: CreateProps) {
   const refreshCompanyUsers = useRefreshCompanyUsers();
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const saveCompany = useHandleCompanySave();
 
@@ -322,7 +323,12 @@ export function useCreate(props: CreateProps) {
 
         $refetch(['quotes']);
 
-        navigate(route('/quotes/:id/edit', { id: response.data.data.id }));
+        const table = searchParams.get('table');
+        const editRoute = route('/quotes/:id/edit', {
+          id: response.data.data.id,
+        });
+
+        navigate(table ? `${editRoute}?table=${table}` : editRoute);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

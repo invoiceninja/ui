@@ -54,6 +54,7 @@ import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
 import { TaxDataBadge } from './components/TaxDataBadge';
+import { useDefaultTabIndex } from '$app/common/hooks/useDefaultTabIndex';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -88,6 +89,7 @@ export default function Edit() {
   const taskColumns = useTaskColumns();
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
+  const { defaultTabIndex, handleTabChange } = useDefaultTabIndex();
 
   useScrollToLineItem(Boolean(invoice && client));
 
@@ -261,7 +263,8 @@ export default function Edit() {
 
           <TabGroup
             tabs={[t('products'), t('tasks')]}
-            defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+            defaultTabIndex={defaultTabIndex}
+            onTabChange={handleTabChange}
             formatTabLabel={(index) => {
               if (index === 1) {
                 return <TasksTabLabel lineItems={invoice?.line_items || []} />;
@@ -273,9 +276,7 @@ export default function Edit() {
                 <ProductsTable
                   type="product"
                   resource={invoice}
-                  shouldCreateInitialLineItem={
-                    searchParams.get('table') !== 'tasks'
-                  }
+                  shouldCreateInitialLineItem={defaultTabIndex === 0}
                   items={invoice.line_items.filter((item) =>
                     [
                       InvoiceItemType.Product,
@@ -304,9 +305,7 @@ export default function Edit() {
                 <ProductsTable
                   type="task"
                   resource={invoice}
-                  shouldCreateInitialLineItem={
-                    searchParams.get('table') === 'tasks'
-                  }
+                  shouldCreateInitialLineItem={defaultTabIndex === 1}
                   items={invoice.line_items.filter(
                     (item) => item.type_id === InvoiceItemType.Task
                   )}

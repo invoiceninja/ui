@@ -29,6 +29,7 @@ import { QuoteDetails } from '../../common/components/QuoteDetails';
 import { QuoteFooter } from '../../common/components/QuoteFooter';
 import { useQuoteUtilities } from '../../common/hooks';
 import { QuoteContext } from '../Create';
+import { useDefaultTabIndex } from '$app/common/hooks/useDefaultTabIndex';
 
 export default function CreatePage() {
   const [t] = useTranslation();
@@ -55,6 +56,7 @@ export default function CreatePage() {
   const taskColumns = useTaskColumns();
   const productColumns = useProductColumns();
   const productQuoteColumns = useProductQuoteColumns();
+  const { defaultTabIndex, handleTabChange } = useDefaultTabIndex();
 
   const {
     handleChange,
@@ -94,7 +96,8 @@ export default function CreatePage() {
         <div className="col-span-12">
           <TabGroup
             tabs={[t('products'), t('tasks')]}
-            defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+            defaultTabIndex={defaultTabIndex}
+            onTabChange={handleTabChange}
             formatTabLabel={(index) => {
               if (index === 1) {
                 return <TasksTabLabel lineItems={quote?.line_items || []} />;
