@@ -52,6 +52,8 @@ export function useInvoiceProject() {
       (response: GenericSingleResourceResponse<Invoice>) => {
         setInvoice(response.data.data);
 
+        toast.dismiss();
+
         navigate(
           route(
             '/invoices/create?table=tasks&project=true&action=invoice_project'
