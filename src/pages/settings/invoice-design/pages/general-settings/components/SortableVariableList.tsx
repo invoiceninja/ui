@@ -11,6 +11,7 @@
 import {
   DragDropContext,
   Draggable,
+  DraggableProvided,
   Droppable,
   DropResult,
 } from '@hello-pangea/dnd';
@@ -33,6 +34,54 @@ interface Props {
   for: string;
   disabled?: boolean;
   excludedVariables?: string[];
+  withDragPortal?: boolean;
+}
+
+interface VariableProps {
+  label: string | undefined;
+  provided: DraggableProvided;
+  disabled?: boolean;
+  onRemove: () => void;
+}
+
+function Variable(props: VariableProps) {
+  const colors = useColorScheme();
+
+  const { label, provided, disabled, onRemove } = props;
+
+  return (
+    <div
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+      ref={provided.innerRef}
+      className="flex items-center justify-between text-sm"
+      style={{ ...provided.draggableProps.style, color: colors.$3 }}
+    >
+      <div className="flex items-center space-x-2 py-2">
+        <div>
+          <GridDotsVertical size="1.2rem" color={colors.$17} />
+        </div>
+
+        <span>{label}</span>
+      </div>
+
+      <div
+        className={classNames({
+          'cursor-not-allowed opacity-75': disabled,
+          'cursor-pointer': !disabled,
+        })}
+        onClick={() => !disabled && onRemove()}
+      >
+        <CircleXMark
+          color={colors.$16}
+          hoverColor={colors.$3}
+          borderColor={colors.$5}
+          hoverBorderColor={colors.$17}
+          size="1.5rem"
+        />
+      </div>
+    </div>
+  );
 }
 
 export function SortableVariableList(props: Props) {
@@ -40,9 +89,7 @@ export function SortableVariableList(props: Props) {
   const company = useCompanyChanges();
   const dispatch = useDispatch();
 
-  const { disabled, excludedVariables } = props;
-
-  const colors = useColorScheme();
+  const { disabled, excludedVariables, withDragPortal } = props;
 
   const defaultVariables = props.defaultVariables;
 
@@ -98,12 +145,25 @@ export function SortableVariableList(props: Props) {
   };
 
   const onDragEnd = (result: DropResult) => {
+    const { source, destination } = result;
+
+    if (!destination) {
+      return;
+    }
+
     const companyClone = cloneDeep(company);
 
+    const variables: string[] =
+      companyClone.settings.pdf_variables?.[props.for] ?? [];
+
+    const visibleIndexes = [...variables.keys()].filter(
+      (index) => !excludedVariables?.includes(variables[index])
+    );
+
     const filtered = arrayMoveImmutable(
-      companyClone.settings.pdf_variables?.[props.for],
-      result.source.index,
-      result.destination?.index as unknown as number
+      variables,
+      visibleIndexes[source.index],
+      visibleIndexes[destination.index]
     );
 
     set(companyClone, `settings.pdf_variables.${props.for}`, filtered);
@@ -133,7 +193,22 @@ export function SortableVariableList(props: Props) {
 
       <Element leftSide={t('variables')} textVerticalAlign="top">
         <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId={props.for} isDropDisabled={disabled}>
+          <Droppable
+            droppableId={props.for}
+            isDropDisabled={disabled}
+            renderClone={
+              withDragPortal
+                ? (provided, _, rubric) => (
+                    <Variable
+                      label={resolveTranslation(rubric.draggableId)?.label}
+                      provided={provided}
+                      disabled={disabled}
+                      onRemove={() => remove(rubric.draggableId)}
+                    />
+                  )
+                : undefined
+            }
+          >
             {(provided) => (
               <div {...provided.droppableProps} ref={provided.innerRef}>
                 {company?.settings?.pdf_variables?.[props.for]
@@ -148,40 +223,12 @@ export function SortableVariableList(props: Props) {
                       isDragDisabled={disabled}
                     >
                       {(provided) => (
-                        <div
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          ref={provided.innerRef}
-                          className="flex items-center justify-between"
-                          key={label}
-                        >
-                          <div className="flex items-center space-x-2 py-2">
-                            <div>
-                              <GridDotsVertical
-                                size="1.2rem"
-                                color={colors.$17}
-                              />
-                            </div>
-
-                            <span>{resolveTranslation(label)?.label}</span>
-                          </div>
-
-                          <div
-                            className={classNames({
-                              'cursor-not-allowed opacity-75': disabled,
-                              'cursor-pointer': !disabled,
-                            })}
-                            onClick={() => !disabled && remove(label)}
-                          >
-                            <CircleXMark
-                              color={colors.$16}
-                              hoverColor={colors.$3}
-                              borderColor={colors.$5}
-                              hoverBorderColor={colors.$17}
-                              size="1.5rem"
-                            />
-                          </div>
-                        </div>
+                        <Variable
+                          label={resolveTranslation(label)?.label}
+                          provided={provided}
+                          disabled={disabled}
+                          onRemove={() => remove(label)}
+                        />
                       )}
                     </Draggable>
                   ))}
