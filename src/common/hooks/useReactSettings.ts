@@ -105,6 +105,7 @@ export interface ReactSettings {
   color_theme?: ColorTheme;
   client_show_cards?: ClientShowCard[];
   dashboard_fields?: string[];
+  show_advanced_invoice_editor?: boolean;
 }
 
 export type ReactTableColumns =

@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Client } from '$app/common/interfaces/client';
@@ -32,6 +33,7 @@ interface Props {
 }
 
 export function EntityCreationModalAction({ client, dropdown }: Props) {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const colors = useColorScheme();
@@ -45,7 +47,7 @@ export function EntityCreationModalAction({ client, dropdown }: Props) {
     setIsModalVisible(false);
 
     setTimeout(() => {
-      navigate(route('/invoices/create?client=:id', { id: client.id }));
+      navigate(route(`${invoicePaths.create}?client=:id`, { id: client.id }));
     }, 150);
   };
 

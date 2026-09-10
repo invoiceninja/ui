@@ -11,6 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -26,6 +27,7 @@ import { ArrowUp } from '$app/components/icons/ArrowUp';
 import { CreditCardChecked } from '$app/components/icons/CreditCardChecked';
 
 export function RecentPayments() {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
 
@@ -69,7 +71,7 @@ export function RecentPayments() {
         payment.invoices &&
         payment.invoices[0] && (
           <DynamicLink
-            to={generatePath('/invoices/:id/edit', {
+            to={generatePath(invoicePaths.edit, {
               id: payment.invoices[0].id,
             })}
             renderSpan={disableNavigation('invoice', payment.invoices[0])}

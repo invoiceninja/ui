@@ -20,6 +20,7 @@ import {
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { EntityState } from '$app/common/enums/entity-state';
 import { ApiTransactionType } from '$app/common/enums/transactions';
 import { getEntityState } from '$app/common/helpers';
@@ -34,6 +35,7 @@ import { Action } from '$app/components/ResourceActions';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 
 export function useActions() {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const bulk = useBulk();
@@ -63,7 +65,7 @@ export function useActions() {
       })
     );
 
-    navigate('/invoices/create?action=invoice_transaction');
+    navigate(`${invoicePaths.create}?action=invoice_transaction`);
   };
 
   const actions: Action<Transaction>[] = [
