@@ -11,6 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { endpoint } from '$app/common/helpers';
+import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Project } from '$app/common/interfaces/project';
 import { User } from '$app/common/interfaces/user';
@@ -33,6 +34,7 @@ interface TaskUserFilterState {
 export function useTaskUserFilters(): TaskUserFilterState {
   const [searchParams, setSearchParams] = useSearchParams();
   const hasPermission = useHasPermission();
+  const preventNavigation = usePreventNavigation();
 
   const canViewAll = hasPermission('view_all');
 
@@ -44,14 +46,14 @@ export function useTaskUserFilters(): TaskUserFilterState {
     const next = new URLSearchParams(searchParams);
     if (id) next.set('user', id);
     else next.delete('user');
-    setSearchParams(next);
+    preventNavigation({ fn: () => setSearchParams(next) });
   };
 
   const setProjectId = (id: string) => {
     const next = new URLSearchParams(searchParams);
     if (id) next.set('project', id);
     else next.delete('project');
-    setSearchParams(next);
+    preventNavigation({ fn: () => setSearchParams(next) });
   };
 
   const parts: string[] = [];
