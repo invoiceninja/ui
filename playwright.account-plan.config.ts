@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const port = Number(process.env.PLAYWRIGHT_ACCOUNT_PLAN_PORT || 4175);
+const baseURL = `http://127.0.0.1:${port}`;
+
 // Standalone component-in-browser tests: no API credentials or account resets.
 export default defineConfig({
   testDir: './tests/browser',
@@ -9,7 +12,7 @@ export default defineConfig({
   retries: 0,
   workers: 4,
   use: {
-    baseURL: 'http://127.0.0.1:4175',
+    baseURL,
     trace: 'retain-on-failure',
   },
   projects: [
@@ -17,8 +20,8 @@ export default defineConfig({
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
   ],
   webServer: {
-    command: 'npx vite --host 127.0.0.1 --port 4175 --strictPort',
-    url: 'http://127.0.0.1:4175/tests/browser/fixtures/account-plan/index.html',
+    command: `npx vite --host 127.0.0.1 --port ${port} --strictPort`,
+    url: `${baseURL}/tests/browser/fixtures/account-plan/index.html`,
     reuseExistingServer: false,
     env: {
       VITE_IS_HOSTED: 'true',
