@@ -28,12 +28,18 @@ import { ChevronRight } from '$app/components/icons/ChevronRight';
 import { Plus } from '$app/components/icons/Plus';
 import { Default } from '$app/components/layouts/Default';
 import {
+  formatTimeLogDayHours,
   parseTimeLog,
   TimeLogType,
+  timeLogSegmentSecondsOnDayKey,
 } from '$app/pages/tasks/common/helpers/calculate-time';
 import { QuickLogTimeModal } from '../common/components/QuickLogTimeModal';
 import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
 import { useTaskUserFilters } from '../common/components/TaskUserFilters';
+import {
+  taskActivityDatesQueryParam,
+  taskHasActivityInDayKeys,
+} from '../common/helpers/activity-dates';
 import { parseDurationToSeconds } from '../common/helpers';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
 import {
@@ -47,11 +53,7 @@ const FLUSH_DELAY_MS = 1800;
 
 type PendingMap = Record<string, Record<string, CellEdit>>;
 
-const formatHours = (seconds: number) => {
-  if (!seconds) return '';
-  const hours = seconds / 3600;
-  return hours.toFixed(2).replace(/\.00$/, '');
-};
+const formatHours = formatTimeLogDayHours;
 
 const getWeekStart = (date: string) =>
   dayjs(date, 'YYYY-MM-DD').startOf('week');
@@ -61,13 +63,10 @@ const getWeekStart = (date: string) =>
 // — no secondary line — to stay legible at narrow column widths.
 
 const sumSecondsForDay = (logs: TimeLogType[], day: dayjs.Dayjs) => {
-  const dayStart = day.startOf('day').unix();
-  const dayEnd = day.endOf('day').unix();
+  const dayKey = day.format('YYYY-MM-DD');
   let total = 0;
   logs.forEach(([s, e]) => {
-    if (!s || s < dayStart || s > dayEnd) return;
-    const finish = e || dayjs().unix();
-    total += Math.max(finish - s, 0);
+    total += timeLogSegmentSecondsOnDayKey(s, e, dayKey);
   });
   return total;
 };
@@ -164,10 +163,13 @@ export default function Weekly() {
 
   const windowStart = weekStart.format('YYYY-MM-DD');
   const windowEnd = weekStart.add(6, 'day').format('YYYY-MM-DD');
-  const dateRangeParam = `&date_range=calculated_start_date,${windowStart},${windowEnd}`;
+  const activityDatesParam = taskActivityDatesQueryParam(
+    windowStart,
+    windowEnd
+  );
 
   const { data, isLoading } = useTasksQuery({
-    endpoint: `/api/v1/tasks?per_page=500&sort=date|asc&include=client,project&status=active&without_deleted_clients=true${userFilters.queryString}${dateRangeParam}`,
+    endpoint: `/api/v1/tasks?per_page=500&sort=date|asc&include=client,project&status=active&without_deleted_clients=true${userFilters.queryString}${activityDatesParam}`,
   });
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
@@ -211,15 +213,18 @@ export default function Weekly() {
   // Ordering is driven by the server-side `sort=date|asc` on the query
   // above; we only filter to rows that have any activity (real or pending)
   // inside the visible week. Order from the API is preserved as-is.
+  const weekDayKeySet = useMemo(() => new Set(weekDayKeys), [weekDayKeys]);
+
   const rows = useMemo(() => {
     return allTasks.filter((task) => {
-      const taskDateInWeek = task.date && weekDayKeys.includes(task.date);
       const hasPendingInWeek = Object.keys(pending[task.id] ?? {}).some(
         (dayKey) => weekDayKeys.includes(dayKey)
       );
-      return taskDateInWeek || hasPendingInWeek;
+      return (
+        taskHasActivityInDayKeys(task, weekDayKeySet) || hasPendingInWeek
+      );
     });
-  }, [allTasks, weekDayKeys, pending]);
+  }, [allTasks, weekDayKeys, weekDayKeySet, pending]);
 
   const setDate = (next: string) => {
     const updated = new URLSearchParams(searchParams);

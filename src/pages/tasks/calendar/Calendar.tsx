@@ -13,7 +13,7 @@ import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
-import { FaGoogle, FaMicrosoft, FaTasks } from 'react-icons/fa';
+import { FaGoogle, FaMicrosoft } from 'react-icons/fa';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { isCalendarConnectionAvailable } from '$app/common/helpers';
@@ -22,7 +22,8 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import {
   CalendarEvent,
   calendarEventDateKey,
-  calendarEventKey,
+  calendarEventLinkKey,
+  calendarTaskEventLinkKey,
 } from '$app/common/interfaces/calendar-event';
 import { Task } from '$app/common/interfaces/task';
 import { useCalendarEventsQuery } from '$app/common/queries/calendar';
@@ -38,8 +39,19 @@ import { QuickLogTimeModal } from '../common/components/QuickLogTimeModal';
 import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
 import { useTaskUserFilters } from '../common/components/TaskUserFilters';
 import {
+  buildTasksByDay,
+  taskActivityDatesQueryParam,
+  taskBillableSecondsOnDayKey,
+  taskSecondsOnDayKey,
+  totalTaskBillableSecondsOnDayKey,
+  totalTaskSecondsOnDayKey,
+} from '../common/helpers/activity-dates';
+import { formatTimeLogDayHours } from '../common/helpers/calculate-time';
+import { isTaskRunning } from '../common/helpers/calculate-entity-state';
+import {
   taskCalendarLabel,
   taskPrimaryLabel,
+  taskProjectAccentColor,
   taskSecondaryLabel,
 } from '../common/helpers/task-label';
 import { useTaskDateDisplay } from '../common/hooks/useTaskDateDisplay';
@@ -88,12 +100,20 @@ export default function Calendar() {
     [gridStart, totalDays]
   );
 
+  const visibleDayKeys = useMemo(
+    () => new Set(cells.map((day) => day.format('YYYY-MM-DD'))),
+    [cells]
+  );
+
   const windowStart = gridStart.format('YYYY-MM-DD');
   const windowEnd = gridEnd.format('YYYY-MM-DD');
-  const dateRangeParam = `&date_range=calculated_start_date,${windowStart},${windowEnd}`;
+  const activityDatesParam = taskActivityDatesQueryParam(
+    windowStart,
+    windowEnd
+  );
 
   const { data, isLoading } = useTasksQuery({
-    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc&status=active&without_deleted_clients=true${userFilters.queryString}${dateRangeParam}`,
+    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc&include=client,project&status=active&without_deleted_clients=true${userFilters.queryString}${activityDatesParam}`,
   });
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
@@ -108,22 +128,17 @@ export default function Calendar() {
   const linkedEventKeys = useMemo(() => {
     const s = new Set<string>();
     allTasks.forEach((task) => {
-      const meta = task.meta;
-      if (!meta?.calendar_event_id) return;
-      const calendarId = meta.calendar_id || '';
-      s.add(`${calendarId}|${meta.calendar_event_id}`);
+      const key = calendarTaskEventLinkKey(task.meta);
+      if (key) s.add(key);
     });
     return s;
   }, [allTasks]);
-
-  const linkKeyForEvent = (ev: CalendarEvent) =>
-    `${ev.calendar_id}|${ev.provider_event_id}`;
 
   const dailyEvents = useMemo(() => {
     const out: Record<string, CalendarEvent[]> = {};
     (calendarEvents ?? []).forEach((ev) => {
       // Already converted into a task, so hide it from the calendar entirely.
-      if (linkedEventKeys.has(linkKeyForEvent(ev))) return;
+      if (linkedEventKeys.has(calendarEventLinkKey(ev))) return;
       const key = calendarEventDateKey(ev);
       (out[key] ||= []).push(ev);
     });
@@ -133,17 +148,11 @@ export default function Calendar() {
     return out;
   }, [calendarEvents, linkedEventKeys]);
 
-  // dayKey -> tasks anchored to that task date. These render as direct task
-  // links only; the month grid intentionally avoids time-total accounting.
-  const tasksByDay = useMemo(() => {
-    const out: Record<string, Task[]> = {};
-    allTasks.forEach((task) => {
-      const key = task.date;
-      if (!key) return;
-      (out[key] ||= []).push(task);
-    });
-    return out;
-  }, [allTasks]);
+  // dayKey -> tasks with time-log activity on that day (else task.date).
+  const tasksByDay = useMemo(
+    () => buildTasksByDay(allTasks, visibleDayKeys),
+    [allTasks, visibleDayKeys]
+  );
 
   const setDate = (next: string) => {
     const updated = new URLSearchParams(searchParams);
@@ -186,7 +195,7 @@ export default function Calendar() {
         event={convertEvent}
         alreadyLinked={
           convertEvent
-            ? linkedEventKeys.has(linkKeyForEvent(convertEvent))
+            ? linkedEventKeys.has(calendarEventLinkKey(convertEvent))
             : false
         }
       />
@@ -324,8 +333,14 @@ export default function Calendar() {
                   const openTask = (task: Task) =>
                     navigate(`/tasks/${task.id}/edit`);
 
-                  const taskOverview = (task: Task) => {
+                  const taskOverview = (task: Task, dayKeyForHours: string) => {
                     const secondary = taskSecondaryLabel(task);
+                    const dayHours = formatTimeLogDayHours(
+                      taskSecondsOnDayKey(task, dayKeyForHours)
+                    );
+                    const billableHours = formatTimeLogDayHours(
+                      taskBillableSecondsOnDayKey(task, dayKeyForHours)
+                    );
 
                     return (
                       <div className="text-left max-w-[18rem]">
@@ -337,9 +352,67 @@ export default function Calendar() {
                             {secondary}
                           </div>
                         )}
+                        {dayHours && (
+                          <div className="font-mono text-[10px] opacity-70 mt-1">
+                            {dayHours} {t('hours')}
+                            {billableHours
+                              ? ` · ${billableHours} ${t('billable')}`
+                              : null}
+                          </div>
+                        )}
+                        {isTaskRunning(task) && (
+                          <div className="text-[10px] mt-1" style={{ color: '#b91c1c' }}>
+                            {t('running')}
+                          </div>
+                        )}
                         <div className="font-mono text-[10px] opacity-70 mt-1">
                           #{task.number || task.id.slice(0, 6)}
                         </div>
+                      </div>
+                    );
+                  };
+
+                  const daySummary = (dayKeyForSummary: string, tasks: Task[]) => {
+                    const totalSeconds = totalTaskSecondsOnDayKey(
+                      tasks,
+                      dayKeyForSummary
+                    );
+                    const billableSeconds = totalTaskBillableSecondsOnDayKey(
+                      tasks,
+                      dayKeyForSummary
+                    );
+                    const totalHours = formatTimeLogDayHours(totalSeconds);
+                    const billableHours = formatTimeLogDayHours(billableSeconds);
+
+                    return (
+                      <div className="text-left max-w-[18rem] space-y-1">
+                        {totalHours && (
+                          <div className="font-mono text-[10px]">
+                            {totalHours} {t('hours')}
+                            {billableHours
+                              ? ` · ${billableHours} ${t('billable')}`
+                              : null}
+                          </div>
+                        )}
+                        {tasks.map((task) => {
+                          const hours = formatTimeLogDayHours(
+                            taskSecondsOnDayKey(task, dayKeyForSummary)
+                          );
+                          return (
+                            <div
+                              key={task.id}
+                              className="text-[10px] truncate opacity-90"
+                            >
+                              {taskPrimaryLabel(task, 40)}
+                              {hours ? (
+                                <span className="font-mono opacity-70">
+                                  {' '}
+                                  · {hours}
+                                </span>
+                              ) : null}
+                            </div>
+                          );
+                        })}
                       </div>
                     );
                   };
@@ -386,35 +459,69 @@ export default function Calendar() {
                         borderColor: colors.$5,
                         backgroundColor: isCurrentMonth ? colors.$1 : colors.$2,
                         color: isCurrentMonth ? colors.$3 : colors.$17,
-                        opacity: isCurrentMonth ? 1 : 0.6,
                       }}
                     >
                       <div className="flex items-center justify-between">
-                        <span
-                          className={
-                            isToday
-                              ? 'inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-semibold'
-                              : 'text-xs font-medium'
+                        {(() => {
+                          const dayNumber = (
+                            <span
+                              className={
+                                isToday
+                                  ? 'inline-flex items-center justify-center min-w-[1.75rem] h-7 px-1 rounded-full text-xs font-semibold tabular-nums leading-none'
+                                  : 'text-xs font-medium tabular-nums leading-none'
+                              }
+                              style={
+                                isToday
+                                  ? {
+                                      backgroundColor: colors.$18,
+                                      color: colors.$1,
+                                    }
+                                  : {
+                                      color: isCurrentMonth
+                                        ? colors.$3
+                                        : colors.$17,
+                                    }
+                              }
+                            >
+                              {day.date()}
+                            </span>
+                          );
+
+                          if (dayTasks.length === 0) {
+                            return dayNumber;
                           }
-                          style={
-                            isToday
-                              ? { backgroundColor: '#2176FF', color: '#fff' }
-                              : undefined
-                          }
-                        >
-                          {day.date()}
-                        </span>
+
+                          return (
+                            <Tippy
+                              duration={0}
+                              delay={[300, 0]}
+                              placement="top"
+                              content={daySummary(dayKey, dayTasks)}
+                              className="rounded-md text-xs p-2 bg-[#F2F2F2] text-black shadow"
+                            >
+                              <span
+                                className="inline-flex"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {dayNumber}
+                              </span>
+                            </Tippy>
+                          );
+                        })()}
                       </div>
 
                       {dayTasks.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1">
-                          {visibleTaskHints.map((task) => (
+                          {visibleTaskHints.map((task) => {
+                            const accent = taskProjectAccentColor(task);
+                            const running = isTaskRunning(task);
+                            return (
                             <Tippy
                               key={task.id}
                               duration={0}
                               delay={[200, 0]}
                               placement="top"
-                              content={taskOverview(task)}
+                              content={taskOverview(task, dayKey)}
                               className="rounded-md text-xs p-2 bg-[#F2F2F2] text-black shadow"
                             >
                               <button
@@ -423,18 +530,29 @@ export default function Calendar() {
                                   e.stopPropagation();
                                   openTask(task);
                                 }}
-                                className="inline-flex h-5 w-5 items-center justify-center rounded border"
+                                className="inline-flex max-w-full items-center gap-1 rounded border px-1 py-0.5 text-[9px] leading-none"
                                 style={{
                                   borderColor: colors.$5,
                                   backgroundColor: colors.$2,
                                   color: colors.$3,
+                                  borderLeftWidth: accent ? 3 : 1,
+                                  borderLeftColor: accent ?? colors.$5,
                                 }}
                                 aria-label={taskCalendarLabel(task)}
                               >
-                                <FaTasks size={10} />
+                                {running && (
+                                  <span
+                                    className="inline-block w-1.5 h-1.5 shrink-0 rounded-full animate-pulse"
+                                    style={{ backgroundColor: '#dc2626' }}
+                                  />
+                                )}
+                                <span className="truncate max-w-[4.5rem]">
+                                  {taskPrimaryLabel(task, 22)}
+                                </span>
                               </button>
                             </Tippy>
-                          ))}
+                            );
+                          })}
 
                           {overflowTaskHints.length > 0 && (
                             <Tippy
@@ -444,7 +562,11 @@ export default function Calendar() {
                               interactive
                               content={
                                 <div className="text-left space-y-1 max-w-[18rem]">
-                                  {overflowTaskHints.map((task) => (
+                                  {overflowTaskHints.map((task) => {
+                                    const dayHours = formatTimeLogDayHours(
+                                      taskSecondsOnDayKey(task, dayKey)
+                                    );
+                                    return (
                                     <button
                                       key={task.id}
                                       type="button"
@@ -455,8 +577,15 @@ export default function Calendar() {
                                       }}
                                     >
                                       {taskPrimaryLabel(task, 90)}
+                                      {dayHours ? (
+                                        <span className="font-mono opacity-70">
+                                          {' '}
+                                          · {dayHours}
+                                        </span>
+                                      ) : null}
                                     </button>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               }
                               className="rounded-md text-xs p-2 bg-[#F2F2F2] text-black shadow"

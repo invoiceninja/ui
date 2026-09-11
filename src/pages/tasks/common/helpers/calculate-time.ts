@@ -30,6 +30,66 @@ export function parseTimeLog(log: string) {
   return parsed;
 }
 
+export function timeLogSegmentEndUnix(end: number): number {
+  return end || Math.floor(Date.now() / 1000);
+}
+
+/** True when any part of [start, end] falls on this calendar day. */
+export function timeLogSegmentOverlapsDayKey(
+  start: number,
+  end: number,
+  dayKey: string
+): boolean {
+  if (!start) return false;
+  const finish = timeLogSegmentEndUnix(end);
+  const day = dayjs(dayKey, 'YYYY-MM-DD');
+  const dayStart = day.startOf('day').unix();
+  const dayEnd = day.endOf('day').unix();
+  return start <= dayEnd && finish >= dayStart;
+}
+
+/** Seconds of this segment attributed to dayKey (clipped to that day). */
+export function timeLogSegmentSecondsOnDayKey(
+  start: number,
+  end: number,
+  dayKey: string
+): number {
+  if (!start) return 0;
+  const finish = timeLogSegmentEndUnix(end);
+  const day = dayjs(dayKey, 'YYYY-MM-DD');
+  const dayStart = day.startOf('day').unix();
+  const dayEnd = day.endOf('day').unix();
+  if (start > dayEnd || finish < dayStart) return 0;
+  const overlapStart = Math.max(start, dayStart);
+  const overlapEnd = Math.min(finish, dayEnd);
+  return Math.max(overlapEnd - overlapStart, 0);
+}
+
+export function timeLogBillableSecondsOnDayKey(
+  log: string,
+  dayKey: string
+): number {
+  return parseTimeLog(log).reduce((sum, [start, end, , billable]) => {
+    if (billable === false) return sum;
+    return sum + timeLogSegmentSecondsOnDayKey(start, end, dayKey);
+  }, 0);
+}
+
+export function timeLogSecondsOnDayKey(log: string, dayKey: string): number {
+  return parseTimeLog(log).reduce(
+    (sum, [start, end]) =>
+      sum + timeLogSegmentSecondsOnDayKey(start, end, dayKey),
+    0
+  );
+}
+
+/** Decimal hours for calendar cells (matches weekly grid). */
+export function formatTimeLogDayHours(seconds: number): string {
+  if (!seconds) return '';
+  const hours = seconds / 3600;
+  return hours.toFixed(2).replace(/\.00$/, '');
+}
+
 export function calculateHours(log: string, includeRunning = false) {
   const times = parseTimeLog(log);
 
