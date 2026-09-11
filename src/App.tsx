@@ -176,15 +176,22 @@ export function App() {
   }, [darkMode, resolvedLanguage]);
 
   useEffect(() => {
-    window.addEventListener('reset.password.required', () => {
-      setIsPasswordRequired(false);
-    });
-
-    window.addEventListener('refetch', (event) => {
+    const handleResetPassword = () => setIsPasswordRequired(false);
+    const handleRefetch = (event: Event) => {
       const { property } = (event as CustomEvent).detail;
-
       refetch(property);
-    });
+    };
+
+    window.addEventListener('reset.password.required', handleResetPassword);
+    window.addEventListener('refetch', handleRefetch);
+
+    return () => {
+      window.removeEventListener(
+        'reset.password.required',
+        handleResetPassword
+      );
+      window.removeEventListener('refetch', handleRefetch);
+    };
   }, []);
 
   useEffect(() => {

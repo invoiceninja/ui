@@ -23,6 +23,12 @@ export const blockedNavigationActionAtom = atom<NavigationAction | undefined>(
   undefined
 );
 
+// Autosaved forms can cancel pending edits and prevent discarding active requests.
+export const navigationDiscardActionsAtom = atom<{
+  discard: () => void;
+  busy: boolean;
+} | null>(null);
+
 interface Params {
   disablePrevention?: boolean;
 }
