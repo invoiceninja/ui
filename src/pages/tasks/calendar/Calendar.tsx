@@ -22,6 +22,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import {
   CalendarEvent,
   calendarEventDateKey,
+  calendarEventKey,
   calendarEventLinkKey,
   calendarTaskEventLinkKey,
 } from '$app/common/interfaces/calendar-event';
@@ -46,8 +47,8 @@ import {
   totalTaskBillableSecondsOnDayKey,
   totalTaskSecondsOnDayKey,
 } from '../common/helpers/activity-dates';
-import { formatTimeLogDayHours } from '../common/helpers/calculate-time';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
+import { formatTimeLogDayHours } from '../common/helpers/calculate-time';
 import {
   taskCalendarLabel,
   taskPrimaryLabel,
@@ -361,7 +362,10 @@ export default function Calendar() {
                           </div>
                         )}
                         {isTaskRunning(task) && (
-                          <div className="text-[10px] mt-1" style={{ color: '#b91c1c' }}>
+                          <div
+                            className="text-[10px] mt-1"
+                            style={{ color: '#b91c1c' }}
+                          >
                             {t('running')}
                           </div>
                         )}
@@ -372,7 +376,10 @@ export default function Calendar() {
                     );
                   };
 
-                  const daySummary = (dayKeyForSummary: string, tasks: Task[]) => {
+                  const daySummary = (
+                    dayKeyForSummary: string,
+                    tasks: Task[]
+                  ) => {
                     const totalSeconds = totalTaskSecondsOnDayKey(
                       tasks,
                       dayKeyForSummary
@@ -382,7 +389,8 @@ export default function Calendar() {
                       dayKeyForSummary
                     );
                     const totalHours = formatTimeLogDayHours(totalSeconds);
-                    const billableHours = formatTimeLogDayHours(billableSeconds);
+                    const billableHours =
+                      formatTimeLogDayHours(billableSeconds);
 
                     return (
                       <div className="text-left max-w-[18rem] space-y-1">
@@ -516,41 +524,41 @@ export default function Calendar() {
                             const accent = taskProjectAccentColor(task);
                             const running = isTaskRunning(task);
                             return (
-                            <Tippy
-                              key={task.id}
-                              duration={0}
-                              delay={[200, 0]}
-                              placement="top"
-                              content={taskOverview(task, dayKey)}
-                              className="rounded-md text-xs p-2 bg-[#F2F2F2] text-black shadow"
-                            >
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openTask(task);
-                                }}
-                                className="inline-flex max-w-full items-center gap-1 rounded border px-1 py-0.5 text-[9px] leading-none"
-                                style={{
-                                  borderColor: colors.$5,
-                                  backgroundColor: colors.$2,
-                                  color: colors.$3,
-                                  borderLeftWidth: accent ? 3 : 1,
-                                  borderLeftColor: accent ?? colors.$5,
-                                }}
-                                aria-label={taskCalendarLabel(task)}
+                              <Tippy
+                                key={task.id}
+                                duration={0}
+                                delay={[200, 0]}
+                                placement="top"
+                                content={taskOverview(task, dayKey)}
+                                className="rounded-md text-xs p-2 bg-[#F2F2F2] text-black shadow"
                               >
-                                {running && (
-                                  <span
-                                    className="inline-block w-1.5 h-1.5 shrink-0 rounded-full animate-pulse"
-                                    style={{ backgroundColor: '#dc2626' }}
-                                  />
-                                )}
-                                <span className="truncate max-w-[4.5rem]">
-                                  {taskPrimaryLabel(task, 22)}
-                                </span>
-                              </button>
-                            </Tippy>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openTask(task);
+                                  }}
+                                  className="inline-flex max-w-full items-center gap-1 rounded border px-1 py-0.5 text-[9px] leading-none"
+                                  style={{
+                                    borderColor: colors.$5,
+                                    backgroundColor: colors.$2,
+                                    color: colors.$3,
+                                    borderLeftWidth: accent ? 3 : 1,
+                                    borderLeftColor: accent ?? colors.$5,
+                                  }}
+                                  aria-label={taskCalendarLabel(task)}
+                                >
+                                  {running && (
+                                    <span
+                                      className="inline-block w-1.5 h-1.5 shrink-0 rounded-full animate-pulse"
+                                      style={{ backgroundColor: '#dc2626' }}
+                                    />
+                                  )}
+                                  <span className="truncate max-w-[4.5rem]">
+                                    {taskPrimaryLabel(task, 22)}
+                                  </span>
+                                </button>
+                              </Tippy>
                             );
                           })}
 
@@ -567,23 +575,23 @@ export default function Calendar() {
                                       taskSecondsOnDayKey(task, dayKey)
                                     );
                                     return (
-                                    <button
-                                      key={task.id}
-                                      type="button"
-                                      className="block w-full text-left truncate hover:underline"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        openTask(task);
-                                      }}
-                                    >
-                                      {taskPrimaryLabel(task, 90)}
-                                      {dayHours ? (
-                                        <span className="font-mono opacity-70">
-                                          {' '}
-                                          · {dayHours}
-                                        </span>
-                                      ) : null}
-                                    </button>
+                                      <button
+                                        key={task.id}
+                                        type="button"
+                                        className="block w-full text-left truncate hover:underline"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          openTask(task);
+                                        }}
+                                      >
+                                        {taskPrimaryLabel(task, 90)}
+                                        {dayHours ? (
+                                          <span className="font-mono opacity-70">
+                                            {' '}
+                                            · {dayHours}
+                                          </span>
+                                        ) : null}
+                                      </button>
                                     );
                                   })}
                                 </div>

@@ -12,16 +12,19 @@ import dayjs from 'dayjs';
 import { Task } from '$app/common/interfaces/task';
 import {
   parseTimeLog,
-  timeLogSegmentEndUnix,
-  timeLogSegmentOverlapsDayKey,
   timeLogBillableSecondsOnDayKey,
   timeLogSecondsOnDayKey,
+  timeLogSegmentEndUnix,
+  timeLogSegmentOverlapsDayKey,
 } from '$app/pages/tasks/common/helpers/calculate-time';
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 /** List tasks with time-log activity between start and end (inclusive). */
-export function taskActivityDatesQueryParam(start: string, end: string): string {
+export function taskActivityDatesQueryParam(
+  start: string,
+  end: string
+): string {
   return `&activity_dates=${start},${end}`;
 }
 
@@ -64,7 +67,12 @@ export function taskActivityDayKeys(
     addSegmentDayKeys(days, start, end, visibleDayKeys);
   });
 
-  if (days.size === 0 && logs.length === 0 && task.date && ISO_DATE.test(task.date)) {
+  if (
+    days.size === 0 &&
+    logs.length === 0 &&
+    task.date &&
+    ISO_DATE.test(task.date)
+  ) {
     if (!visibleDayKeys || visibleDayKeys.has(task.date)) {
       days.add(task.date);
     }

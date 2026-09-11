@@ -36,11 +36,11 @@ import {
 import { QuickLogTimeModal } from '../common/components/QuickLogTimeModal';
 import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
 import { useTaskUserFilters } from '../common/components/TaskUserFilters';
+import { parseDurationToSeconds } from '../common/helpers';
 import {
   taskActivityDatesQueryParam,
   taskHasActivityInDayKeys,
 } from '../common/helpers/activity-dates';
-import { parseDurationToSeconds } from '../common/helpers';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
 import {
   taskPrimaryLabel,
@@ -220,9 +220,7 @@ export default function Weekly() {
       const hasPendingInWeek = Object.keys(pending[task.id] ?? {}).some(
         (dayKey) => weekDayKeys.includes(dayKey)
       );
-      return (
-        taskHasActivityInDayKeys(task, weekDayKeySet) || hasPendingInWeek
-      );
+      return taskHasActivityInDayKeys(task, weekDayKeySet) || hasPendingInWeek;
     });
   }, [allTasks, weekDayKeys, weekDayKeySet, pending]);
 
