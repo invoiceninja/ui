@@ -279,7 +279,7 @@ export function Combobox<T = any>({
       return;
     }
 
-    if (inputValue === '') {
+    if (!nullable || inputValue === '') {
       return;
     }
 
