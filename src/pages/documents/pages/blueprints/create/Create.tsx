@@ -31,11 +31,19 @@ export default function Create() {
     },
   ];
 
-  const handleWizardComplete = (blueprintId: string) => {
+  const handleWizardComplete = (
+    blueprintId: string,
+    templateKind: 'invoice_design' | 'uploaded_pdf' | 'authored_document'
+  ) => {
     navigate(
-      route('/docuninja/templates/:id/edit', {
-        id: blueprintId,
-      })
+      route(
+        templateKind === 'authored_document'
+          ? '/docuninja/templates/:id/document-editor'
+          : '/docuninja/templates/:id/edit',
+        {
+          id: blueprintId,
+        }
+      )
     );
   };
 

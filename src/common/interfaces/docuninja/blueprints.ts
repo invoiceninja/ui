@@ -7,6 +7,8 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
+import type { AuthoredDocumentData } from '@docuninja/builder2.0';
 import { Document } from '$app/common/interfaces/docuninja/api';
 
 export interface Blueprint {
@@ -19,7 +21,8 @@ export interface Blueprint {
   archived_at: string;
   is_deleted: boolean;
   is_template: boolean;
+  template_kind: 'invoice_design' | 'uploaded_pdf' | 'authored_document';
   template?: string;
   document?: Document;
-  grapesjs?: string;
+  grapesjs?: AuthoredDocumentData;
 }

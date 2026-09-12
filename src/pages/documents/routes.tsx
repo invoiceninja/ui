@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Guard } from '$app/common/guards/Guard';
-import { Navigate, Route, Routes } from 'react-router-dom';
 import { lazy } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { DocuNinjaProvider } from '$app/common/components/DocuNinjaProvider';
 import { DocuNinjaGuard } from '$app/common/guards/DocuNinjaGuard';
+import { Guard } from '$app/common/guards/Guard';
 import {
   docuNinjaAdmin,
   docuNinjaOwner,
   docuNinjaPermission,
 } from '$app/common/guards/guards/docuninja/permission';
-import { DocuNinjaProvider } from '$app/common/components/DocuNinjaProvider';
 import { isHosted } from '$app/common/helpers';
 
 const Documents = lazy(() => import('$app/pages/documents/index/Documents'));
@@ -58,9 +58,6 @@ const ReminderSchedules = lazy(
 const Builder = lazy(() => import('$app/pages/documents/builder/Builder'));
 const BlueprintBuilder = lazy(
   () => import('$app/pages/documents/pages/blueprints/builder/BlueprintBuilder')
-);
-const SignatoryMapping = lazy(
-  () => import('$app/pages/documents/pages/blueprints/mapping/SignatoryMapping')
 );
 const EmailTemplates = lazy(
   () =>
@@ -245,16 +242,16 @@ const routes = (
             />
 
             <Route
-              path="templates/:id/map-signatories"
+              path="templates/:id/document-editor"
               element={
                 <DocuNinjaGuard
                   guards={[
                     docuNinjaPermission({
                       model: 'blueprints',
-                      action: 'view',
+                      action: 'create',
                     }),
                   ]}
-                  component={<SignatoryMapping />}
+                  component={<BlueprintBuilder />}
                 />
               }
             />

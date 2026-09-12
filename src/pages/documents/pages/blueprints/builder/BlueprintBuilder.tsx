@@ -1,4 +1,6 @@
 import {
+  type AuthoredDocumentData,
+  blobToBase64,
   Builder as Builder$,
   BuilderContext,
   CreateBlueprintSignatoryProps,
@@ -12,7 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -44,6 +46,8 @@ import {
   Loading,
   MapSignatoriesFlowButton,
   MapSignatoriesFlowDialog,
+  PreviewRefresh,
+  PreviewToggle,
   RectangleSettingsButton,
   RectangleSettingsCheckbox,
   RectangleSettingsDialog,
@@ -228,6 +232,9 @@ function BlueprintBuilder() {
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
 
   const [blueprint, setBlueprint] = useState<Blueprint>();
+  const isAuthoredDocument =
+    blueprint?.template_kind === 'authored_document' ||
+    Boolean(blueprint?.grapesjs);
 
   const actions = useActions({
     onSettingsClick: () => setIsEditModalOpen(true),
@@ -245,7 +252,12 @@ function BlueprintBuilder() {
     { name: t('templates'), href: '/docuninja/templates' },
     {
       name: blueprint?.name || t('blueprint'),
-      href: route('/docuninja/templates/:id/edit', { id }),
+      href: route(
+        isAuthoredDocument
+          ? '/docuninja/templates/:id/document-editor'
+          : '/docuninja/templates/:id/edit',
+        { id }
+      ),
     },
   ];
 
@@ -259,6 +271,74 @@ function BlueprintBuilder() {
 
   const handleSend = () => {
     window.dispatchEvent(new CustomEvent('builder:open.send.confirmation'));
+  };
+
+  const persistAuthoredDocument = async ({
+    editorData,
+    pdf,
+  }: {
+    editorData: AuthoredDocumentData;
+    pdf: Blob;
+  }) => {
+    if (!id) {
+      throw new Error('Blueprint ID is required');
+    }
+
+    await request(
+      'PUT',
+      docuNinjaEndpoint(`/api/blueprints/${id}`),
+      {
+        is_template: true,
+        template_kind: 'authored_document',
+        grapesjs: editorData,
+        base64_file: await blobToBase64(pdf),
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+        },
+      }
+    );
+
+    setBlueprint((current) =>
+      current ? { ...current, grapesjs: editorData } : current
+    );
+  };
+
+  const uploadAuthoredImage = async ({
+    file,
+    signal,
+    onProgress,
+  }: {
+    file: File;
+    signal?: AbortSignal;
+    onProgress?: (progress: number) => void;
+  }) => {
+    if (!id) {
+      throw new Error('Blueprint ID is required');
+    }
+
+    const payload = new FormData();
+    payload.append('file', file);
+
+    const response = await request(
+      'POST',
+      docuNinjaEndpoint(`/api/blueprints/${id}/assets`),
+      payload,
+      {
+        signal,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(
+            'X-DOCU-NINJA-TOKEN'
+          )}`,
+        },
+        onUploadProgress: ({ loaded, total }) => {
+          if (total) onProgress?.(loaded / total);
+        },
+      }
+    );
+
+    return response.data.data as { id: string; url: string };
   };
 
   useEffect(() => {
@@ -353,7 +433,9 @@ function BlueprintBuilder() {
     },
   });
 
-  const navigate = useNavigate();
+  if (!blueprint) {
+    return <Loading />;
+  }
 
   return (
     <Default
@@ -361,28 +443,6 @@ function BlueprintBuilder() {
       breadcrumbs={pages}
       navigationTopRight={
         <div className="flex items-center gap-2">
-          {blueprint?.is_template && blueprint?.template && (
-            <Button
-              type="secondary"
-              behavior="button"
-              onClick={() => {
-                navigate(
-                  route('/docuninja/templates/:id/editor', {
-                    id,
-                    state: {
-                      templateHtml: blueprint.template,
-                      blueprintName: blueprint.name,
-                    },
-                  })
-                );
-              }}
-              disabled={isDocumentSaving}
-              disableWithoutIcon
-            >
-              {t('edit_template')}
-            </Button>
-          )}
-
           {blueprint && (
             <ResourceActions
               resource={blueprint}
@@ -456,6 +516,8 @@ function BlueprintBuilder() {
               toolboxContext: ToolboxContext,
               helper: () => null,
               alert: Alertbox,
+              previewToggle: PreviewToggle,
+              previewRefresh: PreviewRefresh,
               imports: {
                 googleDrive: ImportFromGoogleDrive,
               },
@@ -516,6 +578,9 @@ function BlueprintBuilder() {
               header: {
                 sticky: false,
               },
+              leftSidebar: {
+                visible: !isAuthoredDocument,
+              },
             },
             endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
             blueprint: true,
@@ -523,11 +588,22 @@ function BlueprintBuilder() {
               (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
               undefined,
             readonly: false,
+            authoredDocument: isAuthoredDocument
+              ? {
+                  data: blueprint?.grapesjs,
+                }
+              : undefined,
             services: {
               google: {
                 appId: import.meta.env.VITE_GOOGLE_APP_ID,
                 clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
               },
+              authoredDocuments: isAuthoredDocument
+                ? {
+                    persist: persistAuthoredDocument,
+                    uploadImage: uploadAuthoredImage,
+                  }
+                : undefined,
             },
             translations: {
               ...i18n.getResourceBundle(i18n.language, 'translation'),
