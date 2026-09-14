@@ -8,17 +8,46 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { DEFAULT_TAB, DEFAULT_TABS } from '../constants/default-tab';
+import {
+  DEFAULT_TAB,
+  DEFAULT_TABS,
+  DefaultTab,
+} from '../constants/default-tab';
+import { Invoice } from '../interfaces/invoice';
+import { InvoiceItem, InvoiceItemType } from '../interfaces/invoice-item';
+import { Quote } from '../interfaces/quote';
+import { RecurringInvoice } from '../interfaces/recurring-invoice';
 import { useReactSettings } from './useReactSettings';
 
-export const useDefaultTabIndex = () => {
+type Resource = Invoice | Quote | RecurringInvoice;
+
+const resolveDominantTab = (lineItems: InvoiceItem[]): DefaultTab | null => {
+  const tasks = lineItems.filter(
+    (lineItem) => lineItem.type_id === InvoiceItemType.Task
+  ).length;
+  const products = lineItems.length - tasks;
+
+  if (tasks === products) {
+    return null;
+  }
+
+  return tasks > products ? 'tasks' : 'products';
+};
+
+export const useDefaultTabIndex = (resource: Resource | undefined) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const reactSettings = useReactSettings();
 
+  const dominantTab = useMemo(
+    () => resolveDominantTab(resource?.line_items ?? []),
+    [resource?.id]
+  );
+
   const defaultTab = reactSettings.preferences?.default_tab ?? DEFAULT_TAB;
-  const currentTab = searchParams.get('table') ?? defaultTab;
+  const currentTab = searchParams.get('table') ?? dominantTab ?? defaultTab;
   const currentTabIndex = DEFAULT_TABS.findIndex((tab) => tab === currentTab);
 
   const handleTabChange = (index: number) => {
@@ -31,7 +60,6 @@ export const useDefaultTabIndex = () => {
     const params = new URLSearchParams(searchParams);
 
     params.set('table', tab);
-    params.delete('line_item');
 
     setSearchParams(params, { replace: true });
   };

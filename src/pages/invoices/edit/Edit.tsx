@@ -89,7 +89,7 @@ export default function Edit() {
   const taskColumns = useTaskColumns();
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
-  const { defaultTabIndex, handleTabChange } = useDefaultTabIndex();
+  const { defaultTabIndex } = useDefaultTabIndex(invoice);
 
   useScrollToLineItem(Boolean(invoice && client));
 
@@ -264,7 +264,6 @@ export default function Edit() {
           <TabGroup
             tabs={[t('products'), t('tasks')]}
             defaultTabIndex={defaultTabIndex}
-            onTabChange={handleTabChange}
             formatTabLabel={(index) => {
               if (index === 1) {
                 return <TasksTabLabel lineItems={invoice?.line_items || []} />;
@@ -276,7 +275,9 @@ export default function Edit() {
                 <ProductsTable
                   type="product"
                   resource={invoice}
-                  shouldCreateInitialLineItem={defaultTabIndex === 0}
+                  shouldCreateInitialLineItem={
+                    searchParams.get('table') !== 'tasks'
+                  }
                   items={invoice.line_items.filter((item) =>
                     [
                       InvoiceItemType.Product,
@@ -305,7 +306,9 @@ export default function Edit() {
                 <ProductsTable
                   type="task"
                   resource={invoice}
-                  shouldCreateInitialLineItem={defaultTabIndex === 1}
+                  shouldCreateInitialLineItem={
+                    searchParams.get('table') === 'tasks'
+                  }
                   items={invoice.line_items.filter(
                     (item) => item.type_id === InvoiceItemType.Task
                   )}

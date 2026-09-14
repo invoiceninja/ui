@@ -207,11 +207,7 @@ export function useTaskColumns() {
                 fontSize={19}
                 color={accentColor}
                 onClick={() =>
-                  navigate(
-                    route('/invoices/:id/edit?table=tasks', {
-                      id: task.invoice_id,
-                    })
-                  )
+                  navigate(route('/invoices/:id/edit', { id: task.invoice_id }))
                 }
               />
             </Tooltip>

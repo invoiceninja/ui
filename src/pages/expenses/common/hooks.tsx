@@ -359,9 +359,7 @@ export function useExpenseColumns() {
                   size={19}
                   onClick={() =>
                     navigate(
-                      route('/invoices/:id/edit?table=products', {
-                        id: expense.invoice_id,
-                      })
+                      route('/invoices/:id/edit', { id: expense.invoice_id })
                     )
                   }
                 />

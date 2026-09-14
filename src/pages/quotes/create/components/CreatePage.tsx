@@ -56,7 +56,7 @@ export default function CreatePage() {
   const taskColumns = useTaskColumns();
   const productColumns = useProductColumns();
   const productQuoteColumns = useProductQuoteColumns();
-  const { defaultTabIndex, handleTabChange } = useDefaultTabIndex();
+  const { defaultTabIndex, handleTabChange } = useDefaultTabIndex(quote);
 
   const {
     handleChange,

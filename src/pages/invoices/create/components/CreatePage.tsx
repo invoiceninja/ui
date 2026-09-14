@@ -57,7 +57,7 @@ export default function CreatePage() {
   const taskColumns = useTaskColumns();
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
-  const { defaultTabIndex, handleTabChange } = useDefaultTabIndex();
+  const { defaultTabIndex, handleTabChange } = useDefaultTabIndex(invoice);
 
   const {
     handleChange,
@@ -125,7 +125,9 @@ export default function CreatePage() {
                 <ProductsTable
                   type="product"
                   resource={invoice}
-                  shouldCreateInitialLineItem={defaultTabIndex === 0}
+                  shouldCreateInitialLineItem={
+                    searchParams.get('table') !== 'tasks'
+                  }
                   items={invoice.line_items.filter((item) =>
                     [
                       InvoiceItemType.Product,
@@ -154,7 +156,9 @@ export default function CreatePage() {
                 <ProductsTable
                   type="task"
                   resource={invoice}
-                  shouldCreateInitialLineItem={defaultTabIndex === 1}
+                  shouldCreateInitialLineItem={
+                    searchParams.get('table') === 'tasks'
+                  }
                   items={invoice.line_items.filter(
                     (item) => item.type_id === InvoiceItemType.Task
                   )}

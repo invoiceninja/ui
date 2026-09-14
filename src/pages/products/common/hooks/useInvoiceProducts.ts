@@ -64,7 +64,7 @@ export const useInvoiceProducts = (params?: Params) => {
       if (!onlyAddToInvoice) {
         setInvoice({ ...blankInvoice, line_items: lineItems });
 
-        navigate('/invoices/create?action=invoice_product&table=products');
+        navigate('/invoices/create?action=invoice_product');
       } else {
         setInvoice(
           (current) =>
