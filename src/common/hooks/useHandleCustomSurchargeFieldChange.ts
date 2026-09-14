@@ -17,7 +17,7 @@ import {
 import { useInjectCompanyChanges } from './useInjectCompanyChanges';
 
 export function useHandleCustomSurchargeFieldChange() {
-  const company = useInjectCompanyChanges();
+  const company = useInjectCompanyChanges({ overwrite: false });
   const dispatch = useDispatch();
 
   return (field: string, value: string) => {

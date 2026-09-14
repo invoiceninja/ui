@@ -33,15 +33,15 @@ import { ForecastSummary } from './components/ForecastSummary';
 import { ANALYTICS_CHART_COLORS } from './constants';
 import { findProjectRow, getNestedRows } from './helpers';
 import { useFormatAnalyticsValue } from './hooks/useFormatAnalyticsValue';
-import { ExpensesTab } from './tabs/ExpensesTab';
+import { ChartsTab } from './tabs/ChartsTab';
 import { ProfitTab } from './tabs/ProfitTab';
-import { TimeTab } from './tabs/TimeTab';
 
 interface Props {
   project: Project;
   includeDrafts: boolean;
   overviewContent: (forecastCard: ReactNode) => ReactNode;
   tasksContent?: ReactNode;
+  expensesContent?: ReactNode;
   onCanViewFinancialsChange?: (canViewFinancials: boolean) => void;
 }
 
@@ -50,6 +50,7 @@ export function ProjectAnalytics({
   includeDrafts,
   overviewContent,
   tasksContent,
+  expensesContent,
   onCanViewFinancialsChange,
 }: Props) {
   const [t] = useTranslation();
@@ -255,6 +256,14 @@ export function ProjectAnalytics({
           },
         ]
       : []),
+    ...(expensesContent
+      ? [
+          {
+            label: t('expenses'),
+            content: expensesContent,
+          },
+        ]
+      : []),
     ...(canViewFinancials
       ? [
           {
@@ -271,33 +280,27 @@ export function ProjectAnalytics({
           },
         ]
       : []),
-    ...(canViewFinancials && showTaskTabs
-      ? [
-          {
-            label: t('time'),
-            content: sections && (
-              <TimeTab
-                projectName={project.name}
-                estimatedVsLogged={sections.estimatedVsLogged}
-                projectHealth={sections.projectHealth}
-                teamContribution={sections.teamContribution}
-                timeDistribution={sections.timeDistribution}
-                velocityTrend={sections.velocityTrend}
-                formatter={formatValue}
-              />
-            ),
-          },
-        ]
-      : []),
     ...(canViewFinancials
       ? [
           {
-            label: t('expenses'),
+            label: t('charts'),
             content: sections && (
-              <ExpensesTab
-                expenseBreakdown={sections.expenseBreakdown}
-                cumulativeSpend={sections.cumulativeSpend}
-                formatter={formatValue}
+              <ChartsTab
+                showTimeCharts={showTaskTabs}
+                time={{
+                  projectName: project.name,
+                  estimatedVsLogged: sections.estimatedVsLogged,
+                  projectHealth: sections.projectHealth,
+                  teamContribution: sections.teamContribution,
+                  timeDistribution: sections.timeDistribution,
+                  velocityTrend: sections.velocityTrend,
+                  formatter: formatValue,
+                }}
+                expenses={{
+                  expenseBreakdown: sections.expenseBreakdown,
+                  cumulativeSpend: sections.cumulativeSpend,
+                  formatter: formatValue,
+                }}
               />
             ),
           },

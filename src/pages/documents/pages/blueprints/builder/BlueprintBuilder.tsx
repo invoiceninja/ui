@@ -42,6 +42,8 @@ import {
   DeleteDialog,
   ImportFromGoogleDrive,
   Loading,
+  MapSignatoriesFlowButton,
+  MapSignatoriesFlowDialog,
   RectangleSettingsButton,
   RectangleSettingsCheckbox,
   RectangleSettingsDialog,
@@ -52,8 +54,6 @@ import {
   RectangleSettingsRemoveButton,
   RectangleSettingsSaveButton,
   RectangleSettingsSelect,
-  SingleSignatoryFlowButton,
-  SingleSignatoryFlowDialog,
   ToolboxContext,
   UninviteButton,
   UninviteDialog,
@@ -443,9 +443,9 @@ function BlueprintBuilder() {
               },
               signatorySelector: SignatorySelector,
               signatorySwap: SignatorySwap,
-              singleSignatoryFlow: {
-                dialog: SingleSignatoryFlowDialog,
-                button: SingleSignatoryFlowButton,
+              mapSignatoriesFlow: {
+                dialog: MapSignatoriesFlowDialog,
+                button: MapSignatoriesFlowButton,
               },
               uninvite: {
                 dialog: UninviteDialog,

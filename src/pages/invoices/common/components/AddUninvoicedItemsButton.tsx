@@ -181,12 +181,12 @@ export function AddUninvoicedItemsButton(props: Props) {
           <div className="flex flex-col space-y-4 pt-1 px-4">
             <ProductSelector
               label={t('products') as string}
-              onChange={(product) =>
-                setSelectedProducts((current) => [
-                  ...current,
-                  product.resource as Product,
-                ])
-              }
+              onChange={({ resource }) => {
+                if (resource) {
+                  setSelectedProducts((current) => [...current, resource]);
+                }
+              }}
+              nullable={false}
               withoutAction
               clearInputAfterSelection
               withShadow

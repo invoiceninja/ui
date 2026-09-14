@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { MdDownload, MdSchedule, MdSend } from 'react-icons/md';
 import { useParams } from 'react-router-dom';
 import { endpoint } from '$app/common/helpers';
+import { ALL_TIME_START_DATE } from '$app/common/helpers/dateRange';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -124,6 +125,11 @@ export default function Statement() {
       id: 'last_year',
       start: dayjs().subtract(1, 'year').startOf('year').format('YYYY-MM-DD'),
       end: dayjs().subtract(1, 'year').endOf('year').format('YYYY-MM-DD'),
+    },
+    {
+      id: 'all_time',
+      start: ALL_TIME_START_DATE,
+      end: dayjs().format('YYYY-MM-DD'),
     },
     {
       id: 'custom',

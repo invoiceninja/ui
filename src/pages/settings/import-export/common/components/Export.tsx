@@ -112,6 +112,10 @@ const DATE_RANGES: Range[] = [
     identifier: 'last_year',
     label: 'last_year',
   },
+  {
+    identifier: 'all_time',
+    label: 'all_time',
+  },
   { identifier: 'custom', label: 'custom' },
 ];
 
