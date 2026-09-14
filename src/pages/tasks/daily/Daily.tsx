@@ -37,10 +37,13 @@ import { Tooltip } from '$app/components/Tooltip';
 import {
   parseTimeLog,
   TimeLogType,
+  timeLogSegmentOverlapsDayKey,
+  timeLogSegmentSecondsOnDayKey,
 } from '$app/pages/tasks/common/helpers/calculate-time';
 import { QuickLogTimeModal } from '../common/components/QuickLogTimeModal';
 import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
 import { useTaskUserFilters } from '../common/components/TaskUserFilters';
+import { taskActivityDatesQueryParam } from '../common/helpers/activity-dates';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
 import { shouldShowStartTaskButton } from '../common/helpers/task';
 import {
@@ -68,12 +71,6 @@ const formatSeconds = (seconds: number) => {
   return `${h}:${m.toString().padStart(2, '0')}`;
 };
 
-const entrySeconds = (start: number, stop: number) => {
-  if (!start) return 0;
-  const finish = stop || dayjs().unix();
-  return Math.max(finish - start, 0);
-};
-
 export default function Daily() {
   const { documentTitle } = useTitle('daily');
   const [t] = useTranslation();
@@ -92,10 +89,10 @@ export default function Daily() {
 
   const userFilters = useTaskUserFilters();
 
-  const dateRangeParam = `&date_range=calculated_start_date,${date},${date}`;
+  const activityDatesParam = taskActivityDatesQueryParam(date, date);
 
   const { data, isLoading } = useTasksQuery({
-    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc&status=active&without_deleted_clients=true${userFilters.queryString}${dateRangeParam}`,
+    endpoint: `/api/v1/tasks?per_page=500&sort=updated_at|desc&include=client,project&status=active&without_deleted_clients=true${userFilters.queryString}${activityDatesParam}`,
   });
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
@@ -103,10 +100,10 @@ export default function Daily() {
   const entries: FlatEntry[] = useMemo(() => {
     const flat: FlatEntry[] = [];
     allTasks.forEach((task) => {
-      if (task.date !== date) return;
       const logs = parseTimeLog(task.time_log) as TimeLogType[];
       logs.forEach(([s, e, desc, billable], idx) => {
         if (!s) return;
+        if (!timeLogSegmentOverlapsDayKey(s, e, date)) return;
         flat.push({
           task,
           logIndex: idx,
@@ -120,14 +117,17 @@ export default function Daily() {
     return flat.sort((a, b) => a.start - b.start);
   }, [allTasks, date]);
 
+  const entryDurationSeconds = (entry: FlatEntry) =>
+    timeLogSegmentSecondsOnDayKey(entry.start, entry.stop, date);
+
   const totalSeconds = entries.reduce(
-    (sum, e) => sum + entrySeconds(e.start, e.stop),
+    (sum, e) => sum + entryDurationSeconds(e),
     0
   );
 
   const billableSeconds = entries
     .filter((e) => e.billable)
-    .reduce((sum, e) => sum + entrySeconds(e.start, e.stop), 0);
+    .reduce((sum, e) => sum + entryDurationSeconds(e), 0);
 
   const setDate = (next: string) => {
     const updated = new URLSearchParams(searchParams);
@@ -164,15 +164,13 @@ export default function Daily() {
 
     toast.processing();
 
-    // The page-level useTasksQuery is server-side filtered to `date` only, so
-    // allTasks never contains yesterday. Fetch yesterday on demand instead
-    // of widening the always-on query.
+    // Page query uses activity_dates for `date` only; fetch yesterday the same way.
     let yesterdayTasks: Task[] = [];
     try {
       const response = await request(
         'GET',
         endpoint(
-          `/api/v1/tasks?per_page=500&sort=updated_at|desc&status=active&without_deleted_clients=true${userFilters.queryString}&date_range=calculated_start_date,${yesterday},${yesterday}`
+          `/api/v1/tasks?per_page=500&sort=updated_at|desc&status=active&without_deleted_clients=true${userFilters.queryString}${taskActivityDatesQueryParam(yesterday, yesterday)}`
         )
       );
       yesterdayTasks = response.data?.data ?? [];
@@ -185,7 +183,9 @@ export default function Daily() {
     const tasksToCopy = yesterdayTasks
       .map((task) => ({
         task,
-        logs: parseTimeLog(task.time_log) as TimeLogType[],
+        logs: (parseTimeLog(task.time_log) as TimeLogType[]).filter(([s, e]) =>
+          timeLogSegmentOverlapsDayKey(s, e, yesterday)
+        ),
       }))
       .filter((item) => item.logs.length > 0);
 
@@ -356,7 +356,7 @@ export default function Daily() {
           {!isLoading &&
             entries.map((entry) => {
               const isRunning = entry.stop === 0;
-              const seconds = entrySeconds(entry.start, entry.stop);
+              const seconds = entryDurationSeconds(entry);
               return (
                 <div
                   key={`${entry.task.id}-${entry.logIndex}`}
@@ -365,39 +365,58 @@ export default function Daily() {
                   onClick={() => navigate(`/tasks/${entry.task.id}/edit`)}
                 >
                   <div className="min-w-0 flex-1">
-                    {entry.task.description ? (
-                      <Tooltip
-                        width="auto"
-                        tooltipElement={
-                          <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
-                            <article
-                              className={classNames('prose prose-sm', {
-                                'prose-invert': !reactSettings?.dark_mode,
-                              })}
-                              dangerouslySetInnerHTML={{
-                                __html: sanitizeHTML(entry.task.description),
-                              }}
-                            />
-                          </div>
-                        }
-                      >
-                        <span
-                          className="text-sm block truncate"
+                    <div className="flex items-center gap-2 min-w-0">
+                      {entry.task.description ? (
+                        <Tooltip
+                          width="auto"
+                          tooltipElement={
+                            <div className="w-full max-h-48 overflow-auto whitespace-normal break-all">
+                              <article
+                                className={classNames('prose prose-sm', {
+                                  'prose-invert': !reactSettings?.dark_mode,
+                                })}
+                                dangerouslySetInnerHTML={{
+                                  __html: sanitizeHTML(entry.task.description),
+                                }}
+                              />
+                            </div>
+                          }
+                        >
+                          <span
+                            className="text-sm block truncate"
+                            style={{ color: colors.$3 }}
+                          >
+                            {taskPrimaryLabel(entry.task)}
+                          </span>
+                        </Tooltip>
+                      ) : (
+                        <div
+                          className="text-sm truncate"
                           style={{ color: colors.$3 }}
                         >
-                          {taskPrimaryLabel(entry.task)}
+                          {entry.description
+                            ? extractTextFromHTML(
+                                sanitizeHTML(entry.description)
+                              )
+                            : `#${entry.task.number || ''}`}
+                        </div>
+                      )}
+                      {isTaskRunning(entry.task) && (
+                        <span
+                          className="inline-flex shrink-0 items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
+                          style={{
+                            backgroundColor: '#fee2e2',
+                            color: '#b91c1c',
+                          }}
+                        >
+                          <span
+                            className="inline-block w-1.5 h-1.5 rounded-full animate-pulse"
+                            style={{ backgroundColor: '#dc2626' }}
+                          />
+                          {t('running')}
                         </span>
-                      </Tooltip>
-                    ) : (
-                      <div
-                        className="text-sm truncate"
-                        style={{ color: colors.$3 }}
-                      >
-                        {entry.description
-                          ? extractTextFromHTML(sanitizeHTML(entry.description))
-                          : `#${entry.task.number || ''}`}
-                      </div>
-                    )}
+                      )}
+                    </div>
                     {taskSecondaryLabel(entry.task) && (
                       <div
                         className="text-xs truncate"

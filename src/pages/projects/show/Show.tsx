@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { useEnabled } from '$app/common/guards/guards/enabled';
@@ -41,6 +41,14 @@ import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { TagPills } from '$app/components/tags/TagPills';
+import {
+  defaultColumns as defaultExpenseColumns,
+  useAllExpenseColumns,
+  useActions as useExpenseActions,
+  useExpenseColumns,
+  useExpenseFilters,
+} from '$app/pages/expenses/common/hooks';
+import { useCustomBulkActions as useExpenseCustomBulkActions } from '$app/pages/expenses/common/hooks/useCustomBulkActions';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { ProjectAnalytics } from '$app/pages/projects/analytics/ProjectAnalytics';
 import { ModuleBitmask } from '$app/pages/settings';
@@ -104,6 +112,12 @@ export default function Show() {
 
   const customBulkActions = useCustomBulkActions();
 
+  const expenseActions = useExpenseActions();
+  const expenseFilters = useExpenseFilters();
+  const expenseColumns = useExpenseColumns();
+  const expenseTableColumns = useAllExpenseColumns();
+  const expenseCustomBulkActions = useExpenseCustomBulkActions();
+
   const showEditOption = useShowEditOption();
   const colors = useColorScheme();
 
@@ -125,6 +139,10 @@ export default function Show() {
   }
 
   const showTasks = enabled(ModuleBitmask.Tasks);
+  const showExpenses =
+    enabled(ModuleBitmask.Expenses) &&
+    (hasPermission('view_expense') || hasPermission('edit_expense'));
+
   const tasksContent = (
     <DataTable
       resource="task"
@@ -151,6 +169,37 @@ export default function Show() {
       hideEditableOptions={!hasPermission('edit_task')}
     />
   );
+
+  const expensesContent = showExpenses ? (
+    <DataTable
+      resource="expense"
+      columns={expenseColumns}
+      customActions={expenseActions}
+      endpoint={`/api/v1/expenses?include=client,vendor,category,project&without_deleted_clients=true&without_deleted_vendors=true&sort=id|desc&project_ids=${project.id}`}
+      bulkRoute="/api/v1/expenses/bulk"
+      linkToCreate={route(
+        '/expenses/create?project=:projectId&client=:clientId',
+        {
+          projectId: project.id,
+          clientId: project.client_id,
+        }
+      )}
+      linkToEdit="/expenses/:id/edit"
+      customFilters={expenseFilters}
+      customBulkActions={expenseCustomBulkActions}
+      customFilterPlaceholder="status"
+      withResourcefulActions
+      rightSide={
+        <DataTableColumnsPicker
+          columns={expenseTableColumns as unknown as string[]}
+          defaultColumns={defaultExpenseColumns}
+          table="expense"
+        />
+      }
+      linkToCreateGuards={[permission('create_expense')]}
+      hideEditableOptions={!hasPermission('edit_expense')}
+    />
+  ) : undefined;
 
   const overviewContent = (forecastCard: ReactNode) => (
     <div className="grid grid-cols-12 gap-4 lg:space-y-0">
@@ -263,6 +312,7 @@ export default function Show() {
         includeDrafts={includeDrafts}
         overviewContent={overviewContent}
         tasksContent={showTasks ? tasksContent : undefined}
+        expensesContent={expensesContent}
         onCanViewFinancialsChange={setCanViewFinancials}
       />
 

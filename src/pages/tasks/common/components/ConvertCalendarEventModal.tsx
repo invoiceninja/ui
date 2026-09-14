@@ -26,7 +26,7 @@ import { $refetch } from '$app/common/hooks/useRefetch';
 import {
   CalendarEvent,
   calendarEventDateKey,
-  calendarEventKey,
+  calendarEventLinkKey,
 } from '$app/common/interfaces/calendar-event';
 import { Task } from '$app/common/interfaces/task';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -108,12 +108,8 @@ export function ConvertCalendarEventModal(props: Props) {
       time_log: buildTimeLog(props.event),
       date: calendarEventDateKey(props.event),
       meta: {
-        // Backend uses this triple to dedupe: same calendar event can only
-        // be converted to one task.
-        calendar_event_id:
-          props.event.provider_event_id || calendarEventKey(props.event),
-        calendar_id: props.event.calendar_id,
-        calendar_provider: props.event.provider,
+        // Backend dedupes on this key: same provider event → one task.
+        calendar_event_id: calendarEventLinkKey(props.event),
       },
     });
   }, [props.event, blank]);
