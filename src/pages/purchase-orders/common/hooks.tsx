@@ -74,6 +74,7 @@ import { Link } from '$app/components/forms';
 import { Files } from '$app/components/icons/Files';
 import { Action } from '$app/components/ResourceActions';
 import { TagPills } from '$app/components/tags/TagPills';
+import { Tooltip } from '$app/components/Tooltip';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
@@ -258,18 +259,24 @@ export function usePurchaseOrderColumns() {
                   hasPermission('view_invoice') || hasPermission('edit_invoice')
                 }
                 component={
-                  <MdTextSnippet
-                    className="cursor-pointer"
-                    fontSize={19}
-                    color={accentColor}
-                    onClick={() =>
-                      navigate(
-                        route('/invoices/:id/edit', {
-                          id: purchaseOrder.invoice_id,
-                        })
-                      )
-                    }
-                  />
+                  <Tooltip
+                    message={t('invoice') as string}
+                    width="auto"
+                    placement="top"
+                  >
+                    <MdTextSnippet
+                      className="cursor-pointer"
+                      fontSize={19}
+                      color={accentColor}
+                      onClick={() =>
+                        navigate(
+                          route('/invoices/:id/edit', {
+                            id: purchaseOrder.invoice_id,
+                          })
+                        )
+                      }
+                    />
+                  </Tooltip>
                 }
               />
             )}
@@ -283,18 +290,24 @@ export function usePurchaseOrderColumns() {
                   hasPermission('view_quote') || hasPermission('edit_quote')
                 }
                 component={
-                  <div
-                    className="cursor-pointer"
-                    onClick={() =>
-                      navigate(
-                        route('/quotes/:id/edit', {
-                          id: purchaseOrder.quote_id,
-                        })
-                      )
-                    }
+                  <Tooltip
+                    message={t('quote') as string}
+                    width="auto"
+                    placement="top"
                   >
-                    <Files size="1.2rem" color={accentColor} />
-                  </div>
+                    <div
+                      className="cursor-pointer"
+                      onClick={() =>
+                        navigate(
+                          route('/quotes/:id/edit', {
+                            id: purchaseOrder.quote_id,
+                          })
+                        )
+                      }
+                    >
+                      <Files size="1.2rem" color={accentColor} />
+                    </div>
+                  </Tooltip>
                 }
               />
             )}
