@@ -35,6 +35,7 @@ interface Props {
   withoutAction?: boolean;
   clearInputAfterSelection?: boolean;
   withShadow?: boolean;
+  nullable?: boolean;
 }
 
 export function ProductSelector(props: Props) {
@@ -112,7 +113,7 @@ export function ProductSelector(props: Props) {
         }}
         onDismiss={props.onClearButtonClick}
         sortBy="product_key|asc"
-        nullable
+        nullable={props.nullable ?? true}
         key="product_selector"
         clearInputAfterSelection={props.clearInputAfterSelection}
         withShadow={props.withShadow}

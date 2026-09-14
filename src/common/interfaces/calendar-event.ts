@@ -10,6 +10,7 @@
 
 import dayjs from 'dayjs';
 import type { CalendarProvider } from './user';
+import type { TaskMeta } from './task';
 
 export interface CalendarEvent {
   id: string;
@@ -34,6 +35,23 @@ export interface CalendarEvent {
 export const calendarEventKey = (event: CalendarEvent): string =>
   event.id ||
   `${event.provider}:${event.calendar_id}:${event.provider_event_id}`;
+
+/** Matches task.meta.calendar_event_id when a provider event is converted. */
+export const calendarEventLinkKey = (event: CalendarEvent): string =>
+  `${event.calendar_id}|${event.provider_event_id}`;
+
+/** Resolves the link key stored on a task (supports legacy split meta fields). */
+export const calendarTaskEventLinkKey = (meta?: TaskMeta): string | null => {
+  if (!meta?.calendar_event_id) return null;
+
+  const legacyCalendarId = (meta as TaskMeta & { calendar_id?: string })
+    .calendar_id;
+  if (legacyCalendarId) {
+    return `${legacyCalendarId}|${meta.calendar_event_id}`;
+  }
+
+  return meta.calendar_event_id;
+};
 
 const CALENDAR_EVENT_DATE_TIME =
   /^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2}(?::\d{2})?))?/;

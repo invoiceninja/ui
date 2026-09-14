@@ -10,13 +10,20 @@
 
 import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { preventLeavingPageAtom } from '$app/common/hooks/useAddPreventNavigationEvents';
+import {
+  usePreventNavigation,
+  isNavigationModalVisibleAtom,
+  navigationDiscardActionsAtom,
+} from '$app/common/hooks/usePreventNavigation';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Task } from '$app/common/interfaces/task';
@@ -28,30 +35,33 @@ import { ChevronRight } from '$app/components/icons/ChevronRight';
 import { Plus } from '$app/components/icons/Plus';
 import { Default } from '$app/components/layouts/Default';
 import {
+  formatTimeLogDayHours,
   parseTimeLog,
   TimeLogType,
+  timeLogSegmentSecondsOnDayKey,
 } from '$app/pages/tasks/common/helpers/calculate-time';
 import { QuickLogTimeModal } from '../common/components/QuickLogTimeModal';
 import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
 import { useTaskUserFilters } from '../common/components/TaskUserFilters';
 import { parseDurationToSeconds } from '../common/helpers';
+import {
+  taskActivityDatesQueryParam,
+  taskHasActivityInDayKeys,
+} from '../common/helpers/activity-dates';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
 import {
   taskPrimaryLabel,
   taskSecondaryLabel,
 } from '../common/helpers/task-label';
 import { useTaskDateDisplay } from '../common/hooks/useTaskDateDisplay';
+import { weeklyCellReadOnlyReason } from './cell-editability';
 import { CellEdit, WeeklyCell } from './components/WeeklyCell';
 
 const FLUSH_DELAY_MS = 1800;
 
 type PendingMap = Record<string, Record<string, CellEdit>>;
 
-const formatHours = (seconds: number) => {
-  if (!seconds) return '';
-  const hours = seconds / 3600;
-  return hours.toFixed(2).replace(/\.00$/, '');
-};
+const formatHours = formatTimeLogDayHours;
 
 const getWeekStart = (date: string) =>
   dayjs(date, 'YYYY-MM-DD').startOf('week');
@@ -61,13 +71,10 @@ const getWeekStart = (date: string) =>
 // — no secondary line — to stay legible at narrow column widths.
 
 const sumSecondsForDay = (logs: TimeLogType[], day: dayjs.Dayjs) => {
-  const dayStart = day.startOf('day').unix();
-  const dayEnd = day.endOf('day').unix();
+  const dayKey = day.format('YYYY-MM-DD');
   let total = 0;
   logs.forEach(([s, e]) => {
-    if (!s || s < dayStart || s > dayEnd) return;
-    const finish = e || dayjs().unix();
-    total += Math.max(finish - s, 0);
+    total += timeLogSegmentSecondsOnDayKey(s, e, dayKey);
   });
   return total;
 };
@@ -135,7 +142,14 @@ export default function Weekly() {
   const { documentTitle } = useTitle('freq_weekly');
   const [t] = useTranslation();
   const colors = useColorScheme();
-  const navigate = useNavigate();
+  const preventNavigation = usePreventNavigation();
+  const setPreventLeaving = useSetAtom(preventLeavingPageAtom);
+  const setNavigationDiscardActions = useSetAtom(navigationDiscardActionsAtom);
+  const navigationModalVisible = useAtomValue(isNavigationModalVisibleAtom);
+  const navigationModalRef = useRef(navigationModalVisible);
+  navigationModalRef.current = navigationModalVisible;
+  const [savingCount, setSavingCount] = useState(0);
+  const [saveFailed, setSaveFailed] = useState(false);
   const { displayDate, displayDateRange, displayWeekday } =
     useTaskDateDisplay();
 
@@ -164,15 +178,22 @@ export default function Weekly() {
 
   const windowStart = weekStart.format('YYYY-MM-DD');
   const windowEnd = weekStart.add(6, 'day').format('YYYY-MM-DD');
-  const dateRangeParam = `&date_range=calculated_start_date,${windowStart},${windowEnd}`;
+  const activityDatesParam = taskActivityDatesQueryParam(
+    windowStart,
+    windowEnd
+  );
 
   const { data, isLoading } = useTasksQuery({
-    endpoint: `/api/v1/tasks?per_page=500&sort=date|asc&include=client,project&status=active&without_deleted_clients=true${userFilters.queryString}${dateRangeParam}`,
+    endpoint: `/api/v1/tasks?per_page=500&sort=date|asc&include=client,project&status=active&without_deleted_clients=true${userFilters.queryString}${activityDatesParam}`,
   });
 
   const allTasks: Task[] = useMemo(() => data?.data ?? [], [data]);
 
+  const tasksRef = useRef(allTasks);
+  tasksRef.current = allTasks;
   const flushing = useRef<Set<string>>(new Set());
+  const savesRef = useRef(new Map<string, Promise<boolean>>());
+  const flushRef = useRef<(id: string) => Promise<boolean>>(async () => false);
   const flushTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   // Sync optimistic logs from server state. Only adopts server data when
@@ -211,167 +232,160 @@ export default function Weekly() {
   // Ordering is driven by the server-side `sort=date|asc` on the query
   // above; we only filter to rows that have any activity (real or pending)
   // inside the visible week. Order from the API is preserved as-is.
+  const weekDayKeySet = useMemo(() => new Set(weekDayKeys), [weekDayKeys]);
+
   const rows = useMemo(() => {
     return allTasks.filter((task) => {
-      const taskDateInWeek = task.date && weekDayKeys.includes(task.date);
       const hasPendingInWeek = Object.keys(pending[task.id] ?? {}).some(
         (dayKey) => weekDayKeys.includes(dayKey)
       );
-      return taskDateInWeek || hasPendingInWeek;
+      return taskHasActivityInDayKeys(task, weekDayKeySet) || hasPendingInWeek;
     });
-  }, [allTasks, weekDayKeys, pending]);
+  }, [allTasks, weekDayKeys, weekDayKeySet, pending]);
 
   const setDate = (next: string) => {
     const updated = new URLSearchParams(searchParams);
     if (next) updated.set('date', next);
     else updated.delete('date');
-    setSearchParams(updated);
+    preventNavigation({ fn: () => setSearchParams(updated) });
   };
   const prevWeek = () =>
     setDate(weekStart.subtract(7, 'day').format('YYYY-MM-DD'));
   const nextWeek = () => setDate(weekStart.add(7, 'day').format('YYYY-MM-DD'));
   const goToday = () => setDate(today);
 
-  const flushTask = async (taskId: string) => {
-    if (flushing.current.has(taskId)) {
-      flushTimers.current[taskId] = setTimeout(
-        () => flushTask(taskId),
-        FLUSH_DELAY_MS
-      );
-      return;
-    }
+  const clearFlushTimers = () => {
+    Object.values(flushTimers.current).forEach(clearTimeout);
+    flushTimers.current = {};
+  };
 
-    const snapshot: Record<string, CellEdit> = {
-      ...(pendingRef.current[taskId] ?? {}),
-    };
+  const flushTask = (taskId: string): Promise<boolean> => {
+    const active = savesRef.current.get(taskId);
+    if (active) return active;
+    clearTimeout(flushTimers.current[taskId]);
+    const snapshot = { ...(pendingRef.current[taskId] ?? {}) };
     const dayKeys = Object.keys(snapshot);
-    if (dayKeys.length === 0) return;
-
-    const task = allTasks.find((entry) => entry.id === taskId);
-    if (!task) return;
-
-    if (isTaskRunning(task)) {
-      toast.error('stop_task_to_add_task_entry');
-      return;
-    }
-
+    if (!dayKeys.length) return Promise.resolve(true);
+    const task = tasksRef.current.find((entry) => entry.id === taskId);
+    if (!task) return Promise.resolve(false);
     let logs =
       optimisticLogsRef.current[taskId] ??
       (parseTimeLog(task.time_log) as TimeLogType[]);
-    let invalid = false;
-
     for (const dayKey of dayKeys) {
-      const next = applyCellEditToLogs(logs, dayKey, snapshot[dayKey]);
-      if ('error' in next) {
-        invalid = true;
-        break;
+      const reason = weeklyCellReadOnlyReason(task, logs, dayKey);
+      const next = reason
+        ? null
+        : applyCellEditToLogs(logs, dayKey, snapshot[dayKey]);
+      if (!next || 'error' in next) {
+        toast.error(reason || 'please_enter_a_valid_duration');
+        setSaveFailed(true);
+        return Promise.resolve(false);
       }
       logs = next;
     }
 
-    if (invalid) {
-      toast.error('please_enter_a_valid_duration');
-      return;
-    }
-
-    optimisticLogsRef.current[taskId] = logs;
-    setOptimisticLogs((prev) => ({ ...prev, [taskId]: logs }));
-
-    // Drop snapshotted cells from pending. Newer edits that arrived during
-    // this snapshot stay for the next flush.
-    const nextPendingForTask = { ...(pendingRef.current[taskId] ?? {}) };
-    for (const dayKey of dayKeys) {
-      if (
-        nextPendingForTask[dayKey] &&
-        JSON.stringify(nextPendingForTask[dayKey]) ===
-          JSON.stringify(snapshot[dayKey])
-      ) {
-        delete nextPendingForTask[dayKey];
-      }
-    }
-    const nextPending = { ...pendingRef.current };
-    if (Object.keys(nextPendingForTask).length === 0) {
-      delete nextPending[taskId];
-    } else {
-      nextPending[taskId] = nextPendingForTask;
-    }
-    pendingRef.current = nextPending;
-    setPending(nextPending);
-
     flushing.current.add(taskId);
-    toast.processing();
-
-    try {
-      await request('PUT', endpoint('/api/v1/tasks/:id', { id: taskId }), {
-        ...task,
-        time_log: JSON.stringify(logs),
-        is_date_based: true,
-      });
-      toast.success('updated_task');
-      $refetch(['tasks']);
-    } catch (raw) {
-      const error = raw as AxiosError<ValidationBag>;
-      const status = error?.response?.status;
-      const data = error?.response?.data;
-
-      const rolledBack = parseTimeLog(task.time_log) as TimeLogType[];
-      optimisticLogsRef.current[taskId] = rolledBack;
-      setOptimisticLogs((prev) => ({ ...prev, [taskId]: rolledBack }));
-
-      // Drop the snapshotted edits we just sent so they don't re-flush on
-      // an infinite loop. Anything typed after the snapshot stays.
-      const stillPendingForTask = {
-        ...(pendingRef.current[taskId] ?? {}),
-      };
-      for (const dayKey of dayKeys) {
-        if (
-          stillPendingForTask[dayKey] &&
-          JSON.stringify(stillPendingForTask[dayKey]) ===
-            JSON.stringify(snapshot[dayKey])
-        ) {
-          delete stillPendingForTask[dayKey];
-        }
+    setSavingCount(flushing.current.size);
+    const save = (async () => {
+      let succeeded = false;
+      try {
+        await request(
+          'PUT',
+          endpoint('/api/v1/tasks/:id', { id: taskId }),
+          {
+            ...task,
+            time_log: JSON.stringify(logs),
+            is_date_based: true,
+          },
+          { skipIntercept: true }
+        );
+        optimisticLogsRef.current[taskId] = logs;
+        setOptimisticLogs((prev) => ({ ...prev, [taskId]: logs }));
+        // Keep edits made during the request, and only remove saved snapshots.
+        const remaining = { ...(pendingRef.current[taskId] ?? {}) };
+        dayKeys.forEach((key) => {
+          if (JSON.stringify(remaining[key]) === JSON.stringify(snapshot[key]))
+            delete remaining[key];
+        });
+        const next = { ...pendingRef.current };
+        if (Object.keys(remaining).length) next[taskId] = remaining;
+        else delete next[taskId];
+        pendingRef.current = next;
+        setPending(next);
+        succeeded = true;
+        setSaveFailed(false);
+        toast.success('updated_task');
+        $refetch(['tasks']);
+        return true;
+      } catch (raw) {
+        // Retain the edits for explicit retry; never silently drop failed work.
+        setSaveFailed(true);
+        const error = raw as AxiosError<ValidationBag>;
+        const data = error.response?.data;
+        const message = Object.values(data?.errors ?? {})
+          .flat()
+          .join('\n');
+        toast.error(message || 'weekly_save_failed');
+        return false;
+      } finally {
+        savesRef.current.delete(taskId);
+        flushing.current.delete(taskId);
+        setSavingCount(flushing.current.size);
+        if (succeeded && pendingRef.current[taskId]) scheduleFlush(taskId);
       }
-      const nextPendingAfterFail = { ...pendingRef.current };
-      if (Object.keys(stillPendingForTask).length === 0) {
-        delete nextPendingAfterFail[taskId];
-      } else {
-        nextPendingAfterFail[taskId] = stillPendingForTask;
-      }
-      pendingRef.current = nextPendingAfterFail;
-      setPending(nextPendingAfterFail);
-
-      if (status === 422 && data) {
-        // Do NOT dismiss first: the toast singleton reuses one id for
-        // processing → error. Dismissing kills the id and a subsequent
-        // toast.error against that same id is dropped by react-hot-toast.
-        const messages = Object.values(data.errors ?? {}).flat();
-        const combined =
-          messages.length > 0 ? messages.join('\n') : data.message;
-        toast.error(combined || 'error_title');
-      } else {
-        toast.error();
-      }
-    } finally {
-      flushing.current.delete(taskId);
-      if (
-        pendingRef.current[taskId] &&
-        Object.keys(pendingRef.current[taskId]).length > 0
-      ) {
-        scheduleFlush(taskId);
-      }
-    }
+    })();
+    savesRef.current.set(taskId, save);
+    return save;
   };
+  flushRef.current = flushTask;
 
   const scheduleFlush = (taskId: string) => {
-    if (flushTimers.current[taskId]) {
-      clearTimeout(flushTimers.current[taskId]);
-    }
-    flushTimers.current[taskId] = setTimeout(
-      () => flushTask(taskId),
-      FLUSH_DELAY_MS
-    );
+    clearTimeout(flushTimers.current[taskId]);
+    if (navigationModalRef.current) return;
+    flushTimers.current[taskId] = setTimeout(() => {
+      if (!navigationModalRef.current) void flushRef.current(taskId);
+    }, FLUSH_DELAY_MS);
   };
+
+  const saveAll = async () => {
+    clearFlushTimers();
+    if ((await Promise.all([...savesRef.current.values()])).includes(false))
+      return false;
+    for (const id of Object.keys(pendingRef.current)) {
+      if (!(await flushRef.current(id))) return false;
+    }
+    return Object.keys(pendingRef.current).length === 0;
+  };
+
+  const actionsRef = useRef({ discard: () => {} });
+  actionsRef.current = {
+    discard: () => {
+      clearFlushTimers();
+      pendingRef.current = {};
+      setPending({});
+      setSaveFailed(false);
+    },
+  };
+  useEffect(() => {
+    setNavigationDiscardActions({
+      discard: () => actionsRef.current.discard(),
+      busy: savingCount > 0,
+    });
+  }, [savingCount]);
+
+  const hasUnsavedChanges = Object.keys(pending).length > 0 || savingCount > 0;
+  useEffect(() => {
+    setPreventLeaving((current) => ({
+      ...current,
+      prevent: hasUnsavedChanges,
+    }));
+  }, [hasUnsavedChanges]);
+
+  useEffect(() => {
+    if (navigationModalVisible) clearFlushTimers();
+    else if (!saveFailed)
+      Object.keys(pendingRef.current).forEach(scheduleFlush);
+  }, [navigationModalVisible]);
 
   // Merge partial edit into pending and (re-)arm the debounce timer.
   const mergeCellEdit = (taskId: string, dayKey: string, partial: CellEdit) => {
@@ -388,16 +402,14 @@ export default function Weekly() {
     scheduleFlush(taskId);
   };
 
-  useEffect(() => {
-    const timers = flushTimers.current;
-    return () => {
-      Object.values(timers).forEach((id) => clearTimeout(id));
-      // Best-effort flush of anything still pending on unmount.
-      Object.keys(pendingRef.current).forEach((taskId) => {
-        flushTask(taskId);
-      });
-    };
-  }, []);
+  useEffect(
+    () => () => {
+      clearFlushTimers();
+      setPreventLeaving({ prevent: false });
+      setNavigationDiscardActions(null);
+    },
+    []
+  );
 
   const cellDurationDisplay = (
     taskId: string,
@@ -449,6 +461,14 @@ export default function Weekly() {
       ]}
       topRight={<TaskHeaderControls />}
     >
+      {saveFailed && (
+        <div role="alert" className="px-6 py-3">
+          {t('weekly_save_failed')}
+          <Button type="secondary" onClick={saveAll} disabled={savingCount > 0}>
+            {t('weekly_retry')}
+          </Button>
+        </div>
+      )}
       <QuickLogTimeModal
         visible={quickLogVisible}
         setVisible={setQuickLogVisible}
@@ -564,7 +584,11 @@ export default function Weekly() {
                             <button
                               type="button"
                               className="text-left hover:underline block truncate max-w-[18rem]"
-                              onClick={() => navigate(`/tasks/${task.id}/edit`)}
+                              onClick={() =>
+                                preventNavigation({
+                                  url: `/tasks/${task.id}/edit`,
+                                })
+                              }
                               style={{ color: colors.$3 }}
                               title={taskPrimaryLabel(task, 200)}
                             >
@@ -601,6 +625,11 @@ export default function Weekly() {
                         const dayKey = d.format('YYYY-MM-DD');
                         const pendingEdit = pending[task.id]?.[dayKey];
                         const existingEntry = findDayEntry(logs, d);
+                        const readOnlyReason = weeklyCellReadOnlyReason(
+                          task,
+                          logs,
+                          dayKey
+                        );
                         return (
                           <td key={dayKey} className="p-1 text-center">
                             <WeeklyCell
@@ -615,7 +644,10 @@ export default function Weekly() {
                                 Boolean(pendingEdit) ||
                                 flushing.current.has(task.id)
                               }
-                              disabled={taskIsRunning}
+                              disabled={Boolean(readOnlyReason)}
+                              readOnlyReason={
+                                readOnlyReason ? t(readOnlyReason) : undefined
+                              }
                               initialBillable={
                                 pendingEdit?.billable ??
                                 existingEntry?.[3] ??
