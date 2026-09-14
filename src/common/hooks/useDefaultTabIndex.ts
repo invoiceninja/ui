@@ -10,11 +10,7 @@
 
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import {
-  DEFAULT_TAB,
-  DEFAULT_TABS,
-  DefaultTab,
-} from '../constants/default-tab';
+import { DEFAULT_TAB, DEFAULT_TABS } from '../constants/default-tab';
 import { Invoice } from '../interfaces/invoice';
 import { InvoiceItem, InvoiceItemType } from '../interfaces/invoice-item';
 import { Quote } from '../interfaces/quote';
@@ -23,7 +19,7 @@ import { useReactSettings } from './useReactSettings';
 
 type Resource = Invoice | Quote | RecurringInvoice;
 
-const resolveDominantTab = (lineItems: InvoiceItem[]): DefaultTab | null => {
+const resolveDominantTab = (lineItems: InvoiceItem[]) => {
   const tasks = lineItems.filter(
     (lineItem) => lineItem.type_id === InvoiceItemType.Task
   ).length;
