@@ -55,6 +55,8 @@ export const HOURS_FIELDS = new Set([
   'remaining_hours',
   'hours',
   'unbilled_hours',
+  'task_estimated_hours',
+  'remaining_estimated_hours',
 ]);
 
 export const RATIO_FIELDS = new Set([
@@ -75,6 +77,7 @@ export const PERCENT_FIELDS = new Set([
 ]);
 
 export const FIELD_LABELS: Record<string, string> = {
+  active_tasks_over_estimate_count: 'tasks_over_estimate',
   actual_amount: 'actual_spend',
   average_daily_velocity: 'daily_velocity',
   billable_hours: 'billable',
@@ -100,11 +103,14 @@ export const FIELD_LABELS: Record<string, string> = {
   outstanding_ratio: 'outstanding',
   paid_amount: 'paid',
   paid_progress: 'paid_progress',
+  remaining_estimated_hours: 'remaining_estimated_hours',
   remaining_hours: 'remaining',
   schedule_variance_days: 'days_ahead',
+  task_estimated_hours: 'task_estimated_hours',
   task_value: 'task_value',
   unbilled_amount: 'billable',
   unbilled_hours: 'unbilled_hours',
   unbilled_ratio: 'unbilled_work',
+  unestimated_active_task_count: 'unestimated_tasks',
   work_value: 'total',
 };

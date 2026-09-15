@@ -9,10 +9,10 @@
  */
 
 import classNames from 'classnames';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
-import { date as formatDate } from '$app/common/helpers';
+import { date as formatDate, trans } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Project } from '$app/common/interfaces/project';
 import {
@@ -72,6 +72,7 @@ export function Burnup({
   const [visibleMetricKeys, setVisibleMetricKeys] = useState<
     ProjectBurnupMetricKey[]
   >(DEFAULT_PROJECT_BURNUP_METRICS);
+  const [supportsTaskEstimate, setSupportsTaskEstimate] = useState<boolean>();
 
   const resolvedIncludeDrafts = includeDrafts ?? localIncludeDrafts;
 
@@ -110,13 +111,36 @@ export function Burnup({
     enabled: Boolean(project.id),
   });
   const canViewFinancials = burnup.data?.metadata.can_view_financials === true;
-  const allowedVisibleMetricKeys = canViewFinancials
-    ? visibleMetricKeys
-    : visibleMetricKeys.filter(
-        (key) =>
-          PROJECT_BURNUP_METRICS.find((metric) => metric.key === key)?.axis ===
-          'hours'
-      );
+  const hasTaskEstimate = Boolean(
+    burnup.data?.series.some(
+      (row) => typeof row.task_estimated_hours === 'number'
+    )
+  );
+  const unestimatedTaskCount =
+    burnup.data?.metadata.unestimated_task_count ?? 0;
+
+  useEffect(() => {
+    if (burnup.data) {
+      setSupportsTaskEstimate(hasTaskEstimate);
+    }
+  }, [burnup.data, hasTaskEstimate]);
+
+  const hourMetrics = HOUR_METRICS.filter(
+    (metric) =>
+      metric.key !== 'task_estimated_hours' || supportsTaskEstimate !== false
+  );
+
+  const allowedVisibleMetricKeys = visibleMetricKeys.filter((key) => {
+    if (key === 'task_estimated_hours') {
+      return hasTaskEstimate;
+    }
+
+    return (
+      canViewFinancials ||
+      PROJECT_BURNUP_METRICS.find((metric) => metric.key === key)?.axis ===
+        'hours'
+    );
+  });
 
   const handleMetricToggle = (metricKey: ProjectBurnupMetricKey) => {
     setVisibleMetricKeys((current) => {
@@ -185,7 +209,7 @@ export function Burnup({
         <div className="grid gap-6 xl:grid-cols-2">
           <BurnupMetricGroup
             title={t('hours')}
-            metrics={HOUR_METRICS}
+            metrics={hourMetrics}
             visibleMetricKeys={visibleMetricKeys}
             onToggle={handleMetricToggle}
           />
@@ -208,6 +232,14 @@ export function Burnup({
 
         {burnup.isError && (
           <ErrorMessage>{t('something_went_wrong')}</ErrorMessage>
+        )}
+
+        {hasTaskEstimate && unestimatedTaskCount > 0 && (
+          <p className="text-sm" style={{ color: colors.$22 }}>
+            {trans('current_task_estimate_excludes_unestimated_tasks', {
+              count: unestimatedTaskCount,
+            })}
+          </p>
         )}
 
         {burnup.data && !burnup.isLoading && (
