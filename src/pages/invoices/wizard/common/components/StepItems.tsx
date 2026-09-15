@@ -14,26 +14,29 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
-import { formatTaxName } from '$app/common/helpers/invoices/round';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
-import { Plus } from '$app/components/icons/Plus';
-import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Button, InputField, InputLabel } from '$app/components/forms';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 import { Callout } from './Callout';
-import { ErrorBanner } from './ErrorBanner';
+import { ValidationAlert } from '$app/components/ValidationAlert';
 import { StepFooter } from './StepFooter';
 import { StepTransition } from './StepTransition';
-import { contactEmail, emailableContact, Wizard } from '../useWizard';
+import { Wizard } from '../hooks/useWizard';
+import { TAX_FIELDS, TaxSlot, visibleTaxSlots } from '../helpers/tax-slots';
+import { toNumber } from '../helpers/to-number';
+import { contactEmail, emailableContact } from '../helpers/client-contact';
+import { MoneyRow } from './MoneyRow';
+import { RemoveItemButton } from './RemoveItemButton';
+import { TaxChip } from './TaxChip';
 import { AppliedTax, TaxSetup } from './TaxSetup';
 import { WorkPicker, WorkSource } from './WorkPicker';
 
@@ -45,34 +48,6 @@ interface Props {
 type TaxTarget =
   | { scope: 'invoice' }
   | { scope: 'item'; index: number; slot: TaxSlot };
-
-const TAX_SLOTS = [1, 2, 3] as const;
-
-type TaxSlot = (typeof TAX_SLOTS)[number];
-
-const TAX_FIELDS: Record<
-  TaxSlot,
-  {
-    name: 'tax_name1' | 'tax_name2' | 'tax_name3';
-    rate: 'tax_rate1' | 'tax_rate2' | 'tax_rate3';
-  }
-> = {
-  1: { name: 'tax_name1', rate: 'tax_rate1' },
-  2: { name: 'tax_name2', rate: 'tax_rate2' },
-  3: { name: 'tax_name3', rate: 'tax_rate3' },
-};
-
-const visibleSlots = (item: InvoiceItem, enabled: number) => {
-  const applied = TAX_SLOTS.filter(
-    (slot) => slot <= enabled && Boolean(item[TAX_FIELDS[slot].name])
-  );
-
-  const free = TAX_SLOTS.find(
-    (slot) => slot <= enabled && !item[TAX_FIELDS[slot].name]
-  );
-
-  return free ? [...applied, free] : applied;
-};
 
 export function StepItems({ wizard, embedded }: Props) {
   const reactSettings = useReactSettings();
@@ -94,9 +69,6 @@ export function StepItems({ wizard, embedded }: Props) {
   const [picker, setPicker] = useState<WorkSource | null>(null);
   const [taxSetup, setTaxSetup] = useState<TaxTarget | null>(null);
   const [taxOpen, setTaxOpen] = useState(false);
-  const [missingDescription, setMissingDescription] = useState<string | null>(
-    null
-  );
   const [rates, setRates] = useState<TaxRate[]>([]);
   const [inclusiveAnswered, setInclusiveAnswered] = useState(false);
 
@@ -117,10 +89,6 @@ export function StepItems({ wizard, embedded }: Props) {
   }, []);
 
   const update = (index: number, changes: Partial<InvoiceItem>) => {
-    if (typeof changes.notes === 'string') {
-      setMissingDescription(null);
-    }
-
     wizard.setLineItems(
       items.map((item, position) =>
         position === index ? { ...item, ...changes } : item
@@ -198,21 +166,6 @@ export function StepItems({ wizard, embedded }: Props) {
       .catch(() => toast.error());
   };
 
-  const described = items.some((item) => item.notes || item.product_key);
-
-  const continueForward = () => {
-    if (!described) {
-      const key = items[0]?._id ?? '0';
-
-      setMissingDescription(key);
-      document.getElementById(`iw-desc-${key}`)?.focus();
-
-      return;
-    }
-
-    setMissingDescription(null);
-    wizard.next();
-  };
   const clientName = wizard.client?.display_name || wizard.client?.name || '';
   const recipientEmail = contactEmail(emailableContact(wizard.client));
   const totals = wizard.totals;
@@ -220,7 +173,9 @@ export function StepItems({ wizard, embedded }: Props) {
 
   return (
     <StepTransition>
-      {embedded ? null : <ErrorBanner errors={wizard.errors} />}
+      {embedded || !wizard.errors ? null : (
+        <ValidationAlert errors={wizard.errors} />
+      )}
 
       {embedded || !clientName ? null : (
         <div
@@ -282,13 +237,12 @@ export function StepItems({ wizard, embedded }: Props) {
               }}
             >
               {items.length > 1 ? (
-                <RemoveButton onClick={() => removeRow(index)} />
+                <RemoveItemButton onClick={() => removeRow(index)} />
               ) : null}
 
               <InputField
                 id={`iw-desc-${key}`}
                 width="100%"
-                required
                 label={t('description')}
                 placeholder={t('item_description')}
                 value={item.notes}
@@ -296,12 +250,6 @@ export function StepItems({ wizard, embedded }: Props) {
                 debounceTimeout={0}
                 onValueChange={(value) => update(index, { notes: value })}
               />
-
-              {missingDescription === key ? (
-                <p role="alert" className="text-xs mt-1 text-red-600">
-                  {t('field_is_required')}
-                </p>
-              ) : null}
 
               <div className="mt-3 flex items-end gap-3">
                 <div className="flex-1 min-w-0">
@@ -354,7 +302,7 @@ export function StepItems({ wizard, embedded }: Props) {
               </div>
 
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                {visibleSlots(item, taxSlotCount).map((slot) => (
+                {visibleTaxSlots(item, taxSlotCount).map((slot) => (
                   <TaxChip
                     key={slot}
                     item={item}
@@ -507,7 +455,7 @@ export function StepItems({ wizard, embedded }: Props) {
               </Button>
             }
           >
-            <Button behavior="button" onClick={continueForward}>
+            <Button behavior="button" onClick={wizard.next}>
               {t('continue')}
             </Button>
           </StepFooter>
@@ -551,338 +499,3 @@ export function StepItems({ wizard, embedded }: Props) {
     </StepTransition>
   );
 }
-
-function MoneyRow({
-  label,
-  value,
-  strong,
-}: {
-  label: string;
-  value: string | number;
-  strong?: boolean;
-}) {
-  const colors = useColorScheme();
-
-  return (
-    <div className="flex items-baseline justify-between gap-4">
-      <span
-        className="text-sm"
-        style={{
-          color: strong ? colors.$3 : colors.$17,
-          fontWeight: strong ? 500 : 400,
-        }}
-      >
-        {label}
-      </span>
-
-      <span
-        className={strong ? 'text-lg' : 'text-sm'}
-        style={{
-          color: colors.$3,
-          fontWeight: strong ? 600 : 400,
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}
-
-const PANEL_WIDTH = 288;
-const PANEL_MARGIN = 12;
-const PANEL_MAX_HEIGHT = 320;
-const PANEL_MIN_HEIGHT = 160;
-
-interface Placement {
-  left: number;
-  top: number;
-  maxHeight: number;
-  above: boolean;
-}
-
-function ChipMenu({
-  label,
-  applied,
-  disabled,
-  children,
-}: {
-  label: ReactNode;
-  applied: boolean;
-  disabled?: boolean;
-  children: ReactNode;
-}) {
-  const accentColor = useAccentColor();
-  const colors = useColorScheme();
-  const [open, setOpen] = useState(false);
-  const [hovered, setHovered] = useState(false);
-  const [placement, setPlacement] = useState<Placement>();
-  const chip = useRef<HTMLButtonElement>(null);
-  const panel = useRef<HTMLDivElement>(null);
-
-  const reposition = useCallback(() => {
-    const anchor = chip.current?.getBoundingClientRect();
-
-    if (!anchor) {
-      return;
-    }
-
-    const roomBelow = window.innerHeight - anchor.bottom - PANEL_MARGIN;
-    const roomAbove = anchor.top - PANEL_MARGIN;
-    const above = roomBelow < PANEL_MIN_HEIGHT && roomAbove > roomBelow;
-
-    setPlacement({
-      left: Math.max(
-        PANEL_MARGIN,
-        Math.min(anchor.left, window.innerWidth - PANEL_MARGIN - PANEL_WIDTH)
-      ),
-      top: above ? anchor.top - 6 : anchor.bottom + 6,
-      maxHeight: Math.max(
-        PANEL_MIN_HEIGHT,
-        Math.min(PANEL_MAX_HEIGHT, above ? roomAbove : roomBelow)
-      ),
-      above,
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    reposition();
-
-    const onPointerDown = (event: MouseEvent) => {
-      const target = event.target as Node;
-
-      if (chip.current?.contains(target) || panel.current?.contains(target)) {
-        return;
-      }
-
-      setOpen(false);
-    };
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setOpen(false);
-        chip.current?.focus();
-      }
-    };
-
-    document.addEventListener('mousedown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
-    window.addEventListener('scroll', reposition, true);
-    window.addEventListener('resize', reposition);
-
-    return () => {
-      document.removeEventListener('mousedown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('scroll', reposition, true);
-      window.removeEventListener('resize', reposition);
-    };
-  }, [open, reposition]);
-
-  return (
-    <div className="inline-block">
-      <button
-        ref={chip}
-        type="button"
-        disabled={disabled}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        onClick={() => setOpen(!open)}
-        className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 border"
-        style={{
-          borderRadius: '0.375rem',
-          borderColor: applied ? colors.$24 : hexToRgba(accentColor, 0.35),
-          color: applied ? colors.$3 : accentColor,
-          backgroundColor: applied ? colors.$25 : hexToRgba(accentColor, 0.1),
-          fontWeight: 500,
-          opacity: disabled ? 0.6 : hovered ? 0.75 : 1,
-          cursor: disabled ? 'not-allowed' : 'pointer',
-          transition: 'opacity 150ms ease',
-        }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
-        {applied ? null : <Plus size="0.6875rem" color={accentColor} />}
-        {label}
-      </button>
-
-      {open && placement
-        ? createPortal(
-            <div
-              ref={panel}
-              onClick={() => setOpen(false)}
-              className="fixed flex flex-col border overflow-hidden"
-              style={{
-                left: placement.left,
-                top: placement.top,
-                width: PANEL_WIDTH,
-                maxHeight: placement.maxHeight,
-                transform: placement.above ? 'translateY(-100%)' : undefined,
-                zIndex: 50,
-                backgroundColor: colors.$1,
-                borderColor: colors.$24,
-                borderRadius: '0.375rem',
-                boxShadow: '0 12px 32px -12px rgba(9,9,11,0.28)',
-              }}
-            >
-              {children}
-            </div>,
-            document.body
-          )
-        : null}
-    </div>
-  );
-}
-
-function TaxChip({
-  item,
-  slot,
-  rates,
-  onChange,
-  onCreate,
-}: {
-  item: InvoiceItem;
-  slot: TaxSlot;
-  rates: TaxRate[];
-  onChange: (changes: Partial<InvoiceItem>) => void;
-  onCreate: () => void;
-}) {
-  const colors = useColorScheme();
-  const [t] = useTranslation();
-
-  const field = TAX_FIELDS[slot];
-  const name = item[field.name] ?? '';
-  const rate = item[field.rate] ?? 0;
-  const applied = Boolean(name);
-
-  return (
-    <ChipMenu
-      applied={applied}
-      label={applied ? formatTaxName(name, rate) : t('add_tax')}
-    >
-      <div className="overflow-y-auto" role="listbox">
-        {applied ? (
-          <Option
-            onClick={() => onChange({ [field.name]: '', [field.rate]: 0 })}
-          >
-            {t('none')}
-          </Option>
-        ) : null}
-
-        {rates.map((entry) => (
-          <Option
-            key={entry.id ?? entry.name}
-            selected={applied && name === entry.name}
-            onClick={() =>
-              onChange({ [field.name]: entry.name, [field.rate]: entry.rate })
-            }
-          >
-            {formatTaxName(entry.name, entry.rate)}
-          </Option>
-        ))}
-      </div>
-
-      <div
-        className="shrink-0"
-        style={{ borderTop: `1px solid ${colors.$20}` }}
-      >
-        <Option onClick={onCreate} muted>
-          {t('create_tax_rate')}
-        </Option>
-      </div>
-    </ChipMenu>
-  );
-}
-
-function Option({
-  children,
-  onClick,
-  muted,
-  selected,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  muted?: boolean;
-  selected?: boolean;
-}) {
-  const colors = useColorScheme();
-
-  return (
-    <button
-      type="button"
-      role={typeof selected === 'boolean' ? 'option' : undefined}
-      aria-selected={typeof selected === 'boolean' ? selected : undefined}
-      onClick={onClick}
-      className="w-full text-left px-3 py-2 text-xs"
-      style={{
-        color: muted ? colors.$17 : colors.$3,
-        backgroundColor: selected ? colors.$25 : 'transparent',
-        fontWeight: selected ? 500 : 400,
-      }}
-      onMouseEnter={(event) =>
-        (event.currentTarget.style.backgroundColor = colors.$25)
-      }
-      onMouseLeave={(event) =>
-        (event.currentTarget.style.backgroundColor = selected
-          ? colors.$25
-          : 'transparent')
-      }
-    >
-      {children}
-    </button>
-  );
-}
-
-function RemoveButton({ onClick }: { onClick: () => void }) {
-  const colors = useColorScheme();
-  const [t] = useTranslation();
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={`${t('remove')} ${t('item').toLowerCase()}`}
-      className="absolute grid place-items-center leading-none"
-      style={{
-        top: '0.375rem',
-        right: '0.375rem',
-        width: '1.5rem',
-        height: '1.5rem',
-        fontSize: '0.9375rem',
-        color: colors.$17,
-        borderRadius: '0.375rem',
-      }}
-      onMouseEnter={(event) => {
-        event.currentTarget.style.backgroundColor = colors.$25;
-        event.currentTarget.style.color = colors.$3;
-      }}
-      onMouseLeave={(event) => {
-        event.currentTarget.style.backgroundColor = 'transparent';
-        event.currentTarget.style.color = colors.$17;
-      }}
-    >
-      ✕
-    </button>
-  );
-}
-
-const hexToRgba = (hex: string, alpha: number): string => {
-  const match = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})/i.exec(hex);
-
-  if (!match) {
-    return `rgba(17, 125, 192, ${alpha})`;
-  }
-
-  const [, r, g, b] = match;
-
-  return `rgba(${parseInt(r, 16)}, ${parseInt(g, 16)}, ${parseInt(b, 16)}, ${alpha})`;
-};
-
-const toNumber = (raw: unknown): number => {
-  const parsed = Number(String(raw ?? '').replace(',', '.'));
-
-  return isNaN(parsed) ? 0 : parsed;
-};

@@ -9,8 +9,8 @@
  */
 
 import { useOutletContext } from 'react-router-dom';
-import { StepTiming } from '../components/StepTiming';
-import { WizardContext } from '../useWizard';
+import { StepTiming } from '../common/components/StepTiming';
+import { WizardContext } from '../common/hooks/useWizard';
 
 export default function Payment() {
   const { wizard } = useOutletContext<WizardContext>();

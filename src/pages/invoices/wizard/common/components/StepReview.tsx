@@ -33,11 +33,13 @@ import { Element } from '$app/components/cards';
 import { Button, InputField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Callout } from './Callout';
-import { ErrorBanner } from './ErrorBanner';
+import { ValidationAlert } from '$app/components/ValidationAlert';
 import { StepFooter } from './StepFooter';
 import { PreviewFrame } from './PreviewFrame';
 import { StepTransition } from './StepTransition';
-import { contactEmail, emailableContact, Wizard } from '../useWizard';
+import { Wizard } from '../hooks/useWizard';
+import { contactEmail, emailableContact } from '../helpers/client-contact';
+import { AttachmentOption } from './AttachmentOption';
 import { BrandPrompts } from './BrandPrompts';
 import { ClientContactModal } from './ClientContactModal';
 
@@ -281,7 +283,7 @@ export function StepReview({ wizard }: Props) {
 
   return (
     <StepTransition>
-      <ErrorBanner errors={wizard.errors} />
+      {wizard.errors ? <ValidationAlert errors={wizard.errors} /> : null}
 
       <p
         className="text-xs mb-2"
@@ -319,7 +321,7 @@ export function StepReview({ wizard }: Props) {
           <div>
             <p>{client?.display_name || client?.name || '—'}</p>
 
-            <div className="mt-0.5 flex flex-wrap items-center justify-end gap-2">
+            <div className="mt-0.5 flex flex-wrap items-center justify-end gap-4">
               <span className="text-xs" style={{ color: colors.$17 }}>
                 {recipient || t('no_email_address')}
               </span>
@@ -330,7 +332,7 @@ export function StepReview({ wizard }: Props) {
                   behavior="button"
                   onClick={() => setAskEmail(true)}
                 >
-                  {t('edit_client')}
+                  {t('contact_details')}
                 </Button>
               )}
             </div>
@@ -694,49 +696,5 @@ export function StepReview({ wizard }: Props) {
         onSaved={contactSaved}
       />
     </StepTransition>
-  );
-}
-
-function AttachmentOption({
-  label,
-  checked,
-  allowed,
-  requirement,
-  busy,
-  onChange,
-  onUpgrade,
-}: {
-  label: string;
-  checked: boolean;
-  allowed: boolean;
-  requirement: string;
-  busy: boolean;
-  onChange: (value: boolean) => void;
-  onUpgrade: () => void;
-}) {
-  const [t] = useTranslation();
-
-  return (
-    <Element
-      leftSide={label}
-      leftSideHelp={allowed ? t('saved_for_all_future_emails') : requirement}
-      pushContentToRight
-      noExternalPadding
-      twoGridColumns
-    >
-      <div className="flex items-center justify-end gap-3">
-        {allowed ? null : (
-          <Button type="secondary" behavior="button" onClick={onUpgrade}>
-            {t('upgrade')}
-          </Button>
-        )}
-
-        <Toggle
-          checked={checked}
-          disabled={!allowed || busy}
-          onValueChange={(value) => onChange(value)}
-        />
-      </div>
-    </Element>
   );
 }

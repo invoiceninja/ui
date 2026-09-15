@@ -10,6 +10,7 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -18,7 +19,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '$app/components/Modal';
 import { Button, InputField } from '$app/components/forms';
-import { contactEmail, emailableContact } from '../useWizard';
+import { contactEmail, emailableContact } from '../helpers/client-contact';
 
 interface Props {
   open: boolean;
@@ -36,9 +37,7 @@ export function ClientContactModal({ open, client, onClose, onSaved }: Props) {
     email: '',
   });
   const [busy, setBusy] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; general?: string }>(
-    {}
-  );
+  const [errors, setErrors] = useState<ValidationBag>();
 
   useEffect(() => {
     if (!open) {
@@ -52,7 +51,7 @@ export function ClientContactModal({ open, client, onClose, onSaved }: Props) {
       last_name: existing?.last_name ?? '',
       email: contactEmail(existing),
     });
-    setErrors({});
+    setErrors(undefined);
   }, [open, client]);
 
   const save = () => {
@@ -62,13 +61,7 @@ export function ClientContactModal({ open, client, onClose, onSaved }: Props) {
 
     const email = contact.email.trim();
 
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-      setErrors({ email: t('provide_email') });
-
-      return;
-    }
-
-    setErrors({});
+    setErrors(undefined);
     setBusy(true);
 
     const existing = (client.contacts ?? []).map((entry) => {
@@ -112,14 +105,11 @@ export function ClientContactModal({ open, client, onClose, onSaved }: Props) {
         onClose();
       })
       .catch((caught: AxiosError<ValidationBag>) => {
-        const bag = caught.response?.data?.errors;
-        const emailError = bag?.['contacts.0.email']?.[0];
-
-        setErrors(
-          emailError
-            ? { email: emailError }
-            : { general: t('email_address_not_saved') }
-        );
+        if (caught.response?.status === 422) {
+          setErrors(caught.response.data);
+        } else {
+          toast.error();
+        }
       })
       .finally(() => setBusy(false));
   };
@@ -142,6 +132,7 @@ export function ClientContactModal({ open, client, onClose, onSaved }: Props) {
             onValueChange={(value) =>
               setContact({ ...contact, first_name: value })
             }
+            errorMessage={errors?.errors['contacts.0.first_name']}
           />
 
           <InputField
@@ -153,6 +144,7 @@ export function ClientContactModal({ open, client, onClose, onSaved }: Props) {
             onValueChange={(value) =>
               setContact({ ...contact, last_name: value })
             }
+            errorMessage={errors?.errors['contacts.0.last_name']}
           />
         </div>
 
@@ -165,12 +157,8 @@ export function ClientContactModal({ open, client, onClose, onSaved }: Props) {
           changeOverride
           debounceTimeout={0}
           onValueChange={(value) => setContact({ ...contact, email: value })}
-          errorMessage={errors.email}
+          errorMessage={errors?.errors['contacts.0.email']}
         />
-
-        {errors.general ? (
-          <p className="text-xs text-red-600">{errors.general}</p>
-        ) : null}
 
         <div className="flex items-center justify-end gap-2 pt-1">
           <Button type="secondary" behavior="button" onClick={onClose}>

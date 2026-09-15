@@ -56,9 +56,7 @@ export function TaxSetup({
   const [inclusive, setInclusive] = useState<boolean | null>(null);
   const [asking, setAsking] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string>();
-  const [nameError, setNameError] = useState<string>();
-  const [rateError, setRateError] = useState<string>();
+  const [errors, setErrors] = useState<ValidationBag>();
 
   useEffect(() => {
     if (open) {
@@ -66,15 +64,11 @@ export function TaxSetup({
       setRate('');
       setInclusive(null);
       setAsking(askInclusive);
-      setError(undefined);
-      setNameError(undefined);
-      setRateError(undefined);
+      setErrors(undefined);
     }
   }, [open]);
 
   const parsedRate = Number(rate.replace(',', '.'));
-  const rateIsValid =
-    rate.trim() !== '' && !isNaN(parsedRate) && parsedRate >= 0;
 
   const invoiceScope = scope === 'invoice';
 
@@ -103,20 +97,7 @@ export function TaxSetup({
   };
 
   const apply = () => {
-    setError(undefined);
-    setNameError(undefined);
-    setRateError(undefined);
-
-    if (!name.trim()) {
-      setNameError(t('field_is_required'));
-      return;
-    }
-
-    if (!rateIsValid) {
-      setRateError(t('enter_tax_percentage'));
-      return;
-    }
-
+    setErrors(undefined);
     setBusy(true);
 
     request(
@@ -141,26 +122,14 @@ export function TaxSetup({
             );
             onClose();
           })
-          .catch(() => setError(t('taxes_could_not_be_enabled')));
+          .catch(() => toast.error());
       })
       .catch((caught: AxiosError<ValidationBag>) => {
-        const bag = caught.response?.data?.errors;
-
-        if (!bag) {
-          setError(t('tax_rate_not_saved'));
-
-          return;
+        if (caught.response?.status === 422) {
+          setErrors(caught.response.data);
+        } else {
+          toast.error();
         }
-
-        Object.entries(bag).forEach(([key, messages]) => {
-          if (key === 'name') {
-            setNameError(messages[0]);
-          } else if (key === 'rate') {
-            setRateError(messages[0]);
-          } else {
-            setError(messages[0]);
-          }
-        });
       })
       .finally(() => setBusy(false));
   };
@@ -182,7 +151,7 @@ export function TaxSetup({
           changeOverride
           debounceTimeout={0}
           onValueChange={setName}
-          errorMessage={nameError}
+          errorMessage={errors?.errors.name}
         />
 
         <InputField
@@ -193,7 +162,7 @@ export function TaxSetup({
           changeOverride
           debounceTimeout={0}
           onValueChange={setRate}
-          errorMessage={rateError}
+          errorMessage={errors?.errors.rate}
         />
 
         {asking ? (
@@ -220,8 +189,6 @@ export function TaxSetup({
             </p>
           </div>
         ) : null}
-
-        {error ? <p className="text-xs text-red-600">{error}</p> : null}
 
         <div className="flex items-center justify-end gap-2 pt-1">
           <Button type="secondary" behavior="button" onClick={onClose}>

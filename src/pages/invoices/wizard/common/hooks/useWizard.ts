@@ -19,7 +19,6 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Client } from '$app/common/interfaces/client';
-import { ClientContact } from '$app/common/interfaces/client-contact';
 import { Company } from '$app/common/interfaces/company.interface';
 import { Currency } from '$app/common/interfaces/currency';
 import { Invoice } from '$app/common/interfaces/invoice';
@@ -28,7 +27,7 @@ import { Invitation } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { toast } from '$app/common/helpers/toast/toast';
 import { AxiosError } from 'axios';
-import dayjs from 'dayjs';
+import { today } from '../helpers/dates';
 import { cloneDeep } from 'lodash';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { useAtom } from 'jotai';
@@ -59,7 +58,7 @@ export const STEPS: { key: StepKey; title: string; href: string }[] = [
 
 export type SaveState = 'idle' | 'saving' | 'saved' | 'failed';
 
-const SERVER_OWNED = [
+const SERVER_OWNED: (keyof Invoice)[] = [
   'id',
   'number',
   'status_id',
@@ -67,32 +66,12 @@ const SERVER_OWNED = [
   'created_at',
   'user_id',
   'is_deleted',
-] as const;
+];
 
-export const contactEmail = (contact: ClientContact | undefined): string => {
-  return (contact?.email ?? '').trim();
-};
-
-export const emailableContact = (
-  client: Client | undefined
-): ClientContact | undefined => {
-  const contacts = client?.contacts ?? [];
-
-  return (
-    contacts.find(
-      (entry) => entry.send_email !== false && contactEmail(entry)
-    ) ?? contacts[0]
-  );
-};
-
-export const today = (): string => {
-  return dayjs().format('YYYY-MM-DD');
-};
-
-export const addDays = (from: string, days: number): string => {
-  return dayjs(from || today())
-    .add(days, 'day')
-    .format('YYYY-MM-DD');
+const adoptServerOwned = (target: Invoice, source: Invoice): Invoice => {
+  return SERVER_OWNED.reduce((merged, key) => {
+    return { ...merged, [key]: source[key] };
+  }, target);
 };
 
 export interface Wizard {
@@ -214,6 +193,7 @@ export function useWizard(existingId?: string): Wizard {
   const written = useRef(0);
   const createFailed = useRef(false);
   const forced = useRef(false);
+  const choosing = useRef(false);
   const defaultTerms = useRef(false);
   const defaultTermsSynced = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
@@ -366,7 +346,7 @@ export function useWizard(existingId?: string): Wizard {
 
     const id = persistedId.current;
 
-    if (!id && createFailed.current && !forced.current) {
+    if (!id && !forced.current && (createFailed.current || choosing.current)) {
       return Promise.resolve(null);
     }
 
@@ -413,13 +393,7 @@ export function useWizard(existingId?: string): Wizard {
             return previous;
           }
 
-          const merged = { ...previous };
-
-          SERVER_OWNED.forEach((key) => {
-            (merged as any)[key] = (saved as any)[key];
-          });
-
-          return merged;
+          return adoptServerOwned(previous, saved);
         };
 
         latest.current = merge(latest.current);
@@ -530,6 +504,8 @@ export function useWizard(existingId?: string): Wizard {
 
     return save();
   }, [save]);
+
+  choosing.current = location.pathname === STEPS[0].href;
 
   flushOnLeave.current = () => {
     if (revision.current !== written.current) {

@@ -9,8 +9,8 @@
  */
 
 import { useOutletContext } from 'react-router-dom';
-import { StepItems } from '../components/StepItems';
-import { WizardContext } from '../useWizard';
+import { StepItems } from '../common/components/StepItems';
+import { WizardContext } from '../common/hooks/useWizard';
 
 export default function Items() {
   const { wizard } = useOutletContext<WizardContext>();

@@ -9,8 +9,8 @@
  */
 
 import { useOutletContext } from 'react-router-dom';
-import { StepNotes } from '../components/StepNotes';
-import { WizardContext } from '../useWizard';
+import { StepNotes } from '../common/components/StepNotes';
+import { WizardContext } from '../common/hooks/useWizard';
 
 export default function Notes() {
   const { wizard } = useOutletContext<WizardContext>();

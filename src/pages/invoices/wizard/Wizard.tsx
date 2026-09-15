@@ -12,7 +12,7 @@ import { useColorScheme } from '$app/common/colors';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { route } from '$app/common/helpers/route';
-import { AdvancedConfigurationToggle } from './components/AdvancedConfigurationToggle';
+import { AdvancedConfigurationToggle } from './common/components/AdvancedConfigurationToggle';
 import { Badge } from '$app/components/Badge';
 import { Page } from '$app/components/Breadcrumbs';
 import { Spinner } from '$app/components/Spinner';
@@ -22,7 +22,7 @@ import { Default } from '$app/components/layouts/Default';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { STEPS, useWizard } from './useWizard';
+import { STEPS, useWizard } from './common/hooks/useWizard';
 
 export default function Wizard() {
   const [t] = useTranslation();
@@ -48,22 +48,9 @@ export default function Wizard() {
   const current = STEPS[wizard.stepIndex] ?? STEPS[0];
   const wideStep = wizard.step === 'send' || wizard.step === 'notes';
 
-  const described = (wizard.invoice?.line_items ?? []).some(
-    (item) => item.notes || item.product_key
-  );
-
   if (wizard.ready) {
     if (location.pathname !== STEPS[0].href && !wizard.invoice?.client_id) {
       return <Navigate to={STEPS[0].href} replace />;
-    }
-
-    if (
-      !described &&
-      (wizard.step === 'when' ||
-        wizard.step === 'notes' ||
-        wizard.step === 'send')
-    ) {
-      return <Navigate to={STEPS[1].href} replace />;
     }
 
     if (

@@ -9,8 +9,8 @@
  */
 
 import { useOutletContext } from 'react-router-dom';
-import { StepRecipient } from '../components/StepRecipient';
-import { WizardContext } from '../useWizard';
+import { StepRecipient } from '../common/components/StepRecipient';
+import { WizardContext } from '../common/hooks/useWizard';
 
 export default function Who() {
   const { wizard } = useOutletContext<WizardContext>();

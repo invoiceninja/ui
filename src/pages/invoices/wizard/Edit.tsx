@@ -16,7 +16,7 @@ import { Client } from '$app/common/interfaces/client';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { route } from '$app/common/helpers/route';
-import { AdvancedConfigurationToggle } from './components/AdvancedConfigurationToggle';
+import { AdvancedConfigurationToggle } from './common/components/AdvancedConfigurationToggle';
 import { Page } from '$app/components/Breadcrumbs';
 import { Spinner } from '$app/components/Spinner';
 import { Card } from '$app/components/cards';
@@ -26,14 +26,19 @@ import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePre
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { BrandPrompts } from './components/BrandPrompts';
-import { ClientContactModal } from './components/ClientContactModal';
-import { StepItems } from './components/StepItems';
-import { StepNotes } from './components/StepNotes';
-import { StepTiming } from './components/StepTiming';
-import { ErrorBanner } from './components/ErrorBanner';
-import { PreviewFrame } from './components/PreviewFrame';
-import { contactEmail, emailableContact, useWizard } from './useWizard';
+import { BrandPrompts } from './common/components/BrandPrompts';
+import { ClientContactModal } from './common/components/ClientContactModal';
+import { EditSection } from './common/components/EditSection';
+import { StepItems } from './common/components/StepItems';
+import { StepNotes } from './common/components/StepNotes';
+import { StepTiming } from './common/components/StepTiming';
+import { ValidationAlert } from '$app/components/ValidationAlert';
+import { PreviewFrame } from './common/components/PreviewFrame';
+import { useWizard } from './common/hooks/useWizard';
+import {
+  contactEmail,
+  emailableContact,
+} from './common/helpers/client-contact';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -161,9 +166,11 @@ export default function Edit() {
             </div>
           ) : (
             <div className="pt-4">
-              <ErrorBanner errors={wizard.errors} />
+              {wizard.errors ? (
+                <ValidationAlert errors={wizard.errors} />
+              ) : null}
 
-              <Section label={t('client')}>
+              <EditSection label={t('client')}>
                 <div
                   className="flex items-start justify-between gap-4 border px-4 py-3.5"
                   style={{
@@ -179,7 +186,7 @@ export default function Edit() {
                       {wizard.client?.display_name || wizard.client?.name}
                     </p>
 
-                    <div className="mt-0.5 flex flex-wrap items-center gap-2">
+                    <div className="mt-0.5 flex flex-wrap items-center gap-4">
                       <span className="text-xs" style={{ color: colors.$17 }}>
                         {recipient || t('no_email_address')}
                       </span>
@@ -190,27 +197,27 @@ export default function Edit() {
                           behavior="button"
                           onClick={() => setAskEmail(true)}
                         >
-                          {t('edit_client')}
+                          {t('contact_details')}
                         </Button>
                       )}
                     </div>
                   </div>
                 </div>
-              </Section>
+              </EditSection>
 
-              <Section label={t('items')}>
+              <EditSection label={t('items')}>
                 <StepItems wizard={wizard} embedded />
-              </Section>
+              </EditSection>
 
-              <Section label={t('payment')}>
+              <EditSection label={t('payment')}>
                 <StepTiming wizard={wizard} embedded />
-              </Section>
+              </EditSection>
 
-              <Section label={t('terms')}>
+              <EditSection label={t('terms')}>
                 <StepNotes wizard={wizard} embedded />
-              </Section>
+              </EditSection>
 
-              <Section label={t('preview')} last>
+              <EditSection label={t('preview')} last>
                 <BrandPrompts
                   logoSkipped={wizard.dismissed('logo')}
                   onSkipLogo={() => wizard.dismiss('logo')}
@@ -232,7 +239,7 @@ export default function Edit() {
                     initiallyVisible
                   />
                 </PreviewFrame>
-              </Section>
+              </EditSection>
 
               <div className="mt-8 flex items-center justify-end gap-2">
                 <Button
@@ -263,33 +270,5 @@ export default function Edit() {
         onSaved={contactSaved}
       />
     </Default>
-  );
-}
-
-function Section({
-  label,
-  children,
-  last,
-}: {
-  label: string;
-  children: React.ReactNode;
-  last?: boolean;
-}) {
-  const colors = useColorScheme();
-
-  return (
-    <section
-      className={last ? '' : 'pb-6 mb-6'}
-      style={last ? undefined : { borderBottom: `1px dashed ${colors.$5}` }}
-    >
-      <h4
-        className="text-sm mb-3"
-        style={{ color: colors.$22, fontWeight: 500 }}
-      >
-        {label}
-      </h4>
-
-      {children}
-    </section>
   );
 }

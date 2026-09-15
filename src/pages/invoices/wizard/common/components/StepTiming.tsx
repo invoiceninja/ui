@@ -22,10 +22,11 @@ import { useDispatch } from 'react-redux';
 import { Button, InputField } from '$app/components/forms';
 import { Callout } from './Callout';
 import { Choice } from './Choice';
-import { ErrorBanner } from './ErrorBanner';
+import { ValidationAlert } from '$app/components/ValidationAlert';
 import { StepFooter } from './StepFooter';
 import { StepTransition } from './StepTransition';
-import { Wizard, addDays, today } from '../useWizard';
+import { Wizard } from '../hooks/useWizard';
+import { addDays, today } from '../helpers/dates';
 
 type Term = 'receipt' | '7' | '14' | '30' | 'custom';
 
@@ -124,8 +125,8 @@ export function StepTiming({ wizard, embedded }: Props) {
 
   return (
     <StepTransition>
-      {embedded ? null : (
-        <ErrorBanner errors={wizard.errors} handled={['date', 'due_date']} />
+      {embedded || !wizard.errors ? null : (
+        <ValidationAlert errors={wizard.errors} />
       )}
 
       <div

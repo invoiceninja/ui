@@ -13,11 +13,11 @@ import { useColorScheme } from '$app/common/colors';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
-import { ErrorBanner } from './ErrorBanner';
+import { ValidationAlert } from '$app/components/ValidationAlert';
 import { StepFooter } from './StepFooter';
 import { Legend } from './Legend';
 import { StepTransition } from './StepTransition';
-import { Wizard } from '../useWizard';
+import { Wizard } from '../hooks/useWizard';
 
 interface Props {
   wizard: Wizard;
@@ -32,7 +32,9 @@ export function StepNotes({ wizard, embedded }: Props) {
 
   return (
     <StepTransition>
-      {embedded ? null : <ErrorBanner errors={wizard.errors} />}
+      {embedded || !wizard.errors ? null : (
+        <ValidationAlert errors={wizard.errors} />
+      )}
 
       <div>
         <Legend>{t('terms')}</Legend>

@@ -12,6 +12,7 @@ import { endpoint, trans } from '$app/common/helpers';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -21,11 +22,12 @@ import { useTranslation } from 'react-i18next';
 import { Spinner } from '$app/components/Spinner';
 import { Button, InputField, InputLabel } from '$app/components/forms';
 import { ClientContactModal } from './ClientContactModal';
-import { ErrorBanner } from './ErrorBanner';
+import { ValidationAlert } from '$app/components/ValidationAlert';
 import { StepFooter } from './StepFooter';
 import { Legend } from './Legend';
 import { StepTransition } from './StepTransition';
-import { contactEmail, emailableContact, Wizard } from '../useWizard';
+import { Wizard } from '../hooks/useWizard';
+import { contactEmail, emailableContact } from '../helpers/client-contact';
 
 interface Props {
   wizard: Wizard;
@@ -48,10 +50,7 @@ export function StepRecipient({ wizard }: Props) {
   const [searching, setSearching] = useState(false);
   const [dismissedSearch, setDismissedSearch] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [errors, setErrors] = useState<{
-    name?: string;
-    general?: string;
-  }>({});
+  const [errors, setErrors] = useState<ValidationBag>();
   const [active, setActive] = useState(-1);
   const [contactOpen, setContactOpen] = useState(false);
 
@@ -159,48 +158,18 @@ export function StepRecipient({ wizard }: Props) {
     wizard.attachClient(client);
     setMatches([]);
     setActive(-1);
-    setErrors({});
+    setErrors(undefined);
   };
 
   const reset = () => {
     wizard.detachClient();
     setName('');
     setDismissedSearch(false);
-    setErrors({});
-  };
-
-  const applyServerErrors = (caught: AxiosError<ValidationBag>) => {
-    const bag = caught.response?.data?.errors;
-
-    if (!bag) {
-      setErrors({ general: t('customer_not_saved') });
-
-      return;
-    }
-
-    const next: { name?: string; general?: string } = {};
-
-    Object.entries(bag).forEach(([key, messages]) => {
-      const message = messages[0];
-
-      if (key === 'name') {
-        next.name = message;
-      } else {
-        next.general = message;
-      }
-    });
-
-    setErrors(next);
+    setErrors(undefined);
   };
 
   const createClient = (): Promise<Client | null> => {
-    if (!name.trim()) {
-      setErrors({ name: t('field_is_required') });
-
-      return Promise.resolve(null);
-    }
-
-    setErrors({});
+    setErrors(undefined);
     wizard.clearErrors();
     setBusy(true);
 
@@ -224,7 +193,11 @@ export function StepRecipient({ wizard }: Props) {
         return created;
       })
       .catch((caught: AxiosError<ValidationBag>) => {
-        applyServerErrors(caught);
+        if (caught.response?.status === 422) {
+          setErrors(caught.response.data);
+        } else {
+          toast.error();
+        }
 
         return null;
       })
@@ -244,14 +217,17 @@ export function StepRecipient({ wizard }: Props) {
   };
 
   const continueForward = () => {
-    setErrors({});
+    setErrors(undefined);
 
     if (selected) {
       return proceed();
     }
 
     if (!name.trim()) {
-      setErrors({ name: t('field_is_required') });
+      setErrors({
+        message: t('please_enter_a_client_or_contact_name'),
+        errors: { name: [t('please_enter_a_client_or_contact_name')] },
+      });
 
       return;
     }
@@ -290,14 +266,17 @@ export function StepRecipient({ wizard }: Props) {
         }
 
         setBusy(false);
-        setErrors({ name: t('please_select_a_client') });
+        setErrors({
+          message: t('please_select_a_client'),
+          errors: { name: [t('please_select_a_client')] },
+        });
         setMatches(found);
         setActive(-1);
         setDismissedSearch(false);
       })
       .catch(() => {
         setBusy(false);
-        setErrors({ general: t('customer_not_saved') });
+        toast.error();
       });
   };
 
@@ -306,7 +285,7 @@ export function StepRecipient({ wizard }: Props) {
   if (selected) {
     return (
       <StepTransition>
-        <ErrorBanner errors={wizard.errors} handled={['client_id', 'name']} />
+        {wizard.errors ? <ValidationAlert errors={wizard.errors} /> : null}
 
         <div
           className="flex items-start justify-between gap-4 border px-4 py-3.5"
@@ -320,7 +299,7 @@ export function StepRecipient({ wizard }: Props) {
               {selected.display_name || selected.name}
             </p>
 
-            <div className="mt-0.5 flex flex-wrap items-center gap-2">
+            <div className="mt-0.5 flex flex-wrap items-center gap-4">
               <span className="text-xs" style={{ color: colors.$17 }}>
                 {selectedEmail || t('client_email_not_set')}
               </span>
@@ -331,22 +310,18 @@ export function StepRecipient({ wizard }: Props) {
                   behavior="button"
                   onClick={() => setContactOpen(true)}
                 >
-                  {t('edit_client')}
+                  {t('contact_details')}
                 </Button>
               )}
             </div>
           </div>
 
-          <Button type="secondary" behavior="button" onClick={reset}>
-            {t('change')}
-          </Button>
+          {wizard.invoiceId ? null : (
+            <Button type="secondary" behavior="button" onClick={reset}>
+              {t('change')}
+            </Button>
+          )}
         </div>
-
-        {wizard.errors?.errors?.client_id ? (
-          <p className="text-xs mt-2 text-red-600">
-            {wizard.errors.errors.client_id[0]}
-          </p>
-        ) : null}
 
         <StepFooter>
           <Button behavior="button" disabled={busy} onClick={continueForward}>
@@ -364,13 +339,21 @@ export function StepRecipient({ wizard }: Props) {
     );
   }
 
-  const serverErrors = wizard.errors?.errors;
-  const nameError = errors.name ?? serverErrors?.client_id?.[0];
+  const nameError = errors?.errors?.name ?? wizard.errors?.errors?.client_id;
   const showSuggestions = !dismissedSearch && matches.length > 0;
 
   return (
     <StepTransition>
-      <ErrorBanner errors={wizard.errors} handled={['client_id', 'name']} />
+      {wizard.errors ? <ValidationAlert errors={wizard.errors} /> : null}
+
+      {errors ? (
+        <ValidationAlert
+          errors={errors}
+          entity="client"
+          withoutTopMessage={Boolean(errors.errors?.id)}
+          withoutListBullets={Boolean(errors.errors?.id)}
+        />
+      ) : null}
 
       <div className="space-y-4">
         <div
@@ -419,9 +402,10 @@ export function StepRecipient({ wizard }: Props) {
                   setName(value);
                   setDismissedSearch(false);
                   setActive(-1);
-                  setErrors({});
+                  setErrors(undefined);
                   wizard.clearErrors();
                 }}
+                errorMessage={nameError}
               />
             </div>
 
@@ -437,12 +421,6 @@ export function StepRecipient({ wizard }: Props) {
               <Spinner />
             </span>
           </div>
-
-          {nameError ? (
-            <p role="alert" className="text-xs mt-1 text-red-600">
-              {nameError}
-            </p>
-          ) : null}
 
           {showSuggestions ? (
             <div
@@ -507,10 +485,6 @@ export function StepRecipient({ wizard }: Props) {
             </div>
           ) : null}
         </div>
-
-        {errors.general ? (
-          <p className="text-xs text-red-600">{errors.general}</p>
-        ) : null}
 
         {showAddress ? (
           <div className="space-y-3">

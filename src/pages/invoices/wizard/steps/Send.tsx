@@ -9,8 +9,8 @@
  */
 
 import { useOutletContext } from 'react-router-dom';
-import { StepReview } from '../components/StepReview';
-import { WizardContext } from '../useWizard';
+import { StepReview } from '../common/components/StepReview';
+import { WizardContext } from '../common/hooks/useWizard';
 
 export default function Send() {
   const { wizard } = useOutletContext<WizardContext>();
