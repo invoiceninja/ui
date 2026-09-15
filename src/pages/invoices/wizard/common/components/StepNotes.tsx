@@ -13,7 +13,6 @@ import { useColorScheme } from '$app/common/colors';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
-import { ValidationAlert } from '$app/components/ValidationAlert';
 import { StepFooter } from './StepFooter';
 import { Legend } from './Legend';
 import { StepTransition } from './StepTransition';
@@ -32,10 +31,6 @@ export function StepNotes({ wizard, embedded }: Props) {
 
   return (
     <StepTransition>
-      {embedded || !wizard.errors ? null : (
-        <ValidationAlert errors={wizard.errors} />
-      )}
-
       <div>
         <Legend>{t('terms')}</Legend>
 
@@ -70,14 +65,7 @@ export function StepNotes({ wizard, embedded }: Props) {
               </Button>
             }
           >
-            <Button
-              behavior="button"
-              disableWithoutIcon
-              onClick={() => {
-                void wizard.flush();
-                wizard.next();
-              }}
-            >
+            <Button behavior="button" disableWithoutIcon onClick={wizard.next}>
               {t('review_and_send')}
             </Button>
           </StepFooter>

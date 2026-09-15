@@ -22,7 +22,6 @@ import { useDispatch } from 'react-redux';
 import { Button, InputField } from '$app/components/forms';
 import { Callout } from './Callout';
 import { Choice } from './Choice';
-import { ValidationAlert } from '$app/components/ValidationAlert';
 import { StepFooter } from './StepFooter';
 import { StepTransition } from './StepTransition';
 import { Wizard } from '../hooks/useWizard';
@@ -125,10 +124,6 @@ export function StepTiming({ wizard, embedded }: Props) {
 
   return (
     <StepTransition>
-      {embedded || !wizard.errors ? null : (
-        <ValidationAlert errors={wizard.errors} />
-      )}
-
       <div
         className="space-y-2"
         role="radiogroup"
@@ -155,7 +150,7 @@ export function StepTiming({ wizard, embedded }: Props) {
         ))}
       </div>
 
-      {term === 'custom' ? (
+      {term === 'custom' || serverErrors?.due_date ? (
         <div className="mt-4">
           <InputField
             id="iw-due-date"
@@ -172,7 +167,7 @@ export function StepTiming({ wizard, embedded }: Props) {
       ) : null}
 
       <div className="mt-6">
-        {showDate ? (
+        {showDate || serverErrors?.date ? (
           <div>
             <InputField
               id="iw-invoice-date"
@@ -261,10 +256,7 @@ export function StepTiming({ wizard, embedded }: Props) {
             behavior="button"
             disabled={!invoice?.due_date}
             disableWithoutIcon
-            onClick={() => {
-              void wizard.flush();
-              wizard.next();
-            }}
+            onClick={wizard.next}
           >
             {t('continue')}
           </Button>

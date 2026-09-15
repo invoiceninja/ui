@@ -32,7 +32,6 @@ import { EditSection } from './common/components/EditSection';
 import { StepItems } from './common/components/StepItems';
 import { StepNotes } from './common/components/StepNotes';
 import { StepTiming } from './common/components/StepTiming';
-import { ValidationAlert } from '$app/components/ValidationAlert';
 import { PreviewFrame } from './common/components/PreviewFrame';
 import { useWizard } from './common/hooks/useWizard';
 import {
@@ -166,10 +165,6 @@ export default function Edit() {
             </div>
           ) : (
             <div className="pt-4">
-              {wizard.errors ? (
-                <ValidationAlert errors={wizard.errors} />
-              ) : null}
-
               <EditSection label={t('client')}>
                 <div
                   className="flex items-start justify-between gap-4 border px-4 py-3.5"

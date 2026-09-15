@@ -21,8 +21,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Spinner } from '$app/components/Spinner';
 import { Button, InputField, InputLabel } from '$app/components/forms';
+import { ErrorMessage } from '$app/components/ErrorMessage';
 import { ClientContactModal } from './ClientContactModal';
-import { ValidationAlert } from '$app/components/ValidationAlert';
 import { StepFooter } from './StepFooter';
 import { Legend } from './Legend';
 import { StepTransition } from './StepTransition';
@@ -205,15 +205,7 @@ export function StepRecipient({ wizard }: Props) {
   };
 
   const proceed = () => {
-    setBusy(true);
-
-    return wizard.flush().then((saved) => {
-      setBusy(false);
-
-      if (saved) {
-        wizard.next();
-      }
-    });
+    wizard.next();
   };
 
   const continueForward = () => {
@@ -285,8 +277,6 @@ export function StepRecipient({ wizard }: Props) {
   if (selected) {
     return (
       <StepTransition>
-        {wizard.errors ? <ValidationAlert errors={wizard.errors} /> : null}
-
         <div
           className="flex items-start justify-between gap-4 border px-4 py-3.5"
           style={{ borderColor: colors.$24, borderRadius: '0.375rem' }}
@@ -323,6 +313,10 @@ export function StepRecipient({ wizard }: Props) {
           )}
         </div>
 
+        <ErrorMessage className="mt-2">
+          {wizard.errors?.errors.client_id ?? wizard.errors?.errors.invitations}
+        </ErrorMessage>
+
         <StepFooter>
           <Button behavior="button" disabled={busy} onClick={continueForward}>
             {t('continue')}
@@ -344,17 +338,6 @@ export function StepRecipient({ wizard }: Props) {
 
   return (
     <StepTransition>
-      {wizard.errors ? <ValidationAlert errors={wizard.errors} /> : null}
-
-      {errors ? (
-        <ValidationAlert
-          errors={errors}
-          entity="client"
-          withoutTopMessage={Boolean(errors.errors?.id)}
-          withoutListBullets={Boolean(errors.errors?.id)}
-        />
-      ) : null}
-
       <div className="space-y-4">
         <div
           className="relative"

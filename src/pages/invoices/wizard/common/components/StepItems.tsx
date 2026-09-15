@@ -27,7 +27,6 @@ import { Button, InputField, InputLabel } from '$app/components/forms';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 import { Callout } from './Callout';
-import { ValidationAlert } from '$app/components/ValidationAlert';
 import { StepFooter } from './StepFooter';
 import { StepTransition } from './StepTransition';
 import { Wizard } from '../hooks/useWizard';
@@ -173,10 +172,6 @@ export function StepItems({ wizard, embedded }: Props) {
 
   return (
     <StepTransition>
-      {embedded || !wizard.errors ? null : (
-        <ValidationAlert errors={wizard.errors} />
-      )}
-
       {embedded || !clientName ? null : (
         <div
           className="pb-5 mb-5 flex items-start justify-between gap-4"
@@ -249,6 +244,9 @@ export function StepItems({ wizard, embedded }: Props) {
                 changeOverride
                 debounceTimeout={0}
                 onValueChange={(value) => update(index, { notes: value })}
+                errorMessage={
+                  wizard.errors?.errors[`line_items.${index}.notes`]
+                }
               />
 
               <div className="mt-3 flex items-end gap-3">
@@ -263,6 +261,9 @@ export function StepItems({ wizard, embedded }: Props) {
                     onValueChange={(value) =>
                       update(index, { quantity: toNumber(value) })
                     }
+                    errorMessage={
+                      wizard.errors?.errors[`line_items.${index}.quantity`]
+                    }
                   />
                 </div>
 
@@ -276,6 +277,9 @@ export function StepItems({ wizard, embedded }: Props) {
                     value={item.cost ?? 0}
                     onValueChange={(value) =>
                       update(index, { cost: toNumber(value) })
+                    }
+                    errorMessage={
+                      wizard.errors?.errors[`line_items.${index}.cost`]
                     }
                   />
                 </div>

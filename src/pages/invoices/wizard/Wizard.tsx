@@ -11,7 +11,6 @@
 import { useColorScheme } from '$app/common/colors';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { route } from '$app/common/helpers/route';
 import { AdvancedConfigurationToggle } from './common/components/AdvancedConfigurationToggle';
 import { Badge } from '$app/components/Badge';
 import { Page } from '$app/components/Breadcrumbs';
@@ -65,16 +64,7 @@ export default function Wizard() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      navigationTopRight={<SaveState state={wizard.saveState} />}
-      topRight={
-        <AdvancedConfigurationToggle
-          counterpart={
-            wizard.invoiceId
-              ? route('/invoices/:id/edit', { id: wizard.invoiceId })
-              : '/invoices/create'
-          }
-        />
-      }
+      topRight={<AdvancedConfigurationToggle counterpart="/invoices/create" />}
     >
       <div
         className="mx-auto w-full"
@@ -124,35 +114,5 @@ export default function Wizard() {
         </Card>
       </div>
     </Default>
-  );
-}
-
-function SaveState({
-  state,
-}: {
-  state: ReturnType<typeof useWizard>['saveState'];
-}) {
-  const colors = useColorScheme();
-  const [t] = useTranslation();
-
-  if (state === 'idle') {
-    return null;
-  }
-
-  const failed = state === 'failed';
-
-  return (
-    <span
-      role="status"
-      aria-live="polite"
-      className={failed ? 'text-xs text-red-600' : 'text-xs'}
-      style={failed ? undefined : { color: colors.$17 }}
-    >
-      {state === 'saving'
-        ? `${t('saving')}…`
-        : failed
-          ? t('invoice_save_error')
-          : t('successfully_saved')}
-    </span>
   );
 }

@@ -56,8 +56,6 @@ export const STEPS: { key: StepKey; title: string; href: string }[] = [
   { key: 'send', title: 'review_and_send', href: '/invoices/wizard/send' },
 ];
 
-export type SaveState = 'idle' | 'saving' | 'saved' | 'failed';
-
 const SERVER_OWNED: (keyof Invoice)[] = [
   'id',
   'number',
@@ -84,7 +82,6 @@ export interface Wizard {
   client: Client | undefined;
   step: StepKey;
   stepIndex: number;
-  saveState: SaveState;
   errors: ValidationBag | undefined;
   clearErrors: () => void;
   dismissed: (key: string) => boolean;
@@ -148,6 +145,25 @@ const SURCHARGES: {
   { field: 'custom_surcharge4', label: 'surcharge4' },
 ];
 
+const ERROR_STEPS: { prefix: string; step: StepKey }[] = [
+  { prefix: 'client_id', step: 'who' },
+  { prefix: 'invitations', step: 'who' },
+  { prefix: 'line_items', step: 'what' },
+  { prefix: 'date', step: 'when' },
+  { prefix: 'due_date', step: 'when' },
+  { prefix: 'terms', step: 'notes' },
+];
+
+const errorStep = (bag: ValidationBag): StepKey | undefined => {
+  const keys = Object.keys(bag.errors ?? {});
+
+  return ERROR_STEPS.find((entry) => {
+    return keys.some(
+      (key) => key === entry.prefix || key.startsWith(`${entry.prefix}.`)
+    );
+  })?.step;
+};
+
 const HANDOFF_ACTIONS = [
   'clone',
   'invoice_project',
@@ -181,40 +197,14 @@ export function useWizard(existingId?: string): Wizard {
 
   const step: StepKey =
     STEPS.find((entry) => entry.href === location.pathname)?.key ?? 'who';
-  const [saveState, setSaveState] = useState<SaveState>('idle');
   const [errors, setErrors] = useState<ValidationBag>();
   const [dismissals, setDismissals] = useState<Record<string, boolean>>({});
   const [saveDefaultTerms, setSaveDefaultTerms] = useState(false);
 
   const latest = useRef<Invoice>();
   const persistedId = useRef<string | null>(null);
-  const pending = useRef<Promise<string | null> | null>(null);
-  const revision = useRef(0);
-  const written = useRef(0);
-  const createFailed = useRef(false);
-  const forced = useRef(false);
-  const choosing = useRef(false);
   const defaultTerms = useRef(false);
   const defaultTermsSynced = useRef(false);
-  const timer = useRef<ReturnType<typeof setTimeout>>();
-  const alive = useRef(true);
-
-  const flushOnLeave = useRef<() => void>(() => undefined);
-
-  useEffect(() => {
-    alive.current = true;
-
-    return () => {
-      alive.current = false;
-
-      if (timer.current) {
-        clearTimeout(timer.current);
-      }
-
-      flushOnLeave.current();
-    };
-  }, []);
-
   useEffect(() => {
     let cancelled = false;
 
@@ -333,32 +323,38 @@ export function useWizard(existingId?: string): Wizard {
 
   const retryLoad = useCallback(() => setLoadAttempt((n) => n + 1), []);
 
-  const write = useCallback((): Promise<string | null> => {
+  const patch = useCallback((changes: Partial<Invoice>) => {
+    if (latest.current) {
+      latest.current = { ...latest.current, ...changes };
+    }
+
+    setInvoice((previous) =>
+      previous ? { ...previous, ...changes } : previous
+    );
+  }, []);
+
+  const setLineItems = useCallback(
+    (items: InvoiceItem[]) => {
+      patch({
+        line_items: items.map((item, index) => ({ ...item, sort_id: index })),
+      });
+    },
+    [patch]
+  );
+
+  const flush = useCallback((): Promise<string | null> => {
     const current = latest.current;
 
-    const at = revision.current;
-
-    if (!current || !current.client_id) {
-      written.current = at;
-
+    if (!current) {
       return Promise.resolve(null);
     }
 
     const id = persistedId.current;
-
-    if (!id && !forced.current && (createFailed.current || choosing.current)) {
-      return Promise.resolve(null);
-    }
-
-    forced.current = false;
-
-    setSaveState('saving');
+    const asDefault = defaultTerms.current;
+    const query = asDefault ? '?save_default_terms=true' : '';
 
     const payload = cloneDeep(current) as Invoice & { paymentables?: unknown };
     delete payload.paymentables;
-
-    const asDefault = defaultTerms.current;
-    const query = asDefault ? '?save_default_terms=true' : '';
 
     return (
       id
@@ -374,33 +370,18 @@ export function useWizard(existingId?: string): Wizard {
     )
       .then((response) => {
         const saved = response.data.data as Invoice;
-        const created = !id;
 
         setErrors(undefined);
 
         persistedId.current = saved.id;
-        createFailed.current = false;
-        written.current = at;
-
-        if (!alive.current) {
-          return saved.id;
-        }
-
         setInvoiceId(saved.id);
 
-        const merge = (previous: Invoice | undefined) => {
-          if (!previous) {
-            return previous;
-          }
+        latest.current = adoptServerOwned(current, saved);
+        setInvoice((previous) =>
+          previous ? adoptServerOwned(previous, saved) : previous
+        );
 
-          return adoptServerOwned(previous, saved);
-        };
-
-        latest.current = merge(latest.current);
-        setInvoice(merge);
-        setSaveState('saved');
-
-        if (created) {
+        if (!id) {
           $refetch(['invoices']);
         }
 
@@ -413,111 +394,33 @@ export function useWizard(existingId?: string): Wizard {
         return saved.id;
       })
       .catch((caught: AxiosError<ValidationBag>) => {
-        if (latest.current?.client_id !== current.client_id) {
+        if (caught.response?.status !== 422) {
           return null;
         }
 
-        if (!id) {
-          createFailed.current = true;
+        const bag = caught.response.data;
+
+        if (bag.errors?.amount) {
+          toast.error(bag.errors.amount[0]);
         }
 
-        if (alive.current) {
-          if (caught.response?.status === 422) {
-            const bag = caught.response.data;
+        setErrors(bag);
 
-            if (bag.errors?.amount) {
-              toast.error(bag.errors.amount[0]);
-            } else {
-              toast.dismiss();
-            }
+        const owner = errorStep(bag);
+        const target = STEPS.find((entry) => entry.key === owner);
 
-            setErrors(bag);
-          }
-
-          setSaveState('failed');
+        if (target && target.href !== location.pathname) {
+          navigate(target.href);
         }
 
         return null;
       });
-  }, []);
-
-  const save = useCallback((): Promise<string | null> => {
-    const outstanding = () => {
-      return revision.current !== written.current;
-    };
-
-    if (pending.current) {
-      return pending.current.then(() =>
-        outstanding() ? save() : persistedId.current
-      );
-    }
-
-    const run = write().finally(() => {
-      pending.current = null;
-    });
-
-    pending.current = run;
-
-    return run.then((id) => (outstanding() && id ? save() : id));
-  }, [write]);
-
-  const schedule = useCallback(() => {
-    if (timer.current) {
-      clearTimeout(timer.current);
-    }
-
-    timer.current = setTimeout(() => void save(), 900);
-  }, [save]);
-
-  const patch = useCallback(
-    (changes: Partial<Invoice>) => {
-      if (latest.current) {
-        latest.current = { ...latest.current, ...changes };
-      }
-
-      revision.current += 1;
-
-      setInvoice((previous) =>
-        previous ? { ...previous, ...changes } : previous
-      );
-
-      schedule();
-    },
-    [schedule]
-  );
-
-  const setLineItems = useCallback(
-    (items: InvoiceItem[]) => {
-      patch({
-        line_items: items.map((item, index) => ({ ...item, sort_id: index })),
-      });
-    },
-    [patch]
-  );
-
-  const flush = useCallback((): Promise<string | null> => {
-    if (timer.current) {
-      clearTimeout(timer.current);
-    }
-
-    forced.current = true;
-
-    return save();
-  }, [save]);
-
-  choosing.current = location.pathname === STEPS[0].href;
-
-  flushOnLeave.current = () => {
-    if (revision.current !== written.current) {
-      void save();
-    }
-  };
+  }, [navigate, location.pathname]);
 
   const attachClient = useCallback(
     (next: Client) => {
       setClient(next);
       setErrors(undefined);
-      createFailed.current = false;
 
       const emailable = (next.contacts ?? []).filter(
         (contact) => contact.send_email !== false
@@ -543,7 +446,6 @@ export function useWizard(existingId?: string): Wizard {
   const detachClient = useCallback(() => {
     setClient(undefined);
     setErrors(undefined);
-    createFailed.current = false;
     patch({ client_id: '', invitations: [] });
 
     if (location.pathname !== STEPS[0].href) {
@@ -641,7 +543,6 @@ export function useWizard(existingId?: string): Wizard {
     client,
     step,
     stepIndex,
-    saveState,
     errors,
     clearErrors: () => setErrors(undefined),
     dismissed: (key: string) => Boolean(dismissals[key]),

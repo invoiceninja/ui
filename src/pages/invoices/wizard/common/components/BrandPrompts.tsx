@@ -12,6 +12,9 @@ import { endpoint } from '$app/common/helpers';
 import { useColorScheme } from '$app/common/colors';
 import { compressImageFileForLogo } from '$app/common/helpers/logo-image';
 import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { AxiosError } from 'axios';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { Button, InputField } from '$app/components/forms';
@@ -33,11 +36,9 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
 
   const [name, setName] = useState('');
   const [savingName, setSavingName] = useState(false);
-  const [nameError, setNameError] = useState<string>();
-
   const [uploading, setUploading] = useState(false);
   const [logoFailed, setLogoFailed] = useState(false);
-  const [logoError, setLogoError] = useState<string>();
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const filePicker = useRef<HTMLInputElement>(null);
 
@@ -52,12 +53,7 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
       return;
     }
 
-    if (!name.trim()) {
-      setNameError(t('field_is_required'));
-      return;
-    }
-
-    setNameError(undefined);
+    setErrors(undefined);
     setSavingName(true);
 
     request(
@@ -69,7 +65,13 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
       .then((response) =>
         dispatch(updateRecord({ object: 'company', data: response.data.data }))
       )
-      .catch(() => setNameError(t('business_name_not_saved')))
+      .catch((caught: AxiosError<ValidationBag>) => {
+        if (caught.response?.status === 422) {
+          setErrors(caught.response.data);
+        } else {
+          toast.error();
+        }
+      })
       .finally(() => setSavingName(false));
   };
 
@@ -78,7 +80,7 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
       return;
     }
 
-    setLogoError(undefined);
+    setErrors(undefined);
     setUploading(true);
 
     compressImageFileForLogo(file)
@@ -104,7 +106,13 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
           updateRecord({ object: 'company', data: response.data.data })
         );
       })
-      .catch(() => setLogoError(t('upload_failed')))
+      .catch((caught: AxiosError<ValidationBag>) => {
+        if (caught.response?.status === 422) {
+          setErrors(caught.response.data);
+        } else {
+          toast.error();
+        }
+      })
       .finally(() => setUploading(false));
   };
 
@@ -132,7 +140,7 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
                 changeOverride
                 debounceTimeout={0}
                 onValueChange={setName}
-                errorMessage={nameError}
+                errorMessage={errors?.errors['settings.name']}
               />
             </div>
 
@@ -207,8 +215,10 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
             </div>
           )}
 
-          {logoError ? (
-            <p className="text-xs text-red-600">{logoError}</p>
+          {errors?.errors.company_logo ? (
+            <p className="text-xs text-red-600">
+              {errors.errors.company_logo[0]}
+            </p>
           ) : null}
 
           <input

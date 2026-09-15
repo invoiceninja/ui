@@ -33,7 +33,6 @@ import { Element } from '$app/components/cards';
 import { Button, InputField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Callout } from './Callout';
-import { ValidationAlert } from '$app/components/ValidationAlert';
 import { StepFooter } from './StepFooter';
 import { PreviewFrame } from './PreviewFrame';
 import { StepTransition } from './StepTransition';
@@ -247,7 +246,7 @@ export function StepReview({ wizard }: Props) {
     );
   };
 
-  const previewable = Boolean(wizard.invoiceId) && Boolean(invoice?.client_id);
+  const previewable = Boolean(invoice?.client_id);
 
   const revealPreview = () => {
     if (!previewable || showPreview) {
@@ -283,8 +282,6 @@ export function StepReview({ wizard }: Props) {
 
   return (
     <StepTransition>
-      {wizard.errors ? <ValidationAlert errors={wizard.errors} /> : null}
-
       <p
         className="text-xs mb-2"
         style={{ color: colors.$22, fontWeight: 500 }}
@@ -558,7 +555,7 @@ export function StepReview({ wizard }: Props) {
 
               <PreviewFrame id="iw-preview">
                 <InvoicePreview
-                  for="invoice"
+                  for="create"
                   resource={invoice as Invoice}
                   entity="invoice"
                   relationType="client_id"
