@@ -32,7 +32,7 @@ export function StepNotes({ wizard, embedded }: Props) {
   return (
     <StepTransition>
       <div>
-        <Legend>{t('terms')}</Legend>
+        {embedded ? null : <Legend>{t('terms')}</Legend>}
 
         <MarkdownEditor
           value={invoice?.terms ?? ''}

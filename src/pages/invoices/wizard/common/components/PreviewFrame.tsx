@@ -12,6 +12,6 @@ import styled from 'styled-components';
 
 export const PreviewFrame = styled.div`
   .flex.flex-col.w-full {
-    height: 38rem !important;
+    height: 49rem !important;
   }
 `;
