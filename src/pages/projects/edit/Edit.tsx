@@ -21,6 +21,7 @@ import { CustomField } from '$app/components/CustomField';
 import { Card, Element } from '$app/components/cards';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { InputField } from '$app/components/forms';
+import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { TagPillSelector } from '$app/components/tags/TagPillSelector';
 import { UserSelector } from '$app/components/users/UserSelector';
@@ -106,6 +107,13 @@ export default function Edit() {
           value={project?.tags || []}
           onChange={(tags) => handleChange('tags', tags)}
           errorMessage={errors?.errors.tags}
+        />
+      </Element>
+
+      <Element leftSide={t('color')}>
+        <ColorPicker
+          value={project?.color}
+          onValueChange={(color) => handleChange('color', color)}
         />
       </Element>
 

@@ -220,6 +220,7 @@ export function DropdownDateRangePicker(props: Props) {
         <option value="this_year">{t('this_year')}</option>
         <option value="last_year">{t('last_year')}</option>
         <option value="last365_days">{t('last365_days')}</option>
+        <option value="all_time">{t('all_time')}</option>
         <option value="custom">{t('custom')}</option>
       </SelectField>
 

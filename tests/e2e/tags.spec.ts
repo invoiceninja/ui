@@ -209,6 +209,22 @@ const runBulkAction = async (page: Page, action: 'Archive' | 'Delete') => {
     .click();
 };
 
+const countTagWrites = (page: Page) => {
+  const state = { count: 0 };
+
+  page.on('request', (request) => {
+    const isTagWrite =
+      request.url().includes('/api/v1/tags') &&
+      ['POST', 'PUT'].includes(request.method());
+
+    if (isTagWrite) {
+      state.count += 1;
+    }
+  });
+
+  return state;
+};
+
 // ---------------------------------------------------------------------------
 // CRUD
 // ---------------------------------------------------------------------------
@@ -377,6 +393,68 @@ test('can edit a task tag', async ({ page, api }) => {
 
   await expect(nameInput).toHaveValue(updatedName);
 
+});
+
+test('cannot create a tag whose name contains a comma', async ({ page }) => {
+  await login(page);
+
+  await navigateToTags(page);
+
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Tag', exact: true })
+    .click();
+
+  await page.waitForURL('**/settings/tags/create');
+
+  const tagWrites = countTagWrites(page);
+  const name = `${uniqueName('comma-tag')},13`;
+
+  const nameInput = page.locator('#name');
+  await nameInput.waitFor({ state: 'visible', timeout: 5000 });
+  await nameInput.click();
+  await nameInput.fill(name);
+
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+
+  await expect(page.locator('.error-message-box')).toBeVisible({
+    timeout: 10000,
+  });
+
+  expect(tagWrites.count).toBe(0);
+
+  await expect(page.getByText('Successfully created tag')).toHaveCount(0);
+  await expect(nameInput).toHaveValue(name);
+});
+
+test('cannot rename a tag to a name containing a comma', async ({
+  page,
+  api,
+}) => {
+  await login(page);
+
+  const name = uniqueName('comma-edit-tag');
+
+  await createTag({ page, name });
+
+  const tagId = extractIdFromUrl(page.url(), 'tags');
+  if (tagId) createdTagIds.push(tagId);
+
+  const tagWrites = countTagWrites(page);
+
+  const nameInput = page.locator('#name');
+  await nameInput.click();
+  await nameInput.fill(`${name},13`);
+
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+
+  await expect(page.locator('.error-message-box')).toBeVisible({
+    timeout: 10000,
+  });
+
+  expect(tagWrites.count).toBe(0);
+
+  await expect(page.getByText('Successfully updated tag')).toHaveCount(0);
 });
 
 test('can delete a task tag from the edit page', async ({ page, api }) => {
