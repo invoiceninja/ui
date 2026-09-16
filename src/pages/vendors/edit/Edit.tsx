@@ -48,7 +48,10 @@ export default function Edit() {
 
   const pages: Page[] = [
     { name: t('vendors'), href: '/vendors' },
-    { name: t('edit_vendor'), href: route('/vendors/:id/edit', { id }) },
+    {
+      name: data?.name || t('edit_vendor'),
+      href: route('/vendors/:id/edit', { id }),
+    },
   ];
 
   useEffect(() => {

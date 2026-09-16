@@ -232,6 +232,10 @@ export default function SignatoryMapping() {
   const pages: Page[] = [
     { name: t('docuninja'), href: '/docuninja' },
     { name: t('templates'), href: '/docuninja/templates' },
+    {
+      name: blueprint.name || t('untitled_template'),
+      href: route('/docuninja/templates/:id/edit', { id: blueprint.id }),
+    },
     { name: t('map_signatories'), href: '#' },
   ];
 
