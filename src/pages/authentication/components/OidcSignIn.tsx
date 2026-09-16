@@ -10,7 +10,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { apiEndpoint, endpoint } from '$app/common/helpers';
+import { apiEndpoint, endpoint, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { SignInProviderButton } from './SignInProviders';
 
@@ -32,21 +32,24 @@ interface OidcConfig {
 export function OidcSignIn() {
   const [t] = useTranslation();
 
-  // skipIntercept + no retry: older self-hosted backends don't ship this
-  // endpoint yet; a 404 must silently hide the button rather than trip the
-  // global interceptor (toast, clear-localstorage, or reload loop). Cached
-  // via react-query so parent re-renders don't refire the request.
+  // Generic OIDC only makes sense for self-hosted deployments — the hosted
+  // platform has its own SSO story, so skip the discovery request entirely
+  // there. skipIntercept + no retry: older self-hosted backends don't ship
+  // this endpoint yet; a 404 must silently hide the button rather than trip
+  // the global interceptor (toast, clear-localstorage, or reload loop).
+  // Cached via react-query so parent re-renders don't refire the request.
   const { data: config } = useQuery({
     queryKey: ['/api/v1/oidc/config'],
     queryFn: () =>
       request('GET', endpoint('/api/v1/oidc/config'), undefined, {
         skipIntercept: true,
       }).then((response) => response.data as OidcConfig),
+    enabled: isSelfHosted(),
     staleTime: Infinity,
     retry: false,
   });
 
-  if (!config?.oidc_enabled) {
+  if (!isSelfHosted() || !config?.oidc_enabled) {
     return null;
   }
 
