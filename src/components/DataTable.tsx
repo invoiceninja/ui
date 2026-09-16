@@ -74,6 +74,7 @@ import {
   Td,
   Th,
   Thead,
+  Tr,
 } from './tables';
 import { TFooter } from './tables/TFooter';
 
@@ -207,6 +208,7 @@ interface Props<T> extends CommonProps {
   onSelectedResourcesChange?: (selectedResources: T[]) => void;
   preSelected?: string[];
   emptyState?: ReactNode;
+  beforeRows?: ReactNode;
   beforeFilterInput?: ReactNode;
   withoutBottomRounding?: boolean;
   withoutBottomPadding?: boolean;
@@ -1177,6 +1179,20 @@ export function DataTable<T extends object>(props: Props<T>) {
 
             {props.withResourcefulActions && !hideEditableOptions && <Th></Th>}
           </Thead>
+          {props.beforeRows && (
+            <Tbody>
+              <Tr
+                className="border-b"
+                style={{
+                  borderColor: colors.$20,
+                }}
+                withoutBackgroundColor
+              >
+                <Td colSpan={100}>{props.beforeRows}</Td>
+              </Tr>
+            </Tbody>
+          )}
+
           <Tbody
             style={{
               ...styleOptions?.tBodyStyle,
