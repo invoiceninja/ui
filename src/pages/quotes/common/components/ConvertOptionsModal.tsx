@@ -18,9 +18,11 @@ import { Quote } from '$app/common/interfaces/quote';
 import { CloneOption } from '$app/components/CloneOption';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { Button } from '$app/components/forms';
+import { FileClock } from '$app/components/icons/FileClock';
 import { Invoice as InvoiceIcon } from '$app/components/icons/Invoice';
 import { SuitCase } from '$app/components/icons/SuitCase';
 import { Modal } from '$app/components/Modal';
+import { useConvertToPurchaseOrder } from '$app/pages/invoices/common/hooks/useConvertToPurchaseOrder';
 import { useBulkAction } from '../hooks/useBulkAction';
 
 interface Props {
@@ -34,6 +36,8 @@ export function ConvertOptionsModal({ quote, dropdown }: Props) {
   const bulk = useBulkAction();
   const hasPermission = useHasPermission();
 
+  const convertToPurchaseOrder = useConvertToPurchaseOrder({ entity: 'quote' });
+
   const colors = useColorScheme();
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
@@ -44,6 +48,7 @@ export function ConvertOptionsModal({ quote, dropdown }: Props) {
     <>
       {((hasPermission('create_invoice') &&
         quote.status_id !== QuoteStatus.Converted) ||
+        hasPermission('create_purchase_order') ||
         (hasPermission('create_project') && !quote.project_id)) && (
         <EntityActionElement
           entity="quote"
@@ -72,6 +77,18 @@ export function ConvertOptionsModal({ quote, dropdown }: Props) {
                 iconElement={<InvoiceIcon size="1.1rem" color={colors.$3} />}
                 onClick={() => {
                   bulk([quote.id], 'convert_to_invoice');
+
+                  setIsModalVisible(false);
+                }}
+              />
+            ) : null}
+
+            {hasPermission('create_purchase_order') ? (
+              <CloneOption
+                label={t('purchase_order')}
+                iconElement={<FileClock size="1.1rem" color={colors.$3} />}
+                onClick={() => {
+                  convertToPurchaseOrder([quote.id]);
 
                   setIsModalVisible(false);
                 }}
