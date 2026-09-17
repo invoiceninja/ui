@@ -53,7 +53,7 @@ export const PROJECT_BURNUP_METRICS: ProjectBurnupMetricDefinition[] = [
   {
     key: 'task_estimated_hours',
     axis: 'hours',
-    translationKey: 'current_task_estimate',
+    translationKey: 'estimated_hours',
     stroke: '#d97706',
     strokeDasharray: '12 4',
     strokeWidth: 2.5,

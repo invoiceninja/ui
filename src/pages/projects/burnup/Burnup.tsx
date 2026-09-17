@@ -234,13 +234,13 @@ export function Burnup({
           <ErrorMessage>{t('something_went_wrong')}</ErrorMessage>
         )}
 
-        {hasTaskEstimate && unestimatedTaskCount > 0 && (
+        {/* {hasTaskEstimate && unestimatedTaskCount > 0 && (
           <p className="text-sm" style={{ color: colors.$22 }}>
             {trans('current_task_estimate_excludes_unestimated_tasks', {
               count: unestimatedTaskCount,
             })}
           </p>
-        )}
+        )} */}
 
         {burnup.data && !burnup.isLoading && (
           <ProjectBurnupChart
