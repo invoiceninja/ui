@@ -153,6 +153,7 @@ export function CloneOptionsModal({ quote, dropdown }: Props) {
       vendor_id: '',
       due_date: '',
       partial_due_date: '',
+      expense_id: '',
       design_id: company.settings.purchase_order_design_id,
       vendor: undefined,
     });
