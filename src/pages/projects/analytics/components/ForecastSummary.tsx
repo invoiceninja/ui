@@ -13,8 +13,15 @@ import { date as formatDate } from '$app/common/helpers';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Project } from '$app/common/interfaces/project';
-import { ProjectForecastCompletion } from '$app/common/interfaces/project-analytics';
-import { resolveScheduleVariancePresentation } from '../helpers';
+import {
+  ProjectEstimatedVsLoggedHours,
+  ProjectForecastCompletion,
+} from '$app/common/interfaces/project-analytics';
+import {
+  hasValue,
+  resolveScheduleVariancePresentation,
+  toNumber,
+} from '../helpers';
 import { useAnalyticsFieldLabel } from '../hooks/useAnalyticsFieldLabel';
 import { AnalyticsValueFormatter } from './AnalyticsChartTooltip';
 import { AnalyticsMetricTable } from './AnalyticsMetricTable';
@@ -22,6 +29,7 @@ import { AnalyticsMetricTable } from './AnalyticsMetricTable';
 interface Props {
   project: Project;
   forecast?: ProjectForecastCompletion;
+  estimatedVsLogged?: ProjectEstimatedVsLoggedHours;
   formatter: AnalyticsValueFormatter;
   canViewFinancials: boolean;
 }
@@ -29,6 +37,7 @@ interface Props {
 export function ForecastSummary({
   project,
   forecast,
+  estimatedVsLogged,
   formatter,
   canViewFinancials,
 }: Props) {
@@ -55,6 +64,54 @@ export function ForecastSummary({
       label: t('budgeted_hours'),
       value: formatter('hours', project.budgeted_hours),
     },
+    ...(hasValue(estimatedVsLogged?.task_estimated_hours)
+      ? [
+          {
+            label: t('estimated_hours'),
+            value: formatter(
+              'task_estimated_hours',
+              estimatedVsLogged?.task_estimated_hours
+            ),
+          },
+        ]
+      : []),
+    ...(hasValue(estimatedVsLogged?.logged_hours)
+      ? [
+          {
+            label: t('logged_hours'),
+            value: formatter('logged_hours', estimatedVsLogged?.logged_hours),
+          },
+        ]
+      : []),
+    ...(hasValue(estimatedVsLogged?.remaining_estimated_hours)
+      ? [
+          {
+            label: t('remaining_estimated_hours'),
+            value: formatter(
+              'remaining_estimated_hours',
+              estimatedVsLogged?.remaining_estimated_hours
+            ),
+          },
+        ]
+      : []),
+    ...(hasValue(estimatedVsLogged?.unestimated_active_task_count)
+      ? [
+          {
+            label: t('unestimated_tasks'),
+            value: toNumber(estimatedVsLogged?.unestimated_active_task_count),
+          },
+        ]
+      : []),
+    ...(hasValue(estimatedVsLogged?.active_tasks_over_estimate_count)
+      ? [
+          {
+            label: t('tasks_over_estimate'),
+            value: toNumber(
+              estimatedVsLogged?.active_tasks_over_estimate_count
+            ),
+          },
+        ]
+      : []),
     ...(canViewFinancials
       ? [
           {

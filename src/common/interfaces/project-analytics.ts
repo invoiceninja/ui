@@ -41,6 +41,10 @@ export interface ProjectEstimatedVsLoggedHours extends ProjectScopedRow {
   logged_hours?: ProjectAnalyticsValue;
   billable_hours?: ProjectAnalyticsValue;
   remaining_hours?: ProjectAnalyticsValue;
+  task_estimated_hours?: ProjectAnalyticsValue;
+  remaining_estimated_hours?: ProjectAnalyticsValue;
+  unestimated_active_task_count?: ProjectAnalyticsValue;
+  active_tasks_over_estimate_count?: ProjectAnalyticsValue;
 }
 
 export interface ProjectInvoiceProgress extends ProjectScopedRow {

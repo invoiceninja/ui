@@ -43,6 +43,7 @@ import { calculateTime } from '../helpers/calculate-time';
 import { shouldShowStartTaskButton } from '../helpers/task';
 import { useStart } from '../hooks/useStart';
 import { useStop } from '../hooks/useStop';
+import { EstimatedDurationInput } from './EstimatedDurationInput';
 import { TaskStatus as TaskStatusBadge } from './TaskStatus';
 
 dayjs.extend(duration);
@@ -309,6 +310,21 @@ export function TaskDetails(props: Props) {
             onClearButtonClick={() => handleChange('status_id', '')}
             readonly={props.taskModal}
             errorMessage={errors?.errors.status_id}
+          />
+
+          <InputField
+            type="date"
+            label={t('due_date')}
+            value={task.due_date}
+            onValueChange={(value) => handleChange('due_date', value)}
+            errorMessage={errors?.errors.due_date}
+            width="100%"
+          />
+
+          <EstimatedDurationInput
+            value={task.estimated_duration}
+            onValueChange={(value) => handleChange('estimated_duration', value)}
+            errorMessage={errors?.errors.estimated_duration}
           />
 
           <TagPillSelector
