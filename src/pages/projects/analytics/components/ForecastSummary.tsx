@@ -67,7 +67,7 @@ export function ForecastSummary({
     ...(hasValue(estimatedVsLogged?.task_estimated_hours)
       ? [
           {
-            label: t('task_estimated_hours'),
+            label: t('estimated_hours'),
             value: formatter(
               'task_estimated_hours',
               estimatedVsLogged?.task_estimated_hours
