@@ -12,6 +12,7 @@ import { get } from 'lodash';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import { DEFAULT_TABS } from '$app/common/constants/default-tab';
 import {
   preferencesDefaults,
   useDraftOrCommittedReactSettings,
@@ -19,6 +20,7 @@ import {
 } from '$app/common/hooks/useReactSettings';
 import { Divider } from '$app/components/cards/Divider';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { SelectField } from '$app/components/forms/SelectField';
 import Toggle from '$app/components/forms/Toggle';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
 import { Element } from '../../../../components/cards';
@@ -149,6 +151,26 @@ export function Preferences() {
             )
           }
         />
+      </Element>
+
+      <Element leftSide={t('default_tab')}>
+        <SelectField
+          value={reactSettings.preferences.default_tab}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.preferences.default_tab',
+              value
+            )
+          }
+          customSelector
+          dismissable={false}
+        >
+          {DEFAULT_TABS.map((tab) => (
+            <option key={tab} value={tab}>
+              {t(tab)}
+            </option>
+          ))}
+        </SelectField>
       </Element>
 
       <Element
