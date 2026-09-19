@@ -70,10 +70,11 @@ export function ProductCreate(props: Props) {
   };
 
   useEffect(() => {
-    if (blankProduct) {
+    if (blankProduct && props.isModalOpen) {
       setProduct(blankProduct);
+      setErrors(undefined);
     }
-  }, [blankProduct]);
+  }, [blankProduct, props.isModalOpen]);
 
   return (
     <Modal
