@@ -55,7 +55,7 @@ export default function Product() {
   const pages: Page[] = [
     { name: t('products'), href: '/products' },
     {
-      name: t('edit_product'),
+      name: productData?.data.data.product_key || t('edit_product'),
       href: route('/products/:id', { id }),
     },
   ];

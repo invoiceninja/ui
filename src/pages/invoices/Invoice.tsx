@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
@@ -114,7 +115,10 @@ export default function Invoice() {
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
-    { name: t('edit_invoice'), href: route('/invoices/:id/edit', { id }) },
+    {
+      name: numberBreadcrumb(data?.number, t('edit_invoice')),
+      href: route('/invoices/:id/edit', { id }),
+    },
   ];
 
   useEffect(() => {
