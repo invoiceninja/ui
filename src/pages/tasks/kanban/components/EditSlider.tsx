@@ -27,6 +27,7 @@ import { TabGroup } from '$app/components/TabGroup';
 import { TagPillSelector } from '$app/components/tags/TagPillSelector';
 import { TaskStatusSelector } from '$app/components/task-statuses/TaskStatusSelector';
 import { UserSelector } from '$app/components/users/UserSelector';
+import { EstimatedDurationInput } from '$app/pages/tasks/common/components/EstimatedDurationInput';
 import { LogPosition } from '$app/pages/tasks/common/components/TaskTable';
 import {
   duration,
@@ -263,6 +264,20 @@ export function EditSlider() {
                 taskStatus && handleChange('status_id', taskStatus.id)
               }
               onClearButtonClick={() => handleChange('status_id', '')}
+            />
+
+            <InputField
+              type="date"
+              label={t('due_date')}
+              value={task?.due_date}
+              onValueChange={(value) => handleChange('due_date', value)}
+            />
+
+            <EstimatedDurationInput
+              value={task?.estimated_duration}
+              onValueChange={(value) =>
+                handleChange('estimated_duration', value)
+              }
             />
 
             <TagPillSelector

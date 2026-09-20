@@ -25,7 +25,8 @@ export type ProjectBurnupMetricKey =
   | 'cumulative_net_invoiced_amount'
   | 'cumulative_net_paid_amount'
   | 'budgeted_amount'
-  | 'ideal_amount';
+  | 'ideal_amount'
+  | 'task_estimated_hours';
 
 export interface ProjectBurnupRequest {
   project_id: string;
@@ -35,12 +36,18 @@ export interface ProjectBurnupRequest {
   include_drafts: boolean;
 }
 
+export interface ProjectBurnupProject extends Project {
+  task_estimated_hours?: number;
+}
+
 export interface ProjectBurnupMarkers {
   due_date?: string | null;
+  task_estimated_hours?: number;
 }
 
 export interface ProjectBurnupMetadata {
   can_view_financials: boolean;
+  unestimated_task_count?: number;
 }
 
 export interface ProjectBurnupSeriesRow {
@@ -70,6 +77,7 @@ export interface ProjectBurnupSeriesRow {
   budgeted_amount?: number;
   ideal_hours: number;
   ideal_amount?: number;
+  task_estimated_hours?: number;
   task_log_count: number;
   invoice_count?: number;
   expense_count?: number;
@@ -79,7 +87,7 @@ export interface ProjectBurnupResponse {
   start_date: string;
   end_date: string;
   bucket_type: ProjectBurnupBucketType;
-  project: Project;
+  project: ProjectBurnupProject;
   markers: ProjectBurnupMarkers;
   series: ProjectBurnupSeriesRow[];
   totals: Record<string, unknown>;
