@@ -52,8 +52,8 @@ export interface MailerCheckDraft {
   missingFields: string[];
 }
 
-const trimmed = (value: string | undefined) => {
-  return (value || '').trim();
+const trimmed = (value: string | number | undefined) => {
+  return String(value || '').trim();
 };
 
 export const isOAuthMailer = (mailer: string | undefined) => {
