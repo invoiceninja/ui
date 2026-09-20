@@ -112,6 +112,10 @@ export function calculateHours(log: string, includeRunning = false) {
     seconds += Math.max(durationInSeconds, 0);
   }
 
+  return formatDurationSeconds(seconds);
+}
+
+export function formatDurationSeconds(seconds: number) {
   const totalHours = Math.floor(seconds / 3600);
   const totalMinutes = Math.floor((seconds % 3600) / 60);
   const totalSecondsRemaining = seconds % 60;
