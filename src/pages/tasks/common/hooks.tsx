@@ -79,7 +79,10 @@ import {
   calculateEntityState,
   isTaskRunning,
 } from './helpers/calculate-entity-state';
-import { calculateHours } from './helpers/calculate-time';
+import {
+  calculateHours,
+  formatDurationSeconds,
+} from './helpers/calculate-time';
 import { shouldShowStartTaskButton } from './helpers/task';
 import { useInvoiceTask } from './hooks/useInvoiceTask';
 import { useStart } from './hooks/useStart';
@@ -119,6 +122,8 @@ export function useAllTaskColumns() {
     thirdCustom,
     fourthCustom,
     'date',
+    'due_date',
+    'estimated_duration',
     'documents',
     //   'invoice', @Todo: Need to fetch the relationship
     'is_deleted',
@@ -336,6 +341,21 @@ export function useTaskColumns() {
       format: (value, task) => date(task.date, dateFormat),
     },
     {
+      column: 'due_date',
+      id: 'due_date',
+      label: t('due_date'),
+      format: (value, task) => date(task.due_date, dateFormat),
+    },
+    {
+      column: 'estimated_duration',
+      id: 'estimated_duration',
+      label: t('estimated_duration'),
+      format: (value, task) =>
+        typeof task.estimated_duration === 'number'
+          ? formatDurationSeconds(task.estimated_duration)
+          : '',
+    },
+    {
       column: 'documents',
       id: 'documents',
       label: t('documents'),
@@ -443,6 +463,12 @@ export function useTaskFilters() {
       value: 'uninvoiced',
       color: 'white',
       backgroundColor: statusThemeColors.$4 || '#F87171',
+    },
+    {
+      label: t('overdue'),
+      value: 'overdue',
+      color: 'white',
+      backgroundColor: statusThemeColors.$5 || '#CA8A04',
     },
   ];
 

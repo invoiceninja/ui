@@ -75,6 +75,7 @@ export function CloneOptionsModal({ purchaseOrder, dropdown }: Props) {
       status_id: '1',
       client_id: '',
       paid_to_date: 0,
+      expense_id: '',
       vendor: undefined,
     });
 

@@ -190,6 +190,7 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
       po_number: '',
       due_date: '',
       partial_due_date: '',
+      expense_id: '',
       design_id: company.settings.purchase_order_design_id,
       vendor: undefined,
     });

@@ -59,6 +59,7 @@ import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { CloneOptionsModal } from '../../common/components/CloneOptionsModal';
+import { ConvertOptionsModal } from '../../common/components/ConvertOptionsModal';
 // import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
 import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
 import { useCancelInvoiceModal } from '../hooks/useCancelInvoiceModal';
@@ -438,6 +439,15 @@ export function useActions(params?: Params) {
           {t('schedule')}
         </EntityActionElement>
       ),
+    (invoice: Invoice) => (
+      <ConvertOptionsModal
+        {...(!dropdown && {
+          key: 'convert_to',
+        })}
+        dropdown={dropdown}
+        invoice={invoice}
+      />
+    ),
     (invoice: Invoice) =>
       shouldBeRunTemplateActionVisible && (
         <EntityActionElement

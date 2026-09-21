@@ -34,6 +34,7 @@ export function useAllCommonActions() {
       { value: 'client_portal', label: t('client_portal') },
       { value: 'cancel_invoice', label: t('cancel_invoice') },
       { value: 'reverse', label: t('reverse') },
+      { value: 'convert_to', label: t('convert_to') },
       { value: 'clone_to', label: t('clone_to') },
       { value: 'archive', label: t('archive') },
       { value: 'restore', label: t('restore') },
