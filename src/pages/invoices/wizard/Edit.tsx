@@ -183,7 +183,7 @@ export default function Edit() {
 
                     <div className="mt-0.5 flex flex-wrap items-center gap-4">
                       <span className="text-xs" style={{ color: colors.$17 }}>
-                        {recipient || t('no_email_address')}
+                        {recipient || t('client_email_not_set')}
                       </span>
 
                       {recipient ? null : (

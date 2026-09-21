@@ -8,18 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
-import { $refetch } from '$app/common/hooks/useRefetch';
 import { Client } from '$app/common/interfaces/client';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '$app/components/Modal';
 import { Button, InputField } from '$app/components/forms';
 import { contactEmail, emailableContact } from '../helpers/client-contact';
+import { useSaveClientContact } from '../hooks/useSaveClientContact';
 
 interface Props {
   open: boolean;
@@ -38,6 +34,7 @@ export function ClientContactModal({ open, client, onClose, onSaved }: Props) {
   });
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<ValidationBag>();
+  const saveContact = useSaveClientContact({ setErrors });
 
   useEffect(() => {
     if (!open) {
@@ -59,56 +56,17 @@ export function ClientContactModal({ open, client, onClose, onSaved }: Props) {
       return;
     }
 
-    const email = contact.email.trim();
-
-    setErrors(undefined);
     setBusy(true);
 
-    const existing = (client.contacts ?? []).map((entry) => {
-      const { password, ...rest } = entry;
-
-      return rest;
-    });
-
-    const contacts = existing.length
-      ? existing.map((entry, index) =>
-          index === 0
-            ? {
-                ...entry,
-                first_name: contact.first_name.trim(),
-                last_name: contact.last_name.trim(),
-                email,
-                send_email: true,
-              }
-            : entry
-        )
-      : [
-          {
-            first_name: contact.first_name.trim(),
-            last_name: contact.last_name.trim(),
-            email,
-            send_email: true,
-          },
-        ];
-
-    request(
-      'PUT',
-      endpoint('/api/v1/clients/:id', { id: client.id }),
-      { ...client, contacts, documents: [] },
-      { skipIntercept: true }
-    )
-      .then((response) => {
-        const saved = response.data.data as Client;
-
-        $refetch(['clients']);
-        onSaved(saved);
-        onClose();
-      })
-      .catch((caught: AxiosError<ValidationBag>) => {
-        if (caught.response?.status === 422) {
-          setErrors(caught.response.data);
-        } else {
-          toast.error();
+    saveContact(client, {
+      first_name: contact.first_name.trim(),
+      last_name: contact.last_name.trim(),
+      email: contact.email.trim(),
+    })
+      .then((saved) => {
+        if (saved) {
+          onSaved(saved);
+          onClose();
         }
       })
       .finally(() => setBusy(false));

@@ -27,6 +27,7 @@ import { Button, InputField, InputLabel } from '$app/components/forms';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 import { Callout } from './Callout';
+import { ClientContactModal } from './ClientContactModal';
 import { StepFooter } from './StepFooter';
 import { StepTransition } from './StepTransition';
 import { Wizard } from '../hooks/useWizard';
@@ -70,6 +71,7 @@ export function StepItems({ wizard, embedded }: Props) {
   const [taxOpen, setTaxOpen] = useState(false);
   const [rates, setRates] = useState<TaxRate[]>([]);
   const [inclusiveAnswered, setInclusiveAnswered] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
 
   const enabledTaxSlots = company?.enabled_item_tax_rates ?? 0;
   const taxSlotCount = Math.max(1, enabledTaxSlots);
@@ -192,12 +194,21 @@ export function StepItems({ wizard, embedded }: Props) {
               {clientName}
             </p>
 
-            <p
-              className="text-xs mt-0.5 truncate"
-              style={{ color: colors.$17 }}
-            >
-              {recipientEmail || t('no_email_address')}
-            </p>
+            <div className="mt-0.5 flex flex-wrap items-center gap-4">
+              <span className="text-xs" style={{ color: colors.$17 }}>
+                {recipientEmail || t('client_email_not_set')}
+              </span>
+
+              {recipientEmail ? null : (
+                <Button
+                  type="minimal"
+                  behavior="button"
+                  onClick={() => setContactOpen(true)}
+                >
+                  {t('contact_details')}
+                </Button>
+              )}
+            </div>
           </div>
 
           <button
@@ -499,6 +510,13 @@ export function StepItems({ wizard, embedded }: Props) {
         askInclusive={rates.length === 0 && !inclusiveAnswered}
         onClose={() => setTaxOpen(false)}
         onApplied={applyTax}
+      />
+
+      <ClientContactModal
+        open={contactOpen}
+        client={wizard.client}
+        onClose={() => setContactOpen(false)}
+        onSaved={(saved) => wizard.attachClient(saved)}
       />
     </StepTransition>
   );

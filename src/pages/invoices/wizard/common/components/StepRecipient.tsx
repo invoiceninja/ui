@@ -19,14 +19,14 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import { Spinner } from '$app/components/Spinner';
 import { Button, InputField, InputLabel } from '$app/components/forms';
-import { ErrorMessage } from '$app/components/ErrorMessage';
-import { ClientContactModal } from './ClientContactModal';
 import { StepFooter } from './StepFooter';
 import { Legend } from './Legend';
 import { StepTransition } from './StepTransition';
 import { Wizard } from '../hooks/useWizard';
+import { useSaveClientContact } from '../hooks/useSaveClientContact';
 import { contactEmail, emailableContact } from '../helpers/client-contact';
 
 interface Props {
@@ -39,23 +39,26 @@ export function StepRecipient({ wizard }: Props) {
   const [t] = useTranslation();
 
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [showAddress, setShowAddress] = useState(false);
   const [address, setAddress] = useState({
     address1: '',
     city: '',
+    state: '',
     postal_code: '',
   });
 
   const [matches, setMatches] = useState<Client[]>([]);
+  const [unmatched, setUnmatched] = useState(false);
   const [searching, setSearching] = useState(false);
   const [dismissedSearch, setDismissedSearch] = useState(false);
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<ValidationBag>();
   const [active, setActive] = useState(-1);
-  const [contactOpen, setContactOpen] = useState(false);
+  const saveContact = useSaveClientContact({ setErrors });
 
   const timer = useRef<ReturnType<typeof setTimeout>>();
-  const lastMatches = useRef<Client[]>([]);
+  const reveal = useRef<ReturnType<typeof setTimeout>>();
   const searchBox = useRef<HTMLDivElement>(null);
   const nameInput = useRef<HTMLInputElement>(null);
   const selected = wizard.client;
@@ -101,6 +104,11 @@ export function StepRecipient({ wizard }: Props) {
     if (selected || dismissedSearch || name.trim().length < 2) {
       setMatches([]);
       setSearching(false);
+
+      if (name.trim().length < 2) {
+        setUnmatched(false);
+      }
+
       return;
     }
 
@@ -129,16 +137,19 @@ export function StepRecipient({ wizard }: Props) {
 
           const found = (response.data.data ?? []) as Client[];
 
-          lastMatches.current = found;
           setMatches(found);
           setActive(-1);
+
+          reveal.current = setTimeout(
+            () => setUnmatched(found.length === 0),
+            100
+          );
         })
         .catch(() => {
           if (cancelled) {
             return;
           }
 
-          lastMatches.current = [];
           setMatches([]);
           setActive(-1);
         })
@@ -150,6 +161,10 @@ export function StepRecipient({ wizard }: Props) {
 
       if (timer.current) {
         clearTimeout(timer.current);
+      }
+
+      if (reveal.current) {
+        clearTimeout(reveal.current);
       }
     };
   }, [name, selected, dismissedSearch]);
@@ -164,8 +179,10 @@ export function StepRecipient({ wizard }: Props) {
   const reset = () => {
     wizard.detachClient();
     setName('');
+    setEmail('');
     setDismissedSearch(false);
     setErrors(undefined);
+    nameInput.current?.focus();
   };
 
   const createClient = (): Promise<Client | null> => {
@@ -180,7 +197,11 @@ export function StepRecipient({ wizard }: Props) {
         name: name.trim(),
         address1: address.address1,
         city: address.city,
+        state: address.state,
         postal_code: address.postal_code,
+        contacts: email.trim()
+          ? [{ email: email.trim(), send_email: true }]
+          : [],
       },
       { skipIntercept: true }
     )
@@ -204,6 +225,8 @@ export function StepRecipient({ wizard }: Props) {
       .finally(() => setBusy(false));
   };
 
+  const selectedEmail = contactEmail(emailableContact(selected));
+
   const proceed = () => {
     wizard.next();
   };
@@ -212,7 +235,20 @@ export function StepRecipient({ wizard }: Props) {
     setErrors(undefined);
 
     if (selected) {
-      return proceed();
+      if (selectedEmail || !email.trim()) {
+        return proceed();
+      }
+
+      setBusy(true);
+
+      return saveContact(selected, { email: email.trim() })
+        .then((saved) => {
+          if (saved) {
+            wizard.attachClient(saved);
+            proceed();
+          }
+        })
+        .finally(() => setBusy(false));
     }
 
     if (!name.trim()) {
@@ -239,8 +275,6 @@ export function StepRecipient({ wizard }: Props) {
     )
       .then((response) => {
         const found = (response.data.data ?? []) as Client[];
-
-        lastMatches.current = found;
 
         const collides = found.some((match) => {
           return (
@@ -272,200 +306,171 @@ export function StepRecipient({ wizard }: Props) {
       });
   };
 
-  const selectedEmail = contactEmail(emailableContact(selected));
-
-  if (selected) {
-    return (
-      <StepTransition>
-        <div
-          className="flex items-start justify-between gap-4 border px-4 py-3.5"
-          style={{ borderColor: colors.$24, borderRadius: '0.375rem' }}
-        >
-          <div className="min-w-0">
-            <p
-              className="text-sm"
-              style={{ color: colors.$3, fontWeight: 500 }}
-            >
-              {selected.display_name || selected.name}
-            </p>
-
-            <div className="mt-0.5 flex flex-wrap items-center gap-4">
-              <span className="text-xs" style={{ color: colors.$17 }}>
-                {selectedEmail || t('client_email_not_set')}
-              </span>
-
-              {selectedEmail ? null : (
-                <Button
-                  type="minimal"
-                  behavior="button"
-                  onClick={() => setContactOpen(true)}
-                >
-                  {t('contact_details')}
-                </Button>
-              )}
-            </div>
-          </div>
-
-          {wizard.invoiceId ? null : (
-            <Button type="secondary" behavior="button" onClick={reset}>
-              {t('change')}
-            </Button>
-          )}
-        </div>
-
-        <ErrorMessage className="mt-2">
-          {wizard.errors?.errors.client_id ?? wizard.errors?.errors.invitations}
-        </ErrorMessage>
-
-        <StepFooter>
-          <Button behavior="button" disabled={busy} onClick={continueForward}>
-            {t('continue')}
-          </Button>
-        </StepFooter>
-
-        <ClientContactModal
-          open={contactOpen}
-          client={selected}
-          onClose={() => setContactOpen(false)}
-          onSaved={(saved) => wizard.attachClient(saved)}
-        />
-      </StepTransition>
-    );
-  }
-
-  const nameError = errors?.errors?.name ?? wizard.errors?.errors?.client_id;
+  const nameError =
+    errors?.errors?.name ??
+    wizard.errors?.errors?.client_id ??
+    wizard.errors?.errors?.invitations;
   const showSuggestions = !dismissedSearch && matches.length > 0;
+  const showEmail = selected ? !selectedEmail : unmatched;
 
   return (
     <StepTransition>
       <div className="space-y-4">
-        <div
-          className="relative"
-          ref={searchBox}
-          onFocus={() => setDismissedSearch(false)}
-          onKeyDown={(event) => {
-            if (event.target !== nameInput.current || !matches.length) {
-              return;
-            }
+        <div className={classNames('grid gap-3', { 'grid-cols-2': showEmail })}>
+          <div
+            className="relative"
+            ref={searchBox}
+            onFocus={() => setDismissedSearch(false)}
+            onKeyDown={(event) => {
+              if (event.target !== nameInput.current || !matches.length) {
+                return;
+              }
 
-            if (event.key === 'ArrowDown') {
-              event.preventDefault();
-              setActive((current) => (current + 1) % matches.length);
-            } else if (event.key === 'ArrowUp') {
-              event.preventDefault();
-              setActive((current) =>
-                current <= 0 ? matches.length - 1 : current - 1
-              );
-            } else if (event.key === 'Enter' && matches[active]) {
-              event.preventDefault();
-              choose(matches[active]);
-            } else if (event.key === 'Escape') {
-              setMatches([]);
-              setActive(-1);
-              setDismissedSearch(true);
-            }
-          }}
-        >
-          <InputLabel className="mb-1" for="iw-customer-name">
-            {t('client_name')}
-            <span className="ml-1 text-red-600">*</span>
-          </InputLabel>
+              if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                setActive((current) => (current + 1) % matches.length);
+              } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                setActive((current) =>
+                  current <= 0 ? matches.length - 1 : current - 1
+                );
+              } else if (event.key === 'Enter' && matches[active]) {
+                event.preventDefault();
+                choose(matches[active]);
+              } else if (event.key === 'Escape') {
+                setMatches([]);
+                setActive(-1);
+                setDismissedSearch(true);
+              }
+            }}
+          >
+            <InputLabel className="mb-1" for="iw-customer-name">
+              {t('client_name')}
+              <span className="ml-1 text-red-600">*</span>
+            </InputLabel>
 
-          <div className="flex items-start">
-            <div className="flex-1 min-w-0">
-              <InputField
-                id="iw-customer-name"
-                innerRef={nameInput}
-                placeholder={t('name')}
-                required
-                value={name}
-                changeOverride
-                debounceTimeout={0}
-                onValueChange={(value) => {
-                  setName(value);
-                  setDismissedSearch(false);
-                  setActive(-1);
-                  setErrors(undefined);
-                  wizard.clearErrors();
+            <div className="flex items-start">
+              <div className="flex-1 min-w-0">
+                <InputField
+                  id="iw-customer-name"
+                  innerRef={nameInput}
+                  placeholder={t('name')}
+                  required
+                  value={
+                    selected ? selected.display_name || selected.name : name
+                  }
+                  readOnly={Boolean(selected)}
+                  clearable={Boolean(selected) && !wizard.invoiceId}
+                  changeOverride
+                  debounceTimeout={0}
+                  onValueChange={(value) => {
+                    if (selected) {
+                      reset();
+
+                      return;
+                    }
+
+                    setName(value);
+                    setDismissedSearch(false);
+                    setActive(-1);
+                    setErrors(undefined);
+                    wizard.clearErrors();
+                  }}
+                  errorMessage={nameError}
+                />
+              </div>
+
+              <span
+                className="shrink-0 overflow-hidden flex items-center justify-end"
+                style={{
+                  width: searching ? '1.875rem' : 0,
+                  height: '2.6875rem',
+                  transition: 'width 150ms ease',
                 }}
-                errorMessage={nameError}
-              />
+                aria-hidden={!searching}
+              >
+                <Spinner />
+              </span>
             </div>
 
-            <span
-              className="shrink-0 overflow-hidden flex items-center justify-end"
-              style={{
-                width: searching ? '1.875rem' : 0,
-                height: '2.6875rem',
-                transition: 'width 150ms ease',
-              }}
-              aria-hidden={!searching}
-            >
-              <Spinner />
-            </span>
-          </div>
-
-          {showSuggestions ? (
-            <div
-              id="iw-customer-suggestions"
-              role="listbox"
-              className="absolute left-0 mt-1.5 z-20 border overflow-hidden"
-              style={{
-                right: searching ? '1.875rem' : 0,
-                backgroundColor: colors.$1,
-                borderColor: colors.$24,
-                borderRadius: '0.375rem',
-                boxShadow: '0 12px 32px -12px rgba(9,9,11,0.28)',
-              }}
-            >
-              {matches.map((match, index) => (
-                <button
-                  key={match.id}
-                  id={`iw-customer-${index}`}
-                  role="option"
-                  aria-selected={active === index}
-                  type="button"
-                  onClick={() => choose(match)}
-                  className="w-full text-left px-3.5 py-2.5 flex items-baseline justify-between gap-3"
-                  style={{
-                    color: colors.$3,
-                    backgroundColor:
-                      active === index ? colors.$25 : 'transparent',
-                  }}
-                  onMouseEnter={() => setActive(index)}
-                >
-                  <span className="text-sm truncate">
-                    {match.display_name || match.name}
-                  </span>
-                  <span
-                    className="text-xs shrink-0"
-                    style={{ color: colors.$17 }}
-                  >
-                    {match.contacts?.[0]?.email}
-                  </span>
-                </button>
-              ))}
-
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => {
-                  setMatches([]);
-                  setActive(-1);
-                  setDismissedSearch(true);
-
-                  void createClient();
-                }}
-                className="w-full text-left px-3.5 py-2.5 border-t text-xs"
+            {showSuggestions ? (
+              <div
+                id="iw-customer-suggestions"
+                role="listbox"
+                className="absolute left-0 mt-1.5 z-20 border overflow-hidden"
                 style={{
-                  borderColor: colors.$20,
-                  color: colors.$17,
-                  cursor: busy ? 'not-allowed' : 'pointer',
+                  right: searching ? '1.875rem' : 0,
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$24,
+                  borderRadius: '0.375rem',
+                  boxShadow: '0 12px 32px -12px rgba(9,9,11,0.28)',
                 }}
               >
-                {trans('add_value_as_new_client', { value: name.trim() })}
-              </button>
-            </div>
+                {matches.map((match, index) => (
+                  <button
+                    key={match.id}
+                    id={`iw-customer-${index}`}
+                    role="option"
+                    aria-selected={active === index}
+                    type="button"
+                    onClick={() => choose(match)}
+                    className="w-full text-left px-3.5 py-2.5 flex items-baseline justify-between gap-3"
+                    style={{
+                      color: colors.$3,
+                      backgroundColor:
+                        active === index ? colors.$25 : 'transparent',
+                    }}
+                    onMouseEnter={() => setActive(index)}
+                  >
+                    <span className="text-sm truncate">
+                      {match.display_name || match.name}
+                    </span>
+                    <span
+                      className="text-xs shrink-0"
+                      style={{ color: colors.$17 }}
+                    >
+                      {match.contacts?.[0]?.email}
+                    </span>
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => {
+                    setMatches([]);
+                    setActive(-1);
+                    setDismissedSearch(true);
+
+                    void createClient();
+                  }}
+                  className="w-full text-left px-3.5 py-2.5 border-t text-xs"
+                  style={{
+                    borderColor: colors.$20,
+                    color: colors.$17,
+                    cursor: busy ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {trans('add_value_as_new_client', { value: name.trim() })}
+                </button>
+              </div>
+            ) : null}
+          </div>
+
+          {showEmail ? (
+            <InputField
+              id="iw-customer-email"
+              type="email"
+              label={t('client_email')}
+              value={email}
+              changeOverride
+              debounceTimeout={0}
+              onValueChange={(value) => {
+                setEmail(value);
+                setErrors(undefined);
+              }}
+              errorMessage={errors?.errors['contacts.0.email']}
+            />
           ) : null}
         </div>
 
@@ -473,18 +478,17 @@ export function StepRecipient({ wizard }: Props) {
           <div className="space-y-3">
             <Legend>{t('address')}</Legend>
 
-            <InputField
-              id="iw-customer-address1"
-              label={t('address1')}
-              value={address.address1}
-              changeOverride
-              debounceTimeout={0}
-              onValueChange={(value) =>
-                setAddress({ ...address, address1: value })
-              }
-            />
-
             <div className="grid grid-cols-2 gap-3">
+              <InputField
+                id="iw-customer-address1"
+                label={t('address1')}
+                value={address.address1}
+                changeOverride
+                debounceTimeout={0}
+                onValueChange={(value) =>
+                  setAddress({ ...address, address1: value })
+                }
+              />
               <InputField
                 id="iw-customer-city"
                 label={t('city')}
@@ -493,6 +497,19 @@ export function StepRecipient({ wizard }: Props) {
                 debounceTimeout={0}
                 onValueChange={(value) =>
                   setAddress({ ...address, city: value })
+                }
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <InputField
+                id="iw-customer-state"
+                label={t('state')}
+                value={address.state}
+                changeOverride
+                debounceTimeout={0}
+                onValueChange={(value) =>
+                  setAddress({ ...address, state: value })
                 }
               />
               <InputField
