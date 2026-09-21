@@ -20,6 +20,18 @@ import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { Spinner } from '$app/components/Spinner';
 import { useGenerateActivityElement } from '../hooks/useGenerateActivityElement';
 
+interface ActivityItemProps {
+  record: ActivityRecord;
+}
+
+const ActivityItem = React.memo(function ActivityItem({
+  record,
+}: ActivityItemProps) {
+  const activityElement = useGenerateActivityElement();
+
+  return <>{activityElement(record)}</>;
+});
+
 export function Activity() {
   const [t] = useTranslation();
 
@@ -30,8 +42,6 @@ export function Activity() {
     queryFn: () => request('GET', endpoint('/api/v1/activities?reactv2')),
     staleTime: 300000,
   });
-
-  const activityElement = useGenerateActivityElement();
 
   return (
     <Card
@@ -59,12 +69,9 @@ export function Activity() {
           className="flex flex-col overflow-y-auto px-4"
           style={{ height: '18.9rem' }}
         >
-          {data?.data.data &&
-            data.data.data.map((record: ActivityRecord, index: number) => (
-              <React.Fragment key={index}>
-                {activityElement(record)}
-              </React.Fragment>
-            ))}
+          {data?.data.data?.map((record: ActivityRecord, index: number) => (
+            <ActivityItem key={record.id ?? index} record={record} />
+          ))}
         </div>
       </div>
     </Card>
