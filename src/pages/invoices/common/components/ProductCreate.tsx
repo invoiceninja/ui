@@ -9,6 +9,7 @@
  */
 
 import { AxiosError } from 'axios';
+import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
@@ -40,6 +41,9 @@ export function ProductCreate(props: Props) {
   const [isFormBusy, setIsFormBusy] = useState(false);
 
   const [product, setProduct] = useState<Product>();
+
+  const [fundamentalConceptVisible, setFundamentalConceptVisible] =
+    useState<boolean>(true);
 
   const handleChange = useHandleChange({ setErrors, setProduct });
 
@@ -73,6 +77,7 @@ export function ProductCreate(props: Props) {
     if (blankProduct && props.isModalOpen) {
       setProduct(blankProduct);
       setErrors(undefined);
+      setFundamentalConceptVisible(true);
     }
   }, [blankProduct, props.isModalOpen]);
 
@@ -90,12 +95,28 @@ export function ProductCreate(props: Props) {
           product={product}
           errors={errors}
           handleChange={handleChange}
+          fundamentalConceptVisible={fundamentalConceptVisible}
         />
       )}
 
-      <Button type="primary" behavior="button" onClick={handleSave}>
-        {t('save')}
-      </Button>
+      <div
+        className={classNames('flex', {
+          'justify-between': fundamentalConceptVisible,
+          'justify-end space-x-5': !fundamentalConceptVisible,
+        })}
+      >
+        <Button
+          behavior="button"
+          type="secondary"
+          onClick={() => setFundamentalConceptVisible((current) => !current)}
+        >
+          {fundamentalConceptVisible ? t('more_fields') : t('less_fields')}
+        </Button>
+
+        <Button type="primary" behavior="button" onClick={handleSave}>
+          {t('save')}
+        </Button>
+      </div>
     </Modal>
   );
 }
