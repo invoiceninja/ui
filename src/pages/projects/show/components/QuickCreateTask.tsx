@@ -11,6 +11,7 @@
 import { AxiosError } from 'axios';
 import { KeyboardEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -27,6 +28,14 @@ interface Props {
   project: Project;
 }
 
+const CreateButton = styled.button`
+  color: ${({ theme }) => theme.color};
+
+  &:hover {
+    color: ${({ theme }) => theme.hoverColor};
+  }
+`;
+
 export function QuickCreateTask({ project }: Props) {
   const [t] = useTranslation();
 
@@ -35,6 +44,7 @@ export function QuickCreateTask({ project }: Props) {
   const { data: blankTask } = useBlankTaskQuery();
   const { data: taskStatuses } = useTaskStatusesQuery({ status: 'active' });
 
+  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [description, setDescription] = useState<string>('');
 
   const queue = useRef<Promise<void>>(Promise.resolve());
@@ -65,6 +75,7 @@ export function QuickCreateTask({ project }: Props) {
           $refetch(['tasks']);
         })
         .catch((error: AxiosError<ValidationBag>) => {
+          setIsEditing(true);
           setDescription((current) => current || value);
 
           if (error.response?.status === 422) {
@@ -85,7 +96,7 @@ export function QuickCreateTask({ project }: Props) {
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Escape') {
       setDescription('');
-      event.currentTarget.blur();
+      setIsEditing(false);
 
       return;
     }
@@ -106,6 +117,28 @@ export function QuickCreateTask({ project }: Props) {
     createTask(value);
   };
 
+  const handleBlur = () => {
+    if (!description.trim()) {
+      setDescription('');
+      setIsEditing(false);
+    }
+  };
+
+  if (!isEditing) {
+    return (
+      <CreateButton
+        type="button"
+        onClick={() => setIsEditing(true)}
+        theme={{ color: colors.$17, hoverColor: colors.$3 }}
+        className="flex items-center space-x-2 w-full text-sm focus:outline-none"
+      >
+        <Plus size="1rem" color="currentColor" />
+
+        <span>{t('create')}</span>
+      </CreateButton>
+    );
+  }
+
   return (
     <div className="flex items-center space-x-2">
       <Plus size="1rem" color={colors.$17} />
@@ -115,9 +148,11 @@ export function QuickCreateTask({ project }: Props) {
         value={description}
         onChange={(event) => setDescription(event.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={t('new_task') as string}
+        onBlur={handleBlur}
+        placeholder={`${t('new_task')} ↵`}
         className="flex-1 min-w-0 bg-transparent border-0 p-0 text-sm focus:outline-none focus:ring-0"
         style={{ color: colors.$3 }}
+        autoFocus
       />
     </div>
   );

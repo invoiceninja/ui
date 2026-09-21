@@ -158,7 +158,7 @@ export default function Show() {
       customBulkActions={customBulkActions}
       customFilterPlaceholder="status"
       filterColumns={filterColumns}
-      beforeRows={
+      afterRows={
         hasPermission('create_task') ? (
           <QuickCreateTask project={project} />
         ) : undefined
