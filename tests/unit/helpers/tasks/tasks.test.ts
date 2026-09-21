@@ -86,6 +86,8 @@ describe('Test Valid Task TimeLog', () => {
       created_at: 2,
       updated_at: 3,
       date: '2020-01-01',
+      due_date: '',
+      estimated_duration: null,
       calculated_start_date: '2020-01-01',
       user: user,
       assigned_user: user,

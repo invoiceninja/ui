@@ -220,11 +220,12 @@ export function ProjectAnalytics({
     <AnalyticsCard
       title={t('summary')}
       className="col-span-12 md:col-span-6 xl:col-span-4 2xl:col-span-3"
-      height={420}
+      height="auto"
     >
       <ForecastSummary
         project={project}
         forecast={sections?.forecastCompletion}
+        estimatedVsLogged={sections?.estimatedVsLogged}
         formatter={formatValue}
         canViewFinancials={canViewFinancials}
       />
