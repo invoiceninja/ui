@@ -9,8 +9,7 @@
  */
 
 import { AxiosError, AxiosResponse } from 'axios';
-import { useFormik } from 'formik';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
@@ -34,6 +33,7 @@ import { Link } from '../../components/forms/Link';
 import { RegisterValidation } from './common/ValidationInterface';
 import { Header } from './components/Header';
 import { HostedLinks } from './components/HostedLinks';
+import { OrDivider } from './components/OrDivider';
 import { SignInProviders } from './components/SignInProviders';
 import { TurnstileWidget } from './components/TurnstileWidget';
 
@@ -57,91 +57,95 @@ export function Register() {
 
   const [searchParams] = useSearchParams();
 
-  const form = useFormik({
-    initialValues: {
-      email: '',
-      password: '',
-      password_confirmation: '',
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const resetTurnstile = () => {
+    turnstile.reset();
+    setIsTrunstileVisible(false);
+    setTurnstileToken('');
+  };
+
+  const handleRegister = (form: HTMLFormElement) => {
+    const formData = new FormData(form);
+
+    const values: RegisterForm = {
+      email: formData.get('email') as string,
+      password: formData.get('password') as string,
+      password_confirmation: formData.get('password_confirmation') as string,
       terms_of_service: false,
       privacy_policy: false,
-    },
-    onSubmit(values: RegisterForm) {
-      setMessage('');
-      setErrors(undefined);
-      setIsFormBusy(true);
+    };
 
-      if (values.password !== values.password_confirmation) {
-        setIsFormBusy(false);
+    setMessage('');
+    setErrors(undefined);
 
-        setErrors({
-          password_confirmation: ['Password confirmation does not match.'],
-        });
+    if (values.password !== values.password_confirmation) {
+      setIsFormBusy(false);
 
-        return;
-      }
-
-      const endpoint = new URL(
-        '/api/v1/signup?include=token,user.company_user,company,account',
-        apiEndpoint()
-      );
-
-      [
-        'utm_source',
-        'utm_medium',
-        'utm_campaign',
-        'utm_content',
-        'utm_term',
-      ].forEach((key) => {
-        if (searchParams.has(key)) {
-          endpoint.searchParams.append(key, searchParams.get(key) as string);
-        }
+      setErrors({
+        password_confirmation: ['Password confirmation does not match.'],
       });
 
-      const rc = searchParams.get('rc');
+      resetTurnstile();
 
-      if (rc) {
-        endpoint.searchParams.append('rc', rc as string);
+      return;
+    }
+
+    const endpoint = new URL(
+      '/api/v1/signup?include=token,user.company_user,company,account',
+      apiEndpoint()
+    );
+
+    [
+      'utm_source',
+      'utm_medium',
+      'utm_campaign',
+      'utm_content',
+      'utm_term',
+    ].forEach((key) => {
+      if (searchParams.has(key)) {
+        endpoint.searchParams.append(key, searchParams.get(key) as string);
       }
+    });
 
-      request('POST', endpoint.href, {
-        ...values,
-        ['cf-turnstile']: turnstileToken,
+    const rc = searchParams.get('rc');
+
+    if (rc) {
+      endpoint.searchParams.append('rc', rc as string);
+    }
+
+    request('POST', endpoint.href, {
+      ...values,
+      ['cf-turnstile']: turnstileToken,
+    })
+      .then((response: AxiosResponse) => {
+        dispatch(
+          register({
+            token: response.data.data[0].token.token,
+            user: response.data.data[0].user,
+          })
+        );
+
+        dispatch(updateCompanyUsers(response.data.data));
+        dispatch(resetChanges('company'));
+        dispatch(changeCurrentIndex(0));
       })
-        .then((response: AxiosResponse) => {
-          dispatch(
-            register({
-              token: response.data.data[0].token.token,
-              user: response.data.data[0].user,
-            })
-          );
+      .catch((error: AxiosError<GenericValidationBag<RegisterValidation>>) => {
+        if (error.response?.status === 422) {
+          setErrors(error.response.data.errors);
+        }
 
-          dispatch(updateCompanyUsers(response.data.data));
-          dispatch(resetChanges('company'));
-          dispatch(changeCurrentIndex(0));
-        })
-        .catch(
-          (error: AxiosError<GenericValidationBag<RegisterValidation>>) => {
-            if (error.response?.status === 422) {
-              setErrors(error.response.data.errors);
-            }
-
-            setMessage(error.response?.data.message as string);
-            setIsFormBusy(false);
-          }
-        )
-        .finally(() => {
-          turnstile.reset();
-          setIsTrunstileVisible(false);
-          setTurnstileToken('');
-        });
-    },
-  });
+        setMessage(error.response?.data.message as string);
+        setIsFormBusy(false);
+      })
+      .finally(() => resetTurnstile());
+  };
 
   const colors = useColorScheme();
 
   useEffect(() => {
-    if (turnstileToken) {
-      form.handleSubmit();
+    if (turnstileToken && formRef.current) {
+      handleRegister(formRef.current);
     }
   }, [turnstileToken]);
 
@@ -160,8 +164,10 @@ export function Register() {
             </h2>
 
             <form
+              ref={formRef}
               onSubmit={(event) => {
                 event.preventDefault();
+                setIsFormBusy(true);
                 setIsTrunstileVisible(true);
               }}
               className="space-y-5 my-6"
@@ -172,8 +178,6 @@ export function Register() {
                 label={t('email_address')}
                 id="email"
                 name="email"
-                onChange={form.handleChange}
-                changeOverride
                 errorMessage={errors?.email}
               />
 
@@ -183,8 +187,6 @@ export function Register() {
                 label={t('password')}
                 id="password"
                 name="password"
-                onChange={form.handleChange}
-                changeOverride
                 errorMessage={errors?.password}
               />
 
@@ -194,8 +196,6 @@ export function Register() {
                 label={t('password_confirmation')}
                 id="password_confirmation"
                 name="password_confirmation"
-                onChange={form.handleChange}
-                changeOverride
                 errorMessage={errors?.password_confirmation}
               />
 
@@ -214,20 +214,20 @@ export function Register() {
               </Button>
             </form>
 
+            <div className="mb-6 space-y-6">
+              <OrDivider />
+
+              <SignInProviders />
+            </div>
+
             <div className="flex justify-center">
               {isHosted() && <Link to="/login">{t('login')}</Link>}
             </div>
           </div>
 
-          {
-            <>
-              <SignInProviders />
-
-              <div className="mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
-                <HostedLinks />
-              </div>
-            </>
-          }
+          <div className="mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
+            <HostedLinks />
+          </div>
         </div>
       </div>
     </>
