@@ -9,7 +9,6 @@
  */
 
 import { AxiosError } from 'axios';
-import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { endpoint } from '$app/common/helpers';
@@ -99,12 +98,7 @@ export function ProductCreate(props: Props) {
         />
       )}
 
-      <div
-        className={classNames('flex', {
-          'justify-between': fundamentalConceptVisible,
-          'justify-end space-x-5': !fundamentalConceptVisible,
-        })}
-      >
+      <div className="flex justify-end space-x-5">
         <Button
           behavior="button"
           type="secondary"
