@@ -10,6 +10,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
@@ -29,7 +30,10 @@ export default function Pdf() {
   const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
     {
-      name: t('edit_recurring_invoice'),
+      name: numberBreadcrumb(
+        recurringInvoice?.number,
+        t('edit_recurring_invoice')
+      ),
       href: route('/recurring_invoices/:id/edit', { id }),
     },
     {
