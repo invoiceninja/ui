@@ -14,7 +14,6 @@ import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
 import { StepFooter } from './StepFooter';
-import { Legend } from './Legend';
 import { StepTransition } from './StepTransition';
 import { Wizard } from '../hooks/useWizard';
 
@@ -32,8 +31,6 @@ export function StepNotes({ wizard, embedded }: Props) {
   return (
     <StepTransition>
       <div>
-        {embedded ? null : <Legend>{t('terms')}</Legend>}
-
         <MarkdownEditor
           value={invoice?.terms ?? ''}
           onChange={(value) => wizard.patch({ terms: value })}
