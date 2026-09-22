@@ -107,6 +107,16 @@ Settings > Backup | Restore
     );
   });
 
+  test('strips Docusaurus heading anchors', () => {
+    const result = processMarkdownContent(`## Company Details {#company_details}
+
+### Settings
+`);
+
+    expect(result).toContain('## Company Details');
+    expect(result).not.toContain('{#company_details}');
+  });
+
   test('keeps GFM tables intact', () => {
     const result = processMarkdownContent(`| CSV Value | Result |
 |-----------|--------|

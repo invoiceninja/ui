@@ -10,7 +10,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames';
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Layers, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -43,33 +43,59 @@ export function HelpWidget({ id, url }: Props) {
   const colors = useColorScheme();
   const contentRef = useRef<HTMLDivElement>(null);
   const helpWidgetRef = useRef<HTMLDivElement>(null);
+  const pendingHeadingRef = useRef<string | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const isDarkMode = colors.$0 === 'dark';
 
-  useEffect(() => {
+  const scrollToHeading = (headingText: string) => {
+    if (!contentRef.current || !helpWidgetRef.current) {
+      pendingHeadingRef.current = headingText;
+      return;
+    }
+
+    const headings = contentRef.current.querySelectorAll(
+      'h1, h2, h3, h4, h5, h6'
+    );
+    const headingElement = Array.from(headings).find(
+      (heading) => heading.textContent?.trim() === headingText
+    );
+
+    if (headingElement instanceof HTMLElement) {
+      pendingHeadingRef.current = null;
+      helpWidgetRef.current.scrollTo({
+        behavior: 'smooth',
+        top: headingElement.offsetTop - 50,
+      });
+      return;
+    }
+
+    pendingHeadingRef.current = headingText;
+  };
+
+  const scrollToHeadingRef = useRef(scrollToHeading);
+  scrollToHeadingRef.current = scrollToHeading;
+
+  useLayoutEffect(() => {
     const controller = new AbortController();
 
     window.addEventListener(
-      `help-widget-${id}:moveToHeading`,
+      `help-widget-${id}`,
       (event) => {
-        if ('detail' in event && contentRef.current && helpWidgetRef.current) {
-          const heading = contentRef.current.querySelectorAll(
-            'h1, h2, h3, h4, h5, h6'
-          );
+        const options =
+          'detail' in event && event.detail && typeof event.detail === 'object'
+            ? (event.detail as HelpOptions)
+            : {};
 
-          const headingIndex = Array.from(heading).findIndex(
-            (h) => h.textContent?.trim() === event.detail
-          );
+        if (options.open === true) {
+          setIsOpen(true);
+        } else if (options.open === false) {
+          setIsOpen(false);
+        } else {
+          setIsOpen((open) => !open);
+        }
 
-          if (headingIndex > -1) {
-            const headingElement = heading[headingIndex];
-
-            if (headingElement) {
-              helpWidgetRef.current.scrollTo({
-                behavior: 'smooth',
-                top: headingElement.offsetTop - 50,
-              });
-            }
-          }
+        if (options.moveToHeading) {
+          scrollToHeadingRef.current(options.moveToHeading);
         }
       },
       { signal: controller.signal }
@@ -78,10 +104,26 @@ export function HelpWidget({ id, url }: Props) {
     return () => controller.abort();
   }, [id]);
 
+  useLayoutEffect(() => {
+    if (!data || !isOpen || !pendingHeadingRef.current) {
+      return;
+    }
+
+    const headingText = pendingHeadingRef.current;
+    const frame = requestAnimationFrame(() =>
+      scrollToHeadingRef.current(headingText)
+    );
+
+    return () => cancelAnimationFrame(frame);
+  }, [data, isOpen]);
+
   return createPortal(
     <div
       id={`help-widget-${id}`}
-      className="hidden fixed top-0 right-0 w-full md:w-1/2 lg:w-1/3 xl:w-1/4 h-full shadow-xl border rounded-l-lg z-50 overflow-y-auto"
+      className={classNames(
+        'fixed top-0 right-0 w-full md:w-1/2 lg:w-1/3 xl:w-1/4 h-full shadow-xl border rounded-l-lg z-50 overflow-y-auto',
+        { hidden: !isOpen }
+      )}
       style={{
         backgroundColor: colors.$1,
         color: colors.$3,
@@ -162,23 +204,14 @@ export function HelpWidget({ id, url }: Props) {
 }
 
 export interface HelpOptions {
-  moveToHeading: string;
+  moveToHeading?: string;
+  open?: boolean;
 }
 
 export function $help(id: string, options?: HelpOptions) {
-  const div = document.querySelector(
-    `div#help-widget-${id}`
-  ) as HTMLDivElement | null;
-
-  if (div) {
-    div.classList.toggle('hidden');
-
-    if (options?.moveToHeading) {
-      window.dispatchEvent(
-        new CustomEvent(`help-widget-${id}:moveToHeading`, {
-          detail: options.moveToHeading,
-        })
-      );
-    }
-  }
+  window.dispatchEvent(
+    new CustomEvent(`help-widget-${id}`, {
+      detail: options ?? {},
+    })
+  );
 }

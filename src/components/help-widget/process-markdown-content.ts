@@ -147,12 +147,17 @@ function rewriteHtmlHrefs(content: string) {
   );
 }
 
+function stripHeadingAnchors(content: string) {
+  return content.replace(/^(#{1,6}\s+[^\n]+?)\s*\{#[^}]+\}\s*$/gm, '$1');
+}
+
 export function processMarkdownContent(content: string) {
   const normalized = content.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
 
   return mapOutsideCode(stripFrontmatter(normalized), (segment) => {
     let next = stripMdxImports(segment);
     next = stripJsxComponents(next);
+    next = stripHeadingAnchors(next);
     next = convertAdmonitions(next);
     next = rewriteMarkdownImages(next);
     next = rewriteHtmlImages(next);
