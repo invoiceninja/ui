@@ -371,7 +371,7 @@ test('can edit a task tag', async ({ page, api }) => {
     breadcrumbs.getByRole('link', { name: 'Task Tags', exact: true })
   ).toHaveCount(0);
   await expect(
-    breadcrumbs.getByRole('link', { name: 'Edit Tag', exact: true })
+    breadcrumbs.getByRole('link', { name, exact: true })
   ).toBeVisible();
 
   const editForm = page.locator('form').filter({ has: page.locator('#name') });

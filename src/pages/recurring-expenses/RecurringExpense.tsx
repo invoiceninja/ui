@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { endpoint } from '$app/common/helpers';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -49,7 +50,7 @@ export default function RecurringExpense() {
   const pages: Page[] = [
     { name: t('recurring_expenses'), href: '/recurring_expenses' },
     {
-      name: t('edit_recurring_expense'),
+      name: numberBreadcrumb(data?.number, t('edit_recurring_expense')),
       href: route('/recurring_expenses/:id', { id }),
     },
   ];

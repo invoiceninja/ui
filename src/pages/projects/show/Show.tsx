@@ -85,11 +85,6 @@ export default function Show() {
 
   const enabled = useEnabled();
 
-  const pages: Page[] = [
-    { name: t('projects'), href: '/projects' },
-    { name: t('project'), href: route('/projects/:id', { id }) },
-  ];
-
   const { data: project } = useQuery({
     queryKey: ['/api/v1/projects', `/api/v1/projects/${id}`],
     queryFn: () =>
@@ -103,6 +98,14 @@ export default function Show() {
       ),
     staleTime: Infinity,
   });
+
+  const pages: Page[] = [
+    { name: t('projects'), href: '/projects' },
+    {
+      name: project?.name || t('project'),
+      href: route('/projects/:id', { id }),
+    },
+  ];
 
   const projectActions = useProjectsActions();
   const taskActions = useTasksActions();
