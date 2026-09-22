@@ -72,6 +72,8 @@ export function CloneOptionsModal({ quote, dropdown }: Props) {
       status_id: '',
       vendor_id: '',
       paid_to_date: 0,
+      partial_due_date: '',
+      invoice_id: '',
       client: undefined,
     });
 
