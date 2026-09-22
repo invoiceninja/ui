@@ -52,7 +52,7 @@ export function Edit() {
     { name: t('bank_accounts'), href: '/settings/bank_accounts' },
     {
       name: response?.bank_account_name || t('edit_bank_account'),
-      href: route('/bank_accounts/:id/edit', { id }),
+      href: route('/settings/bank_accounts/:id/edit', { id }),
     },
   ];
 
