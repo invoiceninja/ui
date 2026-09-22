@@ -37,16 +37,16 @@ export function Edit() {
 
   const actions = useActions();
 
+  const { data: scheduleResponse } = useScheduleQuery({ id });
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('schedules'), href: '/settings/schedules' },
     {
-      name: t('edit_schedule'),
+      name: scheduleResponse?.name || t('edit_schedule'),
       href: route('/settings/schedules/:id/edit', { id }),
     },
   ];
-
-  const { data: scheduleResponse } = useScheduleQuery({ id });
 
   const [schedule, setSchedule] = useState<Schedule>();
   const [errors, setErrors] = useState<ValidationBag>();
