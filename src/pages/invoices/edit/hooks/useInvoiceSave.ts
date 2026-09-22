@@ -82,6 +82,10 @@ export function useHandleSave(params: Params) {
         if (searchParams.get('action') === 'add_tasks') {
           $refetch(['tasks']);
         }
+
+        if (searchParams.get('action') === 'invoice_expense') {
+          $refetch(['expenses']);
+        }
       })
       .catch((error) => {
         if (error.response?.status === 422) {

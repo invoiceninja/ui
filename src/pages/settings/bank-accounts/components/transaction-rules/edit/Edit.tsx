@@ -34,6 +34,8 @@ export function Edit() {
 
   const navigate = useNavigate();
 
+  const { data: transactionRuleResponse } = useTransactionRuleQuery({ id });
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('bank_accounts'), href: '/settings/bank_accounts' },
@@ -42,12 +44,10 @@ export function Edit() {
       href: '/settings/bank_accounts/transaction_rules',
     },
     {
-      name: t('edit_transaction_rule'),
+      name: transactionRuleResponse?.name || t('edit_transaction_rule'),
       href: route('/settings/bank_accounts/transaction_rules/:id/edit', { id }),
     },
   ];
-
-  const { data: transactionRuleResponse } = useTransactionRuleQuery({ id });
 
   const [transactionRule, setTransactionRule] = useState<TransactionRule>();
 

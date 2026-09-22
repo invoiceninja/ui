@@ -11,6 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { MdDownload, MdSend } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -43,7 +44,7 @@ export default function Pdf() {
   const pages: Page[] = [
     { name: t('credits'), href: '/credits' },
     {
-      name: t('edit_credit'),
+      name: numberBreadcrumb(credit?.number, t('edit_credit')),
       href: route('/credits/:id/edit', { id }),
     },
     {

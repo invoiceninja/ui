@@ -51,7 +51,7 @@ export function Edit() {
     { name: t('settings'), href: '/settings' },
     { name: t('payment_links'), href: '/settings/subscriptions' },
     {
-      name: t('edit_payment_link'),
+      name: data?.name || t('edit_payment_link'),
       href: route('/settings/subscriptions/:id/edit', { id }),
     },
   ];

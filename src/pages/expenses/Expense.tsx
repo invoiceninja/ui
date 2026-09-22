@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
 import { Outlet, useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
@@ -57,7 +58,10 @@ export default function Expense() {
 
   const pages: Page[] = [
     { name: t('expenses'), href: '/expenses' },
-    { name: t('edit_expense'), href: route('/expenses/:id/edit', { id }) },
+    {
+      name: numberBreadcrumb(data?.number, t('edit_expense')),
+      href: route('/expenses/:id/edit', { id }),
+    },
   ];
 
   const tabs: Tab[] = [
