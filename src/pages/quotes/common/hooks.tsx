@@ -15,6 +15,7 @@ import { Dispatch, SetStateAction, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
+  MdCancel,
   MdCloudCircle,
   MdComment,
   MdDelete,
@@ -102,6 +103,7 @@ import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatu
 import { invoiceSumAtom, quoteAtom } from './atoms';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { ConvertOptionsModal } from './components/ConvertOptionsModal';
+import { isQuoteCancellable } from './helpers';
 import { useApprove } from './hooks/useApprove';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useMarkSent } from './hooks/useMarkSent';
@@ -642,6 +644,23 @@ export function useActions(params?: Params) {
           disablePreventNavigation
         >
           {t('approve')}
+        </EntityActionElement>
+      ),
+    (quote) =>
+      isQuoteCancellable(quote) && (
+        <EntityActionElement
+          {...(!dropdown && {
+            key: 'cancel_quote',
+          })}
+          entity="quote"
+          actionKey="cancel_quote"
+          isCommonActionSection={!dropdown}
+          tooltipText={t('cancel')}
+          onClick={() => bulk([quote.id], 'cancel')}
+          icon={MdCancel}
+          disablePreventNavigation
+        >
+          {t('cancel')}
         </EntityActionElement>
       ),
     (quote) => (
@@ -1247,6 +1266,12 @@ export function useQuoteFilters() {
       value: 'converted',
       color: 'white',
       backgroundColor: statusThemeColors.$3 || '#22C55E',
+    },
+    {
+      label: t('cancelled'),
+      value: 'cancelled',
+      color: 'white',
+      backgroundColor: '#000000',
     },
   ];
 

@@ -11,6 +11,7 @@
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  MdCancel,
   MdContactPage,
   MdDesignServices,
   MdDone,
@@ -33,6 +34,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { useDownloadPdfs } from '$app/pages/invoices/common/hooks/useDownloadPdfs';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { isQuoteCancellable } from '../helpers';
 import { ConvertToInvoiceBulkAction } from '../components/ConvertToInoviceBulkAction';
 import { ConvertToProjectBulkAction } from '../components/ConvertToProjectBulkAction';
 import { SendEmailBulkAction } from '../components/SendEmailBulkAction';
@@ -72,6 +74,10 @@ export function useCustomBulkActions() {
 
   const showMarkSentAction = (quotes: Quote[]) => {
     return quotes.every(({ status_id }) => status_id === QuoteStatus.Draft);
+  };
+
+  const showCancelAction = (quotes: Quote[]) => {
+    return quotes.every((quote) => isQuoteCancellable(quote));
   };
 
   const shouldDownloadDocuments = (quotes: Quote[]) => {
@@ -190,6 +196,19 @@ export function useCustomBulkActions() {
           icon={<Icon element={MdDone} />}
         >
           {t('approve')}
+        </DropdownElement>
+      ),
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showCancelAction(selectedResources) && (
+        <DropdownElement
+          onClick={() => {
+            bulk(selectedIds, 'cancel');
+            setSelected([]);
+          }}
+          icon={<Icon element={MdCancel} />}
+        >
+          {t('cancel')}
         </DropdownElement>
       ),
     ({ selectedIds, selectedResources, setSelected }) =>

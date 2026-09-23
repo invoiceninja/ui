@@ -16,4 +16,5 @@ export default {
   [QuoteStatus.Approved]: 'approved',
   [QuoteStatus.Converted]: 'converted',
   [QuoteStatus.Expired]: 'expired',
+  [QuoteStatus.Cancelled]: 'cancelled',
 };
