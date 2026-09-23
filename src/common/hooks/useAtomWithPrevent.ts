@@ -20,13 +20,14 @@ import { cloneDeep, flatMapDeep, isEqual, isObject, keys, unset } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDebounce } from 'react-use';
+import { Expense } from '../interfaces/expense';
 import { Invoice } from '../interfaces/invoice';
 import { PurchaseOrder } from '../interfaces/purchase-order';
 import { Quote } from '../interfaces/quote';
 import { preventLeavingPageAtom } from './useAddPreventNavigationEvents';
 import { useReactSettings } from './useReactSettings';
 
-type Entity = Invoice | Quote | PurchaseOrder;
+type Entity = Invoice | Quote | PurchaseOrder | Expense;
 type SetAtom<Args extends any[], Result> = (...args: Args) => Result;
 
 export const changesAtom = atom<any | null>(null);
