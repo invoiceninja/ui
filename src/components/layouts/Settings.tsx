@@ -81,6 +81,10 @@ export function Settings(props: Props) {
   }, [settingPathNameKey]);
 
   useEffect(() => {
+    return () => setSettingsHelp(null);
+  }, []);
+
+  useEffect(() => {
     if (!settingsHelp || !pendingHelpOpen.current) {
       return;
     }

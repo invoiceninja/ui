@@ -35,6 +35,7 @@ export function HelpWidget({ id, url }: Props) {
       fetch(url).then((response) =>
         response.text().then(processMarkdownContent)
       ),
+    staleTime: Infinity,
   });
 
   const [, slug = ''] = url.split('v5-rework/docs');
