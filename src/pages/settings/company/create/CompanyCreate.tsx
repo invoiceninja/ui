@@ -18,6 +18,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
 import { endpoint } from '$app/common/helpers';
+import { clearTabCompany } from '$app/common/helpers/company-session';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useDocuNinjaActions } from '$app/common/hooks/useDocuNinjaActions';
@@ -53,6 +54,10 @@ export function CompanyCreate(props: Props) {
     passedUser: Record<string, unknown>,
     passedToken: string
   ) => {
+    // Like the company switcher, this moves every tab to the new company,
+    // including one pinned by a ?company= link.
+    clearTabCompany();
+
     dispatch(
       authenticate({
         type: AuthenticationTypes.TOKEN,

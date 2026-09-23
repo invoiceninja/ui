@@ -13,6 +13,13 @@ import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { resolveCompanyIndex } from '$app/common/helpers/company-index';
+import {
+  clearTabCompany,
+  currentIndexValue,
+  currentToken,
+  hasTabCompany,
+  setTabCompany,
+} from '$app/common/helpers/company-session';
 import { request } from '$app/common/helpers/request';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
@@ -27,14 +34,14 @@ import { RootState } from '../stores/store';
 
 export function useAuthenticated(): boolean {
   const user = useSelector((state: RootState) => state.user);
-  const token = localStorage.getItem('X-NINJA-TOKEN');
+  const token = currentToken();
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   // Reads the search under BrowserRouter and the in-fragment search under
   // HashRouter, so one call covers both router modes.
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   if (token === null) {
     return false;
@@ -56,23 +63,47 @@ export function useAuthenticated(): boolean {
         ).then((response) => {
           const companyUsers: CompanyUser[] = response.data.data;
 
+          const storedIndex = currentIndexValue();
+
           const { index: currentIndex, fromUrl } = resolveCompanyIndex({
             companyUsers,
             requestedCompanyId: searchParams.get('company'),
-            storedIndex: localStorage.getItem('X-CURRENT-INDEX'),
+            storedIndex,
           });
 
-          // Persist only when the URL chose it, exactly as the company switcher
-          // does, so a later in-app navigation stays in that workspace.
-          if (fromUrl) {
-            localStorage.setItem('X-CURRENT-INDEX', currentIndex.toString());
+          const { index: tabIndex } = resolveCompanyIndex({
+            companyUsers,
+            storedIndex,
+          });
+
+          // A link to another company pins only this tab to it; the token has
+          // to change with the index, since the token is what the server
+          // scopes every request by.
+          if (fromUrl && currentIndex !== tabIndex) {
+            setTabCompany(
+              currentIndex,
+              companyUsers[currentIndex].token.token
+            );
+          }
+
+          // Read once. Left in the URL, a reload would re-apply it and undo a
+          // company switch made in this tab.
+          if (searchParams.has('company')) {
+            setSearchParams(
+              (params) => {
+                params.delete('company');
+
+                return params;
+              },
+              { replace: true }
+            );
           }
 
           dispatch(
             authenticate({
               type: AuthenticationTypes.TOKEN,
               user: response.data.data[currentIndex].user,
-              token: localStorage.getItem('X-NINJA-TOKEN') as string,
+              token: currentToken() as string,
             })
           );
 
@@ -91,7 +122,13 @@ export function useAuthenticated(): boolean {
     .catch((e) => {
       console.error(e);
 
-      localStorage.removeItem('X-NINJA-TOKEN');
+      // A tab pinned by a link drops only its own company; the one the other
+      // tabs share may be perfectly valid.
+      if (hasTabCompany()) {
+        clearTabCompany();
+      } else {
+        localStorage.removeItem('X-NINJA-TOKEN');
+      }
 
       navigate('/login');
     });

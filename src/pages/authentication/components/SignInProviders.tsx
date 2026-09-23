@@ -17,6 +17,7 @@ import { useDispatch } from 'react-redux';
 import { v4 } from 'uuid';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
 import { endpoint } from '$app/common/helpers';
+import { clearTabCompany } from '$app/common/helpers/company-session';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { CompanyUser } from '$app/common/interfaces/company-user';
@@ -51,6 +52,7 @@ export function SignInProviders() {
   const queryClient = useQueryClient();
 
   const login = (response: AxiosResponse) => {
+    clearTabCompany();
     localStorage.removeItem('X-CURRENT-INDEX');
 
     let currentIndex = 0;

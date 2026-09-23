@@ -16,6 +16,7 @@ import { useDispatch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { useTurnstile } from 'react-turnstile';
 import { useColorScheme } from '$app/common/colors';
+import { clearTabCompany } from '$app/common/helpers/company-session';
 import { request } from '$app/common/helpers/request';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
@@ -108,6 +109,8 @@ export function Register() {
         ['cf-turnstile']: turnstileToken,
       })
         .then((response: AxiosResponse) => {
+          clearTabCompany();
+
           dispatch(
             register({
               token: response.data.data[0].token.token,
