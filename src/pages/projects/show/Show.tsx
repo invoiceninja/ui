@@ -69,6 +69,7 @@ import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOpti
 import { useActions as useProjectsActions } from '../common/hooks';
 import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
 import { ProjectPublicNotes } from './components/ProjectPublicNotes';
+import { QuickCreateTask } from './components/QuickCreateTask';
 
 dayjs.extend(duration);
 
@@ -161,6 +162,11 @@ export default function Show() {
       customBulkActions={customBulkActions}
       customFilterPlaceholder="status"
       filterColumns={filterColumns}
+      afterRows={
+        hasPermission('create_task') ? (
+          <QuickCreateTask project={project} />
+        ) : undefined
+      }
       withResourcefulActions
       rightSide={
         <DataTableColumnsPicker
