@@ -11,7 +11,8 @@
 import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { resolveCompanyIndex } from '$app/common/helpers/company-index';
 import { request } from '$app/common/helpers/request';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
@@ -31,6 +32,9 @@ export function useAuthenticated(): boolean {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
+  // Reads the search under BrowserRouter and the in-fragment search under
+  // HashRouter, so one call covers both router modes.
+  const [searchParams] = useSearchParams();
 
   if (token === null) {
     return false;
@@ -50,24 +54,18 @@ export function useAuthenticated(): boolean {
             updatedAt: dayjs().unix(),
           })
         ).then((response) => {
-          let currentIndex = 0;
+          const companyUsers: CompanyUser[] = response.data.data;
 
-          if (localStorage.getItem('X-CURRENT-INDEX')) {
-            currentIndex = parseInt(
-              localStorage.getItem('X-CURRENT-INDEX') || '0'
-            );
-          } else {
-            const companyUsers: CompanyUser[] = response.data.data;
-            const defaultCompanyId = companyUsers[0].account.default_company_id;
+          const { index: currentIndex, fromUrl } = resolveCompanyIndex({
+            companyUsers,
+            requestedCompanyId: searchParams.get('company'),
+            storedIndex: localStorage.getItem('X-CURRENT-INDEX'),
+          });
 
-            currentIndex =
-              companyUsers.findIndex(
-                (companyUser) => companyUser.company.id === defaultCompanyId
-              ) || 0;
-          }
-
-          if (currentIndex === -1) {
-            currentIndex = 0;
+          // Persist only when the URL chose it, exactly as the company switcher
+          // does, so a later in-app navigation stays in that workspace.
+          if (fromUrl) {
+            localStorage.setItem('X-CURRENT-INDEX', currentIndex.toString());
           }
 
           dispatch(
