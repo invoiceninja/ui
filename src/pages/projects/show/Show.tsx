@@ -131,6 +131,7 @@ export default function Show() {
     changeTemplateVisible,
     setChangeTemplateVisible,
     changeTemplateResources,
+    changeTemplateEntityContext,
   } = useChangeTemplate();
 
   if (!project) {
@@ -320,7 +321,7 @@ export default function Show() {
       />
 
       <ChangeTemplateModal<Project>
-        entity="project"
+        entity={changeTemplateEntityContext?.entity ?? 'project'}
         entities={changeTemplateResources as Project[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
@@ -331,7 +332,9 @@ export default function Show() {
             <span>{project.number}</span>
           </div>
         )}
-        bulkUrl="/api/v1/projects/bulk"
+        bulkUrl={
+          changeTemplateEntityContext?.endpoint ?? '/api/v1/projects/bulk'
+        }
       />
     </Default>
   );
