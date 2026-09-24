@@ -9,6 +9,7 @@
  */
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { TabGroup } from '$app/components/TabGroup';
 import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
@@ -81,6 +82,7 @@ const Box = styled.div`
 `;
 
 export const useGenerateActivityElement = () => {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
   return (activity: RecurringInvoiceActivity) => {
@@ -94,7 +96,7 @@ export const useGenerateActivityElement = () => {
       ),
       invoice: (
         <Link
-          to={route('/invoices/:id/edit', { id: activity?.invoice?.hashed_id })}
+          to={route(invoicePaths.edit, { id: activity?.invoice?.hashed_id })}
         >
           {activity?.invoice?.label}
         </Link>
