@@ -10,7 +10,6 @@
 
 import { useTranslation } from 'react-i18next';
 import { Element } from '$app/components/cards';
-import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 
 interface Props {
@@ -20,7 +19,6 @@ interface Props {
   requirement: string;
   busy: boolean;
   onChange: (value: boolean) => void;
-  onUpgrade: () => void;
 }
 
 export function AttachmentOption({
@@ -30,7 +28,6 @@ export function AttachmentOption({
   requirement,
   busy,
   onChange,
-  onUpgrade,
 }: Props) {
   const [t] = useTranslation();
 
@@ -42,13 +39,7 @@ export function AttachmentOption({
       noExternalPadding
       twoGridColumns
     >
-      <div className="flex items-center justify-end gap-3">
-        {allowed ? null : (
-          <Button type="secondary" behavior="button" onClick={onUpgrade}>
-            {t('upgrade')}
-          </Button>
-        )}
-
+      <div className="flex items-center justify-end">
         <Toggle
           checked={checked}
           disabled={!allowed || busy}

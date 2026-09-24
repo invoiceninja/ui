@@ -9,8 +9,6 @@
  */
 
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
-import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 import { endpoint, trans } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
@@ -18,20 +16,18 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { Client } from '$app/common/interfaces/client';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
-import dayjs from 'dayjs';
 import reactStringReplace from 'react-string-replace';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHref, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
-import { Element } from '$app/components/cards';
 import { Button, InputField } from '$app/components/forms';
-import Toggle from '$app/components/forms/Toggle';
 import { Callout } from './Callout';
 import { StepFooter } from './StepFooter';
 import { PreviewFrame } from './PreviewFrame';
@@ -50,21 +46,19 @@ const LOOKS: { label: string; design: string }[] = [
 
 type AttachmentKey = 'pdf_email_attachment' | 'document_email_attachment';
 
-const STICKY_HEADER_OFFSET = 80;
-
 interface Props {
   wizard: Wizard;
 }
 
 export function StepReview({ wizard }: Props) {
-  const reactSettings = useReactSettings();
   const [t] = useTranslation();
-  const formatMoney = useFormatMoney();
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const refreshCompanyUsers = useRefreshCompanyUsers();
   const gatewaysHref = useHref('/settings/gateways/create');
+  const accountHref = useHref('/settings/account_management');
 
   const invoice = wizard.invoice;
   const client = wizard.client;
@@ -81,9 +75,7 @@ export function StepReview({ wizard }: Props) {
   const [bankInstructions, setBankInstructions] = useState<string | null>(null);
   const [savingBank, setSavingBank] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
 
-  const preview = useRef<HTMLDivElement>(null);
   const sendAfterContact = useRef(false);
 
   useEffect(() => {
@@ -115,8 +107,8 @@ export function StepReview({ wizard }: Props) {
       .catch(() => setDesignsFailed(true));
   }, []);
 
-  useEffect(() => {
-    request(
+  const lookUpGateways = useCallback(() => {
+    return request(
       'GET',
       endpoint('/api/v1/company_gateways?status=active&per_page=1'),
       {},
@@ -130,7 +122,22 @@ export function StepReview({ wizard }: Props) {
 
         setHasGateway(configured.length > 0);
       });
+  }, [company?.settings?.company_gateway_ids]);
+
+  useEffect(() => {
+    void lookUpGateways();
   }, []);
+
+  useEffect(() => {
+    const onFocus = () => {
+      void refreshCompanyUsers();
+      void lookUpGateways();
+    };
+
+    window.addEventListener('focus', onFocus);
+
+    return () => window.removeEventListener('focus', onFocus);
+  }, [lookUpGateways]);
 
   const saveAttachment = (key: AttachmentKey, value: boolean) => {
     if (!company?.id) {
@@ -153,10 +160,7 @@ export function StepReview({ wizard }: Props) {
   };
 
   const upgrade = () => {
-    wizard
-      .flush()
-      .catch(() => undefined)
-      .finally(() => navigate('/settings/account_management'));
+    window.open(accountHref, '_blank');
   };
 
   const deliver = () => {
@@ -233,44 +237,8 @@ export function StepReview({ wizard }: Props) {
       .finally(() => setSavingBank(false));
   };
 
-  const itemCount = (invoice?.line_items ?? []).filter(
-    (item) => item.notes || item.product_key
-  ).length;
-
-  const money = (value: number) => {
-    return formatMoney(
-      value,
-      client?.country_id,
-      client?.settings?.currency_id,
-      2
-    );
-  };
-
   const previewable = Boolean(invoice?.client_id);
-
-  const revealPreview = () => {
-    if (!previewable || showPreview) {
-      return;
-    }
-
-    setShowPreview(true);
-
-    window.requestAnimationFrame(() => {
-      const frame = preview.current;
-
-      if (!frame) {
-        return;
-      }
-
-      return window.scrollTo({
-        top:
-          frame.getBoundingClientRect().top +
-          window.scrollY -
-          STICKY_HEADER_OFFSET,
-        behavior: 'smooth',
-      });
-    });
-  };
+  const attachmentsAllowed = proPlan() || enterprisePlan();
 
   const chooseDesign = (id: string) => {
     if (invoice?.design_id === id) {
@@ -282,158 +250,102 @@ export function StepReview({ wizard }: Props) {
 
   return (
     <StepTransition>
-      <p
-        className="text-xs mb-2"
-        style={{ color: colors.$22, fontWeight: 500 }}
-      >
-        {`${t('invoice')} ${t('summary')}`}
-      </p>
-
-      <div
-        className="px-4 py-1"
-        style={{
-          borderRadius: '0.375rem',
-          backgroundColor: reactSettings?.dark_mode ? colors.$25 : colors.$2,
-        }}
-      >
-        <Element
-          className="border-b border-dashed"
-          leftSide={t('from')}
-          pushContentToRight
-          withoutWrappingLeftSide
-          noExternalPadding
-          style={{ borderColor: colors.$20 }}
+      {previewable ? (
+        <div
+          id="iw-preview-panel"
+          className="border overflow-hidden"
+          style={{
+            borderColor: colors.$24,
+            borderRadius: '0.375rem',
+            backgroundColor: colors.$1,
+          }}
         >
-          {company?.settings?.name || '—'}
-        </Element>
+          <div
+            className="px-4 py-4 border-b"
+            style={{ borderColor: colors.$24 }}
+          >
+            <p
+              className="text-[0.8125rem] mb-2.5"
+              style={{ color: colors.$22, fontWeight: 500 }}
+            >
+              {t('invoice_design')}
+            </p>
 
-        <Element
-          className="border-b border-dashed"
-          leftSide={t('to')}
-          pushContentToRight
-          withoutWrappingLeftSide
-          noExternalPadding
-          style={{ borderColor: colors.$20 }}
-        >
-          <div>
-            <p>{client?.display_name || client?.name || '—'}</p>
+            {designsFailed ? (
+              <p className="text-sm" style={{ color: colors.$17 }}>
+                {t('layouts_could_not_be_loaded')}
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {LOOKS.map((look) => {
+                  const id = designs[look.design];
+                  const active = Boolean(id) && invoice?.design_id === id;
 
-            <div className="mt-0.5 flex flex-wrap items-center justify-end gap-4">
-              <span className="text-xs" style={{ color: colors.$17 }}>
-                {recipient || t('client_email_not_set')}
-              </span>
+                  return (
+                    <button
+                      key={look.label}
+                      type="button"
+                      disabled={!id}
+                      onClick={() => chooseDesign(id)}
+                      className="text-sm px-3.5 py-2 border"
+                      style={{
+                        borderRadius: '0.375rem',
+                        borderColor: active ? colors.$3 : colors.$24,
+                        backgroundColor: active ? colors.$25 : colors.$1,
+                        color: id ? colors.$3 : colors.$17,
+                        fontWeight: 500,
+                        boxShadow: active
+                          ? `inset 0 0 0 1px ${colors.$3}`
+                          : 'none',
+                        cursor: id ? 'pointer' : 'not-allowed',
+                      }}
+                    >
+                      {t(look.label)}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
-              {recipient ? null : (
-                <Button
-                  type="minimal"
-                  behavior="button"
-                  onClick={() => setAskEmail(true)}
-                >
-                  {t('contact_details')}
-                </Button>
-              )}
+            <div className="mt-4 space-y-4">
+              <BrandPrompts
+                section="name"
+                logoSkipped={wizard.dismissed('logo')}
+                onSkipLogo={() => wizard.dismiss('logo')}
+              />
+
+              <BrandPrompts
+                section="brand"
+                logoSkipped={wizard.dismissed('logo')}
+                onSkipLogo={() => wizard.dismiss('logo')}
+              />
             </div>
           </div>
-        </Element>
 
-        <Element
-          className="border-b border-dashed"
-          leftSide={t('items')}
-          pushContentToRight
-          withoutWrappingLeftSide
-          noExternalPadding
-          style={{ borderColor: colors.$20 }}
-        >
-          {trans('count_items', { count: itemCount })}
-        </Element>
+          <PreviewFrame id="iw-preview">
+            <InvoicePreview
+              for="create"
+              resource={invoice as Invoice}
+              entity="invoice"
+              relationType="client_id"
+              endpoint="/api/v1/live_preview?entity=:entity"
+              initiallyVisible
+            />
+          </PreviewFrame>
+        </div>
+      ) : null}
 
-        <Element
-          className="border-b border-dashed"
-          leftSide={t('subtotal')}
-          pushContentToRight
-          withoutWrappingLeftSide
-          noExternalPadding
-          style={{ borderColor: colors.$20 }}
-        >
-          {money(wizard.totals.subtotal)}
-        </Element>
+      <div className="mt-6 mb-2 flex items-center justify-between gap-4">
+        <p className="text-xs" style={{ color: colors.$22, fontWeight: 500 }}>
+          {t('before_you_send')}
+        </p>
 
-        {wizard.totals.discount ? (
-          <Element
-            className="border-b border-dashed"
-            leftSide={t('discount')}
-            pushContentToRight
-            withoutWrappingLeftSide
-            noExternalPadding
-            style={{ borderColor: colors.$20 }}
-          >
-            {money(wizard.totals.discount)}
-          </Element>
-        ) : null}
-
-        {wizard.totals.surchargeRows.map((row, index) => (
-          <Element
-            key={`surcharge-${index}`}
-            className="border-b border-dashed"
-            leftSide={row.name || t('surcharge')}
-            pushContentToRight
-            withoutWrappingLeftSide
-            noExternalPadding
-            style={{ borderColor: colors.$20 }}
-          >
-            {money(row.total)}
-          </Element>
-        ))}
-
-        {wizard.totals.taxRows.map((row, index) => (
-          <Element
-            key={`${row.name}-${index}`}
-            className="border-b border-dashed"
-            leftSide={
-              invoice?.uses_inclusive_taxes
-                ? `${t('includes')} ${row.name}`
-                : row.name
-            }
-            pushContentToRight
-            withoutWrappingLeftSide
-            noExternalPadding
-            style={{ borderColor: colors.$20 }}
-          >
-            {money(row.total)}
-          </Element>
-        ))}
-
-        <Element
-          className="border-b border-dashed"
-          leftSide={t('total')}
-          pushContentToRight
-          withoutWrappingLeftSide
-          noExternalPadding
-          style={{ borderColor: colors.$20 }}
-        >
-          {money(wizard.totals.total)}
-        </Element>
-
-        <Element
-          leftSide={t('due')}
-          pushContentToRight
-          withoutWrappingLeftSide
-          noExternalPadding
-        >
-          {invoice?.due_date
-            ? invoice.due_date === invoice.date
-              ? t('due_on_receipt')
-              : dayjs(invoice.due_date).format('D MMMM YYYY')
-            : '—'}
-        </Element>
+        {attachmentsAllowed ? null : (
+          <Button type="minimal" behavior="button" onClick={upgrade}>
+            {t('upgrade')}
+          </Button>
+        )}
       </div>
-
-      <p
-        className="text-xs mt-6 mb-2"
-        style={{ color: colors.$22, fontWeight: 500 }}
-      >
-        {t('before_you_send')}
-      </p>
 
       <div
         className="border px-4 py-4"
@@ -441,16 +353,18 @@ export function StepReview({ wizard }: Props) {
           borderColor: colors.$24,
           borderRadius: '0.375rem',
           backgroundColor: colors.$1,
+          opacity: attachmentsAllowed ? 1 : 0.5,
+          pointerEvents: attachmentsAllowed ? undefined : 'none',
         }}
+        aria-disabled={!attachmentsAllowed}
       >
         <AttachmentOption
           label={t('attach_pdf')}
           checked={Boolean(company?.settings?.pdf_email_attachment)}
-          allowed={proPlan() || enterprisePlan()}
+          allowed={attachmentsAllowed}
           requirement={t('pro_plan')}
           busy={savingAttachment !== null}
           onChange={(value) => saveAttachment('pdf_email_attachment', value)}
-          onUpgrade={upgrade}
         />
 
         <AttachmentOption
@@ -462,111 +376,8 @@ export function StepReview({ wizard }: Props) {
           onChange={(value) =>
             saveAttachment('document_email_attachment', value)
           }
-          onUpgrade={upgrade}
-        />
-
-        <BrandPrompts
-          section="name"
-          logoSkipped={wizard.dismissed('logo')}
-          onSkipLogo={() => wizard.dismiss('logo')}
         />
       </div>
-
-      {previewable ? (
-        <div className="mt-6">
-          <Toggle
-            checked={showPreview}
-            label={t('show_pdf_preview')}
-            onValueChange={(value) => {
-              if (value) {
-                return revealPreview();
-              }
-
-              return setShowPreview(false);
-            }}
-          />
-
-          {showPreview ? (
-            <div
-              id="iw-preview-panel"
-              ref={preview}
-              className="mt-3 border overflow-hidden"
-              style={{
-                borderColor: colors.$24,
-                borderRadius: '0.375rem',
-                backgroundColor: colors.$1,
-              }}
-            >
-              <div
-                className="px-4 py-4 border-b"
-                style={{ borderColor: colors.$24 }}
-              >
-                <p
-                  className="text-[0.8125rem] mb-2.5"
-                  style={{ color: colors.$22, fontWeight: 500 }}
-                >
-                  {t('invoice_design')}
-                </p>
-
-                {designsFailed ? (
-                  <p className="text-sm" style={{ color: colors.$17 }}>
-                    {t('layouts_could_not_be_loaded')}
-                  </p>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {LOOKS.map((look) => {
-                      const id = designs[look.design];
-                      const active = Boolean(id) && invoice?.design_id === id;
-
-                      return (
-                        <button
-                          key={look.label}
-                          type="button"
-                          disabled={!id}
-                          onClick={() => chooseDesign(id)}
-                          className="text-sm px-3.5 py-2 border"
-                          style={{
-                            borderRadius: '0.375rem',
-                            borderColor: active ? colors.$3 : colors.$24,
-                            backgroundColor: active ? colors.$25 : colors.$1,
-                            color: id ? colors.$3 : colors.$17,
-                            fontWeight: 500,
-                            boxShadow: active
-                              ? `inset 0 0 0 1px ${colors.$3}`
-                              : 'none',
-                            cursor: id ? 'pointer' : 'not-allowed',
-                          }}
-                        >
-                          {t(look.label)}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-
-                <div className="mt-4">
-                  <BrandPrompts
-                    section="brand"
-                    logoSkipped={wizard.dismissed('logo')}
-                    onSkipLogo={() => wizard.dismiss('logo')}
-                  />
-                </div>
-              </div>
-
-              <PreviewFrame id="iw-preview">
-                <InvoicePreview
-                  for="create"
-                  resource={invoice as Invoice}
-                  entity="invoice"
-                  relationType="client_id"
-                  endpoint="/api/v1/live_preview?entity=:entity"
-                  initiallyVisible
-                />
-              </PreviewFrame>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
 
       {hasGateway === false && !wizard.dismissed('pay') ? (
         <div className="mt-8">
@@ -640,7 +451,21 @@ export function StepReview({ wizard }: Props) {
             )
           )}
         </p>
-      ) : null}
+      ) : (
+        <div className="mt-8 flex flex-wrap items-center gap-4">
+          <span className="text-sm" style={{ color: colors.$3 }}>
+            {t('client_email_not_set')}
+          </span>
+
+          <Button
+            type="minimal"
+            behavior="button"
+            onClick={() => setAskEmail(true)}
+          >
+            {t('contact_details')}
+          </Button>
+        </div>
+      )}
 
       <StepFooter
         back={

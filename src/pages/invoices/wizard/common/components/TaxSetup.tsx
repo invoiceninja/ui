@@ -9,7 +9,6 @@
  */
 
 import { endpoint } from '$app/common/helpers';
-import { useColorScheme } from '$app/common/colors';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { request } from '$app/common/helpers/request';
@@ -46,7 +45,6 @@ export function TaxSetup({
   onClose,
   onApplied,
 }: Props) {
-  const colors = useColorScheme();
   const [t] = useTranslation();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
@@ -183,10 +181,6 @@ export function TaxSetup({
                 detail={t('yes_prices_include_tax_help')}
               />
             </div>
-
-            <p className="text-xs mt-2" style={{ color: colors.$17 }}>
-              {t('tax_applies_to_whole_invoice')}
-            </p>
           </div>
         ) : null}
 

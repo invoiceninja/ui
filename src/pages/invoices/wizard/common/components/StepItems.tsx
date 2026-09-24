@@ -506,7 +506,7 @@ export function StepItems({ wizard, embedded }: Props) {
 
       <TaxSetup
         open={taxOpen}
-        scope={taxSetup?.scope ?? 'invoice'}
+        scope={taxSetup?.scope ?? 'item'}
         askInclusive={rates.length === 0 && !inclusiveAnswered}
         onClose={() => setTaxOpen(false)}
         onApplied={applyTax}

@@ -11,6 +11,8 @@
 import { endpoint, trans } from '$app/common/helpers';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useColorScheme } from '$app/common/colors';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -22,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { Spinner } from '$app/components/Spinner';
 import { Button, InputField, InputLabel } from '$app/components/forms';
+import { CountrySelector } from '$app/components/CountrySelector';
 import { StepFooter } from './StepFooter';
 import { Legend } from './Legend';
 import { StepTransition } from './StepTransition';
@@ -37,6 +40,8 @@ export function StepRecipient({ wizard }: Props) {
   const accentColor = useAccentColor();
   const colors = useColorScheme();
   const [t] = useTranslation();
+  const company = useCurrentCompany();
+  const resolveCountry = useResolveCountry();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -46,6 +51,8 @@ export function StepRecipient({ wizard }: Props) {
     city: '',
     state: '',
     postal_code: '',
+    country_id: '',
+    vat_number: '',
   });
 
   const [matches, setMatches] = useState<Client[]>([]);
@@ -59,9 +66,20 @@ export function StepRecipient({ wizard }: Props) {
 
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const reveal = useRef<ReturnType<typeof setTimeout>>();
+  const countryTouched = useRef(false);
   const searchBox = useRef<HTMLDivElement>(null);
   const nameInput = useRef<HTMLInputElement>(null);
   const selected = wizard.client;
+
+  useEffect(() => {
+    const fallback = company?.settings?.country_id ?? '';
+
+    if (!fallback || countryTouched.current) {
+      return;
+    }
+
+    setAddress((current) => ({ ...current, country_id: fallback }));
+  }, [company?.settings?.country_id]);
 
   useEffect(() => {
     const input = nameInput.current;
@@ -199,6 +217,8 @@ export function StepRecipient({ wizard }: Props) {
         city: address.city,
         state: address.state,
         postal_code: address.postal_code,
+        country_id: address.country_id,
+        vat_number: vatZone ? address.vat_number : '',
         contacts: email.trim()
           ? [{ email: email.trim(), send_email: true }]
           : [],
@@ -226,6 +246,7 @@ export function StepRecipient({ wizard }: Props) {
   };
 
   const selectedEmail = contactEmail(emailableContact(selected));
+  const vatZone = Boolean(resolveCountry(address.country_id)?.eea);
 
   const proceed = () => {
     wizard.next();
@@ -522,6 +543,34 @@ export function StepRecipient({ wizard }: Props) {
                   setAddress({ ...address, postal_code: value })
                 }
               />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <CountrySelector
+                label={t('country')}
+                value={address.country_id}
+                onChange={(value) => {
+                  countryTouched.current = true;
+
+                  setAddress({ ...address, country_id: value });
+                }}
+                errorMessage={errors?.errors.country_id}
+                dismissable
+              />
+
+              {vatZone ? (
+                <InputField
+                  id="iw-customer-vat"
+                  label={t('vat_number')}
+                  value={address.vat_number}
+                  changeOverride
+                  debounceTimeout={0}
+                  onValueChange={(value) =>
+                    setAddress({ ...address, vat_number: value })
+                  }
+                  errorMessage={errors?.errors.vat_number}
+                />
+              ) : null}
             </div>
           </div>
         ) : (

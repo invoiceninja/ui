@@ -31,6 +31,10 @@ export function StepNotes({ wizard, embedded }: Props) {
   return (
     <StepTransition>
       <div>
+        <p className="text-sm mb-3 leading-6" style={{ color: colors.$17 }}>
+          {t('terms_will_appear_here')}
+        </p>
+
         <MarkdownEditor
           value={invoice?.terms ?? ''}
           onChange={(value) => wizard.patch({ terms: value })}
