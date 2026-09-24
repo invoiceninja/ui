@@ -15,15 +15,12 @@ import { Dispatch, SetStateAction, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
-  MdCancel,
   MdCloudCircle,
   MdComment,
   MdDelete,
   MdDesignServices,
-  MdDone,
   MdDownload,
   MdEdit,
-  MdMarkEmailRead,
   MdPictureAsPdf,
   MdPrint,
   MdRestore,
@@ -103,6 +100,7 @@ import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatu
 import { invoiceSumAtom, quoteAtom } from './atoms';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { ConvertOptionsModal } from './components/ConvertOptionsModal';
+import { QuoteActionConfirmation } from './components/QuoteActionConfirmation';
 import { isQuoteCancellable } from './helpers';
 import { useApprove } from './hooks/useApprove';
 import { useBulkAction } from './hooks/useBulkAction';
@@ -613,55 +611,37 @@ export function useActions(params?: Params) {
     ),
     (quote) =>
       quote.status_id === QuoteStatus.Draft && (
-        <EntityActionElement
+        <QuoteActionConfirmation
           {...(!dropdown && {
             key: 'mark_sent',
           })}
-          entity="quote"
-          actionKey="mark_sent"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('mark_sent')}
-          onClick={() => markSent(quote)}
-          icon={MdMarkEmailRead}
-          disablePreventNavigation
-        >
-          {t('mark_sent')}
-        </EntityActionElement>
+          action="mark_sent"
+          dropdown={dropdown}
+          onConfirm={() => markSent(quote)}
+        />
       ),
     (quote) =>
       (quote.status_id === QuoteStatus.Draft ||
         quote.status_id === QuoteStatus.Sent) && (
-        <EntityActionElement
+        <QuoteActionConfirmation
           {...(!dropdown && {
             key: 'approve',
           })}
-          entity="quote"
-          actionKey="approve"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('approve')}
-          onClick={() => approve(quote)}
-          icon={MdDone}
-          disablePreventNavigation
-        >
-          {t('approve')}
-        </EntityActionElement>
+          action="approve"
+          dropdown={dropdown}
+          onConfirm={() => approve(quote)}
+        />
       ),
     (quote) =>
       isQuoteCancellable(quote) && (
-        <EntityActionElement
+        <QuoteActionConfirmation
           {...(!dropdown && {
             key: 'cancel_quote',
           })}
-          entity="quote"
-          actionKey="cancel_quote"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('cancel')}
-          onClick={() => bulk([quote.id], 'cancel')}
-          icon={MdCancel}
-          disablePreventNavigation
-        >
-          {t('cancel')}
-        </EntityActionElement>
+          action="cancel"
+          dropdown={dropdown}
+          onConfirm={() => bulk([quote.id], 'cancel')}
+        />
       ),
     (quote) => (
       <ConvertOptionsModal
