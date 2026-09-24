@@ -14,7 +14,7 @@
     "@headlessui/react": "^1.7.19",
     "@hello-pangea/dnd": "^16.6.0",
     "@monaco-editor/react": "^4.7.0",
-    "@react-oauth/google": "^0.12.1",
+    "@react-oauth/google": "^0.13.0",
     "@reduxjs/toolkit": "^1.9.7",
     "@sentry/react": "^10.70.0",
     "@stripe/stripe-js": "^4.10.0",
