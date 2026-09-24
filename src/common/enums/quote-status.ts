@@ -16,4 +16,5 @@ export const enum QuoteStatus {
   Approved = '3',
   Converted = '4',
   Rejected = '5',
+  Cancelled = '6',
 }

@@ -13,9 +13,7 @@ import { useTranslation } from 'react-i18next';
 import {
   MdContactPage,
   MdDesignServices,
-  MdDone,
   MdDownload,
-  MdMarkEmailRead,
   MdPrint,
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
@@ -33,8 +31,10 @@ import { Icon } from '$app/components/icons/Icon';
 import { useDownloadPdfs } from '$app/pages/invoices/common/hooks/useDownloadPdfs';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { isQuoteCancellable } from '../helpers';
 import { ConvertToInvoiceBulkAction } from '../components/ConvertToInoviceBulkAction';
 import { ConvertToProjectBulkAction } from '../components/ConvertToProjectBulkAction';
+import { QuoteActionConfirmation } from '../components/QuoteActionConfirmation';
 import { SendEmailBulkAction } from '../components/SendEmailBulkAction';
 import { useBulkAction } from './useBulkAction';
 
@@ -72,6 +72,10 @@ export function useCustomBulkActions() {
 
   const showMarkSentAction = (quotes: Quote[]) => {
     return quotes.every(({ status_id }) => status_id === QuoteStatus.Draft);
+  };
+
+  const showCancelAction = (quotes: Quote[]) => {
+    return quotes.every((quote) => isQuoteCancellable(quote));
   };
 
   const shouldDownloadDocuments = (quotes: Quote[]) => {
@@ -169,28 +173,38 @@ export function useCustomBulkActions() {
     ({ selectedIds, selectedResources, setSelected }) =>
       selectedResources &&
       showMarkSentAction(selectedResources) && (
-        <DropdownElement
-          onClick={() => {
+        <QuoteActionConfirmation
+          action="mark_sent"
+          bulkAction
+          onConfirm={() => {
             bulk(selectedIds, 'mark_sent');
             setSelected([]);
           }}
-          icon={<Icon element={MdMarkEmailRead} />}
-        >
-          {t('mark_sent')}
-        </DropdownElement>
+        />
       ),
     ({ selectedIds, selectedResources, setSelected }) =>
       selectedResources &&
       showApproveAction(selectedResources) && (
-        <DropdownElement
-          onClick={() => {
+        <QuoteActionConfirmation
+          action="approve"
+          bulkAction
+          onConfirm={() => {
             bulk(selectedIds, 'approve');
             setSelected([]);
           }}
-          icon={<Icon element={MdDone} />}
-        >
-          {t('approve')}
-        </DropdownElement>
+        />
+      ),
+    ({ selectedIds, selectedResources, setSelected }) =>
+      selectedResources &&
+      showCancelAction(selectedResources) && (
+        <QuoteActionConfirmation
+          action="cancel"
+          bulkAction
+          onConfirm={() => {
+            bulk(selectedIds, 'cancel');
+            setSelected([]);
+          }}
+        />
       ),
     ({ selectedIds, selectedResources, setSelected }) =>
       selectedResources &&
