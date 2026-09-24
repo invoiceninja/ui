@@ -545,7 +545,11 @@ export function StepRecipient({ wizard }: Props) {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div
+              className={classNames('grid gap-3', {
+                'grid-cols-2': vatZone,
+              })}
+            >
               <CountrySelector
                 label={t('country')}
                 value={address.country_id}
