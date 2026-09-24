@@ -20,9 +20,11 @@ import {
 import { ChevronDown, ChevronUp } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Element } from '$app/components/cards/Element';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { useSettingsCardLearnMore } from '$app/components/layouts/settings-docs-context';
 import { Spinner } from '$app/components/Spinner';
 import { Button } from '../forms';
 import { CardContainer } from '.';
@@ -71,6 +73,8 @@ export function Card(props: Props) {
   const [isCollapsed, setIsCollpased] = useState(props.collapsed);
 
   const colors = useColorScheme();
+  const accentColor = useAccentColor();
+  const settingsDocs = useSettingsCardLearnMore(Boolean(props.title));
 
   return (
     <div
@@ -122,14 +126,31 @@ export function Card(props: Props) {
               })}
             >
               <div>
-                <h3
-                  className={classNames('leading-6 font-medium', {
-                    'text-lg': padding == 'regular',
-                    'text-md': padding == 'small',
-                  })}
-                >
-                  {props.title}
-                </h3>
+                <div className="flex items-center gap-x-2">
+                  <h3
+                    className={classNames('leading-6 font-medium', {
+                      'text-lg': padding == 'regular',
+                      'text-md': padding == 'small',
+                    })}
+                  >
+                    {props.title}
+                  </h3>
+
+                  {settingsDocs && (
+                    <button
+                      type="button"
+                      className="text-sm font-medium"
+                      style={{ color: accentColor }}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        settingsDocs.onDocsClick(settingsDocs.docs);
+                      }}
+                    >
+                      {t('learn_more')}
+                    </button>
+                  )}
+                </div>
 
                 {props.description && (
                   <p className="mt-1 max-w-2xl text-sm">{props.description}</p>

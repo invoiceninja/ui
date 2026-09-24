@@ -11,13 +11,12 @@
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { Element } from '$app/components/cards';
+import { Button, InputField, SelectField } from '$app/components/forms';
 
 type Date =
   | 'created_at'
@@ -130,8 +129,6 @@ const DEFAULT_EXPORT: Export = {
 export function Export() {
   const [t] = useTranslation();
 
-  const colors = useColorScheme();
-
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [exportType, setExportType] = useState<ExportType>('activities');
@@ -184,20 +181,11 @@ export function Export() {
   }, [exportType]);
 
   return (
-    <Card
-      title={t('export')}
-      className="shadow-sm"
-      saveButtonLabel={t('export')}
-      withSaveButton
-      onSaveClick={(event) => {
-        event.preventDefault();
-        handleExport();
-      }}
-      disableSubmitButton={isFormBusy}
-      disableWithoutIcon
-      style={{ borderColor: colors.$24 }}
-      headerStyle={{ borderColor: colors.$20 }}
-    >
+    <>
+      <div className="px-4 sm:px-6 pt-2 pb-1">
+        <h3 className="leading-6 font-medium text-lg">{t('export')}</h3>
+      </div>
+
       <Element leftSide={t('export')}>{t('csv')}</Element>
 
       <Element leftSide={t('export_type')}>
@@ -272,6 +260,17 @@ export function Export() {
           </Element>
         </>
       )}
-    </Card>
+
+      <div className="px-4 sm:px-6 py-4 flex justify-end">
+        <Button
+          behavior="button"
+          onClick={handleExport}
+          disabled={isFormBusy}
+          disableWithoutIcon
+        >
+          {t('export')}
+        </Button>
+      </div>
+    </>
   );
 }

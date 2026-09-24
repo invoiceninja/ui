@@ -11,13 +11,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineWarning } from 'react-icons/md';
-import { useColorScheme } from '$app/common/colors';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Element } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
-import { $help } from '$app/components/HelpWidget';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
@@ -25,8 +22,6 @@ import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/commo
 export function CalculateTaxesNotificationModal() {
   const { t } = useTranslation();
 
-  const colors = useColorScheme();
-  const accentColor = useAccentColor();
   const companyChanges = useCompanyChanges();
 
   const handleChange = useHandleCurrentCompanyChangeProperty();
@@ -88,30 +83,7 @@ export function CalculateTaxesNotificationModal() {
       </Modal>
 
       <Element
-        leftSide={
-          <div className="flex items-center gap-2">
-            <span>{t('calculate_taxes')}</span>
-
-            <div className="flex">
-              <span style={{ color: colors.$22 }}>(</span>
-
-              <button
-                type="button"
-                style={{ color: accentColor }}
-                onClick={() =>
-                  $help('calculate-taxes', {
-                    moveToHeading: 'Turn on Calculate Taxes',
-                  })
-                }
-                className="inline-flex items-center space-x-1"
-              >
-                <span>{t('learn_more')}</span>
-              </button>
-
-              <span style={{ color: colors.$22 }}>)</span>
-            </div>
-          </div>
-        }
+        leftSide={t('calculate_taxes')}
         leftSideHelp={t('calculate_taxes_help')}
       >
         <Toggle
