@@ -10,17 +10,20 @@
 
 import { ComponentProps } from 'react';
 import { ExpensesTab } from './ExpensesTab';
+import { ProfitTab } from './ProfitTab';
 import { TimeTab } from './TimeTab';
 
 interface Props {
   showTimeCharts: boolean;
+  money: ComponentProps<typeof ProfitTab>;
   time: ComponentProps<typeof TimeTab>;
   expenses: ComponentProps<typeof ExpensesTab>;
 }
 
-export function ChartsTab({ showTimeCharts, time, expenses }: Props) {
+export function ChartsTab({ showTimeCharts, money, time, expenses }: Props) {
   return (
     <div className="space-y-8">
+      <ProfitTab {...money} />
       {showTimeCharts && <TimeTab {...time} />}
       <ExpensesTab {...expenses} />
     </div>
