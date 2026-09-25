@@ -19,9 +19,13 @@ import { TransactionStatus } from '$app/common/enums/transactions';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { TransactionRule } from '$app/common/interfaces/transaction-rules';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { Button } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { TabGroup } from '$app/components/TabGroup';
 import { ListBox } from './ListBox';
 
@@ -44,6 +48,7 @@ export function TransactionMatchDetails(props: Props) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
+  const company = useCurrentCompany();
   const queryClient = useQueryClient();
 
   const { transactionRule } = props;
@@ -56,6 +61,11 @@ export function TransactionMatchDetails(props: Props) {
   const [expenseIds, setExpenseIds] = useState<string[]>([]);
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [expenseCategoryIds, setExpenseCategoryIds] = useState<string[]>([]);
+  const [clientId, setClientId] = useState<string>('');
+  const [projectId, setProjectId] = useState<string>('');
+  const [shouldBeInvoiced, setShouldBeInvoiced] = useState<boolean>(
+    Boolean(company?.mark_expenses_invoiceable)
+  );
   const [isTransactionConverted, setIsTransactionConverted] =
     useState<boolean>(true);
 
@@ -146,6 +156,10 @@ export function TransactionMatchDetails(props: Props) {
             id: props.transactionDetails.transaction_id,
             vendor_id: vendorIds.join(','),
             ninja_category_id: expenseCategoryIds.join(','),
+            ...(projectId
+              ? { project_id: projectId }
+              : clientId && { client_id: clientId }),
+            should_be_invoiced: shouldBeInvoiced,
           },
         ],
       })
@@ -278,6 +292,40 @@ export function TransactionMatchDetails(props: Props) {
                 />
               ) : (
                 <>
+                  <div
+                    className="flex flex-col space-y-4 px-5 py-4 border-b"
+                    style={{ borderColor: colors.$24 }}
+                  >
+                    <div className="flex space-x-4">
+                      <div className="flex-1 min-w-0">
+                        <ProjectSelector
+                          inputLabel={t('project')}
+                          value={projectId}
+                          clientId={clientId}
+                          onChange={(project) => setProjectId(project.id)}
+                          onClearButtonClick={() => setProjectId('')}
+                        />
+                      </div>
+
+                      {!projectId && (
+                        <div className="flex-1 min-w-0">
+                          <ClientSelector
+                            inputLabel={t('client')}
+                            value={clientId}
+                            onChange={(client) => setClientId(client.id)}
+                            onClearButtonClick={() => setClientId('')}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <Toggle
+                      label={t('should_be_invoiced')}
+                      checked={shouldBeInvoiced}
+                      onValueChange={setShouldBeInvoiced}
+                    />
+                  </div>
+
                   <ListBox
                     style={{
                       color: colors.$3,
