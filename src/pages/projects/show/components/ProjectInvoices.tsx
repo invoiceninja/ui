@@ -12,6 +12,8 @@ import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { useEnabled } from '$app/common/guards/guards/enabled';
+import { permission } from '$app/common/guards/guards/permission';
+import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 import { Project } from '$app/common/interfaces/project';
@@ -73,6 +75,9 @@ export function ProjectInvoices({ project }: Props) {
         customActions={actions}
         endpoint={`/api/v1/invoices?include=client.group_settings,project&without_deleted_clients=true&sort=id|desc&project_id=${project.id}`}
         bulkRoute="/api/v1/invoices/bulk"
+        linkToCreate={route('/invoices/create?client=:clientId', {
+          clientId: project.client_id,
+        })}
         linkToEdit="/invoices/:id/edit"
         customFilters={filters}
         customBulkActions={customBulkActions}
@@ -96,6 +101,7 @@ export function ProjectInvoices({ project }: Props) {
             table="invoice"
           />
         }
+        linkToCreateGuards={[permission('create_invoice')]}
         hideEditableOptions={!hasPermission('edit_invoice')}
       />
 
