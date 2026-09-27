@@ -75,9 +75,13 @@ export function ProjectInvoices({ project }: Props) {
         customActions={actions}
         endpoint={`/api/v1/invoices?include=client.group_settings,project&without_deleted_clients=true&sort=id|desc&project_id=${project.id}`}
         bulkRoute="/api/v1/invoices/bulk"
-        linkToCreate={route('/invoices/create?client=:clientId', {
-          clientId: project.client_id,
-        })}
+        linkToCreate={route(
+          '/invoices/create?client=:clientId&project_id=:projectId',
+          {
+            clientId: project.client_id,
+            projectId: project.id,
+          }
+        )}
         linkToEdit="/invoices/:id/edit"
         customFilters={filters}
         customBulkActions={customBulkActions}
