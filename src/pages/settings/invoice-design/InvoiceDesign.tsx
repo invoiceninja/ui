@@ -26,6 +26,7 @@ import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChang
 import { $refetch, RefetchKey } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Settings } from '$app/common/interfaces/company.interface';
+import { useDesignQuery } from '$app/common/queries/designs';
 import { Page } from '$app/components/Breadcrumbs';
 import { Sparkle } from '$app/components/icons/Sparkle';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
@@ -60,6 +61,8 @@ export default function InvoiceDesign() {
   const { documentTitle } = useTitle('invoice_design');
 
   const { id } = useParams();
+
+  const { data: design } = useDesignQuery({ id, enabled: true });
 
   const tabs = useTabs();
   const location = useLocation();
@@ -109,7 +112,7 @@ export default function InvoiceDesign() {
       href: '/settings/invoice_design/custom_designs',
     },
     {
-      name: t('design'),
+      name: design?.name || t('design'),
       href: id
         ? route('/settings/invoice_design/custom_designs/:id/edit', { id })
         : '/settings/invoice_design/custom_designs/create',

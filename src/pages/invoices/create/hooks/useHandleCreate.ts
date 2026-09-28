@@ -83,12 +83,12 @@ export function useHandleCreate(params: Params) {
           $refetch(['expenses']);
         }
 
-        navigate(
-          route('/invoices/:id/edit?table=:table', {
-            id: response.data.data.id,
-            table: searchParams.get('table') ?? 'products',
-          })
-        );
+        const table = searchParams.get('table');
+        const editRoute = route('/invoices/:id/edit', {
+          id: response.data.data.id,
+        });
+
+        navigate(table ? `${editRoute}?table=${table}` : editRoute);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

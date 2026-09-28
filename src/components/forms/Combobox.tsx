@@ -198,6 +198,7 @@ export function Combobox<T = any>({
     if (clearInputAfterSelection) {
       setInputValue('');
       setSelectedOption(null);
+      setHighlightedIndex(-1);
     }
 
     setTimeout(() => setIsOpen(false), 100);

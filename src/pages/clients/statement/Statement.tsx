@@ -73,7 +73,10 @@ export default function Statement() {
 
   const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
-    { name: t('client'), href: route('/clients/:id', { id }) },
+    {
+      name: clientResponse?.display_name || t('client'),
+      href: route('/clients/:id', { id }),
+    },
     { name: t('statement'), href: route('/clients/:id/statement', { id }) },
   ];
 

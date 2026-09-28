@@ -11,6 +11,14 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
+import {
+  numberBreadcrumb,
+  textBreadcrumb,
+} from '$app/common/helpers/breadcrumbs';
+import {
+  extractTextFromHTML,
+  sanitizeHTML,
+} from '$app/common/helpers/html-string';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
@@ -83,7 +91,10 @@ export default function Task() {
       href: route('/tasks'),
     },
     {
-      name: t('edit_task'),
+      name: textBreadcrumb(
+        extractTextFromHTML(sanitizeHTML(data?.description ?? '')),
+        numberBreadcrumb(data?.number, t('edit_task'))
+      ),
       href: route('/tasks/:id', { id }),
     },
   ];

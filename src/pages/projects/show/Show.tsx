@@ -69,6 +69,7 @@ import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOpti
 import { useActions as useProjectsActions } from '../common/hooks';
 import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
 import { ProjectPublicNotes } from './components/ProjectPublicNotes';
+import { QuickCreateTask } from './components/QuickCreateTask';
 
 dayjs.extend(duration);
 
@@ -83,11 +84,6 @@ export default function Show() {
 
   const enabled = useEnabled();
 
-  const pages: Page[] = [
-    { name: t('projects'), href: '/projects' },
-    { name: t('project'), href: route('/projects/:id', { id }) },
-  ];
-
   const { data: project } = useQuery({
     queryKey: ['/api/v1/projects', `/api/v1/projects/${id}`],
     queryFn: () =>
@@ -101,6 +97,14 @@ export default function Show() {
       ),
     staleTime: Infinity,
   });
+
+  const pages: Page[] = [
+    { name: t('projects'), href: '/projects' },
+    {
+      name: project?.name || t('project'),
+      href: route('/projects/:id', { id }),
+    },
+  ];
 
   const projectActions = useProjectsActions();
   const taskActions = useTasksActions();
@@ -128,6 +132,7 @@ export default function Show() {
     changeTemplateVisible,
     setChangeTemplateVisible,
     changeTemplateResources,
+    changeTemplateEntityContext,
   } = useChangeTemplate();
 
   if (!project) {
@@ -157,6 +162,11 @@ export default function Show() {
       customBulkActions={customBulkActions}
       customFilterPlaceholder="status"
       filterColumns={filterColumns}
+      afterRows={
+        hasPermission('create_task') ? (
+          <QuickCreateTask project={project} />
+        ) : undefined
+      }
       withResourcefulActions
       rightSide={
         <DataTableColumnsPicker
@@ -317,7 +327,7 @@ export default function Show() {
       />
 
       <ChangeTemplateModal<Project>
-        entity="project"
+        entity={changeTemplateEntityContext?.entity ?? 'project'}
         entities={changeTemplateResources as Project[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
@@ -328,7 +338,9 @@ export default function Show() {
             <span>{project.number}</span>
           </div>
         )}
-        bulkUrl="/api/v1/projects/bulk"
+        bulkUrl={
+          changeTemplateEntityContext?.endpoint ?? '/api/v1/projects/bulk'
+        }
       />
     </Default>
   );

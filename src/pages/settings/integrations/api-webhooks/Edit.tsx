@@ -16,6 +16,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
+import { textBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -57,18 +58,6 @@ export function Edit() {
 
   const actions = useActions();
 
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('account_management'), href: '/settings/account_management' },
-    { name: t('api_webhooks'), href: '/settings/integrations/api_webhooks' },
-    {
-      name: t('edit_webhook'),
-      href: route('/settings/integrations/api_webhooks/:id/edit', {
-        id,
-      }),
-    },
-  ];
-
   const events = useEvents();
 
   const [headers, setHeaders] = useState<ApiWebHookHeader>({});
@@ -80,6 +69,18 @@ export function Edit() {
   const handleChange = useHandleChange({ setApiWebHook, setErrors });
 
   const { data: apiWebHookResponse } = useApiWebhookQuery({ id });
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('account_management'), href: '/settings/account_management' },
+    { name: t('api_webhooks'), href: '/settings/integrations/api_webhooks' },
+    {
+      name: textBreadcrumb(apiWebHookResponse?.target_url, t('edit_webhook')),
+      href: route('/settings/integrations/api_webhooks/:id/edit', {
+        id,
+      }),
+    },
+  ];
 
   const handleRemoveHeader = (key: string) => {
     if (Object.hasOwn(headers, key)) {

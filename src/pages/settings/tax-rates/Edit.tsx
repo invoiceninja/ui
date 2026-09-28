@@ -37,16 +37,16 @@ export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
 
+  const { data } = useTaxRateQuery({ id });
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('tax_settings'), href: '/settings/tax_settings' },
     {
-      name: t('edit_tax_rate'),
+      name: data?.data.data.name || t('edit_tax_rate'),
       href: route('/settings/tax_rates/:id/edit', { id }),
     },
   ];
-
-  const { data } = useTaxRateQuery({ id });
   const [errors, setErrors] = useState<Record<string, any>>({});
 
   const actions = useActions();

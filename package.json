@@ -102,6 +102,7 @@
     "react-verification-input": "^3.3.1",
     "recharts": "^2.15.1",
     "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
     "signature_pad": "^5.0.10",
     "styled-components": "^6.1.15",
     "tailwind-scrollbar": "^3.1.0",

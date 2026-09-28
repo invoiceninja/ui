@@ -169,6 +169,7 @@ export function Tags() {
     <Settings
       title={t('tags')}
       breadcrumbs={pages}
+      docsLink="en/basic-settings/#tag_settings"
       onSaveClick={onSave}
       onCancelClick={onCancel}
       disableSaveButton={isFormBusy}

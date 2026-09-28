@@ -46,6 +46,7 @@ export function QuoteStatus(props: Props) {
   const isExpiringToday = dayjs(due_date).isSame(dayjs(), 'day');
   const statusExpired = status_id === QuoteStatusEnum.Expired;
   const statusRejected = status_id === QuoteStatusEnum.Rejected;
+  const statusCancelled = status_id === QuoteStatusEnum.Cancelled;
 
   if (is_deleted) return <Badge variant="red">{t('deleted')}</Badge>;
 
@@ -57,6 +58,10 @@ export function QuoteStatus(props: Props) {
         {t('converted')}
       </Badge>
     );
+  }
+
+  if (statusCancelled) {
+    return <Badge variant="purple">{t('cancelled')}</Badge>;
   }
 
   if (statusExpired && !isExpiringToday) {

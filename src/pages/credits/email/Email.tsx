@@ -11,6 +11,7 @@
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
@@ -35,6 +36,10 @@ export default function Email() {
 
   const pages: Page[] = [
     { name: t('credits'), href: '/credits' },
+    {
+      name: numberBreadcrumb(credit?.number, t('edit_credit')),
+      href: route('/credits/:id/edit', { id }),
+    },
     {
       name: t('email_credit'),
       href: route('/credits/:id/email', { id }),

@@ -11,7 +11,7 @@
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { MdInfo } from 'react-icons/md';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
@@ -38,11 +38,10 @@ import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { RecurringInvoiceStatus as RecurringInvoiceStatusBadge } from '../common/components/RecurringInvoiceStatus';
 import { useRecurringInvoiceUtilities } from '../common/hooks';
 import { RecurringInvoiceContext } from '../create/Create';
+import { useDefaultTabIndex } from '$app/common/hooks/useDefaultTabIndex';
 
 export default function Edit() {
   const [t] = useTranslation();
-
-  const [searchParams] = useSearchParams();
 
   const colors = useColorScheme();
   const taskColumns = useTaskColumns();
@@ -52,6 +51,8 @@ export default function Edit() {
   const context: RecurringInvoiceContext = useOutletContext();
 
   const { recurringInvoice, errors, client } = context;
+
+  const { defaultTabIndex } = useDefaultTabIndex(recurringInvoice);
 
   useScrollToLineItem(Boolean(recurringInvoice && client));
 
@@ -135,7 +136,7 @@ export default function Edit() {
 
           <TabGroup
             tabs={[t('products'), t('tasks')]}
-            defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+            defaultTabIndex={defaultTabIndex}
             formatTabLabel={(index) => {
               if (index === 1) {
                 return (

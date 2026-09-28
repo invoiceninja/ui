@@ -9,7 +9,10 @@
  */
 
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { Card } from '$app/components/cards';
+import { Divider } from '$app/components/cards/Divider';
 import { Settings } from '../../../../components/layouts/Settings';
 import { Export } from '../common/components/Export';
 import { Import } from '../common/components/Import';
@@ -18,6 +21,7 @@ export function ImportExport() {
   useTitle('import_export');
 
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -30,9 +34,24 @@ export function ImportExport() {
       breadcrumbs={pages}
       docsLink="en/basic-settings/#import_export"
     >
-      <Import />
+      <Card
+        title={t('import_export')}
+        className="shadow-sm"
+        style={{ borderColor: colors.$24 }}
+        headerStyle={{ borderColor: colors.$20 }}
+      >
+        <Import />
 
-      <Export />
+        <div className="px-4 sm:px-6 py-4">
+          <Divider
+            className="border-dashed"
+            borderColor={colors.$20}
+            withoutPadding
+          />
+        </div>
+
+        <Export />
+      </Card>
     </Settings>
   );
 }

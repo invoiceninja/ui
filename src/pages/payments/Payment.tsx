@@ -12,6 +12,7 @@ import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
@@ -57,7 +58,7 @@ export default function Payment() {
   const pages: Page[] = [
     { name: t('payments'), href: '/payments' },
     {
-      name: t('edit_payment'),
+      name: numberBreadcrumb(data?.number, t('edit_payment')),
       href: route('/payments/:id/edit', { id: id }),
     },
   ];

@@ -54,7 +54,7 @@ export function Edit() {
     { name: t('settings'), href: '/settings' },
     { name: t('group_settings'), href: '/settings/group_settings' },
     {
-      name: t('edit_group'),
+      name: groupSettingsResponse?.name || t('edit_group'),
       href: route('/settings/group_settings/:id/edit', { id }),
     },
   ];

@@ -37,6 +37,7 @@ interface Props {
   transactionDetails: TransactionDetails;
   isCreditTransactionType: boolean;
   transactionRule: TransactionRule | undefined;
+  onConverted?: () => void;
 }
 
 export function TransactionMatchDetails(props: Props) {
@@ -89,6 +90,8 @@ export function TransactionMatchDetails(props: Props) {
           $refetch(['invoices', 'bank_transactions']);
 
           toast.success('converted_transaction');
+
+          props.onConverted?.();
         })
         .finally(() => setIsFormBusy(false));
     }
@@ -120,6 +123,8 @@ export function TransactionMatchDetails(props: Props) {
           $refetch(['invoices', 'payments', 'bank_transactions']);
 
           toast.success('linked_transaction');
+
+          props.onConverted?.();
         })
         .finally(() => setIsFormBusy(false));
     }
@@ -152,6 +157,8 @@ export function TransactionMatchDetails(props: Props) {
           $refetch(['bank_transactions', 'expenses']);
 
           toast.success('converted_transaction');
+
+          props.onConverted?.();
         })
         .finally(() => setIsFormBusy(false));
     }
@@ -183,6 +190,8 @@ export function TransactionMatchDetails(props: Props) {
           $refetch(['expenses', 'bank_transactions']);
 
           toast.success('linked_transaction');
+
+          props.onConverted?.();
         })
 
         .finally(() => setIsFormBusy(false));
