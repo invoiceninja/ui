@@ -114,6 +114,7 @@ export function BulkUpdatesAction(props: Props) {
   const [newColumnValue, setNewColumnValue] = useState<
     string | number | boolean
   >('');
+  const [projectId, setProjectId] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const handleOnClose = () => {
@@ -126,10 +127,16 @@ export function BulkUpdatesAction(props: Props) {
       return 'textarea';
     }
 
+    if (props.entity === 'expense' && column === 'client_id') {
+      return 'clientProjectSelector';
+    }
+
     return bulkUpdateFieldsTypes.find(({ key }) => key === column)?.type || '';
   };
 
   useEffect(() => {
+    setProjectId('');
+
     if (column === 'remaining_cycles') {
       setNewColumnValue('-1');
     } else if (column === 'auto_bill') {
@@ -218,8 +225,8 @@ export function BulkUpdatesAction(props: Props) {
 
     if (props.entity === 'expense') {
       bulkExpenses(resourceIds, 'bulk_update', {
-        column,
-        new_value: newColumnValue,
+        column: projectId ? 'project_id' : column,
+        new_value: projectId || newColumnValue,
       }).then(() => handleOnClose());
     }
 
@@ -429,6 +436,39 @@ export function BulkUpdatesAction(props: Props) {
                 onClearButtonClick={() => setNewColumnValue('')}
                 withoutAction
               />
+            )}
+
+            {getFieldType() === 'clientProjectSelector' && (
+              <div className="flex flex-col space-y-4">
+                <ClientSelector
+                  value={newColumnValue as string}
+                  onChange={(client) => {
+                    setNewColumnValue(client.id);
+                    setProjectId('');
+                  }}
+                  onClearButtonClick={() => {
+                    setNewColumnValue('');
+                    setProjectId('');
+                  }}
+                  withoutAction
+                />
+
+                <ProjectSelector
+                  key={newColumnValue as string}
+                  inputLabel={t('project')}
+                  value={projectId}
+                  clientId={newColumnValue as string}
+                  onChange={(project) => {
+                    setProjectId(project.id);
+
+                    if (project.client_id) {
+                      setNewColumnValue(project.client_id);
+                    }
+                  }}
+                  onClearButtonClick={() => setProjectId('')}
+                  withoutAction
+                />
+              </div>
             )}
           </div>
 
