@@ -140,6 +140,10 @@ export default function Create() {
           _invoice.client_id = searchParams.get('client')!;
         }
 
+        if (searchParams.get('project_id')) {
+          _invoice.project_id = searchParams.get('project_id')!;
+        }
+
         _invoice.uses_inclusive_taxes =
           company?.settings?.inclusive_taxes ?? false;
 

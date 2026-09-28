@@ -71,6 +71,7 @@ export function useAllCommonActions() {
       { value: 'client_portal', label: t('client_portal') },
       { value: 'mark_sent', label: t('mark_sent') },
       { value: 'approve', label: t('approve') },
+      { value: 'cancel_quote', label: t('cancel') },
       { value: 'convert_to', label: t('convert_to') },
       { value: 'run_template', label: t('run_template') },
       { value: 'clone_to', label: t('clone_to') },

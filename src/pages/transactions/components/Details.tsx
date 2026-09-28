@@ -42,6 +42,7 @@ import { useColorScheme } from '$app/common/colors';
 interface Props {
   transactionId: string;
   setTransactionId: Dispatch<SetStateAction<string>>;
+  onConverted?: () => void;
 }
 
 export function Details(props: Props) {
@@ -264,8 +265,9 @@ export function Details(props: Props) {
             </Element>
           ))}
         </>
-      ) : (
+      ) : transaction ? (
         <TransactionMatchDetails
+          key={props.transactionId}
           transactionDetails={{
             base_type: transaction?.base_type || '',
             transaction_id: transaction?.id || '',
@@ -275,8 +277,9 @@ export function Details(props: Props) {
           }}
           isCreditTransactionType={isCreditTransactionType}
           transactionRule={bankTransactionRuleResponse}
+          onConverted={props.onConverted}
         />
-      )}
+      ) : null}
     </div>
   );
 }

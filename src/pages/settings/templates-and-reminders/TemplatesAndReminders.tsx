@@ -489,6 +489,7 @@ export function TemplatesAndReminders() {
       <AdvancedSettingsPlanAlert />
 
       <Card
+        title={t('templates_and_reminders')}
         className="shadow-sm"
         style={{ borderColor: colors.$24 }}
         headerStyle={{ borderColor: colors.$20 }}

@@ -34,13 +34,13 @@ import { ANALYTICS_CHART_COLORS } from './constants';
 import { findProjectRow, getNestedRows } from './helpers';
 import { useFormatAnalyticsValue } from './hooks/useFormatAnalyticsValue';
 import { ChartsTab } from './tabs/ChartsTab';
-import { ProfitTab } from './tabs/ProfitTab';
 
 interface Props {
   project: Project;
   includeDrafts: boolean;
   overviewContent: (forecastCard: ReactNode) => ReactNode;
   tasksContent?: ReactNode;
+  invoicesContent?: ReactNode;
   expensesContent?: ReactNode;
   onCanViewFinancialsChange?: (canViewFinancials: boolean) => void;
 }
@@ -50,6 +50,7 @@ export function ProjectAnalytics({
   includeDrafts,
   overviewContent,
   tasksContent,
+  invoicesContent,
   expensesContent,
   onCanViewFinancialsChange,
 }: Props) {
@@ -257,6 +258,14 @@ export function ProjectAnalytics({
           },
         ]
       : []),
+    ...(invoicesContent
+      ? [
+          {
+            label: t('invoices'),
+            content: invoicesContent,
+          },
+        ]
+      : []),
     ...(expensesContent
       ? [
           {
@@ -268,26 +277,17 @@ export function ProjectAnalytics({
     ...(canViewFinancials
       ? [
           {
-            label: t('money'),
-            content: sections && (
-              <ProfitTab
-                projectName={project.name}
-                profitability={sections.profitability}
-                budgetVsActual={sections.budgetVsActual}
-                invoiceProgress={sections.invoiceProgress}
-                formatter={formatValue}
-              />
-            ),
-          },
-        ]
-      : []),
-    ...(canViewFinancials
-      ? [
-          {
             label: t('charts'),
             content: sections && (
               <ChartsTab
                 showTimeCharts={showTaskTabs}
+                money={{
+                  projectName: project.name,
+                  profitability: sections.profitability,
+                  budgetVsActual: sections.budgetVsActual,
+                  invoiceProgress: sections.invoiceProgress,
+                  formatter: formatValue,
+                }}
                 time={{
                   projectName: project.name,
                   estimatedVsLogged: sections.estimatedVsLogged,

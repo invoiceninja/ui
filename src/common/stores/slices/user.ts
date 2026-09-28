@@ -10,6 +10,7 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { set } from 'lodash';
+import { setCompanyItem } from '$app/common/helpers/company-session';
 import { Authenticated, Registered } from '../../dtos/authentication';
 
 interface UserState {
@@ -44,13 +45,13 @@ export const userSlice = createSlice({
       state.authenticated = true;
       state.user = action.payload.user;
 
-      localStorage.setItem('X-NINJA-TOKEN', action.payload.token);
+      setCompanyItem('X-NINJA-TOKEN', action.payload.token);
     },
     register: (state, action: PayloadAction<Registered>) => {
       state.authenticated = true;
       state.user = action.payload.user;
 
-      localStorage.setItem('X-NINJA-TOKEN', action.payload.token);
+      setCompanyItem('X-NINJA-TOKEN', action.payload.token);
     },
     updateChanges: (
       state,

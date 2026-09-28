@@ -10,6 +10,7 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { set } from 'lodash';
+import { currentIndexValue } from '$app/common/helpers/company-session';
 
 interface CompanyUser {
   currentIndex: number;
@@ -22,8 +23,8 @@ interface CompanyUser {
 type AvailableResources = 'company';
 
 const initialState: CompanyUser = {
-  currentIndex: localStorage.getItem('X-CURRENT-INDEX')
-    ? parseInt(localStorage.getItem('X-CURRENT-INDEX') as string)
+  currentIndex: currentIndexValue()
+    ? parseInt(currentIndexValue() as string)
     : 0,
   api: {},
   changes: {
