@@ -15,8 +15,6 @@ import { ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
-import { useEnabled } from '$app/common/guards/guards/enabled';
-import { permission } from '$app/common/guards/guards/permission';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
@@ -28,10 +26,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Project } from '$app/common/interfaces/project';
 import { Quote } from '$app/common/interfaces/quote';
-import { Task } from '$app/common/interfaces/task';
 import { Page } from '$app/components/Breadcrumbs';
-import { DataTable } from '$app/components/DataTable';
-import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { InputLabel, Link } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
@@ -41,35 +36,24 @@ import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { TagPills } from '$app/components/tags/TagPills';
-import {
-  defaultColumns as defaultExpenseColumns,
-  useAllExpenseColumns,
-  useActions as useExpenseActions,
-  useExpenseColumns,
-  useExpenseFilters,
-} from '$app/pages/expenses/common/hooks';
-import { useCustomBulkActions as useExpenseCustomBulkActions } from '$app/pages/expenses/common/hooks/useCustomBulkActions';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { ProjectAnalytics } from '$app/pages/projects/analytics/ProjectAnalytics';
-import { ModuleBitmask } from '$app/pages/settings';
 import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import {
-  defaultColumns,
-  useAllTaskColumns,
-  useCustomBulkActions,
-  useTaskColumns,
-  useTaskFilters,
-  useActions as useTasksActions,
-} from '$app/pages/tasks/common/hooks';
-import { useFilterColumns } from '$app/pages/tasks/common/hooks/useFilterColumns';
-import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOption';
 import { useActions as useProjectsActions } from '../common/hooks';
+import {
+  ProjectExpenses,
+  useShowProjectExpenses,
+} from './components/ProjectExpenses';
+import {
+  ProjectInvoices,
+  useShowProjectInvoices,
+} from './components/ProjectInvoices';
 import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
 import { ProjectPublicNotes } from './components/ProjectPublicNotes';
-import { QuickCreateTask } from './components/QuickCreateTask';
+import { ProjectTasks, useShowProjectTasks } from './components/ProjectTasks';
 
 dayjs.extend(duration);
 
@@ -81,8 +65,6 @@ export default function Show() {
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
-
-  const enabled = useEnabled();
 
   const { data: project } = useQuery({
     queryKey: ['/api/v1/projects', `/api/v1/projects/${id}`],
@@ -107,22 +89,11 @@ export default function Show() {
   ];
 
   const projectActions = useProjectsActions();
-  const taskActions = useTasksActions();
-  const columns = useTaskColumns();
 
-  const filters = useTaskFilters();
-  const taskColumns = useAllTaskColumns();
-  const filterColumns = useFilterColumns();
+  const showTasks = useShowProjectTasks();
+  const showInvoices = useShowProjectInvoices();
+  const showExpenses = useShowProjectExpenses();
 
-  const customBulkActions = useCustomBulkActions();
-
-  const expenseActions = useExpenseActions();
-  const expenseFilters = useExpenseFilters();
-  const expenseColumns = useExpenseColumns();
-  const expenseTableColumns = useAllExpenseColumns();
-  const expenseCustomBulkActions = useExpenseCustomBulkActions();
-
-  const showEditOption = useShowEditOption();
   const colors = useColorScheme();
 
   const [includeDrafts, setIncludeDrafts] = useState(false);
@@ -142,74 +113,6 @@ export default function Show() {
       </Default>
     );
   }
-
-  const showTasks = enabled(ModuleBitmask.Tasks);
-  const showExpenses =
-    enabled(ModuleBitmask.Expenses) &&
-    (hasPermission('view_expense') || hasPermission('edit_expense'));
-
-  const tasksContent = (
-    <DataTable
-      resource="task"
-      columns={columns}
-      customActions={taskActions}
-      endpoint={`/api/v1/tasks?include=status,client,project,user,assigned_user,tags&sort=id|desc&project_tasks=${project.id}&without_deleted_clients=true`}
-      bulkRoute="/api/v1/tasks/bulk"
-      linkToCreate={`/tasks/create?project=${id}&rate=${project.task_rate}`}
-      linkToEdit="/tasks/:id/edit"
-      showEdit={(task: Task) => showEditOption(task)}
-      customFilters={filters}
-      customBulkActions={customBulkActions}
-      customFilterPlaceholder="status"
-      filterColumns={filterColumns}
-      afterRows={
-        hasPermission('create_task') ? (
-          <QuickCreateTask project={project} />
-        ) : undefined
-      }
-      withResourcefulActions
-      rightSide={
-        <DataTableColumnsPicker
-          columns={taskColumns as unknown as string[]}
-          defaultColumns={defaultColumns}
-          table="task"
-        />
-      }
-      linkToCreateGuards={[permission('create_task')]}
-      hideEditableOptions={!hasPermission('edit_task')}
-    />
-  );
-
-  const expensesContent = showExpenses ? (
-    <DataTable
-      resource="expense"
-      columns={expenseColumns}
-      customActions={expenseActions}
-      endpoint={`/api/v1/expenses?include=client,vendor,category,project&without_deleted_clients=true&without_deleted_vendors=true&sort=id|desc&project_ids=${project.id}`}
-      bulkRoute="/api/v1/expenses/bulk"
-      linkToCreate={route(
-        '/expenses/create?project=:projectId&client=:clientId',
-        {
-          projectId: project.id,
-          clientId: project.client_id,
-        }
-      )}
-      linkToEdit="/expenses/:id/edit"
-      customFilters={expenseFilters}
-      customBulkActions={expenseCustomBulkActions}
-      customFilterPlaceholder="status"
-      withResourcefulActions
-      rightSide={
-        <DataTableColumnsPicker
-          columns={expenseTableColumns as unknown as string[]}
-          defaultColumns={defaultExpenseColumns}
-          table="expense"
-        />
-      }
-      linkToCreateGuards={[permission('create_expense')]}
-      hideEditableOptions={!hasPermission('edit_expense')}
-    />
-  ) : undefined;
 
   const overviewContent = (forecastCard: ReactNode) => (
     <div className="grid grid-cols-12 gap-4 lg:space-y-0">
@@ -321,8 +224,15 @@ export default function Show() {
         project={project}
         includeDrafts={includeDrafts}
         overviewContent={overviewContent}
-        tasksContent={showTasks ? tasksContent : undefined}
-        expensesContent={expensesContent}
+        tasksContent={
+          showTasks ? <ProjectTasks project={project} /> : undefined
+        }
+        invoicesContent={
+          showInvoices ? <ProjectInvoices project={project} /> : undefined
+        }
+        expensesContent={
+          showExpenses ? <ProjectExpenses project={project} /> : undefined
+        }
         onCanViewFinancialsChange={setCanViewFinancials}
       />
 
