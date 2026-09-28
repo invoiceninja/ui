@@ -129,7 +129,9 @@ export default function Invoice() {
     if (currentInvoice) {
       const _invoice = cloneDeep(currentInvoice);
 
-      _invoice.line_items.map((lineItem) => (lineItem._id = v4()));
+      _invoice.line_items.map(
+        (lineItem) => (lineItem._id = lineItem._id || v4())
+      );
 
       setInvoice(_invoice);
 
