@@ -11,13 +11,11 @@
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
-import { route } from '$app/common/helpers/route';
+import { hasContactWithEmail } from '$app/common/helpers/emails/has-contact-with-email';
 import { Quote } from '$app/common/interfaces/quote';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { Button } from '$app/components/forms';
+import { ContactEmailModal } from '$app/components/emails/ContactEmailModal';
 import { Icon } from '$app/components/icons/Icon';
-import { Modal } from '$app/components/Modal';
 import { SendEmailModal } from './SendEmailModal';
 
 interface Props {
@@ -29,7 +27,6 @@ export const SendEmailBulkAction = (props: Props) => {
   const { selectedQuotes, setSelected } = props;
 
   const [t] = useTranslation();
-  const navigate = useNavigate();
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
@@ -37,13 +34,13 @@ export const SendEmailBulkAction = (props: Props) => {
 
   const haveClientsEmailContacts = () => {
     return selectedQuotes.every(({ client }) =>
-      client?.contacts.some(({ email }) => email)
+      hasContactWithEmail(client?.contacts)
     );
   };
 
   const getQuoteWithoutClientContacts = () => {
     return selectedQuotes.find(
-      ({ client }) => !client?.contacts.some(({ email }) => email)
+      ({ client }) => !hasContactWithEmail(client?.contacts)
     );
   };
 
@@ -67,31 +64,12 @@ export const SendEmailBulkAction = (props: Props) => {
         {t('send_email')}
       </DropdownElement>
 
-      <Modal
-        title={t('contact_email')}
+      <ContactEmailModal
         visible={isContactEmailOpen}
         onClose={() => setContactEmailOpen(false)}
-      >
-        <div className="flex flex-col items-center space-y-4">
-          <span className="text-base font-medium">
-            {t('client_email_not_set')}.
-          </span>
-
-          <Button
-            className="self-end"
-            onClick={() => {
-              navigate(
-                route('/clients/:id/edit', {
-                  id: getQuoteWithoutClientContacts()?.client_id,
-                })
-              );
-              setContactEmailOpen(false);
-            }}
-          >
-            {t('edit_client')}
-          </Button>
-        </div>
-      </Modal>
+        relation="client"
+        relationId={getQuoteWithoutClientContacts()?.client_id}
+      />
     </>
   );
 };

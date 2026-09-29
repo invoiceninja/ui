@@ -13,39 +13,36 @@ import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
 import { hasContactWithEmail } from '$app/common/helpers/emails/has-contact-with-email';
 import { route } from '$app/common/helpers/route';
-import { Invoice } from '$app/common/interfaces/invoice';
+import { Quote } from '$app/common/interfaces/quote';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { ContactEmailModal } from '$app/components/emails/ContactEmailModal';
 
 interface Props {
-  invoice: Invoice;
+  quote: Quote;
   isDropdown?: boolean;
 }
-export function EmailInvoiceAction(props: Props) {
+
+export function EmailQuoteAction({ quote, isDropdown = false }: Props) {
   const [t] = useTranslation();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const { invoice, isDropdown = false } = props;
-
-  const hasEmail = hasContactWithEmail(invoice.client?.contacts);
+  const hasEmail = hasContactWithEmail(quote.client?.contacts);
 
   return (
     <>
       <div onClick={() => !hasEmail && setIsModalOpen(true)}>
         <EntityActionElement
-          entity="invoice"
-          actionKey="email_invoice"
+          entity="quote"
+          actionKey="email_quote"
           isCommonActionSection={!isDropdown}
-          tooltipText={t('email_invoice')}
+          tooltipText={t('email_quote')}
           {...(hasEmail && {
-            to: route('/invoices/:id/email', {
-              id: invoice.id,
-            }),
+            to: route('/quotes/:id/email', { id: quote.id }),
           })}
           icon={MdSend}
         >
-          {t('email_invoice')}
+          {t('email_quote')}
         </EntityActionElement>
       </div>
 
@@ -53,7 +50,7 @@ export function EmailInvoiceAction(props: Props) {
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         relation="client"
-        relationId={invoice.client_id}
+        relationId={quote.client_id}
       />
     </>
   );

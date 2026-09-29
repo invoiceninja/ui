@@ -99,9 +99,10 @@ export const useCustomBulkActions = () => {
   } = useChangeTemplate();
 
   const customBulkActions: CustomBulkAction<Credit>[] = [
-    ({ selectedIds, setSelected }) => (
+    ({ selectedIds, selectedResources, setSelected }) => (
       <SendEmailBulkAction
         selectedIds={selectedIds}
+        selectedCredits={selectedResources}
         setSelected={setSelected}
       />
     ),

@@ -11,29 +11,50 @@
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
+import { hasContactWithEmail } from '$app/common/helpers/emails/has-contact-with-email';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { useBulk } from '$app/common/queries/purchase-orders';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { ContactEmailModal } from '$app/components/emails/ContactEmailModal';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
 
 interface Props {
   selectedIds: string[];
+  selectedPurchaseOrders: PurchaseOrder[];
   setSelected: Dispatch<SetStateAction<string[]>>;
 }
 export const SendEmailBulkAction = (props: Props) => {
   const [t] = useTranslation();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isContactEmailOpen, setContactEmailOpen] = useState<boolean>(false);
 
-  const { selectedIds, setSelected } = props;
+  const { selectedIds, selectedPurchaseOrders, setSelected } = props;
 
   const bulk = useBulk();
+
+  const haveVendorsEmailContacts = () => {
+    return selectedPurchaseOrders.every(({ vendor }) =>
+      hasContactWithEmail(vendor?.contacts)
+    );
+  };
+
+  const getPurchaseOrderWithoutVendorContacts = () => {
+    return selectedPurchaseOrders.find(
+      ({ vendor }) => !hasContactWithEmail(vendor?.contacts)
+    );
+  };
 
   return (
     <>
       <DropdownElement
-        onClick={() => setIsModalOpen(true)}
+        onClick={() =>
+          haveVendorsEmailContacts()
+            ? setIsModalOpen(true)
+            : setContactEmailOpen(true)
+        }
         icon={<Icon element={MdSend} />}
       >
         {t('send_email')}
@@ -59,6 +80,13 @@ export const SendEmailBulkAction = (props: Props) => {
           </Button>
         </div>
       </Modal>
+
+      <ContactEmailModal
+        visible={isContactEmailOpen}
+        onClose={() => setContactEmailOpen(false)}
+        relation="vendor"
+        relationId={getPurchaseOrderWithoutVendorContacts()?.vendor_id}
+      />
     </>
   );
 };
