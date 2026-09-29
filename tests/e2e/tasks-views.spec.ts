@@ -233,16 +233,20 @@ test('calendar task view links dated tasks back to their edit form', async ({
   await page.waitForURL(`**/tasks/calendar?date=${TASK_DATE}`);
 
   const taskLink = page
-    .getByRole('button', { name: description, exact: true })
+    .getByRole('button', {
+      name: new RegExp(`^${escapeRegExp(description)}\\b`),
+    })
     .first();
 
   await expect(taskLink).toBeVisible({ timeout: 10000 });
   await taskLink.click();
 
   await page.waitForURL(`**/tasks/${task.id}/edit`, { timeout: 10000 });
-  await expect(page.getByText(description, { exact: true })).toBeVisible({
-    timeout: 10000,
-  });
+  await expect(
+    fieldContainerByLabelIn(page, 'Description')
+      .getByRole('textbox')
+      .first()
+  ).toHaveValue(description, { timeout: 10000 });
 });
 
 test('kanban task view moves a card between task statuses', async ({

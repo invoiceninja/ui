@@ -14,6 +14,7 @@ import { useSearchParams } from 'react-router-dom';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { preventLeavingPageAtom } from '$app/common/hooks/useAddPreventNavigationEvents';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { Invoice } from '$app/common/interfaces/invoice';
@@ -42,6 +43,7 @@ export function useHandleSave(params: Params) {
   const saveCompany = useHandleCompanySave();
   const refreshCompanyUsers = useRefreshCompanyUsers();
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
+  const setPreventLeavingPage = useSetAtom(preventLeavingPageAtom);
 
   return async (invoice: Invoice) => {
     if (isFormBusy) {
@@ -86,6 +88,15 @@ export function useHandleSave(params: Params) {
         if (searchParams.get('action') === 'invoice_expense') {
           $refetch(['expenses']);
         }
+
+        setPreventLeavingPage(
+          (current) =>
+            current && {
+              ...current,
+              prevent: false,
+              actionKey: undefined,
+            }
+        );
       })
       .catch((error) => {
         if (error.response?.status === 422) {
