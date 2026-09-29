@@ -27,7 +27,6 @@ import {
   MdPrint,
   MdRestore,
   MdSchedule,
-  MdSend,
   MdSwitchRight,
   MdTextSnippet,
 } from 'react-icons/md';
@@ -87,6 +86,7 @@ import { PurchaseOrderStatus as PurchaseOrderStatusBadge } from '$app/pages/purc
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
+import { EmailPurchaseOrderAction } from './components/EmailPurchaseOrderAction';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -577,19 +577,13 @@ export function useActions(params: ActionsParams = {}) {
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
     (purchaseOrder) => (
-      <EntityActionElement
+      <EmailPurchaseOrderAction
         {...(!dropdown && {
           key: 'send_email',
         })}
-        entity="purchase_order"
-        actionKey="send_email"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('send_email')}
-        to={route('/purchase_orders/:id/email', { id: purchaseOrder.id })}
-        icon={MdSend}
-      >
-        {t('send_email')}
-      </EntityActionElement>
+        purchaseOrder={purchaseOrder}
+        isDropdown={dropdown}
+      />
     ),
     (purchaseOrder) => (
       <EntityActionElement

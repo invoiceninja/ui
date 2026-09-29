@@ -370,7 +370,7 @@ test('Add To Invoice bulk action updates the invoice and refreshes the expenses 
   await dialog.getByText(invoiceNumber, { exact: true }).click();
 
   await page.waitForURL(
-    `**/invoices/${invoice.id}/edit?action=invoice_expense`
+    `**/invoices/${invoice.id}/edit?action=invoice_expense**`
   );
 
   await expectLineItemNotes(page, [invoiceNotes, notes]);

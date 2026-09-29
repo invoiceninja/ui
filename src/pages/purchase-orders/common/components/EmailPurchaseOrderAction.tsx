@@ -13,47 +13,47 @@ import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
 import { hasContactWithEmail } from '$app/common/helpers/emails/has-contact-with-email';
 import { route } from '$app/common/helpers/route';
-import { Invoice } from '$app/common/interfaces/invoice';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { ContactEmailModal } from '$app/components/emails/ContactEmailModal';
 
 interface Props {
-  invoice: Invoice;
+  purchaseOrder: PurchaseOrder;
   isDropdown?: boolean;
 }
-export function EmailInvoiceAction(props: Props) {
+
+export function EmailPurchaseOrderAction({
+  purchaseOrder,
+  isDropdown = false,
+}: Props) {
   const [t] = useTranslation();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const { invoice, isDropdown = false } = props;
-
-  const hasEmail = hasContactWithEmail(invoice.client?.contacts);
+  const hasEmail = hasContactWithEmail(purchaseOrder.vendor?.contacts);
 
   return (
     <>
       <div onClick={() => !hasEmail && setIsModalOpen(true)}>
         <EntityActionElement
-          entity="invoice"
-          actionKey="email_invoice"
+          entity="purchase_order"
+          actionKey="send_email"
           isCommonActionSection={!isDropdown}
-          tooltipText={t('email_invoice')}
+          tooltipText={t('send_email')}
           {...(hasEmail && {
-            to: route('/invoices/:id/email', {
-              id: invoice.id,
-            }),
+            to: route('/purchase_orders/:id/email', { id: purchaseOrder.id }),
           })}
           icon={MdSend}
         >
-          {t('email_invoice')}
+          {t('send_email')}
         </EntityActionElement>
       </div>
 
       <ContactEmailModal
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        relation="client"
-        relationId={invoice.client_id}
+        relation="vendor"
+        relationId={purchaseOrder.vendor_id}
       />
     </>
   );

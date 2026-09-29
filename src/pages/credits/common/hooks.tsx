@@ -61,7 +61,6 @@ import {
   MdPrint,
   MdRestore,
   MdSchedule,
-  MdSend,
 } from 'react-icons/md';
 import { Icon } from '$app/components/icons/Icon';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
@@ -85,6 +84,7 @@ import {
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
+import { EmailCreditAction } from './components/EmailCreditAction';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
@@ -556,19 +556,13 @@ export function useActions(params?: Params) {
       />
     ),
     (credit) => (
-      <EntityActionElement
+      <EmailCreditAction
         {...(!dropdown && {
           key: 'email_credit',
         })}
-        entity="credit"
-        actionKey="email_credit"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('email_credit')}
-        to={route('/credits/:id/email', { id: credit.id })}
-        icon={MdSend}
-      >
-        {t('email_credit')}
-      </EntityActionElement>
+        credit={credit}
+        isDropdown={dropdown}
+      />
     ),
     (credit) => (
       <EntityActionElement
