@@ -25,7 +25,6 @@ import {
   MdPrint,
   MdRestore,
   MdSchedule,
-  MdSend,
   MdTextSnippet,
 } from 'react-icons/md';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -101,6 +100,7 @@ import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatu
 import { invoiceSumAtom, quoteAtom } from './atoms';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { ConvertOptionsModal } from './components/ConvertOptionsModal';
+import { EmailQuoteAction } from './components/EmailQuoteAction';
 import { QuoteActionConfirmation } from './components/QuoteActionConfirmation';
 import { isQuoteCancellable } from './helpers';
 import { useApprove } from './hooks/useApprove';
@@ -475,19 +475,13 @@ export function useActions(params?: Params) {
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
     (quote) => (
-      <EntityActionElement
+      <EmailQuoteAction
         {...(!dropdown && {
           key: 'email_quote',
         })}
-        entity="quote"
-        actionKey="email_quote"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('email_quote')}
-        to={route('/quotes/:id/email', { id: quote.id })}
-        icon={MdSend}
-      >
-        {t('email_quote')}
-      </EntityActionElement>
+        quote={quote}
+        isDropdown={dropdown}
+      />
     ),
     (quote) => (
       <EntityActionElement
