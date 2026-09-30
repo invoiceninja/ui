@@ -15,7 +15,10 @@ import { route } from '$app/common/helpers/route';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useFreePlanDesigns } from '$app/common/hooks/useFreePlanDesigns';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { Client } from '$app/common/interfaces/client';
@@ -38,11 +41,7 @@ import { AttachmentOption } from './AttachmentOption';
 import { BrandPrompts } from './BrandPrompts';
 import { ClientContactModal } from './ClientContactModal';
 
-const LOOKS: { label: string; design: string }[] = [
-  { label: 'clean', design: 'Clean' },
-  { label: 'business', design: 'Business' },
-  { label: 'playful', design: 'Playful' },
-];
+const LOOKS = ['Plain', 'Clean', 'Modern', 'Business'];
 
 type AttachmentKey = 'pdf_email_attachment' | 'document_email_attachment';
 
@@ -57,6 +56,9 @@ export function StepReview({ wizard }: Props) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const refreshCompanyUsers = useRefreshCompanyUsers();
+  const getSetting = useGetSetting();
+  const { isOwner } = useAdmin();
+  const freePlanDesigns = useFreePlanDesigns();
   const gatewaysHref = useHref('/settings/gateways/create');
   const accountHref = useHref('/settings/account_management');
 
@@ -81,7 +83,9 @@ export function StepReview({ wizard }: Props) {
   useEffect(() => {
     request(
       'GET',
-      endpoint('/api/v1/designs?status=active&per_page=100&sort=name|asc'),
+      endpoint(
+        '/api/v1/designs?status=active&custom=false&per_page=100&sort=name|asc'
+      ),
       {},
       { skipIntercept: true }
     )
@@ -95,14 +99,6 @@ export function StepReview({ wizard }: Props) {
         );
 
         setDesigns(map);
-
-        if (!wizard.invoice?.design_id) {
-          const fallback = LOOKS.map((look) => map[look.design]).find(Boolean);
-
-          if (fallback) {
-            wizard.patch({ design_id: fallback });
-          }
-        }
       })
       .catch(() => setDesignsFailed(true));
   }, []);
@@ -238,7 +234,15 @@ export function StepReview({ wizard }: Props) {
   };
 
   const previewable = Boolean(invoice?.client_id);
-  const attachmentsAllowed = proPlan() || enterprisePlan();
+
+  const activeDesign =
+    invoice?.design_id ||
+    (getSetting(client, 'invoice_design_id') as string | undefined) ||
+    company?.settings?.invoice_design_id;
+
+  const looks = LOOKS.filter((look) => {
+    return freePlanDesigns.includes(look) || proPlan() || enterprisePlan();
+  });
 
   const chooseDesign = (id: string) => {
     if (invoice?.design_id === id) {
@@ -277,13 +281,13 @@ export function StepReview({ wizard }: Props) {
               </p>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {LOOKS.map((look) => {
-                  const id = designs[look.design];
-                  const active = Boolean(id) && invoice?.design_id === id;
+                {looks.map((look) => {
+                  const id = designs[look];
+                  const active = Boolean(id) && activeDesign === id;
 
                   return (
                     <button
-                      key={look.label}
+                      key={look}
                       type="button"
                       disabled={!id}
                       onClick={() => chooseDesign(id)}
@@ -300,7 +304,7 @@ export function StepReview({ wizard }: Props) {
                         cursor: id ? 'pointer' : 'not-allowed',
                       }}
                     >
-                      {t(look.label)}
+                      {look}
                     </button>
                   );
                 })}
@@ -335,17 +339,12 @@ export function StepReview({ wizard }: Props) {
         </div>
       ) : null}
 
-      <div className="mt-6 mb-2 flex items-center justify-between gap-4">
-        <p className="text-xs" style={{ color: colors.$22, fontWeight: 500 }}>
-          {t('before_you_send')}
-        </p>
-
-        {attachmentsAllowed ? null : (
-          <Button type="minimal" behavior="button" onClick={upgrade}>
-            {t('upgrade')}
-          </Button>
-        )}
-      </div>
+      <p
+        className="text-xs mt-6 mb-2"
+        style={{ color: colors.$22, fontWeight: 500 }}
+      >
+        {t('before_you_send')}
+      </p>
 
       <div
         className="border px-4 py-4"
@@ -353,18 +352,16 @@ export function StepReview({ wizard }: Props) {
           borderColor: colors.$24,
           borderRadius: '0.375rem',
           backgroundColor: colors.$1,
-          opacity: attachmentsAllowed ? 1 : 0.5,
-          pointerEvents: attachmentsAllowed ? undefined : 'none',
         }}
-        aria-disabled={!attachmentsAllowed}
       >
         <AttachmentOption
           label={t('attach_pdf')}
           checked={Boolean(company?.settings?.pdf_email_attachment)}
-          allowed={attachmentsAllowed}
+          allowed={proPlan() || enterprisePlan()}
           requirement={t('pro_plan')}
           busy={savingAttachment !== null}
           onChange={(value) => saveAttachment('pdf_email_attachment', value)}
+          onUpgrade={isOwner ? upgrade : undefined}
         />
 
         <AttachmentOption
@@ -376,6 +373,7 @@ export function StepReview({ wizard }: Props) {
           onChange={(value) =>
             saveAttachment('document_email_attachment', value)
           }
+          onUpgrade={isOwner ? upgrade : undefined}
         />
       </div>
 

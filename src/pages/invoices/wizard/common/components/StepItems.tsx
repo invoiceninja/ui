@@ -237,9 +237,7 @@ export function StepItems({ wizard, embedded }: Props) {
               style={{
                 borderColor: colors.$24,
                 borderRadius: '0.375rem',
-                backgroundColor: reactSettings?.dark_mode
-                  ? colors.$25
-                  : colors.$2,
+                backgroundColor: colors.$2,
               }}
             >
               {items.length > 1 ? (

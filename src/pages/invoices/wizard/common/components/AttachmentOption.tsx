@@ -10,6 +10,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { Element } from '$app/components/cards';
+import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 
 interface Props {
@@ -19,6 +20,7 @@ interface Props {
   requirement: string;
   busy: boolean;
   onChange: (value: boolean) => void;
+  onUpgrade?: () => void;
 }
 
 export function AttachmentOption({
@@ -28,6 +30,7 @@ export function AttachmentOption({
   requirement,
   busy,
   onChange,
+  onUpgrade,
 }: Props) {
   const [t] = useTranslation();
 
@@ -40,11 +43,17 @@ export function AttachmentOption({
       twoGridColumns
     >
       <div className="flex items-center justify-end">
-        <Toggle
-          checked={checked}
-          disabled={!allowed || busy}
-          onValueChange={(value) => onChange(value)}
-        />
+        {allowed ? (
+          <Toggle
+            checked={checked}
+            disabled={busy}
+            onValueChange={(value) => onChange(value)}
+          />
+        ) : onUpgrade ? (
+          <Button type="secondary" behavior="button" onClick={onUpgrade}>
+            {t('upgrade')}
+          </Button>
+        ) : null}
       </div>
     </Element>
   );
