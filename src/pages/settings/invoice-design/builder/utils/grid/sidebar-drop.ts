@@ -18,6 +18,14 @@ export interface SidebarDropGridPosition {
   h: number;
 }
 
+/** Inset (px) inside a drop target's border box — e.g. chrome zone toolbar + padding. */
+export interface DropGridContentInset {
+  top?: number;
+  left?: number;
+  right?: number;
+  bottom?: number;
+}
+
 export interface SidebarDropPixelRect {
   left: number;
   top: number;
@@ -33,14 +41,20 @@ export function computeSidebarDropGridPosition(
   clientY: number,
   gridElement: HTMLElement,
   blockSize: Pick<SidebarDropGridPosition, 'w' | 'h'>,
-  zoom: number
+  zoom: number,
+  contentInset?: DropGridContentInset
 ): SidebarDropGridPosition {
   const gridRect = gridElement.getBoundingClientRect();
   const scale = zoom / 100 || 1;
-  const relativeX = (clientX - gridRect.left) / scale;
-  const relativeY = (clientY - gridRect.top) / scale;
-  const unscaledGridWidth = gridRect.width / scale;
-  const columnWidth = unscaledGridWidth / GRID_CONFIG.cols;
+  const insetTop = contentInset?.top ?? 0;
+  const insetLeft = contentInset?.left ?? 0;
+  const insetRight = contentInset?.right ?? 0;
+  const contentLeft = gridRect.left + insetLeft;
+  const contentTop = gridRect.top + insetTop;
+  const contentWidth = (gridRect.width - insetLeft - insetRight) / scale;
+  const columnWidth = contentWidth / GRID_CONFIG.cols;
+  const relativeX = (clientX - contentLeft) / scale;
+  const relativeY = (clientY - contentTop) / scale;
 
   return {
     x: clampGridValue(

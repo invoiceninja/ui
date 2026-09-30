@@ -26,17 +26,28 @@ import {
 import { GRID_CONFIG } from '../utils/grid-converter';
 import { getInvoiceWidgetClassName } from '../constants/widget-classes';
 
+export interface ChromeDropPreview {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  label: string;
+}
+
 interface PageChromeZoneProps {
   region: Extract<BlockRegion, 'header' | 'footer'>;
   height: number;
   blocks: Block[];
   selectedBlockId: string | null;
   isDragOver: boolean;
+  dropPreview?: ChromeDropPreview | null;
   onHeightChange: (height: number) => void;
   onSelectBlock: (blockId: string | null) => void;
   onDeleteBlock: (blockId: string) => void;
   onBlockDragStart: (blockId: string) => void;
   onBlockDragEnd: () => void;
+  onRegionDragOver: (event: DragEvent<HTMLDivElement>) => void;
+  onRegionDrop: (event: DragEvent<HTMLDivElement>) => void;
   backgroundColor?: string;
 }
 
@@ -46,11 +57,14 @@ export function PageChromeZone({
   blocks,
   selectedBlockId,
   isDragOver,
+  dropPreview,
   onHeightChange,
   onSelectBlock,
   onDeleteBlock,
   onBlockDragStart,
   onBlockDragEnd,
+  onRegionDragOver,
+  onRegionDrop,
   backgroundColor,
 }: PageChromeZoneProps) {
   const [t] = useTranslation();
@@ -78,44 +92,19 @@ export function PageChromeZone({
           : undefined,
       }}
     >
-      <div
-        className="flex items-center justify-between px-2 py-1"
-        style={{ color: colors.$17 }}
-      >
-        <span className="text-[10px] font-medium uppercase tracking-wide pointer-events-none">
-          {t('repeats_every_page') || 'Repeats on every page'}
-        </span>
-        <label className="flex items-center gap-1 text-[10px]">
-          <span>{t('height') || 'Height'}</span>
-          <input
-            type="number"
-            min={24}
-            max={400}
-            value={height}
-            onClick={(event) => event.stopPropagation()}
-            onChange={(event) =>
-              onHeightChange(
-                clampChromeHeight(event.target.value, fallbackHeight)
-              )
-            }
-            className="w-16 rounded border px-1 py-0.5 text-[10px]"
-            style={{
-              borderColor: colors.$5,
-              background: colors.$1,
-              color: colors.$3,
-            }}
-          />
-        </label>
-      </div>
+      
 
       <div
+        data-chrome-grid={region}
         className="relative flex-1"
         style={{
           minHeight: Math.max(40, height - 28),
-          padding: `4px ${GRID_CONFIG.containerPadding[0]}px 8px`,
+          padding: `0 ${GRID_CONFIG.containerPadding[0]}px 0`,
         }}
+        onDragOver={onRegionDragOver}
+        onDrop={onRegionDrop}
       >
-        {blocks.length === 0 && (
+        {blocks.length === 0 && !dropPreview && (
           <div
             className="flex h-full items-center justify-center text-xs pointer-events-none"
             style={{ color: colors.$17 }}
@@ -124,28 +113,42 @@ export function PageChromeZone({
           </div>
         )}
 
-        {blocks.length > 0 && (
-          <div
-            className="grid items-start"
-            style={{
-              gridTemplateColumns: `repeat(${GRID_CONFIG.cols}, minmax(0, 1fr))`,
-              columnGap: `${GRID_CONFIG.margin[0]}px`,
-              rowGap: `${GRID_CONFIG.margin[1]}px`,
-            }}
-          >
-            {blocks.map((block) => (
-              <ChromeZoneBlock
-                key={block.id}
-                block={block}
-                selected={selectedBlockId === block.id}
-                onSelect={() => onSelectBlock(block.id)}
-                onDelete={() => onDeleteBlock(block.id)}
-                onDragStart={onBlockDragStart}
-                onDragEnd={onBlockDragEnd}
-              />
-            ))}
-          </div>
-        )}
+        <div
+          className="grid items-start"
+          style={{
+            gridTemplateColumns: `repeat(${GRID_CONFIG.cols}, minmax(0, 1fr))`,
+            columnGap: `${GRID_CONFIG.margin[0]}px`,
+            rowGap: `${GRID_CONFIG.margin[1]}px`,
+          }}
+        >
+          {blocks.map((block) => (
+            <ChromeZoneBlock
+              key={block.id}
+              block={block}
+              selected={selectedBlockId === block.id}
+              onSelect={() => onSelectBlock(block.id)}
+              onDelete={() => onDeleteBlock(block.id)}
+              onDragStart={onBlockDragStart}
+              onDragEnd={onBlockDragEnd}
+            />
+          ))}
+
+          {dropPreview && (
+            <div
+              className="sidebar-drop-preview pointer-events-none min-h-[2rem] rounded border border-dashed flex items-center justify-center text-[10px] font-medium"
+              style={{
+                gridColumn: `${dropPreview.x + 1} / span ${dropPreview.w}`,
+                gridRow: dropPreview.y + 1,
+                borderColor: accentColor,
+                backgroundColor: `${accentColor}18`,
+                color: accentColor,
+              }}
+              aria-hidden
+            >
+              {dropPreview.label}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -170,9 +173,10 @@ function ChromeZoneBlock({
   const colors = useColorScheme();
   const accentColor = useAccentColor();
   const label = useBlockLabel(block.type);
-  const { x, w } = block.gridPosition;
+  const { x, y, w } = block.gridPosition;
   const columnStart = Math.min(GRID_CONFIG.cols, Math.max(1, x + 1));
   const columnSpan = Math.min(GRID_CONFIG.cols - columnStart + 1, Math.max(1, w));
+  const rowStart = Math.max(1, y + 1);
 
   const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
     event.dataTransfer.setData(EXISTING_BLOCK_DRAG_TYPE, block.id);
@@ -186,6 +190,7 @@ function ChromeZoneBlock({
       className="min-w-0"
       style={{
         gridColumn: `${columnStart} / span ${columnSpan}`,
+        gridRow: rowStart,
       }}
       onClick={(event) => {
         event.stopPropagation();

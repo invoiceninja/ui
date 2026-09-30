@@ -364,10 +364,36 @@ export function generateInvoiceHTML(
   );
   const regions = partitionBlocksByRegion(blocks, pagination);
 
-  const chromeCellStyle = (height: number, background: string) =>
-    `min-height: ${height}px;${
-      background ? ` background-color: ${background};` : ''
-    }`;
+  const paginated = pagination !== 'none';
+  const paginatedChromeInset = {
+    top: 0,
+    right: effectivePadding.right,
+    bottom: 0,
+    left: effectivePadding.left,
+  };
+  const paginatedBodyInset = {
+    top: effectivePadding.top,
+    right: effectivePadding.right,
+    bottom: effectivePadding.bottom,
+    left: effectivePadding.left,
+  };
+
+  const wrapPaginatedChromeCell = (
+    innerHtml: string,
+    height: number,
+    background: string,
+    region: 'header' | 'footer' = 'header'
+  ) => {
+    const fillLayer = background
+      ? `<div style="position: absolute; inset: 0; background-color: ${background};"></div>`
+      : '';
+    const footerBottomPad =
+      region === 'footer'
+        ? ` padding-bottom: ${effectivePadding.bottom}px;`
+        : '';
+
+    return `<div style="position: relative; width: 100%; min-height: ${height}px; box-sizing: border-box;">${fillLayer}<div style="position: relative; min-height: ${height}px; padding-left: ${effectivePadding.left}px; padding-right: ${effectivePadding.right}px;${footerBottomPad} box-sizing: border-box;">${innerHtml}</div></div>`;
+  };
 
   const renderRegionHtml = (
     regionBlocks: Block[],
@@ -418,13 +444,6 @@ export function generateInvoiceHTML(
       .join('\n');
   };
 
-  const chromePadding = {
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-  };
-
   // Render blocks with row-based positioning
   const bodyBlocksHTML =
     pagination === 'none'
@@ -445,7 +464,7 @@ export function generateInvoiceHTML(
             )
           )
           .join('\n')
-      : renderRegionHtml(regions.body, chromePadding);
+      : renderRegionHtml(regions.body, paginatedBodyInset);
 
   const blocksHTML =
     pagination === 'none'
@@ -455,11 +474,12 @@ export function generateInvoiceHTML(
     paginationIncludesHeader(pagination)
       ? `<thead>
     <tr>
-      <td class="invoice-page-header" style="${chromeCellStyle(
-        headerHeight,
-        headerBackground
-      )}">
-        ${renderRegionHtml(regions.header, chromePadding)}
+      <td class="invoice-page-header" style="width:100%;box-sizing:border-box;padding:0;vertical-align:top;">
+        ${wrapPaginatedChromeCell(
+          renderRegionHtml(regions.header, paginatedChromeInset),
+          headerHeight,
+          headerBackground
+        )}
       </td>
     </tr>
   </thead>`
@@ -467,7 +487,7 @@ export function generateInvoiceHTML(
   }
   <tbody>
     <tr>
-      <td class="invoice-page-body">
+      <td class="invoice-page-body" style="width:100%;box-sizing:border-box;vertical-align:top;">
         ${bodyBlocksHTML}
       </td>
     </tr>
@@ -476,11 +496,13 @@ export function generateInvoiceHTML(
     paginationIncludesFooter(pagination)
       ? `<tfoot>
     <tr>
-      <td class="invoice-page-footer" style="${chromeCellStyle(
-        footerHeight,
-        footerBackground
-      )}">
-        ${renderRegionHtml(regions.footer, chromePadding)}
+      <td class="invoice-page-footer" style="width:100%;box-sizing:border-box;padding:0;vertical-align:top;">
+        ${wrapPaginatedChromeCell(
+          renderRegionHtml(regions.footer, paginatedChromeInset),
+          footerHeight,
+          footerBackground,
+          'footer'
+        )}
       </td>
     </tr>
   </tfoot>`
@@ -559,6 +581,17 @@ export function generateInvoiceHTML(
     : undefined;
   const containerOverflow = fullDocument ? 'visible' : 'hidden';
 
+  const containerPaddingTop =
+    paginated && paginationIncludesHeader(pagination)
+      ? 0
+      : effectivePadding.top;
+  const containerPaddingBottom =
+    paginated && paginationIncludesFooter(pagination)
+      ? 0
+      : effectivePadding.bottom;
+  const containerPaddingLeft = paginated ? 0 : effectivePadding.left;
+  const containerPaddingRight = paginated ? 0 : effectivePadding.right;
+
   const generatedHtml = `
 <!DOCTYPE html>
 <html lang="en">
@@ -593,6 +626,17 @@ export function generateInvoiceHTML(
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
+
+    ${
+      paginated
+        ? `body.invoice-paginated-document {
+      width: ${pageDimensions.width}px;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }`
+        : ''
+    }
     
     .text-secondary {
       color: ${secondaryColor};
@@ -604,9 +648,7 @@ export function generateInvoiceHTML(
       ${containerMinHeight ? `min-height: ${containerMinHeight};` : ''}
       background: white;
       margin: 0;
-      padding: ${effectivePadding.top}px ${effectivePadding.right}px ${
-    effectivePadding.bottom
-  }px ${effectivePadding.left}px;
+      padding: ${containerPaddingTop}px ${containerPaddingRight}px ${containerPaddingBottom}px ${containerPaddingLeft}px;
       position: relative;
       overflow: ${containerOverflow};
       box-sizing: border-box; /* Include padding in width calculation */
@@ -641,7 +683,15 @@ export function generateInvoiceHTML(
         ? ''
         : `.invoice-pagination {
       width: 100%;
+      max-width: 100%;
       border-collapse: collapse;
+    }
+
+    .invoice-page-header,
+    .invoice-page-footer,
+    .invoice-page-footer-space {
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .invoice-page-header,
@@ -649,6 +699,10 @@ export function generateInvoiceHTML(
     .invoice-page-footer {
       position: relative;
       vertical-align: top;
+    }
+
+    .invoice-page-body {
+      padding: ${effectivePadding.top}px ${effectivePadding.right}px ${effectivePadding.bottom}px ${effectivePadding.left}px;
     }`
     }
 
@@ -732,11 +786,16 @@ export function generateInvoiceHTML(
       : ''
   }
 </head>
-<body>
-  <div class="invoice-container">
+<body${paginated ? ' class="invoice-paginated-document"' : ''}>
+  ${
+    paginated
+      ? `${blocksHTML}
+    ${showPageNumbering ? '<div class="page-number">Page 1 of 1</div>' : ''}`
+      : `<div class="invoice-container">
     ${blocksHTML}
     ${showPageNumbering ? '<div class="page-number">Page 1 of 1</div>' : ''}
-  </div>
+  </div>`
+  }
 </body>
 </html>
   `.trim();

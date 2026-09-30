@@ -229,6 +229,8 @@ export function assignBlockToRegion<T extends Block>(
     ...block,
     region: region === 'body' ? undefined : region,
     gridPosition:
-      region === 'body' ? gridPosition : { ...gridPosition, y: 0 },
+      region === 'body'
+        ? gridPosition
+        : { ...gridPosition, y: Math.max(0, gridPosition.y) },
   };
 }

@@ -37,7 +37,16 @@ import {
   generateBlockId,
   normalizeDocumentSettings,
 } from './types';
-import { PageChromeZone } from './components/PageChromeZone';
+import {
+  PageChromeZone,
+  type ChromeDropPreview,
+} from './components/PageChromeZone';
+import {
+  chromeStripBlockHeight,
+  computeRegionDropGridPosition,
+  dropSizeForDefinition,
+  dropSizeForDraggedBlock,
+} from './utils/chrome-drop-placement';
 import {
   assignBlockToRegion,
   EXISTING_BLOCK_DRAG_TYPE,
@@ -134,6 +143,9 @@ export function InvoiceBuilder() {
     panelMode: 'document',
   }));
 
+  const builderStateRef = useRef(state);
+  builderStateRef.current = state;
+
   const documentSettingsInitialized = useRef(false);
   useEffect(() => {
     if (documentSettingsInitialized.current || !designSettings) return;
@@ -146,6 +158,13 @@ export function InvoiceBuilder() {
 
   const handleUpdateDocumentSettings = useCallback(
     (documentSettings: DocumentSettings) => {
+      // Save reads builderStateRef; keep it in sync before the next render so
+      // document settings (e.g. repeating header/footer) are not dropped when
+      // the user saves immediately after changing the panel.
+      builderStateRef.current = {
+        ...builderStateRef.current,
+        documentSettings,
+      };
       setState((prev) => ({ ...prev, documentSettings }));
     },
     []
@@ -158,8 +177,6 @@ export function InvoiceBuilder() {
   );
   const shouldFitLoadedContentHeightRef = useRef(false);
 
-  const builderStateRef = useRef(state);
-  builderStateRef.current = state;
   const designNameRef = useRef(designName);
   designNameRef.current = designName;
   const existingDesignRef = useRef(existingDesign);
@@ -185,6 +202,9 @@ export function InvoiceBuilder() {
     h: number;
     label: string;
   } | null>(null);
+  const [chromeDropPreview, setChromeDropPreview] = useState<
+    (ChromeDropPreview & { region: 'header' | 'footer' }) | null
+  >(null);
   const canvasDragDepthRef = useRef(0);
 
   const clearSidebarDragState = useCallback(() => {
@@ -192,6 +212,7 @@ export function InvoiceBuilder() {
     setCurrentDragDefinition(null);
     setIsCanvasDragOver(false);
     setSidebarDropPreview(null);
+    setChromeDropPreview(null);
   }, []);
 
   useLayoutEffect(() => {
@@ -268,32 +289,22 @@ export function InvoiceBuilder() {
         return false;
       }
 
-      const dropZone =
-        document.querySelector<HTMLElement>(
-          `[data-page-region="${region}"]`
-        ) ||
-        (region === 'body'
-          ? document.querySelector<HTMLElement>('.invoice-gridstack-grid')
-          : null);
-
-      if (!dropZone) {
-        return false;
-      }
-
-      const size = {
-        w: block.gridPosition.w,
-        h:
-          region === 'body'
-            ? block.gridPosition.h
-            : Math.min(block.gridPosition.h, 4),
-      };
-      const gridPosition = computeSidebarDropGridPosition(
+      const size =
+        region === 'body'
+          ? { w: block.gridPosition.w, h: block.gridPosition.h }
+          : dropSizeForDraggedBlock(block);
+      const gridPosition = computeRegionDropGridPosition(
+        region,
         clientX,
         clientY,
-        dropZone,
         size,
-        builderStateRef.current.zoom
+        builderStateRef.current.zoom,
+        block
       );
+
+      if (!gridPosition) {
+        return false;
+      }
 
       setState((prev) => ({
         ...prev,
@@ -303,7 +314,7 @@ export function InvoiceBuilder() {
               ? assignBlockToRegion(item, region, {
                   ...item.gridPosition,
                   x: gridPosition.x,
-                  y: region === 'body' ? gridPosition.y : 0,
+                  y: gridPosition.y,
                   w: size.w,
                   h: size.h,
                 })
@@ -489,65 +500,174 @@ export function InvoiceBuilder() {
     currentDragDefinition || draggingBlockId
   );
 
-  const handleCanvasDragEnter = useCallback(
-    (event: ReactDragEvent<HTMLDivElement>) => {
-      if (!isLibraryOrBlockDrag) {
+  const updateChromeDropPreview = useCallback(
+    (
+      event: { clientX: number; clientY: number },
+      region: 'header' | 'footer'
+    ) => {
+      const draggedBlock = draggingBlockId
+        ? builderStateRef.current.blocks.find((item) => item.id === draggingBlockId)
+        : undefined;
+
+      const size = draggedBlock
+        ? dropSizeForDraggedBlock(draggedBlock)
+        : currentDragDefinition
+          ? dropSizeForDefinition(
+              currentDragDefinition,
+              state.documentSettings.globalFontSize
+            )
+          : null;
+
+      if (!size) {
         return;
       }
 
-      event.preventDefault();
-      canvasDragDepthRef.current += 1;
-      setIsCanvasDragOver(true);
-      const region = pageRegionFromClientPoint(event.clientX, event.clientY);
-      setHoverRegion(region);
+      const gridPosition = computeRegionDropGridPosition(
+        region,
+        event.clientX,
+        event.clientY,
+        size,
+        state.zoom,
+        draggedBlock
+      );
+
+      if (!gridPosition) {
+        return;
+      }
+
+      setChromeDropPreview({
+        region,
+        x: gridPosition.x,
+        y: gridPosition.y,
+        w: size.w,
+        h: size.h,
+        label: currentDragDefinition?.label ?? draggedBlock?.type ?? 'Block',
+      });
+    },
+    [
+      currentDragDefinition,
+      draggingBlockId,
+      state.documentSettings.globalFontSize,
+      state.zoom,
+    ]
+  );
+
+  const syncDragPreviews = useCallback(
+    (
+      event: ReactDragEvent<HTMLDivElement>,
+      region: BlockRegion
+    ) => {
       if (currentDragDefinition && region === 'body') {
         updateSidebarDropPreview(event);
-      } else {
-        setSidebarDropPreview(null);
-      }
-    },
-    [currentDragDefinition, isLibraryOrBlockDrag, updateSidebarDropPreview]
-  );
-
-  const handleCanvasDragLeave = useCallback(
-    (event: ReactDragEvent<HTMLDivElement>) => {
-      if (!isLibraryOrBlockDrag) {
+        setChromeDropPreview(null);
         return;
       }
 
-      event.preventDefault();
-      canvasDragDepthRef.current = Math.max(0, canvasDragDepthRef.current - 1);
-
-      if (canvasDragDepthRef.current === 0) {
-        setIsCanvasDragOver(false);
+      if (region === 'header' || region === 'footer') {
         setSidebarDropPreview(null);
-        setHoverRegion(null);
-      }
-    },
-    [isLibraryOrBlockDrag]
-  );
-
-  const handleCanvasDragOver = useCallback(
-    (event: ReactDragEvent<HTMLDivElement>) => {
-      if (!isLibraryOrBlockDrag) {
+        updateChromeDropPreview(event, region);
         return;
       }
 
-      event.preventDefault();
-      event.dataTransfer.dropEffect = currentDragDefinition ? 'copy' : 'move';
-      const region = pageRegionFromClientPoint(event.clientX, event.clientY);
-      setHoverRegion(region);
-      if (currentDragDefinition && region === 'body') {
-        updateSidebarDropPreview(event);
-      } else {
-        setSidebarDropPreview(null);
-      }
+      setSidebarDropPreview(null);
+      setChromeDropPreview(null);
     },
-    [currentDragDefinition, isLibraryOrBlockDrag, updateSidebarDropPreview]
+    [currentDragDefinition, updateChromeDropPreview, updateSidebarDropPreview]
   );
 
-  const handleCanvasDrop = useCallback(
-    (event: ReactDragEvent<HTMLDivElement>) => {
+  const handleChromeRegionDragOver = useCallback(
+    (region: 'header' | 'footer') =>
+      (event: ReactDragEvent<HTMLDivElement>) => {
+        if (!isLibraryOrBlockDrag) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        event.dataTransfer.dropEffect = currentDragDefinition ? 'copy' : 'move';
+        setHoverRegion(region);
+        syncDragPreviews(event, region);
+      },
+    [currentDragDefinition, isLibraryOrBlockDrag, syncDragPreviews]
+  );
+
+  const createBlockInRegion = useCallback(
+    (
+      region: BlockRegion,
+      definition: BlockDefinition,
+      clientX: number,
+      clientY: number,
+      gridPositionOverride?: {
+        x: number;
+        y: number;
+        w: number;
+        h: number;
+      }
+    ) => {
+      const size = dropSizeForDefinition(
+        definition,
+        state.documentSettings.globalFontSize
+      );
+      const gridPosition =
+        gridPositionOverride ??
+        computeRegionDropGridPosition(
+          region,
+          clientX,
+          clientY,
+          size,
+          state.zoom
+        );
+
+      if (!gridPosition) {
+        toast.error('error_dropping_block');
+        return;
+      }
+
+      const isChrome = region === 'header' || region === 'footer';
+      const newBlockId = generateBlockId(definition.type);
+
+      const seededProperties = { ...definition.defaultProperties };
+      const companyPrimary = designSettings?.primary_color;
+      if (companyPrimary) {
+        if (
+          (definition.type === 'table' || definition.type === 'tasks-table') &&
+          'headerColor' in seededProperties
+        ) {
+          seededProperties.headerColor = companyPrimary;
+        }
+        if (definition.type === 'divider' && 'color' in seededProperties) {
+          seededProperties.color = companyPrimary;
+        }
+      }
+
+      const newBlock = {
+        id: newBlockId,
+        type: definition.type,
+        gridPosition: {
+          x: gridPosition.x,
+          y: gridPosition.y,
+          w: size.w,
+          h: isChrome ? chromeStripBlockHeight(size.h) : size.h,
+        },
+        properties: seededProperties,
+        ...(region !== 'body' ? { region } : {}),
+      } as Block;
+
+      setState((prev) => ({
+        ...prev,
+        blocks: repairGridPositionCollisions([...prev.blocks, newBlock]),
+        selectedBlockId: null,
+      }));
+    },
+    [designSettings?.primary_color, state.documentSettings.globalFontSize, state.zoom]
+  );
+
+  const performCanvasDrop = useCallback(
+    (
+      event: ReactDragEvent<HTMLDivElement>,
+      dropRegion: BlockRegion,
+      options?: { stopPropagation?: boolean }
+    ) => {
       const existingBlockId =
         draggingBlockId ||
         event.dataTransfer.getData(EXISTING_BLOCK_DRAG_TYPE);
@@ -557,10 +677,10 @@ export function InvoiceBuilder() {
       }
 
       event.preventDefault();
-      const dropRegion = pageRegionFromClientPoint(
-        event.clientX,
-        event.clientY
-      );
+      if (options?.stopPropagation) {
+        event.stopPropagation();
+      }
+
       setHoverRegion(null);
 
       if (existingBlockId) {
@@ -594,23 +714,11 @@ export function InvoiceBuilder() {
         return;
       }
 
-      const dropZone =
-        dropRegion === 'body'
-          ? gridContainerRef.current
-          : document.querySelector<HTMLElement>(
-              `[data-page-region="${dropRegion}"]`
-            );
-
-      if (!dropZone) {
-        toast.error('error_dropping_block');
-        clearSidebarDragState();
-        return;
-      }
-
-      const size = getContentConstrainedGridSize(definition, {
-        inheritedFontSize: state.documentSettings.globalFontSize,
-      });
-      const gridPosition =
+      const size = dropSizeForDefinition(
+        definition,
+        state.documentSettings.globalFontSize
+      );
+      const previewPosition =
         dropRegion === 'body' &&
         sidebarDropPreview &&
         sidebarDropPreview.w === size.w &&
@@ -621,64 +729,92 @@ export function InvoiceBuilder() {
               w: sidebarDropPreview.w,
               h: sidebarDropPreview.h,
             }
-          : computeSidebarDropGridPosition(
-              event.clientX,
-              event.clientY,
-              dropZone,
-              size,
-              state.zoom
-            );
-      const { x } = gridPosition;
-      const y = dropRegion === 'body' ? gridPosition.y : 0;
-      const h = dropRegion === 'body' ? gridPosition.h : Math.min(size.h, 4);
-      const newBlockId = generateBlockId(definition.type);
+          : undefined;
 
-      const seededProperties = { ...definition.defaultProperties };
-      const companyPrimary = designSettings?.primary_color;
-      if (companyPrimary) {
-        if (
-          (definition.type === 'table' || definition.type === 'tasks-table') &&
-          'headerColor' in seededProperties
-        ) {
-          seededProperties.headerColor = companyPrimary;
-        }
-        if (definition.type === 'divider' && 'color' in seededProperties) {
-          seededProperties.color = companyPrimary;
-        }
-      }
-
-      const newBlock = {
-        id: newBlockId,
-        type: definition.type,
-        gridPosition: {
-          x,
-          y,
-          w: size.w,
-          h,
-        },
-        properties: seededProperties,
-        ...(dropRegion !== 'body' ? { region: dropRegion } : {}),
-      } as Block;
-
-      setState((prev) => ({
-        ...prev,
-        blocks: repairGridPositionCollisions([...prev.blocks, newBlock]),
-        selectedBlockId: null,
-      }));
-
+      createBlockInRegion(
+        dropRegion,
+        definition,
+        event.clientX,
+        event.clientY,
+        previewPosition
+      );
       clearSidebarDragState();
     },
     [
       clearSidebarDragState,
+      createBlockInRegion,
       currentDragDefinition,
-      designSettings?.primary_color,
       draggingBlockId,
-      gridContainerRef,
       moveBlockToRegion,
       sidebarDropPreview,
       state.documentSettings.globalFontSize,
-      state.zoom,
     ]
+  );
+
+  const handleChromeRegionDrop = useCallback(
+    (region: 'header' | 'footer') => (event: ReactDragEvent<HTMLDivElement>) =>
+      performCanvasDrop(event, region, { stopPropagation: true }),
+    [performCanvasDrop]
+  );
+
+  const handleCanvasDragEnter = useCallback(
+    (event: ReactDragEvent<HTMLDivElement>) => {
+      if (!isLibraryOrBlockDrag) {
+        return;
+      }
+
+      event.preventDefault();
+      canvasDragDepthRef.current += 1;
+      setIsCanvasDragOver(true);
+      const region = pageRegionFromClientPoint(event.clientX, event.clientY);
+      setHoverRegion(region);
+      syncDragPreviews(event, region);
+    },
+    [isLibraryOrBlockDrag, syncDragPreviews]
+  );
+
+  const handleCanvasDragLeave = useCallback(
+    (event: ReactDragEvent<HTMLDivElement>) => {
+      if (!isLibraryOrBlockDrag) {
+        return;
+      }
+
+      event.preventDefault();
+      canvasDragDepthRef.current = Math.max(0, canvasDragDepthRef.current - 1);
+
+      if (canvasDragDepthRef.current === 0) {
+        setIsCanvasDragOver(false);
+        setSidebarDropPreview(null);
+        setChromeDropPreview(null);
+        setHoverRegion(null);
+      }
+    },
+    [isLibraryOrBlockDrag]
+  );
+
+  const handleCanvasDragOver = useCallback(
+    (event: ReactDragEvent<HTMLDivElement>) => {
+      if (!isLibraryOrBlockDrag) {
+        return;
+      }
+
+      event.preventDefault();
+      event.dataTransfer.dropEffect = currentDragDefinition ? 'copy' : 'move';
+      const region = pageRegionFromClientPoint(event.clientX, event.clientY);
+      setHoverRegion(region);
+      syncDragPreviews(event, region);
+    },
+    [isLibraryOrBlockDrag, syncDragPreviews]
+  );
+
+  const handleCanvasDrop = useCallback(
+    (event: ReactDragEvent<HTMLDivElement>) => {
+      performCanvasDrop(
+        event,
+        pageRegionFromClientPoint(event.clientX, event.clientY)
+      );
+    },
+    [performCanvasDrop]
   );
 
   const selectedBlock = state.blocks.find(
@@ -1048,6 +1184,13 @@ ${sanitizedCustomCss}
                     setDraggingBlockId(null);
                     setHoverRegion(null);
                   }}
+                  onRegionDragOver={handleChromeRegionDragOver('header')}
+                  onRegionDrop={handleChromeRegionDrop('header')}
+                  dropPreview={
+                    chromeDropPreview?.region === 'header'
+                      ? chromeDropPreview
+                      : null
+                  }
                 />
               )}
               <div
@@ -1259,6 +1402,13 @@ ${sanitizedCustomCss}
                     setDraggingBlockId(null);
                     setHoverRegion(null);
                   }}
+                  onRegionDragOver={handleChromeRegionDragOver('footer')}
+                  onRegionDrop={handleChromeRegionDrop('footer')}
+                  dropPreview={
+                    chromeDropPreview?.region === 'footer'
+                      ? chromeDropPreview
+                      : null
+                  }
                 />
               )}
             </div>

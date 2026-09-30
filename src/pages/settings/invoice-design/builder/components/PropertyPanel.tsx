@@ -88,7 +88,7 @@ export function PropertyPanel({
 
       {pagination !== 'none' && (
         <SelectInput
-          label={t('page_region') || 'Page region'}
+          label={t('section') || 'Section'}
           value={canvasRegionForBlock(block, pagination)}
           onChange={(region) =>
             onChange({

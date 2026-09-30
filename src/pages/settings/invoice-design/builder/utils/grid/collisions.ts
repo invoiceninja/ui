@@ -10,7 +10,97 @@
 
 import { Block } from '../../types';
 import { blockRegion } from '../page-regions';
+import { GRID_CONFIG } from '../grid-converter';
 import { normalizeGridPosition } from './normalize';
+
+function horizontalGridOverlap(
+  a: Block['gridPosition'],
+  b: Block['gridPosition']
+): boolean {
+  return !(a.x + a.w <= b.x || b.x + b.w <= a.x);
+}
+
+/**
+ * Header/footer chrome is a row-based strip: resolve overlaps by shifting X,
+ * never by bumping Y (body-style repair makes horizontal drags jump rows).
+ */
+export function repairChromeRegionCollisions(blocks: Block[]): Block[] {
+  if (blocks.length <= 1) {
+    return blocks;
+  }
+
+  let changed = false;
+  const rows = new Map<number, Block[]>();
+
+  blocks.forEach((block) => {
+    const y = normalizeGridPosition(block.gridPosition).y;
+    const list = rows.get(y) ?? [];
+    list.push(block);
+    rows.set(y, list);
+  });
+
+  const repairedById = new Map<string, Block['gridPosition']>();
+
+  rows.forEach((rowBlocks, rowY) => {
+    const sorted = rowBlocks.slice().sort((a, b) => {
+      if (a.gridPosition.x !== b.gridPosition.x) {
+        return a.gridPosition.x - b.gridPosition.x;
+      }
+
+      return a.id.localeCompare(b.id);
+    });
+    const placed: Block['gridPosition'][] = [];
+
+    sorted.forEach((block) => {
+      let pos = { ...normalizeGridPosition(block.gridPosition), y: rowY };
+
+      for (let attempt = 0; attempt <= GRID_CONFIG.cols; attempt++) {
+        if (!placed.some((placedPosition) => horizontalGridOverlap(pos, placedPosition))) {
+          break;
+        }
+
+        const blocker = placed.find((placedPosition) =>
+          horizontalGridOverlap(pos, placedPosition)
+        );
+
+        if (!blocker) {
+          break;
+        }
+
+        pos = {
+          ...pos,
+          x: Math.min(blocker.x + blocker.w, GRID_CONFIG.cols - pos.w),
+        };
+      }
+
+      pos.x = Math.max(0, Math.min(pos.x, GRID_CONFIG.cols - pos.w));
+
+      if (!isSameGridPosition(block.gridPosition, pos)) {
+        changed = true;
+      }
+
+      placed.push(pos);
+      repairedById.set(block.id, pos);
+    });
+  });
+
+  if (!changed) {
+    return blocks;
+  }
+
+  return blocks.map((block) => {
+    const gridPosition = repairedById.get(block.id);
+
+    if (!gridPosition || isSameGridPosition(block.gridPosition, gridPosition)) {
+      return block;
+    }
+
+    return {
+      ...block,
+      gridPosition,
+    };
+  });
+}
 
 export function isSameGridPosition(
   a: Block['gridPosition'],
@@ -132,8 +222,11 @@ export function repairGridPositionCollisions(blocks: Block[]): Block[] {
   const repairedById = new Map<string, Block>();
   let changed = false;
 
-  byRegion.forEach((regionBlocks) => {
-    const repaired = repairRegionCollisions(regionBlocks);
+  byRegion.forEach((regionBlocks, regionKey) => {
+    const repaired =
+      regionKey === 'header' || regionKey === 'footer'
+        ? repairChromeRegionCollisions(regionBlocks)
+        : repairRegionCollisions(regionBlocks);
 
     if (repaired !== regionBlocks) {
       changed = true;

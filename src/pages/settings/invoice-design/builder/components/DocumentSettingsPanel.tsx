@@ -134,7 +134,7 @@ export function DocumentSettingsPanel({
             />
             {settings.headerBackground ? (
               <ColorInput
-                label={t('header_background_color') || 'Header color'}
+                label={t('color') || 'Header color'}
                 value={settings.headerBackground}
                 onChange={(value) =>
                   update('headerBackground', normalizeChromeBackground(value) || '#FFFFFF')
@@ -179,7 +179,7 @@ export function DocumentSettingsPanel({
             />
             {settings.footerBackground ? (
               <ColorInput
-                label={t('footer_background_color') || 'Footer color'}
+                label={t('color') || 'Footer color'}
                 value={settings.footerBackground}
                 onChange={(value) =>
                   update('footerBackground', normalizeChromeBackground(value) || '#FFFFFF')

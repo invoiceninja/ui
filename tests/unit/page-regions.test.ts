@@ -90,7 +90,7 @@ describe('page regions', () => {
     });
 
     expect(moved.region).toBe('header');
-    expect(moved.gridPosition).toEqual({ x: 2, y: 0, w: 4, h: 3 });
+    expect(moved.gridPosition).toEqual({ x: 2, y: 8, w: 4, h: 3 });
   });
 
   it('clamps chrome heights to the reserved range', () => {
@@ -164,5 +164,24 @@ describe('page regions', () => {
     );
 
     expect(html).toContain('background-color: #111827');
+  });
+
+  it('keeps paginated chrome full page width by removing horizontal container padding', () => {
+    const html = generateInvoiceHTML(
+      [textBlock('header', 'header'), textBlock('body')],
+      undefined,
+      {
+        font_size: 16,
+        pagination: 'both',
+        page_padding_left: 30,
+        page_padding_right: 30,
+        header_background: '#111827',
+      }
+    );
+
+    expect(html).toContain('class="invoice-paginated-document"');
+    expect(html).not.toContain('<div class="invoice-container">');
+    expect(html).toContain('background-color: #111827');
+    expect(html).toContain('padding-left: 30px');
   });
 });
