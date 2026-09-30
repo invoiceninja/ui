@@ -14,7 +14,11 @@ import {
   computeSidebarDropGridPosition,
   type SidebarDropGridPosition,
 } from './grid/sidebar-drop';
-import { blockRegion, type BlockRegion } from './page-regions';
+import {
+  blockRegion,
+  isChromeRegion,
+  type BlockRegion,
+} from './page-regions';
 import { getContentConstrainedGridSize } from './block-sizing';
 
 export function chromeStripBlockHeight(gridHeight: number): number {
@@ -65,7 +69,7 @@ export function computeRegionDropGridPosition(
   );
 
   const repositioningWithinSameChromeStrip =
-    (region === 'header' || region === 'footer') &&
+    isChromeRegion(region) &&
     draggedBlock !== undefined &&
     blockRegion(draggedBlock) === region;
 

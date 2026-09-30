@@ -10,7 +10,7 @@
 
 import { GRID_CONFIG } from './grid-converter';
 import type { DropGridContentInset } from './grid/sidebar-drop';
-import type { BlockRegion } from './page-regions';
+import { isChromeRegion, type BlockRegion } from './page-regions';
 
 export interface ChromeDropTarget {
   element: HTMLElement;
@@ -19,10 +19,10 @@ export interface ChromeDropTarget {
 
 /** Padding on the inner chrome drop grid (matches PageChromeZone). */
 export const CHROME_GRID_CONTENT_INSET: DropGridContentInset = {
-  top: 4,
+  top: 0,
   left: GRID_CONFIG.containerPadding[0],
   right: GRID_CONFIG.containerPadding[0],
-  bottom: 8,
+  bottom: 0,
 };
 
 export function resolveDropTarget(region: BlockRegion): ChromeDropTarget | null {
@@ -34,7 +34,7 @@ export function resolveDropTarget(region: BlockRegion): ChromeDropTarget | null 
     return element ? { element } : null;
   }
 
-  if (region === 'header' || region === 'footer') {
+  if (isChromeRegion(region)) {
     const element = document.querySelector<HTMLElement>(
       `[data-chrome-grid="${region}"]`
     );

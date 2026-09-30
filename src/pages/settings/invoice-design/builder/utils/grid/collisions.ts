@@ -9,7 +9,7 @@
  */
 
 import { Block } from '../../types';
-import { blockRegion } from '../page-regions';
+import { blockRegion, isChromeRegion } from '../page-regions';
 import { GRID_CONFIG } from '../grid-converter';
 import { normalizeGridPosition } from './normalize';
 
@@ -224,7 +224,7 @@ export function repairGridPositionCollisions(blocks: Block[]): Block[] {
 
   byRegion.forEach((regionBlocks, regionKey) => {
     const repaired =
-      regionKey === 'header' || regionKey === 'footer'
+      isChromeRegion(regionKey)
         ? repairChromeRegionCollisions(regionBlocks)
         : repairRegionCollisions(regionBlocks);
 

@@ -19,6 +19,7 @@ import {
   paginationIncludesFooter,
   paginationIncludesHeader,
   partitionBlocksByRegion,
+  type ChromeRegion,
 } from './page-regions';
 import { InvoiceData, SAMPLE_INVOICE_DATA } from './variable-replacer';
 import { getBlockContentPixelHeight } from './block-sizing';
@@ -382,7 +383,7 @@ export function generateInvoiceHTML(
     innerHtml: string,
     height: number,
     background: string,
-    region: 'header' | 'footer' = 'header'
+    region: ChromeRegion = 'header'
   ) => {
     const fillLayer = background
       ? `<div style="position: absolute; inset: 0; background-color: ${background};"></div>`

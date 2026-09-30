@@ -55,6 +55,8 @@ import {
   paginationIncludesHeader,
   partitionBlocksByRegion,
   type BlockRegion,
+  type ChromeRegion,
+  isChromeRegion,
 } from './utils/page-regions';
 import { createTemplates } from './templates/templates';
 import { ComponentLibrary } from './components/ComponentLibrary';
@@ -203,7 +205,7 @@ export function InvoiceBuilder() {
     label: string;
   } | null>(null);
   const [chromeDropPreview, setChromeDropPreview] = useState<
-    (ChromeDropPreview & { region: 'header' | 'footer' }) | null
+    (ChromeDropPreview & { region: ChromeRegion }) | null
   >(null);
   const canvasDragDepthRef = useRef(0);
 
@@ -503,7 +505,7 @@ export function InvoiceBuilder() {
   const updateChromeDropPreview = useCallback(
     (
       event: { clientX: number; clientY: number },
-      region: 'header' | 'footer'
+      region: ChromeRegion
     ) => {
       const draggedBlock = draggingBlockId
         ? builderStateRef.current.blocks.find((item) => item.id === draggingBlockId)
@@ -563,7 +565,7 @@ export function InvoiceBuilder() {
         return;
       }
 
-      if (region === 'header' || region === 'footer') {
+      if (isChromeRegion(region)) {
         setSidebarDropPreview(null);
         updateChromeDropPreview(event, region);
         return;
@@ -576,7 +578,7 @@ export function InvoiceBuilder() {
   );
 
   const handleChromeRegionDragOver = useCallback(
-    (region: 'header' | 'footer') =>
+    (region: ChromeRegion) =>
       (event: ReactDragEvent<HTMLDivElement>) => {
         if (!isLibraryOrBlockDrag) {
           return;
@@ -623,7 +625,7 @@ export function InvoiceBuilder() {
         return;
       }
 
-      const isChrome = region === 'header' || region === 'footer';
+      const isChrome = isChromeRegion(region);
       const newBlockId = generateBlockId(definition.type);
 
       const seededProperties = { ...definition.defaultProperties };
@@ -752,7 +754,7 @@ export function InvoiceBuilder() {
   );
 
   const handleChromeRegionDrop = useCallback(
-    (region: 'header' | 'footer') => (event: ReactDragEvent<HTMLDivElement>) =>
+    (region: ChromeRegion) => (event: ReactDragEvent<HTMLDivElement>) =>
       performCanvasDrop(event, region, { stopPropagation: true }),
     [performCanvasDrop]
   );
@@ -1171,12 +1173,6 @@ ${sanitizedCustomCss}
                   blocks={canvasRegions.header}
                   selectedBlockId={state.selectedBlockId}
                   isDragOver={hoverRegion === 'header'}
-                  onHeightChange={(headerHeight) =>
-                    handleUpdateDocumentSettings({
-                      ...state.documentSettings,
-                      headerHeight,
-                    })
-                  }
                   onSelectBlock={handleSelectBlock}
                   onDeleteBlock={handleDeleteBlock}
                   onBlockDragStart={setDraggingBlockId}
@@ -1389,12 +1385,6 @@ ${sanitizedCustomCss}
                   blocks={canvasRegions.footer}
                   selectedBlockId={state.selectedBlockId}
                   isDragOver={hoverRegion === 'footer'}
-                  onHeightChange={(footerHeight) =>
-                    handleUpdateDocumentSettings({
-                      ...state.documentSettings,
-                      footerHeight,
-                    })
-                  }
                   onSelectBlock={handleSelectBlock}
                   onDeleteBlock={handleDeleteBlock}
                   onBlockDragStart={setDraggingBlockId}

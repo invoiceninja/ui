@@ -17,10 +17,7 @@ import { useBlockLabel } from '../block-library';
 import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import {
-  BlockRegion,
-  clampChromeHeight,
-  DEFAULT_FOOTER_HEIGHT,
-  DEFAULT_HEADER_HEIGHT,
+  type ChromeRegion,
   EXISTING_BLOCK_DRAG_TYPE,
 } from '../utils/page-regions';
 import { GRID_CONFIG } from '../utils/grid-converter';
@@ -35,13 +32,12 @@ export interface ChromeDropPreview {
 }
 
 interface PageChromeZoneProps {
-  region: Extract<BlockRegion, 'header' | 'footer'>;
+  region: ChromeRegion;
   height: number;
   blocks: Block[];
   selectedBlockId: string | null;
   isDragOver: boolean;
   dropPreview?: ChromeDropPreview | null;
-  onHeightChange: (height: number) => void;
   onSelectBlock: (blockId: string | null) => void;
   onDeleteBlock: (blockId: string) => void;
   onBlockDragStart: (blockId: string) => void;
@@ -58,7 +54,6 @@ export function PageChromeZone({
   selectedBlockId,
   isDragOver,
   dropPreview,
-  onHeightChange,
   onSelectBlock,
   onDeleteBlock,
   onBlockDragStart,
@@ -70,8 +65,6 @@ export function PageChromeZone({
   const [t] = useTranslation();
   const colors = useColorScheme();
   const accentColor = useAccentColor();
-  const fallbackHeight =
-    region === 'header' ? DEFAULT_HEADER_HEIGHT : DEFAULT_FOOTER_HEIGHT;
 
   return (
     <div

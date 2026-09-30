@@ -13,6 +13,16 @@ import type { Block } from '../types';
 export const PAGE_REGIONS = ['header', 'body', 'footer'] as const;
 export type BlockRegion = (typeof PAGE_REGIONS)[number];
 
+export const CHROME_REGIONS = ['header', 'footer'] as const;
+export type ChromeRegion = (typeof CHROME_REGIONS)[number];
+
+export function isChromeRegion(value: unknown): value is ChromeRegion {
+  return (
+    typeof value === 'string' &&
+    (CHROME_REGIONS as readonly string[]).includes(value)
+  );
+}
+
 export const PAGINATION_MODES = ['none', 'header', 'footer', 'both'] as const;
 export type PaginationMode = (typeof PAGINATION_MODES)[number];
 
