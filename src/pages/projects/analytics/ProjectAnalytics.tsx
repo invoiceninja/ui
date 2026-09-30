@@ -23,12 +23,14 @@ import {
   ProjectVelocityRow,
 } from '$app/common/interfaces/project-analytics';
 import { useProjectAnalyticsQuery } from '$app/common/queries/project-analytics';
-import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
 import { Burnup } from '$app/pages/projects/burnup/Burnup';
 import { ModuleBitmask } from '$app/pages/settings';
 import { AnalyticsCard } from './components/AnalyticsCard';
-import { AnalyticsStatCard } from './components/AnalyticsStatCard';
+import {
+  AnalyticsStatCard,
+  AnalyticsStatCardSkeleton,
+} from './components/AnalyticsStatCard';
 import { ForecastSummary } from './components/ForecastSummary';
 import { ANALYTICS_CHART_COLORS } from './constants';
 import { findProjectRow, getNestedRows } from './helpers';
@@ -238,11 +240,28 @@ export function ProjectAnalytics({
       label: t('overview'),
       content: (
         <div className="space-y-4">
-          {hasAnalyticsData && (
+          {!analytics.isLoading && !hasAnalyticsData && (
+            <div
+              className="rounded-md border p-4 text-sm"
+              style={{
+                backgroundColor: colors.$1,
+                borderColor: colors.$24,
+                color: colors.$22,
+              }}
+            >
+              {t('no_project_analytics_data')}
+            </div>
+          )}
+
+          {(hasAnalyticsData || analytics.isLoading) && (
             <div className="grid grid-cols-[repeat(auto-fit,minmax(8rem,1fr))] gap-3">
-              {statCards.map((stat, index) => (
-                <AnalyticsStatCard key={index} {...stat} />
-              ))}
+              {analytics.isLoading
+                ? financialStatCards.map((_, index) => (
+                    <AnalyticsStatCardSkeleton key={index} />
+                  ))
+                : statCards.map((stat, index) => (
+                    <AnalyticsStatCard key={index} {...stat} />
+                  ))}
             </div>
           )}
 
@@ -321,28 +340,6 @@ export function ProjectAnalytics({
 
   return (
     <section className="my-4 space-y-4">
-      {analytics.isLoading && (
-        <div
-          className="flex min-h-[160px] items-center justify-center rounded-md border"
-          style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
-        >
-          <Spinner />
-        </div>
-      )}
-
-      {!analytics.isLoading && !hasAnalyticsData && (
-        <div
-          className="rounded-md border p-4 text-sm"
-          style={{
-            backgroundColor: colors.$1,
-            borderColor: colors.$24,
-            color: colors.$22,
-          }}
-        >
-          {t('no_project_analytics_data')}
-        </div>
-      )}
-
       <TabGroup
         tabs={tabs.map((tab) => tab.label)}
         withoutVerticalMargin
