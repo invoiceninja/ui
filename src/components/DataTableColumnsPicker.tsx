@@ -146,127 +146,131 @@ export function DataTableColumnsPicker(props: Props) {
           visible={isModalVisible}
           onClose={setIsModalVisible}
         >
-          <div className="flex flex-col">
-            <SelectField
-              className="shadow-sm"
-              label={t('add_column')}
-              onValueChange={handleSelectChange}
-              value=""
-              withBlank
-              customSelector
-              cypressRef="columSelector"
-            >
-              {filteredColumns
-                .sort((a, b) => t(a).localeCompare(t(b)))
-                .map((column, index) => (
-                  <option key={index} value={column}>
-                    {t(column)}
-                  </option>
-                ))}
-            </SelectField>
+          {isModalVisible && (
+            <div className="flex flex-col">
+              <SelectField
+                className="shadow-sm"
+                label={t('add_column')}
+                onValueChange={handleSelectChange}
+                value=""
+                withBlank
+                customSelector
+                cypressRef="columSelector"
+              >
+                {filteredColumns
+                  .sort((a, b) => t(a).localeCompare(t(b)))
+                  .map((column, index) => (
+                    <option key={index} value={column}>
+                      {t(column)}
+                    </option>
+                  ))}
+              </SelectField>
 
-            <InputLabel className="mt-4">{t('order_columns')}</InputLabel>
+              <InputLabel className="mt-4">{t('order_columns')}</InputLabel>
 
-            <div className="mt-3">
-              <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable
-                  droppableId="columns"
-                  renderClone={(provided, _, rubric) => {
-                    const column = currentColumns[rubric.source.index];
+              <div className="mt-3">
+                <DragDropContext onDragEnd={onDragEnd}>
+                  <Droppable
+                    droppableId="columns"
+                    renderClone={(provided, _, rubric) => {
+                      const column = currentColumns[rubric.source.index];
 
-                    return (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        className="flex items-center justify-between py-[0.4rem] text-sm"
-                      >
+                      return (
                         <div
-                          className="flex flex-1 space-x-2 items-center cursor-pointer"
-                          {...provided.dragHandleProps}
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          className="flex items-center justify-between py-[0.4rem] text-sm"
                         >
-                          <div>
-                            <GridDotsVertical
-                              size="1.2rem"
-                              color={colors.$17}
-                            />
+                          <div
+                            className="flex flex-1 space-x-2 items-center cursor-pointer"
+                            {...provided.dragHandleProps}
+                          >
+                            <div>
+                              <GridDotsVertical
+                                size="1.2rem"
+                                color={colors.$17}
+                              />
+                            </div>
+
+                            <p style={{ color: colors.$3 }}>{t(column)}</p>
                           </div>
 
-                          <p style={{ color: colors.$3 }}>{t(column)}</p>
+                          <CircleXMark
+                            color={colors.$16}
+                            hoverColor={colors.$3}
+                            borderColor={colors.$5}
+                            hoverBorderColor={colors.$17}
+                            size="1.6rem"
+                          />
                         </div>
-
-                        <CircleXMark
-                          color={colors.$16}
-                          hoverColor={colors.$3}
-                          borderColor={colors.$5}
-                          hoverBorderColor={colors.$17}
-                          size="1.6rem"
-                        />
-                      </div>
-                    );
-                  }}
-                >
-                  {(provided) => (
-                    <div {...provided.droppableProps} ref={provided.innerRef}>
-                      {currentColumns.map((column, index) => (
-                        <Draggable
-                          key={index}
-                          draggableId={`item-${index}`}
-                          index={index}
-                        >
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              className="flex items-center justify-between py-[0.4rem]"
-                            >
+                      );
+                    }}
+                  >
+                    {(provided) => (
+                      <div {...provided.droppableProps} ref={provided.innerRef}>
+                        {currentColumns.map((column, index) => (
+                          <Draggable
+                            key={index}
+                            draggableId={`item-${index}`}
+                            index={index}
+                          >
+                            {(provided) => (
                               <div
-                                className="flex flex-1 space-x-2 items-center cursor-pointer"
-                                {...provided.dragHandleProps}
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                className="flex items-center justify-between py-[0.4rem]"
                               >
-                                <div>
-                                  <GridDotsVertical
-                                    size="1.2rem"
-                                    color={colors.$17}
-                                  />
+                                <div
+                                  className="flex flex-1 space-x-2 items-center cursor-pointer"
+                                  {...provided.dragHandleProps}
+                                >
+                                  <div>
+                                    <GridDotsVertical
+                                      size="1.2rem"
+                                      color={colors.$17}
+                                    />
+                                  </div>
+
+                                  <p style={{ color: colors.$3 }}>
+                                    {t(column)}
+                                  </p>
                                 </div>
 
-                                <p style={{ color: colors.$3 }}>{t(column)}</p>
+                                <div
+                                  className="cursor-pointer"
+                                  onClick={() => handleDelete(column)}
+                                >
+                                  <CircleXMark
+                                    color={colors.$16}
+                                    hoverColor={colors.$3}
+                                    borderColor={colors.$5}
+                                    hoverBorderColor={colors.$17}
+                                    size="1.6rem"
+                                  />
+                                </div>
                               </div>
+                            )}
+                          </Draggable>
+                        ))}
 
-                              <div
-                                className="cursor-pointer"
-                                onClick={() => handleDelete(column)}
-                              >
-                                <CircleXMark
-                                  color={colors.$16}
-                                  hoverColor={colors.$3}
-                                  borderColor={colors.$5}
-                                  hoverBorderColor={colors.$17}
-                                  size="1.6rem"
-                                />
-                              </div>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              </div>
 
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </DragDropContext>
+              <div className="flex mt-4 lg:flex-row lg:justify-end">
+                <Inline>
+                  <Button type="secondary" onClick={handleReset}>
+                    {t('reset')}
+                  </Button>
+
+                  <Button onClick={onSave}>{t('save')}</Button>
+                </Inline>
+              </div>
             </div>
-
-            <div className="flex mt-4 lg:flex-row lg:justify-end">
-              <Inline>
-                <Button type="secondary" onClick={handleReset}>
-                  {t('reset')}
-                </Button>
-
-                <Button onClick={onSave}>{t('save')}</Button>
-              </Inline>
-            </div>
-          </div>
+          )}
         </Modal>,
         document.body
       )}
