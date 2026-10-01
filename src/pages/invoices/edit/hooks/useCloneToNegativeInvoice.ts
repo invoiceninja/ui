@@ -12,9 +12,11 @@ import dayjs from 'dayjs';
 import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { invoiceAtom } from '../../common/atoms';
 
 export function useCloneToNegativeInvoice() {
+  const invoicePaths = useInvoiceEditorPaths();
   const navigate = useNavigate();
   const setInvoice = useSetAtom(invoiceAtom);
 
@@ -58,7 +60,7 @@ export function useCloneToNegativeInvoice() {
     setInvoice(negativeInvoice);
     console.log('Set invoice in atom, navigating to create page');
 
-    navigate('/invoices/create?action=clone');
+    navigate(`${invoicePaths.create}?action=clone`);
   };
 
   return cloneToNegativeInvoice;

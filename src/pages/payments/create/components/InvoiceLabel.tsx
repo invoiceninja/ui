@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { useInvoiceResolver } from '$app/common/hooks/invoices/useInvoiceResolver';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { Invoice } from '$app/common/interfaces/invoice';
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function InvoiceLabel({ invoiceId, className }: Props) {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const disableNavigation = useDisableNavigation();
@@ -35,7 +37,7 @@ export function InvoiceLabel({ invoiceId, className }: Props) {
 
       {currentInvoice ? (
         <DynamicLink
-          to={route('/invoices/:id/edit', { id: invoiceId })}
+          to={route(invoicePaths.edit, { id: invoiceId })}
           renderSpan={disableNavigation('invoice', currentInvoice)}
         >
           #{currentInvoice.number}
