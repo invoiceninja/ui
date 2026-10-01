@@ -22,6 +22,7 @@ import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { Client } from '$app/common/interfaces/client';
+import { Design } from '$app/common/interfaces/design';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import reactStringReplace from 'react-string-replace';
@@ -66,8 +67,13 @@ export function StepReview({ wizard }: Props) {
   const client = wizard.client;
   const recipient = contactEmail(emailableContact(client));
 
+  const defaultDesign =
+    (getSetting(client, 'invoice_design_id') as string | undefined) ||
+    company?.settings?.invoice_design_id;
+
   const [designs, setDesigns] = useState<Record<string, string>>({});
   const [designsFailed, setDesignsFailed] = useState(false);
+  const [customDefault, setCustomDefault] = useState<Design>();
   const [sending, setSending] = useState(false);
   const [askEmail, setAskEmail] = useState(false);
 
@@ -102,6 +108,37 @@ export function StepReview({ wizard }: Props) {
       })
       .catch(() => setDesignsFailed(true));
   }, []);
+
+  useEffect(() => {
+    if (
+      !defaultDesign ||
+      !Object.keys(designs).length ||
+      Object.values(designs).includes(defaultDesign)
+    ) {
+      return;
+    }
+
+    let cancelled = false;
+
+    request(
+      'GET',
+      endpoint('/api/v1/designs?with=:id&per_page=1', { id: defaultDesign }),
+      {},
+      { skipIntercept: true }
+    )
+      .then((response) => {
+        if (cancelled) {
+          return;
+        }
+
+        setCustomDefault(response.data.data[0]);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [defaultDesign, designs]);
 
   const lookUpGateways = useCallback(() => {
     return request(
@@ -235,14 +272,24 @@ export function StepReview({ wizard }: Props) {
 
   const previewable = Boolean(invoice?.client_id);
 
-  const activeDesign =
-    invoice?.design_id ||
-    (getSetting(client, 'invoice_design_id') as string | undefined) ||
-    company?.settings?.invoice_design_id;
+  const activeDesign = invoice?.design_id || defaultDesign;
 
   const looks = LOOKS.filter((look) => {
     return freePlanDesigns.includes(look) || proPlan() || enterprisePlan();
+  }).map((look) => {
+    return { id: designs[look], name: look };
   });
+
+  const defaultName =
+    Object.keys(designs).find((name) => designs[name] === defaultDesign) ??
+    (customDefault?.id === defaultDesign ? customDefault?.name : undefined);
+
+  const choices = defaultName
+    ? [
+        { id: defaultDesign, name: defaultName },
+        ...looks.filter((look) => look.id !== defaultDesign),
+      ]
+    : looks;
 
   const chooseDesign = (id: string) => {
     if (invoice?.design_id === id) {
@@ -281,13 +328,13 @@ export function StepReview({ wizard }: Props) {
               </p>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {looks.map((look) => {
-                  const id = designs[look];
+                {choices.map((choice) => {
+                  const id = choice.id;
                   const active = Boolean(id) && activeDesign === id;
 
                   return (
                     <button
-                      key={look}
+                      key={id || choice.name}
                       type="button"
                       disabled={!id}
                       onClick={() => chooseDesign(id)}
@@ -304,7 +351,7 @@ export function StepReview({ wizard }: Props) {
                         cursor: id ? 'pointer' : 'not-allowed',
                       }}
                     >
-                      {look}
+                      {choice.name}
                     </button>
                   );
                 })}
