@@ -62,7 +62,7 @@ interface DesignPreviewProperties {
 
 export const designPreviewPropertiesAtom = atomWithStorage<
   DesignPreviewProperties[]
->('designPreviewProperties', []);
+>('designPreviewProperties', [], undefined, { getOnInit: true });
 
 export default function Settings() {
   const { t } = useTranslation();
