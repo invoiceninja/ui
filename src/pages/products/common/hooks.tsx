@@ -140,7 +140,7 @@ export function useProductColumns() {
     {
       column: 'description',
       id: 'notes',
-      label: t('notes'),
+      label: t('description'),
       format: (value) => (
         <Tooltip
           width="auto"
