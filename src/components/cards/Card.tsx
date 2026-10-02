@@ -104,7 +104,7 @@ export function Card(props: Props) {
           <div
             className={classNames(
               {
-                'bg-white sticky top-0': props.withScrollableBody,
+                'sticky top-0': props.withScrollableBody,
                 'px-4 sm:px-6 py-3':
                   padding == 'small' && !props.withoutHeaderPadding,
                 'px-4 sm:px-6 py-5':
@@ -117,7 +117,11 @@ export function Card(props: Props) {
               typeof props.collapsed !== 'undefined' &&
               setIsCollpased(!isCollapsed)
             }
-            style={{ borderColor: colors.$4, ...props.headerStyle }}
+            style={{
+              borderColor: colors.$4,
+              ...(props.withScrollableBody && { backgroundColor: colors.$1 }),
+              ...props.headerStyle,
+            }}
           >
             <div
               className={classNames('flex items-center justify-between', {

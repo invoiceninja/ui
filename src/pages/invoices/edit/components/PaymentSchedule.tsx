@@ -541,13 +541,13 @@ function PaymentSchedule() {
                 className={classNames(
                   'p-4 border-2 rounded-lg cursor-pointer transition-colors',
                   scheduleType === 'number-payments'
-                    ? 'border-blue-500 bg-blue-50'
+                    ? 'border-blue-500 bg-blue-500 bg-opacity-10'
                     : 'border-gray-200 hover:border-gray-300'
                 )}
                 onClick={() => setScheduleType('number-payments')}
               >
                 <h3 className="font-medium mb-2">{t('split_payments')}</h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm" style={{ color: colors.$22 }}>
                   {t('split_payments_help')}
                 </p>
               </div>
@@ -556,13 +556,13 @@ function PaymentSchedule() {
                 className={classNames(
                   'p-4 border-2 rounded-lg cursor-pointer transition-colors',
                   scheduleType === 'custom'
-                    ? 'border-blue-500 bg-blue-50'
+                    ? 'border-blue-500 bg-blue-500 bg-opacity-10'
                     : 'border-gray-200 hover:border-gray-300'
                 )}
                 onClick={() => setScheduleType('custom')}
               >
                 <h3 className="font-medium mb-2">{t('custom_schedule')}</h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm" style={{ color: colors.$22 }}>
                   {t('custom_schedule_help')}
                 </p>
               </div>
@@ -577,7 +577,7 @@ function PaymentSchedule() {
               <h2 className="text-xl font-semibold mb-4">
                 {t('number_of_payments')}
               </h2>
-              <p className="text-gray-600 mb-6">
+              <p className="mb-6" style={{ color: colors.$22 }}>
                 {t('number_of_payments_helper')}
               </p>
             </div>
@@ -598,7 +598,7 @@ function PaymentSchedule() {
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-xl font-semibold mb-4">{t('frequency')}</h2>
-              <p className="text-gray-600 mb-6">
+              <p className="mb-6" style={{ color: colors.$22 }}>
                 {t('schedule_frequency_help')}
               </p>
             </div>
@@ -631,7 +631,7 @@ function PaymentSchedule() {
               <h2 className="text-xl font-semibold mb-4">
                 {t('first_payment_date')}
               </h2>
-              <p className="text-gray-600 mb-6">
+              <p className="mb-6" style={{ color: colors.$22 }}>
                 {t('first_payment_date_help')}
               </p>
             </div>
@@ -645,6 +645,11 @@ function PaymentSchedule() {
                 }}
                 min={new Date().toISOString().split('T')[0]}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                style={{
+                  backgroundColor: colors.$1,
+                  color: colors.$3,
+                  colorScheme: colors.$0,
+                }}
               />
             </Element>
 
@@ -680,7 +685,9 @@ function PaymentSchedule() {
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-xl font-semibold mb-4">{t('auto_bill')}</h2>
-              <p className="text-gray-600 mb-6">{t('auto_bill_help')}</p>
+              <p className="mb-6" style={{ color: colors.$22 }}>
+                {t('auto_bill_help')}
+              </p>
             </div>
 
             <Element leftSide={t('auto_bill')}>

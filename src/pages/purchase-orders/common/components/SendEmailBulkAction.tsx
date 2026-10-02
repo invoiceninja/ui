@@ -11,6 +11,7 @@
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
+import { useColorScheme } from '$app/common/colors';
 import { hasContactWithEmail } from '$app/common/helpers/emails/has-contact-with-email';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { useBulk } from '$app/common/queries/purchase-orders';
@@ -27,6 +28,7 @@ interface Props {
 }
 export const SendEmailBulkAction = (props: Props) => {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isContactEmailOpen, setContactEmailOpen] = useState<boolean>(false);
@@ -65,7 +67,9 @@ export const SendEmailBulkAction = (props: Props) => {
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       >
-        <span className="text-lg text-gray-900">{t('are_you_sure')}</span>
+        <span className="text-lg" style={{ color: colors.$3 }}>
+          {t('are_you_sure')}
+        </span>
 
         <div className="flex justify-end space-x-4 mt-5">
           <Button

@@ -322,7 +322,7 @@ export default function Daily() {
             )}
             <Button onClick={() => setQuickLogVisible(true)}>
               <span className="inline-flex items-center gap-1">
-                <Plus size="0.9rem" color="#fff" />
+                <Plus size="0.9rem" color={colors.$1} />
                 {t('log_time')}
               </span>
             </Button>

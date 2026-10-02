@@ -11,6 +11,7 @@
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AiOutlineFileText } from 'react-icons/ai';
+import { useColorScheme } from '$app/common/colors';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
@@ -23,6 +24,7 @@ interface Props {
 }
 export const ConvertToInvoiceBulkAction = (props: Props) => {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -44,7 +46,9 @@ export const ConvertToInvoiceBulkAction = (props: Props) => {
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       >
-        <span className="text-lg text-gray-900">{t('are_you_sure')}</span>
+        <span className="text-lg" style={{ color: colors.$3 }}>
+          {t('are_you_sure')}
+        </span>
 
         <div className="flex justify-end space-x-4 mt-5">
           <Button

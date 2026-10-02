@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputLabel } from './InputLabel';
 import { ErrorMessage } from '../ErrorMessage';
@@ -21,6 +22,8 @@ interface Props extends CommonProps {
 }
 
 export function Textarea(props: Props) {
+  const colors = useColorScheme();
+
   return (
     <section>
       {props.label && (
@@ -33,6 +36,11 @@ export function Textarea(props: Props) {
         rows={props.rows ?? 5}
         id={props.id}
         className={`form-textarea w-full py-2 px-3 rounded border border-gray-300 text-sm ${props.className}`}
+        style={{
+          backgroundColor: colors.$1,
+          color: colors.$3,
+          colorScheme: colors.$0,
+        }}
         placeholder={props.placeholder}
         onChange={props.onChange}
         value={props.value}

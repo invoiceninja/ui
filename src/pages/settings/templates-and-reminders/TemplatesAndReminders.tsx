@@ -553,7 +553,7 @@ export function TemplatesAndReminders() {
             />
           ) : (
             <div className="flex flex-col items-start">
-              <span className="text-gray-500 text-sm">
+              <span className="text-sm" style={{ color: colors.$22 }}>
                 {t('email_template_change')}{' '}
                 <strong>
                   {t('enterprise')}/{t('pro')}

@@ -81,7 +81,16 @@ export function AddCreditCard({ onClose, startTrial }: NewCardProps) {
             });
 
             const elements = stripe.elements();
-            const card = elements.create('card');
+            const card = elements.create('card', {
+              style: {
+                base: {
+                  color: colors.$3,
+                  '::placeholder': {
+                    color: colors.$16,
+                  },
+                },
+              },
+            });
 
             card.mount('#card-element');
 

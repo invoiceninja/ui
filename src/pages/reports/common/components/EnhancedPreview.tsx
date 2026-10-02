@@ -336,7 +336,10 @@ export function EnhancedPreview({
                           {sortConfig.direction === 'asc' ? '↑' : '↓'}
                         </span>
                         {enableMultiSort && sortConfigs.length > 1 && (
-                          <span className="text-xs bg-gray-200 rounded px-1">
+                          <span
+                            className="text-xs rounded px-1"
+                            style={{ backgroundColor: colors.$15 }}
+                          >
                             {sortIndex}
                           </span>
                         )}

@@ -23,13 +23,17 @@ interface DocumentStateProps {
 
 export function LoadingState({ pages }: DocumentStateProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   return (
     <Default title={t('documents')} breadcrumbs={pages}>
       <div className="flex items-center justify-center py-8">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('loading')}...</p>
+          <div
+            className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4"
+            style={{ borderColor: colors.$3 }}
+          ></div>
+          <p style={{ color: colors.$22 }}>{t('loading')}...</p>
         </div>
       </div>
     </Default>
@@ -128,12 +132,15 @@ export function CompanySetup({
   isLoading,
 }: CompanySetupProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   return (
     <Default title={t('documents')} breadcrumbs={pages}>
       <div className="flex flex-col items-center gap-4 p-6">
-        <p className="text-gray-600 mb-4">Welcome to DocuNinja!</p>
-        <p className="text-gray-600 mb-4">
+        <p className="mb-4" style={{ color: colors.$3 }}>
+          Welcome to DocuNinja!
+        </p>
+        <p className="mb-4" style={{ color: colors.$22 }}>
           Your account exists but this company is not set up yet. Please click
           the button below to set it up.
         </p>
