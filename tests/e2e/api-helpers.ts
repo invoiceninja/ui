@@ -494,13 +494,14 @@ const CLEAN_USER_REACT_SETTINGS = {
  * The preferences endpoint only authorizes `auth()->id === route user id`;
  * updating any other user returns 401.
  */
-export async function resetUserReactSettings(
+export async function updateUserReactSettings(
   api: ApiContext,
+  patch: Record<string, unknown>,
   options?: { quiet?: boolean }
 ): Promise<void> {
   if (!api.userId) {
     throw new Error(
-      'Cannot reset react settings: login response did not include user.id'
+      'Cannot update react settings: login response did not include user.id'
     );
   }
 
@@ -511,23 +512,47 @@ export async function resetUserReactSettings(
       `/api/v1/company_users/${api.userId}/preferences`,
       {
         headers: api.headers,
-        data: { react_settings: CLEAN_USER_REACT_SETTINGS },
+        data: {
+          react_settings: {
+            ...CLEAN_USER_REACT_SETTINGS,
+            ...patch,
+          },
+        },
       }
     );
 
     if (!update.ok()) {
       throw new Error(
-        `Failed to reset react settings (${update.status()}): ${(
+        `Failed to update react settings (${update.status()}): ${(
           await update.text()
         ).slice(0, 200)}`
       );
     }
 
     if (!options?.quiet) {
-      e2eLog('  Reset react settings');
+      e2eLog('  Updated react settings');
     }
   } finally {
     await context.dispose();
+  }
+}
+
+export async function setUserDarkMode(
+  api: ApiContext,
+  enabled: boolean,
+  options?: { quiet?: boolean }
+): Promise<void> {
+  await updateUserReactSettings(api, { dark_mode: enabled }, options);
+}
+
+export async function resetUserReactSettings(
+  api: ApiContext,
+  options?: { quiet?: boolean }
+): Promise<void> {
+  await updateUserReactSettings(api, {}, options);
+
+  if (!options?.quiet) {
+    e2eLog('  Reset react settings');
   }
 }
 
