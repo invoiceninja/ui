@@ -281,6 +281,15 @@ export default function EInvoice() {
                 }}
               >
                 <div className="flex flex-col space-y-2.5">
+                  {credit?.backup?.guid && credit.backup.guid.length > 1 && (
+                    <div className="flex items-center space-x-4">
+                      <span className="whitespace-nowrap font-medium">
+                        {t('reference')}:
+                      </span>
+                      <span>{credit.backup.guid}</span>
+                    </div>
+                  )}
+
                   {activities
                     ?.filter((activity) =>
                       EINVOICE_ACTIVITY_TYPES.includes(
