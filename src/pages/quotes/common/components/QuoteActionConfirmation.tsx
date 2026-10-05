@@ -11,6 +11,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCancel, MdDone, MdMarkEmailRead } from 'react-icons/md';
+import { useColorScheme } from '$app/common/colors';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { Button } from '$app/components/forms';
@@ -40,6 +41,7 @@ interface Props {
 
 export function QuoteActionConfirmation(props: Props) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const { action, onConfirm, bulkAction, dropdown = true } = props;
 
@@ -75,7 +77,9 @@ export function QuoteActionConfirmation(props: Props) {
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
       >
-        <span className="text-lg text-gray-900">{t('are_you_sure')}</span>
+        <span className="text-lg" style={{ color: colors.$3 }}>
+          {t('are_you_sure')}
+        </span>
 
         <div className="flex justify-end space-x-4 mt-5">
           <Button

@@ -11,6 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { MdDownload, MdSend } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -27,6 +28,7 @@ import { useCreditQuery } from '../common/queries';
 
 export default function Pdf() {
   const [t] = useTranslation();
+  const colors = useColorScheme();
   const navigate = useNavigate();
 
   const hasPermission = useHasPermission();
@@ -71,7 +73,7 @@ export default function Pdf() {
                   )
                 }
               >
-                <Icon element={MdSend} color="white" />
+                <Icon element={MdSend} color={colors.$1} />
                 <span>{t('email_credit')}</span>
               </Button>
             )}
@@ -80,7 +82,7 @@ export default function Pdf() {
               className="flex items-center space-x-1"
               onClick={() => downloadPdf(credit)}
             >
-              <Icon element={MdDownload} color="white" />
+              <Icon element={MdDownload} color={colors.$1} />
               <span>{t('download')}</span>
             </Button>
           </div>

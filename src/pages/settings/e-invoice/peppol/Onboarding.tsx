@@ -65,6 +65,7 @@ export function Onboarding() {
   const accentColor = useAccentColor();
 
   const { t } = useTranslation();
+  const colors = useColorScheme();
   const account = useCurrentAccount();
   const company = useCurrentCompany();
 
@@ -148,7 +149,10 @@ export function Onboarding() {
                       >
                         {t('step')} {i + 1}
                       </span>
-                      <h4 className="text-base lg:text-lg text-gray-900">
+                      <h4
+                        className="text-base lg:text-lg"
+                        style={{ color: colors.$3 }}
+                      >
                         {s === 'vat_check' && isSingapore
                           ? t('classification')
                           : t(translations[s])}

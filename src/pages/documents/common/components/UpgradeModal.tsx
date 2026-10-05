@@ -3,6 +3,7 @@ import React from 'react';
 import { Modal } from '$app/components/Modal';
 import { SelectField } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -58,6 +59,7 @@ type PlanType = 'pro' | 'enterprise' | 'docuninja';
 
 export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
     const [t] = useTranslation();
+    const colors = useColorScheme();
     const account = useCurrentAccount();
     const requiresUserDetails = useRequiresUserDetails();
     const [isLoading, setIsLoading] = useState(false);
@@ -556,13 +558,13 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                             key={plan.value}
                                             className={`border-2 rounded-lg p-4 transition-all duration-200 ${isPlanSelected(plan.value)
                                                     ? isPlanPermanentlySelected(plan.value)
-                                                        ? 'border-green-500 bg-green-50 shadow-md ring-2 ring-green-200 cursor-default'
+                                                        ? 'border-green-500 bg-green-500 bg-opacity-10 shadow-md ring-2 ring-green-200 cursor-default'
                                                         : isSelectedMainPlan(plan.value)
-                                                        ? 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200 cursor-default'
-                                                        : 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200 cursor-pointer'
+                                                        ? 'border-blue-500 bg-blue-500 bg-opacity-10 shadow-md ring-2 ring-blue-200 cursor-default'
+                                                        : 'border-blue-500 bg-blue-500 bg-opacity-10 shadow-md ring-2 ring-blue-200 cursor-pointer'
                                                     : isPlanDisabled(plan.value)
-                                                        ? 'border-gray-200 bg-gray-100 cursor-not-allowed opacity-60'
-                                                        : 'border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50 hover:shadow-sm cursor-pointer'
+                                                        ? 'border-gray-200 bg-gray-500 bg-opacity-10 cursor-not-allowed opacity-60'
+                                                        : 'border-gray-200 hover:border-gray-400 hover:bg-gray-500 hover:bg-opacity-5 hover:shadow-sm cursor-pointer'
                                                 }`}
                                             onClick={() =>
                                                 !isPlanDisabled(plan.value) &&
@@ -667,13 +669,13 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                         <span>{t('plan_term_yearly')} </span>
 
                                     </div>
-                                    <p className="text-sm text-gray-600 mt-2">{t('pay_annually_discount')}</p>
+                                    <p className="text-sm mt-2" style={{ color: colors.$22 }}>{t('pay_annually_discount')}</p>
                                 </div>
                             )}
 
                             {/* Pricing Display */}
                             <div className="space-y-4">
-                                <div className="bg-gray-50 p-4 rounded">
+                                <div className="p-4 rounded" style={{ backgroundColor: colors.$4 }}>
                                     {pricing ? (
                                         <>
                                         
@@ -724,7 +726,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                                         </>
                                     ) : (
                                         <div className="flex justify-center py-4">
-                                            <span className="text-gray-600">{t('loading')}...</span>
+                                            <span style={{ color: colors.$22 }}>{t('loading')}...</span>
                                         </div>
                                     )}
                                 </div>
@@ -759,7 +761,7 @@ export function UpgradeModal({ visible, onClose, onPaymentComplete }: Props) {
                         {/* Step 2: Payment */}
                         <div className="space-y-4">
                             {/* Order Summary */}
-                            <div className="bg-gray-50 p-4 rounded mb-4">
+                            <div className="p-4 rounded mb-4" style={{ backgroundColor: colors.$4 }}>
                                 <div className="flex justify-between items-center">
                                     <h3 className="font-medium">{t('order_overview')}</h3>
                                     <Button

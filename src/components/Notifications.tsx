@@ -656,7 +656,7 @@ export function Notifications() {
                           {generateDisplayLabel(notification.displayLabel)}
                         </div>
 
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs" style={{ color: colors.$22 }}>
                           {getDateTimeLabel(notification.date)}
                         </p>
                       </div>

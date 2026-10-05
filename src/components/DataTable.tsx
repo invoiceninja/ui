@@ -126,6 +126,7 @@ interface StyleOptions {
   withoutRightBorder?: boolean;
   headerBackgroundColor?: string;
   thChildrenClassName?: string;
+  thTextColor?: string;
   tBodyStyle?: CSSProperties;
   thClassName?: string;
   tdClassName?: string;
@@ -1124,6 +1125,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                       setSort(data.sort);
                     }}
                     childrenClassName={styleOptions?.thChildrenClassName}
+                    textColor={styleOptions?.thTextColor}
                     resizable={`${apiEndpoint.pathname}.${column.id}`}
                     useOnlyCurrentSortDirectionIcon={
                       styleOptions?.useOnlyCurrentSortDirectionIcon
