@@ -229,7 +229,10 @@ export function CommonActionsPreferenceModal(props: Props) {
                     <div className="flex items-center space-x-2">
                       <GridDotsVertical size="1.2rem" color={colors.$17} />
 
-                      <span className="font-medium">
+                      <span
+                        className="font-medium"
+                        style={{ color: colors.$3 }}
+                      >
                         {getActionLabel(
                           (commonActionsPreferences?.[entity] || [])[
                             rubric.source.index

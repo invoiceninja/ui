@@ -213,7 +213,10 @@ export default function Show() {
       topRight={
         canViewFinancials ? (
           <div className="flex flex-shrink-0 items-center justify-end space-x-3 lg:pl-6">
-            <span className="whitespace-nowrap text-sm">
+            <span
+              className="whitespace-nowrap text-sm"
+              style={{ color: colors.$3 }}
+            >
               {t('include_drafts')}
             </span>
 

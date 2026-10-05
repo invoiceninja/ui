@@ -121,7 +121,7 @@ export function Edit() {
                 <Icon
                   className="h-4 w-4"
                   element={SettingsIcon}
-                  color="white"
+                  color={colors.$1}
                 />
 
                 <span>{t('configure_settings')}</span>

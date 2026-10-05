@@ -17,16 +17,74 @@ import { endpoint, date as formatDate } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { SystemLogRecord } from '$app/common/interfaces/system-log';
-import { Badge } from '$app/components/Badge';
+import { Badge, BadgeVariant } from '$app/components/Badge';
 import { Card, Element } from '$app/components/cards';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
+import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 
 interface Category {
   id: number;
   name: string;
 }
+
+type SystemLogTone = 'success' | 'failure' | 'warning' | 'neutral';
+
+const EVENT_TONES: Partial<Record<number, SystemLogTone>> = {
+  10: 'failure',
+  11: 'success',
+  21: 'success',
+  22: 'failure',
+  23: 'warning',
+  31: 'warning',
+  32: 'failure',
+  33: 'failure',
+  34: 'success',
+  35: 'success',
+  41: 'success',
+  42: 'failure',
+  60: 'failure',
+  62: 'failure',
+  70: 'failure',
+  71: 'success',
+  72: 'failure',
+  73: 'success',
+};
+
+const TYPE_TONES: Partial<Record<number, SystemLogTone>> = {
+  303: 'failure',
+  400: 'warning',
+  401: 'failure',
+  600: 'failure',
+  601: 'success',
+  800: 'success',
+  801: 'failure',
+};
+
+const TONE_BADGE_VARIANTS: Record<SystemLogTone, BadgeVariant> = {
+  success: 'green',
+  failure: 'red',
+  warning: 'yellow',
+  neutral: 'generic',
+};
+
+const TONE_ACCENTS: Partial<
+  Record<SystemLogTone, { border: string; background: string }>
+> = {
+  failure: { border: '#EF4444', background: 'rgba(239, 68, 68, 0.08)' },
+  warning: { border: '#D97706', background: 'rgba(217, 119, 6, 0.08)' },
+};
+
+const getTone = (systemLog: SystemLogRecord) => {
+  const eventTone = EVENT_TONES[systemLog.event_id ?? 0];
+
+  if (eventTone) {
+    return eventTone;
+  }
+
+  return TYPE_TONES[systemLog.type_id ?? 0] ?? 'neutral';
+};
 
 const jsonTreeTheme = {
   scheme: 'monokai',
@@ -53,6 +111,7 @@ export function SystemLog() {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
+  const statusThemeColors = useStatusThemeColorScheme();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -78,6 +137,9 @@ export function SystemLog() {
     { id: 3, name: t('webhook') },
     { id: 4, name: t('pdf') },
     { id: 5, name: t('security') },
+    { id: 6, name: t('log') },
+    { id: 7, name: t('verifactu') },
+    { id: 8, name: `PEPPOL` },
   ];
 
   const events: Category[] = [
@@ -94,9 +156,16 @@ export function SystemLog() {
     { id: 35, name: t('opened') },
     { id: 40, name: t('webhook_response') },
     { id: 41, name: t('webhook_success') },
+    { id: 42, name: t('webhook_failure') },
     { id: 50, name: t('pdf') },
     { id: 60, name: t('login_failure') },
     { id: 61, name: t('user') },
+    { id: 62, name: t('inbound_mail_blocked') },
+    { id: 70, name: t('failure') },
+    { id: 71, name: t('success') },
+    { id: 72, name: t('failure') },
+    { id: 73, name: t('success') },
+    { id: 74, name: t('accounting') },
   ];
 
   const types: Category[] = [
@@ -152,6 +221,22 @@ export function SystemLog() {
     return <JSONTree data={JSON.parse(src)} theme={jsonTreeTheme} />;
   };
 
+  const getToneThemeColor = (tone: SystemLogTone) => {
+    if (tone === 'success') {
+      return statusThemeColors.$3;
+    }
+
+    if (tone === 'warning') {
+      return statusThemeColors.$4;
+    }
+
+    if (tone === 'failure') {
+      return statusThemeColors.$5;
+    }
+
+    return undefined;
+  };
+
   return (
     <Settings title={t('system_logs')} breadcrumbs={pages}>
       {isLoading && (
@@ -172,35 +257,53 @@ export function SystemLog() {
             systemLog: SystemLogRecord,
             index: number,
             { length }: { length: number }
-          ) => (
-            <div className="px-4 sm:px-6">
-              <div
-                key={index}
-                className={classNames('pt-4', {
-                  'border-b border-dashed pb-4': index !== length - 1,
-                })}
-                style={{ borderColor: colors.$20 }}
-              >
-                <Element
-                  key={index}
-                  leftSide={getCategory(systemLog.category_id)}
-                  leftSideHelp={`${getType(systemLog.type_id)} ${formatDate(
-                    systemLog.created_at,
-                    `${dateFormat} HH:mm:ss`
-                  )}`}
-                  noExternalPadding
-                >
-                  <div className="flex flex-col space-y-2">
-                    <div>
-                      <Badge>{getEvent(systemLog.event_id)}</Badge>
-                    </div>
+          ) => {
+            const tone = getTone(systemLog);
 
-                    <div>{getLog(systemLog.log)}</div>
+            return (
+              <div className="px-4 sm:px-6">
+                <div
+                  key={index}
+                  className={classNames('pt-4', {
+                    'border-b border-dashed pb-4': index !== length - 1,
+                  })}
+                  style={{ borderColor: colors.$20 }}
+                >
+                  <div
+                    className="border-l-4 pl-3 pr-3 rounded-r"
+                    style={{
+                      borderLeftColor:
+                        TONE_ACCENTS[tone]?.border ?? 'transparent',
+                      backgroundColor: TONE_ACCENTS[tone]?.background,
+                    }}
+                  >
+                    <Element
+                      key={index}
+                      leftSide={getCategory(systemLog.category_id)}
+                      leftSideHelp={`${getType(systemLog.type_id)} ${formatDate(
+                        systemLog.created_at,
+                        `${dateFormat} HH:mm:ss`
+                      )}`}
+                      noExternalPadding
+                    >
+                      <div className="flex flex-col space-y-2">
+                        <div>
+                          <Badge
+                            variant={TONE_BADGE_VARIANTS[tone]}
+                            style={{ backgroundColor: getToneThemeColor(tone) }}
+                          >
+                            {getEvent(systemLog.event_id)}
+                          </Badge>
+                        </div>
+
+                        <div>{getLog(systemLog.log)}</div>
+                      </div>
+                    </Element>
                   </div>
-                </Element>
+                </div>
               </div>
-            </div>
-          )
+            );
+          }
         )}
       </Card>
     </Settings>
