@@ -175,7 +175,7 @@ test('retains session storage when server persistence is disabled', () => {
 
 test('record-scoped tables do not inherit session text filters', () => {
   mocks.settings.table_filters = {
-    invoices: { filter: 'DAVID' },
+    invoices: { filter: 'DAVID', status: ['active'] },
   };
   const { params } = mount({
     withRecordScopedFilters: true,
