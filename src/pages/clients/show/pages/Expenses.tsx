@@ -52,6 +52,7 @@ export default function Expenses() {
       hideEditableOptions={!hasPermission('edit_expense')}
       withoutPageAsPreference
       withRecordScopedFilters
+      recordScopeId={id}
     />
   );
 }
