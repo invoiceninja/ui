@@ -419,6 +419,9 @@ export function useWizard(existingId?: string): Wizard {
 
   const attachClient = useCallback(
     (next: Client) => {
+      const changed =
+        !persistedId.current && latest.current?.client_id !== next.id;
+
       setClient(next);
       setErrors(undefined);
 
@@ -438,6 +441,7 @@ export function useWizard(existingId?: string): Wizard {
             client_contact_id: contact.id,
           };
         }),
+        ...(changed ? { due_date: '' } : {}),
       });
     },
     [patch]

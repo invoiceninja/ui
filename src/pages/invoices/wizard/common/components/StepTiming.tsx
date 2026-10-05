@@ -14,9 +14,10 @@ import { useColorScheme } from '$app/common/colors';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Button, InputField } from '$app/components/forms';
@@ -27,35 +28,33 @@ import { StepTransition } from './StepTransition';
 import { Wizard } from '../hooks/useWizard';
 import { addDays, today } from '../helpers/dates';
 
-type Term = 'receipt' | '7' | '14' | '30' | 'custom';
+type Term = number | 'custom';
 
-const TERMS: { key: Term; days: number | null }[] = [
-  { key: 'receipt', days: 0 },
-  { key: '7', days: 7 },
-  { key: '14', days: 14 },
-  { key: '30', days: 30 },
-  { key: 'custom', days: null },
-];
+const PRESET_DAYS = [0, 7, 14, 30];
 
 interface Props {
   wizard: Wizard;
   embedded?: boolean;
 }
 
+const toDays = (value: unknown): number => {
+  const days = parseInt(String(value ?? ''), 10);
+
+  return Number.isFinite(days) && days > 0 ? days : 0;
+};
+
 const termFromDates = (
   date: string | undefined,
-  dueDate: string | undefined
+  dueDate: string | undefined,
+  options: number[]
 ): Term | null => {
   if (!dueDate) {
     return null;
   }
 
   const days = dayjs(dueDate).diff(dayjs(date || today()), 'day');
-  const match = TERMS.find(
-    (option) => option.days !== null && option.days === days
-  );
 
-  return match ? match.key : 'custom';
+  return options.includes(days) ? days : 'custom';
 };
 
 export function StepTiming({ wizard, embedded }: Props) {
@@ -64,36 +63,71 @@ export function StepTiming({ wizard, embedded }: Props) {
   const [t] = useTranslation();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
+  const getSetting = useGetSetting();
 
   const invoice = wizard.invoice;
   const invoiceDate = invoice?.date || today();
 
+  const client = wizard.client;
+
+  const clientTerms = getSetting(
+    client?.settings?.payment_terms === '' ||
+      client?.settings?.payment_terms === null
+      ? {
+          ...client,
+          settings: { ...client.settings, payment_terms: undefined },
+        }
+      : client,
+    'payment_terms'
+  ) as string | null | undefined;
+  const defaultDays = toDays(clientTerms ?? company?.settings?.payment_terms);
+  const options = PRESET_DAYS.includes(defaultDays)
+    ? PRESET_DAYS
+    : [...PRESET_DAYS, defaultDays].sort((a, b) => a - b);
+
   const [term, setTerm] = useState<Term | null>(() =>
-    termFromDates(invoice?.date, invoice?.due_date)
+    termFromDates(invoice?.date, invoice?.due_date, options)
   );
   const [showDate, setShowDate] = useState(false);
   const [defaultSaved, setDefaultSaved] = useState(false);
   const [savingDefault, setSavingDefault] = useState(false);
 
+  const defaulted = useRef(false);
+
+  useEffect(() => {
+    if (defaulted.current || clientTerms === undefined) {
+      return;
+    }
+
+    defaulted.current = true;
+
+    if (wizard.invoiceId || invoice?.due_date) {
+      setTerm(termFromDates(invoice?.date, invoice?.due_date, options));
+
+      return;
+    }
+
+    setTerm(defaultDays);
+    wizard.patch({ due_date: addDays(invoiceDate, defaultDays) });
+  }, [clientTerms]);
+
   const choose = (next: Term) => {
     setTerm(next);
 
-    const entry = TERMS.find((option) => option.key === next);
-
-    if (entry?.days !== null && entry?.days !== undefined) {
-      wizard.patch({ due_date: addDays(invoiceDate, entry.days) });
+    if (next !== 'custom') {
+      wizard.patch({ due_date: addDays(invoiceDate, next) });
     }
   };
 
-  const chosen = TERMS.find((option) => option.key === term);
+  const chosenDays = typeof term === 'number' ? term : null;
   const currentDefault = company?.settings?.payment_terms ?? '';
   const offerDefault =
-    chosen &&
-    chosen.days !== null &&
-    String(chosen.days) !== String(currentDefault);
+    chosenDays !== null &&
+    chosenDays !== defaultDays &&
+    String(chosenDays) !== String(currentDefault);
 
   const saveDefault = () => {
-    if (!company?.id || chosen?.days === null || chosen?.days === undefined) {
+    if (!company?.id || chosenDays === null) {
       return;
     }
 
@@ -106,7 +140,7 @@ export function StepTiming({ wizard, embedded }: Props) {
         ...company,
         settings: {
           ...company.settings,
-          payment_terms: String(chosen.days),
+          payment_terms: String(chosenDays),
         },
       },
       { skipIntercept: true }
@@ -129,25 +163,29 @@ export function StepTiming({ wizard, embedded }: Props) {
         role="radiogroup"
         aria-label={t('payment_terms')}
       >
-        {TERMS.map((option) => (
+        {options.map((days) => (
           <Choice
-            key={option.key}
-            selected={term === option.key}
-            onSelect={() => choose(option.key)}
+            key={days}
+            selected={term === days}
+            onSelect={() => choose(days)}
             title={
-              option.days === null
-                ? t('custom')
-                : option.days === 0
-                  ? t('due_on_receipt')
-                  : trans('count_days', { count: option.days })
+              days === 0
+                ? t('due_on_receipt')
+                : trans('count_days', { count: days })
             }
             trailing={
-              option.days !== null && option.days > 0
-                ? dayjs(addDays(invoiceDate, option.days)).format('D MMM')
+              days > 0
+                ? dayjs(addDays(invoiceDate, days)).format('D MMM')
                 : undefined
             }
           />
         ))}
+
+        <Choice
+          selected={term === 'custom'}
+          onSelect={() => choose('custom')}
+          title={t('custom')}
+        />
       </div>
 
       {term === 'custom' || serverErrors?.due_date ? (
@@ -178,13 +216,12 @@ export function StepTiming({ wizard, embedded }: Props) {
               debounceTimeout={0}
               errorMessage={serverErrors?.date}
               onValueChange={(nextDate) => {
-                const entry = TERMS.find((option) => option.key === term);
                 const dueDate = invoice?.due_date ?? '';
 
                 wizard.patch({
                   date: nextDate,
-                  ...(entry?.days !== null && entry?.days !== undefined
-                    ? { due_date: addDays(nextDate, entry.days) }
+                  ...(typeof term === 'number'
+                    ? { due_date: addDays(nextDate, term) }
                     : dueDate && dueDate < nextDate
                       ? { due_date: nextDate }
                       : {}),
@@ -214,9 +251,9 @@ export function StepTiming({ wizard, embedded }: Props) {
           <Callout
             title={trans('use_for_future_invoices', {
               value:
-                chosen.days === 0
+                chosenDays === 0
                   ? t('due_on_receipt')
-                  : trans('count_days', { count: chosen.days }),
+                  : trans('count_days', { count: chosenDays }),
             })}
             onDismiss={() => wizard.dismiss('terms')}
             dismissLabel={t('no_not_now')}

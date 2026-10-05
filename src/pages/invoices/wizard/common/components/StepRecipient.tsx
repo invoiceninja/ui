@@ -343,6 +343,15 @@ export function StepRecipient({ wizard }: Props) {
             ref={searchBox}
             onFocus={() => setDismissedSearch(false)}
             onKeyDown={(event) => {
+              if (event.key === 'Escape' && matches.length) {
+                nameInput.current?.focus();
+                setMatches([]);
+                setActive(-1);
+                setDismissedSearch(true);
+
+                return;
+              }
+
               if (event.target !== nameInput.current || !matches.length) {
                 return;
               }
@@ -358,10 +367,6 @@ export function StepRecipient({ wizard }: Props) {
               } else if (event.key === 'Enter' && matches[active]) {
                 event.preventDefault();
                 choose(matches[active]);
-              } else if (event.key === 'Escape') {
-                setMatches([]);
-                setActive(-1);
-                setDismissedSearch(true);
               }
             }}
           >
@@ -385,6 +390,13 @@ export function StepRecipient({ wizard }: Props) {
                   changeOverride
                   debounceTimeout={0}
                   onValueChange={(value) => {
+                    if (
+                      value ===
+                      (selected ? selected.display_name || selected.name : name)
+                    ) {
+                      return;
+                    }
+
                     if (selected) {
                       reset();
 

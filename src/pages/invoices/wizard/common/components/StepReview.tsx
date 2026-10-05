@@ -411,7 +411,7 @@ export function StepReview({ wizard }: Props) {
           onUpgrade={isOwner ? upgrade : undefined}
         />
 
-        <AttachmentOption
+        {/* <AttachmentOption
           label={t('attach_documents')}
           checked={Boolean(company?.settings?.document_email_attachment)}
           allowed={enterprisePlan()}
@@ -421,7 +421,7 @@ export function StepReview({ wizard }: Props) {
             saveAttachment('document_email_attachment', value)
           }
           onUpgrade={isOwner ? upgrade : undefined}
-        />
+        /> */}
       </div>
 
       {hasGateway === false && !wizard.dismissed('pay') ? (
