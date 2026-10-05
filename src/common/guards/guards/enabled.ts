@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ModuleBitmask } from '$app/common/enums/module-bitmask';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { store } from '$app/common/stores/store';
-import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { Guard } from '../Guard';
 
 export function enabled(module: ModuleBitmask): Guard {

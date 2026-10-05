@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ModuleBitmask } from '$app/common/enums/module-bitmask';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { permission } from '$app/common/guards/guards/permission';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -15,7 +16,6 @@ import { Project } from '$app/common/interfaces/project';
 import { Task } from '$app/common/interfaces/task';
 import { DataTable } from '$app/components/DataTable';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
-import { ModuleBitmask } from '$app/pages/settings';
 import {
   defaultColumns,
   useActions,

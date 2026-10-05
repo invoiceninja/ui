@@ -10,6 +10,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { ModuleBitmask } from '$app/common/enums/module-bitmask';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { Element } from '../../../../components/cards';
@@ -20,19 +21,7 @@ interface Module {
   bitmask: number;
 }
 
-export enum ModuleBitmask {
-  Invoices = 4096,
-  RecurringInvoices = 1,
-  Quotes = 4,
-  Credits = 2,
-  Projects = 32,
-  Tasks = 8,
-  Vendors = 64,
-  Expenses = 16,
-  RecurringExpenses = 512,
-  PurchaseOrders = 16384,
-  Transactions = 256, // old: 32768
-}
+export { ModuleBitmask };
 
 export const modules: Module[] = [
   { label: 'invoices', bitmask: ModuleBitmask.Invoices },
