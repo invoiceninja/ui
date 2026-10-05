@@ -9,7 +9,7 @@
  */
 
 import { Suspense } from 'react';
-import { Default } from '$app/components/layouts/Default';
+import { LazyDefault as Default } from '$app/components/layouts/LazyDefault';
 import { Spinner } from '$app/components/Spinner';
 
 interface Props {
@@ -22,9 +22,11 @@ export function Fallback({ children, type = 'page' }: Props) {
     <Suspense
       fallback={
         type === 'page' || type === 'component' ? (
-          <Default breadcrumbs={[]}>
-            <Spinner />
-          </Default>
+          <Suspense fallback={<Spinner />}>
+            <Default breadcrumbs={[]}>
+              <Spinner />
+            </Default>
+          </Suspense>
         ) : (
           <Spinner />
         )

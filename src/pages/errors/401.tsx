@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { AlertTriangle } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { Default } from '$app/components/layouts/Default';
+import { LazyDefault as Default } from '$app/components/layouts/LazyDefault';
 import { Spinner } from '$app/components/Spinner';
 
 export function Unauthorized() {
@@ -29,19 +29,21 @@ export function Unauthorized() {
   }, []);
 
   return (
-    <Default breadcrumbs={[]}>
-      <div className="flex flex-col items-center mt-14 space-y-4">
-        {isLoading ? (
-          <Spinner />
-        ) : (
-          <>
-            <AlertTriangle size={128} />
+    <Suspense fallback={<Spinner />}>
+      <Default breadcrumbs={[]}>
+        <div className="flex flex-col items-center mt-14 space-y-4">
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            <>
+              <AlertTriangle size={128} />
 
-            <h1 className="text-2xl">{t('not_allowed')}.</h1>
-          </>
-        )}
-      </div>
-    </Default>
+              <h1 className="text-2xl">{t('not_allowed')}.</h1>
+            </>
+          )}
+        </div>
+      </Default>
+    </Suspense>
   );
 }
 

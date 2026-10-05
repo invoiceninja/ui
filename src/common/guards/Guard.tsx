@@ -9,14 +9,14 @@
  */
 
 import { QueryClient, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Params, useParams } from 'react-router-dom';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { User } from '$app/common/interfaces/user';
 import { Fallback } from '$app/components/Fallback';
-import { Default } from '$app/components/layouts/Default';
+import { LazyDefault as Default } from '$app/components/layouts/LazyDefault';
 import { Spinner } from '$app/components/Spinner';
 import { SubPageUnauthorized, Unauthorized } from '$app/pages/errors/401';
 import { useActiveSettingsDetails } from '../hooks/useActiveSettingsDetails';
@@ -81,9 +81,11 @@ export function Guard({ guards, component, type = 'page' }: Props) {
 
   if (state === State.Loading) {
     return type === 'page' ? (
-      <Default breadcrumbs={[]}>
-        <Spinner />
-      </Default>
+      <Suspense fallback={<Spinner />}>
+        <Default breadcrumbs={[]}>
+          <Spinner />
+        </Default>
+      </Suspense>
     ) : (
       <Spinner />
     );
