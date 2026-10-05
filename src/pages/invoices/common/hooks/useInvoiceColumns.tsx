@@ -35,20 +35,14 @@ import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import classNames from 'classnames';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
-import { MdSend, MdTextSnippet, MdWarning } from 'react-icons/md';
+import { MdTextSnippet } from 'react-icons/md';
 import { Assigned } from '$app/components/Assigned';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useNavigate } from 'react-router-dom';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
-import {
-  Classification,
-  PEPPOL_COUNTRIES,
-  PEPPOL_CLASSIFICATIONS,
-} from '$app/common/helpers/peppol-countries';
 import { TagPills } from '$app/components/tags/TagPills';
+import { PeppolSendingStatus } from '$app/components/e-invoice/PeppolSendingStatus';
 import { calculateNetAmount } from '$app/common/helpers/invoices/net-amount';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
@@ -147,7 +141,6 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const accentColor = useAccentColor();
   const navigate = useNavigate();
   const reactSettings = useReactSettings();
-  const currentCompany = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const getSetting = useGetSetting();
@@ -166,36 +159,6 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       entity: 'invoice',
     });
 
-  const isPeppolEnabled = (currentInvoice: Invoice) => {
-    if (reactSettings?.preferences?.hide_peppol_sent_status) {
-      return false;
-    }
-
-    return (
-      currentCompany.settings.e_invoice_type === 'PEPPOL' &&
-      PEPPOL_COUNTRIES.includes(currentInvoice.client?.country_id || '') &&
-      PEPPOL_CLASSIFICATIONS[
-        currentInvoice.client?.country_id as keyof typeof PEPPOL_CLASSIFICATIONS
-      ]?.includes(
-        (currentInvoice.client?.classification || 'business') as Classification
-      )
-    );
-  };
-
-  const peppolSendingFailed = (currentInvoice: Invoice) => {
-    return (
-      isPeppolEnabled(currentInvoice) &&
-      currentInvoice.status_id !== InvoiceStatusEnum.Draft &&
-      !currentInvoice.backup?.guid &&
-      !currentInvoice.is_deleted &&
-      !currentInvoice.archived_at
-    );
-  };
-
-  const peppolSendingSuccess = (currentInvoice: Invoice) => {
-    return isPeppolEnabled(currentInvoice) && currentInvoice.backup?.guid;
-  };
-
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
     {
       column: 'status',
@@ -205,37 +168,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
         <div className="flex items-center gap-x-2">
           <InvoiceStatus entity={invoice} />
 
-          {peppolSendingFailed(invoice) && (
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                navigate(route('/invoices/:id/e_invoice', { id: invoice.id }));
-              }}
-            >
-              <Tooltip
-                message={t('peppol_sending_failed') as string}
-                width="auto"
-                placement="top"
-              >
-                <MdWarning color="red" size={20} />
-              </Tooltip>
-            </button>
-          )}
-
-          {peppolSendingSuccess(invoice) && (
-            <Tooltip
-              message={t('peppol_sending_success') as string}
-              width="auto"
-              placement="top"
-            >
-              <MdSend
-                color="#22c55e"
-                size={18}
-                style={{ transform: 'rotate(-45deg)' }}
-              />
-            </Tooltip>
-          )}
+          <PeppolSendingStatus entity="invoice" resource={invoice} />
 
           {['R1', 'R2'].includes(invoice.backup?.document_type ?? '') && (
             <Assigned

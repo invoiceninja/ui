@@ -102,6 +102,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 import { TagPills } from '$app/components/tags/TagPills';
+import { PeppolSendingStatus } from '$app/components/e-invoice/PeppolSendingStatus';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -821,7 +822,13 @@ export function useCreditColumns() {
       column: 'status',
       id: 'status_id',
       label: t('status'),
-      format: (_value, credit) => <CreditStatusBadge entity={credit} />,
+      format: (_value, credit) => (
+        <div className="flex items-center gap-x-2">
+          <CreditStatusBadge entity={credit} />
+
+          <PeppolSendingStatus entity="credit" resource={credit} />
+        </div>
+      ),
     },
     {
       column: 'number',
