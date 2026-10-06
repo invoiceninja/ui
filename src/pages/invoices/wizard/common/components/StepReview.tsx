@@ -426,7 +426,7 @@ export function StepReview({ wizard }: Props) {
       {hasGateway === false && !wizard.dismissed('pay') ? (
         <div className="mt-8">
           <Callout
-            title={t('would_you_like_customers_to_pay_online')}
+            title={t('add_gateway_help_message')}
             onDismiss={() => wizard.dismiss('pay')}
             dismissLabel={t('no_not_now')}
           >
@@ -437,7 +437,7 @@ export function StepReview({ wizard }: Props) {
                   behavior="button"
                   onClick={() => window.open(gatewaysHref, '_blank')}
                 >
-                  {t('set_up_card_payments')}
+                  {t('add_gateway')}
                 </Button>
 
                 <Button
