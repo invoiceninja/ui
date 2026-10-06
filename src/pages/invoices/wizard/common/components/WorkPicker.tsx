@@ -84,7 +84,7 @@ export function WorkPicker({ open, source, clientId, onClose, onPick }: Props) {
     <Modal
       visible={open}
       onClose={onClose}
-      title={source === 'saved' ? t('products') : t('add_from_existing_work')}
+      title={source === 'saved' ? t('products') : t('unbilled_work')}
       size="small"
     >
       {source === 'saved' ? (
@@ -321,5 +321,5 @@ const emptyCopy = (source: WorkSource, hasClient: boolean): string => {
     return 'please_select_a_client';
   }
 
-  return 'no_unbilled_work';
+  return 'empty_table';
 };

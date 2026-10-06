@@ -10,7 +10,7 @@
 
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { endpoint, trans } from '$app/common/helpers';
+import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -25,7 +25,6 @@ import { Client } from '$app/common/interfaces/client';
 import { Design } from '$app/common/interfaces/design';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
-import reactStringReplace from 'react-string-replace';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHref, useNavigate } from 'react-router-dom';
@@ -390,7 +389,7 @@ export function StepReview({ wizard }: Props) {
         className="text-xs mt-6 mb-2"
         style={{ color: colors.$22, fontWeight: 500 }}
       >
-        {t('before_you_send')}
+        {t('attachments')}
       </p>
 
       <div
@@ -405,7 +404,7 @@ export function StepReview({ wizard }: Props) {
           label={t('attach_pdf')}
           checked={Boolean(company?.settings?.pdf_email_attachment)}
           allowed={proPlan() || enterprisePlan()}
-          requirement={t('pro_plan')}
+          requirement={t('attach_pdf_help')}
           busy={savingAttachment !== null}
           onChange={(value) => saveAttachment('pdf_email_attachment', value)}
           onUpgrade={isOwner ? upgrade : undefined}
@@ -484,19 +483,7 @@ export function StepReview({ wizard }: Props) {
         </div>
       ) : null}
 
-      {recipient ? (
-        <p className="text-sm mt-8 leading-6" style={{ color: colors.$3 }}>
-          {reactStringReplace(
-            trans('invoice_ready_email_to', { value: ':recipient' }),
-            ':recipient',
-            () => (
-              <strong key="recipient" style={{ fontWeight: 600 }}>
-                {recipient}
-              </strong>
-            )
-          )}
-        </p>
-      ) : (
+      {!recipient ? (
         <div className="mt-8 flex flex-wrap items-center gap-4">
           <span className="text-sm" style={{ color: colors.$3 }}>
             {t('client_email_not_set')}
@@ -510,7 +497,7 @@ export function StepReview({ wizard }: Props) {
             {t('contact_details')}
           </Button>
         </div>
-      )}
+      ) : null}
 
       <StepFooter
         back={

@@ -37,7 +37,7 @@ export function AttachmentOption({
   return (
     <Element
       leftSide={label}
-      leftSideHelp={allowed ? t('saved_for_all_future_emails') : requirement}
+      leftSideHelp={requirement}
       pushContentToRight
       noExternalPadding
       twoGridColumns

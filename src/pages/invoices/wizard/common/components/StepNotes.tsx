@@ -32,7 +32,7 @@ export function StepNotes({ wizard, embedded }: Props) {
     <StepTransition>
       <div>
         <p className="text-sm mb-3 leading-6" style={{ color: colors.$17 }}>
-          {t('terms_will_appear_here')}
+          {t('default_terms_help')}
         </p>
 
         <MarkdownEditor

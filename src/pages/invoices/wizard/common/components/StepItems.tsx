@@ -351,7 +351,7 @@ export function StepItems({ wizard, embedded }: Props) {
           className="text-sm"
           style={{ color: accentColor, fontWeight: 500 }}
         >
-          {t('products')}
+          {t('product_catalogue', { defaultValue: 'Product Catalogue' })}
         </button>
 
         <button
@@ -360,7 +360,7 @@ export function StepItems({ wizard, embedded }: Props) {
           className="text-sm"
           style={{ color: accentColor, fontWeight: 500 }}
         >
-          {t('add_from_existing_work', { defaultValue: 'Add From Tasks' })}
+          {t('add_from_tasks', { defaultValue: 'Add From Tasks' })}
         </button>
       </div>
 
