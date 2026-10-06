@@ -31,7 +31,7 @@ import { useDispatch } from 'react-redux';
 import { useHref, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
-import { Button, InputField } from '$app/components/forms';
+import { Button } from '$app/components/forms';
 import { Callout } from './Callout';
 import { StepFooter } from './StepFooter';
 import { PreviewFrame } from './PreviewFrame';
@@ -81,8 +81,6 @@ export function StepReview({ wizard }: Props) {
   const [savingAttachment, setSavingAttachment] =
     useState<AttachmentKey | null>(null);
   const [hasGateway, setHasGateway] = useState<boolean | null>(null);
-  const [bankInstructions, setBankInstructions] = useState<string | null>(null);
-  const [savingBank, setSavingBank] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
 
   const sendAfterContact = useRef(false);
@@ -240,38 +238,6 @@ export function StepReview({ wizard }: Props) {
     deliver()
       .catch(() => toast.error())
       .finally(() => setSending(false));
-  };
-
-  const saveBankInstructions = () => {
-    if (!bankInstructions?.trim() || !company?.id) {
-      return;
-    }
-
-    setSavingBank(true);
-
-    wizard.patch({ terms: bankInstructions.trim() });
-
-    request(
-      'PUT',
-      endpoint('/api/v1/companies/:id', { id: company.id }),
-      {
-        ...company,
-        settings: {
-          ...company.settings,
-          invoice_terms: bankInstructions.trim(),
-        },
-      },
-      { skipIntercept: true }
-    )
-      .then((response) => {
-        dispatch(updateRecord({ object: 'company', data: response.data.data }));
-
-        setBankInstructions(null);
-        wizard.dismiss('pay');
-        toast.success('updated_settings');
-      })
-      .catch(() => toast.error())
-      .finally(() => setSavingBank(false));
   };
 
   const previewable = Boolean(invoice?.client_id);
@@ -435,55 +401,13 @@ export function StepReview({ wizard }: Props) {
             onDismiss={() => wizard.dismiss('pay')}
             dismissLabel={t('no_not_now')}
           >
-            {bankInstructions === null ? (
-              <div className="flex flex-wrap items-center gap-2">
-                <Button
-                  type="secondary"
-                  behavior="button"
-                  onClick={() => window.open(gatewaysHref, '_blank')}
-                >
-                  {t('add_gateway')}
-                </Button>
-
-                <Button
-                  type="secondary"
-                  behavior="button"
-                  onClick={() => setBankInstructions(invoice?.terms ?? '')}
-                >
-                  {t('add_bank_transfer_instructions')}
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <InputField
-                  element="textarea"
-                  textareaRows={4}
-                  label={t('terms')}
-                  placeholder={t('bank_details_placeholder')}
-                  value={bankInstructions}
-                  changeOverride
-                  debounceTimeout={0}
-                  onValueChange={setBankInstructions}
-                />
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    behavior="button"
-                    disabled={savingBank}
-                    onClick={saveBankInstructions}
-                  >
-                    {t('action_add_to_invoice')}
-                  </Button>
-                  <Button
-                    type="secondary"
-                    behavior="button"
-                    onClick={() => setBankInstructions(null)}
-                  >
-                    {t('cancel')}
-                  </Button>
-                </div>
-              </div>
-            )}
+            <Button
+              type="secondary"
+              behavior="button"
+              onClick={() => window.open(gatewaysHref, '_blank')}
+            >
+              {t('add_gateway')}
+            </Button>
           </Callout>
         </div>
       ) : null}
