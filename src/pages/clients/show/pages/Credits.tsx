@@ -51,6 +51,7 @@ export default function Credits() {
       hideEditableOptions={!hasPermission('edit_credit')}
       withoutPageAsPreference
       withRecordScopedFilters
+      recordScopeId={id}
     />
   );
 }

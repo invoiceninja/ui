@@ -9,6 +9,9 @@ const mocks = vi.hoisted(() => ({
   update: vi.fn(),
   storeSession: vi.fn(),
   storeScoped: vi.fn(),
+  scopedStoredFilters: undefined as
+    | { filter?: string; status?: string[] }
+    | undefined,
 }));
 
 vi.mock('$app/common/hooks/useCurrentUser', () => ({
@@ -39,7 +42,11 @@ vi.mock('$app/common/hooks/useDataTablePreference', () => ({
 }));
 
 vi.mock('$app/common/hooks/useScopedTableFilters', () => ({
-  useScopedTableFilters: () => ({ storeFilters: mocks.storeScoped }),
+  useScopedTableFilters: () => ({
+    scopeId: 'record-1',
+    storedFilters: mocks.scopedStoredFilters,
+    storeFilters: mocks.storeScoped,
+  }),
 }));
 
 import { useDataTablePreferences } from '$app/common/hooks/useDataTablePreferences';
@@ -79,6 +86,7 @@ function mount(overrides: Partial<Params> = {}) {
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.settings = { persist_table_filters: true };
+  mocks.scopedStoredFilters = undefined;
 });
 
 afterEach(() => {
@@ -165,8 +173,33 @@ test('retains session storage when server persistence is disabled', () => {
   expect(mocks.save).not.toHaveBeenCalled();
 });
 
+test('record-scoped tables do not inherit session text filters', () => {
+  mocks.settings.table_filters = {
+    invoices: { filter: 'DAVID', status: ['active'] },
+  };
+  const { params } = mount({
+    withRecordScopedFilters: true,
+    recordScopeId: 'record-1',
+  });
+  expect(params.setFilter).toHaveBeenCalledWith('');
+});
+
+test('record-scoped tables restore text from scoped storage for the active record', () => {
+  mocks.scopedStoredFilters = { filter: 'DAVID', status: ['active'] };
+
+  const { params } = mount({
+    withRecordScopedFilters: true,
+    recordScopeId: 'record-1',
+  });
+
+  expect(params.setFilter).toHaveBeenCalledWith('DAVID');
+});
+
 test('stores record-scoped state without saving server preferences', () => {
-  const { save } = mount({ withRecordScopedFilters: true });
+  const { save } = mount({
+    withRecordScopedFilters: true,
+    recordScopeId: 'record-1',
+  });
   act(() => save('search', 'due_date', 'due_date|desc', 2, ['active'], '10'));
   expect(mocks.storeScoped).toHaveBeenCalledExactlyOnceWith({
     filter: 'search',
