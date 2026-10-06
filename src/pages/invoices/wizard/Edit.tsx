@@ -70,7 +70,7 @@ export default function Edit() {
       .flush()
       .then((saved) => {
         if (!saved) {
-          return toast.error();
+          return;
         }
 
         toast.success('updated_invoice');
@@ -87,7 +87,7 @@ export default function Edit() {
       .flush()
       .then((saved) => {
         if (!saved) {
-          return Promise.reject(new Error('not saved'));
+          return;
         }
 
         $refetch(['invoices']);

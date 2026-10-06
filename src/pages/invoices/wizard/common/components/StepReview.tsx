@@ -20,6 +20,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useFreePlanDesigns } from '$app/common/hooks/useFreePlanDesigns';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { Client } from '$app/common/interfaces/client';
 import { Design } from '$app/common/interfaces/design';
@@ -56,6 +57,7 @@ export function StepReview({ wizard }: Props) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const refreshCompanyUsers = useRefreshCompanyUsers();
+  const showPlanAlert = useShouldDisableAdvanceSettings();
   const getSetting = useGetSetting();
   const { isOwner } = useAdmin();
   const freePlanDesigns = useFreePlanDesigns();
@@ -162,14 +164,17 @@ export function StepReview({ wizard }: Props) {
 
   useEffect(() => {
     const onFocus = () => {
-      void refreshCompanyUsers();
+      if (!showPlanAlert) {
+        void refreshCompanyUsers();
+      }
+
       void lookUpGateways();
     };
 
     window.addEventListener('focus', onFocus);
 
     return () => window.removeEventListener('focus', onFocus);
-  }, [lookUpGateways]);
+  }, [lookUpGateways, showPlanAlert]);
 
   const saveAttachment = (key: AttachmentKey, value: boolean) => {
     if (!company?.id) {
@@ -198,7 +203,7 @@ export function StepReview({ wizard }: Props) {
   const deliver = () => {
     return wizard.flush().then((id) => {
       if (!id) {
-        return Promise.reject(new Error('draft not saved'));
+        return;
       }
 
       $refetch(['invoices']);
@@ -522,7 +527,6 @@ export function StepReview({ wizard }: Props) {
               .flush()
               .then((id) => {
                 if (!id) {
-                  toast.error();
                   return;
                 }
 

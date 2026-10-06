@@ -21,6 +21,7 @@ import { Button, InputField } from '$app/components/forms';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { firstErrorMessage } from '../helpers/first-error';
 
 interface Props {
   section?: 'name' | 'brand';
@@ -116,6 +117,11 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
       .finally(() => setUploading(false));
   };
 
+  const otherError = firstErrorMessage(errors, [
+    'settings.name',
+    'company_logo',
+  ]);
+
   if (!showName && !showBrand) {
     return null;
   }
@@ -140,7 +146,7 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
                 changeOverride
                 debounceTimeout={0}
                 onValueChange={setName}
-                errorMessage={errors?.errors['settings.name']}
+                errorMessage={errors?.errors['settings.name'] ?? otherError}
               />
             </div>
 
@@ -215,9 +221,9 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
             </div>
           )}
 
-          {errors?.errors.company_logo ? (
+          {errors?.errors.company_logo || (!showName && otherError) ? (
             <p className="text-xs text-red-600">
-              {errors.errors.company_logo[0]}
+              {errors?.errors.company_logo?.[0] ?? otherError}
             </p>
           ) : null}
 

@@ -28,6 +28,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { toast } from '$app/common/helpers/toast/toast';
 import { AxiosError } from 'axios';
 import { today } from '../helpers/dates';
+import { firstErrorMessage } from '../helpers/first-error';
 import { cloneDeep } from 'lodash';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { useAtom } from 'jotai';
@@ -154,13 +155,15 @@ const ERROR_STEPS: { prefix: string; step: StepKey }[] = [
   { prefix: 'terms', step: 'notes' },
 ];
 
+const ownsKey = (prefix: string, key: string): boolean => {
+  return key === prefix || key.startsWith(`${prefix}.`);
+};
+
 const errorStep = (bag: ValidationBag): StepKey | undefined => {
   const keys = Object.keys(bag.errors ?? {});
 
   return ERROR_STEPS.find((entry) => {
-    return keys.some(
-      (key) => key === entry.prefix || key.startsWith(`${entry.prefix}.`)
-    );
+    return keys.some((key) => ownsKey(entry.prefix, key));
   })?.step;
 };
 
@@ -395,13 +398,22 @@ export function useWizard(existingId?: string): Wizard {
       })
       .catch((caught: AxiosError<ValidationBag>) => {
         if (caught.response?.status !== 422) {
+          toast.error();
+
           return null;
         }
 
         const bag = caught.response.data;
 
-        if (bag.errors?.amount) {
-          toast.error(bag.errors.amount[0]);
+        const stray = firstErrorMessage(
+          bag,
+          Object.keys(bag.errors ?? {}).filter((key) => {
+            return ERROR_STEPS.some((entry) => ownsKey(entry.prefix, key));
+          })
+        );
+
+        if (stray) {
+          toast.error(stray);
         }
 
         setErrors(bag);
@@ -409,13 +421,13 @@ export function useWizard(existingId?: string): Wizard {
         const owner = errorStep(bag);
         const target = STEPS.find((entry) => entry.key === owner);
 
-        if (target && target.href !== location.pathname) {
+        if (!existingId && target && target.href !== location.pathname) {
           navigate(target.href);
         }
 
         return null;
       });
-  }, [navigate, location.pathname]);
+  }, [navigate, location.pathname, existingId]);
 
   const attachClient = useCallback(
     (next: Client) => {

@@ -20,6 +20,7 @@ import dayjs from 'dayjs';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { Badge } from '$app/components/Badge';
 import { Button, InputField } from '$app/components/forms';
 import { Callout } from './Callout';
 import { Choice } from './Choice';
@@ -169,9 +170,17 @@ export function StepTiming({ wizard, embedded }: Props) {
             selected={term === days}
             onSelect={() => choose(days)}
             title={
-              days === 0
-                ? t('due_on_receipt')
-                : trans('count_days', { count: days })
+              <>
+                {days === 0
+                  ? t('due_on_receipt')
+                  : trans('count_days', { count: days })}
+
+                {days === defaultDays ? (
+                  <Badge className="ml-2" variant="primary">
+                    {t('default')}
+                  </Badge>
+                ) : null}
+              </>
             }
             trailing={
               days > 0
@@ -268,12 +277,6 @@ export function StepTiming({ wizard, embedded }: Props) {
             </Button>
           </Callout>
         </div>
-      ) : null}
-
-      {defaultSaved ? (
-        <p className="text-xs mt-6" style={{ color: colors.$17 }}>
-          {t('new_invoices_use_this_by_default')}
-        </p>
       ) : null}
 
       {embedded ? null : (

@@ -31,6 +31,7 @@ import { StepTransition } from './StepTransition';
 import { Wizard } from '../hooks/useWizard';
 import { useSaveClientContact } from '../hooks/useSaveClientContact';
 import { contactEmail, emailableContact } from '../helpers/client-contact';
+import { firstErrorMessage } from '../helpers/first-error';
 
 interface Props {
   wizard: Wizard;
@@ -327,12 +328,23 @@ export function StepRecipient({ wizard }: Props) {
       });
   };
 
+  const showSuggestions = !dismissedSearch && matches.length > 0;
+  const showEmail = selected ? !selectedEmail : unmatched;
+
+  const renderedFields = [
+    'name',
+    ...(showEmail ? ['contacts.0.email'] : []),
+    ...(showAddress
+      ? ['address1', 'city', 'state', 'postal_code', 'country_id']
+      : []),
+    ...(showAddress && vatZone ? ['vat_number'] : []),
+  ];
+
   const nameError =
     errors?.errors?.name ??
     wizard.errors?.errors?.client_id ??
-    wizard.errors?.errors?.invitations;
-  const showSuggestions = !dismissedSearch && matches.length > 0;
-  const showEmail = selected ? !selectedEmail : unmatched;
+    wizard.errors?.errors?.invitations ??
+    firstErrorMessage(errors, renderedFields);
 
   return (
     <StepTransition>
@@ -521,6 +533,7 @@ export function StepRecipient({ wizard }: Props) {
                 onValueChange={(value) =>
                   setAddress({ ...address, address1: value })
                 }
+                errorMessage={errors?.errors.address1}
               />
               <InputField
                 id="iw-customer-city"
@@ -531,6 +544,7 @@ export function StepRecipient({ wizard }: Props) {
                 onValueChange={(value) =>
                   setAddress({ ...address, city: value })
                 }
+                errorMessage={errors?.errors.city}
               />
             </div>
 
@@ -544,6 +558,7 @@ export function StepRecipient({ wizard }: Props) {
                 onValueChange={(value) =>
                   setAddress({ ...address, state: value })
                 }
+                errorMessage={errors?.errors.state}
               />
               <InputField
                 id="iw-customer-postcode"
@@ -554,6 +569,7 @@ export function StepRecipient({ wizard }: Props) {
                 onValueChange={(value) =>
                   setAddress({ ...address, postal_code: value })
                 }
+                errorMessage={errors?.errors.postal_code}
               />
             </div>
 

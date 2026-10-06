@@ -12,6 +12,7 @@ import { useColorScheme } from '$app/common/colors';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { AdvancedConfigurationToggle } from './common/components/AdvancedConfigurationToggle';
+import { UpgradeAlert } from './common/components/UpgradeAlert';
 import { Badge } from '$app/components/Badge';
 import { Page } from '$app/components/Breadcrumbs';
 import { Spinner } from '$app/components/Spinner';
@@ -70,6 +71,8 @@ export default function Wizard() {
         className="mx-auto w-full"
         style={{ maxWidth: wideStep ? '54rem' : '40rem' }}
       >
+        <UpgradeAlert />
+
         <Card
           className="shadow-sm"
           title={t(current.title)}

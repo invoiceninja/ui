@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { Modal } from '$app/components/Modal';
 import { Button, InputField } from '$app/components/forms';
 import { contactEmail, emailableContact } from '../helpers/client-contact';
+import { firstErrorMessage } from '../helpers/first-error';
 import { useSaveClientContact } from '../hooks/useSaveClientContact';
 
 interface Props {
@@ -115,7 +116,13 @@ export function ClientContactModal({ open, client, onClose, onSaved }: Props) {
           changeOverride
           debounceTimeout={0}
           onValueChange={(value) => setContact({ ...contact, email: value })}
-          errorMessage={errors?.errors['contacts.0.email']}
+          errorMessage={
+            errors?.errors['contacts.0.email'] ??
+            firstErrorMessage(errors, [
+              'contacts.0.first_name',
+              'contacts.0.last_name',
+            ])
+          }
         />
 
         <div className="flex items-center justify-end gap-2 pt-1">

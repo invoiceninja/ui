@@ -22,6 +22,7 @@ import { useDispatch } from 'react-redux';
 import { Modal } from '$app/components/Modal';
 import { Button, InputField } from '$app/components/forms';
 import { Choice } from './Choice';
+import { firstErrorMessage } from '../helpers/first-error';
 import { Legend } from './Legend';
 
 export interface AppliedTax {
@@ -149,7 +150,9 @@ export function TaxSetup({
           changeOverride
           debounceTimeout={0}
           onValueChange={setName}
-          errorMessage={errors?.errors.name}
+          errorMessage={
+            errors?.errors.name ?? firstErrorMessage(errors, ['rate'])
+          }
         />
 
         <InputField

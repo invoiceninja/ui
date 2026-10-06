@@ -20,10 +20,11 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { updateRecord } from '$app/common/stores/slices/company-users';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
+import { Product } from '$app/common/interfaces/product';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Button, InputField, InputLabel } from '$app/components/forms';
+import { Button, InputLabel } from '$app/components/forms';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 import { Callout } from './Callout';
@@ -38,7 +39,14 @@ import { MoneyRow } from './MoneyRow';
 import { RemoveItemButton } from './RemoveItemButton';
 import { TaxChip } from './TaxChip';
 import { AppliedTax, TaxSetup } from './TaxSetup';
-import { WorkPicker, WorkSource } from './WorkPicker';
+import { WorkPicker } from './WorkPicker';
+import { ItemDescriptionField } from './ItemDescriptionField';
+import {
+  WorkRow,
+  WorkSource,
+  loadWorkRows,
+  productFields,
+} from '../helpers/work-rows';
 
 interface Props {
   wizard: Wizard;
@@ -72,6 +80,7 @@ export function StepItems({ wizard, embedded }: Props) {
   const [rates, setRates] = useState<TaxRate[]>([]);
   const [inclusiveAnswered, setInclusiveAnswered] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
+  const [unbilled, setUnbilled] = useState<WorkRow[]>([]);
 
   const enabledTaxSlots = company?.enabled_item_tax_rates ?? 0;
   const taxSlotCount = Math.max(1, enabledTaxSlots);
@@ -88,6 +97,26 @@ export function StepItems({ wizard, embedded }: Props) {
       .then((response) => setRates(response.data.data ?? []))
       .catch(() => setRates([]));
   }, []);
+
+  const clientId = wizard.invoice?.client_id ?? '';
+
+  useEffect(() => {
+    if (!clientId) {
+      setUnbilled([]);
+
+      return;
+    }
+
+    let cancelled = false;
+
+    loadWorkRows('work', '', clientId)
+      .then((rows) => !cancelled && setUnbilled(rows))
+      .catch(() => !cancelled && setUnbilled([]));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [clientId]);
 
   const update = (index: number, changes: Partial<InvoiceItem>) => {
     wizard.setLineItems(
@@ -106,6 +135,20 @@ export function StepItems({ wizard, embedded }: Props) {
 
   const removeRow = (index: number) => {
     wizard.setLineItems(items.filter((_, position) => position !== index));
+  };
+
+  const applyProduct = (index: number, product: Product) => {
+    if (product.tax_name1 || product.tax_name2 || product.tax_name3) {
+      ensureTaxSlot();
+    }
+
+    wizard.setLineItems(
+      items.map((existing, position) =>
+        position === index
+          ? { ...existing, ...productFields(product) }
+          : existing
+      )
+    );
   };
 
   const applyTax = (tax: AppliedTax) => {
@@ -168,6 +211,16 @@ export function StepItems({ wizard, embedded }: Props) {
   };
 
   const clientName = wizard.client?.display_name || wizard.client?.name || '';
+  const usedWork = items
+    .map((item) => {
+      if (item.task_id) {
+        return `task-${item.task_id}`;
+      }
+
+      return item.expense_id ? `expense-${item.expense_id}` : '';
+    })
+    .filter(Boolean);
+  const pendingWork = unbilled.filter((row) => !usedWork.includes(row.id));
   const recipientEmail = contactEmail(emailableContact(wizard.client));
   const totals = wizard.totals;
   const inclusive = Boolean(wizard.invoice?.uses_inclusive_taxes);
@@ -244,15 +297,11 @@ export function StepItems({ wizard, embedded }: Props) {
                 <RemoveItemButton onClick={() => removeRow(index)} />
               ) : null}
 
-              <InputField
+              <ItemDescriptionField
                 id={`iw-desc-${key}`}
-                width="100%"
-                label={t('description')}
-                placeholder={t('item_description')}
                 value={item.notes}
-                changeOverride
-                debounceTimeout={0}
-                onValueChange={(value) => update(index, { notes: value })}
+                onChange={(value) => update(index, { notes: value })}
+                onPick={(product) => applyProduct(index, product)}
                 errorMessage={
                   wizard.errors?.errors[`line_items.${index}.notes`]
                 }
@@ -354,14 +403,16 @@ export function StepItems({ wizard, embedded }: Props) {
           {t('product_catalogue', { defaultValue: 'Product Catalogue' })}
         </button>
 
-        <button
-          type="button"
-          onClick={() => setPicker('work')}
-          className="text-sm"
-          style={{ color: accentColor, fontWeight: 500 }}
-        >
-          {t('add_from_tasks', { defaultValue: 'Add From Tasks' })}
-        </button>
+        {pendingWork.length ? (
+          <button
+            type="button"
+            onClick={() => setPicker('work')}
+            className="text-sm"
+            style={{ color: accentColor, fontWeight: 500 }}
+          >
+            {`${t('unbilled_work')} (${pendingWork.length})`}
+          </button>
+        ) : null}
       </div>
 
       <div
@@ -478,7 +529,8 @@ export function StepItems({ wizard, embedded }: Props) {
       <WorkPicker
         open={picker !== null}
         source={picker ?? 'saved'}
-        clientId={wizard.invoice?.client_id ?? ''}
+        clientId={clientId}
+        exclude={usedWork}
         onClose={() => setPicker(null)}
         onPick={(item) => {
           const blankIndex = items.findIndex(
