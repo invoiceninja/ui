@@ -70,6 +70,7 @@ export default function Projects() {
       hideEditableOptions={!hasPermission('edit_project')}
       withoutPageAsPreference
       withRecordScopedFilters
+      recordScopeId={id}
     />
   );
 }

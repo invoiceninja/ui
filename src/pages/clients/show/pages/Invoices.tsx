@@ -77,6 +77,7 @@ export default function Invoices() {
           (verifactuEnabled && invoice.status_id === InvoiceStatus.Draft)
         }
         withRecordScopedFilters
+        recordScopeId={id}
       />
 
       <DeleteInvoicesConfirmationModal

@@ -67,6 +67,7 @@ export default function Tasks() {
       hideEditableOptions={!hasPermission('edit_task')}
       withoutPageAsPreference
       withRecordScopedFilters
+      recordScopeId={id}
     />
   );
 }
