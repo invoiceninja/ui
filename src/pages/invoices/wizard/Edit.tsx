@@ -58,7 +58,7 @@ export default function Edit() {
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
-    { name: t('edit_invoice'), href: `/invoices/wizard/edit/${id}` },
+    { name: t('edit_invoice'), href: `/invoices/${id}/guided` },
   ];
 
   const recipient = contactEmail(emailableContact(wizard.client));

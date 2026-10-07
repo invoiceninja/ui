@@ -38,23 +38,23 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 export type StepKey = 'who' | 'what' | 'when' | 'notes' | 'send';
 
 export const STEPS: { key: StepKey; title: string; href: string }[] = [
-  { key: 'who', title: 'client_details', href: '/invoices/wizard' },
+  { key: 'who', title: 'client_details', href: '/invoices/guided' },
   {
     key: 'what',
     title: 'what_are_you_charging_for',
-    href: '/invoices/wizard/items',
+    href: '/invoices/guided/items',
   },
   {
     key: 'when',
     title: 'payment_terms',
-    href: '/invoices/wizard/payment',
+    href: '/invoices/guided/payment',
   },
   {
     key: 'notes',
     title: 'terms',
-    href: '/invoices/wizard/notes',
+    href: '/invoices/guided/notes',
   },
-  { key: 'send', title: 'review_and_send', href: '/invoices/wizard/send' },
+  { key: 'send', title: 'review_and_send', href: '/invoices/guided/send' },
 ];
 
 const SERVER_OWNED: (keyof Invoice)[] = [

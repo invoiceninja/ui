@@ -15,8 +15,8 @@ import { useReactSettingsField } from './useReactSettings';
 export const GUIDED_INVOICE_ROLLOUT_DATE = '2026-08-09';
 
 export const GUIDED_INVOICE_PATHS = {
-  create: '/invoices/wizard',
-  edit: '/invoices/wizard/edit/:id',
+  create: '/invoices/guided',
+  edit: '/invoices/:id/guided',
 };
 
 export const DETAILED_INVOICE_PATHS = {

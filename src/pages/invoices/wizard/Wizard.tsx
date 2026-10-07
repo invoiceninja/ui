@@ -42,7 +42,7 @@ export default function Wizard() {
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
-    { name: t('new_invoice'), href: '/invoices/wizard' },
+    { name: t('new_invoice'), href: '/invoices/guided' },
   ];
 
   const current = STEPS[wizard.stepIndex] ?? STEPS[0];

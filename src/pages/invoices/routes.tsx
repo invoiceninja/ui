@@ -106,7 +106,7 @@ export const invoiceRoutes = (
     />
 
     <Route
-      path="wizard"
+      path="guided"
       element={
         <Guard
           guards={[
@@ -125,7 +125,7 @@ export const invoiceRoutes = (
     </Route>
 
     <Route
-      path="wizard/edit/:id"
+      path=":id/guided"
       element={
         <Guard
           guards={[
