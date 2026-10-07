@@ -47,6 +47,7 @@ interface Params {
   withoutStoringPage?: boolean;
   withoutStoringPreferences?: boolean;
   withRecordScopedFilters?: boolean;
+  recordScopeId?: string;
 }
 
 export function useDataTablePreferences(params: Params) {
@@ -75,6 +76,7 @@ export function useDataTablePreferences(params: Params) {
     withoutStoringPage,
     withoutStoringPreferences,
     withRecordScopedFilters,
+    recordScopeId,
   } = params;
 
   const getPreference = useDataTablePreference({ tableKey });
@@ -83,9 +85,12 @@ export function useDataTablePreferences(params: Params) {
     tableKey,
   });
 
-  // The global toggle only gates server-side persistence. The session text
-  // filter always flows so it can bubble down to sub-tables (client overview).
+  // The global toggle only gates server-side persistence. List-page text filters
+  // use session storage; overview sub-tables use scoped in-memory text per record.
   const persistTableFilters = reactSettings.persist_table_filters !== false;
+
+  const isRecordScopeActive =
+    !recordScopeId || scopeId === recordScopeId;
 
   const handleUpdateTableFilters = (
     filter: string,
@@ -100,6 +105,10 @@ export function useDataTablePreferences(params: Params) {
     }
 
     if (withRecordScopedFilters) {
+      if (!isRecordScopeActive) {
+        return;
+      }
+
       storeFilters({
         filter,
         customFilter,
@@ -186,7 +195,7 @@ export function useDataTablePreferences(params: Params) {
   const appliedRef = useRef<boolean>(false);
   useEffect(() => {
     appliedRef.current = false;
-  }, [tableKey, scopeId]);
+  }, [tableKey, scopeId, recordScopeId]);
 
   const rawAtom = useAtomValue(reactSettingsAtom);
   const isHydrated = rawAtom !== null;
@@ -250,10 +259,10 @@ export function useDataTablePreferences(params: Params) {
     }
 
     if (withRecordScopedFilters) {
-      if (storedFilters) {
+      if (isRecordScopeActive && storedFilters) {
         applyScopedFilters(storedFilters);
       } else {
-        setFilter((getPreference('filter') as string) || '');
+        setFilter('');
 
         if (persistTableFilters) {
           applyServerPreferences();
@@ -278,7 +287,7 @@ export function useDataTablePreferences(params: Params) {
       applyServerPreferences();
       markAsApplied();
     }
-  }, [isInitialConfiguration, isHydrated, tableKey, scopeId]);
+  }, [isInitialConfiguration, isHydrated, tableKey, scopeId, recordScopeId]);
 
   return { handleUpdateTableFilters };
 }
