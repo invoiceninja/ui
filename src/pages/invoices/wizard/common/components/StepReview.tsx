@@ -294,7 +294,7 @@ export function StepReview({ wizard }: Props) {
 
             {designsFailed ? (
               <p className="text-sm" style={{ color: colors.$17 }}>
-                {t('layouts_could_not_be_loaded')}
+                {t('designs', { defaultValue: 'Layouts could not be loaded' })}
               </p>
             ) : (
               <div className="flex flex-wrap gap-2">

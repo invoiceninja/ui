@@ -134,7 +134,7 @@ export function BrandPrompts({ section, logoSkipped, onSkipLogo }: Props) {
             className="text-sm mb-2"
             style={{ color: colors.$3, fontWeight: 500 }}
           >
-            {t('invoice_needs_business_name')}
+            {t('set_name')}
           </p>
 
           <div className="flex items-end gap-2">

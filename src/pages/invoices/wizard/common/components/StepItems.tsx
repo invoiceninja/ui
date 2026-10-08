@@ -479,7 +479,7 @@ export function StepItems({ wizard, embedded }: Props) {
         />
       </div>
 
-      {!taxesConfigured && !wizard.dismissed('tax') ? (
+      {/* {!taxesConfigured && !wizard.dismissed('tax') ? (
         <div className="mt-6">
           <Callout title={t('do_you_need_to_charge_tax')}>
             <div className="flex items-center gap-2">
@@ -503,7 +503,7 @@ export function StepItems({ wizard, embedded }: Props) {
             </div>
           </Callout>
         </div>
-      ) : null}
+      ) : null} */}
 
       {embedded ? null : (
         <>

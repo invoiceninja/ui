@@ -168,20 +168,20 @@ export function TaxSetup({
 
         {asking ? (
           <div>
-            <Legend>{t('is_tax_included_in_prices')}</Legend>
+            <Legend>{t('tax_settings')}</Legend>
 
             <div className="space-y-2" role="radiogroup">
               <Choice
                 selected={inclusive === false}
                 onSelect={() => setInclusive(false)}
-                title={t('no_add_tax_on_top')}
-                detail={t('no_add_tax_on_top_help')}
+                title={t('exclusive_taxes')}
+                detail={t('exclusive_taxes_help')}
               />
               <Choice
                 selected={inclusive === true}
                 onSelect={() => setInclusive(true)}
-                title={t('yes_prices_include_tax')}
-                detail={t('yes_prices_include_tax_help')}
+                title={t('inclusive_taxes')}
+                detail={t('inclusive_taxes_help')}
               />
             </div>
           </div>
@@ -198,7 +198,7 @@ export function TaxSetup({
             disableWithoutIcon={!busy}
             onClick={apply}
           >
-            {`${t('apply')} ${t('tax')}`}
+            {t('add_tax')}
           </Button>
         </div>
       </div>
