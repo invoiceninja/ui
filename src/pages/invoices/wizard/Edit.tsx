@@ -9,6 +9,7 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -58,7 +59,10 @@ export default function Edit() {
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
-    { name: t('edit_invoice'), href: `/invoices/${id}/guided` },
+    {
+      name: numberBreadcrumb(wizard.invoice?.number, t('edit_invoice')),
+      href: `/invoices/${id}/guided`,
+    },
   ];
 
   const recipient = contactEmail(emailableContact(wizard.client));
