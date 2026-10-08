@@ -199,6 +199,7 @@ interface Props<T> extends CommonProps {
   withoutPageAsPreference?: boolean;
   withoutStoringPreferences?: boolean;
   withRecordScopedFilters?: boolean;
+  recordScopeId?: string;
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
   enableSavingFilterPreference?: boolean;
@@ -312,6 +313,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutPageAsPreference = false,
     withoutStoringPreferences = false,
     withRecordScopedFilters = false,
+    recordScopeId,
     filterColumns,
     onSelectedResourcesChange,
     preSelected = [],
@@ -405,6 +407,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutStoringPage: withoutPageAsPreference,
     withoutStoringPreferences,
     withRecordScopedFilters,
+    recordScopeId,
     enableSavingFilterPreference,
   });
 

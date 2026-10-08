@@ -59,6 +59,7 @@ export default function Payments() {
       }
       withoutPageAsPreference
       withRecordScopedFilters
+      recordScopeId={id}
     />
   );
 }
