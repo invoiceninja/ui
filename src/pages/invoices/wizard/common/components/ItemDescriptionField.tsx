@@ -13,7 +13,8 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Product } from '$app/common/interfaces/product';
-import { InputField } from '$app/components/forms';
+import { InputField, InputLabel } from '$app/components/forms';
+import { Spinner } from '$app/components/Spinner';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -39,6 +40,7 @@ export function ItemDescriptionField({
   const [query, setQuery] = useState('');
   const [matches, setMatches] = useState<Product[]>([]);
   const [active, setActive] = useState(-1);
+  const [searching, setSearching] = useState(false);
 
   const box = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
@@ -50,6 +52,7 @@ export function ItemDescriptionField({
     if (term.length < 2) {
       setMatches([]);
       setActive(-1);
+      setSearching(false);
 
       return;
     }
@@ -57,6 +60,8 @@ export function ItemDescriptionField({
     let cancelled = false;
 
     const timer = setTimeout(() => {
+      setSearching(true);
+
       request(
         'GET',
         endpoint(
@@ -80,7 +85,8 @@ export function ItemDescriptionField({
           }
 
           setMatches([]);
-        });
+        })
+        .finally(() => !cancelled && setSearching(false));
     }, 300);
 
     return () => {
@@ -150,32 +156,52 @@ export function ItemDescriptionField({
         }
       }}
     >
-      <InputField
-        id={id}
-        innerRef={input}
-        width="100%"
-        label={t('description')}
-        placeholder={t('item_description')}
-        value={value}
-        changeOverride
-        debounceTimeout={0}
-        onValueChange={(next) => {
-          if (next === value || next === value.replace(/[\r\n]/g, '')) {
-            return;
-          }
+      <InputLabel className="mb-1" for={id}>
+        {t('description')}
+      </InputLabel>
 
-          onChange(next);
-          setQuery(next);
-        }}
-        errorMessage={errorMessage}
-      />
+      <div className="flex items-start">
+        <div className="flex-1 min-w-0">
+          <InputField
+            id={id}
+            innerRef={input}
+            width="100%"
+            placeholder={t('item_description')}
+            value={value}
+            changeOverride
+            debounceTimeout={0}
+            onValueChange={(next) => {
+              if (next === value || next === value.replace(/[\r\n]/g, '')) {
+                return;
+              }
+
+              onChange(next);
+              setQuery(next);
+            }}
+            errorMessage={errorMessage}
+          />
+        </div>
+
+        <span
+          className="shrink-0 overflow-hidden flex items-center justify-end"
+          style={{
+            width: searching ? '1.875rem' : 0,
+            height: '2.6875rem',
+            transition: 'width 150ms ease',
+          }}
+          aria-hidden={!searching}
+        >
+          <Spinner />
+        </span>
+      </div>
 
       {matches.length ? (
         <div
           id={listId}
           role="listbox"
-          className="absolute left-0 right-0 mt-1.5 z-20 border overflow-hidden"
+          className="absolute left-0 mt-1.5 z-20 border overflow-hidden"
           style={{
+            right: searching ? '1.875rem' : 0,
             backgroundColor: colors.$1,
             borderColor: colors.$24,
             borderRadius: '0.375rem',
