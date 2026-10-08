@@ -27,7 +27,6 @@ import { useDispatch } from 'react-redux';
 import { Button, InputLabel } from '$app/components/forms';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
-import { Callout } from './Callout';
 import { ClientContactModal } from './ClientContactModal';
 import { StepFooter } from './StepFooter';
 import { StepTransition } from './StepTransition';
@@ -479,7 +478,7 @@ export function StepItems({ wizard, embedded }: Props) {
         />
       </div>
 
-      {!taxesConfigured && !wizard.dismissed('tax') ? (
+      {/* {!taxesConfigured && !wizard.dismissed('tax') ? (
         <div className="mt-6">
           <Callout title={t('do_you_need_to_charge_tax')}>
             <div className="flex items-center gap-2">
@@ -503,7 +502,7 @@ export function StepItems({ wizard, embedded }: Props) {
             </div>
           </Callout>
         </div>
-      ) : null}
+      ) : null} */}
 
       {embedded ? null : (
         <>
