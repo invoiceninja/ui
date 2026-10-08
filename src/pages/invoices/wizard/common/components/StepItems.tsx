@@ -27,7 +27,6 @@ import { useDispatch } from 'react-redux';
 import { Button, InputLabel } from '$app/components/forms';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
-import { Callout } from './Callout';
 import { ClientContactModal } from './ClientContactModal';
 import { StepFooter } from './StepFooter';
 import { StepTransition } from './StepTransition';
