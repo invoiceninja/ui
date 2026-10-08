@@ -37,6 +37,7 @@ interface Props {
   resourceId?: string;
   resourceType?: 'client' | 'company';
   taxData: TaxDataPayload | undefined;
+  clientCountryId?: string;
   refetchInvoices?: boolean;
   buttonClassName?: string;
   buttonType?: 'minimal' | 'secondary';
@@ -55,6 +56,7 @@ export function TaxDataModal({
   resourceId,
   resourceType,
   taxData,
+  clientCountryId,
   refetchInvoices,
   buttonClassName,
   buttonType = 'minimal',
@@ -75,7 +77,7 @@ export function TaxDataModal({
   };
 
   const handleSave = () => {
-    if (!isFormBusy) {
+    if (!isFormBusy && resourceId && resourceType) {
       toast.processing();
 
       setIsFormBusy(true);
@@ -86,7 +88,9 @@ export function TaxDataModal({
         endpointURL = '/api/v1/companies/updateOriginTaxData/:id';
       }
 
-      request('POST', endpoint(endpointURL, { id: resourceId }))
+      request('POST', endpoint(endpointURL, { id: resourceId }), undefined, {
+        skipIntercept: true,
+      })
         .then((response) => {
           if (resourceType === 'client') {
             refetch(['clients']);
@@ -105,13 +109,15 @@ export function TaxDataModal({
 
           handleClose();
         })
+        .catch(() => toast.error())
         .finally(() => setIsFormBusy(false));
     }
   };
 
   const getFormattedValue = (key: string, value: string | number) => {
     if (key === 'taxSales' || key === 'taxUse') {
-      return `${((value || 0) as number) * 100} %`;
+      // Round display-only floating-point noise without padding whole rates.
+      return `${Number((Number(value || 0) * 100).toFixed(6))} %`;
     }
 
     return value;
@@ -124,7 +130,9 @@ export function TaxDataModal({
   }, [taxData]);
 
   if (
-    currentCompany?.settings.country_id !== '840' ||
+    (resourceType === 'client'
+      ? clientCountryId !== '840'
+      : currentCompany?.settings.country_id !== '840') ||
     !currentCompany?.calculate_taxes
   ) {
     return null;
@@ -145,14 +153,10 @@ export function TaxDataModal({
         title={t('tax_details')}
         visible={isModalOpen}
         onClose={handleClose}
-        size={
-          TAX_INFO_DATA.length && TAX_INFO_DATA.every(([key, value]) => value)
-            ? 'small'
-            : 'extraSmall'
-        }
+        size={TAX_INFO_DATA.length ? 'small' : 'extraSmall'}
         disableClosing={isFormBusy}
       >
-        {TAX_INFO_DATA.length && TAX_INFO_DATA.every(([, value]) => value) ? (
+        {TAX_INFO_DATA.length > 0 && (
           <div className="grid grid-cols-2 gap-4">
             {TAX_INFO_DATA.map(([key, value]) => (
               <div key={key} className="flex items-center gap-x-2">
@@ -169,8 +173,15 @@ export function TaxDataModal({
               </div>
             ))}
           </div>
-        ) : (
-          <Button className="w-full" behavior="button" onClick={handleSave}>
+        )}
+
+        {resourceId && resourceType && (
+          <Button
+            className="w-full mt-4"
+            behavior="button"
+            onClick={handleSave}
+            disabled={isFormBusy}
+          >
             {t('update_tax_details')}
           </Button>
         )}
