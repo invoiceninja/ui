@@ -16,7 +16,7 @@ export function PeppolDiscovery({
   const [t] = useTranslation();
   const company = useCurrentCompany();
   const enabled =
-    // isHosted() &&
+    isHosted() &&
     Number(company?.legal_entity_id) > 0 &&
     company?.settings.e_invoice_type === 'PEPPOL';
   const [busy, setBusy] = useState(false);

@@ -159,7 +159,7 @@ export function Details(props: Props) {
 
       {props.page === 'edit' &&
         props.client &&
-        // isHosted() &&
+        isHosted() &&
         Number(company?.legal_entity_id) > 0 &&
         company?.settings.e_invoice_type === 'PEPPOL' && (
           <Element>
