@@ -57,7 +57,7 @@ export function Dropdown(props: Props) {
   const colors = useColorScheme();
   const accentColor = useAccentColor();
 
-  const [children, setChildren] = useState<ReactNode>();
+  const [children, setChildren] = useState<ReactNode[]>();
 
   const getPropsWithChildType = (
     childType: string | typeof DropdownElement,
@@ -99,17 +99,15 @@ export function Dropdown(props: Props) {
             }}
             data-cy={props.cypressRef}
           >
-            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-            {/* @ts-ignore */}
-            {children?.map((child, index: number) =>
-              child &&
-              (child['type'] == DropdownElement || child['type'] == 'div')
-                ? cloneElement(
-                    child,
-                    getPropsWithChildType(child['type'], index)
-                  )
-                : child
-            )}
+            {visible &&
+              children?.map((child: any, index: number) =>
+                child && (child.type == DropdownElement || child.type == 'div')
+                  ? cloneElement(
+                      child,
+                      getPropsWithChildType(child.type, index)
+                    )
+                  : child
+              )}
           </DropdownElements>
         )}
         visible={visible}
