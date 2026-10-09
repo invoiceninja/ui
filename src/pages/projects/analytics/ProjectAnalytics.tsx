@@ -11,6 +11,7 @@
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import { ModuleBitmask } from '$app/common/enums/module-bitmask';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Project } from '$app/common/interfaces/project';
@@ -26,7 +27,6 @@ import { useProjectAnalyticsQuery } from '$app/common/queries/project-analytics'
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
 import { Burnup } from '$app/pages/projects/burnup/Burnup';
-import { ModuleBitmask } from '$app/pages/settings';
 import { AnalyticsCard } from './components/AnalyticsCard';
 import { AnalyticsStatCard } from './components/AnalyticsStatCard';
 import { ForecastSummary } from './components/ForecastSummary';

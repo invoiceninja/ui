@@ -10,6 +10,7 @@
 
 import { lazy } from 'react';
 import { Route, Routes } from 'react-router';
+import { ModuleBitmask } from '$app/common/enums/module-bitmask';
 import { isCalendarConnectionAvailable } from '$app/common/helpers';
 import { TestingPage } from '$app/components/TestingPage';
 import { TestingRoute } from '$app/components/TestingRoute';
@@ -29,7 +30,6 @@ import { quoteRoutes } from '$app/pages/quotes/routes';
 import { recurringExpenseRoutes } from '$app/pages/recurring-expenses/routes';
 import { recurringInvoiceRoutes } from '$app/pages/recurring-invoices/routes';
 import { reportRoutes } from '$app/pages/reports/routes';
-import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { CorpPassFailed } from '$app/pages/settings/e-invoice/peppol/CorpPassFailed';
 import { CorpPassSuccess } from '$app/pages/settings/e-invoice/peppol/CorpPassSuccess';
 import { settingsRoutes } from '$app/pages/settings/routes';

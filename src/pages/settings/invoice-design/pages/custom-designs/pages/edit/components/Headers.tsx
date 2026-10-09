@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import Editor from '@monaco-editor/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
 import { useDebounce } from 'react-use';
 import { useColorScheme } from '$app/common/colors';
+import Editor from '$app/common/MonacoEditor';
 import { Card } from '$app/components/cards';
 import { useDesignUtilities } from '../common/hooks';
 import { Context } from './Settings';

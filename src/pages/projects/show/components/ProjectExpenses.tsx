@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ModuleBitmask } from '$app/common/enums/module-bitmask';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
@@ -23,7 +24,6 @@ import {
   useExpenseFilters,
 } from '$app/pages/expenses/common/hooks';
 import { useCustomBulkActions } from '$app/pages/expenses/common/hooks/useCustomBulkActions';
-import { ModuleBitmask } from '$app/pages/settings';
 
 interface Props {
   project: Project;
