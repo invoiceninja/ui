@@ -69,6 +69,15 @@ export default function Show() {
   const { data: project } = useQuery({
     queryKey: ['/api/v1/projects', `/api/v1/projects/${id}`],
     queryFn: () =>
+      request('GET', endpoint(`/api/v1/projects/${id}`)).then(
+        (response: GenericSingleResourceResponse<Project>) => response.data.data
+      ),
+    staleTime: Infinity,
+  });
+
+  const { data: projectRelations } = useQuery({
+    queryKey: ['/api/v1/projects', `/api/v1/projects/${id}`, 'relations'],
+    queryFn: () =>
       request(
         'GET',
         endpoint(
@@ -114,10 +123,12 @@ export default function Show() {
     );
   }
 
+  const projectWithRelations = projectRelations ?? project;
+
   const overviewContent = (forecastCard: ReactNode) => (
     <div className="grid grid-cols-12 gap-4 lg:space-y-0">
       <InfoCard
-        title={project.name}
+        title={projectWithRelations.name}
         className="col-span-12 h-full p-4 shadow-sm lg:col-span-6 xl:col-span-4 2xl:h-max 2xl:col-span-3"
         style={{ borderColor: colors.$24 }}
         withoutPadding
@@ -128,10 +139,10 @@ export default function Show() {
               {t('status')}
             </span>
 
-            <EntityStatus entity={project} />
+            <EntityStatus entity={projectWithRelations} />
           </div>
 
-          {Boolean(project.tags?.length) && (
+          {Boolean(projectWithRelations.tags?.length) && (
             <div className="flex flex-col space-y-1">
               <span
                 className="text-sm font-medium"
@@ -141,43 +152,52 @@ export default function Show() {
               </span>
 
               <div>
-                <TagPills tags={project.tags} />
+                <TagPills tags={projectWithRelations.tags} />
               </div>
             </div>
           )}
 
-          {project.client && (
-            <ClientActionButtons displayClientName client={project.client} />
+          {projectWithRelations.client && (
+            <ClientActionButtons
+              displayClientName
+              client={projectWithRelations.client}
+            />
           )}
 
           {canViewFinancials && (
             <div className="flex flex-col items-start gap-1">
-              {project.invoices?.map((invoice: Invoice, index: number) => (
-                <Link
-                  key={index}
-                  to={route('/invoices/:id/edit', { id: invoice.id })}
-                >
-                  {t('invoice')} #{invoice.number}
-                </Link>
-              ))}
+              {projectWithRelations.invoices?.map(
+                (invoice: Invoice, index: number) => (
+                  <Link
+                    key={index}
+                    to={route('/invoices/:id/edit', { id: invoice.id })}
+                  >
+                    {t('invoice')} #{invoice.number}
+                  </Link>
+                )
+              )}
 
-              {project.quotes?.map((quote: Quote, index: number) => (
-                <Link
-                  key={index}
-                  to={route('/quotes/:id/edit', { id: quote.id })}
-                >
-                  {t('quote')} #{quote.number}
-                </Link>
-              ))}
+              {projectWithRelations.quotes?.map(
+                (quote: Quote, index: number) => (
+                  <Link
+                    key={index}
+                    to={route('/quotes/:id/edit', { id: quote.id })}
+                  >
+                    {t('quote')} #{quote.number}
+                  </Link>
+                )
+              )}
 
-              {project.expenses?.map((expense: Expense, index: number) => (
-                <Link
-                  key={index}
-                  to={route('/expenses/:id/edit', { id: expense.id })}
-                >
-                  {t('expense')} #{expense.number}
-                </Link>
-              ))}
+              {projectWithRelations.expenses?.map(
+                (expense: Expense, index: number) => (
+                  <Link
+                    key={index}
+                    to={route('/expenses/:id/edit', { id: expense.id })}
+                  >
+                    {t('expense')} #{expense.number}
+                  </Link>
+                )
+              )}
             </div>
           )}
         </div>
@@ -224,7 +244,7 @@ export default function Show() {
       }
     >
       <ProjectAnalytics
-        project={project}
+        project={projectWithRelations}
         includeDrafts={includeDrafts}
         overviewContent={overviewContent}
         tasksContent={
