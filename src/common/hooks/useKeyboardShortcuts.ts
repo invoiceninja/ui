@@ -10,6 +10,7 @@
 
 import { useCallback, useEffect } from 'react';
 import { keyboardShortcuts } from '../constants/keyboard-shortcuts';
+import { useRecurringInvoiceEditorPaths } from './useRecurringInvoiceEditor';
 import { eventMatchesBinding } from '../helpers/keyboard-shortcuts';
 import { getHeldKeys, useTrackHeldKeys } from './useHeldKeys';
 import { usePreventNavigation } from './usePreventNavigation';
@@ -19,6 +20,7 @@ import { isShortcutRecordingActive } from './useShortcutRecorder';
 export function useKeyboardShortcuts() {
   const preventNavigation = usePreventNavigation();
   const bindings = useResolvedShortcuts();
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
 
   useTrackHeldKeys();
 
@@ -44,12 +46,17 @@ export function useKeyboardShortcuts() {
         if (eventMatchesBinding(event, binding, heldKeys)) {
           event.preventDefault();
           event.stopPropagation();
-          preventNavigation({ url: definition.action.to });
+          preventNavigation({
+            url:
+              definition.id === 'create_recurring_invoice'
+                ? recurringInvoicePaths.create
+                : definition.action.to,
+          });
           return;
         }
       }
     },
-    [preventNavigation, bindings]
+    [preventNavigation, bindings, recurringInvoicePaths]
   );
 
   useEffect(() => {

@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { useRecurringInvoiceEditorPaths } from '$app/common/hooks/useRecurringInvoiceEditor';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
@@ -40,6 +41,7 @@ interface Props {
 }
 
 export function CloneOptionsModal({ quote, dropdown }: Props) {
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const navigate = useNavigate();
@@ -135,7 +137,7 @@ export function CloneOptionsModal({ quote, dropdown }: Props) {
     setIsModalVisible(false);
 
     setTimeout(() => {
-      navigate('/recurring_invoices/create?action=clone');
+      navigate(`${recurringInvoicePaths.create}?action=clone`);
     }, 150);
   };
 
