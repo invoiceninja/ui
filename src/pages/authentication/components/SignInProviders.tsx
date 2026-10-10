@@ -8,7 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { PublicClientApplication } from '@azure/msal-browser';
+import {
+  IPublicClientApplication,
+  PublicClientApplication,
+} from '@azure/msal-browser';
 import { GoogleLogin } from '@react-oauth/google';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
@@ -28,6 +31,20 @@ import {
 } from '$app/common/stores/slices/company-users';
 import { authenticate } from '$app/common/stores/slices/user';
 import { AppleSignin } from '$app/components/AppleSignin';
+
+let microsoftClient: Promise<IPublicClientApplication> | undefined;
+
+export const getMicrosoftClient = () => {
+  if (!microsoftClient) {
+    microsoftClient = PublicClientApplication.createPublicClientApplication({
+      auth: {
+        clientId: import.meta.env.VITE_MICROSOFT_CLIENT_ID,
+      },
+    });
+  }
+
+  return microsoftClient;
+};
 
 interface SignInProviderButtonProps {
   disabled?: boolean;
@@ -107,8 +124,6 @@ export function SignInProviders() {
     }).then((response) => login(response));
   };
 
-  const msal = createMsal();
-
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState<number>(0);
 
@@ -139,7 +154,7 @@ export function SignInProviders() {
 
       <SignInProviderButton
         onClick={async () => {
-          if (!msal) return;
+          const msal = await getMicrosoftClient();
 
           await msal.handleRedirectPromise();
 
@@ -203,21 +218,4 @@ export function SignInProviders() {
       ) : null}
     </div>
   );
-}
-
-export function createMsal() {
-  const msal =
-    typeof window !== 'undefined'
-      ? new PublicClientApplication({
-          auth: {
-            clientId: import.meta.env.VITE_MICROSOFT_CLIENT_ID,
-          },
-        })
-      : null;
-
-  if (msal) {
-    msal.initialize();
-  }
-
-  return msal;
 }
