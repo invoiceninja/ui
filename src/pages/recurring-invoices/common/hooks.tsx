@@ -36,6 +36,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { invoiceSumAtom, recurringInvoiceAtom } from './atoms';
 import { route } from '$app/common/helpers/route';
+import { useRecurringInvoiceEditorPaths } from '$app/common/hooks/useRecurringInvoiceEditor';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
@@ -321,6 +322,7 @@ interface Params {
 }
 
 export function useActions(params?: Params) {
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const bulk = useBulkAction();
@@ -341,7 +343,7 @@ export function useActions(params?: Params) {
     (recurringInvoice) =>
       Boolean(showEditAction) && (
         <DropdownElement
-          to={route('/recurring_invoices/:id/edit', {
+          to={route(recurringInvoicePaths.edit, {
             id: recurringInvoice.id,
           })}
           icon={<Icon element={MdEdit} />}
@@ -649,6 +651,7 @@ export function useAllRecurringInvoiceColumns() {
 }
 
 export function useRecurringInvoiceColumns() {
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   const { t } = useTranslation();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -702,7 +705,7 @@ export function useRecurringInvoiceColumns() {
       label: t('number'),
       format: (value, recurringInvoice) => (
         <DynamicLink
-          to={route('/recurring_invoices/:id/edit', {
+          to={route(recurringInvoicePaths.edit, {
             id: recurringInvoice.id,
           })}
           renderSpan={disableNavigation('recurring_invoice', recurringInvoice)}

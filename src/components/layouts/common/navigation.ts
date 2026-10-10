@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { File } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { ShortcutId } from '$app/common/constants/keyboard-shortcuts';
+import { useRecurringInvoiceEditorPaths } from '$app/common/hooks/useRecurringInvoiceEditor';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { formatBinding } from '$app/common/helpers/keyboard-shortcuts';
 import { isHosted } from '$app/common/helpers';
@@ -41,6 +42,7 @@ export function useNavigation() {
   const hasPermission = useHasPermission();
   const companyUser = useCurrentCompanyUser();
   const company = useCurrentCompany();
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
 
   const [cache, setCache] = useAtom($cache);
   const [cachedLanguage, setCachedLanguage] = useAtom($navigationLanguage);
@@ -119,7 +121,7 @@ export function useNavigation() {
           hasPermission('edit_recurring_invoice')),
       rightButton: {
         icon: Plus,
-        to: '/recurring_invoices/create',
+        to: recurringInvoicePaths.create,
         label: t('new_recurring_invoice'),
         visible: hasPermission('create_recurring_invoice'),
         tooltipLabel: tooltipFor('create_recurring_invoice'),

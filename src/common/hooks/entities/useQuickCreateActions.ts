@@ -21,6 +21,7 @@ import { ModuleBitmask } from '$app/pages/settings/account-management/component'
 import { useBankAccountsQuery } from '$app/pages/settings/bank-accounts/common/queries';
 import { useAdmin, useHasPermission } from '../permissions/useHasPermission';
 import { useCurrentCompany } from '../useCurrentCompany';
+import { useRecurringInvoiceEditorPaths } from '../useRecurringInvoiceEditor';
 
 interface EntityAction {
   key: string;
@@ -34,6 +35,7 @@ export function useQuickCreateActions() {
   const currentCompany = useCurrentCompany();
   const hasPermission = useHasPermission();
   const enabled = useEnabled();
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
 
   const { isAdmin, isOwner } = useAdmin();
 
@@ -81,7 +83,7 @@ export function useQuickCreateActions() {
     },
     {
       key: 'recurring_invoice',
-      url: '/recurring_invoices/create',
+      url: recurringInvoicePaths.create,
       section: 'income',
       visible:
         hasPermission('create_recurring_invoice') &&

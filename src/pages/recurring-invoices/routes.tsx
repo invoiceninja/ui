@@ -52,6 +52,30 @@ const Pdf = lazy(() => import('$app/pages/recurring-invoices/pdf/Pdf'));
 const EInvoice = lazy(
   () => import('$app/pages/recurring-invoices/edit/components/EInvoice')
 );
+const Wizard = lazy(
+  () => import('$app/pages/recurring-invoices/wizard/Wizard')
+);
+const WizardWho = lazy(
+  () => import('$app/pages/recurring-invoices/wizard/steps/Who')
+);
+const WizardItems = lazy(
+  () => import('$app/pages/recurring-invoices/wizard/steps/Items')
+);
+const WizardSchedule = lazy(
+  () => import('$app/pages/recurring-invoices/wizard/steps/Schedule')
+);
+const WizardPayment = lazy(
+  () => import('$app/pages/recurring-invoices/wizard/steps/Payment')
+);
+const WizardNotes = lazy(
+  () => import('$app/pages/recurring-invoices/wizard/steps/Notes')
+);
+const WizardSend = lazy(
+  () => import('$app/pages/recurring-invoices/wizard/steps/Send')
+);
+const WizardEdit = lazy(
+  () => import('$app/pages/recurring-invoices/wizard/Edit')
+);
 
 export const recurringInvoiceRoutes = (
   <Route path="/recurring_invoices">
@@ -71,6 +95,42 @@ export const recurringInvoiceRoutes = (
         />
       }
     />
+    <Route
+      path="guided"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.RecurringInvoices),
+            permission('create_recurring_invoice'),
+          ]}
+          component={<Wizard />}
+        />
+      }
+    >
+      <Route path="" element={<WizardWho />} />
+      <Route path="items" element={<WizardItems />} />
+      <Route path="schedule" element={<WizardSchedule />} />
+      <Route path="payment" element={<WizardPayment />} />
+      <Route path="notes" element={<WizardNotes />} />
+      <Route path="send" element={<WizardSend />} />
+    </Route>
+
+    <Route
+      path=":id/guided"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.RecurringInvoices),
+            or(
+              permission('edit_recurring_invoice'),
+              assigned('/api/v1/recurring_invoices/:id')
+            ),
+          ]}
+          component={<WizardEdit />}
+        />
+      }
+    />
+
     <Route
       path="create"
       element={

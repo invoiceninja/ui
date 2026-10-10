@@ -10,6 +10,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import { useRecurringInvoiceEditorPaths } from '$app/common/hooks/useRecurringInvoiceEditor';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useDateTime } from '$app/common/hooks/useDateTime';
@@ -26,6 +27,7 @@ import { ArrowUp } from '$app/components/icons/ArrowUp';
 import { CalendarCheckOut } from '$app/components/icons/CalendarCheckOut';
 
 export function UpcomingRecurringInvoices() {
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const colors = useColorScheme();
@@ -43,7 +45,7 @@ export function UpcomingRecurringInvoices() {
       format: (_, recurringInvoice) => {
         return (
           <DynamicLink
-            to={route('/recurring_invoices/:id/edit', {
+            to={route(recurringInvoicePaths.edit, {
               id: recurringInvoice.id,
             })}
             renderSpan={disableNavigation(

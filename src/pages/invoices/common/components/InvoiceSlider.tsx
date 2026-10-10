@@ -9,6 +9,7 @@
  */
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useRecurringInvoiceEditorPaths } from '$app/common/hooks/useRecurringInvoiceEditor';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { TabGroup } from '$app/components/TabGroup';
 import { Element } from '$app/components/cards';
@@ -107,6 +108,7 @@ const ActivityBox = styled.div`
 `;
 
 export function useGenerateActivityElement() {
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   const [t] = useTranslation();
 
   return (activity: InvoiceActivity) => {
@@ -140,7 +142,7 @@ export function useGenerateActivityElement() {
 
       recurring_invoice: (
         <Link
-          to={route('/recurring_invoices/:id/edit', {
+          to={route(recurringInvoicePaths.edit, {
             id: activity?.recurring_invoice?.hashed_id,
           })}
         >
@@ -194,6 +196,7 @@ export function useGenerateActivityElement() {
 }
 
 export function InvoiceSlider() {
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   const [isVisible, setIsSliderVisible] = useAtom(invoiceSliderVisibilityAtom);
   const [invoice, setInvoice] = useAtom(invoiceSliderAtom);
   const [t] = useTranslation();
@@ -387,7 +390,7 @@ export function InvoiceSlider() {
                 style={{ borderColor: colors.$20 }}
               >
                 <Link
-                  to={route('/recurring_invoices/:id/edit', {
+                  to={route(recurringInvoicePaths.edit, {
                     id: invoice.recurring_id,
                   })}
                 >
