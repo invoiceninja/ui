@@ -20,6 +20,7 @@ import { Params } from './common/params.interface';
 
 interface ExpenseCategoriesParams extends Params {
   enabled?: boolean;
+  with?: string;
 }
 
 export function useExpenseCategoriesQuery(params: ExpenseCategoriesParams) {
@@ -30,13 +31,14 @@ export function useExpenseCategoriesQuery(params: ExpenseCategoriesParams) {
       request(
         'GET',
         endpoint(
-          '/api/v1/expense_categories?per_page=:perPage&page=:currentPage&sort=:sort&filter=:filter&status=:status',
+          '/api/v1/expense_categories?per_page=:perPage&page=:currentPage&sort=:sort&filter=:filter&status=:status&with=:with',
           {
-            perPage: params.perPage ?? '100',
+            perPage: params.perPage ?? '1000',
             currentPage: params.currentPage ?? '1',
             sort: params.sort ?? 'name|asc',
             filter: params.filter ?? '',
             status: params.status?.join(',') ?? '',
+            with: params.with || '',
           }
         )
       ).then(
