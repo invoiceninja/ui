@@ -56,6 +56,7 @@ export function useBlankVendorQuery() {
 interface VendorsParams extends Params {
   enabled?: boolean;
   withoutDeletedClients?: boolean;
+  with?: string;
 }
 
 export function useVendorsQuery(params: VendorsParams) {
@@ -66,12 +67,13 @@ export function useVendorsQuery(params: VendorsParams) {
       request(
         'GET',
         endpoint(
-          '/api/v1/vendors?filter=:filter&per_page=:per_page&status=:status&page=:page',
+          '/api/v1/vendors?filter=:filter&per_page=:per_page&status=:status&page=:page&with=:with',
           {
             per_page: params.perPage ?? '100',
             page: params.currentPage ?? '1',
             status: params.status ?? 'active',
             filter: params.filter ?? '',
+            with: params.with || '',
           }
         )
       ).then(
