@@ -160,7 +160,7 @@ export function SystemLog() {
     { id: 50, name: t('pdf') },
     { id: 60, name: t('login_failure') },
     { id: 61, name: t('user') },
-    { id: 62, name: t('inbound_mail_blocked') },
+    { id: 62, name: t('inbound_mailbox_blacklist') },
     { id: 70, name: t('failure') },
     { id: 71, name: t('success') },
     { id: 72, name: t('failure') },

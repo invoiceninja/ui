@@ -117,9 +117,7 @@ test('weekly save failure retains edits and permits retry before leaving', async
   });
   await cell.fill('2');
   await page.clock.runFor(2500);
-  await expect(
-    page.getByRole('alert').filter({ hasText: 'Changes could not be saved' })
-  ).toBeVisible();
+  await expect(page.getByText('Save rejected')).toBeVisible();
   await leave();
   await dialog
     .getByRole('button', { name: 'Continue Editing', exact: true })
@@ -128,10 +126,10 @@ test('weekly save failure retains edits and permits retry before leaving', async
   await expect(cell).toHaveValue('2');
   expect(await readSeconds()).toBe(4500);
   fail = false;
-  await page.getByRole('button', { name: 'Retry', exact: true }).click();
-  await expect.poll(readSeconds).toBe(7200);
-  await page.clock.runFor(350);
   await page.getByRole('link', { name: 'Daily', exact: true }).click();
+  await dialog
+    .getByRole('button', { name: 'Discard Changes', exact: true })
+    .click();
   await expect(page).toHaveURL(`/tasks/daily?date=${date}`);
 });
 

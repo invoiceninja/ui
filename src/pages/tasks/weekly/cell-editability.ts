@@ -9,8 +9,8 @@ export function weeklyCellReadOnlyReason(
   logs: TimeLogType[],
   dayKey: string
 ): string | undefined {
-  if (task.invoice_id) return 'weekly_invoiced_read_only';
-  if (isTaskRunning(task)) return 'weekly_running_read_only';
+  if (task.invoice_id) return 'task_error_invoiced';
+  if (isTaskRunning(task)) return 'task_error_running';
 
   const day = dayjs(dayKey).startOf('day');
   const start = day.unix();
@@ -19,8 +19,10 @@ export function weeklyCellReadOnlyReason(
     ([s, e]) =>
       s && ((s >= start && s < end) || (s < start && (!e || e > start)))
   );
-  if (entries.length > 1) return 'weekly_multiple_entries_read_only';
-  if (entries.some(([s, e]) => !e || s < start || e > end)) {
-    return 'weekly_overnight_read_only';
+  if (
+    entries.length > 1 ||
+    entries.some(([s, e]) => !e || s < start || e > end)
+  ) {
+    return 'edit_individually';
   }
 }
