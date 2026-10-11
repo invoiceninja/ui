@@ -47,3 +47,35 @@ export function AnalyticsStatCard({ label, value, detail, accent }: Props) {
     </div>
   );
 }
+
+export function AnalyticsStatCardSkeleton() {
+  const colors = useColorScheme();
+
+  return (
+    <div
+      className="animate-pulse rounded-md border p-3"
+      style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span className="flex h-4 items-center">
+          <span
+            className="h-3 w-16 rounded"
+            style={{ backgroundColor: colors.$24 }}
+          />
+        </span>
+
+        <span
+          className="h-2 w-2 flex-shrink-0 rounded-full"
+          style={{ backgroundColor: colors.$24 }}
+        />
+      </div>
+
+      <div className="mt-2 flex h-7 items-center">
+        <div
+          className="h-5 w-3/4 rounded"
+          style={{ backgroundColor: colors.$24 }}
+        />
+      </div>
+    </div>
+  );
+}
