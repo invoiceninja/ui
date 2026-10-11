@@ -9,6 +9,7 @@
  */
 
 import { Element } from '$app/components/cards';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { Link } from '$app/components/forms';
 import { TagPills } from '$app/components/tags/TagPills';
 import {
@@ -45,6 +46,7 @@ interface Props {
 }
 
 export function Details(props: Props) {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const company = useCurrentCompany();
@@ -202,7 +204,7 @@ export function Details(props: Props) {
               className="cursor-pointer"
             >
               <Link
-                to={route('/invoices/:id/edit', {
+                to={route(invoicePaths.edit, {
                   id,
                 })}
               >

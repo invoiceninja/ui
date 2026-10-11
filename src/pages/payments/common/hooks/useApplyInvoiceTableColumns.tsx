@@ -13,6 +13,7 @@ import { cloneDeep, set } from 'lodash';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { date } from '$app/common/helpers';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
@@ -51,6 +52,7 @@ export function useApplyInvoiceTableColumns({
   formik,
   isApplyPage = false,
 }: UseApplyInvoiceTableColumnsProps): DataTableColumns<Invoice> {
+  const invoicePaths = useInvoiceEditorPaths();
   const invoiceColumns = useAllInvoiceColumns();
   type InvoiceColumns = (typeof invoiceColumns)[number];
 
@@ -68,7 +70,7 @@ export function useApplyInvoiceTableColumns({
       label: t('number'),
       format: (value, invoice) => (
         <DynamicLink
-          to={route('/invoices/:id/edit', { id: invoice.id })}
+          to={route(invoicePaths.edit, { id: invoice.id })}
           renderSpan={disableNavigation('invoice', invoice)}
         >
           {value}

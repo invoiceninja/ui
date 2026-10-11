@@ -11,11 +11,13 @@
 import { useTranslation } from 'react-i18next';
 import reactStringReplace from 'react-string-replace';
 import { trans } from '$app/common/helpers';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { route } from '$app/common/helpers/route';
 import { PaymentActivity } from '$app/common/interfaces/payment-activity';
 import { Link } from '$app/components/forms';
 
 export function useGenerateActivityElement() {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
   return (activity: PaymentActivity) => {
@@ -32,7 +34,7 @@ export function useGenerateActivityElement() {
       adjustment: activity?.adjustment?.label,
       invoice: (
         <Link
-          to={route('/invoices/:id/edit', {
+          to={route(invoicePaths.edit, {
             id: activity.invoice?.hashed_id,
           })}
         >
