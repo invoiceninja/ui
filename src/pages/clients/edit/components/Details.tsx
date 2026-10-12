@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isHosted } from '$app/common/helpers';
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
 import { useGroupSettingsQuery } from '$app/common/queries/group-settings';
@@ -23,6 +24,9 @@ import { EntityStatus } from '$app/components/EntityStatus';
 import { useColorScheme } from '$app/common/colors';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { Tag, TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { PeppolDiscovery } from './PeppolDiscovery';
+import { VatValidation } from './VatValidation';
+import { useClientQuery } from '$app/common/queries/clients';
 import { TagPillSelector } from '$app/components/tags/TagPillSelector';
 interface Props {
   client: Client | undefined;
@@ -36,6 +40,21 @@ export function Details(props: Props) {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
+  const { data: savedClient } = useClientQuery({
+    id: props.client?.id,
+    enabled: props.page === 'edit' && Boolean(props.client?.id),
+  });
+  const discoveryRequiresSave =
+    !savedClient ||
+    (
+      [
+        'vat_number',
+        'id_number',
+        'routing_id',
+        'country_id',
+        'classification',
+      ] as const
+    ).some((field) => savedClient[field] !== props.client?.[field]);
 
   const { data: groupSettings } = useGroupSettingsQuery();
 
@@ -138,6 +157,19 @@ export function Details(props: Props) {
         />
       </Element>
 
+      {props.page === 'edit' &&
+        props.client &&
+        isHosted() &&
+        Number(company?.legal_entity_id) > 0 &&
+        company?.settings.e_invoice_type === 'PEPPOL' && (
+          <Element>
+            <PeppolDiscovery
+              client={props.client}
+              requiresSave={discoveryRequiresSave}
+            />
+          </Element>
+        )}
+
       <Element leftSide={t('website')}>
         <InputField
           value={props.client?.website || ''}
@@ -163,12 +195,29 @@ export function Details(props: Props) {
       </Element>
 
       <Element leftSide={t('valid_vat_number')}>
-        <Toggle
-          checked={Boolean(props.client?.has_valid_vat_number)}
-          onValueChange={(value) =>
-            handleCustomFieldChange('has_valid_vat_number', value)
-          }
-        />
+        <div className="flex flex-wrap items-center gap-3">
+          <Toggle
+            checked={Boolean(props.client?.has_valid_vat_number)}
+            onValueChange={(value) =>
+              handleCustomFieldChange('has_valid_vat_number', value)
+            }
+          />
+          {props.client && (
+            <VatValidation
+              client={props.client}
+              requiresSave={
+                props.page !== 'edit' ||
+                !savedClient ||
+                (
+                  ['vat_number', 'country_id', 'shipping_country_id'] as const
+                ).some((field) => savedClient[field] !== props.client?.[field])
+              }
+              onValidated={(valid) =>
+                handleCustomFieldChange('has_valid_vat_number', valid)
+              }
+            />
+          )}
+        </div>
       </Element>
 
       <Element leftSide={t('tax_exempt')}>
