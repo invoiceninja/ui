@@ -31,7 +31,7 @@ export function DurationFormatSwitcher() {
   const currentFormat = reactSettings.preferences.duration_format;
 
   const options: FormatOption[] = [
-    { value: 'decimal', label: t('decimal') },
+    { value: 'decimal', label: t('decimal_hours') },
     { value: 'hh_mm', label: 'HH:MM' },
   ];
 
