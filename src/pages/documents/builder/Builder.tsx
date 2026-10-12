@@ -31,6 +31,7 @@ import { request } from '$app/common/helpers/request';
 import { route, routeWithOrigin } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useDriverTour } from '$app/common/hooks/useDriverTour';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
@@ -152,6 +153,8 @@ function Builder() {
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
   const { preferences, update, save } = usePreferences();
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   useDriverTour({
     show: Boolean(!isFromTemplate && !preferences.document_builder_tour_shown),
@@ -670,6 +673,10 @@ function Builder() {
               (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
               undefined,
             readonly: false,
+            defaultDateFormat: dateFormat as
+              | "MM/DD/YYYY"
+              | "DD/MM/YYYY"
+              | "YYYY-MM-DD",
             onEntityReady: (entity) => setEntity(entity as Document),
             onEntityRefresh: (entity) => setEntity(entity as Document),
             services: {
