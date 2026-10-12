@@ -11,6 +11,7 @@
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { ModuleBitmask } from '$app/common/enums/module-bitmask';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
@@ -30,7 +31,6 @@ import {
 import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
 import { useActions } from '$app/pages/invoices/edit/components/Actions';
 import { confirmActionModalAtom } from '$app/pages/recurring-invoices/common/components/ConfirmActionModal';
-import { ModuleBitmask } from '$app/pages/settings';
 
 interface Props {
   project: Project;
