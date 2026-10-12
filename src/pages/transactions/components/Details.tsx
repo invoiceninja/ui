@@ -63,11 +63,9 @@ export function Details(props: Props) {
     enabled: Boolean(transaction),
   });
 
-  const isMatched = TransactionStatus.Matched === transaction?.status_id;
-
   const { data: bankTransactionRuleResponse } = useTransactionRuleQuery({
     id: transaction?.bank_transaction_rule_id || '',
-    enabled: Boolean(transaction) && isMatched,
+    enabled: Boolean(transaction?.bank_transaction_rule_id),
   });
 
   const [matchedInvoices, setMatchedInvoices] = useState<Invoice[]>();
