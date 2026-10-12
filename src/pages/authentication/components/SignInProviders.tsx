@@ -40,6 +40,10 @@ export const getMicrosoftClient = () => {
       auth: {
         clientId: import.meta.env.VITE_MICROSOFT_CLIENT_ID,
       },
+    }).catch((error) => {
+      microsoftClient = undefined;
+
+      throw error;
     });
   }
 
