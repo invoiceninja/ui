@@ -34,7 +34,7 @@ import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import { GatewayTypeIcon } from '$app/pages/clients/show/components/GatewayTypeIcon';
 import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
-import { Logo } from '../components';
+import { Logo } from '../components/Logo';
 
 interface Props {
   isModalOpen: boolean;
@@ -69,7 +69,7 @@ export function CompanyEdit(props: Props) {
 
   const debouncedCheckSubdomain = useRef(
     debounce((value: string) => {
-      if (!isHosted() ||!value || company?.subdomain === value) return;
+      if (!isHosted() || !value || company?.subdomain === value) return;
 
       setIsCheckingSubdomain(true);
 
