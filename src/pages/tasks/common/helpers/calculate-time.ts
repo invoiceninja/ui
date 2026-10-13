@@ -90,6 +90,14 @@ export function formatTimeLogDayHours(seconds: number): string {
   return hours.toFixed(2).replace(/\.00$/, '');
 }
 
+export const formatHoursMinutes = (seconds: number) => {
+  const totalMinutes = Math.round(seconds / 60);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  return `${hours}:${minutes.toString().padStart(2, '0')}`;
+};
+
 export function calculateHours(log: string, includeRunning = false) {
   const times = parseTimeLog(log);
 

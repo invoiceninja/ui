@@ -9,6 +9,7 @@
  */
 
 import { ApiTransactionType } from '$app/common/enums/transactions';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -36,6 +37,7 @@ import classNames from 'classnames';
 import { TagPills } from '$app/components/tags/TagPills';
 
 export function useTransactionColumns() {
+  const invoicePaths = useInvoiceEditorPaths();
   const { t } = useTranslation();
 
   const company = useCurrentCompany();
@@ -166,7 +168,7 @@ export function useTransactionColumns() {
         return (
           <div className="flex space-x-2">
             {ids.map((id, index) => (
-              <Link key={id} to={route('/invoices/:id/edit', { id })}>
+              <Link key={id} to={route(invoicePaths.edit, { id })}>
                 {t('invoice')} #{index + 1}
               </Link>
             ))}

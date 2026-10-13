@@ -29,6 +29,7 @@ import {
 } from 'react-icons/md';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { EntityState } from '$app/common/enums/entity-state';
 import { QuoteStatus } from '$app/common/enums/quote-status';
 import { date, endpoint, getEntityState } from '$app/common/helpers';
@@ -806,6 +807,7 @@ export function useAllQuoteColumns() {
 }
 
 export function useQuoteColumns() {
+  const invoicePaths = useInvoiceEditorPaths();
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -864,9 +866,7 @@ export function useQuoteColumns() {
                   fontSize={19}
                   color={accentColor}
                   onClick={() =>
-                    navigate(
-                      route('/invoices/:id/edit', { id: quote.invoice_id })
-                    )
+                    navigate(route(invoicePaths.edit, { id: quote.invoice_id }))
                   }
                 />
               }
