@@ -24,6 +24,7 @@ import {
   isNavigationModalVisibleAtom,
   navigationDiscardActionsAtom,
 } from '$app/common/hooks/usePreventNavigation';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Task } from '$app/common/interfaces/task';
@@ -35,6 +36,7 @@ import { ChevronRight } from '$app/components/icons/ChevronRight';
 import { Plus } from '$app/components/icons/Plus';
 import { Default } from '$app/components/layouts/Default';
 import {
+  formatHoursMinutes,
   formatTimeLogDayHours,
   parseTimeLog,
   TimeLogType,
@@ -55,6 +57,7 @@ import {
 } from '../common/helpers/task-label';
 import { useTaskDateDisplay } from '../common/hooks/useTaskDateDisplay';
 import { weeklyCellReadOnlyReason } from './cell-editability';
+import { DurationFormatSwitcher } from './components/DurationFormatSwitcher';
 import { CellEdit, WeeklyCell } from './components/WeeklyCell';
 
 const FLUSH_DELAY_MS = 1800;
@@ -152,6 +155,7 @@ export default function Weekly() {
   const [saveFailed, setSaveFailed] = useState(false);
   const { displayDate, displayDateRange, displayWeekday } =
     useTaskDateDisplay();
+  const reactSettings = useReactSettings();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const dateParam = searchParams.get('date');
@@ -411,6 +415,17 @@ export default function Weekly() {
     []
   );
 
+  const showHoursMinutes =
+    reactSettings.preferences.duration_format === 'hh_mm';
+
+  const formatTotal = (seconds: number) => {
+    if (showHoursMinutes) {
+      return formatHoursMinutes(seconds);
+    }
+
+    return (seconds / 3600).toFixed(2);
+  };
+
   const cellDurationDisplay = (
     taskId: string,
     fallbackLog: string,
@@ -419,9 +434,9 @@ export default function Weekly() {
     const dayKey = day.format('YYYY-MM-DD');
     const pendingDuration = pending[taskId]?.[dayKey]?.duration;
     if (pendingDuration !== undefined) return pendingDuration;
-    return formatHours(
-      sumSecondsForDay(getLogsForTask(taskId, fallbackLog), day)
-    );
+    const seconds = sumSecondsForDay(getLogsForTask(taskId, fallbackLog), day);
+    if (showHoursMinutes) return seconds ? formatHoursMinutes(seconds) : '';
+    return formatHours(seconds);
   };
 
   const cellSeconds = (
@@ -496,7 +511,7 @@ export default function Weekly() {
                 {displayDateRange(weekStart, weekStart.add(6, 'day'))}
               </div>
               <div className="text-xs" style={{ color: colors.$17 }}>
-                {(grandTotalSeconds / 3600).toFixed(2)} {t('hours')}
+                {formatTotal(grandTotalSeconds)} {t('hours')}
               </div>
             </div>
 
@@ -515,12 +530,16 @@ export default function Weekly() {
             </Button>
           </div>
 
-          <Button onClick={() => setQuickLogVisible(true)}>
-            <span className="inline-flex items-center gap-1">
-              <Plus size="0.9rem" color={colors.$1} />
-              {t('log_time')}
-            </span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <DurationFormatSwitcher />
+
+            <Button onClick={() => setQuickLogVisible(true)}>
+              <span className="inline-flex items-center gap-1">
+                <Plus size="0.9rem" color={colors.$1} />
+                {t('log_time')}
+              </span>
+            </Button>
+          </div>
         </div>
 
         <div
@@ -669,7 +688,7 @@ export default function Weekly() {
                         className="p-3 text-center font-mono"
                         style={{ color: colors.$3 }}
                       >
-                        {(weekTotalSeconds(task) / 3600).toFixed(2)}
+                        {formatTotal(weekTotalSeconds(task))}
                       </td>
                     </tr>
                   );
@@ -686,11 +705,11 @@ export default function Weekly() {
                       key={d.format('YYYY-MM-DD')}
                       className="p-3 text-center font-mono"
                     >
-                      {(dayTotalSeconds(d) / 3600).toFixed(2)}
+                      {formatTotal(dayTotalSeconds(d))}
                     </td>
                   ))}
                   <td className="p-3 text-center font-mono">
-                    {(grandTotalSeconds / 3600).toFixed(2)}
+                    {formatTotal(grandTotalSeconds)}
                   </td>
                 </tr>
               )}
