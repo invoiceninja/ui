@@ -20,7 +20,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import {
-  createMsal,
+  getMicrosoftClient,
   SignInProviderButton,
 } from '$app/pages/authentication/components/SignInProviders';
 import { Element } from '../../../../components/cards';
@@ -105,12 +105,6 @@ export function Connect() {
       .finally(() => setIsMailerConnected('false'));
   };
 
-  const msal = createMsal();
-
-  if (!msal) {
-    return null;
-  }
-
   return (
     <>
       <SelectProviderModal />
@@ -136,7 +130,7 @@ export function Connect() {
             <Element leftSide="Microsoft">
               <SignInProviderButton
                 onClick={async () => {
-                  if (!msal) return;
+                  const msal = await getMicrosoftClient();
 
                   await msal.handleRedirectPromise();
 
