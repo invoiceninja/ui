@@ -34,13 +34,12 @@ import {
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { ExtensionBanner } from '../common/components/ExtensionBanner';
-import { TaskHeaderControls } from '../common/components/TaskHeaderControls';
 import {
   TaskSlider,
   taskSliderAtom,
   taskSliderVisibilityAtom,
 } from '../common/components/TaskSlider';
-import { useTaskUserFilters } from '../common/components/TaskUserFilters';
+import { TaskViewSwitcher } from '../common/components/TaskViewSwitcher';
 import {
   defaultColumns,
   useActions,
@@ -68,7 +67,6 @@ export default function Tasks() {
   const taskColumns = useAllTaskColumns();
   const filterColumns = useFilterColumns();
   const customBulkActions = useCustomBulkActions();
-  const userFilter = useTaskUserFilters();
 
   const [taskSlider, setTaskSlider] = useAtom(taskSliderAtom);
   const [sliderTaskId, setSliderTaskId] = useState<string>('');
@@ -118,14 +116,18 @@ export default function Tasks() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      topRight={<TaskHeaderControls />}
+      topRight={
+        <div className="flex justify-end">
+          <TaskViewSwitcher />
+        </div>
+      }
       aboveMainContainer={<ExtensionBanner />}
     >
       <DataTable
         resource="task"
         columns={columns}
         customActions={actions}
-        endpoint={`/api/v1/tasks?include=status,client,project,user,assigned_user,tags&without_deleted_clients=true&sort=id|desc${userFilter.queryString}`}
+        endpoint="/api/v1/tasks?include=status,client,project,user,assigned_user,tags&without_deleted_clients=true&sort=id|desc"
         bulkRoute="/api/v1/tasks/bulk"
         linkToCreate="/tasks/create"
         linkToEdit="/tasks/:id/edit"

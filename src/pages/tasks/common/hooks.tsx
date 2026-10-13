@@ -299,7 +299,7 @@ export function useTaskColumns() {
         formatMoney(
           task.rate || company.settings.default_task_rate,
           task.client?.country_id,
-          task.client?.settings.currency_id
+          task.client?.settings.currency_id,
         ),
     },
     {
@@ -385,7 +385,7 @@ export function useTaskColumns() {
         formatMoney(
           value,
           task.client?.country_id,
-          task.client?.settings.currency_id
+          task.client?.settings.currency_id,
         ),
     },
     {
@@ -397,7 +397,7 @@ export function useTaskColumns() {
     {
       column: 'user',
       id: 'user_id',
-      label: t('creator'),
+      label: t('user'),
       format: (value, task) => formatUserName(task?.user),
     },
     {
@@ -423,7 +423,7 @@ export function useTaskColumns() {
     .sort(
       (a, b) =>
         list.indexOf(normalizeColumnName(a.column)) -
-        list.indexOf(normalizeColumnName(b.column))
+        list.indexOf(normalizeColumnName(b.column)),
     );
 }
 
@@ -434,7 +434,7 @@ export function useSave() {
         toast.success('updated_task');
 
         $refetch(['tasks']);
-      }
+      },
     );
   };
 }
@@ -672,25 +672,25 @@ export const useCustomBulkActions = () => {
 
   const showStopAction = (selectedTasks: Task[]) => {
     return selectedTasks.every(
-      (task) => isTaskRunning(task) && !task.invoice_id
+      (task) => isTaskRunning(task) && !task.invoice_id,
     );
   };
 
   const showInvoiceTaskAction = (selectedTasks: Task[]) => {
     return selectedTasks.every(
-      (task) => !isTaskRunning(task) && !task.invoice_id
+      (task) => !isTaskRunning(task) && !task.invoice_id,
     );
   };
 
   const showAddToInvoiceAction = (selectedTasks: Task[]) => {
     return selectedTasks.every(
-      (task) => !isTaskRunning(task) && !task.invoice_id && task.client_id
+      (task) => !isTaskRunning(task) && !task.invoice_id && task.client_id,
     );
   };
 
   const handleDownloadDocuments = (
     selectedTasks: Task[],
-    setSelected?: Dispatch<SetStateAction<string[]>>
+    setSelected?: Dispatch<SetStateAction<string[]>>,
   ) => {
     const taskIds = getDocumentsIds(selectedTasks);
 
