@@ -10,6 +10,7 @@
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
+import { useRecurringInvoiceEditorPaths } from '$app/common/hooks/useRecurringInvoiceEditor';
 import { TabGroup } from '$app/components/TabGroup';
 import { Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
@@ -83,6 +84,7 @@ const Box = styled.div`
 
 export const useGenerateActivityElement = () => {
   const invoicePaths = useInvoiceEditorPaths();
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   const [t] = useTranslation();
 
   return (activity: RecurringInvoiceActivity) => {
@@ -104,7 +106,7 @@ export const useGenerateActivityElement = () => {
       user: activity.user?.label ?? t('system'),
       recurring_invoice: (
         <Link
-          to={route('/recurring_invoices/:id/edit', {
+          to={route(recurringInvoicePaths.edit, {
             id: activity.recurring_invoice?.hashed_id,
           })}
         >
@@ -129,6 +131,7 @@ export const useGenerateActivityElement = () => {
 };
 
 export const RecurringInvoiceSlider = () => {
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   const [isVisible, setIsSliderVisible] = useAtom(
     recurringInvoiceSliderVisibilityAtom
   );
@@ -441,7 +444,7 @@ export const RecurringInvoiceSlider = () => {
                   lineItem={lineItem}
                   lineItemIndex={index}
                   client={recurringInvoice.client}
-                  editHref={route('/recurring_invoices/:id/edit', {
+                  editHref={route(recurringInvoicePaths.edit, {
                     id: recurringInvoice.id,
                   })}
                 />

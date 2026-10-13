@@ -10,6 +10,7 @@
 
 import { date } from '$app/common/helpers';
 import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
+import { useRecurringInvoiceEditorPaths } from '$app/common/hooks/useRecurringInvoiceEditor';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
@@ -134,6 +135,7 @@ export function useAllInvoiceColumns() {
 
 export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const invoicePaths = useInvoiceEditorPaths();
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   const invoiceColumns = useAllInvoiceColumns();
   type InvoiceColumns = (typeof invoiceColumns)[number];
 
@@ -289,7 +291,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) =>
         invoice.recurring_id ? (
           <DynamicLink
-            to={route('/recurring_invoices/:id/edit', {
+            to={route(recurringInvoicePaths.edit, {
               id: invoice.recurring_id,
             })}
             renderSpan={disableNavigation('recurring_invoice', undefined)}
