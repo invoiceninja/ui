@@ -11,6 +11,7 @@
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
@@ -25,6 +26,7 @@ import { ArrowUp } from '$app/components/icons/ArrowUp';
 import { CalendarCheckOut } from '$app/components/icons/CalendarCheckOut';
 
 export function UpcomingInvoices() {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
   const formatMoney = useFormatMoney();
 
@@ -41,7 +43,7 @@ export function UpcomingInvoices() {
       format: (value, invoice) => {
         return (
           <DynamicLink
-            to={route('/invoices/:id/edit', { id: invoice.id })}
+            to={route(invoicePaths.edit, { id: invoice.id })}
             renderSpan={disableNavigation('invoice', invoice)}
           >
             {invoice.number}

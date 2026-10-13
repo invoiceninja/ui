@@ -18,6 +18,7 @@ import {
   useDraftOrCommittedReactSettings,
   useUpdateDraftOrReactSettings,
 } from '$app/common/hooks/useReactSettings';
+import { useShowGuidedInvoiceEditor } from '$app/common/hooks/useInvoiceEditor';
 import { Divider } from '$app/components/cards/Divider';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
 import { SelectField } from '$app/components/forms/SelectField';
@@ -32,6 +33,7 @@ export function Preferences() {
   const colors = useColorScheme();
   const reactSettings = useDraftOrCommittedReactSettings();
   const updateSettings = useUpdateDraftOrReactSettings();
+  const guidedInvoiceEditor = useShowGuidedInvoiceEditor();
 
   const handleChange = (property: string, value: string | number | boolean) => {
     updateSettings(
@@ -97,6 +99,25 @@ export function Preferences() {
           }
           placeholder={t('number_precision')}
           disablePrecision
+        />
+      </Element>
+
+      <Element
+        leftSide={t('show_advanced_invoice_editor')}
+        leftSideHelp={t('show_advanced_invoice_editor_help')}
+      >
+        <Toggle
+          checked={
+            typeof reactSettings.show_advanced_invoice_editor === 'boolean'
+              ? reactSettings.show_advanced_invoice_editor
+              : !guidedInvoiceEditor
+          }
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.show_advanced_invoice_editor',
+              value
+            )
+          }
         />
       </Element>
 

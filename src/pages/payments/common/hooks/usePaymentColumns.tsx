@@ -9,6 +9,7 @@
  */
 
 import paymentType from '$app/common/constants/payment-type';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -87,6 +88,7 @@ export function useAllPaymentColumns() {
 }
 
 export function usePaymentColumns() {
+  const invoicePaths = useInvoiceEditorPaths();
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -178,7 +180,7 @@ export function usePaymentColumns() {
               {payment.invoices?.map((invoice) => (
                 <DynamicLink
                   key={invoice.id}
-                  to={route('/invoices/:id/edit', {
+                  to={route(invoicePaths.edit, {
                     id: invoice.id,
                   })}
                   renderSpan={disableNavigation('invoice', invoice)}
@@ -197,7 +199,7 @@ export function usePaymentColumns() {
                 index < 3 && (
                   <DynamicLink
                     key={invoice.id}
-                    to={route('/invoices/:id/edit', {
+                    to={route(invoicePaths.edit, {
                       id: invoice.id,
                     })}
                     renderSpan={disableNavigation('invoice', invoice)}
