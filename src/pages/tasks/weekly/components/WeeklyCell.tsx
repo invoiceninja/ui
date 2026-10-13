@@ -50,6 +50,7 @@ export function WeeklyCell({
     top: number;
     left: number;
   } | null>(null);
+  const [draft, setDraft] = useState<string>();
 
   const reposition = useCallback(() => {
     const rect = iconBtnRef.current?.getBoundingClientRect();
@@ -101,7 +102,7 @@ export function WeeklyCell({
           inputMode="decimal"
           pattern="[0-9:.]*"
           data-weekly-cell="1"
-          value={durationText}
+          value={draft ?? durationText}
           readOnly={disabled}
           title={disabled ? undefined : 'Decimal hours (1.5) or h:m (1:30)'}
           onKeyDown={(event) => {
@@ -128,8 +129,10 @@ export function WeeklyCell({
           onChange={(event) => {
             if (disabled) return;
             const cleaned = event.target.value.replace(/[^0-9:.]/g, '');
+            setDraft(cleaned);
             onEdit({ duration: cleaned });
           }}
+          onBlur={() => setDraft(undefined)}
           placeholder="0"
           className="w-full text-center py-2 pl-2 pr-7 rounded-md text-sm border focus:outline-none focus:ring-2"
           style={{

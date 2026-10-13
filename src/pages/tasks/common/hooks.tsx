@@ -26,6 +26,7 @@ import {
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { EntityState } from '$app/common/enums/entity-state';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import {
@@ -139,6 +140,7 @@ export function useAllTaskColumns() {
 }
 
 export function useTaskColumns() {
+  const invoicePaths = useInvoiceEditorPaths();
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
   const accentColor = useAccentColor();
@@ -212,7 +214,7 @@ export function useTaskColumns() {
                 fontSize={19}
                 color={accentColor}
                 onClick={() =>
-                  navigate(route('/invoices/:id/edit', { id: task.invoice_id }))
+                  navigate(route(invoicePaths.edit, { id: task.invoice_id }))
                 }
               />
             </Tooltip>
@@ -299,7 +301,7 @@ export function useTaskColumns() {
         formatMoney(
           task.rate || company.settings.default_task_rate,
           task.client?.country_id,
-          task.client?.settings.currency_id
+          task.client?.settings.currency_id,
         ),
     },
     {
@@ -385,7 +387,7 @@ export function useTaskColumns() {
         formatMoney(
           value,
           task.client?.country_id,
-          task.client?.settings.currency_id
+          task.client?.settings.currency_id,
         ),
     },
     {
@@ -397,7 +399,7 @@ export function useTaskColumns() {
     {
       column: 'user',
       id: 'user_id',
-      label: t('creator'),
+      label: t('user'),
       format: (value, task) => formatUserName(task?.user),
     },
     {
@@ -423,7 +425,7 @@ export function useTaskColumns() {
     .sort(
       (a, b) =>
         list.indexOf(normalizeColumnName(a.column)) -
-        list.indexOf(normalizeColumnName(b.column))
+        list.indexOf(normalizeColumnName(b.column)),
     );
 }
 
@@ -434,7 +436,7 @@ export function useSave() {
         toast.success('updated_task');
 
         $refetch(['tasks']);
-      }
+      },
     );
   };
 }
@@ -672,25 +674,25 @@ export const useCustomBulkActions = () => {
 
   const showStopAction = (selectedTasks: Task[]) => {
     return selectedTasks.every(
-      (task) => isTaskRunning(task) && !task.invoice_id
+      (task) => isTaskRunning(task) && !task.invoice_id,
     );
   };
 
   const showInvoiceTaskAction = (selectedTasks: Task[]) => {
     return selectedTasks.every(
-      (task) => !isTaskRunning(task) && !task.invoice_id
+      (task) => !isTaskRunning(task) && !task.invoice_id,
     );
   };
 
   const showAddToInvoiceAction = (selectedTasks: Task[]) => {
     return selectedTasks.every(
-      (task) => !isTaskRunning(task) && !task.invoice_id && task.client_id
+      (task) => !isTaskRunning(task) && !task.invoice_id && task.client_id,
     );
   };
 
   const handleDownloadDocuments = (
     selectedTasks: Task[],
-    setSelected?: Dispatch<SetStateAction<string[]>>
+    setSelected?: Dispatch<SetStateAction<string[]>>,
   ) => {
     const taskIds = getDocumentsIds(selectedTasks);
 

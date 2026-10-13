@@ -1,4 +1,4 @@
 {
     "typescript.preferences.importModuleSpecifier": "shortest",
-    "playwright.reuseBrowser": false
+    "playwright.reuseBrowser": true
 }

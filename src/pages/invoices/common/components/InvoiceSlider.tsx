@@ -9,6 +9,7 @@
  */
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { useRecurringInvoiceEditorPaths } from '$app/common/hooks/useRecurringInvoiceEditor';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { TabGroup } from '$app/components/TabGroup';
@@ -108,6 +109,7 @@ const ActivityBox = styled.div`
 `;
 
 export function useGenerateActivityElement() {
+  const invoicePaths = useInvoiceEditorPaths();
   const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   const [t] = useTranslation();
 
@@ -132,7 +134,7 @@ export function useGenerateActivityElement() {
       user: activity.user?.label ?? t('system'),
       invoice: (
         <Link
-          to={route('/invoices/:id/edit', {
+          to={route(invoicePaths.edit, {
             id: activity.invoice?.hashed_id,
           })}
         >
@@ -196,6 +198,7 @@ export function useGenerateActivityElement() {
 }
 
 export function InvoiceSlider() {
+  const invoicePaths = useInvoiceEditorPaths();
   const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   const [isVisible, setIsSliderVisible] = useAtom(invoiceSliderVisibilityAtom);
   const [invoice, setInvoice] = useAtom(invoiceSliderAtom);
@@ -630,7 +633,7 @@ export function InvoiceSlider() {
                   lineItem={lineItem}
                   lineItemIndex={index}
                   client={invoice.client}
-                  editHref={route('/invoices/:id/edit', { id: invoice.id })}
+                  editHref={route(invoicePaths.edit, { id: invoice.id })}
                 />
               ))}
             </div>

@@ -4,10 +4,12 @@ import { useEffect } from 'react';
 import { File } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { ShortcutId } from '$app/common/constants/keyboard-shortcuts';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { useRecurringInvoiceEditorPaths } from '$app/common/hooks/useRecurringInvoiceEditor';
+import { ModuleBitmask } from '$app/common/enums/module-bitmask';
 import { useEnabled } from '$app/common/guards/guards/enabled';
-import { formatBinding } from '$app/common/helpers/keyboard-shortcuts';
 import { isHosted } from '$app/common/helpers';
+import { formatBinding } from '$app/common/helpers/keyboard-shortcuts';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
@@ -29,7 +31,6 @@ import SackCoins from '$app/components/icons/SackCoins';
 import { SuitCase } from '$app/components/icons/SuitCase';
 import { Users } from '$app/components/icons/Users';
 import { Wallet } from '$app/components/icons/Wallet';
-import { ModuleBitmask } from '$app/pages/settings';
 import { Invoice as InvoiceIcon } from '../../icons/Invoice';
 import { NavigationItem } from '../components/DesktopSidebar';
 
@@ -42,6 +43,7 @@ export function useNavigation() {
   const hasPermission = useHasPermission();
   const companyUser = useCurrentCompanyUser();
   const company = useCurrentCompany();
+  const invoicePaths = useInvoiceEditorPaths();
   const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
 
   const [cache, setCache] = useAtom($cache);
@@ -104,7 +106,7 @@ export function useNavigation() {
           hasPermission('edit_invoice')),
       rightButton: {
         icon: Plus,
-        to: '/invoices/create',
+        to: invoicePaths.create,
         label: t('new_invoice'),
         visible: hasPermission('create_invoice'),
         tooltipLabel: tooltipFor('create_invoice'),

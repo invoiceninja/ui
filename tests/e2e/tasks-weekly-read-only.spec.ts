@@ -1,5 +1,6 @@
 import { login } from '$tests/e2e/helpers';
 import { test, expect, uniqueName } from '$tests/e2e/fixtures';
+import { t } from '$tests/e2e/translations';
 
 // Fixtures use UTC instants; pin the browser zone for midnight boundaries.
 test.use({ timezoneId: 'UTC' });
@@ -16,14 +17,12 @@ for (const scenario of [
       [timestamp(9, 11), timestamp(9, 13), 'Internal session', false],
     ],
     locked: [2],
-    reason: 'Multiple time entries—edit individually.',
     total: '3',
   },
   {
     name: 'an overnight entry on both affected days',
     logs: [[timestamp(9, 23), timestamp(10, 2), 'Overnight work', false]],
     locked: [2, 3],
-    reason: 'This time entry spans multiple days—edit individually.',
     total: '1',
   },
 ]) {
@@ -62,7 +61,7 @@ for (const scenario of [
       await expect(input).not.toHaveAttribute('title');
       await input.hover();
       await expect(
-        page.getByText(scenario.reason, { exact: true })
+        page.getByText(t('edit_individually'), { exact: true })
       ).toBeVisible();
       await expect(
         input.locator('..').getByRole('button', { name: 'note', exact: true })

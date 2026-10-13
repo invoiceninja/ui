@@ -9,6 +9,7 @@
  */
 
 import { date } from '$app/common/helpers';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { useRecurringInvoiceEditorPaths } from '$app/common/hooks/useRecurringInvoiceEditor';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -133,6 +134,7 @@ export function useAllInvoiceColumns() {
 }
 
 export function useInvoiceColumns(): DataTableColumns<Invoice> {
+  const invoicePaths = useInvoiceEditorPaths();
   const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   const invoiceColumns = useAllInvoiceColumns();
   type InvoiceColumns = (typeof invoiceColumns)[number];
@@ -187,7 +189,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
                   color={accentColor}
                   onClick={() =>
                     navigate(
-                      route('/invoices/:id/edit', {
+                      route(invoicePaths.edit, {
                         id: invoice.backup?.parent_invoice_id,
                       })
                     )
@@ -212,9 +214,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
                     className="cursor-pointer"
                     fontSize={19}
                     color={accentColor}
-                    onClick={() =>
-                      navigate(route('/invoices/:id/edit', { id }))
-                    }
+                    onClick={() => navigate(route(invoicePaths.edit, { id }))}
                   />
                 }
               />
@@ -228,7 +228,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('number'),
       format: (value, invoice) => (
         <DynamicLink
-          to={route('/invoices/:id/edit', { id: invoice.id })}
+          to={route(invoicePaths.edit, { id: invoice.id })}
           renderSpan={disableNavigation('invoice', invoice)}
         >
           {value}

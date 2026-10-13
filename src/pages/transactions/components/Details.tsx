@@ -9,6 +9,7 @@
  */
 
 import { Element } from '$app/components/cards';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { Link } from '$app/components/forms';
 import { TagPills } from '$app/components/tags/TagPills';
 import {
@@ -45,6 +46,7 @@ interface Props {
 }
 
 export function Details(props: Props) {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const company = useCurrentCompany();
@@ -63,11 +65,9 @@ export function Details(props: Props) {
     enabled: Boolean(transaction),
   });
 
-  const isMatched = TransactionStatus.Matched === transaction?.status_id;
-
   const { data: bankTransactionRuleResponse } = useTransactionRuleQuery({
     id: transaction?.bank_transaction_rule_id || '',
-    enabled: Boolean(transaction) && isMatched,
+    enabled: Boolean(transaction?.bank_transaction_rule_id),
   });
 
   const [matchedInvoices, setMatchedInvoices] = useState<Invoice[]>();
@@ -202,7 +202,7 @@ export function Details(props: Props) {
               className="cursor-pointer"
             >
               <Link
-                to={route('/invoices/:id/edit', {
+                to={route(invoicePaths.edit, {
                   id,
                 })}
               >

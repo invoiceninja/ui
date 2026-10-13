@@ -42,6 +42,8 @@ export { resolveShortcutBindings };
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
 
+export type DurationFormat = 'decimal' | 'hh_mm';
+
 export interface TableFiltersPreference {
   filter?: string;
   customFilter?: string[];
@@ -76,6 +78,7 @@ export interface Preferences {
   use_system_fonts: boolean;
   use_legacy_editor: boolean;
   hide_peppol_sent_status: boolean;
+  duration_format?: DurationFormat;
   feedback_slider_displayed_at: number;
   feedback_given_at: number;
   price_increase_banner_dismissed_at?: number;
@@ -107,6 +110,7 @@ export interface ReactSettings {
   color_theme?: ColorTheme;
   client_show_cards?: ClientShowCard[];
   dashboard_fields?: string[];
+  show_advanced_invoice_editor?: boolean;
   show_advanced_recurring_invoice_editor?: boolean;
 }
 
@@ -148,6 +152,7 @@ export const preferencesDefaults: Preferences = {
   use_system_fonts: false,
   use_legacy_editor: false,
   hide_peppol_sent_status: false,
+  duration_format: 'decimal',
   feedback_slider_displayed_at: 0,
   feedback_given_at: 0,
   price_increase_banner_dismissed_at: 0,

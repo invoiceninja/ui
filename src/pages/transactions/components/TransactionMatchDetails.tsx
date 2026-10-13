@@ -234,14 +234,16 @@ export function TransactionMatchDetails(props: Props) {
 
   useEffect(() => {
     if (transactionRule) {
-      const { category_id, vendor_id } = transactionRule;
+      const categoryId =
+        transactionRule.category_id || transactionRule.expense_category?.id;
+      const vendorId = transactionRule.vendor_id || transactionRule.vendor?.id;
 
-      if (category_id) {
-        setExpenseCategoryIds([category_id]);
+      if (categoryId) {
+        setExpenseCategoryIds([categoryId]);
       }
 
-      if (vendor_id) {
-        setVendorIds([vendor_id]);
+      if (vendorId) {
+        setVendorIds([vendorId]);
       }
     }
   }, [transactionRule]);
@@ -337,6 +339,9 @@ export function TransactionMatchDetails(props: Props) {
                     dataKey="vendors"
                     setSelectedIds={setVendorIds}
                     selectedIds={vendorIds}
+                    seededVendors={
+                      transactionRule?.vendor ? [transactionRule.vendor] : undefined
+                    }
                   />
                   <ListBox
                     style={{
@@ -349,6 +354,11 @@ export function TransactionMatchDetails(props: Props) {
                     dataKey="categories"
                     setSelectedIds={setExpenseCategoryIds}
                     selectedIds={expenseCategoryIds}
+                    seededExpenseCategories={
+                      transactionRule?.expense_category
+                        ? [transactionRule.expense_category]
+                        : undefined
+                    }
                   />
                 </>
               )}

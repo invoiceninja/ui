@@ -16,6 +16,7 @@ import { useParams } from 'react-router-dom';
 import reactStringReplace from 'react-string-replace';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { useRecurringInvoiceEditorPaths } from '$app/common/hooks/useRecurringInvoiceEditor';
 import { date, endpoint, trans } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -38,6 +39,7 @@ const Box = styled.div`
 `;
 
 export function useGenerateActivityElement() {
+  const invoicePaths = useInvoiceEditorPaths();
   const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   const [t] = useTranslation();
 
@@ -54,7 +56,7 @@ export function useGenerateActivityElement() {
       user: activity.user?.label ?? t('system'),
       invoice: (
         <Link
-          to={route('/invoices/:id/edit', {
+          to={route(invoicePaths.edit, {
             id: activity.invoice?.hashed_id,
           })}
         >
