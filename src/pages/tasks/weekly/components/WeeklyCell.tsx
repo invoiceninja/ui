@@ -133,7 +133,6 @@ export function WeeklyCell({
             onEdit({ duration: cleaned });
           }}
           onBlur={() => setDraft(undefined)}
-          placeholder="0"
           className="w-full text-center py-2 pl-2 pr-7 rounded-md text-sm border focus:outline-none focus:ring-2"
           style={{
             backgroundColor: colors.$1,
