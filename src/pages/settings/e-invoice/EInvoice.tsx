@@ -127,7 +127,8 @@ export function EInvoice() {
   const disableSettingsField = useDisableSettingsField();
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
-  const { isCompanySettingsActive } = useCurrentSettingsLevel();
+  const { isCompanySettingsActive, isClientSettingsActive } =
+    useCurrentSettingsLevel();
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
 
@@ -216,6 +217,26 @@ export function EInvoice() {
       setSaveChanges(false);
     }
   }, [saveChanges]);
+
+  if (isClientSettingsActive) {
+    return (
+      <Settings
+        title={t('e_invoicing')}
+        docsLink="en/advanced-settings/#e_invoice"
+        breadcrumbs={pages}
+        onSaveClick={() => {
+          eInvoiceRef?.current?.saveEInvoice();
+          setSaveChanges(true);
+        }}
+      >
+        <PaymentMeans
+          ref={eInvoiceRef}
+          currentEInvoice={company?.e_invoice || {}}
+          entity="client"
+        />
+      </Settings>
+    );
+  }
 
   return (
     <Settings
