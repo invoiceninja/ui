@@ -23,6 +23,7 @@ import { Tooltip } from '$app/components/Tooltip';
 import { useTranslation } from 'react-i18next';
 import { InvoiceStatus } from '../components/InvoiceStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
@@ -124,6 +125,8 @@ export function useAllInvoiceColumns() {
     'tax_amount',
     'created_at',
     'updated_at',
+    'user',
+    'assigned_user',
     'project',
     'tags',
     'recurring_invoice',
@@ -154,6 +157,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
 
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
+  const resolveUserName = useResolveUserName();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
@@ -599,6 +603,18 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'updated_at',
       label: t('last_updated'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (_value, invoice) => resolveUserName(invoice.user_id),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (_value, invoice) => resolveUserName(invoice.assigned_user_id),
     },
     {
       column: 'tags',

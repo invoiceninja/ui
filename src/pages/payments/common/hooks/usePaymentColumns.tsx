@@ -23,6 +23,7 @@ import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useIn
 import { useTranslation } from 'react-i18next';
 import { PaymentStatus } from '../components/PaymentStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
@@ -63,10 +64,10 @@ export function useAllPaymentColumns() {
     'type',
     'transaction_reference',
     'archived_at',
-    //   'assigned_to', @Todo: Need to resolve relationship
+    'assigned_user',
     'converted_amount', // @Todo: How's this different to `amount`?
     'created_at',
-    //   'created_by', @Todo: Need to resolve relationship
+    'user',
     //   'credit_number', @Todo: Need to resolve relationship
     firstCustom,
     secondCustom,
@@ -101,6 +102,7 @@ export function usePaymentColumns() {
   const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
   const resolveCurrency = useResolveCurrency();
+  const resolveUserName = useResolveUserName();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const calculateConvertedAmount = (payment: Payment) => {
@@ -362,6 +364,18 @@ export function usePaymentColumns() {
       id: 'updated_at',
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, payment) => resolveUserName(payment.user_id),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (value, payment) => resolveUserName(payment.assigned_user_id),
     },
     {
       column: 'tags',

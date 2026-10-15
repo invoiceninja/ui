@@ -36,6 +36,7 @@ import {
   useEntityTagFilterColumns,
   useTagFilterCleanup,
 } from '$app/common/hooks/useEntityTagFilters';
+import { useEntityUserFilterColumns } from '$app/common/hooks/useEntityUserFilters';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { permission } from '$app/common/guards/guards/permission';
@@ -64,12 +65,18 @@ export default function Projects() {
   const selectedColumns =
     reactSettings?.react_table_columns?.project || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
+  const shouldShowUserFilter = selectedColumns.includes('user');
+  const shouldShowAssignedUserFilter = selectedColumns.includes('assigned_to');
   const columns = useProjectColumns();
   const filterColumns = useEntityTagFilterColumns(
     TAG_ENTITY_TYPES.project,
     'project_tag_ids',
     { enabled: shouldShowTagFilter }
   );
+  const userFilterColumns = useEntityUserFilterColumns({
+    user: shouldShowUserFilter,
+    assignedUser: shouldShowAssignedUserFilter,
+  });
   const projectColumns = useAllProjectColumns();
   const customBulkActions = useCustomBulkActions();
 
@@ -110,10 +117,10 @@ export default function Projects() {
 
   const currentFilterColumnsCount = useMemo(
     () =>
-      filterColumns.filter(
+      [...userFilterColumns, ...filterColumns].filter(
         (column) => (filterColumnsValues[column.column_id] || []).length > 0
       ).length,
-    [filterColumns, filterColumnsValues]
+    [userFilterColumns, filterColumns, filterColumnsValues]
   );
 
   const currentDateRangeColumnsCount = useMemo(
@@ -146,17 +153,22 @@ export default function Projects() {
     <Default title={t('projects')} breadcrumbs={pages} docsLink="en/projects/">
       <DataTable
         resource="project"
-        endpoint={route(
+        endpoint={`${route(
           shouldShowTagFilter
             ? '/api/v1/projects?status=active&include=:include&without_deleted_clients=true&sort=id|desc'
             : '/api/v1/projects?status=active&include=:include&without_deleted_clients=true&sort=id|desc&tag_ids=',
           { include: queryInclusionEntities }
-        )}
+        )}${shouldShowUserFilter ? '' : '&user_ids='}${
+          shouldShowAssignedUserFilter ? '' : '&assigned_user_ids='
+        }`}
         bulkRoute="/api/v1/projects/bulk"
         columns={columns}
         customActions={actions}
         customBulkActions={customBulkActions}
-        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
+        filterColumns={[
+          ...userFilterColumns,
+          ...(shouldShowTagFilter ? filterColumns : []),
+        ]}
         linkToCreate="/projects/create"
         linkToEdit="/projects/:id/edit"
         withResourcefulActions
