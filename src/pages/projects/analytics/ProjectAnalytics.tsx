@@ -43,6 +43,7 @@ interface Props {
   overviewContent: (forecastCard: ReactNode) => ReactNode;
   tasksContent?: ReactNode;
   invoicesContent?: ReactNode;
+  quotesContent?: ReactNode;
   expensesContent?: ReactNode;
   onCanViewFinancialsChange?: (canViewFinancials: boolean) => void;
 }
@@ -53,6 +54,7 @@ export function ProjectAnalytics({
   overviewContent,
   tasksContent,
   invoicesContent,
+  quotesContent,
   expensesContent,
   onCanViewFinancialsChange,
 }: Props) {
@@ -282,6 +284,14 @@ export function ProjectAnalytics({
           {
             label: t('invoices'),
             content: invoicesContent,
+          },
+        ]
+      : []),
+    ...(quotesContent
+      ? [
+          {
+            label: t('quotes'),
+            content: quotesContent,
           },
         ]
       : []),
