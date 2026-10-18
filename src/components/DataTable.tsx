@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { cloneDeep, get, isEqual } from 'lodash';
@@ -268,6 +268,8 @@ function DataTableCheckbox({
 
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
+
+  const queryClient = useQueryClient();
 
   const colors = useColorScheme();
   const options = useDataTableOptions();
@@ -697,6 +699,10 @@ export function DataTable<T extends object>(props: Props<T>) {
         );
       })
       .finally(() => {
+        if (queryIdentificator) {
+          queryClient.invalidateQueries({ queryKey: [queryIdentificator] });
+        }
+
         refetchByUrl([props.endpoint, apiEndpoint.pathname]);
         setSelected([]);
       });
