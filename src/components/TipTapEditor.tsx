@@ -54,6 +54,8 @@ import { PiPencilSimpleFill } from 'react-icons/pi';
 import { useClickAway, useDebounce } from 'react-use';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { compressImageToMaxBytes } from '$app/common/helpers/image-compression';
+import { toast } from '$app/common/helpers/toast/toast';
 import { Button, InputField, InputLabel } from './forms';
 import { Icon } from './icons/Icon';
 import { Modal } from './Modal';
@@ -1122,10 +1124,15 @@ export function TipTapEditor({
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         const src = e.target?.result as string;
-        if (src) {
-          editor.chain().focus().setImage({ src }).run();
+        if (!src) return;
+
+        try {
+          const image = await compressImageToMaxBytes(src);
+          editor.chain().focus().setImage({ src: image }).run();
+        } catch {
+          toast.error('image_upload_failed');
         }
       };
       reader.readAsDataURL(file);
