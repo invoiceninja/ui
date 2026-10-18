@@ -9,6 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 
@@ -26,6 +27,7 @@ export function DowngradeConfirmModal({
   isLoading,
 }: Props) {
   const { t } = useTranslation();
+  const colors = useColorScheme();
 
   return (
     <Modal
@@ -36,7 +38,9 @@ export function DowngradeConfirmModal({
     >
       <div className="flex flex-col space-y-6">
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">{t('downgrade_end_of_cycle')}</p>
+          <p className="text-sm" style={{ color: colors.$3 }}>
+            {t('downgrade_end_of_cycle')}
+          </p>
 
           <div className="bg-yellow-50 p-4 rounded-md">
             <p className="text-sm text-yellow-800">

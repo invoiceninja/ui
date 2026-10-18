@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { ModuleBitmask } from '$app/common/enums/module-bitmask';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
@@ -17,10 +18,10 @@ import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
 import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
-import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { useBankAccountsQuery } from '$app/pages/settings/bank-accounts/common/queries';
 import { useAdmin, useHasPermission } from '../permissions/useHasPermission';
 import { useCurrentCompany } from '../useCurrentCompany';
+import { useInvoiceEditorPaths } from '../useInvoiceEditor';
 
 interface EntityAction {
   key: string;
@@ -34,6 +35,7 @@ export function useQuickCreateActions() {
   const currentCompany = useCurrentCompany();
   const hasPermission = useHasPermission();
   const enabled = useEnabled();
+  const invoicePaths = useInvoiceEditorPaths();
 
   const { isAdmin, isOwner } = useAdmin();
 
@@ -74,7 +76,7 @@ export function useQuickCreateActions() {
     },
     {
       key: 'invoice',
-      url: '/invoices/create',
+      url: invoicePaths.create,
       section: 'income',
       visible:
         hasPermission('create_invoice') && enabled(ModuleBitmask.Invoices),

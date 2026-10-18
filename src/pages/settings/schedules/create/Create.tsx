@@ -29,6 +29,7 @@ import { Spinner } from '$app/components/Spinner';
 import { useFormatSchedulePayload } from '$app/pages/settings/schedules/common/hooks/useFormatSchedulePayload';
 import { scheduleParametersAtom } from '../common/components/EmailStatement';
 import { ScheduleForm } from '../common/components/ScheduleForm';
+import { getScheduleStarter } from '../common/helpers/schedule-starters';
 import {
   DEFAULT_SCHEDULE_PARAMETERS,
   useHandleChange,
@@ -63,11 +64,27 @@ export function Create() {
   useEffect(() => {
     if (blankSchedule) {
       setSchedule(() => {
+        const starter = getScheduleStarter(searchParams.get('starter'));
+
         let currentParameters = parametersAtom;
 
         if (!searchParams.get('template')) {
           currentParameters = undefined;
           setParametersAtom(undefined);
+        }
+
+        if (starter) {
+          return {
+            ...blankSchedule,
+            template: starter.template,
+            frequency_id: starter.frequencyId,
+            ...(starter.nextRun && { next_run: starter.nextRun() }),
+            remaining_cycles: -1,
+            parameters: {
+              ...DEFAULT_SCHEDULE_PARAMETERS,
+              ...starter.parameters,
+            },
+          };
         }
 
         return {

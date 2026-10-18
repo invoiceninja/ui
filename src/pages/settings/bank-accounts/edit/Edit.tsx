@@ -51,8 +51,8 @@ export function Edit() {
     { name: t('settings'), href: '/settings' },
     { name: t('bank_accounts'), href: '/settings/bank_accounts' },
     {
-      name: t('edit_bank_account'),
-      href: route('/bank_accounts/:id/edit', { id }),
+      name: response?.bank_account_name || t('edit_bank_account'),
+      href: route('/settings/bank_accounts/:id/edit', { id }),
     },
   ];
 

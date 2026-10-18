@@ -54,7 +54,7 @@ export function Edit() {
     { name: t('settings'), href: '/settings' },
     { name: t('group_settings'), href: '/settings/group_settings' },
     {
-      name: t('edit_group'),
+      name: groupSettingsResponse?.name || t('edit_group'),
       href: route('/settings/group_settings/:id/edit', { id }),
     },
   ];
@@ -121,7 +121,7 @@ export function Edit() {
                 <Icon
                   className="h-4 w-4"
                   element={SettingsIcon}
-                  color="white"
+                  color={colors.$1}
                 />
 
                 <span>{t('configure_settings')}</span>

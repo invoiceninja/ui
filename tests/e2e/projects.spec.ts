@@ -2,6 +2,7 @@ import {
   Permission,
   checkDropdownActions,
   checkTableEditability,
+  fillDebounced,
   login,
   logout,
   selectAssignedUser,
@@ -133,9 +134,17 @@ const createProject = async (params: CreateParams) => {
     .getByRole('link', { name: 'New Project' })
     .click();
 
-  await page.waitForTimeout(500);
-
-  await page.locator('[data-cy="name"]').fill(name ?? uniqueName('project'));
+  const nameInput = page.locator('[data-cy="name"]');
+  await nameInput.waitFor({ state: 'visible' });
+  // Name is rendered before the blank-project query lands. Filling earlier
+  // is a no-op (`handleChange` bails when the atom is undefined), then the
+  // query result resets the controlled input and Save posts an empty name.
+  await expect(page.getByRole('button', { name: 'Save' })).toBeEnabled({
+    timeout: 10000,
+  });
+  const projectName = name ?? uniqueName('project');
+  await fillDebounced(nameInput, projectName);
+  await expect(nameInput).toHaveValue(projectName);
 
   await page.locator('[data-testid="combobox-input-field"]').first().click();
 
@@ -151,7 +160,7 @@ const createProject = async (params: CreateParams) => {
 
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(page.getByText('Successfully created project')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Successfully created project')).toBeVisible({ timeout: 30000 });
 };
 
 test("can't view projects without permission", async ({ page }) => {

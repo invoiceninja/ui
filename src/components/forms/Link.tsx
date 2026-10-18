@@ -27,6 +27,7 @@ interface Props extends CommonProps {
   disableHoverUnderline?: boolean;
   withoutExternalIcon?: boolean;
   withoutAdjustedHref?: boolean;
+  state?: unknown;
 }
 
 export function Link(props: Props) {
@@ -102,6 +103,7 @@ export function Link(props: Props) {
       })}
       style={!withoutDefaultStyling ? css : undefined}
       to={props.to}
+      state={props.state}
       onClick={(event) => {
         if (preventLeavingPage) {
           event.preventDefault();

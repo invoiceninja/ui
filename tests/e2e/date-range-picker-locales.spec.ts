@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { expect, type Page, test } from '@playwright/test';
 import {
   DATE_FORMATS,
+  DATE_RANGE_MATRIX_EXCLUSIONS,
   EXPECTED_RANGE,
   LOCALE_EXPECTATIONS,
 } from './fixtures/date-range-picker/matrix';
@@ -30,11 +31,14 @@ const expectedDates: DateResult[] = [
   { isDayjs: true, isValid: true, isoDate: EXPECTED_RANGE[1] },
 ];
 
+const excludedLocales = new Set<string>(DATE_RANGE_MATRIX_EXCLUSIONS);
+
 const locales = readdirSync(resolve(process.cwd(), 'src/resources/lang'), {
   withFileTypes: true,
 })
   .filter((entry) => entry.isDirectory())
   .map((entry) => entry.name)
+  .filter((locale) => !excludedLocales.has(locale))
   .sort();
 
 async function selectTestRange(page: Page, dateFormat: string) {

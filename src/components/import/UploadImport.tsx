@@ -14,6 +14,7 @@ import { cloneDeep } from 'lodash';
 import { ParseResult, parse as papaParse } from 'papaparse';
 import { ChangeEvent, ReactNode, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { HelpCircle } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { MdClose } from 'react-icons/md';
 import styled from 'styled-components';
@@ -27,6 +28,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
 import { Button, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
+import { $help, HelpWidget } from '$app/components/HelpWidget';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { BankAccountSelector } from '$app/pages/transactions/components/BankAccountSelector';
 import { ErrorMessage } from '../ErrorMessage';
@@ -515,8 +517,27 @@ export function UploadImport(props: Props) {
             </ul>
           )}
 
+          {!isImportFileTypeZip && (
+            <button
+              type="button"
+              style={{ color: accentColor }}
+              onClick={() => $help('import-and-export')}
+              className="inline-flex items-center space-x-1 mt-4"
+            >
+              <HelpCircle size={18} />
+              <span>{t('how_to_import_data')}</span>
+            </button>
+          )}
+
           {props.postWidgetSlot ?? null}
         </Element>
+
+        {!isImportFileTypeZip && (
+          <HelpWidget
+            id="import-and-export"
+            url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/docs/advanced-topics/import-and-export.md"
+          />
+        )}
 
         {isImportFileTypeZip && (
           <>

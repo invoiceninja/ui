@@ -475,7 +475,10 @@ export function EInvoice() {
                               <CloudUpload size="2.3rem" color={colors.$3} />
                             </div>
 
-                            <span className="mt-2 block text-sm font-medium text-gray-900">
+                            <span
+                              className="mt-2 block text-sm font-medium"
+                              style={{ color: colors.$3 }}
+                            >
                               {isDragActive
                                 ? 'upload_certificate'
                                 : t('dropzone_default_message')}

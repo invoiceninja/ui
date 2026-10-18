@@ -11,7 +11,7 @@
 import { useQuery } from '@tanstack/react-query';
 import collect from 'collect.js';
 import { useSetAtom } from 'jotai';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
@@ -19,7 +19,7 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { DocuNinjaData } from '$app/common/interfaces/docuninja/api';
-import { Default } from '$app/components/layouts/Default';
+import { LazyDefault as Default } from '$app/components/layouts/LazyDefault';
 import { Spinner } from '$app/components/Spinner';
 
 interface DocuNinjaProviderProps {
@@ -103,21 +103,25 @@ export function DocuNinjaProvider({ children }: DocuNinjaProviderProps) {
 
   if (isPending) {
     return (
-      <Default breadcrumbs={[]}>
-        <Spinner />
-      </Default>
+      <Suspense fallback={<Spinner />}>
+        <Default breadcrumbs={[]}>
+          <Spinner />
+        </Default>
+      </Suspense>
     );
   }
 
   if (error) {
     return (
-      <Default breadcrumbs={[]}>
-        <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-          <p className="text-center opacity-70 max-w-lg">
-            {t('server_not_reachable')}
-          </p>
-        </div>
-      </Default>
+      <Suspense fallback={<Spinner />}>
+        <Default breadcrumbs={[]}>
+          <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+            <p className="text-center opacity-70 max-w-lg">
+              {t('server_not_reachable')}
+            </p>
+          </div>
+        </Default>
+      </Suspense>
     );
   }
 

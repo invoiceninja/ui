@@ -9,10 +9,12 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Schedule } from '$app/common/interfaces/schedule';
 import { toast } from '../helpers/toast/toast';
 import { $refetch } from '../hooks/useRefetch';
@@ -27,6 +29,30 @@ export function useBlankScheduleQuery() {
       request('GET', endpoint('/api/v1/task_schedulers/create')).then(
         (response: GenericSingleResourceResponse<Schedule>) =>
           response.data.data
+      ),
+
+    staleTime: Infinity,
+    enabled: isAdmin || isOwner,
+  });
+}
+
+export function useSchedulesTotalQuery() {
+  const { isAdmin, isOwner } = useAdmin();
+
+  return useQuery({
+    queryKey: [
+      '/api/v1/task_schedulers',
+      'per_page=1',
+      'status=active,archived',
+    ],
+
+    queryFn: () =>
+      request(
+        'GET',
+        endpoint('/api/v1/task_schedulers?per_page=1&status=active,archived')
+      ).then(
+        (response: AxiosResponse<GenericManyResponse<Schedule>>) =>
+          response.data.meta.pagination.total
       ),
 
     staleTime: Infinity,

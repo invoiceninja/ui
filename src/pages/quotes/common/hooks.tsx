@@ -19,19 +19,17 @@ import {
   MdComment,
   MdDelete,
   MdDesignServices,
-  MdDone,
   MdDownload,
   MdEdit,
-  MdMarkEmailRead,
   MdPictureAsPdf,
   MdPrint,
   MdRestore,
   MdSchedule,
-  MdSend,
   MdTextSnippet,
 } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { EntityState } from '$app/common/enums/entity-state';
 import { QuoteStatus } from '$app/common/enums/quote-status';
 import { date, endpoint, getEntityState } from '$app/common/helpers';
@@ -102,6 +100,9 @@ import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatu
 import { invoiceSumAtom, quoteAtom } from './atoms';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
 import { ConvertOptionsModal } from './components/ConvertOptionsModal';
+import { EmailQuoteAction } from './components/EmailQuoteAction';
+import { QuoteActionConfirmation } from './components/QuoteActionConfirmation';
+import { isQuoteCancellable } from './helpers';
 import { useApprove } from './hooks/useApprove';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useMarkSent } from './hooks/useMarkSent';
@@ -285,6 +286,7 @@ export function useCreate(props: CreateProps) {
   const refreshCompanyUsers = useRefreshCompanyUsers();
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const saveCompany = useHandleCompanySave();
 
@@ -322,7 +324,12 @@ export function useCreate(props: CreateProps) {
 
         $refetch(['quotes']);
 
-        navigate(route('/quotes/:id/edit', { id: response.data.data.id }));
+        const table = searchParams.get('table');
+        const editRoute = route('/quotes/:id/edit', {
+          id: response.data.data.id,
+        });
+
+        navigate(table ? `${editRoute}?table=${table}` : editRoute);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
@@ -468,19 +475,13 @@ export function useActions(params?: Params) {
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
     (quote) => (
-      <EntityActionElement
+      <EmailQuoteAction
         {...(!dropdown && {
           key: 'email_quote',
         })}
-        entity="quote"
-        actionKey="email_quote"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('email_quote')}
-        to={route('/quotes/:id/email', { id: quote.id })}
-        icon={MdSend}
-      >
-        {t('email_quote')}
-      </EntityActionElement>
+        quote={quote}
+        isDropdown={dropdown}
+      />
     ),
     (quote) => (
       <EntityActionElement
@@ -605,38 +606,37 @@ export function useActions(params?: Params) {
     ),
     (quote) =>
       quote.status_id === QuoteStatus.Draft && (
-        <EntityActionElement
+        <QuoteActionConfirmation
           {...(!dropdown && {
             key: 'mark_sent',
           })}
-          entity="quote"
-          actionKey="mark_sent"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('mark_sent')}
-          onClick={() => markSent(quote)}
-          icon={MdMarkEmailRead}
-          disablePreventNavigation
-        >
-          {t('mark_sent')}
-        </EntityActionElement>
+          action="mark_sent"
+          dropdown={dropdown}
+          onConfirm={() => markSent(quote)}
+        />
       ),
     (quote) =>
       (quote.status_id === QuoteStatus.Draft ||
         quote.status_id === QuoteStatus.Sent) && (
-        <EntityActionElement
+        <QuoteActionConfirmation
           {...(!dropdown && {
             key: 'approve',
           })}
-          entity="quote"
-          actionKey="approve"
-          isCommonActionSection={!dropdown}
-          tooltipText={t('approve')}
-          onClick={() => approve(quote)}
-          icon={MdDone}
-          disablePreventNavigation
-        >
-          {t('approve')}
-        </EntityActionElement>
+          action="approve"
+          dropdown={dropdown}
+          onConfirm={() => approve(quote)}
+        />
+      ),
+    (quote) =>
+      isQuoteCancellable(quote) && (
+        <QuoteActionConfirmation
+          {...(!dropdown && {
+            key: 'cancel_quote',
+          })}
+          action="cancel"
+          dropdown={dropdown}
+          onConfirm={() => bulk([quote.id], 'cancel')}
+        />
       ),
     (quote) => (
       <ConvertOptionsModal
@@ -807,6 +807,7 @@ export function useAllQuoteColumns() {
 }
 
 export function useQuoteColumns() {
+  const invoicePaths = useInvoiceEditorPaths();
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -865,9 +866,7 @@ export function useQuoteColumns() {
                   fontSize={19}
                   color={accentColor}
                   onClick={() =>
-                    navigate(
-                      route('/invoices/:id/edit', { id: quote.invoice_id })
-                    )
+                    navigate(route(invoicePaths.edit, { id: quote.invoice_id }))
                   }
                 />
               }
@@ -1241,6 +1240,12 @@ export function useQuoteFilters() {
       value: 'converted',
       color: 'white',
       backgroundColor: statusThemeColors.$3 || '#22C55E',
+    },
+    {
+      label: t('cancelled'),
+      value: 'cancelled',
+      color: 'white',
+      backgroundColor: '#000000',
     },
   ];
 

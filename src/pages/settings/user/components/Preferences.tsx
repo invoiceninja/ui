@@ -12,13 +12,16 @@ import { get } from 'lodash';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import { DEFAULT_TABS } from '$app/common/constants/default-tab';
 import {
   preferencesDefaults,
   useDraftOrCommittedReactSettings,
   useUpdateDraftOrReactSettings,
 } from '$app/common/hooks/useReactSettings';
+import { useShowGuidedInvoiceEditor } from '$app/common/hooks/useInvoiceEditor';
 import { Divider } from '$app/components/cards/Divider';
 import { NumberInputField } from '$app/components/forms/NumberInputField';
+import { SelectField } from '$app/components/forms/SelectField';
 import Toggle from '$app/components/forms/Toggle';
 import { CircleXMark } from '$app/components/icons/CircleXMark';
 import { Element } from '../../../../components/cards';
@@ -30,6 +33,7 @@ export function Preferences() {
   const colors = useColorScheme();
   const reactSettings = useDraftOrCommittedReactSettings();
   const updateSettings = useUpdateDraftOrReactSettings();
+  const guidedInvoiceEditor = useShowGuidedInvoiceEditor();
 
   const handleChange = (property: string, value: string | number | boolean) => {
     updateSettings(
@@ -98,6 +102,25 @@ export function Preferences() {
         />
       </Element>
 
+      <Element
+        leftSide={t('show_advanced_invoice_editor')}
+        leftSideHelp={t('show_advanced_invoice_editor_help')}
+      >
+        <Toggle
+          checked={
+            typeof reactSettings.show_advanced_invoice_editor === 'boolean'
+              ? reactSettings.show_advanced_invoice_editor
+              : !guidedInvoiceEditor
+          }
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.show_advanced_invoice_editor',
+              value
+            )
+          }
+        />
+      </Element>
+
       <Element leftSide={t('dark_mode')}>
         <Toggle
           checked={Boolean(reactSettings?.dark_mode)}
@@ -149,6 +172,26 @@ export function Preferences() {
             )
           }
         />
+      </Element>
+
+      <Element leftSide={t('default_tab')}>
+        <SelectField
+          value={reactSettings.preferences.default_tab}
+          onValueChange={(value) =>
+            handleChange(
+              'company_user.react_settings.preferences.default_tab',
+              value
+            )
+          }
+          customSelector
+          dismissable={false}
+        >
+          {DEFAULT_TABS.map((tab) => (
+            <option key={tab} value={tab}>
+              {t(tab)}
+            </option>
+          ))}
+        </SelectField>
       </Element>
 
       <Element

@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
@@ -40,6 +41,7 @@ interface Props {
 }
 
 export function CloneOptionsModal({ quote, dropdown }: Props) {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const navigate = useNavigate();
@@ -155,6 +157,7 @@ export function CloneOptionsModal({ quote, dropdown }: Props) {
       vendor_id: '',
       due_date: '',
       partial_due_date: '',
+      expense_id: '',
       design_id: company.settings.purchase_order_design_id,
       vendor: undefined,
     });
@@ -190,7 +193,7 @@ export function CloneOptionsModal({ quote, dropdown }: Props) {
     setIsModalVisible(false);
 
     setTimeout(() => {
-      navigate('/invoices/create?action=clone');
+      navigate(`${invoicePaths.create}?action=clone`);
     }, 150);
   };
 

@@ -9,7 +9,7 @@
  */
 
 import { useAtom } from 'jotai';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaObjectGroup } from 'react-icons/fa';
 import { MdGroup } from 'react-icons/md';
@@ -20,6 +20,7 @@ import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDet
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useSwitchToCompanySettings } from '$app/common/hooks/useSwitchToCompanySettings';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
+import { $help, HelpWidget } from '$app/components/HelpWidget';
 import { ValidationAlert } from '$app/components/ValidationAlert';
 import { classNames } from '../../common/helpers';
 import { companySettingsErrorsAtom } from '../../pages/settings/common/atoms';
@@ -27,8 +28,13 @@ import { SelectField } from '../forms';
 import { Icon } from '../icons/Icon';
 import { Sparkle } from '../icons/Sparkle';
 import { XMark } from '../icons/XMark';
-import { useSettingsRoutes } from './common/hooks';
+import {
+  SettingsDocs,
+  settingsHelpAtom,
+  useSettingsRoutes,
+} from './common/hooks';
 import { Default } from './Default';
+import { SettingsDocsProvider } from './settings-docs-context';
 
 interface Props {
   title: string;
@@ -50,10 +56,14 @@ const LinkStyled = styled(Link)`
   }
 `;
 
+const SETTINGS_HELP_ID = 'settings';
+
 export function Settings(props: Props) {
   const [t] = useTranslation();
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
+  const [settingsHelp, setSettingsHelp] = useAtom(settingsHelpAtom);
+  const pendingHelpOpen = useRef(false);
 
   const location = useLocation();
   const colors = useColorScheme();
@@ -70,6 +80,53 @@ export function Settings(props: Props) {
     setErrors(undefined);
   }, [settingPathNameKey]);
 
+  useEffect(() => {
+    return () => setSettingsHelp(null);
+  }, []);
+
+  useEffect(() => {
+    if (!settingsHelp || !pendingHelpOpen.current) {
+      return;
+    }
+
+    pendingHelpOpen.current = false;
+
+    const frame = requestAnimationFrame(() => {
+      $help(SETTINGS_HELP_ID, {
+        open: true,
+        moveToHeading: settingsHelp.heading,
+      });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [settingsHelp]);
+
+  const currentDocs = [...basic, ...advanced].find(
+    (item) => item.current && item.docs
+  )?.docs;
+
+  const handleDocsClick = useCallback(
+    (docs: SettingsDocs) => {
+      const widget = document.getElementById(`help-widget-${SETTINGS_HELP_ID}`);
+      const isOpen = Boolean(widget && !widget.classList.contains('hidden'));
+      const isSame =
+        settingsHelp?.url === docs.url &&
+        settingsHelp?.heading === docs.heading;
+
+      if (isSame && isOpen) {
+        $help(SETTINGS_HELP_ID, { open: false });
+        return;
+      }
+
+      pendingHelpOpen.current = true;
+      setSettingsHelp({
+        url: docs.url,
+        heading: docs.heading,
+      });
+    },
+    [settingsHelp]
+  );
+
   return (
     <Default
       onSaveClick={props.onSaveClick}
@@ -81,6 +138,14 @@ export function Settings(props: Props) {
       breadcrumbs={[]}
       aboveMainContainer={props.aboveMainContainer}
     >
+      {settingsHelp && (
+        <HelpWidget id={SETTINGS_HELP_ID} url={settingsHelp.url} />
+      )}
+      <SettingsDocsProvider
+        key={location.pathname}
+        docs={currentDocs}
+        onDocsClick={handleDocsClick}
+      >
       {props.breadcrumbs && (
         <div className="w-full pl-0 lg:pl-2 pt-3 pb-2">
           <Breadcrumbs pages={props.breadcrumbs} />
@@ -88,173 +153,175 @@ export function Settings(props: Props) {
       )}
 
       <div className="grid grid-cols-12 lg:gap-6">
-        <div className="col-span-12 lg:col-span-3">
-          {(isGroupSettingsActive || isClientSettingsActive) && (
-            <div
-              className="flex items-center justify-between border py-3 space-x-3 px-3 rounded-md shadow-sm"
-              style={{
-                backgroundColor: colors.$1,
-                borderColor: colors.$24,
-              }}
-            >
-              <div className="flex items-center space-x-2 flex-1 min-w-0">
-                <div>
-                  <Icon
-                    element={isGroupSettingsActive ? FaObjectGroup : MdGroup}
-                    size={20}
-                  />
-                </div>
-
-                <span className="text-sm truncate">
-                  {isGroupSettingsActive
-                    ? t('group_settings')
-                    : t('client_settings')}
-                  : {activeSettings.name}
-                </span>
-              </div>
-
+          <div className="col-span-12 lg:col-span-3">
+            {(isGroupSettingsActive || isClientSettingsActive) && (
               <div
-                className="cursor-pointer hover:opacity-75"
-                onClick={() => {
-                  switchToCompanySettings();
-
-                  isGroupSettingsActive && navigate('/settings/group_settings');
-                  isClientSettingsActive && navigate('/clients');
+                className="flex items-center justify-between border py-3 space-x-3 px-3 rounded-md shadow-sm"
+                style={{
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$24,
                 }}
               >
-                <XMark color={colors.$3} size="1rem" />
-              </div>
-            </div>
-          )}
+                <div className="flex items-center space-x-2 flex-1 min-w-0">
+                  <div>
+                    <Icon
+                      element={isGroupSettingsActive ? FaObjectGroup : MdGroup}
+                      size={20}
+                    />
+                  </div>
 
-          <a className="flex items-center mb-3 mt-4 px-0 lg:px-3 text-sm font-medium">
-            <span className="truncate" style={{ color: colors.$17 }}>
-              {t('basic_settings')}
-            </span>
-          </a>
-
-          <SelectField
-            className="lg:hidden text-sm"
-            value={location.pathname}
-            onValueChange={(value) => navigate(value)}
-            withBlank
-            customSelector
-          >
-            {basic
-              .filter((item) => item.enabled)
-              .map((item) => (
-                <option key={item.name} value={item.href}>
-                  {item.name}
-                </option>
-              ))}
-          </SelectField>
-
-          <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
-            {basic.map(
-              (item) =>
-                item.enabled && (
-                  <LinkStyled
-                    key={item.name}
-                    to={item.href}
-                    className={classNames(
-                      'flex items-center px-3 py-2 text-sm font-medium rounded-md'
-                    )}
-                    aria-current={item.current ? 'page' : undefined}
-                    theme={{
-                      backgroundColor: item.current ? colors.$20 : '',
-                      color: item.current ? colors.$3 : '',
-                      hoverColor: colors.$20,
-                    }}
-                  >
-                    <span className="truncate">{item.name}</span>
-                  </LinkStyled>
-                )
-            )}
-          </nav>
-
-          {advanced.filter((route) => route.enabled).length > 0 && (
-            <div className="flex items-center mb-3 mt-8 px-0 lg:px-3 text-sm font-medium truncate space-x-2">
-              <span style={{ color: colors.$17 }}>
-                {t('advanced_settings')}
-              </span>
-
-              <div className="flex space-x-0.5 items-center text-xs py-1 px-2 bg-[#2176FF26] rounded">
-                <div>
-                  <Sparkle size="1rem" color="#2176FF" />
+                  <span className="text-sm truncate">
+                    {isGroupSettingsActive
+                      ? t('group_settings')
+                      : t('client_settings')}
+                    : {activeSettings.name}
+                  </span>
                 </div>
 
-                <span className="font-medium" style={{ color: '#2176FF' }}>
-                  {t('pro')}
+                <div
+                  className="cursor-pointer hover:opacity-75"
+                  onClick={() => {
+                    switchToCompanySettings();
+
+                    isGroupSettingsActive &&
+                      navigate('/settings/group_settings');
+                    isClientSettingsActive && navigate('/clients');
+                  }}
+                >
+                  <XMark color={colors.$3} size="1rem" />
+                </div>
+              </div>
+            )}
+
+            <a className="flex items-center mb-3 mt-4 px-0 lg:px-3 text-sm font-medium">
+              <span className="truncate" style={{ color: colors.$17 }}>
+                {t('basic_settings')}
+              </span>
+            </a>
+
+            <SelectField
+              className="lg:hidden text-sm"
+              value={location.pathname}
+              onValueChange={(value) => navigate(value)}
+              withBlank
+              customSelector
+            >
+              {basic
+                .filter((item) => item.enabled)
+                .map((item) => (
+                  <option key={item.name} value={item.href}>
+                    {item.name}
+                  </option>
+                ))}
+            </SelectField>
+
+            <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
+              {basic.map(
+                (item) =>
+                  item.enabled && (
+                    <LinkStyled
+                      key={item.name}
+                      to={item.href}
+                      className={classNames(
+                        'flex items-center px-3 py-2 text-sm font-medium rounded-md'
+                      )}
+                      aria-current={item.current ? 'page' : undefined}
+                      theme={{
+                        backgroundColor: item.current ? colors.$20 : '',
+                        color: item.current ? colors.$3 : '',
+                        hoverColor: colors.$20,
+                      }}
+                    >
+                      <span className="truncate">{item.name}</span>
+                    </LinkStyled>
+                  )
+              )}
+            </nav>
+
+            {advanced.filter((route) => route.enabled).length > 0 && (
+              <div className="flex items-center mb-3 mt-8 px-0 lg:px-3 text-sm font-medium truncate space-x-2">
+                <span style={{ color: colors.$17 }}>
+                  {t('advanced_settings')}
                 </span>
-              </div>
-            </div>
-          )}
 
-          <SelectField
-            className="lg:hidden text-sm"
-            value={location.pathname}
-            onValueChange={(value) => navigate(value)}
-            withBlank
-            customSelector
-          >
-            {advanced
-              .filter((item) => item.enabled)
-              .map((item) => (
-                <option key={item.name} value={item.href}>
-                  {item.name}
-                </option>
-              ))}
-          </SelectField>
-
-          <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
-            {advanced.map((item, index) => (
-              <div key={index}>
-                {item.enabled && (
-                  <LinkStyled
-                    key={item.name}
-                    to={item.href}
-                    className={classNames(
-                      'flex items-center px-3 py-2 text-sm font-medium rounded-md'
-                    )}
-                    aria-current={item.current ? 'page' : undefined}
-                    theme={{
-                      backgroundColor: item.current ? colors.$20 : '',
-                      color: item.current ? colors.$3 : '',
-                      hoverColor: colors.$20,
-                    }}
-                  >
-                    <span className="truncate">{item.name}</span>
-                  </LinkStyled>
-                )}
-
-                {item.children && item.current && (
-                  <div className="bg-gray-100 space-y-4 py-3 rounded-b">
-                    {item.children &&
-                      item.children.map((item, index) => (
-                        <Link
-                          key={index}
-                          to={item.href}
-                          className={classNames(
-                            item.current ? 'text-gray-900 font-semibold' : '',
-                            'ml-4 px-3 text-sm block text-gray-700 hover:text-gray-900 transition duration-200 ease-in-out'
-                          )}
-                        >
-                          {item.name}
-                        </Link>
-                      ))}
+                <div className="flex space-x-0.5 items-center text-xs py-1 px-2 bg-[#2176FF26] rounded">
+                  <div>
+                    <Sparkle size="1rem" color="#2176FF" />
                   </div>
-                )}
+
+                  <span className="font-medium" style={{ color: '#2176FF' }}>
+                    {t('pro')}
+                  </span>
+                </div>
               </div>
-            ))}
-          </nav>
-        </div>
+            )}
 
-        <div className="col-span-12 lg:col-start-4 space-y-6 mt-4">
-          {errors && <ValidationAlert errors={errors} />}
+            <SelectField
+              className="lg:hidden text-sm"
+              value={location.pathname}
+              onValueChange={(value) => navigate(value)}
+              withBlank
+              customSelector
+            >
+              {advanced
+                .filter((item) => item.enabled)
+                .map((item) => (
+                  <option key={item.name} value={item.href}>
+                    {item.name}
+                  </option>
+                ))}
+            </SelectField>
 
-          {props.children}
+            <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
+              {advanced.map((item, index) => (
+                <div key={index}>
+                  {item.enabled && (
+                    <LinkStyled
+                      key={item.name}
+                      to={item.href}
+                      className={classNames(
+                        'flex items-center px-3 py-2 text-sm font-medium rounded-md'
+                      )}
+                      aria-current={item.current ? 'page' : undefined}
+                      theme={{
+                        backgroundColor: item.current ? colors.$20 : '',
+                        color: item.current ? colors.$3 : '',
+                        hoverColor: colors.$20,
+                      }}
+                    >
+                      <span className="truncate">{item.name}</span>
+                    </LinkStyled>
+                  )}
+
+                  {item.children && item.current && (
+                    <div className="bg-gray-100 space-y-4 py-3 rounded-b">
+                      {item.children &&
+                        item.children.map((item, index) => (
+                          <Link
+                            key={index}
+                            to={item.href}
+                            className={classNames(
+                              item.current ? 'text-gray-900 font-semibold' : '',
+                              'ml-4 px-3 text-sm block text-gray-700 hover:text-gray-900 transition duration-200 ease-in-out'
+                            )}
+                          >
+                            {item.name}
+                          </Link>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </nav>
+          </div>
+
+          <div className="col-span-12 lg:col-start-4 space-y-6 mt-4">
+            {errors && <ValidationAlert errors={errors} />}
+
+            {props.children}
+          </div>
         </div>
-      </div>
+      </SettingsDocsProvider>
     </Default>
   );
 }

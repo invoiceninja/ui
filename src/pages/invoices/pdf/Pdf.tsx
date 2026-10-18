@@ -11,6 +11,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
@@ -57,7 +58,7 @@ export default function Pdf() {
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
     {
-      name: t('edit_invoice'),
+      name: numberBreadcrumb(data?.number, t('edit_invoice')),
       href: route('/invoices/:id/edit', { id }),
     },
     {

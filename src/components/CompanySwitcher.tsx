@@ -19,6 +19,7 @@ import companySettings from '$app/common/constants/company-settings';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
 import { freePlan } from '$app/common/guards/guards/free-plan';
 import { isDemo, isHosted, isSelfHosted } from '$app/common/helpers';
+import { clearTabCompany } from '$app/common/helpers/company-session';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -100,6 +101,10 @@ export function CompanySwitcher() {
     useState<boolean>(false);
 
   const switchCompany = (index: number) => {
+    // An explicit choice returns a tab pinned by a ?company= link to the
+    // company every tab shares.
+    clearTabCompany();
+
     dispatch(
       authenticate({
         type: AuthenticationTypes.TOKEN,

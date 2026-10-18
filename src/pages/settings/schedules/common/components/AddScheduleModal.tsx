@@ -10,6 +10,7 @@
 
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Schedule, ScheduleParams } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -42,6 +43,7 @@ const defaultSchedule: ScheduleParams = {
 
 export function AddScheduleModal(props: Props) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
   const {
     visible,
     setVisible,
@@ -269,7 +271,7 @@ export function AddScheduleModal(props: Props) {
             errorMessage={errors?.errors.amount}
           />
 
-          <div className="text-sm text-gray-600 mt-1">
+          <div className="text-sm mt-1" style={{ color: colors.$22 }}>
             {currentSchedule.is_amount
               ? `Remaining: $${calculateModalRemaining(currentSchedule.is_amount)} of ${selectedInvoice?.amount || 0}`
               : `Remaining: ${calculateModalRemaining(currentSchedule.is_amount)}% of invoice`}

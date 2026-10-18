@@ -19,6 +19,7 @@ import {
   createApiContext,
   fetchEntityByName,
   getCompany,
+  resetUserReactSettings,
   updateCompany,
   setPermissions as setUserPermissions,
   type ApiContext,
@@ -276,6 +277,15 @@ export function resetAccountBeforeAll(timeout = RESET_ACCOUNT_TIMEOUT) {
   test.beforeAll(async ({ account }, testInfo) => {
     test.setTimeout(timeout);
     await resetTestAccount(account, 'before ' + testInfo.file);
+  });
+
+  test.beforeEach(async ({ account }) => {
+    const api = await createApiContext(
+      account.apiUrl,
+      account.ownerEmail,
+      account.password
+    );
+    await resetUserReactSettings(api, { quiet: true });
   });
 }
 

@@ -31,6 +31,7 @@ import {
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { EntityState } from '$app/common/enums/entity-state';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
@@ -58,6 +59,7 @@ import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { CloneOptionsModal } from '../../common/components/CloneOptionsModal';
+import { ConvertOptionsModal } from '../../common/components/ConvertOptionsModal';
 // import { useReverseInvoice } from '../../common/hooks/useReverseInvoice';
 import { EmailInvoiceAction } from '../../common/components/EmailInvoiceAction';
 import { useCancelInvoiceModal } from '../hooks/useCancelInvoiceModal';
@@ -84,6 +86,7 @@ interface Params {
 }
 
 export function useActions(params?: Params) {
+  const invoicePaths = useInvoiceEditorPaths();
   const { t } = useTranslation();
 
   const {
@@ -178,14 +181,14 @@ export function useActions(params?: Params) {
     };
 
     setInvoice(negativeInvoice);
-    navigate('/invoices/create?action=clone');
+    navigate(`${invoicePaths.create}?action=clone`);
   };
 
   const actions = [
     (invoice: Invoice) =>
       Boolean(showEditAction) && (
         <DropdownElement
-          to={route('/invoices/:id/edit', { id: invoice.id })}
+          to={route(invoicePaths.edit, { id: invoice.id })}
           icon={<Icon element={MdEdit} />}
         >
           {t('edit')}
@@ -436,6 +439,15 @@ export function useActions(params?: Params) {
           {t('schedule')}
         </EntityActionElement>
       ),
+    (invoice: Invoice) => (
+      <ConvertOptionsModal
+        {...(!dropdown && {
+          key: 'convert_to',
+        })}
+        dropdown={dropdown}
+        invoice={invoice}
+      />
+    ),
     (invoice: Invoice) =>
       shouldBeRunTemplateActionVisible && (
         <EntityActionElement

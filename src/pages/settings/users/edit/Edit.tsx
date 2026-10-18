@@ -53,7 +53,12 @@ export function Edit() {
     { name: t('settings'), href: '/settings' },
     { name: t('user_management'), href: '/settings/users' },
     {
-      name: t('edit_user'),
+      name:
+        [response?.data.data.first_name, response?.data.data.last_name]
+          .filter(Boolean)
+          .join(' ') ||
+        response?.data.data.email ||
+        t('edit_user'),
       href: route('/settings/users/:id/edit', { id }),
     },
   ];

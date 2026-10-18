@@ -16,6 +16,7 @@ import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Payment } from '$app/common/interfaces/payment';
 import { DataTable } from '$app/components/DataTable';
+import { showDeletePaymentAction } from '$app/pages/payments/common/helpers/show-delete-payment-action';
 import { useActions } from '$app/pages/payments/common/hooks/useActions';
 import { usePaymentColumns } from '$app/pages/payments/common/hooks/usePaymentColumns';
 import { usePaymentFilters } from '$app/pages/payments/common/hooks/usePaymentFilters';
@@ -48,6 +49,7 @@ export default function Payments() {
       linkToEdit="/payments/:id/edit"
       excludeColumns={['client_id']}
       showRestore={(resource: Payment) => !resource.is_deleted}
+      showDelete={(resource: Payment) => showDeletePaymentAction(resource)}
       linkToCreateGuards={[permission('create_payment')]}
       hideEditableOptions={!hasPermission('edit_payment')}
       showRestoreBulk={(selectedPayments) =>

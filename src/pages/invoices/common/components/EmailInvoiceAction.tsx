@@ -11,13 +11,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
+import { hasContactWithEmail } from '$app/common/helpers/emails/has-contact-with-email';
 import { route } from '$app/common/helpers/route';
-import { Client } from '$app/common/interfaces/client';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { EntityActionElement } from '$app/components/EntityActionElement';
-import { Button } from '$app/components/forms';
-import { Modal } from '$app/components/Modal';
+import { ContactEmailModal } from '$app/components/emails/ContactEmailModal';
 
 interface Props {
   invoice: Invoice;
@@ -25,29 +23,22 @@ interface Props {
 }
 export function EmailInvoiceAction(props: Props) {
   const [t] = useTranslation();
-  const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const { invoice, isDropdown = false } = props;
 
-  const hasClientEmailContacts = (client?: Client) => {
-    return client?.contacts.some(({ email }) => email);
-  };
+  const hasEmail = hasContactWithEmail(invoice.client?.contacts);
 
   return (
     <>
-      <div
-        onClick={() =>
-          !hasClientEmailContacts(invoice.client) && setIsModalOpen(true)
-        }
-      >
+      <div onClick={() => !hasEmail && setIsModalOpen(true)}>
         <EntityActionElement
           entity="invoice"
           actionKey="email_invoice"
           isCommonActionSection={!isDropdown}
           tooltipText={t('email_invoice')}
-          {...(hasClientEmailContacts(invoice.client) && {
+          {...(hasEmail && {
             to: route('/invoices/:id/email', {
               id: invoice.id,
             }),
@@ -58,27 +49,12 @@ export function EmailInvoiceAction(props: Props) {
         </EntityActionElement>
       </div>
 
-      <Modal
-        title={t('contact_email')}
+      <ContactEmailModal
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-      >
-        <div className="flex flex-col items-center space-y-4">
-          <span className="text-base font-medium">
-            {t('client_email_not_set')}.
-          </span>
-
-          <Button
-            className="self-end"
-            onClick={() => {
-              navigate(route('/clients/:id/edit', { id: invoice.client_id }));
-              setIsModalOpen(false);
-            }}
-          >
-            {t('edit_client')}
-          </Button>
-        </div>
-      </Modal>
+        relation="client"
+        relationId={invoice.client_id}
+      />
     </>
   );
 }

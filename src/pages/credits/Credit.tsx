@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
@@ -56,15 +57,15 @@ export default function Credit() {
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
+  const { data } = useCreditQuery({ id: id! });
+
   const pages: Page[] = [
     { name: t('credits'), href: '/credits' },
     {
-      name: t('edit_credit'),
+      name: numberBreadcrumb(data?.number, t('edit_credit')),
       href: route('/credits/:id/edit', { id }),
     },
   ];
-
-  const { data } = useCreditQuery({ id: id! });
 
   const company = useCurrentCompany();
 

@@ -13,10 +13,11 @@ import { atom, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
+import { Account } from '$app/common/interfaces/account';
 import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
 import { darkColorScheme, lightColorScheme } from './common/colors';
 import { toast } from './common/helpers/toast/toast';
@@ -34,9 +35,9 @@ import {
   useReactSettings,
 } from './common/hooks/useReactSettings';
 import { $refetch, useRefetch } from './common/hooks/useRefetch';
+import { useRequiresUserDetails } from './common/hooks/useRequiresUserDetails';
 import { useResolveAntdLocale } from './common/hooks/useResolveAntdLocale';
 import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
-import { useSockets } from './common/hooks/useSockets';
 import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
 import { useSystemFonts } from './common/hooks/useSystemFonts';
 import { useWebSessionTimeout } from './common/hooks/useWebSessionTimeout';
@@ -45,10 +46,11 @@ import {
   useSocketEvent,
 } from './common/queries/sockets';
 import { routes } from './common/routes';
+import { updateAccount } from './common/stores/slices/company-users';
 import { RootState } from './common/stores/store';
 import { antdLocaleAtom } from './components/DropdownDateRangePicker';
-import { dayJSLocaleAtom } from './components/forms';
 import { PreventNavigationModal } from './components/PreventNavigationModal';
+import { UserDetailsModal } from './components/UserDetailsModal';
 import { CompanyEdit } from './pages/settings/company/edit/CompanyEdit';
 
 interface RefreshEntityData {
@@ -71,6 +73,7 @@ export function App() {
   const { isOwner } = useAdmin();
   const { i18n } = useTranslation();
 
+  const dispatch = useDispatch();
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
   const navigate = useNavigate();
@@ -91,6 +94,7 @@ export function App() {
   const resolveAntdLocale = useResolveAntdLocale();
   const resolveDayJSLocale = useResolveDayJSLocale();
   const switchToCompanySettings = useSwitchToCompanySettings();
+  const requiresUserDetails = useRequiresUserDetails();
 
   useFetchReactSettings();
 
@@ -99,13 +103,17 @@ export function App() {
   const setRefreshEntityDataBanner = useSetAtom(refreshEntityDataBannerAtom);
 
   const updateAntdLocale = useSetAtom(antdLocaleAtom);
-  const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
 
   const { isCompanySettingsActive, isGroupSettingsActive } =
     useCurrentSettingsLevel();
 
   const [isCompanyEditModalOpened, setIsCompanyEditModalOpened] =
     useState(false);
+  const [isUserDetailsModalDismissed, setIsUserDetailsModalDismissed] =
+    useState(false);
+
+  const isUserDetailsModalVisible =
+    requiresUserDetails && !isUserDetailsModalDismissed;
 
   const resolvedLanguage = company
     ? resolveLanguage(
@@ -145,7 +153,6 @@ export function App() {
   useEffect(() => {
     if (resolvedLanguage?.locale) {
       resolveDayJSLocale(resolvedLanguage.locale).then((resolvedLocale) => {
-        updateDayJSLocale(resolvedLocale);
         dayjs.locale(resolvedLocale);
       });
 
@@ -172,15 +179,22 @@ export function App() {
   }, [darkMode, resolvedLanguage]);
 
   useEffect(() => {
-    window.addEventListener('reset.password.required', () => {
-      setIsPasswordRequired(false);
-    });
-
-    window.addEventListener('refetch', (event) => {
+    const handleResetPassword = () => setIsPasswordRequired(false);
+    const handleRefetch = (event: Event) => {
       const { property } = (event as CustomEvent).detail;
-
       refetch(property);
-    });
+    };
+
+    window.addEventListener('reset.password.required', handleResetPassword);
+    window.addEventListener('refetch', handleRefetch);
+
+    return () => {
+      window.removeEventListener(
+        'reset.password.required',
+        handleResetPassword
+      );
+      window.removeEventListener('refetch', handleRefetch);
+    };
   }, []);
 
   useEffect(() => {
@@ -197,13 +211,14 @@ export function App() {
 
     if (
       company &&
+      !isUserDetailsModalVisible &&
       (!companyName || companyName === t('untitled_company')) &&
       localStorage.getItem('COMPANY-EDIT-OPENED') !== 'true'
     ) {
       localStorage.setItem('COMPANY-EDIT-OPENED', 'true');
       setIsCompanyEditModalOpened(true);
     }
-  }, [company]);
+  }, [company, isUserDetailsModalVisible]);
 
   useEffect(() => {
     if (
@@ -232,34 +247,19 @@ export function App() {
     }
   }, [location, user]);
 
-  const sockets = useSockets();
-
   usePrivateSocketEvents();
-
-  useEffect(() => {
-    if (company && sockets) {
-      sockets.connection.bind('disconnected', () => {
-        console.log('Disconnected from Pusher');
-      });
-
-      sockets.connection.bind('error', () => {
-        console.error('Error from Pusher');
-      });
-
-      sockets.connect();
-    }
-
-    return () => {
-      if (sockets && company) {
-        sockets.disconnect();
-      }
-    };
-  }, [company?.company_key]);
 
   useSystemFonts();
 
+  useSocketEvent<Account>({
+    on: 'App\\Events\\Account\\AccountWasUpdated',
+    callback: ({ data }) => {
+      dispatch(updateAccount(data));
+    },
+  });
+
   useSocketEvent({
-    on: 'App\\Events\\Socket\\RefreshEntity',
+    on: 'App\\Events\\Socket\\RefetchEntity',
     callback: ({ data }) => {
       const currentData = data as RefreshEntityData;
 
@@ -281,6 +281,11 @@ export function App() {
         <Toaster position="top-center" />
         {routes}
       </div>
+
+      <UserDetailsModal
+        visible={isUserDetailsModalVisible}
+        onClose={() => setIsUserDetailsModalDismissed(true)}
+      />
 
       <CompanyEdit
         isModalOpen={isCompanyEditModalOpened && isOwner}

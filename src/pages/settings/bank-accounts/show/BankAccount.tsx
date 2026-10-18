@@ -29,16 +29,16 @@ export function BankAccount() {
   const actions = useActions();
   const navigate = useNavigate();
 
+  const { data: response } = useBankAccountQuery({ id });
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('bank_accounts'), href: '/settings/bank_accounts' },
     {
-      name: t('bank_account'),
+      name: response?.bank_account_name || t('bank_account'),
       href: route('/settings/bank_accounts/:id/details', { id }),
     },
   ];
-
-  const { data: response } = useBankAccountQuery({ id });
 
   const [accountDetails, setAccountDetails] = useState<BankAccountEntity>();
 

@@ -74,6 +74,7 @@ export function Details(props: Props) {
                   resourceId={client.id}
                   resourceType="client"
                   taxData={client.tax_info}
+                  clientCountryId={client.country_id}
                 />
 
                 <CurrencyCodeBadge currency_id={client.settings?.currency_id} />

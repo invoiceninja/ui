@@ -16,8 +16,6 @@ import { User } from './user';
 
 export interface TaskMeta {
   calendar_event_id?: string;
-  calendar_id?: string;
-  calendar_provider?: string;
 }
 
 export interface Task {
@@ -52,6 +50,8 @@ export interface Task {
   project?: Project;
   documents: any[];
   date: string;
+  due_date: string;
+  estimated_duration: number | null;
   calculated_start_date: string;
   user: User;
   assigned_user: User;

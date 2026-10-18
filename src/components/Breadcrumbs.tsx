@@ -32,8 +32,8 @@ export function Breadcrumbs(props: { pages: Page[] }) {
           </Link>
         </li>
 
-        {props.pages.map((page) => (
-          <li key={page.name}>
+        {props.pages.map((page, index) => (
+          <li key={index}>
             <div className="flex items-center">
               <span style={{ color: colors.$22 }}>/</span>
 

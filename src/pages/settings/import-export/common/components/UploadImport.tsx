@@ -32,6 +32,12 @@ const Box = styled.div`
   }
 `;
 
+const FileItem = styled.li`
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
+
 export function UploadImport(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
@@ -152,9 +158,10 @@ export function UploadImport(props: Props) {
       ) : (
         <ul className="grid xs:grid-rows-6 lg:grid-cols-2">
           {currentFiles.map((file, index) => (
-            <li
+            <FileItem
               key={index}
-              className="flex items-center hover:bg-gray-50 cursor-pointer p-2"
+              className="flex items-center cursor-pointer p-2"
+              theme={{ hoverColor: colors.$4 }}
             >
               {file.name} - {(file.size / 1024).toPrecision(2)} KB{' '}
               {
@@ -164,7 +171,7 @@ export function UploadImport(props: Props) {
                   onClick={() => handleRemoveFile(file)}
                 />
               }
-            </li>
+            </FileItem>
           ))}
         </ul>
       )}

@@ -17,6 +17,8 @@ import {
   DeleteDialogButtonProps,
   DeleteDialogProps,
   ImportFromButtonProps,
+  MapSignatoriesFlowButtonProps,
+  MapSignatoriesFlowDialogProps,
   RectangleSettingsCheckboxProps,
   RectangleSettingsDialogButtonProps,
   RectangleSettingsDialogProps,
@@ -75,6 +77,41 @@ export function DeleteButton({ isSubmitting }: DeleteDialogButtonProps) {
   return (
     <Button behavior="submit" disabled={isSubmitting} className="w-full">
       {t('delete')}
+    </Button>
+  );
+}
+
+export function MapSignatoriesFlowDialog({
+  open,
+  onOpenChange,
+  title,
+  content,
+  action,
+}: MapSignatoriesFlowDialogProps) {
+  return (
+    <Modal title={title} visible={open} onClose={onOpenChange} overflowVisible>
+      {content}
+
+      {action}
+    </Modal>
+  );
+}
+
+export function MapSignatoriesFlowButton({
+  disabled,
+  onClick,
+}: MapSignatoriesFlowButtonProps) {
+  const [t] = useTranslation();
+
+  return (
+    <Button
+      behavior="button"
+      onClick={onClick}
+      disabled={disabled}
+      disableWithoutIcon
+      className="w-full"
+    >
+      {t('continue')}
     </Button>
   );
 }

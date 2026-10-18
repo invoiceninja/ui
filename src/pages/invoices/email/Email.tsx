@@ -11,6 +11,7 @@
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
@@ -38,6 +39,10 @@ export default function Email() {
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
+    {
+      name: numberBreadcrumb(invoice?.number, t('edit_invoice')),
+      href: route('/invoices/:id/edit', { id }),
+    },
     {
       name: t('email_invoice'),
       href: route('/invoices/:id/email', { id }),

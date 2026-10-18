@@ -193,7 +193,10 @@ export function CardsCustomizationModal() {
                     <div className="flex items-center space-x-2">
                       <GridDotsVertical size="1.2rem" color={colors.$17} />
 
-                      <span className="font-medium">
+                      <span
+                        className="font-medium"
+                        style={{ color: colors.$3 }}
+                      >
                         {t((currentCards || [])[rubric.source.index] as string)}
                       </span>
                     </div>

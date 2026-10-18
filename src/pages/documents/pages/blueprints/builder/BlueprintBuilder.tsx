@@ -42,6 +42,8 @@ import {
   DeleteDialog,
   ImportFromGoogleDrive,
   Loading,
+  MapSignatoriesFlowButton,
+  MapSignatoriesFlowDialog,
   RectangleSettingsButton,
   RectangleSettingsCheckbox,
   RectangleSettingsDialog,
@@ -60,6 +62,7 @@ import {
   ValidationErrors,
 } from '$app/pages/documents/builder/components';
 import { AsyncSignatorySelector } from '$app/pages/documents/common/components/AsyncSignatorySelector';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useActions } from '../common/hooks/useActions';
 import { EditBlueprintModal } from '../edit/components/EditBlueprintModal';
 import { SignatorySwap } from './Elements';
@@ -221,6 +224,8 @@ function BlueprintBuilder() {
   const colors = useColorScheme();
 
   const { data: blueprintResponse } = useBlueprintQuery({ id });
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);
@@ -441,6 +446,10 @@ function BlueprintBuilder() {
               },
               signatorySelector: SignatorySelector,
               signatorySwap: SignatorySwap,
+              mapSignatoriesFlow: {
+                dialog: MapSignatoriesFlowDialog,
+                button: MapSignatoriesFlowButton,
+              },
               uninvite: {
                 dialog: UninviteDialog,
                 button: UninviteButton,
@@ -517,6 +526,10 @@ function BlueprintBuilder() {
               (localStorage.getItem('DOCUNINJA_COMPANY_ID') as string) ||
               undefined,
             readonly: false,
+            defaultDateFormat: dateFormat as
+              | "MM/DD/YYYY"
+              | "DD/MM/YYYY"
+              | "YYYY-MM-DD",
             services: {
               google: {
                 appId: import.meta.env.VITE_GOOGLE_APP_ID,

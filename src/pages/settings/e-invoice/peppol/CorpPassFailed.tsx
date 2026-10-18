@@ -10,10 +10,12 @@
 
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { Button } from '$app/components/forms';
 
 export function CorpPassFailed() {
   const { t } = useTranslation();
+  const colors = useColorScheme();
   const navigate = useNavigate();
 
   return (
@@ -35,9 +37,11 @@ export function CorpPassFailed() {
           </svg>
         </div>
 
-        <h1 className="text-2xl font-semibold">{t('error')}</h1>
+        <h1 className="text-2xl font-semibold" style={{ color: colors.$3 }}>
+          {t('error')}
+        </h1>
 
-        <p className="text-gray-600">
+        <p style={{ color: colors.$3 }}>
           CorpPass verification failed or was cancelled. Please try again from
           the e-invoice settings page.
         </p>

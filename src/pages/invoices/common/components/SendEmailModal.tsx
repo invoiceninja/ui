@@ -10,6 +10,8 @@
 
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
+import { useColorScheme } from '$app/common/colors';
 import { trans } from '$app/common/helpers';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useBulk } from '$app/common/queries/invoices';
@@ -72,6 +74,12 @@ function useAvailableTypes() {
   return types;
 }
 
+const Div = styled.div`
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
+
 export function SendEmailModal(props: Props) {
   const { visible, setVisible, invoiceIds } = props;
 
@@ -79,6 +87,7 @@ export function SendEmailModal(props: Props) {
 
   const bulk = useBulk({ onSuccess: () => setVisible(false) });
 
+  const colors = useColorScheme();
   const availableTypes = useAvailableTypes();
 
   return (
@@ -90,16 +99,17 @@ export function SendEmailModal(props: Props) {
     >
       <div>
         {availableTypes.map((type, index) => (
-          <div
+          <Div
             key={index}
-            className="flex justify-between py-2 cursor-pointer hover:bg-gray-100 pl-2"
+            className="flex justify-between py-2 cursor-pointer pl-2"
             onClick={() => {
               bulk(invoiceIds, 'email', type.value);
               props.setSelected([]);
             }}
+            theme={{ hoverColor: colors.$5 }}
           >
             {t(type.label)}
-          </div>
+          </Div>
         ))}
       </div>
     </Modal>
