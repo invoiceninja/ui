@@ -23,6 +23,7 @@ const callbacks: Record<SocketEvent, (data: unknown) => unknown> = {
   'App\\Events\\Document\\DocumentWasSigned': () => {},
   'App\\Events\\DocumentFile\\DocumentFilePreviewGenerated': () => {},
   'App\\Events\\User\\UserWasVerified': () => {},
+  'App\\Events\\Account\\AccountWasUpdated': () => {},
 };
 
 export function attachPrivateChannelEventHandlers(channel: Channel) {
