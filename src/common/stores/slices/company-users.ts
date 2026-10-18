@@ -11,6 +11,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { set } from 'lodash';
 import { currentIndexValue } from '$app/common/helpers/company-session';
+import { Account } from '$app/common/interfaces/account';
 
 interface CompanyUser {
   currentIndex: number;
@@ -76,6 +77,13 @@ export const companyUserSlice = createSlice({
       state.api[state.currentIndex][action.payload.object] =
         action.payload.data;
     },
+    updateAccount: (state, action: PayloadAction<Account>) => {
+      Object.values(state.api ?? {}).forEach((companyUser) => {
+        if (companyUser?.account?.id === action.payload.id) {
+          companyUser.account = action.payload;
+        }
+      });
+    },
   },
 });
 
@@ -86,4 +94,5 @@ export const {
   resetChanges,
   updateChanges,
   updateRecord,
+  updateAccount,
 } = companyUserSlice.actions;
