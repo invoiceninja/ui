@@ -61,7 +61,6 @@ import {
   MdPrint,
   MdRestore,
   MdSchedule,
-  MdSend,
 } from 'react-icons/md';
 import { Icon } from '$app/components/icons/Icon';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
@@ -85,6 +84,7 @@ import {
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
+import { EmailCreditAction } from './components/EmailCreditAction';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
@@ -102,6 +102,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 import { TagPills } from '$app/components/tags/TagPills';
+import { PeppolSendingStatus } from '$app/components/e-invoice/PeppolSendingStatus';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -556,19 +557,13 @@ export function useActions(params?: Params) {
       />
     ),
     (credit) => (
-      <EntityActionElement
+      <EmailCreditAction
         {...(!dropdown && {
           key: 'email_credit',
         })}
-        entity="credit"
-        actionKey="email_credit"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('email_credit')}
-        to={route('/credits/:id/email', { id: credit.id })}
-        icon={MdSend}
-      >
-        {t('email_credit')}
-      </EntityActionElement>
+        credit={credit}
+        isDropdown={dropdown}
+      />
     ),
     (credit) => (
       <EntityActionElement
@@ -827,7 +822,13 @@ export function useCreditColumns() {
       column: 'status',
       id: 'status_id',
       label: t('status'),
-      format: (_value, credit) => <CreditStatusBadge entity={credit} />,
+      format: (_value, credit) => (
+        <div className="flex items-center gap-x-2">
+          <CreditStatusBadge entity={credit} />
+
+          <PeppolSendingStatus entity="credit" resource={credit} />
+        </div>
+      ),
     },
     {
       column: 'number',

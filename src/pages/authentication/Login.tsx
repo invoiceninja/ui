@@ -35,6 +35,7 @@ import { LoginValidation } from './common/ValidationInterface';
 import { Disable2faModal } from './components/Disable2faModal';
 import { Header } from './components/Header';
 import { HostedLinks } from './components/HostedLinks';
+import { OidcSignIn } from './components/OidcSignIn';
 import { OrDivider } from './components/OrDivider';
 import { SignInProviders } from './components/SignInProviders';
 
@@ -305,7 +306,11 @@ export function Login() {
                           {t('password')}
                         </InputLabel>
 
-                        <Link className="truncate" to="/recover_password">
+                        <Link
+                          className="truncate"
+                          to="/recover_password"
+                          state={{ email: confirmedEmail }}
+                        >
                           {t('forgot_password')}
                         </Link>
                       </div>
@@ -314,6 +319,7 @@ export function Login() {
                     <InputField
                       type="password"
                       autoComplete="current-password"
+                      autoFocus
                       id="password"
                       errorMessage={errors?.password}
                       name="password"
@@ -418,6 +424,8 @@ export function Login() {
             <HostedLinks />
           </div>
         )}
+
+        <OidcSignIn />
 
         <p className="mt-4 text-xs">{version}</p>
       </div>

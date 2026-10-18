@@ -2,6 +2,7 @@ import {
   Permission,
   checkDropdownActions,
   checkTableEditability,
+  fillDebounced,
   login,
   logout,
   selectAssignedUser,
@@ -94,8 +95,11 @@ const createExpense = async (params: CreateParams) => {
     );
   }
 
-  await page.locator('section').filter({ hasText: 'Public Notes' }).getByRole('textbox').fill('Public Notes');
-  
+  await fillDebounced(
+    page.locator('section').filter({ hasText: 'Public Notes' }).getByRole('textbox'),
+    'Public Notes'
+  );
+
   await page
     .locator('[data-cy="topNavbar"]')
     .getByRole('button', { name: 'Save', exact: true })
@@ -880,9 +884,9 @@ test('Checking the gross amount by rate', async ({ page, api, settingsGuard }) =
   await taxOption2.waitFor({ state: 'visible', timeout: 5000 });
   await taxOption2.click();
 
-  await page.locator('[data-cy="expenseAmount"]').fill('12222');
-
-  await page.waitForTimeout(300);
+  await fillDebounced(page.locator('[data-cy="expenseAmount"]'), '12222', {
+    kind: 'number',
+  });
 
   await page.getByRole('button', { name: 'Save' }).click();
 
@@ -960,8 +964,9 @@ test('Checking the gross amount with inclusive taxes turned on', async ({
   await taxOption2.waitFor({ state: 'visible', timeout: 5000 });
   await taxOption2.click();
 
-  // Amount field uses NumericFormat (type="text"), find via label
-  await page.locator('[data-cy="expenseAmount"]').fill('12222');
+  await fillDebounced(page.locator('[data-cy="expenseAmount"]'), '12222', {
+    kind: 'number',
+  });
 
   await page.locator('[data-cy="inclusiveTaxesToggle"]').first().check();
 
@@ -1017,8 +1022,9 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
 
   await page.waitForURL('**/expenses/create');
 
-  // Amount field uses NumericFormat (type="text"), find via label
-  await page.locator('[data-cy="expenseAmount"]').fill('12222');
+  await fillDebounced(page.locator('[data-cy="expenseAmount"]'), '12222', {
+    kind: 'number',
+  });
 
   await page.locator('#by_amount').click();
 
@@ -1028,9 +1034,16 @@ test('Checking the gross amount by amount', async ({ page, api, settingsGuard })
   await page.locator('[data-cy="taxNameByAmount1"]').fill(taxName1);
   // NumberInputField's NumericFormat doesn't render data-cy
   // From the name input, go up to its section, then to the sibling section's input
-  await page.locator('[data-cy="taxNameByAmount1"]').locator('xpath=ancestor::section/following-sibling::section//input').fill('100');
+  await page
+    .locator('[data-cy="taxNameByAmount1"]')
+    .locator('xpath=ancestor::section/following-sibling::section//input')
+    .fill('100');
   await page.locator('[data-cy="taxNameByAmount2"]').fill(taxName2);
-  await page.locator('[data-cy="taxNameByAmount2"]').locator('xpath=ancestor::section/following-sibling::section//input').fill('200');
+  await fillDebounced(
+    page.locator('[data-cy="taxNameByAmount2"]').locator('xpath=ancestor::section/following-sibling::section//input'),
+    '200',
+    { kind: 'number' }
+  );
 
   await page.getByRole('button', { name: 'Save' }).click();
 

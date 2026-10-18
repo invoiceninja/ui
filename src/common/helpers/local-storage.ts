@@ -8,7 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { clearTabCompany } from './company-session';
+
 export function clearLocalStorage() {
+  clearTabCompany();
+
   const displayChromeExtensionBanner = localStorage.getItem(
     'displayChromeExtensionBanner'
   );

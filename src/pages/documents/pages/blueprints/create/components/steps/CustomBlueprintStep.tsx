@@ -11,6 +11,7 @@
 import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { docuNinjaEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -36,6 +37,7 @@ export function CustomBlueprintStep({
   onBack,
 }: CustomBlueprintStepProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
   const [errors, setErrors] = useState<ValidationBag | undefined>(undefined);
   const [payload, setPayload] = useState<Payload>({
     name: '',
@@ -70,7 +72,7 @@ export function CustomBlueprintStep({
     <CardContainer>
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-2">{t('create_your_own')}</h2>
-        <p className="text-gray-600">{t('create_your_own_description')}</p>
+        <p style={{ color: colors.$22 }}>{t('create_your_own_description')}</p>
       </div>
 
       <Element leftSide={t('name')}>

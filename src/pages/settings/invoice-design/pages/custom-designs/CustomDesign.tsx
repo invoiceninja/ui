@@ -120,7 +120,11 @@ export default function CustomDesign() {
               entity_id: storedDesignPreviewProperties.entity_id,
             }) as PreviewPayload
         );
+
+        setShouldRenderHTML(Boolean(storedDesignPreviewProperties.html_mode));
       } else {
+        setShouldRenderHTML(false);
+
         setDesignPreviewProperties((current) => [
           ...current,
           {

@@ -11,29 +11,52 @@
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
+import { useColorScheme } from '$app/common/colors';
+import { hasContactWithEmail } from '$app/common/helpers/emails/has-contact-with-email';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { useBulk } from '$app/common/queries/purchase-orders';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { ContactEmailModal } from '$app/components/emails/ContactEmailModal';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
 
 interface Props {
   selectedIds: string[];
+  selectedPurchaseOrders: PurchaseOrder[];
   setSelected: Dispatch<SetStateAction<string[]>>;
 }
 export const SendEmailBulkAction = (props: Props) => {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isContactEmailOpen, setContactEmailOpen] = useState<boolean>(false);
 
-  const { selectedIds, setSelected } = props;
+  const { selectedIds, selectedPurchaseOrders, setSelected } = props;
 
   const bulk = useBulk();
+
+  const haveVendorsEmailContacts = () => {
+    return selectedPurchaseOrders.every(({ vendor }) =>
+      hasContactWithEmail(vendor?.contacts)
+    );
+  };
+
+  const getPurchaseOrderWithoutVendorContacts = () => {
+    return selectedPurchaseOrders.find(
+      ({ vendor }) => !hasContactWithEmail(vendor?.contacts)
+    );
+  };
 
   return (
     <>
       <DropdownElement
-        onClick={() => setIsModalOpen(true)}
+        onClick={() =>
+          haveVendorsEmailContacts()
+            ? setIsModalOpen(true)
+            : setContactEmailOpen(true)
+        }
         icon={<Icon element={MdSend} />}
       >
         {t('send_email')}
@@ -44,7 +67,9 @@ export const SendEmailBulkAction = (props: Props) => {
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       >
-        <span className="text-lg text-gray-900">{t('are_you_sure')}</span>
+        <span className="text-lg" style={{ color: colors.$3 }}>
+          {t('are_you_sure')}
+        </span>
 
         <div className="flex justify-end space-x-4 mt-5">
           <Button
@@ -59,6 +84,13 @@ export const SendEmailBulkAction = (props: Props) => {
           </Button>
         </div>
       </Modal>
+
+      <ContactEmailModal
+        visible={isContactEmailOpen}
+        onClose={() => setContactEmailOpen(false)}
+        relation="vendor"
+        relationId={getPurchaseOrderWithoutVendorContacts()?.vendor_id}
+      />
     </>
   );
 };

@@ -98,7 +98,7 @@ export function InvoiceNinjaDesignStep({
   if (isLoadingBlueprints) {
     return (
       <div className="flex justify-center items-center py-8">
-        <div className="text-gray-600">{t('loading')}...</div>
+        <div style={{ color: colors.$22 }}>{t('loading')}...</div>
       </div>
     );
   }
@@ -106,7 +106,7 @@ export function InvoiceNinjaDesignStep({
   if (availableEntityTypes.length === 0) {
     return (
       <div className="text-center py-8">
-        <div className="text-gray-600 mb-4">
+        <div className="mb-4" style={{ color: colors.$22 }}>
           {t('all_entity_types_created')}
         </div>
         <Button onClick={onBack}>{t('back')}</Button>
@@ -118,7 +118,7 @@ export function InvoiceNinjaDesignStep({
     <CardContainer>
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-2">{t('document_type')}</h2>
-        <p className="text-gray-600">{t('document_type_description')}</p>
+        <p style={{ color: colors.$22 }}>{t('document_type_description')}</p>
       </div>
 
       <Element>

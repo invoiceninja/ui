@@ -9,6 +9,7 @@
  */
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { TabGroup } from '$app/components/TabGroup';
 import { Element } from '$app/components/cards';
 import classNames from 'classnames';
@@ -62,6 +63,7 @@ const Box = styled.div`
 `;
 
 export function PaymentSlider() {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
   const colors = useColorScheme();
   const navigate = useNavigate();
@@ -225,7 +227,7 @@ export function PaymentSlider() {
                 onClick={() => {
                   !disableNavigation('invoice', invoice) &&
                     navigate(
-                      route('/invoices/:id/edit', {
+                      route(invoicePaths.edit, {
                         id: invoice.id,
                       })
                     );

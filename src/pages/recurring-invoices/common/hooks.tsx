@@ -33,7 +33,7 @@ import { Action } from '$app/components/ResourceActions';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { invoiceSumAtom, recurringInvoiceAtom } from './atoms';
 import { route } from '$app/common/helpers/route';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
@@ -543,6 +543,7 @@ export function useCreate({
   isFormBusy,
 }: RecurringInvoiceSaveProps) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
@@ -568,11 +569,12 @@ export function useCreate({
 
         $refetch(['recurring_invoices']);
 
-        navigate(
-          route('/recurring_invoices/:id/edit', {
-            id: response.data.data.id,
-          })
-        );
+        const table = searchParams.get('table');
+        const editRoute = route('/recurring_invoices/:id/edit', {
+          id: response.data.data.id,
+        });
+
+        navigate(table ? `${editRoute}?table=${table}` : editRoute);
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

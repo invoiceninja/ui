@@ -15,18 +15,25 @@ export function useFilterColumns() {
     'task_tag_ids'
   );
 
+  const userOptions =
+    users?.data.data.map((user: User) => ({
+      label:
+        user.first_name || user.last_name
+          ? `${user.first_name} ${user.last_name}`
+          : user.email,
+      value: user.id,
+    })) || [];
+
   const filterColumns: FilterColumn[] = [
     {
       column_id: 'assigned_user_id',
       query_identifier: 'assigned_user_ids',
-      options:
-        users?.data.data.map((user: User) => ({
-          label:
-            user.first_name || user.last_name
-              ? `${user.first_name} ${user.last_name}`
-              : user.email,
-          value: user.id,
-        })) || [],
+      options: userOptions,
+    },
+    {
+      column_id: 'user_id',
+      query_identifier: 'user_ids',
+      options: userOptions,
     },
     {
       column_id: 'project_id',

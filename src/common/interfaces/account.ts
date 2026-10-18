@@ -10,6 +10,7 @@
 
 export interface Account {
   id: string;
+  key: string;
   default_url: string;
   plan: string;
   plan_term: string;

@@ -10,12 +10,12 @@
 
 import { lazy } from 'react';
 import { Route } from 'react-router-dom';
+import { ModuleBitmask } from '$app/common/enums/module-bitmask';
 import { Guard } from '$app/common/guards/Guard';
 import { assigned } from '$app/common/guards/guards/assigned';
 import { enabled } from '$app/common/guards/guards/enabled';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
-import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 
 const Invoices = lazy(() => import('$app/pages/invoices/index/Invoices'));
 const Invoice = lazy(() => import('$app/pages/invoices/Invoice'));
@@ -60,6 +60,19 @@ const CreatePage = lazy(
 const UnappliedPayments = lazy(
   () => import('$app/pages/invoices/edit/components/UnappliedPayments')
 );
+const Wizard = lazy(() => import('$app/pages/invoices/wizard/Wizard'));
+const WizardWho = lazy(() => import('$app/pages/invoices/wizard/steps/Who'));
+const WizardItems = lazy(
+  () => import('$app/pages/invoices/wizard/steps/Items')
+);
+const WizardPayment = lazy(
+  () => import('$app/pages/invoices/wizard/steps/Payment')
+);
+const WizardNotes = lazy(
+  () => import('$app/pages/invoices/wizard/steps/Notes')
+);
+const WizardSend = lazy(() => import('$app/pages/invoices/wizard/steps/Send'));
+const WizardEdit = lazy(() => import('$app/pages/invoices/wizard/Edit'));
 
 export const invoiceRoutes = (
   <Route path="/invoices">
@@ -88,6 +101,38 @@ export const invoiceRoutes = (
             or(permission('create_invoice'), permission('edit_invoice')),
           ]}
           component={<Import />}
+        />
+      }
+    />
+
+    <Route
+      path="guided"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.Invoices),
+            permission('create_invoice'),
+          ]}
+          component={<Wizard />}
+        />
+      }
+    >
+      <Route path="" element={<WizardWho />} />
+      <Route path="items" element={<WizardItems />} />
+      <Route path="payment" element={<WizardPayment />} />
+      <Route path="notes" element={<WizardNotes />} />
+      <Route path="send" element={<WizardSend />} />
+    </Route>
+
+    <Route
+      path=":id/guided"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.Invoices),
+            or(permission('edit_invoice'), assigned('/api/v1/invoices/:id')),
+          ]}
+          component={<WizardEdit />}
         />
       }
     />

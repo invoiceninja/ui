@@ -9,44 +9,25 @@
  */
 
 import dayjs from 'dayjs';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { endpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
-import { toast } from '$app/common/helpers/toast/toast';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Element } from '$app/components/cards';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 
-export function SMTPMailDriver() {
+interface Props {
+  errors: ValidationBag | undefined;
+  isFormBusy: boolean;
+}
+
+export function SMTPMailDriver({ errors, isFormBusy }: Props) {
   const [t] = useTranslation();
 
   const company = useCompanyChanges();
 
   const handleChange = useHandleCurrentCompanyChangeProperty();
-
-  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-
-  const handleTestConfiguration = () => {
-    if (!isFormBusy) {
-      toast.processing();
-      setIsFormBusy(true);
-
-      request('POST', endpoint('/api/v1/smtp/check'), {
-        smtp_host: company?.smtp_host || '',
-        smtp_port: company?.smtp_port || '',
-        smtp_encryption: company?.smtp_encryption || '',
-        smtp_username: company?.smtp_username || '',
-        smtp_password: company?.smtp_password || '',
-        smtp_local_domain: company?.smtp_local_domain || '',
-        smtp_verify_peer: company?.smtp_verify_peer ?? true,
-      })
-        .then((response) => toast.success(response.data.message))
-        .finally(() => setIsFormBusy(false));
-    }
-  };
 
   return (
     <>
@@ -55,6 +36,7 @@ export function SMTPMailDriver() {
           value={company?.smtp_host || ''}
           onValueChange={(value) => handleChange('smtp_host', value)}
           disabled={isFormBusy}
+          errorMessage={errors?.errors.smtp_host}
         />
       </Element>
 
@@ -63,6 +45,7 @@ export function SMTPMailDriver() {
           value={company?.smtp_port || ''}
           onValueChange={(value) => handleChange('smtp_port', value)}
           disabled={isFormBusy}
+          errorMessage={errors?.errors.smtp_port}
         />
       </Element>
 
@@ -72,6 +55,7 @@ export function SMTPMailDriver() {
           onValueChange={(value) => handleChange('smtp_encryption', value)}
           withBlank
           disabled={isFormBusy}
+          errorMessage={errors?.errors.smtp_encryption}
           customSelector
         >
           <option value="tls">STARTTLS</option>
@@ -84,6 +68,7 @@ export function SMTPMailDriver() {
           value={company?.smtp_username || ''}
           onValueChange={(value) => handleChange('smtp_username', value)}
           disabled={isFormBusy}
+          errorMessage={errors?.errors.smtp_username}
         />
       </Element>
 
@@ -92,6 +77,7 @@ export function SMTPMailDriver() {
           value={company?.smtp_password || ''}
           onValueChange={(value) => handleChange('smtp_password', value)}
           disabled={isFormBusy}
+          errorMessage={errors?.errors.smtp_password}
         />
       </Element>
 
@@ -103,6 +89,7 @@ export function SMTPMailDriver() {
           value={company?.smtp_local_domain || ''}
           onValueChange={(value) => handleChange('smtp_local_domain', value)}
           disabled={isFormBusy}
+          errorMessage={errors?.errors.smtp_local_domain}
         />
       </Element>
 
@@ -145,17 +132,6 @@ export function SMTPMailDriver() {
           onValueChange={(value) => handleChange('smtp_verify_peer', value)}
           disabled={isFormBusy}
         />
-      </Element>
-
-      <Element pushContentToRight>
-        <Button
-          behavior="button"
-          onClick={handleTestConfiguration}
-          disableWithoutIcon
-          disabled={isFormBusy}
-        >
-          {t('send_test_email')}
-        </Button>
       </Element>
     </>
   );

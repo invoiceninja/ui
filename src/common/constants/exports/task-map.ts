@@ -15,8 +15,14 @@ export const taskMap: Record[] = [
   { trans: 'start_time', value: 'task.start_time', map: 'task' },
   { trans: 'end_date', value: 'task.end_date', map: 'task' },
   { trans: 'end_time', value: 'task.end_time', map: 'task' },
+  { trans: 'due_date', value: 'task.due_date', map: 'task' },
   { trans: 'duration', value: 'task.duration', map: 'task' },
   { trans: 'duration_words', value: 'task.duration_words', map: 'task' },
+  {
+    trans: 'estimated_duration',
+    value: 'task.estimated_duration',
+    map: 'task',
+  },
   { trans: 'log_duration', value: 'task.time_log', map: 'task' },
   {
     trans: 'log_duration_words',

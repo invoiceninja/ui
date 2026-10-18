@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
+import { waitForDebouncedCommit } from '$tests/e2e/helpers';
 
 interface TaxCreateParams {
   page: Page;
@@ -32,6 +33,7 @@ export const createTaxRate = async (params: TaxCreateParams) => {
   await rateInput.click();
   await rateInput.pressSequentially(rate.toString(), { delay: 20 });
 
+  await waitForDebouncedCommit(page, { kind: 'number' });
   await page.getByRole('button', { name: 'Save', exact: true }).click();
 
   await expect(

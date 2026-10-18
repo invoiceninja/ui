@@ -22,6 +22,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { useValidateTagName } from '$app/common/hooks/useValidateTagName';
 import {
   TAG_ENTITY_TYPE_OPTIONS,
   TAG_ENTITY_TYPES,
@@ -48,6 +49,7 @@ function Create(props: Props) {
   const navigate = useNavigate();
   const colors = useColorScheme();
   const accentColor = useAccentColor();
+  const validateTagName = useValidateTagName();
   const initialEntityType = props.initialEntityType ?? TAG_ENTITY_TYPES.global;
 
   const pages = [
@@ -84,6 +86,14 @@ function Create(props: Props) {
     event.preventDefault();
 
     if (!isFormBusy) {
+      const validationErrors = validateTagName(tag?.name);
+
+      if (validationErrors) {
+        setErrors(validationErrors);
+
+        return;
+      }
+
       toast.processing();
 
       setErrors(undefined);

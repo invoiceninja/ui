@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -39,6 +40,7 @@ interface UserWithDocuNinjaStatus extends InvoiceNinjaUser {
 export default function UserSelection() {
   useTitle('grant_docuninja_access');
   const [t] = useTranslation();
+  const colors = useColorScheme();
   const navigate = useNavigate();
 
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
@@ -231,7 +233,7 @@ export default function UserSelection() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold">{t('docuninja')}</h1>
-          <p className="text-gray-600 mt-1">
+          <p className="mt-1" style={{ color: colors.$22 }}>
             {t('docuninja_grant_access_help')}
           </p>
         </div>
@@ -258,7 +260,9 @@ export default function UserSelection() {
                 </div>
               ) : availableUsers.length === 0 ? (
                 <div className="px-6 py-10 text-center">
-                  <div className="text-gray-500">{t('max_users_reached')}</div>
+                  <div style={{ color: colors.$22 }}>
+                    {t('max_users_reached')}
+                  </div>
                   <div className="text-center py-4 space-x-2">
                     <span>{t('user_limit_reached')}</span>
                     <span className="text-blue-500">
@@ -282,7 +286,7 @@ export default function UserSelection() {
                       />
                       <div>
                         <div className="font-medium">{t('all')}</div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs" style={{ color: colors.$22 }}>
                           {availableUsers.length} {t('users')}
                         </div>
                       </div>
@@ -298,9 +302,10 @@ export default function UserSelection() {
                     return (
                       <div
                         key={user.id}
-                        className={`flex items-center justify-between px-6 py-4 ${
-                          isSelected ? 'bg-gray-50' : ''
-                        }`}
+                        className="flex items-center justify-between px-6 py-4"
+                        style={{
+                          backgroundColor: isSelected ? colors.$4 : undefined,
+                        }}
                       >
                         <div className="flex items-center gap-3">
                           <Checkbox
@@ -315,7 +320,10 @@ export default function UserSelection() {
                             <div className="font-medium">
                               {user.first_name} {user.last_name}
                             </div>
-                            <div className="text-sm text-gray-500">
+                            <div
+                              className="text-sm"
+                              style={{ color: colors.$22 }}
+                            >
                               {user.email}
                             </div>
                           </div>
@@ -386,7 +394,10 @@ export default function UserSelection() {
                           <div className="text-sm font-medium">
                             {user.first_name} {user.last_name}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div
+                            className="text-xs"
+                            style={{ color: colors.$22 }}
+                          >
                             {user.email}
                           </div>
                         </div>

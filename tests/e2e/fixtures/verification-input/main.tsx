@@ -40,6 +40,16 @@ function VerificationInputFixture() {
           onSuccess={() => undefined}
           skipScript
           uiType="dark"
+          render={(props: { onClick: () => void; disabled?: boolean }) => (
+            <button
+              type="button"
+              aria-label="Signin with apple ID"
+              onClick={props.onClick}
+              disabled={props.disabled}
+            >
+              Signin with apple ID
+            </button>
+          )}
         />
       </section>
 

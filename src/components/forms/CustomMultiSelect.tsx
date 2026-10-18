@@ -164,7 +164,7 @@ function Control(props: ControlProps<SelectOption, true>) {
     <div className="relative">
       {label && (
         <span
-          className="xl:hidden absolute left-3 px-1 text-xs font-medium z-10 rounded-sm truncate"
+          className="xl:hidden absolute left-3 px-1 text-xs font-medium z-[1] rounded-sm truncate"
           style={{
             color: colors.$17,
             backgroundColor: colors.$1,

@@ -56,6 +56,7 @@ const MAIN_TABS = [
   { value: 'credit', labelKey: 'credit' },
   { value: 'purchase_order', labelKey: 'purchase_order' },
   { value: 'payment', labelKey: 'payment', hasSubmenu: true },
+  { value: 'statement', labelKey: 'statement' },
   { value: 'reminder', labelKey: 'reminders', hasSubmenu: true },
   { value: 'custom', labelKey: 'custom', hasSubmenu: true },
 ];
@@ -125,8 +126,8 @@ function TemplateSelector({
 
   return (
     <div className="flex flex-col mb-3">
-      <div className="flex overflow-x-auto">
-        <div className="flex">
+      <div className="flex">
+        <div className="flex overflow-x-auto">
           {MAIN_TABS.map((tab) => (
             <button
               key={tab.value}
@@ -488,6 +489,7 @@ export function TemplatesAndReminders() {
       <AdvancedSettingsPlanAlert />
 
       <Card
+        title={t('templates_and_reminders')}
         className="shadow-sm"
         style={{ borderColor: colors.$24 }}
         headerStyle={{ borderColor: colors.$20 }}
@@ -551,7 +553,7 @@ export function TemplatesAndReminders() {
             />
           ) : (
             <div className="flex flex-col items-start">
-              <span className="text-gray-500 text-sm">
+              <span className="text-sm" style={{ color: colors.$22 }}>
                 {t('email_template_change')}{' '}
                 <strong>
                   {t('enterprise')}/{t('pro')}

@@ -3,6 +3,8 @@ import type { Dayjs } from 'dayjs';
 export type DayjsRange = [Dayjs | null, Dayjs | null] | null;
 export type SerializedDateRange = [string, string];
 
+export const ALL_TIME_START_DATE = '2000-01-01';
+
 export function serializeDateRange(value: DayjsRange): SerializedDateRange {
   return [
     value?.[0]?.format('YYYY-MM-DD') ?? '',

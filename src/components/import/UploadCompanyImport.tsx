@@ -69,6 +69,12 @@ const Box = styled.div`
   }
 `;
 
+const FileItem = styled.li`
+  &:hover {
+    background-color: ${(props) => props.theme.hoverColor};
+  }
+`;
+
 function CardWrapper(props: {
   title?: string | null;
   children: ReactNode;
@@ -555,9 +561,10 @@ export function UploadCompanyImport(props: Props) {
           ) : (
             <ul className="grid xs:grid-rows-6 lg:grid-cols-2">
               {files.map((file, index) => (
-                <li
+                <FileItem
                   key={index}
-                  className="flex items-center hover:bg-gray-50 cursor-pointer p-2"
+                  className="flex items-center cursor-pointer p-2"
+                  theme={{ hoverColor: colors.$4 }}
                 >
                   {file.name} - {(file.size / 1024).toPrecision(2)} KB{' '}
                   {
@@ -567,7 +574,7 @@ export function UploadCompanyImport(props: Props) {
                       onClick={() => removeFileFromFormData(index)}
                     />
                   }
-                </li>
+                </FileItem>
               ))}
             </ul>
           )}
@@ -739,7 +746,7 @@ export function UploadCompanyImport(props: Props) {
               className="bg-blue-600 h-2.5 rounded-full"
               style={{ width: `${uploadProgress}%` }}
             ></div>
-            <div className="text-sm text-gray-500 mt-1">
+            <div className="text-sm mt-1" style={{ color: colors.$22 }}>
               {Math.round(uploadProgress)}% {t('uploading_files')}
             </div>
           </div>

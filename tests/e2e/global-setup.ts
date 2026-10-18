@@ -8,13 +8,14 @@
 import { config } from 'dotenv';
 import { getAccountOffset, getConfiguredTestAccounts } from './accounts';
 import { resetTestAccount } from './account-reset';
+import { e2eLog } from './log';
 
 config({ path: '.env.testing', override: true });
 config();
 
 async function globalSetup() {
   if (process.env.PLAYWRIGHT_SKIP_GLOBAL_SETUP === '1') {
-    console.log('\nSkipping API state reset before test suite.\n');
+    e2eLog('\nSkipping API state reset before test suite.\n');
     return;
   }
 
@@ -26,8 +27,8 @@ async function globalSetup() {
     );
   }
 
-  console.log('\nResetting API state before test suite...');
-  console.log(`  API URL: ${apiUrl}`);
+  e2eLog('\nResetting API state before test suite...');
+  e2eLog(`  API URL: ${apiUrl}`);
 
   try {
     const accounts = getConfiguredTestAccounts(apiUrl);
@@ -51,7 +52,7 @@ async function globalSetup() {
       accountsToReset.map((account) => resetTestAccount(account, 'suite setup'))
     );
 
-    console.log('API state reset complete.\n');
+    e2eLog('API state reset complete.\n');
   } catch (error) {
     console.error('Failed to reset API state:', error);
     console.error(

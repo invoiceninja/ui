@@ -10,10 +10,18 @@
 
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdCategory, MdDesignServices, MdDownload } from 'react-icons/md';
+import {
+  MdCategory,
+  MdDesignServices,
+  MdDownload,
+  MdTextSnippet,
+} from 'react-icons/md';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 import { Expense } from '$app/common/interfaces/expense';
 import { ExpenseCategory } from '$app/common/interfaces/expense-category';
@@ -29,6 +37,7 @@ import { Modal } from '$app/components/Modal';
 import { BulkUpdatesAction } from '$app/pages/clients/common/components/BulkUpdatesAction';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { AddToInvoiceAction } from '../components/AddToInvoiceAction';
+import { useInvoiceExpense } from '../useInvoiceExpense';
 
 interface Props {
   isVisible: boolean;
@@ -120,7 +129,10 @@ function ChangeCategory({
 export const useCustomBulkActions = () => {
   const [t] = useTranslation();
 
+  const hasPermission = useHasPermission();
   const documentsBulk = useDocumentsBulk();
+
+  const { create } = useInvoiceExpense();
 
   const { shouldBeVisible: shouldBeRunTemplateActionVisible } =
     useDisplayRunTemplateActions();
@@ -149,6 +161,22 @@ export const useCustomBulkActions = () => {
     setSelected([]);
   };
 
+  const handleInvoiceExpenses = (
+    selectedExpenses: Expense[],
+    setSelected: Dispatch<SetStateAction<string[]>>
+  ) => {
+    const clientIds = new Set(
+      selectedExpenses.map(({ client_id }) => client_id)
+    );
+
+    if (clientIds.size > 1) {
+      return toast.error('multiple_client_error');
+    }
+
+    create(selectedExpenses);
+    setSelected([]);
+  };
+
   const [isChangeCategoryVisible, setIsChangeCategoryVisible] = useState(false);
 
   const {
@@ -170,6 +198,16 @@ export const useCustomBulkActions = () => {
         {t('documents')}
       </DropdownElement>
     ),
+    ({ selectedResources, setSelected }) =>
+      handleDisplayAddToInvoice(selectedResources) &&
+      hasPermission('create_invoice') && (
+        <DropdownElement
+          onClick={() => handleInvoiceExpenses(selectedResources, setSelected)}
+          icon={<Icon element={MdTextSnippet} />}
+        >
+          {t('invoice_expense')}
+        </DropdownElement>
+      ),
     ({ selectedResources }) =>
       handleDisplayAddToInvoice(selectedResources) && (
         <AddToInvoiceAction expenses={selectedResources} bulkAction />

@@ -96,9 +96,10 @@ export function useCustomBulkActions() {
   } = useChangeTemplate();
 
   const customBulkActions: CustomBulkAction<PurchaseOrder>[] = [
-    ({ selectedIds, setSelected }) => (
+    ({ selectedIds, selectedResources, setSelected }) => (
       <SendEmailBulkAction
         selectedIds={selectedIds}
+        selectedPurchaseOrders={selectedResources}
         setSelected={setSelected}
       />
     ),

@@ -44,7 +44,12 @@ export function useUpdateTask(params: Params) {
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
-            toast.dismiss();
+            if (error.response.data.errors?.id) {
+              toast.error(error.response.data.errors.id[0]);
+            } else {
+              toast.dismiss();
+            }
+
             setErrors?.(error.response.data);
           }
         })

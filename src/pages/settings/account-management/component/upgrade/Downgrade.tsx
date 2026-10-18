@@ -116,7 +116,7 @@ export function Downgrade({ docuninja_num_users = 0 }: Props) {
             <div className="flex flex-col text-center justify-between mt-6">
                 <button
                     type="button"
-                    className="text-sm underline cursor-pointer hover:text-gray-600"
+                    className="text-sm underline cursor-pointer hover:opacity-75"
                     onClick={openContactModal}
                 >
                     Need help? Please use the in app message feature to raise a support request.

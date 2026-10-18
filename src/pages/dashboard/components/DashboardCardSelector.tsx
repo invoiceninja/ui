@@ -38,10 +38,16 @@ import {
   Field,
   Format,
   Period,
+  StoredFormat,
 } from '$app/common/interfaces/company-user';
 import { Button, InputField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
+import {
+  DASHBOARD_FIELD_RULES,
+  TASK_METRIC_FIELDS,
+} from '../helpers/dashboard-card-fields';
+import { useTaskMetricFieldsSupport } from '../hooks/useTaskMetricFieldsSupport';
 
 export const FIELDS_LABELS: Record<string, string> = {
   active_invoices: 'total_active_invoices',
@@ -57,6 +63,12 @@ export const FIELDS_LABELS: Record<string, string> = {
   pending_expenses: 'total_pending_expenses',
   invoiced_expenses: 'total_invoiced_expenses',
   invoice_paid_expenses: 'total_invoice_paid_expenses',
+  task_estimated_duration: 'total_task_estimated_duration',
+  task_remaining_estimated_duration: 'total_task_remaining_estimated_duration',
+  unestimated_tasks: 'total_unestimated_tasks',
+  tasks_over_estimate: 'total_tasks_over_estimate',
+  overdue_tasks: 'total_overdue_tasks',
+  tasks_due: 'total_tasks_due',
 };
 
 const FIELDS: Field[] = [
@@ -73,6 +85,12 @@ const FIELDS: Field[] = [
   'pending_expenses',
   'invoiced_expenses',
   'invoice_paid_expenses',
+  'task_estimated_duration',
+  'task_remaining_estimated_duration',
+  'unestimated_tasks',
+  'tasks_over_estimate',
+  'overdue_tasks',
+  'tasks_due',
 ];
 
 const PERIOD_LABEL_MAP: Record<Period, string> = {
@@ -91,6 +109,11 @@ const CALCULATE_OPTIONS: { value: Calculate; labelKey: string }[] = [
   { value: 'sum', labelKey: 'sum' },
   { value: 'avg', labelKey: 'average' },
   { value: 'count', labelKey: 'count' },
+];
+
+const FORMAT_OPTIONS: { value: Format; labelKey: string }[] = [
+  { value: 'money', labelKey: 'money' },
+  { value: 'time', labelKey: 'time' },
 ];
 
 interface ToggleOption {
@@ -195,6 +218,7 @@ export function DashboardCardSelector() {
   const currentUser = useCurrentUser();
   const reactSettings = useReactSettings();
   const saveSettings = useSaveReactSettings();
+  const supportsTaskMetrics = useTaskMetricFieldsSupport();
 
   const fieldsRef = useRef<string[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -207,7 +231,7 @@ export function DashboardCardSelector() {
   const [selectedField, setSelectedField] = useState<Field | ''>('');
   const [period, setPeriod] = useState<Period>('current');
   const [calculate, setCalculate] = useState<Calculate>('sum');
-  const [format, setFormat] = useState<Format>('money');
+  const [format, setFormat] = useState<StoredFormat>('money');
 
   useEffect(() => {
     fieldsRef.current = fields;
@@ -236,12 +260,47 @@ export function DashboardCardSelector() {
     setFormat('money');
   }, [manageOpen, currentUser, reactSettings.dashboard_fields]);
 
+  const availableFields = useMemo(
+    () =>
+      supportsTaskMetrics
+        ? FIELDS
+        : FIELDS.filter((f) => !TASK_METRIC_FIELDS.includes(f)),
+    [supportsTaskMetrics]
+  );
+
   const filteredFields = useMemo(
     () =>
-      FIELDS.filter((f) =>
-        t(FIELDS_LABELS[f]).toLowerCase().includes(searchQuery.toLowerCase())
+      availableFields.filter((f) =>
+        t(FIELDS_LABELS[f] ?? f)
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())
       ),
-    [searchQuery, t]
+    [availableFields, searchQuery, t]
+  );
+
+  const selectedFieldRules = useMemo(
+    () => (selectedField ? DASHBOARD_FIELD_RULES[selectedField] : null),
+    [selectedField]
+  );
+
+  const calculateOptions = useMemo(
+    () =>
+      selectedFieldRules
+        ? CALCULATE_OPTIONS.filter((option) =>
+            selectedFieldRules.calculations.includes(option.value)
+          )
+        : CALCULATE_OPTIONS,
+    [selectedFieldRules]
+  );
+
+  const formatOptions = useMemo(
+    () =>
+      selectedFieldRules
+        ? FORMAT_OPTIONS.filter((option) =>
+            selectedFieldRules.formats.includes(option.value)
+          )
+        : [],
+    [selectedFieldRules]
   );
 
   const isDuplicate = useMemo(
@@ -261,11 +320,6 @@ export function DashboardCardSelector() {
     [selectedField, fields, period, calculate, format]
   );
 
-  const isTaskField = useMemo(
-    () => selectedField.endsWith('tasks'),
-    [selectedField]
-  );
-
   const handleSave = useCallback(() => {
     if (!currentUser || isFormBusy) {
       return;
@@ -282,6 +336,26 @@ export function DashboardCardSelector() {
       .catch(() => toast.dismiss())
       .finally(() => setIsFormBusy(false));
   }, [currentUser, isFormBusy, saveSettings]);
+
+  const handleSelectField = useCallback((field: Field) => {
+    const rules = DASHBOARD_FIELD_RULES[field];
+
+    setSelectedField(field);
+
+    setCalculate((current) =>
+      rules.calculations.includes(current) ? current : rules.calculations[0]
+    );
+
+    setFormat((current) =>
+      rules.formats.includes(current as Format)
+        ? current
+        : (rules.formats[0] ?? '')
+    );
+
+    if (rules.defaultPeriod) {
+      setPeriod(rules.defaultPeriod);
+    }
+  }, []);
 
   const handleAdd = useCallback(() => {
     if (!selectedField || isDuplicate) {
@@ -303,7 +377,7 @@ export function DashboardCardSelector() {
       selectedField as Field,
       period,
       calculate,
-      isTaskField ? format : 'money',
+      format,
       existingCount
     );
 
@@ -316,7 +390,7 @@ export function DashboardCardSelector() {
         behavior: 'smooth',
       });
     });
-  }, [selectedField, isDuplicate, period, calculate, format, isTaskField]);
+  }, [selectedField, isDuplicate, period, calculate, format]);
 
   const handleRemove = useCallback((index: number) => {
     setFields((prev) => prev.filter((_, i) => i !== index));
@@ -491,14 +565,14 @@ export function DashboardCardSelector() {
                     <div
                       key={f}
                       className="flex items-center px-3 py-2 cursor-pointer text-sm shrink-0"
-                      onClick={() => setSelectedField(f)}
+                      onClick={() => handleSelectField(f)}
                       style={{
                         backgroundColor:
                           selectedField === f ? colors.$25 : 'transparent',
                         color: colors.$3,
                       }}
                     >
-                      {t(FIELDS_LABELS[f])}
+                      {t(FIELDS_LABELS[f] ?? f)}
                     </div>
                   ))}
 
@@ -545,14 +619,14 @@ export function DashboardCardSelector() {
                     </span>
 
                     <ToggleGroup
-                      options={CALCULATE_OPTIONS}
+                      options={calculateOptions}
                       value={calculate}
                       onChange={(value) => setCalculate(value as Calculate)}
                       disabled={!selectedField}
                     />
                   </div>
 
-                  {isTaskField && (
+                  {formatOptions.length > 1 && (
                     <div className="flex flex-col space-y-1.5">
                       <span
                         className="text-xs font-medium"
@@ -562,10 +636,7 @@ export function DashboardCardSelector() {
                       </span>
 
                       <ToggleGroup
-                        options={[
-                          { value: 'money', labelKey: 'money' },
-                          { value: 'time', labelKey: 'time' },
-                        ]}
+                        options={formatOptions}
                         value={format}
                         onChange={(value) => setFormat(value as Format)}
                       />
@@ -593,7 +664,11 @@ export function DashboardCardSelector() {
                         className="text-xl font-semibold mt-0.5"
                         style={{ color: colors.$3 }}
                       >
-                        {calculate === 'count' ? '0' : '0.00'}
+                        {calculate === 'count'
+                          ? '0'
+                          : format === 'time'
+                            ? '0:00:00'
+                            : '0.00'}
                       </span>
 
                       <span

@@ -74,6 +74,7 @@ import {
   Td,
   Th,
   Thead,
+  Tr,
 } from './tables';
 import { TFooter } from './tables/TFooter';
 
@@ -125,6 +126,7 @@ interface StyleOptions {
   withoutRightBorder?: boolean;
   headerBackgroundColor?: string;
   thChildrenClassName?: string;
+  thTextColor?: string;
   tBodyStyle?: CSSProperties;
   thClassName?: string;
   tdClassName?: string;
@@ -208,6 +210,7 @@ interface Props<T> extends CommonProps {
   onSelectedResourcesChange?: (selectedResources: T[]) => void;
   preSelected?: string[];
   emptyState?: ReactNode;
+  afterRows?: ReactNode;
   beforeFilterInput?: ReactNode;
   withoutBottomRounding?: boolean;
   withoutBottomPadding?: boolean;
@@ -1125,6 +1128,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                       setSort(data.sort);
                     }}
                     childrenClassName={styleOptions?.thChildrenClassName}
+                    textColor={styleOptions?.thTextColor}
                     resizable={`${apiEndpoint.pathname}.${column.id}`}
                     useOnlyCurrentSortDirectionIcon={
                       styleOptions?.useOnlyCurrentSortDirectionIcon
@@ -1383,6 +1387,14 @@ export function DataTable<T extends object>(props: Props<T>) {
                 </MemoizedTr>
               ))}
           </Tbody>
+
+          {props.afterRows && (
+            <Tbody>
+              <Tr withoutBackgroundColor>
+                <Td colSpan={100}>{props.afterRows}</Td>
+              </Tr>
+            </Tbody>
+          )}
 
           {Boolean(footerColumns.length) &&
             Boolean(currentData?.length) &&

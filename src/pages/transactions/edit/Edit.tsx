@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
+import { textBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -72,7 +73,10 @@ export default function Edit() {
   const pages = [
     { name: t('transactions'), href: '/transactions' },
     {
-      name: t('edit_transaction'),
+      name: textBreadcrumb(
+        data?.description.replace(/\\n/g, ' '),
+        t('edit_transaction')
+      ),
       href: route('/transactions/:id/edit', { id }),
     },
   ];

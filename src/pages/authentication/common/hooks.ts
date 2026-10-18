@@ -13,6 +13,7 @@ import { AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
 import { AuthenticationTypes } from '$app/common/dtos/authentication';
 import { endpoint } from '$app/common/helpers';
+import { clearTabCompany } from '$app/common/helpers/company-session';
 import { request } from '$app/common/helpers/request';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
@@ -44,6 +45,7 @@ export function useLogin() {
   const queryClient = useQueryClient();
 
   return (response: AxiosResponse) => {
+    clearTabCompany();
     localStorage.removeItem('X-CURRENT-INDEX');
 
     let currentIndex = 0;

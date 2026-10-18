@@ -16,6 +16,7 @@ import { Outlet, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { refreshEntityDataBannerAtom } from '$app/App';
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -60,7 +61,7 @@ export default function RecurringInvoice() {
   const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
     {
-      name: t('edit_recurring_invoice'),
+      name: numberBreadcrumb(data?.number, t('edit_recurring_invoice')),
       href: route('/recurring_invoices/:id/edit', { id }),
     },
   ];

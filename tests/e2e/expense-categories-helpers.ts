@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
+import { waitForDebouncedCommit } from '$tests/e2e/helpers';
 
 interface ExpenseCategoryCreateParams {
   page: Page;
@@ -36,6 +37,7 @@ export const createExpenseCategory = async (
   await nameField.clear();
   await nameField.pressSequentially(categoryName, { delay: 50 });
 
+  await waitForDebouncedCommit(page);
   await page.getByRole('button', { name: 'Save', exact: true }).click();
 
   await expect(

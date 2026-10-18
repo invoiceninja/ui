@@ -58,3 +58,14 @@ export const taskPrimaryLabel = (task: Task, max = 50): string => {
 // Secondary line: project name preferred, then client name. Empty string
 // when neither is set so callers can skip rendering the row entirely.
 export const taskSecondaryLabel = (task: Task): string => bracket(task);
+
+/** Project color for calendar chips; ignores empty/white placeholders. */
+export const taskProjectAccentColor = (task: Task): string | undefined => {
+  const color = task.project?.color?.trim();
+  if (!color) return undefined;
+  const lower = color.toLowerCase();
+  if (lower === '#fff' || lower === '#ffffff' || lower === 'white') {
+    return undefined;
+  }
+  return color;
+};
