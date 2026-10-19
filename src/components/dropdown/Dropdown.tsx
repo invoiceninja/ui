@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { detectOverflow } from '@popperjs/core';
 import Tippy, { TippyProps } from '@tippyjs/react/headless';
 import classNames from 'classnames';
 import {
@@ -59,36 +60,44 @@ const popperOptions: TippyProps['popperOptions'] = {
     {
       name: 'openTowardsSpace',
       enabled: true,
-      phase: 'main',
+      phase: 'beforeRead',
       fn: ({ state }) => {
-        const reference = state.elements.reference.getBoundingClientRect();
-        const viewportHeight =
-          window.visualViewport?.height ??
-          document.documentElement.clientHeight;
+        const overflow = detectOverflow(state, {
+          elementContext: 'reference',
+          altBoundary: true,
+        });
 
-        const { offsetParent } = state.elements.popper;
+        const spaceAbove = -overflow.top;
+        const spaceBelow = -overflow.bottom;
 
-        const pageScroll =
-          !offsetParent ||
-          offsetParent === document.body ||
-          offsetParent === document.documentElement
-            ? window.scrollY
-            : 0;
+        state.placement = spaceAbove > spaceBelow ? 'top' : 'bottom';
 
-        const spaceBelow = viewportHeight - reference.bottom;
-        const spaceAbove = reference.top + pageScroll;
+        const availableHeight = Math.floor(
+          Math.max(spaceAbove, spaceBelow) - DROPDOWN_OFFSET - VIEWPORT_PADDING
+        );
 
-        const requiredSpace =
-          state.rects.popper.height + DROPDOWN_OFFSET + VIEWPORT_PADDING;
+        state.modifiersData.openTowardsSpace = { availableHeight };
 
-        const placement =
-          requiredSpace > spaceBelow && requiredSpace <= spaceAbove
-            ? 'top'
-            : 'bottom';
+        const content = state.elements.popper.firstElementChild;
 
-        if (state.placement !== placement) {
-          state.placement = placement;
-          state.reset = true;
+        if (content instanceof HTMLElement && availableHeight > 0) {
+          const contentHeight =
+            content.scrollHeight + content.offsetHeight - content.clientHeight;
+
+          state.rects.popper.height = Math.min(contentHeight, availableHeight);
+        }
+      },
+    },
+    {
+      name: 'applyAvailableHeight',
+      enabled: true,
+      phase: 'write',
+      fn: ({ state }) => {
+        const content = state.elements.popper.firstElementChild;
+        const { availableHeight } = state.modifiersData.openTowardsSpace ?? {};
+
+        if (content instanceof HTMLElement && availableHeight > 0) {
+          content.style.maxHeight = `${availableHeight}px`;
         }
       },
     },
@@ -136,7 +145,7 @@ export function Dropdown(props: Props) {
         render={() => (
           <DropdownElements
             theme={{ hoverColor: colors.$2 }}
-            className={`border box rounded-md shadow-lg focus:outline-none whitespace-normal ${props.className}`}
+            className={`border box rounded-md shadow-lg focus:outline-none whitespace-normal overflow-y-auto overscroll-contain ${props.className}`}
             style={{
               backgroundColor: colors.$1,
               borderColor: colors.$19,
