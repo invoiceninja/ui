@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import Tippy from '@tippyjs/react/headless';
+import Tippy, { TippyProps } from '@tippyjs/react/headless';
 import classNames from 'classnames';
 import {
   Children,
@@ -50,6 +50,57 @@ const DropdownElements = styled.div`
   }
 `;
 
+const DROPDOWN_OFFSET = 10;
+const VIEWPORT_PADDING = 5;
+
+const popperOptions: TippyProps['popperOptions'] = {
+  modifiers: [
+    {
+      name: 'fitAvailableHeight',
+      enabled: true,
+      phase: 'beforeRead',
+      fn: ({ state }) => {
+        const content = state.elements.popper.firstElementChild;
+
+        if (!(content instanceof HTMLElement)) {
+          return;
+        }
+
+        const reference = state.elements.reference.getBoundingClientRect();
+        const viewportHeight =
+          window.visualViewport?.height ??
+          document.documentElement.clientHeight;
+
+        const availableHeight = Math.floor(
+          Math.max(reference.top, viewportHeight - reference.bottom) -
+            DROPDOWN_OFFSET -
+            VIEWPORT_PADDING
+        );
+
+        const contentHeight =
+          content.scrollHeight + content.offsetHeight - content.clientHeight;
+
+        state.rects.popper.height = Math.min(contentHeight, availableHeight);
+        state.modifiersData.fitAvailableHeight = { availableHeight };
+      },
+    },
+    {
+      name: 'applyAvailableHeight',
+      enabled: true,
+      phase: 'write',
+      fn: ({ state }) => {
+        const content = state.elements.popper.firstElementChild;
+        const { availableHeight } =
+          state.modifiersData.fitAvailableHeight ?? {};
+
+        if (content instanceof HTMLElement && availableHeight) {
+          content.style.maxHeight = `${availableHeight}px`;
+        }
+      },
+    },
+  ],
+};
+
 export function Dropdown(props: Props) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -87,10 +138,11 @@ export function Dropdown(props: Props) {
         disabled={props.disabled}
         placement="bottom"
         interactive={true}
+        popperOptions={popperOptions}
         render={() => (
           <DropdownElements
             theme={{ hoverColor: colors.$2 }}
-            className={`border box rounded-md shadow-lg focus:outline-none whitespace-normal ${props.className}`}
+            className={`border box rounded-md shadow-lg focus:outline-none whitespace-normal overflow-y-auto overscroll-contain ${props.className}`}
             style={{
               backgroundColor: colors.$1,
               borderColor: colors.$19,
