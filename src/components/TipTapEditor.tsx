@@ -966,6 +966,56 @@ function ColorPickerComponent({
   );
 }
 
+const ResizableImage = Image.extend({
+  addNodeView() {
+    const parent = this.parent?.();
+
+    if (!parent) {
+      return null;
+    }
+
+    return (props) => {
+      const nodeView = parent(props);
+
+      if (!nodeView) {
+        return nodeView;
+      }
+
+      const dom = nodeView.dom as HTMLElement;
+      const image = dom.querySelector('img');
+
+      if (!image) {
+        return nodeView;
+      }
+
+      const { width, height } = props.node.attrs;
+
+      if (width) {
+        image.style.width = `${width}px`;
+      }
+
+      if (height) {
+        image.style.height = `${height}px`;
+      }
+
+      // v3.19 hides the image until onload. A cached data URL can finish loading
+      // before that handler is attached, which leaves the image invisible.
+      const show = () => {
+        dom.style.visibility = '';
+        dom.style.pointerEvents = '';
+      };
+
+      if (image.complete) {
+        show();
+      }
+
+      image.addEventListener('error', show);
+
+      return nodeView;
+    };
+  },
+});
+
 export function TipTapEditor({
   value,
   onValueChange,
@@ -1008,11 +1058,18 @@ export function TipTapEditor({
         },
         validate: (href: string) => /^https?:\/\//.test(href),
       }),
-      Image.configure({
+      ResizableImage.configure({
         inline: true,
         allowBase64: true,
         HTMLAttributes: {
           class: 'editor-image',
+        },
+        resize: {
+          enabled: true,
+          directions: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+          minWidth: 50,
+          minHeight: 50,
+          alwaysPreserveAspectRatio: true,
         },
       }),
       CustomTable.configure({
