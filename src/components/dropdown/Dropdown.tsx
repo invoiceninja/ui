@@ -55,46 +55,40 @@ const VIEWPORT_PADDING = 5;
 
 const popperOptions: TippyProps['popperOptions'] = {
   modifiers: [
+    { name: 'flip', enabled: false },
     {
-      name: 'fitAvailableHeight',
+      name: 'openTowardsSpace',
       enabled: true,
-      phase: 'beforeRead',
+      phase: 'main',
       fn: ({ state }) => {
-        const content = state.elements.popper.firstElementChild;
-
-        if (!(content instanceof HTMLElement)) {
-          return;
-        }
-
         const reference = state.elements.reference.getBoundingClientRect();
         const viewportHeight =
           window.visualViewport?.height ??
           document.documentElement.clientHeight;
 
-        const availableHeight = Math.floor(
-          Math.max(reference.top, viewportHeight - reference.bottom) -
-            DROPDOWN_OFFSET -
-            VIEWPORT_PADDING
-        );
+        const { offsetParent } = state.elements.popper;
 
-        const contentHeight =
-          content.scrollHeight + content.offsetHeight - content.clientHeight;
+        const pageScroll =
+          !offsetParent ||
+          offsetParent === document.body ||
+          offsetParent === document.documentElement
+            ? window.scrollY
+            : 0;
 
-        state.rects.popper.height = Math.min(contentHeight, availableHeight);
-        state.modifiersData.fitAvailableHeight = { availableHeight };
-      },
-    },
-    {
-      name: 'applyAvailableHeight',
-      enabled: true,
-      phase: 'write',
-      fn: ({ state }) => {
-        const content = state.elements.popper.firstElementChild;
-        const { availableHeight } =
-          state.modifiersData.fitAvailableHeight ?? {};
+        const spaceBelow = viewportHeight - reference.bottom;
+        const spaceAbove = reference.top + pageScroll;
 
-        if (content instanceof HTMLElement && availableHeight) {
-          content.style.maxHeight = `${availableHeight}px`;
+        const requiredSpace =
+          state.rects.popper.height + DROPDOWN_OFFSET + VIEWPORT_PADDING;
+
+        const placement =
+          requiredSpace > spaceBelow && requiredSpace <= spaceAbove
+            ? 'top'
+            : 'bottom';
+
+        if (state.placement !== placement) {
+          state.placement = placement;
+          state.reset = true;
         }
       },
     },
@@ -142,7 +136,7 @@ export function Dropdown(props: Props) {
         render={() => (
           <DropdownElements
             theme={{ hoverColor: colors.$2 }}
-            className={`border box rounded-md shadow-lg focus:outline-none whitespace-normal overflow-y-auto overscroll-contain ${props.className}`}
+            className={`border box rounded-md shadow-lg focus:outline-none whitespace-normal ${props.className}`}
             style={{
               backgroundColor: colors.$1,
               borderColor: colors.$19,
