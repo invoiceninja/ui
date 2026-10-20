@@ -103,6 +103,7 @@ import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 import { TagPills } from '$app/components/tags/TagPills';
 import { PeppolSendingStatus } from '$app/components/e-invoice/PeppolSendingStatus';
+import { withoutFeeLineEntries } from '$app/components/e-invoice/line-fields/fields';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -311,7 +312,11 @@ export function useCreate(props: CreateProps) {
       apiEndpoint += 'save_default_footer=true';
     }
 
-    request('POST', endpoint(apiEndpoint), credit)
+    request(
+      'POST',
+      endpoint(apiEndpoint),
+      withoutFeeLineEntries(credit, 'CreditNote')
+    )
       .then(async (response: GenericSingleResourceResponse<Credit>) => {
         if (isDefaultTerms || isDefaultFooter) {
           await refreshCompanyUsers();

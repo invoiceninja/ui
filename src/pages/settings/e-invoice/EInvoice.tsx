@@ -20,16 +20,22 @@ import { whiteLabelPlan } from '$app/common/guards/guards/white-label';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useDisableSettingsField } from '$app/common/hooks/useDisableSettingsField';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import {
   resetChanges,
   updateRecord,
 } from '$app/common/stores/slices/company-users';
 import { Card, Element } from '$app/components/cards';
-import { PaymentMeans } from '$app/components/e-invoice/PaymentMeans';
+import { getExposedLinePaths } from '$app/components/e-invoice/line-fields/fields';
+import {
+  PaymentMeans,
+  PaymentMeansFormComponent,
+} from '$app/components/e-invoice/PaymentMeans';
 import { InputField, Link, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/layouts/Settings';
@@ -41,9 +47,11 @@ import {
   useHandleCompanySave,
 } from '../common/hooks/useHandleCompanySave';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
+import { EInvoiceLineFields } from './common/components/EInvoiceLineFields';
 import { EUTaxDetails } from './common/components/EUTaxDetails';
 import { FranceReporting } from './common/components/FranceReporting';
 import { PEPPOLPlanBanner } from './common/components/PEPPOLPlanBanner';
+import { useRestoreExposedLineFields } from './common/hooks/useRestoreExposedLineFields';
 import { Onboarding } from './peppol/Onboarding';
 import { Preferences } from './peppol/Preferences';
 import { isPeppolCountryAllowed } from '$app/common/helpers/peppol-countries';
@@ -112,7 +120,11 @@ export function EInvoice() {
     return isPlanActive && company?.settings.country_id === '724';
   };
 
-  const eInvoiceRef = useRef<EInvoiceComponent>(null);
+  const eInvoiceRef = useRef<PaymentMeansFormComponent>(null);
+
+  const savedCompany = useCurrentCompany();
+  const refreshCompanyUsers = useRefreshCompanyUsers();
+  const restoreExposedLineFields = useRestoreExposedLineFields();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -135,6 +147,7 @@ export function EInvoice() {
 
   const [formData, setFormData] = useState(new FormData());
   const [saveChanges, setSaveChanges] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [certificateCleared, setCertificateCleared] = useState<boolean>(false);
   const [passphraseCleared, setPassphraseCleared] = useState<boolean>(false);
 
@@ -231,11 +244,31 @@ export function EInvoice() {
 
       //   setSaveChanges(true);
       // }}
-      onSaveClick={() => {
-        eInvoiceRef?.current?.saveEInvoice();
-        onSave();
+      onSaveClick={async () => {
+        if (isSaving) {
+          return;
+        }
+
+        const pendingLinePaths = getExposedLinePaths(company?.e_invoice);
+        const storedLinePaths = getExposedLinePaths(savedCompany?.e_invoice);
+
+        setIsSaving(true);
+
+        try {
+          const isCompanySaved = (await onSave()) !== false;
+
+          if (await eInvoiceRef?.current?.saveEInvoice()) {
+            await restoreExposedLineFields(
+              isCompanySaved ? pendingLinePaths : storedLinePaths
+            );
+
+            await refreshCompanyUsers();
+          }
+        } finally {
+          setIsSaving(false);
+        }
       }}
-      disableSaveButton={isFormBusy}
+      disableSaveButton={isFormBusy || isSaving}
     >
       <PEPPOLPlanBanner />
 
@@ -590,6 +623,8 @@ export function EInvoice() {
         currentEInvoice={company?.e_invoice || {}}
         entity="company"
       />
+
+      <EInvoiceLineFields />
 
       <EUTaxDetails />
     </Settings>

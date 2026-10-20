@@ -30,6 +30,9 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Assigned } from '$app/components/Assigned';
 import { Badge } from '$app/components/Badge';
 import { Card } from '$app/components/cards';
+import { EInvoiceLines } from '$app/components/e-invoice/line-fields/EInvoiceLines';
+import { EInvoiceLinesTabLabel } from '$app/components/e-invoice/line-fields/EInvoiceLinesTabLabel';
+import { useEInvoiceLineFields } from '$app/components/e-invoice/line-fields/useEInvoiceLineFields';
 import { InputLabel, Link } from '$app/components/forms';
 import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 import { Icon } from '$app/components/icons/Icon';
@@ -89,6 +92,7 @@ export default function Edit() {
   const taskColumns = useTaskColumns();
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
+  const eInvoiceLineFields = useEInvoiceLineFields(invoice, 'Invoice');
   const { defaultTabIndex } = useDefaultTabIndex(invoice);
 
   useScrollToLineItem(Boolean(invoice && client));
@@ -262,11 +266,27 @@ export default function Edit() {
           )}
 
           <TabGroup
-            tabs={[t('products'), t('tasks')]}
+            tabs={[
+              t('products'),
+              t('tasks'),
+              ...(eInvoiceLineFields.length
+                ? [t('e_invoice_line_fields')]
+                : []),
+            ]}
             defaultTabIndex={defaultTabIndex}
             formatTabLabel={(index) => {
               if (index === 1) {
                 return <TasksTabLabel lineItems={invoice?.line_items || []} />;
+              }
+
+              if (index === 2) {
+                return (
+                  <EInvoiceLinesTabLabel
+                    eInvoice={invoice?.e_invoice}
+                    root="Invoice"
+                    errors={errors}
+                  />
+                );
               }
             }}
           >
@@ -326,6 +346,19 @@ export default function Edit() {
                 <Spinner />
               )}
             </div>
+
+            {invoice && eInvoiceLineFields.length ? (
+              <EInvoiceLines
+                resource={invoice}
+                root="Invoice"
+                fields={eInvoiceLineFields}
+                client={client}
+                errors={errors}
+                onChange={(eInvoice) => handleChange('e_invoice', eInvoice)}
+              />
+            ) : (
+              <div />
+            )}
           </TabGroup>
         </div>
 

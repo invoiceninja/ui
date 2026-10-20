@@ -15,6 +15,7 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useScrollToLineItem } from '$app/common/hooks/useScrollToLineItem';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Card } from '$app/components/cards';
+import { EInvoiceLineItemsTabs } from '$app/components/e-invoice/line-fields/EInvoiceLineItemsTabs';
 import { HiddenResourceTaxesAlert } from '$app/components/HiddenResourceTaxesAlert';
 import { Spinner } from '$app/components/Spinner';
 import { ClientSelector } from '$app/pages/invoices/common/components/ClientSelector';
@@ -106,25 +107,33 @@ export default function Edit() {
           )}
 
           {credit ? (
-            <ProductsTable
-              type="product"
+            <EInvoiceLineItemsTabs
               resource={credit}
-              items={credit.line_items.filter((item) =>
-                [
-                  InvoiceItemType.Product,
-                  InvoiceItemType.UnpaidFee,
-                  InvoiceItemType.PaidFee,
-                  InvoiceItemType.LateFee,
-                ].includes(item.type_id)
-              )}
-              columns={productColumns}
-              relationType="client_id"
-              onLineItemChange={handleLineItemChange}
-              onSort={(lineItems) => handleChange('line_items', lineItems)}
-              onLineItemPropertyChange={handleLineItemPropertyChange}
-              onCreateItemClick={handleCreateLineItem}
-              onDeleteRowClick={handleDeleteLineItem}
-            />
+              root="CreditNote"
+              client={client}
+              errors={errors}
+              onChange={(eInvoice) => handleChange('e_invoice', eInvoice)}
+            >
+              <ProductsTable
+                type="product"
+                resource={credit}
+                items={credit.line_items.filter((item) =>
+                  [
+                    InvoiceItemType.Product,
+                    InvoiceItemType.UnpaidFee,
+                    InvoiceItemType.PaidFee,
+                    InvoiceItemType.LateFee,
+                  ].includes(item.type_id)
+                )}
+                columns={productColumns}
+                relationType="client_id"
+                onLineItemChange={handleLineItemChange}
+                onSort={(lineItems) => handleChange('line_items', lineItems)}
+                onLineItemPropertyChange={handleLineItemPropertyChange}
+                onCreateItemClick={handleCreateLineItem}
+                onDeleteRowClick={handleDeleteLineItem}
+              />
+            </EInvoiceLineItemsTabs>
           ) : (
             <Spinner />
           )}
