@@ -31,7 +31,7 @@ import {
   updateRecord,
 } from '$app/common/stores/slices/company-users';
 import { Card, Element } from '$app/components/cards';
-import { getExposedLinePaths } from '$app/components/e-invoice/line-fields/fields';
+import { getLineTemplate } from '$app/components/e-invoice/line-fields/fields';
 import {
   PaymentMeans,
   PaymentMeansFormComponent,
@@ -51,7 +51,7 @@ import { EInvoiceLineFields } from './common/components/EInvoiceLineFields';
 import { EUTaxDetails } from './common/components/EUTaxDetails';
 import { FranceReporting } from './common/components/FranceReporting';
 import { PEPPOLPlanBanner } from './common/components/PEPPOLPlanBanner';
-import { useRestoreExposedLineFields } from './common/hooks/useRestoreExposedLineFields';
+import { useRestoreLineTemplate } from './common/hooks/useRestoreLineTemplate';
 import { Onboarding } from './peppol/Onboarding';
 import { Preferences } from './peppol/Preferences';
 import { isPeppolCountryAllowed } from '$app/common/helpers/peppol-countries';
@@ -124,7 +124,7 @@ export function EInvoice() {
 
   const savedCompany = useCurrentCompany();
   const refreshCompanyUsers = useRefreshCompanyUsers();
-  const restoreExposedLineFields = useRestoreExposedLineFields();
+  const restoreLineTemplate = useRestoreLineTemplate();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -249,8 +249,8 @@ export function EInvoice() {
           return;
         }
 
-        const pendingLinePaths = getExposedLinePaths(company?.e_invoice);
-        const storedLinePaths = getExposedLinePaths(savedCompany?.e_invoice);
+        const pendingLineTemplate = getLineTemplate(company?.e_invoice);
+        const storedLineTemplate = getLineTemplate(savedCompany?.e_invoice);
 
         setIsSaving(true);
 
@@ -258,8 +258,8 @@ export function EInvoice() {
           const isCompanySaved = (await onSave()) !== false;
 
           if (await eInvoiceRef?.current?.saveEInvoice()) {
-            await restoreExposedLineFields(
-              isCompanySaved ? pendingLinePaths : storedLinePaths
+            await restoreLineTemplate(
+              isCompanySaved ? pendingLineTemplate : storedLineTemplate
             );
 
             await refreshCompanyUsers();

@@ -11,12 +11,12 @@
 import { useMemo, useRef } from 'react';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import {
-  E_INVOICE_LINE_FIELDS,
+  EInvoiceLineField,
   EInvoiceLinesRoot,
-  getExposedLinePaths,
+  getEntryFields,
   getLineEntries,
-  isEInvoiceLineFieldsSupported,
-  resolveLineFields,
+  getLineTemplate,
+  getTemplateFields,
 } from './fields';
 
 interface Resource {
@@ -30,34 +30,31 @@ export const useEInvoiceLineFields = (
 ) => {
   const company = useCurrentCompany();
 
-  const shown = useRef<{ id?: string; keys: string[] }>({ keys: [] });
+  const shown = useRef<{ id?: string; fields: EInvoiceLineField[] }>({
+    fields: [],
+  });
 
   const isAvailable =
-    (company?.settings?.enable_e_invoice === true ||
-      company?.settings?.e_invoice_type === 'PEPPOL') &&
-    isEInvoiceLineFieldsSupported(company?.settings?.e_invoice_type);
+    company?.settings?.enable_e_invoice === true ||
+    company?.settings?.e_invoice_type === 'PEPPOL';
 
   return useMemo(() => {
     if (!isAvailable) {
       return [];
     }
 
-    const keys = resolveLineFields(
-      getExposedLinePaths(company?.e_invoice),
-      getLineEntries(resource?.e_invoice, root)
-    ).map((field) => field.key);
-
-    shown.current = {
-      id: resource?.id,
-      keys:
-        shown.current.id === resource?.id
-          ? [...new Set([...shown.current.keys, ...keys])]
-          : keys,
-    };
-
-    return E_INVOICE_LINE_FIELDS.filter((field) =>
-      shown.current.keys.includes(field.key)
+    const fields = [
+      ...(shown.current.id === resource?.id ? shown.current.fields : []),
+      ...getTemplateFields(getLineTemplate(company?.e_invoice)),
+      ...getEntryFields(getLineEntries(resource?.e_invoice, root)),
+    ].filter(
+      (field, index, all) =>
+        all.findIndex((current) => current.key === field.key) === index
     );
+
+    shown.current = { id: resource?.id, fields };
+
+    return fields;
   }, [
     isAvailable,
     company?.e_invoice,

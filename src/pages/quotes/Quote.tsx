@@ -24,6 +24,8 @@ import { Client } from '$app/common/interfaces/client';
 import { Quote as IQuote } from '$app/common/interfaces/quote';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Page } from '$app/components/Breadcrumbs';
+import { normalizeLineEntries } from '$app/components/e-invoice/line-fields/fields';
+import { useEInvoiceLinesAlignment } from '$app/components/e-invoice/line-fields/useEInvoiceLinesAlignment';
 import { InputLabel } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
@@ -61,6 +63,13 @@ export default function Edit() {
   ];
 
   const [quote, setQuote] = useAtomWithPrevent(quoteAtom);
+
+  useEInvoiceLinesAlignment({
+    resource: quote,
+    setResource: setQuote,
+    root: 'Invoice',
+  });
+
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client>();
@@ -91,6 +100,11 @@ export default function Edit() {
       const _quote = cloneDeep(data);
 
       _quote.line_items.map((item) => (item._id = v4()));
+
+      _quote.e_invoice = normalizeLineEntries(
+        _quote.e_invoice,
+        'Invoice'
+      ) as IQuote['e_invoice'];
 
       setQuote(_quote);
 

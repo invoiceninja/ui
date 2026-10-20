@@ -87,6 +87,7 @@ export default function Create() {
     setResource: setCredit,
     root: 'CreditNote',
   });
+
   const [invoiceSum, setInvoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client>();

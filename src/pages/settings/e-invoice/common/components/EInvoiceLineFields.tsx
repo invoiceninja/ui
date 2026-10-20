@@ -13,14 +13,12 @@ import { useColorScheme } from '$app/common/colors';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { Card, Element } from '$app/components/cards';
 import {
-  E_INVOICE_LINE_OPTIONS,
-  EInvoiceLineOption,
-  getCustomLinePaths,
-  getExposedLinePaths,
-  isEInvoiceLineFieldsSupported,
-  isLineOptionEnabled,
-  toggleExposedLinePaths,
-  withExposedLinePaths,
+  E_INVOICE_LINE_FIELDS,
+  getLineTemplate,
+  getTemplateFields,
+  isTemplateFieldEnabled,
+  toggleTemplateField,
+  withLineTemplate,
 } from '$app/components/e-invoice/line-fields/fields';
 import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
@@ -35,30 +33,26 @@ export function EInvoiceLineFields() {
 
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
-  const paths = getExposedLinePaths(company?.e_invoice);
-  const customPaths = getCustomLinePaths(paths);
+  const template = getLineTemplate(company?.e_invoice);
 
-  const handlePathsChange = (nextPaths: string[]) => {
+  const customFields = getTemplateFields(template).filter(
+    (field) => field.isCustom
+  );
+
+  const handleToggle = (path: string, enabled: boolean) => {
     handleChange(
       'e_invoice',
-      withExposedLinePaths(company?.e_invoice, nextPaths)
+      withLineTemplate(
+        company?.e_invoice,
+        toggleTemplateField(template, path, enabled)
+      )
     );
   };
 
-  const handleOptionToggle = (option: EInvoiceLineOption, value: boolean) => {
-    const optionPaths = option.fields.map((field) => field.path);
-
-    handlePathsChange(
-      toggleExposedLinePaths(paths, optionPaths, value ? optionPaths : [])
-    );
-  };
-
-  const isAvailable =
-    (company?.settings.enable_e_invoice === true ||
-      company?.settings.e_invoice_type === 'PEPPOL') &&
-    isEInvoiceLineFieldsSupported(company?.settings.e_invoice_type);
-
-  if (!isAvailable) {
+  if (
+    company?.settings.enable_e_invoice !== true &&
+    company?.settings.e_invoice_type !== 'PEPPOL'
+  ) {
     return null;
   }
 
@@ -70,38 +64,36 @@ export function EInvoiceLineFields() {
       style={{ borderColor: colors.$24 }}
       headerStyle={{ borderColor: colors.$20 }}
     >
-      {E_INVOICE_LINE_OPTIONS.map((option) => (
+      {E_INVOICE_LINE_FIELDS.map((field) => (
         <Element
-          key={option.key}
-          leftSide={`${t(option.label)} (${option.businessTerm})`}
-          leftSideHelp={t(option.help)}
+          key={field.key}
+          leftSide={t(field.label)}
+          leftSideHelp={t(field.help)}
         >
           <Toggle
-            checked={isLineOptionEnabled(paths, option)}
-            onValueChange={(value) => handleOptionToggle(option, value)}
-            cypressRef={`e_invoice_line_field_${option.key}`}
+            checked={isTemplateFieldEnabled(template, field)}
+            onValueChange={(value) => handleToggle(field.path, value)}
+            cypressRef={`e_invoice_line_field_${field.key}`}
           />
         </Element>
       ))}
 
-      {customPaths.length > 0 && (
+      {customFields.length > 0 && (
         <Element leftSide={t('other')}>
           <div className="flex flex-col space-y-2">
-            {customPaths.map((path) => (
+            {customFields.map((field) => (
               <div
-                key={path}
+                key={field.key}
                 className="flex items-center justify-between space-x-4"
               >
-                <span className="font-mono text-xs break-all">{path}</span>
+                <span className="font-mono text-xs break-all">
+                  {field.path}
+                </span>
 
                 <Button
                   behavior="button"
                   type="secondary"
-                  onClick={() =>
-                    handlePathsChange(
-                      paths.filter((currentPath) => currentPath !== path)
-                    )
-                  }
+                  onClick={() => handleToggle(field.path, false)}
                 >
                   <div className="flex items-center space-x-2">
                     <div>

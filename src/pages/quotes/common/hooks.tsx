@@ -78,6 +78,7 @@ import { Divider } from '$app/components/cards/Divider';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { withoutFeeLineEntries } from '$app/components/e-invoice/line-fields/fields';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Icon } from '$app/components/icons/Icon';
@@ -314,7 +315,11 @@ export function useCreate(props: CreateProps) {
       apiEndpoint += 'save_default_footer=true';
     }
 
-    request('POST', endpoint(apiEndpoint), quote)
+    request(
+      'POST',
+      endpoint(apiEndpoint),
+      withoutFeeLineEntries(quote, 'Invoice')
+    )
       .then(async (response: GenericSingleResourceResponse<Quote>) => {
         if (isDefaultTerms || isDefaultFooter) {
           await refreshCompanyUsers();

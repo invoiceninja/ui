@@ -19,106 +19,59 @@ export type EInvoiceLinesRoot = 'Invoice' | 'CreditNote';
 
 export type EInvoiceLineEntry = Record<string, unknown>;
 
-export interface EInvoiceLineField {
-  key: string;
-  label: string;
-  businessTerm: string;
-  path: string;
-  type: 'text' | 'date';
-}
-
-export interface EInvoiceLineOption {
+interface EInvoiceLineCatalogField {
   key: string;
   label: string;
   help: string;
-  businessTerm: string;
-  fields: EInvoiceLineField[];
+  path: string;
 }
 
-export const E_INVOICE_LINE_OPTIONS: EInvoiceLineOption[] = [
+export interface EInvoiceLineField {
+  key: string;
+  label: string;
+  path: string;
+  valuePath: string;
+  isCustom?: boolean;
+}
+
+export const E_INVOICE_LINE_FIELDS: EInvoiceLineCatalogField[] = [
+  {
+    key: 'order_reference',
+    label: 'order_reference',
+    help: 'order_reference_help',
+    path: 'OrderLineReference.OrderReference.ID',
+  },
   {
     key: 'order_line_reference',
     label: 'order_line_reference',
     help: 'order_line_reference_help',
-    businessTerm: 'BT-132',
-    fields: [
-      {
-        key: 'order_line_reference',
-        label: 'order_line_reference',
-        businessTerm: 'BT-132',
-        path: 'OrderLineReference.0.LineID.value',
-        type: 'text',
-      },
-    ],
+    path: 'OrderLineReference.LineID',
   },
   {
-    key: 'buyer_accounting_reference',
-    label: 'buyer_accounting_reference',
-    help: 'buyer_accounting_reference_help',
-    businessTerm: 'BT-133',
-    fields: [
-      {
-        key: 'buyer_accounting_reference',
-        label: 'buyer_accounting_reference',
-        businessTerm: 'BT-133',
-        path: 'AccountingCost',
-        type: 'text',
-      },
-    ],
+    key: 'buyer_item_identifier',
+    label: 'buyer_item_identifier',
+    help: 'buyer_item_identifier_help',
+    path: 'Item.BuyersItemIdentification.ID',
   },
   {
-    key: 'line_note',
-    label: 'line_note',
-    help: 'line_note_help',
-    businessTerm: 'BT-127',
-    fields: [
-      {
-        key: 'line_note',
-        label: 'line_note',
-        businessTerm: 'BT-127',
-        path: 'Note',
-        type: 'text',
-      },
-    ],
-  },
-  {
-    key: 'line_period',
-    label: 'line_period',
-    help: 'line_period_help',
-    businessTerm: 'BT-134, BT-135',
-    fields: [
-      {
-        key: 'line_period_start',
-        label: 'start_date',
-        businessTerm: 'BT-134',
-        path: 'InvoicePeriod.0.StartDate',
-        type: 'date',
-      },
-      {
-        key: 'line_period_end',
-        label: 'end_date',
-        businessTerm: 'BT-135',
-        path: 'InvoicePeriod.0.EndDate',
-        type: 'date',
-      },
-    ],
+    key: 'seller_item_identifier',
+    label: 'seller_item_identifier',
+    help: 'seller_item_identifier_help',
+    path: 'Item.SellersItemIdentification.ID',
   },
 ];
-
-export const E_INVOICE_LINE_FIELDS = E_INVOICE_LINE_OPTIONS.flatMap(
-  (option) => option.fields
-);
-
-const EXPOSED_LINE_PATHS = 'Exposed.InvoiceLine';
 
 const LINE_KEYS: Record<EInvoiceLinesRoot, string> = {
   Invoice: 'InvoiceLine',
   CreditNote: 'CreditNoteLine',
 };
 
-const UNSUPPORTED_E_INVOICE_TYPES = ['FatturaPA', 'FACT1'];
-
 const FEE_LINE_TYPES = [InvoiceItemType.UnpaidFee, InvoiceItemType.PaidFee];
+
+interface Leaf {
+  path: string;
+  value: unknown;
+}
 
 const isContainer = (value: unknown) => {
   return Array.isArray(value) || isPlainObject(value);
@@ -135,6 +88,44 @@ const isBlank = (value: unknown) => {
     value === '' ||
     isEmptyContainer(value)
   );
+};
+
+const withoutIndexes = (path: string) => {
+  return path
+    .split('.')
+    .filter((segment) => !/^\d+$/.test(segment))
+    .join('.');
+};
+
+const humanize = (path: string) => {
+  return withoutIndexes(path)
+    .split('.')
+    .map((segment) => segment.replace(/([a-z])([A-Z])/g, '$1 $2'))
+    .join(' › ');
+};
+
+const collectLeaves = (value: unknown, path = ''): Leaf[] => {
+  if (!isContainer(value) || isEmptyContainer(value)) {
+    return path ? [{ path, value }] : [];
+  }
+
+  return Object.entries(value as EInvoiceLineEntry).flatMap(([key, child]) =>
+    collectLeaves(child, path ? `${path}.${key}` : key)
+  );
+};
+
+const findCatalogField = (path: string) => {
+  return E_INVOICE_LINE_FIELDS.find(
+    (field) => field.path === withoutIndexes(path)
+  );
+};
+
+const toLineField = (path: string, valuePath: string): EInvoiceLineField => {
+  const catalogField = findCatalogField(path);
+
+  return catalogField
+    ? { key: catalogField.key, label: catalogField.label, path, valuePath }
+    : { key: path, label: humanize(path), path, valuePath, isCustom: true };
 };
 
 const removeAt = (target: EInvoiceLineEntry, segments: string[]) => {
@@ -223,58 +214,75 @@ export const withLineIds = (lineItems: InvoiceItem[]): InvoiceItem[] => {
   );
 };
 
-export const isEInvoiceLineFieldsSupported = (type: string | undefined) => {
-  return (
-    !UNSUPPORTED_E_INVOICE_TYPES.includes(type ?? '') &&
-    !(type ?? '').startsWith('Facturae')
+export const getLineTemplate = (eInvoice: unknown): EInvoiceLineEntry => {
+  return toEntries(get(eInvoice, 'Invoice.InvoiceLine'))[0] ?? {};
+};
+
+export const getTemplateFields = (
+  template: EInvoiceLineEntry
+): EInvoiceLineField[] => {
+  return collectLeaves(template).map((leaf) =>
+    toLineField(
+      leaf.path,
+      isContainer(leaf.value) ? `${leaf.path}.value` : leaf.path
+    )
   );
 };
 
-export const getExposedLinePaths = (eInvoice: unknown): string[] => {
-  const paths: unknown = get(eInvoice, EXPOSED_LINE_PATHS);
-
-  return Array.isArray(paths)
-    ? paths.filter((path) => typeof path === 'string' && path.trim() !== '')
-    : [];
+export const getTemplatePaths = (template: EInvoiceLineEntry) => {
+  return collectLeaves(template)
+    .map((leaf) => leaf.path)
+    .sort();
 };
 
-export const getCustomLinePaths = (paths: string[]) => {
-  return paths.filter(
-    (path, index) =>
-      paths.indexOf(path) === index &&
-      !E_INVOICE_LINE_FIELDS.some((field) => field.path === path)
+export const isTemplateFieldEnabled = (
+  template: EInvoiceLineEntry,
+  field: EInvoiceLineCatalogField
+) => {
+  return collectLeaves(template).some(
+    (leaf) => withoutIndexes(leaf.path) === field.path
   );
 };
 
-export const isLineOptionEnabled = (
-  paths: string[],
-  option: EInvoiceLineOption
+export const toggleTemplateField = (
+  template: EInvoiceLineEntry,
+  path: string,
+  enabled: boolean
 ) => {
-  return option.fields.some((field) => paths.includes(field.path));
-};
+  const next = cloneDeep(template);
 
-export const toggleExposedLinePaths = (
-  paths: string[],
-  removed: string[],
-  added: string[]
-) => {
-  return [...paths.filter((path) => !removed.includes(path)), ...added];
-};
+  collectLeaves(next)
+    .filter(
+      (leaf) =>
+        leaf.path === path || withoutIndexes(leaf.path) === withoutIndexes(path)
+    )
+    .reverse()
+    .forEach((leaf) => removePath(next, leaf.path));
 
-export const withExposedLinePaths = (eInvoice: unknown, paths: string[]) => {
-  const next = asObject(eInvoice);
-  const exposed = asObject(next.Exposed);
-
-  if (paths.length) {
-    exposed.InvoiceLine = paths;
-  } else {
-    delete exposed.InvoiceLine;
+  if (enabled) {
+    set(next, path, {});
   }
 
-  if (isEmpty(exposed)) {
-    delete next.Exposed;
+  return next;
+};
+
+export const withLineTemplate = (
+  eInvoice: unknown,
+  template: EInvoiceLineEntry
+) => {
+  const next = asObject(eInvoice);
+  const invoice = asObject(next.Invoice);
+
+  if (isEmpty(template)) {
+    delete invoice.InvoiceLine;
   } else {
-    next.Exposed = exposed;
+    invoice.InvoiceLine = [template];
+  }
+
+  if (isEmpty(invoice)) {
+    delete next.Invoice;
+  } else {
+    next.Invoice = invoice;
   }
 
   return next;
@@ -285,6 +293,24 @@ export const getLineEntries = (
   root: EInvoiceLinesRoot
 ): EInvoiceLineEntry[] => {
   return toEntries(get(eInvoice, [root, LINE_KEYS[root]]));
+};
+
+export const getEntryFields = (
+  entries: EInvoiceLineEntry[]
+): EInvoiceLineField[] => {
+  const valuePaths = [
+    ...new Set(
+      entries.flatMap((entry) =>
+        collectLeaves(entry)
+          .filter((leaf) => !isBlank(leaf.value))
+          .map((leaf) => leaf.path)
+      )
+    ),
+  ];
+
+  return valuePaths.map((valuePath) =>
+    toLineField(valuePath.replace(/\.value$/, ''), valuePath)
+  );
 };
 
 export const withLineEntries = (
@@ -354,7 +380,7 @@ export const getLineValue = (
   index: number,
   field: EInvoiceLineField
 ) => {
-  const value = get(entries[index], field.path);
+  const value = get(entries[index], field.valuePath);
 
   return typeof value === 'string' || typeof value === 'number'
     ? String(value)
@@ -374,31 +400,20 @@ export const setLineValue = (
   }
 
   if (isBlank(value)) {
-    removePath(next[index], field.path);
+    removePath(next[index], field.valuePath);
   } else {
-    set(next[index], field.path, value);
+    set(next[index], field.valuePath, value);
   }
 
   return next;
 };
 
-export const hasLineValues = (entries: EInvoiceLineEntry[]) => {
+const hasLineValues = (entries: EInvoiceLineEntry[]) => {
   return entries.some((entry) => !isEmpty(entry));
 };
 
 export const countLinesWithValues = (entries: EInvoiceLineEntry[]) => {
   return entries.filter((entry) => !isEmpty(entry)).length;
-};
-
-export const resolveLineFields = (
-  paths: string[],
-  entries: EInvoiceLineEntry[]
-) => {
-  return E_INVOICE_LINE_FIELDS.filter(
-    (field) =>
-      paths.includes(field.path) ||
-      entries.some((_, index) => getLineValue(entries, index, field) !== '')
-  );
 };
 
 export const realignLineEntries = (

@@ -144,6 +144,11 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
       po_number: '',
       design_id: company.settings.quote_design_id,
       client: undefined,
+      e_invoice: withLineEntries(
+        withLineEntries(credit.e_invoice, 'CreditNote', []),
+        'Invoice',
+        getLineEntries(credit.e_invoice, 'CreditNote')
+      ) as Quote['e_invoice'],
     });
 
     setIsModalVisible(false);

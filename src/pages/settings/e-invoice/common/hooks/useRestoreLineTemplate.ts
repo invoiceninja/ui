@@ -9,22 +9,24 @@
  */
 
 import { AxiosResponse } from 'axios';
-import { isEqual } from 'lodash';
+import { isEmpty, isEqual } from 'lodash';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Company } from '$app/common/interfaces/company.interface';
 import {
-  getExposedLinePaths,
-  withExposedLinePaths,
+  EInvoiceLineEntry,
+  getLineTemplate,
+  getTemplatePaths,
+  withLineTemplate,
 } from '$app/components/e-invoice/line-fields/fields';
 
-export function useRestoreExposedLineFields() {
+export function useRestoreLineTemplate() {
   const company = useCurrentCompany();
 
-  return async (paths: string[]) => {
-    if (!paths.length || !company?.id) {
+  return async (template: EInvoiceLineEntry) => {
+    if (isEmpty(template) || !company?.id) {
       return;
     }
 
@@ -35,13 +37,18 @@ export function useRestoreExposedLineFields() {
         (response: AxiosResponse) => response.data.data
       );
 
-      if (isEqual(getExposedLinePaths(current.e_invoice), paths)) {
+      if (
+        isEqual(
+          getTemplatePaths(getLineTemplate(current.e_invoice)),
+          getTemplatePaths(template)
+        )
+      ) {
         return;
       }
 
       await request('PUT', url, {
         ...current,
-        e_invoice: withExposedLinePaths(current.e_invoice, paths),
+        e_invoice: withLineTemplate(current.e_invoice, template),
       });
     } catch {
       toast.error();
