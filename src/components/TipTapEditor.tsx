@@ -636,6 +636,60 @@ const EditorWrapper = styled.div<{ theme: ThemeProps }>`
       margin: 1em 0;
     }
 
+    [data-resize-container] {
+      max-width: 100%;
+      margin: 1em 0;
+    }
+
+    [data-resize-container].ProseMirror-selectednode {
+      outline: 2px solid ${(props) => props.theme.linkColor};
+      outline-offset: 2px;
+    }
+
+    [data-resize-wrapper] {
+      max-width: 100%;
+
+      img {
+        margin: 0;
+      }
+    }
+
+    [data-resize-handle] {
+      width: 10px;
+      height: 10px;
+      background: ${(props) => props.theme.linkColor};
+      border: 1px solid #fff;
+      border-radius: 2px;
+      z-index: 2;
+      box-sizing: border-box;
+    }
+
+    [data-resize-handle='top-left'],
+    [data-resize-handle='bottom-right'] {
+      cursor: nwse-resize;
+    }
+
+    [data-resize-handle='top-right'],
+    [data-resize-handle='bottom-left'] {
+      cursor: nesw-resize;
+    }
+
+    [data-resize-handle='top-left'] {
+      transform: translate(-50%, -50%);
+    }
+
+    [data-resize-handle='top-right'] {
+      transform: translate(50%, -50%);
+    }
+
+    [data-resize-handle='bottom-left'] {
+      transform: translate(-50%, 50%);
+    }
+
+    [data-resize-handle='bottom-right'] {
+      transform: translate(50%, 50%);
+    }
+
     table {
       border-collapse: collapse;
       margin: 1em 0;
@@ -967,6 +1021,8 @@ function ColorPickerComponent({
 }
 
 const ResizableImage = Image.extend({
+  atom: true,
+
   addNodeView() {
     const parent = this.parent?.();
 
@@ -1059,7 +1115,7 @@ export function TipTapEditor({
         validate: (href: string) => /^https?:\/\//.test(href),
       }),
       ResizableImage.configure({
-        inline: true,
+        inline: false,
         allowBase64: true,
         HTMLAttributes: {
           class: 'editor-image',
