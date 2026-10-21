@@ -19,6 +19,7 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 
 interface Props {
   tiers: PriceTier[];
+  mode: string;
   productPrice: number;
   onChange: (tiers: PriceTier[]) => void;
 }
@@ -29,7 +30,9 @@ export function PriceTiers(props: Props) {
   const colors = useColorScheme();
   const formatMoney = useFormatMoney();
 
-  const { tiers, productPrice, onChange } = props;
+  const { tiers, mode, productPrice, onChange } = props;
+
+  const progressive = mode === 'progressive';
 
   const sorted = (list: PriceTier[]) =>
     [...list].sort(
@@ -65,12 +68,51 @@ export function PriceTiers(props: Props) {
     );
   };
 
-  const effectivePrice = (tier: PriceTier): number => {
-    if ('price' in tier) {
-      return tier.price ?? 0;
+  /* Rate of a single tier */
+  const tierRate = (tier: PriceTier): number =>
+    'price' in tier
+      ? tier.price ?? 0
+      : productPrice * (1 - (tier.discount ?? 0) / 100);
+
+  /* Blended unit price when ordering exactly `quantity` units
+   * (progressive mode only, mirrors ApplyPriceTiers::progressiveCost) */
+  const blendedPrice = (quantity: number): number => {
+    if (quantity <= 0) {
+      return productPrice;
     }
 
-    return productPrice * (1 - (tier.discount ?? 0) / 100);
+    let total = 0;
+    let lower = 0;
+    let rate = productPrice;
+
+    for (const tier of sorted(tiers)) {
+      const boundary = Math.max(0, (Number(tier.min_quantity) || 0) - 1);
+
+      if (boundary >= quantity) {
+        break;
+      }
+
+      if (boundary > lower) {
+        total += (boundary - lower) * rate;
+        lower = boundary;
+      }
+
+      rate = tierRate(tier);
+    }
+
+    total += (quantity - lower) * rate;
+
+    return total / quantity;
+  };
+
+  const preview = (tier: PriceTier): string => {
+    if (!progressive) {
+      return String(formatMoney(tierRate(tier), undefined, undefined));
+    }
+
+    const min = Number(tier.min_quantity) || 0;
+
+    return `Ø ${formatMoney(blendedPrice(min), undefined, undefined)}`;
   };
 
   return (
@@ -83,7 +125,9 @@ export function PriceTiers(props: Props) {
           <span className="w-24">{t('min_quantity')}</span>
           <span className="w-28">{t('type')}</span>
           <span className="w-28">{t('value')}</span>
-          <span className="flex-1">{t('effective_price')}</span>
+          <span className="flex-1">
+            {progressive ? t('avg_price_at_min') : t('effective_price')}
+          </span>
           <span className="w-5" />
         </div>
       )}
@@ -136,7 +180,7 @@ export function PriceTiers(props: Props) {
             </div>
 
             <span className="flex-1 text-sm" style={{ color: colors.$3 }}>
-              {formatMoney(effectivePrice(tier), undefined, undefined)}
+              {preview(tier)}
             </span>
 
             <Icon
@@ -158,11 +202,11 @@ export function PriceTiers(props: Props) {
         </Button>
       </div>
 
-      {tiers.length === 0 && (
-        <p className="text-xs" style={{ color: colors.$3, opacity: 0.6 }}>
-          {t('price_tiers_help')}
-        </p>
-      )}
+      <p className="text-xs" style={{ color: colors.$3, opacity: 0.6 }}>
+        {progressive
+          ? t('price_tiers_help_progressive')
+          : t('price_tiers_help_all_units')}
+      </p>
     </div>
   );
 }
