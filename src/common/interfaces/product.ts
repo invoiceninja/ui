@@ -51,4 +51,5 @@ export interface Product {
   tags?: Tag[];
   product_tag_ids?: string[];
   price_tiers?: PriceTier[];
+  price_tiers_mode?: string;
 }

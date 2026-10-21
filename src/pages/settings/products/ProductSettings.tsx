@@ -142,6 +142,18 @@ export function ProductSettings() {
         </Element>
 
         <Element
+          leftSide={t('enable_price_tiers')}
+          leftSideHelp={t('enable_price_tiers_help')}
+        >
+          <Toggle
+            checked={companyChanges?.enable_price_tiers}
+            onChange={(value: boolean) =>
+              handleToggleChange('enable_price_tiers', value)
+            }
+          />
+        </Element>
+
+        <Element
           leftSide={t('show_product_cost')}
           leftSideHelp={t('show_cost_help')}
         >

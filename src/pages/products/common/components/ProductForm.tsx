@@ -128,14 +128,30 @@ export function ProductForm(props: Props) {
         </Element>
       )}
 
-      {!fundamentalConceptVisible && (
-        <Element leftSide={t('price_tiers')}>
-          <PriceTiers
-            tiers={product.price_tiers ?? []}
-            productPrice={product.price}
-            onChange={(tiers) => handleChange('price_tiers', tiers)}
-          />
-        </Element>
+      {!fundamentalConceptVisible && company?.enable_price_tiers && (
+        <>
+          <Element leftSide={t('pricing_mode')}>
+            <SelectField
+              value={product.price_tiers_mode || 'all_units'}
+              onValueChange={(value) =>
+                handleChange('price_tiers_mode', value)
+              }
+              customSelector
+              dismissable={false}
+            >
+              <option value="all_units">{t('all_units')}</option>
+              <option value="progressive">{t('progressive')}</option>
+            </SelectField>
+          </Element>
+
+          <Element leftSide={t('price_tiers')}>
+            <PriceTiers
+              tiers={product.price_tiers ?? []}
+              productPrice={product.price}
+              onChange={(tiers) => handleChange('price_tiers', tiers)}
+            />
+          </Element>
+        </>
       )}
 
       {!fundamentalConceptVisible &&

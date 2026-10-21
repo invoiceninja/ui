@@ -22,6 +22,7 @@ export interface Company {
   enabled_tax_rates: number;
   enabled_item_tax_rates: number;
   enable_product_discount: boolean;
+  enable_price_tiers: boolean;
   mark_expenses_paid: boolean;
   mark_expenses_invoiceable: boolean;
   invoice_expense_documents: boolean;
