@@ -132,6 +132,7 @@ export function ProductForm(props: Props) {
         <Element leftSide={t('price_tiers')}>
           <PriceTiers
             tiers={product.price_tiers ?? []}
+            productPrice={product.price}
             onChange={(tiers) => handleChange('price_tiers', tiers)}
           />
         </Element>
