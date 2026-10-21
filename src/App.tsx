@@ -13,10 +13,11 @@ import { atom, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
+import { Account } from '$app/common/interfaces/account';
 import { isPasswordRequiredAtom } from './common/atoms/password-confirmation';
 import { darkColorScheme, lightColorScheme } from './common/colors';
 import { toast } from './common/helpers/toast/toast';
@@ -45,6 +46,7 @@ import {
   useSocketEvent,
 } from './common/queries/sockets';
 import { routes } from './common/routes';
+import { updateAccount } from './common/stores/slices/company-users';
 import { RootState } from './common/stores/store';
 import { antdLocaleAtom } from './components/DropdownDateRangePicker';
 import { PreventNavigationModal } from './components/PreventNavigationModal';
@@ -71,6 +73,7 @@ export function App() {
   const { isOwner } = useAdmin();
   const { i18n } = useTranslation();
 
+  const dispatch = useDispatch();
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
   const navigate = useNavigate();
@@ -247,6 +250,13 @@ export function App() {
   usePrivateSocketEvents();
 
   useSystemFonts();
+
+  useSocketEvent<Account>({
+    on: 'App\\Events\\Account\\AccountWasUpdated',
+    callback: ({ data }) => {
+      dispatch(updateAccount(data));
+    },
+  });
 
   useSocketEvent({
     on: 'App\\Events\\Socket\\RefetchEntity',
