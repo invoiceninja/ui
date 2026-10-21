@@ -145,7 +145,7 @@ export function Dropdown(props: Props) {
         render={() => (
           <DropdownElements
             theme={{ hoverColor: colors.$2 }}
-            className={`border box rounded-md shadow-lg focus:outline-none whitespace-normal overflow-y-auto overscroll-contain ${props.className}`}
+            className={`border box rounded-md shadow-lg py-1 focus:outline-none whitespace-normal overflow-y-auto overscroll-contain ${props.className}`}
             style={{
               backgroundColor: colors.$1,
               borderColor: colors.$19,
