@@ -105,14 +105,26 @@ export function PriceTiers(props: Props) {
     return total / quantity;
   };
 
-  const preview = (tier: PriceTier): string => {
+  /* Bracket covered by the tier at `index`, e.g. "10–49" or "50+" */
+  const bracketLabel = (index: number): string => {
+    const min = Number(tiers[index].min_quantity) || 0;
+    const next = Number(tiers[index + 1]?.min_quantity) || null;
+
+    return next ? `${min}–${next - 1}` : `${min}+`;
+  };
+
+  const preview = (tier: PriceTier, index: number): string => {
     if (!progressive) {
       return String(formatMoney(tierRate(tier), undefined, undefined));
     }
 
     const min = Number(tier.min_quantity) || 0;
 
-    return `Ø ${formatMoney(blendedPrice(min), undefined, undefined)}`;
+    return `${bracketLabel(index)} · Ø ${formatMoney(
+      blendedPrice(min),
+      undefined,
+      undefined
+    )}`;
   };
 
   return (
@@ -131,6 +143,20 @@ export function PriceTiers(props: Props) {
           <span className="w-5" />
         </div>
       )}
+
+      {progressive &&
+        tiers.length > 0 &&
+        (Number(tiers[0].min_quantity) || 0) > 1 && (
+          <div className="flex items-center gap-2 text-sm" style={{ color: colors.$3, opacity: 0.6 }}>
+            <span className="w-24">{t('base_price')}</span>
+            <span className="w-28">—</span>
+            <span className="w-28">{formatMoney(productPrice, undefined, undefined)}</span>
+            <span className="flex-1">
+              {`1–${(Number(tiers[0].min_quantity) || 0) - 1}`}
+            </span>
+            <span className="w-5" />
+          </div>
+        )}
 
       {tiers.map((tier, index) => {
         const type = 'price' in tier ? 'price' : 'discount';
@@ -180,7 +206,7 @@ export function PriceTiers(props: Props) {
             </div>
 
             <span className="flex-1 text-sm" style={{ color: colors.$3 }}>
-              {preview(tier)}
+              {preview(tier, index)}
             </span>
 
             <Icon
