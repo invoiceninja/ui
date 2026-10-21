@@ -26,6 +26,7 @@ import { ErrorMessage } from '$app/components/ErrorMessage';
 import { IncomeAccountSelector } from '$app/components/IncomeAccountSelector';
 import { TagPillSelector } from '$app/components/tags/TagPillSelector';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { PriceTiers } from './PriceTiers';
 
 interface Props {
   type?: 'create' | 'edit';
@@ -125,6 +126,36 @@ export function ProductForm(props: Props) {
             errorMessage={errors?.errors.max_quantity}
           />
         </Element>
+      )}
+
+      {!fundamentalConceptVisible && company?.enable_price_tiers && (
+        <>
+          <Element
+            leftSide={t('pricing_mode')}
+            leftSideHelp={t('pricing_mode_help')}
+          >
+            <SelectField
+              value={product.price_tiers_mode || 'all_units'}
+              onValueChange={(value) =>
+                handleChange('price_tiers_mode', value)
+              }
+              customSelector
+              dismissable={false}
+            >
+              <option value="all_units">{t('all_units')}</option>
+              <option value="progressive">{t('progressive')}</option>
+            </SelectField>
+          </Element>
+
+          <Element leftSide={t('price_tiers')}>
+            <PriceTiers
+              tiers={product.price_tiers ?? []}
+              mode={product.price_tiers_mode || 'all_units'}
+              productPrice={product.price}
+              onChange={(tiers) => handleChange('price_tiers', tiers)}
+            />
+          </Element>
+        </>
       )}
 
       {!fundamentalConceptVisible &&

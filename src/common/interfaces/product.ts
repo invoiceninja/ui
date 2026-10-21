@@ -10,6 +10,12 @@ import { Tag } from './tag';
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+export interface PriceTier {
+  min_quantity: number;
+  price?: number;
+  discount?: number;
+}
+
 export interface Product {
   id: string;
   user_id: string;
@@ -44,4 +50,6 @@ export interface Product {
   income_account_id: string;
   tags?: Tag[];
   product_tag_ids?: string[];
+  price_tiers?: PriceTier[];
+  price_tiers_mode?: string;
 }
