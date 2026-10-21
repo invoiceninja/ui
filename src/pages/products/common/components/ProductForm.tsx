@@ -26,6 +26,7 @@ import { ErrorMessage } from '$app/components/ErrorMessage';
 import { IncomeAccountSelector } from '$app/components/IncomeAccountSelector';
 import { TagPillSelector } from '$app/components/tags/TagPillSelector';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
+import { PriceTiers } from './PriceTiers';
 
 interface Props {
   type?: 'create' | 'edit';
@@ -123,6 +124,15 @@ export function ProductForm(props: Props) {
               handleChange('max_quantity', parseFloat(value))
             }
             errorMessage={errors?.errors.max_quantity}
+          />
+        </Element>
+      )}
+
+      {!fundamentalConceptVisible && (
+        <Element leftSide={t('price_tiers')}>
+          <PriceTiers
+            tiers={product.price_tiers ?? []}
+            onChange={(tiers) => handleChange('price_tiers', tiers)}
           />
         </Element>
       )}
