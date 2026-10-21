@@ -130,7 +130,10 @@ export function ProductForm(props: Props) {
 
       {!fundamentalConceptVisible && company?.enable_price_tiers && (
         <>
-          <Element leftSide={t('pricing_mode')}>
+          <Element
+            leftSide={t('pricing_mode')}
+            leftSideHelp={t('pricing_mode_help')}
+          >
             <SelectField
               value={product.price_tiers_mode || 'all_units'}
               onValueChange={(value) =>
