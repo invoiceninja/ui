@@ -68,6 +68,7 @@ export function StepRecipient({ wizard }: Props) {
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const reveal = useRef<ReturnType<typeof setTimeout>>();
   const countryTouched = useRef(false);
+  const keyboardActive = useRef(false);
   const searchBox = useRef<HTMLDivElement>(null);
   const nameInput = useRef<HTMLInputElement>(null);
   const selected = wizard.client;
@@ -246,6 +247,14 @@ export function StepRecipient({ wizard }: Props) {
       .finally(() => setBusy(false));
   };
 
+  const addAsNewClient = () => {
+    setMatches([]);
+    setActive(-1);
+    setDismissedSearch(true);
+
+    void createClient();
+  };
+
   const selectedEmail = contactEmail(emailableContact(selected));
   const vatZone = Boolean(resolveCountry(address.country_id)?.eea);
 
@@ -282,8 +291,6 @@ export function StepRecipient({ wizard }: Props) {
       return;
     }
 
-    const typed = name.trim().toLowerCase();
-
     setBusy(true);
 
     return request(
@@ -298,14 +305,7 @@ export function StepRecipient({ wizard }: Props) {
       .then((response) => {
         const found = (response.data.data ?? []) as Client[];
 
-        const collides = found.some((match) => {
-          return (
-            (match.display_name || match.name || '').trim().toLowerCase() ===
-            typed
-          );
-        });
-
-        if (!collides) {
+        if (!found.length) {
           return createClient().then((created) => {
             if (created) {
               return proceed();
@@ -370,15 +370,22 @@ export function StepRecipient({ wizard }: Props) {
 
               if (event.key === 'ArrowDown') {
                 event.preventDefault();
-                setActive((current) => (current + 1) % matches.length);
+                keyboardActive.current = true;
+                setActive((current) => (current + 1) % (matches.length + 1));
               } else if (event.key === 'ArrowUp') {
                 event.preventDefault();
+                keyboardActive.current = true;
                 setActive((current) =>
-                  current <= 0 ? matches.length - 1 : current - 1
+                  current <= 0 ? matches.length : current - 1
                 );
-              } else if (event.key === 'Enter' && matches[active]) {
-                event.preventDefault();
-                choose(matches[active]);
+              } else if (event.key === 'Enter' && keyboardActive.current) {
+                if (matches[active]) {
+                  event.preventDefault();
+                  choose(matches[active]);
+                } else if (active === matches.length && !busy) {
+                  event.preventDefault();
+                  addAsNewClient();
+                }
               }
             }}
           >
@@ -458,6 +465,7 @@ export function StepRecipient({ wizard }: Props) {
                     role="option"
                     aria-selected={active === index}
                     type="button"
+                    tabIndex={-1}
                     onClick={() => choose(match)}
                     className="w-full text-left px-3.5 py-2.5 flex items-baseline justify-between gap-3"
                     style={{
@@ -465,7 +473,10 @@ export function StepRecipient({ wizard }: Props) {
                       backgroundColor:
                         active === index ? colors.$25 : 'transparent',
                     }}
-                    onMouseEnter={() => setActive(index)}
+                    onMouseEnter={() => {
+                      keyboardActive.current = false;
+                      setActive(index);
+                    }}
                   >
                     <span className="text-sm truncate">
                       {match.display_name || match.name}
@@ -481,19 +492,20 @@ export function StepRecipient({ wizard }: Props) {
 
                 <button
                   type="button"
+                  tabIndex={-1}
                   disabled={busy}
-                  onClick={() => {
-                    setMatches([]);
-                    setActive(-1);
-                    setDismissedSearch(true);
-
-                    void createClient();
+                  onClick={addAsNewClient}
+                  onMouseEnter={() => {
+                    keyboardActive.current = false;
+                    setActive(matches.length);
                   }}
                   className="w-full text-left px-3.5 py-2.5 border-t text-xs"
                   style={{
                     borderColor: colors.$20,
                     color: colors.$17,
                     cursor: busy ? 'not-allowed' : 'pointer',
+                    backgroundColor:
+                      active === matches.length ? colors.$25 : 'transparent',
                   }}
                 >
                   {trans('add_value_as_new_client', { value: name.trim() })}
