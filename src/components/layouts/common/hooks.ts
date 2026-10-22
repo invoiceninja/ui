@@ -52,7 +52,8 @@ function settingsDocs(path: string, heading?: string): SettingsDocs {
 export function useSettingsRoutes() {
   const [t] = useTranslation();
   const location = useLocation();
-  const { isCompanySettingsActive } = useCurrentSettingsLevel();
+  const { isCompanySettingsActive, isClientSettingsActive } =
+    useCurrentSettingsLevel();
 
   const { isOwner, isAdmin } = useAdmin();
 
@@ -201,7 +202,10 @@ export function useSettingsRoutes() {
       name: t('e_invoicing'),
       href: '/settings/e_invoice',
       current: location.pathname.startsWith('/settings/e_invoice'),
-      enabled: ((isAdmin || isOwner) && isCompanySettingsActive) || false,
+      enabled:
+        ((isAdmin || isOwner) &&
+          (isCompanySettingsActive || isClientSettingsActive)) ||
+        false,
       docs: settingsDocs('user-guide/einvoicing.md'),
     },
     {
