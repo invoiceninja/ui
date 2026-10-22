@@ -44,6 +44,7 @@ export function ItemDescriptionField({
 
   const box = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
+  const keyboardActive = useRef(false);
   const listId = `${id}-products`;
 
   useEffect(() => {
@@ -141,13 +142,19 @@ export function ItemDescriptionField({
 
         if (event.key === 'ArrowDown') {
           event.preventDefault();
+          keyboardActive.current = true;
           setActive((current) => (current + 1) % matches.length);
         } else if (event.key === 'ArrowUp') {
           event.preventDefault();
+          keyboardActive.current = true;
           setActive((current) =>
             current <= 0 ? matches.length - 1 : current - 1
           );
-        } else if (event.key === 'Enter' && matches[active]) {
+        } else if (
+          event.key === 'Enter' &&
+          keyboardActive.current &&
+          matches[active]
+        ) {
           event.preventDefault();
           pick(matches[active]);
         } else if (event.key === 'Escape') {
@@ -218,7 +225,10 @@ export function ItemDescriptionField({
               tabIndex={-1}
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => pick(product)}
-              onMouseEnter={() => setActive(index)}
+              onMouseEnter={() => {
+                keyboardActive.current = false;
+                setActive(index);
+              }}
               className="w-full text-left px-3.5 py-2.5 flex items-center justify-between gap-3"
               style={{
                 color: colors.$3,

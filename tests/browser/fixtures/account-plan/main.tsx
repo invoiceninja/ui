@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createInstance } from 'i18next';
 import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
@@ -8,6 +9,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { AccountPlanExpired } from '$app/components/banners/AccountPlanExpired';
 
 const i18n = createInstance();
+const queryClient = new QueryClient();
 
 void i18n
   .init({
@@ -24,37 +26,44 @@ void i18n
   .then(() => {
     const root = createRoot(document.getElementById('root')!);
     const render = (params: URLSearchParams) => {
+      const account = {
+        plan: params.get('plan') ?? 'pro',
+        plan_expires: params.get('expires'),
+      };
       const state = {
         companyUsers: {
           currentIndex: 0,
           api: [
             {
               is_owner: params.get('owner') !== 'false',
-              account: {
-                plan: params.get('plan') ?? 'pro',
-                plan_expires: params.get('expires'),
-              },
+              account,
             },
           ],
         },
         user: { user: {} },
       };
       const store = configureStore({ reducer: () => state });
+      queryClient.setQueryData(
+        ['/api/v1/refresh_react', 'account_status'],
+        account
+      );
       flushSync(() =>
         root.render(
           <Provider store={store}>
-            <I18nextProvider i18n={i18n}>
-              <MemoryRouter
-                future={{
-                  v7_startTransition: true,
-                  v7_relativeSplatPath: true,
-                }}
-              >
-                <main data-testid="ready">
-                  <AccountPlanExpired />
-                </main>
-              </MemoryRouter>
-            </I18nextProvider>
+            <QueryClientProvider client={queryClient}>
+              <I18nextProvider i18n={i18n}>
+                <MemoryRouter
+                  future={{
+                    v7_startTransition: true,
+                    v7_relativeSplatPath: true,
+                  }}
+                >
+                  <main data-testid="ready">
+                    <AccountPlanExpired />
+                  </main>
+                </MemoryRouter>
+              </I18nextProvider>
+            </QueryClientProvider>
           </Provider>
         )
       );
