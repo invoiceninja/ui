@@ -16,6 +16,7 @@ import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { useTranslation } from 'react-i18next';
 import { shouldDisplayAccountPlanExpiredBanner } from '$app/common/helpers/account-plan';
+import { useAccountStatusQuery } from '$app/common/queries/account';
 
 export function AccountPlanExpired() {
   const [t] = useTranslation();
@@ -27,15 +28,19 @@ export function AccountPlanExpired() {
   const forceDisplay =
     import.meta.env.VITE_SHOW_ACCOUNT_PLAN_EXPIRED_BANNER === 'true';
 
-  if (
-    !shouldDisplayAccountPlanExpiredBanner({
-      forceDisplay,
-      isHosted: isHosted(),
-      isOwner,
-      plan: account?.plan,
-      planExpires: account?.plan_expires,
-    })
-  ) {
+  const isPlanExpired = shouldDisplayAccountPlanExpiredBanner({
+    forceDisplay,
+    isHosted: isHosted(),
+    isOwner,
+    plan: account?.plan,
+    planExpires: account?.plan_expires,
+  });
+
+  const { data: freshAccount, isStale } = useAccountStatusQuery({
+    enabled: isPlanExpired && !forceDisplay,
+  });
+
+  if (!isPlanExpired || (!forceDisplay && (!freshAccount || isStale))) {
     return null;
   }
 
