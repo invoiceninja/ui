@@ -46,6 +46,7 @@ import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { RecurringExpenseStatus as RecurringExpenseStatusBadge } from './components/RecurringExpenseStatus';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { EntityState } from '$app/common/enums/entity-state';
@@ -100,10 +101,10 @@ export function useAllRecurringExpenseColumns() {
     'public_notes',
     'entity_state',
     'archived_at',
-    //   'assigned_to', @Todo: Need to resolve relationship
+    'assigned_user',
     //   'category', @Todo: Need to resolve relationship
     'created_at',
-    'created_by',
+    'user',
     firstCustom,
     secondCustom,
     thirdCustom,
@@ -147,6 +148,7 @@ export function useRecurringExpenseColumns() {
   const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
   const formatCustomFieldValue = useFormatCustomFieldValue();
+  const resolveUserName = useResolveUserName();
   const calculateExpenseAmount = useCalculateExpenseAmount();
   const calculateExpenseExclusiveAmount = useCalculateExpenseExclusiveAmount();
   const recurringExpenseColumns = useAllRecurringExpenseColumns();
@@ -450,6 +452,20 @@ export function useRecurringExpenseColumns() {
         }
         return <span>{value}</span>;
       },
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, recurringExpense) =>
+        resolveUserName(recurringExpense.user_id),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (value, recurringExpense) =>
+        resolveUserName(recurringExpense.assigned_user_id),
     },
     {
       column: 'tags',

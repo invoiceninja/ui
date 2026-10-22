@@ -35,6 +35,7 @@ import { bulk } from '$app/common/queries/products';
 import { Divider } from '$app/components/cards/Divider';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
@@ -74,10 +75,10 @@ export function useAllProductColumns() {
     'price',
     'quantity',
     'archived_at',
-    // 'assigned_to', @Todo: Relationship not included.
+    'assigned_user',
     'cost',
     'created_at',
-    // 'created_by', @Todo: Relationship not included.
+    'user',
     firstCustom,
     secondCustom,
     thirdCustom,
@@ -112,6 +113,7 @@ export function useProductColumns() {
   const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
   const disableNavigation = useDisableNavigation();
+  const resolveUserName = useResolveUserName();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
@@ -293,6 +295,18 @@ export function useProductColumns() {
       id: 'updated_at',
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, product) => resolveUserName(product.user_id),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (value, product) => resolveUserName(product.assigned_user_id),
     },
     {
       column: 'tags',

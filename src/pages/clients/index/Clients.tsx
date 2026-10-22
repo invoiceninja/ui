@@ -22,6 +22,7 @@ import {
   useEntityTagFilterColumns,
   useTagFilterCleanup,
 } from '$app/common/hooks/useEntityTagFilters';
+import { useEntityUserFilterColumns } from '$app/common/hooks/useEntityUserFilters';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
@@ -66,11 +67,18 @@ export default function Clients() {
   const selectedColumns =
     reactSettings?.react_table_columns?.client || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
+  const shouldShowUserFilter = selectedColumns.includes('user');
+  const shouldShowAssignedUserFilter =
+    selectedColumns.includes('assigned_user');
   const filterColumns = useEntityTagFilterColumns(
     TAG_ENTITY_TYPES.client,
     'client_tag_ids',
     { enabled: shouldShowTagFilter }
   );
+  const userFilterColumns = useEntityUserFilterColumns({
+    user: shouldShowUserFilter,
+    assignedUser: shouldShowAssignedUserFilter,
+  });
 
   useTagFilterCleanup(shouldShowTagFilter, 'client_tag_ids');
 
@@ -113,7 +121,9 @@ export default function Clients() {
         resource="client"
         endpoint={`/api/v1/clients?include=group_settings${
           shouldShowTagFilter ? ',tags' : ''
-        }&sort=id|desc${shouldShowTagFilter ? '' : '&tag_ids='}`}
+        }&sort=id|desc${shouldShowTagFilter ? '' : '&tag_ids='}${
+          shouldShowUserFilter ? '' : '&user_ids='
+        }${shouldShowAssignedUserFilter ? '' : '&assigned_user_ids='}`}
         bulkRoute="/api/v1/clients/bulk"
         columns={columns}
         linkToCreate="/clients/create"
@@ -122,7 +132,10 @@ export default function Clients() {
         customActions={actions}
         bottomActionsKeys={['purge']}
         customBulkActions={customBulkActions}
-        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
+        filterColumns={[
+          ...userFilterColumns,
+          ...(shouldShowTagFilter ? filterColumns : []),
+        ]}
         rightSide={
           <div className="flex items-center space-x-2">
             <DataTableColumnsPicker

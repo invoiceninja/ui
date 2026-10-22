@@ -23,6 +23,7 @@ import {
   useEntityTagFilterColumns,
   useTagFilterCleanup,
 } from '$app/common/hooks/useEntityTagFilters';
+import { useEntityUserFilterColumns } from '$app/common/hooks/useEntityUserFilters';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
@@ -66,11 +67,18 @@ export default function Expenses() {
   const selectedColumns =
     reactSettings?.react_table_columns?.expense || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
+  const shouldShowUserFilter = selectedColumns.includes('user');
+  const shouldShowAssignedUserFilter =
+    selectedColumns.includes('assigned_user');
   const filterColumns = useEntityTagFilterColumns(
     TAG_ENTITY_TYPES.expense,
     'expense_tag_ids',
     { enabled: shouldShowTagFilter }
   );
+  const userFilterColumns = useEntityUserFilterColumns({
+    user: shouldShowUserFilter,
+    assignedUser: shouldShowAssignedUserFilter,
+  });
 
   useTagFilterCleanup(shouldShowTagFilter, 'expense_tag_ids');
 
@@ -115,6 +123,8 @@ export default function Expenses() {
           shouldShowTagFilter ? ',tags' : ''
         }&without_deleted_clients=true&without_deleted_vendors=true&sort=id|desc${
           shouldShowTagFilter ? '' : '&tag_ids='
+        }${shouldShowUserFilter ? '' : '&user_ids='}${
+          shouldShowAssignedUserFilter ? '' : '&assigned_user_ids='
         }`}
         columns={columns}
         bulkRoute="/api/v1/expenses/bulk"
@@ -124,7 +134,10 @@ export default function Expenses() {
         customFilters={filters}
         customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
-        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
+        filterColumns={[
+          ...userFilterColumns,
+          ...(shouldShowTagFilter ? filterColumns : []),
+        ]}
         withResourcefulActions
         rightSide={
           <div className="flex items-center space-x-2">
