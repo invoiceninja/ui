@@ -25,6 +25,11 @@ import { Invitation } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Page } from '$app/components/Breadcrumbs';
+import {
+  normalizeLineEntries,
+  withLineIds,
+} from '$app/components/e-invoice/line-fields/fields';
+import { useEInvoiceLinesAlignment } from '$app/components/e-invoice/line-fields/useEInvoiceLinesAlignment';
 import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { Tab, Tabs } from '$app/components/Tabs';
@@ -76,6 +81,13 @@ export default function Create() {
   const [searchParams] = useSearchParams();
 
   const [quote, setQuote] = useAtomWithPrevent(quoteAtom);
+
+  useEInvoiceLinesAlignment({
+    resource: quote,
+    setResource: setQuote,
+    root: 'Invoice',
+  });
+
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client>();
@@ -150,7 +162,18 @@ export default function Create() {
         _quote.uses_inclusive_taxes =
           company?.settings?.inclusive_taxes ?? false;
 
-        return (value = _quote);
+        value = _quote;
+      }
+
+      if (value && Array.isArray(value.line_items)) {
+        value = {
+          ...value,
+          line_items: withLineIds(value.line_items),
+          e_invoice: normalizeLineEntries(
+            value.e_invoice,
+            'Invoice'
+          ) as Quote['e_invoice'],
+        };
       }
 
       return value;

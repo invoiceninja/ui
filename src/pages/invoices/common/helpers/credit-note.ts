@@ -11,6 +11,10 @@
 import dayjs from 'dayjs';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
+import {
+  getLineEntries,
+  withLineEntries,
+} from '$app/components/e-invoice/line-fields/fields';
 
 export function buildPeppolCreditNote(
   invoice: Invoice,
@@ -37,18 +41,22 @@ export function buildPeppolCreditNote(
     client: undefined,
     // The API treats a populated invoice_id as an invoice reversal command.
     invoice_id: '',
-    e_invoice: {
-      CreditNote: {
-        BillingReference: [
-          {
-            InvoiceDocumentReference: {
-              ID: invoice.number,
-              IssueDate: invoice.date,
+    e_invoice: withLineEntries(
+      {
+        CreditNote: {
+          BillingReference: [
+            {
+              InvoiceDocumentReference: {
+                ID: invoice.number,
+                IssueDate: invoice.date,
+              },
             },
-          },
-        ],
+          ],
+        },
       },
-    },
+      'CreditNote',
+      getLineEntries(invoice.e_invoice, 'Invoice')
+    ),
   } as unknown as Credit;
 }
 

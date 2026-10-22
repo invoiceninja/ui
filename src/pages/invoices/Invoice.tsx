@@ -35,6 +35,8 @@ import {
 } from '$app/common/queries/sockets';
 import { Banner } from '$app/components/Banner';
 import { Page } from '$app/components/Breadcrumbs';
+import { normalizeLineEntries } from '$app/components/e-invoice/line-fields/fields';
+import { useEInvoiceLinesAlignment } from '$app/components/e-invoice/line-fields/useEInvoiceLinesAlignment';
 import { Default } from '$app/components/layouts/Default';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
 import { QuickbooksDepositDisabledAlert } from '$app/components/QuickbooksDepositDisabledAlert';
@@ -78,6 +80,12 @@ export default function Invoice() {
   });
 
   const { actions, modal } = useActions({ invoice });
+
+  useEInvoiceLinesAlignment({
+    resource: invoice,
+    setResource: setInvoice,
+    root: 'Invoice',
+  });
 
   const { validationResponse } = useCheckEInvoiceValidation({
     resource: invoice,
@@ -132,6 +140,11 @@ export default function Invoice() {
       _invoice.line_items.map(
         (lineItem) => (lineItem._id = lineItem._id || v4())
       );
+
+      _invoice.e_invoice = normalizeLineEntries(
+        _invoice.e_invoice,
+        'Invoice'
+      ) as InvoiceType['e_invoice'];
 
       setInvoice(_invoice);
 

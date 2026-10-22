@@ -34,6 +34,13 @@ import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { useAtom } from 'jotai';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import {
+  getLineEntries,
+  realignLineEntries,
+  withLineEntries,
+  withLineIds,
+  withoutFeeLineEntries,
+} from '$app/components/e-invoice/line-fields/fields';
 
 export type StepKey = 'who' | 'what' | 'when' | 'notes' | 'send';
 
@@ -178,7 +185,7 @@ const HANDOFF_ACTIONS = [
 
 const withRows = (items: InvoiceItem[]): InvoiceItem[] => {
   return items.length
-    ? items
+    ? withLineIds(items)
     : [{ ...blankLineItem(), quantity: 1, sort_id: 0 }];
 };
 
@@ -289,6 +296,8 @@ export function useWizard(existingId?: string): Wizard {
           loaded.line_items = [];
         }
 
+        loaded.line_items = withLineIds(loaded.line_items);
+
         if (existingId) {
           persistedId.current = loaded.id;
           setInvoiceId(loaded.id);
@@ -338,8 +347,31 @@ export function useWizard(existingId?: string): Wizard {
 
   const setLineItems = useCallback(
     (items: InvoiceItem[]) => {
+      const lineItems = items.map((item, index) => ({
+        ...item,
+        sort_id: index,
+      }));
+
+      const current = latest.current;
+
+      const entries = current
+        ? realignLineEntries(
+            getLineEntries(current.e_invoice, 'Invoice'),
+            current.line_items.map((item) => item._id ?? ''),
+            lineItems.map((item) => item._id ?? ''),
+            'drop'
+          )
+        : null;
+
       patch({
-        line_items: items.map((item, index) => ({ ...item, sort_id: index })),
+        line_items: lineItems,
+        ...(entries && {
+          e_invoice: withLineEntries(
+            current?.e_invoice,
+            'Invoice',
+            entries
+          ) as unknown as Invoice['e_invoice'],
+        }),
       });
     },
     [patch]
@@ -367,9 +399,14 @@ export function useWizard(existingId?: string): Wizard {
             payload,
             { skipIntercept: true }
           )
-        : request('POST', endpoint(`/api/v1/invoices${query}`), payload, {
-            skipIntercept: true,
-          })
+        : request(
+            'POST',
+            endpoint(`/api/v1/invoices${query}`),
+            withoutFeeLineEntries(payload, 'Invoice'),
+            {
+              skipIntercept: true,
+            }
+          )
     )
       .then((response) => {
         const saved = response.data.data as Invoice;

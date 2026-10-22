@@ -26,7 +26,6 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { EInvoiceType } from '$app/pages/settings';
@@ -43,8 +42,8 @@ interface Props {
   setInvoice?: Dispatch<SetStateAction<Invoice | undefined>>;
 }
 
-interface PaymentMeansFormComponent {
-  saveEInvoice: () => void;
+export interface PaymentMeansFormComponent {
+  saveEInvoice: () => Promise<boolean | undefined>;
 }
 
 interface PaymentMeans {
@@ -322,8 +321,6 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
 
     const [t] = useTranslation();
 
-    const refreshCompanyUsers = useRefreshCompanyUsers();
-
     const [errors, setErrors] = useState<ValidationBag | null>(null);
 
     const form = useFormik({
@@ -347,11 +344,15 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
         toast.processing();
         setErrors(null);
 
-        request('POST', endpoint('/api/v1/einvoice/configurations'), values)
+        return request(
+          'POST',
+          endpoint('/api/v1/einvoice/configurations'),
+          values
+        )
           .then(() => {
             toast.success('saved_einvoice_details');
 
-            refreshCompanyUsers();
+            return true;
           })
           .catch((error: AxiosError<ValidationBag>) => {
             if (error.response?.status === 422) {
@@ -359,10 +360,12 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
 
               setErrors(error.response.data);
 
-              return;
+              return false;
             }
 
             toast.error();
+
+            return false;
           })
           .finally(() => setSubmitting(false));
       },
@@ -371,7 +374,7 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
     useImperativeHandle(ref, () => {
       return {
         saveEInvoice() {
-          form.submitForm();
+          return form.submitForm();
         },
       };
     }, [form.values]);
