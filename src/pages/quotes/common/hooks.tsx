@@ -55,6 +55,7 @@ import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
@@ -771,7 +772,7 @@ export function useAllQuoteColumns() {
     'date',
     'valid_until',
     'archived_at',
-    // 'assigned_to',  @Todo: Need to fetch the relationship
+    'assigned_user',
     'client_city',
     'client_country',
     'client_postal_code',
@@ -779,7 +780,7 @@ export function useAllQuoteColumns() {
     'contact_email',
     'contact_name',
     'created_at',
-    // 'created_by', @Todo: Need to resolve relationship
+    'user',
     firstCustom,
     secondCustom,
     thirdCustom,
@@ -824,6 +825,7 @@ export function useQuoteColumns() {
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
   const resolveCountry = useResolveCountry();
+  const resolveUserName = useResolveUserName();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const quoteViewedAt = useCallback((quote: Quote) => {
@@ -1178,6 +1180,18 @@ export function useQuoteColumns() {
       id: 'updated_at',
       label: t('last_updated'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, quote) => resolveUserName(quote.user_id),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (value, quote) => resolveUserName(quote.assigned_user_id),
     },
     {
       column: 'tags',

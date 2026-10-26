@@ -23,6 +23,7 @@ import {
   useEntityTagFilterColumns,
   useTagFilterCleanup,
 } from '$app/common/hooks/useEntityTagFilters';
+import { useEntityUserFilterColumns } from '$app/common/hooks/useEntityUserFilters';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
@@ -68,11 +69,18 @@ export default function Credits() {
   const selectedColumns =
     reactSettings?.react_table_columns?.credit || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
+  const shouldShowUserFilter = selectedColumns.includes('user');
+  const shouldShowAssignedUserFilter =
+    selectedColumns.includes('assigned_user');
   const filterColumns = useEntityTagFilterColumns(
     TAG_ENTITY_TYPES.credit,
     'credit_tag_ids',
     { enabled: shouldShowTagFilter }
   );
+  const userFilterColumns = useEntityUserFilterColumns({
+    user: shouldShowUserFilter,
+    assignedUser: shouldShowAssignedUserFilter,
+  });
 
   useTagFilterCleanup(shouldShowTagFilter, 'credit_tag_ids');
 
@@ -120,6 +128,8 @@ export default function Credits() {
           shouldShowTagFilter ? ',tags' : ''
         }&without_deleted_clients=true&sort=id|desc${
           shouldShowTagFilter ? '' : '&tag_ids='
+        }${shouldShowUserFilter ? '' : '&user_ids='}${
+          shouldShowAssignedUserFilter ? '' : '&assigned_user_ids='
         }`}
         bulkRoute="/api/v1/credits/bulk"
         columns={columns}
@@ -129,7 +139,10 @@ export default function Credits() {
         customBulkActions={customBulkActions}
         customFilters={filters}
         customFilterPlaceholder="status"
-        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
+        filterColumns={[
+          ...userFilterColumns,
+          ...(shouldShowTagFilter ? filterColumns : []),
+        ]}
         withResourcefulActions
         rightSide={
           <DataTableColumnsPicker

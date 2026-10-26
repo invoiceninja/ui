@@ -20,6 +20,7 @@ import {
   useEntityTagFilterColumns,
   useTagFilterCleanup,
 } from '$app/common/hooks/useEntityTagFilters';
+import { useEntityUserFilterColumns } from '$app/common/hooks/useEntityUserFilters';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
@@ -72,11 +73,18 @@ export default function PurchaseOrders() {
   const selectedColumns =
     reactSettings?.react_table_columns?.purchaseOrder || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
+  const shouldShowUserFilter = selectedColumns.includes('user');
+  const shouldShowAssignedUserFilter =
+    selectedColumns.includes('assigned_user');
   const filterColumns = useEntityTagFilterColumns(
     TAG_ENTITY_TYPES.purchaseOrder,
     'purchase_order_tag_ids',
     { enabled: shouldShowTagFilter }
   );
+  const userFilterColumns = useEntityUserFilterColumns({
+    user: shouldShowUserFilter,
+    assignedUser: shouldShowAssignedUserFilter,
+  });
 
   useTagFilterCleanup(shouldShowTagFilter, 'purchase_order_tag_ids');
   const disableNavigation = useDisableNavigation();
@@ -121,6 +129,8 @@ export default function PurchaseOrders() {
           shouldShowTagFilter ? ',tags' : ''
         }&without_deleted_vendors=true&sort=id|desc${
           shouldShowTagFilter ? '' : '&tag_ids='
+        }${shouldShowUserFilter ? '' : '&user_ids='}${
+          shouldShowAssignedUserFilter ? '' : '&assigned_user_ids='
         }`}
         bulkRoute="/api/v1/purchase_orders/bulk"
         linkToCreate="/purchase_orders/create"
@@ -130,7 +140,10 @@ export default function PurchaseOrders() {
         customBulkActions={customBulkActions}
         customFilters={filters}
         customFilterPlaceholder="status"
-        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
+        filterColumns={[
+          ...userFilterColumns,
+          ...(shouldShowTagFilter ? filterColumns : []),
+        ]}
         withResourcefulActions
         rightSide={
           <div className="flex items-center space-x-2">
