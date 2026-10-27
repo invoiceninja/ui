@@ -10,6 +10,7 @@
 
 import { blankInvitation } from '$app/common/constants/blank-invitation';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
+import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 import { endpoint } from '$app/common/helpers';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
@@ -27,7 +28,7 @@ import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { toast } from '$app/common/helpers/toast/toast';
 import { AxiosError } from 'axios';
-import { startDate, today } from '../helpers/dates';
+import { startDate, toDateInput, today } from '../helpers/dates';
 import { firstErrorMessage } from '../helpers/first-error';
 import { cloneDeep } from 'lodash';
 import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
@@ -61,7 +62,7 @@ export const STEPS: { key: StepKey; title: string; href: string }[] = [
   },
   {
     key: 'send',
-    title: 'review_and_start',
+    title: 'review_and_send',
     href: '/recurring_invoices/guided/send',
   },
 ];
@@ -76,11 +77,20 @@ const SERVER_OWNED: (keyof RecurringInvoice)[] = [
   'is_deleted',
 ];
 
+const SENT_NOW_OWNED: (keyof RecurringInvoice)[] = [
+  ...SERVER_OWNED,
+  'next_send_date',
+  'next_send_datetime',
+  'remaining_cycles',
+  'last_sent_date',
+];
+
 const adoptServerOwned = (
   target: RecurringInvoice,
-  source: RecurringInvoice
+  source: RecurringInvoice,
+  keys: (keyof RecurringInvoice)[]
 ): RecurringInvoice => {
-  return SERVER_OWNED.reduce((merged, key) => {
+  return keys.reduce((merged, key) => {
     return { ...merged, [key]: source[key] };
   }, target);
 };
@@ -101,6 +111,8 @@ export interface Wizard {
   dismiss: (key: string) => void;
   totals: Totals;
   currency: Currency | undefined;
+  startLater: boolean;
+  setStartLater: (later: boolean) => void;
 
   goTo: (step: StepKey) => void;
   next: () => void;
@@ -117,6 +129,7 @@ export interface Wizard {
 
 export interface FlushOptions {
   start?: boolean;
+  sendNow?: boolean;
 }
 
 export interface WizardContext {
@@ -219,6 +232,7 @@ export function useWizard(existingId?: string): Wizard {
     STEPS.find((entry) => entry.href === location.pathname)?.key ?? 'who';
   const [errors, setErrors] = useState<ValidationBag>();
   const [dismissals, setDismissals] = useState<Record<string, boolean>>({});
+  const [startLater, setStartLater] = useState(false);
 
   const latest = useRef<RecurringInvoice>();
   const persistedId = useRef<string | null>(null);
@@ -281,6 +295,7 @@ export function useWizard(existingId?: string): Wizard {
 
       latest.current = seeded;
       setRecurringInvoice(seeded);
+      setStartLater(seeded.next_send_date > today());
       setHandoff(undefined);
 
       if (seeded.client_id) {
@@ -318,8 +333,14 @@ export function useWizard(existingId?: string): Wizard {
             setClient(loaded.client);
           }
 
-          latest.current = loaded;
-          setRecurringInvoice(loaded);
+          const existing =
+            loaded.status_id === RecurringInvoiceStatus.DRAFT
+              ? { ...loaded, next_send_date: startDate(loaded.next_send_date) }
+              : loaded;
+
+          latest.current = existing;
+          setRecurringInvoice(existing);
+          setStartLater(toDateInput(existing.next_send_date) > today());
 
           return;
         }
@@ -375,7 +396,12 @@ export function useWizard(existingId?: string): Wizard {
       }
 
       const id = persistedId.current;
-      const query = options?.start ? '?start=true' : '';
+      const query = options?.start
+        ? '?start=true'
+        : options?.sendNow
+          ? '?send_now=true'
+          : '';
+      const owned = options?.sendNow ? SENT_NOW_OWNED : SERVER_OWNED;
 
       return (
         id
@@ -395,16 +421,35 @@ export function useWizard(existingId?: string): Wizard {
         .then((response) => {
           const saved = response.data.data as RecurringInvoice;
 
+          if (!id || !options?.sendNow) {
+            return saved;
+          }
+
+          return request(
+            'GET',
+            endpoint('/api/v1/recurring_invoices/:id', { id }),
+            {},
+            { skipIntercept: true }
+          )
+            .then((reloaded) => reloaded.data.data as RecurringInvoice)
+            .catch(() => saved);
+        })
+        .then((saved) => {
+          const source = {
+            ...saved,
+            next_send_date: String(saved.next_send_date ?? '').slice(0, 10),
+          };
+
           setErrors(undefined);
 
           persistedId.current = saved.id;
           setRecurringInvoiceId(saved.id);
 
           latest.current = latest.current
-            ? adoptServerOwned(latest.current, saved)
+            ? adoptServerOwned(latest.current, source, owned)
             : latest.current;
           setRecurringInvoice((previous) =>
-            previous ? adoptServerOwned(previous, saved) : previous
+            previous ? adoptServerOwned(previous, source, owned) : previous
           );
 
           if (!id) {
@@ -585,6 +630,8 @@ export function useWizard(existingId?: string): Wizard {
       setDismissals((current) => ({ ...current, [key]: true })),
     totals,
     currency,
+    startLater,
+    setStartLater,
     goTo,
     next,
     back,

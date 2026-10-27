@@ -11,6 +11,7 @@
 import { useColorScheme } from '$app/common/colors';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { AdvancedConfigurationToggle } from './common/components/AdvancedConfigurationToggle';
+import { GuideTopic, StepGuide } from './common/components/StepGuide';
 import { UpgradeAlert } from './common/components/UpgradeAlert';
 import { Badge } from '$app/components/Badge';
 import { Page } from '$app/components/Breadcrumbs';
@@ -21,7 +22,13 @@ import { Default } from '$app/components/layouts/Default';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { STEPS, useWizard } from './common/hooks/useWizard';
+import { STEPS, StepKey, useWizard } from './common/hooks/useWizard';
+
+const GUIDE_TOPICS: Partial<Record<StepKey, GuideTopic>> = {
+  schedule: 'schedule',
+  when: 'payment',
+  send: 'send',
+};
 
 export default function Wizard() {
   const [t] = useTranslation();
@@ -86,9 +93,13 @@ export default function Wizard() {
           style={{ borderColor: colors.$24 }}
           headerStyle={{ borderColor: colors.$20 }}
           topRight={
-            <Badge variant="primary" className="shrink-0">
-              {`${wizard.stepIndex + 1} / ${STEPS.length}`}
-            </Badge>
+            <div className="flex shrink-0 items-center gap-4">
+              <StepGuide key={wizard.step} topic={GUIDE_TOPICS[wizard.step]} />
+
+              <Badge variant="primary" className="shrink-0">
+                {`${wizard.stepIndex + 1} / ${STEPS.length}`}
+              </Badge>
+            </div>
           }
         >
           {wizard.loadFailed ? (

@@ -37,10 +37,13 @@ import { PreviewFrame } from './PreviewFrame';
 import { StepTransition } from './StepTransition';
 import { Wizard } from '../hooks/useWizard';
 import { contactEmail, emailableContact } from '../helpers/client-contact';
+import { today } from '../helpers/dates';
+import { sendsRightAway } from '../helpers/schedule';
 import { isRunning } from '../helpers/status';
 import { AttachmentOption } from './AttachmentOption';
 import { BrandPrompts } from './BrandPrompts';
 import { ClientContactModal } from './ClientContactModal';
+import { LaunchNote } from './LaunchNote';
 
 const LOOKS = ['Plain', 'Clean', 'Modern', 'Business'];
 
@@ -198,21 +201,29 @@ export function StepReview({ wizard }: Props) {
     window.open(accountHref, '_blank');
   };
 
+  const rightAway = sendsRightAway(recurringInvoice, wizard.startLater);
+
   const launch = () => {
-    return wizard.flush({ start: true }).then((saved) => {
-      if (!saved) {
-        return;
-      }
+    if (rightAway) {
+      wizard.patch({ next_send_date: today() });
+    }
 
-      toast.success(
-        isRunning(saved)
-          ? 'started_recurring_invoice'
-          : 'created_recurring_invoice'
-      );
-      $refetch(['recurring_invoices']);
+    return wizard
+      .flush(rightAway ? { sendNow: true } : { start: true })
+      .then((saved) => {
+        if (!saved) {
+          return;
+        }
 
-      navigate('/recurring_invoices');
-    });
+        toast.success(
+          isRunning(saved) || saved.last_sent_date
+            ? 'started_recurring_invoice'
+            : 'created_recurring_invoice'
+        );
+        $refetch(['recurring_invoices']);
+
+        navigate('/recurring_invoices');
+      });
   };
 
   const start = () => {
@@ -438,6 +449,12 @@ export function StepReview({ wizard }: Props) {
         </div>
       ) : null}
 
+      <LaunchNote
+        className="mt-8"
+        wizard={wizard}
+        onChange={() => wizard.goTo('schedule')}
+      />
+
       <StepFooter
         back={
           <Button
@@ -480,7 +497,7 @@ export function StepReview({ wizard }: Props) {
           disableWithoutIcon={!starting}
           onClick={start}
         >
-          {t('start')}
+          {rightAway ? t('send_now') : t('start')}
         </Button>
       </StepFooter>
 

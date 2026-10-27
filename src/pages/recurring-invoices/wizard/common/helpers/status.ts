@@ -11,6 +11,15 @@
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 
+export const isDraft = (
+  recurringInvoice: RecurringInvoice | undefined
+): boolean => {
+  return (
+    !recurringInvoice?.id ||
+    recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT
+  );
+};
+
 export const isRunning = (recurringInvoice: RecurringInvoice): boolean => {
   return (
     recurringInvoice.status_id === RecurringInvoiceStatus.ACTIVE ||

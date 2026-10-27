@@ -30,6 +30,8 @@ import { useParams } from 'react-router-dom';
 import { BrandPrompts } from './common/components/BrandPrompts';
 import { ClientContactModal } from './common/components/ClientContactModal';
 import { EditSection } from './common/components/EditSection';
+import { LaunchNote } from './common/components/LaunchNote';
+import { StepGuide } from './common/components/StepGuide';
 import { StepItems } from './common/components/StepItems';
 import { StepNotes } from './common/components/StepNotes';
 import { StepSchedule } from './common/components/StepSchedule';
@@ -40,7 +42,9 @@ import {
   contactEmail,
   emailableContact,
 } from './common/helpers/client-contact';
-import { isRunning } from './common/helpers/status';
+import { today } from './common/helpers/dates';
+import { sendsRightAway } from './common/helpers/schedule';
+import { isDraft, isRunning } from './common/helpers/status';
 
 export default function Edit() {
   const [t] = useTranslation();
@@ -72,6 +76,8 @@ export default function Edit() {
     wizard.recurringInvoice?.status_id === RecurringInvoiceStatus.DRAFT ||
     wizard.recurringInvoice?.status_id === RecurringInvoiceStatus.PAUSED;
 
+  const rightAway = sendsRightAway(wizard.recurringInvoice, wizard.startLater);
+
   const recipient = contactEmail(emailableContact(wizard.client));
 
   const save = () => {
@@ -94,15 +100,19 @@ export default function Edit() {
   const launch = () => {
     setStarting(true);
 
+    if (rightAway) {
+      wizard.patch({ next_send_date: today() });
+    }
+
     wizard
-      .flush({ start: true })
+      .flush(rightAway ? { sendNow: true } : { start: true })
       .then((saved) => {
         if (!saved) {
           return;
         }
 
         toast.success(
-          isRunning(saved)
+          isRunning(saved) || saved.last_sent_date
             ? 'started_recurring_invoice'
             : 'updated_recurring_invoice'
         );
@@ -223,11 +233,25 @@ export default function Edit() {
                 <StepItems wizard={wizard} embedded />
               </EditSection>
 
-              <EditSection label={t('schedule')}>
+              <EditSection
+                label={t('schedule')}
+                action={
+                  <StepGuide
+                    topic={
+                      isDraft(wizard.recurringInvoice)
+                        ? 'schedule'
+                        : 'schedule_running'
+                    }
+                  />
+                }
+              >
                 <StepSchedule wizard={wizard} embedded />
               </EditSection>
 
-              <EditSection label={t('payment')}>
+              <EditSection
+                label={t('payment')}
+                action={<StepGuide topic="payment" />}
+              >
                 <StepTiming wizard={wizard} embedded />
               </EditSection>
 
@@ -259,6 +283,8 @@ export default function Edit() {
                 </PreviewFrame>
               </EditSection>
 
+              <LaunchNote className="mt-8" wizard={wizard} />
+
               <div className="mt-8 flex items-center justify-end gap-2">
                 <Button
                   type={startable ? 'secondary' : 'primary'}
@@ -277,7 +303,7 @@ export default function Edit() {
                     disableWithoutIcon={!starting}
                     onClick={start}
                   >
-                    {t('start')}
+                    {rightAway ? t('send_now') : t('start')}
                   </Button>
                 ) : null}
               </div>

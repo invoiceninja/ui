@@ -55,7 +55,7 @@ export function StepNotes({ wizard, embedded }: Props) {
             }
           >
             <Button behavior="button" disableWithoutIcon onClick={wizard.next}>
-              {t('review_and_start')}
+              {t('review_and_send')}
             </Button>
           </StepFooter>
         </>

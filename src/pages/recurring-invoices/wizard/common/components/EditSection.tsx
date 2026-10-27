@@ -15,9 +15,10 @@ interface Props {
   label: string;
   children: ReactNode;
   last?: boolean;
+  action?: ReactNode;
 }
 
-export function EditSection({ label, children, last }: Props) {
+export function EditSection({ label, children, last, action }: Props) {
   const colors = useColorScheme();
 
   return (
@@ -25,12 +26,13 @@ export function EditSection({ label, children, last }: Props) {
       className={last ? '' : 'pb-6 mb-6'}
       style={last ? undefined : { borderBottom: `1px dashed ${colors.$5}` }}
     >
-      <h4
-        className="text-sm mb-3"
-        style={{ color: colors.$22, fontWeight: 500 }}
-      >
-        {label}
-      </h4>
+      <div className="flex items-center justify-between gap-4 mb-3">
+        <h4 className="text-sm" style={{ color: colors.$22, fontWeight: 500 }}>
+          {label}
+        </h4>
+
+        {action}
+      </div>
 
       {children}
     </section>

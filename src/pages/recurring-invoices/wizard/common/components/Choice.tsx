@@ -10,6 +10,7 @@
 
 import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import classNames from 'classnames';
 import { ReactNode } from 'react';
 import styled from 'styled-components';
 
@@ -31,10 +32,9 @@ interface Props {
   onSelect: () => void;
   title: ReactNode;
   detail?: ReactNode;
-  trailing?: ReactNode;
 }
 
-export function Choice({ selected, onSelect, title, detail, trailing }: Props) {
+export function Choice({ selected, onSelect, title, detail }: Props) {
   const accentColor = useAccentColor();
   const colors = useColorScheme();
 
@@ -45,7 +45,10 @@ export function Choice({ selected, onSelect, title, detail, trailing }: Props) {
       aria-checked={selected}
       onClick={onSelect}
       theme={{ hover: colors.$25, focus: accentColor }}
-      className="w-full flex items-center gap-3 text-left px-3.5 py-2.5 border"
+      className={classNames(
+        'w-full flex gap-3 text-left px-3.5 py-2.5 border',
+        detail ? 'items-start' : 'items-center'
+      )}
       style={{
         borderRadius: '0.375rem',
         borderColor: selected ? colors.$3 : colors.$24,
@@ -58,6 +61,7 @@ export function Choice({ selected, onSelect, title, detail, trailing }: Props) {
         style={{
           width: '1rem',
           height: '1rem',
+          marginTop: detail ? '0.125rem' : 0,
           borderRadius: '999px',
           border: `1px solid ${selected ? colors.$3 : colors.$5}`,
         }}
@@ -82,17 +86,14 @@ export function Choice({ selected, onSelect, title, detail, trailing }: Props) {
           {title}
         </span>
         {detail ? (
-          <span className="block text-xs mt-0.5" style={{ color: colors.$17 }}>
+          <span
+            className="block text-[0.8125rem] mt-0.5"
+            style={{ color: colors.$22, fontWeight: 400 }}
+          >
             {detail}
           </span>
         ) : null}
       </div>
-
-      {trailing ? (
-        <span className="shrink-0 text-xs" style={{ color: colors.$17 }}>
-          {trailing}
-        </span>
-      ) : null}
     </ChoiceButton>
   );
 }

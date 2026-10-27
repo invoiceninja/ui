@@ -10,32 +10,34 @@
 
 import { trans } from '$app/common/helpers';
 import { useColorScheme } from '$app/common/colors';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import {
-  useGetSetting,
-  useGetSettingWithLevel,
-} from '$app/common/hooks/useGetSetting';
-import { Client } from '$app/common/interfaces/client';
-import { Settings } from '$app/common/interfaces/company.interface';
+import { useGetSettingWithLevel } from '$app/common/hooks/useGetSetting';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '$app/components/Badge';
 import { ErrorMessage } from '$app/components/ErrorMessage';
-import { Button, SelectField } from '$app/components/forms';
+import { Button } from '$app/components/forms';
+import { AutoBillTiming } from './AutoBillTiming';
 import { Choice } from './Choice';
+import { DueDayPicker } from './DueDayPicker';
+import { FieldHeading } from './FieldHeading';
 import { StepFooter } from './StepFooter';
 import { StepTransition } from './StepTransition';
+import { UpcomingInvoices } from './UpcomingInvoices';
+import { usePaymentTerms } from '../hooks/usePaymentTerms';
 import { Wizard } from '../hooks/useWizard';
+import { today } from '../helpers/dates';
+import { dueDate, firstSendDate, upcomingDates } from '../helpers/schedule';
+import { withoutBlankSetting } from '../helpers/settings';
 
 type DueChoice = 'on_receipt' | 'terms' | 'custom';
 
 const DAYS = Array.from({ length: 31 }, (_, index) => String(index + 1));
 
 const AUTO_BILL_OPTIONS = [
-  { value: 'always', label: 'enabled' },
-  { value: 'optout', label: 'optout' },
-  { value: 'optin', label: 'optin' },
-  { value: 'off', label: 'disabled' },
+  { value: 'always', label: 'enabled', detail: 'auto_bill_always_detail' },
+  { value: 'optout', label: 'optout', detail: 'auto_bill_optout_detail' },
+  { value: 'optin', label: 'optin', detail: 'auto_bill_optin_detail' },
+  { value: 'off', label: 'disabled', detail: 'auto_bill_off_detail' },
 ];
 
 interface Props {
@@ -57,36 +59,15 @@ const dueChoiceOf = (value: string | undefined): DueChoice => {
   return DAYS.includes(String(value)) ? 'custom' : 'terms';
 };
 
-const withoutBlankSetting = (
-  client: Client | undefined,
-  key: keyof Settings
-): Client | undefined => {
-  if (!client) {
-    return client;
-  }
-
-  const value = client.settings?.[key];
-
-  return value === '' || value === null
-    ? { ...client, settings: { ...client.settings, [key]: undefined } }
-    : client;
-};
-
 export function StepTiming({ wizard, embedded }: Props) {
   const colors = useColorScheme();
   const [t] = useTranslation();
-  const company = useCurrentCompany();
-  const getSetting = useGetSetting();
   const getSettingWithLevel = useGetSettingWithLevel();
 
   const recurringInvoice = wizard.recurringInvoice;
   const client = wizard.client;
 
-  const clientTerms = getSetting(
-    withoutBlankSetting(client, 'payment_terms'),
-    'payment_terms'
-  ) as string | null | undefined;
-  const terms = clientTerms ?? company?.settings?.payment_terms;
+  const terms = usePaymentTerms(client);
   const termDays = toDays(terms);
   const hasTerms = terms !== '' && terms !== null && terms !== undefined;
 
@@ -133,20 +114,30 @@ export function StepTiming({ wizard, embedded }: Props) {
 
   const serverErrors = wizard.errors?.errors;
 
+  const first = firstSendDate(recurringInvoice, wizard.startLater);
+  const dueTerms = hasTerms ? terms : null;
+
+  const upcoming = upcomingDates(
+    first,
+    recurringInvoice?.frequency_id ?? '',
+    Number(recurringInvoice?.remaining_cycles ?? -1),
+    3
+  );
+
+  const hasDueDate =
+    dueDate(first || today(), recurringInvoice?.due_date_days, dueTerms) !==
+    null;
+
   return (
     <StepTransition>
-      <p
-        className="text-[0.8125rem] mb-2.5"
-        style={{ color: colors.$22, fontWeight: 500 }}
-      >
-        {t('due_date')}
-      </p>
+      <FieldHeading label={t('due_date')} help={t('recurring_due_date_hint')} />
 
       <div className="space-y-2" role="radiogroup" aria-label={t('due_date')}>
         <Choice
           selected={due === 'on_receipt'}
           onSelect={() => chooseDue('on_receipt')}
           title={t('due_on_receipt')}
+          detail={t('due_on_receipt_help')}
         />
 
         <Choice
@@ -161,52 +152,57 @@ export function StepTiming({ wizard, embedded }: Props) {
               </Badge>
             </>
           }
-          trailing={
+          detail={
             !hasTerms
-              ? t('no_due_date')
+              ? t('no_payment_terms_help')
               : termDays === 0
-                ? t('due_on_receipt')
-                : trans('count_days', { count: termDays })
+                ? t('due_on_receipt_help')
+                : trans('due_count_days_after_sent', { count: termDays })
           }
         />
 
         <Choice
           selected={due === 'custom'}
           onSelect={() => chooseDue('custom')}
-          title={t('custom')}
+          title={t('day_of_the_month')}
+          detail={t('day_of_the_month_help')}
         />
       </div>
 
       {due === 'custom' ? (
-        <div className="mt-4">
-          <SelectField
-            id="iw-due-day"
-            label={t('due_date')}
+        <div className="mt-3">
+          <DueDayPicker
             value={String(recurringInvoice?.due_date_days ?? '')}
-            onValueChange={(value) => wizard.patch({ due_date_days: value })}
-            errorMessage={serverErrors?.due_date_days}
-            customSelector
-            dismissable={false}
-          >
-            {DAYS.map((day) => (
-              <option key={day} value={day}>
-                {`${t('day')} ${day}`}
-              </option>
-            ))}
-          </SelectField>
-        </div>
-      ) : (
-        <ErrorMessage className="mt-2">
-          {serverErrors?.due_date_days}
-        </ErrorMessage>
-      )}
+            label={t('day_of_the_month')}
+            onChange={(day) => wizard.patch({ due_date_days: day })}
+          />
 
-      <p
-        className="text-[0.8125rem] mt-8 mb-2.5"
-        style={{ color: colors.$22, fontWeight: 500 }}
-      >
-        {t('auto_bill')}
-      </p>
+          <p className="text-[0.8125rem] mt-2.5" style={{ color: colors.$22 }}>
+            {t('day_of_the_month_rule')}
+          </p>
+        </div>
+      ) : null}
+
+      <ErrorMessage className="mt-2">
+        {serverErrors?.due_date_days}
+      </ErrorMessage>
+
+      <div className="mt-6">
+        <UpcomingInvoices
+          dates={upcoming}
+          due={{
+            dueDateDays: recurringInvoice?.due_date_days,
+            terms: dueTerms,
+          }}
+        />
+      </div>
+
+      <div className="mt-8">
+        <FieldHeading
+          label={t('auto_bill')}
+          help={t('recurring_auto_bill_help')}
+        />
+      </div>
 
       <div className="space-y-2" role="radiogroup" aria-label={t('auto_bill')}>
         {AUTO_BILL_OPTIONS.map((option) => (
@@ -225,9 +221,12 @@ export function StepTiming({ wizard, embedded }: Props) {
                 ) : null}
               </>
             }
+            detail={t(option.detail)}
           />
         ))}
       </div>
+
+      <AutoBillTiming wizard={wizard} hasDueDate={hasDueDate} />
 
       <ErrorMessage className="mt-2">
         {serverErrors?.auto_bill ?? serverErrors?.auto_bill_enabled}

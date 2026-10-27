@@ -10,19 +10,23 @@
 
 import { useColorScheme } from '$app/common/colors';
 import frequencies from '$app/common/constants/frequency';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button } from '$app/components/forms';
 import { ErrorMessage } from '$app/components/ErrorMessage';
-import dayjs from 'dayjs';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FieldHeading } from './FieldHeading';
+import { NextSendDate } from './NextSendDate';
+import { ScheduleEnd } from './ScheduleEnd';
+import { ScheduleStart } from './ScheduleStart';
 import { StepFooter } from './StepFooter';
 import { StepTransition } from './StepTransition';
+import { UpcomingInvoices } from './UpcomingInvoices';
 import { Wizard } from '../hooks/useWizard';
-import { toDateInput, today } from '../helpers/dates';
-import { upcomingDates } from '../helpers/schedule';
-
-const CYCLES = Array.from({ length: 36 }, (_, index) => index + 1);
+import {
+  firstSendDate,
+  sendsRightAway,
+  upcomingDates,
+} from '../helpers/schedule';
+import { isDraft } from '../helpers/status';
 
 interface Props {
   wizard: Wizard;
@@ -32,28 +36,30 @@ interface Props {
 export function StepSchedule({ wizard, embedded }: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
-  const accentColor = useAccentColor();
 
   const recurringInvoice = wizard.recurringInvoice;
   const serverErrors = wizard.errors?.errors;
 
   const frequencyId = recurringInvoice?.frequency_id ?? '';
-  const start = toDateInput(recurringInvoice?.next_send_date);
   const cycles = Number(recurringInvoice?.remaining_cycles ?? -1);
 
-  const [showCycles, setShowCycles] = useState(false);
+  const draft = isDraft(recurringInvoice);
+  const rightAway = sendsRightAway(recurringInvoice, wizard.startLater);
 
-  const upcoming = upcomingDates(start, frequencyId, cycles, 3);
+  const upcoming = upcomingDates(
+    firstSendDate(recurringInvoice, wizard.startLater),
+    frequencyId,
+    cycles,
+    3
+  );
 
   return (
     <StepTransition>
       <div>
-        <p
-          className="text-[0.8125rem] mb-2.5"
-          style={{ color: colors.$22, fontWeight: 500 }}
-        >
-          {t('frequency')}
-        </p>
+        <FieldHeading
+          label={t('frequency')}
+          help={t('recurring_frequency_help')}
+        />
 
         <div
           className="grid grid-cols-2 sm:grid-cols-3 gap-2"
@@ -91,93 +97,26 @@ export function StepSchedule({ wizard, embedded }: Props) {
         </ErrorMessage>
       </div>
 
-      <div className="mt-6">
-        <InputField
-          id="iw-start-date"
-          label={t('start_date')}
-          type="date"
-          value={start}
-          min={today()}
-          changeOverride
-          debounceTimeout={0}
-          errorMessage={serverErrors?.next_send_date}
-          onValueChange={(value) => {
-            if (value === start) {
-              return;
-            }
-
-            wizard.patch({ next_send_date: value });
-          }}
-        />
-      </div>
-
-      <div className="mt-6">
-        {showCycles || serverErrors?.remaining_cycles ? (
-          <SelectField
-            id="iw-remaining-cycles"
-            label={t('remaining_cycles')}
-            value={String(cycles)}
-            onValueChange={(value) =>
-              wizard.patch({ remaining_cycles: parseInt(value, 10) })
-            }
-            errorMessage={serverErrors?.remaining_cycles}
-            customSelector
-            dismissable={false}
-          >
-            <option value="-1">{t('endless')}</option>
-
-            {(cycles === 0 ? [0, ...CYCLES] : CYCLES).map((count) => (
-              <option key={count} value={String(count)}>
-                {count}
-              </option>
-            ))}
-          </SelectField>
+      <div className="mt-8">
+        {draft ? (
+          <ScheduleStart wizard={wizard} />
         ) : (
-          <p className="text-sm" style={{ color: colors.$17 }}>
-            {`${t('remaining_cycles')}: ${cycles < 0 ? t('endless') : cycles}`}{' '}
-            <button
-              type="button"
-              onClick={() => setShowCycles(true)}
-              style={{ color: accentColor, fontWeight: 500 }}
-            >
-              {t('change')}
-            </button>
-          </p>
+          <NextSendDate wizard={wizard} />
         )}
       </div>
 
-      {upcoming.length ? (
-        <div
-          className="mt-6 border px-4 py-3.5"
-          style={{
-            borderColor: colors.$24,
-            borderRadius: '0.375rem',
-            backgroundColor: colors.$1,
-          }}
-        >
-          <p
-            className="text-xs mb-2"
-            style={{ color: colors.$22, fontWeight: 500 }}
-          >
-            {t('upcoming_invoices')}
-          </p>
+      <div className="mt-8">
+        <ScheduleEnd wizard={wizard} draft={draft} />
+      </div>
 
-          <ul className="space-y-1">
-            {upcoming.map((date) => (
-              <li
-                key={date}
-                className="text-sm"
-                style={{
-                  color: colors.$3,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {dayjs(date).format('D MMMM YYYY')}
-              </li>
-            ))}
-          </ul>
+      {embedded ? null : (
+        <div className="mt-8">
+          <UpcomingInvoices
+            dates={upcoming}
+            firstTag={rightAway ? t('right_away') : undefined}
+          />
         </div>
-      ) : null}
+      )}
 
       {embedded ? null : (
         <StepFooter

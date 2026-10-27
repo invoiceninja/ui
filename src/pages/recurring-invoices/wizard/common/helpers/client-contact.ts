@@ -15,6 +15,21 @@ export const contactEmail = (contact: ClientContact | undefined): string => {
   return (contact?.email ?? '').trim();
 };
 
+export const invitedEmails = (
+  invitations: { client_contact_id: string }[] | undefined,
+  client: Client | undefined
+): string[] => {
+  return (invitations ?? [])
+    .map((invitation) => {
+      return contactEmail(
+        client?.contacts?.find(
+          (contact) => contact.id === invitation.client_contact_id
+        )
+      );
+    })
+    .filter((email) => email.length > 0);
+};
+
 export const emailableContact = (
   client: Client | undefined
 ): ClientContact | undefined => {

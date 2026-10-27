@@ -17,9 +17,11 @@ interface Props {
 
 export function StepFooter({ back, children }: Props) {
   return (
-    <div className="mt-8 flex items-center justify-between gap-3">
+    <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-2">{back}</div>
-      <div className="flex items-center gap-2">{children}</div>
+      <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+        {children}
+      </div>
     </div>
   );
 }
