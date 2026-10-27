@@ -41,6 +41,7 @@ import { formatTime, TaskClock } from '../../kanban/components/TaskClock';
 import { isTaskRunning } from '../helpers/calculate-entity-state';
 import { calculateTime } from '../helpers/calculate-time';
 import { shouldShowStartTaskButton } from '../helpers/task';
+import { useResolveTaskRate } from '../hooks/useResolveTaskRate';
 import { useStart } from '../hooks/useStart';
 import { useStop } from '../hooks/useStop';
 import { EstimatedDurationInput } from './EstimatedDurationInput';
@@ -70,6 +71,7 @@ export function TaskDetails(props: Props) {
 
   const stop = useStop();
   const start = useStart();
+  const resolveTaskRate = useResolveTaskRate();
 
   const calculation = calculateTime(task.time_log, {
     inSeconds: true,
@@ -220,10 +222,7 @@ export function TaskDetails(props: Props) {
                 handleChange('client_id', client.id);
 
                 if (!task.id) {
-                  handleChange(
-                    'rate',
-                    client?.settings?.default_task_rate ?? 0
-                  );
+                  handleChange('rate', resolveTaskRate(client));
                 }
               }}
               clearButton={Boolean(task.client_id)}

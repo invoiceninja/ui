@@ -54,6 +54,10 @@ import {
 } from './components/ProjectInvoices';
 import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
 import { ProjectPublicNotes } from './components/ProjectPublicNotes';
+import {
+  ProjectQuotes,
+  useShowProjectQuotes,
+} from './components/ProjectQuotes';
 import { ProjectTasks, useShowProjectTasks } from './components/ProjectTasks';
 
 dayjs.extend(duration);
@@ -103,6 +107,7 @@ export default function Show() {
 
   const showTasks = useShowProjectTasks();
   const showInvoices = useShowProjectInvoices();
+  const showQuotes = useShowProjectQuotes();
   const showExpenses = useShowProjectExpenses();
 
   const colors = useColorScheme();
@@ -254,6 +259,9 @@ export default function Show() {
         }
         invoicesContent={
           showInvoices ? <ProjectInvoices project={project} /> : undefined
+        }
+        quotesContent={
+          showQuotes ? <ProjectQuotes project={project} /> : undefined
         }
         expensesContent={
           showExpenses ? <ProjectExpenses project={project} /> : undefined

@@ -19,6 +19,7 @@ export const socketEvents = [
   'App\\Events\\Document\\DocumentWasSigned',
   'App\\Events\\DocumentFile\\DocumentFilePreviewGenerated',
   'App\\Events\\User\\UserWasVerified',
+  'App\\Events\\Account\\AccountWasUpdated',
 ] as const;
 
 export type SocketEvent = (typeof socketEvents)[number];

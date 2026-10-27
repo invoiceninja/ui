@@ -60,6 +60,7 @@ import {
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { useBulkAction } from '$app/pages/recurring-invoices/common/queries';
 import { EntityState } from '$app/common/enums/entity-state';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
@@ -628,9 +629,9 @@ export function useAllRecurringInvoiceColumns() {
     'due_date_days',
     'auto_bill',
     'archived_at',
-    // 'assigned_to', @Todo: Need to fetch the relationship.
+    'assigned_user',
     'created_at',
-    // 'created_by', @Todo: Need to fetch the relationship.
+    'user',
     firstCustom,
     secondCustom,
     thirdCustom,
@@ -667,6 +668,7 @@ export function useRecurringInvoiceColumns() {
 
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
+  const resolveUserName = useResolveUserName();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
@@ -929,6 +931,20 @@ export function useRecurringInvoiceColumns() {
       id: 'updated_at',
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, recurringInvoice) =>
+        resolveUserName(recurringInvoice.user_id),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (value, recurringInvoice) =>
+        resolveUserName(recurringInvoice.assigned_user_id),
     },
     {
       column: 'tags',

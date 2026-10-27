@@ -37,6 +37,7 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { TaskLockedBanner } from './common/components/TaskLockedBanner';
 import { useActions } from './common/hooks';
 import { useUpdateTask } from './common/hooks/useUpdateTask';
 
@@ -115,6 +116,7 @@ export default function Task() {
             />
           ),
         })}
+      aboveMainContainer={task && <TaskLockedBanner task={task} />}
       afterBreadcrumbs={<PreviousNextNavigation entity="task" />}
     >
       {task ? (

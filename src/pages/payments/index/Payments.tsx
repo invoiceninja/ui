@@ -22,6 +22,7 @@ import {
   useEntityTagFilterColumns,
   useTagFilterCleanup,
 } from '$app/common/hooks/useEntityTagFilters';
+import { useEntityUserFilterColumns } from '$app/common/hooks/useEntityUserFilters';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useActions } from '../common/hooks/useActions';
@@ -74,11 +75,18 @@ export default function Payments() {
   const selectedColumns =
     reactSettings?.react_table_columns?.payment || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
+  const shouldShowUserFilter = selectedColumns.includes('user');
+  const shouldShowAssignedUserFilter =
+    selectedColumns.includes('assigned_user');
   const filterColumns = useEntityTagFilterColumns(
     TAG_ENTITY_TYPES.payment,
     'payment_tag_ids',
     { enabled: shouldShowTagFilter }
   );
+  const userFilterColumns = useEntityUserFilterColumns({
+    user: shouldShowUserFilter,
+    assignedUser: shouldShowAssignedUserFilter,
+  });
 
   useTagFilterCleanup(shouldShowTagFilter, 'payment_tag_ids');
 
@@ -123,6 +131,8 @@ export default function Payments() {
           shouldShowTagFilter ? ',tags' : ''
         }&without_deleted_clients=true&sort=id|desc${
           shouldShowTagFilter ? '' : '&tag_ids='
+        }${shouldShowUserFilter ? '' : '&user_ids='}${
+          shouldShowAssignedUserFilter ? '' : '&assigned_user_ids='
         }`}
         linkToCreate="/payments/create"
         bulkRoute="/api/v1/payments/bulk"
@@ -132,7 +142,10 @@ export default function Payments() {
         customFilters={filters}
         customBulkActions={customBulkActions}
         customFilterPlaceholder="status"
-        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
+        filterColumns={[
+          ...userFilterColumns,
+          ...(shouldShowTagFilter ? filterColumns : []),
+        ]}
         showRestore={(resource: Payment) => !resource.is_deleted}
         showDelete={(resource: Payment) => showDeletePaymentAction(resource)}
         rightSide={
