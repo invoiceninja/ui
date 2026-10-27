@@ -9,7 +9,7 @@
  */
 
 import { useColorScheme } from '$app/common/colors';
-import { useShowGuidedRecurringInvoiceEditor } from '$app/common/hooks/useRecurringInvoiceEditor';
+import { useShowGuidedInvoiceEditor } from '$app/common/hooks/useInvoiceEditor';
 import {
   useFlushReactSettings,
   useUpdateReactSettings,
@@ -31,7 +31,7 @@ export function AdvancedConfigurationToggle({ counterpart }: Props) {
   const colors = useColorScheme();
   const navigate = useNavigate();
 
-  const detailed = !useShowGuidedRecurringInvoiceEditor();
+  const detailed = !useShowGuidedInvoiceEditor();
   const updateSettings = useUpdateReactSettings();
   const flushSettings = useFlushReactSettings();
 
@@ -48,7 +48,7 @@ export function AdvancedConfigurationToggle({ counterpart }: Props) {
       <Toggle
         checked={detailed}
         onValueChange={(value) => {
-          updateSettings('show_advanced_recurring_invoice_editor', value);
+          updateSettings('show_advanced_invoice_editor', value);
           persist(flushSettings);
           navigate(counterpart);
         }}

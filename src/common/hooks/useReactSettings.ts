@@ -111,7 +111,6 @@ export interface ReactSettings {
   client_show_cards?: ClientShowCard[];
   dashboard_fields?: string[];
   show_advanced_invoice_editor?: boolean;
-  show_advanced_recurring_invoice_editor?: boolean;
 }
 
 export type ReactTableColumns =
