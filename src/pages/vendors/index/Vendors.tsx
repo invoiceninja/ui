@@ -20,6 +20,7 @@ import {
   useEntityTagFilterColumns,
   useTagFilterCleanup,
 } from '$app/common/hooks/useEntityTagFilters';
+import { useEntityUserFilterColumns } from '$app/common/hooks/useEntityUserFilters';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
@@ -61,11 +62,18 @@ export default function Vendors() {
   const selectedColumns =
     reactSettings?.react_table_columns?.vendor || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
+  const shouldShowUserFilter = selectedColumns.includes('user');
+  const shouldShowAssignedUserFilter =
+    selectedColumns.includes('assigned_user');
   const filterColumns = useEntityTagFilterColumns(
     TAG_ENTITY_TYPES.vendor,
     'vendor_tag_ids',
     { enabled: shouldShowTagFilter }
   );
+  const userFilterColumns = useEntityUserFilterColumns({
+    user: shouldShowUserFilter,
+    assignedUser: shouldShowAssignedUserFilter,
+  });
 
   useTagFilterCleanup(shouldShowTagFilter, 'vendor_tag_ids');
 
@@ -103,6 +111,8 @@ export default function Vendors() {
         columns={columns}
         endpoint={`/api/v1/vendors?sort=id|desc${
           shouldShowTagFilter ? '&include=tags' : '&tag_ids='
+        }${shouldShowUserFilter ? '' : '&user_ids='}${
+          shouldShowAssignedUserFilter ? '' : '&assigned_user_ids='
         }`}
         bulkRoute="/api/v1/vendors/bulk"
         linkToCreate="/vendors/create"
@@ -110,7 +120,10 @@ export default function Vendors() {
         withResourcefulActions
         customActions={actions}
         customBulkActions={customBulkActions}
-        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
+        filterColumns={[
+          ...userFilterColumns,
+          ...(shouldShowTagFilter ? filterColumns : []),
+        ]}
         rightSide={
           <div className="flex items-center space-x-2">
             <DataTableColumnsPicker
