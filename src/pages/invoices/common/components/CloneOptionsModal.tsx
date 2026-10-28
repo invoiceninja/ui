@@ -10,6 +10,7 @@
 
 import dayjs from 'dayjs';
 import { useSetAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdControlPointDuplicate } from 'react-icons/md';
@@ -65,7 +66,7 @@ export function CloneOptionsModal(props: Props) {
 
   const cloneToInvoice = () => {
     setInvoice({
-      ...invoice,
+      ...cloneDeep(invoice),
       id: '',
       number: '',
       documents: [],
@@ -88,7 +89,7 @@ export function CloneOptionsModal(props: Props) {
 
   const cloneToQuote = () => {
     setQuote({
-      ...(invoice as unknown as Quote),
+      ...(cloneDeep(invoice) as unknown as Quote),
       id: '',
       number: '',
       documents: [],
@@ -124,7 +125,7 @@ export function CloneOptionsModal(props: Props) {
 
   const cloneToRecurringInvoice = () => {
     setRecurringInvoice({
-      ...(invoice as unknown as RecurringInvoice),
+      ...(cloneDeep(invoice) as unknown as RecurringInvoice),
       id: '',
       number: '',
       documents: [],
@@ -148,7 +149,7 @@ export function CloneOptionsModal(props: Props) {
 
   const cloneToPurchaseOrder = () => {
     setPurchaseOrder({
-      ...(invoice as unknown as PurchaseOrder),
+      ...(cloneDeep(invoice) as unknown as PurchaseOrder),
       id: '',
       number: '',
       documents: [],

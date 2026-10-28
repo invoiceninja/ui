@@ -12,6 +12,7 @@ import { EInvoiceType } from '$app/pages/settings';
 import { BankAccount } from './bank-accounts';
 import { Document } from './document.interface';
 import { Quickbooks } from './quickbooks';
+import { User } from './user';
 
 export interface Company {
   id: string;
@@ -69,6 +70,7 @@ export interface Company {
   convert_products: boolean;
   bank_integrations: BankAccount[];
   documents: Document[];
+  users?: User[];
   calculate_expense_tax_by_amount: boolean;
   expense_inclusive_taxes: boolean;
   smtp_host: string;
