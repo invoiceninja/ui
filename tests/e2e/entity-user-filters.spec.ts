@@ -1,7 +1,11 @@
 import { login } from './helpers';
-import { emailForCurrentAccount } from './accounts';
 import { test, expect, resetAccountBeforeAll, uniqueName } from './fixtures';
-import { resetUserReactSettings, updateUserReactSettings } from './api-helpers';
+import {
+  ensureColumnFilterUsers,
+  formatUserLabel,
+  resetUserReactSettings,
+  updateUserReactSettings,
+} from './api-helpers';
 import {
   applyColumnFilter,
   clearColumnFilter,
@@ -31,30 +35,8 @@ for (const entity of cases) {
     api,
   }) => {
     test.setTimeout(90000);
-    const usersResponse = await page.request.get(
-      `${api.context.baseUrl}/api/v1/users?per_page=100`,
-      { headers: api.context.headers }
-    );
-    expect(usersResponse.ok()).toBeTruthy();
-    type CompanyUser = {
-      id: string;
-      first_name: string;
-      last_name: string;
-      email: string;
-    };
-    const users = (await usersResponse.json()).data as CompanyUser[];
-    const owner = users.find((user) => user.id === api.context.userId);
-    const other = users.find(
-      (user) => user.email === emailForCurrentAccount('permissions@example.com')
-    );
-    expect(owner, 'Seed account must contain its owner').toBeDefined();
-    expect(other, 'Seed account must contain a second user').toBeDefined();
-    if (!owner || !other) throw new Error('Missing seeded users');
-    const label = (user: CompanyUser) =>
-      user.first_name || user.last_name
-        ? `${user.first_name} ${user.last_name}`.trim()
-        : user.email;
-    expect(label(owner)).not.toBe(label(other));
+    const { owner, other } = await ensureColumnFilterUsers(api.context);
+    const label = formatUserLabel;
 
     const assignedColumn =
       entity.type === 'projects' ? 'assigned_to' : 'assigned_user';
