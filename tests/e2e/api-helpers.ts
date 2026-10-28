@@ -382,19 +382,28 @@ interface ApiUser {
 
 async function fetchAllUsers(api: ApiContext): Promise<ApiUser[]> {
   const context = await apiRequest(api);
-  const response = await context.get(
-    '/api/v1/users?per_page=100&include_deleted=true',
-    { headers: api.headers }
-  );
+  const users: ApiUser[] = [];
 
-  if (!response.ok()) {
+  try {
+    let page = 1;
+    let totalPages = 1;
+    do {
+      const response = await context.get(
+        `/api/v1/users?per_page=100&include_deleted=true&page=${page}`,
+        { headers: api.headers }
+      );
+      if (!response.ok()) {
+        throw new Error(`Failed to fetch users (${response.status()})`);
+      }
+      const body = await response.json();
+      users.push(...(body.data || []));
+      totalPages = body.meta?.pagination?.total_pages ?? 1;
+      page += 1;
+    } while (page <= totalPages);
+    return users;
+  } finally {
     await context.dispose();
-    return [];
   }
-
-  const body = await response.json();
-  await context.dispose();
-  return body.data || [];
 }
 
 /**
