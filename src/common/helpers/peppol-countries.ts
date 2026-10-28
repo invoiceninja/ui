@@ -41,6 +41,7 @@ export const PEPPOL_COUNTRIES = [
   '702',
   '752',
   '826',
+  '246'
 ];
 
 export const PEPPOL_CLASSIFICATIONS: Record<string, Classification[]> = {
