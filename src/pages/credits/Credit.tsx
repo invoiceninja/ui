@@ -31,6 +31,8 @@ import {
 } from '$app/common/queries/sockets';
 import { Banner } from '$app/components/Banner';
 import { Page } from '$app/components/Breadcrumbs';
+import { normalizeLineEntries } from '$app/components/e-invoice/line-fields/fields';
+import { useEInvoiceLinesAlignment } from '$app/components/e-invoice/line-fields/useEInvoiceLinesAlignment';
 import { InputLabel } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
 import { PreviousNextNavigation } from '$app/components/PreviousNextNavigation';
@@ -71,6 +73,12 @@ export default function Credit() {
 
   const invoiceSum = useAtomValue(invoiceSumAtom);
   const [credit, setCredit] = useAtomWithPrevent(creditAtom);
+
+  useEInvoiceLinesAlignment({
+    resource: credit,
+    setResource: setCredit,
+    root: 'CreditNote',
+  });
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -120,6 +128,11 @@ export default function Credit() {
       const _credit = cloneDeep(data);
 
       _credit.line_items.map((item) => (item._id = v4()));
+
+      _credit.e_invoice = normalizeLineEntries(
+        _credit.e_invoice,
+        'CreditNote'
+      ) as ICredit['e_invoice'];
 
       setCredit(_credit);
 

@@ -8,18 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTranslation } from 'react-i18next';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Card } from '$app/components/cards';
+import { EInvoiceLines } from '$app/components/e-invoice/line-fields/EInvoiceLines';
+import { EInvoiceLinesTabLabel } from '$app/components/e-invoice/line-fields/EInvoiceLinesTabLabel';
+import { useEInvoiceLineFields } from '$app/components/e-invoice/line-fields/useEInvoiceLineFields';
 import { Spinner } from '$app/components/Spinner';
+import { TabGroup } from '$app/components/TabGroup';
 import { ClientSelector } from '$app/pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
-import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
-import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
 import { CreditDetails } from '../../common/components/CreditDetails';
+import { CreditProductsTable } from '../../common/components/CreditProductsTable';
 import { CreditFooter } from '../../common/components/CreditFooter';
 import { useCreditUtilities } from '../../common/hooks';
 import { CreditsContext } from '../Create';
@@ -38,23 +41,17 @@ export default function CreatePage() {
     setIsDefaultTerms,
   } = context;
 
+  const [t] = useTranslation();
   const [searchParams] = useSearchParams();
 
   const colors = useColorScheme();
   const reactSettings = useReactSettings();
-  const productColumns = useProductColumns();
+  const eInvoiceLineFields = useEInvoiceLineFields(credit, 'CreditNote');
 
-  const {
-    handleChange,
-    handleInvitationChange,
-    handleLineItemChange,
-    handleLineItemPropertyChange,
-    handleCreateLineItem,
-    handleDeleteLineItem,
-    handleContactCanSignChange,
-  } = useCreditUtilities({
-    client,
-  });
+  const { handleChange, handleInvitationChange, handleContactCanSignChange } =
+    useCreditUtilities({
+      client,
+    });
 
   return (
     <>
@@ -83,25 +80,37 @@ export default function CreatePage() {
 
         <div className="col-span-12">
           {credit ? (
-            <ProductsTable
-              type="product"
-              resource={credit}
-              items={credit.line_items.filter((item) =>
-                [
-                  InvoiceItemType.Product,
-                  InvoiceItemType.UnpaidFee,
-                  InvoiceItemType.PaidFee,
-                  InvoiceItemType.LateFee,
-                ].includes(item.type_id)
-              )}
-              columns={productColumns}
-              relationType="client_id"
-              onLineItemChange={handleLineItemChange}
-              onSort={(lineItems) => handleChange('line_items', lineItems)}
-              onLineItemPropertyChange={handleLineItemPropertyChange}
-              onCreateItemClick={handleCreateLineItem}
-              onDeleteRowClick={handleDeleteLineItem}
-            />
+            eInvoiceLineFields.length ? (
+              <TabGroup
+                tabs={[t('products'), t('e_invoice_line_fields')]}
+                formatTabLabel={(index) => {
+                  if (index === 1) {
+                    return (
+                      <EInvoiceLinesTabLabel
+                        eInvoice={credit.e_invoice}
+                        root="CreditNote"
+                        errors={errors}
+                      />
+                    );
+                  }
+                }}
+              >
+                <div>
+                  <CreditProductsTable client={client} />
+                </div>
+
+                <EInvoiceLines
+                  resource={credit}
+                  root="CreditNote"
+                  fields={eInvoiceLineFields}
+                  client={client}
+                  errors={errors}
+                  onChange={(eInvoice) => handleChange('e_invoice', eInvoice)}
+                />
+              </TabGroup>
+            ) : (
+              <CreditProductsTable client={client} />
+            )
           ) : (
             <Spinner />
           )}

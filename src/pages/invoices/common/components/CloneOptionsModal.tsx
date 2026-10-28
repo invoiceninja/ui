@@ -36,6 +36,7 @@ import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
+import { withLineEntries } from '$app/components/e-invoice/line-fields/fields';
 import { buildCreditFromInvoice } from '../helpers/credit-note';
 
 interface Props {
@@ -142,6 +143,11 @@ export function CloneOptionsModal(props: Props) {
       partial_due_date: '',
       design_id: company.settings.invoice_design_id,
       client: undefined,
+      e_invoice: withLineEntries(
+        invoice.e_invoice,
+        'Invoice',
+        []
+      ) as RecurringInvoice['e_invoice'],
     });
 
     navigate('/recurring_invoices/create?action=clone');

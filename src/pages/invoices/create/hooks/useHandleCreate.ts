@@ -21,6 +21,7 @@ import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { withoutFeeLineEntries } from '$app/components/e-invoice/line-fields/fields';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import { isDeleteActionTriggeredAtom } from '../../common/components/ProductsTable';
 
@@ -69,7 +70,11 @@ export function useHandleCreate(params: Params) {
       apiEndpoint += 'save_default_footer=true';
     }
 
-    request('POST', endpoint(apiEndpoint), invoice)
+    request(
+      'POST',
+      endpoint(apiEndpoint),
+      withoutFeeLineEntries(invoice, 'Invoice')
+    )
       .then(async (response: GenericSingleResourceResponse<Invoice>) => {
         if (isDefaultTerms || isDefaultFooter) {
           await refreshCompanyUsers();
