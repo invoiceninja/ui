@@ -31,11 +31,10 @@ import { Document } from '$app/common/interfaces/document.interface';
 import { defaultHeaders } from '$app/common/queries/common/headers';
 import { useSetDocumentVisibility } from '$app/common/queries/documents';
 import { Dropdown } from './dropdown/Dropdown';
+import { DocumentVisibilityLock } from './DocumentVisibilityLock';
 import { DropdownElement } from './dropdown/DropdownElement';
 import { FileIcon } from './FileIcon';
 import { Icon } from './icons/Icon';
-import { Lock } from './icons/Lock';
-import { LockOpen } from './icons/LockOpen';
 import { PasswordConfirmation } from './PasswordConfirmation';
 import { Spinner } from './Spinner';
 import { Table, Tbody, Td, Th, Thead, Tr } from './tables';
@@ -223,11 +222,11 @@ export function DocumentsTable(props: Props) {
                     <FileIcon type={document.type} />
                     <span>{document.name}</span>
 
-                    {document.is_public ? (
-                      <LockOpen color={colors.$3} size="1.4rem" />
-                    ) : (
-                      <Lock color={colors.$3} size="1.4rem" />
-                    )}
+                    <DocumentVisibilityLock
+                      document={document}
+                      onVisibilityChange={props.onDocumentDelete}
+                      disabled={disableEditableOptions}
+                    />
                   </div>
 
                   {reactSettings.show_document_preview &&
