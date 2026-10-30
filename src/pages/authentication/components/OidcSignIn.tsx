@@ -76,7 +76,7 @@ export function OidcSignIn() {
           >
             <path d="M12 2l3 6 6 .9-4.5 4.3 1 6.3L12 16.9 6.5 19.5l1-6.3L3 8.9 9 8z" />
           </svg>
-          <p>{t('sign_in_with', { provider: label })}</p>
+          <p>{t('sign_in_with').replace(':provider', label)}</p>
         </SignInProviderButton>
       </div>
     </div>
