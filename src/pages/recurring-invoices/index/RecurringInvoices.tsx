@@ -9,6 +9,7 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
+import { useRecurringInvoiceEditorPaths } from '$app/common/hooks/useRecurringInvoiceEditor';
 import { Page } from '$app/components/Breadcrumbs';
 import { DataTable } from '$app/components/DataTable';
 import {
@@ -49,6 +50,7 @@ import { DataTableFooterColumnsPicker } from '$app/components/DataTableFooterCol
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export default function RecurringInvoices() {
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   useTitle('recurring_invoices');
 
   const [t] = useTranslation();
@@ -128,8 +130,8 @@ export default function RecurringInvoices() {
         }${shouldShowUserFilter ? '' : '&user_ids='}${
           shouldShowAssignedUserFilter ? '' : '&assigned_user_ids='
         }`}
-        linkToCreate="/recurring_invoices/create"
-        linkToEdit="/recurring_invoices/:id/edit"
+        linkToCreate={recurringInvoicePaths.create}
+        linkToEdit={recurringInvoicePaths.edit}
         bulkRoute="/api/v1/recurring_invoices/bulk"
         customActions={actions}
         customFilters={filters}
