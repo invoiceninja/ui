@@ -488,7 +488,7 @@ export function StepReview({ wizard }: Props) {
               .finally(() => setSavingDraft(false));
           }}
         >
-          {t('save_draft')}
+          {t('save')}
         </Button>
 
         <Button
@@ -497,7 +497,7 @@ export function StepReview({ wizard }: Props) {
           disableWithoutIcon={!starting}
           onClick={start}
         >
-          {rightAway ? t('send_now') : t('start')}
+          {rightAway ? t('send_now') : t('activate_recurring_invoice')}
         </Button>
       </StepFooter>
 

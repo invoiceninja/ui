@@ -303,7 +303,9 @@ export default function Edit() {
                     disableWithoutIcon={!starting}
                     onClick={start}
                   >
-                    {rightAway ? t('send_now') : t('start')}
+                    {rightAway
+                      ? t('send_now')
+                      : t('activate_recurring_invoice')}
                   </Button>
                 ) : null}
               </div>

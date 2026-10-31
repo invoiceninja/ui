@@ -29,6 +29,16 @@ import { isDraft } from '../helpers/status';
 
 const CHARGED_AT_SEND = ['always', 'optout'];
 
+const openingKey = (rightAway: boolean, emailed: boolean): string => {
+  if (rightAway) {
+    return emailed ? 'send_now_first_invoice' : 'send_now_first_invoice_draft';
+  }
+
+  return emailed
+    ? 'activate_first_invoice_on'
+    : 'activate_first_invoice_draft_on';
+};
+
 interface Props {
   wizard: Wizard;
   className?: string;
@@ -74,7 +84,6 @@ export function LaunchNote({ wizard, className, onChange }: Props) {
   }
 
   const emailed = autoEmail.value !== false;
-  const recipients = emails.join(', ');
 
   const charged =
     emailed &&
@@ -82,16 +91,10 @@ export function LaunchNote({ wizard, className, onChange }: Props) {
     (autoBillDate.value === 'on_send_date' ||
       dueDate(dates[0], recurringInvoice?.due_date_days, terms) === dates[0]);
 
-  const opening = emailed
-    ? rightAway
-      ? trans('send_now_first_invoice', { email: recipients })
-      : trans('start_first_invoice_on', {
-          email: recipients,
-          date: formatDate(dates[0]),
-        })
-    : rightAway
-      ? t('send_now_first_invoice_draft')
-      : trans('start_first_invoice_draft_on', { date: formatDate(dates[0]) });
+  const opening = trans(openingKey(rightAway, emailed), {
+    email: emails.join(', '),
+    date: formatDate(dates[0]),
+  });
 
   return (
     <div
@@ -100,7 +103,7 @@ export function LaunchNote({ wizard, className, onChange }: Props) {
     >
       <p>
         {opening}{' '}
-        {onChange ? (
+        {onChange && (
           <button
             type="button"
             onClick={onChange}
@@ -108,16 +111,16 @@ export function LaunchNote({ wizard, className, onChange }: Props) {
           >
             {t('change')}
           </button>
-        ) : null}
+        )}
       </p>
 
-      {emailed ? null : <p>{t('recurring_auto_email_off')}</p>}
+      {!emailed && <p>{t('recurring_auto_email_off')}</p>}
 
-      {rightAway && dates[1] ? (
+      {rightAway && dates[1] && (
         <p>{trans('next_invoice_on', { date: formatDate(dates[1]) })}</p>
-      ) : null}
+      )}
 
-      {charged ? <p>{t('recurring_auto_bill_at_send')}</p> : null}
+      {charged && <p>{t('recurring_auto_bill_at_send')}</p>}
     </div>
   );
 }

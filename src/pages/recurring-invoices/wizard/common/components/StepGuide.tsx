@@ -106,8 +106,8 @@ const GUIDES: Record<GuideTopic, { title: string; sections: GuideSection[] }> =
           heading: 'guide_finish_heading',
           entries: [
             { term: 'send_now', text: 'guide_send_now' },
-            { term: 'start', text: 'guide_start' },
-            { term: 'save_draft', text: 'guide_save_draft' },
+            { term: 'activate_recurring_invoice', text: 'guide_activate' },
+            { term: 'save', text: 'guide_save' },
           ],
           example: 'guide_which_button',
         },
