@@ -12,6 +12,7 @@ import { type ComponentType, lazy } from 'react';
 import { Navigate, Outlet, Route } from 'react-router-dom';
 import { Guard } from '$app/common/guards/Guard';
 import { admin, owner } from '$app/common/guards/guards/admin';
+import { clientSettings } from '$app/common/guards/guards/client-settings';
 import { companySettings } from '$app/common/guards/guards/company-settings';
 import { or } from '$app/common/guards/guards/or';
 import { plan } from '$app/common/guards/guards/plan';
@@ -304,7 +305,10 @@ export const settingsRoutes = (
       <Route
         path="e_invoice"
         element={
-          <Guard guards={[companySettings()]} component={<EInvoice />} />
+          <Guard
+            guards={[or(companySettings(), clientSettings())]}
+            component={<EInvoice />}
+          />
         }
       />
       <Route path="email_settings" element={<EmailSettings />} />
