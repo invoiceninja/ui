@@ -10,8 +10,7 @@
 
 import { AxiosError } from 'axios';
 import { useFormik } from 'formik';
-import { useAtomValue } from 'jotai';
-import { get, isEmpty, isPlainObject, set } from 'lodash';
+import { get } from 'lodash';
 import {
   Dispatch,
   forwardRef,
@@ -22,17 +21,20 @@ import {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { $refetch } from '$app/common/hooks/useRefetch';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
+import { Client } from '$app/common/interfaces/client';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 import { EInvoiceType } from '$app/pages/settings';
-import { companySettingsErrorsAtom } from '$app/pages/settings/common/atoms';
-import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { Card, Element } from '../cards';
 import { InputField, SelectField } from '../forms';
 
@@ -40,6 +42,7 @@ type Entity = 'company' | 'invoice' | 'client';
 
 interface Props {
   entity: Entity;
+  entityId?: string;
   currentEInvoice: EInvoiceType;
   isInvoiceLevel?: boolean;
   invoice?: Invoice | undefined;
@@ -232,66 +235,6 @@ const PAYMENT_MEANS_FORM_ELEMENTS = {
   ZZZ: [], // Mutually defined
 };
 
-const PAYMENT_MEANS_FIELD_PATHS = {
-  iban: 'PayeeFinancialAccount.ID.value',
-  bic_swift:
-    'PayeeFinancialAccount.FinancialInstitutionBranch.FinancialInstitution.ID.value',
-  account_holder: 'PayeeFinancialAccount.Name',
-  payer_bank_account: 'PaymentMandate.PayerFinancialAccount.ID.value',
-  bsb_sort: 'PayeeFinancialAccount.FinancialInstitutionBranch.ID.value',
-  card_type: 'CardAccount.NetworkID.value',
-  card_number: 'CardAccount.PrimaryAccountNumberID.value',
-  card_holder: 'CardAccount.HolderName',
-};
-
-type PaymentMeansValues = Record<string, string | null>;
-
-const toPaymentMeans = (values: PaymentMeansValues) => {
-  const fields: string[] =
-    PAYMENT_MEANS_FORM_ELEMENTS[
-      values.code as keyof typeof PAYMENT_MEANS_FORM_ELEMENTS
-    ] || [];
-
-  const paymentMeans = { PaymentMeansCode: { value: values.code } };
-
-  fields.forEach((field) => {
-    if (values[field]) {
-      set(
-        paymentMeans,
-        PAYMENT_MEANS_FIELD_PATHS[
-          field as keyof typeof PAYMENT_MEANS_FIELD_PATHS
-        ],
-        values[field]
-      );
-    }
-  });
-
-  return paymentMeans;
-};
-
-const withPaymentMeans = (
-  eInvoice: EInvoiceType,
-  values: PaymentMeansValues
-) => {
-  const { Invoice: invoice, ...rest } = eInvoice;
-
-  const updatedInvoice: Record<string, unknown> = isPlainObject(invoice)
-    ? { ...(invoice as EInvoiceType) }
-    : {};
-
-  if (values.code) {
-    updatedInvoice.PaymentMeans = [toPaymentMeans(values)];
-  } else {
-    delete updatedInvoice.PaymentMeans;
-  }
-
-  if (isEmpty(updatedInvoice)) {
-    return rest;
-  }
-
-  return { ...rest, Invoice: updatedInvoice };
-};
-
 // public static array $payment_means_requirements_codes = [
 //     '1' => [], // Instrument not defined
 //     '2' => ['iban', 'bic_swift'], // ACH credit
@@ -385,38 +328,38 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
 
     const [t] = useTranslation();
 
+    const dispatch = useDispatch();
     const refreshCompanyUsers = useRefreshCompanyUsers();
-    const handleChange = useHandleCurrentCompanyChangeProperty();
 
     const isClientLevel = props.entity === 'client';
     const eInvoice = isClientLevel ? props.currentEInvoice : company.e_invoice;
 
     const [errors, setErrors] = useState<ValidationBag | null>(null);
-    const settingsErrors = useAtomValue(companySettingsErrorsAtom);
 
-    const errorMessage = (field: string) => {
-      if (isClientLevel) {
-        const path =
-          field === 'code'
-            ? 'PaymentMeansCode.value'
-            : PAYMENT_MEANS_FIELD_PATHS[
-                field as keyof typeof PAYMENT_MEANS_FIELD_PATHS
-              ];
+    const refreshClient = () => {
+      request(
+        'GET',
+        endpoint('/api/v1/clients/:id', { id: props.entityId })
+      ).then((response: GenericSingleResourceResponse<Client>) => {
+        dispatch(
+          updateChanges({
+            object: 'company',
+            property: 'e_invoice',
+            value: response.data.data.e_invoice || {},
+          })
+        );
 
-        return settingsErrors?.errors?.[
-          `e_invoice.Invoice.PaymentMeans.0.${path}`
-        ];
-      }
-
-      return errors?.errors?.[`payment_means.0.${field}`];
+        $refetch(['clients']);
+      });
     };
 
     const form = useFormik({
       initialValues: {
         entity: props.entity,
+        entity_id: props.entityId,
         payment_means: [
           {
-            code: '1',
+            code: isClientLevel ? '' : '1',
             iban: null,
             bic_swift: '',
             payer_bank_account: '',
@@ -432,9 +375,21 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
         toast.processing();
         setErrors(null);
 
-        request('POST', endpoint('/api/v1/einvoice/configurations'), values)
+        request(
+          'POST',
+          endpoint('/api/v1/einvoice/configurations'),
+          isClientLevel && !values.payment_means[0].code
+            ? { ...values, payment_means: [] }
+            : values
+        )
           .then(() => {
             toast.success('saved_einvoice_details');
+
+            if (isClientLevel) {
+              refreshClient();
+
+              return;
+            }
 
             refreshCompanyUsers();
           })
@@ -456,22 +411,10 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
     useImperativeHandle(ref, () => {
       return {
         saveEInvoice() {
-          if (isClientLevel) {
-            handleChange(
-              'e_invoice',
-              withPaymentMeans(
-                props.currentEInvoice,
-                form.values.payment_means[0]
-              )
-            );
-
-            return;
-          }
-
           form.submitForm();
         },
       };
-    }, [form.values, props.currentEInvoice]);
+    }, [form.values]);
 
     const elements = useMemo(() => {
       return form.values.payment_means[0].code
@@ -488,14 +431,55 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
         get(eInvoice, 'Invoice.PaymentMeans.0.PaymentMeansCode.value') ||
           (isClientLevel ? '' : '1')
       );
-
-      Object.entries(PAYMENT_MEANS_FIELD_PATHS).forEach(([field, path]) => {
-        form.setFieldValue(
-          `payment_means.0.${field}`,
-          get(eInvoice, `Invoice.PaymentMeans.0.${path}`) ||
-            (field === 'iban' ? null : '')
-        );
-      });
+      form.setFieldValue(
+        'payment_means.0.iban',
+        get(
+          eInvoice,
+          'Invoice.PaymentMeans.0.PayeeFinancialAccount.ID.value'
+        ) || null
+      );
+      form.setFieldValue(
+        'payment_means.0.bic_swift',
+        get(
+          eInvoice,
+          'Invoice.PaymentMeans.0.PayeeFinancialAccount.FinancialInstitutionBranch.FinancialInstitution.ID.value'
+        ) || ''
+      );
+      form.setFieldValue(
+        'payment_means.0.account_holder',
+        get(eInvoice, 'Invoice.PaymentMeans.0.PayeeFinancialAccount.Name') || ''
+      );
+      form.setFieldValue(
+        'payment_means.0.payer_bank_account',
+        get(
+          eInvoice,
+          'Invoice.PaymentMeans.0.PayerFinancialAccount.ID.value'
+        ) || ''
+      );
+      form.setFieldValue(
+        'payment_means.0.bsb_sort',
+        get(
+          eInvoice,
+          'Invoice.PaymentMeans.0.PayeeFinancialAccount.SortCode.value'
+        ) || ''
+      );
+      form.setFieldValue(
+        'payment_means.0.card_type',
+        get(eInvoice, 'Invoice.PaymentMeans.0.CardAccount.NetworkID.value') ||
+          ''
+      );
+      form.setFieldValue(
+        'payment_means.0.card_number',
+        get(
+          eInvoice,
+          'Invoice.PaymentMeans.0.CardAccount.PrimaryAccountNumberID.value'
+        ) || ''
+      );
+      form.setFieldValue(
+        'payment_means.0.card_holder',
+        get(eInvoice, 'Invoice.PaymentMeans.0.CardAccount.HolderName.value') ||
+          ''
+      );
     }, [eInvoice]);
 
     return (
@@ -511,7 +495,7 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
             onValueChange={(value) =>
               form.setFieldValue('payment_means.0.code', value)
             }
-            errorMessage={errorMessage('code')}
+            errorMessage={errors?.errors?.['payment_means.0.code']}
             withBlank={isClientLevel}
             dismissable={isClientLevel}
             customSelector
@@ -531,7 +515,7 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
               onValueChange={(value) =>
                 form.setFieldValue('payment_means.0.iban', value)
               }
-              errorMessage={errorMessage('iban')}
+              errorMessage={errors?.errors?.['payment_means.0.iban']}
             />
           </Element>
         ) : null}
@@ -543,7 +527,7 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
               onValueChange={(value) =>
                 form.setFieldValue('payment_means.0.bic_swift', value)
               }
-              errorMessage={errorMessage('bic_swift')}
+              errorMessage={errors?.errors?.['payment_means.0.bic_swift']}
             />
           </Element>
         ) : null}
@@ -558,7 +542,9 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
               onValueChange={(value) =>
                 form.setFieldValue('payment_means.0.payer_bank_account', value)
               }
-              errorMessage={errorMessage('payer_bank_account')}
+              errorMessage={
+                errors?.errors?.['payment_means.0.payer_bank_account']
+              }
             />
           </Element>
         ) : null}
@@ -573,7 +559,7 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
               onValueChange={(value) =>
                 form.setFieldValue('payment_means.0.account_holder', value)
               }
-              errorMessage={errorMessage('account_holder')}
+              errorMessage={errors?.errors?.['payment_means.0.account_holder']}
             />
           </Element>
         ) : null}
@@ -585,7 +571,7 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
               onValueChange={(value) =>
                 form.setFieldValue('payment_means.0.bsb_sort', value)
               }
-              errorMessage={errorMessage('bsb_sort')}
+              errorMessage={errors?.errors?.['payment_means.0.bsb_sort']}
             />
           </Element>
         ) : null}
@@ -597,7 +583,7 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
               onValueChange={(value) =>
                 form.setFieldValue('payment_means.0.card_type', value)
               }
-              errorMessage={errorMessage('card_type')}
+              errorMessage={errors?.errors?.['payment_means.0.card_type']}
             />
           </Element>
         ) : null}
@@ -612,7 +598,7 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
               onValueChange={(value) =>
                 form.setFieldValue('payment_means.0.card_number', value)
               }
-              errorMessage={errorMessage('card_number')}
+              errorMessage={errors?.errors?.['payment_means.0.card_number']}
             />
           </Element>
         ) : null}
@@ -627,7 +613,7 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
               onValueChange={(value) =>
                 form.setFieldValue('payment_means.0.card_holder', value)
               }
-              errorMessage={errorMessage('card_holder')}
+              errorMessage={errors?.errors?.['payment_means.0.card_holder']}
             />
           </Element>
         ) : null}
