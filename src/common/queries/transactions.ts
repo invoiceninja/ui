@@ -61,7 +61,7 @@ export function useBlankTransactionQuery() {
 
 const successMessages = {
   convert_matched: 'converted_transactions',
-  unlink: 'unlinked_payment',
+  unlink: 'unlinked_transaction'
 };
 
 export const useBulk = () => {
