@@ -34,11 +34,11 @@ const getLineIds = (resource: Resource | undefined) => {
     : [];
 };
 
-export const useEInvoiceLinesAlignment = <T extends Resource>({
+export function useEInvoiceLinesAlignment<T extends Resource>({
   resource,
   setResource,
   root,
-}: Params<T>) => {
+}: Params<T>) {
   const alignedIds = useRef<string[]>([]);
 
   const ids = getLineIds(resource);
@@ -77,4 +77,4 @@ export const useEInvoiceLinesAlignment = <T extends Resource>({
         : current
     );
   }, [idsKey]);
-};
+}

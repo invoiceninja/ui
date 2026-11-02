@@ -21,6 +21,8 @@ interface Props {
 }
 
 export function CreditProductsTable(props: Props) {
+  const { client } = props;
+
   const credit = useAtomValue(creditAtom);
   const productColumns = useProductColumns();
 
@@ -30,7 +32,7 @@ export function CreditProductsTable(props: Props) {
     handleLineItemPropertyChange,
     handleCreateLineItem,
     handleDeleteLineItem,
-  } = useCreditUtilities({ client: props.client });
+  } = useCreditUtilities({ client });
 
   if (!credit) {
     return null;

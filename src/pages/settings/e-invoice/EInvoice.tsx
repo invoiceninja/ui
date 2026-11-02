@@ -122,7 +122,7 @@ export function EInvoice() {
 
   const eInvoiceRef = useRef<PaymentMeansFormComponent>(null);
 
-  const savedCompany = useCurrentCompany();
+  const currentCompany = useCurrentCompany();
   const refreshCompanyUsers = useRefreshCompanyUsers();
   const restoreLineTemplate = useRestoreLineTemplate();
 
@@ -230,6 +230,31 @@ export function EInvoice() {
     }
   }, [saveChanges]);
 
+  const handleSave = async () => {
+    if (isSaving) {
+      return;
+    }
+
+    const pendingLineTemplate = getLineTemplate(company?.e_invoice);
+    const storedLineTemplate = getLineTemplate(currentCompany?.e_invoice);
+
+    setIsSaving(true);
+
+    try {
+      const isCompanySaved = (await onSave()) !== false;
+
+      if (await eInvoiceRef?.current?.saveEInvoice()) {
+        await restoreLineTemplate(
+          isCompanySaved ? pendingLineTemplate : storedLineTemplate
+        );
+
+        await refreshCompanyUsers();
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <Settings
       title={t('e_invoicing')}
@@ -244,30 +269,7 @@ export function EInvoice() {
 
       //   setSaveChanges(true);
       // }}
-      onSaveClick={async () => {
-        if (isSaving) {
-          return;
-        }
-
-        const pendingLineTemplate = getLineTemplate(company?.e_invoice);
-        const storedLineTemplate = getLineTemplate(savedCompany?.e_invoice);
-
-        setIsSaving(true);
-
-        try {
-          const isCompanySaved = (await onSave()) !== false;
-
-          if (await eInvoiceRef?.current?.saveEInvoice()) {
-            await restoreLineTemplate(
-              isCompanySaved ? pendingLineTemplate : storedLineTemplate
-            );
-
-            await refreshCompanyUsers();
-          }
-        } finally {
-          setIsSaving(false);
-        }
-      }}
+      onSaveClick={handleSave}
       disableSaveButton={isFormBusy || isSaving}
     >
       <PEPPOLPlanBanner />

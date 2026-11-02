@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosResponse } from 'axios';
 import { isEmpty, isEqual } from 'lodash';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -30,12 +29,12 @@ export function useRestoreLineTemplate() {
       return;
     }
 
-    const url = endpoint('/api/v1/companies/:id', { id: company.id });
-
     try {
-      const current: Company = await request('GET', url).then(
-        (response: AxiosResponse) => response.data.data
+      const response = await request(
+        'GET',
+        endpoint('/api/v1/companies/:id', { id: company.id })
       );
+      const current: Company = response.data.data;
 
       if (
         isEqual(
@@ -46,10 +45,14 @@ export function useRestoreLineTemplate() {
         return;
       }
 
-      await request('PUT', url, {
-        ...current,
-        e_invoice: withLineTemplate(current.e_invoice, template),
-      });
+      await request(
+        'PUT',
+        endpoint('/api/v1/companies/:id', { id: company.id }),
+        {
+          ...current,
+          e_invoice: withLineTemplate(current.e_invoice, template),
+        }
+      );
     } catch {
       toast.error();
     }

@@ -22,12 +22,14 @@ import { ClientSelector } from '$app/pages/invoices/common/components/ClientSele
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
 import { CreditDetails } from '../../common/components/CreditDetails';
-import { CreditProductsTable } from '../../common/components/CreditProductsTable';
 import { CreditFooter } from '../../common/components/CreditFooter';
+import { CreditProductsTable } from '../../common/components/CreditProductsTable';
 import { useCreditUtilities } from '../../common/hooks';
 import { CreditsContext } from '../Create';
 
 export default function CreatePage() {
+  const [t] = useTranslation();
+
   const context: CreditsContext = useOutletContext();
 
   const {
@@ -41,7 +43,6 @@ export default function CreatePage() {
     setIsDefaultTerms,
   } = context;
 
-  const [t] = useTranslation();
   const [searchParams] = useSearchParams();
 
   const colors = useColorScheme();

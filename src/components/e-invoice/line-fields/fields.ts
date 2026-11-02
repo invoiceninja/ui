@@ -73,6 +73,11 @@ interface Leaf {
   value: unknown;
 }
 
+interface Resource {
+  line_items: InvoiceItem[];
+  e_invoice?: unknown;
+}
+
 const isContainer = (value: unknown) => {
   return Array.isArray(value) || isPlainObject(value);
 };
@@ -298,15 +303,15 @@ export const getLineEntries = (
 export const getEntryFields = (
   entries: EInvoiceLineEntry[]
 ): EInvoiceLineField[] => {
-  const valuePaths = [
-    ...new Set(
+  const valuePaths = Array.from(
+    new Set(
       entries.flatMap((entry) =>
         collectLeaves(entry)
           .filter((leaf) => !isBlank(leaf.value))
           .map((leaf) => leaf.path)
       )
-    ),
-  ];
+    )
+  );
 
   return valuePaths.map((valuePath) =>
     toLineField(valuePath.replace(/\.value$/, ''), valuePath)
@@ -453,9 +458,7 @@ export const realignLineEntries = (
     : realigned;
 };
 
-export const withoutFeeLineEntries = <
-  T extends { line_items: InvoiceItem[]; e_invoice?: unknown },
->(
+export const withoutFeeLineEntries = <T extends Resource>(
   resource: T,
   root: EInvoiceLinesRoot
 ): T => {

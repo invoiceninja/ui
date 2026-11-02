@@ -24,8 +24,8 @@ import { ClientSelector } from '$app/pages/invoices/common/components/ClientSele
 import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
 import { CreditDetails } from '../common/components/CreditDetails';
-import { CreditProductsTable } from '../common/components/CreditProductsTable';
 import { CreditFooter } from '../common/components/CreditFooter';
+import { CreditProductsTable } from '../common/components/CreditProductsTable';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
 import { useCreditUtilities } from '../common/hooks';
 import { CreditsContext } from '../create/Create';

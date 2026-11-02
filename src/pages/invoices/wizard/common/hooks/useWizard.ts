@@ -370,7 +370,7 @@ export function useWizard(existingId?: string): Wizard {
             current?.e_invoice,
             'Invoice',
             entries
-          ) as unknown as Invoice['e_invoice'],
+          ) as Invoice['e_invoice'],
         }),
       });
     },
@@ -403,9 +403,7 @@ export function useWizard(existingId?: string): Wizard {
             'POST',
             endpoint(`/api/v1/invoices${query}`),
             withoutFeeLineEntries(payload, 'Invoice'),
-            {
-              skipIntercept: true,
-            }
+            { skipIntercept: true }
           )
     )
       .then((response) => {

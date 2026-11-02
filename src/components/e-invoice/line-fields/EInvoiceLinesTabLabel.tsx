@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import {
@@ -25,18 +26,19 @@ interface Props {
 export function EInvoiceLinesTabLabel(props: Props) {
   const [t] = useTranslation();
 
-  const count = countLinesWithValues(
-    getLineEntries(props.eInvoice, props.root)
-  );
+  const { eInvoice, root, errors } = props;
 
-  const hasErrors = Object.keys(props.errors?.errors ?? {}).some((key) =>
+  const count = countLinesWithValues(getLineEntries(eInvoice, root));
+
+  const hasErrors = Object.keys(errors?.errors ?? {}).some((key) =>
     key.startsWith('e_invoice')
   );
 
   return (
     <div
-      className="flex space-x-1"
-      style={hasErrors ? { color: '#ef4444' } : undefined}
+      className={classNames('flex space-x-1', {
+        'text-red-500': hasErrors,
+      })}
     >
       <span>{t('e_invoice_line_fields')}</span>
 

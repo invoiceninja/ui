@@ -24,6 +24,7 @@ import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { CloneOption } from '$app/components/CloneOption';
+import { withLineEntries } from '$app/components/e-invoice/line-fields/fields';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { FileClock } from '$app/components/icons/FileClock';
 import { Files } from '$app/components/icons/Files';
@@ -36,7 +37,6 @@ import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
-import { withLineEntries } from '$app/components/e-invoice/line-fields/fields';
 import { buildCreditFromInvoice } from '../helpers/credit-note';
 
 interface Props {

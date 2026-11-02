@@ -24,10 +24,10 @@ interface Resource {
   e_invoice?: unknown;
 }
 
-export const useEInvoiceLineFields = (
+export function useEInvoiceLineFields(
   resource: Resource | undefined,
   root: EInvoiceLinesRoot
-) => {
+) {
   const company = useCurrentCompany();
 
   const shown = useRef<{ id?: string; fields: EInvoiceLineField[] }>({
@@ -62,4 +62,4 @@ export const useEInvoiceLineFields = (
     resource?.e_invoice,
     root,
   ]);
-};
+}
