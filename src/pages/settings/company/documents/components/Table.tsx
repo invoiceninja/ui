@@ -36,12 +36,11 @@ import {
   useSetDocumentVisibility,
 } from '$app/common/queries/documents';
 import { DocumentUrl } from '$app/components/DocumentsTable';
+import { DocumentVisibilityLock } from '$app/components/DocumentVisibilityLock';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { FileIcon } from '$app/components/FileIcon';
 import { Icon } from '$app/components/icons/Icon';
-import { Lock } from '$app/components/icons/Lock';
-import { LockOpen } from '$app/components/icons/LockOpen';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { Spinner } from '$app/components/Spinner';
 import {
@@ -234,11 +233,10 @@ export function Table() {
                       <FileIcon type={document.type} />
                       <span>{document.name}</span>
 
-                      {document.is_public ? (
-                        <LockOpen color={colors.$3} size="1.4rem" />
-                      ) : (
-                        <Lock color={colors.$3} size="1.4rem" />
-                      )}
+                      <DocumentVisibilityLock
+                        document={document}
+                        onVisibilityChange={invalidateDocumentsQuery}
+                      />
                     </div>
 
                     {reactSettings.show_document_preview &&

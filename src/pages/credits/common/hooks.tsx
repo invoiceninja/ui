@@ -66,6 +66,7 @@ import { Icon } from '$app/components/icons/Icon';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { EntityState } from '$app/common/enums/entity-state';
@@ -766,7 +767,7 @@ export function useAllCreditColumns() {
     'date',
     'remaining',
     'archived_at',
-    // 'assigned_to', @Todo: Need to resolve relationship
+    'assigned_user',
     'client_city',
     'client_country',
     'client_postal_code',
@@ -774,7 +775,7 @@ export function useAllCreditColumns() {
     'contact_email',
     'contact_name',
     'created_at',
-    // 'created_by', @Todo: Need to resolve relationship
+    'user',
     firstCustom,
     secondCustom,
     thirdCustom,
@@ -815,6 +816,7 @@ export function useCreditColumns() {
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
   const resolveCountry = useResolveCountry();
+  const resolveUserName = useResolveUserName();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
@@ -1129,6 +1131,18 @@ export function useCreditColumns() {
       id: 'due_date',
       label: t('valid_until'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, credit) => resolveUserName(credit.user_id),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (value, credit) => resolveUserName(credit.assigned_user_id),
     },
     {
       column: 'tags',

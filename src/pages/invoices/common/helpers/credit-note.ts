@@ -9,6 +9,7 @@
  */
 
 import dayjs from 'dayjs';
+import { cloneDeep } from 'lodash';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import {
@@ -22,7 +23,7 @@ export function buildPeppolCreditNote(
   date = dayjs().format('YYYY-MM-DD')
 ) {
   return {
-    ...(invoice as unknown as Credit),
+    ...(cloneDeep(invoice) as unknown as Credit),
     id: '',
     number: '',
     documents: [],
@@ -66,7 +67,7 @@ export function buildClonedCredit(
   date = dayjs().format('YYYY-MM-DD')
 ) {
   return {
-    ...(invoice as unknown as Credit),
+    ...(cloneDeep(invoice) as unknown as Credit),
     id: '',
     number: '',
     documents: [],

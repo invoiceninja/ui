@@ -14,6 +14,7 @@ import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { Tooltip } from '$app/components/Tooltip';
@@ -50,6 +51,7 @@ export function useTransactionColumns() {
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
   const cleanDescriptionText = useCleanDescriptionText();
+  const resolveUserName = useResolveUserName();
 
   const columns: DataTableColumnsExtended<Transaction, TransactionColumns> = [
     {
@@ -199,6 +201,12 @@ export function useTransactionColumns() {
           </div>
         );
       },
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, transaction) => resolveUserName(transaction.user_id),
     },
     {
       column: 'tags',

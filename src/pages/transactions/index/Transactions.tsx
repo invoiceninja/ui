@@ -14,6 +14,7 @@ import {
   useEntityTagFilterColumns,
   useTagFilterCleanup,
 } from '$app/common/hooks/useEntityTagFilters';
+import { useEntityUserFilterColumns } from '$app/common/hooks/useEntityUserFilters';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
@@ -75,11 +76,16 @@ export default function Transactions() {
   const selectedColumns =
     reactSettings?.react_table_columns?.transaction || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
+  const shouldShowUserFilter = selectedColumns.includes('user');
   const filterColumns = useEntityTagFilterColumns(
     TAG_ENTITY_TYPES.bankTransaction,
     'bank_transaction_tag_ids',
     { enabled: shouldShowTagFilter }
   );
+  const userFilterColumns = useEntityUserFilterColumns({
+    user: shouldShowUserFilter,
+    assignedUser: false,
+  });
 
   useTagFilterCleanup(shouldShowTagFilter, 'bank_transaction_tag_ids');
 
@@ -158,7 +164,9 @@ export default function Transactions() {
           resource="transaction"
           endpoint={`/api/v1/bank_transactions?sort=id|desc&active_banks=true${
             shouldShowTagFilter ? '&include=tags' : ''
-          }${shouldShowTagFilter ? '' : '&tag_ids='}`}
+          }${shouldShowTagFilter ? '' : '&tag_ids='}${
+            shouldShowUserFilter ? '' : '&user_ids='
+          }`}
           bulkRoute="/api/v1/bank_transactions/bulk"
           columns={columns}
           linkToCreate="/transactions/create"
@@ -168,7 +176,10 @@ export default function Transactions() {
           customFilters={filters}
           customBulkActions={customBulkActions}
           customFilterPlaceholder="status"
-          filterColumns={shouldShowTagFilter ? filterColumns : undefined}
+          filterColumns={[
+            ...userFilterColumns,
+            ...(shouldShowTagFilter ? filterColumns : []),
+          ]}
           rightSide={
             <div className="flex items-center space-x-2">
               {((isHosted() && (proPlan() || enterprisePlan())) ||

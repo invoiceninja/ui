@@ -21,6 +21,7 @@ import { route } from '$app/common/helpers/route';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
@@ -58,10 +59,10 @@ export function useAllVendorColumns() {
     'address2',
     'archived_at',
     'last_login_at',
-    //   'assigned_to', @Todo: Need to resolve relationship
+    'assigned_user',
     'contacts',
     'country_id',
-    //   'created_by', @Todo: Need to resolve relationship
+    'user',
     'currency_id',
     firstCustom,
     secondCustom,
@@ -92,6 +93,7 @@ export function useVendorColumns() {
 
   const resolveCountry = useResolveCountry();
   const resolveCurrency = useResolveCurrency();
+  const resolveUserName = useResolveUserName();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const vendorColumns = useAllVendorColumns();
@@ -293,6 +295,18 @@ export function useVendorColumns() {
       id: 'website',
       label: t('website'),
       format: (value) => <CopyToClipboard text={value.toString()} />,
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, vendor) => resolveUserName(vendor.user_id),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (value, vendor) => resolveUserName(vendor.assigned_user_id),
     },
     {
       column: 'tags',

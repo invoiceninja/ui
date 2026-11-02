@@ -11,6 +11,7 @@
 import collect from 'collect.js';
 import dayjs from 'dayjs';
 import { useSetAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
@@ -84,7 +85,7 @@ export function useInvoiceTask(params?: Params) {
 
   return async (tasks: Task[]) => {
     if (data) {
-      const invoice: Invoice = { ...data };
+      const invoice: Invoice = cloneDeep(data);
 
       if (company && company.enabled_tax_rates > 0) {
         invoice.tax_name1 = company.settings?.tax_name1;

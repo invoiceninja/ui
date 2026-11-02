@@ -21,6 +21,7 @@ import {
   useEntityTagFilterColumns,
   useTagFilterCleanup,
 } from '$app/common/hooks/useEntityTagFilters';
+import { useEntityUserFilterColumns } from '$app/common/hooks/useEntityUserFilters';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Quote } from '$app/common/interfaces/quote';
@@ -78,11 +79,18 @@ export default function Quotes() {
   const selectedColumns =
     reactSettings?.react_table_columns?.quote || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
+  const shouldShowUserFilter = selectedColumns.includes('user');
+  const shouldShowAssignedUserFilter =
+    selectedColumns.includes('assigned_user');
   const filterColumns = useEntityTagFilterColumns(
     TAG_ENTITY_TYPES.quote,
     'quote_tag_ids',
     { enabled: shouldShowTagFilter }
   );
+  const userFilterColumns = useEntityUserFilterColumns({
+    user: shouldShowUserFilter,
+    assignedUser: shouldShowAssignedUserFilter,
+  });
 
   useTagFilterCleanup(shouldShowTagFilter, 'quote_tag_ids');
 
@@ -116,6 +124,8 @@ export default function Quotes() {
           shouldShowTagFilter ? ',tags' : ''
         }&without_deleted_clients=true&sort=id|desc${
           shouldShowTagFilter ? '' : '&tag_ids='
+        }${shouldShowUserFilter ? '' : '&user_ids='}${
+          shouldShowAssignedUserFilter ? '' : '&assigned_user_ids='
         }`}
         linkToEdit="/quotes/:id/edit"
         linkToCreate="/quotes/create"
@@ -124,7 +134,10 @@ export default function Quotes() {
         customBulkActions={customBulkActions}
         customFilters={filters}
         customFilterPlaceholder="status"
-        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
+        filterColumns={[
+          ...userFilterColumns,
+          ...(shouldShowTagFilter ? filterColumns : []),
+        ]}
         withResourcefulActions
         rightSide={
           <div className="flex items-center space-x-2">

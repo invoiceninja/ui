@@ -41,6 +41,7 @@ import { useNavigate } from 'react-router-dom';
 import { expenseAtom } from './atoms';
 import { ExpenseStatus } from './components/ExpenseStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { useSetAtom } from 'jotai';
 import { useBulk } from '$app/common/queries/expenses';
 import { Divider } from '$app/components/cards/Divider';
@@ -268,10 +269,10 @@ export function useAllExpenseColumns() {
     'public_notes',
     'entity_state',
     'archived_at',
-    //   'assigned_to', @Todo: Need to resolve relationship
+    'assigned_user',
     'category',
     'created_at',
-    //'created_by', @Todo: Need to resolve relationship
+    'user',
     firstCustom,
     secondCustom,
     thirdCustom,
@@ -314,6 +315,7 @@ export function useExpenseColumns() {
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
+  const resolveUserName = useResolveUserName();
   const formatCustomFieldValue = useFormatCustomFieldValue();
   const calculateExpenseAmount = useCalculateExpenseAmount();
   const calculateExpenseExclusiveAmount = useCalculateExpenseExclusiveAmount();
@@ -640,6 +642,18 @@ export function useExpenseColumns() {
           {expense?.project?.name}
         </Link>
       ),
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, expense) => resolveUserName(expense.user_id),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (value, expense) => resolveUserName(expense.assigned_user_id),
     },
     {
       column: 'tags',
