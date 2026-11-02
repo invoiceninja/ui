@@ -710,6 +710,57 @@ export async function ensurePermissionUserExists(
   return userId;
 }
 
+export type ColumnFilterUser = Pick<
+  ApiUser,
+  'id' | 'first_name' | 'last_name' | 'email'
+>;
+
+/** Label shown in User / Assigned User column filter options. */
+export function formatUserLabel(user: ColumnFilterUser): string {
+  return user.first_name || user.last_name
+    ? `${user.first_name} ${user.last_name}`.trim()
+    : user.email;
+}
+
+/**
+ * Owner plus a distinct second user for column filter tests. Creates or restores
+ * the lane-scoped permissions user when missing (same as account reset).
+ */
+export async function ensureColumnFilterUsers(
+  api: ApiContext
+): Promise<{ owner: ColumnFilterUser; other: ColumnFilterUser }> {
+  const ownerId = api.userId;
+  if (!ownerId) {
+    throw new Error('API context is missing userId (owner login)');
+  }
+
+  const otherEmail = emailForCurrentAccount('permissions@example.com');
+  const otherId = await ensurePermissionUserExists(api, otherEmail);
+
+  const users = await fetchAllUsers(api);
+  const owner = users.find((user) => user.id === ownerId && !user.is_deleted);
+  const other = users.find((user) => user.id === otherId && !user.is_deleted);
+
+  if (!owner) {
+    throw new Error(`Active owner user ${ownerId} not found in company`);
+  }
+  if (!other) {
+    throw new Error(
+      `Active permissions user ${otherEmail} not found after ensure`
+    );
+  }
+
+  const ownerLabel = formatUserLabel(owner);
+  const otherLabel = formatUserLabel(other);
+  if (ownerLabel === otherLabel) {
+    throw new Error(
+      `Owner and permissions user share filter label "${ownerLabel}"`
+    );
+  }
+
+  return { owner, other };
+}
+
 // ---------------------------------------------------------------------------
 // Company settings
 // ---------------------------------------------------------------------------
