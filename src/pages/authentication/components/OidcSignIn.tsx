@@ -17,6 +17,7 @@ import { SignInProviderButton } from './SignInProviders';
 interface OidcConfig {
   oidc_enabled: boolean;
   oidc_provider_label: string;
+  oidc_auto: boolean;
 }
 
 /**
@@ -53,14 +54,20 @@ export function OidcSignIn() {
     return null;
   }
 
-  const label = config.oidc_provider_label || 'OIDC';
+  const authUrl = `${apiEndpoint()}/auth/oidc`;
+
+  if (config?.oidc_auto) {
+    window.location.href = authUrl;
+  }
+
+  const label = config.oidc_provider_label || 'Single Sign-On';
 
   return (
     <div className="grid grid-cols-3 text-sm mt-4">
       <div className="col-span-3 flex flex-col items-center space-y-3">
         <SignInProviderButton
           onClick={() => {
-            window.location.href = `${apiEndpoint()}/auth/oidc`;
+            window.location.href = authUrl;
           }}
         >
           <svg
@@ -76,7 +83,7 @@ export function OidcSignIn() {
           >
             <path d="M12 2l3 6 6 .9-4.5 4.3 1 6.3L12 16.9 6.5 19.5l1-6.3L3 8.9 9 8z" />
           </svg>
-          <p>{t('sign_in_with', { provider: label })}</p>
+          <p>{label}</p>
         </SignInProviderButton>
       </div>
     </div>
