@@ -36,12 +36,6 @@ export interface EInvoiceLineField {
 
 export const E_INVOICE_LINE_FIELDS: EInvoiceLineCatalogField[] = [
   {
-    key: 'order_reference',
-    label: 'order_reference',
-    help: 'order_reference_help',
-    path: 'OrderLineReference.OrderReference.ID',
-  },
-  {
     key: 'order_line_reference',
     label: 'order_line_reference',
     help: 'order_line_reference_help',
