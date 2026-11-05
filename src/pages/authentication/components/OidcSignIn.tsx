@@ -8,9 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { apiEndpoint, endpoint, isSelfHosted } from '$app/common/helpers';
+import {
+  apiEndpoint,
+  endpoint,
+  isSelfHosted,
+  trans,
+} from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { SignInProviderButton } from './SignInProviders';
 
@@ -30,8 +34,6 @@ interface OidcConfig {
  * authorization code flow.
  */
 export function OidcSignIn() {
-  const [t] = useTranslation();
-
   // Generic OIDC only makes sense for self-hosted deployments — the hosted
   // platform has its own SSO story, so skip the discovery request entirely
   // there. skipIntercept + no retry: older self-hosted backends don't ship
@@ -76,7 +78,7 @@ export function OidcSignIn() {
           >
             <path d="M12 2l3 6 6 .9-4.5 4.3 1 6.3L12 16.9 6.5 19.5l1-6.3L3 8.9 9 8z" />
           </svg>
-          <p>{t('sign_in_with', { provider: label })}</p>
+          <p>{trans('sign_in_with', { provider: label })}</p>
         </SignInProviderButton>
       </div>
     </div>
