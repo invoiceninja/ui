@@ -93,11 +93,16 @@ const Box = styled.div`
 export function useGenerateActivityElement() {
   const [t] = useTranslation();
 
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
+
   return (activity: QuoteActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
     const replacements = {
-      client: (
+      client: disableNavigation('client', null) ? (
+        activity.client?.label
+      ) : (
         <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
           {activity.client?.label}
         </Link>
@@ -112,7 +117,9 @@ export function useGenerateActivityElement() {
           {activity?.quote?.label}
         </Link>
       ),
-      contact: (
+      contact: !hasPermission('edit_client') ? (
+        activity?.contact?.label
+      ) : (
         <Link
           to={route('/clients/:id/edit', {
             id: activity?.contact?.hashed_id,

@@ -73,7 +73,6 @@ import {
   isColorLight,
   useAdjustColorDarkness,
 } from '$app/common/hooks/useAdjustColorDarkness';
-import { Link } from '$app/components/forms';
 import classNames from 'classnames';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
@@ -638,9 +637,12 @@ export function useExpenseColumns() {
       id: 'project',
       label: t('project'),
       format: (_, expense) => (
-        <Link to={route('/projects/:id', { id: expense?.project?.id })}>
+        <DynamicLink
+          to={route('/projects/:id', { id: expense?.project?.id })}
+          renderSpan={disableNavigation('project', expense?.project)}
+        >
           {expense?.project?.name}
-        </Link>
+        </DynamicLink>
       ),
     },
     {

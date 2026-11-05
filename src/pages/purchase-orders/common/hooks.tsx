@@ -339,9 +339,12 @@ export function usePurchaseOrderColumns() {
         label: t('vendor'),
         format: (field, purchaseOrder) =>
           purchaseOrder.vendor && (
-            <Link to={route('/vendors/:id', { id: purchaseOrder.vendor.id })}>
+            <DynamicLink
+              to={route('/vendors/:id', { id: purchaseOrder.vendor.id })}
+              renderSpan={disableNavigation('vendor', purchaseOrder.vendor)}
+            >
               {purchaseOrder.vendor.name}
-            </Link>
+            </DynamicLink>
           ),
       },
       {
@@ -350,11 +353,12 @@ export function usePurchaseOrderColumns() {
         label: t('expense'),
         format: (field, purchaseOrder) =>
           purchaseOrder.expense && (
-            <Link
+            <DynamicLink
               to={route('/expenses/:id/edit', { id: purchaseOrder.expense.id })}
+              renderSpan={disableNavigation('expense', purchaseOrder.expense)}
             >
               {purchaseOrder.expense.number}
-            </Link>
+            </DynamicLink>
           ),
       },
       {
@@ -389,10 +393,13 @@ export function usePurchaseOrderColumns() {
         format: (value, purchaseOrder) =>
           purchaseOrder.vendor &&
           purchaseOrder.vendor?.contacts?.length > 0 && (
-            <Link to={route('/vendors/:id', { id: purchaseOrder.id })}>
+            <DynamicLink
+              to={route('/vendors/:id', { id: purchaseOrder.id })}
+              renderSpan={disableNavigation('vendor', purchaseOrder.vendor)}
+            >
               {purchaseOrder.vendor.contacts[0].first_name}{' '}
               {purchaseOrder.vendor.contacts[0].last_name}
-            </Link>
+            </DynamicLink>
           ),
       },
       {
@@ -565,6 +572,7 @@ export function useActions(params: ActionsParams = {}) {
   const bulk = useBulk();
   const navigate = useNavigate();
   const markSent = useMarkSent();
+  const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
   const printPdf = usePrintPdf({ entity: 'purchase_order' });
   const downloadPdf = useDownloadPdf({ resource: 'purchase_order' });
@@ -723,7 +731,8 @@ export function useActions(params: ActionsParams = {}) {
         </EntityActionElement>
       ),
     (purchaseOrder) =>
-      Boolean(!purchaseOrder.expense_id.length) && (
+      Boolean(!purchaseOrder.expense_id.length) &&
+      hasPermission('create_expense') && (
         <EntityActionElement
           {...(!dropdown && {
             key: 'convert_to_expense',

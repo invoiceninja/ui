@@ -27,6 +27,7 @@ import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { DynamicLink } from '$app/components/DynamicLink';
 import { Button, Link } from '$app/components/forms';
 import { InfoCard } from '$app/components/InfoCard';
 import { ChevronDown } from '$app/components/icons/ChevronDown';
@@ -49,7 +50,7 @@ export function Gateways(props: Props) {
 
   const { client } = props;
 
-  const { isAdmin } = useAdmin();
+  const { isAdmin, isOwner } = useAdmin();
   const colors = useColorScheme();
   const currentCompany = useCurrentCompany();
 
@@ -195,13 +196,14 @@ export function Gateways(props: Props) {
                         <span>{t('gateway')}</span>
                         <MdChevronRight size={20} />
 
-                        <Link
+                        <DynamicLink
                           to={route('/settings/gateways/:id/edit', {
                             id: token.company_gateway_id,
                           })}
+                          renderSpan={!isAdmin && !isOwner}
                         >
                           {getCompanyGateway(token.company_gateway_id)?.label}
-                        </Link>
+                        </DynamicLink>
                       </div>
                     </div>
 

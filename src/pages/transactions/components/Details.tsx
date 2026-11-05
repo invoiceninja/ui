@@ -10,7 +10,7 @@
 
 import { Element } from '$app/components/cards';
 import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
-import { Link } from '$app/components/forms';
+import { DynamicLink } from '$app/components/DynamicLink';
 import { TagPills } from '$app/components/tags/TagPills';
 import {
   ApiTransactionType,
@@ -19,7 +19,9 @@ import {
 } from '$app/common/enums/transactions';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { ExpenseCategory } from '$app/common/interfaces/expense-category';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Payment } from '$app/common/interfaces/payment';
@@ -52,6 +54,9 @@ export function Details(props: Props) {
   const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
+  const disableNavigation = useDisableNavigation();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -171,13 +176,14 @@ export function Details(props: Props) {
         )}
 
         <Element leftSide={t('bank_account')} className="cursor-pointer">
-          <Link
+          <DynamicLink
             to={route('/settings/bank_accounts/:id/details', {
               id: bankAccountResponse?.id,
             })}
+            renderSpan={!isAdmin && !isOwner}
           >
             {bankAccountResponse?.bank_account_name}
-          </Link>
+          </DynamicLink>
         </Element>
 
         {transaction?.participant && (
@@ -195,71 +201,76 @@ export function Details(props: Props) {
 
       {!showTransactionMatchDetails ? (
         <>
-          {matchedInvoices?.map(({ id, number }) => (
+          {matchedInvoices?.map((invoice) => (
             <Element
-              key={id}
+              key={invoice.id}
               leftSide={t('invoice')}
               className="cursor-pointer"
             >
-              <Link
+              <DynamicLink
                 to={route(invoicePaths.edit, {
-                  id,
+                  id: invoice.id,
                 })}
+                renderSpan={disableNavigation('invoice', invoice)}
               >
-                {number}
-              </Link>
+                {invoice.number}
+              </DynamicLink>
             </Element>
           ))}
 
           {transaction?.payment_id && (
             <Element leftSide={t('payment')} className="cursor-pointer">
-              <Link
+              <DynamicLink
                 to={route('/payments/:id/edit', {
                   id: matchedPayment?.id,
                 })}
+                renderSpan={disableNavigation('payment', matchedPayment)}
               >
                 {matchedPayment?.number}
-              </Link>
+              </DynamicLink>
             </Element>
           )}
 
           {transaction?.vendor_id && (
             <Element leftSide={t('vendor')} className="cursor-pointer">
-              <Link
+              <DynamicLink
                 to={route('/vendors/:id', {
                   id: vendorResponse?.id,
                 })}
+                renderSpan={disableNavigation('vendor', vendorResponse)}
               >
                 {vendorResponse?.name}
-              </Link>
+              </DynamicLink>
             </Element>
           )}
 
           {transaction?.ninja_category_id && (
             <Element leftSide={t('category')} className="cursor-pointer">
-              <Link
+              <DynamicLink
                 to={route('/settings/expense_categories/:id/edit', {
                   id: matchedExpenseCategory?.id,
                 })}
+                renderSpan={!isAdmin && !isOwner}
               >
                 {matchedExpenseCategory?.name}
-              </Link>
+              </DynamicLink>
             </Element>
           )}
 
-          {matchedExpenses?.map(({ id, number, date }) => (
+          {matchedExpenses?.map((expense) => (
             <Element
-              key={id}
+              key={expense.id}
               leftSide={t('expense')}
               className="cursor-pointer"
             >
-              <Link
+              <DynamicLink
                 to={route('/expenses/:id/edit', {
-                  id,
+                  id: expense.id,
                 })}
+                renderSpan={disableNavigation('expense', expense)}
               >
-                {number || formatDate(date, dateFormat)}
-              </Link>
+                {expense.number || formatDate(expense.date, dateFormat)}
+              </DynamicLink>
             </Element>
           ))}
         </>

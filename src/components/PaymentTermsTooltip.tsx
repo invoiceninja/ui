@@ -14,6 +14,8 @@ import { MdInfoOutline } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import { Client } from '$app/common/interfaces/client';
 import { Link } from './forms';
@@ -32,6 +34,9 @@ export function PaymentTermsTooltip({ client, clientId }: Props) {
 
   const colors = useColorScheme();
   const clientResolver = useClientResolver();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const [resolvedClient, setResolvedClient] = useState<Client | undefined>(
     client
@@ -82,12 +87,14 @@ export function PaymentTermsTooltip({ client, clientId }: Props) {
               : t('none')}
           </span>
 
-          <Link
-            to={route('/clients/:id/settings', { id: resolvedClient.id })}
-            className="text-xs"
-          >
-            {t('configure')}
-          </Link>
+          {(hasPermission('edit_client') || entityAssigned(resolvedClient)) && (
+            <Link
+              to={route('/clients/:id/settings', { id: resolvedClient.id })}
+              className="text-xs"
+            >
+              {t('configure')}
+            </Link>
+          )}
         </div>
       }
     >

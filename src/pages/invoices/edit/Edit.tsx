@@ -20,6 +20,7 @@ import {
 } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useScrollToLineItem } from '$app/common/hooks/useScrollToLineItem';
 import { Client } from '$app/common/interfaces/client';
@@ -74,6 +75,7 @@ export default function Edit() {
   const [searchParams] = useSearchParams();
 
   const navigate = useNavigate();
+  const disableNavigation = useDisableNavigation();
 
   const context: Context = useOutletContext();
   const {
@@ -161,24 +163,26 @@ export default function Edit() {
               </div>
             )}
 
-            {invoice && invoice.recurring_id && (
-              <div className="flex items-center space-x-9">
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: colors.$22 }}
-                >
-                  {t('recurring_invoice')}
-                </span>
+            {invoice &&
+              invoice.recurring_id &&
+              !disableNavigation('recurring_invoice', null) && (
+                <div className="flex items-center space-x-9">
+                  <span
+                    className="text-sm font-medium"
+                    style={{ color: colors.$22 }}
+                  >
+                    {t('recurring_invoice')}
+                  </span>
 
-                <Link
-                  to={route('/recurring_invoices/:id/edit', {
-                    id: invoice.recurring_id,
-                  })}
-                >
-                  {t('view')}
-                </Link>
-              </div>
-            )}
+                  <Link
+                    to={route('/recurring_invoices/:id/edit', {
+                      id: invoice.recurring_id,
+                    })}
+                  >
+                    {t('view')}
+                  </Link>
+                </div>
+              )}
 
             {invoice &&
               invoice.sync?.dn_completed &&

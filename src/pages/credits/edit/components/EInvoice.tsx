@@ -22,7 +22,13 @@ import { endpoint, trans } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useSendCooldown } from '$app/common/hooks/useSendCooldown';
 import { Credit } from '$app/common/interfaces/credit';
@@ -62,6 +68,12 @@ export default function EInvoice() {
   const location = useLocation();
   const colors = useColorScheme();
   const company = useCurrentCompany();
+
+  const { isAdmin, isOwner } = useAdmin();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
 
   const context: Context = useOutletContext();
 
@@ -142,7 +154,9 @@ export default function EInvoice() {
       </Link>
     );
 
-    const clientElement = (
+    const clientElement = disableNavigation('client', credit?.client) ? (
+      credit?.client?.display_name
+    ) : (
       <Link to={route('/clients/:id', { id: credit?.client_id })}>
         {credit?.client?.display_name}
       </Link>
@@ -222,17 +236,19 @@ export default function EInvoice() {
                           </Link>
                         )}
 
-                        {entity === 'client' && (
-                          <Link
-                            to={route('/clients/:id/edit', {
-                              id: credit?.client_id,
-                            })}
-                          >
-                            {t('edit_client')}
-                          </Link>
-                        )}
+                        {entity === 'client' &&
+                          (hasPermission('edit_client') ||
+                            entityAssigned(credit?.client)) && (
+                            <Link
+                              to={route('/clients/:id/edit', {
+                                id: credit?.client_id,
+                              })}
+                            >
+                              {t('edit_client')}
+                            </Link>
+                          )}
 
-                        {entity === 'company' && (
+                        {entity === 'company' && (isAdmin || isOwner) && (
                           <Link to="/settings/company_details">
                             {t('settings')}
                           </Link>

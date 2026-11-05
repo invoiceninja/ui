@@ -25,7 +25,7 @@ import { Vendor } from '../interfaces/vendor';
 import { useHasPermission } from './permissions/useHasPermission';
 import { useEntityAssigned } from './useEntityAssigned';
 
-type Entity =
+export type Entity =
   | 'client'
   | 'recurring_invoice'
   | 'payment'

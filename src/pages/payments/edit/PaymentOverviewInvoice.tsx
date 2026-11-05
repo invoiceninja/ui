@@ -17,6 +17,7 @@ import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Payment, Paymentable } from '$app/common/interfaces/payment';
@@ -55,6 +56,7 @@ export function PaymentOverviewInvoice(props: Props) {
 
   const colors = useColorScheme();
   const accentColor = useAccentColor();
+  const disableNavigation = useDisableNavigation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   return (
@@ -68,22 +70,28 @@ export function PaymentOverviewInvoice(props: Props) {
             <div className="flex items-center space-x-2">
               <span style={{ color: colors.$3 }}>{t('invoice')}</span>
 
-              <Link
-                to={route(invoicePaths.edit, {
-                  id: props.paymentable.invoice_id,
-                })}
-              >
-                <div
-                  className="flex items-center gap-2"
-                  style={{ color: colors.$3, colorScheme: colors.$0 }}
+              {disableNavigation('invoice', null) ? (
+                <span style={{ color: colors.$3 }}>
+                  {setLabel(props.payment, props.paymentable)}
+                </span>
+              ) : (
+                <Link
+                  to={route(invoicePaths.edit, {
+                    id: props.paymentable.invoice_id,
+                  })}
                 >
-                  <span>{setLabel(props.payment, props.paymentable)}</span>
+                  <div
+                    className="flex items-center gap-2"
+                    style={{ color: colors.$3, colorScheme: colors.$0 }}
+                  >
+                    <span>{setLabel(props.payment, props.paymentable)}</span>
 
-                  <div>
-                    <ExternalLink color={accentColor} size="1.1rem" />
+                    <div>
+                      <ExternalLink color={accentColor} size="1.1rem" />
+                    </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
+              )}
             </div>
           </div>
 
@@ -126,24 +134,30 @@ export function PaymentOverviewInvoice(props: Props) {
             <div className="flex items-center space-x-2">
               <span style={{ color: colors.$3 }}>{t('credit')}</span>
 
-              <Link
-                to={route('/credits/:id/edit', {
-                  id: props.paymentable.credit_id,
-                })}
-              >
-                <div
-                  className="flex items-center gap-2"
-                  style={{ color: colors.$3, colorScheme: colors.$0 }}
+              {disableNavigation('credit', null) ? (
+                <span style={{ color: colors.$3 }}>
+                  {setLabel(props.payment, props.paymentable, true)}
+                </span>
+              ) : (
+                <Link
+                  to={route('/credits/:id/edit', {
+                    id: props.paymentable.credit_id,
+                  })}
                 >
-                  <span>
-                    {setLabel(props.payment, props.paymentable, true)}
-                  </span>
+                  <div
+                    className="flex items-center gap-2"
+                    style={{ color: colors.$3, colorScheme: colors.$0 }}
+                  >
+                    <span>
+                      {setLabel(props.payment, props.paymentable, true)}
+                    </span>
 
-                  <div>
-                    <ExternalLink color={accentColor} size="1.1rem" />
+                    <div>
+                      <ExternalLink color={accentColor} size="1.1rem" />
+                    </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
+              )}
             </div>
           </div>
 

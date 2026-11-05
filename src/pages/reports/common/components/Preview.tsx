@@ -22,8 +22,10 @@ import React, {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { currentWidthAtom } from '$app/common/hooks/useResizeColumn';
-import { Button, InputField, Link } from '$app/components/forms';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { Button, InputField } from '$app/components/forms';
 import { Tooltip } from '$app/components/Tooltip';
 import { Table, Tbody, Td, Thead, Tr } from '$app/components/tables';
 import {
@@ -74,11 +76,18 @@ export function usePreview() {
   const [preview] = useAtom(previewAtom);
   const [processed, setProcessed] = useState<Preview | null>(null);
 
+  const disableNavigation = useDisableNavigation();
+
   const replacements: Replacement[] = [
     {
       identifier: 'credit.number',
       format: (cell) => (
-        <Link to={`/credits/${cell.value}`}>{cell.display_value}</Link>
+        <DynamicLink
+          to={`/credits/${cell.value}`}
+          renderSpan={disableNavigation('credit', null)}
+        >
+          {cell.display_value}
+        </DynamicLink>
       ),
     },
   ];
