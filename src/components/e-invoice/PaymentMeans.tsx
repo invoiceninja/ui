@@ -21,13 +21,18 @@ import {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { $refetch } from '$app/common/hooks/useRefetch';
+import { Client } from '$app/common/interfaces/client';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 import { EInvoiceType } from '$app/pages/settings';
 import { Card, Element } from '../cards';
 import { InputField, SelectField } from '../forms';
@@ -36,6 +41,7 @@ type Entity = 'company' | 'invoice' | 'client';
 
 interface Props {
   entity: Entity;
+  entityId?: string;
   currentEInvoice: EInvoiceType;
   isInvoiceLevel?: boolean;
   invoice?: Invoice | undefined;
@@ -321,14 +327,37 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
 
     const [t] = useTranslation();
 
+    const dispatch = useDispatch();
+
+    const isClientLevel = props.entity === 'client';
+    const eInvoice = isClientLevel ? props.currentEInvoice : company.e_invoice;
+
     const [errors, setErrors] = useState<ValidationBag | null>(null);
+
+    const refreshClient = () => {
+      request(
+        'GET',
+        endpoint('/api/v1/clients/:id', { id: props.entityId })
+      ).then((response: GenericSingleResourceResponse<Client>) => {
+        dispatch(
+          updateChanges({
+            object: 'company',
+            property: 'e_invoice',
+            value: response.data.data.e_invoice || {},
+          })
+        );
+
+        $refetch(['clients']);
+      });
+    };
 
     const form = useFormik({
       initialValues: {
         entity: props.entity,
+        entity_id: props.entityId,
         payment_means: [
           {
-            code: '1',
+            code: isClientLevel ? '' : '1',
             iban: null,
             bic_swift: '',
             payer_bank_account: '',
@@ -347,10 +376,16 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
         return request(
           'POST',
           endpoint('/api/v1/einvoice/configurations'),
-          values
+          isClientLevel && !values.payment_means[0].code
+            ? { ...values, payment_means: [] }
+            : values
         )
           .then(() => {
             toast.success('saved_einvoice_details');
+
+            if (isClientLevel) {
+              refreshClient();
+            }
 
             return true;
           })
@@ -391,68 +426,59 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
     useEffect(() => {
       form.setFieldValue(
         'payment_means.0.code',
-        get(
-          company.e_invoice,
-          'Invoice.PaymentMeans.0.PaymentMeansCode.value'
-        ) || '1'
+        get(eInvoice, 'Invoice.PaymentMeans.0.PaymentMeansCode.value') ||
+          (isClientLevel ? '' : '1')
       );
       form.setFieldValue(
         'payment_means.0.iban',
         get(
-          company.e_invoice,
+          eInvoice,
           'Invoice.PaymentMeans.0.PayeeFinancialAccount.ID.value'
         ) || null
       );
       form.setFieldValue(
         'payment_means.0.bic_swift',
         get(
-          company.e_invoice,
+          eInvoice,
           'Invoice.PaymentMeans.0.PayeeFinancialAccount.FinancialInstitutionBranch.FinancialInstitution.ID.value'
         ) || ''
       );
       form.setFieldValue(
         'payment_means.0.account_holder',
-        get(
-          company.e_invoice,
-          'Invoice.PaymentMeans.0.PayeeFinancialAccount.Name'
-        ) || ''
+        get(eInvoice, 'Invoice.PaymentMeans.0.PayeeFinancialAccount.Name') || ''
       );
       form.setFieldValue(
         'payment_means.0.payer_bank_account',
         get(
-          company.e_invoice,
+          eInvoice,
           'Invoice.PaymentMeans.0.PayerFinancialAccount.ID.value'
         ) || ''
       );
       form.setFieldValue(
         'payment_means.0.bsb_sort',
         get(
-          company.e_invoice,
+          eInvoice,
           'Invoice.PaymentMeans.0.PayeeFinancialAccount.SortCode.value'
         ) || ''
       );
       form.setFieldValue(
         'payment_means.0.card_type',
-        get(
-          company.e_invoice,
-          'Invoice.PaymentMeans.0.CardAccount.NetworkID.value'
-        ) || ''
+        get(eInvoice, 'Invoice.PaymentMeans.0.CardAccount.NetworkID.value') ||
+          ''
       );
       form.setFieldValue(
         'payment_means.0.card_number',
         get(
-          company.e_invoice,
+          eInvoice,
           'Invoice.PaymentMeans.0.CardAccount.PrimaryAccountNumberID.value'
         ) || ''
       );
       form.setFieldValue(
         'payment_means.0.card_holder',
-        get(
-          company.e_invoice,
-          'Invoice.PaymentMeans.0.CardAccount.HolderName.value'
-        ) || ''
+        get(eInvoice, 'Invoice.PaymentMeans.0.CardAccount.HolderName.value') ||
+          ''
       );
-    }, [company.e_invoice]);
+    }, [eInvoice]);
 
     return (
       <Card
@@ -468,7 +494,8 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
               form.setFieldValue('payment_means.0.code', value)
             }
             errorMessage={errors?.errors?.['payment_means.0.code']}
-            dismissable={false}
+            withBlank={isClientLevel}
+            dismissable={isClientLevel}
             customSelector
           >
             {Object.entries(PAYMENT_MEANS_CODE_LIST).map(([key, label]) => (

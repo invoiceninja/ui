@@ -15,6 +15,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { whiteLabelPlan } from '$app/common/guards/guards/white-label';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
@@ -139,7 +140,10 @@ export function EInvoice() {
   const disableSettingsField = useDisableSettingsField();
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
-  const { isCompanySettingsActive } = useCurrentSettingsLevel();
+  const { isCompanySettingsActive, isClientSettingsActive } =
+    useCurrentSettingsLevel();
+
+  const activeSettings = useAtomValue(activeSettingsAtom);
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
 
@@ -254,6 +258,24 @@ export function EInvoice() {
       setIsSaving(false);
     }
   };
+
+  if (isClientSettingsActive) {
+    return (
+      <Settings
+        title={t('e_invoicing')}
+        docsLink="en/advanced-settings/#e_invoice"
+        breadcrumbs={pages}
+        onSaveClick={() => eInvoiceRef?.current?.saveEInvoice()}
+      >
+        <PaymentMeans
+          ref={eInvoiceRef}
+          entity="client"
+          entityId={activeSettings?.id}
+          currentEInvoice={company?.e_invoice || {}}
+        />
+      </Settings>
+    );
+  }
 
   return (
     <Settings

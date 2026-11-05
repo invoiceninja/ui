@@ -18,6 +18,7 @@ import { styled } from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
 import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { useSwitchToCompanySettings } from '$app/common/hooks/useSwitchToCompanySettings';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { $help, HelpWidget } from '$app/components/HelpWidget';
@@ -72,6 +73,7 @@ export function Settings(props: Props) {
   const settingPathNameKey = location.pathname.split('/')[2];
   const { isGroupSettingsActive, isClientSettingsActive } =
     useCurrentSettingsLevel();
+  const showProBadge = useShouldDisableAdvanceSettings();
 
   const navigate = useNavigate();
   const switchToCompanySettings = useSwitchToCompanySettings();
@@ -244,15 +246,17 @@ export function Settings(props: Props) {
                   {t('advanced_settings')}
                 </span>
 
-                <div className="flex space-x-0.5 items-center text-xs py-1 px-2 bg-[#2176FF26] rounded">
-                  <div>
-                    <Sparkle size="1rem" color="#2176FF" />
-                  </div>
+                {showProBadge && (
+                  <div className="flex space-x-0.5 items-center text-xs py-1 px-2 bg-[#2176FF26] rounded">
+                    <div>
+                      <Sparkle size="1rem" color="#2176FF" />
+                    </div>
 
-                  <span className="font-medium" style={{ color: '#2176FF' }}>
-                    {t('pro')}
-                  </span>
-                </div>
+                    <span className="font-medium" style={{ color: '#2176FF' }}>
+                      {t('pro')}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
 

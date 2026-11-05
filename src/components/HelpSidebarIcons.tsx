@@ -10,24 +10,33 @@
 
 import { useQuery } from '@tanstack/react-query';
 import Tippy from '@tippyjs/react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { useFormik } from 'formik';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { Mail } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { FaSlack } from 'react-icons/fa';
+import {
+  MdOutlineAddPhotoAlternate,
+  MdOutlineScreenshotMonitor,
+} from 'react-icons/md';
 import { useDispatch } from 'react-redux';
 import { useColorScheme } from '$app/common/colors';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import {
+  captureScreenshot,
+  isScreenshotSupported,
+} from '$app/common/helpers/screenshot';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useHandleCollapseExpandSidebar } from '$app/common/hooks/useHandleCollapseExpandSidebar';
 import { useHandleDarkLightMode } from '$app/common/hooks/useHandleDarkLightMode';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import {
   resetChanges,
   updateCompanyUsers,
@@ -46,6 +55,7 @@ import { OpenNavbarArrow } from './icons/OpenNavbarArrow';
 import { Sun } from './icons/Sun';
 import { TriangleWarning } from './icons/TriangleWarning';
 import { Modal } from './Modal';
+import { SupportAttachments } from './SupportAttachments';
 import { UpdateAppModal } from './UpdateAppModal';
 
 interface Props {
@@ -89,12 +99,16 @@ export function HelpSidebarIcons(props: Props) {
   });
 
   const [isContactVisible, setIsContactVisible] = useState<boolean>(false);
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [errors, setErrors] = useState<ValidationBag>();
   const [isAboutVisible, setIsAboutVisible] = useState<boolean>(false);
   const [cronsNotEnabledModal, setCronsNotEnabledModal] =
     useState<boolean>(false);
   const [disabledButton, setDisabledButton] = useState<boolean>(false);
   const [isUpdateModalVisible, setIsUpdateModalVisible] =
     useState<boolean>(false);
+
+  const attachmentsInput = useRef<HTMLInputElement>(null);
 
   const isMiniSidebar = Boolean(reactSettings.show_mini_sidebar);
 
@@ -113,15 +127,69 @@ export function HelpSidebarIcons(props: Props) {
     },
     onSubmit: (values) => {
       toast.processing();
+      setErrors(undefined);
 
-      request('POST', endpoint('/api/v1/support/messages/send'), values)
-        .then(() => toast.success('your_message_has_been_received'))
-        .finally(() => {
-          formik.setSubmitting(false);
-          setIsContactVisible(false);
-        });
+      const formData = new FormData();
+
+      formData.append('message', values.message);
+      formData.append('platform', values.platform);
+
+      if (values.send_logs) {
+        formData.append('send_logs', 'true');
+      }
+
+      attachments.forEach((attachment) =>
+        formData.append('attachments[]', attachment)
+      );
+
+      request('POST', endpoint('/api/v1/support/messages/send'), formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+        .then(() => {
+          toast.success('your_message_has_been_received');
+          handleCloseContact();
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            toast.dismiss();
+            setErrors(error.response.data);
+          }
+        })
+        .finally(() => formik.setSubmitting(false));
     },
   });
+
+  const handleCloseContact = () => {
+    setIsContactVisible(false);
+    setAttachments([]);
+    setErrors(undefined);
+    formik.resetForm();
+  };
+
+  const handleTakeScreenshot = () => {
+    setIsContactVisible(false);
+
+    captureScreenshot()
+      .then((screenshot) =>
+        setAttachments((current) => [...current, screenshot])
+      )
+      .catch(() => undefined)
+      .finally(() => setIsContactVisible(true));
+  };
+
+  const handleAddImages = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
+
+    setAttachments((current) => [...current, ...files]);
+
+    event.target.value = '';
+  };
+
+  const handleRemoveAttachment = (index: number) => {
+    setAttachments((current) =>
+      current.filter((_, attachmentIndex) => attachmentIndex !== index)
+    );
+  };
 
   const refreshData = () => {
     setDisabledButton(true);
@@ -150,7 +218,7 @@ export function HelpSidebarIcons(props: Props) {
       <Modal
         title={t('contact_us')}
         visible={isContactVisible}
-        onClose={setIsContactVisible}
+        onClose={handleCloseContact}
         disableClosing
         enableClosingOnXMark
       >
@@ -165,32 +233,92 @@ export function HelpSidebarIcons(props: Props) {
           element="textarea"
           label={t('message')}
           id="message"
+          value={formik.values.message}
           onChange={formik.handleChange}
+          errorMessage={errors?.errors.message}
         />
 
         {isSelfHosted() && (
           <Toggle
             id="send_errors"
             label={t('include_recent_errors')}
+            checked={formik.values.send_logs}
             onChange={(value) => formik.setFieldValue('send_logs', value)}
           />
         )}
 
-        <div className="flex gap-x-4 justify-end">
-          <Button
-            type="secondary"
-            onClick={() => setIsContactVisible(false)}
-            disabled={formik.isSubmitting}
-          >
-            {t('cancel')}
-          </Button>
+        <SupportAttachments
+          attachments={attachments}
+          errors={errors}
+          onRemove={handleRemoveAttachment}
+        />
 
-          <Button
-            onClick={() => formik.submitForm()}
-            disabled={formik.isSubmitting}
-          >
-            {t('send')}
-          </Button>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-x-3">
+            {isScreenshotSupported() && (
+              <Tippy
+                duration={0}
+                content={t('take_screenshot')}
+                className="rounded-md text-xs p-2 bg-[#F2F2F2]"
+              >
+                <button
+                  type="button"
+                  onClick={handleTakeScreenshot}
+                  disabled={formik.isSubmitting}
+                >
+                  <Icon
+                    element={MdOutlineScreenshotMonitor}
+                    size={22}
+                    color={colors.$3}
+                  />
+                </button>
+              </Tippy>
+            )}
+
+            <Tippy
+              duration={0}
+              content={t('add_image')}
+              className="rounded-md text-xs p-2 bg-[#F2F2F2]"
+            >
+              <button
+                type="button"
+                onClick={() => attachmentsInput.current?.click()}
+                disabled={formik.isSubmitting}
+              >
+                <Icon
+                  element={MdOutlineAddPhotoAlternate}
+                  size={22}
+                  color={colors.$3}
+                />
+              </button>
+            </Tippy>
+
+            <input
+              ref={attachmentsInput}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAddImages}
+              multiple
+            />
+          </div>
+
+          <div className="flex gap-x-4">
+            <Button
+              type="secondary"
+              onClick={handleCloseContact}
+              disabled={formik.isSubmitting}
+            >
+              {t('cancel')}
+            </Button>
+
+            <Button
+              onClick={() => formik.submitForm()}
+              disabled={formik.isSubmitting}
+            >
+              {t('send')}
+            </Button>
+          </div>
         </div>
       </Modal>
 
