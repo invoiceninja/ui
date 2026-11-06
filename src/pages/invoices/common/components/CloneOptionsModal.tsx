@@ -24,6 +24,10 @@ import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { CloneOption } from '$app/components/CloneOption';
+import {
+  withLineEntries,
+  withOrderReference,
+} from '$app/components/e-invoice/line-fields/fields';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { FileClock } from '$app/components/icons/FileClock';
 import { Files } from '$app/components/icons/Files';
@@ -82,6 +86,10 @@ export function CloneOptionsModal(props: Props) {
       paid_to_date: 0,
       backup: undefined,
       client: undefined,
+      e_invoice: withOrderReference(
+        invoice.e_invoice,
+        ''
+      ) as Invoice['e_invoice'],
     });
 
     navigate(`${invoicePaths.create}?action=clone`);
@@ -142,6 +150,11 @@ export function CloneOptionsModal(props: Props) {
       partial_due_date: '',
       design_id: company.settings.invoice_design_id,
       client: undefined,
+      e_invoice: withLineEntries(
+        withOrderReference(invoice.e_invoice, ''),
+        'Invoice',
+        []
+      ) as RecurringInvoice['e_invoice'],
     });
 
     navigate('/recurring_invoices/create?action=clone');

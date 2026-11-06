@@ -30,6 +30,7 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
+import { withOrderReference } from '$app/components/e-invoice/line-fields/fields';
 import { Button, InputField, Link } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { EInvoiceComponent } from '$app/pages/settings';
@@ -166,6 +167,26 @@ export default function EInvoice() {
     set(updatedInvoice, property, value);
 
     setInvoice(updatedInvoice);
+  };
+
+  const orderReference =
+    get(invoice, 'e_invoice.Invoice.OrderReference.ID.value') || '';
+
+  const handleOrderReferenceChange = (value: string) => {
+    if (value === orderReference) {
+      return;
+    }
+
+    setInvoice(
+      (current) =>
+        current && {
+          ...current,
+          e_invoice: withOrderReference(
+            current.e_invoice,
+            value
+          ) as Invoice['e_invoice'],
+        }
+    );
   };
 
   const isInvoiceEditable = (invoice?: Invoice): boolean => {
@@ -408,6 +429,25 @@ export default function EInvoice() {
           />
         </Element>
       </Card>
+
+      {company?.settings.e_invoice_type === 'PEPPOL' && (
+        <Card title={t('order_reference')}>
+          <Element
+            leftSide={t('order_number')}
+            leftSideHelp={t('order_reference_help')}
+          >
+            <InputField
+              changeOverride
+              debounceTimeout={0}
+              value={orderReference}
+              onValueChange={handleOrderReferenceChange}
+              errorMessage={
+                errors?.errors?.['e_invoice.OrderReference.ID.value']
+              }
+            />
+          </Element>
+        </Card>
+      )}
     </>
   );
 }

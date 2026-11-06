@@ -27,6 +27,11 @@ import { Invitation } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankInvoiceQuery } from '$app/common/queries/invoices';
 import { Page } from '$app/components/Breadcrumbs';
+import {
+  normalizeLineEntries,
+  withLineIds,
+} from '$app/components/e-invoice/line-fields/fields';
+import { useEInvoiceLinesAlignment } from '$app/components/e-invoice/line-fields/useEInvoiceLinesAlignment';
 import { Default } from '$app/components/layouts/Default';
 import { QuickbooksDepositDisabledAlert } from '$app/components/QuickbooksDepositDisabledAlert';
 import { Spinner } from '$app/components/Spinner';
@@ -104,6 +109,12 @@ export default function Create() {
 
   const { handleChange, calculateInvoiceSum } = useInvoiceUtilities({ client });
 
+  useEInvoiceLinesAlignment({
+    resource: invoice,
+    setResource: setInvoice,
+    root: 'Invoice',
+  });
+
   const save = useHandleCreate({
     setErrors,
     isDefaultTerms,
@@ -153,6 +164,17 @@ export default function Create() {
           company?.settings?.inclusive_taxes ?? false;
 
         value = _invoice;
+      }
+
+      if (value && Array.isArray(value.line_items)) {
+        value = {
+          ...value,
+          line_items: withLineIds(value.line_items),
+          e_invoice: normalizeLineEntries(
+            value.e_invoice,
+            'Invoice'
+          ) as Invoice['e_invoice'],
+        };
       }
 
       return value;

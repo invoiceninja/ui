@@ -111,12 +111,16 @@ export function useHandleCompanySave({ onFinally }: Params = {}) {
         }
 
         !adjustedExcludeToaster && toast.success('updated_settings');
+
+        return true;
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
           setErrors(error.response.data);
           toast.dismiss();
         }
+
+        return false;
       })
       .finally(() => {
         setIsFormBusy(false);
