@@ -11,6 +11,7 @@
 import { useCallback, useEffect } from 'react';
 import { keyboardShortcuts } from '../constants/keyboard-shortcuts';
 import { useInvoiceEditorPaths } from './useInvoiceEditor';
+import { useRecurringInvoiceEditorPaths } from './useRecurringInvoiceEditor';
 import { eventMatchesBinding } from '../helpers/keyboard-shortcuts';
 import { getHeldKeys, useTrackHeldKeys } from './useHeldKeys';
 import { usePreventNavigation } from './usePreventNavigation';
@@ -21,6 +22,7 @@ export function useKeyboardShortcuts() {
   const preventNavigation = usePreventNavigation();
   const bindings = useResolvedShortcuts();
   const invoicePaths = useInvoiceEditorPaths();
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
 
   useTrackHeldKeys();
 
@@ -50,13 +52,15 @@ export function useKeyboardShortcuts() {
             url:
               definition.id === 'create_invoice'
                 ? invoicePaths.create
-                : definition.action.to,
+                : definition.id === 'create_recurring_invoice'
+                  ? recurringInvoicePaths.create
+                  : definition.action.to,
           });
           return;
         }
       }
     },
-    [preventNavigation, bindings, invoicePaths]
+    [preventNavigation, bindings, invoicePaths, recurringInvoicePaths]
   );
 
   useEffect(() => {
