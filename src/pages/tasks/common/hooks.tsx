@@ -202,7 +202,7 @@ export function useTaskColumns() {
         <div className="flex items-center space-x-2">
           <TaskStatus entity={task} />
 
-          {task.invoice_id && (
+          {task.invoice_id && !disableNavigation('invoice', null) && (
             <Tooltip
               width="auto"
               message={t('view_invoice') as string}

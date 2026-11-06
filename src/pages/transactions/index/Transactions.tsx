@@ -36,7 +36,10 @@ import { Guard } from '$app/common/guards/Guard';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { useCustomBulkActions } from '../common/hooks/useCustomBulkActions';
-import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
 import { useActions } from '../common/hooks/useActions';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import {
@@ -61,6 +64,8 @@ export default function Transactions() {
 
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const pages = [{ name: t('transactions'), href: '/transactions' }];
 
@@ -182,26 +187,27 @@ export default function Transactions() {
           ]}
           rightSide={
             <div className="flex items-center space-x-2">
-              {((isHosted() && (proPlan() || enterprisePlan())) ||
-                isSelfHosted()) && (
-                <Button
-                  type="secondary"
-                  onClick={() =>
-                    navigate('/settings/bank_accounts/transaction_rules')
-                  }
-                >
-                  <span className="mr-2">
-                    {
-                      <Icon
-                        element={MdRuleFolder}
-                        size={20}
-                        color={colors.$3}
-                      />
+              {(isAdmin || isOwner) &&
+                ((isHosted() && (proPlan() || enterprisePlan())) ||
+                  isSelfHosted()) && (
+                  <Button
+                    type="secondary"
+                    onClick={() =>
+                      navigate('/settings/bank_accounts/transaction_rules')
                     }
-                  </span>
-                  {t('rules')}
-                </Button>
-              )}
+                  >
+                    <span className="mr-2">
+                      {
+                        <Icon
+                          element={MdRuleFolder}
+                          size={20}
+                          color={colors.$3}
+                        />
+                      }
+                    </span>
+                    {t('rules')}
+                  </Button>
+                )}
 
               <DataTableColumnsPicker
                 table="transaction"

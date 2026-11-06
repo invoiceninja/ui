@@ -19,14 +19,23 @@ import { date, endpoint, trans } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import {
+  Entity,
+  useDisableNavigation,
+} from '$app/common/hooks/useDisableNavigation';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import {
   ActivityRecord,
   ActivityRecordBase,
 } from '$app/common/interfaces/activity-record';
-import { Button, InputField, Link } from '$app/components/forms';
+import { DynamicLink } from '$app/components/DynamicLink';
+import { Button, InputField } from '$app/components/forms';
 import { ArrowRight } from '$app/components/icons/ArrowRight';
 import { SquareActivityChart } from '$app/components/icons/SquareActivityChart';
 import { Modal } from '$app/components/Modal';
@@ -44,6 +53,11 @@ export function useGenerateActivityElement() {
   const [t] = useTranslation();
 
   const colors = useColorScheme();
+
+  const { isAdmin, isOwner } = useAdmin();
+
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
 
   const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -94,101 +108,125 @@ export function useGenerateActivityElement() {
 
     const replacements = {
       client: (
-        <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
+        <DynamicLink
+          to={route('/clients/:id', { id: activity.client?.hashed_id })}
+          renderSpan={disableNavigation('client', null)}
+        >
           {activity.client?.label}
-        </Link>
+        </DynamicLink>
       ),
       contact: (
-        <Link
+        <DynamicLink
           to={route(`/${activity?.contact?.contact_entity}/:id`, {
             id: activity.contact?.hashed_id,
           })}
+          renderSpan={disableNavigation(
+            activity?.contact?.contact_entity === 'vendors'
+              ? 'vendor'
+              : 'client',
+            null
+          )}
         >
           {activity.contact?.label}
-        </Link>
+        </DynamicLink>
       ),
       quote: (
-        <Link to={route('/quotes/:id/edit', { id: activity.quote?.hashed_id })}>
+        <DynamicLink
+          to={route('/quotes/:id/edit', { id: activity.quote?.hashed_id })}
+          renderSpan={disableNavigation('quote', null)}
+        >
           {activity.quote?.label}
-        </Link>
+        </DynamicLink>
       ),
       user: activity.user?.label ?? t('system'),
       expense: (
-        <Link
+        <DynamicLink
           to={route('/expenses/:id/edit', { id: activity.expense?.hashed_id })}
+          renderSpan={disableNavigation('expense', null)}
         >
           {activity?.expense?.label}
-        </Link>
+        </DynamicLink>
       ),
       recurring_invoice: (
-        <Link
+        <DynamicLink
           to={route('/recurring_invoices/:id/edit', {
             id: activity.recurring_invoice?.hashed_id,
           })}
+          renderSpan={disableNavigation('recurring_invoice', null)}
         >
           {activity?.recurring_invoice?.label}
-        </Link>
+        </DynamicLink>
       ),
       recurring_expense: (
-        <Link
+        <DynamicLink
           to={route('/recurring_expenses/:id/edit', {
             id: activity.recurring_expense?.hashed_id,
           })}
+          renderSpan={disableNavigation('recurring_expense', null)}
         >
           {activity?.recurring_expense?.label}
-        </Link>
+        </DynamicLink>
       ),
       purchase_order: (
-        <Link
+        <DynamicLink
           to={route('/purchase_orders/:id/edit', {
             id: activity.purchase_order?.hashed_id,
           })}
+          renderSpan={disableNavigation('purchase_order', null)}
         >
           {activity?.purchase_order?.label}
-        </Link>
+        </DynamicLink>
       ),
       invoice: (
-        <Link
+        <DynamicLink
           to={route(invoicePaths.edit, { id: activity.invoice?.hashed_id })}
+          renderSpan={disableNavigation('invoice', null)}
         >
           {activity?.invoice?.label}
-        </Link>
+        </DynamicLink>
       ),
       payment_amount: activity?.payment_amount?.label,
       payment: (
-        <Link
+        <DynamicLink
           to={route('/payments/:id/edit', { id: activity.payment?.hashed_id })}
+          renderSpan={disableNavigation('payment', null)}
         >
           {activity?.payment?.label}
-        </Link>
+        </DynamicLink>
       ),
       credit: (
-        <Link
+        <DynamicLink
           to={route('/credits/:id/edit', { id: activity.credit?.hashed_id })}
+          renderSpan={disableNavigation('credit', null)}
         >
           {activity?.credit?.label}
-        </Link>
+        </DynamicLink>
       ),
       task: (
-        <Link to={route('/tasks/:id/edit', { id: activity.task?.hashed_id })}>
+        <DynamicLink
+          to={route('/tasks/:id/edit', { id: activity.task?.hashed_id })}
+          renderSpan={disableNavigation('task', null)}
+        >
           {activity?.task?.label}
-        </Link>
+        </DynamicLink>
       ),
       vendor: (
-        <Link
+        <DynamicLink
           to={route('/vendors/:id/edit', { id: activity.vendor?.hashed_id })}
+          renderSpan={!hasPermission('edit_vendor')}
         >
           {activity?.vendor?.label}
-        </Link>
+        </DynamicLink>
       ),
       subscription: (
-        <Link
+        <DynamicLink
           to={route('/settings/subscriptions/:id/edit', {
             id: activity.subscription?.hashed_id,
           })}
+          renderSpan={!isAdmin && !isOwner}
         >
           {activity?.subscription?.label}
-        </Link>
+        </DynamicLink>
       ),
       adjustment: activity?.adjustment?.label,
       notes:
@@ -200,7 +238,7 @@ export function useGenerateActivityElement() {
           <>
             <br />
 
-            <Link
+            <DynamicLink
               to={route(
                 `/${activityEntity}s/${
                   (
@@ -210,9 +248,10 @@ export function useGenerateActivityElement() {
                   ).hashed_id
                 }/edit`
               )}
+              renderSpan={disableNavigation(activityEntity as Entity, null)}
             >
               {activity?.notes}
-            </Link>
+            </DynamicLink>
           </>
         ) : null,
     };

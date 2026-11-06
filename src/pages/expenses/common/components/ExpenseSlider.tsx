@@ -15,6 +15,7 @@ import { route } from '$app/common/helpers/route';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -24,7 +25,7 @@ import { Divider } from '$app/components/cards/Divider';
 import { Slider } from '$app/components/cards/Slider';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
-import { Link } from '$app/components/forms';
+import { DynamicLink } from '$app/components/DynamicLink';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
@@ -77,6 +78,7 @@ export function ExpenseSlider() {
   const resolveCurrency = useResolveCurrency();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
   const calculateExpenseAmount = useCalculateExpenseAmount();
 
   const actions = useActions({
@@ -190,9 +192,12 @@ export function ExpenseSlider() {
                   noExternalPadding
                   style={{ borderColor: colors.$20 }}
                 >
-                  <Link to={route('/vendors/:id', { id: expense.vendor_id })}>
+                  <DynamicLink
+                    to={route('/vendors/:id', { id: expense.vendor_id })}
+                    renderSpan={disableNavigation('vendor', expense.vendor)}
+                  >
                     {expense.vendor.name}
-                  </Link>
+                  </DynamicLink>
                 </Element>
               )}
 
@@ -205,9 +210,12 @@ export function ExpenseSlider() {
                   noExternalPadding
                   style={{ borderColor: colors.$20 }}
                 >
-                  <Link to={route('/clients/:id', { id: expense.client_id })}>
+                  <DynamicLink
+                    to={route('/clients/:id', { id: expense.client_id })}
+                    renderSpan={disableNavigation('client', expense.client)}
+                  >
                     {expense.client.display_name}
-                  </Link>
+                  </DynamicLink>
                 </Element>
               )}
 

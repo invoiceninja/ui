@@ -85,21 +85,27 @@ export const useGenerateActivityElement = () => {
   const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
+  const disableNavigation = useDisableNavigation();
+
   return (activity: RecurringInvoiceActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
     const replacements = {
       client: (
-        <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
+        <DynamicLink
+          to={route('/clients/:id', { id: activity.client?.hashed_id })}
+          renderSpan={disableNavigation('client', null)}
+        >
           {activity.client?.label}
-        </Link>
+        </DynamicLink>
       ),
       invoice: (
-        <Link
+        <DynamicLink
           to={route(invoicePaths.edit, { id: activity?.invoice?.hashed_id })}
+          renderSpan={disableNavigation('invoice', null)}
         >
           {activity?.invoice?.label}
-        </Link>
+        </DynamicLink>
       ),
       user: activity.user?.label ?? t('system'),
       recurring_invoice: (

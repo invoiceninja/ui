@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import { PurchaseOrderStatus } from '$app/common/enums/purchase-order-status';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
@@ -41,6 +42,7 @@ export function useCustomBulkActions() {
 
   const navigate = useNavigate();
 
+  const hasPermission = useHasPermission();
   const disableNavigation = useDisableNavigation();
 
   const bulk = useBulk();
@@ -156,7 +158,8 @@ export function useCustomBulkActions() {
       ),
     ({ selectedIds, selectedResources, setSelected }) =>
       selectedResources &&
-      showConvertToExpenseAction(selectedResources) && (
+      showConvertToExpenseAction(selectedResources) &&
+      hasPermission('create_expense') && (
         <DropdownElement
           onClick={() => {
             bulk(selectedIds, 'expense');

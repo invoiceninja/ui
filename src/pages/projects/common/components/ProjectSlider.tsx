@@ -15,6 +15,7 @@ import { route } from '$app/common/helpers/route';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -91,6 +92,7 @@ export function ProjectSlider() {
   const formatNumber = useFormatNumber();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
 
   const actions = useActions({
     showEditAction: true,
@@ -286,6 +288,10 @@ export function ProjectSlider() {
                   <Box
                     className="flex items-center justify-between p-4 shadow-sm border w-full cursor-pointer rounded-md"
                     onClick={() => {
+                      if (disableNavigation('client', currentProject.client)) {
+                        return;
+                      }
+
                       onClose();
                       navigate(
                         route('/clients/:id', {
@@ -306,11 +312,13 @@ export function ProjectSlider() {
                       {currentProject.client.display_name}
                     </span>
 
-                    <Icon
-                      element={ChevronRight}
-                      size={18}
-                      color={colors.$17}
-                    />
+                    {!disableNavigation('client', currentProject.client) && (
+                      <Icon
+                        element={ChevronRight}
+                        size={18}
+                        color={colors.$17}
+                      />
+                    )}
                   </Box>
                 </div>
               </>
@@ -333,6 +341,10 @@ export function ProjectSlider() {
                       key={task.id}
                       className="flex items-center justify-between p-4 shadow-sm border w-full cursor-pointer rounded-md"
                       onClick={() => {
+                        if (disableNavigation('task', task)) {
+                          return;
+                        }
+
                         onClose();
                         navigate(route('/tasks/:id/edit', { id: task.id }));
                       }}
@@ -360,11 +372,13 @@ export function ProjectSlider() {
                           })}
                         </span>
 
-                        <Icon
-                          element={ChevronRight}
-                          size={18}
-                          color={colors.$17}
-                        />
+                        {!disableNavigation('task', task) && (
+                          <Icon
+                            element={ChevronRight}
+                            size={18}
+                            color={colors.$17}
+                          />
+                        )}
                       </div>
                     </Box>
                   ))}

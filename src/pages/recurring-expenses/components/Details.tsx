@@ -11,6 +11,7 @@
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
@@ -63,6 +64,7 @@ export function Details(props: Props) {
   const colors = useColorScheme();
   const company = useCurrentCompany();
   const [searchParams] = useSearchParams();
+  const disableNavigation = useDisableNavigation();
 
   const { recurringExpense, handleChange, taxInputType, pageType, errors } =
     props;
@@ -136,16 +138,17 @@ export function Details(props: Props) {
               <div className="flex items-center space-x-2">
                 <span>{t('vendor')}</span>
 
-                {recurringExpense.vendor_id && (
-                  <Link
-                    to={route('/vendors/:id', {
-                      id: recurringExpense.vendor_id,
-                    })}
-                    target="_blank"
-                  >
-                    <Icon element={MdLaunch} size={18} />
-                  </Link>
-                )}
+                {recurringExpense.vendor_id &&
+                  !disableNavigation('vendor', recurringExpense.vendor) && (
+                    <Link
+                      to={route('/vendors/:id', {
+                        id: recurringExpense.vendor_id,
+                      })}
+                      target="_blank"
+                    >
+                      <Icon element={MdLaunch} size={18} />
+                    </Link>
+                  )}
               </div>
             }
           >
@@ -183,16 +186,17 @@ export function Details(props: Props) {
               <div className="flex items-center space-x-2">
                 <span>{t('project')}</span>
 
-                {recurringExpense.project_id && (
-                  <Link
-                    to={route('/projects/:id', {
-                      id: recurringExpense.project_id,
-                    })}
-                    target="_blank"
-                  >
-                    <Icon element={MdLaunch} size={18} />
-                  </Link>
-                )}
+                {recurringExpense.project_id &&
+                  !disableNavigation('project', null) && (
+                    <Link
+                      to={route('/projects/:id', {
+                        id: recurringExpense.project_id,
+                      })}
+                      target="_blank"
+                    >
+                      <Icon element={MdLaunch} size={18} />
+                    </Link>
+                  )}
               </div>
             }
           >

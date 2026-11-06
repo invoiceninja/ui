@@ -10,8 +10,10 @@
 
 import { Link } from '$app/components/forms';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Client } from '$app/common/interfaces/client';
+import { DynamicLink } from '$app/components/DynamicLink';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 import { useGetSettingWithLevel } from '$app/common/hooks/useGetSetting';
@@ -38,6 +40,8 @@ export function Details(props: Props) {
 
   const colors = useColorScheme();
   const company = useCurrentCompany();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const getSettingWithLevel = useGetSettingWithLevel();
   const formatMoney = useFormatMoney();
@@ -146,14 +150,15 @@ export function Details(props: Props) {
                 </span>
 
                 <span data-cy="clientGroupSettingsName">
-                  <Link
+                  <DynamicLink
                     className="font-medium"
                     to={route('/settings/group_settings/:id/edit', {
                       id: client.group_settings_id,
                     })}
+                    renderSpan={!isAdmin && !isOwner}
                   >
                     {client.group_settings?.name}
-                  </Link>
+                  </DynamicLink>
                 </span>
               </div>
             )}

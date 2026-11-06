@@ -280,7 +280,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value, invoice) => (
         <DynamicLink
           to={route('/projects/:id', { id: invoice.project_id })}
-          renderSpan={disableNavigation('invoice', invoice.project)}
+          renderSpan={disableNavigation('project', invoice.project)}
         >
           {invoice?.project?.name ?? ''}
         </DynamicLink>

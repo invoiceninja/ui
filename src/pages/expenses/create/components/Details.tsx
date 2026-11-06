@@ -39,6 +39,7 @@ import { getTaxRateComboValue } from '$app/common/helpers/tax-rates/tax-rates-co
 import { useColorScheme } from '$app/common/colors';
 import { ExternalLink } from '$app/components/icons/ExternalLink';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { TagPillSelector } from '$app/components/tags/TagPillSelector';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 
@@ -66,6 +67,7 @@ export function Details(props: Props) {
   const colors = useColorScheme();
   const accentColor = useAccentColor();
   const company = useCurrentCompany();
+  const disableNavigation = useDisableNavigation();
 
   const { data: taxes } = useTaxRatesQuery({ status: ['active'] });
 
@@ -147,17 +149,20 @@ export function Details(props: Props) {
           </>
         )}
 
-        {expense && pageType === 'edit' && expense.transaction_id && (
-          <Element leftSide={t('transaction')}>
-            <LinkBase
-              to={route('/transactions/:id/edit', {
-                id: expense.transaction_id,
-              })}
-            >
-              {t('view')}
-            </LinkBase>
-          </Element>
-        )}
+        {expense &&
+          pageType === 'edit' &&
+          expense.transaction_id &&
+          !disableNavigation('bank_transaction', null) && (
+            <Element leftSide={t('transaction')}>
+              <LinkBase
+                to={route('/transactions/:id/edit', {
+                  id: expense.transaction_id,
+                })}
+              >
+                {t('view')}
+              </LinkBase>
+            </Element>
+          )}
 
         {expense && (
           <Element
@@ -165,18 +170,19 @@ export function Details(props: Props) {
               <div className="flex items-center space-x-2">
                 <span>{t('vendor')}</span>
 
-                {expense.vendor_id && (
-                  <Link
-                    to={route('/vendors/:id', {
-                      id: expense.vendor_id,
-                    })}
-                    target="_blank"
-                  >
-                    <div>
-                      <ExternalLink color={accentColor} size="1.1rem" />
-                    </div>
-                  </Link>
-                )}
+                {expense.vendor_id &&
+                  !disableNavigation('vendor', expense.vendor) && (
+                    <Link
+                      to={route('/vendors/:id', {
+                        id: expense.vendor_id,
+                      })}
+                      target="_blank"
+                    >
+                      <div>
+                        <ExternalLink color={accentColor} size="1.1rem" />
+                      </div>
+                    </Link>
+                  )}
               </div>
             }
           >
@@ -213,18 +219,19 @@ export function Details(props: Props) {
               <div className="flex items-center space-x-2">
                 <span>{t('project')}</span>
 
-                {expense.project_id && (
-                  <Link
-                    to={route('/projects/:id', {
-                      id: expense.project_id,
-                    })}
-                    target="_blank"
-                  >
-                    <div>
-                      <ExternalLink color={accentColor} size="1.1rem" />
-                    </div>
-                  </Link>
-                )}
+                {expense.project_id &&
+                  !disableNavigation('project', expense.project) && (
+                    <Link
+                      to={route('/projects/:id', {
+                        id: expense.project_id,
+                      })}
+                      target="_blank"
+                    >
+                      <div>
+                        <ExternalLink color={accentColor} size="1.1rem" />
+                      </div>
+                    </Link>
+                  )}
               </div>
             }
           >
