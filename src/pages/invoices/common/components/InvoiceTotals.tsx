@@ -9,7 +9,7 @@
  */
 
 import classNames from 'classnames';
-import { Fragment, useRef } from 'react';
+import { Fragment, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdWarning } from 'react-icons/md';
 import reactStringReplace from 'react-string-replace';
@@ -36,6 +36,7 @@ interface Props {
   invoiceSum?: InvoiceSum | InvoiceSumInclusive;
   relationType: RelationType;
   onChange: (property: keyof ProductTableResource, value: unknown) => unknown;
+  children?: ReactNode;
 }
 
 export function InvoiceTotals(props: Props) {
@@ -431,6 +432,8 @@ export function InvoiceTotals(props: Props) {
               )}
             </Fragment>
           ))}
+
+          {props.children}
         </div>
       </div>
     </Card>
