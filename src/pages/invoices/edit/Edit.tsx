@@ -48,6 +48,10 @@ import { invoiceSumAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
+import {
+  InvoicePayment,
+  InvoicePaymentParams,
+} from '../common/components/InvoicePayment';
 import { InvoicePreview } from '../common/components/InvoicePreview';
 import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
@@ -68,6 +72,8 @@ export interface Context {
   setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
   errors: ValidationBag | undefined;
   client: Client | undefined;
+  payment: InvoicePaymentParams | undefined;
+  setPayment: Dispatch<SetStateAction<InvoicePaymentParams | undefined>>;
 }
 
 export default function Edit() {
@@ -87,6 +93,8 @@ export default function Edit() {
     setIsDefaultFooter,
     errors,
     client,
+    payment,
+    setPayment,
   } = context;
 
   const taskColumns = useTaskColumns();
@@ -380,7 +388,13 @@ export default function Edit() {
             onChange={(property, value) =>
               handleChange(property, value as string)
             }
-          />
+          >
+            <InvoicePayment
+              invoice={invoice}
+              payment={payment}
+              setPayment={setPayment}
+            />
+          </InvoiceTotals>
         )}
       </div>
 
