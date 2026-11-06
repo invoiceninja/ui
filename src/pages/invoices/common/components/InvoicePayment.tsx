@@ -66,6 +66,7 @@ export function InvoicePayment(props: Props) {
         withoutWrappingLeftSide
       >
         <Toggle
+          cypressRef="invoiceEnterPaymentToggle"
           checked={Boolean(payment)}
           onValueChange={(value) =>
             setPayment(value ? { paid: true } : undefined)
@@ -75,8 +76,12 @@ export function InvoicePayment(props: Props) {
 
       {payment && (
         <Element leftSide={t('amount')} noExternalPadding>
-          <div className="flex flex-col gap-y-2 w-full">
+          <div
+            className="flex flex-col gap-y-2 w-full"
+            data-cy="invoicePaymentAmountFields"
+          >
             <SelectField
+              cypressRef="invoicePaymentAmountType"
               value={payment.paid ? 'paid_in_full' : 'partial_payment'}
               onValueChange={handleAmountTypeChange}
               customSelector
@@ -89,6 +94,7 @@ export function InvoicePayment(props: Props) {
 
             {!payment.paid && (
               <NumberInputField
+                cypressRef="invoicePaymentAmount"
                 value={payment.amount_paid ?? ''}
                 onValueChange={(value) =>
                   setPayment((current) => ({
@@ -105,6 +111,7 @@ export function InvoicePayment(props: Props) {
       {payment && (
         <Element leftSide={t('transaction_reference')} noExternalPadding>
           <InputField
+            cypressRef="invoicePaymentReference"
             value={payment.reference ?? ''}
             onValueChange={(value) =>
               setPayment((current) => ({ ...current, reference: value }))
