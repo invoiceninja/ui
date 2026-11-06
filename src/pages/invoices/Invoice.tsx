@@ -45,6 +45,7 @@ import { EInvoiceComponent } from '../settings';
 import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { invoiceAtom } from './common/atoms';
 import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
+import { InvoicePaymentParams } from './common/components/InvoicePayment';
 import { useTabs } from './common/hooks/useTabs';
 import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
 import { useActions } from './edit/components/Actions';
@@ -99,6 +100,7 @@ export default function Invoice() {
   const [saveChanges, setSaveChanges] = useState<boolean>(false);
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
+  const [payment, setPayment] = useState<InvoicePaymentParams>();
 
   const save = useHandleSave({
     setErrors,
@@ -106,6 +108,8 @@ export default function Invoice() {
     isDefaultFooter,
     isFormBusy,
     setIsFormBusy,
+    payment,
+    setPayment,
   });
 
   const tabs = useTabs({
@@ -140,6 +144,10 @@ export default function Invoice() {
       }
     }
   }, [data]);
+
+  useEffect(() => {
+    setPayment(undefined);
+  }, [id]);
 
   useEffect(() => {
     invoice && calculateInvoiceSum(invoice);
@@ -258,6 +266,8 @@ export default function Invoice() {
                   eInvoiceValidationEntityResponse: validationResponse,
                   triggerValidationQuery,
                   setTriggerValidationQuery,
+                  payment,
+                  setPayment,
                 }}
               />
             </div>

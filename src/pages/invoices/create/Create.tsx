@@ -33,6 +33,7 @@ import { Spinner } from '$app/components/Spinner';
 import { Tab, Tabs } from '$app/components/Tabs';
 import { invoiceAtom, invoiceSumAtom } from '../common/atoms';
 import { AddUninvoicedItemsButton } from '../common/components/AddUninvoicedItemsButton';
+import { InvoicePaymentParams } from '../common/components/InvoicePayment';
 import { useHandleCreate } from './hooks/useHandleCreate';
 import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
 
@@ -51,6 +52,8 @@ export interface CreateInvoiceContext {
   errors: ValidationBag | undefined;
   client: Client | undefined;
   invoiceSum: InvoiceSum | InvoiceSumInclusive | undefined;
+  payment: InvoicePaymentParams | undefined;
+  setPayment: Dispatch<SetStateAction<InvoicePaymentParams | undefined>>;
 }
 
 export default function Create() {
@@ -74,6 +77,7 @@ export default function Create() {
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
+  const [payment, setPayment] = useState<InvoicePaymentParams>();
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -106,6 +110,7 @@ export default function Create() {
     isDefaultFooter,
     isFormBusy,
     setIsFormBusy,
+    payment,
   });
 
   useEffect(() => {
@@ -282,6 +287,8 @@ export default function Create() {
                 setIsDefaultFooter,
                 client,
                 invoiceSum,
+                payment,
+                setPayment,
               }}
             />
           </div>

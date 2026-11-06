@@ -22,6 +22,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { InvoicePaymentParams } from '../../common/components/InvoicePayment';
 import { isDeleteActionTriggeredAtom } from '../../common/components/ProductsTable';
 
 interface Params {
@@ -30,6 +31,7 @@ interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
   isFormBusy: boolean;
   setIsFormBusy: Dispatch<SetStateAction<boolean>>;
+  payment: InvoicePaymentParams | undefined;
 }
 export function useHandleCreate(params: Params) {
   const navigate = useNavigate();
@@ -41,6 +43,7 @@ export function useHandleCreate(params: Params) {
     isDefaultFooter,
     setIsFormBusy,
     isFormBusy,
+    payment,
   } = params;
 
   const refreshCompanyUsers = useRefreshCompanyUsers();
@@ -69,7 +72,7 @@ export function useHandleCreate(params: Params) {
       apiEndpoint += 'save_default_footer=true';
     }
 
-    request('POST', endpoint(apiEndpoint), invoice)
+    request('POST', endpoint(apiEndpoint), { ...invoice, ...payment })
       .then(async (response: GenericSingleResourceResponse<Invoice>) => {
         if (isDefaultTerms || isDefaultFooter) {
           await refreshCompanyUsers();
@@ -78,6 +81,10 @@ export function useHandleCreate(params: Params) {
         toast.success('created_invoice');
 
         $refetch(['products', 'tasks']);
+
+        if (payment) {
+          $refetch(['payments']);
+        }
 
         if (searchParams.get('action') === 'invoice_expense') {
           $refetch(['expenses']);
