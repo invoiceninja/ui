@@ -8,7 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { cloneDeep, get, isEmpty, isEqual, isPlainObject, set } from 'lodash';
+import {
+  castArray,
+  cloneDeep,
+  get,
+  isEmpty,
+  isEqual,
+  isPlainObject,
+  omit,
+  set,
+} from 'lodash';
 import { v4 } from 'uuid';
 import {
   InvoiceItem,
@@ -39,7 +48,7 @@ export const E_INVOICE_LINE_FIELDS: EInvoiceLineCatalogField[] = [
     key: 'order_line_reference',
     label: 'order_line_reference',
     help: 'order_line_reference_help',
-    path: 'OrderLineReference.LineID',
+    path: 'OrderLineReference.0.LineID',
   },
   {
     key: 'buyer_item_identifier',
@@ -115,7 +124,7 @@ const collectLeaves = (value: unknown, path = ''): Leaf[] => {
 
 const findCatalogField = (path: string) => {
   return E_INVOICE_LINE_FIELDS.find(
-    (field) => field.path === withoutIndexes(path)
+    (field) => withoutIndexes(field.path) === withoutIndexes(path)
   );
 };
 
@@ -207,6 +216,17 @@ const asObject = (value: unknown): EInvoiceLineEntry => {
   return isPlainObject(value) ? cloneDeep(value as EInvoiceLineEntry) : {};
 };
 
+const toLineEntry = (entry: EInvoiceLineEntry): EInvoiceLineEntry => {
+  const references = castArray(entry.OrderLineReference)
+    .filter(isPlainObject)
+    .map((reference) => omit(reference as EInvoiceLineEntry, 'OrderReference'))
+    .filter((reference) => !isEmpty(reference));
+
+  return references.length
+    ? { ...entry, OrderLineReference: references }
+    : omit(entry, 'OrderLineReference');
+};
+
 export const withLineIds = (lineItems: InvoiceItem[]): InvoiceItem[] => {
   return lineItems.map((lineItem) =>
     lineItem._id ? lineItem : { ...lineItem, _id: v4() }
@@ -214,7 +234,7 @@ export const withLineIds = (lineItems: InvoiceItem[]): InvoiceItem[] => {
 };
 
 export const getLineTemplate = (eInvoice: unknown): EInvoiceLineEntry => {
-  return toEntries(get(eInvoice, 'Invoice.InvoiceLine'))[0] ?? {};
+  return toLineEntry(toEntries(get(eInvoice, 'Invoice.InvoiceLine'))[0] ?? {});
 };
 
 export const getTemplateFields = (
@@ -239,7 +259,7 @@ export const isTemplateFieldEnabled = (
   field: EInvoiceLineCatalogField
 ) => {
   return collectLeaves(template).some(
-    (leaf) => withoutIndexes(leaf.path) === field.path
+    (leaf) => withoutIndexes(leaf.path) === withoutIndexes(field.path)
   );
 };
 
@@ -291,7 +311,7 @@ export const getLineEntries = (
   eInvoice: unknown,
   root: EInvoiceLinesRoot
 ): EInvoiceLineEntry[] => {
-  return toEntries(get(eInvoice, [root, LINE_KEYS[root]]));
+  return toEntries(get(eInvoice, [root, LINE_KEYS[root]])).map(toLineEntry);
 };
 
 export const getEntryFields = (
@@ -363,6 +383,28 @@ export const withCreditReference = (
   return next;
 };
 
+export const withOrderReference = (eInvoice: unknown, value: string) => {
+  const next = asObject(eInvoice);
+  const invoice = asObject(next.Invoice);
+
+  if (value.trim()) {
+    invoice.OrderReference = {
+      ...asObject(invoice.OrderReference),
+      ID: { value },
+    };
+  } else {
+    delete invoice.OrderReference;
+  }
+
+  if (isEmpty(invoice)) {
+    delete next.Invoice;
+  } else {
+    next.Invoice = invoice;
+  }
+
+  return next;
+};
+
 export const normalizeLineEntries = (
   eInvoice: unknown,
   root: EInvoiceLinesRoot
@@ -398,7 +440,7 @@ export const setLineValue = (
     next.push({});
   }
 
-  if (isBlank(value)) {
+  if (isBlank(value.trim())) {
     removePath(next[index], field.valuePath);
   } else {
     set(next[index], field.valuePath, value);
