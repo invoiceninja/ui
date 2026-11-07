@@ -36,6 +36,7 @@ const EXPENSE_REPORT_STATUSES = [
   'invoiced',
   'paid',
   'unpaid',
+  'uncategorized',
 ];
 
 export function StatusSelector(props: Props) {
