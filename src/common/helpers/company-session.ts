@@ -61,6 +61,14 @@ export function setTabCompany(index: number, token: string): void {
   sessionStorage.setItem(TOKEN, token);
 }
 
+/**
+ * Signs this tab in with [token] before its company is known (the embedded
+ * page's handshake): the index follows once the account loads.
+ */
+export function setTabToken(token: string): void {
+  sessionStorage.setItem(TOKEN, token);
+}
+
 /** Returns this tab to the company shared by every tab. */
 export function clearTabCompany(): void {
   COMPANY_KEYS.forEach((key) => sessionStorage.removeItem(key));

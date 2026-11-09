@@ -38,6 +38,7 @@ import {
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { LuTrash } from 'react-icons/lu';
+import { isEmbedded } from '$app/common/helpers/embed';
 import { Alert } from '$app/components/Alert';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
@@ -308,6 +309,12 @@ export function ImportFromGoogleDrive({
   isSubmitting,
 }: ImportFromButtonProps) {
   const [t] = useTranslation();
+
+  // Google refuses its sign-in inside an app's web view, so the Drive
+  // import cannot work embedded (`common/helpers/embed.ts`).
+  if (isEmbedded()) {
+    return null;
+  }
 
   return (
     <Button

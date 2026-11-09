@@ -13,6 +13,7 @@ import { defaultHeaders } from '$app/common/queries/common/headers';
 import { checkJsonObject } from '../helpers';
 import { $refetch } from '../hooks/useRefetch';
 import { ValidationBag } from '../interfaces/validation-bag';
+import { isEmbedded, postToHost } from './embed';
 import { clearLocalStorage } from './local-storage';
 import { toast } from './toast/toast';
 
@@ -83,6 +84,19 @@ client.interceptors.response.use(
     }
 
     if (error.response?.status === 429 || error.response?.status === 401) {
+      // Embedded, a reload would boot with the same token and fail the same
+      // way, forever. A 401 is a sign-in the host app must answer; a 429 is
+      // only a moment's rate limit, so the page carries on.
+      if (isEmbedded()) {
+        if (error.response.status === 401) {
+          postToHost('error', { status: 401 });
+        } else {
+          toast.error('error_title');
+        }
+
+        return Promise.reject(error);
+      }
+
       window.location.reload();
       clearLocalStorage();
     }

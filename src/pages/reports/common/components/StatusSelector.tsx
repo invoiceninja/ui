@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MultiValue } from 'react-select';
 import { SelectOption } from '$app/components/datatables/Actions';
@@ -30,6 +29,16 @@ interface Props {
   onValueChange: (status: string) => void;
   errorMessage?: string[] | string;
 }
+
+const EXPENSE_REPORT_STATUSES = [
+  'logged',
+  'pending',
+  'invoiced',
+  'paid',
+  'unpaid',
+  'uncategorized',
+];
+
 export function StatusSelector(props: Props) {
   const [t] = useTranslation();
 
@@ -44,8 +53,6 @@ export function StatusSelector(props: Props) {
   const purchaseOrderFilters = usePurchaseOrderFilters();
   const recurringInvoiceFilters = useRecurringInvoiceFilters();
 
-  const [options, setOptions] = useState<SelectOption[]>([]);
-
   const handleStatusChange = (
     statuses: MultiValue<{ value: string; label: string }>
   ) =>
@@ -53,39 +60,45 @@ export function StatusSelector(props: Props) {
       .map((option: { value: string; label: string }) => option.value)
       .join(',');
 
-  useEffect(() => {
+  const getOptions = (): SelectOption[] => {
     if (report === 'invoice' || report === 'invoice_item') {
-      setOptions(invoiceFilters);
+      return invoiceFilters;
     }
 
     if (report === 'credit') {
-      setOptions(creditFilters);
+      return creditFilters;
     }
 
     if (report === 'expense') {
-      setOptions(expenseFilters);
+      return expenseFilters.filter((option) =>
+        EXPENSE_REPORT_STATUSES.includes(option.value)
+      );
     }
 
     if (report === 'purchase_order' || report === 'purchase_order_item') {
-      setOptions(purchaseOrderFilters);
+      return purchaseOrderFilters;
     }
 
     if (report === 'quote' || report === 'quote_item') {
-      setOptions(quoteFilters);
+      return quoteFilters;
     }
 
     if (report === 'recurring_invoice' || report === 'recurring_invoice_item') {
-      setOptions(recurringInvoiceFilters);
+      return recurringInvoiceFilters;
     }
 
     if (report === 'payment') {
-      setOptions(paymentFilters);
+      return paymentFilters;
     }
 
     if (report === 'task') {
-      setOptions(taskFilters);
+      return taskFilters;
     }
-  }, [report]);
+
+    return [];
+  };
+
+  const options = getOptions();
 
   return (
     <>
