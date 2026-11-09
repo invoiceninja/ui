@@ -180,7 +180,6 @@ export default function CreatePage() {
                 root="Invoice"
                 fields={eInvoiceLineFields}
                 client={client}
-                errors={errors}
                 onChange={(eInvoice) => handleChange('e_invoice', eInvoice)}
               />
             ) : (

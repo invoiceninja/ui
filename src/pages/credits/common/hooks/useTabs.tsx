@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { route } from '$app/common/helpers/route';
@@ -15,6 +16,7 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Credit } from '$app/common/interfaces/credit';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Tab } from '$app/components/Tabs';
 import { ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
@@ -22,9 +24,14 @@ import { ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/h
 interface Params {
   credit: Credit | undefined;
   eInvoiceValidationResponse?: ValidationEntityResponse | undefined;
+  errors?: ValidationBag;
 }
 
-export function useTabs({ credit, eInvoiceValidationResponse }: Params) {
+export function useTabs({
+  credit,
+  eInvoiceValidationResponse,
+  errors,
+}: Params) {
   const [t] = useTranslation();
 
   const { id } = useParams();
@@ -38,6 +45,11 @@ export function useTabs({ credit, eInvoiceValidationResponse }: Params) {
     hasPermission('edit_credit') ||
     entityAssigned(credit);
 
+  const hasEInvoiceErrors = Object.keys(errors?.errors ?? {}).some(
+    (key) =>
+      key.startsWith('e_invoice') && !key.startsWith('e_invoice.CreditNoteLine')
+  );
+
   const tabs: Tab[] = [
     {
       name: t('edit'),
@@ -50,7 +62,11 @@ export function useTabs({ credit, eInvoiceValidationResponse }: Params) {
         company?.settings.enable_e_invoice === true ||
         company?.settings.e_invoice_type === 'PEPPOL',
       formatName: () => (
-        <div className="flex space-x-1">
+        <div
+          className={classNames('flex space-x-1', {
+            'text-red-500': hasEInvoiceErrors,
+          })}
+        >
           <span>{t('e_invoice')}</span>
 
           {Boolean(

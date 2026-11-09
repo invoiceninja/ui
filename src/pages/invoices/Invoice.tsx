@@ -123,6 +123,7 @@ export default function Invoice() {
   const tabs = useTabs({
     invoice,
     eInvoiceValidationResponse: validationResponse,
+    errors,
   });
 
   const pages: Page[] = [

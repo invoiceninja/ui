@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { get } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
@@ -21,9 +20,7 @@ import {
   InvoiceItem,
   InvoiceItemType,
 } from '$app/common/interfaces/invoice-item';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { InputField, InputLabel, Link } from '$app/components/forms';
-import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
+import { InputField, Link } from '$app/components/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { EInvoiceType } from '$app/pages/settings';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
@@ -35,13 +32,11 @@ import {
   getLineValue,
   getTemplateFields,
   setLineValue,
-  withCreditReference,
   withLineEntries,
 } from './fields';
 
 export interface EInvoiceLinesResource {
   id?: string;
-  client_id?: string;
   line_items: InvoiceItem[];
   e_invoice?: unknown;
 }
@@ -51,12 +46,9 @@ interface Props {
   root: EInvoiceLinesRoot;
   fields: EInvoiceLineField[];
   client?: Client;
-  errors?: ValidationBag;
   onChange: (eInvoice: EInvoiceType) => unknown;
   className?: string;
 }
-
-const REFERENCE_PATH = 'CreditNote.BillingReference.0.InvoiceDocumentReference';
 
 export function EInvoiceLines(props: Props) {
   const [t] = useTranslation();
@@ -69,7 +61,7 @@ export function EInvoiceLines(props: Props) {
 
   const { isAdmin, isOwner } = useAdmin();
 
-  const { resource, root, fields, client, errors, onChange, className } = props;
+  const { resource, root, fields, client, onChange, className } = props;
 
   const isHidden = Boolean(className?.split(' ').includes('hidden'));
 
@@ -91,14 +83,6 @@ export function EInvoiceLines(props: Props) {
     getLineTemplate(company?.e_invoice)
   ).map((field) => field.key);
 
-  const isCreditReferenceMissing =
-    root === 'CreditNote' && !get(resource.e_invoice, `${REFERENCE_PATH}.ID`);
-
-  const referenceError =
-    errors?.errors?.[
-      'e_invoice.BillingReference.0.InvoiceDocumentReference.ID'
-    ];
-
   const handleValueChange = (
     index: number,
     field: EInvoiceLineField,
@@ -113,20 +97,6 @@ export function EInvoiceLines(props: Props) {
         resource.e_invoice,
         root,
         setLineValue(entries, index, field, value)
-      ) as unknown as EInvoiceType
-    );
-  };
-
-  const handleReferenceChange = (number: string, date: string) => {
-    if (!number && !get(resource.e_invoice, 'CreditNote.BillingReference')) {
-      return;
-    }
-
-    onChange(
-      withCreditReference(
-        resource.e_invoice,
-        number,
-        date
       ) as unknown as EInvoiceType
     );
   };
@@ -149,28 +119,6 @@ export function EInvoiceLines(props: Props) {
   return (
     <div className={className}>
       <div className="flex flex-col space-y-3">
-        {root === 'CreditNote' && (
-          <div className="flex flex-col space-y-2 max-w-md">
-            <InputLabel>{t('invoice')}</InputLabel>
-
-            <InvoiceSelector
-              clientId={resource.client_id}
-              value={get(resource.e_invoice, `${REFERENCE_PATH}.ID`, '')}
-              onChange={(invoice) =>
-                handleReferenceChange(invoice.number, invoice.date)
-              }
-              onClearButtonClick={() => handleReferenceChange('', '')}
-              errorMessage={referenceError}
-            />
-
-            {isCreditReferenceMissing && (
-              <span className="text-xs" style={{ color: colors.$22 }}>
-                {t('e_invoice_lines_credit_reference_help')}
-              </span>
-            )}
-          </div>
-        )}
-
         {(isAdmin || isOwner) && (
           <div className="flex justify-end">
             <Link to="/settings/e_invoice" className="whitespace-nowrap">

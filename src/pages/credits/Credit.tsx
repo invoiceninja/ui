@@ -105,6 +105,7 @@ export default function Credit() {
   const tabs = useTabs({
     credit,
     eInvoiceValidationResponse: validationResponse,
+    errors,
   });
 
   const { calculateInvoiceSum } = useCreditUtilities({ client });

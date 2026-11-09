@@ -31,7 +31,7 @@ export function EInvoiceLinesTabLabel(props: Props) {
   const count = countLinesWithValues(getLineEntries(eInvoice, root));
 
   const hasErrors = Object.keys(errors?.errors ?? {}).some((key) =>
-    key.startsWith('e_invoice')
+    key.startsWith(`e_invoice.${root}Line`)
   );
 
   return (
