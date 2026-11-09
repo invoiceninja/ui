@@ -20,6 +20,7 @@ import {
   hasTabCompany,
   setTabCompany,
 } from '$app/common/helpers/company-session';
+import { isEmbedded } from '$app/common/helpers/embed';
 import { request } from '$app/common/helpers/request';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
@@ -79,11 +80,10 @@ export function useAuthenticated(): boolean {
           // A link to another company pins only this tab to it; the token has
           // to change with the index, since the token is what the server
           // scopes every request by.
-          if (fromUrl && currentIndex !== tabIndex) {
-            setTabCompany(
-              currentIndex,
-              companyUsers[currentIndex].token.token
-            );
+          // Embedded, the tab always holds its own company, even when the URL
+          // names the one the account would open anyway.
+          if (fromUrl && (currentIndex !== tabIndex || isEmbedded())) {
+            setTabCompany(currentIndex, companyUsers[currentIndex].token.token);
           }
 
           // Read once. Left in the URL, a reload would re-apply it and undo a

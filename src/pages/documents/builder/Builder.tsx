@@ -27,6 +27,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useColorScheme } from '$app/common/colors';
 import { docuNinjaEndpoint } from '$app/common/helpers';
+import { isEmbedded, openOutside, postToHost } from '$app/common/helpers/embed';
 import { request } from '$app/common/helpers/request';
 import { route, routeWithOrigin } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -75,6 +76,7 @@ import {
   UploadDialog,
   ValidationErrors,
 } from './components';
+import { useEmbeddedBuilderEvents } from './useEmbeddedBuilderEvents';
 
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
@@ -234,6 +236,8 @@ function Builder() {
     },
   });
 
+  useEmbeddedBuilderEvents(id);
+
   const pages: Page[] = [
     { name: t('docuninja'), href: '/docuninja' },
     {
@@ -241,6 +245,27 @@ function Builder() {
       href: route('/docuninja/:id/builder', { id }),
     },
   ];
+
+  /** Saves, then runs [next] once the save landed (not on a failure). */
+  const saveThen = (next: () => void) => {
+    const onSaved = () => {
+      cleanup();
+      next();
+    };
+
+    const cleanup = () => {
+      window.removeEventListener(
+        'builder:document.successfully.saved',
+        onSaved
+      );
+      window.removeEventListener('builder:save.error', cleanup);
+    };
+
+    window.addEventListener('builder:document.successfully.saved', onSaved);
+    window.addEventListener('builder:save.error', cleanup);
+
+    handleSave();
+  };
 
   const handleSave = () => {
     toast.processing();
@@ -390,6 +415,13 @@ function Builder() {
     const handleSingleSignatorySent = () => {
       toast.success('document_queued_for_sending');
 
+      // Embedded, the host app owns the navigation: it closes the builder.
+      if (isEmbedded()) {
+        postToHost('mapSignatoriesSent', { documentId: id });
+
+        return;
+      }
+
       navigate('/docuninja');
     };
 
@@ -467,20 +499,27 @@ function Builder() {
             <Button
               type="secondary"
               behavior="button"
-              onClick={() =>
-                window.open(
-                  routeWithOrigin(
-                    '/docuninja/sign/:document/:invitation?sig=:sig&company=:company',
-                    {
-                      document: id,
-                      invitation: getInvitationId(),
-                      sig: getInvitationId(),
-                      company: getDocuNinjaCompany()?.id,
-                    }
-                  ),
-                  '_blank'
-                )
-              }
+              onClick={() => {
+                const url = routeWithOrigin(
+                  '/docuninja/sign/:document/:invitation?sig=:sig&company=:company',
+                  {
+                    document: id,
+                    invitation: getInvitationId(),
+                    sig: getInvitationId(),
+                    company: getDocuNinjaCompany()?.id,
+                  }
+                );
+
+                // Embedded, the sign page replaces this one (no new tab), so
+                // the fields placed so far are saved first, not lost.
+                if (isEmbedded()) {
+                  saveThen(() => openOutside(url));
+
+                  return;
+                }
+
+                openOutside(url);
+              }}
               disabled={isDocumentSaving || isDocumentSending}
               disableWithoutIcon
             >
