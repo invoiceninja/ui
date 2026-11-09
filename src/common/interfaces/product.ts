@@ -1,4 +1,3 @@
-import { Company } from './company.interface';
 import { Tag } from './tag';
 
 /**
@@ -40,7 +39,6 @@ export interface Product {
   stock_notification: boolean;
   stock_notification_threshold: number;
   documents: any[];
-  company?: Company;
   income_account_id: string;
   tags?: Tag[];
   product_tag_ids?: string[];

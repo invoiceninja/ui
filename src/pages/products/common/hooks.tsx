@@ -13,6 +13,7 @@ import { date, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Product } from '$app/common/interfaces/product';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -108,6 +109,7 @@ export function useProductColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
@@ -170,8 +172,8 @@ export function useProductColumns() {
       format: (value, product) =>
         formatMoney(
           value,
-          product.company?.settings.country_id,
-          product.company?.settings.currency_id
+          company?.settings.country_id,
+          company?.settings.currency_id
         ),
     },
     {
@@ -193,8 +195,8 @@ export function useProductColumns() {
       format: (value, product) =>
         formatMoney(
           value,
-          product.company?.settings.country_id,
-          product.company?.settings.currency_id
+          company?.settings.country_id,
+          company?.settings.currency_id
         ),
     },
     {

@@ -102,9 +102,9 @@ export default function Products() {
       <DataTable
         resource="product"
         columns={columns}
-        endpoint={`/api/v1/products?include=company${
-          shouldShowTagFilter ? ',tags' : ''
-        }&sort=id|desc${shouldShowTagFilter ? '' : '&tag_ids='}`}
+        endpoint={`/api/v1/products?${
+          shouldShowTagFilter ? 'include=tags&' : ''
+        }sort=id|desc${shouldShowTagFilter ? '' : '&tag_ids='}`}
         bulkRoute="/api/v1/products/bulk"
         linkToCreate="/products/create"
         linkToEdit="/products/:id/edit"
