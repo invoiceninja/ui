@@ -340,22 +340,12 @@ function Builder() {
     );
   };
 
-  const getInvitationId = () => {
-    const currentInvitationIndex = entity?.invitations?.findIndex(
-      (invitation) => invitation.user_id === docuninjaAccount?.id
-    ) as unknown as number;
-
-    if (currentInvitationIndex === -1) {
-      return null;
-    }
-
-    const currentInvitation = entity?.invitations?.[currentInvitationIndex];
-
-    if (!entity?.invitations?.[currentInvitationIndex]?.client_contact_id) {
-      return currentInvitation?.id;
-    }
-
-    return null;
+  const getInvitation = () => {
+    return entity?.invitations?.find(
+      (invitation) =>
+        invitation.user_id === docuninjaAccount?.id &&
+        !invitation.client_contact_id
+    );
   };
 
   useEffect(() => {
@@ -462,24 +452,30 @@ function Builder() {
       breadcrumbs={pages}
       navigationTopRight={
         <div className="flex items-center gap-2">
-          {getInvitationId() && (
+          {getInvitation() && (
             <Button
               type="secondary"
               behavior="button"
-              onClick={() =>
+              onClick={() => {
+                const invitation = getInvitation();
+
+                if (!invitation) {
+                  return;
+                }
+
                 window.open(
                   routeWithOrigin(
                     '/docuninja/sign/:document/:invitation?sig=:sig&company=:company',
                     {
                       document: id,
-                      invitation: getInvitationId(),
-                      sig: getInvitationId(),
+                      invitation: invitation.id,
+                      sig: (invitation as { sig?: string | null }).sig ?? '',
                       company: getDocuNinjaCompany()?.id,
                     }
                   ),
                   '_blank'
-                )
-              }
+                );
+              }}
               disabled={isDocumentSaving || isDocumentSending}
               disableWithoutIcon
             >
