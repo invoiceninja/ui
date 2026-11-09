@@ -44,6 +44,7 @@ const Div = styled.div`
 
 export default function Index() {
   const params = useParams();
+  const sig = new URLSearchParams(window.location.search).get('sig') ?? '';
   const colors = useColorScheme();
 
   const [t] = useTranslation();
@@ -57,6 +58,7 @@ export default function Index() {
           endpoint: import.meta.env.VITE_DOCUNINJA_API_URL,
           document: params.document as string,
           invitation: params.invitation as string,
+          sig,
           components: {
             start: StartSigningButton,
             minimize: MinimizeButton,
