@@ -17,6 +17,7 @@ import { Provider } from 'react-redux';
 import { BrowserRouter, HashRouter } from 'react-router-dom';
 import { ScrollToTop } from '$app/components/ScrollToTop';
 import { App } from './App';
+import { readEmbedFlag, waitForHostInit } from './common/helpers/embed';
 import { initializeSentry } from './common/sentry';
 import { store } from './common/stores/store';
 
@@ -59,6 +60,12 @@ const queryClient = new QueryClient({
 const container = document.getElementById('root') as HTMLElement;
 
 async function bootstrap() {
+  // Embedded in the Invoice Ninja app: sign in with the token it hands over
+  // before anything renders or requests.
+  if (readEmbedFlag()) {
+    await waitForHostInit();
+  }
+
   try {
     await initializeSentry();
   } catch (error) {

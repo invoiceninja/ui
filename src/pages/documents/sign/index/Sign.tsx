@@ -23,12 +23,14 @@ import {
 } from '@docuninja/builder2.0';
 import classNames from 'classnames';
 import type { LegacyRef } from 'react';
+import { useEffect } from 'react';
 import { Check, ChevronLeft, ChevronRight } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { FiMinimize2 } from 'react-icons/fi';
 import { useParams } from 'react-router';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { isEmbedded, postToHost } from '$app/common/helpers/embed';
 import { Card } from '$app/components/cards';
 import { Button, InputField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
@@ -47,6 +49,25 @@ export default function Index() {
   const colors = useColorScheme();
 
   const [t] = useTranslation();
+
+  // Embedded in the Invoice Ninja app (`common/helpers/embed.ts`): the page
+  // is up, and later the signature landed, so the app can refresh the
+  // document and close.
+  useEffect(() => {
+    if (!isEmbedded()) {
+      return;
+    }
+
+    postToHost('loaded', { documentId: params.document });
+
+    const onSigned = () =>
+      postToHost('signed', { documentId: params.document });
+
+    window.addEventListener('builder:sign.submit.success', onSigned);
+
+    return () =>
+      window.removeEventListener('builder:sign.submit.success', onSigned);
+  }, [params.document]);
 
   return (
     <div className="max-w-[90rem] mx-auto">
