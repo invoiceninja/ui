@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { isDemo, isHosted, isSelfHosted, trans } from '$app/common/helpers';
+import { isEmbedded } from '$app/common/helpers/embed';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
@@ -135,6 +136,33 @@ export function Default(props: Props) {
   });
 
   const navigate = useNavigate();
+
+  // Embedded in the Invoice Ninja app, which draws its own title, back
+  // button and navigation: only the page's own actions and its content.
+  if (isEmbedded()) {
+    const topRight =
+      navigationTopRightElement?.element || props.navigationTopRight;
+
+    return (
+      <div style={{ backgroundColor: colors.$23 }}>
+        {topRight && (
+          <div
+            style={{ backgroundColor: colors.$1 }}
+            className="sticky top-0 z-10 flex justify-end items-center border-b px-4 py-2 space-x-3"
+          >
+            {topRight}
+          </div>
+        )}
+
+        <main
+          style={{ color: colors.$3 }}
+          className="p-2 md:p-4 dark:text-gray-100"
+        >
+          {props.children}
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div>
