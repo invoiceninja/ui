@@ -55,6 +55,8 @@ export default function Create() {
 
   const company = useCurrentCompany();
 
+  const [credit, setCredit] = useAtomWithPrevent(creditAtom);
+
   const pages: Page[] = [
     { name: t('credits'), href: '/credits' },
     {
@@ -69,6 +71,14 @@ export default function Create() {
       href: '/credits/create',
     },
     {
+      name: t('e_invoice'),
+      href: '/credits/create/e_invoice',
+      enabled:
+        Boolean(credit?.client_id) &&
+        (company?.settings.enable_e_invoice === true ||
+          company?.settings.e_invoice_type === 'PEPPOL'),
+    },
+    {
       name: t('documents'),
       href: '/credits/create/documents',
     },
@@ -79,8 +89,6 @@ export default function Create() {
   ];
 
   const [searchParams] = useSearchParams();
-
-  const [credit, setCredit] = useAtomWithPrevent(creditAtom);
 
   useEInvoiceLinesAlignment({
     resource: credit,

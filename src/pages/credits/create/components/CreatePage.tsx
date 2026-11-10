@@ -8,13 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { get } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { Credit } from '$app/common/interfaces/credit';
 import { Card } from '$app/components/cards';
 import { EInvoiceLines } from '$app/components/e-invoice/line-fields/EInvoiceLines';
 import { EInvoiceLinesTabLabel } from '$app/components/e-invoice/line-fields/EInvoiceLinesTabLabel';
+import { withCreditReference } from '$app/components/e-invoice/line-fields/fields';
 import { useEInvoiceLineFields } from '$app/components/e-invoice/line-fields/useEInvoiceLineFields';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
@@ -54,6 +57,20 @@ export default function CreatePage() {
       client,
     });
 
+  const handleClientChange = (clientId: string) => {
+    if (
+      clientId !== credit?.client_id &&
+      get(credit, 'e_invoice.CreditNote.BillingReference')
+    ) {
+      handleChange(
+        'e_invoice',
+        withCreditReference(credit?.e_invoice, '', '') as Credit['e_invoice']
+      );
+    }
+
+    handleChange('client_id', clientId);
+  };
+
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
@@ -64,10 +81,10 @@ export default function CreatePage() {
         >
           <ClientSelector
             resource={credit}
-            onChange={(id) => handleChange('client_id', id)}
+            onChange={(id) => handleClientChange(id)}
             onLocationChange={(id) => handleChange('location_id', id)}
             onClearButtonClick={() => {
-              handleChange('client_id', '');
+              handleClientChange('');
               handleChange('location_id', '');
             }}
             onContactCheckboxChange={handleInvitationChange}

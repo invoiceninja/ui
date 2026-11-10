@@ -14,7 +14,7 @@ import { get } from 'lodash';
 import { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCheckCircle } from 'react-icons/md';
-import { useLocation, useOutletContext } from 'react-router-dom';
+import { Navigate, useLocation, useOutletContext } from 'react-router-dom';
 import reactStringReplace from 'react-string-replace';
 import { useColorScheme } from '$app/common/colors';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
@@ -75,7 +75,10 @@ export default function EInvoice() {
     errors,
   } = context;
 
+  const isCreatePage = location.pathname.includes('/create');
+
   const displayEInvoiceAndStatusCard =
+    !isCreatePage &&
     company?.settings.e_invoice_type === 'PEPPOL' &&
     company?.tax_data?.acts_as_sender;
 
@@ -175,6 +178,10 @@ export default function EInvoice() {
 
     return text;
   };
+
+  if (isCreatePage && credit && !credit.client_id) {
+    return <Navigate to="/credits/create" replace />;
+  }
 
   return (
     <>
