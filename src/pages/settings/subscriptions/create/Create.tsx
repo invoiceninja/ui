@@ -47,7 +47,6 @@ export function Create() {
   const { data } = useBlankSubscriptionQuery();
 
   const { data: productsData } = useProductsQuery({
-    include: 'company',
     status: ['active'],
   });
 
