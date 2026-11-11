@@ -54,7 +54,7 @@ export function DropdownElement(props: Props) {
 
   if (props.to) {
     return (
-      <div className="p-1">
+      <div className="px-1 py-0.5">
         <StyledLink
           theme={{
             color: colors.$3,
@@ -65,7 +65,7 @@ export function DropdownElement(props: Props) {
             {
               'flex items-center': props.icon,
             },
-            `w-full text-left z-50 block px-4 py-2 text-sm text-gray-700 rounded-[0.1875rem] ${props.className}`
+            `w-full text-left z-50 block px-2.5 py-1.5 text-[0.8125rem] leading-[1.125rem] text-gray-700 rounded-[0.1875rem] ${props.className}`
           )}
           onClick={(event) => {
             if (preventLeavingPage) {
@@ -75,7 +75,11 @@ export function DropdownElement(props: Props) {
             }
           }}
         >
-          {props.icon && <div>{props.icon}</div>}
+          {props.icon && (
+            <div className="flex shrink-0 items-center [&_svg]:size-4">
+              {props.icon}
+            </div>
+          )}
 
           <div
             className={classNames({
@@ -90,7 +94,7 @@ export function DropdownElement(props: Props) {
   }
 
   return (
-    <div className="p-1">
+    <div className="px-1 py-0.5">
       <Button
         theme={{
           color: colors.$3,
@@ -111,11 +115,15 @@ export function DropdownElement(props: Props) {
           {
             'flex items-center': props.icon,
           },
-          `w-full text-left z-50 block px-4 py-2 text-sm rounded-[0.1875rem] ${props.className} `
+          `w-full text-left z-50 block px-2.5 py-1.5 text-[0.8125rem] leading-[1.125rem] rounded-[0.1875rem] ${props.className} `
         )}
         data-cy={props.cypressRef}
       >
-        {props.icon && <div>{props.icon}</div>}
+        {props.icon && (
+          <div className="flex shrink-0 items-center [&_svg]:size-4">
+            {props.icon}
+          </div>
+        )}
 
         <div
           className={classNames({

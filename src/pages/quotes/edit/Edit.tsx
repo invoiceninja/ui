@@ -156,6 +156,7 @@ export default function Edit() {
               {quote && client ? (
                 <ProductsTable
                   type="product"
+                  withOptionalLines
                   resource={quote}
                   items={quote.line_items.filter(
                     (item) => item.type_id === InvoiceItemType.Product

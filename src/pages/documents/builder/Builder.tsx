@@ -18,7 +18,7 @@ import {
   useBuilderStore,
 } from '@docuninja/builder2.0';
 import { useAtomValue } from 'jotai';
-import { useEffect, useState } from 'react';
+import { CSSProperties, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaFileSignature } from 'react-icons/fa';
 import { MdSend } from 'react-icons/md';
@@ -27,6 +27,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
 import { useColorScheme } from '$app/common/colors';
 import { docuNinjaEndpoint } from '$app/common/helpers';
+import { isEmbedded, openOutside, postToHost } from '$app/common/helpers/embed';
 import { request } from '$app/common/helpers/request';
 import { route, routeWithOrigin } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -75,6 +76,7 @@ import {
   UploadDialog,
   ValidationErrors,
 } from './components';
+import { useEmbeddedBuilderEvents } from './useEmbeddedBuilderEvents';
 
 function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
   const [t] = useTranslation();
@@ -128,6 +130,43 @@ export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
   );
 }
 
+/**
+ * The builder's three columns, stacked: the signatories and checklist (what
+ * to do next), the files, then the page. The page stays last: the builder
+ * keeps it sticky, so anything below it would slide under it on a scroll.
+ * Inline styles win over the builder's own (`display: none` below 1024px,
+ * sticky full-height columns), and in a flex column its grid columns no
+ * longer apply.
+ */
+const embeddedStack = {
+  wrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  signatories: {
+    display: 'block',
+    order: -2,
+    position: 'static',
+    height: 'auto',
+    overflowY: 'visible',
+    paddingLeft: 0,
+    // Its width beside the page, a little wider: a select stretched across
+    // a desktop pane reads as a different control.
+    maxWidth: '24rem',
+  },
+  files: {
+    display: 'block',
+    order: -1,
+    position: 'static',
+    height: 'auto',
+    overflowY: 'visible',
+    paddingRight: 0,
+    // Its width beside the page: wider, a file's thumbnail grows to the
+    // size of the page under it and reads as a second copy.
+    maxWidth: '12.5rem',
+  },
+} satisfies Record<string, CSSProperties>;
+
 function Builder() {
   const { t, i18n } = useTranslation();
 
@@ -151,6 +190,13 @@ function Builder() {
   const [hasBeenSent, setHasBeenSent] = useState<boolean>(false);
 
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
+
+  // The builder shows its files and signatories columns only from 1024px
+  // and has no layout below that, so a narrower page loses the way to add
+  // signers. Embedded, the page is the app's pane, not the window (a phone,
+  // or a desktop window beside the app's sidebar): stack the columns there.
+  const stackColumns =
+    useMediaQuery({ query: '(max-width: 1023px)' }) && isEmbedded();
 
   const { preferences, update, save } = usePreferences();
 
@@ -234,6 +280,8 @@ function Builder() {
     },
   });
 
+  useEmbeddedBuilderEvents(id);
+
   const pages: Page[] = [
     { name: t('docuninja'), href: '/docuninja' },
     {
@@ -241,6 +289,27 @@ function Builder() {
       href: route('/docuninja/:id/builder', { id }),
     },
   ];
+
+  /** Saves, then runs [next] once the save landed (not on a failure). */
+  const saveThen = (next: () => void) => {
+    const onSaved = () => {
+      cleanup();
+      next();
+    };
+
+    const cleanup = () => {
+      window.removeEventListener(
+        'builder:document.successfully.saved',
+        onSaved
+      );
+      window.removeEventListener('builder:save.error', cleanup);
+    };
+
+    window.addEventListener('builder:document.successfully.saved', onSaved);
+    window.addEventListener('builder:save.error', cleanup);
+
+    handleSave();
+  };
 
   const handleSave = () => {
     toast.processing();
@@ -390,6 +459,13 @@ function Builder() {
     const handleSingleSignatorySent = () => {
       toast.success('document_queued_for_sending');
 
+      // Embedded, the host app owns the navigation: it closes the builder.
+      if (isEmbedded()) {
+        postToHost('mapSignatoriesSent', { documentId: id });
+
+        return;
+      }
+
       navigate('/docuninja');
     };
 
@@ -467,20 +543,27 @@ function Builder() {
             <Button
               type="secondary"
               behavior="button"
-              onClick={() =>
-                window.open(
-                  routeWithOrigin(
-                    '/docuninja/sign/:document/:invitation?sig=:sig&company=:company',
-                    {
-                      document: id,
-                      invitation: getInvitationId(),
-                      sig: getInvitationId(),
-                      company: getDocuNinjaCompany()?.id,
-                    }
-                  ),
-                  '_blank'
-                )
-              }
+              onClick={() => {
+                const url = routeWithOrigin(
+                  '/docuninja/sign/:document/:invitation?sig=:sig&company=:company',
+                  {
+                    document: id,
+                    invitation: getInvitationId(),
+                    sig: getInvitationId(),
+                    company: getDocuNinjaCompany()?.id,
+                  }
+                );
+
+                // Embedded, the sign page replaces this one (no new tab), so
+                // the fields placed so far are saved first, not lost.
+                if (isEmbedded()) {
+                  saveThen(() => openOutside(url));
+
+                  return;
+                }
+
+                openOutside(url);
+              }}
               disabled={isDocumentSaving || isDocumentSending}
               disableWithoutIcon
             >
@@ -621,7 +704,12 @@ function Builder() {
                 paddingRight: isSmallScreen ? '1rem' : '1.5rem',
                 paddingTop: '2rem',
                 paddingBottom: '3rem',
+                ...(stackColumns && embeddedStack.wrapper),
               },
+              ...(stackColumns && {
+                signatoriesWrapper: embeddedStack.signatories,
+                filesWrapper: embeddedStack.files,
+              }),
               title: {
                 paddingLeft: isSmallScreen ? '1rem' : '1.5rem',
                 paddingRight: isSmallScreen ? '1rem' : '1.5rem',

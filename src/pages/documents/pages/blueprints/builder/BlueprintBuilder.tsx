@@ -61,6 +61,7 @@ import {
   UploadDialog,
   ValidationErrors,
 } from '$app/pages/documents/builder/components';
+import { useEmbeddedBuilderEvents } from '$app/pages/documents/builder/useEmbeddedBuilderEvents';
 import { AsyncSignatorySelector } from '$app/pages/documents/common/components/AsyncSignatorySelector';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useActions } from '../common/hooks/useActions';
@@ -224,6 +225,10 @@ function BlueprintBuilder() {
   const colors = useColorScheme();
 
   const { data: blueprintResponse } = useBlueprintQuery({ id });
+
+  // Embedded in the Invoice Ninja app: the same events as the document
+  // builder (`common/helpers/embed.ts`).
+  useEmbeddedBuilderEvents(id);
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 

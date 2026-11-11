@@ -20,6 +20,7 @@ import { TabGroup } from '$app/components/TabGroup';
 import { ClientSelector } from '../../common/components/ClientSelector';
 import { InvoiceDetails } from '../../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../../common/components/InvoiceFooter';
+import { InvoicePayment } from '../../common/components/InvoicePayment';
 import { InvoicePreview } from '../../common/components/InvoicePreview';
 import { InvoiceTotals } from '../../common/components/InvoiceTotals';
 import { ProductsTable } from '../../common/components/ProductsTable';
@@ -52,6 +53,8 @@ export default function CreatePage() {
     isDefaultTerms,
     setIsDefaultFooter,
     setIsDefaultTerms,
+    payment,
+    setPayment,
   } = context;
 
   const taskColumns = useTaskColumns();
@@ -197,7 +200,13 @@ export default function CreatePage() {
             onChange={(property, value) =>
               handleChange(property, value as string)
             }
-          />
+          >
+            <InvoicePayment
+              invoice={invoice}
+              payment={payment}
+              setPayment={setPayment}
+            />
+          </InvoiceTotals>
         )}
       </div>
 

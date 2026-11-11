@@ -15,6 +15,7 @@ import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Product } from '$app/common/interfaces/product';
 import { Subscription } from '$app/common/interfaces/subscription';
 import { Link, SelectField } from '$app/components/forms';
@@ -40,6 +41,7 @@ export function MultipleProductSelector(props: Props) {
 
   const navigate = useNavigate();
 
+  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
 
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
@@ -70,8 +72,8 @@ export function MultipleProductSelector(props: Props) {
       ' ' +
       formatMoney(
         product.price,
-        product.company?.settings.country_id,
-        product.company?.settings.currency_id
+        company?.settings.country_id,
+        company?.settings.currency_id
       ).toString()
     );
   };
@@ -165,8 +167,8 @@ export function MultipleProductSelector(props: Props) {
                       <span className="font-mono">
                         {formatMoney(
                           product.price,
-                          product.company?.settings.country_id,
-                          product.company?.settings.currency_id
+                          company?.settings.country_id,
+                          company?.settings.currency_id
                         )}
                       </span>
                     </div>
