@@ -54,7 +54,7 @@
     "dotenv": "^16.4.7",
     "driver.js": "^1.4.0",
     "formik": "^2.4.6",
-    "grapesjs": "^0.22.13",
+    "grapesjs": "^0.23.0",
     "grapesjs-blocks-basic": "^1.0.2",
     "grapesjs-parser-postcss": "^1.0.3",
     "grapesjs-plugin-export": "^1.0.12",
