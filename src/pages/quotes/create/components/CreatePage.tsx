@@ -128,6 +128,7 @@ export default function CreatePage() {
               {quote ? (
                 <ProductsTable
                   type="product"
+                  withOptionalLines
                   resource={quote}
                   items={quote.line_items.filter(
                     (item) => item.type_id === InvoiceItemType.Product
