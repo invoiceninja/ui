@@ -17,6 +17,7 @@ import { useOpenFeedbackSlider } from '$app/common/hooks/useOpenFeedbackSlider';
 import { reactSettingsAtom } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Activity } from '$app/pages/dashboard/components/Activity';
+import { NeedsAttention } from '$app/pages/dashboard/components/NeedsAttention';
 import { PastDueInvoices } from '$app/pages/dashboard/components/PastDueInvoices';
 import { RecentPayments } from '$app/pages/dashboard/components/RecentPayments';
 import { Totals } from '$app/pages/dashboard/components/Totals';
@@ -44,6 +45,8 @@ export default function Dashboard() {
 
   return (
     <Default title={t('dashboard')} breadcrumbs={[]}>
+      {enabled(ModuleBitmask.Invoices) && <NeedsAttention />}
+
       <Totals />
 
       <div className="grid grid-cols-12 gap-8 my-8">
