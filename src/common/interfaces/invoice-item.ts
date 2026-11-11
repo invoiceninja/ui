@@ -47,4 +47,5 @@ export interface InvoiceItem {
   task_id?: string;
   expense_id?: string;
   income_account_id?: string;
+  is_optional?: boolean;
 }
