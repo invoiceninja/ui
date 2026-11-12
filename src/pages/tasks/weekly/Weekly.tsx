@@ -11,7 +11,7 @@
 import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
@@ -141,6 +141,213 @@ const applyCellEditToLogs = (
   return remaining;
 };
 
+const fallbackLogsCache = new WeakMap<Task, TimeLogType[]>();
+
+const fallbackLogsFor = (task: Task) => {
+  const cached = fallbackLogsCache.get(task);
+
+  if (cached) {
+    return cached;
+  }
+
+  const logs = parseTimeLog(task.time_log) as TimeLogType[];
+
+  fallbackLogsCache.set(task, logs);
+
+  return logs;
+};
+
+const weekSecondsCache = new WeakMap<TimeLogType[], Map<string, number[]>>();
+
+const weekSecondsFor = (
+  logs: TimeLogType[],
+  days: dayjs.Dayjs[],
+  weekKey: string
+) => {
+  if (logs.some(([start, end]) => start && !end)) {
+    return days.map((day) => sumSecondsForDay(logs, day));
+  }
+
+  let secondsByWeek = weekSecondsCache.get(logs);
+
+  if (!secondsByWeek) {
+    secondsByWeek = new Map();
+    weekSecondsCache.set(logs, secondsByWeek);
+  }
+
+  let seconds = secondsByWeek.get(weekKey);
+
+  if (!seconds) {
+    seconds = days.map((day) => sumSecondsForDay(logs, day));
+    secondsByWeek.set(weekKey, seconds);
+  }
+
+  return seconds;
+};
+
+const cellSecondsAt = (
+  logSeconds: number[],
+  pendingForTask: Record<string, CellEdit> | undefined,
+  dayKey: string,
+  index: number
+) => {
+  const pendingDuration = pendingForTask?.[dayKey]?.duration;
+
+  if (pendingDuration !== undefined) {
+    return parseDurationToSeconds(pendingDuration) ?? 0;
+  }
+
+  return logSeconds[index];
+};
+
+const cellDurationText = (
+  pendingDuration: string | undefined,
+  seconds: number,
+  showHoursMinutes: boolean
+) => {
+  if (pendingDuration !== undefined) {
+    return pendingDuration;
+  }
+
+  if (showHoursMinutes) {
+    return seconds ? formatHoursMinutes(seconds) : '';
+  }
+
+  return formatHours(seconds);
+};
+
+const formatTotal = (seconds: number, showHoursMinutes: boolean) => {
+  if (showHoursMinutes) {
+    return formatHoursMinutes(seconds);
+  }
+
+  return (seconds / 3600).toFixed(2);
+};
+
+interface WeeklyRowProps {
+  task: Task;
+  logs: TimeLogType[];
+  logSeconds: number[];
+  pending: Record<string, CellEdit> | undefined;
+  days: dayjs.Dayjs[];
+  isFlushing: boolean;
+  showHoursMinutes: boolean;
+  onEdit: (taskId: string, dayKey: string, partial: CellEdit) => void;
+  onOpenTask: (taskId: string) => void;
+}
+
+const WeeklyRow = memo(function WeeklyRow({
+  task,
+  logs,
+  logSeconds,
+  pending,
+  days,
+  isFlushing,
+  showHoursMinutes,
+  onEdit,
+  onOpenTask,
+}: WeeklyRowProps) {
+  const [t] = useTranslation();
+  const colors = useColorScheme();
+
+  const cells = useMemo(
+    () =>
+      days.map((day) => {
+        const dayKey = day.format('YYYY-MM-DD');
+
+        return {
+          dayKey,
+          existingEntry: findDayEntry(logs, day),
+          readOnlyReason: weeklyCellReadOnlyReason(task, logs, dayKey),
+        };
+      }),
+    [task, logs, days]
+  );
+
+  const taskIsRunning = isTaskRunning(task);
+
+  return (
+    <tr className="border-t" style={{ borderColor: colors.$5 }}>
+      <td className="p-3">
+        <div className="flex items-start gap-2">
+          <div className="min-w-0">
+            <button
+              type="button"
+              className="text-left hover:underline block truncate max-w-[18rem]"
+              onClick={() => onOpenTask(task.id)}
+              style={{ color: colors.$3 }}
+              title={taskPrimaryLabel(task, 200)}
+            >
+              {taskPrimaryLabel(task)}
+            </button>
+            {taskSecondaryLabel(task) && (
+              <div
+                className="text-xs truncate max-w-[18rem]"
+                style={{ color: colors.$17 }}
+              >
+                {taskSecondaryLabel(task)}
+              </div>
+            )}
+          </div>
+          {taskIsRunning && (
+            <span
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
+              style={{
+                backgroundColor: '#fee2e2',
+                color: '#b91c1c',
+              }}
+              title="Stop the running timer to edit this row"
+            >
+              <span
+                className="inline-block w-1.5 h-1.5 rounded-full animate-pulse"
+                style={{ backgroundColor: '#dc2626' }}
+              />
+              {t('running')}
+            </span>
+          )}
+        </div>
+      </td>
+      {cells.map(({ dayKey, existingEntry, readOnlyReason }, index) => {
+        const pendingEdit = pending?.[dayKey];
+
+        return (
+          <td key={dayKey} className="p-1 text-center">
+            <WeeklyCell
+              taskId={task.id}
+              dayKey={dayKey}
+              durationText={cellDurationText(
+                pendingEdit?.duration,
+                logSeconds[index],
+                showHoursMinutes
+              )}
+              isPending={Boolean(pendingEdit) || isFlushing}
+              disabled={Boolean(readOnlyReason)}
+              readOnlyReason={readOnlyReason ? t(readOnlyReason) : undefined}
+              initialBillable={
+                pendingEdit?.billable ?? existingEntry?.[3] ?? true
+              }
+              initialDescription={
+                pendingEdit?.description ?? existingEntry?.[2] ?? ''
+              }
+              onEdit={onEdit}
+            />
+          </td>
+        );
+      })}
+      <td className="p-3 text-center font-mono" style={{ color: colors.$3 }}>
+        {formatTotal(
+          cells.reduce(
+            (sum, { dayKey }, index) =>
+              sum + cellSecondsAt(logSeconds, pending, dayKey, index),
+            0
+          ),
+          showHoursMinutes
+        )}
+      </td>
+    </tr>
+  );
+});
+
 export default function Weekly() {
   const { documentTitle } = useTitle('freq_weekly');
   const [t] = useTranslation();
@@ -161,7 +368,11 @@ export default function Weekly() {
   const dateParam = searchParams.get('date');
   const today = dayjs().format('YYYY-MM-DD');
   const referenceDate = dateParam || today;
-  const weekStart = getWeekStart(referenceDate);
+  const dayjsLocale = dayjs.locale();
+  const weekStart = useMemo(
+    () => getWeekStart(referenceDate),
+    [referenceDate, dayjsLocale]
+  );
 
   const [quickLogVisible, setQuickLogVisible] = useState(false);
 
@@ -210,7 +421,7 @@ export default function Weekly() {
       if (flushing.current.has(task.id)) return;
       if (pendingRef.current[task.id]) return;
 
-      const next = parseTimeLog(task.time_log) as TimeLogType[];
+      const next = fallbackLogsFor(task);
       const prev = optimisticLogsRef.current[task.id];
 
       if (!prev || JSON.stringify(prev) !== JSON.stringify(next)) {
@@ -225,8 +436,9 @@ export default function Weekly() {
     }
   }, [allTasks]);
 
-  const getLogsForTask = (taskId: string, fallbackLog: string) =>
-    optimisticLogs[taskId] ?? (parseTimeLog(fallbackLog) as TimeLogType[]);
+  const logsFor = (task: Task) => {
+    return optimisticLogs[task.id] ?? fallbackLogsFor(task);
+  };
 
   const weekDayKeys = useMemo(
     () => days.map((d) => d.format('YYYY-MM-DD')),
@@ -238,14 +450,24 @@ export default function Weekly() {
   // inside the visible week. Order from the API is preserved as-is.
   const weekDayKeySet = useMemo(() => new Set(weekDayKeys), [weekDayKeys]);
 
+  const activeTaskIds = useMemo(
+    () =>
+      new Set(
+        allTasks
+          .filter((task) => taskHasActivityInDayKeys(task, weekDayKeySet))
+          .map((task) => task.id)
+      ),
+    [allTasks, weekDayKeySet]
+  );
+
   const rows = useMemo(() => {
     return allTasks.filter((task) => {
       const hasPendingInWeek = Object.keys(pending[task.id] ?? {}).some(
-        (dayKey) => weekDayKeys.includes(dayKey)
+        (dayKey) => weekDayKeySet.has(dayKey)
       );
-      return taskHasActivityInDayKeys(task, weekDayKeySet) || hasPendingInWeek;
+      return activeTaskIds.has(task.id) || hasPendingInWeek;
     });
-  }, [allTasks, weekDayKeys, weekDayKeySet, pending]);
+  }, [allTasks, activeTaskIds, weekDayKeySet, pending]);
 
   const setDate = (next: string) => {
     const updated = new URLSearchParams(searchParams);
@@ -406,6 +628,23 @@ export default function Weekly() {
     scheduleFlush(taskId);
   };
 
+  const mergeCellEditRef = useRef(mergeCellEdit);
+  mergeCellEditRef.current = mergeCellEdit;
+
+  const handleCellEdit = useCallback(
+    (taskId: string, dayKey: string, partial: CellEdit) => {
+      mergeCellEditRef.current(taskId, dayKey, partial);
+    },
+    []
+  );
+
+  const preventNavigationRef = useRef(preventNavigation);
+  preventNavigationRef.current = preventNavigation;
+
+  const handleOpenTask = useCallback((taskId: string) => {
+    preventNavigationRef.current({ url: `/tasks/${taskId}/edit` });
+  }, []);
+
   useEffect(
     () => () => {
       clearFlushTimers();
@@ -418,52 +657,23 @@ export default function Weekly() {
   const showHoursMinutes =
     reactSettings.preferences.duration_format === 'hh_mm';
 
-  const formatTotal = (seconds: number) => {
-    if (showHoursMinutes) {
-      return formatHoursMinutes(seconds);
-    }
+  const weekKey = weekDayKeys[0];
 
-    return (seconds / 3600).toFixed(2);
-  };
+  const rowSeconds = rows.map((task) =>
+    weekSecondsFor(logsFor(task), days, weekKey)
+  );
 
-  const cellDurationDisplay = (
-    taskId: string,
-    fallbackLog: string,
-    day: dayjs.Dayjs
-  ) => {
-    const dayKey = day.format('YYYY-MM-DD');
-    const pendingDuration = pending[taskId]?.[dayKey]?.duration;
-    if (pendingDuration !== undefined) return pendingDuration;
-    const seconds = sumSecondsForDay(getLogsForTask(taskId, fallbackLog), day);
-    if (showHoursMinutes) return seconds ? formatHoursMinutes(seconds) : '';
-    return formatHours(seconds);
-  };
-
-  const cellSeconds = (
-    taskId: string,
-    fallbackLog: string,
-    day: dayjs.Dayjs
-  ) => {
-    const dayKey = day.format('YYYY-MM-DD');
-    const pendingDuration = pending[taskId]?.[dayKey]?.duration;
-    if (pendingDuration !== undefined) {
-      const parsed = parseDurationToSeconds(pendingDuration);
-      return parsed ?? 0;
-    }
-    return sumSecondsForDay(getLogsForTask(taskId, fallbackLog), day);
-  };
-
-  const weekTotalSeconds = (task: Task) =>
-    days.reduce((sum, d) => sum + cellSeconds(task.id, task.time_log, d), 0);
-
-  const dayTotalSeconds = (day: dayjs.Dayjs) =>
+  const dayTotals = weekDayKeys.map((dayKey, index) =>
     rows.reduce(
-      (sum, task) => sum + cellSeconds(task.id, task.time_log, day),
+      (sum, task, rowIndex) =>
+        sum +
+        cellSecondsAt(rowSeconds[rowIndex], pending[task.id], dayKey, index),
       0
-    );
+    )
+  );
 
-  const grandTotalSeconds = rows.reduce(
-    (sum, task) => sum + weekTotalSeconds(task),
+  const grandTotalSeconds = dayTotals.reduce(
+    (sum, seconds) => sum + seconds,
     0
   );
 
@@ -511,7 +721,7 @@ export default function Weekly() {
                 {displayDateRange(weekStart, weekStart.add(6, 'day'))}
               </div>
               <div className="text-xs" style={{ color: colors.$17 }}>
-                {formatTotal(grandTotalSeconds)} {t('hours')}
+                {formatTotal(grandTotalSeconds, showHoursMinutes)} {t('hours')}
               </div>
             </div>
 
@@ -588,109 +798,20 @@ export default function Weekly() {
               )}
 
               {!isLoading &&
-                rows.map((task) => {
-                  const logs = getLogsForTask(task.id, task.time_log);
-                  const taskIsRunning = isTaskRunning(task);
+                rows.map((task, rowIndex) => {
                   return (
-                    <tr
+                    <WeeklyRow
                       key={task.id}
-                      className="border-t"
-                      style={{ borderColor: colors.$5 }}
-                    >
-                      <td className="p-3">
-                        <div className="flex items-start gap-2">
-                          <div className="min-w-0">
-                            <button
-                              type="button"
-                              className="text-left hover:underline block truncate max-w-[18rem]"
-                              onClick={() =>
-                                preventNavigation({
-                                  url: `/tasks/${task.id}/edit`,
-                                })
-                              }
-                              style={{ color: colors.$3 }}
-                              title={taskPrimaryLabel(task, 200)}
-                            >
-                              {taskPrimaryLabel(task)}
-                            </button>
-                            {taskSecondaryLabel(task) && (
-                              <div
-                                className="text-xs truncate max-w-[18rem]"
-                                style={{ color: colors.$17 }}
-                              >
-                                {taskSecondaryLabel(task)}
-                              </div>
-                            )}
-                          </div>
-                          {taskIsRunning && (
-                            <span
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
-                              style={{
-                                backgroundColor: '#fee2e2',
-                                color: '#b91c1c',
-                              }}
-                              title="Stop the running timer to edit this row"
-                            >
-                              <span
-                                className="inline-block w-1.5 h-1.5 rounded-full animate-pulse"
-                                style={{ backgroundColor: '#dc2626' }}
-                              />
-                              {t('running')}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      {days.map((d) => {
-                        const dayKey = d.format('YYYY-MM-DD');
-                        const pendingEdit = pending[task.id]?.[dayKey];
-                        const existingEntry = findDayEntry(logs, d);
-                        const readOnlyReason = weeklyCellReadOnlyReason(
-                          task,
-                          logs,
-                          dayKey
-                        );
-                        return (
-                          <td key={dayKey} className="p-1 text-center">
-                            <WeeklyCell
-                              taskId={task.id}
-                              dayKey={dayKey}
-                              durationText={cellDurationDisplay(
-                                task.id,
-                                task.time_log,
-                                d
-                              )}
-                              isPending={
-                                Boolean(pendingEdit) ||
-                                flushing.current.has(task.id)
-                              }
-                              disabled={Boolean(readOnlyReason)}
-                              readOnlyReason={
-                                readOnlyReason ? t(readOnlyReason) : undefined
-                              }
-                              initialBillable={
-                                pendingEdit?.billable ??
-                                existingEntry?.[3] ??
-                                true
-                              }
-                              initialDescription={
-                                pendingEdit?.description ??
-                                existingEntry?.[2] ??
-                                ''
-                              }
-                              onEdit={(partial) =>
-                                mergeCellEdit(task.id, dayKey, partial)
-                              }
-                            />
-                          </td>
-                        );
-                      })}
-                      <td
-                        className="p-3 text-center font-mono"
-                        style={{ color: colors.$3 }}
-                      >
-                        {formatTotal(weekTotalSeconds(task))}
-                      </td>
-                    </tr>
+                      task={task}
+                      logs={logsFor(task)}
+                      logSeconds={rowSeconds[rowIndex]}
+                      pending={pending[task.id]}
+                      days={days}
+                      isFlushing={flushing.current.has(task.id)}
+                      showHoursMinutes={showHoursMinutes}
+                      onEdit={handleCellEdit}
+                      onOpenTask={handleOpenTask}
+                    />
                   );
                 })}
 
@@ -700,16 +821,16 @@ export default function Weekly() {
                   style={{ borderColor: colors.$5, color: colors.$3 }}
                 >
                   <td className="p-3 text-right">{t('total')}</td>
-                  {days.map((d) => (
+                  {days.map((d, index) => (
                     <td
                       key={d.format('YYYY-MM-DD')}
                       className="p-3 text-center font-mono"
                     >
-                      {formatTotal(dayTotalSeconds(d))}
+                      {formatTotal(dayTotals[index], showHoursMinutes)}
                     </td>
                   ))}
                   <td className="p-3 text-center font-mono">
-                    {formatTotal(grandTotalSeconds)}
+                    {formatTotal(grandTotalSeconds, showHoursMinutes)}
                   </td>
                 </tr>
               )}

@@ -9,7 +9,14 @@
  */
 
 import { Popover, Transition } from '@headlessui/react';
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Fragment,
+  memo,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
@@ -32,10 +39,12 @@ interface WeeklyCellProps {
   readOnlyReason?: string;
   initialBillable: boolean;
   initialDescription: string;
-  onEdit: (partial: CellEdit) => void;
+  onEdit: (taskId: string, dayKey: string, partial: CellEdit) => void;
 }
 
-export function WeeklyCell({
+export const WeeklyCell = memo(function WeeklyCell({
+  taskId,
+  dayKey,
   durationText,
   isPending,
   disabled,
@@ -72,6 +81,10 @@ export function WeeklyCell({
   }, [panelPos, reposition]);
 
   const hasNote = Boolean(initialDescription) || initialBillable === false;
+
+  const handleEdit = (partial: CellEdit) => {
+    onEdit(taskId, dayKey, partial);
+  };
   const cellRootRef = useRef<HTMLDivElement>(null);
 
   const moveFocusToAdjacentCell = (direction: 'next' | 'prev') => {
@@ -130,7 +143,7 @@ export function WeeklyCell({
             if (disabled) return;
             const cleaned = event.target.value.replace(/[^0-9:.]/g, '');
             setDraft(cleaned);
-            onEdit({ duration: cleaned });
+            handleEdit({ duration: cleaned });
           }}
           onBlur={() => setDraft(undefined)}
           className="w-full text-center py-2 pl-2 pr-7 rounded-md text-sm border focus:outline-none focus:ring-2"
@@ -191,7 +204,7 @@ export function WeeklyCell({
                         <CellNotePanel
                           initialBillable={initialBillable}
                           initialDescription={initialDescription}
-                          onEdit={onEdit}
+                          onEdit={handleEdit}
                           onDone={() => close()}
                           onTabAway={(direction) => {
                             close();
@@ -212,7 +225,7 @@ export function WeeklyCell({
       </div>
     </Tooltip>
   );
-}
+});
 
 interface CellNotePanelProps {
   initialBillable: boolean;
