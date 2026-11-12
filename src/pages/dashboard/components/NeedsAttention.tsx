@@ -48,7 +48,6 @@ import { ContactEmailModal } from '$app/components/emails/ContactEmailModal';
 import { Icon } from '$app/components/icons/Icon';
 import { Tooltip } from '$app/components/Tooltip';
 import {
-  attentionFact,
   daysLate,
   lateAmount,
   NEEDS_ATTENTION_CARD,
@@ -74,7 +73,6 @@ function NeedsAttentionRow(props: RowProps) {
   const formatMoney = useFormatMoney();
   const invoicePaths = useInvoiceEditorPaths();
   const disableNavigation = useDisableNavigation();
-  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const [isContactModalOpen, setIsContactModalOpen] = useState<boolean>(false);
 
@@ -82,7 +80,6 @@ function NeedsAttentionRow(props: RowProps) {
 
   const today = dayjs().startOf('day');
   const days = daysLate(invoice, today);
-  const fact = attentionFact(invoice);
 
   const handleRemind = () => {
     if (!hasContactWithEmail(invoice.client?.contacts)) {
@@ -139,20 +136,6 @@ function NeedsAttentionRow(props: RowProps) {
                 )
               : t('past_due')}
           </span>
-
-          {fact && (
-            <span style={{ color: colors.$17 }}>
-              &nbsp;·&nbsp;
-              {fact.kind === 'not_opened'
-                ? t('not_opened_label')
-                : trans(
-                    fact.kind === 'viewed'
-                      ? 'viewed_on_date'
-                      : 'reminded_on_date',
-                    { date: fact.date?.format(dateFormat) }
-                  )}
-            </span>
-          )}
         </div>
 
         <div className="flex items-center space-x-2 shrink-0">

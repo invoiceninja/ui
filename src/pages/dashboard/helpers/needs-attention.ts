@@ -9,20 +9,12 @@
  */
 
 import dayjs, { Dayjs } from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 import { Invoice } from '$app/common/interfaces/invoice';
-
-dayjs.extend(utc);
 
 export const NEEDS_ATTENTION_CARD = 'needs_your_attention';
 export const NEEDS_ATTENTION_ROWS = 3;
 export const NEEDS_ATTENTION_MAX_COLUMNS = 3;
 export const NEEDS_ATTENTION_COLUMN_WIDTH = 300;
-
-export interface AttentionFact {
-  kind: 'reminded' | 'viewed' | 'not_opened';
-  date?: Dayjs;
-}
 
 const toDay = (value: string | undefined | null) => {
   if (!value) {
@@ -68,44 +60,6 @@ export const lateAmount = (invoice: Invoice, today: Dayjs) => {
   }
 
   return invoice.balance;
-};
-
-export const attentionFact = (invoice: Invoice): AttentionFact | null => {
-  const reminded = [
-    invoice.reminder_last_sent,
-    invoice.reminder1_sent,
-    invoice.reminder2_sent,
-    invoice.reminder3_sent,
-  ]
-    .map((value) => toDay(value))
-    .reduce<Dayjs | null>(
-      (latest, day) => (day && (!latest || day.isAfter(latest)) ? day : latest),
-      null
-    );
-
-  const viewed = (invoice.invitations ?? [])
-    .map(({ viewed_date }) =>
-      viewed_date ? dayjs.utc(viewed_date).local().startOf('day') : null
-    )
-    .reduce<Dayjs | null>(
-      (latest, day) =>
-        day && day.isValid() && (!latest || day.isAfter(latest)) ? day : latest,
-      null
-    );
-
-  if (reminded && (!viewed || !reminded.isBefore(viewed))) {
-    return { kind: 'reminded', date: reminded };
-  }
-
-  if (viewed) {
-    return { kind: 'viewed', date: viewed };
-  }
-
-  if ((invoice.invitations ?? []).some(({ sent_date }) => Boolean(sent_date))) {
-    return { kind: 'not_opened' };
-  }
-
-  return null;
 };
 
 export const nextReminderTemplate = (invoice: Invoice) => {
