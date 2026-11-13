@@ -36,6 +36,7 @@ import {
 import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
 import { Search } from '$app/pages/dashboard/components/Search';
 import CommonProps from '../../common/interfaces/common-props.interface';
+import { AccountPlanExpired } from '../banners/AccountPlanExpired';
 import { ActivateCompany } from '../banners/ActivateCompany';
 import { EInvoiceCredits } from '../banners/EInvoiceCredits';
 import { PriceIncreaseBanner } from '../banners/PriceIncrease';
@@ -43,7 +44,6 @@ import { VerifyEmail } from '../banners/VerifyEmail';
 import { VerifyPhone } from '../banners/VerifyPhone';
 import { Feedback } from '../Feedback';
 import { Notifications } from '../Notifications';
-import { AccountPlanExpired } from '../banners/AccountPlanExpired';
 import { useNavigation } from './common/navigation';
 import { DesktopSidebar } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
@@ -173,13 +173,13 @@ export function Default(props: Props) {
           </button>
 
           <div
-            className="flex-1 px-4 xl:px-8 flex items-center"
+            className="flex-1 min-w-0 px-4 xl:px-8 flex items-center"
             data-cy="topNavbar"
           >
-            <div className="flex flex-1 items-center space-x-4">
+            <div className="flex flex-1 min-w-0 items-center space-x-4">
               <h2
                 style={{ color: colors.$3 }}
-                className="text-sm md:text-lg whitespace-nowrap"
+                className="min-w-0 text-sm md:text-lg whitespace-nowrap truncate"
               >
                 {props.title}
               </h2>
@@ -188,7 +188,7 @@ export function Default(props: Props) {
               <Search />
             </div>
 
-            <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
+            <div className="ml-4 flex flex-shrink-0 items-center md:ml-6 space-x-2 lg:space-x-3">
               <Notifications />
 
               {shouldShowUnlockButton && (
@@ -205,7 +205,8 @@ export function Default(props: Props) {
                   onClick={() => {
                     if (
                       isHosted() ||
-                      import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT === 'true'
+                      import.meta.env.VITE_ENABLE_NEW_ACCOUNT_MANAGEMENT ===
+                        'true'
                     ) {
                       return navigate('/settings/account_management');
                     }
