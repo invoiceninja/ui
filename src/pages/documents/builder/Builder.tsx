@@ -12,6 +12,7 @@ import {
   Builder as Builder$,
   BuilderContext,
   CreateDialogProps,
+  darkBuilderTheme,
   Document,
   useBuilderStore,
 } from '@docuninja/builder2.0';
@@ -29,6 +30,7 @@ import { request } from '$app/common/helpers/request';
 import { route, routeWithOrigin } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDriverTour } from '$app/common/hooks/useDriverTour';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -72,6 +74,7 @@ function Builder() {
 
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const reactSettings = useReactSettings();
   const [searchParams] = useSearchParams();
   const isFromTemplate = searchParams.get('from_template') === 'true';
 
@@ -472,6 +475,7 @@ function Builder() {
           value={{
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
             document: id as string,
+            theme: reactSettings?.dark_mode ? darkBuilderTheme : undefined,
             slots: {
               helper: () => null,
               signatorySelector: SignatorySelector,

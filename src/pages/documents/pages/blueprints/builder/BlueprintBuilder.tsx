@@ -2,6 +2,7 @@ import {
   type AuthoredDocumentData,
   Builder as Builder$,
   BuilderContext,
+  darkBuilderTheme,
   blobToBase64,
 } from '@docuninja/builder2.0';
 import { useEffect, useState } from 'react';
@@ -14,6 +15,7 @@ import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDriverTour } from '$app/common/hooks/useDriverTour';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { $refetch } from '$app/common/hooks/useRefetch';
@@ -42,6 +44,7 @@ function BlueprintBuilder() {
 
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const reactSettings = useReactSettings();
   const colors = useColorScheme();
 
   const { data: blueprintResponse } = useBlueprintQuery({ id });
@@ -279,6 +282,7 @@ function BlueprintBuilder() {
           value={{
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
             document: id as string,
+            theme: reactSettings?.dark_mode ? darkBuilderTheme : undefined,
             events: {
               onMessage: (message) => toast.info(message),
               onMessageDismiss: () => null,
@@ -329,6 +333,11 @@ function BlueprintBuilder() {
                 panel: {
                   marginBottom: '0.5rem',
                 },
+              },
+              general: {
+                backgroundColor: colors.$1,
+                textColor: colors.$3,
+                foregroundColor: colors.$4,
               },
             },
             options: {

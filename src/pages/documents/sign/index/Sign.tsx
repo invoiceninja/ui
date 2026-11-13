@@ -8,15 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Sign, SignContext } from '@docuninja/builder2.0';
+import { darkBuilderTheme, Sign, SignContext } from '@docuninja/builder2.0';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { useColorScheme } from '$app/common/colors';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export default function Index() {
   const params = useParams();
   const sig = new URLSearchParams(window.location.search).get('sig') ?? '';
   const colors = useColorScheme();
+  const reactSettings = useReactSettings();
 
   const [t, i18n] = useTranslation();
 
@@ -27,6 +29,7 @@ export default function Index() {
           endpoint: import.meta.env.VITE_DOCUNINJA_API_URL,
           document: params.document as string,
           invitation: params.invitation as string,
+          theme: reactSettings?.dark_mode ? darkBuilderTheme : undefined,
           sig,
           styles: {
             border: colors.$24,
