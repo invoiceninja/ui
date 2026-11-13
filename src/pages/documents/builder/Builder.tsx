@@ -43,7 +43,7 @@ import {
   SignatorySelector,
   SignatorySwap,
 } from '../pages/blueprints/builder/Elements';
-import { ImportFromGoogleDrive } from './components';
+import { ImportFromGoogleDrive } from './google-drive';
 
 export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
   const [t] = useTranslation();
@@ -587,7 +587,5 @@ function Builder() {
     </Default>
   );
 }
-
-export { Alertbox, ImportFromGoogleDrive } from './components';
 
 export default Builder;

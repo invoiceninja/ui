@@ -22,7 +22,7 @@ import { Card } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { ImportFromGoogleDrive } from '$app/pages/documents/builder/components';
+import { ImportFromGoogleDrive } from '$app/pages/documents/builder/google-drive';
 import { useActions } from '../common/hooks/useActions';
 import { EditBlueprintModal } from '../edit/components/EditBlueprintModal';
 import { SignatorySelector, SignatorySwap } from './Elements';
