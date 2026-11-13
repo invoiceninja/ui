@@ -1,5 +1,5 @@
 {
-  "name": "@invoiceninja/ui",
+  "name": "@invoiceninja/web",
   "version": "28.06.2025.1",
   "private": true,
   "dependencies": {
